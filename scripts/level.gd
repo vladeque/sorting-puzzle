@@ -1,10 +1,14 @@
 extends Node2D
 
 const SLOT_ITEM_POSITION := Vector2(0, -42)
+const BACK_LAYER_NAME := "BackLayer"
 
 @export var slot_snap_distance := 86.0
 @export var item_pick_size := Vector2(58, 92)
 @export var drag_start_distance := 12.0
+@export var back_layer_offset := Vector2(0, -18)
+@export var back_layer_item_scale := 0.86
+@export var back_layer_item_modulate := Color(0.42, 0.42, 0.42, 0.34)
 
 var _slots: Array[Node2D] = []
 var _dragged_item: ShelfItem
@@ -21,6 +25,7 @@ var _selected_slot: Node2D
 func _ready() -> void:
 	_drag_layer = get_node("DragLayer") as Node2D
 	_collect_slots()
+	_build_back_layers()
 
 
 func _input(event: InputEvent) -> void:
@@ -57,6 +62,61 @@ func _collect_slots() -> void:
 			var slot := child as Node2D
 			if slot != null and slot.name.begins_with("Slot"):
 				_slots.append(slot)
+
+
+func _build_back_layers() -> void:
+	var shelves := get_node("Shelves")
+	for shelf in shelves.get_children():
+		var shelf_node := shelf as Node2D
+		if shelf_node == null:
+			continue
+
+		var existing_back_layer := shelf_node.get_node_or_null(BACK_LAYER_NAME)
+		if existing_back_layer != null:
+			shelf_node.remove_child(existing_back_layer)
+			existing_back_layer.free()
+
+		var back_layer := Node2D.new()
+		back_layer.name = BACK_LAYER_NAME
+		back_layer.z_index = 4
+		shelf_node.add_child(back_layer)
+
+		for slot in _get_front_slots(shelf_node):
+			_add_back_slot(back_layer, slot)
+
+
+func _get_front_slots(shelf: Node) -> Array[Node2D]:
+	var front_slots: Array[Node2D] = []
+	for child in shelf.get_children():
+		var slot := child as Node2D
+		if slot != null and slot.name.begins_with("Slot"):
+			front_slots.append(slot)
+
+	return front_slots
+
+
+func _add_back_slot(back_layer: Node2D, front_slot: Node2D) -> void:
+	var back_slot := Node2D.new()
+	back_slot.name = "Back%s" % front_slot.name
+	back_slot.position = front_slot.position + back_layer_offset
+	back_layer.add_child(back_slot)
+
+	var front_item := _get_slot_item(front_slot)
+	if front_item == null:
+		return
+
+	var back_item := front_item.duplicate() as ShelfItem
+	back_item.name = "%sBackLayer" % front_item.name
+	back_item.position = SLOT_ITEM_POSITION
+	back_item.z_index = 0
+	back_item.modulate = back_layer_item_modulate
+	back_item.input_pickable = false
+	back_item.visual_scale *= back_layer_item_scale
+	back_slot.add_child(back_item)
+
+	var collision := back_item.get_node_or_null("CollisionShape2D") as CollisionShape2D
+	if collision != null:
+		collision.disabled = true
 
 
 func _handle_press_at(pointer_global_position: Vector2) -> void:
