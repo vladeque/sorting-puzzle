@@ -1,4 +1,13 @@
-[gd_scene format=3 uid="uid://bx74wdn60xop5"]
+[gd_scene load_steps=9 format=3 uid="uid://bx74wdn60xop5"]
+
+[ext_resource type="Texture2D" path="res://assets/items/item_milk_carton.png" id="1_milk"]
+[ext_resource type="Texture2D" path="res://assets/items/item_soda_bottle.png" id="2_soda"]
+[ext_resource type="Texture2D" path="res://assets/items/item_chips_can.png" id="3_chips"]
+[ext_resource type="Texture2D" path="res://assets/items/item_cookie_box.png" id="4_cookie"]
+[ext_resource type="Texture2D" path="res://assets/items/item_ketchup_bottle.png" id="5_ketchup"]
+[ext_resource type="Texture2D" path="res://assets/items/item_toy_robot.png" id="6_robot"]
+[ext_resource type="Texture2D" path="res://assets/items/item_golden_cat_figurine.png" id="7_cat"]
+[ext_resource type="Texture2D" path="res://assets/items/item_plant_pot.png" id="8_plant"]
 
 [node name="Level" type="Node2D" unique_id=949256860]
 
@@ -50,6 +59,13 @@ polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
 [node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf01/Slot01"]
 position = Vector2(0, -42)
 
+[node name="LevelItemMilkCarton" type="Sprite2D" parent="Shelves/Shelf01/Slot01"]
+position = Vector2(0, -42)
+scale = Vector2(0.34, 0.34)
+z_index = 6
+texture = ExtResource("1_milk")
+metadata/item_id = "milk_carton"
+
 [node name="Slot02" type="Node2D" parent="Shelves/Shelf01"]
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf01/Slot02"]
@@ -59,6 +75,13 @@ polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
 
 [node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf01/Slot02"]
 position = Vector2(0, -42)
+
+[node name="LevelItemChipsCan" type="Sprite2D" parent="Shelves/Shelf01/Slot02"]
+position = Vector2(0, -42)
+scale = Vector2(0.34, 0.34)
+z_index = 6
+texture = ExtResource("3_chips")
+metadata/item_id = "chips_can"
 
 [node name="Slot03" type="Node2D" parent="Shelves/Shelf01"]
 position = Vector2(56, 0)
@@ -111,6 +134,13 @@ polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
 [node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf02/Slot01"]
 position = Vector2(0, -42)
 
+[node name="LevelItemToyRobot" type="Sprite2D" parent="Shelves/Shelf02/Slot01"]
+position = Vector2(0, -42)
+scale = Vector2(0.34, 0.34)
+z_index = 6
+texture = ExtResource("6_robot")
+metadata/item_id = "toy_robot"
+
 [node name="Slot02" type="Node2D" parent="Shelves/Shelf02"]
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf02/Slot02"]
@@ -120,6 +150,13 @@ polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
 
 [node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf02/Slot02"]
 position = Vector2(0, -42)
+
+[node name="LevelItemSodaBottle" type="Sprite2D" parent="Shelves/Shelf02/Slot02"]
+position = Vector2(0, -42)
+scale = Vector2(0.34, 0.34)
+z_index = 6
+texture = ExtResource("2_soda")
+metadata/item_id = "soda_bottle"
 
 [node name="Slot03" type="Node2D" parent="Shelves/Shelf02"]
 position = Vector2(56, 0)
@@ -131,6 +168,13 @@ polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
 
 [node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf02/Slot03"]
 position = Vector2(0, -42)
+
+[node name="LevelItemGoldenCat" type="Sprite2D" parent="Shelves/Shelf02/Slot03"]
+position = Vector2(0, -42)
+scale = Vector2(0.34, 0.34)
+z_index = 6
+texture = ExtResource("7_cat")
+metadata/item_id = "golden_cat_figurine"
 
 [node name="Shelf03" type="Node2D" parent="Shelves"]
 position = Vector2(210, -210)
@@ -172,6 +216,13 @@ polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
 [node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf03/Slot01"]
 position = Vector2(0, -42)
 
+[node name="LevelItemPlantPot" type="Sprite2D" parent="Shelves/Shelf03/Slot01"]
+position = Vector2(0, -42)
+scale = Vector2(0.34, 0.34)
+z_index = 6
+texture = ExtResource("8_plant")
+metadata/item_id = "plant_pot"
+
 [node name="Slot02" type="Node2D" parent="Shelves/Shelf03"]
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf03/Slot02"]
@@ -181,6 +232,13 @@ polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
 
 [node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf03/Slot02"]
 position = Vector2(0, -42)
+
+[node name="LevelItemCookieBox" type="Sprite2D" parent="Shelves/Shelf03/Slot02"]
+position = Vector2(0, -42)
+scale = Vector2(0.34, 0.34)
+z_index = 6
+texture = ExtResource("4_cookie")
+metadata/item_id = "cookie_box"
 
 [node name="Slot03" type="Node2D" parent="Shelves/Shelf03"]
 position = Vector2(56, 0)
@@ -192,6 +250,13 @@ polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
 
 [node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf03/Slot03"]
 position = Vector2(0, -42)
+
+[node name="LevelItemKetchupBottle" type="Sprite2D" parent="Shelves/Shelf03/Slot03"]
+position = Vector2(0, -42)
+scale = Vector2(0.34, 0.34)
+z_index = 6
+texture = ExtResource("5_ketchup")
+metadata/item_id = "ketchup_bottle"
 
 [node name="Shelf04" type="Node2D" parent="Shelves"]
 position = Vector2(-210, 0)
@@ -233,6 +298,13 @@ polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
 [node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf04/Slot01"]
 position = Vector2(0, -42)
 
+[node name="LevelItemChipsCan" type="Sprite2D" parent="Shelves/Shelf04/Slot01"]
+position = Vector2(0, -42)
+scale = Vector2(0.34, 0.34)
+z_index = 6
+texture = ExtResource("3_chips")
+metadata/item_id = "chips_can"
+
 [node name="Slot02" type="Node2D" parent="Shelves/Shelf04"]
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf04/Slot02"]
@@ -242,6 +314,13 @@ polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
 
 [node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf04/Slot02"]
 position = Vector2(0, -42)
+
+[node name="LevelItemToyRobot" type="Sprite2D" parent="Shelves/Shelf04/Slot02"]
+position = Vector2(0, -42)
+scale = Vector2(0.34, 0.34)
+z_index = 6
+texture = ExtResource("6_robot")
+metadata/item_id = "toy_robot"
 
 [node name="Slot03" type="Node2D" parent="Shelves/Shelf04"]
 position = Vector2(56, 0)
@@ -253,6 +332,13 @@ polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
 
 [node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf04/Slot03"]
 position = Vector2(0, -42)
+
+[node name="LevelItemMilkCarton" type="Sprite2D" parent="Shelves/Shelf04/Slot03"]
+position = Vector2(0, -42)
+scale = Vector2(0.34, 0.34)
+z_index = 6
+texture = ExtResource("1_milk")
+metadata/item_id = "milk_carton"
 
 [node name="Shelf05" type="Node2D" parent="Shelves"]
 
@@ -303,6 +389,13 @@ polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
 [node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf05/Slot02"]
 position = Vector2(0, -42)
 
+[node name="LevelItemGoldenCat" type="Sprite2D" parent="Shelves/Shelf05/Slot02"]
+position = Vector2(0, -42)
+scale = Vector2(0.34, 0.34)
+z_index = 6
+texture = ExtResource("7_cat")
+metadata/item_id = "golden_cat_figurine"
+
 [node name="Slot03" type="Node2D" parent="Shelves/Shelf05"]
 position = Vector2(56, 0)
 
@@ -313,6 +406,13 @@ polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
 
 [node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf05/Slot03"]
 position = Vector2(0, -42)
+
+[node name="LevelItemSodaBottle" type="Sprite2D" parent="Shelves/Shelf05/Slot03"]
+position = Vector2(0, -42)
+scale = Vector2(0.34, 0.34)
+z_index = 6
+texture = ExtResource("2_soda")
+metadata/item_id = "soda_bottle"
 
 [node name="Shelf06" type="Node2D" parent="Shelves"]
 position = Vector2(210, 0)
@@ -354,6 +454,13 @@ polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
 [node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf06/Slot01"]
 position = Vector2(0, -42)
 
+[node name="LevelItemCookieBox" type="Sprite2D" parent="Shelves/Shelf06/Slot01"]
+position = Vector2(0, -42)
+scale = Vector2(0.34, 0.34)
+z_index = 6
+texture = ExtResource("4_cookie")
+metadata/item_id = "cookie_box"
+
 [node name="Slot02" type="Node2D" parent="Shelves/Shelf06"]
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf06/Slot02"]
@@ -363,6 +470,13 @@ polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
 
 [node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf06/Slot02"]
 position = Vector2(0, -42)
+
+[node name="LevelItemPlantPot" type="Sprite2D" parent="Shelves/Shelf06/Slot02"]
+position = Vector2(0, -42)
+scale = Vector2(0.34, 0.34)
+z_index = 6
+texture = ExtResource("8_plant")
+metadata/item_id = "plant_pot"
 
 [node name="Slot03" type="Node2D" parent="Shelves/Shelf06"]
 position = Vector2(56, 0)
@@ -374,6 +488,13 @@ polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
 
 [node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf06/Slot03"]
 position = Vector2(0, -42)
+
+[node name="LevelItemKetchupBottle" type="Sprite2D" parent="Shelves/Shelf06/Slot03"]
+position = Vector2(0, -42)
+scale = Vector2(0.34, 0.34)
+z_index = 6
+texture = ExtResource("5_ketchup")
+metadata/item_id = "ketchup_bottle"
 
 [node name="Shelf07" type="Node2D" parent="Shelves"]
 position = Vector2(-210, 210)
@@ -415,6 +536,13 @@ polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
 [node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf07/Slot01"]
 position = Vector2(0, -42)
 
+[node name="LevelItemToyRobot" type="Sprite2D" parent="Shelves/Shelf07/Slot01"]
+position = Vector2(0, -42)
+scale = Vector2(0.34, 0.34)
+z_index = 6
+texture = ExtResource("6_robot")
+metadata/item_id = "toy_robot"
+
 [node name="Slot02" type="Node2D" parent="Shelves/Shelf07"]
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf07/Slot02"]
@@ -424,6 +552,13 @@ polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
 
 [node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf07/Slot02"]
 position = Vector2(0, -42)
+
+[node name="LevelItemChipsCan" type="Sprite2D" parent="Shelves/Shelf07/Slot02"]
+position = Vector2(0, -42)
+scale = Vector2(0.34, 0.34)
+z_index = 6
+texture = ExtResource("3_chips")
+metadata/item_id = "chips_can"
 
 [node name="Slot03" type="Node2D" parent="Shelves/Shelf07"]
 position = Vector2(56, 0)
@@ -435,6 +570,13 @@ polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
 
 [node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf07/Slot03"]
 position = Vector2(0, -42)
+
+[node name="LevelItemGoldenCat" type="Sprite2D" parent="Shelves/Shelf07/Slot03"]
+position = Vector2(0, -42)
+scale = Vector2(0.34, 0.34)
+z_index = 6
+texture = ExtResource("7_cat")
+metadata/item_id = "golden_cat_figurine"
 
 [node name="Shelf08" type="Node2D" parent="Shelves"]
 position = Vector2(0, 210)
@@ -476,6 +618,13 @@ polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
 [node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf08/Slot01"]
 position = Vector2(0, -42)
 
+[node name="LevelItemSodaBottle" type="Sprite2D" parent="Shelves/Shelf08/Slot01"]
+position = Vector2(0, -42)
+scale = Vector2(0.34, 0.34)
+z_index = 6
+texture = ExtResource("2_soda")
+metadata/item_id = "soda_bottle"
+
 [node name="Slot02" type="Node2D" parent="Shelves/Shelf08"]
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf08/Slot02"]
@@ -496,6 +645,13 @@ polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
 
 [node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf08/Slot03"]
 position = Vector2(0, -42)
+
+[node name="LevelItemCookieBox" type="Sprite2D" parent="Shelves/Shelf08/Slot03"]
+position = Vector2(0, -42)
+scale = Vector2(0.34, 0.34)
+z_index = 6
+texture = ExtResource("4_cookie")
+metadata/item_id = "cookie_box"
 
 [node name="Shelf09" type="Node2D" parent="Shelves"]
 position = Vector2(210, 210)
@@ -537,6 +693,13 @@ polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
 [node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf09/Slot01"]
 position = Vector2(0, -42)
 
+[node name="LevelItemKetchupBottle" type="Sprite2D" parent="Shelves/Shelf09/Slot01"]
+position = Vector2(0, -42)
+scale = Vector2(0.34, 0.34)
+z_index = 6
+texture = ExtResource("5_ketchup")
+metadata/item_id = "ketchup_bottle"
+
 [node name="Slot02" type="Node2D" parent="Shelves/Shelf09"]
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf09/Slot02"]
@@ -546,6 +709,13 @@ polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
 
 [node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf09/Slot02"]
 position = Vector2(0, -42)
+
+[node name="LevelItemMilkCarton" type="Sprite2D" parent="Shelves/Shelf09/Slot02"]
+position = Vector2(0, -42)
+scale = Vector2(0.34, 0.34)
+z_index = 6
+texture = ExtResource("1_milk")
+metadata/item_id = "milk_carton"
 
 [node name="Slot03" type="Node2D" parent="Shelves/Shelf09"]
 position = Vector2(56, 0)
@@ -557,3 +727,10 @@ polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
 
 [node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf09/Slot03"]
 position = Vector2(0, -42)
+
+[node name="LevelItemPlantPot" type="Sprite2D" parent="Shelves/Shelf09/Slot03"]
+position = Vector2(0, -42)
+scale = Vector2(0.34, 0.34)
+z_index = 6
+texture = ExtResource("8_plant")
+metadata/item_id = "plant_pot"
