@@ -1,35 +1,678 @@
-[gd_scene load_steps=11 format=3 uid="uid://bx74wdn60xop5"]
+[gd_scene format=3 uid="uid://bx74wdn60xop5"]
 
-[ext_resource type="Texture2D" path="res://assets/items/item_milk_carton.png" id="1_milk"]
-[ext_resource type="Texture2D" path="res://assets/items/item_soda_bottle.png" id="2_soda"]
-[ext_resource type="Texture2D" path="res://assets/items/item_chips_can.png" id="3_chips"]
-[ext_resource type="Texture2D" path="res://assets/items/item_cookie_box.png" id="4_cookie"]
-[ext_resource type="Texture2D" path="res://assets/items/item_ketchup_bottle.png" id="5_ketchup"]
-[ext_resource type="Texture2D" path="res://assets/items/item_toy_robot.png" id="6_robot"]
-[ext_resource type="Texture2D" path="res://assets/items/item_golden_cat_figurine.png" id="7_cat"]
-[ext_resource type="Texture2D" path="res://assets/items/item_plant_pot.png" id="8_plant"]
+[ext_resource type="Texture2D" uid="uid://dxgmdrkbsqui0" path="res://assets/items/item_milk_carton.png" id="1_milk"]
+[ext_resource type="Texture2D" uid="uid://ckyeys23bgwun" path="res://assets/items/item_soda_bottle.png" id="2_soda"]
+[ext_resource type="Texture2D" uid="uid://dtwrjetafkk86" path="res://assets/items/item_chips_can.png" id="3_chips"]
+[ext_resource type="Texture2D" uid="uid://b1ne0jf5koao2" path="res://assets/items/item_cookie_box.png" id="4_cookie"]
+[ext_resource type="Texture2D" uid="uid://bxk5q3c8oyips" path="res://assets/items/item_ketchup_bottle.png" id="5_ketchup"]
+[ext_resource type="Texture2D" uid="uid://dc0cqq68vbllj" path="res://assets/items/item_toy_robot.png" id="6_robot"]
+[ext_resource type="Texture2D" uid="uid://cpb31xqj4fcjc" path="res://assets/items/item_golden_cat_figurine.png" id="7_cat"]
+[ext_resource type="Texture2D" uid="uid://cdtjymfe8et2d" path="res://assets/items/item_plant_pot.png" id="8_plant"]
 [ext_resource type="PackedScene" path="res://scenes/item.tscn" id="9_item_scene"]
-[ext_resource type="Script" path="res://scripts/level.gd" id="10_level_script"]
+[ext_resource type="Script" uid="uid://cy80oincxrrc5" path="res://scripts/level.gd" id="10_level_script"]
 
 [node name="Level" type="Node2D" unique_id=949256860]
 script = ExtResource("10_level_script")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="ColorRect" parent="." unique_id=156883377]
 offset_right = 720.0
 offset_bottom = 1280.0
 color = Color(0.12, 0.15, 0.2, 1)
 
-[node name="Shelves" type="Node2D" parent="."]
+[node name="Shelves" type="Node2D" parent="." unique_id=1655339205]
 position = Vector2(360, 520)
 
-[node name="DragLayer" type="Node2D" parent="."]
+[node name="Shelf01" type="Node2D" parent="Shelves" unique_id=1633124619]
+position = Vector2(-210, -210)
+
+[node name="Shadow" type="Polygon2D" parent="Shelves/Shelf01" unique_id=2134060451]
+color = Color(0.03, 0.025, 0.02, 0.34)
+polygon = PackedVector2Array(-98, 9, 98, 9, 84, 34, -84, 34)
+
+[node name="BackPanel" type="Polygon2D" parent="Shelves/Shelf01" unique_id=1389254729]
+z_index = 1
+color = Color(0.33, 0.21, 0.14, 1)
+polygon = PackedVector2Array(-88, -76, 88, -76, 88, -20, -88, -20)
+
+[node name="TopSurface" type="Polygon2D" parent="Shelves/Shelf01" unique_id=609559220]
+z_index = 2
+color = Color(0.67, 0.43, 0.25, 1)
+polygon = PackedVector2Array(-94, -26, 94, -26, 78, 4, -78, 4)
+
+[node name="FrontLip" type="Polygon2D" parent="Shelves/Shelf01" unique_id=1789687302]
+z_index = 3
+color = Color(0.44, 0.27, 0.16, 1)
+polygon = PackedVector2Array(-78, 4, 78, 4, 88, 28, -88, 28)
+
+[node name="Highlight" type="Line2D" parent="Shelves/Shelf01" unique_id=55449556]
+z_index = 4
+points = PackedVector2Array(-76, -21, 76, -21)
+width = 2.0
+default_color = Color(0.86, 0.61, 0.36, 0.72)
+
+[node name="Slot01" type="Node2D" parent="Shelves/Shelf01" unique_id=327090627]
+position = Vector2(-56, 0)
+
+[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf01/Slot01" unique_id=617563127]
+z_index = 5
+color = Color(0.25, 0.74, 0.82, 0.22)
+polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
+
+[node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf01/Slot01" unique_id=1449988355]
+position = Vector2(0, -42)
+
+[node name="LevelItemMilkCarton" parent="Shelves/Shelf01/Slot01" unique_id=1171903248 instance=ExtResource("9_item_scene")]
+position = Vector2(0, -42)
+item_id = &"milk_carton"
+texture = ExtResource("1_milk")
+
+[node name="Slot02" type="Node2D" parent="Shelves/Shelf01" unique_id=1755008325]
+
+[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf01/Slot02" unique_id=2082312845]
+z_index = 5
+color = Color(0.25, 0.74, 0.82, 0.22)
+polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
+
+[node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf01/Slot02" unique_id=1853772734]
+position = Vector2(0, -42)
+
+[node name="LevelItemChipsCan" parent="Shelves/Shelf01/Slot02" unique_id=1927738432 instance=ExtResource("9_item_scene")]
+position = Vector2(0, -42)
+item_id = &"chips_can"
+texture = ExtResource("3_chips")
+
+[node name="Slot03" type="Node2D" parent="Shelves/Shelf01" unique_id=1260009315]
+position = Vector2(56, 0)
+
+[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf01/Slot03" unique_id=89283854]
+z_index = 5
+color = Color(0.25, 0.74, 0.82, 0.22)
+polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
+
+[node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf01/Slot03" unique_id=858498798]
+position = Vector2(0, -42)
+
+[node name="Shelf02" type="Node2D" parent="Shelves" unique_id=1216891554]
+position = Vector2(0, -210)
+
+[node name="Shadow" type="Polygon2D" parent="Shelves/Shelf02" unique_id=1033104142]
+color = Color(0.03, 0.025, 0.02, 0.34)
+polygon = PackedVector2Array(-98, 9, 98, 9, 84, 34, -84, 34)
+
+[node name="BackPanel" type="Polygon2D" parent="Shelves/Shelf02" unique_id=1479360030]
+z_index = 1
+color = Color(0.33, 0.21, 0.14, 1)
+polygon = PackedVector2Array(-88, -76, 88, -76, 88, -20, -88, -20)
+
+[node name="TopSurface" type="Polygon2D" parent="Shelves/Shelf02" unique_id=1815304771]
+z_index = 2
+color = Color(0.67, 0.43, 0.25, 1)
+polygon = PackedVector2Array(-94, -26, 94, -26, 78, 4, -78, 4)
+
+[node name="FrontLip" type="Polygon2D" parent="Shelves/Shelf02" unique_id=337125522]
+z_index = 3
+color = Color(0.44, 0.27, 0.16, 1)
+polygon = PackedVector2Array(-78, 4, 78, 4, 88, 28, -88, 28)
+
+[node name="Highlight" type="Line2D" parent="Shelves/Shelf02" unique_id=1595129260]
+z_index = 4
+points = PackedVector2Array(-76, -21, 76, -21)
+width = 2.0
+default_color = Color(0.86, 0.61, 0.36, 0.72)
+
+[node name="Slot01" type="Node2D" parent="Shelves/Shelf02" unique_id=874914722]
+position = Vector2(-56, 0)
+
+[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf02/Slot01" unique_id=657272703]
+z_index = 5
+color = Color(0.25, 0.74, 0.82, 0.22)
+polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
+
+[node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf02/Slot01" unique_id=2131963930]
+position = Vector2(0, -42)
+
+[node name="LevelItemToyRobot" parent="Shelves/Shelf02/Slot01" unique_id=264545649 instance=ExtResource("9_item_scene")]
+position = Vector2(0, -42)
+item_id = &"toy_robot"
+texture = ExtResource("6_robot")
+
+[node name="Slot02" type="Node2D" parent="Shelves/Shelf02" unique_id=803563401]
+
+[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf02/Slot02" unique_id=2113497820]
+z_index = 5
+color = Color(0.25, 0.74, 0.82, 0.22)
+polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
+
+[node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf02/Slot02" unique_id=614891559]
+position = Vector2(0, -42)
+
+[node name="LevelItemSodaBottle" parent="Shelves/Shelf02/Slot02" unique_id=188806148 instance=ExtResource("9_item_scene")]
+position = Vector2(0, -42)
+item_id = &"soda_bottle"
+texture = ExtResource("2_soda")
+
+[node name="Slot03" type="Node2D" parent="Shelves/Shelf02" unique_id=2140402547]
+position = Vector2(56, 0)
+
+[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf02/Slot03" unique_id=1459629608]
+z_index = 5
+color = Color(0.25, 0.74, 0.82, 0.22)
+polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
+
+[node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf02/Slot03" unique_id=1879184923]
+position = Vector2(0, -42)
+
+[node name="Shelf03" type="Node2D" parent="Shelves" unique_id=164678045]
+position = Vector2(210, -210)
+
+[node name="Shadow" type="Polygon2D" parent="Shelves/Shelf03" unique_id=1080664083]
+color = Color(0.03, 0.025, 0.02, 0.34)
+polygon = PackedVector2Array(-98, 9, 98, 9, 84, 34, -84, 34)
+
+[node name="BackPanel" type="Polygon2D" parent="Shelves/Shelf03" unique_id=1057879776]
+z_index = 1
+color = Color(0.33, 0.21, 0.14, 1)
+polygon = PackedVector2Array(-88, -76, 88, -76, 88, -20, -88, -20)
+
+[node name="TopSurface" type="Polygon2D" parent="Shelves/Shelf03" unique_id=2040041807]
+z_index = 2
+color = Color(0.67, 0.43, 0.25, 1)
+polygon = PackedVector2Array(-94, -26, 94, -26, 78, 4, -78, 4)
+
+[node name="FrontLip" type="Polygon2D" parent="Shelves/Shelf03" unique_id=306498629]
+z_index = 3
+color = Color(0.44, 0.27, 0.16, 1)
+polygon = PackedVector2Array(-78, 4, 78, 4, 88, 28, -88, 28)
+
+[node name="Highlight" type="Line2D" parent="Shelves/Shelf03" unique_id=1614073765]
+z_index = 4
+points = PackedVector2Array(-76, -21, 76, -21)
+width = 2.0
+default_color = Color(0.86, 0.61, 0.36, 0.72)
+
+[node name="Slot01" type="Node2D" parent="Shelves/Shelf03" unique_id=798117664]
+position = Vector2(-56, 0)
+
+[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf03/Slot01" unique_id=256501549]
+z_index = 5
+color = Color(0.25, 0.74, 0.82, 0.22)
+polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
+
+[node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf03/Slot01" unique_id=1042412530]
+position = Vector2(0, -42)
+
+[node name="LevelItemPlantPot" parent="Shelves/Shelf03/Slot01" unique_id=415173593 instance=ExtResource("9_item_scene")]
+position = Vector2(0, -42)
+item_id = &"plant_pot"
+texture = ExtResource("8_plant")
+
+[node name="Slot02" type="Node2D" parent="Shelves/Shelf03" unique_id=1224562587]
+
+[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf03/Slot02" unique_id=2092798612]
+z_index = 5
+color = Color(0.25, 0.74, 0.82, 0.22)
+polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
+
+[node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf03/Slot02" unique_id=1426114138]
+position = Vector2(0, -42)
+
+[node name="LevelItemCookieBox" parent="Shelves/Shelf03/Slot02" unique_id=2110266019 instance=ExtResource("9_item_scene")]
+position = Vector2(0, -42)
+item_id = &"cookie_box"
+texture = ExtResource("4_cookie")
+
+[node name="Slot03" type="Node2D" parent="Shelves/Shelf03" unique_id=700439945]
+position = Vector2(56, 0)
+
+[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf03/Slot03" unique_id=674761969]
+z_index = 5
+color = Color(0.25, 0.74, 0.82, 0.22)
+polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
+
+[node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf03/Slot03" unique_id=1614597095]
+position = Vector2(0, -42)
+
+[node name="LevelItemKetchupBottle" parent="Shelves/Shelf03/Slot03" unique_id=2055091035 instance=ExtResource("9_item_scene")]
+position = Vector2(0, -42)
+item_id = &"ketchup_bottle"
+texture = ExtResource("5_ketchup")
+
+[node name="Shelf04" type="Node2D" parent="Shelves" unique_id=730516984]
+position = Vector2(-210, 0)
+
+[node name="Shadow" type="Polygon2D" parent="Shelves/Shelf04" unique_id=517899081]
+color = Color(0.03, 0.025, 0.02, 0.34)
+polygon = PackedVector2Array(-98, 9, 98, 9, 84, 34, -84, 34)
+
+[node name="BackPanel" type="Polygon2D" parent="Shelves/Shelf04" unique_id=994180778]
+z_index = 1
+color = Color(0.33, 0.21, 0.14, 1)
+polygon = PackedVector2Array(-88, -76, 88, -76, 88, -20, -88, -20)
+
+[node name="TopSurface" type="Polygon2D" parent="Shelves/Shelf04" unique_id=2097935699]
+z_index = 2
+color = Color(0.67, 0.43, 0.25, 1)
+polygon = PackedVector2Array(-94, -26, 94, -26, 78, 4, -78, 4)
+
+[node name="FrontLip" type="Polygon2D" parent="Shelves/Shelf04" unique_id=2107396569]
+z_index = 3
+color = Color(0.44, 0.27, 0.16, 1)
+polygon = PackedVector2Array(-78, 4, 78, 4, 88, 28, -88, 28)
+
+[node name="Highlight" type="Line2D" parent="Shelves/Shelf04" unique_id=835922221]
+z_index = 4
+points = PackedVector2Array(-76, -21, 76, -21)
+width = 2.0
+default_color = Color(0.86, 0.61, 0.36, 0.72)
+
+[node name="Slot01" type="Node2D" parent="Shelves/Shelf04" unique_id=1364311298]
+position = Vector2(-56, 0)
+
+[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf04/Slot01" unique_id=28378386]
+z_index = 5
+color = Color(0.25, 0.74, 0.82, 0.22)
+polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
+
+[node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf04/Slot01" unique_id=868575871]
+position = Vector2(0, -42)
+
+[node name="LevelItemChipsCan" parent="Shelves/Shelf04/Slot01" unique_id=6502277 instance=ExtResource("9_item_scene")]
+position = Vector2(0, -42)
+item_id = &"chips_can"
+texture = ExtResource("3_chips")
+
+[node name="Slot02" type="Node2D" parent="Shelves/Shelf04" unique_id=2106448619]
+
+[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf04/Slot02" unique_id=1342518945]
+z_index = 5
+color = Color(0.25, 0.74, 0.82, 0.22)
+polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
+
+[node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf04/Slot02" unique_id=779102854]
+position = Vector2(0, -42)
+
+[node name="LevelItemToyRobot" parent="Shelves/Shelf04/Slot02" unique_id=1878426034 instance=ExtResource("9_item_scene")]
+position = Vector2(0, -42)
+item_id = &"toy_robot"
+texture = ExtResource("6_robot")
+
+[node name="Slot03" type="Node2D" parent="Shelves/Shelf04" unique_id=1486802164]
+position = Vector2(56, 0)
+
+[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf04/Slot03" unique_id=2077590492]
+z_index = 5
+color = Color(0.25, 0.74, 0.82, 0.22)
+polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
+
+[node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf04/Slot03" unique_id=1477064490]
+position = Vector2(0, -42)
+
+[node name="LevelItemMilkCarton" parent="Shelves/Shelf04/Slot03" unique_id=231267652 instance=ExtResource("9_item_scene")]
+position = Vector2(0, -42)
+item_id = &"milk_carton"
+texture = ExtResource("1_milk")
+
+[node name="Shelf05" type="Node2D" parent="Shelves" unique_id=1406273713]
+
+[node name="Shadow" type="Polygon2D" parent="Shelves/Shelf05" unique_id=1793039013]
+color = Color(0.03, 0.025, 0.02, 0.34)
+polygon = PackedVector2Array(-98, 9, 98, 9, 84, 34, -84, 34)
+
+[node name="BackPanel" type="Polygon2D" parent="Shelves/Shelf05" unique_id=1946069498]
+z_index = 1
+color = Color(0.33, 0.21, 0.14, 1)
+polygon = PackedVector2Array(-88, -76, 88, -76, 88, -20, -88, -20)
+
+[node name="TopSurface" type="Polygon2D" parent="Shelves/Shelf05" unique_id=752677281]
+z_index = 2
+color = Color(0.67, 0.43, 0.25, 1)
+polygon = PackedVector2Array(-94, -26, 94, -26, 78, 4, -78, 4)
+
+[node name="FrontLip" type="Polygon2D" parent="Shelves/Shelf05" unique_id=115630291]
+z_index = 3
+color = Color(0.44, 0.27, 0.16, 1)
+polygon = PackedVector2Array(-78, 4, 78, 4, 88, 28, -88, 28)
+
+[node name="Highlight" type="Line2D" parent="Shelves/Shelf05" unique_id=1693099308]
+z_index = 4
+points = PackedVector2Array(-76, -21, 76, -21)
+width = 2.0
+default_color = Color(0.86, 0.61, 0.36, 0.72)
+
+[node name="Slot01" type="Node2D" parent="Shelves/Shelf05" unique_id=1494456839]
+position = Vector2(-56, 0)
+
+[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf05/Slot01" unique_id=1064810633]
+z_index = 5
+color = Color(0.25, 0.74, 0.82, 0.22)
+polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
+
+[node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf05/Slot01" unique_id=1823533094]
+position = Vector2(0, -42)
+
+[node name="Slot02" type="Node2D" parent="Shelves/Shelf05" unique_id=1504587227]
+
+[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf05/Slot02" unique_id=510711312]
+z_index = 5
+color = Color(0.25, 0.74, 0.82, 0.22)
+polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
+
+[node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf05/Slot02" unique_id=1115681324]
+position = Vector2(0, -42)
+
+[node name="Slot03" type="Node2D" parent="Shelves/Shelf05" unique_id=1085724564]
+position = Vector2(56, 0)
+
+[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf05/Slot03" unique_id=1998625325]
+z_index = 5
+color = Color(0.25, 0.74, 0.82, 0.22)
+polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
+
+[node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf05/Slot03" unique_id=1766564391]
+position = Vector2(0, -42)
+
+[node name="LevelItemSodaBottle" parent="Shelves/Shelf05/Slot03" unique_id=1066180009 instance=ExtResource("9_item_scene")]
+position = Vector2(0, -42)
+item_id = &"soda_bottle"
+texture = ExtResource("2_soda")
+
+[node name="Shelf06" type="Node2D" parent="Shelves" unique_id=1845391759]
+position = Vector2(210, 0)
+
+[node name="Shadow" type="Polygon2D" parent="Shelves/Shelf06" unique_id=997515707]
+color = Color(0.03, 0.025, 0.02, 0.34)
+polygon = PackedVector2Array(-98, 9, 98, 9, 84, 34, -84, 34)
+
+[node name="BackPanel" type="Polygon2D" parent="Shelves/Shelf06" unique_id=1262043374]
+z_index = 1
+color = Color(0.33, 0.21, 0.14, 1)
+polygon = PackedVector2Array(-88, -76, 88, -76, 88, -20, -88, -20)
+
+[node name="TopSurface" type="Polygon2D" parent="Shelves/Shelf06" unique_id=103652379]
+z_index = 2
+color = Color(0.67, 0.43, 0.25, 1)
+polygon = PackedVector2Array(-94, -26, 94, -26, 78, 4, -78, 4)
+
+[node name="FrontLip" type="Polygon2D" parent="Shelves/Shelf06" unique_id=649175943]
+z_index = 3
+color = Color(0.44, 0.27, 0.16, 1)
+polygon = PackedVector2Array(-78, 4, 78, 4, 88, 28, -88, 28)
+
+[node name="Highlight" type="Line2D" parent="Shelves/Shelf06" unique_id=1538128364]
+z_index = 4
+points = PackedVector2Array(-76, -21, 76, -21)
+width = 2.0
+default_color = Color(0.86, 0.61, 0.36, 0.72)
+
+[node name="Slot01" type="Node2D" parent="Shelves/Shelf06" unique_id=356102140]
+position = Vector2(-56, 0)
+
+[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf06/Slot01" unique_id=184040667]
+z_index = 5
+color = Color(0.25, 0.74, 0.82, 0.22)
+polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
+
+[node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf06/Slot01" unique_id=157626723]
+position = Vector2(0, -42)
+
+[node name="LevelItemCookieBox" parent="Shelves/Shelf06/Slot01" unique_id=1861613263 instance=ExtResource("9_item_scene")]
+position = Vector2(0, -42)
+item_id = &"cookie_box"
+texture = ExtResource("4_cookie")
+
+[node name="Slot02" type="Node2D" parent="Shelves/Shelf06" unique_id=1481512229]
+
+[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf06/Slot02" unique_id=585910532]
+z_index = 5
+color = Color(0.25, 0.74, 0.82, 0.22)
+polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
+
+[node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf06/Slot02" unique_id=26128911]
+position = Vector2(0, -42)
+
+[node name="LevelItemPlantPot" parent="Shelves/Shelf06/Slot02" unique_id=1721171398 instance=ExtResource("9_item_scene")]
+position = Vector2(0, -42)
+item_id = &"plant_pot"
+texture = ExtResource("8_plant")
+
+[node name="Slot03" type="Node2D" parent="Shelves/Shelf06" unique_id=814996225]
+position = Vector2(56, 0)
+
+[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf06/Slot03" unique_id=1209018719]
+z_index = 5
+color = Color(0.25, 0.74, 0.82, 0.22)
+polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
+
+[node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf06/Slot03" unique_id=1114309833]
+position = Vector2(0, -42)
+
+[node name="LevelItemKetchupBottle" parent="Shelves/Shelf06/Slot03" unique_id=1349565441 instance=ExtResource("9_item_scene")]
+position = Vector2(0, -42)
+item_id = &"ketchup_bottle"
+texture = ExtResource("5_ketchup")
+
+[node name="Shelf07" type="Node2D" parent="Shelves" unique_id=1709650424]
+position = Vector2(-210, 210)
+
+[node name="Shadow" type="Polygon2D" parent="Shelves/Shelf07" unique_id=945143771]
+color = Color(0.03, 0.025, 0.02, 0.34)
+polygon = PackedVector2Array(-98, 9, 98, 9, 84, 34, -84, 34)
+
+[node name="BackPanel" type="Polygon2D" parent="Shelves/Shelf07" unique_id=319151469]
+z_index = 1
+color = Color(0.33, 0.21, 0.14, 1)
+polygon = PackedVector2Array(-88, -76, 88, -76, 88, -20, -88, -20)
+
+[node name="TopSurface" type="Polygon2D" parent="Shelves/Shelf07" unique_id=2091431589]
+z_index = 2
+color = Color(0.67, 0.43, 0.25, 1)
+polygon = PackedVector2Array(-94, -26, 94, -26, 78, 4, -78, 4)
+
+[node name="FrontLip" type="Polygon2D" parent="Shelves/Shelf07" unique_id=1749136079]
+z_index = 3
+color = Color(0.44, 0.27, 0.16, 1)
+polygon = PackedVector2Array(-78, 4, 78, 4, 88, 28, -88, 28)
+
+[node name="Highlight" type="Line2D" parent="Shelves/Shelf07" unique_id=1522265713]
+z_index = 4
+points = PackedVector2Array(-76, -21, 76, -21)
+width = 2.0
+default_color = Color(0.86, 0.61, 0.36, 0.72)
+
+[node name="Slot01" type="Node2D" parent="Shelves/Shelf07" unique_id=983236271]
+position = Vector2(-56, 0)
+
+[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf07/Slot01" unique_id=1637301177]
+z_index = 5
+color = Color(0.25, 0.74, 0.82, 0.22)
+polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
+
+[node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf07/Slot01" unique_id=448693245]
+position = Vector2(0, -42)
+
+[node name="LevelItemToyRobot" parent="Shelves/Shelf07/Slot01" unique_id=59552423 instance=ExtResource("9_item_scene")]
+position = Vector2(0, -42)
+item_id = &"toy_robot"
+texture = ExtResource("6_robot")
+
+[node name="Slot02" type="Node2D" parent="Shelves/Shelf07" unique_id=1112584000]
+
+[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf07/Slot02" unique_id=1108907141]
+z_index = 5
+color = Color(0.25, 0.74, 0.82, 0.22)
+polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
+
+[node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf07/Slot02" unique_id=1793241035]
+position = Vector2(0, -42)
+
+[node name="LevelItemChipsCan" parent="Shelves/Shelf07/Slot02" unique_id=1798088749 instance=ExtResource("9_item_scene")]
+position = Vector2(0, -42)
+item_id = &"chips_can"
+texture = ExtResource("3_chips")
+
+[node name="Slot03" type="Node2D" parent="Shelves/Shelf07" unique_id=155861349]
+position = Vector2(56, 0)
+
+[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf07/Slot03" unique_id=940036064]
+z_index = 5
+color = Color(0.25, 0.74, 0.82, 0.22)
+polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
+
+[node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf07/Slot03" unique_id=2138480233]
+position = Vector2(0, -42)
+
+[node name="Shelf08" type="Node2D" parent="Shelves" unique_id=1678909838]
+position = Vector2(0, 210)
+
+[node name="Shadow" type="Polygon2D" parent="Shelves/Shelf08" unique_id=2070395478]
+color = Color(0.03, 0.025, 0.02, 0.34)
+polygon = PackedVector2Array(-98, 9, 98, 9, 84, 34, -84, 34)
+
+[node name="BackPanel" type="Polygon2D" parent="Shelves/Shelf08" unique_id=426093352]
+z_index = 1
+color = Color(0.33, 0.21, 0.14, 1)
+polygon = PackedVector2Array(-88, -76, 88, -76, 88, -20, -88, -20)
+
+[node name="TopSurface" type="Polygon2D" parent="Shelves/Shelf08" unique_id=522379215]
+z_index = 2
+color = Color(0.67, 0.43, 0.25, 1)
+polygon = PackedVector2Array(-94, -26, 94, -26, 78, 4, -78, 4)
+
+[node name="FrontLip" type="Polygon2D" parent="Shelves/Shelf08" unique_id=1378463387]
+z_index = 3
+color = Color(0.44, 0.27, 0.16, 1)
+polygon = PackedVector2Array(-78, 4, 78, 4, 88, 28, -88, 28)
+
+[node name="Highlight" type="Line2D" parent="Shelves/Shelf08" unique_id=1053321954]
+z_index = 4
+points = PackedVector2Array(-76, -21, 76, -21)
+width = 2.0
+default_color = Color(0.86, 0.61, 0.36, 0.72)
+
+[node name="Slot01" type="Node2D" parent="Shelves/Shelf08" unique_id=1674058094]
+position = Vector2(-56, 0)
+
+[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf08/Slot01" unique_id=28710066]
+z_index = 5
+color = Color(0.25, 0.74, 0.82, 0.22)
+polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
+
+[node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf08/Slot01" unique_id=1280441011]
+position = Vector2(0, -42)
+
+[node name="LevelItemSodaBottle" parent="Shelves/Shelf08/Slot01" unique_id=1914412463 instance=ExtResource("9_item_scene")]
+position = Vector2(0, -42)
+item_id = &"soda_bottle"
+texture = ExtResource("2_soda")
+
+[node name="Slot02" type="Node2D" parent="Shelves/Shelf08" unique_id=1313319424]
+
+[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf08/Slot02" unique_id=1138568770]
+z_index = 5
+color = Color(0.25, 0.74, 0.82, 0.22)
+polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
+
+[node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf08/Slot02" unique_id=386775976]
+position = Vector2(0, -42)
+
+[node name="Slot03" type="Node2D" parent="Shelves/Shelf08" unique_id=709281335]
+position = Vector2(56, 0)
+
+[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf08/Slot03" unique_id=296822847]
+z_index = 5
+color = Color(0.25, 0.74, 0.82, 0.22)
+polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
+
+[node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf08/Slot03" unique_id=1966031484]
+position = Vector2(0, -42)
+
+[node name="LevelItemCookieBox" parent="Shelves/Shelf08/Slot03" unique_id=1712929051 instance=ExtResource("9_item_scene")]
+position = Vector2(0, -42)
+item_id = &"cookie_box"
+texture = ExtResource("4_cookie")
+
+[node name="Shelf09" type="Node2D" parent="Shelves" unique_id=1851230297]
+position = Vector2(210, 210)
+
+[node name="Shadow" type="Polygon2D" parent="Shelves/Shelf09" unique_id=1253967492]
+color = Color(0.03, 0.025, 0.02, 0.34)
+polygon = PackedVector2Array(-98, 9, 98, 9, 84, 34, -84, 34)
+
+[node name="BackPanel" type="Polygon2D" parent="Shelves/Shelf09" unique_id=1362301312]
+z_index = 1
+color = Color(0.33, 0.21, 0.14, 1)
+polygon = PackedVector2Array(-88, -76, 88, -76, 88, -20, -88, -20)
+
+[node name="TopSurface" type="Polygon2D" parent="Shelves/Shelf09" unique_id=1248052904]
+z_index = 2
+color = Color(0.67, 0.43, 0.25, 1)
+polygon = PackedVector2Array(-94, -26, 94, -26, 78, 4, -78, 4)
+
+[node name="FrontLip" type="Polygon2D" parent="Shelves/Shelf09" unique_id=1018548894]
+z_index = 3
+color = Color(0.44, 0.27, 0.16, 1)
+polygon = PackedVector2Array(-78, 4, 78, 4, 88, 28, -88, 28)
+
+[node name="Highlight" type="Line2D" parent="Shelves/Shelf09" unique_id=134195107]
+z_index = 4
+points = PackedVector2Array(-76, -21, 76, -21)
+width = 2.0
+default_color = Color(0.86, 0.61, 0.36, 0.72)
+
+[node name="Slot01" type="Node2D" parent="Shelves/Shelf09" unique_id=1974443928]
+position = Vector2(-56, 0)
+
+[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf09/Slot01" unique_id=1366387334]
+z_index = 5
+color = Color(0.25, 0.74, 0.82, 0.22)
+polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
+
+[node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf09/Slot01" unique_id=1092517549]
+position = Vector2(0, -42)
+
+[node name="LevelItemKetchupBottle" parent="Shelves/Shelf09/Slot01" unique_id=2001695999 instance=ExtResource("9_item_scene")]
+position = Vector2(0, -42)
+item_id = &"ketchup_bottle"
+texture = ExtResource("5_ketchup")
+
+[node name="Slot02" type="Node2D" parent="Shelves/Shelf09" unique_id=340442654]
+
+[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf09/Slot02" unique_id=824476921]
+z_index = 5
+color = Color(0.25, 0.74, 0.82, 0.22)
+polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
+
+[node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf09/Slot02" unique_id=893111349]
+position = Vector2(0, -42)
+
+[node name="LevelItemMilkCarton" parent="Shelves/Shelf09/Slot02" unique_id=940838265 instance=ExtResource("9_item_scene")]
+position = Vector2(0, -42)
+item_id = &"milk_carton"
+texture = ExtResource("1_milk")
+
+[node name="Slot03" type="Node2D" parent="Shelves/Shelf09" unique_id=1459903094]
+position = Vector2(56, 0)
+
+[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf09/Slot03" unique_id=755175282]
+z_index = 5
+color = Color(0.25, 0.74, 0.82, 0.22)
+polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
+
+[node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf09/Slot03" unique_id=1973242705]
+position = Vector2(0, -42)
+
+[node name="LevelItemPlantPot" parent="Shelves/Shelf09/Slot03" unique_id=1876279815 instance=ExtResource("9_item_scene")]
+position = Vector2(0, -42)
+item_id = &"plant_pot"
+texture = ExtResource("8_plant")
+
+[node name="DragLayer" type="Node2D" parent="." unique_id=1163629860]
 z_index = 100
 
-[node name="UI" type="CanvasLayer" parent="."]
+[node name="UI" type="CanvasLayer" parent="." unique_id=1854925290]
 layer = 10
 
-[node name="TimerLabel" type="Label" parent="UI"]
-offset_left = 0.0
+[node name="TimerLabel" type="Label" parent="UI" unique_id=272348979]
 offset_top = 28.0
 offset_right = 720.0
 offset_bottom = 92.0
@@ -42,14 +685,14 @@ text = "05:00"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="FailurePanel" type="ColorRect" parent="UI"]
+[node name="FailurePanel" type="ColorRect" parent="UI" unique_id=784630851]
 visible = false
 offset_right = 720.0
 offset_bottom = 1280.0
 color = Color(0.04, 0.04, 0.05, 0.68)
 
-[node name="FailureLabel" type="Label" parent="UI/FailurePanel"]
-offset_left = 0.0
+[node name="FailureLabel" type="Label" parent="UI/FailurePanel" unique_id=1144242749]
+layout_mode = 0
 offset_top = 548.0
 offset_right = 720.0
 offset_bottom = 644.0
@@ -61,659 +704,3 @@ theme_override_font_sizes/font_size = 58
 text = "Level Failed"
 horizontal_alignment = 1
 vertical_alignment = 1
-
-[node name="Shelf01" type="Node2D" parent="Shelves"]
-position = Vector2(-210, -210)
-
-[node name="Shadow" type="Polygon2D" parent="Shelves/Shelf01"]
-z_index = 0
-color = Color(0.03, 0.025, 0.02, 0.34)
-polygon = PackedVector2Array(-98, 9, 98, 9, 84, 34, -84, 34)
-
-[node name="BackPanel" type="Polygon2D" parent="Shelves/Shelf01"]
-z_index = 1
-color = Color(0.33, 0.21, 0.14, 1)
-polygon = PackedVector2Array(-88, -76, 88, -76, 88, -20, -88, -20)
-
-[node name="TopSurface" type="Polygon2D" parent="Shelves/Shelf01"]
-z_index = 2
-color = Color(0.67, 0.43, 0.25, 1)
-polygon = PackedVector2Array(-94, -26, 94, -26, 78, 4, -78, 4)
-
-[node name="FrontLip" type="Polygon2D" parent="Shelves/Shelf01"]
-z_index = 3
-color = Color(0.44, 0.27, 0.16, 1)
-polygon = PackedVector2Array(-78, 4, 78, 4, 88, 28, -88, 28)
-
-[node name="Highlight" type="Line2D" parent="Shelves/Shelf01"]
-z_index = 4
-points = PackedVector2Array(-76, -21, 76, -21)
-width = 2.0
-default_color = Color(0.86, 0.61, 0.36, 0.72)
-
-[node name="Slot01" type="Node2D" parent="Shelves/Shelf01"]
-position = Vector2(-56, 0)
-
-[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf01/Slot01"]
-z_index = 5
-color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
-
-[node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf01/Slot01"]
-position = Vector2(0, -42)
-
-[node name="LevelItemMilkCarton" parent="Shelves/Shelf01/Slot01" instance=ExtResource("9_item_scene")]
-position = Vector2(0, -42)
-item_id = &"milk_carton"
-texture = ExtResource("1_milk")
-
-[node name="Slot02" type="Node2D" parent="Shelves/Shelf01"]
-
-[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf01/Slot02"]
-z_index = 5
-color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
-
-[node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf01/Slot02"]
-position = Vector2(0, -42)
-
-[node name="LevelItemChipsCan" parent="Shelves/Shelf01/Slot02" instance=ExtResource("9_item_scene")]
-position = Vector2(0, -42)
-item_id = &"chips_can"
-texture = ExtResource("3_chips")
-
-[node name="Slot03" type="Node2D" parent="Shelves/Shelf01"]
-position = Vector2(56, 0)
-
-[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf01/Slot03"]
-z_index = 5
-color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
-
-[node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf01/Slot03"]
-position = Vector2(0, -42)
-
-[node name="Shelf02" type="Node2D" parent="Shelves"]
-position = Vector2(0, -210)
-
-[node name="Shadow" type="Polygon2D" parent="Shelves/Shelf02"]
-z_index = 0
-color = Color(0.03, 0.025, 0.02, 0.34)
-polygon = PackedVector2Array(-98, 9, 98, 9, 84, 34, -84, 34)
-
-[node name="BackPanel" type="Polygon2D" parent="Shelves/Shelf02"]
-z_index = 1
-color = Color(0.33, 0.21, 0.14, 1)
-polygon = PackedVector2Array(-88, -76, 88, -76, 88, -20, -88, -20)
-
-[node name="TopSurface" type="Polygon2D" parent="Shelves/Shelf02"]
-z_index = 2
-color = Color(0.67, 0.43, 0.25, 1)
-polygon = PackedVector2Array(-94, -26, 94, -26, 78, 4, -78, 4)
-
-[node name="FrontLip" type="Polygon2D" parent="Shelves/Shelf02"]
-z_index = 3
-color = Color(0.44, 0.27, 0.16, 1)
-polygon = PackedVector2Array(-78, 4, 78, 4, 88, 28, -88, 28)
-
-[node name="Highlight" type="Line2D" parent="Shelves/Shelf02"]
-z_index = 4
-points = PackedVector2Array(-76, -21, 76, -21)
-width = 2.0
-default_color = Color(0.86, 0.61, 0.36, 0.72)
-
-[node name="Slot01" type="Node2D" parent="Shelves/Shelf02"]
-position = Vector2(-56, 0)
-
-[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf02/Slot01"]
-z_index = 5
-color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
-
-[node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf02/Slot01"]
-position = Vector2(0, -42)
-
-[node name="LevelItemToyRobot" parent="Shelves/Shelf02/Slot01" instance=ExtResource("9_item_scene")]
-position = Vector2(0, -42)
-item_id = &"toy_robot"
-texture = ExtResource("6_robot")
-
-[node name="Slot02" type="Node2D" parent="Shelves/Shelf02"]
-
-[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf02/Slot02"]
-z_index = 5
-color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
-
-[node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf02/Slot02"]
-position = Vector2(0, -42)
-
-[node name="LevelItemSodaBottle" parent="Shelves/Shelf02/Slot02" instance=ExtResource("9_item_scene")]
-position = Vector2(0, -42)
-item_id = &"soda_bottle"
-texture = ExtResource("2_soda")
-
-[node name="Slot03" type="Node2D" parent="Shelves/Shelf02"]
-position = Vector2(56, 0)
-
-[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf02/Slot03"]
-z_index = 5
-color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
-
-[node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf02/Slot03"]
-position = Vector2(0, -42)
-
-
-[node name="Shelf03" type="Node2D" parent="Shelves"]
-position = Vector2(210, -210)
-
-[node name="Shadow" type="Polygon2D" parent="Shelves/Shelf03"]
-z_index = 0
-color = Color(0.03, 0.025, 0.02, 0.34)
-polygon = PackedVector2Array(-98, 9, 98, 9, 84, 34, -84, 34)
-
-[node name="BackPanel" type="Polygon2D" parent="Shelves/Shelf03"]
-z_index = 1
-color = Color(0.33, 0.21, 0.14, 1)
-polygon = PackedVector2Array(-88, -76, 88, -76, 88, -20, -88, -20)
-
-[node name="TopSurface" type="Polygon2D" parent="Shelves/Shelf03"]
-z_index = 2
-color = Color(0.67, 0.43, 0.25, 1)
-polygon = PackedVector2Array(-94, -26, 94, -26, 78, 4, -78, 4)
-
-[node name="FrontLip" type="Polygon2D" parent="Shelves/Shelf03"]
-z_index = 3
-color = Color(0.44, 0.27, 0.16, 1)
-polygon = PackedVector2Array(-78, 4, 78, 4, 88, 28, -88, 28)
-
-[node name="Highlight" type="Line2D" parent="Shelves/Shelf03"]
-z_index = 4
-points = PackedVector2Array(-76, -21, 76, -21)
-width = 2.0
-default_color = Color(0.86, 0.61, 0.36, 0.72)
-
-[node name="Slot01" type="Node2D" parent="Shelves/Shelf03"]
-position = Vector2(-56, 0)
-
-[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf03/Slot01"]
-z_index = 5
-color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
-
-[node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf03/Slot01"]
-position = Vector2(0, -42)
-
-[node name="LevelItemPlantPot" parent="Shelves/Shelf03/Slot01" instance=ExtResource("9_item_scene")]
-position = Vector2(0, -42)
-item_id = &"plant_pot"
-texture = ExtResource("8_plant")
-
-[node name="Slot02" type="Node2D" parent="Shelves/Shelf03"]
-
-[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf03/Slot02"]
-z_index = 5
-color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
-
-[node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf03/Slot02"]
-position = Vector2(0, -42)
-
-[node name="LevelItemCookieBox" parent="Shelves/Shelf03/Slot02" instance=ExtResource("9_item_scene")]
-position = Vector2(0, -42)
-item_id = &"cookie_box"
-texture = ExtResource("4_cookie")
-
-[node name="Slot03" type="Node2D" parent="Shelves/Shelf03"]
-position = Vector2(56, 0)
-
-[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf03/Slot03"]
-z_index = 5
-color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
-
-[node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf03/Slot03"]
-position = Vector2(0, -42)
-
-[node name="LevelItemKetchupBottle" parent="Shelves/Shelf03/Slot03" instance=ExtResource("9_item_scene")]
-position = Vector2(0, -42)
-item_id = &"ketchup_bottle"
-texture = ExtResource("5_ketchup")
-
-[node name="Shelf04" type="Node2D" parent="Shelves"]
-position = Vector2(-210, 0)
-
-[node name="Shadow" type="Polygon2D" parent="Shelves/Shelf04"]
-z_index = 0
-color = Color(0.03, 0.025, 0.02, 0.34)
-polygon = PackedVector2Array(-98, 9, 98, 9, 84, 34, -84, 34)
-
-[node name="BackPanel" type="Polygon2D" parent="Shelves/Shelf04"]
-z_index = 1
-color = Color(0.33, 0.21, 0.14, 1)
-polygon = PackedVector2Array(-88, -76, 88, -76, 88, -20, -88, -20)
-
-[node name="TopSurface" type="Polygon2D" parent="Shelves/Shelf04"]
-z_index = 2
-color = Color(0.67, 0.43, 0.25, 1)
-polygon = PackedVector2Array(-94, -26, 94, -26, 78, 4, -78, 4)
-
-[node name="FrontLip" type="Polygon2D" parent="Shelves/Shelf04"]
-z_index = 3
-color = Color(0.44, 0.27, 0.16, 1)
-polygon = PackedVector2Array(-78, 4, 78, 4, 88, 28, -88, 28)
-
-[node name="Highlight" type="Line2D" parent="Shelves/Shelf04"]
-z_index = 4
-points = PackedVector2Array(-76, -21, 76, -21)
-width = 2.0
-default_color = Color(0.86, 0.61, 0.36, 0.72)
-
-[node name="Slot01" type="Node2D" parent="Shelves/Shelf04"]
-position = Vector2(-56, 0)
-
-[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf04/Slot01"]
-z_index = 5
-color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
-
-[node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf04/Slot01"]
-position = Vector2(0, -42)
-
-[node name="LevelItemChipsCan" parent="Shelves/Shelf04/Slot01" instance=ExtResource("9_item_scene")]
-position = Vector2(0, -42)
-item_id = &"chips_can"
-texture = ExtResource("3_chips")
-
-[node name="Slot02" type="Node2D" parent="Shelves/Shelf04"]
-
-[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf04/Slot02"]
-z_index = 5
-color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
-
-[node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf04/Slot02"]
-position = Vector2(0, -42)
-
-[node name="LevelItemToyRobot" parent="Shelves/Shelf04/Slot02" instance=ExtResource("9_item_scene")]
-position = Vector2(0, -42)
-item_id = &"toy_robot"
-texture = ExtResource("6_robot")
-
-[node name="Slot03" type="Node2D" parent="Shelves/Shelf04"]
-position = Vector2(56, 0)
-
-[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf04/Slot03"]
-z_index = 5
-color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
-
-[node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf04/Slot03"]
-position = Vector2(0, -42)
-
-[node name="LevelItemMilkCarton" parent="Shelves/Shelf04/Slot03" instance=ExtResource("9_item_scene")]
-position = Vector2(0, -42)
-item_id = &"milk_carton"
-texture = ExtResource("1_milk")
-
-[node name="Shelf05" type="Node2D" parent="Shelves"]
-
-[node name="Shadow" type="Polygon2D" parent="Shelves/Shelf05"]
-z_index = 0
-color = Color(0.03, 0.025, 0.02, 0.34)
-polygon = PackedVector2Array(-98, 9, 98, 9, 84, 34, -84, 34)
-
-[node name="BackPanel" type="Polygon2D" parent="Shelves/Shelf05"]
-z_index = 1
-color = Color(0.33, 0.21, 0.14, 1)
-polygon = PackedVector2Array(-88, -76, 88, -76, 88, -20, -88, -20)
-
-[node name="TopSurface" type="Polygon2D" parent="Shelves/Shelf05"]
-z_index = 2
-color = Color(0.67, 0.43, 0.25, 1)
-polygon = PackedVector2Array(-94, -26, 94, -26, 78, 4, -78, 4)
-
-[node name="FrontLip" type="Polygon2D" parent="Shelves/Shelf05"]
-z_index = 3
-color = Color(0.44, 0.27, 0.16, 1)
-polygon = PackedVector2Array(-78, 4, 78, 4, 88, 28, -88, 28)
-
-[node name="Highlight" type="Line2D" parent="Shelves/Shelf05"]
-z_index = 4
-points = PackedVector2Array(-76, -21, 76, -21)
-width = 2.0
-default_color = Color(0.86, 0.61, 0.36, 0.72)
-
-[node name="Slot01" type="Node2D" parent="Shelves/Shelf05"]
-position = Vector2(-56, 0)
-
-[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf05/Slot01"]
-z_index = 5
-color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
-
-[node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf05/Slot01"]
-position = Vector2(0, -42)
-
-[node name="Slot02" type="Node2D" parent="Shelves/Shelf05"]
-
-[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf05/Slot02"]
-z_index = 5
-color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
-
-[node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf05/Slot02"]
-position = Vector2(0, -42)
-
-
-[node name="Slot03" type="Node2D" parent="Shelves/Shelf05"]
-position = Vector2(56, 0)
-
-[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf05/Slot03"]
-z_index = 5
-color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
-
-[node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf05/Slot03"]
-position = Vector2(0, -42)
-
-[node name="LevelItemSodaBottle" parent="Shelves/Shelf05/Slot03" instance=ExtResource("9_item_scene")]
-position = Vector2(0, -42)
-item_id = &"soda_bottle"
-texture = ExtResource("2_soda")
-
-[node name="Shelf06" type="Node2D" parent="Shelves"]
-position = Vector2(210, 0)
-
-[node name="Shadow" type="Polygon2D" parent="Shelves/Shelf06"]
-z_index = 0
-color = Color(0.03, 0.025, 0.02, 0.34)
-polygon = PackedVector2Array(-98, 9, 98, 9, 84, 34, -84, 34)
-
-[node name="BackPanel" type="Polygon2D" parent="Shelves/Shelf06"]
-z_index = 1
-color = Color(0.33, 0.21, 0.14, 1)
-polygon = PackedVector2Array(-88, -76, 88, -76, 88, -20, -88, -20)
-
-[node name="TopSurface" type="Polygon2D" parent="Shelves/Shelf06"]
-z_index = 2
-color = Color(0.67, 0.43, 0.25, 1)
-polygon = PackedVector2Array(-94, -26, 94, -26, 78, 4, -78, 4)
-
-[node name="FrontLip" type="Polygon2D" parent="Shelves/Shelf06"]
-z_index = 3
-color = Color(0.44, 0.27, 0.16, 1)
-polygon = PackedVector2Array(-78, 4, 78, 4, 88, 28, -88, 28)
-
-[node name="Highlight" type="Line2D" parent="Shelves/Shelf06"]
-z_index = 4
-points = PackedVector2Array(-76, -21, 76, -21)
-width = 2.0
-default_color = Color(0.86, 0.61, 0.36, 0.72)
-
-[node name="Slot01" type="Node2D" parent="Shelves/Shelf06"]
-position = Vector2(-56, 0)
-
-[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf06/Slot01"]
-z_index = 5
-color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
-
-[node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf06/Slot01"]
-position = Vector2(0, -42)
-
-[node name="LevelItemCookieBox" parent="Shelves/Shelf06/Slot01" instance=ExtResource("9_item_scene")]
-position = Vector2(0, -42)
-item_id = &"cookie_box"
-texture = ExtResource("4_cookie")
-
-[node name="Slot02" type="Node2D" parent="Shelves/Shelf06"]
-
-[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf06/Slot02"]
-z_index = 5
-color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
-
-[node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf06/Slot02"]
-position = Vector2(0, -42)
-
-[node name="LevelItemPlantPot" parent="Shelves/Shelf06/Slot02" instance=ExtResource("9_item_scene")]
-position = Vector2(0, -42)
-item_id = &"plant_pot"
-texture = ExtResource("8_plant")
-
-[node name="Slot03" type="Node2D" parent="Shelves/Shelf06"]
-position = Vector2(56, 0)
-
-[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf06/Slot03"]
-z_index = 5
-color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
-
-[node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf06/Slot03"]
-position = Vector2(0, -42)
-
-[node name="LevelItemKetchupBottle" parent="Shelves/Shelf06/Slot03" instance=ExtResource("9_item_scene")]
-position = Vector2(0, -42)
-item_id = &"ketchup_bottle"
-texture = ExtResource("5_ketchup")
-
-[node name="Shelf07" type="Node2D" parent="Shelves"]
-position = Vector2(-210, 210)
-
-[node name="Shadow" type="Polygon2D" parent="Shelves/Shelf07"]
-z_index = 0
-color = Color(0.03, 0.025, 0.02, 0.34)
-polygon = PackedVector2Array(-98, 9, 98, 9, 84, 34, -84, 34)
-
-[node name="BackPanel" type="Polygon2D" parent="Shelves/Shelf07"]
-z_index = 1
-color = Color(0.33, 0.21, 0.14, 1)
-polygon = PackedVector2Array(-88, -76, 88, -76, 88, -20, -88, -20)
-
-[node name="TopSurface" type="Polygon2D" parent="Shelves/Shelf07"]
-z_index = 2
-color = Color(0.67, 0.43, 0.25, 1)
-polygon = PackedVector2Array(-94, -26, 94, -26, 78, 4, -78, 4)
-
-[node name="FrontLip" type="Polygon2D" parent="Shelves/Shelf07"]
-z_index = 3
-color = Color(0.44, 0.27, 0.16, 1)
-polygon = PackedVector2Array(-78, 4, 78, 4, 88, 28, -88, 28)
-
-[node name="Highlight" type="Line2D" parent="Shelves/Shelf07"]
-z_index = 4
-points = PackedVector2Array(-76, -21, 76, -21)
-width = 2.0
-default_color = Color(0.86, 0.61, 0.36, 0.72)
-
-[node name="Slot01" type="Node2D" parent="Shelves/Shelf07"]
-position = Vector2(-56, 0)
-
-[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf07/Slot01"]
-z_index = 5
-color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
-
-[node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf07/Slot01"]
-position = Vector2(0, -42)
-
-[node name="LevelItemToyRobot" parent="Shelves/Shelf07/Slot01" instance=ExtResource("9_item_scene")]
-position = Vector2(0, -42)
-item_id = &"toy_robot"
-texture = ExtResource("6_robot")
-
-[node name="Slot02" type="Node2D" parent="Shelves/Shelf07"]
-
-[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf07/Slot02"]
-z_index = 5
-color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
-
-[node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf07/Slot02"]
-position = Vector2(0, -42)
-
-[node name="LevelItemChipsCan" parent="Shelves/Shelf07/Slot02" instance=ExtResource("9_item_scene")]
-position = Vector2(0, -42)
-item_id = &"chips_can"
-texture = ExtResource("3_chips")
-
-[node name="Slot03" type="Node2D" parent="Shelves/Shelf07"]
-position = Vector2(56, 0)
-
-[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf07/Slot03"]
-z_index = 5
-color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
-
-[node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf07/Slot03"]
-position = Vector2(0, -42)
-
-
-[node name="Shelf08" type="Node2D" parent="Shelves"]
-position = Vector2(0, 210)
-
-[node name="Shadow" type="Polygon2D" parent="Shelves/Shelf08"]
-z_index = 0
-color = Color(0.03, 0.025, 0.02, 0.34)
-polygon = PackedVector2Array(-98, 9, 98, 9, 84, 34, -84, 34)
-
-[node name="BackPanel" type="Polygon2D" parent="Shelves/Shelf08"]
-z_index = 1
-color = Color(0.33, 0.21, 0.14, 1)
-polygon = PackedVector2Array(-88, -76, 88, -76, 88, -20, -88, -20)
-
-[node name="TopSurface" type="Polygon2D" parent="Shelves/Shelf08"]
-z_index = 2
-color = Color(0.67, 0.43, 0.25, 1)
-polygon = PackedVector2Array(-94, -26, 94, -26, 78, 4, -78, 4)
-
-[node name="FrontLip" type="Polygon2D" parent="Shelves/Shelf08"]
-z_index = 3
-color = Color(0.44, 0.27, 0.16, 1)
-polygon = PackedVector2Array(-78, 4, 78, 4, 88, 28, -88, 28)
-
-[node name="Highlight" type="Line2D" parent="Shelves/Shelf08"]
-z_index = 4
-points = PackedVector2Array(-76, -21, 76, -21)
-width = 2.0
-default_color = Color(0.86, 0.61, 0.36, 0.72)
-
-[node name="Slot01" type="Node2D" parent="Shelves/Shelf08"]
-position = Vector2(-56, 0)
-
-[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf08/Slot01"]
-z_index = 5
-color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
-
-[node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf08/Slot01"]
-position = Vector2(0, -42)
-
-[node name="LevelItemSodaBottle" parent="Shelves/Shelf08/Slot01" instance=ExtResource("9_item_scene")]
-position = Vector2(0, -42)
-item_id = &"soda_bottle"
-texture = ExtResource("2_soda")
-
-[node name="Slot02" type="Node2D" parent="Shelves/Shelf08"]
-
-[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf08/Slot02"]
-z_index = 5
-color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
-
-[node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf08/Slot02"]
-position = Vector2(0, -42)
-
-[node name="Slot03" type="Node2D" parent="Shelves/Shelf08"]
-position = Vector2(56, 0)
-
-[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf08/Slot03"]
-z_index = 5
-color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
-
-[node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf08/Slot03"]
-position = Vector2(0, -42)
-
-[node name="LevelItemCookieBox" parent="Shelves/Shelf08/Slot03" instance=ExtResource("9_item_scene")]
-position = Vector2(0, -42)
-item_id = &"cookie_box"
-texture = ExtResource("4_cookie")
-
-[node name="Shelf09" type="Node2D" parent="Shelves"]
-position = Vector2(210, 210)
-
-[node name="Shadow" type="Polygon2D" parent="Shelves/Shelf09"]
-z_index = 0
-color = Color(0.03, 0.025, 0.02, 0.34)
-polygon = PackedVector2Array(-98, 9, 98, 9, 84, 34, -84, 34)
-
-[node name="BackPanel" type="Polygon2D" parent="Shelves/Shelf09"]
-z_index = 1
-color = Color(0.33, 0.21, 0.14, 1)
-polygon = PackedVector2Array(-88, -76, 88, -76, 88, -20, -88, -20)
-
-[node name="TopSurface" type="Polygon2D" parent="Shelves/Shelf09"]
-z_index = 2
-color = Color(0.67, 0.43, 0.25, 1)
-polygon = PackedVector2Array(-94, -26, 94, -26, 78, 4, -78, 4)
-
-[node name="FrontLip" type="Polygon2D" parent="Shelves/Shelf09"]
-z_index = 3
-color = Color(0.44, 0.27, 0.16, 1)
-polygon = PackedVector2Array(-78, 4, 78, 4, 88, 28, -88, 28)
-
-[node name="Highlight" type="Line2D" parent="Shelves/Shelf09"]
-z_index = 4
-points = PackedVector2Array(-76, -21, 76, -21)
-width = 2.0
-default_color = Color(0.86, 0.61, 0.36, 0.72)
-
-[node name="Slot01" type="Node2D" parent="Shelves/Shelf09"]
-position = Vector2(-56, 0)
-
-[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf09/Slot01"]
-z_index = 5
-color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
-
-[node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf09/Slot01"]
-position = Vector2(0, -42)
-
-[node name="LevelItemKetchupBottle" parent="Shelves/Shelf09/Slot01" instance=ExtResource("9_item_scene")]
-position = Vector2(0, -42)
-item_id = &"ketchup_bottle"
-texture = ExtResource("5_ketchup")
-
-[node name="Slot02" type="Node2D" parent="Shelves/Shelf09"]
-
-[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf09/Slot02"]
-z_index = 5
-color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
-
-[node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf09/Slot02"]
-position = Vector2(0, -42)
-
-[node name="LevelItemMilkCarton" parent="Shelves/Shelf09/Slot02" instance=ExtResource("9_item_scene")]
-position = Vector2(0, -42)
-item_id = &"milk_carton"
-texture = ExtResource("1_milk")
-
-[node name="Slot03" type="Node2D" parent="Shelves/Shelf09"]
-position = Vector2(56, 0)
-
-[node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf09/Slot03"]
-z_index = 5
-color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
-
-[node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf09/Slot03"]
-position = Vector2(0, -42)
-
-[node name="LevelItemPlantPot" parent="Shelves/Shelf09/Slot03" instance=ExtResource("9_item_scene")]
-position = Vector2(0, -42)
-item_id = &"plant_pot"
-texture = ExtResource("8_plant")
