@@ -8,552 +8,552 @@ offset_bottom = 1280.0
 color = Color(0.12, 0.15, 0.2, 1)
 
 [node name="Shelves" type="Node2D" parent="."]
-position = Vector2(360, 142)
+position = Vector2(360, 520)
 
 [node name="Shelf01" type="Node2D" parent="Shelves"]
+position = Vector2(-210, -210)
 
 [node name="Shadow" type="Polygon2D" parent="Shelves/Shelf01"]
 z_index = 0
 color = Color(0.03, 0.025, 0.02, 0.34)
-polygon = PackedVector2Array(-306, -9, 306, -9, 276, 23, -276, 23)
+polygon = PackedVector2Array(-96, 5, 96, 5, 84, 28, -84, 28)
 
 [node name="BackPanel" type="Polygon2D" parent="Shelves/Shelf01"]
 z_index = 1
 color = Color(0.33, 0.21, 0.14, 1)
-polygon = PackedVector2Array(-300, -98, 300, -98, 300, -32, -300, -32)
+polygon = PackedVector2Array(-88, -52, 88, -52, 88, -20, -88, -20)
 
 [node name="TopSurface" type="Polygon2D" parent="Shelves/Shelf01"]
 z_index = 2
 color = Color(0.67, 0.43, 0.25, 1)
-polygon = PackedVector2Array(-300, -36, 300, -36, 268, -2, -268, -2)
+polygon = PackedVector2Array(-94, -22, 94, -22, 78, 2, -78, 2)
 
 [node name="FrontLip" type="Polygon2D" parent="Shelves/Shelf01"]
 z_index = 3
 color = Color(0.44, 0.27, 0.16, 1)
-polygon = PackedVector2Array(-268, -2, 268, -2, 284, 24, -284, 24)
+polygon = PackedVector2Array(-78, 2, 78, 2, 88, 20, -88, 20)
 
 [node name="Highlight" type="Line2D" parent="Shelves/Shelf01"]
 z_index = 4
-points = PackedVector2Array(-260, -28, 260, -28)
-width = 4.0
+points = PackedVector2Array(-76, -17, 76, -17)
+width = 2.0
 default_color = Color(0.86, 0.61, 0.36, 0.72)
 
 [node name="Slot01" type="Node2D" parent="Shelves/Shelf01"]
-position = Vector2(-190, 0)
+position = Vector2(-56, 0)
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf01/Slot01"]
 z_index = 5
 color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-76, -93, 76, -93, 64, -16, -64, -16)
+polygon = PackedVector2Array(-24, -50, 24, -50, 20, -8, -20, -8)
 
 [node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf01/Slot01"]
-position = Vector2(0, -52)
+position = Vector2(0, -27)
 
 [node name="Slot02" type="Node2D" parent="Shelves/Shelf01"]
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf01/Slot02"]
 z_index = 5
 color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-76, -93, 76, -93, 64, -16, -64, -16)
+polygon = PackedVector2Array(-24, -50, 24, -50, 20, -8, -20, -8)
 
 [node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf01/Slot02"]
-position = Vector2(0, -52)
+position = Vector2(0, -27)
 
 [node name="Slot03" type="Node2D" parent="Shelves/Shelf01"]
-position = Vector2(190, 0)
+position = Vector2(56, 0)
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf01/Slot03"]
 z_index = 5
 color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-76, -93, 76, -93, 64, -16, -64, -16)
+polygon = PackedVector2Array(-24, -50, 24, -50, 20, -8, -20, -8)
 
 [node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf01/Slot03"]
-position = Vector2(0, -52)
+position = Vector2(0, -27)
 
 [node name="Shelf02" type="Node2D" parent="Shelves"]
-position = Vector2(0, 122)
+position = Vector2(0, -210)
 
 [node name="Shadow" type="Polygon2D" parent="Shelves/Shelf02"]
 z_index = 0
 color = Color(0.03, 0.025, 0.02, 0.34)
-polygon = PackedVector2Array(-306, -9, 306, -9, 276, 23, -276, 23)
+polygon = PackedVector2Array(-96, 5, 96, 5, 84, 28, -84, 28)
 
 [node name="BackPanel" type="Polygon2D" parent="Shelves/Shelf02"]
 z_index = 1
 color = Color(0.33, 0.21, 0.14, 1)
-polygon = PackedVector2Array(-300, -98, 300, -98, 300, -32, -300, -32)
+polygon = PackedVector2Array(-88, -52, 88, -52, 88, -20, -88, -20)
 
 [node name="TopSurface" type="Polygon2D" parent="Shelves/Shelf02"]
 z_index = 2
 color = Color(0.67, 0.43, 0.25, 1)
-polygon = PackedVector2Array(-300, -36, 300, -36, 268, -2, -268, -2)
+polygon = PackedVector2Array(-94, -22, 94, -22, 78, 2, -78, 2)
 
 [node name="FrontLip" type="Polygon2D" parent="Shelves/Shelf02"]
 z_index = 3
 color = Color(0.44, 0.27, 0.16, 1)
-polygon = PackedVector2Array(-268, -2, 268, -2, 284, 24, -284, 24)
+polygon = PackedVector2Array(-78, 2, 78, 2, 88, 20, -88, 20)
 
 [node name="Highlight" type="Line2D" parent="Shelves/Shelf02"]
 z_index = 4
-points = PackedVector2Array(-260, -28, 260, -28)
-width = 4.0
+points = PackedVector2Array(-76, -17, 76, -17)
+width = 2.0
 default_color = Color(0.86, 0.61, 0.36, 0.72)
 
 [node name="Slot01" type="Node2D" parent="Shelves/Shelf02"]
-position = Vector2(-190, 0)
+position = Vector2(-56, 0)
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf02/Slot01"]
 z_index = 5
 color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-76, -93, 76, -93, 64, -16, -64, -16)
+polygon = PackedVector2Array(-24, -50, 24, -50, 20, -8, -20, -8)
 
 [node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf02/Slot01"]
-position = Vector2(0, -52)
+position = Vector2(0, -27)
 
 [node name="Slot02" type="Node2D" parent="Shelves/Shelf02"]
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf02/Slot02"]
 z_index = 5
 color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-76, -93, 76, -93, 64, -16, -64, -16)
+polygon = PackedVector2Array(-24, -50, 24, -50, 20, -8, -20, -8)
 
 [node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf02/Slot02"]
-position = Vector2(0, -52)
+position = Vector2(0, -27)
 
 [node name="Slot03" type="Node2D" parent="Shelves/Shelf02"]
-position = Vector2(190, 0)
+position = Vector2(56, 0)
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf02/Slot03"]
 z_index = 5
 color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-76, -93, 76, -93, 64, -16, -64, -16)
+polygon = PackedVector2Array(-24, -50, 24, -50, 20, -8, -20, -8)
 
 [node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf02/Slot03"]
-position = Vector2(0, -52)
+position = Vector2(0, -27)
 
 [node name="Shelf03" type="Node2D" parent="Shelves"]
-position = Vector2(0, 244)
+position = Vector2(210, -210)
 
 [node name="Shadow" type="Polygon2D" parent="Shelves/Shelf03"]
 z_index = 0
 color = Color(0.03, 0.025, 0.02, 0.34)
-polygon = PackedVector2Array(-306, -9, 306, -9, 276, 23, -276, 23)
+polygon = PackedVector2Array(-96, 5, 96, 5, 84, 28, -84, 28)
 
 [node name="BackPanel" type="Polygon2D" parent="Shelves/Shelf03"]
 z_index = 1
 color = Color(0.33, 0.21, 0.14, 1)
-polygon = PackedVector2Array(-300, -98, 300, -98, 300, -32, -300, -32)
+polygon = PackedVector2Array(-88, -52, 88, -52, 88, -20, -88, -20)
 
 [node name="TopSurface" type="Polygon2D" parent="Shelves/Shelf03"]
 z_index = 2
 color = Color(0.67, 0.43, 0.25, 1)
-polygon = PackedVector2Array(-300, -36, 300, -36, 268, -2, -268, -2)
+polygon = PackedVector2Array(-94, -22, 94, -22, 78, 2, -78, 2)
 
 [node name="FrontLip" type="Polygon2D" parent="Shelves/Shelf03"]
 z_index = 3
 color = Color(0.44, 0.27, 0.16, 1)
-polygon = PackedVector2Array(-268, -2, 268, -2, 284, 24, -284, 24)
+polygon = PackedVector2Array(-78, 2, 78, 2, 88, 20, -88, 20)
 
 [node name="Highlight" type="Line2D" parent="Shelves/Shelf03"]
 z_index = 4
-points = PackedVector2Array(-260, -28, 260, -28)
-width = 4.0
+points = PackedVector2Array(-76, -17, 76, -17)
+width = 2.0
 default_color = Color(0.86, 0.61, 0.36, 0.72)
 
 [node name="Slot01" type="Node2D" parent="Shelves/Shelf03"]
-position = Vector2(-190, 0)
+position = Vector2(-56, 0)
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf03/Slot01"]
 z_index = 5
 color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-76, -93, 76, -93, 64, -16, -64, -16)
+polygon = PackedVector2Array(-24, -50, 24, -50, 20, -8, -20, -8)
 
 [node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf03/Slot01"]
-position = Vector2(0, -52)
+position = Vector2(0, -27)
 
 [node name="Slot02" type="Node2D" parent="Shelves/Shelf03"]
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf03/Slot02"]
 z_index = 5
 color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-76, -93, 76, -93, 64, -16, -64, -16)
+polygon = PackedVector2Array(-24, -50, 24, -50, 20, -8, -20, -8)
 
 [node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf03/Slot02"]
-position = Vector2(0, -52)
+position = Vector2(0, -27)
 
 [node name="Slot03" type="Node2D" parent="Shelves/Shelf03"]
-position = Vector2(190, 0)
+position = Vector2(56, 0)
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf03/Slot03"]
 z_index = 5
 color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-76, -93, 76, -93, 64, -16, -64, -16)
+polygon = PackedVector2Array(-24, -50, 24, -50, 20, -8, -20, -8)
 
 [node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf03/Slot03"]
-position = Vector2(0, -52)
+position = Vector2(0, -27)
 
 [node name="Shelf04" type="Node2D" parent="Shelves"]
-position = Vector2(0, 366)
+position = Vector2(-210, 0)
 
 [node name="Shadow" type="Polygon2D" parent="Shelves/Shelf04"]
 z_index = 0
 color = Color(0.03, 0.025, 0.02, 0.34)
-polygon = PackedVector2Array(-306, -9, 306, -9, 276, 23, -276, 23)
+polygon = PackedVector2Array(-96, 5, 96, 5, 84, 28, -84, 28)
 
 [node name="BackPanel" type="Polygon2D" parent="Shelves/Shelf04"]
 z_index = 1
 color = Color(0.33, 0.21, 0.14, 1)
-polygon = PackedVector2Array(-300, -98, 300, -98, 300, -32, -300, -32)
+polygon = PackedVector2Array(-88, -52, 88, -52, 88, -20, -88, -20)
 
 [node name="TopSurface" type="Polygon2D" parent="Shelves/Shelf04"]
 z_index = 2
 color = Color(0.67, 0.43, 0.25, 1)
-polygon = PackedVector2Array(-300, -36, 300, -36, 268, -2, -268, -2)
+polygon = PackedVector2Array(-94, -22, 94, -22, 78, 2, -78, 2)
 
 [node name="FrontLip" type="Polygon2D" parent="Shelves/Shelf04"]
 z_index = 3
 color = Color(0.44, 0.27, 0.16, 1)
-polygon = PackedVector2Array(-268, -2, 268, -2, 284, 24, -284, 24)
+polygon = PackedVector2Array(-78, 2, 78, 2, 88, 20, -88, 20)
 
 [node name="Highlight" type="Line2D" parent="Shelves/Shelf04"]
 z_index = 4
-points = PackedVector2Array(-260, -28, 260, -28)
-width = 4.0
+points = PackedVector2Array(-76, -17, 76, -17)
+width = 2.0
 default_color = Color(0.86, 0.61, 0.36, 0.72)
 
 [node name="Slot01" type="Node2D" parent="Shelves/Shelf04"]
-position = Vector2(-190, 0)
+position = Vector2(-56, 0)
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf04/Slot01"]
 z_index = 5
 color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-76, -93, 76, -93, 64, -16, -64, -16)
+polygon = PackedVector2Array(-24, -50, 24, -50, 20, -8, -20, -8)
 
 [node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf04/Slot01"]
-position = Vector2(0, -52)
+position = Vector2(0, -27)
 
 [node name="Slot02" type="Node2D" parent="Shelves/Shelf04"]
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf04/Slot02"]
 z_index = 5
 color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-76, -93, 76, -93, 64, -16, -64, -16)
+polygon = PackedVector2Array(-24, -50, 24, -50, 20, -8, -20, -8)
 
 [node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf04/Slot02"]
-position = Vector2(0, -52)
+position = Vector2(0, -27)
 
 [node name="Slot03" type="Node2D" parent="Shelves/Shelf04"]
-position = Vector2(190, 0)
+position = Vector2(56, 0)
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf04/Slot03"]
 z_index = 5
 color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-76, -93, 76, -93, 64, -16, -64, -16)
+polygon = PackedVector2Array(-24, -50, 24, -50, 20, -8, -20, -8)
 
 [node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf04/Slot03"]
-position = Vector2(0, -52)
+position = Vector2(0, -27)
 
 [node name="Shelf05" type="Node2D" parent="Shelves"]
-position = Vector2(0, 488)
 
 [node name="Shadow" type="Polygon2D" parent="Shelves/Shelf05"]
 z_index = 0
 color = Color(0.03, 0.025, 0.02, 0.34)
-polygon = PackedVector2Array(-306, -9, 306, -9, 276, 23, -276, 23)
+polygon = PackedVector2Array(-96, 5, 96, 5, 84, 28, -84, 28)
 
 [node name="BackPanel" type="Polygon2D" parent="Shelves/Shelf05"]
 z_index = 1
 color = Color(0.33, 0.21, 0.14, 1)
-polygon = PackedVector2Array(-300, -98, 300, -98, 300, -32, -300, -32)
+polygon = PackedVector2Array(-88, -52, 88, -52, 88, -20, -88, -20)
 
 [node name="TopSurface" type="Polygon2D" parent="Shelves/Shelf05"]
 z_index = 2
 color = Color(0.67, 0.43, 0.25, 1)
-polygon = PackedVector2Array(-300, -36, 300, -36, 268, -2, -268, -2)
+polygon = PackedVector2Array(-94, -22, 94, -22, 78, 2, -78, 2)
 
 [node name="FrontLip" type="Polygon2D" parent="Shelves/Shelf05"]
 z_index = 3
 color = Color(0.44, 0.27, 0.16, 1)
-polygon = PackedVector2Array(-268, -2, 268, -2, 284, 24, -284, 24)
+polygon = PackedVector2Array(-78, 2, 78, 2, 88, 20, -88, 20)
 
 [node name="Highlight" type="Line2D" parent="Shelves/Shelf05"]
 z_index = 4
-points = PackedVector2Array(-260, -28, 260, -28)
-width = 4.0
+points = PackedVector2Array(-76, -17, 76, -17)
+width = 2.0
 default_color = Color(0.86, 0.61, 0.36, 0.72)
 
 [node name="Slot01" type="Node2D" parent="Shelves/Shelf05"]
-position = Vector2(-190, 0)
+position = Vector2(-56, 0)
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf05/Slot01"]
 z_index = 5
 color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-76, -93, 76, -93, 64, -16, -64, -16)
+polygon = PackedVector2Array(-24, -50, 24, -50, 20, -8, -20, -8)
 
 [node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf05/Slot01"]
-position = Vector2(0, -52)
+position = Vector2(0, -27)
 
 [node name="Slot02" type="Node2D" parent="Shelves/Shelf05"]
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf05/Slot02"]
 z_index = 5
 color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-76, -93, 76, -93, 64, -16, -64, -16)
+polygon = PackedVector2Array(-24, -50, 24, -50, 20, -8, -20, -8)
 
 [node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf05/Slot02"]
-position = Vector2(0, -52)
+position = Vector2(0, -27)
 
 [node name="Slot03" type="Node2D" parent="Shelves/Shelf05"]
-position = Vector2(190, 0)
+position = Vector2(56, 0)
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf05/Slot03"]
 z_index = 5
 color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-76, -93, 76, -93, 64, -16, -64, -16)
+polygon = PackedVector2Array(-24, -50, 24, -50, 20, -8, -20, -8)
 
 [node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf05/Slot03"]
-position = Vector2(0, -52)
+position = Vector2(0, -27)
 
 [node name="Shelf06" type="Node2D" parent="Shelves"]
-position = Vector2(0, 610)
+position = Vector2(210, 0)
 
 [node name="Shadow" type="Polygon2D" parent="Shelves/Shelf06"]
 z_index = 0
 color = Color(0.03, 0.025, 0.02, 0.34)
-polygon = PackedVector2Array(-306, -9, 306, -9, 276, 23, -276, 23)
+polygon = PackedVector2Array(-96, 5, 96, 5, 84, 28, -84, 28)
 
 [node name="BackPanel" type="Polygon2D" parent="Shelves/Shelf06"]
 z_index = 1
 color = Color(0.33, 0.21, 0.14, 1)
-polygon = PackedVector2Array(-300, -98, 300, -98, 300, -32, -300, -32)
+polygon = PackedVector2Array(-88, -52, 88, -52, 88, -20, -88, -20)
 
 [node name="TopSurface" type="Polygon2D" parent="Shelves/Shelf06"]
 z_index = 2
 color = Color(0.67, 0.43, 0.25, 1)
-polygon = PackedVector2Array(-300, -36, 300, -36, 268, -2, -268, -2)
+polygon = PackedVector2Array(-94, -22, 94, -22, 78, 2, -78, 2)
 
 [node name="FrontLip" type="Polygon2D" parent="Shelves/Shelf06"]
 z_index = 3
 color = Color(0.44, 0.27, 0.16, 1)
-polygon = PackedVector2Array(-268, -2, 268, -2, 284, 24, -284, 24)
+polygon = PackedVector2Array(-78, 2, 78, 2, 88, 20, -88, 20)
 
 [node name="Highlight" type="Line2D" parent="Shelves/Shelf06"]
 z_index = 4
-points = PackedVector2Array(-260, -28, 260, -28)
-width = 4.0
+points = PackedVector2Array(-76, -17, 76, -17)
+width = 2.0
 default_color = Color(0.86, 0.61, 0.36, 0.72)
 
 [node name="Slot01" type="Node2D" parent="Shelves/Shelf06"]
-position = Vector2(-190, 0)
+position = Vector2(-56, 0)
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf06/Slot01"]
 z_index = 5
 color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-76, -93, 76, -93, 64, -16, -64, -16)
+polygon = PackedVector2Array(-24, -50, 24, -50, 20, -8, -20, -8)
 
 [node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf06/Slot01"]
-position = Vector2(0, -52)
+position = Vector2(0, -27)
 
 [node name="Slot02" type="Node2D" parent="Shelves/Shelf06"]
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf06/Slot02"]
 z_index = 5
 color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-76, -93, 76, -93, 64, -16, -64, -16)
+polygon = PackedVector2Array(-24, -50, 24, -50, 20, -8, -20, -8)
 
 [node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf06/Slot02"]
-position = Vector2(0, -52)
+position = Vector2(0, -27)
 
 [node name="Slot03" type="Node2D" parent="Shelves/Shelf06"]
-position = Vector2(190, 0)
+position = Vector2(56, 0)
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf06/Slot03"]
 z_index = 5
 color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-76, -93, 76, -93, 64, -16, -64, -16)
+polygon = PackedVector2Array(-24, -50, 24, -50, 20, -8, -20, -8)
 
 [node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf06/Slot03"]
-position = Vector2(0, -52)
+position = Vector2(0, -27)
 
 [node name="Shelf07" type="Node2D" parent="Shelves"]
-position = Vector2(0, 732)
+position = Vector2(-210, 210)
 
 [node name="Shadow" type="Polygon2D" parent="Shelves/Shelf07"]
 z_index = 0
 color = Color(0.03, 0.025, 0.02, 0.34)
-polygon = PackedVector2Array(-306, -9, 306, -9, 276, 23, -276, 23)
+polygon = PackedVector2Array(-96, 5, 96, 5, 84, 28, -84, 28)
 
 [node name="BackPanel" type="Polygon2D" parent="Shelves/Shelf07"]
 z_index = 1
 color = Color(0.33, 0.21, 0.14, 1)
-polygon = PackedVector2Array(-300, -98, 300, -98, 300, -32, -300, -32)
+polygon = PackedVector2Array(-88, -52, 88, -52, 88, -20, -88, -20)
 
 [node name="TopSurface" type="Polygon2D" parent="Shelves/Shelf07"]
 z_index = 2
 color = Color(0.67, 0.43, 0.25, 1)
-polygon = PackedVector2Array(-300, -36, 300, -36, 268, -2, -268, -2)
+polygon = PackedVector2Array(-94, -22, 94, -22, 78, 2, -78, 2)
 
 [node name="FrontLip" type="Polygon2D" parent="Shelves/Shelf07"]
 z_index = 3
 color = Color(0.44, 0.27, 0.16, 1)
-polygon = PackedVector2Array(-268, -2, 268, -2, 284, 24, -284, 24)
+polygon = PackedVector2Array(-78, 2, 78, 2, 88, 20, -88, 20)
 
 [node name="Highlight" type="Line2D" parent="Shelves/Shelf07"]
 z_index = 4
-points = PackedVector2Array(-260, -28, 260, -28)
-width = 4.0
+points = PackedVector2Array(-76, -17, 76, -17)
+width = 2.0
 default_color = Color(0.86, 0.61, 0.36, 0.72)
 
 [node name="Slot01" type="Node2D" parent="Shelves/Shelf07"]
-position = Vector2(-190, 0)
+position = Vector2(-56, 0)
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf07/Slot01"]
 z_index = 5
 color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-76, -93, 76, -93, 64, -16, -64, -16)
+polygon = PackedVector2Array(-24, -50, 24, -50, 20, -8, -20, -8)
 
 [node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf07/Slot01"]
-position = Vector2(0, -52)
+position = Vector2(0, -27)
 
 [node name="Slot02" type="Node2D" parent="Shelves/Shelf07"]
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf07/Slot02"]
 z_index = 5
 color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-76, -93, 76, -93, 64, -16, -64, -16)
+polygon = PackedVector2Array(-24, -50, 24, -50, 20, -8, -20, -8)
 
 [node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf07/Slot02"]
-position = Vector2(0, -52)
+position = Vector2(0, -27)
 
 [node name="Slot03" type="Node2D" parent="Shelves/Shelf07"]
-position = Vector2(190, 0)
+position = Vector2(56, 0)
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf07/Slot03"]
 z_index = 5
 color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-76, -93, 76, -93, 64, -16, -64, -16)
+polygon = PackedVector2Array(-24, -50, 24, -50, 20, -8, -20, -8)
 
 [node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf07/Slot03"]
-position = Vector2(0, -52)
+position = Vector2(0, -27)
 
 [node name="Shelf08" type="Node2D" parent="Shelves"]
-position = Vector2(0, 854)
+position = Vector2(0, 210)
 
 [node name="Shadow" type="Polygon2D" parent="Shelves/Shelf08"]
 z_index = 0
 color = Color(0.03, 0.025, 0.02, 0.34)
-polygon = PackedVector2Array(-306, -9, 306, -9, 276, 23, -276, 23)
+polygon = PackedVector2Array(-96, 5, 96, 5, 84, 28, -84, 28)
 
 [node name="BackPanel" type="Polygon2D" parent="Shelves/Shelf08"]
 z_index = 1
 color = Color(0.33, 0.21, 0.14, 1)
-polygon = PackedVector2Array(-300, -98, 300, -98, 300, -32, -300, -32)
+polygon = PackedVector2Array(-88, -52, 88, -52, 88, -20, -88, -20)
 
 [node name="TopSurface" type="Polygon2D" parent="Shelves/Shelf08"]
 z_index = 2
 color = Color(0.67, 0.43, 0.25, 1)
-polygon = PackedVector2Array(-300, -36, 300, -36, 268, -2, -268, -2)
+polygon = PackedVector2Array(-94, -22, 94, -22, 78, 2, -78, 2)
 
 [node name="FrontLip" type="Polygon2D" parent="Shelves/Shelf08"]
 z_index = 3
 color = Color(0.44, 0.27, 0.16, 1)
-polygon = PackedVector2Array(-268, -2, 268, -2, 284, 24, -284, 24)
+polygon = PackedVector2Array(-78, 2, 78, 2, 88, 20, -88, 20)
 
 [node name="Highlight" type="Line2D" parent="Shelves/Shelf08"]
 z_index = 4
-points = PackedVector2Array(-260, -28, 260, -28)
-width = 4.0
+points = PackedVector2Array(-76, -17, 76, -17)
+width = 2.0
 default_color = Color(0.86, 0.61, 0.36, 0.72)
 
 [node name="Slot01" type="Node2D" parent="Shelves/Shelf08"]
-position = Vector2(-190, 0)
+position = Vector2(-56, 0)
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf08/Slot01"]
 z_index = 5
 color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-76, -93, 76, -93, 64, -16, -64, -16)
+polygon = PackedVector2Array(-24, -50, 24, -50, 20, -8, -20, -8)
 
 [node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf08/Slot01"]
-position = Vector2(0, -52)
+position = Vector2(0, -27)
 
 [node name="Slot02" type="Node2D" parent="Shelves/Shelf08"]
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf08/Slot02"]
 z_index = 5
 color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-76, -93, 76, -93, 64, -16, -64, -16)
+polygon = PackedVector2Array(-24, -50, 24, -50, 20, -8, -20, -8)
 
 [node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf08/Slot02"]
-position = Vector2(0, -52)
+position = Vector2(0, -27)
 
 [node name="Slot03" type="Node2D" parent="Shelves/Shelf08"]
-position = Vector2(190, 0)
+position = Vector2(56, 0)
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf08/Slot03"]
 z_index = 5
 color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-76, -93, 76, -93, 64, -16, -64, -16)
+polygon = PackedVector2Array(-24, -50, 24, -50, 20, -8, -20, -8)
 
 [node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf08/Slot03"]
-position = Vector2(0, -52)
+position = Vector2(0, -27)
 
 [node name="Shelf09" type="Node2D" parent="Shelves"]
-position = Vector2(0, 976)
+position = Vector2(210, 210)
 
 [node name="Shadow" type="Polygon2D" parent="Shelves/Shelf09"]
 z_index = 0
 color = Color(0.03, 0.025, 0.02, 0.34)
-polygon = PackedVector2Array(-306, -9, 306, -9, 276, 23, -276, 23)
+polygon = PackedVector2Array(-96, 5, 96, 5, 84, 28, -84, 28)
 
 [node name="BackPanel" type="Polygon2D" parent="Shelves/Shelf09"]
 z_index = 1
 color = Color(0.33, 0.21, 0.14, 1)
-polygon = PackedVector2Array(-300, -98, 300, -98, 300, -32, -300, -32)
+polygon = PackedVector2Array(-88, -52, 88, -52, 88, -20, -88, -20)
 
 [node name="TopSurface" type="Polygon2D" parent="Shelves/Shelf09"]
 z_index = 2
 color = Color(0.67, 0.43, 0.25, 1)
-polygon = PackedVector2Array(-300, -36, 300, -36, 268, -2, -268, -2)
+polygon = PackedVector2Array(-94, -22, 94, -22, 78, 2, -78, 2)
 
 [node name="FrontLip" type="Polygon2D" parent="Shelves/Shelf09"]
 z_index = 3
 color = Color(0.44, 0.27, 0.16, 1)
-polygon = PackedVector2Array(-268, -2, 268, -2, 284, 24, -284, 24)
+polygon = PackedVector2Array(-78, 2, 78, 2, 88, 20, -88, 20)
 
 [node name="Highlight" type="Line2D" parent="Shelves/Shelf09"]
 z_index = 4
-points = PackedVector2Array(-260, -28, 260, -28)
-width = 4.0
+points = PackedVector2Array(-76, -17, 76, -17)
+width = 2.0
 default_color = Color(0.86, 0.61, 0.36, 0.72)
 
 [node name="Slot01" type="Node2D" parent="Shelves/Shelf09"]
-position = Vector2(-190, 0)
+position = Vector2(-56, 0)
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf09/Slot01"]
 z_index = 5
 color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-76, -93, 76, -93, 64, -16, -64, -16)
+polygon = PackedVector2Array(-24, -50, 24, -50, 20, -8, -20, -8)
 
 [node name="ItemSlot01" type="Marker2D" parent="Shelves/Shelf09/Slot01"]
-position = Vector2(0, -52)
+position = Vector2(0, -27)
 
 [node name="Slot02" type="Node2D" parent="Shelves/Shelf09"]
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf09/Slot02"]
 z_index = 5
 color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-76, -93, 76, -93, 64, -16, -64, -16)
+polygon = PackedVector2Array(-24, -50, 24, -50, 20, -8, -20, -8)
 
 [node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf09/Slot02"]
-position = Vector2(0, -52)
+position = Vector2(0, -27)
 
 [node name="Slot03" type="Node2D" parent="Shelves/Shelf09"]
-position = Vector2(190, 0)
+position = Vector2(56, 0)
 
 [node name="SlotGuide" type="Polygon2D" parent="Shelves/Shelf09/Slot03"]
 z_index = 5
 color = Color(0.25, 0.74, 0.82, 0.22)
-polygon = PackedVector2Array(-76, -93, 76, -93, 64, -16, -64, -16)
+polygon = PackedVector2Array(-24, -50, 24, -50, 20, -8, -20, -8)
 
 [node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf09/Slot03"]
-position = Vector2(0, -52)
+position = Vector2(0, -27)
