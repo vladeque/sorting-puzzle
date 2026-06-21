@@ -11,12 +11,17 @@ const ITEMS_PER_TYPE := 3
 @export var back_layer_offset := Vector2(0, -18)
 @export var back_layer_item_scale := 0.86
 @export var back_layer_item_modulate := Color(0.42, 0.42, 0.42, 0.34)
+@export var level_duration_seconds := 300.0
 
 var _slots: Array[Node2D] = []
 var _dragged_item: ShelfItem
 var _origin_slot: Node2D
 var _drag_offset := Vector2.ZERO
 var _drag_layer: Node2D
+var _timer_label: Label
+var _failure_panel: Control
+var _time_remaining := 0.0
+var _level_failed := false
 var _pressed_item: ShelfItem
 var _pressed_origin_slot: Node2D
 var _press_position := Vector2.ZERO
@@ -26,11 +31,30 @@ var _selected_slot: Node2D
 
 func _ready() -> void:
 	_drag_layer = get_node("DragLayer") as Node2D
+	_timer_label = get_node("UI/TimerLabel") as Label
+	_failure_panel = get_node("UI/FailurePanel") as Control
+	_time_remaining = level_duration_seconds
+	_failure_panel.visible = false
 	_collect_slots()
 	_build_back_layers()
+	_update_timer_label()
+
+
+func _process(delta: float) -> void:
+	if _level_failed:
+		return
+
+	_time_remaining = maxf(_time_remaining - delta, 0.0)
+	_update_timer_label()
+
+	if _time_remaining <= 0.0:
+		_fail_level()
 
 
 func _input(event: InputEvent) -> void:
+	if _level_failed:
+		return
+
 	if event is InputEventMouseButton:
 		var mouse_event := event as InputEventMouseButton
 		if mouse_event.button_index != MOUSE_BUTTON_LEFT:
@@ -168,6 +192,28 @@ func _shuffle_array(items: Array) -> void:
 		var current_item = items[i]
 		items[i] = items[swap_index]
 		items[swap_index] = current_item
+
+
+func _update_timer_label() -> void:
+	var remaining_seconds := ceili(_time_remaining)
+	var minutes := remaining_seconds / 60
+	var seconds := remaining_seconds % 60
+	_timer_label.text = "%02d:%02d" % [minutes, seconds]
+
+
+func _fail_level() -> void:
+	_level_failed = true
+	_clear_selected_item()
+
+	if _dragged_item != null and _origin_slot != null:
+		_place_item_in_slot(_dragged_item, _origin_slot)
+
+	_dragged_item = null
+	_origin_slot = null
+	_drag_offset = Vector2.ZERO
+	_pressed_item = null
+	_pressed_origin_slot = null
+	_failure_panel.visible = true
 
 
 func _handle_press_at(pointer_global_position: Vector2) -> void:
