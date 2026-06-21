@@ -3,6 +3,7 @@ extends Node2D
 const SLOT_ITEM_POSITION := Vector2(0, -42)
 
 @export var slot_snap_distance := 86.0
+@export var item_pick_size := Vector2(58, 92)
 
 var _slots: Array[Node2D] = []
 var _dragged_item: ShelfItem
@@ -15,6 +16,31 @@ func _ready() -> void:
 	_drag_layer = get_node("DragLayer") as Node2D
 	_collect_slots()
 	_connect_items()
+
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseButton:
+		var mouse_event := event as InputEventMouseButton
+		if mouse_event.button_index != MOUSE_BUTTON_LEFT:
+			return
+
+		var pointer_position := get_global_mouse_position()
+		if mouse_event.pressed:
+			_try_start_drag_at(pointer_position)
+		else:
+			_finish_active_drag(pointer_position)
+	elif event is InputEventMouseMotion:
+		_move_active_drag(get_global_mouse_position())
+	elif event is InputEventScreenTouch:
+		var touch_event := event as InputEventScreenTouch
+		var pointer_position := _screen_position_to_global(touch_event.position)
+		if touch_event.pressed:
+			_try_start_drag_at(pointer_position)
+		else:
+			_finish_active_drag(pointer_position)
+	elif event is InputEventScreenDrag:
+		var drag_event := event as InputEventScreenDrag
+		_move_active_drag(_screen_position_to_global(drag_event.position))
 
 
 func _collect_slots() -> void:
@@ -49,6 +75,36 @@ func _on_item_drag_started(item: ShelfItem, pointer_global_position: Vector2) ->
 		item.cancel_drag()
 		return
 
+	_begin_drag(item, pointer_global_position)
+
+
+func _on_item_drag_moved(item: ShelfItem, pointer_global_position: Vector2) -> void:
+	if item != _dragged_item:
+		return
+
+	_move_active_drag(pointer_global_position)
+
+
+func _on_item_drag_ended(item: ShelfItem, pointer_global_position: Vector2) -> void:
+	if item != _dragged_item:
+		return
+
+	_finish_active_drag(pointer_global_position)
+
+
+func _try_start_drag_at(pointer_global_position: Vector2) -> void:
+	if _dragged_item != null:
+		return
+
+	var item := _find_item_at_position(pointer_global_position)
+	if item == null:
+		return
+
+	_begin_drag(item, pointer_global_position)
+	get_viewport().set_input_as_handled()
+
+
+func _begin_drag(item: ShelfItem, pointer_global_position: Vector2) -> void:
 	_dragged_item = item
 	_origin_slot = item.get_parent() as Node2D
 	_drag_offset = item.global_position - pointer_global_position
@@ -57,17 +113,19 @@ func _on_item_drag_started(item: ShelfItem, pointer_global_position: Vector2) ->
 	item.global_position = pointer_global_position + _drag_offset
 
 
-func _on_item_drag_moved(item: ShelfItem, pointer_global_position: Vector2) -> void:
-	if item != _dragged_item:
+func _move_active_drag(pointer_global_position: Vector2) -> void:
+	if _dragged_item == null:
 		return
 
-	item.global_position = pointer_global_position + _drag_offset
+	_dragged_item.global_position = pointer_global_position + _drag_offset
+	get_viewport().set_input_as_handled()
 
 
-func _on_item_drag_ended(item: ShelfItem, pointer_global_position: Vector2) -> void:
-	if item != _dragged_item:
+func _finish_active_drag(pointer_global_position: Vector2) -> void:
+	if _dragged_item == null:
 		return
 
+	var item := _dragged_item
 	var target_slot := _find_nearest_slot(pointer_global_position)
 	if target_slot == null:
 		_place_item_in_slot(item, _origin_slot)
@@ -84,6 +142,20 @@ func _on_item_drag_ended(item: ShelfItem, pointer_global_position: Vector2) -> v
 	_dragged_item = null
 	_origin_slot = null
 	_drag_offset = Vector2.ZERO
+	get_viewport().set_input_as_handled()
+
+
+func _find_item_at_position(pointer_global_position: Vector2) -> ShelfItem:
+	for i in range(_slots.size() - 1, -1, -1):
+		var item := _get_slot_item(_slots[i])
+		if item == null:
+			continue
+
+		var item_rect := Rect2(item.global_position - item_pick_size * 0.5, item_pick_size)
+		if item_rect.has_point(pointer_global_position):
+			return item
+
+	return null
 
 
 func _find_nearest_slot(pointer_global_position: Vector2) -> Node2D:
@@ -116,3 +188,7 @@ func _place_item_in_slot(item: ShelfItem, slot: Node2D) -> void:
 	item.reparent(slot, true)
 	item.position = SLOT_ITEM_POSITION
 	item.z_index = 6
+
+
+func _screen_position_to_global(screen_position: Vector2) -> Vector2:
+	return get_canvas_transform().affine_inverse() * screen_position
