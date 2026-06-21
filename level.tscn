@@ -1,0 +1,327 @@
+[gd_scene load_steps=7 format=3 uid="uid://bx74wdn60xop5"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_shelf"]
+albedo_color = Color(0.55, 0.36, 0.22, 1)
+roughness = 0.62
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rail"]
+albedo_color = Color(0.38, 0.24, 0.15, 1)
+roughness = 0.7
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_slot"]
+albedo_color = Color(0.28, 0.68, 0.78, 0.38)
+transparency = 1
+roughness = 0.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_plank"]
+material = SubResource("StandardMaterial3D_shelf")
+size = Vector3(4.5, 0.16, 0.6)
+
+[sub_resource type="BoxMesh" id="BoxMesh_back_rail"]
+material = SubResource("StandardMaterial3D_rail")
+size = Vector3(4.5, 0.42, 0.12)
+
+[sub_resource type="BoxMesh" id="BoxMesh_slot_guide"]
+material = SubResource("StandardMaterial3D_slot")
+size = Vector3(1.05, 0.03, 0.46)
+
+[node name="Level" type="Node3D" unique_id=949256860]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 11)
+projection = 1
+current = true
+size = 10.2
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 3, 5)
+light_energy = 1.4
+
+[node name="Shelves" type="Node3D" parent="."]
+
+[node name="Shelf01" type="Node3D" parent="Shelves"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+
+[node name="Plank" type="MeshInstance3D" parent="Shelves/Shelf01"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.24, 0)
+mesh = SubResource("BoxMesh_plank")
+
+[node name="BackRail" type="MeshInstance3D" parent="Shelves/Shelf01"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, -0.32)
+mesh = SubResource("BoxMesh_back_rail")
+
+[node name="SlotGuide01" type="MeshInstance3D" parent="Shelves/Shelf01"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.35, -0.12, 0.04)
+mesh = SubResource("BoxMesh_slot_guide")
+
+[node name="ItemSlot01" type="Marker3D" parent="Shelves/Shelf01/SlotGuide01"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
+
+[node name="SlotGuide02" type="MeshInstance3D" parent="Shelves/Shelf01"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0.04)
+mesh = SubResource("BoxMesh_slot_guide")
+
+[node name="ItemSlot02" type="Marker3D" parent="Shelves/Shelf01/SlotGuide02"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
+
+[node name="SlotGuide03" type="MeshInstance3D" parent="Shelves/Shelf01"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.35, -0.12, 0.04)
+mesh = SubResource("BoxMesh_slot_guide")
+
+[node name="ItemSlot03" type="Marker3D" parent="Shelves/Shelf01/SlotGuide03"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
+
+[node name="Shelf02" type="Node3D" parent="Shelves"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
+
+[node name="Plank" type="MeshInstance3D" parent="Shelves/Shelf02"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.24, 0)
+mesh = SubResource("BoxMesh_plank")
+
+[node name="BackRail" type="MeshInstance3D" parent="Shelves/Shelf02"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, -0.32)
+mesh = SubResource("BoxMesh_back_rail")
+
+[node name="SlotGuide01" type="MeshInstance3D" parent="Shelves/Shelf02"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.35, -0.12, 0.04)
+mesh = SubResource("BoxMesh_slot_guide")
+
+[node name="ItemSlot01" type="Marker3D" parent="Shelves/Shelf02/SlotGuide01"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
+
+[node name="SlotGuide02" type="MeshInstance3D" parent="Shelves/Shelf02"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0.04)
+mesh = SubResource("BoxMesh_slot_guide")
+
+[node name="ItemSlot02" type="Marker3D" parent="Shelves/Shelf02/SlotGuide02"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
+
+[node name="SlotGuide03" type="MeshInstance3D" parent="Shelves/Shelf02"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.35, -0.12, 0.04)
+mesh = SubResource("BoxMesh_slot_guide")
+
+[node name="ItemSlot03" type="Marker3D" parent="Shelves/Shelf02/SlotGuide03"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
+
+[node name="Shelf03" type="Node3D" parent="Shelves"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+
+[node name="Plank" type="MeshInstance3D" parent="Shelves/Shelf03"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.24, 0)
+mesh = SubResource("BoxMesh_plank")
+
+[node name="BackRail" type="MeshInstance3D" parent="Shelves/Shelf03"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, -0.32)
+mesh = SubResource("BoxMesh_back_rail")
+
+[node name="SlotGuide01" type="MeshInstance3D" parent="Shelves/Shelf03"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.35, -0.12, 0.04)
+mesh = SubResource("BoxMesh_slot_guide")
+
+[node name="ItemSlot01" type="Marker3D" parent="Shelves/Shelf03/SlotGuide01"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
+
+[node name="SlotGuide02" type="MeshInstance3D" parent="Shelves/Shelf03"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0.04)
+mesh = SubResource("BoxMesh_slot_guide")
+
+[node name="ItemSlot02" type="Marker3D" parent="Shelves/Shelf03/SlotGuide02"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
+
+[node name="SlotGuide03" type="MeshInstance3D" parent="Shelves/Shelf03"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.35, -0.12, 0.04)
+mesh = SubResource("BoxMesh_slot_guide")
+
+[node name="ItemSlot03" type="Marker3D" parent="Shelves/Shelf03/SlotGuide03"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
+
+[node name="Shelf04" type="Node3D" parent="Shelves"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="Plank" type="MeshInstance3D" parent="Shelves/Shelf04"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.24, 0)
+mesh = SubResource("BoxMesh_plank")
+
+[node name="BackRail" type="MeshInstance3D" parent="Shelves/Shelf04"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, -0.32)
+mesh = SubResource("BoxMesh_back_rail")
+
+[node name="SlotGuide01" type="MeshInstance3D" parent="Shelves/Shelf04"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.35, -0.12, 0.04)
+mesh = SubResource("BoxMesh_slot_guide")
+
+[node name="ItemSlot01" type="Marker3D" parent="Shelves/Shelf04/SlotGuide01"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
+
+[node name="SlotGuide02" type="MeshInstance3D" parent="Shelves/Shelf04"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0.04)
+mesh = SubResource("BoxMesh_slot_guide")
+
+[node name="ItemSlot02" type="Marker3D" parent="Shelves/Shelf04/SlotGuide02"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
+
+[node name="SlotGuide03" type="MeshInstance3D" parent="Shelves/Shelf04"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.35, -0.12, 0.04)
+mesh = SubResource("BoxMesh_slot_guide")
+
+[node name="ItemSlot03" type="Marker3D" parent="Shelves/Shelf04/SlotGuide03"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
+
+[node name="Shelf05" type="Node3D" parent="Shelves"]
+
+[node name="Plank" type="MeshInstance3D" parent="Shelves/Shelf05"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.24, 0)
+mesh = SubResource("BoxMesh_plank")
+
+[node name="BackRail" type="MeshInstance3D" parent="Shelves/Shelf05"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, -0.32)
+mesh = SubResource("BoxMesh_back_rail")
+
+[node name="SlotGuide01" type="MeshInstance3D" parent="Shelves/Shelf05"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.35, -0.12, 0.04)
+mesh = SubResource("BoxMesh_slot_guide")
+
+[node name="ItemSlot01" type="Marker3D" parent="Shelves/Shelf05/SlotGuide01"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
+
+[node name="SlotGuide02" type="MeshInstance3D" parent="Shelves/Shelf05"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0.04)
+mesh = SubResource("BoxMesh_slot_guide")
+
+[node name="ItemSlot02" type="Marker3D" parent="Shelves/Shelf05/SlotGuide02"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
+
+[node name="SlotGuide03" type="MeshInstance3D" parent="Shelves/Shelf05"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.35, -0.12, 0.04)
+mesh = SubResource("BoxMesh_slot_guide")
+
+[node name="ItemSlot03" type="Marker3D" parent="Shelves/Shelf05/SlotGuide03"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
+
+[node name="Shelf06" type="Node3D" parent="Shelves"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+
+[node name="Plank" type="MeshInstance3D" parent="Shelves/Shelf06"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.24, 0)
+mesh = SubResource("BoxMesh_plank")
+
+[node name="BackRail" type="MeshInstance3D" parent="Shelves/Shelf06"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, -0.32)
+mesh = SubResource("BoxMesh_back_rail")
+
+[node name="SlotGuide01" type="MeshInstance3D" parent="Shelves/Shelf06"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.35, -0.12, 0.04)
+mesh = SubResource("BoxMesh_slot_guide")
+
+[node name="ItemSlot01" type="Marker3D" parent="Shelves/Shelf06/SlotGuide01"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
+
+[node name="SlotGuide02" type="MeshInstance3D" parent="Shelves/Shelf06"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0.04)
+mesh = SubResource("BoxMesh_slot_guide")
+
+[node name="ItemSlot02" type="Marker3D" parent="Shelves/Shelf06/SlotGuide02"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
+
+[node name="SlotGuide03" type="MeshInstance3D" parent="Shelves/Shelf06"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.35, -0.12, 0.04)
+mesh = SubResource("BoxMesh_slot_guide")
+
+[node name="ItemSlot03" type="Marker3D" parent="Shelves/Shelf06/SlotGuide03"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
+
+[node name="Shelf07" type="Node3D" parent="Shelves"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2, 0)
+
+[node name="Plank" type="MeshInstance3D" parent="Shelves/Shelf07"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.24, 0)
+mesh = SubResource("BoxMesh_plank")
+
+[node name="BackRail" type="MeshInstance3D" parent="Shelves/Shelf07"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, -0.32)
+mesh = SubResource("BoxMesh_back_rail")
+
+[node name="SlotGuide01" type="MeshInstance3D" parent="Shelves/Shelf07"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.35, -0.12, 0.04)
+mesh = SubResource("BoxMesh_slot_guide")
+
+[node name="ItemSlot01" type="Marker3D" parent="Shelves/Shelf07/SlotGuide01"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
+
+[node name="SlotGuide02" type="MeshInstance3D" parent="Shelves/Shelf07"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0.04)
+mesh = SubResource("BoxMesh_slot_guide")
+
+[node name="ItemSlot02" type="Marker3D" parent="Shelves/Shelf07/SlotGuide02"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
+
+[node name="SlotGuide03" type="MeshInstance3D" parent="Shelves/Shelf07"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.35, -0.12, 0.04)
+mesh = SubResource("BoxMesh_slot_guide")
+
+[node name="ItemSlot03" type="Marker3D" parent="Shelves/Shelf07/SlotGuide03"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
+
+[node name="Shelf08" type="Node3D" parent="Shelves"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -3, 0)
+
+[node name="Plank" type="MeshInstance3D" parent="Shelves/Shelf08"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.24, 0)
+mesh = SubResource("BoxMesh_plank")
+
+[node name="BackRail" type="MeshInstance3D" parent="Shelves/Shelf08"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, -0.32)
+mesh = SubResource("BoxMesh_back_rail")
+
+[node name="SlotGuide01" type="MeshInstance3D" parent="Shelves/Shelf08"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.35, -0.12, 0.04)
+mesh = SubResource("BoxMesh_slot_guide")
+
+[node name="ItemSlot01" type="Marker3D" parent="Shelves/Shelf08/SlotGuide01"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
+
+[node name="SlotGuide02" type="MeshInstance3D" parent="Shelves/Shelf08"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0.04)
+mesh = SubResource("BoxMesh_slot_guide")
+
+[node name="ItemSlot02" type="Marker3D" parent="Shelves/Shelf08/SlotGuide02"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
+
+[node name="SlotGuide03" type="MeshInstance3D" parent="Shelves/Shelf08"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.35, -0.12, 0.04)
+mesh = SubResource("BoxMesh_slot_guide")
+
+[node name="ItemSlot03" type="Marker3D" parent="Shelves/Shelf08/SlotGuide03"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
+
+[node name="Shelf09" type="Node3D" parent="Shelves"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4, 0)
+
+[node name="Plank" type="MeshInstance3D" parent="Shelves/Shelf09"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.24, 0)
+mesh = SubResource("BoxMesh_plank")
+
+[node name="BackRail" type="MeshInstance3D" parent="Shelves/Shelf09"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, -0.32)
+mesh = SubResource("BoxMesh_back_rail")
+
+[node name="SlotGuide01" type="MeshInstance3D" parent="Shelves/Shelf09"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.35, -0.12, 0.04)
+mesh = SubResource("BoxMesh_slot_guide")
+
+[node name="ItemSlot01" type="Marker3D" parent="Shelves/Shelf09/SlotGuide01"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
+
+[node name="SlotGuide02" type="MeshInstance3D" parent="Shelves/Shelf09"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0.04)
+mesh = SubResource("BoxMesh_slot_guide")
+
+[node name="ItemSlot02" type="Marker3D" parent="Shelves/Shelf09/SlotGuide02"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
+
+[node name="SlotGuide03" type="MeshInstance3D" parent="Shelves/Shelf09"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.35, -0.12, 0.04)
+mesh = SubResource("BoxMesh_slot_guide")
+
+[node name="ItemSlot03" type="Marker3D" parent="Shelves/Shelf09/SlotGuide03"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
