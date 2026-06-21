@@ -131,9 +131,23 @@ def compose_shelves(
     layer_count: int,
     filled_layer_count: int,
 ) -> list[dict[str, Any]]:
-    trailing_empty_slots = shelf_count * (layer_count - filled_layer_count) * SLOTS_PER_SHELF
-    slot_values = eligible_slot_values + [None] * trailing_empty_slots
-    return distribute_slots(slot_values, shelf_count, layer_count)
+    shelves = []
+    value_index = 0
+
+    for _shelf_index in range(shelf_count):
+        layers = []
+        for layer_index in range(layer_count):
+            if layer_index < filled_layer_count:
+                layer = eligible_slot_values[value_index : value_index + SLOTS_PER_SHELF]
+                value_index += SLOTS_PER_SHELF
+            else:
+                layer = [None] * SLOTS_PER_SHELF
+
+            layers.append(layer)
+
+        shelves.append({"layers": layers})
+
+    return shelves
 
 
 def generate_shelves(
