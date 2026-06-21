@@ -193,10 +193,10 @@ func _add_shelf(parent: Node2D, shelf_number: int, shelf_position: Vector2) -> N
 	shelf.position = shelf_position
 	parent.add_child(shelf)
 
-	_add_polygon(shelf, "Shadow", 0, Color(0.03, 0.025, 0.02, 0.34), PackedVector2Array([-98, 9, 98, 9, 84, 34, -84, 34]))
-	_add_polygon(shelf, "BackPanel", 1, Color(0.33, 0.21, 0.14, 1), PackedVector2Array([-88, -76, 88, -76, 88, -20, -88, -20]))
-	_add_polygon(shelf, "TopSurface", 2, Color(0.67, 0.43, 0.25, 1), PackedVector2Array([-94, -26, 94, -26, 78, 4, -78, 4]))
-	_add_polygon(shelf, "FrontLip", 3, Color(0.44, 0.27, 0.16, 1), PackedVector2Array([-78, 4, 78, 4, 88, 28, -88, 28]))
+	_add_polygon(shelf, "Shadow", 0, Color(0.03, 0.025, 0.02, 0.34), PackedVector2Array([Vector2(-98, 9), Vector2(98, 9), Vector2(84, 34), Vector2(-84, 34)]))
+	_add_polygon(shelf, "BackPanel", 1, Color(0.33, 0.21, 0.14, 1), PackedVector2Array([Vector2(-88, -76), Vector2(88, -76), Vector2(88, -20), Vector2(-88, -20)]))
+	_add_polygon(shelf, "TopSurface", 2, Color(0.67, 0.43, 0.25, 1), PackedVector2Array([Vector2(-94, -26), Vector2(94, -26), Vector2(78, 4), Vector2(-78, 4)]))
+	_add_polygon(shelf, "FrontLip", 3, Color(0.44, 0.27, 0.16, 1), PackedVector2Array([Vector2(-78, 4), Vector2(78, 4), Vector2(88, 28), Vector2(-88, 28)]))
 	_add_highlight(shelf)
 
 	for slot_index in range(SLOT_COUNT):
@@ -218,7 +218,7 @@ func _add_highlight(parent: Node) -> void:
 	var highlight := Line2D.new()
 	highlight.name = "Highlight"
 	highlight.z_index = 4
-	highlight.points = PackedVector2Array([-76, -21, 76, -21])
+	highlight.points = PackedVector2Array([Vector2(-76, -21), Vector2(76, -21)])
 	highlight.width = 2.0
 	highlight.default_color = Color(0.86, 0.61, 0.36, 0.72)
 	parent.add_child(highlight)
@@ -231,7 +231,7 @@ func _add_front_slot(shelf: Node2D, slot_index: int) -> Node2D:
 	slot.position = SLOT_POSITIONS[slot_index]
 	shelf.add_child(slot)
 
-	_add_polygon(slot, "SlotGuide", 5, Color(0.25, 0.74, 0.82, 0.22), PackedVector2Array([-26, -76, 26, -76, 22, -8, -22, -8]))
+	_add_polygon(slot, "SlotGuide", 5, Color(0.25, 0.74, 0.82, 0.22), PackedVector2Array([Vector2(-26, -76), Vector2(26, -76), Vector2(22, -8), Vector2(-22, -8)]))
 
 	var marker := Marker2D.new()
 	marker.name = "ItemSlot%02d" % slot_number
