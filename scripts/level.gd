@@ -127,11 +127,15 @@ func _finish_active_drag(pointer_global_position: Vector2) -> void:
 
 	var item := _dragged_item
 	var target_slot := _find_nearest_slot(pointer_global_position)
+	var shelves_to_check: Array[Node] = []
 	if target_slot == null:
 		_place_item_in_slot(item, _origin_slot)
 	elif target_slot == _origin_slot:
 		_place_item_in_slot(item, _origin_slot)
 	else:
+		_add_shelf_to_check(shelves_to_check, _origin_slot)
+		_add_shelf_to_check(shelves_to_check, target_slot)
+
 		var target_item := _get_slot_item(target_slot)
 		if target_item == null:
 			_place_item_in_slot(item, target_slot)
@@ -142,6 +146,7 @@ func _finish_active_drag(pointer_global_position: Vector2) -> void:
 	_dragged_item = null
 	_origin_slot = null
 	_drag_offset = Vector2.ZERO
+	_clear_matching_shelves(shelves_to_check)
 	get_viewport().set_input_as_handled()
 
 
@@ -188,6 +193,41 @@ func _place_item_in_slot(item: ShelfItem, slot: Node2D) -> void:
 	item.reparent(slot, true)
 	item.position = SLOT_ITEM_POSITION
 	item.z_index = 6
+
+
+func _add_shelf_to_check(shelves_to_check: Array[Node], slot: Node2D) -> void:
+	var shelf := slot.get_parent()
+	if shelf != null and not shelves_to_check.has(shelf):
+		shelves_to_check.append(shelf)
+
+
+func _clear_matching_shelves(shelves_to_check: Array[Node]) -> void:
+	for shelf in shelves_to_check:
+		var shelf_items := _get_shelf_items(shelf)
+		if shelf_items.size() != 3:
+			continue
+
+		var item_id := shelf_items[0].item_id
+		if item_id == &"":
+			continue
+
+		if shelf_items.all(func(item: ShelfItem) -> bool: return item.item_id == item_id):
+			for item in shelf_items:
+				item.queue_free()
+
+
+func _get_shelf_items(shelf: Node) -> Array[ShelfItem]:
+	var shelf_items: Array[ShelfItem] = []
+	for child in shelf.get_children():
+		var slot := child as Node2D
+		if slot == null or not slot.name.begins_with("Slot"):
+			continue
+
+		var item := _get_slot_item(slot)
+		if item != null:
+			shelf_items.append(item)
+
+	return shelf_items
 
 
 func _screen_position_to_global(screen_position: Vector2) -> Vector2:
