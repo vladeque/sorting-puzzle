@@ -1,10 +1,14 @@
 extends Node2D
 
 const SLOT_ITEM_POSITION := Vector2(0, -42)
-const GENERATED_LAYER_PREFIX := "ShelfLayer"
-const FIRST_GENERATED_LAYER := 2
-const ITEM_TYPE_COUNT := 7
-const ITEMS_PER_TYPE := 3
+const SLOT_COUNT := 3
+const SLOT_POSITIONS := [Vector2(-56, 0), Vector2(0, 0), Vector2(56, 0)]
+const BACK_LAYER_PREFIX := "ShelfLayer"
+const FIRST_BACK_LAYER_INDEX := 1
+const ITEM_SCENE := preload("res://scenes/item.tscn")
+const ITEM_SPRITES_CONFIG := "res://configs/item_sprites.json"
+const LEVEL_CONFIG_TEMPLATE := "res://configs/levels/level_%03d.json"
+const DEFAULT_LEVEL_CONFIG := "res://configs/levels/level_001.json"
 
 @export var slot_snap_distance := 86.0
 @export var item_pick_size := Vector2(58, 92)
@@ -12,11 +16,12 @@ const ITEMS_PER_TYPE := 3
 @export var back_layer_offset := Vector2(0, -18)
 @export var back_layer_item_scale := 0.86
 @export var back_layer_item_modulate := Color(0.42, 0.42, 0.42, 0.34)
-@export_range(1, 20, 1) var shelf_layer_count := 2
 @export var level_duration_seconds := 300.0
 @export_range(1, 10, 1) var selected_level := 1
 
 var _slots: Array[Node2D] = []
+var _item_textures: Dictionary = {}
+var _max_layer_count := 1
 var _dragged_item: ShelfItem
 var _origin_slot: Node2D
 var _drag_offset := Vector2.ZERO
@@ -38,10 +43,10 @@ func _ready() -> void:
 	_timer_label = get_node("UI/TimerLabel") as Label
 	_level_label = get_node("UI/LevelLabel") as Label
 	_failure_panel = get_node("UI/FailurePanel") as Control
-	_time_remaining = level_duration_seconds
 	_failure_panel.visible = false
+	_load_item_textures()
+	_apply_level_config(_load_level_config(selected_level))
 	_collect_slots()
-	_build_back_layers()
 	_update_level_label()
 	_update_timer_label()
 
@@ -85,6 +90,209 @@ func _input(event: InputEvent) -> void:
 		_handle_motion_at(_screen_position_to_global(drag_event.position))
 
 
+func _load_item_textures() -> void:
+	_item_textures.clear()
+
+	var config := _load_json_file(ITEM_SPRITES_CONFIG)
+	var items := config.get("items", []) as Array
+	for item_data in items:
+		var item_config := item_data as Dictionary
+		if item_config == null:
+			continue
+
+		var item_id := str(item_config.get("id", ""))
+		var texture_path := str(item_config.get("texture", ""))
+		if item_id.is_empty() or texture_path.is_empty():
+			continue
+
+		var texture := load(texture_path) as Texture2D
+		if texture != null:
+			_item_textures[item_id] = texture
+
+
+func _load_level_config(level_number: int) -> Dictionary:
+	var level_config_path := LEVEL_CONFIG_TEMPLATE % level_number
+	if not FileAccess.file_exists(level_config_path):
+		push_warning("Missing %s. Using %s." % [level_config_path, DEFAULT_LEVEL_CONFIG])
+		level_config_path = DEFAULT_LEVEL_CONFIG
+
+	return _load_json_file(level_config_path)
+
+
+func _load_json_file(path: String) -> Dictionary:
+	var file := FileAccess.open(path, FileAccess.READ)
+	if file == null:
+		push_error("Could not open config: %s" % path)
+		return {}
+
+	var parsed = JSON.parse_string(file.get_as_text())
+	var config := parsed as Dictionary
+	if config == null:
+		push_error("Config is not a JSON object: %s" % path)
+		return {}
+
+	return config
+
+
+func _apply_level_config(config: Dictionary) -> void:
+	level_duration_seconds = float(config.get("time_seconds", level_duration_seconds))
+	_time_remaining = level_duration_seconds
+	_max_layer_count = 1
+
+	var shelves_config := config.get("shelves", []) as Array
+	var layout_preset := str(config.get("layout_preset", "grid_3x3"))
+	var shelf_positions := _get_layout_positions(layout_preset, shelves_config.size())
+	var shelves := get_node("Shelves") as Node2D
+	_clear_shelves(shelves)
+
+	for shelf_index in range(shelves_config.size()):
+		var shelf_config := shelves_config[shelf_index] as Dictionary
+		if shelf_config == null:
+			continue
+
+		var shelf := _add_shelf(shelves, shelf_index + 1, shelf_positions[shelf_index])
+		var layers := shelf_config.get("layers", []) as Array
+		_max_layer_count = maxi(_max_layer_count, layers.size())
+		_add_configured_layers(shelf, layers)
+
+
+func _clear_shelves(shelves: Node) -> void:
+	for child in shelves.get_children():
+		shelves.remove_child(child)
+		child.free()
+
+
+func _get_layout_positions(layout_preset: String, shelf_count: int) -> Array[Vector2]:
+	var columns := 3
+	var spacing := Vector2(210, 210)
+
+	if layout_preset == "grid_2x3":
+		columns = 2
+	elif layout_preset == "grid_4x3":
+		columns = 4
+	elif layout_preset != "grid_3x3":
+		push_warning("Unknown layout preset '%s'. Using grid_3x3." % layout_preset)
+
+	var rows := ceili(float(shelf_count) / float(columns))
+	var origin := Vector2(
+		-(columns - 1) * spacing.x * 0.5,
+		-(rows - 1) * spacing.y * 0.5
+	)
+	var positions: Array[Vector2] = []
+	for shelf_index in range(shelf_count):
+		var column := shelf_index % columns
+		var row := shelf_index / columns
+		positions.append(origin + Vector2(column * spacing.x, row * spacing.y))
+
+	return positions
+
+
+func _add_shelf(parent: Node2D, shelf_number: int, shelf_position: Vector2) -> Node2D:
+	var shelf := Node2D.new()
+	shelf.name = "Shelf%02d" % shelf_number
+	shelf.position = shelf_position
+	parent.add_child(shelf)
+
+	_add_polygon(shelf, "Shadow", 0, Color(0.03, 0.025, 0.02, 0.34), PackedVector2Array([-98, 9, 98, 9, 84, 34, -84, 34]))
+	_add_polygon(shelf, "BackPanel", 1, Color(0.33, 0.21, 0.14, 1), PackedVector2Array([-88, -76, 88, -76, 88, -20, -88, -20]))
+	_add_polygon(shelf, "TopSurface", 2, Color(0.67, 0.43, 0.25, 1), PackedVector2Array([-94, -26, 94, -26, 78, 4, -78, 4]))
+	_add_polygon(shelf, "FrontLip", 3, Color(0.44, 0.27, 0.16, 1), PackedVector2Array([-78, 4, 78, 4, 88, 28, -88, 28]))
+	_add_highlight(shelf)
+
+	for slot_index in range(SLOT_COUNT):
+		_add_front_slot(shelf, slot_index)
+
+	return shelf
+
+
+func _add_polygon(parent: Node, node_name: String, z_index: int, color: Color, points: PackedVector2Array) -> void:
+	var polygon := Polygon2D.new()
+	polygon.name = node_name
+	polygon.z_index = z_index
+	polygon.color = color
+	polygon.polygon = points
+	parent.add_child(polygon)
+
+
+func _add_highlight(parent: Node) -> void:
+	var highlight := Line2D.new()
+	highlight.name = "Highlight"
+	highlight.z_index = 4
+	highlight.points = PackedVector2Array([-76, -21, 76, -21])
+	highlight.width = 2.0
+	highlight.default_color = Color(0.86, 0.61, 0.36, 0.72)
+	parent.add_child(highlight)
+
+
+func _add_front_slot(shelf: Node2D, slot_index: int) -> Node2D:
+	var slot_number := slot_index + 1
+	var slot := Node2D.new()
+	slot.name = "Slot%02d" % slot_number
+	slot.position = SLOT_POSITIONS[slot_index]
+	shelf.add_child(slot)
+
+	_add_polygon(slot, "SlotGuide", 5, Color(0.25, 0.74, 0.82, 0.22), PackedVector2Array([-26, -76, 26, -76, 22, -8, -22, -8]))
+
+	var marker := Marker2D.new()
+	marker.name = "ItemSlot%02d" % slot_number
+	marker.position = SLOT_ITEM_POSITION
+	slot.add_child(marker)
+
+	return slot
+
+
+func _add_configured_layers(shelf: Node2D, layers: Array) -> void:
+	for layer_index in range(layers.size()):
+		var item_ids := layers[layer_index] as Array
+		if item_ids == null:
+			push_warning("%s layer %s is not an array." % [shelf.name, layer_index + 1])
+			continue
+
+		if item_ids.size() != SLOT_COUNT:
+			push_warning("%s layer %s expected %s slots, found %s." % [shelf.name, layer_index + 1, SLOT_COUNT, item_ids.size()])
+
+		var layer_slots := _get_front_slots(shelf) if layer_index == 0 else _add_back_layer(shelf, layer_index)
+		var fill_count = mini(SLOT_COUNT, item_ids.size())
+		for slot_index in range(fill_count):
+			_add_configured_item(layer_slots[slot_index], item_ids[slot_index], layer_index, slot_index)
+
+
+func _add_back_layer(shelf: Node2D, layer_index: int) -> Array[Node2D]:
+	var layer := Node2D.new()
+	layer.name = _get_back_layer_name(layer_index)
+	layer.z_index = 4
+	layer.visible = layer_index == FIRST_BACK_LAYER_INDEX
+	shelf.add_child(layer)
+
+	var layer_slots: Array[Node2D] = []
+	for front_slot in _get_front_slots(shelf):
+		layer_slots.append(_add_layer_slot(layer, front_slot))
+
+	return layer_slots
+
+
+func _add_configured_item(slot: Node2D, item_value, layer_index: int, slot_index: int) -> void:
+	if item_value == null:
+		return
+
+	var item_id := str(item_value)
+	if item_id.is_empty():
+		return
+
+	var item := ITEM_SCENE.instantiate() as ShelfItem
+	item.name = "Item%sL%sS%s" % [item_id.to_pascal_case(), layer_index + 1, slot_index + 1]
+	item.item_id = StringName(item_id)
+	item.texture = _item_textures.get(item_id)
+	if item.texture == null:
+		push_warning("No texture configured for item '%s'." % item_id)
+
+	item.position = SLOT_ITEM_POSITION
+	slot.add_child(item)
+
+	if layer_index > 0:
+		_configure_back_layer_item(item, layer_index == FIRST_BACK_LAYER_INDEX)
+
+
 func _collect_slots() -> void:
 	_slots.clear()
 
@@ -96,57 +304,8 @@ func _collect_slots() -> void:
 				_slots.append(slot)
 
 
-func _build_back_layers() -> void:
-	var shelves := get_node("Shelves")
-	var templates := _get_item_templates()
-	for shelf in shelves.get_children():
-		var shelf_node := shelf as Node2D
-		if shelf_node == null:
-			continue
-
-		_clear_generated_layers(shelf_node)
-
-	for layer_index in range(FIRST_GENERATED_LAYER, shelf_layer_count + 1):
-		var layer_slots: Array[Node2D] = []
-		for shelf in shelves.get_children():
-			var shelf_node := shelf as Node2D
-			if shelf_node == null:
-				continue
-
-			layer_slots.append_array(_add_generated_layer(shelf_node, layer_index))
-
-		var layer_items := _build_layer_items(templates, layer_index)
-		_shuffle_array(layer_slots)
-		_shuffle_array(layer_items)
-
-		var fill_count = mini(layer_slots.size(), layer_items.size())
-		for i in range(fill_count):
-			_add_layer_item(layer_slots[i], layer_items[i], layer_index == FIRST_GENERATED_LAYER)
-
-
-func _clear_generated_layers(shelf: Node) -> void:
-	for child in shelf.get_children():
-		if child.name.begins_with(GENERATED_LAYER_PREFIX):
-			shelf.remove_child(child)
-			child.free()
-
-
-func _add_generated_layer(shelf: Node2D, layer_index: int) -> Array[Node2D]:
-	var layer := Node2D.new()
-	layer.name = _get_generated_layer_name(layer_index)
-	layer.z_index = 4
-	layer.visible = layer_index == FIRST_GENERATED_LAYER
-	shelf.add_child(layer)
-
-	var layer_slots: Array[Node2D] = []
-	for slot in _get_front_slots(shelf):
-		layer_slots.append(_add_layer_slot(layer, slot))
-
-	return layer_slots
-
-
-func _get_generated_layer_name(layer_index: int) -> String:
-	return "%s%02d" % [GENERATED_LAYER_PREFIX, layer_index]
+func _get_back_layer_name(layer_index: int) -> String:
+	return "%s%02d" % [BACK_LAYER_PREFIX, layer_index + 1]
 
 
 func _get_front_slots(shelf: Node) -> Array[Node2D]:
@@ -168,58 +327,15 @@ func _add_layer_slot(layer: Node2D, front_slot: Node2D) -> Node2D:
 	return layer_slot
 
 
-func _build_layer_items(templates: Array[ShelfItem], layer_index: int) -> Array[ShelfItem]:
-	var layer_items: Array[ShelfItem] = []
-	if templates.size() < ITEM_TYPE_COUNT:
-		push_warning("Shelf layers expected %s item types, found %s." % [ITEM_TYPE_COUNT, templates.size()])
+func _configure_back_layer_item(item: ShelfItem, should_show: bool) -> void:
+	item.z_index = 0
+	item.modulate = back_layer_item_modulate if should_show else Color.TRANSPARENT
+	item.input_pickable = false
+	item.visual_scale *= back_layer_item_scale
 
-	var type_count = mini(ITEM_TYPE_COUNT, templates.size())
-	for i in range(type_count):
-		for repeat in range(ITEMS_PER_TYPE):
-			var template := templates[i]
-			var layer_item := template.duplicate() as ShelfItem
-			layer_item.name = "%sLayer%sItem%s" % [template.name, layer_index, repeat + 1]
-			layer_items.append(layer_item)
-
-	return layer_items
-
-
-func _get_item_templates() -> Array[ShelfItem]:
-	var templates: Array[ShelfItem] = []
-	var seen_item_ids: Array[StringName] = []
-	for slot in _slots:
-		var item := _get_slot_item(slot)
-		if item == null or seen_item_ids.has(item.item_id):
-			continue
-
-		templates.append(item)
-		seen_item_ids.append(item.item_id)
-
-	return templates
-
-
-func _add_layer_item(layer_slot: Node2D, layer_item: ShelfItem, should_show: bool) -> void:
-	layer_item.position = SLOT_ITEM_POSITION
-	layer_item.z_index = 0
-	layer_item.modulate = back_layer_item_modulate if should_show else Color.TRANSPARENT
-	layer_item.input_pickable = false
-	layer_item.visual_scale *= back_layer_item_scale
-	layer_slot.add_child(layer_item)
-
-	var collision := layer_item.get_node_or_null("CollisionShape2D") as CollisionShape2D
+	var collision := item.get_node_or_null("CollisionShape2D") as CollisionShape2D
 	if collision != null:
 		collision.disabled = true
-
-
-func _shuffle_array(items: Array) -> void:
-	var random := RandomNumberGenerator.new()
-	random.randomize()
-
-	for i in range(items.size() - 1, 0, -1):
-		var swap_index := random.randi_range(0, i)
-		var current_item = items[i]
-		items[i] = items[swap_index]
-		items[swap_index] = current_item
 
 
 func _update_timer_label() -> void:
@@ -480,7 +596,7 @@ func _front_layer_is_empty(shelf: Node) -> bool:
 
 
 func _promote_back_layer(shelf: Node2D) -> bool:
-	var next_layer := shelf.get_node_or_null(_get_generated_layer_name(FIRST_GENERATED_LAYER)) as Node2D
+	var next_layer := shelf.get_node_or_null(_get_back_layer_name(FIRST_BACK_LAYER_INDEX)) as Node2D
 	if next_layer == null:
 		return false
 
@@ -498,22 +614,22 @@ func _promote_back_layer(shelf: Node2D) -> bool:
 
 	shelf.remove_child(next_layer)
 	next_layer.free()
-	_advance_generated_layers(shelf)
+	_advance_back_layers(shelf)
 	return true
 
 
-func _advance_generated_layers(shelf: Node2D) -> void:
-	for layer_index in range(FIRST_GENERATED_LAYER + 1, shelf_layer_count + 1):
-		var layer := shelf.get_node_or_null(_get_generated_layer_name(layer_index)) as Node2D
+func _advance_back_layers(shelf: Node2D) -> void:
+	for layer_index in range(FIRST_BACK_LAYER_INDEX + 1, _max_layer_count):
+		var layer := shelf.get_node_or_null(_get_back_layer_name(layer_index)) as Node2D
 		if layer == null:
 			continue
 
-		layer.name = _get_generated_layer_name(layer_index - 1)
-		_configure_generated_layer(layer, layer_index - 1)
+		layer.name = _get_back_layer_name(layer_index - 1)
+		_configure_back_layer(layer, layer_index - 1)
 
 
-func _configure_generated_layer(layer: Node2D, layer_index: int) -> void:
-	var should_show := layer_index == FIRST_GENERATED_LAYER
+func _configure_back_layer(layer: Node2D, layer_index: int) -> void:
+	var should_show := layer_index == FIRST_BACK_LAYER_INDEX
 	layer.visible = should_show
 
 	for layer_slot in layer.get_children():
