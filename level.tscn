@@ -204,10 +204,6 @@ polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
 [node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf02/Slot03"]
 position = Vector2(0, -42)
 
-[node name="LevelItemGoldenCat" parent="Shelves/Shelf02/Slot03" instance=ExtResource("9_item_scene")]
-position = Vector2(0, -42)
-item_id = &"golden_cat_figurine"
-texture = ExtResource("7_cat")
 
 [node name="Shelf03" type="Node2D" parent="Shelves"]
 position = Vector2(210, -210)
@@ -410,10 +406,6 @@ polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
 [node name="ItemSlot02" type="Marker2D" parent="Shelves/Shelf05/Slot02"]
 position = Vector2(0, -42)
 
-[node name="LevelItemGoldenCat" parent="Shelves/Shelf05/Slot02" instance=ExtResource("9_item_scene")]
-position = Vector2(0, -42)
-item_id = &"golden_cat_figurine"
-texture = ExtResource("7_cat")
 
 [node name="Slot03" type="Node2D" parent="Shelves/Shelf05"]
 position = Vector2(56, 0)
@@ -578,10 +570,6 @@ polygon = PackedVector2Array(-26, -76, 26, -76, 22, -8, -22, -8)
 [node name="ItemSlot03" type="Marker2D" parent="Shelves/Shelf07/Slot03"]
 position = Vector2(0, -42)
 
-[node name="LevelItemGoldenCat" parent="Shelves/Shelf07/Slot03" instance=ExtResource("9_item_scene")]
-position = Vector2(0, -42)
-item_id = &"golden_cat_figurine"
-texture = ExtResource("7_cat")
 
 [node name="Shelf08" type="Node2D" parent="Shelves"]
 position = Vector2(0, 210)
