@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://bx74wdn60xop5"]
+[gd_scene load_steps=11 format=3 uid="uid://bx74wdn60xop5"]
 
 [ext_resource type="Texture2D" path="res://assets/items/item_milk_carton.png" id="1_milk"]
 [ext_resource type="Texture2D" path="res://assets/items/item_soda_bottle.png" id="2_soda"]
@@ -9,8 +9,10 @@
 [ext_resource type="Texture2D" path="res://assets/items/item_golden_cat_figurine.png" id="7_cat"]
 [ext_resource type="Texture2D" path="res://assets/items/item_plant_pot.png" id="8_plant"]
 [ext_resource type="PackedScene" path="res://scenes/item.tscn" id="9_item_scene"]
+[ext_resource type="Script" path="res://scripts/level.gd" id="10_level_script"]
 
 [node name="Level" type="Node2D" unique_id=949256860]
+script = ExtResource("10_level_script")
 
 [node name="Background" type="ColorRect" parent="."]
 offset_right = 720.0
@@ -19,6 +21,9 @@ color = Color(0.12, 0.15, 0.2, 1)
 
 [node name="Shelves" type="Node2D" parent="."]
 position = Vector2(360, 520)
+
+[node name="DragLayer" type="Node2D" parent="."]
+z_index = 100
 
 [node name="Shelf01" type="Node2D" parent="Shelves"]
 position = Vector2(-210, -210)
