@@ -1,7 +1,8 @@
 extends Node2D
 
 const SLOT_ITEM_POSITION := Vector2(0, -42)
-const BACK_LAYER_NAME := "BackLayer"
+const GENERATED_LAYER_PREFIX := "ShelfLayer"
+const FIRST_GENERATED_LAYER := 2
 const ITEM_TYPE_COUNT := 8
 const ITEMS_PER_TYPE := 3
 
@@ -11,6 +12,7 @@ const ITEMS_PER_TYPE := 3
 @export var back_layer_offset := Vector2(0, -18)
 @export var back_layer_item_scale := 0.86
 @export var back_layer_item_modulate := Color(0.42, 0.42, 0.42, 0.34)
+@export_range(1, 20, 1) var shelf_layer_count := 2
 @export var level_duration_seconds := 300.0
 
 var _slots: Array[Node2D] = []
@@ -92,32 +94,55 @@ func _collect_slots() -> void:
 
 func _build_back_layers() -> void:
 	var shelves := get_node("Shelves")
-	var back_slots: Array[Node2D] = []
+	var templates := _get_item_templates()
 	for shelf in shelves.get_children():
 		var shelf_node := shelf as Node2D
 		if shelf_node == null:
 			continue
 
-		var existing_back_layer := shelf_node.get_node_or_null(BACK_LAYER_NAME)
-		if existing_back_layer != null:
-			shelf_node.remove_child(existing_back_layer)
-			existing_back_layer.free()
+		_clear_generated_layers(shelf_node)
 
-		var back_layer := Node2D.new()
-		back_layer.name = BACK_LAYER_NAME
-		back_layer.z_index = 4
-		shelf_node.add_child(back_layer)
+	for layer_index in range(FIRST_GENERATED_LAYER, shelf_layer_count + 1):
+		var layer_slots: Array[Node2D] = []
+		for shelf in shelves.get_children():
+			var shelf_node := shelf as Node2D
+			if shelf_node == null:
+				continue
 
-		for slot in _get_front_slots(shelf_node):
-			back_slots.append(_add_back_slot(back_layer, slot))
+			layer_slots.append_array(_add_generated_layer(shelf_node, layer_index))
 
-	var back_items := _build_back_layer_items()
-	_shuffle_array(back_slots)
-	_shuffle_array(back_items)
+		var layer_items := _build_layer_items(templates, layer_index)
+		_shuffle_array(layer_slots)
+		_shuffle_array(layer_items)
 
-	var fill_count = mini(back_slots.size(), back_items.size())
-	for i in range(fill_count):
-		_add_back_item(back_slots[i], back_items[i])
+		var fill_count = mini(layer_slots.size(), layer_items.size())
+		for i in range(fill_count):
+			_add_layer_item(layer_slots[i], layer_items[i], layer_index == FIRST_GENERATED_LAYER)
+
+
+func _clear_generated_layers(shelf: Node) -> void:
+	for child in shelf.get_children():
+		if child.name.begins_with(GENERATED_LAYER_PREFIX):
+			shelf.remove_child(child)
+			child.free()
+
+
+func _add_generated_layer(shelf: Node2D, layer_index: int) -> Array[Node2D]:
+	var layer := Node2D.new()
+	layer.name = _get_generated_layer_name(layer_index)
+	layer.z_index = 4
+	layer.visible = layer_index == FIRST_GENERATED_LAYER
+	shelf.add_child(layer)
+
+	var layer_slots: Array[Node2D] = []
+	for slot in _get_front_slots(shelf):
+		layer_slots.append(_add_layer_slot(layer, slot))
+
+	return layer_slots
+
+
+func _get_generated_layer_name(layer_index: int) -> String:
+	return "%s%02d" % [GENERATED_LAYER_PREFIX, layer_index]
 
 
 func _get_front_slots(shelf: Node) -> Array[Node2D]:
@@ -130,30 +155,29 @@ func _get_front_slots(shelf: Node) -> Array[Node2D]:
 	return front_slots
 
 
-func _add_back_slot(back_layer: Node2D, front_slot: Node2D) -> Node2D:
-	var back_slot := Node2D.new()
-	back_slot.name = "Back%s" % front_slot.name
-	back_slot.position = front_slot.position + back_layer_offset
-	back_layer.add_child(back_slot)
+func _add_layer_slot(layer: Node2D, front_slot: Node2D) -> Node2D:
+	var layer_slot := Node2D.new()
+	layer_slot.name = "Layer%s" % front_slot.name
+	layer_slot.position = front_slot.position + back_layer_offset
+	layer.add_child(layer_slot)
 
-	return back_slot
+	return layer_slot
 
 
-func _build_back_layer_items() -> Array[ShelfItem]:
-	var back_items: Array[ShelfItem] = []
-	var templates := _get_item_templates()
+func _build_layer_items(templates: Array[ShelfItem], layer_index: int) -> Array[ShelfItem]:
+	var layer_items: Array[ShelfItem] = []
 	if templates.size() < ITEM_TYPE_COUNT:
-		push_warning("Back layer expected %s item types, found %s." % [ITEM_TYPE_COUNT, templates.size()])
+		push_warning("Shelf layers expected %s item types, found %s." % [ITEM_TYPE_COUNT, templates.size()])
 
 	var type_count = mini(ITEM_TYPE_COUNT, templates.size())
 	for i in range(type_count):
 		for repeat in range(ITEMS_PER_TYPE):
 			var template := templates[i]
-			var back_item := template.duplicate() as ShelfItem
-			back_item.name = "%sBackLayer%s" % [template.name, repeat + 1]
-			back_items.append(back_item)
+			var layer_item := template.duplicate() as ShelfItem
+			layer_item.name = "%sLayer%sItem%s" % [template.name, layer_index, repeat + 1]
+			layer_items.append(layer_item)
 
-	return back_items
+	return layer_items
 
 
 func _get_item_templates() -> Array[ShelfItem]:
@@ -170,15 +194,15 @@ func _get_item_templates() -> Array[ShelfItem]:
 	return templates
 
 
-func _add_back_item(back_slot: Node2D, back_item: ShelfItem) -> void:
-	back_item.position = SLOT_ITEM_POSITION
-	back_item.z_index = 0
-	back_item.modulate = back_layer_item_modulate
-	back_item.input_pickable = false
-	back_item.visual_scale *= back_layer_item_scale
-	back_slot.add_child(back_item)
+func _add_layer_item(layer_slot: Node2D, layer_item: ShelfItem, should_show: bool) -> void:
+	layer_item.position = SLOT_ITEM_POSITION
+	layer_item.z_index = 0
+	layer_item.modulate = back_layer_item_modulate if should_show else Color.TRANSPARENT
+	layer_item.input_pickable = false
+	layer_item.visual_scale *= back_layer_item_scale
+	layer_slot.add_child(layer_item)
 
-	var collision := back_item.get_node_or_null("CollisionShape2D") as CollisionShape2D
+	var collision := layer_item.get_node_or_null("CollisionShape2D") as CollisionShape2D
 	if collision != null:
 		collision.disabled = true
 
@@ -412,10 +436,11 @@ func _clear_matching_shelves(shelves_to_check: Array[Node]) -> void:
 func _promote_empty_front_layers(shelves_to_check: Array[Node]) -> void:
 	for shelf in shelves_to_check:
 		var shelf_node := shelf as Node2D
-		if shelf_node == null or not _front_layer_is_empty(shelf_node):
+		if shelf_node == null:
 			continue
 
-		_promote_back_layer(shelf_node)
+		while _front_layer_is_empty(shelf_node) and _promote_back_layer(shelf_node):
+			pass
 
 
 func _front_layer_is_empty(shelf: Node) -> bool:
@@ -426,25 +451,51 @@ func _front_layer_is_empty(shelf: Node) -> bool:
 	return true
 
 
-func _promote_back_layer(shelf: Node2D) -> void:
-	var back_layer := shelf.get_node_or_null(BACK_LAYER_NAME) as Node2D
-	if back_layer == null:
-		return
+func _promote_back_layer(shelf: Node2D) -> bool:
+	var next_layer := shelf.get_node_or_null(_get_generated_layer_name(FIRST_GENERATED_LAYER)) as Node2D
+	if next_layer == null:
+		return false
 
 	for front_slot in _get_front_slots(shelf):
-		var back_slot := back_layer.get_node_or_null("Back%s" % front_slot.name) as Node2D
-		if back_slot == null:
+		var layer_slot := next_layer.get_node_or_null("Layer%s" % front_slot.name) as Node2D
+		if layer_slot == null:
 			continue
 
-		var back_item := _get_slot_item(back_slot)
-		if back_item == null:
+		var layer_item := _get_slot_item(layer_slot)
+		if layer_item == null:
 			continue
 
-		_activate_back_layer_item(back_item)
-		_place_item_in_slot(back_item, front_slot)
+		_activate_back_layer_item(layer_item)
+		_place_item_in_slot(layer_item, front_slot)
 
-	shelf.remove_child(back_layer)
-	back_layer.free()
+	shelf.remove_child(next_layer)
+	next_layer.free()
+	_advance_generated_layers(shelf)
+	return true
+
+
+func _advance_generated_layers(shelf: Node2D) -> void:
+	for layer_index in range(FIRST_GENERATED_LAYER + 1, shelf_layer_count + 1):
+		var layer := shelf.get_node_or_null(_get_generated_layer_name(layer_index)) as Node2D
+		if layer == null:
+			continue
+
+		layer.name = _get_generated_layer_name(layer_index - 1)
+		_configure_generated_layer(layer, layer_index - 1)
+
+
+func _configure_generated_layer(layer: Node2D, layer_index: int) -> void:
+	var should_show := layer_index == FIRST_GENERATED_LAYER
+	layer.visible = should_show
+
+	for layer_slot in layer.get_children():
+		var slot := layer_slot as Node2D
+		if slot == null:
+			continue
+
+		var item := _get_slot_item(slot)
+		if item != null:
+			item.modulate = back_layer_item_modulate if should_show else Color.TRANSPARENT
 
 
 func _activate_back_layer_item(item: ShelfItem) -> void:
