@@ -233,6 +233,7 @@ func _move_item_to_slot(item: ShelfItem, origin_slot: Node2D, target_slot: Node2
 		_place_item_in_slot(item, target_slot)
 
 	_clear_matching_shelves(shelves_to_check)
+	_promote_empty_front_layers(shelves_to_check)
 
 
 func _find_item_at_position(pointer_global_position: Vector2) -> ShelfItem:
@@ -275,7 +276,7 @@ func _find_nearest_slot(pointer_global_position: Vector2) -> Node2D:
 func _get_slot_item(slot: Node2D) -> ShelfItem:
 	for child in slot.get_children():
 		var item := child as ShelfItem
-		if item != null:
+		if item != null and not item.is_queued_for_deletion():
 			return item
 
 	return null
@@ -309,6 +310,55 @@ func _clear_matching_shelves(shelves_to_check: Array[Node]) -> void:
 
 			if shelf_items.has(_selected_item):
 				_clear_selected_item()
+
+
+func _promote_empty_front_layers(shelves_to_check: Array[Node]) -> void:
+	for shelf in shelves_to_check:
+		var shelf_node := shelf as Node2D
+		if shelf_node == null or not _front_layer_is_empty(shelf_node):
+			continue
+
+		_promote_back_layer(shelf_node)
+
+
+func _front_layer_is_empty(shelf: Node) -> bool:
+	for slot in _get_front_slots(shelf):
+		if _get_slot_item(slot) != null:
+			return false
+
+	return true
+
+
+func _promote_back_layer(shelf: Node2D) -> void:
+	var back_layer := shelf.get_node_or_null(BACK_LAYER_NAME) as Node2D
+	if back_layer == null:
+		return
+
+	for front_slot in _get_front_slots(shelf):
+		var back_slot := back_layer.get_node_or_null("Back%s" % front_slot.name) as Node2D
+		if back_slot == null:
+			continue
+
+		var back_item := _get_slot_item(back_slot)
+		if back_item == null:
+			continue
+
+		_activate_back_layer_item(back_item)
+		_place_item_in_slot(back_item, front_slot)
+
+	shelf.remove_child(back_layer)
+	back_layer.free()
+
+
+func _activate_back_layer_item(item: ShelfItem) -> void:
+	item.modulate = Color.WHITE
+	item.input_pickable = true
+	if back_layer_item_scale > 0.0:
+		item.visual_scale /= back_layer_item_scale
+
+	var collision := item.get_node_or_null("CollisionShape2D") as CollisionShape2D
+	if collision != null:
+		collision.disabled = false
 
 
 func _get_shelf_items(shelf: Node) -> Array[ShelfItem]:
