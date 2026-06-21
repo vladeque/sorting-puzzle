@@ -14,6 +14,7 @@ const ITEMS_PER_TYPE := 3
 @export var back_layer_item_modulate := Color(0.42, 0.42, 0.42, 0.34)
 @export_range(1, 20, 1) var shelf_layer_count := 2
 @export var level_duration_seconds := 300.0
+@export_range(1, 10, 1) var selected_level := 1
 
 var _slots: Array[Node2D] = []
 var _dragged_item: ShelfItem
@@ -21,6 +22,7 @@ var _origin_slot: Node2D
 var _drag_offset := Vector2.ZERO
 var _drag_layer: Node2D
 var _timer_label: Label
+var _level_label: Label
 var _failure_panel: Control
 var _time_remaining := 0.0
 var _level_failed := false
@@ -34,11 +36,13 @@ var _selected_slot: Node2D
 func _ready() -> void:
 	_drag_layer = get_node("DragLayer") as Node2D
 	_timer_label = get_node("UI/TimerLabel") as Label
+	_level_label = get_node("UI/LevelLabel") as Label
 	_failure_panel = get_node("UI/FailurePanel") as Control
 	_time_remaining = level_duration_seconds
 	_failure_panel.visible = false
 	_collect_slots()
 	_build_back_layers()
+	_update_level_label()
 	_update_timer_label()
 
 
@@ -223,6 +227,10 @@ func _update_timer_label() -> void:
 	var minutes := remaining_seconds / 60
 	var seconds := remaining_seconds % 60
 	_timer_label.text = "%02d:%02d" % [minutes, seconds]
+
+
+func _update_level_label() -> void:
+	_level_label.text = "Level %d" % selected_level
 
 
 func _fail_level() -> void:
