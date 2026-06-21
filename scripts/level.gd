@@ -4,18 +4,23 @@ const SLOT_ITEM_POSITION := Vector2(0, -42)
 
 @export var slot_snap_distance := 86.0
 @export var item_pick_size := Vector2(58, 92)
+@export var drag_start_distance := 12.0
 
 var _slots: Array[Node2D] = []
 var _dragged_item: ShelfItem
 var _origin_slot: Node2D
 var _drag_offset := Vector2.ZERO
 var _drag_layer: Node2D
+var _pressed_item: ShelfItem
+var _pressed_origin_slot: Node2D
+var _press_position := Vector2.ZERO
+var _selected_item: ShelfItem
+var _selected_slot: Node2D
 
 
 func _ready() -> void:
 	_drag_layer = get_node("DragLayer") as Node2D
 	_collect_slots()
-	_connect_items()
 
 
 func _input(event: InputEvent) -> void:
@@ -26,21 +31,21 @@ func _input(event: InputEvent) -> void:
 
 		var pointer_position := get_global_mouse_position()
 		if mouse_event.pressed:
-			_try_start_drag_at(pointer_position)
+			_handle_press_at(pointer_position)
 		else:
-			_finish_active_drag(pointer_position)
+			_handle_release_at(pointer_position)
 	elif event is InputEventMouseMotion:
-		_move_active_drag(get_global_mouse_position())
+		_handle_motion_at(get_global_mouse_position())
 	elif event is InputEventScreenTouch:
 		var touch_event := event as InputEventScreenTouch
 		var pointer_position := _screen_position_to_global(touch_event.position)
 		if touch_event.pressed:
-			_try_start_drag_at(pointer_position)
+			_handle_press_at(pointer_position)
 		else:
-			_finish_active_drag(pointer_position)
+			_handle_release_at(pointer_position)
 	elif event is InputEventScreenDrag:
 		var drag_event := event as InputEventScreenDrag
-		_move_active_drag(_screen_position_to_global(drag_event.position))
+		_handle_motion_at(_screen_position_to_global(drag_event.position))
 
 
 func _collect_slots() -> void:
@@ -54,53 +59,61 @@ func _collect_slots() -> void:
 				_slots.append(slot)
 
 
-func _connect_items() -> void:
-	for slot in _slots:
-		var item := _get_slot_item(slot)
-		if item != null:
-			_connect_item(item)
-
-
-func _connect_item(item: ShelfItem) -> void:
-	if not item.drag_started.is_connected(_on_item_drag_started):
-		item.drag_started.connect(_on_item_drag_started)
-	if not item.drag_moved.is_connected(_on_item_drag_moved):
-		item.drag_moved.connect(_on_item_drag_moved)
-	if not item.drag_ended.is_connected(_on_item_drag_ended):
-		item.drag_ended.connect(_on_item_drag_ended)
-
-
-func _on_item_drag_started(item: ShelfItem, pointer_global_position: Vector2) -> void:
-	if _dragged_item != null:
-		item.cancel_drag()
-		return
-
-	_begin_drag(item, pointer_global_position)
-
-
-func _on_item_drag_moved(item: ShelfItem, pointer_global_position: Vector2) -> void:
-	if item != _dragged_item:
-		return
-
-	_move_active_drag(pointer_global_position)
-
-
-func _on_item_drag_ended(item: ShelfItem, pointer_global_position: Vector2) -> void:
-	if item != _dragged_item:
-		return
-
-	_finish_active_drag(pointer_global_position)
-
-
-func _try_start_drag_at(pointer_global_position: Vector2) -> void:
+func _handle_press_at(pointer_global_position: Vector2) -> void:
 	if _dragged_item != null:
 		return
 
-	var item := _find_item_at_position(pointer_global_position)
-	if item == null:
+	var clicked_item := _find_item_at_position(pointer_global_position)
+	if _selected_item != null:
+		var target_slot := _find_clicked_slot(pointer_global_position, clicked_item)
+		if target_slot != null:
+			_move_item_to_slot(_selected_item, _selected_slot, target_slot)
+			_clear_selected_item()
+			get_viewport().set_input_as_handled()
+			return
+
+		_clear_selected_item()
+
+	if clicked_item == null:
 		return
 
-	_begin_drag(item, pointer_global_position)
+	_pressed_item = clicked_item
+	_pressed_origin_slot = clicked_item.get_parent() as Node2D
+	_press_position = pointer_global_position
+	get_viewport().set_input_as_handled()
+
+
+func _handle_motion_at(pointer_global_position: Vector2) -> void:
+	if _dragged_item != null:
+		_move_active_drag(pointer_global_position)
+		return
+
+	if _pressed_item == null:
+		return
+
+	if pointer_global_position.distance_to(_press_position) < drag_start_distance:
+		return
+
+	_clear_selected_item()
+	_begin_drag(_pressed_item, pointer_global_position)
+	get_viewport().set_input_as_handled()
+
+
+func _handle_release_at(pointer_global_position: Vector2) -> void:
+	if _dragged_item != null:
+		_finish_active_drag(pointer_global_position)
+		_pressed_item = null
+		_pressed_origin_slot = null
+		return
+
+	if _pressed_item == null:
+		return
+
+	if _pressed_item.get_parent() == _pressed_origin_slot:
+		_set_selected_item(_pressed_item, _pressed_origin_slot)
+
+	_pressed_item = null
+	_pressed_origin_slot = null
 	get_viewport().set_input_as_handled()
 
 
@@ -127,27 +140,39 @@ func _finish_active_drag(pointer_global_position: Vector2) -> void:
 
 	var item := _dragged_item
 	var target_slot := _find_nearest_slot(pointer_global_position)
-	var shelves_to_check: Array[Node] = []
 	if target_slot == null:
 		_place_item_in_slot(item, _origin_slot)
 	elif target_slot == _origin_slot:
 		_place_item_in_slot(item, _origin_slot)
 	else:
-		_add_shelf_to_check(shelves_to_check, _origin_slot)
-		_add_shelf_to_check(shelves_to_check, target_slot)
-
-		var target_item := _get_slot_item(target_slot)
-		if target_item == null:
-			_place_item_in_slot(item, target_slot)
-		else:
-			_place_item_in_slot(target_item, _origin_slot)
-			_place_item_in_slot(item, target_slot)
+		_move_item_to_slot(item, _origin_slot, target_slot)
 
 	_dragged_item = null
 	_origin_slot = null
 	_drag_offset = Vector2.ZERO
-	_clear_matching_shelves(shelves_to_check)
 	get_viewport().set_input_as_handled()
+
+
+func _move_item_to_slot(item: ShelfItem, origin_slot: Node2D, target_slot: Node2D) -> void:
+	if item == null or origin_slot == null or target_slot == null:
+		return
+
+	if target_slot == origin_slot:
+		_place_item_in_slot(item, origin_slot)
+		return
+
+	var shelves_to_check: Array[Node] = []
+	_add_shelf_to_check(shelves_to_check, origin_slot)
+	_add_shelf_to_check(shelves_to_check, target_slot)
+
+	var target_item := _get_slot_item(target_slot)
+	if target_item == null:
+		_place_item_in_slot(item, target_slot)
+	else:
+		_place_item_in_slot(target_item, origin_slot)
+		_place_item_in_slot(item, target_slot)
+
+	_clear_matching_shelves(shelves_to_check)
 
 
 func _find_item_at_position(pointer_global_position: Vector2) -> ShelfItem:
@@ -161,6 +186,13 @@ func _find_item_at_position(pointer_global_position: Vector2) -> ShelfItem:
 			return item
 
 	return null
+
+
+func _find_clicked_slot(pointer_global_position: Vector2, clicked_item: ShelfItem) -> Node2D:
+	if clicked_item != null:
+		return clicked_item.get_parent() as Node2D
+
+	return _find_nearest_slot(pointer_global_position)
 
 
 func _find_nearest_slot(pointer_global_position: Vector2) -> Node2D:
@@ -215,6 +247,9 @@ func _clear_matching_shelves(shelves_to_check: Array[Node]) -> void:
 			for item in shelf_items:
 				item.queue_free()
 
+			if shelf_items.has(_selected_item):
+				_clear_selected_item()
+
 
 func _get_shelf_items(shelf: Node) -> Array[ShelfItem]:
 	var shelf_items: Array[ShelfItem] = []
@@ -232,3 +267,26 @@ func _get_shelf_items(shelf: Node) -> Array[ShelfItem]:
 
 func _screen_position_to_global(screen_position: Vector2) -> Vector2:
 	return get_canvas_transform().affine_inverse() * screen_position
+
+
+func _set_selected_item(item: ShelfItem, slot: Node2D) -> void:
+	_clear_selected_item()
+	_selected_item = item
+	_selected_slot = slot
+	_apply_item_selected(item, true)
+
+
+func _clear_selected_item() -> void:
+	if _selected_item != null and is_instance_valid(_selected_item):
+		_apply_item_selected(_selected_item, false)
+
+	_selected_item = null
+	_selected_slot = null
+
+
+func _apply_item_selected(item: ShelfItem, selected: bool) -> void:
+	var sprite := item.get_node_or_null("Sprite2D") as Sprite2D
+	if sprite == null:
+		return
+
+	sprite.modulate = Color(1.12, 1.12, 1.12, 1.0) if selected else Color.WHITE
