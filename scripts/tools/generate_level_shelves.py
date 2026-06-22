@@ -12,6 +12,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from validate_level_solvable import load_item_ids as load_known_item_ids
+from validate_level_solvable import solve_level, shelves_to_state, validate_shelves_shape
+
 
 SLOTS_PER_SHELF = 3
 DEFAULT_ITEM_CONFIG = Path("configs/item_sprites.json")
@@ -203,6 +206,99 @@ def generate_shelves(
     return shelves, stats
 
 
+def validate_generated_shelves(
+    shelves: list[dict[str, Any]],
+    item_config_path: Path,
+    max_states: int,
+    max_depth: int,
+) -> dict[str, Any]:
+    known_item_ids = load_known_item_ids(item_config_path)
+    errors, item_counts = validate_shelves_shape(
+        shelves=shelves,
+        known_item_ids=known_item_ids,
+        skip_known_items=False,
+    )
+    if errors:
+        return {
+            "valid": False,
+            "errors": errors,
+            "item_counts": dict(sorted(item_counts.items())),
+            "solvable": None,
+            "reason": "invalid",
+            "moves": None,
+            "states_checked": 0,
+            "max_queue_size": 0,
+        }
+
+    search_result = solve_level(
+        initial_state=shelves_to_state(shelves),
+        max_states=max_states,
+        max_depth=max_depth,
+        keep_solution=False,
+    )
+    return {
+        "valid": True,
+        "errors": [],
+        "item_counts": dict(sorted(item_counts.items())),
+        "solvable": search_result.solvable,
+        "reason": search_result.reason,
+        "moves": search_result.moves,
+        "states_checked": search_result.states_checked,
+        "max_queue_size": search_result.max_queue_size,
+    }
+
+
+def generate_with_optional_validation(
+    shelf_count: int,
+    layer_count: int,
+    filled_layer_count: int,
+    item_types: list[str],
+    difficulty: str,
+    seed: int | None,
+    should_validate: bool,
+    require_solvable: bool,
+    max_attempts: int,
+    item_config_path: Path,
+    max_states: int,
+    max_depth: int,
+) -> tuple[list[dict[str, Any]], dict[str, Any], dict[str, Any] | None, int | None]:
+    attempts = max(1, max_attempts if require_solvable else 1)
+    random_seed_source = random.SystemRandom()
+    last_result = None
+
+    for attempt_index in range(attempts):
+        attempt_seed = seed + attempt_index if seed is not None else random_seed_source.randrange(1, 2**31)
+        shelves, stats = generate_shelves(
+            shelf_count=shelf_count,
+            layer_count=layer_count,
+            filled_layer_count=filled_layer_count,
+            item_types=item_types,
+            difficulty=difficulty,
+            seed=attempt_seed,
+        )
+        stats["attempt"] = attempt_index + 1
+        stats["max_attempts"] = attempts
+
+        validation = None
+        if should_validate or require_solvable:
+            validation = validate_generated_shelves(
+                shelves=shelves,
+                item_config_path=item_config_path,
+                max_states=max_states,
+                max_depth=max_depth,
+            )
+            stats["validation"] = validation
+
+        last_result = (shelves, stats, validation, attempt_seed)
+        if not require_solvable or (validation is not None and validation["solvable"] is True):
+            return last_result
+
+    if last_result is None:
+        raise ValueError("Could not generate shelves")
+
+    return last_result
+
+
 def build_item_pool_with_preset(
     item_types: list[str],
     filled_slots: int,
@@ -354,6 +450,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--time-seconds", type=int, default=300)
     parser.add_argument("--layout-preset", default="grid_3x3")
     parser.add_argument("--stats", action="store_true", help="Print generation stats to stderr.")
+    parser.add_argument("--validate", action="store_true", help="Run the solvability validator once after generation.")
+    parser.add_argument(
+        "--require-solvable",
+        action="store_true",
+        help="Retry generation until the validator finds a solvable layout or attempts run out.",
+    )
+    parser.add_argument("--max-generation-attempts", type=int, default=25)
+    parser.add_argument("--validator-max-states", type=int, default=20_000)
+    parser.add_argument("--validator-max-depth", type=int, default=200)
     return parser.parse_args()
 
 
@@ -365,17 +470,29 @@ def main() -> int:
 
     try:
         item_types = parse_item_types(args.item_types, args.item_config)
-        shelves, stats = generate_shelves(
+        shelves, stats, validation, used_seed = generate_with_optional_validation(
             shelf_count=args.shelf_count,
             layer_count=args.layer_count,
             filled_layer_count=filled_layer_count,
             item_types=item_types,
             difficulty=args.difficulty,
             seed=args.seed,
+            should_validate=args.validate,
+            require_solvable=args.require_solvable,
+            max_attempts=args.max_generation_attempts,
+            item_config_path=args.item_config,
+            max_states=args.validator_max_states,
+            max_depth=args.validator_max_depth,
         )
     except (OSError, ValueError, KeyError) as error:
         print(f"error: {error}", file=sys.stderr)
         return 1
+
+    if args.require_solvable and (validation is None or validation["solvable"] is not True):
+        if args.stats:
+            print(json.dumps(stats, indent=2), file=sys.stderr)
+        print("error: could not generate a solvable level within the attempt limit", file=sys.stderr)
+        return 3
 
     output_data: Any = shelves
     if args.full_level:
@@ -384,7 +501,7 @@ def main() -> int:
             level_number=args.level_number,
             time_seconds=args.time_seconds,
             layout_preset=args.layout_preset,
-            seed=args.seed,
+            seed=used_seed,
             difficulty=args.difficulty,
         )
 

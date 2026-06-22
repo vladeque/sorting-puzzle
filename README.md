@@ -10,6 +10,12 @@ py scripts\tools\generate_level_shelves.py --shelf-count 9 --layer-count 2 --dif
 
 By default the tool prints only the JSON array that belongs in a level file's `shelves` field. Add `--full-level --output configs\levels\level_002.json` to write a complete level config.
 
+Add `--validate` to run the solvability validator once after generation. Add `--require-solvable --max-generation-attempts 25` to retry generation until a solvable layout is found.
+
+```powershell
+py scripts\tools\generate_level_shelves.py --shelf-count 9 --layer-count 2 --difficulty medium --seed 123 --require-solvable --stats
+```
+
 ## Level solvability validation
 
 Use `scripts/tools/validate_level_solvable.py` to validate level JSON and run a bounded solvability search.
