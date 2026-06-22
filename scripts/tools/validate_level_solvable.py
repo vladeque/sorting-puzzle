@@ -1,0 +1,391 @@
+#!/usr/bin/env python3
+"""Validate whether a Sorting Puzzle level can be completed."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from collections import Counter
+from pathlib import Path
+from typing import Any, NamedTuple
+
+
+SLOTS_PER_SHELF = 3
+DEFAULT_ITEM_CONFIG = Path("configs/item_sprites.json")
+
+Item = str | None
+Layer = tuple[Item, Item, Item]
+Shelf = tuple[Layer, ...]
+State = tuple[Shelf, ...]
+
+
+class Move(NamedTuple):
+    item_id: str
+    from_shelf: int
+    from_slot: int
+    to_shelf: int
+    to_slot: int
+
+
+class SearchResult(NamedTuple):
+    solvable: bool | None
+    reason: str
+    moves: int | None
+    states_checked: int
+    max_queue_size: int
+    solution: list[Move]
+
+
+def load_item_ids(item_config_path: Path) -> set[str]:
+    with item_config_path.open("r", encoding="utf-8") as config_file:
+        config = json.load(config_file)
+
+    return {
+        item["id"]
+        for item in config.get("items", [])
+        if isinstance(item, dict) and isinstance(item.get("id"), str)
+    }
+
+
+def load_shelves(path: Path, shelves_only: bool) -> list[dict[str, Any]]:
+    with path.open("r", encoding="utf-8") as level_file:
+        data = json.load(level_file)
+
+    if shelves_only:
+        if not isinstance(data, list):
+            raise ValueError("--shelves-only expects a JSON array")
+        return data
+
+    if isinstance(data, dict) and isinstance(data.get("shelves"), list):
+        return data["shelves"]
+    if isinstance(data, list):
+        return data
+
+    raise ValueError("Expected a level JSON object with 'shelves' or a shelves array")
+
+
+def validate_shelves_shape(
+    shelves: list[dict[str, Any]],
+    known_item_ids: set[str],
+    skip_known_items: bool,
+) -> tuple[list[str], Counter[str]]:
+    errors = []
+    item_counts: Counter[str] = Counter()
+
+    if not shelves:
+        errors.append("level must contain at least one shelf")
+
+    for shelf_index, shelf in enumerate(shelves):
+        if not isinstance(shelf, dict):
+            errors.append(f"shelf {shelf_index + 1} must be an object")
+            continue
+
+        layers = shelf.get("layers")
+        if not isinstance(layers, list) or not layers:
+            errors.append(f"shelf {shelf_index + 1} must contain a non-empty layers array")
+            continue
+
+        for layer_index, layer in enumerate(layers):
+            if not isinstance(layer, list):
+                errors.append(f"shelf {shelf_index + 1} layer {layer_index + 1} must be an array")
+                continue
+            if len(layer) != SLOTS_PER_SHELF:
+                errors.append(
+                    f"shelf {shelf_index + 1} layer {layer_index + 1} must contain {SLOTS_PER_SHELF} slots"
+                )
+                continue
+
+            for slot_index, item_id in enumerate(layer):
+                if item_id is None:
+                    continue
+                if not isinstance(item_id, str) or not item_id:
+                    errors.append(
+                        f"shelf {shelf_index + 1} layer {layer_index + 1} slot {slot_index + 1} "
+                        "must be an item ID string or null"
+                    )
+                    continue
+                if not skip_known_items and item_id not in known_item_ids:
+                    errors.append(f"unknown item ID '{item_id}'")
+
+                item_counts[item_id] += 1
+
+    for item_id, count in sorted(item_counts.items()):
+        if count % SLOTS_PER_SHELF != 0:
+            errors.append(f"item '{item_id}' appears {count} times, expected a multiple of {SLOTS_PER_SHELF}")
+
+    return errors, item_counts
+
+
+def shelves_to_state(shelves: list[dict[str, Any]]) -> State:
+    state_shelves = []
+    for shelf in shelves:
+        layers = []
+        for layer in shelf["layers"]:
+            layers.append(tuple(layer))
+        state_shelves.append(tuple(layers))
+
+    return tuple(state_shelves)
+
+
+def slot_sort_key(item: Item) -> tuple[int, str]:
+    return (1, "") if item is None else (0, item)
+
+
+def shelf_sort_key(shelf: Shelf) -> tuple[tuple[tuple[int, str], ...], ...]:
+    return tuple(tuple(slot_sort_key(item) for item in layer) for layer in shelf)
+
+
+def canonicalize_state(state: State) -> State:
+    canonical_shelves = []
+    for shelf in state:
+        canonical_layers = []
+        for layer in shelf:
+            canonical_layers.append(tuple(sorted(layer, key=slot_sort_key)))
+        canonical_shelves.append(tuple(canonical_layers))
+
+    return tuple(sorted(canonical_shelves, key=shelf_sort_key))
+
+
+def is_empty_layer(layer: Layer) -> bool:
+    return all(item is None for item in layer)
+
+
+def is_matching_layer(layer: Layer) -> bool:
+    first = layer[0]
+    return first is not None and all(item == first for item in layer)
+
+
+def settle_state(state: State) -> State:
+    shelves = [list(shelf) for shelf in state]
+    changed = True
+
+    while changed:
+        changed = False
+        for shelf_index, shelf in enumerate(shelves):
+            while shelf and (is_empty_layer(shelf[0]) or is_matching_layer(shelf[0])):
+                shelf.pop(0)
+                changed = True
+
+            shelves[shelf_index] = shelf
+
+    return tuple(tuple(shelf) for shelf in shelves)
+
+
+def normalize_state(state: State) -> State:
+    return canonicalize_state(settle_state(state))
+
+
+def is_cleared(state: State) -> bool:
+    return all(len(shelf) == 0 for shelf in state)
+
+
+def visible_layer(shelf: Shelf) -> Layer:
+    if not shelf:
+        return (None, None, None)
+
+    return shelf[0]
+
+
+def legal_moves(state: State) -> list[Move]:
+    sources = []
+    targets = []
+
+    for shelf_index, shelf in enumerate(state):
+        front = visible_layer(shelf)
+        for slot_index, item_id in enumerate(front):
+            if item_id is None:
+                targets.append((shelf_index, slot_index))
+            else:
+                sources.append((shelf_index, slot_index, item_id))
+
+    moves = []
+    for from_shelf, from_slot, item_id in sources:
+        for to_shelf, to_slot in targets:
+            if from_shelf == to_shelf:
+                continue
+
+            moves.append(Move(item_id, from_shelf, from_slot, to_shelf, to_slot))
+
+    moves.sort(key=lambda move: move_score(state, move), reverse=True)
+    return moves
+
+
+def move_score(state: State, move: Move) -> int:
+    target_front = visible_layer(state[move.to_shelf])
+    target_same_count = sum(1 for item_id in target_front if item_id == move.item_id)
+    target_empty_count = sum(1 for item_id in target_front if item_id is None)
+    source_front = visible_layer(state[move.from_shelf])
+    source_remaining_count = sum(1 for item_id in source_front if item_id == move.item_id) - 1
+
+    score = target_same_count * 10
+    if target_same_count == 2 and target_empty_count == 1:
+        score += 100
+    if source_remaining_count == 0:
+        score += 3
+    return score
+
+
+def apply_move(state: State, move: Move) -> State:
+    shelves = [[list(layer) for layer in shelf] for shelf in state]
+
+    if not shelves[move.to_shelf]:
+        shelves[move.to_shelf].append([None, None, None])
+
+    shelves[move.from_shelf][0][move.from_slot] = None
+    shelves[move.to_shelf][0][move.to_slot] = move.item_id
+
+    return tuple(tuple(tuple(layer) for layer in shelf) for shelf in shelves)
+
+
+def solve_level(initial_state: State, max_states: int, max_depth: int, keep_solution: bool) -> SearchResult:
+    start_state = normalize_state(initial_state)
+    if is_cleared(start_state):
+        return SearchResult(True, "solved", 0, 1, 1, [])
+
+    queue = [(start_state, 0)]
+    visited = {start_state}
+    parents: dict[State, tuple[State, Move]] = {}
+    states_checked = 0
+    max_queue_size = 1
+
+    while queue:
+        state, depth = queue.pop()
+        states_checked += 1
+
+        if states_checked > max_states:
+            return SearchResult(None, "state_limit", None, states_checked, max_queue_size, [])
+        if depth >= max_depth:
+            continue
+
+        moves = legal_moves(state)
+        for move in reversed(moves):
+            next_state = normalize_state(apply_move(state, move))
+            if next_state in visited:
+                continue
+
+            if keep_solution:
+                parents[next_state] = (state, move)
+
+            if is_cleared(next_state):
+                solution = reconstruct_solution(parents, start_state, next_state) if keep_solution else []
+                return SearchResult(True, "solved", depth + 1, states_checked, max_queue_size, solution)
+
+            visited.add(next_state)
+            queue.append((next_state, depth + 1))
+            max_queue_size = max(max_queue_size, len(queue))
+
+    return SearchResult(False, "exhausted", None, states_checked, max_queue_size, [])
+
+
+def reconstruct_solution(parents: dict[State, tuple[State, Move]], start_state: State, end_state: State) -> list[Move]:
+    solution = []
+    state = end_state
+
+    while state != start_state:
+        parent_state, move = parents[state]
+        solution.append(move)
+        state = parent_state
+
+    solution.reverse()
+    return solution
+
+
+def result_to_json(
+    path: Path,
+    valid: bool,
+    errors: list[str],
+    item_counts: Counter[str],
+    search_result: SearchResult | None,
+) -> dict[str, Any]:
+    result: dict[str, Any] = {
+        "file": str(path),
+        "valid": valid,
+        "errors": errors,
+        "item_counts": dict(sorted(item_counts.items())),
+    }
+
+    if search_result is None:
+        result.update(
+            {
+                "solvable": None,
+                "reason": "invalid",
+                "moves": None,
+                "states_checked": 0,
+                "max_queue_size": 0,
+            }
+        )
+        return result
+
+    result.update(
+        {
+            "solvable": search_result.solvable,
+            "reason": search_result.reason,
+            "moves": search_result.moves,
+            "states_checked": search_result.states_checked,
+            "max_queue_size": search_result.max_queue_size,
+        }
+    )
+
+    if search_result.solution:
+        result["solution"] = [
+            {
+                "item": move.item_id,
+                "from_canonical_shelf": move.from_shelf + 1,
+                "from_slot": move.from_slot + 1,
+                "to_canonical_shelf": move.to_shelf + 1,
+                "to_slot": move.to_slot + 1,
+            }
+            for move in search_result.solution
+        ]
+
+    return result
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Validate whether a Sorting Puzzle level is solvable.")
+    parser.add_argument("level", type=Path, help="Path to a full level JSON file or shelves-only JSON array.")
+    parser.add_argument("--shelves-only", action="store_true", help="Require the input file to be a shelves array.")
+    parser.add_argument("--item-config", type=Path, default=DEFAULT_ITEM_CONFIG)
+    parser.add_argument("--skip-known-items", action="store_true")
+    parser.add_argument("--max-states", type=int, default=100_000)
+    parser.add_argument("--max-depth", type=int, default=200)
+    parser.add_argument("--show-solution", action="store_true")
+    return parser.parse_args()
+
+
+def main() -> int:
+    args = parse_args()
+
+    try:
+        known_item_ids = set() if args.skip_known_items else load_item_ids(args.item_config)
+        shelves = load_shelves(args.level, args.shelves_only)
+        errors, item_counts = validate_shelves_shape(shelves, known_item_ids, args.skip_known_items)
+    except (OSError, ValueError, json.JSONDecodeError) as error:
+        result = result_to_json(args.level, False, [str(error)], Counter(), None)
+        print(json.dumps(result, indent=2))
+        return 1
+
+    if errors:
+        result = result_to_json(args.level, False, errors, item_counts, None)
+        print(json.dumps(result, indent=2))
+        return 1
+
+    search_result = solve_level(
+        initial_state=shelves_to_state(shelves),
+        max_states=args.max_states,
+        max_depth=args.max_depth,
+        keep_solution=args.show_solution,
+    )
+    result = result_to_json(args.level, True, [], item_counts, search_result)
+    print(json.dumps(result, indent=2))
+
+    if search_result.solvable is True:
+        return 0
+    if search_result.solvable is False:
+        return 2
+    return 3
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

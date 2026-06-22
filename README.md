@@ -9,3 +9,13 @@ py scripts\tools\generate_level_shelves.py --shelf-count 9 --layer-count 2 --dif
 ```
 
 By default the tool prints only the JSON array that belongs in a level file's `shelves` field. Add `--full-level --output configs\levels\level_002.json` to write a complete level config.
+
+## Level solvability validation
+
+Use `scripts/tools/validate_level_solvable.py` to validate level JSON and run a bounded solvability search.
+
+```powershell
+py scripts\tools\validate_level_solvable.py configs\levels\level_001.json --max-states 20000 --max-depth 200
+```
+
+The validator returns JSON with shape errors, item counts, solvability, searched state count, and the result reason. Add `--show-solution` to include a canonicalized move path for debugging.
