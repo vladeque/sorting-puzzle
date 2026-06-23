@@ -13,6 +13,7 @@ const ITEM_SCENE := preload("res://scenes/item.tscn")
 const ITEM_SPRITES_CONFIG := "res://configs/item_sprites.json"
 const LEVEL_CONFIG_TEMPLATE := "res://configs/levels/level_%03d.json"
 const DEFAULT_LEVEL_CONFIG := "res://configs/levels/level_001.json"
+const DEFAULT_LAYOUT_PRESET := "grid_3x3"
 
 @export var slot_snap_distance := 86.0
 @export var item_pick_size := Vector2(58, 92)
@@ -43,7 +44,7 @@ var _time_remaining := 0.0
 var _level_failed := false
 var _highlight_timer := 0.0
 var _highlighted_items: Array[ShelfItem] = []
-var _layout_preset := "grid_3x3"
+var _layout_preset := DEFAULT_LAYOUT_PRESET
 var _rng := RandomNumberGenerator.new()
 var _pressed_item: ShelfItem
 var _pressed_origin_slot: Node2D
@@ -160,7 +161,7 @@ func _apply_level_config(config: Dictionary) -> void:
 	_reset_ability_uses()
 
 	var shelves_config := config.get("shelves", []) as Array
-	_layout_preset = str(config.get("layout_preset", "grid_3x3"))
+	_layout_preset = str(config.get("layout_preset", DEFAULT_LAYOUT_PRESET))
 	var shelf_positions := _get_layout_positions(_layout_preset, shelves_config.size())
 	var shelves := get_node("Shelves") as Node2D
 	_clear_shelves(shelves)
@@ -188,12 +189,19 @@ func _get_layout_positions(layout_preset: String, shelf_count: int) -> Array[Vec
 	var columns := 3
 	var spacing := Vector2(210, 210)
 
-	if layout_preset == "grid_2x3":
-		columns = 2
-	elif layout_preset == "grid_4x3":
-		columns = 4
-	elif layout_preset != "grid_3x3":
-		push_warning("Unknown layout preset '%s'. Using grid_3x3." % layout_preset)
+	match layout_preset:
+		"grid_2x3":
+			columns = 2
+		"grid_3x3":
+			pass
+		"grid_3x4":
+			spacing.y = 190
+		"grid_3x5":
+			spacing.y = 170
+		"grid_4x3":
+			columns = 4
+		_:
+			push_warning("Unknown layout preset '%s'. Using %s." % [layout_preset, DEFAULT_LAYOUT_PRESET])
 
 	var rows := ceili(float(shelf_count) / float(columns))
 	var origin := Vector2(

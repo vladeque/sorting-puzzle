@@ -18,6 +18,7 @@ from validate_level_solvable import solve_level, shelves_to_state, validate_shel
 
 SLOTS_PER_SHELF = 3
 DEFAULT_ITEM_CONFIG = Path("configs/item_sprites.json")
+LAYOUT_PRESETS = ("grid_2x3", "grid_3x3", "grid_3x4", "grid_3x5", "grid_4x3")
 
 
 @dataclass(frozen=True)
@@ -448,7 +449,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--level-number", type=int, default=1)
     parser.add_argument("--time-seconds", type=int, default=300)
-    parser.add_argument("--layout-preset", default="grid_3x3")
+    parser.add_argument("--layout-preset", choices=LAYOUT_PRESETS, default="grid_3x3")
     parser.add_argument("--stats", action="store_true", help="Print generation stats to stderr.")
     parser.add_argument("--validate", action="store_true", help="Run the solvability validator once after generation.")
     parser.add_argument(
