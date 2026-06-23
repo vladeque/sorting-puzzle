@@ -75,6 +75,8 @@ Prefer clear names for scenes, nodes, scripts, and configuration files.
 
 Avoid hardcoding values in scripts when they should be configurable through exported variables or config files.
 
+After every meaningful code, scene, script, or config change, update the relevant docs in `docs/` so future contributors and AI agents can quickly identify which module, scene, or script owns the changed behavior.
+
 ## Agent Behavior
 
 ### Clarifications
