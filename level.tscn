@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://bx74wdn60xop5"]
 
+[ext_resource type="Texture2D" uid="uid://h4ru3gdl5338" path="res://assets/abilities/ability_hammer.png" id="2_hammer_icon"]
+[ext_resource type="Texture2D" uid="uid://x0qk7pd87bfv" path="res://assets/abilities/ability_shuffle.png" id="3_shuffle_icon"]
+[ext_resource type="Texture2D" uid="uid://dwmyah5l2r82d" path="res://assets/abilities/ability_lantern.png" id="4_lantern_icon"]
 [ext_resource type="Script" uid="uid://cy80oincxrrc5" path="res://scripts/level.gd" id="10_level_script"]
-[ext_resource type="Texture2D" path="res://assets/abilities/ability_hammer.png" id="2_hammer_icon"]
-[ext_resource type="Texture2D" path="res://assets/abilities/ability_shuffle.png" id="3_shuffle_icon"]
-[ext_resource type="Texture2D" path="res://assets/abilities/ability_lantern.png" id="4_lantern_icon"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ability_normal"]
 bg_color = Color(0.16, 0.21, 0.27, 0.94)
@@ -61,6 +61,21 @@ corner_radius_top_left = 48
 corner_radius_top_right = 48
 corner_radius_bottom_right = 48
 corner_radius_bottom_left = 48
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ability_count_badge"]
+bg_color = Color(0.93, 0.32, 0.18, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.92, 0.62, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+shadow_color = Color(0, 0, 0, 0.34)
+shadow_size = 5
+shadow_offset = Vector2(0, 2)
 
 [node name="Level" type="Node2D" unique_id=949256860]
 script = ExtResource("10_level_script")
@@ -134,29 +149,31 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_ability_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_ability_hover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_ability_disabled")
 
-[node name="Icon" type="TextureRect" parent="UI/AbilityBar/HBoxContainer/HammerButton"]
+[node name="Icon" type="TextureRect" parent="UI/AbilityBar/HBoxContainer/HammerButton" unique_id=1732395234]
 layout_mode = 0
-offset_left = 13.0
-offset_top = 9.0
-offset_right = 83.0
-offset_bottom = 79.0
+offset_left = 11.0
+offset_top = 15.0
+offset_right = 81.0
+offset_bottom = 85.0
 mouse_filter = 2
 texture = ExtResource("2_hammer_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="UsesLabel" type="Label" parent="UI/AbilityBar/HBoxContainer/HammerButton"]
+[node name="UsesLabel" type="Label" parent="UI/AbilityBar/HBoxContainer/HammerButton" unique_id=1543480415]
+z_index = 1
 layout_mode = 0
-offset_left = 58.0
-offset_top = 62.0
-offset_right = 88.0
-offset_bottom = 90.0
+offset_left = 70.0
+offset_top = -7.0
+offset_right = 106.0
+offset_bottom = 29.0
 mouse_filter = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.86)
 theme_override_constants/shadow_offset_x = 0
-theme_override_constants/shadow_offset_y = 2
-theme_override_font_sizes/font_size = 22
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_ability_count_badge")
 text = "3"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -174,29 +191,31 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_ability_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_ability_hover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_ability_disabled")
 
-[node name="Icon" type="TextureRect" parent="UI/AbilityBar/HBoxContainer/ShuffleButton"]
+[node name="Icon" type="TextureRect" parent="UI/AbilityBar/HBoxContainer/ShuffleButton" unique_id=1105853491]
 layout_mode = 0
-offset_left = 13.0
-offset_top = 9.0
-offset_right = 83.0
-offset_bottom = 79.0
+offset_left = 14.0
+offset_top = 14.0
+offset_right = 84.0
+offset_bottom = 84.0
 mouse_filter = 2
 texture = ExtResource("3_shuffle_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="UsesLabel" type="Label" parent="UI/AbilityBar/HBoxContainer/ShuffleButton"]
+[node name="UsesLabel" type="Label" parent="UI/AbilityBar/HBoxContainer/ShuffleButton" unique_id=1303288169]
+z_index = 1
 layout_mode = 0
-offset_left = 58.0
-offset_top = 62.0
-offset_right = 88.0
-offset_bottom = 90.0
+offset_left = 70.0
+offset_top = -7.0
+offset_right = 106.0
+offset_bottom = 29.0
 mouse_filter = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.86)
 theme_override_constants/shadow_offset_x = 0
-theme_override_constants/shadow_offset_y = 2
-theme_override_font_sizes/font_size = 22
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_ability_count_badge")
 text = "3"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -214,7 +233,7 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_ability_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_ability_hover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_ability_disabled")
 
-[node name="Icon" type="TextureRect" parent="UI/AbilityBar/HBoxContainer/HighlightButton"]
+[node name="Icon" type="TextureRect" parent="UI/AbilityBar/HBoxContainer/HighlightButton" unique_id=1263034158]
 layout_mode = 0
 offset_left = 13.0
 offset_top = 9.0
@@ -225,18 +244,20 @@ texture = ExtResource("4_lantern_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="UsesLabel" type="Label" parent="UI/AbilityBar/HBoxContainer/HighlightButton"]
+[node name="UsesLabel" type="Label" parent="UI/AbilityBar/HBoxContainer/HighlightButton" unique_id=1882750827]
+z_index = 1
 layout_mode = 0
-offset_left = 58.0
-offset_top = 62.0
-offset_right = 88.0
-offset_bottom = 90.0
+offset_left = 70.0
+offset_top = -7.0
+offset_right = 106.0
+offset_bottom = 29.0
 mouse_filter = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.86)
 theme_override_constants/shadow_offset_x = 0
-theme_override_constants/shadow_offset_y = 2
-theme_override_font_sizes/font_size = 22
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_ability_count_badge")
 text = "3"
 horizontal_alignment = 1
 vertical_alignment = 1
