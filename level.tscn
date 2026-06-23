@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://bx74wdn60xop5"]
+[gd_scene format=3 uid="uid://bx74wdn60xop5"]
 
 [ext_resource type="Script" uid="uid://cy80oincxrrc5" path="res://scripts/level.gd" id="10_level_script"]
 
@@ -17,21 +17,6 @@ shadow_color = Color(0, 0, 0, 0.28)
 shadow_size = 8
 shadow_offset = Vector2(0, 5)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ability_hover"]
-bg_color = Color(0.21, 0.29, 0.36, 0.98)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.89, 0.94, 0.72, 0.95)
-corner_radius_top_left = 48
-corner_radius_top_right = 48
-corner_radius_bottom_right = 48
-corner_radius_bottom_left = 48
-shadow_color = Color(0, 0, 0, 0.32)
-shadow_size = 10
-shadow_offset = Vector2(0, 5)
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ability_pressed"]
 bg_color = Color(0.1, 0.15, 0.2, 1)
 border_width_left = 2
@@ -46,6 +31,21 @@ corner_radius_bottom_left = 48
 shadow_color = Color(0, 0, 0, 0.22)
 shadow_size = 5
 shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ability_hover"]
+bg_color = Color(0.21, 0.29, 0.36, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.89, 0.94, 0.72, 0.95)
+corner_radius_top_left = 48
+corner_radius_top_right = 48
+corner_radius_bottom_right = 48
+corner_radius_bottom_left = 48
+shadow_color = Color(0, 0, 0, 0.32)
+shadow_size = 10
+shadow_offset = Vector2(0, 5)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ability_disabled"]
 bg_color = Color(0.11, 0.12, 0.14, 0.68)
@@ -102,61 +102,63 @@ theme_override_font_sizes/font_size = 28
 text = "Level 1"
 vertical_alignment = 1
 
-[node name="AbilityBar" type="Control" parent="UI"]
-offset_top = 1134.0
+[node name="AbilityBar" type="Control" parent="UI" unique_id=1352307940]
+layout_mode = 3
+anchors_preset = 0
+offset_top = 1049.0
 offset_right = 720.0
-offset_bottom = 1260.0
+offset_bottom = 1175.0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="UI/AbilityBar"]
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/AbilityBar" unique_id=57155548]
 layout_mode = 0
 offset_left = 162.0
 offset_top = 12.0
 offset_right = 558.0
 offset_bottom = 112.0
-theme_override_constants/separation = 42
+theme_override_constants/separation = 60
 alignment = 1
 
-[node name="HammerButton" type="Button" parent="UI/AbilityBar/HBoxContainer"]
+[node name="HammerButton" type="Button" parent="UI/AbilityBar/HBoxContainer" unique_id=430508680]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_disabled_color = Color(1, 1, 1, 0.42)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_disabled_color = Color(1, 1, 1, 0.42)
 theme_override_font_sizes/font_size = 16
 theme_override_styles/normal = SubResource("StyleBoxFlat_ability_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_ability_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_ability_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ability_hover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_ability_disabled")
 text = "Hammer
 3"
 
-[node name="ShuffleButton" type="Button" parent="UI/AbilityBar/HBoxContainer"]
+[node name="ShuffleButton" type="Button" parent="UI/AbilityBar/HBoxContainer" unique_id=510958542]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_disabled_color = Color(1, 1, 1, 0.42)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_disabled_color = Color(1, 1, 1, 0.42)
 theme_override_font_sizes/font_size = 16
 theme_override_styles/normal = SubResource("StyleBoxFlat_ability_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_ability_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_ability_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ability_hover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_ability_disabled")
 text = "Shuffle
 3"
 
-[node name="HighlightButton" type="Button" parent="UI/AbilityBar/HBoxContainer"]
+[node name="HighlightButton" type="Button" parent="UI/AbilityBar/HBoxContainer" unique_id=607930161]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_disabled_color = Color(1, 1, 1, 0.42)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_disabled_color = Color(1, 1, 1, 0.42)
 theme_override_font_sizes/font_size = 16
 theme_override_styles/normal = SubResource("StyleBoxFlat_ability_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_ability_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_ability_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ability_hover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_ability_disabled")
 text = "Find
 3"
