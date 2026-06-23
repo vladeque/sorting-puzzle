@@ -14,6 +14,7 @@ const ITEM_SPRITES_CONFIG := "res://configs/item_sprites.json"
 const LEVEL_CONFIG_TEMPLATE := "res://configs/levels/level_%03d.json"
 const DEFAULT_LEVEL_CONFIG := "res://configs/levels/level_001.json"
 const DEFAULT_LAYOUT_PRESET := "grid_3x3"
+const MAIN_MENU_SCENE := "res://scenes/main_menu.tscn"
 
 @export var slot_snap_distance := 86.0
 @export var item_pick_size := Vector2(58, 92)
@@ -22,6 +23,7 @@ const DEFAULT_LAYOUT_PRESET := "grid_3x3"
 @export var back_layer_item_scale := 0.86
 @export var back_layer_item_modulate := Color(0.42, 0.42, 0.42, 0.34)
 @export var level_duration_seconds := 300.0
+@export var completion_return_delay_seconds := 1.75
 @export_range(1, 10, 1) var selected_level := 1
 
 var _slots: Array[Node2D] = []
@@ -34,6 +36,7 @@ var _drag_layer: Node2D
 var _timer_label: Label
 var _level_label: Label
 var _failure_panel: Control
+var _completion_panel: Control
 var _ability_buttons: Dictionary = {}
 var _ability_uses: Dictionary = {
 	ABILITY_HAMMER: 3,
@@ -42,6 +45,9 @@ var _ability_uses: Dictionary = {
 }
 var _time_remaining := 0.0
 var _level_failed := false
+var _level_completed := false
+var _completion_return_time_remaining := 0.0
+var _returning_to_menu := false
 var _highlight_timer := 0.0
 var _highlighted_items: Array[ShelfItem] = []
 var _layout_preset := DEFAULT_LAYOUT_PRESET
@@ -58,7 +64,9 @@ func _ready() -> void:
 	_timer_label = get_node("UI/TimerLabel") as Label
 	_level_label = get_node("UI/LevelLabel") as Label
 	_failure_panel = get_node("UI/FailurePanel") as Control
+	_completion_panel = get_node("UI/CompletionPanel") as Control
 	_failure_panel.visible = false
+	_completion_panel.visible = false
 	_rng.randomize()
 	_setup_ability_buttons()
 	_load_item_textures()
@@ -70,6 +78,12 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	if _level_completed:
+		_completion_return_time_remaining = maxf(_completion_return_time_remaining - delta, 0.0)
+		if _completion_return_time_remaining <= 0.0 and not _returning_to_menu:
+			_return_to_main_menu()
+		return
+
 	if _level_failed:
 		return
 
@@ -82,7 +96,7 @@ func _process(delta: float) -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if _level_failed:
+	if _level_failed or _level_completed:
 		return
 
 	if event is InputEventMouseButton:
@@ -157,6 +171,12 @@ func _apply_level_config(config: Dictionary) -> void:
 	level_duration_seconds = float(config.get("time_seconds", level_duration_seconds))
 	_time_remaining = level_duration_seconds
 	_max_layer_count = 1
+	_level_failed = false
+	_level_completed = false
+	_completion_return_time_remaining = 0.0
+	_returning_to_menu = false
+	_failure_panel.visible = false
+	_completion_panel.visible = false
 	_clear_ability_highlights()
 	_reset_ability_uses()
 
@@ -177,6 +197,7 @@ func _apply_level_config(config: Dictionary) -> void:
 		_add_configured_layers(shelf, layers)
 
 	_resolve_shelves(_get_all_shelves())
+	_check_level_completed()
 
 
 func _clear_shelves(shelves: Node) -> void:
@@ -395,6 +416,36 @@ func _fail_level() -> void:
 	_failure_panel.visible = true
 
 
+func _complete_level() -> void:
+	_level_completed = true
+	_completion_return_time_remaining = maxf(completion_return_delay_seconds, 0.0)
+	_clear_selected_item()
+	_dragged_item = null
+	_origin_slot = null
+	_drag_offset = Vector2.ZERO
+	_pressed_item = null
+	_pressed_origin_slot = null
+	_clear_ability_highlights()
+	_update_ability_buttons()
+	_completion_panel.visible = true
+
+
+func _check_level_completed() -> void:
+	if _level_failed or _level_completed:
+		return
+
+	if _get_all_items().is_empty():
+		_complete_level()
+
+
+func _return_to_main_menu() -> void:
+	_returning_to_menu = true
+	var error := get_tree().change_scene_to_file(MAIN_MENU_SCENE)
+	if error != OK:
+		_returning_to_menu = false
+		push_error("Could not return to main menu: %s" % MAIN_MENU_SCENE)
+
+
 func _handle_press_at(pointer_global_position: Vector2) -> void:
 	if _dragged_item != null:
 		return
@@ -509,6 +560,7 @@ func _move_item_to_slot(item: ShelfItem, origin_slot: Node2D, target_slot: Node2
 
 	_resolve_shelves(shelves_to_check)
 	_refresh_ability_highlights()
+	_check_level_completed()
 	return true
 
 
@@ -774,7 +826,7 @@ func _register_ability_button(ability_id: StringName, button_path: NodePath) -> 
 
 
 func _on_ability_button_pressed(ability_id: StringName) -> void:
-	if _level_failed or int(_ability_uses.get(ability_id, 0)) <= 0:
+	if _level_failed or _level_completed or int(_ability_uses.get(ability_id, 0)) <= 0:
 		return
 
 	_cancel_active_interaction()
@@ -859,6 +911,7 @@ func _use_shuffle() -> bool:
 
 	_resolve_shelves(_get_all_shelves())
 	_refresh_ability_highlights()
+	_check_level_completed()
 	return true
 
 
@@ -894,6 +947,7 @@ func _destroy_items(items_to_destroy: Array[ShelfItem]) -> void:
 
 	_resolve_shelves(shelves_to_check)
 	_refresh_ability_highlights()
+	_check_level_completed()
 
 
 func _find_immediate_triple_items() -> Array[ShelfItem]:
@@ -986,7 +1040,7 @@ func _update_ability_button(ability_id: StringName) -> void:
 	if uses_label != null:
 		uses_label.text = str(uses_left)
 
-	button.disabled = _level_failed or uses_left <= 0
+	button.disabled = _level_failed or _level_completed or uses_left <= 0
 
 
 func _get_all_shelves() -> Array[Node]:
