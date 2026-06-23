@@ -175,6 +175,8 @@ func _apply_level_config(config: Dictionary) -> void:
 		_max_layer_count = maxi(_max_layer_count, layers.size())
 		_add_configured_layers(shelf, layers)
 
+	_resolve_shelves(_get_all_shelves())
+
 
 func _clear_shelves(shelves: Node) -> void:
 	for child in shelves.get_children():
@@ -497,8 +499,7 @@ func _move_item_to_slot(item: ShelfItem, origin_slot: Node2D, target_slot: Node2
 
 	_place_item_in_slot(item, target_slot)
 
-	_clear_matching_shelves(shelves_to_check)
-	_promote_empty_front_layers(shelves_to_check)
+	_resolve_shelves(shelves_to_check)
 	_refresh_ability_highlights()
 	return true
 
@@ -582,7 +583,17 @@ func _add_shelf_to_check(shelves_to_check: Array[Node], slot: Node2D) -> void:
 		shelves_to_check.append(shelf)
 
 
-func _clear_matching_shelves(shelves_to_check: Array[Node]) -> void:
+func _resolve_shelves(shelves_to_check: Array[Node]) -> void:
+	while true:
+		var cleared := _clear_matching_shelves(shelves_to_check)
+		var promoted := _promote_empty_front_layers(shelves_to_check)
+		if not cleared and not promoted:
+			break
+
+
+func _clear_matching_shelves(shelves_to_check: Array[Node]) -> bool:
+	var cleared_any := false
+
 	for shelf in shelves_to_check:
 		var shelf_items := _get_shelf_items(shelf)
 		if shelf_items.size() != 3:
@@ -593,6 +604,7 @@ func _clear_matching_shelves(shelves_to_check: Array[Node]) -> void:
 			continue
 
 		if shelf_items.all(func(item: ShelfItem) -> bool: return item.item_id == item_id):
+			cleared_any = true
 			for item in shelf_items:
 				item.queue_free()
 
@@ -602,15 +614,21 @@ func _clear_matching_shelves(shelves_to_check: Array[Node]) -> void:
 			for item in shelf_items:
 				_highlighted_items.erase(item)
 
+	return cleared_any
 
-func _promote_empty_front_layers(shelves_to_check: Array[Node]) -> void:
+
+func _promote_empty_front_layers(shelves_to_check: Array[Node]) -> bool:
+	var promoted_any := false
+
 	for shelf in shelves_to_check:
 		var shelf_node := shelf as Node2D
 		if shelf_node == null:
 			continue
 
-		while _front_layer_is_empty(shelf_node) and _promote_back_layer(shelf_node):
-			pass
+		if _front_layer_is_empty(shelf_node) and _promote_back_layer(shelf_node):
+			promoted_any = true
+
+	return promoted_any
 
 
 func _front_layer_is_empty(shelf: Node) -> bool:
@@ -831,9 +849,7 @@ func _use_shuffle() -> bool:
 		item.texture = _item_textures.get(String(item_id))
 		_apply_item_visual_state(item)
 
-	var shelves_to_check := _get_all_shelves()
-	_clear_matching_shelves(shelves_to_check)
-	_promote_empty_front_layers(shelves_to_check)
+	_resolve_shelves(_get_all_shelves())
 	_refresh_ability_highlights()
 	return true
 
@@ -868,7 +884,7 @@ func _destroy_items(items_to_destroy: Array[ShelfItem]) -> void:
 
 		item.queue_free()
 
-	_promote_empty_front_layers(shelves_to_check)
+	_resolve_shelves(shelves_to_check)
 	_refresh_ability_highlights()
 
 
