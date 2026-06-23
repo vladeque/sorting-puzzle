@@ -1,5 +1,9 @@
 # sorting-puzzle
 
+## Project documentation
+
+Start with `docs/PROJECT_MAP.md` to identify which scene, script, config, or tool owns a feature. Supporting inventories live in `docs/SCENES.md`, `docs/SCRIPTS.md`, and `docs/CONFIGS.md`.
+
 ## Level shelf generation
 
 Use `scripts/tools/generate_level_shelves.py` with Python 3.10+ to generate the `shelves` array for a level config.
