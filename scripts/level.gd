@@ -8,7 +8,6 @@ const FIRST_BACK_LAYER_INDEX := 1
 const ABILITY_HAMMER := &"hammer"
 const ABILITY_SHUFFLE := &"shuffle"
 const ABILITY_HIGHLIGHT := &"highlight"
-const ABILITY_EXTRA_SHELF := &"extra_shelf"
 const HIGHLIGHT_DURATION_SECONDS := 15.0
 const ITEM_SCENE := preload("res://scenes/item.tscn")
 const ITEM_SPRITES_CONFIG := "res://configs/item_sprites.json"
@@ -39,14 +38,12 @@ var _ability_uses: Dictionary = {
 	ABILITY_HAMMER: 3,
 	ABILITY_SHUFFLE: 3,
 	ABILITY_HIGHLIGHT: 3,
-	ABILITY_EXTRA_SHELF: 1,
 }
 var _time_remaining := 0.0
 var _level_failed := false
 var _highlight_timer := 0.0
 var _highlighted_items: Array[ShelfItem] = []
 var _layout_preset := "grid_3x3"
-var _extra_shelf_added := false
 var _rng := RandomNumberGenerator.new()
 var _pressed_item: ShelfItem
 var _pressed_origin_slot: Node2D
@@ -159,7 +156,6 @@ func _apply_level_config(config: Dictionary) -> void:
 	level_duration_seconds = float(config.get("time_seconds", level_duration_seconds))
 	_time_remaining = level_duration_seconds
 	_max_layer_count = 1
-	_extra_shelf_added = false
 	_clear_ability_highlights()
 	_reset_ability_uses()
 
@@ -739,7 +735,6 @@ func _setup_ability_buttons() -> void:
 	_register_ability_button(ABILITY_HAMMER, "UI/AbilityBar/HBoxContainer/HammerButton")
 	_register_ability_button(ABILITY_SHUFFLE, "UI/AbilityBar/HBoxContainer/ShuffleButton")
 	_register_ability_button(ABILITY_HIGHLIGHT, "UI/AbilityBar/HBoxContainer/HighlightButton")
-	_register_ability_button(ABILITY_EXTRA_SHELF, "UI/AbilityBar/HBoxContainer/ShelfButton")
 
 
 func _register_ability_button(ability_id: StringName, button_path: NodePath) -> void:
@@ -766,8 +761,6 @@ func _on_ability_button_pressed(ability_id: StringName) -> void:
 			did_apply = _use_shuffle()
 		ABILITY_HIGHLIGHT:
 			did_apply = _use_highlight()
-		ABILITY_EXTRA_SHELF:
-			did_apply = _use_extra_shelf()
 
 	if not did_apply:
 		return
@@ -856,18 +849,6 @@ func _use_highlight() -> bool:
 	for item in _highlighted_items:
 		_apply_item_visual_state(item)
 
-	return true
-
-
-func _use_extra_shelf() -> bool:
-	if _extra_shelf_added:
-		return false
-
-	var shelves := get_node("Shelves") as Node2D
-	var shelf_position := _get_extra_shelf_position(shelves)
-	_add_shelf(shelves, shelves.get_child_count() + 1, shelf_position)
-	_collect_slots()
-	_extra_shelf_added = true
 	return true
 
 
@@ -961,7 +942,6 @@ func _update_ability_buttons() -> void:
 	_update_ability_button(ABILITY_HAMMER, "Hammer")
 	_update_ability_button(ABILITY_SHUFFLE, "Shuffle")
 	_update_ability_button(ABILITY_HIGHLIGHT, "Find")
-	_update_ability_button(ABILITY_EXTRA_SHELF, "Shelf")
 
 
 func _reset_ability_uses() -> void:
@@ -969,7 +949,6 @@ func _reset_ability_uses() -> void:
 		ABILITY_HAMMER: 3,
 		ABILITY_SHUFFLE: 3,
 		ABILITY_HIGHLIGHT: 3,
-		ABILITY_EXTRA_SHELF: 1,
 	}
 
 
@@ -1029,16 +1008,6 @@ func _get_owning_shelf(node: Node) -> Node:
 		current = current.get_parent()
 
 	return null
-
-
-func _get_extra_shelf_position(shelves: Node2D) -> Vector2:
-	var max_y := 0.0
-	for child in shelves.get_children():
-		var shelf := child as Node2D
-		if shelf != null:
-			max_y = maxf(max_y, shelf.position.y)
-
-	return Vector2(0, max_y + 210.0)
 
 
 func _shuffle_array(values: Array) -> void:

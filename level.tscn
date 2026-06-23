@@ -109,11 +109,11 @@ offset_bottom = 1260.0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="UI/AbilityBar"]
 layout_mode = 0
-offset_left = 74.0
+offset_left = 162.0
 offset_top = 12.0
-offset_right = 646.0
+offset_right = 558.0
 offset_bottom = 112.0
-theme_override_constants/separation = 28
+theme_override_constants/separation = 42
 alignment = 1
 
 [node name="HammerButton" type="Button" parent="UI/AbilityBar/HBoxContainer"]
@@ -160,21 +160,6 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_ability_pressed")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_ability_disabled")
 text = "Find
 3"
-
-[node name="ShelfButton" type="Button" parent="UI/AbilityBar/HBoxContainer"]
-custom_minimum_size = Vector2(96, 96)
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_disabled_color = Color(1, 1, 1, 0.42)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 16
-theme_override_styles/normal = SubResource("StyleBoxFlat_ability_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_ability_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_ability_pressed")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_ability_disabled")
-text = "Shelf
-1"
 
 [node name="FailurePanel" type="ColorRect" parent="UI" unique_id=784630851]
 visible = false
