@@ -4,173 +4,173 @@
   "layout_preset": "grid_3x3",
   "difficulty": "medium",
   "shelves": [
-    {
-      "layers": [
-        [
-          null,
-          "gift_box",
-          null
-        ],
-        [
-          "cupcake",
-          "cupcake",
+	{
+	  "layers": [
+		[
+		  null,
+		  "gift_box",
+		  null
+		],
+		[
+		  "cupcake",
+		  "cupcake",
           "plant_pot"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "plant_pot",
-          "golden_cat_figurine",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "plant_pot",
+		  "golden_cat_figurine",
           "golden_cat_figurine"
-        ],
-        [
-          "cookie_box",
-          null,
+		],
+		[
+		  "cookie_box",
+		  null,
           "chips_can"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "gift_box",
-          "candy_bag",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "gift_box",
+		  "candy_bag",
           "plant_pot"
-        ],
-        [
-          null,
-          "chips_can",
+		],
+		[
+		  null,
+		  "chips_can",
           "gift_box"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "plant_pot",
-          "cookie_box",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "plant_pot",
+		  "cookie_box",
           "chips_can"
-        ],
-        [
-          "cupcake",
-          "golden_cat_figurine",
+		],
+		[
+		  "cupcake",
+		  "golden_cat_figurine",
           "cupcake"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "gift_box",
-          "candy_bag",
-          null
-        ],
-        [
-          "candy_bag",
-          "cookie_box",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "gift_box",
+		  "candy_bag",
+		  null
+		],
+		[
+		  "candy_bag",
+		  "cookie_box",
           "golden_cat_figurine"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "chips_can",
-          "chips_can",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "chips_can",
+		  "chips_can",
           "cupcake"
-        ],
-        [
-          null,
-          "chips_can",
-          null
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "candy_bag",
-          "cookie_box",
+		],
+		[
+		  null,
+		  "chips_can",
+		  null
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "candy_bag",
+		  "cookie_box",
           "cupcake"
-        ],
-        [
-          "gift_box",
-          "cookie_box",
+		],
+		[
+		  "gift_box",
+		  "cookie_box",
           "chips_can"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "gift_box",
-          "golden_cat_figurine",
-          null
-        ],
-        [
-          null,
-          "cupcake",
-          null
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "chips_can",
-          "plant_pot",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "gift_box",
+		  "golden_cat_figurine",
+		  null
+		],
+		[
+		  null,
+		  "cupcake",
+		  null
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "chips_can",
+		  "plant_pot",
           "cupcake"
-        ],
-        [
-          "chips_can",
-          "golden_cat_figurine",
+		],
+		[
+		  "chips_can",
+		  "golden_cat_figurine",
           "candy_bag"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          null,
-          "chips_can",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  null,
+		  "chips_can",
           "plant_pot"
-        ],
-        [
-          "cupcake",
-          "cookie_box",
+		],
+		[
+		  "cupcake",
+		  "cookie_box",
           "chips_can"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "cupcake",
-          "cookie_box",
-          null
-        ],
-        [
-          "cupcake",
-          "gift_box",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "cupcake",
+		  "cookie_box",
+		  null
+		],
+		[
+		  "cupcake",
+		  "gift_box",
           "candy_bag"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "gift_box",
-          "gift_box",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "gift_box",
+		  "gift_box",
           "cookie_box"
-        ],
-        [
-          "cupcake",
-          "cookie_box",
+		],
+		[
+		  "cupcake",
+		  "cookie_box",
           "chips_can"
-        ]
-      ]
-    }
+		]
+	  ]
+	}
   ]
 }
