@@ -939,9 +939,9 @@ func _clear_ability_highlights() -> void:
 
 
 func _update_ability_buttons() -> void:
-	_update_ability_button(ABILITY_HAMMER, "Hammer")
-	_update_ability_button(ABILITY_SHUFFLE, "Shuffle")
-	_update_ability_button(ABILITY_HIGHLIGHT, "Find")
+	_update_ability_button(ABILITY_HAMMER)
+	_update_ability_button(ABILITY_SHUFFLE)
+	_update_ability_button(ABILITY_HIGHLIGHT)
 
 
 func _reset_ability_uses() -> void:
@@ -952,13 +952,16 @@ func _reset_ability_uses() -> void:
 	}
 
 
-func _update_ability_button(ability_id: StringName, label: String) -> void:
+func _update_ability_button(ability_id: StringName) -> void:
 	var button := _ability_buttons.get(ability_id) as Button
 	if button == null:
 		return
 
 	var uses_left := int(_ability_uses.get(ability_id, 0))
-	button.text = "%s\n%d" % [label, uses_left]
+	var uses_label := button.get_node_or_null("UsesLabel") as Label
+	if uses_label != null:
+		uses_label.text = str(uses_left)
+
 	button.disabled = _level_failed or uses_left <= 0
 
 

@@ -1,6 +1,9 @@
 [gd_scene format=3 uid="uid://bx74wdn60xop5"]
 
 [ext_resource type="Script" uid="uid://cy80oincxrrc5" path="res://scripts/level.gd" id="10_level_script"]
+[ext_resource type="Texture2D" path="res://assets/abilities/ability_hammer.png" id="2_hammer_icon"]
+[ext_resource type="Texture2D" path="res://assets/abilities/ability_shuffle.png" id="3_shuffle_icon"]
+[ext_resource type="Texture2D" path="res://assets/abilities/ability_lantern.png" id="4_lantern_icon"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ability_normal"]
 bg_color = Color(0.16, 0.21, 0.27, 0.94)
@@ -130,8 +133,33 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_ability_normal")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_ability_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_ability_hover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_ability_disabled")
-text = "Hammer
-3"
+
+[node name="Icon" type="TextureRect" parent="UI/AbilityBar/HBoxContainer/HammerButton"]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 9.0
+offset_right = 83.0
+offset_bottom = 79.0
+mouse_filter = 2
+texture = ExtResource("2_hammer_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="UsesLabel" type="Label" parent="UI/AbilityBar/HBoxContainer/HammerButton"]
+layout_mode = 0
+offset_left = 58.0
+offset_top = 62.0
+offset_right = 88.0
+offset_bottom = 90.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.86)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 22
+text = "3"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="ShuffleButton" type="Button" parent="UI/AbilityBar/HBoxContainer" unique_id=510958542]
 custom_minimum_size = Vector2(96, 96)
@@ -145,8 +173,33 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_ability_normal")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_ability_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_ability_hover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_ability_disabled")
-text = "Shuffle
-3"
+
+[node name="Icon" type="TextureRect" parent="UI/AbilityBar/HBoxContainer/ShuffleButton"]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 9.0
+offset_right = 83.0
+offset_bottom = 79.0
+mouse_filter = 2
+texture = ExtResource("3_shuffle_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="UsesLabel" type="Label" parent="UI/AbilityBar/HBoxContainer/ShuffleButton"]
+layout_mode = 0
+offset_left = 58.0
+offset_top = 62.0
+offset_right = 88.0
+offset_bottom = 90.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.86)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 22
+text = "3"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="HighlightButton" type="Button" parent="UI/AbilityBar/HBoxContainer" unique_id=607930161]
 custom_minimum_size = Vector2(96, 96)
@@ -160,8 +213,33 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_ability_normal")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_ability_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_ability_hover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_ability_disabled")
-text = "Find
-3"
+
+[node name="Icon" type="TextureRect" parent="UI/AbilityBar/HBoxContainer/HighlightButton"]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 9.0
+offset_right = 83.0
+offset_bottom = 79.0
+mouse_filter = 2
+texture = ExtResource("4_lantern_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="UsesLabel" type="Label" parent="UI/AbilityBar/HBoxContainer/HighlightButton"]
+layout_mode = 0
+offset_left = 58.0
+offset_top = 62.0
+offset_right = 88.0
+offset_bottom = 90.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.86)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 22
+text = "3"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="FailurePanel" type="ColorRect" parent="UI" unique_id=784630851]
 visible = false
