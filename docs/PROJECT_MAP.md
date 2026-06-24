@@ -48,6 +48,7 @@ Responsibility:
 - Spawns `ShelfItem` instances from config layers.
 - Handles mouse and touch interaction.
 - Resolves matches of three identical visible items on the same shelf, including the gather-and-shrink clear animation.
+- Keeps non-clearing items interactive while match animations run, with pending shelf resolves queued behind the active animation.
 - Promotes back layers when the visible layer clears.
 - Tracks the countdown timer and win/loss overlays.
 

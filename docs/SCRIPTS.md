@@ -69,6 +69,8 @@ Key responsibilities:
 - Handle mouse and touch input through `_input()` and the press/motion/release helpers.
 - Move items with `_move_item_to_slot()` and `_place_item_in_slot()`.
 - Clear triples with `_clear_matching_shelves()` and `_play_match_clear_animation()`.
+- Track clearing items so only disappearing items ignore input and abilities during the animation.
+- Queue shelf resolution requests made while another match animation is still finishing.
 - Promote back layers with `_promote_back_layer()` and `_advance_back_layers()`.
 - Check win/loss state with `_check_level_completed()`, `_fail_level()`, and `_complete_level()`.
 - Manage hammer, shuffle, and highlight abilities.

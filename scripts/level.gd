@@ -60,6 +60,8 @@ var _press_position := Vector2.ZERO
 var _selected_item: ShelfItem
 var _selected_slot: Node2D
 var _is_resolving_shelves := false
+var _shelves_pending_resolve: Array[Node] = []
+var _clearing_items: Array[ShelfItem] = []
 
 
 func _ready() -> void:
@@ -99,7 +101,7 @@ func _process(delta: float) -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if _level_failed or _level_completed or _is_resolving_shelves:
+	if _level_failed or _level_completed:
 		return
 
 	if event is InputEventMouseButton:
@@ -568,7 +570,7 @@ func _move_item_to_slot(item: ShelfItem, origin_slot: Node2D, target_slot: Node2
 func _find_item_at_position(pointer_global_position: Vector2) -> ShelfItem:
 	for i in range(_slots.size() - 1, -1, -1):
 		var item := _get_slot_item(_slots[i])
-		if item == null:
+		if item == null or _is_item_clearing(item):
 			continue
 
 		var item_rect := Rect2(item.global_position - item_pick_size * 0.5, item_pick_size)
@@ -645,22 +647,31 @@ func _add_shelf_to_check(shelves_to_check: Array[Node], slot: Node2D) -> void:
 
 
 func _resolve_shelves(shelves_to_check: Array[Node]) -> void:
+	_queue_shelves_to_resolve(shelves_to_check)
 	if _is_resolving_shelves:
 		return
 
 	_is_resolving_shelves = true
-	_update_ability_buttons()
+	while not _shelves_pending_resolve.is_empty():
+		var active_shelves := _shelves_pending_resolve.duplicate()
+		_shelves_pending_resolve.clear()
 
-	while true:
-		var cleared := await _clear_matching_shelves(shelves_to_check)
-		var promoted := _promote_empty_front_layers(shelves_to_check)
-		if not cleared and not promoted:
-			break
+		while true:
+			var cleared := await _clear_matching_shelves(active_shelves)
+			var promoted := _promote_empty_front_layers(active_shelves)
+			if not cleared and not promoted:
+				break
 
 	_is_resolving_shelves = false
 	_refresh_ability_highlights()
 	_check_level_completed()
 	_update_ability_buttons()
+
+
+func _queue_shelves_to_resolve(shelves_to_check: Array[Node]) -> void:
+	for shelf in shelves_to_check:
+		if shelf != null and is_instance_valid(shelf) and not _shelves_pending_resolve.has(shelf):
+			_shelves_pending_resolve.append(shelf)
 
 
 func _clear_matching_shelves(shelves_to_check: Array[Node]) -> bool:
@@ -698,6 +709,7 @@ func _play_match_clear_animation(shelf_items: Array[ShelfItem]) -> void:
 		for item in shelf_items:
 			if item != null and is_instance_valid(item):
 				item.queue_free()
+			_unmark_item_clearing(item)
 		return
 
 	var center_position := center_item.global_position
@@ -705,6 +717,7 @@ func _play_match_clear_animation(shelf_items: Array[ShelfItem]) -> void:
 		if item == null or not is_instance_valid(item):
 			continue
 
+		_mark_item_clearing(item)
 		item.input_pickable = false
 		item.z_index = 20
 
@@ -757,6 +770,22 @@ func _play_match_clear_animation(shelf_items: Array[ShelfItem]) -> void:
 
 	if center_item != null and is_instance_valid(center_item):
 		center_item.queue_free()
+
+	for item in shelf_items:
+		_unmark_item_clearing(item)
+
+
+func _mark_item_clearing(item: ShelfItem) -> void:
+	if item != null and is_instance_valid(item) and not _clearing_items.has(item):
+		_clearing_items.append(item)
+
+
+func _unmark_item_clearing(item: ShelfItem) -> void:
+	_clearing_items.erase(item)
+
+
+func _is_item_clearing(item: ShelfItem) -> bool:
+	return item != null and _clearing_items.has(item)
 
 
 func _promote_empty_front_layers(shelves_to_check: Array[Node]) -> bool:
@@ -908,7 +937,7 @@ func _register_ability_button(ability_id: StringName, button_path: NodePath) -> 
 
 
 func _on_ability_button_pressed(ability_id: StringName) -> void:
-	if _level_failed or _level_completed or _is_resolving_shelves or int(_ability_uses.get(ability_id, 0)) <= 0:
+	if _level_failed or _level_completed or int(_ability_uses.get(ability_id, 0)) <= 0:
 		return
 
 	_cancel_active_interaction()
@@ -1118,7 +1147,7 @@ func _update_ability_button(ability_id: StringName) -> void:
 	if uses_label != null:
 		uses_label.text = str(uses_left)
 
-	button.disabled = _level_failed or _level_completed or _is_resolving_shelves or uses_left <= 0
+	button.disabled = _level_failed or _level_completed or uses_left <= 0
 
 
 func _get_all_shelves() -> Array[Node]:
@@ -1141,7 +1170,8 @@ func _get_visible_items() -> Array[ShelfItem]:
 	var items: Array[ShelfItem] = []
 	for shelf in _get_all_shelves():
 		for item in _get_shelf_items(shelf):
-			items.append(item)
+			if not _is_item_clearing(item):
+				items.append(item)
 
 	return items
 
@@ -1150,7 +1180,7 @@ func _collect_items_recursive(node: Node, items: Array[ShelfItem]) -> void:
 	for child in node.get_children():
 		var item := child as ShelfItem
 		if item != null:
-			if not item.is_queued_for_deletion():
+			if not item.is_queued_for_deletion() and not _is_item_clearing(item):
 				items.append(item)
 			continue
 
