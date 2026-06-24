@@ -123,9 +123,9 @@ vertical_alignment = 1
 [node name="AbilityBar" type="Control" parent="UI" unique_id=1352307940]
 layout_mode = 3
 anchors_preset = 0
-offset_top = 1049.0
+offset_top = 1097.0
 offset_right = 720.0
-offset_bottom = 1175.0
+offset_bottom = 1223.0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="UI/AbilityBar" unique_id=57155548]
 layout_mode = 0
@@ -167,7 +167,6 @@ offset_left = 70.0
 offset_top = -7.0
 offset_right = 106.0
 offset_bottom = 29.0
-mouse_filter = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.86)
 theme_override_constants/shadow_offset_x = 0
@@ -209,7 +208,6 @@ offset_left = 70.0
 offset_top = -7.0
 offset_right = 106.0
 offset_bottom = 29.0
-mouse_filter = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.86)
 theme_override_constants/shadow_offset_x = 0
@@ -251,7 +249,6 @@ offset_left = 70.0
 offset_top = -7.0
 offset_right = 106.0
 offset_bottom = 29.0
-mouse_filter = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.86)
 theme_override_constants/shadow_offset_x = 0
@@ -282,13 +279,13 @@ text = "Level Failed"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CompletionPanel" type="ColorRect" parent="UI"]
+[node name="CompletionPanel" type="ColorRect" parent="UI" unique_id=1385350832]
 visible = false
 offset_right = 720.0
 offset_bottom = 1280.0
 color = Color(0.03, 0.08, 0.06, 0.72)
 
-[node name="CompletionLabel" type="Label" parent="UI/CompletionPanel"]
+[node name="CompletionLabel" type="Label" parent="UI/CompletionPanel" unique_id=2100778384]
 layout_mode = 0
 offset_top = 548.0
 offset_right = 720.0
