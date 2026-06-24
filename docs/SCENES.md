@@ -54,7 +54,7 @@ Important nodes:
 
 Runtime-created nodes:
 - `ShelfXX`: generated under `Shelves`.
-- Shelf art nodes such as `BackPanel`, `Ceiling`, `LeftWall`, `RightWall`, `Floor`, and `FloorLip`: generated under each shelf to make it a packed cell.
+- Shelf art nodes such as `BackWall`, `Ceiling`, `LeftWall`, `RightWall`, `FloorSurface`, `FloorFrontLip`, and `FloorGrain*`: generated under each shelf to make it a packed cell.
 - `SlotXX`: generated under each shelf.
 - `ItemSlotXX`: marker under each slot for snap positions.
 - `ShelfLayerXX`: generated back layers for hidden or upcoming item rows.

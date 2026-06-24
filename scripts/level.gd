@@ -1,6 +1,5 @@
 extends Node2D
 
-const SLOT_ITEM_POSITION := Vector2(0, -42)
 const SLOT_COUNT := 3
 const SLOT_POSITIONS := [Vector2(-52, 0), Vector2(0, 0), Vector2(52, 0)]
 const SHELF_CELL_LEFT := -88.0
@@ -8,8 +7,12 @@ const SHELF_CELL_RIGHT := 88.0
 const SHELF_CELL_TOP := -104.0
 const SHELF_CELL_BOTTOM := 46.0
 const SHELF_WALL_THICKNESS := 8.0
-const SHELF_FLOOR_THICKNESS := 16.0
+const SHELF_FLOOR_SURFACE_Y := 16.0
 const SHELF_CELL_SIZE := Vector2(SHELF_CELL_RIGHT - SHELF_CELL_LEFT, SHELF_CELL_BOTTOM - SHELF_CELL_TOP)
+const SHELF_INNER_LEFT := SHELF_CELL_LEFT + SHELF_WALL_THICKNESS
+const SHELF_INNER_RIGHT := SHELF_CELL_RIGHT - SHELF_WALL_THICKNESS
+const SHELF_INNER_TOP := SHELF_CELL_TOP + SHELF_WALL_THICKNESS
+const SLOT_ITEM_POSITION := Vector2(0, SHELF_FLOOR_SURFACE_Y - 42.0)
 const BACK_LAYER_PREFIX := "ShelfLayer"
 const FIRST_BACK_LAYER_INDEX := 1
 const ABILITY_HAMMER := &"hammer"
@@ -260,7 +263,7 @@ func _add_shelf(parent: Node2D, shelf_number: int, shelf_position: Vector2) -> N
 		shelf,
 		"Shadow",
 		0,
-		Color(0.03, 0.025, 0.02, 0.26),
+		Color(0.03, 0.025, 0.02, 0.18),
 		SHELF_CELL_LEFT + 2.0,
 		SHELF_CELL_BOTTOM - 2.0,
 		SHELF_CELL_RIGHT + 2.0,
@@ -268,19 +271,29 @@ func _add_shelf(parent: Node2D, shelf_number: int, shelf_position: Vector2) -> N
 	)
 	_add_rect_polygon(
 		shelf,
-		"BackPanel",
+		"BackWall",
 		1,
-		Color(0.31, 0.2, 0.14, 1),
-		SHELF_CELL_LEFT + SHELF_WALL_THICKNESS,
-		SHELF_CELL_TOP + SHELF_WALL_THICKNESS,
-		SHELF_CELL_RIGHT - SHELF_WALL_THICKNESS,
-		SHELF_CELL_BOTTOM - SHELF_FLOOR_THICKNESS
+		Color(0.72, 0.7, 0.67, 1),
+		SHELF_INNER_LEFT,
+		SHELF_INNER_TOP,
+		SHELF_INNER_RIGHT,
+		SHELF_FLOOR_SURFACE_Y
+	)
+	_add_rect_polygon(
+		shelf,
+		"BackWallLeftShade",
+		2,
+		Color(0.62, 0.6, 0.57, 0.74),
+		SHELF_INNER_LEFT,
+		SHELF_INNER_TOP,
+		SHELF_INNER_LEFT + 28.0,
+		SHELF_FLOOR_SURFACE_Y
 	)
 	_add_rect_polygon(
 		shelf,
 		"Ceiling",
-		2,
-		Color(0.66, 0.43, 0.25, 1),
+		3,
+		Color(0.78, 0.52, 0.29, 1),
 		SHELF_CELL_LEFT,
 		SHELF_CELL_TOP,
 		SHELF_CELL_RIGHT,
@@ -289,8 +302,8 @@ func _add_shelf(parent: Node2D, shelf_number: int, shelf_position: Vector2) -> N
 	_add_rect_polygon(
 		shelf,
 		"LeftWall",
-		3,
-		Color(0.48, 0.29, 0.17, 1),
+		4,
+		Color(0.68, 0.42, 0.22, 1),
 		SHELF_CELL_LEFT,
 		SHELF_CELL_TOP,
 		SHELF_CELL_LEFT + SHELF_WALL_THICKNESS,
@@ -299,8 +312,8 @@ func _add_shelf(parent: Node2D, shelf_number: int, shelf_position: Vector2) -> N
 	_add_rect_polygon(
 		shelf,
 		"RightWall",
-		3,
-		Color(0.38, 0.23, 0.14, 1),
+		4,
+		Color(0.54, 0.33, 0.18, 1),
 		SHELF_CELL_RIGHT - SHELF_WALL_THICKNESS,
 		SHELF_CELL_TOP,
 		SHELF_CELL_RIGHT,
@@ -308,24 +321,25 @@ func _add_shelf(parent: Node2D, shelf_number: int, shelf_position: Vector2) -> N
 	)
 	_add_rect_polygon(
 		shelf,
-		"Floor",
-		4,
-		Color(0.55, 0.34, 0.19, 1),
-		SHELF_CELL_LEFT,
-		SHELF_CELL_BOTTOM - SHELF_FLOOR_THICKNESS,
-		SHELF_CELL_RIGHT,
-		SHELF_CELL_BOTTOM
+		"FloorSurface",
+		5,
+		Color(0.64, 0.39, 0.19, 1),
+		SHELF_INNER_LEFT,
+		SHELF_FLOOR_SURFACE_Y,
+		SHELF_INNER_RIGHT,
+		SHELF_CELL_BOTTOM - 4.0
 	)
 	_add_rect_polygon(
 		shelf,
-		"FloorLip",
+		"FloorFrontLip",
 		5,
-		Color(0.34, 0.2, 0.12, 1),
+		Color(0.48, 0.27, 0.13, 1),
 		SHELF_CELL_LEFT,
-		SHELF_CELL_BOTTOM - 5.0,
+		SHELF_CELL_BOTTOM - 8.0,
 		SHELF_CELL_RIGHT,
 		SHELF_CELL_BOTTOM
 	)
+	_add_floor_grain(shelf)
 	_add_highlight(shelf)
 
 	for slot_index in range(SLOT_COUNT):
@@ -359,6 +373,68 @@ func _add_rect_polygon(
 		Vector2(right, bottom),
 		Vector2(left, bottom),
 	]))
+
+
+func _add_line(parent: Node, node_name: String, z_index: int, color: Color, width: float, points: PackedVector2Array) -> void:
+	var line := Line2D.new()
+	line.name = node_name
+	line.z_index = z_index
+	line.default_color = color
+	line.width = width
+	line.points = points
+	parent.add_child(line)
+
+
+func _add_floor_grain(shelf: Node) -> void:
+	var grain_color := Color(0.38, 0.21, 0.1, 0.34)
+	_add_line(
+		shelf,
+		"FloorGrainBack",
+		6,
+		grain_color,
+		1.2,
+		PackedVector2Array([
+			Vector2(SHELF_INNER_LEFT + 8.0, SHELF_FLOOR_SURFACE_Y + 5.0),
+			Vector2(SHELF_INNER_RIGHT - 10.0, SHELF_FLOOR_SURFACE_Y + 5.0),
+		])
+	)
+	_add_line(
+		shelf,
+		"FloorGrainMiddle",
+		6,
+		grain_color,
+		1.0,
+		PackedVector2Array([
+			Vector2(SHELF_INNER_LEFT + 10.0, SHELF_FLOOR_SURFACE_Y + 13.0),
+			Vector2(SHELF_INNER_LEFT + 60.0, SHELF_FLOOR_SURFACE_Y + 12.0),
+			Vector2(SHELF_INNER_LEFT + 96.0, SHELF_FLOOR_SURFACE_Y + 15.0),
+			Vector2(SHELF_INNER_RIGHT - 8.0, SHELF_FLOOR_SURFACE_Y + 13.0),
+		])
+	)
+	_add_line(
+		shelf,
+		"FloorGrainKnot",
+		6,
+		Color(0.32, 0.17, 0.08, 0.28),
+		1.0,
+		PackedVector2Array([
+			Vector2(SHELF_INNER_RIGHT - 58.0, SHELF_FLOOR_SURFACE_Y + 19.0),
+			Vector2(SHELF_INNER_RIGHT - 48.0, SHELF_FLOOR_SURFACE_Y + 15.0),
+			Vector2(SHELF_INNER_RIGHT - 34.0, SHELF_FLOOR_SURFACE_Y + 18.0),
+			Vector2(SHELF_INNER_RIGHT - 22.0, SHELF_FLOOR_SURFACE_Y + 23.0),
+		])
+	)
+	_add_line(
+		shelf,
+		"FloorGrainFront",
+		6,
+		grain_color,
+		1.2,
+		PackedVector2Array([
+			Vector2(SHELF_CELL_LEFT + 8.0, SHELF_CELL_BOTTOM - 7.0),
+			Vector2(SHELF_CELL_RIGHT - 8.0, SHELF_CELL_BOTTOM - 7.0),
+		])
+	)
 
 
 func _add_highlight(parent: Node) -> void:
