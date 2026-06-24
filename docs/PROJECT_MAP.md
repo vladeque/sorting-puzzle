@@ -40,6 +40,7 @@ Files:
 - `level.tscn`
 - `scenes/shelf.tscn`
 - `scripts/level.gd`
+- `assets/audio/*.wav`
 - `configs/levels/level_*.json`
 - `configs/item_sprites.json`
 
@@ -49,6 +50,7 @@ Responsibility:
 - Spawns `ShelfItem` instances from config layers.
 - Handles mouse and touch interaction.
 - Resolves matches of three identical visible items on the same shelf, including the gather-and-shrink clear animation.
+- Plays item placement and triple-clear sound effects.
 - Keeps non-clearing items interactive while match animations run, with pending shelf resolves queued behind the active animation.
 - Promotes back layers when the visible layer clears.
 - Tracks the countdown timer and win/loss overlays.
@@ -136,6 +138,9 @@ Change matching rules:
 
 Change drag or tap movement:
 - Update `_input()`, `_handle_press_at()`, `_handle_motion_at()`, `_handle_release_at()`, `_move_item_to_slot()`, and slot lookup helpers in `scripts/level.gd`.
+
+Change gameplay sound effects:
+- Update `assets/audio/item_place.wav`, `assets/audio/triple_clear.wav`, and the audio player helpers in `scripts/level.gd`.
 
 Change level win or loss flow:
 - Update `_process()`, `_fail_level()`, `_complete_level()`, `_check_level_completed()`, and the panels in `level.tscn`.

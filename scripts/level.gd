@@ -18,6 +18,8 @@ const LEVEL_CONFIG_TEMPLATE := "res://configs/levels/level_%03d.json"
 const DEFAULT_LEVEL_CONFIG := "res://configs/levels/level_001.json"
 const DEFAULT_LAYOUT_PRESET := "grid_3x3"
 const MAIN_MENU_SCENE := "res://scenes/main_menu.tscn"
+const ITEM_PLACE_SOUND := preload("res://assets/audio/item_place.wav")
+const TRIPLE_CLEAR_SOUND := preload("res://assets/audio/triple_clear.wav")
 
 @export var slot_snap_distance := 86.0
 @export var item_pick_size := Vector2(58, 92)
@@ -29,6 +31,8 @@ const MAIN_MENU_SCENE := "res://scenes/main_menu.tscn"
 @export var match_shrink_duration_seconds := 0.16
 @export var level_duration_seconds := 300.0
 @export var completion_return_delay_seconds := 1.75
+@export_range(-40.0, 6.0, 0.5) var item_place_volume_db := -8.0
+@export_range(-40.0, 6.0, 0.5) var triple_clear_volume_db := -7.0
 @export_range(1, 10, 1) var selected_level := 1
 
 var _slots: Array[Node2D] = []
@@ -65,6 +69,8 @@ var _selected_slot: Node2D
 var _is_resolving_shelves := false
 var _shelves_pending_resolve: Array[Node] = []
 var _clearing_item_ids: Array[int] = []
+var _item_place_audio_player: AudioStreamPlayer
+var _triple_clear_audio_player: AudioStreamPlayer
 
 
 func _ready() -> void:
@@ -76,6 +82,7 @@ func _ready() -> void:
 	_failure_panel.visible = false
 	_completion_panel.visible = false
 	_rng.randomize()
+	_setup_audio_players()
 	_setup_ability_buttons()
 	_load_item_textures()
 	_apply_level_config(_load_level_config(selected_level))
@@ -83,6 +90,36 @@ func _ready() -> void:
 	_update_level_label()
 	_update_timer_label()
 	_update_ability_buttons()
+
+
+func _setup_audio_players() -> void:
+	_item_place_audio_player = _create_audio_player("ItemPlaceAudio", ITEM_PLACE_SOUND, item_place_volume_db)
+	_triple_clear_audio_player = _create_audio_player("TripleClearAudio", TRIPLE_CLEAR_SOUND, triple_clear_volume_db)
+
+
+func _create_audio_player(player_name: String, stream: AudioStream, volume: float) -> AudioStreamPlayer:
+	var player := AudioStreamPlayer.new()
+	player.name = player_name
+	player.stream = stream
+	player.volume_db = volume
+	add_child(player)
+	return player
+
+
+func _play_item_place_sound() -> void:
+	if _item_place_audio_player == null:
+		return
+
+	_item_place_audio_player.stop()
+	_item_place_audio_player.play()
+
+
+func _play_triple_clear_sound() -> void:
+	if _triple_clear_audio_player == null:
+		return
+
+	_triple_clear_audio_player.stop()
+	_triple_clear_audio_player.play()
 
 
 func _process(delta: float) -> void:
@@ -491,12 +528,12 @@ func _finish_active_drag(pointer_global_position: Vector2) -> void:
 	var item := _dragged_item
 	var target_slot := _find_nearest_slot(pointer_global_position)
 	if target_slot == null:
-		_place_item_in_slot(item, _origin_slot)
+		_place_item_in_slot(item, _origin_slot, true)
 	elif target_slot == _origin_slot:
-		_place_item_in_slot(item, _origin_slot)
+		_place_item_in_slot(item, _origin_slot, true)
 	else:
 		if not _move_item_to_slot(item, _origin_slot, target_slot):
-			_place_item_in_slot(item, _origin_slot)
+			_place_item_in_slot(item, _origin_slot, true)
 
 	_dragged_item = null
 	_origin_slot = null
@@ -509,7 +546,7 @@ func _move_item_to_slot(item: ShelfItem, origin_slot: Node2D, target_slot: Node2
 		return false
 
 	if target_slot == origin_slot:
-		_place_item_in_slot(item, origin_slot)
+		_place_item_in_slot(item, origin_slot, true)
 		return true
 
 	if _get_slot_item(target_slot) != null:
@@ -519,7 +556,7 @@ func _move_item_to_slot(item: ShelfItem, origin_slot: Node2D, target_slot: Node2
 	_add_shelf_to_check(shelves_to_check, origin_slot)
 	_add_shelf_to_check(shelves_to_check, target_slot)
 
-	_place_item_in_slot(item, target_slot)
+	_place_item_in_slot(item, target_slot, true)
 
 	_resolve_shelves(shelves_to_check)
 	return true
@@ -591,11 +628,13 @@ func _get_slot_item(slot: Node2D) -> ShelfItem:
 	return null
 
 
-func _place_item_in_slot(item: ShelfItem, slot: Node2D) -> void:
+func _place_item_in_slot(item: ShelfItem, slot: Node2D, should_play_sound := false) -> void:
 	item.reparent(slot, true)
 	item.position = SLOT_ITEM_POSITION
 	item.z_index = 6
 	_apply_item_visual_state(item)
+	if should_play_sound:
+		_play_item_place_sound()
 
 
 func _add_shelf_to_check(shelves_to_check: Array[Node], slot: Node2D) -> void:
@@ -703,6 +742,7 @@ func _play_match_clear_animation(shelf_items: Array[ShelfItem]) -> void:
 		).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 
 	await gather_tween.finished
+	_play_triple_clear_sound()
 
 	for item in shelf_items:
 		if item != center_item and item != null and is_instance_valid(item):

@@ -51,6 +51,8 @@ Important exports:
 - `match_shrink_duration_seconds`: duration for the center item shrink-out after a triple gathers.
 - `level_duration_seconds`: fallback duration if config does not define `time_seconds`.
 - `completion_return_delay_seconds`: delay before returning to the main menu after completion.
+- `item_place_volume_db`: volume for the item placement sound effect.
+- `triple_clear_volume_db`: volume for the matched triple clear sound effect.
 - `selected_level`: level number loaded from `configs/levels/level_%03d.json`.
 
 Important constants:
@@ -66,6 +68,8 @@ Important constants:
 - `DEFAULT_LEVEL_CONFIG`: fallback level config.
 - `DEFAULT_LAYOUT_PRESET`: fallback layout preset.
 - `MAIN_MENU_SCENE`: scene returned to after completion.
+- `ITEM_PLACE_SOUND`: short sound played when the player drops or moves an item into a shelf slot.
+- `TRIPLE_CLEAR_SOUND`: sound played when a matched triple gathers and disappears.
 
 Key responsibilities:
 - Load JSON configs with `_load_json_file()`.
@@ -75,6 +79,7 @@ Key responsibilities:
 - Handle mouse and touch input through `_input()` and the press/motion/release helpers.
 - Move items with `_move_item_to_slot()` and `_place_item_in_slot()`.
 - Clear triples with `_clear_matching_shelves()` and `_play_match_clear_animation()`.
+- Play placement and triple-clear sound effects with runtime `AudioStreamPlayer` nodes.
 - Track clearing items so only disappearing items ignore input and abilities during the animation.
 - Queue shelf resolution requests made while another match animation is still finishing.
 - Promote back layers with `_promote_back_layer()` and `_advance_back_layers()`.
@@ -85,6 +90,7 @@ Depends on:
 - `level.tscn` node names and paths.
 - `scenes/shelf.tscn` slot names and item snap marker names.
 - `scenes/item.tscn` and `ShelfItem`.
+- `assets/audio/item_place.wav` and `assets/audio/triple_clear.wav`.
 - `configs/item_sprites.json` item IDs and texture paths.
 - `configs/levels/level_*.json` shelf schema.
 

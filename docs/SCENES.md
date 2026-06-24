@@ -56,10 +56,12 @@ Runtime-created nodes:
 - `ShelfXX`: `scenes/shelf.tscn` instances generated under `Shelves`.
 - `ShelfLayerXX`: generated back layers for hidden or upcoming item rows.
 - `ShelfItem` instances from `scenes/item.tscn`.
+- `ItemPlaceAudio` and `TripleClearAudio`: `AudioStreamPlayer` nodes created by `scripts/level.gd`.
 
 Depends on:
 - `scenes/shelf.tscn`
 - `scenes/item.tscn`
+- `assets/audio/*.wav`
 - `configs/item_sprites.json`
 - `configs/levels/level_*.json`
 - `assets/abilities/*.png`
