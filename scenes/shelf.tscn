@@ -1,105 +1,111 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://snc20hx11yql"]
 
-[node name="Shelf" type="Node2D"]
+[node name="Shelf" type="Node2D" unique_id=961540884]
 
-[node name="Shadow" type="Polygon2D" parent="."]
-z_index = 0
+[node name="Shadow" type="Polygon2D" parent="." unique_id=1166351438]
 color = Color(0.03, 0.025, 0.02, 0.18)
 polygon = PackedVector2Array(-86, 44, 90, 44, 90, 58, -86, 58)
 
-[node name="BackWall" type="Polygon2D" parent="."]
+[node name="BackWall" type="Polygon2D" parent="." unique_id=251890705]
 z_index = 1
 color = Color(0.72, 0.7, 0.67, 1)
 polygon = PackedVector2Array(-80, -96, 80, -96, 80, 16, -80, 16)
 
-[node name="BackWallLeftShade" type="Polygon2D" parent="."]
+[node name="BackWallLeftShade" type="Polygon2D" parent="." unique_id=1566344107]
 z_index = 2
 color = Color(0.62, 0.6, 0.57, 0.74)
-polygon = PackedVector2Array(-80, -96, -52, -96, -52, 16, -80, 16)
+polygon = PackedVector2Array(-80, -96, -66.94711, -95.856705, -66.59662, 16.30133, -80, 16, -42.290794, -95.7905, -41.911896, -89.25448, -67.06674, -89.15928)
+uv = PackedVector2Array(-42.290794, -95.7905, -41.911896, -89.25448, -67.06674, -89.15928)
+internal_vertex_count = 3
 
-[node name="Ceiling" type="Polygon2D" parent="."]
+[node name="Ceiling" type="Polygon2D" parent="." unique_id=356773762]
 z_index = 3
 color = Color(0.78, 0.52, 0.29, 1)
 polygon = PackedVector2Array(-88, -104, 88, -104, 88, -96, -88, -96)
 
-[node name="LeftWall" type="Polygon2D" parent="."]
+[node name="LeftWall" type="Polygon2D" parent="." unique_id=1529082060]
 z_index = 4
-color = Color(0.68, 0.42, 0.22, 1)
+color = Color(0.78039217, 0.52156866, 0.2901961, 1)
 polygon = PackedVector2Array(-88, -104, -80, -104, -80, 46, -88, 46)
 
-[node name="RightWall" type="Polygon2D" parent="."]
+[node name="RightWall" type="Polygon2D" parent="." unique_id=1412430343]
 z_index = 4
-color = Color(0.54, 0.33, 0.18, 1)
+color = Color(0.78039217, 0.52156866, 0.2901961, 1)
 polygon = PackedVector2Array(80, -104, 88, -104, 88, 46, 80, 46)
 
-[node name="FloorSurface" type="Polygon2D" parent="."]
+[node name="FloorSurface" type="Polygon2D" parent="." unique_id=211239445]
 z_index = 5
 color = Color(0.64, 0.39, 0.19, 1)
 polygon = PackedVector2Array(-80, 16, 80, 16, 80, 42, -80, 42)
 
-[node name="FloorFrontLip" type="Polygon2D" parent="."]
+[node name="FloorFrontLip" type="Polygon2D" parent="." unique_id=348182537]
 z_index = 5
-color = Color(0.48, 0.27, 0.13, 1)
+color = Color(0.78039217, 0.52156866, 0.2901961, 1)
 polygon = PackedVector2Array(-88, 38, 88, 38, 88, 46, -88, 46)
 
-[node name="FloorGrainBack" type="Line2D" parent="."]
+[node name="FloorGrainBack" type="Line2D" parent="." unique_id=810284]
 z_index = 6
-points = PackedVector2Array(-72, 21, 70, 21)
+points = PackedVector2Array(-72, 21, 44.48242, 20.99997, 70, 21)
 width = 1.2
 default_color = Color(0.38, 0.21, 0.1, 0.34)
 
-[node name="FloorGrainMiddle" type="Line2D" parent="."]
+[node name="FloorGrainMiddle" type="Line2D" parent="." unique_id=87843650]
 z_index = 6
 points = PackedVector2Array(-70, 29, -20, 28, 16, 31, 72, 29)
 width = 1.0
 default_color = Color(0.38, 0.21, 0.1, 0.34)
 
-[node name="FloorGrainKnot" type="Line2D" parent="."]
+[node name="FloorGrainKnot" type="Line2D" parent="." unique_id=27174572]
 z_index = 6
 points = PackedVector2Array(22, 35, 32, 31, 46, 34, 58, 39)
 width = 1.0
 default_color = Color(0.32, 0.17, 0.08, 0.28)
 
-[node name="FloorGrainFront" type="Line2D" parent="."]
+[node name="FloorGrainFront" type="Line2D" parent="." unique_id=35188272]
 z_index = 6
 points = PackedVector2Array(-80, 39, 80, 39)
 width = 1.2
 default_color = Color(0.38, 0.21, 0.1, 0.34)
 
-[node name="Highlight" type="Line2D" parent="."]
+[node name="Highlight" type="Line2D" parent="." unique_id=548222879]
+visible = false
 z_index = 4
 points = PackedVector2Array(-72, -94, 72, -94)
 width = 2.0
 default_color = Color(0.86, 0.61, 0.36, 0.72)
 
-[node name="Slot01" type="Node2D" parent="."]
-position = Vector2(-52, 0)
+[node name="Slot01" type="Node2D" parent="." unique_id=842389614]
+position = Vector2(-52, 20)
 
-[node name="SlotGuide" type="Polygon2D" parent="Slot01"]
+[node name="SlotGuide" type="Polygon2D" parent="Slot01" unique_id=1585536341]
+visible = false
 z_index = 5
 color = Color(0.25, 0.74, 0.82, 0.18)
 polygon = PackedVector2Array(-23, -88, 23, -88, 23, -12, -23, -12)
 
-[node name="ItemSlot01" type="Marker2D" parent="Slot01"]
-position = Vector2(0, -26)
+[node name="ItemSlot01" type="Marker2D" parent="Slot01" unique_id=1119674850]
+position = Vector2(0, -10)
 
-[node name="Slot02" type="Node2D" parent="."]
+[node name="Slot02" type="Node2D" parent="." unique_id=139519496]
+position = Vector2(0, 20)
 
-[node name="SlotGuide" type="Polygon2D" parent="Slot02"]
+[node name="SlotGuide" type="Polygon2D" parent="Slot02" unique_id=1474240817]
+visible = false
 z_index = 5
 color = Color(0.25, 0.74, 0.82, 0.18)
 polygon = PackedVector2Array(-23, -88, 23, -88, 23, -12, -23, -12)
 
-[node name="ItemSlot02" type="Marker2D" parent="Slot02"]
-position = Vector2(0, -26)
+[node name="ItemSlot02" type="Marker2D" parent="Slot02" unique_id=1663469452]
+position = Vector2(0, -10)
 
-[node name="Slot03" type="Node2D" parent="."]
-position = Vector2(52, 0)
+[node name="Slot03" type="Node2D" parent="." unique_id=1454627210]
+position = Vector2(52, 20)
 
-[node name="SlotGuide" type="Polygon2D" parent="Slot03"]
+[node name="SlotGuide" type="Polygon2D" parent="Slot03" unique_id=662629680]
+visible = false
 z_index = 5
 color = Color(0.25, 0.74, 0.82, 0.18)
 polygon = PackedVector2Array(-23, -88, 23, -88, 23, -12, -23, -12)
 
-[node name="ItemSlot03" type="Marker2D" parent="Slot03"]
-position = Vector2(0, -26)
+[node name="ItemSlot03" type="Marker2D" parent="Slot03" unique_id=1677532579]
+position = Vector2(0, -10)
