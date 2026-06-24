@@ -2,7 +2,14 @@ extends Node2D
 
 const SLOT_ITEM_POSITION := Vector2(0, -42)
 const SLOT_COUNT := 3
-const SLOT_POSITIONS := [Vector2(-56, 0), Vector2(0, 0), Vector2(56, 0)]
+const SLOT_POSITIONS := [Vector2(-52, 0), Vector2(0, 0), Vector2(52, 0)]
+const SHELF_CELL_LEFT := -88.0
+const SHELF_CELL_RIGHT := 88.0
+const SHELF_CELL_TOP := -104.0
+const SHELF_CELL_BOTTOM := 46.0
+const SHELF_WALL_THICKNESS := 8.0
+const SHELF_FLOOR_THICKNESS := 16.0
+const SHELF_CELL_SIZE := Vector2(SHELF_CELL_RIGHT - SHELF_CELL_LEFT, SHELF_CELL_BOTTOM - SHELF_CELL_TOP)
 const BACK_LAYER_PREFIX := "ShelfLayer"
 const FIRST_BACK_LAYER_INDEX := 1
 const ABILITY_HAMMER := &"hammer"
@@ -213,7 +220,7 @@ func _clear_shelves(shelves: Node) -> void:
 
 func _get_layout_positions(layout_preset: String, shelf_count: int) -> Array[Vector2]:
 	var columns := 3
-	var spacing := Vector2(210, 210)
+	var spacing := SHELF_CELL_SIZE
 
 	match layout_preset:
 		"grid_2x3":
@@ -221,9 +228,9 @@ func _get_layout_positions(layout_preset: String, shelf_count: int) -> Array[Vec
 		"grid_3x3":
 			pass
 		"grid_3x4":
-			spacing.y = 190
+			pass
 		"grid_3x5":
-			spacing.y = 170
+			pass
 		"grid_4x3":
 			columns = 4
 		_:
@@ -249,10 +256,76 @@ func _add_shelf(parent: Node2D, shelf_number: int, shelf_position: Vector2) -> N
 	shelf.position = shelf_position
 	parent.add_child(shelf)
 
-	_add_polygon(shelf, "Shadow", 0, Color(0.03, 0.025, 0.02, 0.34), PackedVector2Array([Vector2(-98, 9), Vector2(98, 9), Vector2(84, 34), Vector2(-84, 34)]))
-	_add_polygon(shelf, "BackPanel", 1, Color(0.33, 0.21, 0.14, 1), PackedVector2Array([Vector2(-88, -76), Vector2(88, -76), Vector2(88, -20), Vector2(-88, -20)]))
-	_add_polygon(shelf, "TopSurface", 2, Color(0.67, 0.43, 0.25, 1), PackedVector2Array([Vector2(-94, -26), Vector2(94, -26), Vector2(78, 4), Vector2(-78, 4)]))
-	_add_polygon(shelf, "FrontLip", 3, Color(0.44, 0.27, 0.16, 1), PackedVector2Array([Vector2(-78, 4), Vector2(78, 4), Vector2(88, 28), Vector2(-88, 28)]))
+	_add_rect_polygon(
+		shelf,
+		"Shadow",
+		0,
+		Color(0.03, 0.025, 0.02, 0.26),
+		SHELF_CELL_LEFT + 2.0,
+		SHELF_CELL_BOTTOM - 2.0,
+		SHELF_CELL_RIGHT + 2.0,
+		SHELF_CELL_BOTTOM + 12.0
+	)
+	_add_rect_polygon(
+		shelf,
+		"BackPanel",
+		1,
+		Color(0.31, 0.2, 0.14, 1),
+		SHELF_CELL_LEFT + SHELF_WALL_THICKNESS,
+		SHELF_CELL_TOP + SHELF_WALL_THICKNESS,
+		SHELF_CELL_RIGHT - SHELF_WALL_THICKNESS,
+		SHELF_CELL_BOTTOM - SHELF_FLOOR_THICKNESS
+	)
+	_add_rect_polygon(
+		shelf,
+		"Ceiling",
+		2,
+		Color(0.66, 0.43, 0.25, 1),
+		SHELF_CELL_LEFT,
+		SHELF_CELL_TOP,
+		SHELF_CELL_RIGHT,
+		SHELF_CELL_TOP + SHELF_WALL_THICKNESS
+	)
+	_add_rect_polygon(
+		shelf,
+		"LeftWall",
+		3,
+		Color(0.48, 0.29, 0.17, 1),
+		SHELF_CELL_LEFT,
+		SHELF_CELL_TOP,
+		SHELF_CELL_LEFT + SHELF_WALL_THICKNESS,
+		SHELF_CELL_BOTTOM
+	)
+	_add_rect_polygon(
+		shelf,
+		"RightWall",
+		3,
+		Color(0.38, 0.23, 0.14, 1),
+		SHELF_CELL_RIGHT - SHELF_WALL_THICKNESS,
+		SHELF_CELL_TOP,
+		SHELF_CELL_RIGHT,
+		SHELF_CELL_BOTTOM
+	)
+	_add_rect_polygon(
+		shelf,
+		"Floor",
+		4,
+		Color(0.55, 0.34, 0.19, 1),
+		SHELF_CELL_LEFT,
+		SHELF_CELL_BOTTOM - SHELF_FLOOR_THICKNESS,
+		SHELF_CELL_RIGHT,
+		SHELF_CELL_BOTTOM
+	)
+	_add_rect_polygon(
+		shelf,
+		"FloorLip",
+		5,
+		Color(0.34, 0.2, 0.12, 1),
+		SHELF_CELL_LEFT,
+		SHELF_CELL_BOTTOM - 5.0,
+		SHELF_CELL_RIGHT,
+		SHELF_CELL_BOTTOM
+	)
 	_add_highlight(shelf)
 
 	for slot_index in range(SLOT_COUNT):
@@ -270,11 +343,32 @@ func _add_polygon(parent: Node, node_name: String, z_index: int, color: Color, p
 	parent.add_child(polygon)
 
 
+func _add_rect_polygon(
+	parent: Node,
+	node_name: String,
+	z_index: int,
+	color: Color,
+	left: float,
+	top: float,
+	right: float,
+	bottom: float
+) -> void:
+	_add_polygon(parent, node_name, z_index, color, PackedVector2Array([
+		Vector2(left, top),
+		Vector2(right, top),
+		Vector2(right, bottom),
+		Vector2(left, bottom),
+	]))
+
+
 func _add_highlight(parent: Node) -> void:
 	var highlight := Line2D.new()
 	highlight.name = "Highlight"
 	highlight.z_index = 4
-	highlight.points = PackedVector2Array([Vector2(-76, -21), Vector2(76, -21)])
+	highlight.points = PackedVector2Array([
+		Vector2(SHELF_CELL_LEFT + SHELF_WALL_THICKNESS + 8.0, SHELF_CELL_TOP + SHELF_WALL_THICKNESS + 2.0),
+		Vector2(SHELF_CELL_RIGHT - SHELF_WALL_THICKNESS - 8.0, SHELF_CELL_TOP + SHELF_WALL_THICKNESS + 2.0),
+	])
 	highlight.width = 2.0
 	highlight.default_color = Color(0.86, 0.61, 0.36, 0.72)
 	parent.add_child(highlight)
@@ -287,7 +381,7 @@ func _add_front_slot(shelf: Node2D, slot_index: int) -> Node2D:
 	slot.position = SLOT_POSITIONS[slot_index]
 	shelf.add_child(slot)
 
-	_add_polygon(slot, "SlotGuide", 5, Color(0.25, 0.74, 0.82, 0.22), PackedVector2Array([Vector2(-26, -76), Vector2(26, -76), Vector2(22, -8), Vector2(-22, -8)]))
+	_add_polygon(slot, "SlotGuide", 5, Color(0.25, 0.74, 0.82, 0.18), PackedVector2Array([Vector2(-23, -88), Vector2(23, -88), Vector2(23, -12), Vector2(-23, -12)]))
 
 	var marker := Marker2D.new()
 	marker.name = "ItemSlot%02d" % slot_number

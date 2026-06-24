@@ -55,6 +55,7 @@ Important exports:
 
 Important constants:
 - `SLOT_COUNT`: currently three items per shelf front layer.
+- `SHELF_CELL_*`: generated shelf cell bounds, wall thickness, and packed layout size.
 - `ITEM_SCENE`: `res://scenes/item.tscn`.
 - `ITEM_SPRITES_CONFIG`: `res://configs/item_sprites.json`.
 - `LEVEL_CONFIG_TEMPLATE`: `res://configs/levels/level_%03d.json`.
@@ -65,6 +66,7 @@ Important constants:
 Key responsibilities:
 - Load JSON configs with `_load_json_file()`.
 - Build shelf and slot nodes with `_add_shelf()`, `_add_front_slot()`, and `_add_back_layer()`.
+- Draw each generated shelf as a full cell with its own walls, ceiling, and floor; packed layout presets place neighboring cells flush so borders line up.
 - Spawn configured items with `_add_configured_item()`.
 - Handle mouse and touch input through `_input()` and the press/motion/release helpers.
 - Move items with `_move_item_to_slot()` and `_place_item_in_slot()`.

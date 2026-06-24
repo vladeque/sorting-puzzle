@@ -45,6 +45,7 @@ Files:
 Responsibility:
 - Loads level JSON and item sprite config.
 - Generates shelf nodes and slot nodes at runtime.
+- Renders generated shelves as packed cells whose wall, floor, and ceiling bounds define tight shared borders in grid layouts.
 - Spawns `ShelfItem` instances from config layers.
 - Handles mouse and touch interaction.
 - Resolves matches of three identical visible items on the same shelf, including the gather-and-shrink clear animation.
@@ -113,7 +114,7 @@ Add a new level:
 - Validate the level with `scripts/tools/validate_level_solvable.py`.
 
 Change shelf layout spacing:
-- Update `_get_layout_positions()` in `scripts/level.gd`.
+- Update `SHELF_CELL_*` and `_get_layout_positions()` in `scripts/level.gd`.
 - Keep `scripts/tools/generate_level_shelves.py` layout presets in sync if preset names or supported shapes change.
 
 Change matching rules:

@@ -71,7 +71,7 @@ Item count rules:
 
 Runtime behavior:
 - `scripts/level.gd` generates shelf nodes from `shelves`.
-- `scripts/level.gd` uses `layout_preset` to position generated shelves.
+- `scripts/level.gd` uses `layout_preset` to choose the grid columns, then packs generated shelf cells edge-to-edge.
 - `scripts/level.gd` uses `time_seconds` as the active timer.
 
 Validation:
