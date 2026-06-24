@@ -38,14 +38,14 @@ Change here when:
 
 Files:
 - `level.tscn`
+- `scenes/shelf.tscn`
 - `scripts/level.gd`
 - `configs/levels/level_*.json`
 - `configs/item_sprites.json`
 
 Responsibility:
 - Loads level JSON and item sprite config.
-- Generates shelf nodes and slot nodes at runtime.
-- Renders generated shelves as packed cells with a visible back wall and wood floor; cell bounds define tight shared borders in grid layouts.
+- Instantiates `scenes/shelf.tscn` for each configured shelf and packs shelf cells edge-to-edge in grid layouts.
 - Spawns `ShelfItem` instances from config layers.
 - Handles mouse and touch interaction.
 - Resolves matches of three identical visible items on the same shelf, including the gather-and-shrink clear animation.
@@ -55,6 +55,18 @@ Responsibility:
 
 Change here when:
 - Editing puzzle rules, input behavior, runtime shelf construction, level timing, completion conditions, or ability behavior.
+
+### Shelf Cell
+
+Files:
+- `scenes/shelf.tscn`
+
+Responsibility:
+- Defines the reusable shelf cell visuals, front slots, and item snap markers.
+- Contains the visible back wall, wood floor, frame, floor lip, and floor grain nodes.
+
+Change here when:
+- Editing shelf visual details, front slot positions, item snap marker positions, or cell art node names.
 
 ### Item Runtime
 
@@ -114,7 +126,8 @@ Add a new level:
 - Validate the level with `scripts/tools/validate_level_solvable.py`.
 
 Change shelf layout spacing:
-- Update `SHELF_CELL_*` and `_get_layout_positions()` in `scripts/level.gd`.
+- Update `SHELF_CELL_SIZE` and `_get_layout_positions()` in `scripts/level.gd`.
+- Keep `scenes/shelf.tscn` cell bounds aligned with `SHELF_CELL_SIZE`.
 - Keep `scripts/tools/generate_level_shelves.py` layout presets in sync if preset names or supported shapes change.
 
 Change matching rules:

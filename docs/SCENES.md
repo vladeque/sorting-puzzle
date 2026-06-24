@@ -53,21 +53,42 @@ Important nodes:
 - `UI/CompletionPanel`: shown after all items clear.
 
 Runtime-created nodes:
-- `ShelfXX`: generated under `Shelves`.
-- Shelf art nodes such as `BackWall`, `Ceiling`, `LeftWall`, `RightWall`, `FloorSurface`, `FloorFrontLip`, and `FloorGrain*`: generated under each shelf to make it a packed cell.
-- `SlotXX`: generated under each shelf.
-- `ItemSlotXX`: marker under each slot for snap positions.
+- `ShelfXX`: `scenes/shelf.tscn` instances generated under `Shelves`.
 - `ShelfLayerXX`: generated back layers for hidden or upcoming item rows.
 - `ShelfItem` instances from `scenes/item.tscn`.
 
 Depends on:
+- `scenes/shelf.tscn`
 - `scenes/item.tscn`
 - `configs/item_sprites.json`
 - `configs/levels/level_*.json`
 - `assets/abilities/*.png`
 
 Do not use for:
-- Static authoring of individual shelves. Current shelves are generated from JSON at runtime.
+- Static shelf cell visuals. Put those in `scenes/shelf.tscn`.
+
+## `scenes/shelf.tscn`
+
+Root:
+- `Shelf` (`Node2D`)
+
+Purpose:
+- Reusable shelf cell instantiated by `scripts/level.gd` for each configured shelf.
+- Owns the visible shelf back wall, floor, frame, front slot positions, and item snap markers.
+
+Important nodes:
+- `BackWall`: muted panel behind shelf items.
+- `Ceiling`, `LeftWall`, and `RightWall`: wooden cell frame.
+- `FloorSurface` and `FloorFrontLip`: wooden floor where items visually rest.
+- `FloorGrain*`: subtle line details on the floor.
+- `Slot01`, `Slot02`, `Slot03`: front slots used by runtime movement and matching logic.
+- `SlotXX/ItemSlotXX`: marker positions used by `scripts/level.gd` for snap targeting.
+
+Depends on:
+- Runtime item spawning from `scripts/level.gd`.
+
+Do not use for:
+- Level timing, matching, input handling, or back-layer promotion. Those stay in `scripts/level.gd`.
 
 ## `scenes/item.tscn`
 

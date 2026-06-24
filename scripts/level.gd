@@ -1,24 +1,15 @@
 extends Node2D
 
 const SLOT_COUNT := 3
-const SLOT_POSITIONS := [Vector2(-52, 0), Vector2(0, 0), Vector2(52, 0)]
-const SHELF_CELL_LEFT := -88.0
-const SHELF_CELL_RIGHT := 88.0
-const SHELF_CELL_TOP := -104.0
-const SHELF_CELL_BOTTOM := 46.0
-const SHELF_WALL_THICKNESS := 8.0
-const SHELF_FLOOR_SURFACE_Y := 16.0
-const SHELF_CELL_SIZE := Vector2(SHELF_CELL_RIGHT - SHELF_CELL_LEFT, SHELF_CELL_BOTTOM - SHELF_CELL_TOP)
-const SHELF_INNER_LEFT := SHELF_CELL_LEFT + SHELF_WALL_THICKNESS
-const SHELF_INNER_RIGHT := SHELF_CELL_RIGHT - SHELF_WALL_THICKNESS
-const SHELF_INNER_TOP := SHELF_CELL_TOP + SHELF_WALL_THICKNESS
-const SLOT_ITEM_POSITION := Vector2(0, SHELF_FLOOR_SURFACE_Y - 42.0)
+const SLOT_ITEM_POSITION := Vector2(0, -26)
+const SHELF_CELL_SIZE := Vector2(176, 150)
 const BACK_LAYER_PREFIX := "ShelfLayer"
 const FIRST_BACK_LAYER_INDEX := 1
 const ABILITY_HAMMER := &"hammer"
 const ABILITY_SHUFFLE := &"shuffle"
 const ABILITY_HIGHLIGHT := &"highlight"
 const HIGHLIGHT_DURATION_SECONDS := 15.0
+const SHELF_SCENE := preload("res://scenes/shelf.tscn")
 const ITEM_SCENE := preload("res://scenes/item.tscn")
 const ITEM_SPRITES_CONFIG := "res://configs/item_sprites.json"
 const LEVEL_CONFIG_TEMPLATE := "res://configs/levels/level_%03d.json"
@@ -254,217 +245,12 @@ func _get_layout_positions(layout_preset: String, shelf_count: int) -> Array[Vec
 
 
 func _add_shelf(parent: Node2D, shelf_number: int, shelf_position: Vector2) -> Node2D:
-	var shelf := Node2D.new()
+	var shelf := SHELF_SCENE.instantiate() as Node2D
 	shelf.name = "Shelf%02d" % shelf_number
 	shelf.position = shelf_position
 	parent.add_child(shelf)
 
-	_add_rect_polygon(
-		shelf,
-		"Shadow",
-		0,
-		Color(0.03, 0.025, 0.02, 0.18),
-		SHELF_CELL_LEFT + 2.0,
-		SHELF_CELL_BOTTOM - 2.0,
-		SHELF_CELL_RIGHT + 2.0,
-		SHELF_CELL_BOTTOM + 12.0
-	)
-	_add_rect_polygon(
-		shelf,
-		"BackWall",
-		1,
-		Color(0.72, 0.7, 0.67, 1),
-		SHELF_INNER_LEFT,
-		SHELF_INNER_TOP,
-		SHELF_INNER_RIGHT,
-		SHELF_FLOOR_SURFACE_Y
-	)
-	_add_rect_polygon(
-		shelf,
-		"BackWallLeftShade",
-		2,
-		Color(0.62, 0.6, 0.57, 0.74),
-		SHELF_INNER_LEFT,
-		SHELF_INNER_TOP,
-		SHELF_INNER_LEFT + 28.0,
-		SHELF_FLOOR_SURFACE_Y
-	)
-	_add_rect_polygon(
-		shelf,
-		"Ceiling",
-		3,
-		Color(0.78, 0.52, 0.29, 1),
-		SHELF_CELL_LEFT,
-		SHELF_CELL_TOP,
-		SHELF_CELL_RIGHT,
-		SHELF_CELL_TOP + SHELF_WALL_THICKNESS
-	)
-	_add_rect_polygon(
-		shelf,
-		"LeftWall",
-		4,
-		Color(0.68, 0.42, 0.22, 1),
-		SHELF_CELL_LEFT,
-		SHELF_CELL_TOP,
-		SHELF_CELL_LEFT + SHELF_WALL_THICKNESS,
-		SHELF_CELL_BOTTOM
-	)
-	_add_rect_polygon(
-		shelf,
-		"RightWall",
-		4,
-		Color(0.54, 0.33, 0.18, 1),
-		SHELF_CELL_RIGHT - SHELF_WALL_THICKNESS,
-		SHELF_CELL_TOP,
-		SHELF_CELL_RIGHT,
-		SHELF_CELL_BOTTOM
-	)
-	_add_rect_polygon(
-		shelf,
-		"FloorSurface",
-		5,
-		Color(0.64, 0.39, 0.19, 1),
-		SHELF_INNER_LEFT,
-		SHELF_FLOOR_SURFACE_Y,
-		SHELF_INNER_RIGHT,
-		SHELF_CELL_BOTTOM - 4.0
-	)
-	_add_rect_polygon(
-		shelf,
-		"FloorFrontLip",
-		5,
-		Color(0.48, 0.27, 0.13, 1),
-		SHELF_CELL_LEFT,
-		SHELF_CELL_BOTTOM - 8.0,
-		SHELF_CELL_RIGHT,
-		SHELF_CELL_BOTTOM
-	)
-	_add_floor_grain(shelf)
-	_add_highlight(shelf)
-
-	for slot_index in range(SLOT_COUNT):
-		_add_front_slot(shelf, slot_index)
-
 	return shelf
-
-
-func _add_polygon(parent: Node, node_name: String, z_index: int, color: Color, points: PackedVector2Array) -> void:
-	var polygon := Polygon2D.new()
-	polygon.name = node_name
-	polygon.z_index = z_index
-	polygon.color = color
-	polygon.polygon = points
-	parent.add_child(polygon)
-
-
-func _add_rect_polygon(
-	parent: Node,
-	node_name: String,
-	z_index: int,
-	color: Color,
-	left: float,
-	top: float,
-	right: float,
-	bottom: float
-) -> void:
-	_add_polygon(parent, node_name, z_index, color, PackedVector2Array([
-		Vector2(left, top),
-		Vector2(right, top),
-		Vector2(right, bottom),
-		Vector2(left, bottom),
-	]))
-
-
-func _add_line(parent: Node, node_name: String, z_index: int, color: Color, width: float, points: PackedVector2Array) -> void:
-	var line := Line2D.new()
-	line.name = node_name
-	line.z_index = z_index
-	line.default_color = color
-	line.width = width
-	line.points = points
-	parent.add_child(line)
-
-
-func _add_floor_grain(shelf: Node) -> void:
-	var grain_color := Color(0.38, 0.21, 0.1, 0.34)
-	_add_line(
-		shelf,
-		"FloorGrainBack",
-		6,
-		grain_color,
-		1.2,
-		PackedVector2Array([
-			Vector2(SHELF_INNER_LEFT + 8.0, SHELF_FLOOR_SURFACE_Y + 5.0),
-			Vector2(SHELF_INNER_RIGHT - 10.0, SHELF_FLOOR_SURFACE_Y + 5.0),
-		])
-	)
-	_add_line(
-		shelf,
-		"FloorGrainMiddle",
-		6,
-		grain_color,
-		1.0,
-		PackedVector2Array([
-			Vector2(SHELF_INNER_LEFT + 10.0, SHELF_FLOOR_SURFACE_Y + 13.0),
-			Vector2(SHELF_INNER_LEFT + 60.0, SHELF_FLOOR_SURFACE_Y + 12.0),
-			Vector2(SHELF_INNER_LEFT + 96.0, SHELF_FLOOR_SURFACE_Y + 15.0),
-			Vector2(SHELF_INNER_RIGHT - 8.0, SHELF_FLOOR_SURFACE_Y + 13.0),
-		])
-	)
-	_add_line(
-		shelf,
-		"FloorGrainKnot",
-		6,
-		Color(0.32, 0.17, 0.08, 0.28),
-		1.0,
-		PackedVector2Array([
-			Vector2(SHELF_INNER_RIGHT - 58.0, SHELF_FLOOR_SURFACE_Y + 19.0),
-			Vector2(SHELF_INNER_RIGHT - 48.0, SHELF_FLOOR_SURFACE_Y + 15.0),
-			Vector2(SHELF_INNER_RIGHT - 34.0, SHELF_FLOOR_SURFACE_Y + 18.0),
-			Vector2(SHELF_INNER_RIGHT - 22.0, SHELF_FLOOR_SURFACE_Y + 23.0),
-		])
-	)
-	_add_line(
-		shelf,
-		"FloorGrainFront",
-		6,
-		grain_color,
-		1.2,
-		PackedVector2Array([
-			Vector2(SHELF_CELL_LEFT + 8.0, SHELF_CELL_BOTTOM - 7.0),
-			Vector2(SHELF_CELL_RIGHT - 8.0, SHELF_CELL_BOTTOM - 7.0),
-		])
-	)
-
-
-func _add_highlight(parent: Node) -> void:
-	var highlight := Line2D.new()
-	highlight.name = "Highlight"
-	highlight.z_index = 4
-	highlight.points = PackedVector2Array([
-		Vector2(SHELF_CELL_LEFT + SHELF_WALL_THICKNESS + 8.0, SHELF_CELL_TOP + SHELF_WALL_THICKNESS + 2.0),
-		Vector2(SHELF_CELL_RIGHT - SHELF_WALL_THICKNESS - 8.0, SHELF_CELL_TOP + SHELF_WALL_THICKNESS + 2.0),
-	])
-	highlight.width = 2.0
-	highlight.default_color = Color(0.86, 0.61, 0.36, 0.72)
-	parent.add_child(highlight)
-
-
-func _add_front_slot(shelf: Node2D, slot_index: int) -> Node2D:
-	var slot_number := slot_index + 1
-	var slot := Node2D.new()
-	slot.name = "Slot%02d" % slot_number
-	slot.position = SLOT_POSITIONS[slot_index]
-	shelf.add_child(slot)
-
-	_add_polygon(slot, "SlotGuide", 5, Color(0.25, 0.74, 0.82, 0.18), PackedVector2Array([Vector2(-23, -88), Vector2(23, -88), Vector2(23, -12), Vector2(-23, -12)]))
-
-	var marker := Marker2D.new()
-	marker.name = "ItemSlot%02d" % slot_number
-	marker.position = SLOT_ITEM_POSITION
-	slot.add_child(marker)
-
-	return slot
 
 
 func _add_configured_layers(shelf: Node2D, layers: Array) -> void:
