@@ -61,7 +61,7 @@ var _selected_item: ShelfItem
 var _selected_slot: Node2D
 var _is_resolving_shelves := false
 var _shelves_pending_resolve: Array[Node] = []
-var _clearing_items: Array[ShelfItem] = []
+var _clearing_item_ids: Array[int] = []
 
 
 func _ready() -> void:
@@ -709,15 +709,17 @@ func _play_match_clear_animation(shelf_items: Array[ShelfItem]) -> void:
 		for item in shelf_items:
 			if item != null and is_instance_valid(item):
 				item.queue_free()
-			_unmark_item_clearing(item)
 		return
 
+	var clearing_item_ids: Array[int] = []
 	var center_position := center_item.global_position
 	for item in shelf_items:
 		if item == null or not is_instance_valid(item):
 			continue
 
-		_mark_item_clearing(item)
+		var item_instance_id := item.get_instance_id()
+		clearing_item_ids.append(item_instance_id)
+		_mark_item_clearing_by_id(item_instance_id)
 		item.input_pickable = false
 		item.z_index = 20
 
@@ -749,6 +751,8 @@ func _play_match_clear_animation(shelf_items: Array[ShelfItem]) -> void:
 			item.queue_free()
 
 	if center_item == null or not is_instance_valid(center_item):
+		for item_instance_id in clearing_item_ids:
+			_unmark_item_clearing_by_id(item_instance_id)
 		return
 
 	var shrink_tween := create_tween()
@@ -771,21 +775,21 @@ func _play_match_clear_animation(shelf_items: Array[ShelfItem]) -> void:
 	if center_item != null and is_instance_valid(center_item):
 		center_item.queue_free()
 
-	for item in shelf_items:
-		_unmark_item_clearing(item)
+	for item_instance_id in clearing_item_ids:
+		_unmark_item_clearing_by_id(item_instance_id)
 
 
-func _mark_item_clearing(item: ShelfItem) -> void:
-	if item != null and is_instance_valid(item) and not _clearing_items.has(item):
-		_clearing_items.append(item)
+func _mark_item_clearing_by_id(instance_id: int) -> void:
+	if instance_id != 0 and not _clearing_item_ids.has(instance_id):
+		_clearing_item_ids.append(instance_id)
 
 
-func _unmark_item_clearing(item: ShelfItem) -> void:
-	_clearing_items.erase(item)
+func _unmark_item_clearing_by_id(instance_id: int) -> void:
+	_clearing_item_ids.erase(instance_id)
 
 
 func _is_item_clearing(item: ShelfItem) -> bool:
-	return item != null and _clearing_items.has(item)
+	return item != null and _clearing_item_ids.has(item.get_instance_id())
 
 
 func _promote_empty_front_layers(shelves_to_check: Array[Node]) -> bool:
