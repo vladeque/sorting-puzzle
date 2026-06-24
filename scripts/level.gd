@@ -22,6 +22,8 @@ const MAIN_MENU_SCENE := "res://scenes/main_menu.tscn"
 @export var back_layer_offset := Vector2(0, -18)
 @export var back_layer_item_scale := 0.86
 @export var back_layer_item_modulate := Color(0.42, 0.42, 0.42, 0.34)
+@export var match_gather_duration_seconds := 0.18
+@export var match_shrink_duration_seconds := 0.16
 @export var level_duration_seconds := 300.0
 @export var completion_return_delay_seconds := 1.75
 @export_range(1, 10, 1) var selected_level := 1
@@ -57,6 +59,7 @@ var _pressed_origin_slot: Node2D
 var _press_position := Vector2.ZERO
 var _selected_item: ShelfItem
 var _selected_slot: Node2D
+var _is_resolving_shelves := false
 
 
 func _ready() -> void:
@@ -96,7 +99,7 @@ func _process(delta: float) -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if _level_failed or _level_completed:
+	if _level_failed or _level_completed or _is_resolving_shelves:
 		return
 
 	if event is InputEventMouseButton:
@@ -559,8 +562,6 @@ func _move_item_to_slot(item: ShelfItem, origin_slot: Node2D, target_slot: Node2
 	_place_item_in_slot(item, target_slot)
 
 	_resolve_shelves(shelves_to_check)
-	_refresh_ability_highlights()
-	_check_level_completed()
 	return true
 
 
@@ -644,11 +645,22 @@ func _add_shelf_to_check(shelves_to_check: Array[Node], slot: Node2D) -> void:
 
 
 func _resolve_shelves(shelves_to_check: Array[Node]) -> void:
+	if _is_resolving_shelves:
+		return
+
+	_is_resolving_shelves = true
+	_update_ability_buttons()
+
 	while true:
-		var cleared := _clear_matching_shelves(shelves_to_check)
+		var cleared := await _clear_matching_shelves(shelves_to_check)
 		var promoted := _promote_empty_front_layers(shelves_to_check)
 		if not cleared and not promoted:
 			break
+
+	_is_resolving_shelves = false
+	_refresh_ability_highlights()
+	_check_level_completed()
+	_update_ability_buttons()
 
 
 func _clear_matching_shelves(shelves_to_check: Array[Node]) -> bool:
@@ -665,8 +677,6 @@ func _clear_matching_shelves(shelves_to_check: Array[Node]) -> bool:
 
 		if shelf_items.all(func(item: ShelfItem) -> bool: return item.item_id == item_id):
 			cleared_any = true
-			for item in shelf_items:
-				item.queue_free()
 
 			if shelf_items.has(_selected_item):
 				_clear_selected_item()
@@ -674,7 +684,79 @@ func _clear_matching_shelves(shelves_to_check: Array[Node]) -> bool:
 			for item in shelf_items:
 				_highlighted_items.erase(item)
 
+			await _play_match_clear_animation(shelf_items)
+
 	return cleared_any
+
+
+func _play_match_clear_animation(shelf_items: Array[ShelfItem]) -> void:
+	if shelf_items.size() != SLOT_COUNT:
+		return
+
+	var center_item := shelf_items[1]
+	if center_item == null or not is_instance_valid(center_item):
+		for item in shelf_items:
+			if item != null and is_instance_valid(item):
+				item.queue_free()
+		return
+
+	var center_position := center_item.global_position
+	for item in shelf_items:
+		if item == null or not is_instance_valid(item):
+			continue
+
+		item.input_pickable = false
+		item.z_index = 20
+
+	center_item.z_index = 21
+
+	var gather_tween := create_tween()
+	gather_tween.set_parallel(true)
+	for item in shelf_items:
+		if item == center_item or item == null or not is_instance_valid(item):
+			continue
+
+		gather_tween.tween_property(
+			item,
+			"global_position",
+			center_position,
+			match_gather_duration_seconds
+		).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+		gather_tween.tween_property(
+			item,
+			"scale",
+			Vector2.ONE * 0.82,
+			match_gather_duration_seconds
+		).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+
+	await gather_tween.finished
+
+	for item in shelf_items:
+		if item != center_item and item != null and is_instance_valid(item):
+			item.queue_free()
+
+	if center_item == null or not is_instance_valid(center_item):
+		return
+
+	var shrink_tween := create_tween()
+	shrink_tween.set_parallel(true)
+	shrink_tween.tween_property(
+		center_item,
+		"scale",
+		Vector2.ZERO,
+		match_shrink_duration_seconds
+	).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+	shrink_tween.tween_property(
+		center_item,
+		"modulate",
+		Color(1, 1, 1, 0),
+		match_shrink_duration_seconds
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+
+	await shrink_tween.finished
+
+	if center_item != null and is_instance_valid(center_item):
+		center_item.queue_free()
 
 
 func _promote_empty_front_layers(shelves_to_check: Array[Node]) -> bool:
@@ -826,7 +908,7 @@ func _register_ability_button(ability_id: StringName, button_path: NodePath) -> 
 
 
 func _on_ability_button_pressed(ability_id: StringName) -> void:
-	if _level_failed or _level_completed or int(_ability_uses.get(ability_id, 0)) <= 0:
+	if _level_failed or _level_completed or _is_resolving_shelves or int(_ability_uses.get(ability_id, 0)) <= 0:
 		return
 
 	_cancel_active_interaction()
@@ -910,8 +992,6 @@ func _use_shuffle() -> bool:
 		_apply_item_visual_state(item)
 
 	_resolve_shelves(_get_all_shelves())
-	_refresh_ability_highlights()
-	_check_level_completed()
 	return true
 
 
@@ -946,8 +1026,6 @@ func _destroy_items(items_to_destroy: Array[ShelfItem]) -> void:
 		item.queue_free()
 
 	_resolve_shelves(shelves_to_check)
-	_refresh_ability_highlights()
-	_check_level_completed()
 
 
 func _find_immediate_triple_items() -> Array[ShelfItem]:
@@ -1040,7 +1118,7 @@ func _update_ability_button(ability_id: StringName) -> void:
 	if uses_label != null:
 		uses_label.text = str(uses_left)
 
-	button.disabled = _level_failed or _level_completed or uses_left <= 0
+	button.disabled = _level_failed or _level_completed or _is_resolving_shelves or uses_left <= 0
 
 
 func _get_all_shelves() -> Array[Node]:

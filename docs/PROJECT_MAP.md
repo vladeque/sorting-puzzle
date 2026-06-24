@@ -47,7 +47,7 @@ Responsibility:
 - Generates shelf nodes and slot nodes at runtime.
 - Spawns `ShelfItem` instances from config layers.
 - Handles mouse and touch interaction.
-- Resolves matches of three identical visible items on the same shelf.
+- Resolves matches of three identical visible items on the same shelf, including the gather-and-shrink clear animation.
 - Promotes back layers when the visible layer clears.
 - Tracks the countdown timer and win/loss overlays.
 

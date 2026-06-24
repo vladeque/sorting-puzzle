@@ -47,6 +47,8 @@ Important exports:
 - `back_layer_offset`: visual offset for hidden/upcoming shelf layers.
 - `back_layer_item_scale`: scale multiplier for back-layer item previews.
 - `back_layer_item_modulate`: color used for visible back-layer previews.
+- `match_gather_duration_seconds`: duration for side items to pull into the center item when a triple clears.
+- `match_shrink_duration_seconds`: duration for the center item shrink-out after a triple gathers.
 - `level_duration_seconds`: fallback duration if config does not define `time_seconds`.
 - `completion_return_delay_seconds`: delay before returning to the main menu after completion.
 - `selected_level`: level number loaded from `configs/levels/level_%03d.json`.
@@ -66,7 +68,7 @@ Key responsibilities:
 - Spawn configured items with `_add_configured_item()`.
 - Handle mouse and touch input through `_input()` and the press/motion/release helpers.
 - Move items with `_move_item_to_slot()` and `_place_item_in_slot()`.
-- Clear triples with `_clear_matching_shelves()`.
+- Clear triples with `_clear_matching_shelves()` and `_play_match_clear_animation()`.
 - Promote back layers with `_promote_back_layer()` and `_advance_back_layers()`.
 - Check win/loss state with `_check_level_completed()`, `_fail_level()`, and `_complete_level()`.
 - Manage hammer, shuffle, and highlight abilities.
