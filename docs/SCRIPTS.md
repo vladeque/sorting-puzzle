@@ -56,7 +56,9 @@ Important exports:
 Important constants:
 - `SLOT_COUNT`: currently three items per shelf front layer.
 - `SLOT_ITEM_POSITION`: item local position that matches `scenes/shelf.tscn` item snap markers.
-- `SHELF_CELL_SIZE`: packed layout size that should match the reusable shelf scene bounds.
+- `SHELF_CELL_SIZE`: reusable shelf scene bounds.
+- `SHELF_SHARED_EDGE_THICKNESS`: shelf boundary thickness that neighboring cells overlap.
+- `SHELF_GRID_STEP`: packed layout spacing after overlapping shared shelf edges.
 - `SHELF_SCENE`: `res://scenes/shelf.tscn`.
 - `ITEM_SCENE`: `res://scenes/item.tscn`.
 - `ITEM_SPRITES_CONFIG`: `res://configs/item_sprites.json`.
@@ -68,7 +70,7 @@ Important constants:
 Key responsibilities:
 - Load JSON configs with `_load_json_file()`.
 - Instantiate reusable shelf cells with `_add_shelf()` and add generated back layers with `_add_back_layer()`.
-- Pack shelf cells edge-to-edge based on `SHELF_CELL_SIZE`.
+- Pack shelf cells with shared boundaries based on `SHELF_GRID_STEP`.
 - Spawn configured items with `_add_configured_item()`.
 - Handle mouse and touch input through `_input()` and the press/motion/release helpers.
 - Move items with `_move_item_to_slot()` and `_place_item_in_slot()`.

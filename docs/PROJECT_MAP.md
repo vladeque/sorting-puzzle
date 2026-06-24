@@ -45,7 +45,7 @@ Files:
 
 Responsibility:
 - Loads level JSON and item sprite config.
-- Instantiates `scenes/shelf.tscn` for each configured shelf and packs shelf cells edge-to-edge in grid layouts.
+- Instantiates `scenes/shelf.tscn` for each configured shelf and packs shelf cells with shared boundaries in grid layouts.
 - Spawns `ShelfItem` instances from config layers.
 - Handles mouse and touch interaction.
 - Resolves matches of three identical visible items on the same shelf, including the gather-and-shrink clear animation.
@@ -126,8 +126,8 @@ Add a new level:
 - Validate the level with `scripts/tools/validate_level_solvable.py`.
 
 Change shelf layout spacing:
-- Update `SHELF_CELL_SIZE` and `_get_layout_positions()` in `scripts/level.gd`.
-- Keep `scenes/shelf.tscn` cell bounds aligned with `SHELF_CELL_SIZE`.
+- Update `SHELF_CELL_SIZE`, `SHELF_SHARED_EDGE_THICKNESS`, `SHELF_GRID_STEP`, and `_get_layout_positions()` in `scripts/level.gd`.
+- Keep `scenes/shelf.tscn` cell bounds and boundary thickness aligned with those layout constants.
 - Keep `scripts/tools/generate_level_shelves.py` layout presets in sync if preset names or supported shapes change.
 
 Change matching rules:

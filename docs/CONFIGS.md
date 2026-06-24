@@ -71,7 +71,7 @@ Item count rules:
 
 Runtime behavior:
 - `scripts/level.gd` instantiates one `scenes/shelf.tscn` cell for each configured shelf.
-- `scripts/level.gd` uses `layout_preset` to choose the grid columns, then packs generated shelf cells edge-to-edge.
+- `scripts/level.gd` uses `layout_preset` to choose the grid columns, then packs generated shelf cells with overlapping shared boundaries.
 - `scripts/level.gd` uses `time_seconds` as the active timer.
 
 Validation:

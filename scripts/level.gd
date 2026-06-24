@@ -3,6 +3,8 @@ extends Node2D
 const SLOT_COUNT := 3
 const SLOT_ITEM_POSITION := Vector2(0, -26)
 const SHELF_CELL_SIZE := Vector2(176, 150)
+const SHELF_SHARED_EDGE_THICKNESS := 8.0
+const SHELF_GRID_STEP := SHELF_CELL_SIZE - Vector2(SHELF_SHARED_EDGE_THICKNESS, SHELF_SHARED_EDGE_THICKNESS)
 const BACK_LAYER_PREFIX := "ShelfLayer"
 const FIRST_BACK_LAYER_INDEX := 1
 const ABILITY_HAMMER := &"hammer"
@@ -214,7 +216,7 @@ func _clear_shelves(shelves: Node) -> void:
 
 func _get_layout_positions(layout_preset: String, shelf_count: int) -> Array[Vector2]:
 	var columns := 3
-	var spacing := SHELF_CELL_SIZE
+	var spacing := SHELF_GRID_STEP
 
 	match layout_preset:
 		"grid_2x3":
