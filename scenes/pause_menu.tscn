@@ -19,50 +19,7 @@ shadow_color = Color(0, 0, 0, 0.42)
 shadow_size = 18
 shadow_offset = Vector2(0, 8)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_icon_normal"]
-bg_color = Color(0.16, 0.21, 0.27, 0.94)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.55, 0.77, 0.86, 0.82)
-corner_radius_top_left = 48
-corner_radius_top_right = 48
-corner_radius_bottom_right = 48
-corner_radius_bottom_left = 48
-shadow_color = Color(0, 0, 0, 0.28)
-shadow_size = 8
-shadow_offset = Vector2(0, 5)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_icon_pressed"]
-bg_color = Color(0.1, 0.15, 0.2, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.94, 0.76, 0.38, 1)
-corner_radius_top_left = 48
-corner_radius_top_right = 48
-corner_radius_bottom_right = 48
-corner_radius_bottom_left = 48
-shadow_color = Color(0, 0, 0, 0.22)
-shadow_size = 5
-shadow_offset = Vector2(0, 3)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_icon_hover"]
-bg_color = Color(0.21, 0.29, 0.36, 0.98)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.89, 0.94, 0.72, 0.95)
-corner_radius_top_left = 48
-corner_radius_top_right = 48
-corner_radius_bottom_right = 48
-corner_radius_bottom_left = 48
-shadow_color = Color(0, 0, 0, 0.32)
-shadow_size = 10
-shadow_offset = Vector2(0, 5)
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_icon_button"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_leave_button_normal"]
 bg_color = Color(0.78, 0.18, 0.13, 1)
@@ -169,14 +126,18 @@ alignment = 1
 [node name="MusicButton" type="Button" parent="PauseMenuPanel/MarginContainer/VBoxContainer/IconRow" unique_id=476301978]
 custom_minimum_size = Vector2(86, 86)
 layout_mode = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_icon_normal")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_icon_pressed")
-theme_override_styles/hover = SubResource("StyleBoxFlat_icon_hover")
+focus_mode = 0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_icon_button")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_icon_button")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_icon_button")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_icon_button")
 
 [node name="Icon" type="TextureRect" parent="PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/MusicButton" unique_id=1923076712]
 layout_mode = 0
-offset_right = 86.0
-offset_bottom = 86.0
+offset_left = -2.0
+offset_top = -2.0
+offset_right = 88.0
+offset_bottom = 88.0
 mouse_filter = 2
 texture = ExtResource("1_music_icon")
 expand_mode = 1
@@ -185,14 +146,18 @@ stretch_mode = 5
 [node name="SoundEffectsButton" type="Button" parent="PauseMenuPanel/MarginContainer/VBoxContainer/IconRow" unique_id=213460749]
 custom_minimum_size = Vector2(86, 86)
 layout_mode = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_icon_normal")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_icon_pressed")
-theme_override_styles/hover = SubResource("StyleBoxFlat_icon_hover")
+focus_mode = 0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_icon_button")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_icon_button")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_icon_button")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_icon_button")
 
 [node name="Icon" type="TextureRect" parent="PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/SoundEffectsButton" unique_id=1855192667]
 layout_mode = 0
-offset_right = 86.0
-offset_bottom = 86.0
+offset_left = -2.0
+offset_top = -2.0
+offset_right = 88.0
+offset_bottom = 88.0
 mouse_filter = 2
 texture = ExtResource("2_sound_effects_icon")
 expand_mode = 1
@@ -201,14 +166,18 @@ stretch_mode = 5
 [node name="VibrationButton" type="Button" parent="PauseMenuPanel/MarginContainer/VBoxContainer/IconRow" unique_id=1013902673]
 custom_minimum_size = Vector2(86, 86)
 layout_mode = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_icon_normal")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_icon_pressed")
-theme_override_styles/hover = SubResource("StyleBoxFlat_icon_hover")
+focus_mode = 0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_icon_button")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_icon_button")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_icon_button")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_icon_button")
 
 [node name="Icon" type="TextureRect" parent="PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/VibrationButton" unique_id=1516946932]
 layout_mode = 0
-offset_right = 86.0
-offset_bottom = 86.0
+offset_left = -2.0
+offset_top = -2.0
+offset_right = 88.0
+offset_bottom = 88.0
 mouse_filter = 2
 texture = ExtResource("3_vibration_icon")
 expand_mode = 1
