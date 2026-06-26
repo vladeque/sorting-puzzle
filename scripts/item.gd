@@ -62,7 +62,7 @@ func _apply_visual_scale() -> void:
 
 	var outline_sprite := get_node_or_null("OutlineSprite") as Sprite2D
 	if outline_sprite != null:
-		outline_sprite.scale = Vector2.ONE * visual_scale
+		outline_sprite.scale = _get_outline_scale()
 
 
 func _prepare_outline_material() -> void:
@@ -90,7 +90,21 @@ func _apply_outline() -> void:
 	var outline_sprite := get_node_or_null("OutlineSprite") as Sprite2D
 	if outline_sprite != null:
 		outline_sprite.visible = _outline_enabled
+		outline_sprite.scale = _get_outline_scale()
 
 	_outline_material.set_shader_parameter("outline_color", outline_color)
-	_outline_material.set_shader_parameter("outline_width", outline_width if _outline_enabled else 0.0)
 	_outline_material.set_shader_parameter("alpha_threshold", outline_alpha_threshold)
+
+
+func _get_outline_scale() -> Vector2:
+	if not _outline_enabled or texture == null:
+		return Vector2.ONE * visual_scale
+
+	var texture_size := texture.get_size()
+	if texture_size.x <= 0.0 or texture_size.y <= 0.0:
+		return Vector2.ONE * visual_scale
+
+	return Vector2(
+		visual_scale + outline_width * 2.0 / texture_size.x,
+		visual_scale + outline_width * 2.0 / texture_size.y
+	)

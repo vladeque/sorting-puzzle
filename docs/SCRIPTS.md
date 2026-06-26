@@ -49,7 +49,7 @@ Important exports:
 - `back_layer_item_modulate`: color used for visible back-layer previews.
 - `highlight_outline_color`: border color used by the highlight ability.
 - `selected_highlight_outline_color`: border color used when a highlighted item is also selected.
-- `highlight_outline_width`: pixel radius used by the item alpha-outline shader.
+- `highlight_outline_width`: screen-pixel expansion used by the item outline sprite.
 - `match_gather_duration_seconds`: duration for side items to pull into the center item when a triple clears.
 - `match_shrink_duration_seconds`: duration for the center item shrink-out after a triple gathers.
 - `level_duration_seconds`: fallback duration if config does not define `time_seconds`.
@@ -89,7 +89,6 @@ Key responsibilities:
 - Check win/loss state with `_check_level_completed()`, `_fail_level()`, and `_complete_level()`.
 - Manage hammer, shuffle, and highlight abilities.
 - Apply highlight ability visuals through `ShelfItem.set_outline()` so only item silhouettes receive a border.
-- Choose highlight targets by preferring immediate shelf-completion triples, then falling back to any visible matching triple.
 
 Depends on:
 - `level.tscn` node names and paths.
@@ -119,7 +118,7 @@ Exports:
 - `texture`: assigned by `scripts/level.gd`; setter updates `Sprite2D.texture`.
 - `visual_scale`: scalar applied to `Sprite2D.scale`.
 - `outline_color`: color passed to the item outline shader.
-- `outline_width`: outline radius; `0.0` disables the border.
+- `outline_width`: screen-pixel expansion used when the outline sprite is enabled.
 - `outline_alpha_threshold`: alpha cutoff used to detect the item silhouette.
 
 Key methods:
