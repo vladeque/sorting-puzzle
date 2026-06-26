@@ -1029,7 +1029,7 @@ func _use_shuffle() -> bool:
 
 
 func _use_highlight() -> bool:
-	var items_to_highlight := _find_immediate_triple_items()
+	var items_to_highlight := _find_highlight_items()
 	if items_to_highlight.is_empty():
 		return false
 
@@ -1040,6 +1040,14 @@ func _use_highlight() -> bool:
 		_apply_item_visual_state(item)
 
 	return true
+
+
+func _find_highlight_items() -> Array[ShelfItem]:
+	var immediate_items := _find_immediate_triple_items()
+	if not immediate_items.is_empty():
+		return immediate_items
+
+	return _find_visible_triple_items()
 
 
 func _destroy_items(items_to_destroy: Array[ShelfItem]) -> void:
@@ -1093,6 +1101,32 @@ func _find_immediate_triple_items() -> Array[ShelfItem]:
 	return highlighted
 
 
+func _find_visible_triple_items() -> Array[ShelfItem]:
+	var items_by_type := {}
+	var candidate_id := &""
+	for item in _get_visible_items():
+		if item.item_id == &"":
+			continue
+
+		if not items_by_type.has(item.item_id):
+			items_by_type[item.item_id] = []
+
+		var typed_items := items_by_type[item.item_id] as Array
+		typed_items.append(item)
+		if candidate_id == &"" and typed_items.size() >= SLOT_COUNT:
+			candidate_id = item.item_id
+
+	if candidate_id == &"":
+		return []
+
+	var highlighted: Array[ShelfItem] = []
+	var candidate_items := items_by_type[candidate_id] as Array
+	for item in candidate_items:
+		highlighted.append(item)
+
+	return highlighted
+
+
 func _update_highlight_timer(delta: float) -> void:
 	if _highlight_timer <= 0.0:
 		return
@@ -1107,7 +1141,7 @@ func _refresh_ability_highlights() -> void:
 		return
 
 	var previous_items := _highlighted_items.duplicate()
-	_highlighted_items = _find_immediate_triple_items()
+	_highlighted_items = _find_highlight_items()
 	for item in previous_items:
 		if item != null and is_instance_valid(item):
 			_apply_item_visual_state(item)

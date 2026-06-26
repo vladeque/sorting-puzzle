@@ -89,6 +89,7 @@ Key responsibilities:
 - Check win/loss state with `_check_level_completed()`, `_fail_level()`, and `_complete_level()`.
 - Manage hammer, shuffle, and highlight abilities.
 - Apply highlight ability visuals through `ShelfItem.set_outline()` so only item silhouettes receive a border.
+- Choose highlight targets by preferring immediate shelf-completion triples, then falling back to any visible matching triple.
 
 Depends on:
 - `level.tscn` node names and paths.
