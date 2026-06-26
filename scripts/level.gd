@@ -532,14 +532,15 @@ func _finish_active_drag(pointer_global_position: Vector2) -> void:
 		return
 
 	var item := _dragged_item
+	var origin_slot := _origin_slot
 	var target_slot := _find_nearest_slot(pointer_global_position)
 	if target_slot == null:
-		_place_item_in_slot(item, _origin_slot, true)
-	elif target_slot == _origin_slot:
-		_place_item_in_slot(item, _origin_slot, true)
+		_return_item_to_origin_after_animation(item, origin_slot)
+	elif target_slot == origin_slot:
+		_return_item_to_origin_after_animation(item, origin_slot)
 	else:
-		if not _move_item_to_slot(item, _origin_slot, target_slot):
-			_place_item_in_slot(item, _origin_slot, true)
+		if not _move_item_to_slot(item, origin_slot, target_slot):
+			_return_item_to_origin_after_animation(item, origin_slot)
 
 	_dragged_item = null
 	_origin_slot = null
@@ -644,6 +645,10 @@ func _place_item_in_slot(item: ShelfItem, slot: Node2D, should_play_sound := fal
 func _move_item_to_slot_after_animation(item: ShelfItem, target_slot: Node2D, shelves_to_check: Array[Node]) -> void:
 	await _play_item_move_animation(item, target_slot)
 	_resolve_shelves(shelves_to_check)
+
+
+func _return_item_to_origin_after_animation(item: ShelfItem, origin_slot: Node2D) -> void:
+	await _play_item_move_animation(item, origin_slot)
 
 
 func _play_item_move_animation(item: ShelfItem, target_slot: Node2D) -> void:

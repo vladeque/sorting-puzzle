@@ -48,7 +48,7 @@ Important exports:
 - `back_layer_item_scale`: scale multiplier for back-layer item previews.
 - `back_layer_item_modulate`: color used for visible back-layer previews.
 - `layer_promotion_duration_seconds`: duration for back-layer items to slide forward into active front slots.
-- `item_move_duration_seconds`: duration for moved items to slide into destination slots after tap or drag placement.
+- `item_move_duration_seconds`: duration for moved items to slide into destination slots after tap or drag placement, including invalid drag returns.
 - `highlight_outline_color`: border color used by the highlight ability.
 - `selected_highlight_outline_color`: border color used when a highlighted item is also selected.
 - `highlight_outline_width`: screen-pixel expansion used by the item outline sprite.
