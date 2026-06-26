@@ -40,6 +40,7 @@ Files:
 - `level.tscn`
 - `scenes/shelf.tscn`
 - `scenes/pause_menu.tscn`
+- `assets/ui/*.png`
 - `scripts/level.gd`
 - `assets/audio/*.wav`
 - `configs/levels/level_*.json`
@@ -113,7 +114,7 @@ Files:
 
 Responsibility:
 - `level.tscn` provides the top-right circular pause button and instances the pause menu scene.
-- `scenes/pause_menu.tscn` owns the popup layout, `Pause` title, placeholder icon buttons, and Leave/Continue buttons.
+- `scenes/pause_menu.tscn` owns the popup layout, `Pause` title, music / sound-effects / vibration icon buttons, and Leave/Continue buttons.
 - `scripts/level.gd` opens and closes the menu, pauses the timer and gameplay input, and routes Leave back to the main menu.
 
 Change here when:
@@ -166,6 +167,7 @@ Change level win or loss flow:
 
 Change pause menu layout:
 - Update `scenes/pause_menu.tscn`.
+- Update `assets/ui/*.png` when changing pause menu icon art.
 - Keep node paths used by `scripts/level.gd` stable unless the script is updated in the same change.
 
 ## Related Docs

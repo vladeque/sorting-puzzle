@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://g1xsr7chqeg7"]
 
-[ext_resource type="Texture2D" uid="uid://h4ru3gdl5338" path="res://assets/abilities/ability_hammer.png" id="1_hammer_icon"]
-[ext_resource type="Texture2D" uid="uid://x0qk7pd87bfv" path="res://assets/abilities/ability_shuffle.png" id="2_shuffle_icon"]
-[ext_resource type="Texture2D" uid="uid://dwmyah5l2r82d" path="res://assets/abilities/ability_lantern.png" id="3_lantern_icon"]
+[ext_resource type="Texture2D" path="res://assets/ui/icon_music.png" id="1_music_icon"]
+[ext_resource type="Texture2D" path="res://assets/ui/icon_sound_effects.png" id="2_sound_effects_icon"]
+[ext_resource type="Texture2D" path="res://assets/ui/icon_vibration.png" id="3_vibration_icon"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pause_panel"]
 bg_color = Color(0.12, 0.16, 0.2, 0.98)
@@ -166,57 +166,57 @@ layout_mode = 2
 theme_override_constants/separation = 36
 alignment = 1
 
-[node name="HammerIconButton" type="Button" parent="PauseMenuPanel/MarginContainer/VBoxContainer/IconRow" unique_id=476301978]
+[node name="MusicButton" type="Button" parent="PauseMenuPanel/MarginContainer/VBoxContainer/IconRow" unique_id=476301978]
 custom_minimum_size = Vector2(86, 86)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_icon_normal")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_icon_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_icon_hover")
 
-[node name="Icon" type="TextureRect" parent="PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/HammerIconButton" unique_id=1923076712]
+[node name="Icon" type="TextureRect" parent="PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/MusicButton" unique_id=1923076712]
 layout_mode = 0
 offset_left = 13.0
 offset_top = 13.0
 offset_right = 73.0
 offset_bottom = 73.0
 mouse_filter = 2
-texture = ExtResource("1_hammer_icon")
+texture = ExtResource("1_music_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="ShuffleIconButton" type="Button" parent="PauseMenuPanel/MarginContainer/VBoxContainer/IconRow" unique_id=213460749]
+[node name="SoundEffectsButton" type="Button" parent="PauseMenuPanel/MarginContainer/VBoxContainer/IconRow" unique_id=213460749]
 custom_minimum_size = Vector2(86, 86)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_icon_normal")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_icon_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_icon_hover")
 
-[node name="Icon" type="TextureRect" parent="PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/ShuffleIconButton" unique_id=1855192667]
+[node name="Icon" type="TextureRect" parent="PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/SoundEffectsButton" unique_id=1855192667]
 layout_mode = 0
 offset_left = 13.0
 offset_top = 13.0
 offset_right = 73.0
 offset_bottom = 73.0
 mouse_filter = 2
-texture = ExtResource("2_shuffle_icon")
+texture = ExtResource("2_sound_effects_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="LanternIconButton" type="Button" parent="PauseMenuPanel/MarginContainer/VBoxContainer/IconRow" unique_id=1013902673]
+[node name="VibrationButton" type="Button" parent="PauseMenuPanel/MarginContainer/VBoxContainer/IconRow" unique_id=1013902673]
 custom_minimum_size = Vector2(86, 86)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_icon_normal")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_icon_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_icon_hover")
 
-[node name="Icon" type="TextureRect" parent="PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/LanternIconButton" unique_id=1516946932]
+[node name="Icon" type="TextureRect" parent="PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/VibrationButton" unique_id=1516946932]
 layout_mode = 0
 offset_left = 13.0
 offset_top = 9.0
 offset_right = 73.0
 offset_bottom = 69.0
 mouse_filter = 2
-texture = ExtResource("3_lantern_icon")
+texture = ExtResource("3_vibration_icon")
 expand_mode = 1
 stretch_mode = 5
 

@@ -79,17 +79,19 @@ Root:
 
 Purpose:
 - Reusable in-level pause menu overlay instanced by `level.tscn`.
-- Owns the modal dimmer, popup panel styling, `Pause` title, three inert circular icon buttons, and `Leave` / `Continue` buttons.
+- Owns the modal dimmer, popup panel styling, `Pause` title, music / sound-effects / vibration icon buttons, and `Leave` / `Continue` buttons.
 
 Important nodes:
 - `PauseMenuPanel`: centered popup panel.
 - `PauseMenuPanel/MarginContainer/VBoxContainer/TitleLabel`: pause menu title.
-- `PauseMenuPanel/MarginContainer/VBoxContainer/IconRow`: placeholder circular icon buttons.
+- `PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/MusicButton`: circular music toggle placeholder.
+- `PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/SoundEffectsButton`: circular sound effects toggle placeholder.
+- `PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/VibrationButton`: circular phone vibration toggle placeholder.
 - `PauseMenuPanel/MarginContainer/VBoxContainer/ButtonRow/LeaveButton`: button wired by `scripts/level.gd` to return to the main menu.
 - `PauseMenuPanel/MarginContainer/VBoxContainer/ButtonRow/ContinueButton`: button wired by `scripts/level.gd` to resume the level.
 
 Depends on:
-- `assets/abilities/*.png` for placeholder icon art.
+- `assets/ui/icon_music.png`, `assets/ui/icon_sound_effects.png`, and `assets/ui/icon_vibration.png` for settings icon art.
 - Runtime button wiring from `scripts/level.gd`.
 
 Do not use for:
