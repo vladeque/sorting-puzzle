@@ -90,13 +90,14 @@ Key responsibilities:
 - Queue shelf resolution requests made while another match animation is still finishing.
 - Promote back layers with `_promote_back_layer()`, `_play_layer_promotion_animation()`, and `_advance_back_layers()`.
 - Check win/loss state with `_check_level_completed()`, `_fail_level()`, and `_complete_level()`.
-- Pause and resume active gameplay through the top-right menu button, `UI/PauseMenuOverlay`, `Leave`, and `Continue`.
+- Pause and resume active gameplay through the top-right menu button, the instanced `UI/PauseMenuOverlay`, `Leave`, and `Continue`.
 - Manage hammer, shuffle, and highlight abilities.
 - Apply highlight ability visuals through `ShelfItem.set_outline()` so only item silhouettes receive a border.
 
 Depends on:
 - `level.tscn` node names and paths.
 - `scenes/shelf.tscn` slot names and item snap marker names.
+- `scenes/pause_menu.tscn` button node names used under `UI/PauseMenuOverlay`.
 - `scenes/item.tscn` and `ShelfItem`.
 - `assets/audio/item_place.wav` and `assets/audio/triple_clear.wav`.
 - `configs/item_sprites.json` item IDs and texture paths.

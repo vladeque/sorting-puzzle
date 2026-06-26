@@ -12,7 +12,7 @@ Main scene:
 Playable level scene:
 - `level.tscn`
 - Instantiated by `scripts/main_menu.gd`.
-- Owns shelf layout, timer, drag and tap movement, triple matching, abilities, failure, and completion flow.
+- Owns shelf layout, timer, drag and tap movement, triple matching, abilities, pause-menu wiring, failure, and completion flow.
 
 Reusable item scene:
 - `scenes/item.tscn`
@@ -39,6 +39,7 @@ Change here when:
 Files:
 - `level.tscn`
 - `scenes/shelf.tscn`
+- `scenes/pause_menu.tscn`
 - `scripts/level.gd`
 - `assets/audio/*.wav`
 - `configs/levels/level_*.json`
@@ -54,7 +55,7 @@ Responsibility:
 - Keeps non-clearing items interactive while match animations run, with pending shelf resolves queued behind the active animation.
 - Promotes back layers when the visible layer clears.
 - Tracks the countdown timer and win/loss overlays.
-- Owns the in-level pause menu, including the top-right circular menu button, modal overlay, Leave action, and Continue action.
+- Wires the in-level pause menu, including the top-right circular menu button, modal overlay, Leave action, and Continue action.
 
 Change here when:
 - Editing puzzle rules, input behavior, runtime shelf construction, level timing, completion conditions, or ability behavior.
@@ -103,6 +104,21 @@ Responsibility:
 Change here when:
 - Adding, removing, rebalancing, or restyling player abilities.
 
+### Pause Menu
+
+Files:
+- `level.tscn`
+- `scenes/pause_menu.tscn`
+- `scripts/level.gd`
+
+Responsibility:
+- `level.tscn` provides the top-right circular pause button and instances the pause menu scene.
+- `scenes/pause_menu.tscn` owns the popup layout, `Pause` title, placeholder icon buttons, and Leave/Continue buttons.
+- `scripts/level.gd` opens and closes the menu, pauses the timer and gameplay input, and routes Leave back to the main menu.
+
+Change here when:
+- Restyling the in-level pause popup, adding pause menu actions, or changing pause/resume behavior.
+
 ### Level Data And Tooling
 
 Files:
@@ -147,6 +163,10 @@ Change gameplay sound effects:
 
 Change level win or loss flow:
 - Update `_process()`, `_fail_level()`, `_complete_level()`, `_check_level_completed()`, pause-menu helpers, and the panels in `level.tscn`.
+
+Change pause menu layout:
+- Update `scenes/pause_menu.tscn`.
+- Keep node paths used by `scripts/level.gd` stable unless the script is updated in the same change.
 
 ## Related Docs
 

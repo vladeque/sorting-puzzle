@@ -52,7 +52,7 @@ Important nodes:
 - `UI/AbilityBar/HBoxContainer/HighlightButton`: highlight ability button.
 - `UI/FailurePanel`: shown when time runs out.
 - `UI/CompletionPanel`: shown after all items clear.
-- `UI/PauseMenuOverlay`: modal pause menu containing the `Pause` title, inert circular icon buttons, plus `Leave` and `Continue` actions.
+- `UI/PauseMenuOverlay`: `scenes/pause_menu.tscn` instance used for the modal pause menu.
 
 Runtime-created nodes:
 - `ShelfXX`: `scenes/shelf.tscn` instances generated under `Shelves`.
@@ -63,6 +63,7 @@ Runtime-created nodes:
 Depends on:
 - `scenes/shelf.tscn`
 - `scenes/item.tscn`
+- `scenes/pause_menu.tscn`
 - `assets/audio/*.wav`
 - `configs/item_sprites.json`
 - `configs/levels/level_*.json`
@@ -70,6 +71,29 @@ Depends on:
 
 Do not use for:
 - Static shelf cell visuals. Put those in `scenes/shelf.tscn`.
+
+## `scenes/pause_menu.tscn`
+
+Root:
+- `PauseMenuOverlay` (`ColorRect`)
+
+Purpose:
+- Reusable in-level pause menu overlay instanced by `level.tscn`.
+- Owns the modal dimmer, popup panel styling, `Pause` title, three inert circular icon buttons, and `Leave` / `Continue` buttons.
+
+Important nodes:
+- `PauseMenuPanel`: centered popup panel.
+- `PauseMenuPanel/MarginContainer/VBoxContainer/TitleLabel`: pause menu title.
+- `PauseMenuPanel/MarginContainer/VBoxContainer/IconRow`: placeholder circular icon buttons.
+- `PauseMenuPanel/MarginContainer/VBoxContainer/ButtonRow/LeaveButton`: button wired by `scripts/level.gd` to return to the main menu.
+- `PauseMenuPanel/MarginContainer/VBoxContainer/ButtonRow/ContinueButton`: button wired by `scripts/level.gd` to resume the level.
+
+Depends on:
+- `assets/abilities/*.png` for placeholder icon art.
+- Runtime button wiring from `scripts/level.gd`.
+
+Do not use for:
+- Timer state, scene navigation, or gameplay pause rules. Those stay in `scripts/level.gd`.
 
 ## `scenes/shelf.tscn`
 
