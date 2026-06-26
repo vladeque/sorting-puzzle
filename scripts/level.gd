@@ -533,12 +533,13 @@ func _handle_press_at(pointer_global_position: Vector2) -> void:
 	if _selected_item != null:
 		var target_slot := _find_clicked_slot(pointer_global_position, clicked_item)
 		if target_slot != null:
-			_move_item_to_slot(_selected_item, _selected_slot, target_slot)
+			var moved_item := _move_item_to_slot(_selected_item, _selected_slot, target_slot)
 			_clear_selected_item()
-			get_viewport().set_input_as_handled()
-			return
-
-		_clear_selected_item()
+			if moved_item:
+				get_viewport().set_input_as_handled()
+				return
+		else:
+			_clear_selected_item()
 
 	if clicked_item == null:
 		return
@@ -625,12 +626,13 @@ func _move_item_to_slot(item: ShelfItem, origin_slot: Node2D, target_slot: Node2
 	if item == null or origin_slot == null or target_slot == null:
 		return false
 
+	target_slot = _resolve_move_target_slot(origin_slot, target_slot)
+	if target_slot == null:
+		return false
+
 	if target_slot == origin_slot:
 		_place_item_in_slot(item, origin_slot, true)
 		return true
-
-	if _get_slot_item(target_slot) != null:
-		return false
 
 	var shelves_to_check: Array[Node] = []
 	_add_shelf_to_check(shelves_to_check, origin_slot)
@@ -655,7 +657,7 @@ func _find_item_at_position(pointer_global_position: Vector2) -> ShelfItem:
 
 func _find_clicked_slot(pointer_global_position: Vector2, clicked_item: ShelfItem) -> Node2D:
 	if clicked_item != null:
-		return null
+		return clicked_item.get_parent() as Node2D
 
 	return _find_nearest_empty_slot(pointer_global_position)
 
@@ -665,7 +667,7 @@ func _find_nearest_slot(pointer_global_position: Vector2) -> Node2D:
 	var nearest_distance := slot_snap_distance
 
 	for slot in _slots:
-		var marker := slot.get_node_or_null("ItemSlot%s" % slot.name.trim_prefix("Slot")) as Marker2D
+		var marker := _get_slot_marker(slot)
 		if marker == null:
 			continue
 
@@ -685,7 +687,7 @@ func _find_nearest_empty_slot(pointer_global_position: Vector2) -> Node2D:
 		if _get_slot_item(slot) != null:
 			continue
 
-		var marker := slot.get_node_or_null("ItemSlot%s" % slot.name.trim_prefix("Slot")) as Marker2D
+		var marker := _get_slot_marker(slot)
 		if marker == null:
 			continue
 
@@ -695,6 +697,47 @@ func _find_nearest_empty_slot(pointer_global_position: Vector2) -> Node2D:
 			nearest_distance = distance
 
 	return nearest_slot
+
+
+func _resolve_move_target_slot(origin_slot: Node2D, target_slot: Node2D) -> Node2D:
+	if target_slot == origin_slot:
+		return target_slot
+
+	if _get_slot_item(target_slot) == null:
+		return target_slot
+
+	return _find_free_slot_on_target_shelf(target_slot, origin_slot)
+
+
+func _find_free_slot_on_target_shelf(target_slot: Node2D, excluded_slot: Node2D) -> Node2D:
+	var target_shelf := _get_owning_shelf(target_slot)
+	if target_shelf == null:
+		return null
+
+	var target_marker := _get_slot_marker(target_slot)
+	if target_marker == null:
+		return null
+
+	var nearest_slot: Node2D
+	var nearest_distance := INF
+	for shelf_slot in _get_front_slots(target_shelf):
+		if shelf_slot == excluded_slot or _get_slot_item(shelf_slot) != null:
+			continue
+
+		var marker := _get_slot_marker(shelf_slot)
+		if marker == null:
+			continue
+
+		var distance := target_marker.global_position.distance_to(marker.global_position)
+		if distance < nearest_distance:
+			nearest_slot = shelf_slot
+			nearest_distance = distance
+
+	return nearest_slot
+
+
+func _get_slot_marker(slot: Node2D) -> Marker2D:
+	return slot.get_node_or_null("ItemSlot%s" % slot.name.trim_prefix("Slot")) as Marker2D
 
 
 func _get_slot_item(slot: Node2D) -> ShelfItem:

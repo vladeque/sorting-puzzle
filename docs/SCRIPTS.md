@@ -82,7 +82,8 @@ Key responsibilities:
 - Pack shelf cells with shared boundaries based on `SHELF_GRID_STEP`.
 - Spawn configured items with `_add_configured_item()`.
 - Handle mouse and touch input through `_input()` and the press/motion/release helpers.
-- Move items with `_move_item_to_slot()`, `_play_item_move_animation()`, and `_place_item_in_slot()`.
+- Move items with `_move_item_to_slot()`, `_resolve_move_target_slot()`, `_play_item_move_animation()`, and `_place_item_in_slot()`.
+- Redirect moves aimed at an occupied destination slot to the nearest free front slot on that destination shelf.
 - Clear triples with `_clear_matching_shelves()` and `_play_match_clear_animation()`.
 - Play placement and triple-clear sound effects with runtime `AudioStreamPlayer` nodes.
 - Track clearing items so only disappearing items ignore input and abilities during the animation.

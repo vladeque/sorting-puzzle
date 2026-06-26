@@ -160,7 +160,8 @@ Change matching rules:
 - Update `scripts/tools/validate_level_solvable.py` so generated or validated levels match runtime behavior.
 
 Change drag or tap movement:
-- Update `_input()`, `_handle_press_at()`, `_handle_motion_at()`, `_handle_release_at()`, `_move_item_to_slot()`, and slot lookup helpers in `scripts/level.gd`.
+- Update `_input()`, `_handle_press_at()`, `_handle_motion_at()`, `_handle_release_at()`, `_move_item_to_slot()`, `_resolve_move_target_slot()`, and slot lookup helpers in `scripts/level.gd`.
+- Keep occupied-slot fallback behavior in sync with `_find_free_slot_on_target_shelf()`.
 
 Change gameplay sound effects:
 - Update `assets/audio/item_place.wav`, `assets/audio/triple_clear.wav`, and the audio player helpers in `scripts/level.gd`.
