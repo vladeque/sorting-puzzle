@@ -14,8 +14,8 @@ uniform float alpha_threshold : hint_range(0.0, 1.0, 0.01) = 0.1;
 
 void fragment() {
 	vec4 vertex_color = COLOR;
-	vec4 base_color = texture(TEXTURE, UV) * vertex_color;
-	vec4 final_color = base_color;
+	vec4 base_color = texture(TEXTURE, UV);
+	vec4 final_color = vec4(0.0);
 
 	if (outline_width > 0.0 && base_color.a <= alpha_threshold) {
 		vec2 outline_step = TEXTURE_PIXEL_SIZE * outline_width;
@@ -49,8 +49,11 @@ shader_parameter/alpha_threshold = 0.1
 z_index = 6
 script = ExtResource("1_item_script")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="OutlineSprite" type="Sprite2D" parent="."]
+visible = false
 material = SubResource("ShaderMaterial_item_outline")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_item_hitbox")

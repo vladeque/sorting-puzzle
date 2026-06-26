@@ -105,7 +105,8 @@ Purpose:
 - Gives each spawned item a collision area and sprite.
 
 Important nodes:
-- `Sprite2D`: texture, visual scale, and alpha-based outline material are controlled by `ShelfItem`.
+- `OutlineSprite`: hidden sprite used by `ShelfItem` to draw alpha-based highlight borders.
+- `Sprite2D`: main item sprite; texture and visual scale are controlled by `ShelfItem`.
 - `CollisionShape2D`: rectangular item hitbox used by runtime interaction.
 
 Depends on:

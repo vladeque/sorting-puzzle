@@ -29,6 +29,7 @@ extends Area2D
 		outline_alpha_threshold = value
 		_apply_outline()
 
+var _outline_enabled := false
 var _outline_material: ShaderMaterial
 
 func _ready() -> void:
@@ -39,48 +40,57 @@ func _ready() -> void:
 
 
 func set_outline(enabled: bool, color: Color, width: float) -> void:
+	_outline_enabled = enabled
 	outline_color = color
-	outline_width = width if enabled else 0.0
+	outline_width = width
 
 
 func _apply_texture() -> void:
 	var sprite := get_node_or_null("Sprite2D") as Sprite2D
-	if sprite == null:
-		return
+	if sprite != null:
+		sprite.texture = texture
 
-	sprite.texture = texture
+	var outline_sprite := get_node_or_null("OutlineSprite") as Sprite2D
+	if outline_sprite != null:
+		outline_sprite.texture = texture
 
 
 func _apply_visual_scale() -> void:
 	var sprite := get_node_or_null("Sprite2D") as Sprite2D
-	if sprite == null:
-		return
+	if sprite != null:
+		sprite.scale = Vector2.ONE * visual_scale
 
-	sprite.scale = Vector2.ONE * visual_scale
+	var outline_sprite := get_node_or_null("OutlineSprite") as Sprite2D
+	if outline_sprite != null:
+		outline_sprite.scale = Vector2.ONE * visual_scale
 
 
 func _prepare_outline_material() -> void:
-	var sprite := get_node_or_null("Sprite2D") as Sprite2D
-	if sprite == null:
+	var outline_sprite := get_node_or_null("OutlineSprite") as Sprite2D
+	if outline_sprite == null:
 		return
 
-	var shader_material := sprite.material as ShaderMaterial
+	var shader_material := outline_sprite.material as ShaderMaterial
 	if shader_material == null:
 		return
 
 	_outline_material = shader_material.duplicate() as ShaderMaterial
-	sprite.material = _outline_material
+	outline_sprite.material = _outline_material
 
 
 func _apply_outline() -> void:
 	if _outline_material == null:
-		var sprite := get_node_or_null("Sprite2D") as Sprite2D
-		if sprite != null:
-			_outline_material = sprite.material as ShaderMaterial
+		var outline_sprite := get_node_or_null("OutlineSprite") as Sprite2D
+		if outline_sprite != null:
+			_outline_material = outline_sprite.material as ShaderMaterial
 
 	if _outline_material == null:
 		return
 
+	var outline_sprite := get_node_or_null("OutlineSprite") as Sprite2D
+	if outline_sprite != null:
+		outline_sprite.visible = _outline_enabled
+
 	_outline_material.set_shader_parameter("outline_color", outline_color)
-	_outline_material.set_shader_parameter("outline_width", outline_width)
+	_outline_material.set_shader_parameter("outline_width", outline_width if _outline_enabled else 0.0)
 	_outline_material.set_shader_parameter("alpha_threshold", outline_alpha_threshold)

@@ -126,10 +126,11 @@ Key methods:
 - `_apply_texture()`: updates `Sprite2D.texture`.
 - `_apply_visual_scale()`: updates `Sprite2D.scale`.
 - `set_outline(enabled, color, width)`: enables or disables the sprite border highlight.
-- `_apply_outline()`: sends outline properties to the sprite shader material.
+- `_apply_outline()`: sends outline properties to the `OutlineSprite` shader material.
 
 Depends on:
 - Child node `Sprite2D`.
+- Child node `OutlineSprite`.
 - `scenes/item.tscn` outline `ShaderMaterial`.
 
 Do not use for:
