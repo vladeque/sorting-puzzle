@@ -168,6 +168,7 @@ Change level win or loss flow:
 Change pause menu layout:
 - Update `scenes/pause_menu.tscn`.
 - Update `assets/ui/*.png` when changing pause menu icon art.
+- `assets/ui/pause_menu_option_a_sheet.png` and `assets/ui/pause_menu_option_b_sheet.png` are kept as alternate generated style sheets.
 - Keep node paths used by `scripts/level.gd` stable unless the script is updated in the same change.
 
 ## Related Docs
