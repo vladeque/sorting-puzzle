@@ -81,9 +81,10 @@ Responsibility:
 - Represents one sortable item as an `Area2D`.
 - Stores `item_id`.
 - Applies texture and visual scale to its `Sprite2D`.
+- Draws reusable alpha-based sprite outlines for item highlight states.
 
 Change here when:
-- Adjusting item hitboxes, sprite scale behavior, item identity storage, or common item visuals.
+- Adjusting item hitboxes, sprite scale behavior, item identity storage, outline rendering, or common item visuals.
 
 ### Ability Bar
 
@@ -96,6 +97,7 @@ Responsibility:
 - Provides hammer, shuffle, and highlight buttons.
 - Tracks three uses per ability per level.
 - Disables abilities after failure, completion, or when uses run out.
+- Uses `ShelfItem` outline state for border-only highlight ability visuals.
 
 Change here when:
 - Adding, removing, rebalancing, or restyling player abilities.

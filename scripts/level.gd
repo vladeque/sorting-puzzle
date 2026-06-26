@@ -27,6 +27,9 @@ const TRIPLE_CLEAR_SOUND := preload("res://assets/audio/triple_clear.wav")
 @export var back_layer_offset := Vector2(0, -10)
 @export var back_layer_item_scale := 0.86
 @export var back_layer_item_modulate := Color(0.42, 0.42, 0.42, 0.34)
+@export var highlight_outline_color := Color(1.0, 0.86, 0.18, 1.0)
+@export var selected_highlight_outline_color := Color(1.0, 0.96, 0.36, 1.0)
+@export_range(0.0, 8.0, 0.25) var highlight_outline_width := 4.0
 @export var match_gather_duration_seconds := 0.18
 @export var match_shrink_duration_seconds := 0.16
 @export var level_duration_seconds := 300.0
@@ -912,14 +915,13 @@ func _apply_item_visual_state(item: ShelfItem) -> void:
 
 	var is_selected := item == _selected_item
 	var is_highlighted := _highlighted_items.has(item)
-	if is_selected and is_highlighted:
-		sprite.modulate = Color(1.24, 1.14, 0.54, 1.0)
-	elif is_selected:
+	if is_selected:
 		sprite.modulate = Color(1.12, 1.12, 1.12, 1.0)
-	elif is_highlighted:
-		sprite.modulate = Color(1.0, 0.88, 0.24, 1.0)
 	else:
 		sprite.modulate = Color.WHITE
+
+	var outline_color := selected_highlight_outline_color if is_selected else highlight_outline_color
+	item.set_outline(is_highlighted, outline_color, highlight_outline_width)
 
 
 func _setup_ability_buttons() -> void:

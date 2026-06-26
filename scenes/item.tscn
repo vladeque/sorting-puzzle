@@ -1,15 +1,56 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/item.gd" id="1_item_script"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_item_hitbox"]
 size = Vector2(64, 100)
 
+[sub_resource type="Shader" id="Shader_item_outline"]
+code = "shader_type canvas_item;
+
+uniform vec4 outline_color : source_color = vec4(1.0, 0.86, 0.18, 1.0);
+uniform float outline_width : hint_range(0.0, 8.0, 0.25) = 0.0;
+uniform float alpha_threshold : hint_range(0.0, 1.0, 0.01) = 0.1;
+
+void fragment() {
+	vec4 base_color = texture(TEXTURE, UV) * COLOR;
+	if (outline_width <= 0.0 || base_color.a > alpha_threshold) {
+		COLOR = base_color;
+		return;
+	}
+
+	vec2 outline_step = TEXTURE_PIXEL_SIZE * outline_width;
+	float outline_alpha = 0.0;
+	outline_alpha = max(outline_alpha, texture(TEXTURE, UV + vec2(outline_step.x, 0.0)).a);
+	outline_alpha = max(outline_alpha, texture(TEXTURE, UV + vec2(-outline_step.x, 0.0)).a);
+	outline_alpha = max(outline_alpha, texture(TEXTURE, UV + vec2(0.0, outline_step.y)).a);
+	outline_alpha = max(outline_alpha, texture(TEXTURE, UV + vec2(0.0, -outline_step.y)).a);
+	outline_alpha = max(outline_alpha, texture(TEXTURE, UV + outline_step).a);
+	outline_alpha = max(outline_alpha, texture(TEXTURE, UV - outline_step).a);
+	outline_alpha = max(outline_alpha, texture(TEXTURE, UV + vec2(outline_step.x, -outline_step.y)).a);
+	outline_alpha = max(outline_alpha, texture(TEXTURE, UV + vec2(-outline_step.x, outline_step.y)).a);
+
+	if (outline_alpha > alpha_threshold) {
+		COLOR = vec4(outline_color.rgb, outline_color.a * COLOR.a);
+	} else {
+		COLOR = base_color;
+	}
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_item_outline"]
+resource_local_to_scene = true
+shader = SubResource("Shader_item_outline")
+shader_parameter/outline_color = Color(1, 0.86, 0.18, 1)
+shader_parameter/outline_width = 0.0
+shader_parameter/alpha_threshold = 0.1
+
 [node name="Item" type="Area2D"]
 z_index = 6
 script = ExtResource("1_item_script")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_item_outline")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_item_hitbox")

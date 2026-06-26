@@ -105,11 +105,12 @@ Purpose:
 - Gives each spawned item a collision area and sprite.
 
 Important nodes:
-- `Sprite2D`: texture and visual scale are controlled by `ShelfItem`.
+- `Sprite2D`: texture, visual scale, and alpha-based outline material are controlled by `ShelfItem`.
 - `CollisionShape2D`: rectangular item hitbox used by runtime interaction.
 
 Depends on:
 - Texture assignment from `scripts/level.gd`.
+- Highlight outline color and width assignment from `scripts/level.gd`.
 - Item IDs defined in `configs/item_sprites.json`.
 
 Do not use for:

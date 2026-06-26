@@ -47,6 +47,9 @@ Important exports:
 - `back_layer_offset`: visual offset for hidden/upcoming shelf layers.
 - `back_layer_item_scale`: scale multiplier for back-layer item previews.
 - `back_layer_item_modulate`: color used for visible back-layer previews.
+- `highlight_outline_color`: border color used by the highlight ability.
+- `selected_highlight_outline_color`: border color used when a highlighted item is also selected.
+- `highlight_outline_width`: pixel radius used by the item alpha-outline shader.
 - `match_gather_duration_seconds`: duration for side items to pull into the center item when a triple clears.
 - `match_shrink_duration_seconds`: duration for the center item shrink-out after a triple gathers.
 - `level_duration_seconds`: fallback duration if config does not define `time_seconds`.
@@ -85,6 +88,7 @@ Key responsibilities:
 - Promote back layers with `_promote_back_layer()` and `_advance_back_layers()`.
 - Check win/loss state with `_check_level_completed()`, `_fail_level()`, and `_complete_level()`.
 - Manage hammer, shuffle, and highlight abilities.
+- Apply highlight ability visuals through `ShelfItem.set_outline()` so only item silhouettes receive a border.
 
 Depends on:
 - `level.tscn` node names and paths.
@@ -113,14 +117,20 @@ Exports:
 - `item_id`: item identity used by matching and config loading.
 - `texture`: assigned by `scripts/level.gd`; setter updates `Sprite2D.texture`.
 - `visual_scale`: scalar applied to `Sprite2D.scale`.
+- `outline_color`: color passed to the item outline shader.
+- `outline_width`: outline radius; `0.0` disables the border.
+- `outline_alpha_threshold`: alpha cutoff used to detect the item silhouette.
 
 Key methods:
 - `_ready()`: applies current texture and scale.
 - `_apply_texture()`: updates `Sprite2D.texture`.
 - `_apply_visual_scale()`: updates `Sprite2D.scale`.
+- `set_outline(enabled, color, width)`: enables or disables the sprite border highlight.
+- `_apply_outline()`: sends outline properties to the sprite shader material.
 
 Depends on:
 - Child node `Sprite2D`.
+- `scenes/item.tscn` outline `ShaderMaterial`.
 
 Do not use for:
 - Input ownership, matching rules, abilities, or shelf promotion.
