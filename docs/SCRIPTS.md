@@ -48,6 +48,7 @@ Important exports:
 - `back_layer_item_scale`: scale multiplier for back-layer item previews.
 - `back_layer_item_modulate`: color used for visible back-layer previews.
 - `layer_promotion_duration_seconds`: duration for back-layer items to slide forward into active front slots.
+- `item_move_duration_seconds`: duration for moved items to slide into destination slots after tap or drag placement.
 - `highlight_outline_color`: border color used by the highlight ability.
 - `selected_highlight_outline_color`: border color used when a highlighted item is also selected.
 - `highlight_outline_width`: screen-pixel expansion used by the item outline sprite.
@@ -81,7 +82,7 @@ Key responsibilities:
 - Pack shelf cells with shared boundaries based on `SHELF_GRID_STEP`.
 - Spawn configured items with `_add_configured_item()`.
 - Handle mouse and touch input through `_input()` and the press/motion/release helpers.
-- Move items with `_move_item_to_slot()` and `_place_item_in_slot()`.
+- Move items with `_move_item_to_slot()`, `_play_item_move_animation()`, and `_place_item_in_slot()`.
 - Clear triples with `_clear_matching_shelves()` and `_play_match_clear_animation()`.
 - Play placement and triple-clear sound effects with runtime `AudioStreamPlayer` nodes.
 - Track clearing items so only disappearing items ignore input and abilities during the animation.

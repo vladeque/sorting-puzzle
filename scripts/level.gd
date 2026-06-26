@@ -28,6 +28,7 @@ const TRIPLE_CLEAR_SOUND := preload("res://assets/audio/triple_clear.wav")
 @export var back_layer_item_scale := 0.86
 @export var back_layer_item_modulate := Color(0.42, 0.42, 0.42, 0.34)
 @export var layer_promotion_duration_seconds := 0.22
+@export var item_move_duration_seconds := 0.16
 @export var highlight_outline_color := Color(1.0, 0.86, 0.18, 1.0)
 @export var selected_highlight_outline_color := Color(1.0, 0.96, 0.36, 1.0)
 @export_range(0.0, 8.0, 0.25) var highlight_outline_width := 4.0
@@ -561,9 +562,7 @@ func _move_item_to_slot(item: ShelfItem, origin_slot: Node2D, target_slot: Node2
 	_add_shelf_to_check(shelves_to_check, origin_slot)
 	_add_shelf_to_check(shelves_to_check, target_slot)
 
-	_place_item_in_slot(item, target_slot, true)
-
-	_resolve_shelves(shelves_to_check)
+	_move_item_to_slot_after_animation(item, target_slot, shelves_to_check)
 	return true
 
 
@@ -640,6 +639,51 @@ func _place_item_in_slot(item: ShelfItem, slot: Node2D, should_play_sound := fal
 	_apply_item_visual_state(item)
 	if should_play_sound:
 		_play_item_place_sound()
+
+
+func _move_item_to_slot_after_animation(item: ShelfItem, target_slot: Node2D, shelves_to_check: Array[Node]) -> void:
+	await _play_item_move_animation(item, target_slot)
+	_resolve_shelves(shelves_to_check)
+
+
+func _play_item_move_animation(item: ShelfItem, target_slot: Node2D) -> void:
+	if item == null or target_slot == null or not is_instance_valid(item):
+		return
+
+	var duration := maxf(item_move_duration_seconds, 0.0)
+	item.reparent(target_slot, true)
+	item.z_index = 9
+	item.input_pickable = false
+	_mark_item_transitioning_by_id(item.get_instance_id())
+
+	var collision := item.get_node_or_null("CollisionShape2D") as CollisionShape2D
+	if collision != null:
+		collision.disabled = true
+
+	if duration > 0.0:
+		var move_tween := create_tween()
+		move_tween.tween_property(
+			item,
+			"position",
+			SLOT_ITEM_POSITION,
+			duration
+		).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		await move_tween.finished
+
+	if item == null or not is_instance_valid(item):
+		return
+
+	item.position = SLOT_ITEM_POSITION
+	item.z_index = 6
+	item.input_pickable = true
+	_unmark_item_transitioning_by_id(item.get_instance_id())
+
+	collision = item.get_node_or_null("CollisionShape2D") as CollisionShape2D
+	if collision != null:
+		collision.disabled = false
+
+	_apply_item_visual_state(item)
+	_play_item_place_sound()
 
 
 func _add_shelf_to_check(shelves_to_check: Array[Node], slot: Node2D) -> void:
