@@ -107,6 +107,24 @@ Do not use for:
 - Offline level generation or solvability search. Keep that in `scripts/tools/`.
 - Persistent progression or save data once that system exists.
 
+## `scripts/pause_menu.gd`
+
+Attached to:
+- `scenes/pause_menu.tscn` root `PauseMenuOverlay`.
+
+Purpose:
+- Owns local pause menu settings-button visual state.
+- Toggles a crossed-out overlay on the music, sound effects, and vibration buttons when clicked.
+
+Important nodes:
+- `PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/MusicButton`
+- `PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/SoundEffectsButton`
+- `PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/VibrationButton`
+
+Do not use for:
+- Applying actual music, sound effect, or vibration settings until those runtime systems exist.
+- Level pause, continue, or leave flow. Those stay in `scripts/level.gd`.
+
 ## `scripts/item.gd`
 
 Class:

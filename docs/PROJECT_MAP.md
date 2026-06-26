@@ -110,11 +110,14 @@ Change here when:
 Files:
 - `level.tscn`
 - `scenes/pause_menu.tscn`
+- `assets/ui/*.png`
+- `scripts/pause_menu.gd`
 - `scripts/level.gd`
 
 Responsibility:
 - `level.tscn` provides the top-right circular pause button and instances the pause menu scene.
 - `scenes/pause_menu.tscn` owns the popup layout, `Pause` title, music / sound-effects / vibration icon buttons, and Leave/Continue buttons.
+- `scripts/pause_menu.gd` toggles crossed-out visuals on the three settings icon buttons.
 - `scripts/level.gd` opens and closes the menu, pauses the timer and gameplay input, and routes Leave back to the main menu.
 
 Change here when:

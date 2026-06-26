@@ -77,9 +77,12 @@ Do not use for:
 Root:
 - `PauseMenuOverlay` (`ColorRect`)
 
+Script:
+- `scripts/pause_menu.gd`
+
 Purpose:
 - Reusable in-level pause menu overlay instanced by `level.tscn`.
-- Owns the modal dimmer, popup panel styling, `Pause` title, music / sound-effects / vibration icon buttons, and `Leave` / `Continue` buttons.
+- Owns the modal dimmer, popup panel styling, `Pause` title, music / sound-effects / vibration icon buttons, their crossed-out toggle visuals, and `Leave` / `Continue` buttons.
 
 Important nodes:
 - `PauseMenuPanel`: centered popup panel.
@@ -94,9 +97,10 @@ Depends on:
 - `assets/ui/icon_music.png`, `assets/ui/icon_sound_effects.png`, and `assets/ui/icon_vibration.png` for settings icon art.
 - `assets/ui/pause_menu_option_a_sheet.png` and `assets/ui/pause_menu_option_b_sheet.png` are archived alternate visual directions for these icons.
 - Runtime button wiring from `scripts/level.gd`.
+- Local settings-button visual toggles from `scripts/pause_menu.gd`.
 
 Do not use for:
-- Timer state, scene navigation, or gameplay pause rules. Those stay in `scripts/level.gd`.
+- Timer state, scene navigation, gameplay pause rules, or actual audio/vibration settings. Those stay in owning runtime systems.
 
 ## `scenes/shelf.tscn`
 
