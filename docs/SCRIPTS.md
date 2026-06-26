@@ -47,6 +47,7 @@ Important exports:
 - `back_layer_offset`: visual offset for hidden/upcoming shelf layers.
 - `back_layer_item_scale`: scale multiplier for back-layer item previews.
 - `back_layer_item_modulate`: color used for visible back-layer previews.
+- `layer_promotion_duration_seconds`: duration for back-layer items to slide forward into active front slots.
 - `highlight_outline_color`: border color used by the highlight ability.
 - `selected_highlight_outline_color`: border color used when a highlighted item is also selected.
 - `highlight_outline_width`: screen-pixel expansion used by the item outline sprite.
@@ -84,8 +85,9 @@ Key responsibilities:
 - Clear triples with `_clear_matching_shelves()` and `_play_match_clear_animation()`.
 - Play placement and triple-clear sound effects with runtime `AudioStreamPlayer` nodes.
 - Track clearing items so only disappearing items ignore input and abilities during the animation.
+- Track transitioning items so newly promoted back-layer items ignore input and abilities until their forward slide finishes.
 - Queue shelf resolution requests made while another match animation is still finishing.
-- Promote back layers with `_promote_back_layer()` and `_advance_back_layers()`.
+- Promote back layers with `_promote_back_layer()`, `_play_layer_promotion_animation()`, and `_advance_back_layers()`.
 - Check win/loss state with `_check_level_completed()`, `_fail_level()`, and `_complete_level()`.
 - Manage hammer, shuffle, and highlight abilities.
 - Apply highlight ability visuals through `ShelfItem.set_outline()` so only item silhouettes receive a border.

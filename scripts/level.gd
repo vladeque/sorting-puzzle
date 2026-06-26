@@ -27,6 +27,7 @@ const TRIPLE_CLEAR_SOUND := preload("res://assets/audio/triple_clear.wav")
 @export var back_layer_offset := Vector2(0, -10)
 @export var back_layer_item_scale := 0.86
 @export var back_layer_item_modulate := Color(0.42, 0.42, 0.42, 0.34)
+@export var layer_promotion_duration_seconds := 0.22
 @export var highlight_outline_color := Color(1.0, 0.86, 0.18, 1.0)
 @export var selected_highlight_outline_color := Color(1.0, 0.96, 0.36, 1.0)
 @export_range(0.0, 8.0, 0.25) var highlight_outline_width := 4.0
@@ -72,6 +73,7 @@ var _selected_slot: Node2D
 var _is_resolving_shelves := false
 var _shelves_pending_resolve: Array[Node] = []
 var _clearing_item_ids: Array[int] = []
+var _transitioning_item_ids: Array[int] = []
 var _item_place_audio_player: AudioStreamPlayer
 var _triple_clear_audio_player: AudioStreamPlayer
 
@@ -568,7 +570,7 @@ func _move_item_to_slot(item: ShelfItem, origin_slot: Node2D, target_slot: Node2
 func _find_item_at_position(pointer_global_position: Vector2) -> ShelfItem:
 	for i in range(_slots.size() - 1, -1, -1):
 		var item := _get_slot_item(_slots[i])
-		if item == null or _is_item_clearing(item):
+		if item == null or _is_item_busy(item):
 			continue
 
 		var item_rect := Rect2(item.global_position - item_pick_size * 0.5, item_pick_size)
@@ -658,7 +660,7 @@ func _resolve_shelves(shelves_to_check: Array[Node]) -> void:
 
 		while true:
 			var cleared := await _clear_matching_shelves(active_shelves)
-			var promoted := _promote_empty_front_layers(active_shelves)
+			var promoted := await _promote_empty_front_layers(active_shelves)
 			if not cleared and not promoted:
 				break
 
@@ -793,6 +795,23 @@ func _is_item_clearing(item: ShelfItem) -> bool:
 	return item != null and _clearing_item_ids.has(item.get_instance_id())
 
 
+func _mark_item_transitioning_by_id(instance_id: int) -> void:
+	if instance_id != 0 and not _transitioning_item_ids.has(instance_id):
+		_transitioning_item_ids.append(instance_id)
+
+
+func _unmark_item_transitioning_by_id(instance_id: int) -> void:
+	_transitioning_item_ids.erase(instance_id)
+
+
+func _is_item_transitioning(item: ShelfItem) -> bool:
+	return item != null and _transitioning_item_ids.has(item.get_instance_id())
+
+
+func _is_item_busy(item: ShelfItem) -> bool:
+	return _is_item_clearing(item) or _is_item_transitioning(item)
+
+
 func _promote_empty_front_layers(shelves_to_check: Array[Node]) -> bool:
 	var promoted_any := false
 
@@ -801,7 +820,10 @@ func _promote_empty_front_layers(shelves_to_check: Array[Node]) -> bool:
 		if shelf_node == null:
 			continue
 
-		if _front_layer_is_empty(shelf_node) and _promote_back_layer(shelf_node):
+		if not _front_layer_is_empty(shelf_node):
+			continue
+
+		if await _promote_back_layer(shelf_node):
 			promoted_any = true
 
 	return promoted_any
@@ -820,6 +842,7 @@ func _promote_back_layer(shelf: Node2D) -> bool:
 	if next_layer == null:
 		return false
 
+	var promotion_entries: Array[Dictionary] = []
 	for front_slot in _get_front_slots(shelf):
 		var layer_slot := next_layer.get_node_or_null("Layer%s" % front_slot.name) as Node2D
 		if layer_slot == null:
@@ -829,13 +852,103 @@ func _promote_back_layer(shelf: Node2D) -> bool:
 		if layer_item == null:
 			continue
 
-		_activate_back_layer_item(layer_item)
-		_place_item_in_slot(layer_item, front_slot)
+		promotion_entries.append(_prepare_layer_promotion_item(layer_item, front_slot))
 
 	shelf.remove_child(next_layer)
 	next_layer.free()
 	_advance_back_layers(shelf)
+	await _play_layer_promotion_animation(promotion_entries)
 	return true
+
+
+func _prepare_layer_promotion_item(item: ShelfItem, front_slot: Node2D) -> Dictionary:
+	var target_visual_scale := item.visual_scale
+	if back_layer_item_scale > 0.0:
+		target_visual_scale /= back_layer_item_scale
+
+	item.reparent(front_slot, true)
+	item.z_index = 8
+	item.input_pickable = false
+	_mark_item_transitioning_by_id(item.get_instance_id())
+
+	var collision := item.get_node_or_null("CollisionShape2D") as CollisionShape2D
+	if collision != null:
+		collision.disabled = true
+
+	return {
+		"item": item,
+		"target_visual_scale": target_visual_scale,
+	}
+
+
+func _play_layer_promotion_animation(promotion_entries: Array[Dictionary]) -> void:
+	if promotion_entries.is_empty():
+		return
+
+	var duration := maxf(layer_promotion_duration_seconds, 0.0)
+	if duration <= 0.0:
+		for entry in promotion_entries:
+			_finish_layer_promotion_item(entry)
+		return
+
+	var promotion_tween := create_tween()
+	promotion_tween.set_parallel(true)
+	var did_add_tween := false
+
+	for entry in promotion_entries:
+		var item := entry.get("item") as ShelfItem
+		if item == null or not is_instance_valid(item):
+			continue
+
+		var target_visual_scale := float(entry.get("target_visual_scale", item.visual_scale))
+		did_add_tween = true
+		promotion_tween.tween_property(
+			item,
+			"position",
+			SLOT_ITEM_POSITION,
+			duration
+		).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		promotion_tween.tween_property(
+			item,
+			"modulate",
+			Color.WHITE,
+			duration
+		).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		promotion_tween.tween_property(
+			item,
+			"visual_scale",
+			target_visual_scale,
+			duration
+		).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+	if not did_add_tween:
+		for entry in promotion_entries:
+			_finish_layer_promotion_item(entry)
+		return
+
+	await promotion_tween.finished
+
+	for entry in promotion_entries:
+		_finish_layer_promotion_item(entry)
+
+
+func _finish_layer_promotion_item(entry: Dictionary) -> void:
+	var item := entry.get("item") as ShelfItem
+	if item == null or not is_instance_valid(item):
+		return
+
+	item.position = SLOT_ITEM_POSITION
+	item.z_index = 6
+	item.modulate = Color.WHITE
+	item.visual_scale = float(entry.get("target_visual_scale", item.visual_scale))
+	item.input_pickable = true
+	_unmark_item_transitioning_by_id(item.get_instance_id())
+
+	var collision := item.get_node_or_null("CollisionShape2D") as CollisionShape2D
+	if collision != null:
+		collision.disabled = false
+
+	_apply_item_visual_state(item)
 
 
 func _advance_back_layers(shelf: Node2D) -> void:
@@ -860,17 +973,6 @@ func _configure_back_layer(layer: Node2D, layer_index: int) -> void:
 		var item := _get_slot_item(slot)
 		if item != null:
 			item.modulate = back_layer_item_modulate if should_show else Color.TRANSPARENT
-
-
-func _activate_back_layer_item(item: ShelfItem) -> void:
-	item.modulate = Color.WHITE
-	item.input_pickable = true
-	if back_layer_item_scale > 0.0:
-		item.visual_scale /= back_layer_item_scale
-
-	var collision := item.get_node_or_null("CollisionShape2D") as CollisionShape2D
-	if collision != null:
-		collision.disabled = false
 
 
 func _get_shelf_items(shelf: Node) -> Array[ShelfItem]:
@@ -1174,7 +1276,7 @@ func _get_visible_items() -> Array[ShelfItem]:
 	var items: Array[ShelfItem] = []
 	for shelf in _get_all_shelves():
 		for item in _get_shelf_items(shelf):
-			if not _is_item_clearing(item):
+			if not _is_item_busy(item):
 				items.append(item)
 
 	return items
@@ -1184,7 +1286,7 @@ func _collect_items_recursive(node: Node, items: Array[ShelfItem]) -> void:
 	for child in node.get_children():
 		var item := child as ShelfItem
 		if item != null:
-			if not item.is_queued_for_deletion() and not _is_item_clearing(item):
+			if not item.is_queued_for_deletion() and not _is_item_busy(item):
 				items.append(item)
 			continue
 
