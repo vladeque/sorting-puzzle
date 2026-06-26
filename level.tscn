@@ -459,6 +459,17 @@ layout_mode = 2
 theme_override_constants/separation = 30
 alignment = 1
 
+[node name="TitleLabel" type="Label" parent="UI/PauseMenuOverlay/PauseMenuPanel/MarginContainer/VBoxContainer" unique_id=1601264629]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.72)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 3
+theme_override_font_sizes/font_size = 42
+text = "Pause"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="IconRow" type="HBoxContainer" parent="UI/PauseMenuOverlay/PauseMenuPanel/MarginContainer/VBoxContainer" unique_id=580625493]
 layout_mode = 2
 theme_override_constants/separation = 36

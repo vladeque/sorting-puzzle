@@ -52,7 +52,7 @@ Important nodes:
 - `UI/AbilityBar/HBoxContainer/HighlightButton`: highlight ability button.
 - `UI/FailurePanel`: shown when time runs out.
 - `UI/CompletionPanel`: shown after all items clear.
-- `UI/PauseMenuOverlay`: modal pause menu containing inert circular icon buttons plus `Leave` and `Continue` actions.
+- `UI/PauseMenuOverlay`: modal pause menu containing the `Pause` title, inert circular icon buttons, plus `Leave` and `Continue` actions.
 
 Runtime-created nodes:
 - `ShelfXX`: `scenes/shelf.tscn` instances generated under `Shelves`.
