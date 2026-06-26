@@ -51,6 +51,10 @@ var _timer_label: Label
 var _level_label: Label
 var _failure_panel: Control
 var _completion_panel: Control
+var _pause_menu_button: Button
+var _pause_menu_overlay: Control
+var _leave_button: Button
+var _continue_button: Button
 var _ability_buttons: Dictionary = {}
 var _ability_uses: Dictionary = {
 	ABILITY_HAMMER: 3,
@@ -60,6 +64,7 @@ var _ability_uses: Dictionary = {
 var _time_remaining := 0.0
 var _level_failed := false
 var _level_completed := false
+var _level_paused := false
 var _completion_return_time_remaining := 0.0
 var _returning_to_menu := false
 var _highlight_timer := 0.0
@@ -85,10 +90,16 @@ func _ready() -> void:
 	_level_label = get_node("UI/LevelLabel") as Label
 	_failure_panel = get_node("UI/FailurePanel") as Control
 	_completion_panel = get_node("UI/CompletionPanel") as Control
+	_pause_menu_button = get_node("UI/PauseMenuButton") as Button
+	_pause_menu_overlay = get_node("UI/PauseMenuOverlay") as Control
+	_leave_button = get_node("UI/PauseMenuOverlay/PauseMenuPanel/MarginContainer/VBoxContainer/ButtonRow/LeaveButton") as Button
+	_continue_button = get_node("UI/PauseMenuOverlay/PauseMenuPanel/MarginContainer/VBoxContainer/ButtonRow/ContinueButton") as Button
 	_failure_panel.visible = false
 	_completion_panel.visible = false
+	_pause_menu_overlay.visible = false
 	_rng.randomize()
 	_setup_audio_players()
+	_setup_pause_menu_buttons()
 	_setup_ability_buttons()
 	_load_item_textures()
 	_apply_level_config(_load_level_config(selected_level))
@@ -96,6 +107,7 @@ func _ready() -> void:
 	_update_level_label()
 	_update_timer_label()
 	_update_ability_buttons()
+	_update_pause_menu_button()
 
 
 func _setup_audio_players() -> void:
@@ -138,6 +150,9 @@ func _process(delta: float) -> void:
 	if _level_failed:
 		return
 
+	if _level_paused:
+		return
+
 	_time_remaining = maxf(_time_remaining - delta, 0.0)
 	_update_timer_label()
 	_update_highlight_timer(delta)
@@ -148,6 +163,9 @@ func _process(delta: float) -> void:
 
 func _input(event: InputEvent) -> void:
 	if _level_failed or _level_completed:
+		return
+
+	if _level_paused:
 		return
 
 	if event is InputEventMouseButton:
@@ -224,10 +242,14 @@ func _apply_level_config(config: Dictionary) -> void:
 	_max_layer_count = 1
 	_level_failed = false
 	_level_completed = false
+	_level_paused = false
 	_completion_return_time_remaining = 0.0
 	_returning_to_menu = false
 	_failure_panel.visible = false
 	_completion_panel.visible = false
+	if _pause_menu_overlay != null:
+		_pause_menu_overlay.visible = false
+
 	_clear_ability_highlights()
 	_reset_ability_uses()
 
@@ -249,6 +271,7 @@ func _apply_level_config(config: Dictionary) -> void:
 
 	_resolve_shelves(_get_all_shelves())
 	_check_level_completed()
+	_update_pause_menu_button()
 
 
 func _clear_shelves(shelves: Node) -> void:
@@ -408,8 +431,10 @@ func _update_level_label() -> void:
 
 func _fail_level() -> void:
 	_level_failed = true
+	_level_paused = false
 	_clear_selected_item()
 	_update_ability_buttons()
+	_update_pause_menu_button()
 
 	if _dragged_item != null and _origin_slot != null:
 		_place_item_in_slot(_dragged_item, _origin_slot)
@@ -420,10 +445,12 @@ func _fail_level() -> void:
 	_pressed_item = null
 	_pressed_origin_slot = null
 	_failure_panel.visible = true
+	_pause_menu_overlay.visible = false
 
 
 func _complete_level() -> void:
 	_level_completed = true
+	_level_paused = false
 	_completion_return_time_remaining = maxf(completion_return_delay_seconds, 0.0)
 	_clear_selected_item()
 	_dragged_item = null
@@ -433,7 +460,9 @@ func _complete_level() -> void:
 	_pressed_origin_slot = null
 	_clear_ability_highlights()
 	_update_ability_buttons()
+	_update_pause_menu_button()
 	_completion_panel.visible = true
+	_pause_menu_overlay.visible = false
 
 
 func _check_level_completed() -> void:
@@ -445,11 +474,55 @@ func _check_level_completed() -> void:
 
 
 func _return_to_main_menu() -> void:
+	_level_paused = false
 	_returning_to_menu = true
 	var error := get_tree().change_scene_to_file(MAIN_MENU_SCENE)
 	if error != OK:
 		_returning_to_menu = false
 		push_error("Could not return to main menu: %s" % MAIN_MENU_SCENE)
+
+
+func _setup_pause_menu_buttons() -> void:
+	_pause_menu_button.pressed.connect(_on_pause_menu_button_pressed)
+	_leave_button.pressed.connect(_on_pause_menu_leave_pressed)
+	_continue_button.pressed.connect(_on_pause_menu_continue_pressed)
+
+
+func _on_pause_menu_button_pressed() -> void:
+	if _level_failed or _level_completed:
+		return
+
+	_open_pause_menu()
+
+
+func _open_pause_menu() -> void:
+	_cancel_active_interaction()
+	_level_paused = true
+	_pause_menu_overlay.visible = true
+	_update_ability_buttons()
+	_update_pause_menu_button()
+
+
+func _on_pause_menu_leave_pressed() -> void:
+	_return_to_main_menu()
+
+
+func _on_pause_menu_continue_pressed() -> void:
+	_close_pause_menu()
+
+
+func _close_pause_menu() -> void:
+	_level_paused = false
+	_pause_menu_overlay.visible = false
+	_update_ability_buttons()
+	_update_pause_menu_button()
+
+
+func _update_pause_menu_button() -> void:
+	if _pause_menu_button == null:
+		return
+
+	_pause_menu_button.disabled = _level_failed or _level_completed or _level_paused
 
 
 func _handle_press_at(pointer_global_position: Vector2) -> void:
@@ -1302,7 +1375,7 @@ func _update_ability_button(ability_id: StringName) -> void:
 	if uses_label != null:
 		uses_label.text = str(uses_left)
 
-	button.disabled = _level_failed or _level_completed or uses_left <= 0
+	button.disabled = _level_failed or _level_completed or _level_paused or uses_left <= 0
 
 
 func _get_all_shelves() -> Array[Node]:

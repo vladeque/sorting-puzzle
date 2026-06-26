@@ -54,6 +54,7 @@ Responsibility:
 - Keeps non-clearing items interactive while match animations run, with pending shelf resolves queued behind the active animation.
 - Promotes back layers when the visible layer clears.
 - Tracks the countdown timer and win/loss overlays.
+- Owns the in-level pause menu, including the top-right circular menu button, modal overlay, Leave action, and Continue action.
 
 Change here when:
 - Editing puzzle rules, input behavior, runtime shelf construction, level timing, completion conditions, or ability behavior.
@@ -145,7 +146,7 @@ Change gameplay sound effects:
 - Update `assets/audio/item_place.wav`, `assets/audio/triple_clear.wav`, and the audio player helpers in `scripts/level.gd`.
 
 Change level win or loss flow:
-- Update `_process()`, `_fail_level()`, `_complete_level()`, `_check_level_completed()`, and the panels in `level.tscn`.
+- Update `_process()`, `_fail_level()`, `_complete_level()`, `_check_level_completed()`, pause-menu helpers, and the panels in `level.tscn`.
 
 ## Related Docs
 

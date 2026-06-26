@@ -90,6 +90,7 @@ Key responsibilities:
 - Queue shelf resolution requests made while another match animation is still finishing.
 - Promote back layers with `_promote_back_layer()`, `_play_layer_promotion_animation()`, and `_advance_back_layers()`.
 - Check win/loss state with `_check_level_completed()`, `_fail_level()`, and `_complete_level()`.
+- Pause and resume active gameplay through the top-right menu button, `UI/PauseMenuOverlay`, `Leave`, and `Continue`.
 - Manage hammer, shuffle, and highlight abilities.
 - Apply highlight ability visuals through `ShelfItem.set_outline()` so only item silhouettes receive a border.
 

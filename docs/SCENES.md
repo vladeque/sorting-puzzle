@@ -46,11 +46,13 @@ Important nodes:
 - `UI`: `CanvasLayer` for gameplay labels, ability buttons, and overlays.
 - `UI/TimerLabel`: countdown display.
 - `UI/LevelLabel`: current level display.
+- `UI/PauseMenuButton`: circular top-right button that pauses the active level and opens the pause menu overlay.
 - `UI/AbilityBar/HBoxContainer/HammerButton`: hammer ability button.
 - `UI/AbilityBar/HBoxContainer/ShuffleButton`: shuffle ability button.
 - `UI/AbilityBar/HBoxContainer/HighlightButton`: highlight ability button.
 - `UI/FailurePanel`: shown when time runs out.
 - `UI/CompletionPanel`: shown after all items clear.
+- `UI/PauseMenuOverlay`: modal pause menu containing inert circular icon buttons plus `Leave` and `Continue` actions.
 
 Runtime-created nodes:
 - `ShelfXX`: `scenes/shelf.tscn` instances generated under `Shelves`.
