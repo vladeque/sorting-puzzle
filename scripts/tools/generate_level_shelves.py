@@ -43,7 +43,7 @@ DIFFICULTIES = {
     "easy": DifficultyPreset(
         empty_ratio_min=0.22,
         empty_ratio_max=0.32,
-        max_triples_per_item=3,
+        max_triples_per_item=2,
         max_same_item_per_layer=3,
         allow_front_layer_matches=True,
         shuffle_passes=1,
@@ -59,7 +59,7 @@ DIFFICULTIES = {
     "hard": DifficultyPreset(
         empty_ratio_min=0.05,
         empty_ratio_max=0.10,
-        max_triples_per_item=2,
+        max_triples_per_item=1,
         max_same_item_per_layer=2,
         allow_front_layer_matches=False,
         shuffle_passes=4,
