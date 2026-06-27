@@ -37,8 +37,8 @@ const PAUSE_SETTING_SOUND_EFFECTS := &"sound_effects"
 @export var match_shrink_duration_seconds := 0.16
 @export var level_duration_seconds := 300.0
 @export var completion_return_delay_seconds := 1.75
-@export_range(-40.0, 6.0, 0.5) var item_place_volume_db := -8.0
-@export_range(-40.0, 6.0, 0.5) var triple_clear_volume_db := -7.0
+@export_range(-40.0, 6.0, 0.5) var item_place_volume_db := -1.0
+@export_range(-40.0, 6.0, 0.5) var triple_clear_volume_db := -1.0
 @export_range(1, 10, 1) var selected_level := 1
 
 var _slots: Array[Node2D] = []
