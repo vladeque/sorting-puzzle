@@ -63,7 +63,7 @@ Important exports:
 Important constants:
 - `SLOT_COUNT`: currently three items per shelf front layer.
 - `SLOT_ITEM_POSITION`: item local position that matches `scenes/shelf.tscn` item snap markers.
-- `SHELF_CELL_SIZE`: reusable shelf scene bounds; three cells in a row are packed to fill most of the 720 px gameplay viewport.
+- `SHELF_CELL_SIZE`: reusable shelf scene bounds; three cells in a row are packed to fill most of the 720 px gameplay viewport, with compact vertical row spacing.
 - `SHELF_SHARED_EDGE_THICKNESS`: shelf boundary thickness that neighboring cells overlap.
 - `SHELF_GRID_STEP`: packed layout spacing after overlapping shared shelf edges.
 - `SHELF_SCENE`: `res://scenes/shelf.tscn`.

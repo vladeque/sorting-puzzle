@@ -110,7 +110,7 @@ Root:
 Purpose:
 - Reusable shelf cell instantiated by `scripts/level.gd` for each configured shelf.
 - Owns the visible shelf back wall, floor, frame, front slot positions, and item snap markers.
-- Uses wide cell bounds so three generated shelves span most of the 720 px gameplay viewport.
+- Uses wide, slightly shorter cell bounds so three generated shelves span most of the 720 px gameplay viewport with compact row spacing.
 
 Important nodes:
 - `BackWall`: muted panel behind shelf items.

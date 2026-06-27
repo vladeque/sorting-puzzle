@@ -69,7 +69,7 @@ Files:
 Responsibility:
 - Defines the reusable shelf cell visuals, front slots, and item snap markers.
 - Contains the visible back wall, wood floor, frame, floor lip, and floor grain nodes.
-- Keeps the shelf width and slot positions aligned with the level grid constants so a three-shelf row fills most of the gameplay viewport.
+- Keeps the shelf width, height, and slot positions aligned with the level grid constants so a three-shelf row fills most of the gameplay viewport.
 
 Change here when:
 - Editing shelf visual details, front slot positions, item snap marker positions, or cell art node names.
