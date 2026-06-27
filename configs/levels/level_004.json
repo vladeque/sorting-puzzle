@@ -1,293 +1,293 @@
 {
   "level": 4,
   "time_seconds": 360,
-  "layout_preset": "grid_3x3",
+  "layout_preset": "grid_3x5",
   "difficulty": "hard",
   "shelves": [
-    {
-      "layers": [
-        [
-          null,
-          "soda_bottle",
+	{
+	  "layers": [
+		[
+		  null,
+		  "soda_bottle",
           "plant_pot"
-        ],
-        [
-          "plant_pot",
-          "soda_bottle",
-          null
-        ],
-        [
-          "plant_pot",
-          "cookie_box",
+		],
+		[
+		  "plant_pot",
+		  "soda_bottle",
+		  null
+		],
+		[
+		  "plant_pot",
+		  "cookie_box",
           "candy_bag"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "cookie_box",
-          "cookie_box",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "cookie_box",
+		  "cookie_box",
           "ketchup_bottle"
-        ],
-        [
-          null,
-          "cookie_box",
+		],
+		[
+		  null,
+		  "cookie_box",
           "soda_bottle"
-        ],
-        [
-          "golden_cat_figurine",
-          "teddy_bear",
-          null
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "candy_bag",
-          "soda_bottle",
+		],
+		[
+		  "golden_cat_figurine",
+		  "teddy_bear",
+		  null
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "candy_bag",
+		  "soda_bottle",
           "soda_bottle"
-        ],
-        [
-          "soap_pump",
-          "soap_pump",
+		],
+		[
+		  "soap_pump",
+		  "soap_pump",
           "soda_bottle"
-        ],
-        [
-          "soda_bottle",
-          "soap_pump",
+		],
+		[
+		  "soda_bottle",
+		  "soap_pump",
           "golden_cat_figurine"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "soda_bottle",
-          "ketchup_bottle",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "soda_bottle",
+		  "ketchup_bottle",
           "soap_pump"
-        ],
-        [
-          "plant_pot",
-          "plant_pot",
+		],
+		[
+		  "plant_pot",
+		  "plant_pot",
           "ketchup_bottle"
-        ],
-        [
-          "soda_bottle",
-          "plant_pot",
+		],
+		[
+		  "soda_bottle",
+		  "plant_pot",
           "soda_bottle"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "plant_pot",
-          "ketchup_bottle",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "plant_pot",
+		  "ketchup_bottle",
           "teddy_bear"
-        ],
-        [
-          "chips_can",
-          null,
+		],
+		[
+		  "chips_can",
+		  null,
           "plant_pot"
-        ],
-        [
-          null,
-          "cookie_box",
+		],
+		[
+		  null,
+		  "cookie_box",
           "teddy_bear"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "plant_pot",
-          "golden_cat_figurine",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "plant_pot",
+		  "golden_cat_figurine",
           "teddy_bear"
-        ],
-        [
-          "plant_pot",
-          "plant_pot",
+		],
+		[
+		  "plant_pot",
+		  "plant_pot",
           "teddy_bear"
-        ],
-        [
-          "cookie_box",
-          null,
+		],
+		[
+		  "cookie_box",
+		  null,
           "cookie_box"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "teddy_bear",
-          "cookie_box",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "teddy_bear",
+		  "cookie_box",
           "soap_pump"
-        ],
-        [
-          "soap_pump",
-          "soda_bottle",
-          null
-        ],
-        [
-          "plant_pot",
-          "plant_pot",
+		],
+		[
+		  "soap_pump",
+		  "soda_bottle",
+		  null
+		],
+		[
+		  "plant_pot",
+		  "plant_pot",
           "soda_bottle"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "soda_bottle",
-          "soda_bottle",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "soda_bottle",
+		  "soda_bottle",
           "golden_cat_figurine"
-        ],
-        [
-          "plant_pot",
-          "chips_can",
+		],
+		[
+		  "plant_pot",
+		  "chips_can",
           "teddy_bear"
-        ],
-        [
-          "soda_bottle",
-          "soda_bottle",
+		],
+		[
+		  "soda_bottle",
+		  "soda_bottle",
           "ketchup_bottle"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "teddy_bear",
-          "soap_pump",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "teddy_bear",
+		  "soap_pump",
           "ketchup_bottle"
-        ],
-        [
-          "chips_can",
-          "soda_bottle",
+		],
+		[
+		  "chips_can",
+		  "soda_bottle",
           "soda_bottle"
-        ],
-        [
-          "cookie_box",
-          "ketchup_bottle",
+		],
+		[
+		  "cookie_box",
+		  "ketchup_bottle",
           "cookie_box"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "candy_bag",
-          "soda_bottle",
-          null
-        ],
-        [
-          "soda_bottle",
-          "soap_pump",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "candy_bag",
+		  "soda_bottle",
+		  null
+		],
+		[
+		  "soda_bottle",
+		  "soap_pump",
           "ketchup_bottle"
-        ],
-        [
-          "soda_bottle",
-          "teddy_bear",
+		],
+		[
+		  "soda_bottle",
+		  "teddy_bear",
           "soda_bottle"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "plant_pot",
-          "soda_bottle",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "plant_pot",
+		  "soda_bottle",
           "teddy_bear"
-        ],
-        [
-          "plant_pot",
-          "soap_pump",
+		],
+		[
+		  "plant_pot",
+		  "soap_pump",
           "ketchup_bottle"
-        ],
-        [
-          "cookie_box",
-          "chips_can",
+		],
+		[
+		  "cookie_box",
+		  "chips_can",
           "teddy_bear"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "chips_can",
-          "cookie_box",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "chips_can",
+		  "cookie_box",
           "cookie_box"
-        ],
-        [
-          "golden_cat_figurine",
-          "cookie_box",
+		],
+		[
+		  "golden_cat_figurine",
+		  "cookie_box",
           "golden_cat_figurine"
-        ],
-        [
-          "golden_cat_figurine",
-          "plant_pot",
+		],
+		[
+		  "golden_cat_figurine",
+		  "plant_pot",
           "cookie_box"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "teddy_bear",
-          "golden_cat_figurine",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "teddy_bear",
+		  "golden_cat_figurine",
           "chips_can"
-        ],
-        [
-          "cookie_box",
-          "soap_pump",
-          null
-        ],
-        [
-          "candy_bag",
-          null,
-          null
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "teddy_bear",
-          "candy_bag",
+		],
+		[
+		  "cookie_box",
+		  "soap_pump",
+		  null
+		],
+		[
+		  "candy_bag",
+		  null,
+		  null
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "teddy_bear",
+		  "candy_bag",
           "teddy_bear"
-        ],
-        [
-          "golden_cat_figurine",
-          "candy_bag",
+		],
+		[
+		  "golden_cat_figurine",
+		  "candy_bag",
           "teddy_bear"
-        ],
-        [
-          "soap_pump",
-          "plant_pot",
+		],
+		[
+		  "soap_pump",
+		  "plant_pot",
           "golden_cat_figurine"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "golden_cat_figurine",
-          "soap_pump",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "golden_cat_figurine",
+		  "soap_pump",
           "soap_pump"
-        ],
-        [
-          "cookie_box",
-          "cookie_box",
+		],
+		[
+		  "cookie_box",
+		  "cookie_box",
           "soda_bottle"
-        ],
-        [
-          "soap_pump",
-          "soap_pump",
+		],
+		[
+		  "soap_pump",
+		  "soap_pump",
           "golden_cat_figurine"
-        ]
-      ]
-    }
+		]
+	  ]
+	}
   ]
 }
