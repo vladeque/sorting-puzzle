@@ -33,7 +33,8 @@ LAYOUT_PRESETS = (
 class DifficultyPreset:
     empty_ratio_min: float
     empty_ratio_max: float
-    max_item_types: int
+    max_triples_per_item: int
+    max_same_item_per_layer: int
     allow_front_layer_matches: bool
     shuffle_passes: int
 
@@ -42,28 +43,32 @@ DIFFICULTIES = {
     "easy": DifficultyPreset(
         empty_ratio_min=0.22,
         empty_ratio_max=0.32,
-        max_item_types=5,
+        max_triples_per_item=3,
+        max_same_item_per_layer=3,
         allow_front_layer_matches=True,
         shuffle_passes=1,
     ),
     "medium": DifficultyPreset(
         empty_ratio_min=0.12,
         empty_ratio_max=0.20,
-        max_item_types=7,
+        max_triples_per_item=2,
+        max_same_item_per_layer=2,
         allow_front_layer_matches=True,
         shuffle_passes=2,
     ),
     "hard": DifficultyPreset(
         empty_ratio_min=0.05,
         empty_ratio_max=0.10,
-        max_item_types=9,
+        max_triples_per_item=2,
+        max_same_item_per_layer=2,
         allow_front_layer_matches=False,
         shuffle_passes=4,
     ),
     "expert": DifficultyPreset(
         empty_ratio_min=0.0,
         empty_ratio_max=0.05,
-        max_item_types=12,
+        max_triples_per_item=1,
+        max_same_item_per_layer=2,
         allow_front_layer_matches=False,
         shuffle_passes=6,
     ),
@@ -106,6 +111,11 @@ def calculate_filled_slots(total_slots: int, preset: DifficultyPreset, rng: rand
 
 
 def would_create_front_match(shelves: list[dict[str, list[list[str | None]]]]) -> bool:
+    return count_front_layer_matches(shelves) > 0
+
+
+def count_front_layer_matches(shelves: list[dict[str, list[list[str | None]]]]) -> int:
+    match_count = 0
     for shelf in shelves:
         layers = shelf["layers"]
         if not layers:
@@ -116,9 +126,9 @@ def would_create_front_match(shelves: list[dict[str, list[list[str | None]]]]) -
             continue
 
         if len(set(front_layer)) == 1:
-            return True
+            match_count += 1
 
-    return False
+    return match_count
 
 
 def distribute_slots(slot_values: list[str | None], shelf_count: int, layer_count: int) -> list[dict[str, Any]]:
@@ -183,10 +193,22 @@ def generate_shelves(
     filled_slots = calculate_filled_slots(eligible_slots, preset, rng)
     empty_slots = eligible_slots - filled_slots
     item_pool = build_item_pool_with_preset(item_types, filled_slots, preset, rng)
-    eligible_slot_values: list[str | None] = item_pool + [None] * empty_slots
+    eligible_slot_values = spread_values_across_layers(
+        item_pool=item_pool,
+        empty_slots=empty_slots,
+        shelf_count=shelf_count,
+        filled_layer_count=filled_layer_count,
+        max_same_item_per_layer=preset.max_same_item_per_layer,
+        rng=rng,
+    )
 
     for _ in range(preset.shuffle_passes):
-        rng.shuffle(eligible_slot_values)
+        shuffle_values_within_layers(
+            eligible_slot_values=eligible_slot_values,
+            shelf_count=shelf_count,
+            filled_layer_count=filled_layer_count,
+            rng=rng,
+        )
 
     shelves = compose_shelves(
         eligible_slot_values=eligible_slot_values,
@@ -194,15 +216,15 @@ def generate_shelves(
         layer_count=layer_count,
         filled_layer_count=filled_layer_count,
     )
-    if not preset.allow_front_layer_matches:
-        shelves = reshuffle_without_front_matches(
-            eligible_slot_values=eligible_slot_values,
-            shelf_count=shelf_count,
-            layer_count=layer_count,
-            filled_layer_count=filled_layer_count,
-            rng=rng,
-            max_attempts=100,
-        )
+    shelves = reshuffle_for_layout_constraints(
+        eligible_slot_values=eligible_slot_values,
+        shelf_count=shelf_count,
+        layer_count=layer_count,
+        filled_layer_count=filled_layer_count,
+        preset=preset,
+        rng=rng,
+        max_attempts=250,
+    )
 
     stats = build_stats(
         shelves=shelves,
@@ -211,6 +233,7 @@ def generate_shelves(
         shelf_count=shelf_count,
         layer_count=layer_count,
         filled_layer_count=filled_layer_count,
+        preset=preset,
     )
     return shelves, stats
 
@@ -315,7 +338,8 @@ def build_item_pool_with_preset(
     rng: random.Random,
 ) -> list[str]:
     triple_count = filled_slots // SLOTS_PER_SHELF
-    usable_count = min(len(item_types), preset.max_item_types, triple_count)
+    required_type_count = (triple_count + preset.max_triples_per_item - 1) // preset.max_triples_per_item
+    usable_count = min(len(item_types), triple_count, required_type_count)
     if usable_count <= 0:
         raise ValueError("At least one item type and one item triple are required")
 
@@ -323,10 +347,9 @@ def build_item_pool_with_preset(
     rng.shuffle(shuffled_item_types)
     selected_item_types = shuffled_item_types[:usable_count]
 
-    triples_by_item = Counter({item_id: 1 for item_id in selected_item_types})
-    remaining_triples = triple_count - len(selected_item_types)
-    for _ in range(remaining_triples):
-        triples_by_item[rng.choice(selected_item_types)] += 1
+    triples_by_item: Counter[str] = Counter()
+    for triple_index in range(triple_count):
+        triples_by_item[selected_item_types[triple_index % usable_count]] += 1
 
     item_pool = []
     for item_id, triples in triples_by_item.items():
@@ -334,6 +357,129 @@ def build_item_pool_with_preset(
 
     rng.shuffle(item_pool)
     return item_pool
+
+
+def rebuild_values_from_layers(
+    layer_values: list[list[str | None]],
+    shelf_count: int,
+    filled_layer_count: int,
+) -> list[str | None]:
+    eligible_slot_values: list[str | None] = []
+    layer_offsets = [0] * filled_layer_count
+
+    for _shelf_index in range(shelf_count):
+        for layer_index in range(filled_layer_count):
+            layer_offset = layer_offsets[layer_index]
+            eligible_slot_values.extend(
+                layer_values[layer_index][layer_offset : layer_offset + SLOTS_PER_SHELF]
+            )
+            layer_offsets[layer_index] += SLOTS_PER_SHELF
+
+    return eligible_slot_values
+
+
+def split_values_by_layer(
+    eligible_slot_values: list[str | None],
+    shelf_count: int,
+    filled_layer_count: int,
+) -> list[list[str | None]]:
+    layer_values: list[list[str | None]] = [[] for _ in range(filled_layer_count)]
+    value_index = 0
+
+    for _shelf_index in range(shelf_count):
+        for layer_index in range(filled_layer_count):
+            layer_values[layer_index].extend(
+                eligible_slot_values[value_index : value_index + SLOTS_PER_SHELF]
+            )
+            value_index += SLOTS_PER_SHELF
+
+    return layer_values
+
+
+def shuffle_values_within_layers(
+    eligible_slot_values: list[str | None],
+    shelf_count: int,
+    filled_layer_count: int,
+    rng: random.Random,
+) -> None:
+    layer_values = split_values_by_layer(
+        eligible_slot_values=eligible_slot_values,
+        shelf_count=shelf_count,
+        filled_layer_count=filled_layer_count,
+    )
+    for values in layer_values:
+        rng.shuffle(values)
+
+    eligible_slot_values[:] = rebuild_values_from_layers(
+        layer_values=layer_values,
+        shelf_count=shelf_count,
+        filled_layer_count=filled_layer_count,
+    )
+
+
+def spread_values_across_layers(
+    item_pool: list[str],
+    empty_slots: int,
+    shelf_count: int,
+    filled_layer_count: int,
+    max_same_item_per_layer: int,
+    rng: random.Random,
+) -> list[str | None]:
+    layer_capacity = shelf_count * SLOTS_PER_SHELF
+    layer_values: list[list[str | None]] = [[] for _ in range(filled_layer_count)]
+    layer_item_counts: list[Counter[str]] = [Counter() for _ in range(filled_layer_count)]
+    item_counts = Counter(item_pool)
+    item_limits = build_layer_item_limits(
+        item_counts=item_counts,
+        filled_layer_count=filled_layer_count,
+        max_same_item_per_layer=max_same_item_per_layer,
+    )
+    shuffled_item_ids = list(item_counts)
+    rng.shuffle(shuffled_item_ids)
+
+    for item_id in shuffled_item_ids:
+        for _copy_index in range(item_counts[item_id]):
+            candidates = [
+                layer_index
+                for layer_index in range(filled_layer_count)
+                if len(layer_values[layer_index]) < layer_capacity
+                and layer_item_counts[layer_index][item_id] < item_limits[item_id]
+            ]
+            if not candidates:
+                candidates = [
+                    layer_index
+                    for layer_index in range(filled_layer_count)
+                    if len(layer_values[layer_index]) < layer_capacity
+                ]
+
+            candidates.sort(
+                key=lambda layer_index: (
+                    layer_item_counts[layer_index][item_id],
+                    len(layer_values[layer_index]),
+                    rng.random(),
+                )
+            )
+            layer_index = candidates[0]
+            layer_values[layer_index].append(item_id)
+            layer_item_counts[layer_index][item_id] += 1
+
+    for _empty_index in range(empty_slots):
+        candidates = [
+            layer_index
+            for layer_index in range(filled_layer_count)
+            if len(layer_values[layer_index]) < layer_capacity
+        ]
+        candidates.sort(key=lambda layer_index: (len(layer_values[layer_index]), rng.random()))
+        layer_values[candidates[0]].append(None)
+
+    for values in layer_values:
+        rng.shuffle(values)
+
+    return rebuild_values_from_layers(
+        layer_values=layer_values,
+        shelf_count=shelf_count,
+        filled_layer_count=filled_layer_count,
+    )
 
 
 def flatten_shelves(shelves: list[dict[str, Any]]) -> list[str | None]:
@@ -344,11 +490,105 @@ def flatten_shelves(shelves: list[dict[str, Any]]) -> list[str | None]:
     return values
 
 
-def reshuffle_without_front_matches(
+def build_layer_item_counts(
+    shelves: list[dict[str, Any]],
+    filled_layer_count: int,
+) -> list[Counter[str]]:
+    layer_counts: list[Counter[str]] = [Counter() for _ in range(filled_layer_count)]
+    for shelf in shelves:
+        for layer_index, layer in enumerate(shelf["layers"][:filled_layer_count]):
+            layer_counts[layer_index].update(value for value in layer if value is not None)
+
+    return layer_counts
+
+
+def build_layer_item_limits(
+    item_counts: Counter[str],
+    filled_layer_count: int,
+    max_same_item_per_layer: int,
+) -> dict[str, int]:
+    if filled_layer_count <= 0:
+        return {}
+
+    return {
+        item_id: max(max_same_item_per_layer, (count + filled_layer_count - 1) // filled_layer_count)
+        for item_id, count in item_counts.items()
+    }
+
+
+def find_layer_item_overloads(
+    shelves: list[dict[str, Any]],
+    filled_layer_count: int,
+    max_same_item_per_layer: int,
+) -> dict[str, dict[str, int]]:
+    item_counts = Counter(value for value in flatten_shelves(shelves) if value is not None)
+    item_limits = build_layer_item_limits(
+        item_counts=item_counts,
+        filled_layer_count=filled_layer_count,
+        max_same_item_per_layer=max_same_item_per_layer,
+    )
+    overloads: dict[str, dict[str, int]] = {}
+
+    for layer_index, layer_counts in enumerate(build_layer_item_counts(shelves, filled_layer_count)):
+        layer_overloads = {
+            item_id: count
+            for item_id, count in sorted(layer_counts.items())
+            if count > item_limits[item_id]
+        }
+        if layer_overloads:
+            overloads[str(layer_index)] = layer_overloads
+
+    return overloads
+
+
+def score_layer_item_spread(
+    shelves: list[dict[str, Any]],
+    filled_layer_count: int,
+    max_same_item_per_layer: int,
+) -> tuple[int, int, int]:
+    item_counts = Counter(value for value in flatten_shelves(shelves) if value is not None)
+    item_limits = build_layer_item_limits(
+        item_counts=item_counts,
+        filled_layer_count=filled_layer_count,
+        max_same_item_per_layer=max_same_item_per_layer,
+    )
+    total_overage = 0
+    largest_overage = 0
+    largest_layer_count = 0
+
+    for layer_counts in build_layer_item_counts(shelves, filled_layer_count):
+        for item_id, count in layer_counts.items():
+            largest_layer_count = max(largest_layer_count, count)
+            overage = max(0, count - item_limits[item_id])
+            total_overage += overage
+            largest_overage = max(largest_overage, overage)
+
+    return total_overage, largest_overage, largest_layer_count
+
+
+def score_layout_constraints(
+    shelves: list[dict[str, Any]],
+    filled_layer_count: int,
+    preset: DifficultyPreset,
+) -> tuple[int, int, int, int]:
+    front_match_count = 0
+    if not preset.allow_front_layer_matches:
+        front_match_count = count_front_layer_matches(shelves)
+
+    layer_overage, largest_overage, largest_layer_count = score_layer_item_spread(
+        shelves=shelves,
+        filled_layer_count=filled_layer_count,
+        max_same_item_per_layer=preset.max_same_item_per_layer,
+    )
+    return front_match_count, layer_overage, largest_overage, largest_layer_count
+
+
+def reshuffle_for_layout_constraints(
     eligible_slot_values: list[str | None],
     shelf_count: int,
     layer_count: int,
     filled_layer_count: int,
+    preset: DifficultyPreset,
     rng: random.Random,
     max_attempts: int,
 ) -> list[dict[str, Any]]:
@@ -358,19 +598,38 @@ def reshuffle_without_front_matches(
         layer_count=layer_count,
         filled_layer_count=filled_layer_count,
     )
+    best_shelves = shelves
+    best_score = score_layout_constraints(
+        shelves=shelves,
+        filled_layer_count=filled_layer_count,
+        preset=preset,
+    )
     for _attempt in range(max_attempts):
-        if not would_create_front_match(shelves):
-            return shelves
+        if best_score[:3] == (0, 0, 0):
+            return best_shelves
 
-        rng.shuffle(eligible_slot_values)
+        shuffle_values_within_layers(
+            eligible_slot_values=eligible_slot_values,
+            shelf_count=shelf_count,
+            filled_layer_count=filled_layer_count,
+            rng=rng,
+        )
         shelves = compose_shelves(
             eligible_slot_values=eligible_slot_values,
             shelf_count=shelf_count,
             layer_count=layer_count,
             filled_layer_count=filled_layer_count,
         )
+        score = score_layout_constraints(
+            shelves=shelves,
+            filled_layer_count=filled_layer_count,
+            preset=preset,
+        )
+        if score < best_score:
+            best_shelves = shelves
+            best_score = score
 
-    return shelves
+    return best_shelves
 
 
 def build_stats(
@@ -380,6 +639,7 @@ def build_stats(
     shelf_count: int,
     layer_count: int,
     filled_layer_count: int,
+    preset: DifficultyPreset,
 ) -> dict[str, Any]:
     values = flatten_shelves(shelves)
     item_counts = Counter(value for value in values if value is not None)
@@ -400,7 +660,19 @@ def build_stats(
         "empty_slots": sum(1 for value in values if value is None),
         "item_counts": dict(sorted(item_counts.items())),
         "invalid_item_counts": invalid_counts,
+        "max_triples_per_item": preset.max_triples_per_item,
+        "max_same_item_per_layer": preset.max_same_item_per_layer,
+        "layer_item_counts": [
+            dict(sorted(layer_counts.items()))
+            for layer_counts in build_layer_item_counts(shelves, filled_layer_count)
+        ],
+        "layer_item_overloads": find_layer_item_overloads(
+            shelves=shelves,
+            filled_layer_count=filled_layer_count,
+            max_same_item_per_layer=preset.max_same_item_per_layer,
+        ),
         "front_layer_matches": would_create_front_match(shelves),
+        "front_layer_match_count": count_front_layer_matches(shelves),
     }
 
 

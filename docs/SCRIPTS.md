@@ -172,6 +172,11 @@ Key inputs:
 - Shelf count, layer count, filled layer count, difficulty, seed, layout preset, item type filters, and optional solvability requirements.
 - Layout preset values mirror `scripts/level.gd`, including fixed-count staggered presets for 14-shelf `staggered_5_4_5` and 13-shelf `staggered_4_5_4` layouts.
 
+Generation constraints:
+- Difficulty presets cap how many triples a single item type should receive, falling back only when the requested board needs more triples than the available item catalog can uniquely cover.
+- Generated layouts reshuffle shelf slots to reduce same-item concentration on a single filled layer, using an adaptive per-layer limit so one-layer or tiny levels remain possible.
+- Hard and expert difficulties still avoid shelves that start with a complete front-layer match.
+
 Depends on:
 - `configs/item_sprites.json` for known item IDs by default.
 - `scripts/tools/validate_level_solvable.py` for validation and optional solvability checks.
