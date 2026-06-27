@@ -117,8 +117,8 @@ Files:
 Responsibility:
 - `level.tscn` provides the top-right circular pause button and instances the pause menu scene.
 - `scenes/pause_menu.tscn` owns the popup layout, `Pause` title, music / sound-effects / vibration icon buttons, and Leave/Continue buttons.
-- `scripts/pause_menu.gd` toggles crossed-out visuals on the three settings icon buttons.
-- `scripts/level.gd` opens and closes the menu, pauses the timer and gameplay input, and routes Leave back to the main menu.
+- `scripts/pause_menu.gd` toggles crossed-out visuals on the three settings icon buttons and emits setting state changes.
+- `scripts/level.gd` opens and closes the menu, pauses the timer and gameplay input, routes Leave back to the main menu, and mutes gameplay sound effects when the sound-effects button is crossed out.
 
 Change here when:
 - Restyling the in-level pause popup, adding pause menu actions, or changing pause/resume behavior.
@@ -165,6 +165,7 @@ Change drag or tap movement:
 
 Change gameplay sound effects:
 - Update `assets/audio/item_place.wav`, `assets/audio/triple_clear.wav`, and the audio player helpers in `scripts/level.gd`.
+- Keep the `SoundEffectsButton` setting path in `scripts/pause_menu.gd` and `scripts/level.gd` aligned when changing pause menu sound-effect controls.
 
 Change level win or loss flow:
 - Update `_process()`, `_fail_level()`, `_complete_level()`, `_check_level_completed()`, pause-menu helpers, and the panels in `level.tscn`.

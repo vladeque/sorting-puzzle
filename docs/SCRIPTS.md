@@ -92,6 +92,7 @@ Key responsibilities:
 - Promote back layers with `_promote_back_layer()`, `_play_layer_promotion_animation()`, and `_advance_back_layers()`.
 - Check win/loss state with `_check_level_completed()`, `_fail_level()`, and `_complete_level()`.
 - Pause and resume active gameplay through the top-right menu button, the instanced `UI/PauseMenuOverlay`, `Leave`, and `Continue`.
+- Disable item placement and triple-clear sound effects while the pause menu sound-effects toggle is crossed out.
 - Manage hammer, shuffle, and highlight abilities.
 - Apply highlight ability visuals through `ShelfItem.set_outline()` so only item silhouettes receive a border.
 
@@ -116,6 +117,7 @@ Attached to:
 Purpose:
 - Owns local pause menu settings-button visual state.
 - Toggles a crossed-out overlay on the music, sound effects, and vibration buttons when clicked.
+- Emits `setting_toggled(setting_id, is_disabled)` so owning runtime scripts can apply supported settings.
 
 Important nodes:
 - `PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/MusicButton`
@@ -123,7 +125,7 @@ Important nodes:
 - `PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/VibrationButton`
 
 Do not use for:
-- Applying actual music, sound effect, or vibration settings until those runtime systems exist.
+- Applying actual music or vibration settings until those runtime systems exist.
 - Level pause, continue, or leave flow. Those stay in `scripts/level.gd`.
 
 ## `scripts/item.gd`

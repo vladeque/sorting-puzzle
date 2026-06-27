@@ -88,7 +88,7 @@ Important nodes:
 - `PauseMenuPanel`: centered popup panel.
 - `PauseMenuPanel/MarginContainer/VBoxContainer/TitleLabel`: pause menu title.
 - `PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/MusicButton`: circular music toggle placeholder.
-- `PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/SoundEffectsButton`: circular sound effects toggle placeholder.
+- `PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/SoundEffectsButton`: circular sound effects toggle that disables or enables gameplay sound effects.
 - `PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/VibrationButton`: circular phone vibration toggle placeholder.
 - `PauseMenuPanel/MarginContainer/VBoxContainer/ButtonRow/LeaveButton`: button wired by `scripts/level.gd` to return to the main menu.
 - `PauseMenuPanel/MarginContainer/VBoxContainer/ButtonRow/ContinueButton`: button wired by `scripts/level.gd` to resume the level.
@@ -100,7 +100,7 @@ Depends on:
 - Local settings-button visual toggles from `scripts/pause_menu.gd`.
 
 Do not use for:
-- Timer state, scene navigation, gameplay pause rules, or actual audio/vibration settings. Those stay in owning runtime systems.
+- Timer state, scene navigation, gameplay pause rules, music playback, or actual vibration settings. Those stay in owning runtime systems.
 
 ## `scenes/shelf.tscn`
 

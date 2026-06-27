@@ -1,26 +1,43 @@
 extends ColorRect
 
-const SETTINGS_BUTTON_PATHS: Array[NodePath] = [
-	^"PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/MusicButton",
-	^"PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/SoundEffectsButton",
-	^"PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/VibrationButton",
+signal setting_toggled(setting_id: StringName, is_disabled: bool)
+
+const SETTING_MUSIC := &"music"
+const SETTING_SOUND_EFFECTS := &"sound_effects"
+const SETTING_VIBRATION := &"vibration"
+const SETTINGS_BUTTONS: Array[Dictionary] = [
+	{
+		"path": ^"PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/MusicButton",
+		"setting_id": SETTING_MUSIC,
+	},
+	{
+		"path": ^"PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/SoundEffectsButton",
+		"setting_id": SETTING_SOUND_EFFECTS,
+	},
+	{
+		"path": ^"PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/VibrationButton",
+		"setting_id": SETTING_VIBRATION,
+	},
 ]
 const CROSS_OUT_NAME := "CrossOut"
 
 
 func _ready() -> void:
-	for button_path in SETTINGS_BUTTON_PATHS:
+	for button_config in SETTINGS_BUTTONS:
+		var button_path := button_config.get("path") as NodePath
+		var setting_id := button_config.get("setting_id") as StringName
 		var button := get_node_or_null(button_path) as Button
 		if button == null:
 			push_warning("Missing pause menu setting button: %s" % button_path)
 			continue
 
 		var cross_out := _create_cross_out_marker(button)
-		button.pressed.connect(_on_setting_button_pressed.bind(cross_out))
+		button.pressed.connect(_on_setting_button_pressed.bind(cross_out, setting_id))
 
 
-func _on_setting_button_pressed(cross_out: Control) -> void:
+func _on_setting_button_pressed(cross_out: Control, setting_id: StringName) -> void:
 	cross_out.visible = not cross_out.visible
+	setting_toggled.emit(setting_id, cross_out.visible)
 
 
 func _create_cross_out_marker(button: Button) -> Control:

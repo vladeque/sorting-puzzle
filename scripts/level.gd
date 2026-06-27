@@ -20,6 +20,7 @@ const DEFAULT_LAYOUT_PRESET := "grid_3x3"
 const MAIN_MENU_SCENE := "res://scenes/main_menu.tscn"
 const ITEM_PLACE_SOUND := preload("res://assets/audio/item_place.wav")
 const TRIPLE_CLEAR_SOUND := preload("res://assets/audio/triple_clear.wav")
+const PAUSE_SETTING_SOUND_EFFECTS := &"sound_effects"
 
 @export var slot_snap_distance := 86.0
 @export var item_pick_size := Vector2(58, 92)
@@ -82,6 +83,7 @@ var _clearing_item_ids: Array[int] = []
 var _transitioning_item_ids: Array[int] = []
 var _item_place_audio_player: AudioStreamPlayer
 var _triple_clear_audio_player: AudioStreamPlayer
+var _sound_effects_enabled := true
 
 
 func _ready() -> void:
@@ -125,7 +127,7 @@ func _create_audio_player(player_name: String, stream: AudioStream, volume: floa
 
 
 func _play_item_place_sound() -> void:
-	if _item_place_audio_player == null:
+	if not _sound_effects_enabled or _item_place_audio_player == null:
 		return
 
 	_item_place_audio_player.stop()
@@ -133,11 +135,19 @@ func _play_item_place_sound() -> void:
 
 
 func _play_triple_clear_sound() -> void:
-	if _triple_clear_audio_player == null:
+	if not _sound_effects_enabled or _triple_clear_audio_player == null:
 		return
 
 	_triple_clear_audio_player.stop()
 	_triple_clear_audio_player.play()
+
+
+func _stop_sound_effects() -> void:
+	if _item_place_audio_player != null:
+		_item_place_audio_player.stop()
+
+	if _triple_clear_audio_player != null:
+		_triple_clear_audio_player.stop()
 
 
 func _process(delta: float) -> void:
@@ -486,6 +496,17 @@ func _setup_pause_menu_buttons() -> void:
 	_pause_menu_button.pressed.connect(_on_pause_menu_button_pressed)
 	_leave_button.pressed.connect(_on_pause_menu_leave_pressed)
 	_continue_button.pressed.connect(_on_pause_menu_continue_pressed)
+	if _pause_menu_overlay.has_signal(&"setting_toggled"):
+		_pause_menu_overlay.connect(&"setting_toggled", _on_pause_menu_setting_toggled)
+
+
+func _on_pause_menu_setting_toggled(setting_id: StringName, is_disabled: bool) -> void:
+	if setting_id != PAUSE_SETTING_SOUND_EFFECTS:
+		return
+
+	_sound_effects_enabled = not is_disabled
+	if not _sound_effects_enabled:
+		_stop_sound_effects()
 
 
 func _on_pause_menu_button_pressed() -> void:
