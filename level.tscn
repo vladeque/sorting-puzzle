@@ -123,6 +123,21 @@ shadow_color = Color(0, 0, 0, 0.34)
 shadow_size = 5
 shadow_offset = Vector2(0, 2)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_highlight_timer_badge"]
+bg_color = Color(0.1, 0.15, 0.2, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.92, 0.62, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+shadow_color = Color(0, 0, 0, 0.34)
+shadow_size = 5
+shadow_offset = Vector2(0, 2)
+
 [node name="Level" type="Node2D" unique_id=949256860]
 script = ExtResource("10_level_script")
 
@@ -323,15 +338,16 @@ vertical_alignment = 1
 visible = false
 z_index = 1
 layout_mode = 0
-offset_left = 104.0
-offset_top = 35.0
-offset_right = 158.0
-offset_bottom = 66.0
-theme_override_colors/font_color = Color(1, 0.92, 0.62, 1)
+offset_left = 66.0
+offset_top = 61.0
+offset_right = 110.0
+offset_bottom = 105.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.86)
 theme_override_constants/shadow_offset_x = 0
-theme_override_constants/shadow_offset_y = 2
-theme_override_font_sizes/font_size = 19
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_highlight_timer_badge")
 text = "15s"
 horizontal_alignment = 1
 vertical_alignment = 1

@@ -103,7 +103,7 @@ Responsibility:
 - Disables abilities after failure, completion, or when uses run out.
 - Starts the highlight timer even when no current shelf state can be highlighted.
 - Uses `ShelfItem` outline state for border-only highlight ability visuals.
-- Shows the active highlight countdown next to the highlight button.
+- Shows the active highlight countdown in a bottom-right badge on the highlight button.
 
 Change here when:
 - Adding, removing, rebalancing, or restyling player abilities.
