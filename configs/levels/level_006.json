@@ -1,61 +1,255 @@
 {
-  "level": 1,
-  "time_seconds": 300,
-  "layout_preset": "grid_3x3",
+  "level": 6,
+  "time_seconds": 420,
+  "layout_preset": "staggered_4_5_4",
+  "difficulty": "expert",
   "shelves": [
-	{
-	  "layers": [
-		["milk_carton", "chips_can", null],
-		["milk_carton", "chips_can", "toy_robot"]
-	  ]
-	},
-	{
-	  "layers": [
-		["toy_robot", "soda_bottle", null],
-		["soda_bottle", "plant_pot", "cookie_box"]
-	  ]
-	},
-	{
-	  "layers": [
-		["plant_pot", "cookie_box", "ketchup_bottle"],
-		["ketchup_bottle", "milk_carton", "chips_can"]
-	  ]
-	},
-	{
-	  "layers": [
-		["chips_can", "toy_robot", "milk_carton"],
-		["toy_robot", "soda_bottle", "plant_pot"]
-	  ]
-	},
-	{
-	  "layers": [
-		[null, null, "soda_bottle"],
-		["cookie_box", "ketchup_bottle", "milk_carton"]
-	  ]
-	},
-	{
-	  "layers": [
-		["cookie_box", "plant_pot", "ketchup_bottle"],
-		["chips_can", "toy_robot", "soda_bottle"]
-	  ]
-	},
-	{
-	  "layers": [
-		["toy_robot", "chips_can", null],
-		["plant_pot", "cookie_box", "ketchup_bottle"]
-	  ]
-	},
-	{
-	  "layers": [
-		["soda_bottle", null, "cookie_box"],
-		[null, null, null]
-	  ]
-	},
-	{
-	  "layers": [
-		["ketchup_bottle", "milk_carton", "plant_pot"],
-		[null, null, null]
-	  ]
-	}
+    {
+      "layers": [
+        [
+          "candy_bag",
+          "rubber_duck",
+          "soda_bottle"
+        ],
+        [
+          "rubber_duck",
+          "candy_bag",
+          null
+        ],
+        [
+          "rubber_duck",
+          "soda_bottle",
+          "soap_pump"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "rubber_duck",
+          "ice_cream_cup",
+          "cereal_box"
+        ],
+        [
+          "jam_jar",
+          "chocolate_bar",
+          "cookie_box"
+        ],
+        [
+          "shampoo_bottle",
+          "rubber_duck",
+          "candy_bag"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "teddy_bear",
+          "chocolate_bar",
+          "chocolate_bar"
+        ],
+        [
+          "candy_bag",
+          "cereal_box",
+          "cookie_box"
+        ],
+        [
+          "shampoo_bottle",
+          "candy_bag",
+          "rubber_duck"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "jam_jar",
+          "cereal_box",
+          "cereal_box"
+        ],
+        [
+          "jam_jar",
+          "candy_bag",
+          "soda_bottle"
+        ],
+        [
+          "cupcake",
+          "rubber_duck",
+          "shampoo_bottle"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "shampoo_bottle",
+          "cereal_box",
+          "cupcake"
+        ],
+        [
+          "cereal_box",
+          "ice_cream_cup",
+          "jam_jar"
+        ],
+        [
+          "rubber_duck",
+          "cookie_box",
+          "jam_jar"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "soap_pump",
+          "cookie_box",
+          "jam_jar"
+        ],
+        [
+          "soda_bottle",
+          "soda_bottle",
+          "rubber_duck"
+        ],
+        [
+          "shampoo_bottle",
+          "candy_bag",
+          "teddy_bear"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "teddy_bear",
+          "teddy_bear",
+          "rubber_duck"
+        ],
+        [
+          "soda_bottle",
+          "ice_cream_cup",
+          "cupcake"
+        ],
+        [
+          "jam_jar",
+          "candy_bag",
+          "candy_bag"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "jam_jar",
+          "soda_bottle",
+          "cupcake"
+        ],
+        [
+          "cupcake",
+          "cookie_box",
+          "soap_pump"
+        ],
+        [
+          "jam_jar",
+          "soap_pump",
+          "cupcake"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "soda_bottle",
+          null,
+          "cookie_box"
+        ],
+        [
+          "cupcake",
+          "candy_bag",
+          "soap_pump"
+        ],
+        [
+          "soda_bottle",
+          "candy_bag",
+          "soap_pump"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "ice_cream_cup",
+          "shampoo_bottle",
+          "soda_bottle"
+        ],
+        [
+          "rubber_duck",
+          "cookie_box",
+          "teddy_bear"
+        ],
+        [
+          "candy_bag",
+          "soda_bottle",
+          "shampoo_bottle"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "ice_cream_cup",
+          "soap_pump",
+          "candy_bag"
+        ],
+        [
+          "cookie_box",
+          "shampoo_bottle",
+          "rubber_duck"
+        ],
+        [
+          "cupcake",
+          "jam_jar",
+          "rubber_duck"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "soap_pump",
+          "jam_jar",
+          "shampoo_bottle"
+        ],
+        [
+          "rubber_duck",
+          "candy_bag",
+          "cookie_box"
+        ],
+        [
+          "soda_bottle",
+          "soap_pump",
+          "teddy_bear"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "jam_jar",
+          "ice_cream_cup",
+          null
+        ],
+        [
+          "soda_bottle",
+          "cupcake",
+          "soda_bottle"
+        ],
+        [
+          "soda_bottle",
+          "rubber_duck",
+          "candy_bag"
+        ]
+      ]
+    }
   ]
 }
