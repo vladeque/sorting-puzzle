@@ -50,6 +50,7 @@ Important nodes:
 - `UI/AbilityBar/HBoxContainer/HammerButton`: hammer ability button.
 - `UI/AbilityBar/HBoxContainer/ShuffleButton`: shuffle ability button.
 - `UI/AbilityBar/HBoxContainer/HighlightButton`: highlight ability button.
+- `UI/AbilityBar/HBoxContainer/HighlightButton/TimerLabel`: active highlight ability countdown.
 - `UI/FailurePanel`: shown when time runs out.
 - `UI/CompletionPanel`: shown after all items clear.
 - `UI/PauseMenuOverlay`: `scenes/pause_menu.tscn` instance used for the modal pause menu.

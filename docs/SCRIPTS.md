@@ -94,7 +94,8 @@ Key responsibilities:
 - Pause and resume active gameplay through the top-right menu button, the instanced `UI/PauseMenuOverlay`, `Leave`, and `Continue`.
 - Disable item placement and triple-clear sound effects while the pause menu sound-effects toggle is crossed out.
 - Manage hammer, shuffle, and highlight abilities.
-- Apply highlight ability visuals through `ShelfItem.set_outline()` so only item silhouettes receive a border.
+- Let highlight uses start their timed window even when no immediate triple can currently be highlighted.
+- Apply highlight ability visuals through `ShelfItem.set_outline()` so only item silhouettes receive a border, and update the highlight button countdown label while that window is active.
 
 Depends on:
 - `level.tscn` node names and paths.

@@ -57,6 +57,7 @@ var _pause_menu_overlay: Control
 var _leave_button: Button
 var _continue_button: Button
 var _ability_buttons: Dictionary = {}
+var _highlight_timer_label: Label
 var _ability_uses: Dictionary = {
 	ABILITY_HAMMER: 3,
 	ABILITY_SHUFFLE: 3,
@@ -1219,6 +1220,8 @@ func _setup_ability_buttons() -> void:
 	_register_ability_button(ABILITY_HAMMER, "UI/AbilityBar/HBoxContainer/HammerButton")
 	_register_ability_button(ABILITY_SHUFFLE, "UI/AbilityBar/HBoxContainer/ShuffleButton")
 	_register_ability_button(ABILITY_HIGHLIGHT, "UI/AbilityBar/HBoxContainer/HighlightButton")
+	_highlight_timer_label = get_node_or_null("UI/AbilityBar/HBoxContainer/HighlightButton/TimerLabel") as Label
+	_update_highlight_timer_label()
 
 
 func _register_ability_button(ability_id: StringName, button_path: NodePath) -> void:
@@ -1321,15 +1324,13 @@ func _use_shuffle() -> bool:
 
 func _use_highlight() -> bool:
 	var items_to_highlight := _find_immediate_triple_items()
-	if items_to_highlight.is_empty():
-		return false
-
 	_clear_ability_highlights()
 	_highlighted_items = items_to_highlight
 	_highlight_timer = HIGHLIGHT_DURATION_SECONDS
 	for item in _highlighted_items:
 		_apply_item_visual_state(item)
 
+	_update_highlight_timer_label()
 	return true
 
 
@@ -1389,6 +1390,7 @@ func _update_highlight_timer(delta: float) -> void:
 		return
 
 	_highlight_timer = maxf(_highlight_timer - delta, 0.0)
+	_update_highlight_timer_label()
 	if _highlight_timer <= 0.0:
 		_clear_ability_highlights()
 
@@ -1412,16 +1414,30 @@ func _clear_ability_highlights() -> void:
 	var previous_items := _highlighted_items.duplicate()
 	_highlighted_items.clear()
 	_highlight_timer = 0.0
+	_update_highlight_timer_label()
 
 	for item in previous_items:
 		if item != null and is_instance_valid(item):
 			_apply_item_visual_state(item)
 
 
+func _update_highlight_timer_label() -> void:
+	if _highlight_timer_label == null:
+		return
+
+	var should_show := _highlight_timer > 0.0 and not _level_failed and not _level_completed
+	_highlight_timer_label.visible = should_show
+	if not should_show:
+		return
+
+	_highlight_timer_label.text = "%ds" % ceili(_highlight_timer)
+
+
 func _update_ability_buttons() -> void:
 	_update_ability_button(ABILITY_HAMMER)
 	_update_ability_button(ABILITY_SHUFFLE)
 	_update_ability_button(ABILITY_HIGHLIGHT)
+	_update_highlight_timer_label()
 
 
 func _reset_ability_uses() -> void:
