@@ -727,6 +727,9 @@ func _resolve_move_target_slot(origin_slot: Node2D, target_slot: Node2D) -> Node
 	if _get_slot_item(target_slot) == null:
 		return target_slot
 
+	if _get_owning_shelf(origin_slot) == _get_owning_shelf(target_slot):
+		return origin_slot
+
 	return _find_free_slot_on_target_shelf(target_slot, origin_slot)
 
 

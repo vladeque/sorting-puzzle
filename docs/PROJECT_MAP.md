@@ -163,7 +163,7 @@ Change matching rules:
 
 Change drag or tap movement:
 - Update `_input()`, `_handle_press_at()`, `_handle_motion_at()`, `_handle_release_at()`, `_move_item_to_slot()`, `_resolve_move_target_slot()`, and slot lookup helpers in `scripts/level.gd`.
-- Keep occupied-slot fallback behavior in sync with `_find_free_slot_on_target_shelf()`.
+- Keep occupied-slot fallback behavior in sync with `_resolve_move_target_slot()` and `_find_free_slot_on_target_shelf()`, including the same-shelf return-to-origin rule.
 
 Change gameplay sound effects:
 - Update `assets/audio/item_place.wav`, `assets/audio/triple_clear.wav`, and the audio player helpers in `scripts/level.gd`.
