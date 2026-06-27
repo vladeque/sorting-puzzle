@@ -292,22 +292,28 @@ func _clear_shelves(shelves: Node) -> void:
 
 
 func _get_layout_positions(layout_preset: String, shelf_count: int) -> Array[Vector2]:
-	var columns := 3
-	var spacing := SHELF_GRID_STEP
-
 	match layout_preset:
 		"grid_2x3":
-			columns = 2
+			return _get_grid_layout_positions(2, shelf_count)
 		"grid_3x3":
-			pass
+			return _get_grid_layout_positions(3, shelf_count)
 		"grid_3x4":
-			pass
+			return _get_grid_layout_positions(3, shelf_count)
 		"grid_3x5":
-			pass
+			return _get_grid_layout_positions(3, shelf_count)
 		"grid_4x3":
-			columns = 4
+			return _get_grid_layout_positions(4, shelf_count)
+		"staggered_5_4_5":
+			return _get_fixed_layout_positions(layout_preset, shelf_count, _get_staggered_5_4_5_cells())
+		"staggered_4_5_4":
+			return _get_fixed_layout_positions(layout_preset, shelf_count, _get_staggered_4_5_4_cells())
 		_:
 			push_warning("Unknown layout preset '%s'. Using %s." % [layout_preset, DEFAULT_LAYOUT_PRESET])
+			return _get_grid_layout_positions(3, shelf_count)
+
+
+func _get_grid_layout_positions(columns: int, shelf_count: int) -> Array[Vector2]:
+	var spacing := SHELF_GRID_STEP
 
 	var rows := ceili(float(shelf_count) / float(columns))
 	var origin := Vector2(
@@ -317,10 +323,62 @@ func _get_layout_positions(layout_preset: String, shelf_count: int) -> Array[Vec
 	var positions: Array[Vector2] = []
 	for shelf_index in range(shelf_count):
 		var column := shelf_index % columns
-		var row := shelf_index / columns
+		var row := floori(float(shelf_index) / float(columns))
 		positions.append(origin + Vector2(column * spacing.x, row * spacing.y))
 
 	return positions
+
+
+func _get_fixed_layout_positions(layout_preset: String, shelf_count: int, layout_cells: Array[Vector2]) -> Array[Vector2]:
+	if shelf_count != layout_cells.size():
+		push_warning(
+			"Layout preset '%s' expects %s shelves, got %s. Using %s."
+			% [layout_preset, layout_cells.size(), shelf_count, DEFAULT_LAYOUT_PRESET]
+		)
+		return _get_grid_layout_positions(3, shelf_count)
+
+	return _center_layout_cells(layout_cells)
+
+
+func _center_layout_cells(layout_cells: Array[Vector2]) -> Array[Vector2]:
+	var min_cell := layout_cells[0]
+	var max_cell := layout_cells[0]
+	for cell in layout_cells:
+		min_cell.x = minf(min_cell.x, cell.x)
+		min_cell.y = minf(min_cell.y, cell.y)
+		max_cell.x = maxf(max_cell.x, cell.x)
+		max_cell.y = maxf(max_cell.y, cell.y)
+
+	var center_cell := (min_cell + max_cell) * 0.5
+	var positions: Array[Vector2] = []
+	for cell in layout_cells:
+		positions.append((cell - center_cell) * SHELF_GRID_STEP)
+
+	return positions
+
+
+func _get_staggered_5_4_5_cells() -> Array[Vector2]:
+	var cells: Array[Vector2] = []
+	for row in range(5):
+		cells.append(Vector2(0, row))
+	for row in range(4):
+		cells.append(Vector2(1, row + 0.5))
+	for row in range(5):
+		cells.append(Vector2(2, row))
+
+	return cells
+
+
+func _get_staggered_4_5_4_cells() -> Array[Vector2]:
+	var cells: Array[Vector2] = []
+	for row in range(4):
+		cells.append(Vector2(0, row + 0.5))
+	for row in range(5):
+		cells.append(Vector2(1, row))
+	for row in range(4):
+		cells.append(Vector2(2, row + 0.5))
+
+	return cells
 
 
 func _add_shelf(parent: Node2D, shelf_number: int, shelf_position: Vector2) -> Node2D:

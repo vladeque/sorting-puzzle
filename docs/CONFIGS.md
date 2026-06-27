@@ -46,6 +46,8 @@ Supported layout presets:
 - `grid_3x4`
 - `grid_3x5`
 - `grid_4x3`
+- `staggered_5_4_5`: 14 shelves arranged as five left, four centered, five right.
+- `staggered_4_5_4`: 13 shelves arranged as four left, five centered, four right.
 
 Shelf shape:
 
@@ -71,7 +73,7 @@ Item count rules:
 
 Runtime behavior:
 - `scripts/level.gd` instantiates one `scenes/shelf.tscn` cell for each configured shelf.
-- `scripts/level.gd` uses `layout_preset` to choose the grid columns, then packs generated shelf cells with overlapping shared boundaries.
+- `scripts/level.gd` uses `layout_preset` to choose the grid columns or fixed staggered shelf pattern, then packs generated shelf cells with overlapping shared boundaries.
 - `scripts/level.gd` uses `time_seconds` as the active timer.
 
 Validation:

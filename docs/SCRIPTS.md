@@ -79,7 +79,7 @@ Important constants:
 Key responsibilities:
 - Load JSON configs with `_load_json_file()`.
 - Instantiate reusable shelf cells with `_add_shelf()` and add generated back layers with `_add_back_layer()`.
-- Pack shelf cells with shared boundaries based on `SHELF_GRID_STEP`.
+- Pack shelf cells with shared boundaries based on `SHELF_GRID_STEP`, including grid and fixed staggered layout presets.
 - Spawn configured items with `_add_configured_item()`.
 - Handle mouse and touch input through `_input()` and the press/motion/release helpers.
 - Move items with `_move_item_to_slot()`, `_resolve_move_target_slot()`, `_play_item_move_animation()`, and `_place_item_in_slot()`.
@@ -170,6 +170,7 @@ Purpose:
 
 Key inputs:
 - Shelf count, layer count, filled layer count, difficulty, seed, layout preset, item type filters, and optional solvability requirements.
+- Layout preset values mirror `scripts/level.gd`, including fixed-count staggered presets for 14-shelf `staggered_5_4_5` and 13-shelf `staggered_4_5_4` layouts.
 
 Depends on:
 - `configs/item_sprites.json` for known item IDs by default.

@@ -18,7 +18,15 @@ from validate_level_solvable import solve_level, shelves_to_state, validate_shel
 
 SLOTS_PER_SHELF = 3
 DEFAULT_ITEM_CONFIG = Path("configs/item_sprites.json")
-LAYOUT_PRESETS = ("grid_2x3", "grid_3x3", "grid_3x4", "grid_3x5", "grid_4x3")
+LAYOUT_PRESETS = (
+    "grid_2x3",
+    "grid_3x3",
+    "grid_3x4",
+    "grid_3x5",
+    "grid_4x3",
+    "staggered_5_4_5",
+    "staggered_4_5_4",
+)
 
 
 @dataclass(frozen=True)
