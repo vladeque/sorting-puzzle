@@ -9,7 +9,7 @@ extends Area2D
 		texture = value
 		_apply_texture()
 
-@export_range(0.1, 2.0, 0.01) var visual_scale: float = 0.34:
+@export_range(0.1, 2.0, 0.01) var visual_scale: float = 0.46:
 	set(value):
 		visual_scale = value
 		_apply_visual_scale()

@@ -110,13 +110,14 @@ Root:
 Purpose:
 - Reusable shelf cell instantiated by `scripts/level.gd` for each configured shelf.
 - Owns the visible shelf back wall, floor, frame, front slot positions, and item snap markers.
+- Uses wide cell bounds so three generated shelves span most of the 720 px gameplay viewport.
 
 Important nodes:
 - `BackWall`: muted panel behind shelf items.
 - `Ceiling`, `LeftWall`, and `RightWall`: wooden cell frame.
 - `FloorSurface` and `FloorFrontLip`: wooden floor where items visually rest.
 - `FloorGrain*`: subtle line details on the floor.
-- `Slot01`, `Slot02`, `Slot03`: front slots used by runtime movement and matching logic.
+- `Slot01`, `Slot02`, `Slot03`: front slots used by runtime movement and matching logic, positioned so default item silhouettes sit next to each other.
 - `SlotXX/ItemSlotXX`: marker positions used by `scripts/level.gd` for snap targeting.
 
 Depends on:
@@ -136,6 +137,7 @@ Script:
 Purpose:
 - Reusable sortable item scene.
 - Gives each spawned item a collision area and sprite.
+- Uses a default visual scale and hitbox sized for the wide shelf cell slots.
 
 Important nodes:
 - `OutlineSprite`: hidden sprite used by `ShelfItem` to draw alpha-based highlight borders.

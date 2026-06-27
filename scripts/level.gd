@@ -1,8 +1,8 @@
 extends Node2D
 
 const SLOT_COUNT := 3
-const SLOT_ITEM_POSITION := Vector2(0, -26)
-const SHELF_CELL_SIZE := Vector2(176, 150)
+const SLOT_ITEM_POSITION := Vector2(0, -32)
+const SHELF_CELL_SIZE := Vector2(224, 150)
 const SHELF_SHARED_EDGE_THICKNESS := 8.0
 const SHELF_GRID_STEP := SHELF_CELL_SIZE - Vector2(SHELF_SHARED_EDGE_THICKNESS, SHELF_SHARED_EDGE_THICKNESS)
 const BACK_LAYER_PREFIX := "ShelfLayer"
@@ -22,8 +22,8 @@ const ITEM_PLACE_SOUND := preload("res://assets/audio/item_place.wav")
 const TRIPLE_CLEAR_SOUND := preload("res://assets/audio/triple_clear.wav")
 const PAUSE_SETTING_SOUND_EFFECTS := &"sound_effects"
 
-@export var slot_snap_distance := 86.0
-@export var item_pick_size := Vector2(58, 92)
+@export var slot_snap_distance := 98.0
+@export var item_pick_size := Vector2(74, 112)
 @export var drag_start_distance := 12.0
 @export var back_layer_offset := Vector2(0, -10)
 @export var back_layer_item_scale := 0.86

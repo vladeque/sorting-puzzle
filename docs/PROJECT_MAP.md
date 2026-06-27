@@ -69,6 +69,7 @@ Files:
 Responsibility:
 - Defines the reusable shelf cell visuals, front slots, and item snap markers.
 - Contains the visible back wall, wood floor, frame, floor lip, and floor grain nodes.
+- Keeps the shelf width and slot positions aligned with the level grid constants so a three-shelf row fills most of the gameplay viewport.
 
 Change here when:
 - Editing shelf visual details, front slot positions, item snap marker positions, or cell art node names.
@@ -153,6 +154,7 @@ Add a new level:
 Change shelf layout spacing:
 - Update `SHELF_CELL_SIZE`, `SHELF_SHARED_EDGE_THICKNESS`, `SHELF_GRID_STEP`, and `_get_layout_positions()` in `scripts/level.gd`.
 - Keep `scenes/shelf.tscn` cell bounds and boundary thickness aligned with those layout constants.
+- Keep `SLOT_ITEM_POSITION`, shelf slot markers, `scenes/item.tscn` default scale, and `item_pick_size` aligned when shelf width changes affect item spacing.
 - Keep `scripts/tools/generate_level_shelves.py` layout presets in sync if preset names or supported shapes change.
 
 Change matching rules:

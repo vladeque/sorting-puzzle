@@ -41,8 +41,8 @@ Purpose:
 - Owns active level state, runtime shelf creation, item spawning, input handling, matching, abilities, timer, failure, and completion.
 
 Important exports:
-- `slot_snap_distance`: maximum snap distance for drag or tap placement.
-- `item_pick_size`: rectangle used to detect clicked or touched visible items.
+- `slot_snap_distance`: maximum snap distance for drag or tap placement, sized for the wider shelf spacing.
+- `item_pick_size`: rectangle used to detect clicked or touched visible items at the default item scale.
 - `drag_start_distance`: pointer movement required to convert a press into a drag.
 - `back_layer_offset`: visual offset for hidden/upcoming shelf layers.
 - `back_layer_item_scale`: scale multiplier for back-layer item previews.
@@ -63,7 +63,7 @@ Important exports:
 Important constants:
 - `SLOT_COUNT`: currently three items per shelf front layer.
 - `SLOT_ITEM_POSITION`: item local position that matches `scenes/shelf.tscn` item snap markers.
-- `SHELF_CELL_SIZE`: reusable shelf scene bounds.
+- `SHELF_CELL_SIZE`: reusable shelf scene bounds; three cells in a row are packed to fill most of the 720 px gameplay viewport.
 - `SHELF_SHARED_EDGE_THICKNESS`: shelf boundary thickness that neighboring cells overlap.
 - `SHELF_GRID_STEP`: packed layout spacing after overlapping shared shelf edges.
 - `SHELF_SCENE`: `res://scenes/shelf.tscn`.

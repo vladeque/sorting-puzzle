@@ -28,7 +28,7 @@ shader_parameter/outline_color = Color(1, 0.86, 0.18, 1)
 shader_parameter/alpha_threshold = 0.1
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_item_hitbox"]
-size = Vector2(64, 100)
+size = Vector2(74, 112)
 
 [node name="Item" type="Area2D" unique_id=757671973]
 z_index = 6
@@ -37,10 +37,10 @@ script = ExtResource("1_item_script")
 [node name="OutlineSprite" type="Sprite2D" parent="." unique_id=515204852]
 visible = false
 material = SubResource("ShaderMaterial_4gq7n")
-scale = Vector2(0.34, 0.34)
+scale = Vector2(0.46, 0.46)
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=800087730]
-scale = Vector2(0.34, 0.34)
+scale = Vector2(0.46, 0.46)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=518417999]
 shape = SubResource("RectangleShape2D_item_hitbox")
