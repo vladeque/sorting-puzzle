@@ -86,7 +86,7 @@ Key responsibilities:
 - Redirect moves aimed at an occupied destination slot on another shelf to the nearest free front slot on that destination shelf; same-shelf occupied targets leave the item in its original slot.
 - Clear triples with `_clear_matching_shelves()` and `_play_match_clear_animation()`.
 - Track cleared triples and locked shelf accessibility with `_record_triples_cleared()`, `_update_locked_shelves()`, and shelf metadata from `unlock_after_triples`.
-- Render locked shelf overlays at runtime and keep locked shelves out of move, match, promotion, and ability targeting.
+- Render locked shelf lock-icon overlays with the remaining triple count at runtime and keep locked shelves out of move, match, promotion, and ability targeting.
 - Play placement and triple-clear sound effects with runtime `AudioStreamPlayer` nodes.
 - Track clearing items so only disappearing items ignore input and abilities during the animation.
 - Track transitioning items so newly promoted back-layer items ignore input and abilities until their forward slide finishes.

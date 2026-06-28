@@ -78,7 +78,7 @@ Runtime behavior:
 - `scripts/level.gd` instantiates one `scenes/shelf.tscn` cell for each configured shelf.
 - `scripts/level.gd` uses `layout_preset` to choose the grid columns or fixed staggered shelf pattern, then packs generated shelf cells with overlapping shared boundaries.
 - `scripts/level.gd` uses `time_seconds` as the active timer.
-- Locked shelves show a runtime overlay with the remaining triple count and cannot be used as move sources, move targets, match clears, promotions, or ability targets until unlocked.
+- Locked shelves show a runtime lock overlay with the remaining triple count on the lock and cannot be used as move sources, move targets, match clears, promotions, or ability targets until unlocked.
 - Hammer clears count as cleared triples for shelf unlocking.
 
 Validation:
