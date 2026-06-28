@@ -105,6 +105,7 @@ Depends on:
 - `scenes/shelf.tscn` slot names and item snap marker names.
 - `scenes/pause_menu.tscn` button node names used under `UI/PauseMenuOverlay`.
 - `scenes/item.tscn` and `ShelfItem`.
+- `assets/ui/lock_shelf_cutout.png` for locked shelf overlays.
 - `assets/audio/item_place.wav` and `assets/audio/triple_clear.wav`.
 - `configs/item_sprites.json` item IDs and texture paths.
 - `configs/levels/level_*.json` shelf schema.

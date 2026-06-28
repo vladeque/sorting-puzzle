@@ -20,6 +20,7 @@ const DEFAULT_LAYOUT_PRESET := "grid_3x3"
 const MAIN_MENU_SCENE := "res://scenes/main_menu.tscn"
 const ITEM_PLACE_SOUND := preload("res://assets/audio/item_place.wav")
 const TRIPLE_CLEAR_SOUND := preload("res://assets/audio/triple_clear.wav")
+const LOCK_SHELF_TEXTURE := preload("res://assets/ui/lock_shelf_cutout.png")
 const PAUSE_SETTING_SOUND_EFFECTS := &"sound_effects"
 const SHELF_UNLOCK_REQUIREMENT_META := &"unlock_after_triples"
 const SHELF_LOCKED_META := &"is_locked"
@@ -495,79 +496,24 @@ func _create_shelf_lock_overlay() -> Node2D:
 	])
 	overlay.add_child(shade)
 
-	var lock_shadow := Polygon2D.new()
-	lock_shadow.name = "LockShadow"
-	lock_shadow.position = Vector2(0, 5)
-	lock_shadow.color = Color(0.0, 0.0, 0.0, 0.32)
-	lock_shadow.polygon = PackedVector2Array([
-		Vector2(-52, -16),
-		Vector2(52, -16),
-		Vector2(52, 44),
-		Vector2(-52, 44),
-	])
-	overlay.add_child(lock_shadow)
-
-	var shackle := Line2D.new()
-	shackle.name = "LockShackle"
-	shackle.z_index = 1
-	shackle.width = 12.0
-	shackle.default_color = Color(0.98, 0.82, 0.42, 1.0)
-	shackle.points = PackedVector2Array([
-		Vector2(-34, -12),
-		Vector2(-34, -34),
-		Vector2(-24, -52),
-		Vector2(0, -60),
-		Vector2(24, -52),
-		Vector2(34, -34),
-		Vector2(34, -12),
-	])
-	overlay.add_child(shackle)
-
-	var shackle_highlight := Line2D.new()
-	shackle_highlight.name = "LockShackleHighlight"
-	shackle_highlight.z_index = 2
-	shackle_highlight.width = 3.0
-	shackle_highlight.default_color = Color(1.0, 0.95, 0.72, 0.72)
-	shackle_highlight.points = PackedVector2Array([
-		Vector2(-25, -18),
-		Vector2(-25, -35),
-		Vector2(-15, -48),
-		Vector2(0, -52),
-		Vector2(15, -48),
-	])
-	overlay.add_child(shackle_highlight)
-
-	var lock_body := Polygon2D.new()
-	lock_body.name = "LockBody"
-	lock_body.z_index = 3
-	lock_body.color = Color(0.95, 0.62, 0.18, 1.0)
-	lock_body.polygon = PackedVector2Array([
-		Vector2(-52, -16),
-		Vector2(52, -16),
-		Vector2(52, 44),
-		Vector2(-52, 44),
-	])
-	overlay.add_child(lock_body)
-
-	var lock_body_highlight := Line2D.new()
-	lock_body_highlight.name = "LockBodyHighlight"
-	lock_body_highlight.z_index = 4
-	lock_body_highlight.width = 3.0
-	lock_body_highlight.default_color = Color(1.0, 0.9, 0.52, 0.62)
-	lock_body_highlight.points = PackedVector2Array([
-		Vector2(-42, -7),
-		Vector2(42, -7),
-	])
-	overlay.add_child(lock_body_highlight)
+	var lock_sprite := Sprite2D.new()
+	lock_sprite.name = "LockSprite"
+	lock_sprite.texture = LOCK_SHELF_TEXTURE
+	lock_sprite.position = Vector2(0, -8)
+	lock_sprite.z_index = 2
+	var texture_size := LOCK_SHELF_TEXTURE.get_size()
+	var target_size := Vector2(104, 104)
+	lock_sprite.scale = Vector2.ONE * minf(target_size.x / texture_size.x, target_size.y / texture_size.y)
+	overlay.add_child(lock_sprite)
 
 	var count_label := Label.new()
 	count_label.name = "RemainingLabel"
-	count_label.z_index = 5
-	count_label.position = Vector2(-44, -14)
-	count_label.size = Vector2(88, 56)
+	count_label.z_index = 3
+	count_label.position = Vector2(-38, -15)
+	count_label.size = Vector2(76, 44)
 	count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	count_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	count_label.add_theme_font_size_override("font_size", 42)
+	count_label.add_theme_font_size_override("font_size", 36)
 	count_label.add_theme_color_override("font_color", Color(1.0, 1.0, 0.92, 1.0))
 	count_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.9))
 	count_label.add_theme_constant_override("shadow_offset_x", 0)
