@@ -15,6 +15,24 @@ SLOTS_PER_SHELF = 3
 DEFAULT_ITEM_CONFIG = Path("configs/item_sprites.json")
 ROW_MOTION_HORIZONTAL_WRAP = "horizontal_wrap"
 ROW_VISUAL_VARIANTS = {"full", "floor_only"}
+LAYOUT_GRID_3X3_MOVING_5_BOTTOM = "grid_3x3_moving_5_bottom"
+LAYOUT_PRESET_ROW_LAYOUTS: dict[str, list[dict[str, Any]]] = {
+    LAYOUT_GRID_3X3_MOVING_5_BOTTOM: [
+        {"shelf_count": 3},
+        {"shelf_count": 3},
+        {"shelf_count": 3},
+        {
+            "shelf_count": 5,
+            "visible_count": 3,
+            "motion": {
+                "type": ROW_MOTION_HORIZONTAL_WRAP,
+                "speed": 70,
+                "direction": "right",
+            },
+            "visual_variant": "floor_only",
+        },
+    ],
+}
 
 Item = str | None
 Layer = tuple[Item, Item, Item]
@@ -78,14 +96,17 @@ def load_shelves(path: Path, shelves_only: bool) -> list[dict[str, Any]]:
 
 
 def validate_row_layouts_shape(level_data: Any, shelves: list[dict[str, Any]]) -> list[str]:
-    if not isinstance(level_data, dict) or "row_layouts" not in level_data:
+    if not isinstance(level_data, dict):
         return []
 
-    errors = []
-    row_layouts = level_data.get("row_layouts")
+    row_layouts = get_effective_row_layouts(level_data)
+    if row_layouts is None:
+        return []
+
     if not isinstance(row_layouts, list) or not row_layouts:
         return ["row_layouts must be a non-empty array when present"]
 
+    errors = []
     total_shelf_count = 0
     for row_index, row_layout in enumerate(row_layouts):
         row_number = row_index + 1
@@ -135,6 +156,17 @@ def validate_row_layouts_shape(level_data: Any, shelves: list[dict[str, Any]]) -
         errors.append(f"row_layouts shelf_count total is {total_shelf_count}, expected {len(shelves)} shelves")
 
     return errors
+
+
+def get_effective_row_layouts(level_data: dict[str, Any]) -> Any:
+    if "row_layouts" in level_data:
+        return level_data.get("row_layouts")
+
+    layout_preset = level_data.get("layout_preset")
+    if isinstance(layout_preset, str):
+        return LAYOUT_PRESET_ROW_LAYOUTS.get(layout_preset)
+
+    return None
 
 
 def validate_row_motion_shape(row_layout: dict[str, Any], row_index: int) -> list[str]:

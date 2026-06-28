@@ -47,6 +47,7 @@ Supported layout presets:
 - `grid_3x4`
 - `grid_3x5`
 - `grid_4x3`
+- `grid_3x3_moving_5_bottom`: 14 shelves arranged as a 3x3 static grid plus a bottom row of five moving shelves, with three moving shelves visible at once.
 - `staggered_5_4_5`: 14 shelves arranged as five left, four centered, five right.
 - `staggered_4_5_4`: 13 shelves arranged as four left, five centered, four right.
 
@@ -79,6 +80,7 @@ Row layout rules:
 - `motion.direction` supports `right` and `left`.
 - `visual_variant` supports `full` and `floor_only`. Moving rows default to `floor_only`; static rows default to `full`.
 - Locked shelves are not allowed inside moving rows.
+- `grid_3x3_moving_5_bottom` is a shorthand preset for three static rows of three shelves plus the bottom moving row from the example above.
 
 Shelf shape:
 

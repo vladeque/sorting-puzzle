@@ -207,7 +207,7 @@ Purpose:
 
 Key inputs:
 - Shelf count, layer count, filled layer count, difficulty, seed, layout preset, item type filters, and optional solvability requirements.
-- Layout preset values mirror `scripts/level.gd`, including fixed-count staggered presets for 14-shelf `staggered_5_4_5` and 13-shelf `staggered_4_5_4` layouts.
+- Layout preset values mirror `scripts/level.gd`, including fixed-count staggered presets for 14-shelf `staggered_5_4_5`, 13-shelf `staggered_4_5_4`, and 14-shelf `grid_3x3_moving_5_bottom` layouts.
 
 Generation constraints:
 - Difficulty presets cap how many copies of the same item can appear on one filled layer.

@@ -18,6 +18,7 @@ const ITEM_SPRITES_CONFIG := "res://configs/item_sprites.json"
 const LEVEL_CONFIG_TEMPLATE := "res://configs/levels/level_%03d.json"
 const DEFAULT_LEVEL_CONFIG := "res://configs/levels/level_001.json"
 const DEFAULT_LAYOUT_PRESET := "grid_3x3"
+const LAYOUT_GRID_3X3_MOVING_5_BOTTOM := "grid_3x3_moving_5_bottom"
 const MAIN_MENU_SCENE := "res://scenes/main_menu.tscn"
 const ITEM_PLACE_SOUND := preload("res://assets/audio/item_place.wav")
 const TRIPLE_CLEAR_SOUND := preload("res://assets/audio/triple_clear.wav")
@@ -29,6 +30,7 @@ const ROW_LAYOUTS_KEY := "row_layouts"
 const ROW_MOTION_HORIZONTAL_WRAP := "horizontal_wrap"
 const SHELF_VISUAL_VARIANT_FULL := "full"
 const SHELF_VISUAL_VARIANT_FLOOR_ONLY := "floor_only"
+const DEFAULT_MOVING_ROW_SPEED := 70.0
 const SHELF_FLOOR_ONLY_HIDDEN_NODES := [
 	"BackWall",
 	"BackWallLeftShade",
@@ -291,6 +293,8 @@ func _apply_level_config(config: Dictionary) -> void:
 	var row_layouts := config.get(ROW_LAYOUTS_KEY, []) as Array
 	if row_layouts != null and not row_layouts.is_empty():
 		_add_row_layout_shelves(shelves, shelves_config, row_layouts)
+	elif _layout_preset_has_row_layout(_layout_preset):
+		_add_row_layout_shelves(shelves, shelves_config, _get_layout_preset_row_layouts(_layout_preset))
 	else:
 		_add_preset_layout_shelves(shelves, shelves_config)
 
@@ -481,6 +485,32 @@ func _get_row_visible_count(row_config: Dictionary, row_shelf_count: int, is_mov
 func _get_row_visual_variant(row_config: Dictionary, is_moving: bool) -> String:
 	var default_variant := SHELF_VISUAL_VARIANT_FLOOR_ONLY if is_moving else SHELF_VISUAL_VARIANT_FULL
 	return str(row_config.get("visual_variant", default_variant)).to_lower()
+
+
+func _layout_preset_has_row_layout(layout_preset: String) -> bool:
+	return not _get_layout_preset_row_layouts(layout_preset).is_empty()
+
+
+func _get_layout_preset_row_layouts(layout_preset: String) -> Array:
+	match layout_preset:
+		LAYOUT_GRID_3X3_MOVING_5_BOTTOM:
+			return [
+				{"shelf_count": 3},
+				{"shelf_count": 3},
+				{"shelf_count": 3},
+				{
+					"shelf_count": 5,
+					"visible_count": 3,
+					"motion": {
+						"type": ROW_MOTION_HORIZONTAL_WRAP,
+						"speed": DEFAULT_MOVING_ROW_SPEED,
+						"direction": "right",
+					},
+					"visual_variant": SHELF_VISUAL_VARIANT_FLOOR_ONLY,
+				},
+			]
+		_:
+			return []
 
 
 func _apply_shelf_visual_variant(shelf: Node2D, visual_variant: String) -> void:

@@ -158,6 +158,7 @@ Files:
 Responsibility:
 - Stores level number, time limit, layout preset, and shelf layers.
 - Supports optional row layout configs for static and moving shelf rows.
+- Supports the `grid_3x3_moving_5_bottom` preset for a 3x3 static grid plus a five-shelf moving bottom row.
 - Supports optional per-shelf triple-clear unlock requirements.
 - Generates shelf configs from difficulty, item, shelf, and layer settings.
 - Validates shelf shape, known item IDs, row layout shape, item counts, and bounded solvability.

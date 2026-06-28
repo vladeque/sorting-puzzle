@@ -24,6 +24,7 @@ LAYOUT_PRESETS = (
     "grid_3x4",
     "grid_3x5",
     "grid_4x3",
+    "grid_3x3_moving_5_bottom",
     "staggered_5_4_5",
     "staggered_4_5_4",
 )
