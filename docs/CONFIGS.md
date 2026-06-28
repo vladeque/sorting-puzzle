@@ -53,6 +53,7 @@ Shelf shape:
 
 ```json
 {
+  "unlock_after_triples": 3,
   "layers": [
     ["milk_carton", "chips_can", null],
     ["milk_carton", "chips_can", "toy_robot"]
@@ -61,6 +62,8 @@ Shelf shape:
 ```
 
 Layer rules:
+- `unlock_after_triples` is optional. Omit it or set `0` for shelves that are accessible at level start.
+- A positive `unlock_after_triples` keeps the shelf inaccessible until the player has cleared that many triples.
 - Each shelf must contain a non-empty `layers` array.
 - Each layer must contain exactly three slots.
 - Slot values must be item ID strings or `null`.
@@ -75,6 +78,8 @@ Runtime behavior:
 - `scripts/level.gd` instantiates one `scenes/shelf.tscn` cell for each configured shelf.
 - `scripts/level.gd` uses `layout_preset` to choose the grid columns or fixed staggered shelf pattern, then packs generated shelf cells with overlapping shared boundaries.
 - `scripts/level.gd` uses `time_seconds` as the active timer.
+- Locked shelves show a runtime overlay with the remaining triple count and cannot be used as move sources, move targets, match clears, promotions, or ability targets until unlocked.
+- Hammer clears count as cleared triples for shelf unlocking.
 
 Validation:
 
@@ -89,6 +94,12 @@ py scripts\tools\generate_level_shelves.py --shelf-count 9 --layer-count 2 --dif
 ```
 
 Use `--max-items-per-type` when a generated level should have a lower global item repetition cap than the layer-based default. If the item catalog cannot fill the board within that cap, the generator leaves additional slots empty rather than exceeding the requested cap.
+
+Use `--locked-shelves` to add unlock requirements to generated shelves. Entries are 1-based shelf numbers and required cleared triples:
+
+```powershell
+py scripts\tools\generate_level_shelves.py --shelf-count 9 --layer-count 2 --difficulty medium --locked-shelves 7:3,8:5 --validate
+```
 
 ## Documentation Update Checklist
 

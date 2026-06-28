@@ -16,8 +16,14 @@ DEFAULT_ITEM_CONFIG = Path("configs/item_sprites.json")
 
 Item = str | None
 Layer = tuple[Item, Item, Item]
-Shelf = tuple[Layer, ...]
-State = tuple[Shelf, ...]
+
+
+class ShelfState(NamedTuple):
+    unlock_after_triples: int
+    layers: tuple[Layer, ...]
+
+
+State = tuple[int, tuple[ShelfState, ...]]
 
 
 class Move(NamedTuple):
@@ -81,6 +87,10 @@ def validate_shelves_shape(
             errors.append(f"shelf {shelf_index + 1} must be an object")
             continue
 
+        unlock_after_triples = shelf.get("unlock_after_triples", 0)
+        if type(unlock_after_triples) is not int or unlock_after_triples < 0:
+            errors.append(f"shelf {shelf_index + 1} unlock_after_triples must be a non-negative integer")
+
         layers = shelf.get("layers")
         if not isinstance(layers, list) or not layers:
             errors.append(f"shelf {shelf_index + 1} must contain a non-empty layers array")
@@ -123,28 +133,42 @@ def shelves_to_state(shelves: list[dict[str, Any]]) -> State:
         layers = []
         for layer in shelf["layers"]:
             layers.append(tuple(layer))
-        state_shelves.append(tuple(layers))
+        state_shelves.append(
+            ShelfState(
+                unlock_after_triples=max(0, int(shelf.get("unlock_after_triples", 0))),
+                layers=tuple(layers),
+            )
+        )
 
-    return tuple(state_shelves)
+    return (0, tuple(state_shelves))
 
 
 def slot_sort_key(item: Item) -> tuple[int, str]:
     return (1, "") if item is None else (0, item)
 
 
-def shelf_sort_key(shelf: Shelf) -> tuple[tuple[tuple[int, str], ...], ...]:
-    return tuple(tuple(slot_sort_key(item) for item in layer) for layer in shelf)
+def shelf_sort_key(shelf: ShelfState) -> tuple[int, tuple[tuple[tuple[int, str], ...], ...]]:
+    return (
+        shelf.unlock_after_triples,
+        tuple(tuple(slot_sort_key(item) for item in layer) for layer in shelf.layers),
+    )
 
 
 def canonicalize_state(state: State) -> State:
+    triples_cleared, shelves = state
     canonical_shelves = []
-    for shelf in state:
+    for shelf in shelves:
         canonical_layers = []
-        for layer in shelf:
+        for layer in shelf.layers:
             canonical_layers.append(tuple(sorted(layer, key=slot_sort_key)))
-        canonical_shelves.append(tuple(canonical_layers))
+        canonical_shelves.append(
+            ShelfState(
+                unlock_after_triples=shelf.unlock_after_triples,
+                layers=tuple(canonical_layers),
+            )
+        )
 
-    return tuple(sorted(canonical_shelves, key=shelf_sort_key))
+    return (triples_cleared, tuple(sorted(canonical_shelves, key=shelf_sort_key)))
 
 
 def is_empty_layer(layer: Layer) -> bool:
@@ -156,20 +180,39 @@ def is_matching_layer(layer: Layer) -> bool:
     return first is not None and all(item == first for item in layer)
 
 
+def is_shelf_unlocked(shelf: ShelfState, triples_cleared: int) -> bool:
+    return shelf.unlock_after_triples <= triples_cleared
+
+
 def settle_state(state: State) -> State:
-    shelves = [list(shelf) for shelf in state]
+    triples_cleared, state_shelves = state
+    shelves = [list(shelf.layers) for shelf in state_shelves]
     changed = True
 
     while changed:
         changed = False
         for shelf_index, shelf in enumerate(shelves):
-            while shelf and (is_empty_layer(shelf[0]) or is_matching_layer(shelf[0])):
+            shelf_state = state_shelves[shelf_index]
+            while shelf and is_shelf_unlocked(shelf_state, triples_cleared) and (
+                is_empty_layer(shelf[0]) or is_matching_layer(shelf[0])
+            ):
+                if is_matching_layer(shelf[0]):
+                    triples_cleared += 1
                 shelf.pop(0)
                 changed = True
 
             shelves[shelf_index] = shelf
 
-    return tuple(tuple(shelf) for shelf in shelves)
+    settled_shelves = []
+    for shelf_index, layers in enumerate(shelves):
+        settled_shelves.append(
+            ShelfState(
+                unlock_after_triples=state_shelves[shelf_index].unlock_after_triples,
+                layers=tuple(layers),
+            )
+        )
+
+    return (triples_cleared, tuple(settled_shelves))
 
 
 def normalize_state(state: State) -> State:
@@ -177,21 +220,25 @@ def normalize_state(state: State) -> State:
 
 
 def is_cleared(state: State) -> bool:
-    return all(len(shelf) == 0 for shelf in state)
+    return all(len(shelf.layers) == 0 for shelf in state[1])
 
 
-def visible_layer(shelf: Shelf) -> Layer:
-    if not shelf:
+def visible_layer(shelf: ShelfState) -> Layer:
+    if not shelf.layers:
         return (None, None, None)
 
-    return shelf[0]
+    return shelf.layers[0]
 
 
 def legal_moves(state: State) -> list[Move]:
     sources = []
     targets = []
+    triples_cleared, shelves = state
 
-    for shelf_index, shelf in enumerate(state):
+    for shelf_index, shelf in enumerate(shelves):
+        if not is_shelf_unlocked(shelf, triples_cleared):
+            continue
+
         front = visible_layer(shelf)
         for slot_index, item_id in enumerate(front):
             if item_id is None:
@@ -212,10 +259,11 @@ def legal_moves(state: State) -> list[Move]:
 
 
 def move_score(state: State, move: Move) -> int:
-    target_front = visible_layer(state[move.to_shelf])
+    shelves = state[1]
+    target_front = visible_layer(shelves[move.to_shelf])
     target_same_count = sum(1 for item_id in target_front if item_id == move.item_id)
     target_empty_count = sum(1 for item_id in target_front if item_id is None)
-    source_front = visible_layer(state[move.from_shelf])
+    source_front = visible_layer(shelves[move.from_shelf])
     source_remaining_count = sum(1 for item_id in source_front if item_id == move.item_id) - 1
 
     score = target_same_count * 10
@@ -227,7 +275,8 @@ def move_score(state: State, move: Move) -> int:
 
 
 def apply_move(state: State, move: Move) -> State:
-    shelves = [[list(layer) for layer in shelf] for shelf in state]
+    triples_cleared, state_shelves = state
+    shelves = [[list(layer) for layer in shelf.layers] for shelf in state_shelves]
 
     if not shelves[move.to_shelf]:
         shelves[move.to_shelf].append([None, None, None])
@@ -235,7 +284,16 @@ def apply_move(state: State, move: Move) -> State:
     shelves[move.from_shelf][0][move.from_slot] = None
     shelves[move.to_shelf][0][move.to_slot] = move.item_id
 
-    return tuple(tuple(tuple(layer) for layer in shelf) for shelf in shelves)
+    moved_shelves = []
+    for shelf_index, shelf in enumerate(shelves):
+        moved_shelves.append(
+            ShelfState(
+                unlock_after_triples=state_shelves[shelf_index].unlock_after_triples,
+                layers=tuple(tuple(layer) for layer in shelf),
+            )
+        )
+
+    return (triples_cleared, tuple(moved_shelves))
 
 
 def solve_level(initial_state: State, max_states: int, max_depth: int, keep_solution: bool) -> SearchResult:

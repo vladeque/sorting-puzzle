@@ -85,6 +85,8 @@ Key responsibilities:
 - Move items with `_move_item_to_slot()`, `_resolve_move_target_slot()`, `_play_item_move_animation()`, and `_place_item_in_slot()`.
 - Redirect moves aimed at an occupied destination slot on another shelf to the nearest free front slot on that destination shelf; same-shelf occupied targets leave the item in its original slot.
 - Clear triples with `_clear_matching_shelves()` and `_play_match_clear_animation()`.
+- Track cleared triples and locked shelf accessibility with `_record_triples_cleared()`, `_update_locked_shelves()`, and shelf metadata from `unlock_after_triples`.
+- Render locked shelf overlays at runtime and keep locked shelves out of move, match, promotion, and ability targeting.
 - Play placement and triple-clear sound effects with runtime `AudioStreamPlayer` nodes.
 - Track clearing items so only disappearing items ignore input and abilities during the animation.
 - Track transitioning items so newly promoted back-layer items ignore input and abilities until their forward slide finishes.
@@ -94,6 +96,7 @@ Key responsibilities:
 - Pause and resume active gameplay through the top-right menu button, the instanced `UI/PauseMenuOverlay`, `Leave`, and `Continue`.
 - Disable item placement and triple-clear sound effects while the pause menu sound-effects toggle is crossed out.
 - Manage hammer, shuffle, and highlight abilities.
+- Count hammer destroys as cleared triples for shelf unlocking.
 - Let highlight uses start their timed window even when no immediate triple can currently be highlighted.
 - Apply highlight ability visuals through `ShelfItem.set_outline()` so only item silhouettes receive a border, and update the highlight button countdown label while that window is active.
 
@@ -176,6 +179,7 @@ Generation constraints:
 - Difficulty presets cap how many copies of the same item can appear on one filled layer.
 - The generator derives the default total item cap per type from the per-layer cap and the filled layer count, then rounds that cap down to a valid multiple of three.
 - `--max-items-per-type` can lower the derived total cap for special levels that need less overall repetition, such as limiting a four-layer level to six copies of each item type.
+- `--locked-shelves` can add per-shelf `unlock_after_triples` requirements using 1-based shelf numbers such as `7:3,8:5`.
 - When the item catalog cannot satisfy the target filled-slot count within the effective per-type cap, the generator adds extra empty slots instead of exceeding the cap.
 - Generated layouts reshuffle shelf slots to reduce same-item concentration on a single filled layer, using an adaptive per-layer limit so constrained levels remain possible.
 - Hard and expert difficulties still avoid shelves that start with a complete front-layer match.
@@ -198,10 +202,12 @@ Purpose:
 Checks:
 - Level has shelves.
 - Shelves have non-empty `layers` arrays.
+- Optional `unlock_after_triples` values are non-negative integers.
 - Each layer has exactly three slots.
 - Slot values are item ID strings or `null`.
 - Item IDs exist in `configs/item_sprites.json` unless skipped.
 - Item counts are multiples of three.
+- Solvability search mirrors locked shelf timing by counting auto-cleared triples and only allowing moves on unlocked shelves.
 
 Use when:
 - Reviewing generated levels or hand-authored level JSON.

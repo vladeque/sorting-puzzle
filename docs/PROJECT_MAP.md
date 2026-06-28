@@ -52,6 +52,7 @@ Responsibility:
 - Spawns `ShelfItem` instances from config layers.
 - Handles mouse and touch interaction.
 - Resolves matches of three identical visible items on the same shelf, including the gather-and-shrink clear animation.
+- Tracks cleared triples and unlocks shelves whose configs require progress before becoming accessible.
 - Plays item placement and triple-clear sound effects.
 - Keeps non-clearing items interactive while match animations run, with pending shelf resolves queued behind the active animation.
 - Promotes back layers when the visible layer clears.
@@ -135,6 +136,7 @@ Files:
 
 Responsibility:
 - Stores level number, time limit, layout preset, and shelf layers.
+- Supports optional per-shelf triple-clear unlock requirements.
 - Generates shelf configs from difficulty, item, shelf, and layer settings.
 - Validates shelf shape, known item IDs, item counts, and bounded solvability.
 
@@ -163,6 +165,11 @@ Change shelf layout spacing:
 Change matching rules:
 - Update `_clear_matching_shelves()`, `_resolve_shelves()`, and related validation logic if the data rules also change.
 - Update `scripts/tools/validate_level_solvable.py` so generated or validated levels match runtime behavior.
+
+Change shelf unlock rules:
+- Update `scripts/level.gd` shelf lock helpers, ability item collection, and match/promotion filters.
+- Update `scripts/tools/validate_level_solvable.py` when unlock timing or counting semantics change.
+- Keep `docs/CONFIGS.md` and generator `--locked-shelves` behavior aligned with the level JSON field.
 
 Change drag or tap movement:
 - Update `_input()`, `_handle_press_at()`, `_handle_motion_at()`, `_handle_release_at()`, `_move_item_to_slot()`, `_resolve_move_target_slot()`, and slot lookup helpers in `scripts/level.gd`.

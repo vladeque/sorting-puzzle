@@ -102,6 +102,49 @@ def parse_item_types(raw_item_types: str | None, item_config_path: Path) -> list
     return load_item_ids(item_config_path)
 
 
+def parse_locked_shelves(raw_locked_shelves: str | None) -> dict[int, int]:
+    if not raw_locked_shelves:
+        return {}
+
+    locked_shelves: dict[int, int] = {}
+    for raw_entry in raw_locked_shelves.split(","):
+        entry = raw_entry.strip()
+        if not entry:
+            continue
+
+        parts = entry.split(":")
+        if len(parts) != 2:
+            raise ValueError("--locked-shelves entries must use SHELF:TRIPLES")
+
+        try:
+            shelf_number = int(parts[0])
+            unlock_after_triples = int(parts[1])
+        except ValueError as error:
+            raise ValueError("--locked-shelves entries must contain integers") from error
+
+        if shelf_number <= 0:
+            raise ValueError("--locked-shelves shelf numbers are 1-based and must be positive")
+        if unlock_after_triples < 0:
+            raise ValueError("--locked-shelves triple counts must be non-negative")
+
+        locked_shelves[shelf_number] = unlock_after_triples
+
+    return locked_shelves
+
+
+def apply_locked_shelves(shelves: list[dict[str, Any]], locked_shelves: dict[int, int]) -> None:
+    for shelf_number, unlock_after_triples in locked_shelves.items():
+        if shelf_number > len(shelves):
+            raise ValueError(
+                f"--locked-shelves references shelf {shelf_number}, but only {len(shelves)} shelves exist"
+            )
+
+        if unlock_after_triples > 0:
+            shelves[shelf_number - 1]["unlock_after_triples"] = unlock_after_triples
+        else:
+            shelves[shelf_number - 1].pop("unlock_after_triples", None)
+
+
 def calculate_filled_slots(total_slots: int, preset: DifficultyPreset, rng: random.Random) -> int:
     empty_ratio = rng.uniform(preset.empty_ratio_min, preset.empty_ratio_max)
     target_empty_slots = round(total_slots * empty_ratio)
@@ -332,10 +375,12 @@ def generate_with_optional_validation(
     item_config_path: Path,
     max_states: int,
     max_depth: int,
+    locked_shelves: dict[int, int] | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any], dict[str, Any] | None, int | None]:
     attempts = max(1, max_attempts if require_solvable else 1)
     random_seed_source = random.SystemRandom()
     last_result = None
+    locked_shelves = locked_shelves or {}
 
     for attempt_index in range(attempts):
         attempt_seed = seed + attempt_index if seed is not None else random_seed_source.randrange(1, 2**31)
@@ -348,8 +393,13 @@ def generate_with_optional_validation(
             seed=attempt_seed,
             max_items_per_type_override=max_items_per_type_override,
         )
+        apply_locked_shelves(shelves, locked_shelves)
         stats["attempt"] = attempt_index + 1
         stats["max_attempts"] = attempts
+        stats["locked_shelves"] = {
+            str(shelf_number): unlock_after_triples
+            for shelf_number, unlock_after_triples in sorted(locked_shelves.items())
+        }
 
         validation = None
         if should_validate or require_solvable:
@@ -804,6 +854,13 @@ def parse_args() -> argparse.Namespace:
             "The effective value is rounded down to a multiple of three."
         ),
     )
+    parser.add_argument(
+        "--locked-shelves",
+        help=(
+            "Comma-separated 1-based shelf unlock requirements, such as 7:3,8:5. "
+            "Each shelf unlocks after that many cleared triples."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -815,6 +872,7 @@ def main() -> int:
 
     try:
         item_types = parse_item_types(args.item_types, args.item_config)
+        locked_shelves = parse_locked_shelves(args.locked_shelves)
         shelves, stats, validation, used_seed = generate_with_optional_validation(
             shelf_count=args.shelf_count,
             layer_count=args.layer_count,
@@ -829,6 +887,7 @@ def main() -> int:
             item_config_path=args.item_config,
             max_states=args.validator_max_states,
             max_depth=args.validator_max_depth,
+            locked_shelves=locked_shelves,
         )
     except (OSError, ValueError, KeyError) as error:
         print(f"error: {error}", file=sys.stderr)

@@ -21,6 +21,9 @@ const MAIN_MENU_SCENE := "res://scenes/main_menu.tscn"
 const ITEM_PLACE_SOUND := preload("res://assets/audio/item_place.wav")
 const TRIPLE_CLEAR_SOUND := preload("res://assets/audio/triple_clear.wav")
 const PAUSE_SETTING_SOUND_EFFECTS := &"sound_effects"
+const SHELF_UNLOCK_REQUIREMENT_META := &"unlock_after_triples"
+const SHELF_LOCKED_META := &"is_locked"
+const LOCKED_OVERLAY_NAME := "LockedOverlay"
 
 @export var slot_snap_distance := 98.0
 @export var item_pick_size := Vector2(74, 112)
@@ -85,6 +88,7 @@ var _transitioning_item_ids: Array[int] = []
 var _item_place_audio_player: AudioStreamPlayer
 var _triple_clear_audio_player: AudioStreamPlayer
 var _sound_effects_enabled := true
+var _triples_cleared := 0
 
 
 func _ready() -> void:
@@ -254,6 +258,7 @@ func _apply_level_config(config: Dictionary) -> void:
 	_level_failed = false
 	_level_completed = false
 	_level_paused = false
+	_triples_cleared = 0
 	_completion_return_time_remaining = 0.0
 	_returning_to_menu = false
 	_failure_panel.visible = false
@@ -279,7 +284,9 @@ func _apply_level_config(config: Dictionary) -> void:
 		var layers := shelf_config.get("layers", []) as Array
 		_max_layer_count = maxi(_max_layer_count, layers.size())
 		_add_configured_layers(shelf, layers)
+		_configure_shelf_unlock(shelf, shelf_config)
 
+	_update_locked_shelves()
 	_resolve_shelves(_get_all_shelves())
 	_check_level_completed()
 	_update_pause_menu_button()
@@ -404,6 +411,126 @@ func _add_configured_layers(shelf: Node2D, layers: Array) -> void:
 		var fill_count = mini(SLOT_COUNT, item_ids.size())
 		for slot_index in range(fill_count):
 			_add_configured_item(layer_slots[slot_index], item_ids[slot_index], layer_index, slot_index)
+
+
+func _configure_shelf_unlock(shelf: Node2D, shelf_config: Dictionary) -> void:
+	var unlock_after_triples := maxi(int(shelf_config.get("unlock_after_triples", 0)), 0)
+	shelf.set_meta(SHELF_UNLOCK_REQUIREMENT_META, unlock_after_triples)
+	shelf.set_meta(SHELF_LOCKED_META, false)
+
+
+func _record_triples_cleared(triple_count: int) -> void:
+	if triple_count <= 0:
+		return
+
+	_triples_cleared += triple_count
+	var newly_unlocked_shelves := _update_locked_shelves()
+	_queue_shelves_to_resolve(newly_unlocked_shelves)
+
+
+func _update_locked_shelves() -> Array[Node]:
+	var newly_unlocked_shelves: Array[Node] = []
+	for shelf in _get_all_shelves():
+		var shelf_node := shelf as Node2D
+		if shelf_node == null:
+			continue
+
+		var was_locked := _is_shelf_locked(shelf_node)
+		var should_lock := _get_shelf_unlock_requirement(shelf_node) > _triples_cleared
+		shelf_node.set_meta(SHELF_LOCKED_META, should_lock)
+		_update_shelf_lock_overlay(shelf_node, should_lock)
+		_update_shelf_input_pickable(shelf_node, not should_lock)
+
+		if was_locked and not should_lock:
+			newly_unlocked_shelves.append(shelf_node)
+
+	return newly_unlocked_shelves
+
+
+func _get_shelf_unlock_requirement(shelf: Node) -> int:
+	if shelf == null:
+		return 0
+
+	return maxi(int(shelf.get_meta(SHELF_UNLOCK_REQUIREMENT_META, 0)), 0)
+
+
+func _is_shelf_locked(shelf: Node) -> bool:
+	return shelf != null and bool(shelf.get_meta(SHELF_LOCKED_META, false))
+
+
+func _is_slot_locked(slot: Node) -> bool:
+	return _is_shelf_locked(_get_owning_shelf(slot))
+
+
+func _update_shelf_lock_overlay(shelf: Node2D, should_lock: bool) -> void:
+	var overlay := shelf.get_node_or_null(LOCKED_OVERLAY_NAME) as Node2D
+	if not should_lock:
+		if overlay != null:
+			overlay.queue_free()
+		return
+
+	if overlay == null:
+		overlay = _create_shelf_lock_overlay()
+		shelf.add_child(overlay)
+
+	var remaining := maxi(_get_shelf_unlock_requirement(shelf) - _triples_cleared, 0)
+	var count_label := overlay.get_node_or_null("RemainingLabel") as Label
+	if count_label != null:
+		count_label.text = str(remaining)
+
+
+func _create_shelf_lock_overlay() -> Node2D:
+	var overlay := Node2D.new()
+	overlay.name = LOCKED_OVERLAY_NAME
+	overlay.z_index = 40
+
+	var shade := Polygon2D.new()
+	shade.name = "Shade"
+	shade.color = Color(0.04, 0.05, 0.06, 0.62)
+	shade.polygon = PackedVector2Array([
+		Vector2(-104, -81),
+		Vector2(104, -81),
+		Vector2(104, 46),
+		Vector2(-104, 46),
+	])
+	overlay.add_child(shade)
+
+	var title_label := Label.new()
+	title_label.name = "TitleLabel"
+	title_label.position = Vector2(-64, -64)
+	title_label.size = Vector2(128, 26)
+	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	title_label.text = "LOCKED"
+	title_label.add_theme_font_size_override("font_size", 20)
+	title_label.add_theme_color_override("font_color", Color(1.0, 0.96, 0.82, 1.0))
+	title_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.85))
+	title_label.add_theme_constant_override("shadow_offset_x", 0)
+	title_label.add_theme_constant_override("shadow_offset_y", 2)
+	overlay.add_child(title_label)
+
+	var count_label := Label.new()
+	count_label.name = "RemainingLabel"
+	count_label.position = Vector2(-44, -34)
+	count_label.size = Vector2(88, 58)
+	count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	count_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	count_label.add_theme_font_size_override("font_size", 42)
+	count_label.add_theme_color_override("font_color", Color(1.0, 0.78, 0.32, 1.0))
+	count_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.9))
+	count_label.add_theme_constant_override("shadow_offset_x", 0)
+	count_label.add_theme_constant_override("shadow_offset_y", 3)
+	overlay.add_child(count_label)
+
+	return overlay
+
+
+func _update_shelf_input_pickable(shelf: Node, should_enable: bool) -> void:
+	for item in _get_shelf_items(shelf):
+		if item == null or not is_instance_valid(item):
+			continue
+
+		item.input_pickable = should_enable and not _is_item_busy(item)
 
 
 func _add_back_layer(shelf: Node2D, layer_index: int) -> Array[Node2D]:
@@ -706,6 +833,9 @@ func _move_item_to_slot(item: ShelfItem, origin_slot: Node2D, target_slot: Node2
 	if item == null or origin_slot == null or target_slot == null:
 		return false
 
+	if _is_slot_locked(origin_slot) or _is_slot_locked(target_slot):
+		return false
+
 	target_slot = _resolve_move_target_slot(origin_slot, target_slot)
 	if target_slot == null:
 		return false
@@ -724,7 +854,11 @@ func _move_item_to_slot(item: ShelfItem, origin_slot: Node2D, target_slot: Node2
 
 func _find_item_at_position(pointer_global_position: Vector2) -> ShelfItem:
 	for i in range(_slots.size() - 1, -1, -1):
-		var item := _get_slot_item(_slots[i])
+		var slot := _slots[i]
+		if _is_slot_locked(slot):
+			continue
+
+		var item := _get_slot_item(slot)
 		if item == null or _is_item_busy(item):
 			continue
 
@@ -747,6 +881,9 @@ func _find_nearest_slot(pointer_global_position: Vector2) -> Node2D:
 	var nearest_distance := slot_snap_distance
 
 	for slot in _slots:
+		if _is_slot_locked(slot):
+			continue
+
 		var marker := _get_slot_marker(slot)
 		if marker == null:
 			continue
@@ -764,6 +901,9 @@ func _find_nearest_empty_slot(pointer_global_position: Vector2) -> Node2D:
 	var nearest_distance := slot_snap_distance
 
 	for slot in _slots:
+		if _is_slot_locked(slot):
+			continue
+
 		if _get_slot_item(slot) != null:
 			continue
 
@@ -780,6 +920,9 @@ func _find_nearest_empty_slot(pointer_global_position: Vector2) -> Node2D:
 
 
 func _resolve_move_target_slot(origin_slot: Node2D, target_slot: Node2D) -> Node2D:
+	if _is_slot_locked(origin_slot) or _is_slot_locked(target_slot):
+		return null
+
 	if target_slot == origin_slot:
 		return target_slot
 
@@ -928,6 +1071,9 @@ func _clear_matching_shelves(shelves_to_check: Array[Node]) -> bool:
 	var cleared_any := false
 
 	for shelf in shelves_to_check:
+		if _is_shelf_locked(shelf):
+			continue
+
 		var shelf_items := _get_shelf_items(shelf)
 		if shelf_items.size() != 3:
 			continue
@@ -946,6 +1092,7 @@ func _clear_matching_shelves(shelves_to_check: Array[Node]) -> bool:
 				_highlighted_items.erase(item)
 
 			await _play_match_clear_animation(shelf_items)
+			_record_triples_cleared(1)
 
 	return cleared_any
 
@@ -1066,6 +1213,9 @@ func _promote_empty_front_layers(shelves_to_check: Array[Node]) -> bool:
 	for shelf in shelves_to_check:
 		var shelf_node := shelf as Node2D
 		if shelf_node == null:
+			continue
+
+		if _is_shelf_locked(shelf_node):
 			continue
 
 		if not _front_layer_is_empty(shelf_node):
@@ -1360,7 +1510,7 @@ func _use_hammer() -> bool:
 
 
 func _use_shuffle() -> bool:
-	var items := _get_all_items()
+	var items := _get_unlocked_items()
 	if items.size() < 2:
 		return false
 
@@ -1394,6 +1544,7 @@ func _use_highlight() -> bool:
 
 func _destroy_items(items_to_destroy: Array[ShelfItem]) -> void:
 	var shelves_to_check: Array[Node] = []
+	var destroyed_count := 0
 	for item in items_to_destroy:
 		if item == null or not is_instance_valid(item) or item.is_queued_for_deletion():
 			continue
@@ -1407,6 +1558,10 @@ func _destroy_items(items_to_destroy: Array[ShelfItem]) -> void:
 			_clear_selected_item()
 
 		item.queue_free()
+		destroyed_count += 1
+
+	var destroyed_triples := floori(float(destroyed_count) / float(SLOT_COUNT))
+	_record_triples_cleared(destroyed_triples)
 
 	_resolve_shelves(shelves_to_check)
 
@@ -1421,6 +1576,9 @@ func _find_immediate_triple_items() -> Array[ShelfItem]:
 
 	var triplable_ids := {}
 	for shelf in _get_all_shelves():
+		if _is_shelf_locked(shelf):
+			continue
+
 		var shelf_items := _get_shelf_items(shelf)
 		if shelf_items.size() != SLOT_COUNT - 1:
 			continue
@@ -1535,9 +1693,23 @@ func _get_all_items() -> Array[ShelfItem]:
 	return items
 
 
+func _get_unlocked_items() -> Array[ShelfItem]:
+	var items: Array[ShelfItem] = []
+	for shelf in _get_all_shelves():
+		if _is_shelf_locked(shelf):
+			continue
+
+		_collect_items_recursive(shelf, items)
+
+	return items
+
+
 func _get_visible_items() -> Array[ShelfItem]:
 	var items: Array[ShelfItem] = []
 	for shelf in _get_all_shelves():
+		if _is_shelf_locked(shelf):
+			continue
+
 		for item in _get_shelf_items(shelf):
 			if not _is_item_busy(item):
 				items.append(item)
