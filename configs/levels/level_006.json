@@ -4,252 +4,252 @@
   "layout_preset": "staggered_4_5_4",
   "difficulty": "expert",
   "shelves": [
-    {
-      "layers": [
-        [
-          "shampoo_bottle",
-          null,
+	{
+	  "layers": [
+		[
+		  "shampoo_bottle",
+		  null,
           "cookie_box"
-        ],
-        [
-          "soap_pump",
-          "plant_pot",
+		],
+		[
+		  "soap_pump",
+		  "plant_pot",
           "gift_box"
-        ],
-        [
-          "plant_pot",
-          "soda_bottle",
+		],
+		[
+		  "plant_pot",
+		  "soda_bottle",
           "orange_juice_box"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "orange_juice_box",
-          "gift_box",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "orange_juice_box",
+		  "gift_box",
           "soap_pump"
-        ],
-        [
-          "soap_pump",
-          "ketchup_bottle",
+		],
+		[
+		  "soap_pump",
+		  "ketchup_bottle",
           "orange_juice_box"
-        ],
-        [
-          "orange_juice_box",
-          "cookie_box",
+		],
+		[
+		  "orange_juice_box",
+		  "cookie_box",
           "cookie_box"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "plant_pot",
-          "plant_pot",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "plant_pot",
+		  "plant_pot",
           "soda_bottle"
-        ],
-        [
-          "shampoo_bottle",
-          "shampoo_bottle",
+		],
+		[
+		  "shampoo_bottle",
+		  "shampoo_bottle",
           "rubber_duck"
-        ],
-        [
-          "orange_juice_box",
-          "ketchup_bottle",
+		],
+		[
+		  "orange_juice_box",
+		  "ketchup_bottle",
           "ketchup_bottle"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "shampoo_bottle",
-          "canned_food",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "shampoo_bottle",
+		  "canned_food",
           "ketchup_bottle"
-        ],
-        [
-          "plant_pot",
-          "soda_bottle",
+		],
+		[
+		  "plant_pot",
+		  "soda_bottle",
           "milk_carton"
-        ],
-        [
-          "cookie_box",
-          "milk_carton",
+		],
+		[
+		  "cookie_box",
+		  "milk_carton",
           "canned_food"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "shampoo_bottle",
-          "gift_box",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "shampoo_bottle",
+		  "gift_box",
           "canned_food"
-        ],
-        [
-          "cookie_box",
-          "water_bottle",
+		],
+		[
+		  "cookie_box",
+		  "water_bottle",
           "soda_bottle"
-        ],
-        [
-          "soap_pump",
-          "soda_bottle",
+		],
+		[
+		  "soap_pump",
+		  "soda_bottle",
           "soap_pump"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "rubber_duck",
-          "ketchup_bottle",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "rubber_duck",
+		  "ketchup_bottle",
           "rubber_duck"
-        ],
-        [
-          "ketchup_bottle",
-          "toy_unicorn",
+		],
+		[
+		  "ketchup_bottle",
+		  "toy_unicorn",
           "shampoo_bottle"
-        ],
-        [
-          "shampoo_bottle",
-          "milk_carton",
+		],
+		[
+		  "shampoo_bottle",
+		  "milk_carton",
           "rubber_duck"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "gift_box",
-          "toy_unicorn",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "gift_box",
+		  "toy_unicorn",
           "soda_bottle"
-        ],
-        [
-          "milk_carton",
-          "rubber_duck",
+		],
+		[
+		  "milk_carton",
+		  "rubber_duck",
           "soda_bottle"
-        ],
-        [
-          null,
-          "gift_box",
+		],
+		[
+		  null,
+		  "gift_box",
           "toy_unicorn"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "orange_juice_box",
-          "cookie_box",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "orange_juice_box",
+		  "cookie_box",
           "rubber_duck"
-        ],
-        [
-          "plant_pot",
-          "canned_food",
+		],
+		[
+		  "plant_pot",
+		  "canned_food",
           "toy_unicorn"
-        ],
-        [
-          "gift_box",
-          "water_bottle",
+		],
+		[
+		  "gift_box",
+		  "water_bottle",
           "canned_food"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "canned_food",
-          "toy_unicorn",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "canned_food",
+		  "toy_unicorn",
           "milk_carton"
-        ],
-        [
-          "cookie_box",
-          "gift_box",
+		],
+		[
+		  "cookie_box",
+		  "gift_box",
           "milk_carton"
-        ],
-        [
-          "water_bottle",
-          "plant_pot",
+		],
+		[
+		  "water_bottle",
+		  "plant_pot",
           "shampoo_bottle"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "milk_carton",
-          "soda_bottle",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "milk_carton",
+		  "soda_bottle",
           "milk_carton"
-        ],
-        [
-          "orange_juice_box",
-          "gift_box",
+		],
+		[
+		  "orange_juice_box",
+		  "gift_box",
           "toy_unicorn"
-        ],
-        [
-          "soda_bottle",
-          "toy_unicorn",
+		],
+		[
+		  "soda_bottle",
+		  "toy_unicorn",
           "milk_carton"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "soap_pump",
-          "cookie_box",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "soap_pump",
+		  "cookie_box",
           "water_bottle"
-        ],
-        [
-          "ketchup_bottle",
-          null,
+		],
+		[
+		  "ketchup_bottle",
+		  null,
           "canned_food"
-        ],
-        [
-          "shampoo_bottle",
-          "plant_pot",
+		],
+		[
+		  "shampoo_bottle",
+		  "plant_pot",
           "canned_food"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "soap_pump",
-          "plant_pot",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "soap_pump",
+		  "plant_pot",
           "orange_juice_box"
-        ],
-        [
-          "soap_pump",
-          "water_bottle",
+		],
+		[
+		  "soap_pump",
+		  "water_bottle",
           "rubber_duck"
-        ],
-        [
-          "gift_box",
-          "rubber_duck",
+		],
+		[
+		  "gift_box",
+		  "rubber_duck",
           "rubber_duck"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "water_bottle",
-          "toy_unicorn",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "water_bottle",
+		  "toy_unicorn",
           "ketchup_bottle"
-        ],
-        [
-          "canned_food",
-          "orange_juice_box",
+		],
+		[
+		  "canned_food",
+		  "orange_juice_box",
           "cookie_box"
-        ],
-        [
-          "soap_pump",
-          "toy_unicorn",
+		],
+		[
+		  "soap_pump",
+		  "toy_unicorn",
           "ketchup_bottle"
-        ]
-      ]
-    }
+		]
+	  ]
+	}
   ]
 }
