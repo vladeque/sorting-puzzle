@@ -39,9 +39,11 @@ Change here when:
 Files:
 - `level.tscn`
 - `scenes/shelf.tscn`
+- `scenes/moving_shelf_row.tscn`
 - `scenes/pause_menu.tscn`
 - `assets/ui/*.png`
 - `scripts/level.gd`
+- `scripts/moving_shelf_row.gd`
 - `assets/audio/*.wav`
 - `configs/levels/level_*.json`
 - `configs/item_sprites.json`
@@ -49,6 +51,7 @@ Files:
 Responsibility:
 - Loads level JSON and item sprite config.
 - Instantiates `scenes/shelf.tscn` for each configured shelf and packs shelf cells with shared boundaries in grid or fixed staggered layouts.
+- Builds optional `row_layouts`, including moving rows that clip and horizontally wrap more shelves than are visible at once.
 - Spawns `ShelfItem` instances from config layers.
 - Handles mouse and touch interaction.
 - Resolves matches of three identical visible items on the same shelf, including the gather-and-shrink clear animation.
@@ -61,6 +64,23 @@ Responsibility:
 
 Change here when:
 - Editing puzzle rules, input behavior, runtime shelf construction, level timing, completion conditions, or ability behavior.
+
+### Moving Shelf Rows
+
+Files:
+- `scenes/moving_shelf_row.tscn`
+- `scripts/moving_shelf_row.gd`
+- `scripts/level.gd`
+- `configs/levels/level_*.json`
+
+Responsibility:
+- Clips a shelf row to a configured visible window.
+- Moves shelves horizontally at runtime and wraps them back through the opposite side.
+- Lets `scripts/level.gd` decide drag/drop eligibility based on whether a moving shelf is currently inside the row window.
+- Supports the floor-only shelf visual variant by runtime node hiding in `scripts/level.gd`.
+
+Change here when:
+- Adding row motion types, changing wrap timing, changing moving-row drag/drop targeting, or changing moving-row visual variants.
 
 ### Shelf Cell
 
@@ -137,9 +157,10 @@ Files:
 
 Responsibility:
 - Stores level number, time limit, layout preset, and shelf layers.
+- Supports optional row layout configs for static and moving shelf rows.
 - Supports optional per-shelf triple-clear unlock requirements.
 - Generates shelf configs from difficulty, item, shelf, and layer settings.
-- Validates shelf shape, known item IDs, item counts, and bounded solvability.
+- Validates shelf shape, known item IDs, row layout shape, item counts, and bounded solvability.
 
 Change here when:
 - Creating levels, adjusting level schema, adding layout presets, or improving validation/generation rules.
@@ -159,6 +180,7 @@ Add a new level:
 Change shelf layout spacing:
 - Update `SHELF_CELL_SIZE`, `SHELF_SHARED_EDGE_THICKNESS`, `SHELF_GRID_STEP`, and `_get_layout_positions()` in `scripts/level.gd`.
 - Keep `scenes/shelf.tscn` cell bounds and boundary thickness aligned with those layout constants.
+- Keep `scripts/moving_shelf_row.gd` row sizing and runtime configuration aligned with `SHELF_CELL_SIZE` and `SHELF_GRID_STEP`.
 - Keep `SLOT_ITEM_POSITION`, shelf slot markers, `scenes/item.tscn` default scale, and `item_pick_size` aligned when shelf width changes affect item spacing.
 - Keep `scripts/tools/generate_level_shelves.py` layout presets in sync if preset names or supported shapes change.
 - Fixed staggered presets live in `scripts/level.gd`; keep their required shelf counts documented in `docs/CONFIGS.md`.
@@ -176,6 +198,13 @@ Change shelf unlock rules:
 Change drag or tap movement:
 - Update `_input()`, `_handle_press_at()`, `_handle_motion_at()`, `_handle_release_at()`, `_move_item_to_slot()`, `_resolve_move_target_slot()`, and slot lookup helpers in `scripts/level.gd`.
 - Keep occupied-slot fallback behavior in sync with `_resolve_move_target_slot()` and `_find_free_slot_on_target_shelf()`, including the same-shelf return-to-origin rule.
+- Keep `_is_slot_drag_drop_targetable()` aligned with moving-row visibility rules if moving rows change.
+
+Change moving shelf rows:
+- Update `scripts/moving_shelf_row.gd` for row wrapping, clipping, speed, or visible-window behavior.
+- Update `scripts/level.gd` row layout helpers and floor-only visual variant node list when config semantics or shelf visuals change.
+- Update `scripts/tools/validate_level_solvable.py` when row layout config validation changes.
+- Keep `docs/CONFIGS.md` row-layout schema and moving-row lock restrictions aligned.
 
 Change gameplay sound effects:
 - Update `assets/audio/item_place.wav`, `assets/audio/triple_clear.wav`, and the audio player helpers in `scripts/level.gd`.

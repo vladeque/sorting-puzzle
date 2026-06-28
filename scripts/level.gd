@@ -12,6 +12,7 @@ const ABILITY_SHUFFLE := &"shuffle"
 const ABILITY_HIGHLIGHT := &"highlight"
 const HIGHLIGHT_DURATION_SECONDS := 15.0
 const SHELF_SCENE := preload("res://scenes/shelf.tscn")
+const MOVING_SHELF_ROW_SCENE := preload("res://scenes/moving_shelf_row.tscn")
 const ITEM_SCENE := preload("res://scenes/item.tscn")
 const ITEM_SPRITES_CONFIG := "res://configs/item_sprites.json"
 const LEVEL_CONFIG_TEMPLATE := "res://configs/levels/level_%03d.json"
@@ -24,6 +25,18 @@ const PAUSE_SETTING_SOUND_EFFECTS := &"sound_effects"
 const SHELF_UNLOCK_REQUIREMENT_META := &"unlock_after_triples"
 const SHELF_LOCKED_META := &"is_locked"
 const LOCKED_OVERLAY_NAME := "LockedOverlay"
+const ROW_LAYOUTS_KEY := "row_layouts"
+const ROW_MOTION_HORIZONTAL_WRAP := "horizontal_wrap"
+const SHELF_VISUAL_VARIANT_FULL := "full"
+const SHELF_VISUAL_VARIANT_FLOOR_ONLY := "floor_only"
+const SHELF_FLOOR_ONLY_HIDDEN_NODES := [
+	"BackWall",
+	"BackWallLeftShade",
+	"Ceiling",
+	"LeftWall",
+	"RightWall",
+	"Highlight",
+]
 
 @export var slot_snap_distance := 98.0
 @export var item_pick_size := Vector2(74, 112)
@@ -171,6 +184,7 @@ func _process(delta: float) -> void:
 	_time_remaining = maxf(_time_remaining - delta, 0.0)
 	_update_timer_label()
 	_update_highlight_timer(delta)
+	_clear_drag_drop_selection_if_unavailable()
 
 	if _time_remaining <= 0.0:
 		_fail_level()
@@ -271,21 +285,16 @@ func _apply_level_config(config: Dictionary) -> void:
 
 	var shelves_config := config.get("shelves", []) as Array
 	_layout_preset = str(config.get("layout_preset", DEFAULT_LAYOUT_PRESET))
-	var shelf_positions := _get_layout_positions(_layout_preset, shelves_config.size())
 	var shelves := get_node("Shelves") as Node2D
 	_clear_shelves(shelves)
 
-	for shelf_index in range(shelves_config.size()):
-		var shelf_config := shelves_config[shelf_index] as Dictionary
-		if shelf_config == null:
-			continue
+	var row_layouts := config.get(ROW_LAYOUTS_KEY, []) as Array
+	if row_layouts != null and not row_layouts.is_empty():
+		_add_row_layout_shelves(shelves, shelves_config, row_layouts)
+	else:
+		_add_preset_layout_shelves(shelves, shelves_config)
 
-		var shelf := _add_shelf(shelves, shelf_index + 1, shelf_positions[shelf_index])
-		var layers := shelf_config.get("layers", []) as Array
-		_max_layer_count = maxi(_max_layer_count, layers.size())
-		_add_configured_layers(shelf, layers)
-		_configure_shelf_unlock(shelf, shelf_config)
-
+	_set_moving_shelf_rows_paused(false)
 	_update_locked_shelves()
 	_resolve_shelves(_get_all_shelves())
 	_check_level_completed()
@@ -296,6 +305,195 @@ func _clear_shelves(shelves: Node) -> void:
 	for child in shelves.get_children():
 		shelves.remove_child(child)
 		child.free()
+
+
+func _add_preset_layout_shelves(shelves: Node2D, shelves_config: Array) -> void:
+	var shelf_positions := _get_layout_positions(_layout_preset, shelves_config.size())
+	for shelf_index in range(shelves_config.size()):
+		var shelf_config := shelves_config[shelf_index] as Dictionary
+		if shelf_config == null:
+			continue
+
+		var shelf := _add_shelf(shelves, shelf_index + 1, shelf_positions[shelf_index])
+		_configure_shelf_from_config(shelf, shelf_config)
+
+
+func _add_row_layout_shelves(shelves: Node2D, shelves_config: Array, row_layouts: Array) -> void:
+	var configured_shelf_count := _get_row_layout_shelf_count(row_layouts)
+	if configured_shelf_count != shelves_config.size():
+		push_warning(
+			"%s shelf_count total must match shelves size. Using %s."
+			% [ROW_LAYOUTS_KEY, DEFAULT_LAYOUT_PRESET]
+		)
+		_add_preset_layout_shelves(shelves, shelves_config)
+		return
+
+	var row_origin_y := -float(row_layouts.size() - 1) * SHELF_GRID_STEP.y * 0.5
+	var shelf_config_index := 0
+	for row_index in range(row_layouts.size()):
+		var row_config := row_layouts[row_index] as Dictionary
+		if row_config == null:
+			continue
+
+		var row_shelf_count := int(row_config.get("shelf_count", 0))
+		var row_center_y := row_origin_y + float(row_index) * SHELF_GRID_STEP.y
+		var is_moving := _is_row_layout_moving(row_config)
+		var visible_count := _get_row_visible_count(row_config, row_shelf_count, is_moving)
+		var visual_variant := _get_row_visual_variant(row_config, is_moving)
+
+		if is_moving:
+			_add_moving_shelf_row(
+				shelves,
+				shelves_config,
+				shelf_config_index,
+				row_shelf_count,
+				visible_count,
+				row_center_y,
+				row_config,
+				visual_variant
+			)
+		else:
+			_add_static_shelf_row(
+				shelves,
+				shelves_config,
+				shelf_config_index,
+				row_shelf_count,
+				row_center_y,
+				visual_variant
+			)
+
+		shelf_config_index += row_shelf_count
+
+
+func _get_row_layout_shelf_count(row_layouts: Array) -> int:
+	var shelf_count := 0
+	for row_layout in row_layouts:
+		var row_config := row_layout as Dictionary
+		if row_config == null:
+			return -1
+
+		var row_shelf_count := int(row_config.get("shelf_count", 0))
+		if row_shelf_count <= 0:
+			return -1
+
+		shelf_count += row_shelf_count
+
+	return shelf_count
+
+
+func _add_static_shelf_row(
+	shelves: Node2D,
+	shelves_config: Array,
+	start_shelf_index: int,
+	row_shelf_count: int,
+	row_center_y: float,
+	visual_variant: String
+) -> void:
+	var row_origin_x := -float(row_shelf_count - 1) * SHELF_GRID_STEP.x * 0.5
+	for row_shelf_index in range(row_shelf_count):
+		var shelf_config := shelves_config[start_shelf_index + row_shelf_index] as Dictionary
+		if shelf_config == null:
+			continue
+
+		var shelf_number := start_shelf_index + row_shelf_index + 1
+		var shelf_position := Vector2(row_origin_x + float(row_shelf_index) * SHELF_GRID_STEP.x, row_center_y)
+		var shelf := _add_shelf(shelves, shelf_number, shelf_position)
+		_apply_shelf_visual_variant(shelf, visual_variant)
+		_configure_shelf_from_config(shelf, shelf_config)
+
+
+func _add_moving_shelf_row(
+	shelves: Node2D,
+	shelves_config: Array,
+	start_shelf_index: int,
+	row_shelf_count: int,
+	visible_count: int,
+	row_center_y: float,
+	row_config: Dictionary,
+	visual_variant: String
+) -> void:
+	var row := MOVING_SHELF_ROW_SCENE.instantiate() as MovingShelfRow
+	row.name = "MovingShelfRow%02d" % (start_shelf_index + 1)
+	row.configure(
+		visible_count,
+		SHELF_GRID_STEP.x,
+		SHELF_CELL_SIZE,
+		_get_row_motion_speed(row_config),
+		_get_row_motion_direction(row_config)
+	)
+	var visible_size := row.get_visible_size()
+	row.position = Vector2(-visible_size.x * 0.5, row_center_y - visible_size.y * 0.5)
+	shelves.add_child(row)
+
+	for row_shelf_index in range(row_shelf_count):
+		var shelf_config := shelves_config[start_shelf_index + row_shelf_index] as Dictionary
+		if shelf_config == null:
+			continue
+
+		var shelf_number := start_shelf_index + row_shelf_index + 1
+		var shelf := _add_shelf(row, shelf_number, Vector2.ZERO)
+		row.add_shelf(shelf)
+		_apply_shelf_visual_variant(shelf, visual_variant)
+		_configure_shelf_from_config(shelf, shelf_config, false)
+
+
+func _configure_shelf_from_config(shelf: Node2D, shelf_config: Dictionary, allow_locked := true) -> void:
+	var layers := shelf_config.get("layers", []) as Array
+	_max_layer_count = maxi(_max_layer_count, layers.size())
+	_add_configured_layers(shelf, layers)
+	_configure_shelf_unlock(shelf, shelf_config, allow_locked)
+
+
+func _is_row_layout_moving(row_config: Dictionary) -> bool:
+	var motion := _get_row_motion_config(row_config)
+	var motion_type := str(motion.get("type", "")).to_lower()
+	if motion_type == ROW_MOTION_HORIZONTAL_WRAP:
+		return true
+
+	if row_config.has("moving"):
+		return bool(row_config.get("moving", false))
+
+	return _get_row_motion_speed(row_config) > 0.0
+
+
+func _get_row_motion_config(row_config: Dictionary) -> Dictionary:
+	var motion := row_config.get("motion", {}) as Dictionary
+	return {} if motion == null else motion
+
+
+func _get_row_motion_speed(row_config: Dictionary) -> float:
+	var motion := _get_row_motion_config(row_config)
+	return maxf(float(motion.get("speed", row_config.get("speed", 0.0))), 0.0)
+
+
+func _get_row_motion_direction(row_config: Dictionary) -> int:
+	var motion := _get_row_motion_config(row_config)
+	var direction_name := str(motion.get("direction", row_config.get("direction", "right"))).to_lower()
+	return -1 if direction_name == "left" else 1
+
+
+func _get_row_visible_count(row_config: Dictionary, row_shelf_count: int, is_moving: bool) -> int:
+	var default_visible_count := mini(3, row_shelf_count) if is_moving else row_shelf_count
+	var visible_count := int(row_config.get("visible_count", default_visible_count))
+	return clampi(visible_count, 1, row_shelf_count)
+
+
+func _get_row_visual_variant(row_config: Dictionary, is_moving: bool) -> String:
+	var default_variant := SHELF_VISUAL_VARIANT_FLOOR_ONLY if is_moving else SHELF_VISUAL_VARIANT_FULL
+	return str(row_config.get("visual_variant", default_variant)).to_lower()
+
+
+func _apply_shelf_visual_variant(shelf: Node2D, visual_variant: String) -> void:
+	match visual_variant:
+		SHELF_VISUAL_VARIANT_FULL:
+			return
+		SHELF_VISUAL_VARIANT_FLOOR_ONLY:
+			for node_name in SHELF_FLOOR_ONLY_HIDDEN_NODES:
+				var node := shelf.get_node_or_null(node_name) as CanvasItem
+				if node != null:
+					node.visible = false
+		_:
+			push_warning("Unknown shelf visual_variant '%s'. Using full shelf." % visual_variant)
 
 
 func _get_layout_positions(layout_preset: String, shelf_count: int) -> Array[Vector2]:
@@ -413,8 +611,12 @@ func _add_configured_layers(shelf: Node2D, layers: Array) -> void:
 			_add_configured_item(layer_slots[slot_index], item_ids[slot_index], layer_index, slot_index)
 
 
-func _configure_shelf_unlock(shelf: Node2D, shelf_config: Dictionary) -> void:
+func _configure_shelf_unlock(shelf: Node2D, shelf_config: Dictionary, allow_locked := true) -> void:
 	var unlock_after_triples := maxi(int(shelf_config.get("unlock_after_triples", 0)), 0)
+	if unlock_after_triples > 0 and not allow_locked:
+		push_warning("%s is in a moving row. Locked moving shelves are not allowed." % shelf.name)
+		unlock_after_triples = 0
+
 	shelf.set_meta(SHELF_UNLOCK_REQUIREMENT_META, unlock_after_triples)
 	shelf.set_meta(SHELF_LOCKED_META, false)
 
@@ -460,6 +662,43 @@ func _is_shelf_locked(shelf: Node) -> bool:
 
 func _is_slot_locked(slot: Node) -> bool:
 	return _is_shelf_locked(_get_owning_shelf(slot))
+
+
+func _is_slot_drag_drop_targetable(slot: Node) -> bool:
+	return slot != null and _is_shelf_drag_drop_targetable(_get_owning_shelf(slot))
+
+
+func _is_shelf_drag_drop_targetable(shelf: Node) -> bool:
+	var shelf_node := shelf as Node2D
+	if shelf_node == null:
+		return false
+
+	if _is_shelf_locked(shelf_node):
+		return false
+
+	var moving_row := _get_moving_shelf_row(shelf_node)
+	return moving_row == null or moving_row.is_shelf_inside_visible_window(shelf_node)
+
+
+func _get_moving_shelf_row(node: Node) -> MovingShelfRow:
+	var current := node.get_parent()
+	while current != null:
+		var moving_row := current as MovingShelfRow
+		if moving_row != null:
+			return moving_row
+
+		current = current.get_parent()
+
+	return null
+
+
+func _clear_drag_drop_selection_if_unavailable() -> void:
+	if _selected_slot != null and not _is_slot_drag_drop_targetable(_selected_slot):
+		_clear_selected_item()
+
+	if _pressed_origin_slot != null and not _is_slot_drag_drop_targetable(_pressed_origin_slot):
+		_pressed_item = null
+		_pressed_origin_slot = null
 
 
 func _update_shelf_lock_overlay(shelf: Node2D, should_lock: bool) -> void:
@@ -524,12 +763,9 @@ func _add_configured_item(slot: Node2D, item_value, layer_index: int, slot_index
 func _collect_slots() -> void:
 	_slots.clear()
 
-	var shelves := get_node("Shelves")
-	for shelf in shelves.get_children():
-		for child in shelf.get_children():
-			var slot := child as Node2D
-			if slot != null and slot.name.begins_with("Slot"):
-				_slots.append(slot)
+	for shelf in _get_all_shelves():
+		for slot in _get_front_slots(shelf):
+			_slots.append(slot)
 
 
 func _get_back_layer_name(layer_index: int) -> String:
@@ -581,6 +817,7 @@ func _fail_level() -> void:
 	_level_failed = true
 	_level_paused = false
 	_clear_selected_item()
+	_set_moving_shelf_rows_paused(true)
 	_update_ability_buttons()
 	_update_pause_menu_button()
 
@@ -601,6 +838,7 @@ func _complete_level() -> void:
 	_level_paused = false
 	_completion_return_time_remaining = maxf(completion_return_delay_seconds, 0.0)
 	_clear_selected_item()
+	_set_moving_shelf_rows_paused(true)
 	_dragged_item = null
 	_origin_slot = null
 	_drag_offset = Vector2.ZERO
@@ -657,6 +895,7 @@ func _on_pause_menu_button_pressed() -> void:
 func _open_pause_menu() -> void:
 	_cancel_active_interaction()
 	_level_paused = true
+	_set_moving_shelf_rows_paused(true)
 	_pause_menu_overlay.visible = true
 	_update_ability_buttons()
 	_update_pause_menu_button()
@@ -672,6 +911,7 @@ func _on_pause_menu_continue_pressed() -> void:
 
 func _close_pause_menu() -> void:
 	_level_paused = false
+	_set_moving_shelf_rows_paused(false)
 	_pause_menu_overlay.visible = false
 	_update_ability_buttons()
 	_update_pause_menu_button()
@@ -717,6 +957,11 @@ func _handle_motion_at(pointer_global_position: Vector2) -> void:
 	if _pressed_item == null:
 		return
 
+	if not _is_slot_drag_drop_targetable(_pressed_origin_slot):
+		_pressed_item = null
+		_pressed_origin_slot = null
+		return
+
 	if pointer_global_position.distance_to(_press_position) < drag_start_distance:
 		return
 
@@ -735,7 +980,7 @@ func _handle_release_at(pointer_global_position: Vector2) -> void:
 	if _pressed_item == null:
 		return
 
-	if _pressed_item.get_parent() == _pressed_origin_slot:
+	if _pressed_item.get_parent() == _pressed_origin_slot and _is_slot_drag_drop_targetable(_pressed_origin_slot):
 		_set_selected_item(_pressed_item, _pressed_origin_slot)
 
 	_pressed_item = null
@@ -744,8 +989,12 @@ func _handle_release_at(pointer_global_position: Vector2) -> void:
 
 
 func _begin_drag(item: ShelfItem, pointer_global_position: Vector2) -> void:
+	var origin_slot := item.get_parent() as Node2D
+	if not _is_slot_drag_drop_targetable(origin_slot):
+		return
+
 	_dragged_item = item
-	_origin_slot = item.get_parent() as Node2D
+	_origin_slot = origin_slot
 	_drag_offset = item.global_position - pointer_global_position
 	item.reparent(_drag_layer, true)
 	item.z_index = 100
@@ -785,7 +1034,7 @@ func _move_item_to_slot(item: ShelfItem, origin_slot: Node2D, target_slot: Node2
 	if item == null or origin_slot == null or target_slot == null:
 		return false
 
-	if _is_slot_locked(origin_slot) or _is_slot_locked(target_slot):
+	if _is_slot_locked(origin_slot) or not _is_slot_drag_drop_targetable(target_slot):
 		return false
 
 	target_slot = _resolve_move_target_slot(origin_slot, target_slot)
@@ -807,7 +1056,7 @@ func _move_item_to_slot(item: ShelfItem, origin_slot: Node2D, target_slot: Node2
 func _find_item_at_position(pointer_global_position: Vector2) -> ShelfItem:
 	for i in range(_slots.size() - 1, -1, -1):
 		var slot := _slots[i]
-		if _is_slot_locked(slot):
+		if not _is_slot_drag_drop_targetable(slot):
 			continue
 
 		var item := _get_slot_item(slot)
@@ -833,7 +1082,7 @@ func _find_nearest_slot(pointer_global_position: Vector2) -> Node2D:
 	var nearest_distance := slot_snap_distance
 
 	for slot in _slots:
-		if _is_slot_locked(slot):
+		if not _is_slot_drag_drop_targetable(slot):
 			continue
 
 		var marker := _get_slot_marker(slot)
@@ -853,7 +1102,7 @@ func _find_nearest_empty_slot(pointer_global_position: Vector2) -> Node2D:
 	var nearest_distance := slot_snap_distance
 
 	for slot in _slots:
-		if _is_slot_locked(slot):
+		if not _is_slot_drag_drop_targetable(slot):
 			continue
 
 		if _get_slot_item(slot) != null:
@@ -872,7 +1121,7 @@ func _find_nearest_empty_slot(pointer_global_position: Vector2) -> Node2D:
 
 
 func _resolve_move_target_slot(origin_slot: Node2D, target_slot: Node2D) -> Node2D:
-	if _is_slot_locked(origin_slot) or _is_slot_locked(target_slot):
+	if _is_slot_locked(origin_slot) or not _is_slot_drag_drop_targetable(target_slot):
 		return null
 
 	if target_slot == origin_slot:
@@ -890,6 +1139,9 @@ func _resolve_move_target_slot(origin_slot: Node2D, target_slot: Node2D) -> Node
 func _find_free_slot_on_target_shelf(target_slot: Node2D, excluded_slot: Node2D) -> Node2D:
 	var target_shelf := _get_owning_shelf(target_slot)
 	if target_shelf == null:
+		return null
+
+	if not _is_shelf_drag_drop_targetable(target_shelf):
 		return null
 
 	var target_marker := _get_slot_marker(target_slot)
@@ -1629,12 +1881,44 @@ func _update_ability_button(ability_id: StringName) -> void:
 	button.disabled = _level_failed or _level_completed or _level_paused or uses_left <= 0
 
 
+func _set_moving_shelf_rows_paused(should_pause: bool) -> void:
+	for moving_row in _get_all_moving_shelf_rows():
+		moving_row.set_movement_paused(should_pause)
+
+
+func _get_all_moving_shelf_rows() -> Array[MovingShelfRow]:
+	var moving_rows: Array[MovingShelfRow] = []
+	_collect_moving_shelf_rows_recursive(get_node("Shelves"), moving_rows)
+	return moving_rows
+
+
+func _collect_moving_shelf_rows_recursive(node: Node, moving_rows: Array[MovingShelfRow]) -> void:
+	for child in node.get_children():
+		var moving_row := child as MovingShelfRow
+		if moving_row != null:
+			moving_rows.append(moving_row)
+
+		_collect_moving_shelf_rows_recursive(child, moving_rows)
+
+
 func _get_all_shelves() -> Array[Node]:
 	var shelves: Array[Node] = []
-	for child in get_node("Shelves").get_children():
-		shelves.append(child)
+	_collect_shelves_recursive(get_node("Shelves"), shelves)
 
 	return shelves
+
+
+func _collect_shelves_recursive(node: Node, shelves: Array[Node]) -> void:
+	for child in node.get_children():
+		if _is_shelf_node(child):
+			shelves.append(child)
+			continue
+
+		_collect_shelves_recursive(child, shelves)
+
+
+func _is_shelf_node(node: Node) -> bool:
+	return node is Node2D and _get_front_slots(node).size() == SLOT_COUNT
 
 
 func _get_all_items() -> Array[ShelfItem]:
@@ -1684,7 +1968,7 @@ func _get_owning_shelf(node: Node) -> Node:
 	var current := node
 	var shelves := get_node("Shelves")
 	while current != null:
-		if current.get_parent() == shelves:
+		if current != shelves and _is_shelf_node(current):
 			return current
 
 		current = current.get_parent()

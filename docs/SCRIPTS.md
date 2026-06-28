@@ -67,6 +67,7 @@ Important constants:
 - `SHELF_SHARED_EDGE_THICKNESS`: shelf boundary thickness that neighboring cells overlap.
 - `SHELF_GRID_STEP`: packed layout spacing after overlapping shared shelf edges.
 - `SHELF_SCENE`: `res://scenes/shelf.tscn`.
+- `MOVING_SHELF_ROW_SCENE`: `res://scenes/moving_shelf_row.tscn`.
 - `ITEM_SCENE`: `res://scenes/item.tscn`.
 - `ITEM_SPRITES_CONFIG`: `res://configs/item_sprites.json`.
 - `LEVEL_CONFIG_TEMPLATE`: `res://configs/levels/level_%03d.json`.
@@ -80,6 +81,8 @@ Key responsibilities:
 - Load JSON configs with `_load_json_file()`.
 - Instantiate reusable shelf cells with `_add_shelf()` and add generated back layers with `_add_back_layer()`.
 - Pack shelf cells with shared boundaries based on `SHELF_GRID_STEP`, including grid and fixed staggered layout presets.
+- Build optional `row_layouts` rows with `_add_row_layout_shelves()`, including horizontally wrapping moving rows and static rows mixed in one level.
+- Keep moving-row shelves out of drag/drop targeting while they are outside the row's visible window, while abilities still use unlocked shelf items.
 - Spawn configured items with `_add_configured_item()`.
 - Handle mouse and touch input through `_input()` and the press/motion/release helpers.
 - Move items with `_move_item_to_slot()`, `_resolve_move_target_slot()`, `_play_item_move_animation()`, and `_place_item_in_slot()`.
@@ -104,6 +107,7 @@ Depends on:
 - `level.tscn` node names and paths.
 - `scenes/shelf.tscn` slot names and item snap marker names.
 - `scenes/shelf.tscn` `LockedOverlay/RemainingLabel` for locked shelf progress display.
+- `scenes/moving_shelf_row.tscn` for optional row-layout movement and clipping.
 - `scenes/pause_menu.tscn` button node names used under `UI/PauseMenuOverlay`.
 - `scenes/item.tscn` and `ShelfItem`.
 - `assets/audio/item_place.wav` and `assets/audio/triple_clear.wav`.
@@ -113,6 +117,35 @@ Depends on:
 Do not use for:
 - Offline level generation or solvability search. Keep that in `scripts/tools/`.
 - Persistent progression or save data once that system exists.
+
+## `scripts/moving_shelf_row.gd`
+
+Class:
+- `MovingShelfRow`
+
+Attached to:
+- `scenes/moving_shelf_row.tscn` root `MovingShelfRow`.
+
+Purpose:
+- Clips a horizontal shelf row to a visible window.
+- Moves child shelves horizontally and wraps them when they pass the row bounds.
+- Reports whether a shelf center is inside the visible window for drag/drop targeting.
+
+Exports:
+- `visible_shelf_count`: number of shelf positions in the clipped row window.
+- `shelf_cell_size`: shelf cell bounds supplied by `scripts/level.gd`.
+- `shelf_step_x`: packed horizontal shelf spacing supplied by `scripts/level.gd`.
+- `speed_pixels_per_second`: row motion speed.
+- `direction`: `1` for rightward motion, `-1` for leftward motion.
+
+Key methods:
+- `configure()`: applies runtime row settings from a level config.
+- `add_shelf()`: registers a child shelf for wrapping layout.
+- `set_movement_paused()`: pauses row motion during pause, failure, or completion states.
+- `is_shelf_inside_visible_window()`: used by `scripts/level.gd` drag/drop targeting.
+
+Do not use for:
+- Shelf item rules, matching, ability behavior, locking, or level completion. Those stay in `scripts/level.gd`.
 
 ## `scripts/pause_menu.gd`
 
@@ -208,7 +241,11 @@ Checks:
 - Slot values are item ID strings or `null`.
 - Item IDs exist in `configs/item_sprites.json` unless skipped.
 - Item counts are multiples of three.
+- Optional `row_layouts` totals match the number of shelves.
+- Moving row fields use supported motion, direction, and visual variant values.
+- Locked shelves are not placed inside moving rows.
 - Solvability search mirrors locked shelf timing by counting auto-cleared triples and only allowing moves on unlocked shelves.
+- Moving row timing is treated as eventually accessible; the search does not model shelf positions over time.
 
 Use when:
 - Reviewing generated levels or hand-authored level JSON.

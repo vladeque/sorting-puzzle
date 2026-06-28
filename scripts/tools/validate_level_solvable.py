@@ -13,6 +13,8 @@ from typing import Any, NamedTuple
 
 SLOTS_PER_SHELF = 3
 DEFAULT_ITEM_CONFIG = Path("configs/item_sprites.json")
+ROW_MOTION_HORIZONTAL_WRAP = "horizontal_wrap"
+ROW_VISUAL_VARIANTS = {"full", "floor_only"}
 
 Item = str | None
 Layer = tuple[Item, Item, Item]
@@ -54,9 +56,13 @@ def load_item_ids(item_config_path: Path) -> set[str]:
     }
 
 
-def load_shelves(path: Path, shelves_only: bool) -> list[dict[str, Any]]:
+def load_level_data(path: Path) -> Any:
     with path.open("r", encoding="utf-8") as level_file:
-        data = json.load(level_file)
+        return json.load(level_file)
+
+
+def load_shelves(path: Path, shelves_only: bool) -> list[dict[str, Any]]:
+    data = load_level_data(path)
 
     if shelves_only:
         if not isinstance(data, list):
@@ -69,6 +75,105 @@ def load_shelves(path: Path, shelves_only: bool) -> list[dict[str, Any]]:
         return data
 
     raise ValueError("Expected a level JSON object with 'shelves' or a shelves array")
+
+
+def validate_row_layouts_shape(level_data: Any, shelves: list[dict[str, Any]]) -> list[str]:
+    if not isinstance(level_data, dict) or "row_layouts" not in level_data:
+        return []
+
+    errors = []
+    row_layouts = level_data.get("row_layouts")
+    if not isinstance(row_layouts, list) or not row_layouts:
+        return ["row_layouts must be a non-empty array when present"]
+
+    total_shelf_count = 0
+    for row_index, row_layout in enumerate(row_layouts):
+        row_number = row_index + 1
+        if not isinstance(row_layout, dict):
+            errors.append(f"row_layouts[{row_index}] must be an object")
+            continue
+
+        shelf_count = row_layout.get("shelf_count")
+        if type(shelf_count) is not int or shelf_count <= 0:
+            errors.append(f"row_layouts[{row_index}].shelf_count must be a positive integer")
+            continue
+
+        visible_count = row_layout.get("visible_count")
+        if visible_count is not None and (
+            type(visible_count) is not int or visible_count <= 0 or visible_count > shelf_count
+        ):
+            errors.append(
+                f"row_layouts[{row_index}].visible_count must be a positive integer no greater than shelf_count"
+            )
+
+        visual_variant = row_layout.get("visual_variant")
+        if visual_variant is not None and visual_variant not in ROW_VISUAL_VARIANTS:
+            errors.append(
+                f"row_layouts[{row_index}].visual_variant must be one of {sorted(ROW_VISUAL_VARIANTS)}"
+            )
+
+        moving = row_layout.get("moving")
+        if moving is not None and type(moving) is not bool:
+            errors.append(f"row_layouts[{row_index}].moving must be a boolean")
+
+        motion_errors = validate_row_motion_shape(row_layout, row_index)
+        errors.extend(motion_errors)
+
+        is_moving = row_layout_is_moving(row_layout)
+        if is_moving:
+            row_start = total_shelf_count
+            row_end = row_start + shelf_count
+            for shelf_index in range(row_start, min(row_end, len(shelves))):
+                shelf = shelves[shelf_index]
+                unlock_after_triples = shelf.get("unlock_after_triples", 0) if isinstance(shelf, dict) else 0
+                if type(unlock_after_triples) is int and unlock_after_triples > 0:
+                    errors.append(f"shelf {shelf_index + 1} is locked, but row {row_number} is moving")
+
+        total_shelf_count += shelf_count
+
+    if total_shelf_count != len(shelves):
+        errors.append(f"row_layouts shelf_count total is {total_shelf_count}, expected {len(shelves)} shelves")
+
+    return errors
+
+
+def validate_row_motion_shape(row_layout: dict[str, Any], row_index: int) -> list[str]:
+    errors = []
+    motion = row_layout.get("motion")
+    if motion is not None and not isinstance(motion, dict):
+        return [f"row_layouts[{row_index}].motion must be an object"]
+
+    motion_config = motion if isinstance(motion, dict) else {}
+    motion_type = motion_config.get("type")
+    if motion_type is not None and motion_type != ROW_MOTION_HORIZONTAL_WRAP:
+        errors.append(f"row_layouts[{row_index}].motion.type must be '{ROW_MOTION_HORIZONTAL_WRAP}'")
+
+    direction = motion_config.get("direction", row_layout.get("direction"))
+    if direction is not None and direction not in {"left", "right"}:
+        errors.append(f"row_layouts[{row_index}] direction must be 'left' or 'right'")
+
+    for field_path, value in (
+        ("speed", row_layout.get("speed")),
+        ("motion.speed", motion_config.get("speed")),
+    ):
+        if value is None:
+            continue
+        if type(value) not in (int, float) or value < 0:
+            errors.append(f"row_layouts[{row_index}].{field_path} must be a non-negative number")
+
+    return errors
+
+
+def row_layout_is_moving(row_layout: dict[str, Any]) -> bool:
+    motion = row_layout.get("motion")
+    motion_config = motion if isinstance(motion, dict) else {}
+    if motion_config.get("type") == ROW_MOTION_HORIZONTAL_WRAP:
+        return True
+    if row_layout.get("moving") is True:
+        return True
+
+    speed = motion_config.get("speed", row_layout.get("speed", 0))
+    return type(speed) in (int, float) and speed > 0
 
 
 def validate_shelves_shape(
@@ -417,8 +522,20 @@ def main() -> int:
 
     try:
         known_item_ids = set() if args.skip_known_items else load_item_ids(args.item_config)
-        shelves = load_shelves(args.level, args.shelves_only)
+        level_data = load_level_data(args.level)
+        if args.shelves_only:
+            if not isinstance(level_data, list):
+                raise ValueError("--shelves-only expects a JSON array")
+            shelves = level_data
+        elif isinstance(level_data, dict) and isinstance(level_data.get("shelves"), list):
+            shelves = level_data["shelves"]
+        elif isinstance(level_data, list):
+            shelves = level_data
+        else:
+            raise ValueError("Expected a level JSON object with 'shelves' or a shelves array")
         errors, item_counts = validate_shelves_shape(shelves, known_item_ids, args.skip_known_items)
+        if not args.shelves_only:
+            errors.extend(validate_row_layouts_shape(level_data, shelves))
     except (OSError, ValueError, json.JSONDecodeError) as error:
         result = result_to_json(args.level, False, [str(error)], Counter(), None)
         print(json.dumps(result, indent=2))

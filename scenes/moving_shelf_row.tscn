@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://d4lgv52gsp8ph"]
+
+[ext_resource type="Script" uid="uid://b7n08awt3so6k" path="res://scripts/moving_shelf_row.gd" id="1_moving_shelf_row"]
+
+[node name="MovingShelfRow" type="Control"]
+anchors_preset = 0
+offset_right = 656.0
+offset_bottom = 183.0
+mouse_filter = 2
+clip_contents = true
+script = ExtResource("1_moving_shelf_row")

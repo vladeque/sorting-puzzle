@@ -41,7 +41,7 @@ Purpose:
 
 Important nodes:
 - `Background`: fullscreen gameplay background.
-- `Shelves`: parent for generated shelf nodes.
+- `Shelves`: parent for generated shelf nodes and optional moving shelf row containers.
 - `DragLayer`: temporary parent for dragged items, drawn above shelves.
 - `UI`: `CanvasLayer` for gameplay labels, ability buttons, and overlays.
 - `UI/TimerLabel`: countdown display.
@@ -57,12 +57,14 @@ Important nodes:
 
 Runtime-created nodes:
 - `ShelfXX`: `scenes/shelf.tscn` instances generated under `Shelves`.
+- `MovingShelfRowXX`: `scenes/moving_shelf_row.tscn` instances generated under `Shelves` when a level config defines `row_layouts` moving rows.
 - `ShelfLayerXX`: generated back layers for hidden or upcoming item rows.
 - `ShelfItem` instances from `scenes/item.tscn`.
 - `ItemPlaceAudio` and `TripleClearAudio`: `AudioStreamPlayer` nodes created by `scripts/level.gd`.
 
 Depends on:
 - `scenes/shelf.tscn`
+- `scenes/moving_shelf_row.tscn`
 - `scenes/item.tscn`
 - `scenes/pause_menu.tscn`
 - `assets/audio/*.wav`
@@ -72,6 +74,33 @@ Depends on:
 
 Do not use for:
 - Static shelf cell visuals. Put those in `scenes/shelf.tscn`.
+
+## `scenes/moving_shelf_row.tscn`
+
+Root:
+- `MovingShelfRow` (`Control`)
+
+Script:
+- `scripts/moving_shelf_row.gd`
+
+Purpose:
+- Runtime row container for shelf rows with horizontal wrap motion.
+- Clips child shelf rendering to the configured visible shelf window.
+- Keeps moving-row bounds separate from individual shelf cell visuals.
+
+Important properties:
+- `clip_contents`: enabled so off-window shelves are hidden by the row rectangle.
+- `mouse_filter`: ignored so gameplay input remains owned by `scripts/level.gd`.
+
+Runtime-created nodes:
+- `ShelfXX`: `scenes/shelf.tscn` instances parented under the row and registered with `MovingShelfRow.add_shelf()`.
+
+Depends on:
+- Runtime configuration from `scripts/level.gd`.
+- Child shelf scenes from `scenes/shelf.tscn`.
+
+Do not use for:
+- Puzzle rules, item movement rules, matching, abilities, or lock progression. Those stay in `scripts/level.gd`.
 
 ## `scenes/pause_menu.tscn`
 
@@ -113,6 +142,7 @@ Purpose:
 - Owns the visible shelf back wall, floor, frame, front slot positions, and item snap markers.
 - Owns the hidden locked-shelf overlay visuals shown by `scripts/level.gd` when a level config gates the shelf behind cleared triples.
 - Uses wide, slightly shorter cell bounds so three generated shelves span most of the 720 px gameplay viewport with compact row spacing.
+- Can be switched by `scripts/level.gd` to a `floor_only` visual variant for moving rows by hiding wall and ceiling nodes at runtime.
 
 Important nodes:
 - `BackWall`: muted panel behind shelf items.
