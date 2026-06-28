@@ -586,7 +586,7 @@ func _get_staggered_4_5_4_cells() -> Array[Vector2]:
 	return cells
 
 
-func _add_shelf(parent: Node2D, shelf_number: int, shelf_position: Vector2) -> Node2D:
+func _add_shelf(parent: Node, shelf_number: int, shelf_position: Vector2) -> Node2D:
 	var shelf := SHELF_SCENE.instantiate() as Node2D
 	shelf.name = "Shelf%02d" % shelf_number
 	shelf.position = shelf_position
