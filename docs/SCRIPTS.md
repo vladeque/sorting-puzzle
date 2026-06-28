@@ -173,8 +173,11 @@ Key inputs:
 - Layout preset values mirror `scripts/level.gd`, including fixed-count staggered presets for 14-shelf `staggered_5_4_5` and 13-shelf `staggered_4_5_4` layouts.
 
 Generation constraints:
-- Difficulty presets cap how many triples a single item type should receive, falling back only when the requested board needs more triples than the available item catalog can uniquely cover.
-- Generated layouts reshuffle shelf slots to reduce same-item concentration on a single filled layer, using an adaptive per-layer limit so one-layer or tiny levels remain possible.
+- Difficulty presets cap how many copies of the same item can appear on one filled layer.
+- The generator derives the default total item cap per type from the per-layer cap and the filled layer count, then rounds that cap down to a valid multiple of three.
+- `--max-items-per-type` can lower the derived total cap for special levels that need less overall repetition, such as limiting a four-layer level to six copies of each item type.
+- When the item catalog cannot satisfy the target filled-slot count within the effective per-type cap, the generator adds extra empty slots instead of exceeding the cap.
+- Generated layouts reshuffle shelf slots to reduce same-item concentration on a single filled layer, using an adaptive per-layer limit so constrained levels remain possible.
 - Hard and expert difficulties still avoid shelves that start with a complete front-layer match.
 
 Depends on:

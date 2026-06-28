@@ -33,8 +33,8 @@ LAYOUT_PRESETS = (
 class DifficultyPreset:
     empty_ratio_min: float
     empty_ratio_max: float
-    max_triples_per_item: int
     max_same_item_per_layer: int
+    max_items_per_type: int | None
     allow_front_layer_matches: bool
     shuffle_passes: int
 
@@ -43,32 +43,32 @@ DIFFICULTIES = {
     "easy": DifficultyPreset(
         empty_ratio_min=0.22,
         empty_ratio_max=0.32,
-        max_triples_per_item=2,
         max_same_item_per_layer=5,
+        max_items_per_type=None,
         allow_front_layer_matches=True,
         shuffle_passes=1,
     ),
     "medium": DifficultyPreset(
         empty_ratio_min=0.12,
         empty_ratio_max=0.20,
-        max_triples_per_item=2,
         max_same_item_per_layer=4,
+        max_items_per_type=None,
         allow_front_layer_matches=True,
         shuffle_passes=2,
     ),
     "hard": DifficultyPreset(
         empty_ratio_min=0.05,
         empty_ratio_max=0.10,
-        max_triples_per_item=3,
         max_same_item_per_layer=4,
+        max_items_per_type=None,
         allow_front_layer_matches=False,
         shuffle_passes=4,
     ),
     "expert": DifficultyPreset(
         empty_ratio_min=0.0,
         empty_ratio_max=0.05,
-        max_triples_per_item=3,
         max_same_item_per_layer=3,
+        max_items_per_type=None,
         allow_front_layer_matches=False,
         shuffle_passes=6,
     ),
@@ -108,6 +108,29 @@ def calculate_filled_slots(total_slots: int, preset: DifficultyPreset, rng: rand
     empty_slots = min(total_slots - SLOTS_PER_SHELF, target_empty_slots)
     empty_slots -= empty_slots % SLOTS_PER_SHELF
     return total_slots - empty_slots
+
+
+def round_down_to_triple_count(item_count: int) -> int:
+    return item_count - (item_count % SLOTS_PER_SHELF)
+
+
+def calculate_max_items_per_type(
+    preset: DifficultyPreset,
+    filled_layer_count: int,
+    max_items_per_type_override: int | None,
+) -> int:
+    derived_max_items = preset.max_same_item_per_layer * filled_layer_count
+    configured_limits = [derived_max_items]
+    if preset.max_items_per_type is not None:
+        configured_limits.append(preset.max_items_per_type)
+    if max_items_per_type_override is not None:
+        configured_limits.append(max_items_per_type_override)
+
+    max_items_per_type = round_down_to_triple_count(min(configured_limits))
+    if max_items_per_type < SLOTS_PER_SHELF:
+        raise ValueError("Effective max items per type must allow at least one triple")
+
+    return max_items_per_type
 
 
 def would_create_front_match(shelves: list[dict[str, list[list[str | None]]]]) -> bool:
@@ -179,6 +202,7 @@ def generate_shelves(
     item_types: list[str],
     difficulty: str,
     seed: int | None,
+    max_items_per_type_override: int | None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     if shelf_count <= 0:
         raise ValueError("--shelf-count must be greater than 0")
@@ -190,9 +214,21 @@ def generate_shelves(
     preset = DIFFICULTIES[difficulty]
     rng = random.Random(seed)
     eligible_slots = shelf_count * filled_layer_count * SLOTS_PER_SHELF
-    filled_slots = calculate_filled_slots(eligible_slots, preset, rng)
+    target_filled_slots = calculate_filled_slots(eligible_slots, preset, rng)
+    max_items_per_type = calculate_max_items_per_type(
+        preset=preset,
+        filled_layer_count=filled_layer_count,
+        max_items_per_type_override=max_items_per_type_override,
+    )
+    filled_slots = min(target_filled_slots, len(item_types) * max_items_per_type)
+    filled_slots -= filled_slots % SLOTS_PER_SHELF
     empty_slots = eligible_slots - filled_slots
-    item_pool = build_item_pool_with_preset(item_types, filled_slots, preset, rng)
+    item_pool = build_item_pool_with_limit(
+        item_types=item_types,
+        filled_slots=filled_slots,
+        max_items_per_type=max_items_per_type,
+        rng=rng,
+    )
     eligible_slot_values = spread_values_across_layers(
         item_pool=item_pool,
         empty_slots=empty_slots,
@@ -234,6 +270,8 @@ def generate_shelves(
         layer_count=layer_count,
         filled_layer_count=filled_layer_count,
         preset=preset,
+        max_items_per_type_override=max_items_per_type_override,
+        target_filled_slots=target_filled_slots,
     )
     return shelves, stats
 
@@ -290,6 +328,7 @@ def generate_with_optional_validation(
     should_validate: bool,
     require_solvable: bool,
     max_attempts: int,
+    max_items_per_type_override: int | None,
     item_config_path: Path,
     max_states: int,
     max_depth: int,
@@ -307,6 +346,7 @@ def generate_with_optional_validation(
             item_types=item_types,
             difficulty=difficulty,
             seed=attempt_seed,
+            max_items_per_type_override=max_items_per_type_override,
         )
         stats["attempt"] = attempt_index + 1
         stats["max_attempts"] = attempts
@@ -331,14 +371,15 @@ def generate_with_optional_validation(
     return last_result
 
 
-def build_item_pool_with_preset(
+def build_item_pool_with_limit(
     item_types: list[str],
     filled_slots: int,
-    preset: DifficultyPreset,
+    max_items_per_type: int,
     rng: random.Random,
 ) -> list[str]:
     triple_count = filled_slots // SLOTS_PER_SHELF
-    required_type_count = (triple_count + preset.max_triples_per_item - 1) // preset.max_triples_per_item
+    max_triples_per_item = max_items_per_type // SLOTS_PER_SHELF
+    required_type_count = (triple_count + max_triples_per_item - 1) // max_triples_per_item
     usable_count = min(len(item_types), triple_count, required_type_count)
     if usable_count <= 0:
         raise ValueError("At least one item type and one item triple are required")
@@ -640,6 +681,8 @@ def build_stats(
     layer_count: int,
     filled_layer_count: int,
     preset: DifficultyPreset,
+    max_items_per_type_override: int | None,
+    target_filled_slots: int,
 ) -> dict[str, Any]:
     values = flatten_shelves(shelves)
     item_counts = Counter(value for value in values if value is not None)
@@ -648,6 +691,14 @@ def build_stats(
         for item_id, count in sorted(item_counts.items())
         if count % SLOTS_PER_SHELF != 0
     }
+    derived_max_items_per_type = round_down_to_triple_count(
+        preset.max_same_item_per_layer * filled_layer_count
+    )
+    effective_max_items_per_type = calculate_max_items_per_type(
+        preset=preset,
+        filled_layer_count=filled_layer_count,
+        max_items_per_type_override=max_items_per_type_override,
+    )
 
     return {
         "difficulty": difficulty,
@@ -656,12 +707,17 @@ def build_stats(
         "layer_count": layer_count,
         "filled_layer_count": filled_layer_count,
         "total_slots": len(values),
+        "target_filled_slots": target_filled_slots,
         "filled_slots": sum(1 for value in values if value is not None),
         "empty_slots": sum(1 for value in values if value is None),
+        "item_cap_added_empty_slots": target_filled_slots - sum(1 for value in values if value is not None),
         "item_counts": dict(sorted(item_counts.items())),
         "invalid_item_counts": invalid_counts,
-        "max_triples_per_item": preset.max_triples_per_item,
         "max_same_item_per_layer": preset.max_same_item_per_layer,
+        "derived_max_items_per_type": derived_max_items_per_type,
+        "preset_max_items_per_type": preset.max_items_per_type,
+        "requested_max_items_per_type": max_items_per_type_override,
+        "effective_max_items_per_type": effective_max_items_per_type,
         "layer_item_counts": [
             dict(sorted(layer_counts.items()))
             for layer_counts in build_layer_item_counts(shelves, filled_layer_count)
@@ -740,6 +796,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-generation-attempts", type=int, default=25)
     parser.add_argument("--validator-max-states", type=int, default=20_000)
     parser.add_argument("--validator-max-depth", type=int, default=200)
+    parser.add_argument(
+        "--max-items-per-type",
+        type=int,
+        help=(
+            "Optional global cap for generated item copies per type. "
+            "The effective value is rounded down to a multiple of three."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -761,6 +825,7 @@ def main() -> int:
             should_validate=args.validate,
             require_solvable=args.require_solvable,
             max_attempts=args.max_generation_attempts,
+            max_items_per_type_override=args.max_items_per_type,
             item_config_path=args.item_config,
             max_states=args.validator_max_states,
             max_depth=args.validator_max_depth,

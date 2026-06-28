@@ -88,6 +88,8 @@ Generation:
 py scripts\tools\generate_level_shelves.py --shelf-count 9 --layer-count 2 --difficulty medium --seed 123 --require-solvable --stats
 ```
 
+Use `--max-items-per-type` when a generated level should have a lower global item repetition cap than the layer-based default. If the item catalog cannot fill the board within that cap, the generator leaves additional slots empty rather than exceeding the requested cap.
+
 ## Documentation Update Checklist
 
 When changing scene, script, or config ownership:
