@@ -59,7 +59,7 @@ DIFFICULTIES = {
     "hard": DifficultyPreset(
         empty_ratio_min=0.05,
         empty_ratio_max=0.10,
-        max_triples_per_item=1,
+        max_triples_per_item=3,
         max_same_item_per_layer=4,
         allow_front_layer_matches=False,
         shuffle_passes=4,
@@ -67,7 +67,7 @@ DIFFICULTIES = {
     "expert": DifficultyPreset(
         empty_ratio_min=0.0,
         empty_ratio_max=0.05,
-        max_triples_per_item=1,
+        max_triples_per_item=3,
         max_same_item_per_layer=3,
         allow_front_layer_matches=False,
         shuffle_passes=6,
