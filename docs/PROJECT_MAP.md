@@ -70,10 +70,11 @@ Files:
 Responsibility:
 - Defines the reusable shelf cell visuals, front slots, and item snap markers.
 - Contains the visible back wall, wood floor, frame, floor lip, and floor grain nodes.
+- Contains the hidden generated lock overlay used by triple-gated shelves; `scripts/level.gd` toggles it and updates the remaining count.
 - Keeps the shelf width, height, and slot positions aligned with the level grid constants so a three-shelf row fills most of the gameplay viewport.
 
 Change here when:
-- Editing shelf visual details, front slot positions, item snap marker positions, or cell art node names.
+- Editing shelf visual details, locked shelf overlay visuals, front slot positions, item snap marker positions, or cell art node names.
 
 ### Item Runtime
 
@@ -168,6 +169,7 @@ Change matching rules:
 
 Change shelf unlock rules:
 - Update `scripts/level.gd` shelf lock helpers, ability item collection, and match/promotion filters.
+- Update `scenes/shelf.tscn` when changing the locked shelf overlay art, placement, or count label.
 - Update `scripts/tools/validate_level_solvable.py` when unlock timing or counting semantics change.
 - Keep `docs/CONFIGS.md` and generator `--locked-shelves` behavior aligned with the level JSON field.
 

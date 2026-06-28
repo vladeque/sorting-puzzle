@@ -20,7 +20,6 @@ const DEFAULT_LAYOUT_PRESET := "grid_3x3"
 const MAIN_MENU_SCENE := "res://scenes/main_menu.tscn"
 const ITEM_PLACE_SOUND := preload("res://assets/audio/item_place.wav")
 const TRIPLE_CLEAR_SOUND := preload("res://assets/audio/triple_clear.wav")
-const LOCK_SHELF_TEXTURE := preload("res://assets/ui/lock_shelf_cutout.png")
 const PAUSE_SETTING_SOUND_EFFECTS := &"sound_effects"
 const SHELF_UNLOCK_REQUIREMENT_META := &"unlock_after_triples"
 const SHELF_LOCKED_META := &"is_locked"
@@ -465,62 +464,17 @@ func _is_slot_locked(slot: Node) -> bool:
 
 func _update_shelf_lock_overlay(shelf: Node2D, should_lock: bool) -> void:
 	var overlay := shelf.get_node_or_null(LOCKED_OVERLAY_NAME) as Node2D
-	if not should_lock:
-		if overlay != null:
-			overlay.queue_free()
+	if overlay == null:
 		return
 
-	if overlay == null:
-		overlay = _create_shelf_lock_overlay()
-		shelf.add_child(overlay)
+	overlay.visible = should_lock
+	if not should_lock:
+		return
 
 	var remaining := maxi(_get_shelf_unlock_requirement(shelf) - _triples_cleared, 0)
 	var count_label := overlay.get_node_or_null("RemainingLabel") as Label
 	if count_label != null:
 		count_label.text = str(remaining)
-
-
-func _create_shelf_lock_overlay() -> Node2D:
-	var overlay := Node2D.new()
-	overlay.name = LOCKED_OVERLAY_NAME
-	overlay.z_index = 40
-
-	var shade := Polygon2D.new()
-	shade.name = "Shade"
-	shade.color = Color(0.04, 0.05, 0.06, 0.62)
-	shade.polygon = PackedVector2Array([
-		Vector2(-104, -81),
-		Vector2(104, -81),
-		Vector2(104, 46),
-		Vector2(-104, 46),
-	])
-	overlay.add_child(shade)
-
-	var lock_sprite := Sprite2D.new()
-	lock_sprite.name = "LockSprite"
-	lock_sprite.texture = LOCK_SHELF_TEXTURE
-	lock_sprite.position = Vector2(0, -8)
-	lock_sprite.z_index = 2
-	var texture_size := LOCK_SHELF_TEXTURE.get_size()
-	var target_size := Vector2(104, 104)
-	lock_sprite.scale = Vector2.ONE * minf(target_size.x / texture_size.x, target_size.y / texture_size.y)
-	overlay.add_child(lock_sprite)
-
-	var count_label := Label.new()
-	count_label.name = "RemainingLabel"
-	count_label.z_index = 3
-	count_label.position = Vector2(-38, -15)
-	count_label.size = Vector2(76, 44)
-	count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	count_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	count_label.add_theme_font_size_override("font_size", 36)
-	count_label.add_theme_color_override("font_color", Color(1.0, 1.0, 0.92, 1.0))
-	count_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.9))
-	count_label.add_theme_constant_override("shadow_offset_x", 0)
-	count_label.add_theme_constant_override("shadow_offset_y", 3)
-	overlay.add_child(count_label)
-
-	return overlay
 
 
 func _update_shelf_input_pickable(shelf: Node, should_enable: bool) -> void:

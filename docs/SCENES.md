@@ -111,6 +111,7 @@ Root:
 Purpose:
 - Reusable shelf cell instantiated by `scripts/level.gd` for each configured shelf.
 - Owns the visible shelf back wall, floor, frame, front slot positions, and item snap markers.
+- Owns the hidden locked-shelf overlay visuals shown by `scripts/level.gd` when a level config gates the shelf behind cleared triples.
 - Uses wide, slightly shorter cell bounds so three generated shelves span most of the 720 px gameplay viewport with compact row spacing.
 
 Important nodes:
@@ -118,14 +119,18 @@ Important nodes:
 - `Ceiling`, `LeftWall`, and `RightWall`: wooden cell frame.
 - `FloorSurface` and `FloorFrontLip`: wooden floor where items visually rest.
 - `FloorGrain*`: subtle line details on the floor.
+- `LockedOverlay`: hidden lock overlay used for triple-gated shelves.
+- `LockedOverlay/LockSprite`: generated lock image from `assets/ui/lock_shelf_cutout.png`.
+- `LockedOverlay/RemainingLabel`: runtime-updated count of triples still needed to unlock the shelf.
 - `Slot01`, `Slot02`, `Slot03`: front slots used by runtime movement and matching logic, positioned so default item silhouettes sit next to each other.
 - `SlotXX/ItemSlotXX`: marker positions used by `scripts/level.gd` for snap targeting.
 
 Depends on:
+- `assets/ui/lock_shelf_cutout.png` for locked shelf overlay art.
 - Runtime item spawning from `scripts/level.gd`.
 
 Do not use for:
-- Level timing, matching, input handling, or back-layer promotion. Those stay in `scripts/level.gd`.
+- Level timing, matching, input handling, lock progression, or back-layer promotion. Those stay in `scripts/level.gd`.
 
 ## `scenes/item.tscn`
 
