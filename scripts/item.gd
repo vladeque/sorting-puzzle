@@ -79,15 +79,14 @@ func _prepare_outline_material() -> void:
 
 
 func _apply_outline() -> void:
+	var outline_sprite := get_node_or_null("OutlineSprite") as Sprite2D
 	if _outline_material == null:
-		var outline_sprite := get_node_or_null("OutlineSprite") as Sprite2D
 		if outline_sprite != null:
 			_outline_material = outline_sprite.material as ShaderMaterial
 
 	if _outline_material == null:
 		return
 
-	var outline_sprite := get_node_or_null("OutlineSprite") as Sprite2D
 	if outline_sprite != null:
 		outline_sprite.visible = _outline_enabled
 		outline_sprite.scale = _get_outline_scale()

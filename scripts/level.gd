@@ -834,7 +834,7 @@ func _configure_back_layer_item(item: ShelfItem, should_show: bool) -> void:
 
 func _update_timer_label() -> void:
 	var remaining_seconds := ceili(_time_remaining)
-	var minutes := remaining_seconds / 60
+	var minutes := floori(float(remaining_seconds) / 60.0)
 	var seconds := remaining_seconds % 60
 	_timer_label.text = "%02d:%02d" % [minutes, seconds]
 

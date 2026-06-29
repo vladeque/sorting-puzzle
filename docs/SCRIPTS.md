@@ -96,6 +96,7 @@ Key responsibilities:
 - Queue shelf resolution requests made while another match animation is still finishing.
 - Promote back layers with `_promote_back_layer()`, `_play_layer_promotion_animation()`, and `_advance_back_layers()`.
 - Check win/loss state with `_check_level_completed()`, `_fail_level()`, and `_complete_level()`.
+- Format the active timer as zero-padded `MM:SS` text with `_update_timer_label()`.
 - Pause and resume active gameplay through the top-right menu button, the instanced `UI/PauseMenuOverlay`, `Leave`, and `Continue`.
 - Disable item placement and triple-clear sound effects while the pause menu sound-effects toggle is crossed out.
 - Manage hammer, shuffle, and highlight abilities.
@@ -190,7 +191,7 @@ Key methods:
 - `_apply_texture()`: updates `Sprite2D.texture`.
 - `_apply_visual_scale()`: updates `Sprite2D.scale`.
 - `set_outline(enabled, color, width)`: enables or disables the sprite border highlight.
-- `_apply_outline()`: sends outline properties to the `OutlineSprite` shader material.
+- `_apply_outline()`: sends outline properties to the `OutlineSprite` shader material and keeps the outline node visible only while enabled.
 
 Depends on:
 - Child node `Sprite2D`.
