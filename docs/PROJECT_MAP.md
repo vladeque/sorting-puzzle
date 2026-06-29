@@ -122,7 +122,7 @@ Files:
 Responsibility:
 - Provides hammer, shuffle, and highlight buttons.
 - Tracks three uses per ability per level.
-- Lets hammer clear matching visible/front items first, or first-back-layer items if no visible item type can make a triple.
+- Lets hammer clear matching visible/front items first, or supplement visible/front items with first-back-layer copies of the same type if no visible item type can make a triple.
 - Disables abilities after failure, completion, or when uses run out.
 - Starts the highlight timer even when no current shelf state can be highlighted.
 - Uses `ShelfItem` outline state for border-only highlight ability visuals.

@@ -1712,9 +1712,10 @@ func _cancel_active_interaction() -> void:
 
 
 func _use_hammer() -> bool:
-	var items_to_destroy := _find_hammer_targets(_get_visible_items())
+	var visible_items := _get_visible_items()
+	var items_to_destroy := _find_hammer_targets(visible_items)
 	if items_to_destroy.is_empty():
-		items_to_destroy = _find_hammer_targets(_get_first_back_layer_items())
+		items_to_destroy = _find_hammer_supplemented_targets(visible_items, _get_first_back_layer_items())
 
 	if items_to_destroy.is_empty():
 		return false
@@ -1724,16 +1725,7 @@ func _use_hammer() -> bool:
 
 
 func _find_hammer_targets(items: Array[ShelfItem]) -> Array[ShelfItem]:
-	var items_by_type := {}
-	for item in items:
-		if item.item_id == &"":
-			continue
-
-		if not items_by_type.has(item.item_id):
-			items_by_type[item.item_id] = []
-
-		items_by_type[item.item_id].append(item)
-
+	var items_by_type := _group_hammer_items_by_type(items)
 	var candidate_ids: Array[StringName] = []
 	for item_id in items_by_type.keys():
 		var typed_items := items_by_type[item_id] as Array
@@ -1754,6 +1746,59 @@ func _find_hammer_targets(items: Array[ShelfItem]) -> Array[ShelfItem]:
 			items_to_destroy.append(item)
 
 	return items_to_destroy
+
+
+func _find_hammer_supplemented_targets(
+	front_items: Array[ShelfItem],
+	back_layer_items: Array[ShelfItem]
+) -> Array[ShelfItem]:
+	var front_items_by_type := _group_hammer_items_by_type(front_items)
+	var back_items_by_type := _group_hammer_items_by_type(back_layer_items)
+
+	var candidate_ids: Array[StringName] = []
+	for item_id in front_items_by_type.keys():
+		var front_typed_items := front_items_by_type[item_id] as Array
+		var back_typed_items := back_items_by_type.get(item_id, []) as Array
+		if not front_typed_items.is_empty() and front_typed_items.size() + back_typed_items.size() >= SLOT_COUNT:
+			candidate_ids.append(item_id)
+
+	if candidate_ids.is_empty():
+		return []
+
+	var chosen_id := candidate_ids[_rng.randi_range(0, candidate_ids.size() - 1)]
+	var chosen_front_items := front_items_by_type[chosen_id] as Array
+	var chosen_back_items := back_items_by_type.get(chosen_id, []) as Array
+	_shuffle_array(chosen_front_items)
+	_shuffle_array(chosen_back_items)
+
+	var items_to_destroy: Array[ShelfItem] = []
+	var front_item_count = mini(chosen_front_items.size(), SLOT_COUNT)
+	for item_index in range(front_item_count):
+		var item := chosen_front_items[item_index] as ShelfItem
+		if item != null:
+			items_to_destroy.append(item)
+
+	var back_items_needed := SLOT_COUNT - items_to_destroy.size()
+	for item_index in range(back_items_needed):
+		var item := chosen_back_items[item_index] as ShelfItem
+		if item != null:
+			items_to_destroy.append(item)
+
+	return items_to_destroy
+
+
+func _group_hammer_items_by_type(items: Array[ShelfItem]) -> Dictionary:
+	var items_by_type := {}
+	for item in items:
+		if item.item_id == &"":
+			continue
+
+		if not items_by_type.has(item.item_id):
+			items_by_type[item.item_id] = []
+
+		items_by_type[item.item_id].append(item)
+
+	return items_by_type
 
 
 func _use_shuffle() -> bool:
