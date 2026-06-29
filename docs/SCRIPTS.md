@@ -214,6 +214,7 @@ Generation constraints:
 - Difficulty presets cap how many copies of the same item can appear on one filled layer.
 - The generator derives the default total item cap per type from the per-layer cap and the filled layer count, then rounds that cap down to a valid multiple of three.
 - `--max-items-per-type` can lower the derived total cap for special levels that need less overall repetition, such as limiting a four-layer level to six copies of each item type.
+- `--min-front-visible-triples` defaults to `1` and guarantees at least that many item types have three visible front-layer copies somewhere across shelves, which gives generated levels an intuitive starting move without requiring a completed shelf match. Use `0` to disable the guarantee.
 - `--locked-shelves` can add per-shelf `unlock_after_triples` requirements using 1-based shelf numbers such as `7:3,8:5`.
 - When the item catalog cannot satisfy the target filled-slot count within the effective per-type cap, the generator adds extra empty slots instead of exceeding the cap.
 - Generated layouts reshuffle shelf slots to reduce same-item concentration on a single filled layer, using an adaptive per-layer limit so constrained levels remain possible.

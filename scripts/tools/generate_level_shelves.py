@@ -247,6 +247,7 @@ def generate_shelves(
     difficulty: str,
     seed: int | None,
     max_items_per_type_override: int | None,
+    min_front_visible_triples: int,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     if shelf_count <= 0:
         raise ValueError("--shelf-count must be greater than 0")
@@ -254,6 +255,8 @@ def generate_shelves(
         raise ValueError("--layer-count must be greater than 0")
     if filled_layer_count <= 0 or filled_layer_count > layer_count:
         raise ValueError("--filled-layer-count must be between 1 and --layer-count")
+    if min_front_visible_triples < 0:
+        raise ValueError("--min-front-visible-triples must be zero or greater")
 
     preset = DIFFICULTIES[difficulty]
     rng = random.Random(seed)
@@ -278,6 +281,14 @@ def generate_shelves(
         empty_slots=empty_slots,
         shelf_count=shelf_count,
         filled_layer_count=filled_layer_count,
+        max_same_item_per_layer=preset.max_same_item_per_layer,
+        rng=rng,
+    )
+    ensure_min_front_visible_triples(
+        eligible_slot_values=eligible_slot_values,
+        shelf_count=shelf_count,
+        filled_layer_count=filled_layer_count,
+        min_front_visible_triples=min_front_visible_triples,
         max_same_item_per_layer=preset.max_same_item_per_layer,
         rng=rng,
     )
@@ -315,6 +326,7 @@ def generate_shelves(
         filled_layer_count=filled_layer_count,
         preset=preset,
         max_items_per_type_override=max_items_per_type_override,
+        min_front_visible_triples=min_front_visible_triples,
         target_filled_slots=target_filled_slots,
     )
     return shelves, stats
@@ -373,6 +385,7 @@ def generate_with_optional_validation(
     require_solvable: bool,
     max_attempts: int,
     max_items_per_type_override: int | None,
+    min_front_visible_triples: int,
     item_config_path: Path,
     max_states: int,
     max_depth: int,
@@ -393,6 +406,7 @@ def generate_with_optional_validation(
             difficulty=difficulty,
             seed=attempt_seed,
             max_items_per_type_override=max_items_per_type_override,
+            min_front_visible_triples=min_front_visible_triples,
         )
         apply_locked_shelves(shelves, locked_shelves)
         stats["attempt"] = attempt_index + 1
@@ -574,6 +588,153 @@ def spread_values_across_layers(
     )
 
 
+def count_front_visible_triple_candidates(shelves: list[dict[str, Any]]) -> int:
+    front_counts: Counter[str] = Counter()
+    for shelf in shelves:
+        layers = shelf["layers"]
+        if not layers:
+            continue
+
+        front_counts.update(item_id for item_id in layers[0] if item_id is not None)
+
+    return sum(1 for count in front_counts.values() if count >= SLOTS_PER_SHELF)
+
+
+def ensure_min_front_visible_triples(
+    eligible_slot_values: list[str | None],
+    shelf_count: int,
+    filled_layer_count: int,
+    min_front_visible_triples: int,
+    max_same_item_per_layer: int,
+    rng: random.Random,
+) -> None:
+    if min_front_visible_triples <= 0:
+        return
+
+    layer_values = split_values_by_layer(
+        eligible_slot_values=eligible_slot_values,
+        shelf_count=shelf_count,
+        filled_layer_count=filled_layer_count,
+    )
+    item_counts = Counter(value for values in layer_values for value in values if value is not None)
+    item_limits = build_layer_item_limits(
+        item_counts=item_counts,
+        filled_layer_count=filled_layer_count,
+        max_same_item_per_layer=max_same_item_per_layer,
+    )
+    front_counts = Counter(value for value in layer_values[0] if value is not None)
+    satisfied_items = {item_id for item_id, count in front_counts.items() if count >= SLOTS_PER_SHELF}
+    needed_count = min_front_visible_triples - len(satisfied_items)
+    if needed_count <= 0:
+        return
+
+    candidate_items = [
+        item_id
+        for item_id, count in item_counts.items()
+        if count >= SLOTS_PER_SHELF and item_id not in satisfied_items
+    ]
+    rng.shuffle(candidate_items)
+
+    for item_id in candidate_items:
+        if needed_count <= 0:
+            break
+        if front_counts[item_id] >= SLOTS_PER_SHELF:
+            continue
+
+        moved_count = move_item_copies_to_front_layer(
+            layer_values=layer_values,
+            front_counts=front_counts,
+            item_limits=item_limits,
+            item_id=item_id,
+            rng=rng,
+        )
+        if moved_count > 0 and front_counts[item_id] >= SLOTS_PER_SHELF:
+            satisfied_items.add(item_id)
+            needed_count -= 1
+
+    if needed_count > 0:
+        possible_count = len(satisfied_items)
+        raise ValueError(
+            f"Could not satisfy --min-front-visible-triples={min_front_visible_triples}; "
+            f"only {possible_count} visible triple candidates could be arranged"
+        )
+
+    eligible_slot_values[:] = rebuild_values_from_layers(
+        layer_values=layer_values,
+        shelf_count=shelf_count,
+        filled_layer_count=filled_layer_count,
+    )
+
+
+def move_item_copies_to_front_layer(
+    layer_values: list[list[str | None]],
+    front_counts: Counter[str],
+    item_limits: dict[str, int],
+    item_id: str,
+    rng: random.Random,
+) -> int:
+    moved_count = 0
+
+    while front_counts[item_id] < SLOTS_PER_SHELF:
+        move = find_front_layer_swap(
+            layer_values=layer_values,
+            front_counts=front_counts,
+            item_limits=item_limits,
+            item_id=item_id,
+            rng=rng,
+        )
+        if move is None:
+            break
+
+        target_position, source_layer_index, source_position = move
+        swapped_item = layer_values[0][target_position]
+        layer_values[0][target_position] = item_id
+        layer_values[source_layer_index][source_position] = swapped_item
+        front_counts[item_id] += 1
+        if swapped_item is not None:
+            front_counts[swapped_item] -= 1
+        moved_count += 1
+
+    return moved_count
+
+
+def find_front_layer_swap(
+    layer_values: list[list[str | None]],
+    front_counts: Counter[str],
+    item_limits: dict[str, int],
+    item_id: str,
+    rng: random.Random,
+) -> tuple[int, int, int] | None:
+    source_candidates = []
+    for layer_index in range(1, len(layer_values)):
+        for source_position, source_item_id in enumerate(layer_values[layer_index]):
+            if source_item_id == item_id:
+                source_candidates.append((layer_index, source_position))
+    rng.shuffle(source_candidates)
+
+    target_positions = [
+        target_position
+        for target_position, target_item_id in enumerate(layer_values[0])
+        if target_item_id != item_id
+        and (target_item_id is None or front_counts[target_item_id] != SLOTS_PER_SHELF)
+    ]
+    rng.shuffle(target_positions)
+
+    layer_counts = [
+        Counter(value for value in values if value is not None)
+        for values in layer_values
+    ]
+    for target_position in target_positions:
+        swapped_item = layer_values[0][target_position]
+        for source_layer_index, source_position in source_candidates:
+            if swapped_item is None:
+                return target_position, source_layer_index, source_position
+            if layer_counts[source_layer_index][swapped_item] < item_limits[swapped_item]:
+                return target_position, source_layer_index, source_position
+
+    return None
+
+
 def flatten_shelves(shelves: list[dict[str, Any]]) -> list[str | None]:
     values = []
     for shelf in shelves:
@@ -733,6 +894,7 @@ def build_stats(
     filled_layer_count: int,
     preset: DifficultyPreset,
     max_items_per_type_override: int | None,
+    min_front_visible_triples: int,
     target_filled_slots: int,
 ) -> dict[str, Any]:
     values = flatten_shelves(shelves)
@@ -769,6 +931,8 @@ def build_stats(
         "preset_max_items_per_type": preset.max_items_per_type,
         "requested_max_items_per_type": max_items_per_type_override,
         "effective_max_items_per_type": effective_max_items_per_type,
+        "min_front_visible_triples": min_front_visible_triples,
+        "front_visible_triple_candidates": count_front_visible_triple_candidates(shelves),
         "layer_item_counts": [
             dict(sorted(layer_counts.items()))
             for layer_counts in build_layer_item_counts(shelves, filled_layer_count)
@@ -856,6 +1020,15 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     parser.add_argument(
+        "--min-front-visible-triples",
+        type=int,
+        default=1,
+        help=(
+            "Minimum number of item types with at least three visible front-layer copies. "
+            "Use 0 to disable this starter-progress guarantee."
+        ),
+    )
+    parser.add_argument(
         "--locked-shelves",
         help=(
             "Comma-separated 1-based shelf unlock requirements, such as 7:3,8:5. "
@@ -885,6 +1058,7 @@ def main() -> int:
             require_solvable=args.require_solvable,
             max_attempts=args.max_generation_attempts,
             max_items_per_type_override=args.max_items_per_type,
+            min_front_visible_triples=args.min_front_visible_triples,
             item_config_path=args.item_config,
             max_states=args.validator_max_states,
             max_depth=args.validator_max_depth,

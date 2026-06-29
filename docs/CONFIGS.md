@@ -133,6 +133,8 @@ py scripts\tools\generate_level_shelves.py --shelf-count 9 --layer-count 2 --dif
 
 Use `--max-items-per-type` when a generated level should have a lower global item repetition cap than the layer-based default. If the item catalog cannot fill the board within that cap, the generator leaves additional slots empty rather than exceeding the requested cap.
 
+Generated levels default to `--min-front-visible-triples 1`, so at least one item type starts with three visible front-layer copies across shelves. Use `--min-front-visible-triples 0` for layouts that should not force a starter visible triple candidate.
+
 Use `--locked-shelves` to add unlock requirements to generated shelves. Entries are 1-based shelf numbers and required cleared triples:
 
 ```powershell
