@@ -114,7 +114,7 @@ Runtime behavior:
 - `scripts/level.gd` uses `time_seconds` as the active timer.
 - Locked shelves show a runtime lock overlay with the remaining triple count on the lock and cannot be used as move sources, move targets, match clears, promotions, or ability targets until unlocked.
 - Off-window moving shelves cannot be selected or targeted by drag/drop, but abilities can still target their front-layer items.
-- Hammer clears count as cleared triples for shelf unlocking.
+- Hammer clears count as cleared triples for shelf unlocking. If no unlocked visible/front item type has three available copies, hammer can clear a matching set from the first back layer instead.
 
 Validation:
 

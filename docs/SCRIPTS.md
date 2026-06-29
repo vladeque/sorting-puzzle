@@ -99,7 +99,7 @@ Key responsibilities:
 - Format the active timer as zero-padded `MM:SS` text with `_update_timer_label()`.
 - Pause and resume active gameplay through the top-right menu button, the instanced `UI/PauseMenuOverlay`, `Leave`, and `Continue`.
 - Disable item placement and triple-clear sound effects while the pause menu sound-effects toggle is crossed out.
-- Manage hammer, shuffle, and highlight abilities.
+- Manage hammer, shuffle, and highlight abilities. Hammer targets visible/front triples first, then falls back to the first back layer when no visible item type has three available copies.
 - Count hammer destroys as cleared triples for shelf unlocking.
 - Let highlight uses start their timed window even when no immediate triple can currently be highlighted.
 - Apply highlight ability visuals through `ShelfItem.set_outline()` so only item silhouettes receive a border, and update the highlight button countdown label while that window is active.

@@ -1712,8 +1712,20 @@ func _cancel_active_interaction() -> void:
 
 
 func _use_hammer() -> bool:
+	var items_to_destroy := _find_hammer_targets(_get_visible_items())
+	if items_to_destroy.is_empty():
+		items_to_destroy = _find_hammer_targets(_get_first_back_layer_items())
+
+	if items_to_destroy.is_empty():
+		return false
+
+	_destroy_items(items_to_destroy)
+	return true
+
+
+func _find_hammer_targets(items: Array[ShelfItem]) -> Array[ShelfItem]:
 	var items_by_type := {}
-	for item in _get_visible_items():
+	for item in items:
 		if item.item_id == &"":
 			continue
 
@@ -1729,7 +1741,7 @@ func _use_hammer() -> bool:
 			candidate_ids.append(item_id)
 
 	if candidate_ids.is_empty():
-		return false
+		return []
 
 	var chosen_id := candidate_ids[_rng.randi_range(0, candidate_ids.size() - 1)]
 	var chosen_items := items_by_type[chosen_id] as Array
@@ -1737,10 +1749,11 @@ func _use_hammer() -> bool:
 
 	var items_to_destroy: Array[ShelfItem] = []
 	for item_index in range(SLOT_COUNT):
-		items_to_destroy.append(chosen_items[item_index])
+		var item := chosen_items[item_index] as ShelfItem
+		if item != null:
+			items_to_destroy.append(item)
 
-	_destroy_items(items_to_destroy)
-	return true
+	return items_to_destroy
 
 
 func _use_shuffle() -> bool:
@@ -1978,6 +1991,32 @@ func _get_visible_items() -> Array[ShelfItem]:
 
 		for item in _get_shelf_items(shelf):
 			if not _is_item_busy(item):
+				items.append(item)
+
+	return items
+
+
+func _get_first_back_layer_items() -> Array[ShelfItem]:
+	var items: Array[ShelfItem] = []
+	for shelf in _get_all_shelves():
+		if _is_shelf_locked(shelf):
+			continue
+
+		var shelf_node := shelf as Node2D
+		if shelf_node == null:
+			continue
+
+		var back_layer := shelf_node.get_node_or_null(_get_back_layer_name(FIRST_BACK_LAYER_INDEX)) as Node2D
+		if back_layer == null:
+			continue
+
+		for layer_slot_node in back_layer.get_children():
+			var layer_slot := layer_slot_node as Node2D
+			if layer_slot == null:
+				continue
+
+			var item := _get_slot_item(layer_slot)
+			if item != null and not _is_item_busy(item):
 				items.append(item)
 
 	return items
