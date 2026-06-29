@@ -62,7 +62,7 @@ DIFFICULTIES = {
         empty_ratio_max=0.15,
         max_same_item_per_layer=3,
         max_items_per_type=None,
-        allow_front_layer_matches=False,
+        allow_front_layer_matches=True,
         shuffle_passes=4,
     ),
     "expert": DifficultyPreset(
