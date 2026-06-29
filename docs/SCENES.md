@@ -150,13 +150,13 @@ Important nodes:
 - `FloorSurface` and `FloorFrontLip`: wooden floor where items visually rest.
 - `FloorGrain*`: subtle line details on the floor.
 - `LockedOverlay`: hidden lock overlay used for triple-gated shelves.
-- `LockedOverlay/LockSprite`: generated lock image from `assets/ui/lock_shelf_cutout.png`.
-- `LockedOverlay/RemainingLabel`: runtime-updated count of triples still needed to unlock the shelf.
+- `LockedOverlay/LockSprite`: transparent lock image from `assets/ui/lock_shelf_cutout.png`, scaled to fit the shelf overlay.
+- `LockedOverlay/RemainingLabel`: runtime-updated count of triples still needed to unlock the shelf, positioned over the lock's clear center panel.
 - `Slot01`, `Slot02`, `Slot03`: front slots used by runtime movement and matching logic, positioned so default item silhouettes sit next to each other.
 - `SlotXX/ItemSlotXX`: marker positions used by `scripts/level.gd` for snap targeting.
 
 Depends on:
-- `assets/ui/lock_shelf_cutout.png` for locked shelf overlay art.
+- `assets/ui/lock_shelf_cutout.png` for locked shelf overlay art with a clear center panel for the count label.
 - Runtime item spawning from `scripts/level.gd`.
 
 Do not use for:

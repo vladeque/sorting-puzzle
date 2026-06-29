@@ -26,6 +26,7 @@ const PAUSE_SETTING_SOUND_EFFECTS := &"sound_effects"
 const SHELF_UNLOCK_REQUIREMENT_META := &"unlock_after_triples"
 const SHELF_LOCKED_META := &"is_locked"
 const LOCKED_OVERLAY_NAME := "LockedOverlay"
+const LOCK_REMAINING_LABEL_NAME := "RemainingLabel"
 const ROW_LAYOUTS_KEY := "row_layouts"
 const ROW_MOTION_HORIZONTAL_WRAP := "horizontal_wrap"
 const SHELF_VISUAL_VARIANT_FULL := "full"
@@ -741,9 +742,22 @@ func _update_shelf_lock_overlay(shelf: Node2D, should_lock: bool) -> void:
 		return
 
 	var remaining := maxi(_get_shelf_unlock_requirement(shelf) - _triples_cleared, 0)
-	var count_label := overlay.get_node_or_null("RemainingLabel") as Label
+	var count_label := overlay.get_node_or_null(LOCK_REMAINING_LABEL_NAME) as Label
 	if count_label != null:
-		count_label.text = str(remaining)
+		_update_lock_remaining_label(count_label, remaining)
+
+
+func _update_lock_remaining_label(count_label: Label, remaining: int) -> void:
+	var remaining_text := str(remaining)
+	count_label.text = remaining_text
+
+	var font_size := 34
+	if remaining_text.length() >= 3:
+		font_size = 24
+	elif remaining_text.length() == 2:
+		font_size = 30
+
+	count_label.add_theme_font_size_override("font_size", font_size)
 
 
 func _update_shelf_input_pickable(shelf: Node, should_enable: bool) -> void:

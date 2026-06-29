@@ -90,7 +90,7 @@ Files:
 Responsibility:
 - Defines the reusable shelf cell visuals, front slots, and item snap markers.
 - Contains the visible back wall, wood floor, frame, floor lip, and floor grain nodes.
-- Contains the hidden generated lock overlay used by triple-gated shelves; `scripts/level.gd` toggles it and updates the remaining count.
+- Contains the hidden lock overlay used by triple-gated shelves; `scripts/level.gd` toggles it and fits the remaining count onto the lock center panel.
 - Keeps the shelf width, height, and slot positions aligned with the level grid constants so a three-shelf row fills most of the gameplay viewport.
 
 Change here when:
