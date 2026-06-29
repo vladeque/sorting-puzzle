@@ -1,25 +1,63 @@
 {
   "level": 8,
-  "time_seconds": 240,
+  "time_seconds": 300,
   "layout_preset": "grid_3x3_moving_5_bottom",
   "difficulty": "hard",
   "shelves": [
     {
       "layers": [
         [
-          "orange_juice_box",
-          "toothpaste_box",
-          "toothpaste_box"
-        ],
-        [
-          "jam_jar",
           "chips_can",
-          "chocolate_bar"
+          "jam_jar",
+          "candy_bag"
         ],
         [
-          "cereal_box",
+          "water_bottle",
+          "soap_pump",
+          "shampoo_bottle"
+        ],
+        [
           "chocolate_bar",
-          "orange_juice_box"
+          "shampoo_bottle",
+          "cupcake"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "golden_cat_figurine",
+          "orange_juice_box",
+          null
+        ],
+        [
+          "orange_juice_box",
+          null,
+          "ice_cream_cup"
+        ],
+        [
+          "ice_cream_cup",
+          "shampoo_bottle",
+          "milk_carton"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "rubber_duck",
+          null,
+          "ketchup_bottle"
+        ],
+        [
+          "golden_cat_figurine",
+          "ketchup_bottle",
+          null
+        ],
+        [
+          "cookie_box",
+          "cupcake",
+          "jam_jar"
         ]
       ]
     },
@@ -27,17 +65,93 @@
       "layers": [
         [
           "cupcake",
-          "gift_box",
-          "chips_can"
+          "soap_pump",
+          "shampoo_bottle"
         ],
         [
+          "orange_juice_box",
+          "ice_cream_cup",
+          "gift_box"
+        ],
+        [
+          "golden_cat_figurine",
+          "gift_box",
+          "cereal_box"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "soap_pump",
+          null,
+          "canned_food"
+        ],
+        [
+          "water_bottle",
+          "chocolate_bar",
+          "toy_robot"
+        ],
+        [
+          null,
+          "orange_juice_box",
+          "golden_cat_figurine"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
           "cupcake",
+          null,
+          "cereal_box"
+        ],
+        [
+          "golden_cat_figurine",
+          "chocolate_bar",
+          "cereal_box"
+        ],
+        [
+          "orange_juice_box",
+          "ketchup_bottle",
+          "toy_robot"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "cereal_box",
+          "shampoo_bottle",
+          "milk_carton"
+        ],
+        [
+          "canned_food",
+          "cupcake",
+          "shampoo_bottle"
+        ],
+        [
+          "candy_bag",
+          null,
+          "cereal_box"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "jam_jar",
+          "chips_can",
+          "chocolate_bar"
+        ],
+        [
           "milk_carton",
+          "candy_bag",
           null
         ],
         [
-          "milk_carton",
-          "toy_robot",
+          "gift_box",
+          "ice_cream_cup",
           "canned_food"
         ]
       ]
@@ -45,17 +159,17 @@
     {
       "layers": [
         [
-          "canned_food",
-          "jam_jar",
-          "toy_robot"
+          "toy_robot",
+          "milk_carton",
+          "candy_bag"
         ],
         [
-          "soda_bottle",
-          "water_bottle",
-          "shampoo_bottle"
+          "ketchup_bottle",
+          null,
+          "rubber_duck"
         ],
         [
-          "candy_bag",
+          "cookie_box",
           "rubber_duck",
           "candy_bag"
         ]
@@ -64,209 +178,95 @@
     {
       "layers": [
         [
+          "ice_cream_cup",
           null,
-          "soda_bottle",
-          "cupcake"
+          "chips_can"
         ],
         [
-          "shampoo_bottle",
+          null,
           "candy_bag",
-          "rubber_duck"
+          "canned_food"
         ],
         [
-          "milk_carton",
-          "water_bottle",
-          "cupcake"
+          "canned_food",
+          "soap_pump",
+          "ketchup_bottle"
         ]
       ]
     },
     {
       "layers": [
         [
-          "candy_bag",
           "cookie_box",
-          "cereal_box"
-        ],
-        [
-          "soda_bottle",
-          "gift_box",
-          "golden_cat_figurine"
-        ],
-        [
-          "soda_bottle",
-          "golden_cat_figurine",
-          "soda_bottle"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          null,
-          "cookie_box",
+          "ice_cream_cup",
           "water_bottle"
         ],
         [
-          null,
-          "chips_can",
-          "orange_juice_box"
-        ],
-        [
-          "water_bottle",
-          "jam_jar",
-          null
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "soap_pump",
-          "water_bottle",
-          "jam_jar"
-        ],
-        [
-          "jam_jar",
-          "chocolate_bar",
-          "cereal_box"
-        ],
-        [
-          "shampoo_bottle",
-          "rubber_duck",
-          "soap_pump"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          null,
-          null,
-          "gift_box"
-        ],
-        [
-          "soap_pump",
-          "golden_cat_figurine",
-          "canned_food"
-        ],
-        [
-          "soap_pump",
-          "chocolate_bar",
-          "cupcake"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "chips_can",
-          "orange_juice_box",
-          "chocolate_bar"
-        ],
-        [
-          "canned_food",
-          "candy_bag",
-          "soap_pump"
-        ],
-        [
-          "cookie_box",
-          "shampoo_bottle",
-          null
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "canned_food",
-          "golden_cat_figurine",
-          "chocolate_bar"
-        ],
-        [
-          "rubber_duck",
-          null,
-          "orange_juice_box"
-        ],
-        [
-          "jam_jar",
-          "chips_can",
-          "golden_cat_figurine"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "milk_carton",
-          "milk_carton",
-          "soap_pump"
-        ],
-        [
           "toy_robot",
-          "water_bottle",
-          "cupcake"
+          "cookie_box",
+          "cookie_box"
         ],
         [
-          "cookie_box",
-          "toothpaste_box",
-          "canned_food"
+          "chocolate_bar",
+          "jam_jar",
+          "water_bottle"
         ]
       ]
     },
     {
       "layers": [
         [
-          "candy_bag",
-          "rubber_duck",
+          "ketchup_bottle",
+          "chocolate_bar",
           "toy_robot"
         ],
         [
-          "cookie_box",
-          null,
-          "toothpaste_box"
+          "jam_jar",
+          "rubber_duck",
+          "jam_jar"
         ],
         [
-          "toothpaste_box",
-          "toy_robot",
-          "gift_box"
+          "soap_pump",
+          "gift_box",
+          null
         ]
       ]
     },
     {
       "layers": [
         [
-          "soda_bottle",
           "golden_cat_figurine",
-          "shampoo_bottle"
+          "canned_food",
+          "orange_juice_box"
         ],
         [
-          "toothpaste_box",
+          "gift_box",
+          "soap_pump",
+          "cupcake"
+        ],
+        [
+          "water_bottle",
+          "rubber_duck",
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "rubber_duck",
           "toy_robot",
+          "cookie_box"
+        ],
+        [
+          "gift_box",
+          "cereal_box",
           "milk_carton"
         ],
         [
           null,
-          null,
-          "chips_can"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          null,
-          "shampoo_bottle",
-          "rubber_duck"
-        ],
-        [
-          "cookie_box",
-          "gift_box",
-          null
-        ],
-        [
-          "orange_juice_box",
-          "gift_box",
-          null
+          "milk_carton",
+          "water_bottle"
         ]
       ]
     }
