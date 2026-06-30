@@ -45,6 +45,9 @@ const ABILITY_BUTTON_ROW_SIZE := Vector2(396, 100)
 const ABILITY_BUTTON_ROW_TOP := 12.0
 const SHELVES_TOP_CLEARANCE := 128.0
 const SHELVES_BOTTOM_CLEARANCE := 52.0
+const SHELVES_SIDE_MARGIN := 32.0
+const SHELVES_MIN_LAYOUT_SCALE := 0.45
+const SHELVES_MAX_LAYOUT_SCALE := 1.5
 const RESULT_LABEL_HEIGHT := 96.0
 const PAUSE_MENU_PANEL_SIZE := Vector2(520, 363)
 const SHELF_FLOOR_ONLY_HIDDEN_NODES := [
@@ -124,6 +127,7 @@ var _item_place_audio_player: AudioStreamPlayer
 var _triple_clear_audio_player: AudioStreamPlayer
 var _sound_effects_enabled := true
 var _triples_cleared := 0
+var _shelves_layout_scale := 1.0
 
 
 func _ready() -> void:
@@ -314,14 +318,28 @@ func _layout_shelves(viewport_size: Vector2, safe_margins: Vector4) -> void:
 	var play_top := safe_margins.y + SHELVES_TOP_CLEARANCE
 	var ability_top := viewport_size.y - _get_ability_bar_bottom_margin(safe_margins) - ABILITY_BAR_HEIGHT
 	var play_bottom := maxf(play_top, ability_top - SHELVES_BOTTOM_CLEARANCE)
-	var root_position := Vector2(viewport_size.x * 0.5, (play_top + play_bottom) * 0.5)
+	var play_left := safe_margins.x + SHELVES_SIDE_MARGIN
+	var play_right := viewport_size.x - safe_margins.z - SHELVES_SIDE_MARGIN
 	var shelf_bounds := _get_shelves_local_bounds()
+	_shelves_layout_scale = _get_shelves_layout_scale(shelf_bounds, play_left, play_right, play_top, play_bottom)
+	_shelves_root.scale = Vector2.ONE * _shelves_layout_scale
+
+	var scaled_bounds := _get_scaled_rect(shelf_bounds, _shelves_layout_scale)
+	var root_position := Vector2((play_left + play_right) * 0.5, (play_top + play_bottom) * 0.5)
 	if shelf_bounds.size.y > 0.0:
-		var bounds_center_y := shelf_bounds.position.y + shelf_bounds.size.y * 0.5
+		var bounds_center_x := scaled_bounds.position.x + scaled_bounds.size.x * 0.5
+		root_position.x = (play_left + play_right) * 0.5 - bounds_center_x
+
+		var min_root_x := play_left - scaled_bounds.position.x
+		var max_root_x := play_right - (scaled_bounds.position.x + scaled_bounds.size.x)
+		if min_root_x <= max_root_x:
+			root_position.x = clampf(root_position.x, min_root_x, max_root_x)
+
+		var bounds_center_y := scaled_bounds.position.y + scaled_bounds.size.y * 0.5
 		root_position.y = (play_top + play_bottom) * 0.5 - bounds_center_y
 
-		var min_root_y := play_top - shelf_bounds.position.y
-		var max_root_y := play_bottom - (shelf_bounds.position.y + shelf_bounds.size.y)
+		var min_root_y := play_top - scaled_bounds.position.y
+		var max_root_y := play_bottom - (scaled_bounds.position.y + scaled_bounds.size.y)
 		if min_root_y <= max_root_y:
 			root_position.y = clampf(root_position.y, min_root_y, max_root_y)
 		else:
@@ -330,26 +348,56 @@ func _layout_shelves(viewport_size: Vector2, safe_margins: Vector4) -> void:
 	_shelves_root.position = root_position
 
 
+func _get_shelves_layout_scale(
+	shelf_bounds: Rect2,
+	play_left: float,
+	play_right: float,
+	play_top: float,
+	play_bottom: float
+) -> float:
+	if shelf_bounds.size.x <= 0.0 or shelf_bounds.size.y <= 0.0:
+		return 1.0
+
+	var play_width := maxf(play_right - play_left, 1.0)
+	var play_height := maxf(play_bottom - play_top, 1.0)
+	var fit_scale := minf(play_width / shelf_bounds.size.x, play_height / shelf_bounds.size.y)
+	return clampf(fit_scale, SHELVES_MIN_LAYOUT_SCALE, SHELVES_MAX_LAYOUT_SCALE)
+
+
+func _get_scaled_rect(rect: Rect2, scale_value: float) -> Rect2:
+	return Rect2(rect.position * scale_value, rect.size * scale_value)
+
+
 func _get_shelves_local_bounds() -> Rect2:
 	if _shelves_root == null:
 		return Rect2()
 
 	var bounds := Rect2()
 	var has_bounds := false
-	for shelf in _get_all_shelves():
-		var shelf_node := shelf as Node2D
-		if shelf_node == null:
+	for child in _shelves_root.get_children():
+		var child_rect := _get_shelves_root_child_bounds(child)
+		if child_rect.size.x <= 0.0 or child_rect.size.y <= 0.0:
 			continue
 
-		var shelf_center := _shelves_root.to_local(shelf_node.global_position)
-		var shelf_rect := Rect2(shelf_center - SHELF_CELL_SIZE * 0.5, SHELF_CELL_SIZE)
 		if has_bounds:
-			bounds = bounds.merge(shelf_rect)
+			bounds = bounds.merge(child_rect)
 		else:
-			bounds = shelf_rect
+			bounds = child_rect
 			has_bounds = true
 
 	return bounds if has_bounds else Rect2()
+
+
+func _get_shelves_root_child_bounds(child: Node) -> Rect2:
+	var moving_row := child as MovingShelfRow
+	if moving_row != null:
+		return Rect2(moving_row.position, moving_row.size)
+
+	var shelf_node := child as Node2D
+	if shelf_node != null and _is_shelf_node(shelf_node):
+		return Rect2(shelf_node.position - SHELF_CELL_SIZE * 0.5, SHELF_CELL_SIZE)
+
+	return Rect2()
 
 
 func _setup_audio_players() -> void:
@@ -1309,7 +1357,8 @@ func _find_item_at_position(pointer_global_position: Vector2) -> ShelfItem:
 		if item == null or _is_item_busy(item):
 			continue
 
-		var item_rect := Rect2(item.global_position - item_pick_size * 0.5, item_pick_size)
+		var scaled_pick_size := item_pick_size * _shelves_layout_scale
+		var item_rect := Rect2(item.global_position - scaled_pick_size * 0.5, scaled_pick_size)
 		if item_rect.has_point(pointer_global_position):
 			return item
 
@@ -1325,7 +1374,7 @@ func _find_clicked_slot(pointer_global_position: Vector2, clicked_item: ShelfIte
 
 func _find_nearest_slot(pointer_global_position: Vector2) -> Node2D:
 	var nearest_slot: Node2D
-	var nearest_distance := slot_snap_distance
+	var nearest_distance := _get_scaled_slot_snap_distance()
 
 	for slot in _slots:
 		if not _is_slot_drag_drop_targetable(slot):
@@ -1345,7 +1394,7 @@ func _find_nearest_slot(pointer_global_position: Vector2) -> Node2D:
 
 func _find_nearest_empty_slot(pointer_global_position: Vector2) -> Node2D:
 	var nearest_slot: Node2D
-	var nearest_distance := slot_snap_distance
+	var nearest_distance := _get_scaled_slot_snap_distance()
 
 	for slot in _slots:
 		if not _is_slot_drag_drop_targetable(slot):
@@ -1364,6 +1413,10 @@ func _find_nearest_empty_slot(pointer_global_position: Vector2) -> Node2D:
 			nearest_distance = distance
 
 	return nearest_slot
+
+
+func _get_scaled_slot_snap_distance() -> float:
+	return slot_snap_distance * _shelves_layout_scale
 
 
 func _resolve_move_target_slot(origin_slot: Node2D, target_slot: Node2D) -> Node2D:

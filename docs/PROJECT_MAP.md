@@ -53,7 +53,7 @@ Files:
 
 Responsibility:
 - Loads level JSON and item sprite config.
-- Applies responsive layout for the top HUD, bottom ability bar, overlays, pause menu panel, and shelf root when the viewport size changes.
+- Applies responsive layout for the top HUD, bottom ability bar, overlays, pause menu panel, and scaled shelf root when the viewport size changes.
 - Instantiates `scenes/shelf.tscn` for each configured shelf and places shelf cells from `scenes/layouts/layout_*.tscn` preset templates.
 - Builds optional `row_layouts` or template-authored moving rows, including moving rows that clip and horizontally wrap more shelves than are visible at once.
 - Spawns `ShelfItem` instances from config layers.

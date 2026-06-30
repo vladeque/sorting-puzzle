@@ -41,7 +41,7 @@ Purpose:
 
 Important nodes:
 - `Background`: fullscreen gameplay background.
-- `Shelves`: parent for generated shelf nodes and optional moving shelf row containers; `scripts/level.gd` centers it in the available play area for the current viewport height.
+- `Shelves`: parent for generated shelf nodes and optional moving shelf row containers; `scripts/level.gd` scales and centers it in the available play area for the current viewport size.
 - `DragLayer`: temporary parent for dragged items, drawn above shelves.
 - `UI`: `CanvasLayer` for gameplay labels, ability buttons, and overlays; top-level controls are anchored or positioned at runtime for non-720x1280 portrait screens.
 - `UI/TimerLabel`: countdown display.
