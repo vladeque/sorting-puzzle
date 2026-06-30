@@ -77,6 +77,14 @@ Avoid hardcoding values in scripts when they should be configurable through expo
 
 After every meaningful code, scene, script, or config change, update the relevant docs in `docs/` so future contributors and AI agents can quickly identify which module, scene, or script owns the changed behavior.
 
+### Responsive UI
+
+All UI and gameplay layouts should support multiple mobile screen resolutions, not only the 720x1280 design resolution.
+
+Use anchors, containers, stretch settings, safe-area padding, and runtime scaling where appropriate so menus, HUD, shelves, items, overlays, touch targets, and drag/drop hit areas remain usable on smaller, taller, wider, and tablet-like portrait screens.
+
+When changing UI or gameplay layout, test representative resolutions such as 540x960, 720x1280, 1080x1920, 1080x2400, and a squarer tablet-like viewport.
+
 ## Agent Behavior
 
 ### Clarifications
