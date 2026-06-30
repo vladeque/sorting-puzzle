@@ -17,8 +17,8 @@ const ITEM_SCENE := preload("res://scenes/item.tscn")
 const ITEM_SPRITES_CONFIG := "res://configs/item_sprites.json"
 const LEVEL_CONFIG_TEMPLATE := "res://configs/levels/level_%03d.json"
 const DEFAULT_LEVEL_CONFIG := "res://configs/levels/level_001.json"
+const LAYOUT_SCENE_TEMPLATE := "res://scenes/layouts/layout_%s.tscn"
 const DEFAULT_LAYOUT_PRESET := "grid_3x3"
-const LAYOUT_GRID_3X3_MOVING_5_BOTTOM := "grid_3x3_moving_5_bottom"
 const MAIN_MENU_SCENE := "res://scenes/main_menu.tscn"
 const ITEM_PLACE_SOUND := preload("res://assets/audio/item_place.wav")
 const TRIPLE_CLEAR_SOUND := preload("res://assets/audio/triple_clear.wav")
@@ -31,7 +31,6 @@ const ROW_LAYOUTS_KEY := "row_layouts"
 const ROW_MOTION_HORIZONTAL_WRAP := "horizontal_wrap"
 const SHELF_VISUAL_VARIANT_FULL := "full"
 const SHELF_VISUAL_VARIANT_FLOOR_ONLY := "floor_only"
-const DEFAULT_MOVING_ROW_SPEED := 70.0
 const SHELF_FLOOR_ONLY_HIDDEN_NODES := [
 	"BackWall",
 	"BackWallLeftShade",
@@ -294,8 +293,6 @@ func _apply_level_config(config: Dictionary) -> void:
 	var row_layouts := config.get(ROW_LAYOUTS_KEY, []) as Array
 	if row_layouts != null and not row_layouts.is_empty():
 		_add_row_layout_shelves(shelves, shelves_config, row_layouts)
-	elif _layout_preset_has_row_layout(_layout_preset):
-		_add_row_layout_shelves(shelves, shelves_config, _get_layout_preset_row_layouts(_layout_preset))
 	else:
 		_add_preset_layout_shelves(shelves, shelves_config)
 
@@ -313,7 +310,11 @@ func _clear_shelves(shelves: Node) -> void:
 
 
 func _add_preset_layout_shelves(shelves: Node2D, shelves_config: Array) -> void:
-	var shelf_positions := _get_layout_positions(_layout_preset, shelves_config.size())
+	if _add_layout_template_shelves(shelves, shelves_config, _layout_preset):
+		return
+
+	push_warning("Layout preset '%s' has no compatible template scene. Using %s." % [_layout_preset, DEFAULT_LAYOUT_PRESET])
+	var shelf_positions := _get_grid_layout_positions(3, shelves_config.size())
 	for shelf_index in range(shelves_config.size()):
 		var shelf_config := shelves_config[shelf_index] as Dictionary
 		if shelf_config == null:
@@ -353,7 +354,7 @@ func _add_row_layout_shelves(shelves: Node2D, shelves_config: Array, row_layouts
 				shelf_config_index,
 				row_shelf_count,
 				visible_count,
-				row_center_y,
+				Vector2(0.0, row_center_y),
 				row_config,
 				visual_variant
 			)
@@ -413,7 +414,7 @@ func _add_moving_shelf_row(
 	start_shelf_index: int,
 	row_shelf_count: int,
 	visible_count: int,
-	row_center_y: float,
+	row_center_position: Vector2,
 	row_config: Dictionary,
 	visual_variant: String
 ) -> void:
@@ -427,7 +428,7 @@ func _add_moving_shelf_row(
 		_get_row_motion_direction(row_config)
 	)
 	var visible_size := row.get_visible_size()
-	row.position = Vector2(-visible_size.x * 0.5, row_center_y - visible_size.y * 0.5)
+	row.position = row_center_position - visible_size * 0.5
 	shelves.add_child(row)
 
 	for row_shelf_index in range(row_shelf_count):
@@ -488,30 +489,83 @@ func _get_row_visual_variant(row_config: Dictionary, is_moving: bool) -> String:
 	return str(row_config.get("visual_variant", default_variant)).to_lower()
 
 
-func _layout_preset_has_row_layout(layout_preset: String) -> bool:
-	return not _get_layout_preset_row_layouts(layout_preset).is_empty()
+func _add_layout_template_shelves(shelves: Node2D, shelves_config: Array, layout_preset: String) -> bool:
+	var layout_scene_path := _get_layout_scene_path(layout_preset)
+	if not ResourceLoader.exists(layout_scene_path):
+		return false
+
+	var layout_scene := load(layout_scene_path) as PackedScene
+	if layout_scene == null:
+		push_warning("Layout preset '%s' could not load from %s. Using %s." % [layout_preset, layout_scene_path, DEFAULT_LAYOUT_PRESET])
+		return false
+
+	var layout_template := layout_scene.instantiate() as Node2D
+	if layout_template == null:
+		push_warning("Layout preset '%s' is not a Node2D scene. Using %s." % [layout_preset, DEFAULT_LAYOUT_PRESET])
+		return false
+
+	var template_shelf_count := _get_layout_template_shelf_count(layout_template)
+	if template_shelf_count != shelves_config.size():
+		push_warning(
+			"Layout preset '%s' expects %s shelves, got %s. Using %s."
+			% [layout_preset, template_shelf_count, shelves_config.size(), DEFAULT_LAYOUT_PRESET]
+		)
+		layout_template.queue_free()
+		return false
+
+	var shelf_config_index := 0
+	for layout_node in layout_template.get_children():
+		if layout_node is ShelfLayoutRow:
+			var layout_row := layout_node as ShelfLayoutRow
+			var row_shelf_count := layout_row.shelf_count
+			var visible_count := clampi(layout_row.visible_count, 1, row_shelf_count)
+			var row_config := layout_row.to_row_config()
+			var visual_variant := _get_row_visual_variant(row_config, true)
+			_add_moving_shelf_row(
+				shelves,
+				shelves_config,
+				shelf_config_index,
+				row_shelf_count,
+				visible_count,
+				layout_row.position,
+				row_config,
+				visual_variant
+			)
+			shelf_config_index += row_shelf_count
+		elif _is_layout_shelf_marker(layout_node):
+			var shelf_config := shelves_config[shelf_config_index] as Dictionary
+			if shelf_config != null:
+				var shelf_marker := layout_node as Node2D
+				var shelf := _add_shelf(shelves, shelf_config_index + 1, shelf_marker.position)
+				_configure_shelf_from_config(shelf, shelf_config)
+
+			shelf_config_index += 1
+
+	layout_template.queue_free()
+	return true
 
 
-func _get_layout_preset_row_layouts(layout_preset: String) -> Array:
-	match layout_preset:
-		LAYOUT_GRID_3X3_MOVING_5_BOTTOM:
-			return [
-				{"shelf_count": 3},
-				{"shelf_count": 3},
-				{"shelf_count": 3},
-				{
-					"shelf_count": 5,
-					"visible_count": 3,
-					"motion": {
-						"type": ROW_MOTION_HORIZONTAL_WRAP,
-						"speed": DEFAULT_MOVING_ROW_SPEED,
-						"direction": "right",
-					},
-					"visual_variant": SHELF_VISUAL_VARIANT_FLOOR_ONLY,
-				},
-			]
-		_:
-			return []
+func _get_layout_scene_path(layout_preset: String) -> String:
+	return LAYOUT_SCENE_TEMPLATE % layout_preset
+
+
+func _get_layout_template_shelf_count(layout_template: Node2D) -> int:
+	var shelf_count := 0
+	for layout_node in layout_template.get_children():
+		if layout_node is ShelfLayoutRow:
+			var layout_row := layout_node as ShelfLayoutRow
+			if layout_row.shelf_count <= 0:
+				return -1
+
+			shelf_count += layout_row.shelf_count
+		elif _is_layout_shelf_marker(layout_node):
+			shelf_count += 1
+
+	return shelf_count
+
+
+func _is_layout_shelf_marker(layout_node: Node) -> bool:
+	return layout_node is Marker2D and str(layout_node.name).begins_with("Shelf")
 
 
 func _apply_shelf_visual_variant(shelf: Node2D, visual_variant: String) -> void:
@@ -525,27 +579,6 @@ func _apply_shelf_visual_variant(shelf: Node2D, visual_variant: String) -> void:
 					node.visible = false
 		_:
 			push_warning("Unknown shelf visual_variant '%s'. Using full shelf." % visual_variant)
-
-
-func _get_layout_positions(layout_preset: String, shelf_count: int) -> Array[Vector2]:
-	match layout_preset:
-		"grid_2x3":
-			return _get_grid_layout_positions(2, shelf_count)
-		"grid_3x3":
-			return _get_grid_layout_positions(3, shelf_count)
-		"grid_3x4":
-			return _get_grid_layout_positions(3, shelf_count)
-		"grid_3x5":
-			return _get_grid_layout_positions(3, shelf_count)
-		"grid_4x3":
-			return _get_grid_layout_positions(4, shelf_count)
-		"staggered_5_4_5":
-			return _get_fixed_layout_positions(layout_preset, shelf_count, _get_staggered_5_4_5_cells())
-		"staggered_4_5_4":
-			return _get_fixed_layout_positions(layout_preset, shelf_count, _get_staggered_4_5_4_cells())
-		_:
-			push_warning("Unknown layout preset '%s'. Using %s." % [layout_preset, DEFAULT_LAYOUT_PRESET])
-			return _get_grid_layout_positions(3, shelf_count)
 
 
 func _get_grid_layout_positions(columns: int, shelf_count: int) -> Array[Vector2]:
@@ -563,58 +596,6 @@ func _get_grid_layout_positions(columns: int, shelf_count: int) -> Array[Vector2
 		positions.append(origin + Vector2(column * spacing.x, row * spacing.y))
 
 	return positions
-
-
-func _get_fixed_layout_positions(layout_preset: String, shelf_count: int, layout_cells: Array[Vector2]) -> Array[Vector2]:
-	if shelf_count != layout_cells.size():
-		push_warning(
-			"Layout preset '%s' expects %s shelves, got %s. Using %s."
-			% [layout_preset, layout_cells.size(), shelf_count, DEFAULT_LAYOUT_PRESET]
-		)
-		return _get_grid_layout_positions(3, shelf_count)
-
-	return _center_layout_cells(layout_cells)
-
-
-func _center_layout_cells(layout_cells: Array[Vector2]) -> Array[Vector2]:
-	var min_cell := layout_cells[0]
-	var max_cell := layout_cells[0]
-	for cell in layout_cells:
-		min_cell.x = minf(min_cell.x, cell.x)
-		min_cell.y = minf(min_cell.y, cell.y)
-		max_cell.x = maxf(max_cell.x, cell.x)
-		max_cell.y = maxf(max_cell.y, cell.y)
-
-	var center_cell := (min_cell + max_cell) * 0.5
-	var positions: Array[Vector2] = []
-	for cell in layout_cells:
-		positions.append((cell - center_cell) * SHELF_GRID_STEP)
-
-	return positions
-
-
-func _get_staggered_5_4_5_cells() -> Array[Vector2]:
-	var cells: Array[Vector2] = []
-	for row in range(5):
-		cells.append(Vector2(0, row))
-	for row in range(4):
-		cells.append(Vector2(1, row + 0.5))
-	for row in range(5):
-		cells.append(Vector2(2, row))
-
-	return cells
-
-
-func _get_staggered_4_5_4_cells() -> Array[Vector2]:
-	var cells: Array[Vector2] = []
-	for row in range(4):
-		cells.append(Vector2(0, row + 0.5))
-	for row in range(5):
-		cells.append(Vector2(1, row))
-	for row in range(4):
-		cells.append(Vector2(2, row + 0.5))
-
-	return cells
 
 
 func _add_shelf(parent: Node, shelf_number: int, shelf_position: Vector2) -> Node2D:

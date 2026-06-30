@@ -57,7 +57,7 @@ Important nodes:
 
 Runtime-created nodes:
 - `ShelfXX`: `scenes/shelf.tscn` instances generated under `Shelves`.
-- `MovingShelfRowXX`: `scenes/moving_shelf_row.tscn` instances generated under `Shelves` when a level config defines `row_layouts` moving rows.
+- `MovingShelfRowXX`: `scenes/moving_shelf_row.tscn` instances generated under `Shelves` when a level config or layout template defines moving rows.
 - `ShelfLayerXX`: generated back layers for hidden or upcoming item rows.
 - `ShelfItem` instances from `scenes/item.tscn`.
 - `ItemPlaceAudio` and `TripleClearAudio`: `AudioStreamPlayer` nodes created by `scripts/level.gd`.
@@ -65,6 +65,7 @@ Runtime-created nodes:
 Depends on:
 - `scenes/shelf.tscn`
 - `scenes/moving_shelf_row.tscn`
+- `scenes/layouts/layout_*.tscn`
 - `scenes/item.tscn`
 - `scenes/pause_menu.tscn`
 - `assets/audio/*.wav`
@@ -74,6 +75,37 @@ Depends on:
 
 Do not use for:
 - Static shelf cell visuals. Put those in `scenes/shelf.tscn`.
+
+## `scenes/layouts/layout_*.tscn`
+
+Root:
+- `Node2D`
+
+Purpose:
+- Editor-authored shelf placement templates for `layout_preset` values in level JSON.
+- Keep each preset's shelf markers easy to nudge, align, and review visually in Godot.
+- Own static shelf marker positions and optional moving-row marker positions.
+
+Important nodes:
+- `ShelfXX`: `Marker2D` nodes consumed in scene order by `scripts/level.gd`; their positions become runtime `scenes/shelf.tscn` positions.
+- `MovingRowXX`: optional `Node2D` nodes with `scripts/shelf_layout_row.gd`; their positions become the visible moving-row center.
+
+Existing presets:
+- `scenes/layouts/layout_grid_2x3.tscn`
+- `scenes/layouts/layout_grid_3x3.tscn`
+- `scenes/layouts/layout_grid_3x4.tscn`
+- `scenes/layouts/layout_grid_3x5.tscn`
+- `scenes/layouts/layout_grid_4x3.tscn`
+- `scenes/layouts/layout_grid_3x3_moving_5_bottom.tscn`
+- `scenes/layouts/layout_staggered_5_4_5.tscn`
+- `scenes/layouts/layout_staggered_4_5_4.tscn`
+
+Depends on:
+- Runtime shelf instantiation from `scripts/level.gd`.
+- `scripts/shelf_layout_row.gd` for moving-row template metadata.
+
+Do not use for:
+- Shelf contents, item layers, locks, matching rules, or runtime state. Those stay in level JSON and `scripts/level.gd`.
 
 ## `scenes/moving_shelf_row.tscn`
 

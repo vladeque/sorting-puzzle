@@ -40,18 +40,20 @@ Files:
 - `level.tscn`
 - `scenes/shelf.tscn`
 - `scenes/moving_shelf_row.tscn`
+- `scenes/layouts/layout_*.tscn`
 - `scenes/pause_menu.tscn`
 - `assets/ui/*.png`
 - `scripts/level.gd`
 - `scripts/moving_shelf_row.gd`
+- `scripts/shelf_layout_row.gd`
 - `assets/audio/*.wav`
 - `configs/levels/level_*.json`
 - `configs/item_sprites.json`
 
 Responsibility:
 - Loads level JSON and item sprite config.
-- Instantiates `scenes/shelf.tscn` for each configured shelf and packs shelf cells with shared boundaries in grid or fixed staggered layouts.
-- Builds optional `row_layouts`, including moving rows that clip and horizontally wrap more shelves than are visible at once.
+- Instantiates `scenes/shelf.tscn` for each configured shelf and places shelf cells from `scenes/layouts/layout_*.tscn` preset templates.
+- Builds optional `row_layouts` or template-authored moving rows, including moving rows that clip and horizontally wrap more shelves than are visible at once.
 - Spawns `ShelfItem` instances from config layers.
 - Handles mouse and touch interaction.
 - Resolves matches of three identical visible items on the same shelf, including the gather-and-shrink clear animation.
@@ -69,13 +71,16 @@ Change here when:
 
 Files:
 - `scenes/moving_shelf_row.tscn`
+- `scenes/layouts/layout_*.tscn`
 - `scripts/moving_shelf_row.gd`
+- `scripts/shelf_layout_row.gd`
 - `scripts/level.gd`
 - `configs/levels/level_*.json`
 
 Responsibility:
 - Clips a shelf row to a configured visible window.
 - Moves shelves horizontally at runtime and wraps them back through the opposite side.
+- Lets layout templates author moving-row center positions and metadata.
 - Lets `scripts/level.gd` decide drag/drop eligibility based on whether a moving shelf is currently inside the row window.
 - Supports the floor-only shelf visual variant by runtime node hiding in `scripts/level.gd`.
 
@@ -153,11 +158,13 @@ Change here when:
 
 Files:
 - `configs/levels/level_*.json`
+- `scenes/layouts/layout_*.tscn`
 - `scripts/tools/generate_level_shelves.py`
 - `scripts/tools/validate_level_solvable.py`
 
 Responsibility:
 - Stores level number, time limit, layout preset, and shelf layers.
+- Stores named layout preset positions in Godot scene templates.
 - Supports optional row layout configs for static and moving shelf rows.
 - Supports the `grid_3x3_moving_5_bottom` preset for a 3x3 static grid plus a five-shelf moving bottom row.
 - Supports optional per-shelf triple-clear unlock requirements.
@@ -180,12 +187,13 @@ Add a new level:
 - Validate the level with `scripts/tools/validate_level_solvable.py`.
 
 Change shelf layout spacing:
-- Update `SHELF_CELL_SIZE`, `SHELF_SHARED_EDGE_THICKNESS`, `SHELF_GRID_STEP`, and `_get_layout_positions()` in `scripts/level.gd`.
+- Update `SHELF_CELL_SIZE`, `SHELF_SHARED_EDGE_THICKNESS`, and `SHELF_GRID_STEP` in `scripts/level.gd`.
+- Reposition shelf markers in the relevant `scenes/layouts/layout_*.tscn` templates.
 - Keep `scenes/shelf.tscn` cell bounds and boundary thickness aligned with those layout constants.
 - Keep `scripts/moving_shelf_row.gd` row sizing and runtime configuration aligned with `SHELF_CELL_SIZE` and `SHELF_GRID_STEP`.
 - Keep `SLOT_ITEM_POSITION`, shelf slot markers, `scenes/item.tscn` default scale, and `item_pick_size` aligned when shelf width changes affect item spacing.
 - Keep `scripts/tools/generate_level_shelves.py` layout presets in sync if preset names or supported shapes change.
-- Fixed staggered presets live in `scripts/level.gd`; keep their required shelf counts documented in `docs/CONFIGS.md`.
+- Fixed staggered preset positions live in `scenes/layouts/`; keep their required shelf counts documented in `docs/CONFIGS.md`.
 
 Change matching rules:
 - Update `_clear_matching_shelves()`, `_resolve_shelves()`, and related validation logic if the data rules also change.

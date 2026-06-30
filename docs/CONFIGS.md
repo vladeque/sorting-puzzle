@@ -37,7 +37,7 @@ File naming:
 Top-level fields:
 - `level`: numeric level identifier.
 - `time_seconds`: countdown duration for the level.
-- `layout_preset`: shelf placement preset used by `scripts/level.gd`.
+- `layout_preset`: shelf placement preset used by `scripts/level.gd`; preset positions are authored in matching `scenes/layouts/layout_*.tscn` template scenes.
 - `row_layouts`: optional row-by-row shelf placement and motion config. When present, its `shelf_count` total must equal the `shelves` length and it replaces `layout_preset` placement at runtime.
 - `shelves`: ordered shelf list.
 
@@ -109,7 +109,8 @@ Item count rules:
 
 Runtime behavior:
 - `scripts/level.gd` instantiates one `scenes/shelf.tscn` cell for each configured shelf.
-- `scripts/level.gd` uses `layout_preset` to choose the grid columns or fixed staggered shelf pattern, then packs generated shelf cells with overlapping shared boundaries.
+- `scripts/level.gd` uses `layout_preset` to load `scenes/layouts/layout_%s.tscn`, then places generated shelf cells at the template's `ShelfXX` markers.
+- Layout template `MovingRowXX` nodes with `scripts/shelf_layout_row.gd` create moving rows from authored row positions and metadata.
 - If `row_layouts` is present, `scripts/level.gd` creates shelves row by row instead. Moving rows are clipped to their visible window and wrap shelves horizontally from right to left or left to right.
 - `scripts/level.gd` uses `time_seconds` as the active timer.
 - Locked shelves show a runtime lock overlay with the remaining triple count on the lock and cannot be used as move sources, move targets, match clears, promotions, or ability targets until unlocked.
@@ -122,7 +123,7 @@ Validation:
 py scripts\tools\validate_level_solvable.py configs\levels\level_001.json --max-states 20000 --max-depth 200
 ```
 
-The validator checks `row_layouts` totals, moving-row motion fields, supported visual variants, and rejects locked shelves inside moving rows.
+The validator checks `row_layouts` totals, moving-row motion fields, supported visual variants, and rejects locked shelves inside moving rows. For preset-defined moving rows, the validator mirrors the moving-row metadata from the matching layout template.
 Solvability search treats moving rows as eventually accessible and does not model shelf positions over time.
 
 Generation:

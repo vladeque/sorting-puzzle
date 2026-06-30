@@ -72,6 +72,7 @@ Important constants:
 - `ITEM_SPRITES_CONFIG`: `res://configs/item_sprites.json`.
 - `LEVEL_CONFIG_TEMPLATE`: `res://configs/levels/level_%03d.json`.
 - `DEFAULT_LEVEL_CONFIG`: fallback level config.
+- `LAYOUT_SCENE_TEMPLATE`: `res://scenes/layouts/layout_%s.tscn` path pattern used by `layout_preset`.
 - `DEFAULT_LAYOUT_PRESET`: fallback layout preset.
 - `MAIN_MENU_SCENE`: scene returned to after completion.
 - `ITEM_PLACE_SOUND`: short sound played when the player drops or moves an item into a shelf slot.
@@ -80,8 +81,9 @@ Important constants:
 Key responsibilities:
 - Load JSON configs with `_load_json_file()`.
 - Instantiate reusable shelf cells with `_add_shelf()` and add generated back layers with `_add_back_layer()`.
-- Pack shelf cells with shared boundaries based on `SHELF_GRID_STEP`, including grid and fixed staggered layout presets.
+- Load `layout_preset` scene templates from `scenes/layouts/` and place runtime shelves at their authored `ShelfXX` markers.
 - Build optional `row_layouts` rows with `_add_row_layout_shelves()`, including horizontally wrapping moving rows and static rows mixed in one level.
+- Build moving rows declared by layout template `MovingRowXX` nodes with `scripts/shelf_layout_row.gd`.
 - Keep moving-row shelves out of drag/drop targeting while they are outside the row's visible window, while abilities still use unlocked shelf items.
 - Spawn configured items with `_add_configured_item()`.
 - Handle mouse and touch input through `_input()` and the press/motion/release helpers.
@@ -109,6 +111,7 @@ Depends on:
 - `scenes/shelf.tscn` slot names and item snap marker names.
 - `scenes/shelf.tscn` `LockedOverlay/RemainingLabel` for locked shelf progress display on the lock image.
 - `scenes/moving_shelf_row.tscn` for optional row-layout movement and clipping.
+- `scenes/layouts/layout_*.tscn` for named layout preset placement.
 - `scenes/pause_menu.tscn` button node names used under `UI/PauseMenuOverlay`.
 - `scenes/item.tscn` and `ShelfItem`.
 - `assets/audio/item_place.wav` and `assets/audio/triple_clear.wav`.
@@ -118,6 +121,33 @@ Depends on:
 Do not use for:
 - Offline level generation or solvability search. Keep that in `scripts/tools/`.
 - Persistent progression or save data once that system exists.
+
+## `scripts/shelf_layout_row.gd`
+
+Class:
+- `ShelfLayoutRow`
+
+Attached to:
+- Moving-row marker nodes in `scenes/layouts/layout_*.tscn`.
+
+Purpose:
+- Stores editor-authored moving-row metadata for layout templates.
+- Converts row properties into the same row config shape used by runtime `row_layouts`.
+
+Exports:
+- `shelf_count`: number of level shelves consumed by this row.
+- `visible_count`: number of shelf positions visible inside the clipped row window.
+- `motion_type`: currently `horizontal_wrap`.
+- `speed_pixels_per_second`: row motion speed.
+- `direction`: `right` or `left`.
+- `visual_variant`: `full` or `floor_only`.
+
+Key methods:
+- `to_row_config()`: returns a runtime row dictionary consumed by `scripts/level.gd`.
+
+Do not use for:
+- Moving the shelves at runtime. That stays in `scripts/moving_shelf_row.gd`.
+- Shelf contents, locking, matching, or item spawning.
 
 ## `scripts/moving_shelf_row.gd`
 
@@ -208,7 +238,7 @@ Purpose:
 
 Key inputs:
 - Shelf count, layer count, filled layer count, difficulty, seed, layout preset, item type filters, and optional solvability requirements.
-- Layout preset values mirror `scripts/level.gd`, including fixed-count staggered presets for 14-shelf `staggered_5_4_5`, 13-shelf `staggered_4_5_4`, and 14-shelf `grid_3x3_moving_5_bottom` layouts.
+- Layout preset values mirror the runtime layout template names in `scenes/layouts/`, including fixed-count staggered presets for 14-shelf `staggered_5_4_5`, 13-shelf `staggered_4_5_4`, and 14-shelf `grid_3x3_moving_5_bottom` layouts.
 
 Generation constraints:
 - Difficulty presets cap how many copies of the same item can appear on one filled layer.
