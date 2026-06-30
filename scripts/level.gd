@@ -85,7 +85,7 @@ var _dragged_item: ShelfItem
 var _origin_slot: Node2D
 var _drag_offset := Vector2.ZERO
 var _drag_layer: Node2D
-var _background: ColorRect
+var _background: Control
 var _shelves_root: Node2D
 var _timer_label: Label
 var _level_label: Label
@@ -131,7 +131,7 @@ var _shelves_layout_scale := 1.0
 
 
 func _ready() -> void:
-	_background = get_node("Background") as ColorRect
+	_background = get_node("Background") as Control
 	_shelves_root = get_node("Shelves") as Node2D
 	_drag_layer = get_node("DragLayer") as Node2D
 	_timer_label = get_node("UI/TimerLabel") as Label

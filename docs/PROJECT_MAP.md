@@ -43,7 +43,6 @@ Files:
 - `scenes/moving_shelf_row.tscn`
 - `scenes/layouts/layout_*.tscn`
 - `scenes/pause_menu.tscn`
-- `assets/backgrounds/*.png`
 - `assets/ui/*.png`
 - `scripts/level.gd`
 - `scripts/moving_shelf_row.gd`
@@ -66,10 +65,10 @@ Responsibility:
 - Promotes back layers when the visible layer clears.
 - Tracks the countdown timer and win/loss overlays.
 - Wires the in-level pause menu, including the top-right circular menu button, modal overlay, Leave action, and Continue action.
-- Displays the fullscreen shop-wall level background from `assets/backgrounds/level_shop_wall.png` behind generated shelves.
+- Displays a responsive Godot-authored level backdrop with a top HUD strip, monotone shop wall, baseboard, and bottom floor band behind generated shelves.
 
 Change here when:
-- Editing puzzle rules, input behavior, runtime shelf construction, level background art, level timing, completion conditions, or ability behavior.
+- Editing puzzle rules, input behavior, runtime shelf construction, procedural level background styling, level timing, completion conditions, or ability behavior.
 
 ### Moving Shelf Rows
 

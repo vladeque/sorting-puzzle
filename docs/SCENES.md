@@ -40,7 +40,7 @@ Purpose:
 - Provides stable top-level nodes that `scripts/level.gd` fills and controls at runtime.
 
 Important nodes:
-- `Background`: fullscreen gameplay background using `assets/backgrounds/level_shop_wall.png`, scaled to cover portrait viewports.
+- `Background`: fullscreen procedural gameplay backdrop with child nodes for the top HUD strip, simple shop wall, baseboard, and bottom floor band.
 - `Shelves`: parent for generated shelf nodes and optional moving shelf row containers; `scripts/level.gd` scales and centers it in the available play area for the current viewport size.
 - `DragLayer`: temporary parent for dragged items, drawn above shelves.
 - `UI`: `CanvasLayer` for gameplay labels, ability buttons, and overlays; top-level controls are anchored or positioned at runtime for non-720x1280 portrait screens.
@@ -69,7 +69,6 @@ Depends on:
 - `scenes/item.tscn`
 - `scenes/pause_menu.tscn`
 - `assets/audio/*.wav`
-- `assets/backgrounds/level_shop_wall.png`
 - `configs/item_sprites.json`
 - `configs/levels/level_*.json`
 - `assets/abilities/*.png`
