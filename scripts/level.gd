@@ -527,7 +527,7 @@ func _add_layout_template_shelves(shelves: Node2D, shelves_config: Array, layout
 				shelf_config_index,
 				row_shelf_count,
 				visible_count,
-				layout_row.position,
+				layout_row.global_position,
 				row_config,
 				visual_variant
 			)
@@ -536,7 +536,7 @@ func _add_layout_template_shelves(shelves: Node2D, shelves_config: Array, layout
 			var shelf_config := shelves_config[shelf_config_index] as Dictionary
 			if shelf_config != null:
 				var shelf_marker := layout_node as Node2D
-				var shelf := _add_shelf(shelves, shelf_config_index + 1, shelf_marker.position)
+				var shelf := _add_shelf(shelves, shelf_config_index + 1, shelf_marker.global_position)
 				_configure_shelf_from_config(shelf, shelf_config)
 
 			shelf_config_index += 1
