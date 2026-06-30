@@ -5,3 +5,6 @@
 # Python tooling
 __pycache__/
 *.py[cod]
+
+# IDE metadata
+.idea/
