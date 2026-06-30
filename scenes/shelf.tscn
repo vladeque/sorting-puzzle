@@ -87,15 +87,16 @@ polygon = PackedVector2Array(-104, -81, 104, -81, 104, 46, -104, 46)
 [node name="LockSprite" type="Sprite2D" parent="LockedOverlay"]
 position = Vector2(0, -6)
 z_index = 2
+position = Vector2(0, -6)
 scale = Vector2(0.43, 0.43)
 texture = ExtResource("1_lock_shelf")
 
 [node name="RemainingLabel" type="Label" parent="LockedOverlay"]
 z_index = 3
 offset_left = -36.0
-offset_top = -16.0
+offset_top = -20.0
 offset_right = 36.0
-offset_bottom = 14.0
+offset_bottom = 27.0
 theme_override_colors/font_color = Color(1, 1, 0.92, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
 theme_override_constants/shadow_offset_x = 0
