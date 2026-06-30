@@ -1,41 +1,37 @@
-[gd_scene load_steps=2 format=3 uid="uid://rjhn6n2gw1fa"]
+[gd_scene format=3 uid="uid://rjhn6n2gw1fa"]
 
-[ext_resource type="Script" uid="uid://c7ucxk6s8a2nl" path="res://scripts/shelf_layout_row.gd" id="1_layout_row"]
+[ext_resource type="Script" path="res://scripts/shelf_layout_row.gd" id="1_layout_row"]
 
-[node name="LayoutGrid3x3Moving5Bottom" type="Node2D"]
+[node name="LayoutGrid3x3Moving5Bottom" type="Node2D" unique_id=197465711]
 
-[node name="Shelf01" type="Marker2D" parent="."]
+[node name="Shelf01" type="Marker2D" parent="." unique_id=496630792]
 position = Vector2(-216, -190.5)
 
-[node name="Shelf02" type="Marker2D" parent="."]
+[node name="Shelf02" type="Marker2D" parent="." unique_id=1763145357]
 position = Vector2(0, -190.5)
 
-[node name="Shelf03" type="Marker2D" parent="."]
+[node name="Shelf03" type="Marker2D" parent="." unique_id=949618796]
 position = Vector2(216, -190.5)
 
-[node name="Shelf04" type="Marker2D" parent="."]
+[node name="Shelf04" type="Marker2D" parent="." unique_id=1551967127]
 position = Vector2(-216, -63.5)
 
-[node name="Shelf05" type="Marker2D" parent="."]
+[node name="Shelf05" type="Marker2D" parent="." unique_id=1644284789]
 position = Vector2(0, -63.5)
 
-[node name="Shelf06" type="Marker2D" parent="."]
+[node name="Shelf06" type="Marker2D" parent="." unique_id=1243699281]
 position = Vector2(216, -63.5)
 
-[node name="Shelf07" type="Marker2D" parent="."]
+[node name="Shelf07" type="Marker2D" parent="." unique_id=1991736720]
 position = Vector2(-216, 63.5)
 
-[node name="Shelf08" type="Marker2D" parent="."]
+[node name="Shelf08" type="Marker2D" parent="." unique_id=472339995]
 position = Vector2(0, 63.5)
 
-[node name="Shelf09" type="Marker2D" parent="."]
+[node name="Shelf09" type="Marker2D" parent="." unique_id=1582299666]
 position = Vector2(216, 63.5)
 
-[node name="MovingRow10" type="Node2D" parent="."]
-position = Vector2(0, 190.5)
+[node name="MovingRow10" type="Node2D" parent="." unique_id=2092107825]
+position = Vector2(0, 230)
 script = ExtResource("1_layout_row")
 shelf_count = 5
-visible_count = 3
-speed_pixels_per_second = 70.0
-direction = "right"
-visual_variant = "floor_only"

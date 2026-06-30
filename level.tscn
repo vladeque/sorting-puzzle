@@ -147,7 +147,7 @@ offset_bottom = 1280.0
 color = Color(0.12, 0.15, 0.2, 1)
 
 [node name="Shelves" type="Node2D" parent="." unique_id=1655339205]
-position = Vector2(360, 520)
+position = Vector2(360, 570)
 
 [node name="DragLayer" type="Node2D" parent="." unique_id=1163629860]
 z_index = 100
@@ -334,7 +334,7 @@ text = "3"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="TimerLabel" type="Label" parent="UI/AbilityBar/HBoxContainer/HighlightButton"]
+[node name="TimerLabel" type="Label" parent="UI/AbilityBar/HBoxContainer/HighlightButton" unique_id=2021912790]
 visible = false
 z_index = 1
 layout_mode = 0
