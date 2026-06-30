@@ -31,6 +31,22 @@ const ROW_LAYOUTS_KEY := "row_layouts"
 const ROW_MOTION_HORIZONTAL_WRAP := "horizontal_wrap"
 const SHELF_VISUAL_VARIANT_FULL := "full"
 const SHELF_VISUAL_VARIANT_FLOOR_ONLY := "floor_only"
+const HUD_TOP_MARGIN := 28.0
+const HUD_SIDE_MARGIN := 24.0
+const LEVEL_LABEL_MARGIN_LEFT := 32.0
+const LEVEL_LABEL_TOP := 42.0
+const LEVEL_LABEL_SIZE := Vector2(194, 40)
+const TIMER_LABEL_HEIGHT := 64.0
+const PAUSE_BUTTON_SIZE := Vector2(64, 64)
+const ABILITY_BAR_HEIGHT := 126.0
+const ABILITY_BAR_DESIGN_BOTTOM_MARGIN := 57.0
+const ABILITY_BAR_SAFE_BOTTOM_PADDING := 24.0
+const ABILITY_BUTTON_ROW_SIZE := Vector2(396, 100)
+const ABILITY_BUTTON_ROW_TOP := 12.0
+const SHELVES_TOP_CLEARANCE := 128.0
+const SHELVES_BOTTOM_CLEARANCE := 52.0
+const RESULT_LABEL_HEIGHT := 96.0
+const PAUSE_MENU_PANEL_SIZE := Vector2(520, 363)
 const SHELF_FLOOR_ONLY_HIDDEN_NODES := [
 	"BackWall",
 	"BackWallLeftShade",
@@ -66,6 +82,8 @@ var _dragged_item: ShelfItem
 var _origin_slot: Node2D
 var _drag_offset := Vector2.ZERO
 var _drag_layer: Node2D
+var _background: ColorRect
+var _shelves_root: Node2D
 var _timer_label: Label
 var _level_label: Label
 var _failure_panel: Control
@@ -74,6 +92,8 @@ var _pause_menu_button: Button
 var _pause_menu_overlay: Control
 var _leave_button: Button
 var _continue_button: Button
+var _ability_bar: Control
+var _ability_button_row: Control
 var _ability_buttons: Dictionary = {}
 var _highlight_timer_label: Label
 var _ability_uses: Dictionary = {
@@ -107,6 +127,8 @@ var _triples_cleared := 0
 
 
 func _ready() -> void:
+	_background = get_node("Background") as ColorRect
+	_shelves_root = get_node("Shelves") as Node2D
 	_drag_layer = get_node("DragLayer") as Node2D
 	_timer_label = get_node("UI/TimerLabel") as Label
 	_level_label = get_node("UI/LevelLabel") as Label
@@ -116,9 +138,12 @@ func _ready() -> void:
 	_pause_menu_overlay = get_node("UI/PauseMenuOverlay") as Control
 	_leave_button = get_node("UI/PauseMenuOverlay/PauseMenuPanel/MarginContainer/VBoxContainer/ButtonRow/LeaveButton") as Button
 	_continue_button = get_node("UI/PauseMenuOverlay/PauseMenuPanel/MarginContainer/VBoxContainer/ButtonRow/ContinueButton") as Button
+	_ability_bar = get_node("UI/AbilityBar") as Control
+	_ability_button_row = get_node("UI/AbilityBar/HBoxContainer") as Control
 	_failure_panel.visible = false
 	_completion_panel.visible = false
 	_pause_menu_overlay.visible = false
+	get_viewport().size_changed.connect(_apply_responsive_layout)
 	_rng.randomize()
 	_setup_audio_players()
 	_setup_pause_menu_buttons()
@@ -130,6 +155,201 @@ func _ready() -> void:
 	_update_timer_label()
 	_update_ability_buttons()
 	_update_pause_menu_button()
+
+
+func _apply_responsive_layout() -> void:
+	var viewport_size := get_viewport_rect().size
+	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
+		return
+
+	var safe_margins := _get_safe_area_margins(viewport_size)
+	if _background != null:
+		_background.position = Vector2.ZERO
+		_background.size = viewport_size
+
+	_layout_top_hud(safe_margins)
+	_layout_ability_bar(safe_margins)
+	_layout_result_panel(_failure_panel, safe_margins)
+	_layout_result_panel(_completion_panel, safe_margins)
+	_layout_pause_menu_overlay()
+	_layout_shelves(viewport_size, safe_margins)
+
+
+func _get_safe_area_margins(viewport_size: Vector2) -> Vector4:
+	var window_size := Vector2(DisplayServer.window_get_size())
+	var safe_area := DisplayServer.get_display_safe_area()
+	if window_size.x <= 0.0 or window_size.y <= 0.0 or safe_area.size.x <= 0 or safe_area.size.y <= 0:
+		return Vector4.ZERO
+
+	var scale := Vector2(viewport_size.x / window_size.x, viewport_size.y / window_size.y)
+	var safe_end := safe_area.position + safe_area.size
+	return Vector4(
+		maxf(float(safe_area.position.x) * scale.x, 0.0),
+		maxf(float(safe_area.position.y) * scale.y, 0.0),
+		maxf(float(window_size.x - safe_end.x) * scale.x, 0.0),
+		maxf(float(window_size.y - safe_end.y) * scale.y, 0.0)
+	)
+
+
+func _layout_top_hud(safe_margins: Vector4) -> void:
+	if _timer_label != null:
+		_timer_label.anchor_left = 0.0
+		_timer_label.anchor_top = 0.0
+		_timer_label.anchor_right = 1.0
+		_timer_label.anchor_bottom = 0.0
+		_timer_label.offset_left = safe_margins.x
+		_timer_label.offset_top = safe_margins.y + HUD_TOP_MARGIN
+		_timer_label.offset_right = -safe_margins.z
+		_timer_label.offset_bottom = safe_margins.y + HUD_TOP_MARGIN + TIMER_LABEL_HEIGHT
+
+	if _level_label != null:
+		_level_label.anchor_left = 0.0
+		_level_label.anchor_top = 0.0
+		_level_label.anchor_right = 0.0
+		_level_label.anchor_bottom = 0.0
+		_level_label.offset_left = safe_margins.x + LEVEL_LABEL_MARGIN_LEFT
+		_level_label.offset_top = safe_margins.y + LEVEL_LABEL_TOP
+		_level_label.offset_right = _level_label.offset_left + LEVEL_LABEL_SIZE.x
+		_level_label.offset_bottom = _level_label.offset_top + LEVEL_LABEL_SIZE.y
+
+	if _pause_menu_button != null:
+		_pause_menu_button.anchor_left = 1.0
+		_pause_menu_button.anchor_top = 0.0
+		_pause_menu_button.anchor_right = 1.0
+		_pause_menu_button.anchor_bottom = 0.0
+		_pause_menu_button.offset_right = -(safe_margins.z + HUD_SIDE_MARGIN)
+		_pause_menu_button.offset_left = _pause_menu_button.offset_right - PAUSE_BUTTON_SIZE.x
+		_pause_menu_button.offset_top = safe_margins.y + HUD_TOP_MARGIN
+		_pause_menu_button.offset_bottom = _pause_menu_button.offset_top + PAUSE_BUTTON_SIZE.y
+
+
+func _layout_ability_bar(safe_margins: Vector4) -> void:
+	if _ability_bar == null:
+		return
+
+	var bottom_margin := _get_ability_bar_bottom_margin(safe_margins)
+	_ability_bar.anchor_left = 0.0
+	_ability_bar.anchor_top = 1.0
+	_ability_bar.anchor_right = 1.0
+	_ability_bar.anchor_bottom = 1.0
+	_ability_bar.offset_left = safe_margins.x
+	_ability_bar.offset_top = -(bottom_margin + ABILITY_BAR_HEIGHT)
+	_ability_bar.offset_right = -safe_margins.z
+	_ability_bar.offset_bottom = -bottom_margin
+
+	if _ability_button_row != null:
+		_ability_button_row.anchor_left = 0.5
+		_ability_button_row.anchor_top = 0.0
+		_ability_button_row.anchor_right = 0.5
+		_ability_button_row.anchor_bottom = 0.0
+		_ability_button_row.offset_left = -ABILITY_BUTTON_ROW_SIZE.x * 0.5
+		_ability_button_row.offset_top = ABILITY_BUTTON_ROW_TOP
+		_ability_button_row.offset_right = ABILITY_BUTTON_ROW_SIZE.x * 0.5
+		_ability_button_row.offset_bottom = ABILITY_BUTTON_ROW_TOP + ABILITY_BUTTON_ROW_SIZE.y
+
+
+func _get_ability_bar_bottom_margin(safe_margins: Vector4) -> float:
+	return maxf(ABILITY_BAR_DESIGN_BOTTOM_MARGIN, safe_margins.w + ABILITY_BAR_SAFE_BOTTOM_PADDING)
+
+
+func _layout_result_panel(panel: Control, safe_margins: Vector4) -> void:
+	if panel == null:
+		return
+
+	panel.anchor_left = 0.0
+	panel.anchor_top = 0.0
+	panel.anchor_right = 1.0
+	panel.anchor_bottom = 1.0
+	panel.offset_left = 0.0
+	panel.offset_top = 0.0
+	panel.offset_right = 0.0
+	panel.offset_bottom = 0.0
+
+	for child in panel.get_children():
+		var label := child as Label
+		if label == null:
+			continue
+
+		label.anchor_left = 0.0
+		label.anchor_top = 0.5
+		label.anchor_right = 1.0
+		label.anchor_bottom = 0.5
+		label.offset_left = safe_margins.x
+		label.offset_top = -RESULT_LABEL_HEIGHT * 0.5
+		label.offset_right = -safe_margins.z
+		label.offset_bottom = RESULT_LABEL_HEIGHT * 0.5
+
+
+func _layout_pause_menu_overlay() -> void:
+	if _pause_menu_overlay == null:
+		return
+
+	_pause_menu_overlay.anchor_left = 0.0
+	_pause_menu_overlay.anchor_top = 0.0
+	_pause_menu_overlay.anchor_right = 1.0
+	_pause_menu_overlay.anchor_bottom = 1.0
+	_pause_menu_overlay.offset_left = 0.0
+	_pause_menu_overlay.offset_top = 0.0
+	_pause_menu_overlay.offset_right = 0.0
+	_pause_menu_overlay.offset_bottom = 0.0
+
+	var panel := _pause_menu_overlay.get_node_or_null("PauseMenuPanel") as Control
+	if panel == null:
+		return
+
+	panel.anchor_left = 0.5
+	panel.anchor_top = 0.5
+	panel.anchor_right = 0.5
+	panel.anchor_bottom = 0.5
+	panel.offset_left = -PAUSE_MENU_PANEL_SIZE.x * 0.5
+	panel.offset_top = -PAUSE_MENU_PANEL_SIZE.y * 0.5
+	panel.offset_right = PAUSE_MENU_PANEL_SIZE.x * 0.5
+	panel.offset_bottom = PAUSE_MENU_PANEL_SIZE.y * 0.5
+
+
+func _layout_shelves(viewport_size: Vector2, safe_margins: Vector4) -> void:
+	if _shelves_root == null:
+		return
+
+	var play_top := safe_margins.y + SHELVES_TOP_CLEARANCE
+	var ability_top := viewport_size.y - _get_ability_bar_bottom_margin(safe_margins) - ABILITY_BAR_HEIGHT
+	var play_bottom := maxf(play_top, ability_top - SHELVES_BOTTOM_CLEARANCE)
+	var root_position := Vector2(viewport_size.x * 0.5, (play_top + play_bottom) * 0.5)
+	var shelf_bounds := _get_shelves_local_bounds()
+	if shelf_bounds.size.y > 0.0:
+		var bounds_center_y := shelf_bounds.position.y + shelf_bounds.size.y * 0.5
+		root_position.y = (play_top + play_bottom) * 0.5 - bounds_center_y
+
+		var min_root_y := play_top - shelf_bounds.position.y
+		var max_root_y := play_bottom - (shelf_bounds.position.y + shelf_bounds.size.y)
+		if min_root_y <= max_root_y:
+			root_position.y = clampf(root_position.y, min_root_y, max_root_y)
+		else:
+			root_position.y = min_root_y
+
+	_shelves_root.position = root_position
+
+
+func _get_shelves_local_bounds() -> Rect2:
+	if _shelves_root == null:
+		return Rect2()
+
+	var bounds := Rect2()
+	var has_bounds := false
+	for shelf in _get_all_shelves():
+		var shelf_node := shelf as Node2D
+		if shelf_node == null:
+			continue
+
+		var shelf_center := _shelves_root.to_local(shelf_node.global_position)
+		var shelf_rect := Rect2(shelf_center - SHELF_CELL_SIZE * 0.5, SHELF_CELL_SIZE)
+		if has_bounds:
+			bounds = bounds.merge(shelf_rect)
+		else:
+			bounds = shelf_rect
+			has_bounds = true
+
+	return bounds if has_bounds else Rect2()
 
 
 func _setup_audio_players() -> void:
@@ -296,6 +516,7 @@ func _apply_level_config(config: Dictionary) -> void:
 	else:
 		_add_preset_layout_shelves(shelves, shelves_config)
 
+	_apply_responsive_layout()
 	_set_moving_shelf_rows_paused(false)
 	_update_locked_shelves()
 	_resolve_shelves(_get_all_shelves())

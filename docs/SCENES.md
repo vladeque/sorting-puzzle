@@ -41,9 +41,9 @@ Purpose:
 
 Important nodes:
 - `Background`: fullscreen gameplay background.
-- `Shelves`: parent for generated shelf nodes and optional moving shelf row containers.
+- `Shelves`: parent for generated shelf nodes and optional moving shelf row containers; `scripts/level.gd` centers it in the available play area for the current viewport height.
 - `DragLayer`: temporary parent for dragged items, drawn above shelves.
-- `UI`: `CanvasLayer` for gameplay labels, ability buttons, and overlays.
+- `UI`: `CanvasLayer` for gameplay labels, ability buttons, and overlays; top-level controls are anchored or positioned at runtime for non-720x1280 portrait screens.
 - `UI/TimerLabel`: countdown display.
 - `UI/LevelLabel`: current level display.
 - `UI/PauseMenuButton`: circular top-right button that pauses the active level and opens the pause menu overlay.
@@ -145,6 +145,7 @@ Script:
 Purpose:
 - Reusable in-level pause menu overlay instanced by `level.tscn`.
 - Owns the modal dimmer, popup panel styling, `Pause` title, music / sound-effects / vibration icon buttons, their crossed-out toggle visuals, and `Leave` / `Continue` buttons.
+- Uses full-rect overlay anchors and a centered popup panel so it tracks the stretched viewport.
 
 Important nodes:
 - `PauseMenuPanel`: centered popup panel.

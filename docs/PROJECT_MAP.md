@@ -7,6 +7,7 @@ Use this file as the first stop when you need to identify where a feature lives.
 Main scene:
 - `scenes/main_menu.tscn`
 - Configured in `project.godot` as `run/main_scene`.
+- `project.godot` keeps the 720x1280 design viewport and uses `canvas_items` stretch with `keep_width` so portrait devices share a stable logical width while gaining or losing vertical play space.
 - Owns the level selection screen and launches playable levels.
 
 Playable level scene:
@@ -52,6 +53,7 @@ Files:
 
 Responsibility:
 - Loads level JSON and item sprite config.
+- Applies responsive layout for the top HUD, bottom ability bar, overlays, pause menu panel, and shelf root when the viewport size changes.
 - Instantiates `scenes/shelf.tscn` for each configured shelf and places shelf cells from `scenes/layouts/layout_*.tscn` preset templates.
 - Builds optional `row_layouts` or template-authored moving rows, including moving rows that clip and horizontally wrap more shelves than are visible at once.
 - Spawns `ShelfItem` instances from config layers.

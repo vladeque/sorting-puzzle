@@ -84,17 +84,28 @@ shadow_offset = Vector2(0, 3)
 
 [node name="PauseMenuOverlay" type="ColorRect" unique_id=636763679]
 visible = false
-offset_right = 720.0
-offset_bottom = 1280.0
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 color = Color(0.02, 0.025, 0.03, 0.66)
 script = ExtResource("4_pause_menu_script")
 
 [node name="PauseMenuPanel" type="PanelContainer" parent="." unique_id=1355035433]
-layout_mode = 0
-offset_left = 100.0
-offset_top = 397.0
-offset_right = 620.0
-offset_bottom = 760.0
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -260.0
+offset_top = -181.5
+offset_right = 260.0
+offset_bottom = 181.5
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_pause_panel")
 
 [node name="MarginContainer" type="MarginContainer" parent="PauseMenuPanel" unique_id=302232463]
@@ -135,11 +146,16 @@ theme_override_styles/hover = SubResource("StyleBoxEmpty_icon_button")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_icon_button")
 
 [node name="Icon" type="TextureRect" parent="PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/MusicButton" unique_id=1923076712]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 offset_left = -2.0
 offset_top = -2.0
-offset_right = 88.0
-offset_bottom = 88.0
+offset_right = 2.0
+offset_bottom = 2.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("1_music_icon")
 expand_mode = 1
@@ -155,11 +171,16 @@ theme_override_styles/hover = SubResource("StyleBoxEmpty_icon_button")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_icon_button")
 
 [node name="Icon" type="TextureRect" parent="PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/SoundEffectsButton" unique_id=1855192667]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 offset_left = -2.0
 offset_top = -2.0
-offset_right = 88.0
-offset_bottom = 88.0
+offset_right = 2.0
+offset_bottom = 2.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("2_sound_effects_icon")
 expand_mode = 1
@@ -175,11 +196,16 @@ theme_override_styles/hover = SubResource("StyleBoxEmpty_icon_button")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_icon_button")
 
 [node name="Icon" type="TextureRect" parent="PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/VibrationButton" unique_id=1516946932]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 offset_left = -2.0
 offset_top = -2.0
-offset_right = 88.0
-offset_bottom = 88.0
+offset_right = 2.0
+offset_bottom = 2.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("3_vibration_icon")
 expand_mode = 1

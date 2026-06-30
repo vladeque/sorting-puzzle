@@ -66,6 +66,7 @@ Important constants:
 - `SHELF_CELL_SIZE`: reusable shelf scene bounds; three cells in a row are packed to fill most of the 720 px gameplay viewport, with compact vertical row spacing.
 - `SHELF_SHARED_EDGE_THICKNESS`: shelf boundary thickness that neighboring cells overlap.
 - `SHELF_GRID_STEP`: packed layout spacing after overlapping shared shelf edges.
+- `HUD_*`, `ABILITY_BAR_*`, `SHELVES_*`, `RESULT_LABEL_HEIGHT`, and `PAUSE_MENU_PANEL_SIZE`: responsive layout constants for positioning the HUD, ability bar, result overlays, pause panel, and generated shelf root across portrait viewport heights.
 - `SHELF_SCENE`: `res://scenes/shelf.tscn`.
 - `MOVING_SHELF_ROW_SCENE`: `res://scenes/moving_shelf_row.tscn`.
 - `ITEM_SCENE`: `res://scenes/item.tscn`.
@@ -79,6 +80,7 @@ Important constants:
 - `TRIPLE_CLEAR_SOUND`: sound played when a matched triple gathers and disappears.
 
 Key responsibilities:
+- Apply responsive layout with `_apply_responsive_layout()`, including safe-area-aware top HUD placement, bottom ability bar placement, full-screen overlays, centered pause popup, and shelf-root centering between HUD and ability controls.
 - Load JSON configs with `_load_json_file()`.
 - Instantiate reusable shelf cells with `_add_shelf()` and add generated back layers with `_add_back_layer()`.
 - Load `layout_preset` scene templates from `scenes/layouts/` and place runtime shelves at their authored `ShelfXX` markers.
