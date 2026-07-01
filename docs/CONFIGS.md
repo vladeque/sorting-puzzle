@@ -142,6 +142,25 @@ Use `--locked-shelves` to add unlock requirements to generated shelves. Entries 
 py scripts\tools\generate_level_shelves.py --shelf-count 9 --layer-count 2 --difficulty medium --locked-shelves 7:3,8:5 --validate
 ```
 
+## `user://player_progress.json`
+
+Purpose:
+- Stores local campaign progression and campaign ability inventory.
+- Owned by the `PlayerProgress` autoload in `scripts/player_progress.gd`.
+
+Fields:
+- `version`: save schema version.
+- `current_level`: next normal campaign level to launch from the main menu.
+- `highest_completed_level`: highest normal campaign level completed.
+- `ability_uses`: remaining campaign uses for `hammer`, `shuffle`, and `highlight`.
+
+Runtime behavior:
+- Fresh saves start at level 1 with three uses for each ability.
+- Ability uses are spent and saved immediately when an ability successfully applies.
+- Failed or abandoned levels do not refund ability uses.
+- Completing the current campaign level advances `current_level` by one.
+- Developer/test level selection is isolated from this save data.
+
 ## Documentation Update Checklist
 
 When changing scene, script, or config ownership:

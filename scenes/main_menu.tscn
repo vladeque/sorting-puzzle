@@ -60,8 +60,16 @@ horizontal_alignment = 1
 layout_mode = 2
 theme_override_colors/font_color = Color(0.78, 0.9, 0.93, 1)
 theme_override_font_sizes/font_size = 30
-text = "Select Level"
+text = "Level 1"
 horizontal_alignment = 1
+
+[node name="PlayButton" type="Button" parent="Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 88)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 34
+text = "Play"
 
 [node name="LevelGrid" type="GridContainer" parent="Content"]
 unique_name_in_owner = true

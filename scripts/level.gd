@@ -19,6 +19,7 @@ const LEVEL_CONFIG_TEMPLATE := "res://configs/levels/level_%03d.json"
 const DEFAULT_LEVEL_CONFIG := "res://configs/levels/level_001.json"
 const LAYOUT_SCENE_TEMPLATE := "res://scenes/layouts/layout_%s.tscn"
 const DEFAULT_LAYOUT_PRESET := "grid_3x3"
+const LEVEL_SCENE_PATH := "res://level.tscn"
 const MAIN_MENU_SCENE := "res://scenes/main_menu.tscn"
 const ITEM_PLACE_SOUND := preload("res://assets/audio/item_place.wav")
 const TRIPLE_CLEAR_SOUND := preload("res://assets/audio/triple_clear.wav")
@@ -77,6 +78,7 @@ const SHELF_FLOOR_ONLY_HIDDEN_NODES := [
 @export_range(-40.0, 6.0, 0.5) var item_place_volume_db := -5.0
 @export_range(-40.0, 6.0, 0.5) var triple_clear_volume_db := -5.0
 @export_range(1, 10, 1) var selected_level := 1
+@export var launched_from_dev_mode := false
 
 var _slots: Array[Node2D] = []
 var _item_textures: Dictionary = {}
@@ -442,7 +444,7 @@ func _process(delta: float) -> void:
 	if _level_completed:
 		_completion_return_time_remaining = maxf(_completion_return_time_remaining - delta, 0.0)
 		if _completion_return_time_remaining <= 0.0 and not _returning_to_menu:
-			_return_to_main_menu()
+			_advance_after_completion()
 		return
 
 	if _level_failed:
@@ -551,7 +553,7 @@ func _apply_level_config(config: Dictionary) -> void:
 		_pause_menu_overlay.visible = false
 
 	_clear_ability_highlights()
-	_reset_ability_uses()
+	_load_ability_uses()
 
 	var shelves_config := config.get("shelves", []) as Array
 	_layout_preset = str(config.get("layout_preset", DEFAULT_LAYOUT_PRESET))
@@ -1131,6 +1133,8 @@ func _complete_level() -> void:
 	_level_completed = true
 	_level_paused = false
 	_completion_return_time_remaining = maxf(completion_return_delay_seconds, 0.0)
+	if not launched_from_dev_mode:
+		PlayerProgress.complete_level(selected_level)
 	_clear_selected_item()
 	_set_moving_shelf_rows_paused(true)
 	_dragged_item = null
@@ -1160,6 +1164,45 @@ func _return_to_main_menu() -> void:
 	if error != OK:
 		_returning_to_menu = false
 		push_error("Could not return to main menu: %s" % MAIN_MENU_SCENE)
+
+
+func _advance_after_completion() -> void:
+	if launched_from_dev_mode:
+		_return_to_main_menu()
+		return
+
+	var next_level := selected_level + 1
+	if not _level_config_exists(next_level):
+		_return_to_main_menu()
+		return
+
+	_change_to_level(next_level, false)
+
+
+func _change_to_level(level_number: int, dev_mode: bool) -> void:
+	_level_paused = false
+	_returning_to_menu = true
+	var level_scene_resource := load(LEVEL_SCENE_PATH) as PackedScene
+	if level_scene_resource == null:
+		_returning_to_menu = false
+		push_error("Could not load level scene: %s" % LEVEL_SCENE_PATH)
+		return
+
+	var level_scene := level_scene_resource.instantiate()
+	level_scene.selected_level = level_number
+	level_scene.launched_from_dev_mode = dev_mode
+
+	var tree := get_tree()
+	var current_scene := tree.current_scene
+	tree.root.add_child(level_scene)
+	tree.current_scene = level_scene
+
+	if current_scene != null:
+		current_scene.queue_free()
+
+
+func _level_config_exists(level_number: int) -> bool:
+	return FileAccess.file_exists(LEVEL_CONFIG_TEMPLATE % level_number)
 
 
 func _setup_pause_menu_buttons() -> void:
@@ -1963,7 +2006,7 @@ func _on_ability_button_pressed(ability_id: StringName) -> void:
 	if not did_apply:
 		return
 
-	_ability_uses[ability_id] = int(_ability_uses.get(ability_id, 0)) - 1
+	_spend_ability_use(ability_id)
 	_update_ability_buttons()
 
 
@@ -2223,6 +2266,30 @@ func _reset_ability_uses() -> void:
 		ABILITY_SHUFFLE: 3,
 		ABILITY_HIGHLIGHT: 3,
 	}
+
+
+func _load_ability_uses() -> void:
+	if launched_from_dev_mode:
+		_reset_ability_uses()
+		return
+
+	var saved_uses := PlayerProgress.get_ability_uses()
+	_ability_uses = {
+		ABILITY_HAMMER: maxi(int(saved_uses.get(String(ABILITY_HAMMER), 3)), 0),
+		ABILITY_SHUFFLE: maxi(int(saved_uses.get(String(ABILITY_SHUFFLE), 3)), 0),
+		ABILITY_HIGHLIGHT: maxi(int(saved_uses.get(String(ABILITY_HIGHLIGHT), 3)), 0),
+	}
+
+
+func _spend_ability_use(ability_id: StringName) -> void:
+	if launched_from_dev_mode:
+		_ability_uses[ability_id] = maxi(int(_ability_uses.get(ability_id, 0)) - 1, 0)
+		return
+
+	if not PlayerProgress.spend_ability(ability_id):
+		push_warning("Could not spend ability use: %s" % String(ability_id))
+
+	_load_ability_uses()
 
 
 func _update_ability_button(ability_id: StringName) -> void:

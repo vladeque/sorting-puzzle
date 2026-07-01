@@ -8,29 +8,63 @@ Attached to:
 - `scenes/main_menu.tscn` root `MainMenu`.
 
 Purpose:
-- Builds the level selection grid.
-- Launches the selected level.
+- Shows the campaign play entry point for the saved current level.
+- Builds the developer/test level selection grid when dev level select is enabled.
+- Launches campaign or isolated dev/test levels.
 
 Key constants:
 - `LEVEL_SCENE`: preloads `res://level.tscn`.
 - `MIN_LEVEL`: first selectable level number.
 - `MAX_LEVEL`: last selectable level number.
+- `DEV_LEVEL_SELECT_SETTING`: optional project setting that overrides debug-build dev level selection.
 
 Important nodes:
+- `%PlayButton`: starts the saved campaign level.
 - `%LevelGrid`: `GridContainer` filled with generated `Button` nodes.
 
 Key methods:
-- `_ready()`: populates the selector.
-- `_populate_level_selector()`: clears old buttons and creates one button per level.
-- `_launch_level(level_number)`: instantiates the level, sets `selected_level`, swaps current scene, and queues the menu for deletion.
+- `_ready()`: loads progress, wires the play button, updates campaign progress text, and populates the dev selector when enabled.
+- `_update_campaign_progress()`: displays the saved current level or all-complete state.
+- `_populate_level_selector()`: clears old buttons and creates one isolated dev/test button per level when dev selection is enabled.
+- `_launch_campaign_level()`: launches `PlayerProgress.current_level`.
+- `_launch_level(level_number, launched_from_dev_mode)`: instantiates the level, sets launch metadata, swaps current scene, and queues the menu for deletion.
 
 Depends on:
 - `level.tscn`
 - `scripts/level.gd` export `selected_level`
+- `scripts/level.gd` export `launched_from_dev_mode`
+- `PlayerProgress` autoload
 
 Do not use for:
-- Level availability rules that need persisted player progress until save data exists.
+- Persistent save data ownership. Put that in `scripts/player_progress.gd`.
 - Puzzle runtime logic.
+
+## `scripts/player_progress.gd`
+
+Autoload:
+- Registered as `PlayerProgress` in `project.godot`.
+
+Purpose:
+- Owns saved campaign progression and campaign ability inventory.
+- Persists state to `user://player_progress.json`.
+
+Saved fields:
+- `version`: save schema version.
+- `current_level`: next campaign level to play.
+- `highest_completed_level`: highest campaign level completed.
+- `ability_uses`: remaining campaign uses for hammer, shuffle, and highlight.
+
+Key methods:
+- `load_progress()`: reads and sanitizes the save file or creates default in-memory progress.
+- `save_progress()`: writes the current progress data.
+- `get_current_level()`: returns the next campaign level.
+- `get_ability_uses()`: returns remaining campaign ability uses.
+- `spend_ability(ability_id)`: immediately spends and saves one campaign ability use.
+- `complete_level(level_number)`: records completion and advances `current_level` when the completed level is the active campaign level.
+- `reset_progress()`: restores default progress and writes it to disk for testing.
+
+Do not use for:
+- Per-level shelf state, timer state, or dev/test level runtime state.
 
 ## `scripts/level.gd`
 
@@ -59,6 +93,7 @@ Important exports:
 - `item_place_volume_db`: volume for the item placement sound effect.
 - `triple_clear_volume_db`: volume for the matched triple clear sound effect.
 - `selected_level`: level number loaded from `configs/levels/level_%03d.json`.
+- `launched_from_dev_mode`: makes a level use isolated temporary ability counts and return to the menu instead of saving campaign progress.
 
 Important constants:
 - `SLOT_COUNT`: currently three items per shelf front layer.
@@ -76,6 +111,7 @@ Important constants:
 - `LAYOUT_SCENE_TEMPLATE`: `res://scenes/layouts/layout_%s.tscn` path pattern used by `layout_preset`.
 - `DEFAULT_LAYOUT_PRESET`: fallback layout preset.
 - `MAIN_MENU_SCENE`: scene returned to after completion.
+- `LEVEL_SCENE_PATH`: scene loaded when normal campaign play auto-advances to the next level.
 - `ITEM_PLACE_SOUND`: short sound played when the player drops or moves an item into a shelf slot.
 - `TRIPLE_CLEAR_SOUND`: sound played when a matched triple gathers and disappears.
 
@@ -101,10 +137,12 @@ Key responsibilities:
 - Queue shelf resolution requests made while another match animation is still finishing.
 - Promote back layers with `_promote_back_layer()`, `_play_layer_promotion_animation()`, and `_advance_back_layers()`.
 - Check win/loss state with `_check_level_completed()`, `_fail_level()`, and `_complete_level()`.
+- Save campaign completion through `PlayerProgress` and auto-load the next campaign level when it exists.
 - Format the active timer as zero-padded `MM:SS` text with `_update_timer_label()`.
 - Pause and resume active gameplay through the top-right menu button, the instanced `UI/PauseMenuOverlay`, `Leave`, and `Continue`.
 - Disable item placement and triple-clear sound effects while the pause menu sound-effects toggle is crossed out.
-- Manage hammer, shuffle, and highlight abilities. Hammer targets visible/front triples first, then can supplement visible/front matches with first-back-layer copies of the same item type when no visible item type has three available copies.
+- Manage hammer, shuffle, and highlight abilities. Campaign levels read and spend saved ability counts through `PlayerProgress`; dev/test levels use isolated temporary counts.
+- Hammer targets visible/front triples first, then can supplement visible/front matches with first-back-layer copies of the same item type when no visible item type has three available copies.
 - Count hammer destroys as cleared triples for shelf unlocking.
 - Let highlight uses start their timed window even when no immediate triple can currently be highlighted.
 - Apply highlight ability visuals through `ShelfItem.set_outline()` so only item silhouettes receive a border, and update the highlight button countdown label while that window is active.
@@ -120,10 +158,11 @@ Depends on:
 - `assets/audio/item_place.wav` and `assets/audio/triple_clear.wav`.
 - `configs/item_sprites.json` item IDs and texture paths.
 - `configs/levels/level_*.json` shelf schema.
+- `PlayerProgress` autoload for campaign progress and ability inventory.
 
 Do not use for:
 - Offline level generation or solvability search. Keep that in `scripts/tools/`.
-- Persistent progression or save data once that system exists.
+- Save data ownership. Keep that in `scripts/player_progress.gd`.
 
 ## `scripts/shelf_layout_row.gd`
 

@@ -8,12 +8,17 @@ Main scene:
 - `scenes/main_menu.tscn`
 - Configured in `project.godot` as `run/main_scene`.
 - `project.godot` keeps the 720x1280 design viewport and uses `canvas_items` stretch with `keep_width` so portrait devices share a stable logical width while gaining or losing vertical play space.
-- Owns the level selection screen and launches playable levels.
+- Owns the campaign play entry point, shows developer level selection in dev/test mode, and launches playable levels.
 
 Playable level scene:
 - `level.tscn`
-- Instantiated by `scripts/main_menu.gd`.
+- Instantiated by `scripts/main_menu.gd` and by `scripts/level.gd` when normal campaign play auto-advances to the next level.
 - Owns shelf layout, timer, drag and tap movement, triple matching, abilities, pause-menu wiring, failure, and completion flow.
+
+Player progression:
+- `scripts/player_progress.gd`
+- Registered in `project.godot` as the `PlayerProgress` autoload.
+- Saves campaign level progress and campaign ability inventory under `user://player_progress.json`.
 
 Reusable item scene:
 - `scenes/item.tscn`
@@ -27,13 +32,31 @@ Reusable item scene:
 Files:
 - `scenes/main_menu.tscn`
 - `scripts/main_menu.gd`
+- `scripts/player_progress.gd`
 
 Responsibility:
-- Builds level buttons for levels 1 through 10.
-- Instantiates `level.tscn`, assigns `selected_level`, swaps it into `SceneTree.current_scene`, and removes the menu.
+- Shows a normal campaign `Play` button for `PlayerProgress.current_level`.
+- Hides free level selection from normal campaign play.
+- Builds level buttons for levels 1 through 10 only when dev/test level selection is enabled.
+- Instantiates `level.tscn`, assigns `selected_level` and `launched_from_dev_mode`, swaps it into `SceneTree.current_scene`, and removes the menu.
 
 Change here when:
-- Adding level selection UI, lock states, stars, level paging, or menu-to-game navigation behavior.
+- Adding campaign entry UI, dev/test level selection UI, lock states, stars, level paging, or menu-to-game navigation behavior.
+
+### Player Progression
+
+Files:
+- `scripts/player_progress.gd`
+- `project.godot`
+
+Responsibility:
+- Loads and saves `user://player_progress.json`.
+- Tracks the current campaign level, highest completed level, and campaign ability uses.
+- Spends ability uses immediately so failure or leaving a level does not refund them.
+- Advances `current_level` only when the active campaign level is completed.
+
+Change here when:
+- Adding ability refills, rewards, purchases, reset flows, save migrations, cloud save hooks, or new persisted player state.
 
 ### Level Runtime
 
@@ -125,11 +148,12 @@ Change here when:
 Files:
 - `level.tscn`
 - `scripts/level.gd`
+- `scripts/player_progress.gd`
 - `assets/abilities/*.png`
 
 Responsibility:
 - Provides hammer, shuffle, and highlight buttons.
-- Tracks three uses per ability per level.
+- Reads campaign ability uses from `PlayerProgress`, spends campaign uses immediately, and uses temporary three-use counts for isolated dev/test levels.
 - Lets hammer clear matching visible/front items first, or supplement visible/front items with first-back-layer copies of the same type if no visible item type can make a triple.
 - Disables abilities after failure, completion, or when uses run out.
 - Starts the highlight timer even when no current shelf state can be highlighted.

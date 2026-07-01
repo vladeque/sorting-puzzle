@@ -12,17 +12,21 @@ Script:
 
 Purpose:
 - Main project entry scene.
-- Displays title and level selector.
-- Provides a `%LevelGrid` container that the script fills with level buttons.
+- Displays title and campaign progress.
+- Provides a campaign play button.
+- Provides a `%LevelGrid` container that the script fills with isolated dev/test level buttons when dev selection is enabled.
 
 Important nodes:
 - `Background`: fullscreen menu background.
 - `ShelfBackdrop` and `ShelfLip`: static decorative shelf art.
 - `Content`: centered menu layout container.
-- `Content/LevelGrid`: unique-name `GridContainer` used by the script.
+- `Content/SelectorLabel`: campaign current-level label in normal flow, or dev selector label in dev/test mode.
+- `Content/PlayButton`: unique-name button that launches the saved campaign level.
+- `Content/LevelGrid`: unique-name `GridContainer` used by the script for dev/test level selection.
 
 Depends on:
 - `level.tscn` through `scripts/main_menu.gd`.
+- `PlayerProgress` autoload for the saved campaign level.
 
 Do not use for:
 - Runtime puzzle rules or shelf state. Put those in `level.tscn` and `scripts/level.gd`.
@@ -38,6 +42,7 @@ Script:
 Purpose:
 - Playable puzzle scene.
 - Provides stable top-level nodes that `scripts/level.gd` fills and controls at runtime.
+- Normal campaign launches save completion and auto-advance to the next level; dev/test launches return to the menu and do not touch campaign save data.
 
 Important nodes:
 - `Background`: fullscreen procedural gameplay backdrop with child nodes for the top HUD strip, simple shop wall, baseboard, and bottom floor band.
