@@ -80,7 +80,7 @@ Important constants:
 - `TRIPLE_CLEAR_SOUND`: sound played when a matched triple gathers and disappears.
 
 Key responsibilities:
-- Apply responsive layout with `_apply_responsive_layout()`, including safe-area-aware top HUD placement, bottom ability bar placement, full-screen overlays, centered pause popup, shelf-root scaling, and shelf-root centering between HUD and ability controls.
+- Apply responsive layout with `_apply_responsive_layout()`, including safe-area-aware top HUD placement, ability bar placement over the floor/baseboard transition strip, full-screen overlays, centered pause popup, shelf-root scaling, and shelf-root centering between HUD and ability controls.
 - Resize the scene-owned `Background` control so its procedural top strip, shop wall, baseboard, and floor bands fill the active viewport.
 - Load JSON configs with `_load_json_file()`.
 - Instantiate reusable shelf cells with `_add_shelf()` and add generated back layers with `_add_back_layer()`.
