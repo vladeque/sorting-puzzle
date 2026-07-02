@@ -2,6 +2,8 @@
 class_name ShelfItem
 extends Area2D
 
+const DEFAULT_VISUAL_SCALE := 0.46
+
 @export var item_id: StringName = &""
 
 @export var texture: Texture2D:
@@ -54,6 +56,10 @@ func _apply_texture() -> void:
 	if outline_sprite != null:
 		outline_sprite.texture = texture
 
+	var shadow := get_node_or_null("Shadow") as CanvasItem
+	if shadow != null:
+		shadow.visible = texture != null
+
 
 func _apply_visual_scale() -> void:
 	var sprite := get_node_or_null("Sprite2D") as Sprite2D
@@ -63,6 +69,10 @@ func _apply_visual_scale() -> void:
 	var outline_sprite := get_node_or_null("OutlineSprite") as Sprite2D
 	if outline_sprite != null:
 		outline_sprite.scale = _get_outline_scale()
+
+	var shadow := get_node_or_null("Shadow") as Node2D
+	if shadow != null:
+		shadow.scale = Vector2.ONE * (visual_scale / DEFAULT_VISUAL_SCALE)
 
 
 func _prepare_outline_material() -> void:

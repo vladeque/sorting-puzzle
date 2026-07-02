@@ -28,10 +28,14 @@ const SHELF_UNLOCK_REQUIREMENT_META := &"unlock_after_triples"
 const SHELF_LOCKED_META := &"is_locked"
 const LOCKED_OVERLAY_NAME := "LockedOverlay"
 const LOCK_REMAINING_LABEL_NAME := "RemainingLabel"
+const SHELF_VISUAL_VARIANT_META := &"visual_variant"
+const SHELF_TOP_CEILING_CAP_NAME := "TopCeilingCap"
 const ROW_LAYOUTS_KEY := "row_layouts"
 const ROW_MOTION_HORIZONTAL_WRAP := "horizontal_wrap"
 const SHELF_VISUAL_VARIANT_FULL := "full"
 const SHELF_VISUAL_VARIANT_FLOOR_ONLY := "floor_only"
+const SHELF_TOP_STACK_VERTICAL_EPSILON := 4.0
+const SHELF_TOP_STACK_MIN_HORIZONTAL_OVERLAP := 0.35
 const HUD_TOP_MARGIN := 28.0
 const HUD_SIDE_MARGIN := 24.0
 const LEVEL_LABEL_MARGIN_LEFT := 32.0
@@ -53,8 +57,11 @@ const RESULT_LABEL_HEIGHT := 96.0
 const PAUSE_MENU_PANEL_SIZE := Vector2(520, 363)
 const SHELF_FLOOR_ONLY_HIDDEN_NODES := [
 	"BackWall",
+	"BackWallTopShade",
+	"BackWallTopShadeSoft",
 	"BackWallLeftShade",
 	"Ceiling",
+	"TopCeilingCap",
 	"LeftWall",
 	"RightWall",
 	"Highlight",
@@ -572,6 +579,7 @@ func _apply_level_config(config: Dictionary) -> void:
 	else:
 		_add_preset_layout_shelves(shelves, shelves_config)
 
+	_update_top_shelf_ceiling_caps()
 	_apply_responsive_layout()
 	_set_moving_shelf_rows_paused(false)
 	_update_locked_shelves()
@@ -848,14 +856,65 @@ func _is_layout_shelf_marker(layout_node: Node) -> bool:
 func _apply_shelf_visual_variant(shelf: Node2D, visual_variant: String) -> void:
 	match visual_variant:
 		SHELF_VISUAL_VARIANT_FULL:
+			shelf.set_meta(SHELF_VISUAL_VARIANT_META, SHELF_VISUAL_VARIANT_FULL)
 			return
 		SHELF_VISUAL_VARIANT_FLOOR_ONLY:
+			shelf.set_meta(SHELF_VISUAL_VARIANT_META, SHELF_VISUAL_VARIANT_FLOOR_ONLY)
 			for node_name in SHELF_FLOOR_ONLY_HIDDEN_NODES:
 				var node := shelf.get_node_or_null(node_name) as CanvasItem
 				if node != null:
 					node.visible = false
 		_:
+			shelf.set_meta(SHELF_VISUAL_VARIANT_META, SHELF_VISUAL_VARIANT_FULL)
 			push_warning("Unknown shelf visual_variant '%s'. Using full shelf." % visual_variant)
+
+
+func _update_top_shelf_ceiling_caps() -> void:
+	var shelves := _get_all_shelves()
+	for shelf_node in shelves:
+		var shelf := shelf_node as Node2D
+		if shelf == null:
+			continue
+
+		_set_shelf_top_ceiling_cap_visible(shelf, not _has_stacked_shelf_above(shelf, shelves))
+
+
+func _has_stacked_shelf_above(shelf: Node2D, shelves: Array[Node]) -> bool:
+	var shelf_position := _get_shelf_root_local_position(shelf)
+	for other_node in shelves:
+		var other_shelf := other_node as Node2D
+		if other_shelf == null or other_shelf == shelf:
+			continue
+
+		var other_position := _get_shelf_root_local_position(other_shelf)
+		if other_position.y >= shelf_position.y - SHELF_TOP_STACK_VERTICAL_EPSILON:
+			continue
+
+		if _shelf_cells_stack_horizontally(shelf_position.x, other_position.x):
+			return true
+
+	return false
+
+
+func _shelf_cells_stack_horizontally(first_x: float, second_x: float) -> bool:
+	var overlap_width = maxf(SHELF_CELL_SIZE.x - absf(first_x - second_x), 0.0)
+	return overlap_width / SHELF_CELL_SIZE.x >= SHELF_TOP_STACK_MIN_HORIZONTAL_OVERLAP
+
+
+func _get_shelf_root_local_position(shelf: Node2D) -> Vector2:
+	if _shelves_root != null and shelf.is_inside_tree():
+		return _shelves_root.to_local(shelf.global_position)
+
+	return shelf.position
+
+
+func _set_shelf_top_ceiling_cap_visible(shelf: Node2D, should_show: bool) -> void:
+	var cap := shelf.get_node_or_null(SHELF_TOP_CEILING_CAP_NAME) as CanvasItem
+	if cap == null:
+		return
+
+	var visual_variant := str(shelf.get_meta(SHELF_VISUAL_VARIANT_META, SHELF_VISUAL_VARIANT_FULL))
+	cap.visible = should_show and visual_variant == SHELF_VISUAL_VARIANT_FULL
 
 
 func _get_grid_layout_positions(columns: int, shelf_count: int) -> Array[Vector2]:
@@ -879,6 +938,7 @@ func _add_shelf(parent: Node, shelf_number: int, shelf_position: Vector2) -> Nod
 	var shelf := SHELF_SCENE.instantiate() as Node2D
 	shelf.name = "Shelf%02d" % shelf_number
 	shelf.position = shelf_position
+	shelf.set_meta(SHELF_VISUAL_VARIANT_META, SHELF_VISUAL_VARIANT_FULL)
 	parent.add_child(shelf)
 
 	return shelf

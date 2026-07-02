@@ -176,6 +176,7 @@ Key responsibilities:
 - Resize the scene-owned `Background` control so its procedural top strip, shop wall, baseboard, and floor bands fill the active viewport.
 - Load JSON configs with `_load_json_file()`.
 - Instantiate reusable shelf cells with `_add_shelf()` and add generated back layers with `_add_back_layer()`.
+- Toggle each shelf scene's hidden `TopCeilingCap` only when the shelf uses full visuals and no stacked shelf exists above it in the generated layout.
 - Load `layout_preset` scene templates from `scenes/layouts/` and place runtime shelves at their authored `ShelfXX` markers.
 - Build optional `row_layouts` rows with `_add_row_layout_shelves()`, including horizontally wrapping moving rows and static rows mixed in one level.
 - Build moving rows declared by layout template `MovingRowXX` nodes with `scripts/shelf_layout_row.gd`.
@@ -316,14 +317,15 @@ Exports:
 
 Key methods:
 - `_ready()`: applies current texture and scale.
-- `_apply_texture()`: updates `Sprite2D.texture`.
-- `_apply_visual_scale()`: updates `Sprite2D.scale`.
+- `_apply_texture()`: updates `Sprite2D.texture` and hides the soft contact shadow when the item has no texture.
+- `_apply_visual_scale()`: updates `Sprite2D`, `OutlineSprite`, and contact-shadow scale.
 - `set_outline(enabled, color, width)`: enables or disables the sprite border highlight.
 - `_apply_outline()`: sends outline properties to the `OutlineSprite` shader material and keeps the outline node visible only while enabled.
 
 Depends on:
 - Child node `Sprite2D`.
 - Child node `OutlineSprite`.
+- Child node `Shadow`.
 - `scenes/item.tscn` outline `ShaderMaterial`.
 
 Do not use for:
