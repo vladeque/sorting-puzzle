@@ -6,6 +6,38 @@
 [ext_resource type="PackedScene" uid="uid://g1xsr7chqeg7" path="res://scenes/pause_menu.tscn" id="5_pause_menu"]
 [ext_resource type="Script" uid="uid://cy80oincxrrc5" path="res://scripts/level.gd" id="10_level_script"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_top_hud_strip"]
+bg_color = Color(0.7, 0.34, 0.24, 1)
+border_width_bottom = 4
+border_color = Color(0.45, 0.19, 0.13, 1)
+shadow_color = Color(0.25, 0.1, 0.06, 0.32)
+shadow_size = 8
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hud_center_slot"]
+bg_color = Color(0.36, 0.08, 0.06, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.84, 0.48, 0.34, 0.72)
+corner_radius_top_left = 13
+corner_radius_top_right = 13
+corner_radius_bottom_right = 13
+corner_radius_bottom_left = 13
+shadow_color = Color(0.2, 0.05, 0.04, 0.36)
+shadow_size = 5
+shadow_offset = Vector2(0, 2)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_baseboard"]
+bg_color = Color(0.83, 0.66, 0.47, 1)
+border_width_top = 2
+border_width_bottom = 2
+border_color = Color(0.98, 0.87, 0.66, 0.82)
+shadow_color = Color(0.45, 0.22, 0.13, 0.24)
+shadow_size = 7
+shadow_offset = Vector2(0, -2)
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pause_button_normal"]
 bg_color = Color(0.12, 0.17, 0.22, 0.96)
 border_width_left = 2
@@ -138,38 +170,6 @@ shadow_color = Color(0, 0, 0, 0.34)
 shadow_size = 5
 shadow_offset = Vector2(0, 2)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_top_hud_strip"]
-bg_color = Color(0.7, 0.34, 0.24, 1)
-border_width_bottom = 4
-border_color = Color(0.45, 0.19, 0.13, 1)
-shadow_color = Color(0.25, 0.1, 0.06, 0.32)
-shadow_size = 8
-shadow_offset = Vector2(0, 4)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hud_center_slot"]
-bg_color = Color(0.36, 0.08, 0.06, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.84, 0.48, 0.34, 0.72)
-corner_radius_top_left = 13
-corner_radius_top_right = 13
-corner_radius_bottom_right = 13
-corner_radius_bottom_left = 13
-shadow_color = Color(0.2, 0.05, 0.04, 0.36)
-shadow_size = 5
-shadow_offset = Vector2(0, 2)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_baseboard"]
-bg_color = Color(0.83, 0.66, 0.47, 1)
-border_width_top = 2
-border_width_bottom = 2
-border_color = Color(0.98, 0.87, 0.66, 0.82)
-shadow_color = Color(0.45, 0.22, 0.13, 0.24)
-shadow_size = 7
-shadow_offset = Vector2(0, -2)
-
 [node name="Level" type="Node2D" unique_id=949256860]
 script = ExtResource("10_level_script")
 
@@ -218,15 +218,15 @@ layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -95.0
+offset_left = -85.0
 offset_top = 92.0
-offset_right = 95.0
+offset_right = 85.0
 offset_bottom = 121.0
 grow_horizontal = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_hud_center_slot")
 
-[node name="ComboLabel" type="Label" parent="Background/HudCenterSlot"]
+[node name="ComboLabel" type="Label" parent="Background/HudCenterSlot" unique_id=449182547]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -234,7 +234,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 theme_override_colors/font_color = Color(1, 0.92, 0.62, 1)
 theme_override_colors/font_shadow_color = Color(0.08, 0.02, 0.01, 0.82)
 theme_override_constants/shadow_offset_x = 0
@@ -300,60 +299,55 @@ color = Color(0.45, 0.16, 0.12, 0.24)
 
 [node name="FloorLineVertical01" type="ColorRect" parent="Background/Floor" unique_id=1040645247]
 layout_mode = 1
-anchors_preset = 14
-anchor_top = 0.0
-anchor_right = 0.0
+anchors_preset = 9
 anchor_bottom = 1.0
 offset_left = 120.0
 offset_right = 123.0
+grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 color = Color(0.45, 0.16, 0.12, 0.18)
 
 [node name="FloorLineVertical02" type="ColorRect" parent="Background/Floor" unique_id=1124884613]
 layout_mode = 1
-anchors_preset = 14
-anchor_top = 0.0
-anchor_right = 0.0
+anchors_preset = 9
 anchor_bottom = 1.0
 offset_left = 240.0
 offset_right = 243.0
+grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 color = Color(0.82, 0.45, 0.32, 0.24)
 
 [node name="FloorLineVertical03" type="ColorRect" parent="Background/Floor" unique_id=1357820063]
 layout_mode = 1
-anchors_preset = 14
-anchor_top = 0.0
-anchor_right = 0.0
+anchors_preset = 9
 anchor_bottom = 1.0
 offset_left = 360.0
 offset_right = 363.0
+grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 color = Color(0.45, 0.16, 0.12, 0.18)
 
 [node name="FloorLineVertical04" type="ColorRect" parent="Background/Floor" unique_id=155185640]
 layout_mode = 1
-anchors_preset = 14
-anchor_top = 0.0
-anchor_right = 0.0
+anchors_preset = 9
 anchor_bottom = 1.0
 offset_left = 480.0
 offset_right = 483.0
+grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 color = Color(0.82, 0.45, 0.32, 0.24)
 
 [node name="FloorLineVertical05" type="ColorRect" parent="Background/Floor" unique_id=81432366]
 layout_mode = 1
-anchors_preset = 14
-anchor_top = 0.0
-anchor_right = 0.0
+anchors_preset = 9
 anchor_bottom = 1.0
 offset_left = 600.0
 offset_right = 603.0
+grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 color = Color(0.45, 0.16, 0.12, 0.18)
@@ -368,7 +362,6 @@ z_index = 100
 layer = 10
 
 [node name="TimerLabel" type="Label" parent="UI" unique_id=272348979]
-layout_mode = 3
 anchors_preset = 10
 anchor_right = 1.0
 offset_top = 28.0
@@ -384,7 +377,6 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="LevelLabel" type="Label" parent="UI" unique_id=1053243000]
-layout_mode = 3
 offset_left = 32.0
 offset_top = 42.0
 offset_right = 226.0
@@ -398,15 +390,17 @@ text = "Level 1"
 vertical_alignment = 1
 
 [node name="PauseMenuButton" type="Button" parent="UI" unique_id=406101987]
-layout_mode = 3
 anchors_preset = 3
 anchor_left = 1.0
+anchor_top = 1.0
 anchor_right = 1.0
+anchor_bottom = 1.0
 offset_left = -88.0
 offset_top = 28.0
 offset_right = -24.0
 offset_bottom = 92.0
 grow_horizontal = 0
+grow_vertical = 0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
@@ -586,7 +580,6 @@ vertical_alignment = 1
 
 [node name="FailurePanel" type="ColorRect" parent="UI" unique_id=784630851]
 visible = false
-layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -596,7 +589,7 @@ color = Color(0.04, 0.04, 0.05, 0.68)
 
 [node name="FailureLabel" type="Label" parent="UI/FailurePanel" unique_id=1144242749]
 layout_mode = 1
-anchors_preset = 10
+anchors_preset = 14
 anchor_top = 0.5
 anchor_right = 1.0
 anchor_bottom = 0.5
@@ -614,7 +607,6 @@ vertical_alignment = 1
 
 [node name="CompletionPanel" type="ColorRect" parent="UI" unique_id=1385350832]
 visible = false
-layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -624,7 +616,7 @@ color = Color(0.03, 0.08, 0.06, 0.72)
 
 [node name="CompletionLabel" type="Label" parent="UI/CompletionPanel" unique_id=2100778384]
 layout_mode = 1
-anchors_preset = 10
+anchors_preset = 14
 anchor_top = 0.5
 anchor_right = 1.0
 anchor_bottom = 0.5
