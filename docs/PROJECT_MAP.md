@@ -17,8 +17,9 @@ Playable level scene:
 
 Player progression:
 - `scripts/player_progress.gd`
+- `scripts/save_providers/*.gd`
 - Registered in `project.godot` as the `PlayerProgress` autoload.
-- Saves campaign level progress and campaign ability inventory under `user://player_progress.json`.
+- Saves campaign level progress and campaign ability inventory through the configured save provider.
 
 Reusable item scene:
 - `scenes/item.tscn`
@@ -47,16 +48,22 @@ Change here when:
 
 Files:
 - `scripts/player_progress.gd`
+- `scripts/save_providers/save_provider.gd`
+- `scripts/save_providers/local_save_provider.gd`
+- `scripts/save_providers/cloud_save_provider.gd`
 - `project.godot`
+- `docs/CLOUD_SAVE.md`
 
 Responsibility:
-- Loads and saves `user://player_progress.json`.
+- Loads and saves campaign progress through the configured provider.
+- Uses `LocalSaveProvider` for editor/development saves under `user://player_progress.json`.
+- Uses `CloudSaveProvider` for release cloud saves through native Google Play Games or Apple Game Center bridge singletons.
 - Tracks the current campaign level, highest completed level, and campaign ability uses.
 - Spends ability uses immediately so failure or leaving a level does not refund them.
 - Advances `current_level` only when the active campaign level is completed.
 
 Change here when:
-- Adding ability refills, rewards, purchases, reset flows, save migrations, cloud save hooks, or new persisted player state.
+- Adding ability refills, rewards, purchases, reset flows, save migrations, native cloud save hooks, or new persisted player state.
 
 ### Level Runtime
 
@@ -261,3 +268,4 @@ Change pause menu layout:
 - `docs/SCENES.md`: scene and node ownership inventory.
 - `docs/SCRIPTS.md`: script responsibilities, exports, and dependencies.
 - `docs/CONFIGS.md`: config file schema and data contracts.
+- `docs/CLOUD_SAVE.md`: platform cloud-save setup and bridge contract.

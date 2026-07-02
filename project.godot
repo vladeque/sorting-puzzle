@@ -14,6 +14,9 @@ config/name="SortingPuzzle"
 run/main_scene="res://scenes/main_menu.tscn"
 config/features=PackedStringArray("4.6", "Mobile")
 config/icon="res://icon.svg"
+config/save_provider="local"
+config/cloud_save_name="player_progress"
+config/cloud_save_bridge_singleton=""
 
 [autoload]
 

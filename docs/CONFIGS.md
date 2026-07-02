@@ -145,7 +145,7 @@ py scripts\tools\generate_level_shelves.py --shelf-count 9 --layer-count 2 --dif
 ## `user://player_progress.json`
 
 Purpose:
-- Stores local campaign progression and campaign ability inventory.
+- Stores local campaign progression and campaign ability inventory when `application/config/save_provider` is `local`.
 - Owned by the `PlayerProgress` autoload in `scripts/player_progress.gd`.
 
 Fields:
@@ -160,6 +160,25 @@ Runtime behavior:
 - Failed or abandoned levels do not refund ability uses.
 - Completing the current campaign level advances `current_level` by one.
 - Developer/test level selection is isolated from this save data.
+- Release builds can switch to cloud-only persistence by setting `application/config/save_provider` to `cloud`.
+
+## Save Provider Settings
+
+Purpose:
+- Selects how `PlayerProgress` persists campaign data.
+
+Fields:
+- `application/config/save_provider`: `local` or `cloud`. The project default is `local` while the game is in development.
+- `application/config/cloud_save_name`: save slot name sent to cloud APIs. Defaults to `player_progress`.
+- `application/config/cloud_save_bridge_singleton`: optional native singleton override. Leave empty to use platform defaults.
+
+Cloud bridge defaults:
+- Android uses `GooglePlayGamesSaveBridge`.
+- iOS uses `GameCenterSaveBridge`.
+- Other platforms fall back to `CloudSaveBridge`.
+
+See:
+- `docs/CLOUD_SAVE.md`
 
 ## Documentation Update Checklist
 

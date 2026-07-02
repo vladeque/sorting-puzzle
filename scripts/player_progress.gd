@@ -1,8 +1,16 @@
 extends Node
 
+const LocalSaveProviderScript := preload("res://scripts/save_providers/local_save_provider.gd")
+const CloudSaveProviderScript := preload("res://scripts/save_providers/cloud_save_provider.gd")
 const SAVE_PATH := "user://player_progress.json"
+const SAVE_NAME := "player_progress"
 const SAVE_VERSION := 1
 const MIN_LEVEL := 1
+const SAVE_PROVIDER_SETTING := "application/config/save_provider"
+const CLOUD_SAVE_NAME_SETTING := "application/config/cloud_save_name"
+const CLOUD_SAVE_BRIDGE_SETTING := "application/config/cloud_save_bridge_singleton"
+const SAVE_PROVIDER_LOCAL := "local"
+const SAVE_PROVIDER_CLOUD := "cloud"
 const ABILITY_HAMMER := "hammer"
 const ABILITY_SHUFFLE := "shuffle"
 const ABILITY_HIGHLIGHT := "highlight"
@@ -13,35 +21,34 @@ const DEFAULT_ABILITY_USES := {
 }
 
 var _data := {}
+var _save_provider: SaveProvider
 
 
 func _ready() -> void:
+	_save_provider = _create_save_provider()
 	load_progress()
 
 
 func load_progress() -> void:
-	var loaded_data := {}
-	if FileAccess.file_exists(SAVE_PATH):
-		var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
-		if file != null:
-			var parsed = JSON.parse_string(file.get_as_text())
-			if parsed is Dictionary:
-				loaded_data = parsed
-			else:
-				push_warning("Ignoring invalid player progress save.")
-		else:
-			push_warning("Could not open player progress save for reading.")
+	_ensure_save_provider()
+	var result := _save_provider.load_data()
+	if bool(result.get("ok", false)):
+		var loaded_data := result.get("data", {}) as Dictionary
+		if loaded_data == null:
+			loaded_data = {}
 
-	_data = _sanitize_data(loaded_data)
+		_data = _sanitize_data(loaded_data)
+		return
+
+	push_warning("Could not load %s save: %s" % [_save_provider.get_provider_name(), result.get("error", "")])
+	_data = _default_data()
 
 
 func save_progress() -> void:
-	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
-	if file == null:
-		push_error("Could not open player progress save for writing.")
-		return
-
-	file.store_string(JSON.stringify(_data, "\t"))
+	_ensure_save_provider()
+	var result := _save_provider.save_data(_data)
+	if not bool(result.get("ok", false)):
+		push_error("Could not save %s progress: %s" % [_save_provider.get_provider_name(), result.get("error", "")])
 
 
 func get_current_level() -> int:
@@ -92,6 +99,11 @@ func reset_progress() -> void:
 	save_progress()
 
 
+func get_save_provider_name() -> String:
+	_ensure_save_provider()
+	return _save_provider.get_provider_name()
+
+
 func _sanitize_data(raw_data: Dictionary) -> Dictionary:
 	var sanitized := _default_data()
 	sanitized["version"] = int(raw_data.get("version", SAVE_VERSION))
@@ -114,3 +126,26 @@ func _default_data() -> Dictionary:
 		"highest_completed_level": 0,
 		"ability_uses": DEFAULT_ABILITY_USES.duplicate(),
 	}
+
+
+func _ensure_save_provider() -> void:
+	if _save_provider == null:
+		_save_provider = _create_save_provider()
+
+
+func _create_save_provider() -> SaveProvider:
+	var provider_id := str(_get_project_setting(SAVE_PROVIDER_SETTING, SAVE_PROVIDER_LOCAL)).to_lower()
+	if provider_id == SAVE_PROVIDER_CLOUD:
+		return CloudSaveProviderScript.new(
+			str(_get_project_setting(CLOUD_SAVE_NAME_SETTING, SAVE_NAME)),
+			str(_get_project_setting(CLOUD_SAVE_BRIDGE_SETTING, ""))
+		)
+
+	return LocalSaveProviderScript.new(SAVE_PATH)
+
+
+func _get_project_setting(setting_name: String, default_value):
+	if ProjectSettings.has_setting(setting_name):
+		return ProjectSettings.get_setting(setting_name)
+
+	return default_value

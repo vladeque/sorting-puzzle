@@ -46,7 +46,7 @@ Autoload:
 
 Purpose:
 - Owns saved campaign progression and campaign ability inventory.
-- Persists state to `user://player_progress.json`.
+- Persists state through the configured save provider.
 
 Saved fields:
 - `version`: save schema version.
@@ -55,16 +55,72 @@ Saved fields:
 - `ability_uses`: remaining campaign uses for hammer, shuffle, and highlight.
 
 Key methods:
-- `load_progress()`: reads and sanitizes the save file or creates default in-memory progress.
-- `save_progress()`: writes the current progress data.
+- `load_progress()`: reads and sanitizes provider data or creates default in-memory progress.
+- `save_progress()`: writes the current progress data through the active provider.
 - `get_current_level()`: returns the next campaign level.
 - `get_ability_uses()`: returns remaining campaign ability uses.
 - `spend_ability(ability_id)`: immediately spends and saves one campaign ability use.
 - `complete_level(level_number)`: records completion and advances `current_level` when the completed level is the active campaign level.
 - `reset_progress()`: restores default progress and writes it to disk for testing.
+- `get_save_provider_name()`: reports the active provider for diagnostics.
+
+Depends on:
+- `scripts/save_providers/local_save_provider.gd`
+- `scripts/save_providers/cloud_save_provider.gd`
+- `application/config/save_provider`
+- `application/config/cloud_save_name`
+- `application/config/cloud_save_bridge_singleton`
 
 Do not use for:
 - Per-level shelf state, timer state, or dev/test level runtime state.
+
+## `scripts/save_providers/save_provider.gd`
+
+Class:
+- `SaveProvider`
+
+Purpose:
+- Base interface for progress persistence providers.
+
+Key methods:
+- `get_provider_name()`: returns a diagnostic provider name.
+- `is_available()`: reports whether the provider can be used.
+- `load_data()`: returns `{ "ok": bool, "data": Dictionary, "error": String }`.
+- `save_data(data)`: writes a progress dictionary using the same result shape.
+
+## `scripts/save_providers/local_save_provider.gd`
+
+Class:
+- `LocalSaveProvider`
+
+Purpose:
+- Reads and writes local development progress at `user://player_progress.json`.
+
+Do not use for:
+- Release cloud persistence that must survive uninstall/reinstall.
+
+## `scripts/save_providers/cloud_save_provider.gd`
+
+Class:
+- `CloudSaveProvider`
+
+Purpose:
+- Routes progress JSON to a platform-native cloud save bridge.
+- Uses Google Play Games on Android and Apple Game Center on iOS when the matching Godot native singleton exists.
+
+Bridge singleton names:
+- `GooglePlayGamesSaveBridge` on Android.
+- `GameCenterSaveBridge` on iOS.
+- `CloudSaveBridge` fallback for tests or custom plugins.
+
+Bridge method contract:
+- Optional sign-in method: `is_signed_in()` or `is_authenticated()`.
+- Load method: `load_save(save_name)`, `load_game(save_name)`, `load_progress(save_name)`, or `load_data(save_name)`.
+- Save method: `save_save(save_name, json_payload)`, `save_game(save_name, json_payload)`, `save_progress(save_name, json_payload)`, or `save_data(save_name, json_payload)`.
+
+Depends on:
+- A native Godot Android/iOS plugin for real platform API calls.
+- `docs/CLOUD_SAVE.md` for release setup details.
 
 ## `scripts/level.gd`
 
