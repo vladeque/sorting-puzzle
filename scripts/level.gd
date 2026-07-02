@@ -30,6 +30,7 @@ const LOCKED_OVERLAY_NAME := "LockedOverlay"
 const LOCK_REMAINING_LABEL_NAME := "RemainingLabel"
 const SHELF_VISUAL_VARIANT_META := &"visual_variant"
 const SHELF_TOP_CEILING_CAP_NAME := "TopCeilingCap"
+const SHELF_BOTTOM_SHADOW_NAME := "Shadow"
 const SHELF_RIGHT_COLUMN_SHADOW_NAME := "RightColumnShadow"
 const ROW_LAYOUTS_KEY := "row_layouts"
 const ROW_MOTION_HORIZONTAL_WRAP := "horizontal_wrap"
@@ -37,6 +38,7 @@ const SHELF_VISUAL_VARIANT_FULL := "full"
 const SHELF_VISUAL_VARIANT_FLOOR_ONLY := "floor_only"
 const SHELF_TOP_STACK_VERTICAL_EPSILON := 4.0
 const SHELF_TOP_STACK_MIN_HORIZONTAL_OVERLAP := 0.35
+const SHELF_BOTTOM_STACK_VERTICAL_EPSILON := 4.0
 const SHELF_RIGHT_STACK_HORIZONTAL_EPSILON := 4.0
 const SHELF_RIGHT_STACK_MIN_VERTICAL_OVERLAP := 0.35
 const HUD_TOP_MARGIN := 28.0
@@ -59,6 +61,7 @@ const SHELVES_MAX_LAYOUT_SCALE := 1.5
 const RESULT_LABEL_HEIGHT := 96.0
 const PAUSE_MENU_PANEL_SIZE := Vector2(520, 363)
 const SHELF_FLOOR_ONLY_HIDDEN_NODES := [
+	"Shadow",
 	"BackWall",
 	"BackWallTopShade",
 	"BackWallLeftShade",
@@ -880,6 +883,7 @@ func _update_shelf_perspective_edges() -> void:
 			continue
 
 		_set_shelf_top_ceiling_cap_visible(shelf, not _has_stacked_shelf_above(shelf, shelves))
+		_set_shelf_bottom_shadow_visible(shelf, not _has_stacked_shelf_below(shelf, shelves))
 		_set_shelf_right_column_shadow_visible(shelf, not _has_stacked_shelf_to_right(shelf, shelves))
 
 
@@ -892,6 +896,23 @@ func _has_stacked_shelf_above(shelf: Node2D, shelves: Array[Node]) -> bool:
 
 		var other_position := _get_shelf_root_local_position(other_shelf)
 		if other_position.y >= shelf_position.y - SHELF_TOP_STACK_VERTICAL_EPSILON:
+			continue
+
+		if _shelf_cells_stack_horizontally(shelf_position.x, other_position.x):
+			return true
+
+	return false
+
+
+func _has_stacked_shelf_below(shelf: Node2D, shelves: Array[Node]) -> bool:
+	var shelf_position := _get_shelf_root_local_position(shelf)
+	for other_node in shelves:
+		var other_shelf := other_node as Node2D
+		if other_shelf == null or other_shelf == shelf:
+			continue
+
+		var other_position := _get_shelf_root_local_position(other_shelf)
+		if other_position.y <= shelf_position.y + SHELF_BOTTOM_STACK_VERTICAL_EPSILON:
 			continue
 
 		if _shelf_cells_stack_horizontally(shelf_position.x, other_position.x):
@@ -941,6 +962,15 @@ func _set_shelf_top_ceiling_cap_visible(shelf: Node2D, should_show: bool) -> voi
 
 	var visual_variant := str(shelf.get_meta(SHELF_VISUAL_VARIANT_META, SHELF_VISUAL_VARIANT_FULL))
 	cap.visible = should_show and visual_variant == SHELF_VISUAL_VARIANT_FULL
+
+
+func _set_shelf_bottom_shadow_visible(shelf: Node2D, should_show: bool) -> void:
+	var shadow := shelf.get_node_or_null(SHELF_BOTTOM_SHADOW_NAME) as CanvasItem
+	if shadow == null:
+		return
+
+	var visual_variant := str(shelf.get_meta(SHELF_VISUAL_VARIANT_META, SHELF_VISUAL_VARIANT_FULL))
+	shadow.visible = should_show and visual_variant == SHELF_VISUAL_VARIANT_FULL
 
 
 func _set_shelf_right_column_shadow_visible(shelf: Node2D, should_show: bool) -> void:
