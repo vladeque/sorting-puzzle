@@ -37,7 +37,7 @@ script = ExtResource("1_item_script")
 [node name="Shadow" type="Polygon2D" parent="." unique_id=1649807921]
 z_index = -1
 position = Vector2(6, 42)
-color = Color(0.04, 0.03, 0.02, 0.23)
+color = Color(0.5, 0.31, 0.15, 1)
 polygon = PackedVector2Array(-31, 8, -15, -2, 33, -15, 49, -7, 27, 5, -24, 13)
 
 [node name="OutlineSprite" type="Sprite2D" parent="." unique_id=515204852]

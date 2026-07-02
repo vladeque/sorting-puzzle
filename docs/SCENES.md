@@ -179,6 +179,7 @@ Purpose:
 - Reusable shelf cell instantiated by `scripts/level.gd` for each configured shelf.
 - Owns the visible shelf back wall, floor, frame, front slot positions, and item snap markers.
 - Owns soft internal left/top wall shadows, a diagonal bottom cast shadow, the hidden top ceiling cap, and the hidden right-column cast shadow toggled by `scripts/level.gd`.
+- Uses opaque pre-blended shadow colors so overlapping shadow polygons do not compound into darker patches.
 - Owns the hidden locked-shelf overlay visuals shown by `scripts/level.gd` when a level config gates the shelf behind cleared triples.
 - Uses wide, slightly shorter cell bounds so three generated shelves span most of the 720 px gameplay viewport with compact row spacing.
 - Can be switched by `scripts/level.gd` to a `floor_only` visual variant for moving rows by hiding wall and ceiling nodes at runtime.
@@ -187,7 +188,7 @@ Important nodes:
 - `BackWall`: muted panel behind shelf items.
 - `BackWallLeftShade` and `BackWallTopShade`: soft interior wall shadow layers behind items.
 - `Ceiling`, `TopCeilingCap`, `LeftWall`, and `RightWall`: wooden cell frame. `TopCeilingCap` is hidden in the scene and shown at runtime only for top shelves.
-- `Shadow` and `RightColumnShadow`: perspective cast shadows, with `RightColumnShadow` shown at runtime only for far-right shelf columns.
+- `Shadow` and `RightColumnShadow`: solid-color perspective cast shadows, with `RightColumnShadow` shown at runtime only for far-right shelf columns.
 - `FloorSurface` and `FloorFrontLip`: wooden floor where items visually rest.
 - `FloorGrain*`: subtle line details on the floor.
 - `LockedOverlay`: hidden lock overlay used for triple-gated shelves.
@@ -217,7 +218,7 @@ Purpose:
 - Uses a default visual scale and hitbox sized for the wide shelf cell slots.
 
 Important nodes:
-- `Shadow`: soft up-right cast shadow behind the item sprite.
+- `Shadow`: solid-color up-right cast shadow behind the item sprite.
 - `OutlineSprite`: hidden sprite used by `ShelfItem` to draw alpha-based highlight borders.
 - `Sprite2D`: main item sprite; texture and visual scale are controlled by `ShelfItem`.
 - `CollisionShape2D`: rectangular item hitbox used by runtime interaction.
