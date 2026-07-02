@@ -144,6 +144,7 @@ Important exports:
 - `highlight_outline_width`: screen-pixel expansion used by the item outline sprite.
 - `match_gather_duration_seconds`: duration for side items to pull into the center item when a triple clears.
 - `match_shrink_duration_seconds`: duration for the center item shrink-out after a triple gathers.
+- `combo_window_seconds`: time allowed after a triple clear to extend the active combo before the center HUD combo label disappears.
 - `level_duration_seconds`: fallback duration if config does not define `time_seconds`.
 - `completion_return_delay_seconds`: delay before returning to the main menu after completion.
 - `item_place_volume_db`: volume for the item placement sound effect.
@@ -188,6 +189,7 @@ Key responsibilities:
 - Move items with `_move_item_to_slot()`, `_resolve_move_target_slot()`, `_play_item_move_animation()`, and `_place_item_in_slot()`.
 - Redirect moves aimed at an occupied destination slot on another shelf to the nearest free front slot on that destination shelf; same-shelf occupied targets leave the item in its original slot.
 - Clear triples with `_clear_matching_shelves()` and `_play_match_clear_animation()`.
+- Track the active triple-clear combo with `_extend_combo()`, `_update_combo_timer()`, `_reset_combo()`, and `_update_combo_label()`.
 - Track cleared triples and locked shelf accessibility with `_record_triples_cleared()`, `_update_locked_shelves()`, and shelf metadata from `unlock_after_triples`.
 - Toggle each shelf scene's lock overlay with the remaining triple count, fit that count to the lock art's center panel, and keep locked shelves out of move, match, promotion, and ability targeting.
 - Play placement and triple-clear sound effects with runtime `AudioStreamPlayer` nodes.

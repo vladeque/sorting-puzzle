@@ -91,6 +91,7 @@ const SHELF_FLOOR_ONLY_HIDDEN_NODES := [
 @export_range(0.0, 8.0, 0.25) var highlight_outline_width := 4.0
 @export var match_gather_duration_seconds := 0.18
 @export var match_shrink_duration_seconds := 0.16
+@export_range(0.25, 30.0, 0.25) var combo_window_seconds := 5.0
 @export var level_duration_seconds := 300.0
 @export var completion_return_delay_seconds := 1.75
 @export_range(-40.0, 6.0, 0.5) var item_place_volume_db := -5.0
@@ -109,6 +110,7 @@ var _background: Control
 var _shelves_root: Node2D
 var _timer_label: Label
 var _level_label: Label
+var _combo_label: Label
 var _failure_panel: Control
 var _completion_panel: Control
 var _pause_menu_button: Button
@@ -132,6 +134,8 @@ var _level_paused := false
 var _completion_return_time_remaining := 0.0
 var _returning_to_menu := false
 var _highlight_timer := 0.0
+var _combo_count := 0
+var _combo_time_remaining := 0.0
 var _highlighted_items: Array[ShelfItem] = []
 var _layout_preset := DEFAULT_LAYOUT_PRESET
 var _rng := RandomNumberGenerator.new()
@@ -157,6 +161,7 @@ func _ready() -> void:
 	_drag_layer = get_node("DragLayer") as Node2D
 	_timer_label = get_node("UI/TimerLabel") as Label
 	_level_label = get_node("UI/LevelLabel") as Label
+	_combo_label = get_node("Background/HudCenterSlot/ComboLabel") as Label
 	_failure_panel = get_node("UI/FailurePanel") as Control
 	_completion_panel = get_node("UI/CompletionPanel") as Control
 	_pause_menu_button = get_node("UI/PauseMenuButton") as Button
@@ -472,6 +477,7 @@ func _process(delta: float) -> void:
 	if _level_paused:
 		return
 
+	_update_combo_timer(delta)
 	_update_highlight_timer(delta)
 	_clear_drag_drop_selection_if_unavailable()
 
@@ -569,6 +575,7 @@ func _apply_level_config(config: Dictionary) -> void:
 	_level_completed = false
 	_level_paused = false
 	_triples_cleared = 0
+	_reset_combo()
 	_completion_return_time_remaining = 0.0
 	_returning_to_menu = false
 	_failure_panel.visible = false
@@ -1046,6 +1053,9 @@ func _record_triples_cleared(triple_count: int) -> void:
 		return
 
 	_triples_cleared += triple_count
+	if _has_player_started_timer and not _level_failed and not _level_completed:
+		_extend_combo(triple_count)
+
 	var newly_unlocked_shelves := _update_locked_shelves()
 	_queue_shelves_to_resolve(newly_unlocked_shelves)
 
@@ -1246,6 +1256,44 @@ func _update_level_label() -> void:
 	_level_label.text = "Level %d" % selected_level
 
 
+func _extend_combo(triple_count: int) -> void:
+	if triple_count <= 0:
+		return
+
+	if _combo_count <= 0 or _combo_time_remaining <= 0.0:
+		_combo_count = triple_count
+	else:
+		_combo_count += triple_count
+
+	_combo_time_remaining = maxf(combo_window_seconds, 0.0)
+	_update_combo_label()
+
+
+func _update_combo_timer(delta: float) -> void:
+	if _combo_count <= 0:
+		return
+
+	_combo_time_remaining = maxf(_combo_time_remaining - delta, 0.0)
+	if _combo_time_remaining <= 0.0:
+		_reset_combo()
+
+
+func _reset_combo() -> void:
+	_combo_count = 0
+	_combo_time_remaining = 0.0
+	_update_combo_label()
+
+
+func _update_combo_label() -> void:
+	if _combo_label == null:
+		return
+
+	var should_show := _combo_count > 0 and not _level_failed and not _level_completed
+	_combo_label.visible = should_show
+	if should_show:
+		_combo_label.text = "Combo x%d" % _combo_count
+
+
 func _start_level_timer_from_player_action() -> void:
 	if _has_player_started_timer:
 		return
@@ -1256,6 +1304,7 @@ func _start_level_timer_from_player_action() -> void:
 func _fail_level() -> void:
 	_level_failed = true
 	_level_paused = false
+	_reset_combo()
 	_clear_selected_item()
 	_set_moving_shelf_rows_paused(true)
 	_update_ability_buttons()
@@ -1276,6 +1325,7 @@ func _fail_level() -> void:
 func _complete_level() -> void:
 	_level_completed = true
 	_level_paused = false
+	_reset_combo()
 	_completion_return_time_remaining = maxf(completion_return_delay_seconds, 0.0)
 	if not launched_from_dev_mode:
 		PlayerProgress.complete_level(selected_level)

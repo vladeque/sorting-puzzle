@@ -89,6 +89,7 @@ Responsibility:
 - Spawns `ShelfItem` instances from config layers.
 - Handles mouse and touch interaction.
 - Resolves matches of three identical visible items on the same shelf, including the gather-and-shrink clear animation.
+- Shows and expires the active combo count in `Background/HudCenterSlot/ComboLabel` when triple clears happen within the configured combo window.
 - Tracks cleared triples and unlocks shelves whose configs require progress before becoming accessible.
 - Plays item placement and triple-clear sound effects.
 - Keeps non-clearing items interactive while match animations run, with pending shelf resolves queued behind the active animation.
