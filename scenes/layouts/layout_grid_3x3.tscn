@@ -3,27 +3,27 @@
 [node name="LayoutGrid3x3" type="Node2D" unique_id=1680089608]
 
 [node name="Shelf01" type="Marker2D" parent="." unique_id=630559457]
-position = Vector2(-216, -127)
+position = Vector2(-228.96, -134.62)
 
 [node name="Shelf02" type="Marker2D" parent="." unique_id=1670667737]
-position = Vector2(0, -127)
+position = Vector2(0, -134.62)
 
 [node name="Shelf03" type="Marker2D" parent="." unique_id=1176672302]
-position = Vector2(216, -127)
+position = Vector2(228.96, -134.62)
 
 [node name="Shelf04" type="Marker2D" parent="." unique_id=308342429]
-position = Vector2(-216, 0)
+position = Vector2(-228.96, 0)
 
 [node name="Shelf05" type="Marker2D" parent="." unique_id=1873160248]
 
 [node name="Shelf06" type="Marker2D" parent="." unique_id=1246098576]
-position = Vector2(216, 0)
+position = Vector2(228.96, 0)
 
 [node name="Shelf07" type="Marker2D" parent="." unique_id=582260162]
-position = Vector2(-216, 127)
+position = Vector2(-228.96, 134.62)
 
 [node name="Shelf08" type="Marker2D" parent="." unique_id=810745235]
-position = Vector2(0, 127)
+position = Vector2(0, 134.62)
 
 [node name="Shelf09" type="Marker2D" parent="." unique_id=1720736683]
-position = Vector2(216, 127)
+position = Vector2(228.96, 134.62)

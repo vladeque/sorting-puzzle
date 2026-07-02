@@ -221,11 +221,11 @@ Add a new level:
 - Validate the level with `scripts/tools/validate_level_solvable.py`.
 
 Change shelf layout spacing:
-- Update `SHELF_CELL_SIZE`, `SHELF_SHARED_EDGE_THICKNESS`, and `SHELF_GRID_STEP` in `scripts/level.gd`.
+- Update `SHELF_CELL_VISUAL_SCALE`, `SHELF_BASE_CELL_SIZE`, `SHELF_SHARED_EDGE_THICKNESS`, and `SHELF_GRID_STEP` in `scripts/level.gd`.
 - Reposition shelf markers in the relevant `scenes/layouts/layout_*.tscn` templates.
 - Keep `scenes/shelf.tscn` cell bounds and boundary thickness aligned with those layout constants.
 - Keep `scripts/moving_shelf_row.gd` row sizing and runtime configuration aligned with `SHELF_CELL_SIZE` and `SHELF_GRID_STEP`.
-- Keep `SLOT_ITEM_POSITION`, shelf slot markers, `scenes/item.tscn` default scale, and `item_pick_size` aligned when shelf width changes affect item spacing.
+- Keep `SLOT_ITEM_POSITION`, shelf slot markers, `scenes/item.tscn` default scale, shelf instance scaling, and `item_pick_size` aligned when shelf width changes affect item spacing.
 - Keep `scripts/tools/generate_level_shelves.py` layout presets in sync if preset names or supported shapes change.
 - Fixed staggered preset positions live in `scenes/layouts/`; keep their required shelf counts documented in `docs/CONFIGS.md`.
 

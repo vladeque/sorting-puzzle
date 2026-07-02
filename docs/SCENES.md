@@ -182,6 +182,7 @@ Purpose:
 - Uses opaque pre-blended shadow colors so overlapping shadow polygons do not compound into darker patches.
 - Owns the hidden locked-shelf overlay visuals shown by `scripts/level.gd` when a level config gates the shelf behind cleared triples.
 - Uses wide, slightly shorter cell bounds so three generated shelves span most of the 720 px gameplay viewport with compact row spacing.
+- Runtime shelf instances are scaled slightly by `scripts/level.gd`, with layout template markers and moving-row windows authored to match the scaled cell footprint.
 - Can be switched by `scripts/level.gd` to a `floor_only` visual variant for moving rows by hiding wall and ceiling nodes at runtime.
 
 Important nodes:
@@ -216,6 +217,7 @@ Purpose:
 - Reusable sortable item scene.
 - Gives each spawned item a collision area and sprite.
 - Uses a default visual scale and hitbox sized for the wide shelf cell slots.
+- In generated shelves, the owning shelf cell scale enlarges the item sprite, shadow, and hit area together with the shelf visuals.
 
 Important nodes:
 - `Shadow`: solid-color up-right cast shadow behind the item sprite.

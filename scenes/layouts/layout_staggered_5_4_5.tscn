@@ -3,43 +3,43 @@
 [node name="LayoutStaggered5x4x5" type="Node2D"]
 
 [node name="Shelf01" type="Marker2D" parent="."]
-position = Vector2(-216, -254)
+position = Vector2(-228.96, -269.24)
 
 [node name="Shelf02" type="Marker2D" parent="."]
-position = Vector2(-216, -127)
+position = Vector2(-228.96, -134.62)
 
 [node name="Shelf03" type="Marker2D" parent="."]
-position = Vector2(-216, 0)
+position = Vector2(-228.96, 0)
 
 [node name="Shelf04" type="Marker2D" parent="."]
-position = Vector2(-216, 127)
+position = Vector2(-228.96, 134.62)
 
 [node name="Shelf05" type="Marker2D" parent="."]
-position = Vector2(-216, 254)
+position = Vector2(-228.96, 269.24)
 
 [node name="Shelf06" type="Marker2D" parent="."]
-position = Vector2(0, -190.5)
+position = Vector2(0, -201.93)
 
 [node name="Shelf07" type="Marker2D" parent="."]
-position = Vector2(0, -63.5)
+position = Vector2(0, -67.31)
 
 [node name="Shelf08" type="Marker2D" parent="."]
-position = Vector2(0, 63.5)
+position = Vector2(0, 67.31)
 
 [node name="Shelf09" type="Marker2D" parent="."]
-position = Vector2(0, 190.5)
+position = Vector2(0, 201.93)
 
 [node name="Shelf10" type="Marker2D" parent="."]
-position = Vector2(216, -254)
+position = Vector2(228.96, -269.24)
 
 [node name="Shelf11" type="Marker2D" parent="."]
-position = Vector2(216, -127)
+position = Vector2(228.96, -134.62)
 
 [node name="Shelf12" type="Marker2D" parent="."]
-position = Vector2(216, 0)
+position = Vector2(228.96, 0)
 
 [node name="Shelf13" type="Marker2D" parent="."]
-position = Vector2(216, 127)
+position = Vector2(228.96, 134.62)
 
 [node name="Shelf14" type="Marker2D" parent="."]
-position = Vector2(216, 254)
+position = Vector2(228.96, 269.24)

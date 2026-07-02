@@ -1,11 +1,11 @@
 class_name MovingShelfRow
 extends Control
 
-const ROW_HEIGHT_PADDING := 48.0
+const ROW_HEIGHT_PADDING := 50.88
 
 @export_range(1, 12, 1) var visible_shelf_count := 3
-@export var shelf_cell_size := Vector2(224, 135)
-@export var shelf_step_x := 216.0
+@export var shelf_cell_size := Vector2(237.44, 143.1)
+@export var shelf_step_x := 228.96
 @export var speed_pixels_per_second := 0.0
 @export var direction := 1
 

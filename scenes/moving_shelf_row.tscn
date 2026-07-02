@@ -4,8 +4,8 @@
 
 [node name="MovingShelfRow" type="Control"]
 anchors_preset = 0
-offset_right = 656.0
-offset_bottom = 183.0
+offset_right = 695.36
+offset_bottom = 193.98
 mouse_filter = 2
 clip_contents = true
 script = ExtResource("1_moving_shelf_row")

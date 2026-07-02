@@ -2,9 +2,14 @@ extends Node2D
 
 const SLOT_COUNT := 3
 const SLOT_ITEM_POSITION := Vector2(0, -32)
-const SHELF_CELL_SIZE := Vector2(224, 135)
-const SHELF_SHARED_EDGE_THICKNESS := 8.0
+const SHELF_CELL_VISUAL_SCALE := 1.06
+const SHELF_BASE_CELL_SIZE := Vector2(224, 135)
+const SHELF_CELL_SIZE := SHELF_BASE_CELL_SIZE * SHELF_CELL_VISUAL_SCALE
+const SHELF_BASE_SHARED_EDGE_THICKNESS := 8.0
+const SHELF_SHARED_EDGE_THICKNESS := SHELF_BASE_SHARED_EDGE_THICKNESS * SHELF_CELL_VISUAL_SCALE
 const SHELF_GRID_STEP := SHELF_CELL_SIZE - Vector2(SHELF_SHARED_EDGE_THICKNESS, SHELF_SHARED_EDGE_THICKNESS)
+const BASE_SLOT_SNAP_DISTANCE := 98.0
+const BASE_ITEM_PICK_SIZE := Vector2(74, 112)
 const BACK_LAYER_PREFIX := "ShelfLayer"
 const FIRST_BACK_LAYER_INDEX := 1
 const ABILITY_HAMMER := &"hammer"
@@ -55,7 +60,7 @@ const ABILITY_BUTTON_ROW_SIZE := Vector2(396, 100)
 const ABILITY_BUTTON_ROW_TOP := 12.0
 const SHELVES_TOP_CLEARANCE := 128.0
 const SHELVES_BOTTOM_CLEARANCE := 52.0
-const SHELVES_SIDE_MARGIN := 32.0
+const SHELVES_SIDE_MARGIN := 16.0
 const SHELVES_MIN_LAYOUT_SCALE := 0.45
 const SHELVES_MAX_LAYOUT_SCALE := 1.5
 const RESULT_LABEL_HEIGHT := 96.0
@@ -73,8 +78,8 @@ const SHELF_FLOOR_ONLY_HIDDEN_NODES := [
 	"Highlight",
 ]
 
-@export var slot_snap_distance := 98.0
-@export var item_pick_size := Vector2(74, 112)
+@export var slot_snap_distance := BASE_SLOT_SNAP_DISTANCE * SHELF_CELL_VISUAL_SCALE
+@export var item_pick_size := BASE_ITEM_PICK_SIZE * SHELF_CELL_VISUAL_SCALE
 @export var drag_start_distance := 12.0
 @export var back_layer_offset := Vector2(0, -10)
 @export var back_layer_item_scale := 0.86
@@ -1003,6 +1008,7 @@ func _add_shelf(parent: Node, shelf_number: int, shelf_position: Vector2) -> Nod
 	var shelf := SHELF_SCENE.instantiate() as Node2D
 	shelf.name = "Shelf%02d" % shelf_number
 	shelf.position = shelf_position
+	shelf.scale = Vector2.ONE * SHELF_CELL_VISUAL_SCALE
 	shelf.set_meta(SHELF_VISUAL_VARIANT_META, SHELF_VISUAL_VARIANT_FULL)
 	parent.add_child(shelf)
 

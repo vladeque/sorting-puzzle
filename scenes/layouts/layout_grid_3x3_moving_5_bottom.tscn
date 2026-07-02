@@ -5,33 +5,33 @@
 [node name="LayoutGrid3x3Moving5Bottom" type="Node2D" unique_id=197465711]
 
 [node name="Shelf01" type="Marker2D" parent="." unique_id=496630792]
-position = Vector2(-216, -190.5)
+position = Vector2(-228.96, -201.93)
 
 [node name="Shelf02" type="Marker2D" parent="." unique_id=1763145357]
-position = Vector2(0, -190.5)
+position = Vector2(0, -201.93)
 
 [node name="Shelf03" type="Marker2D" parent="." unique_id=949618796]
-position = Vector2(216, -190.5)
+position = Vector2(228.96, -201.93)
 
 [node name="Shelf04" type="Marker2D" parent="." unique_id=1551967127]
-position = Vector2(-216, -63.5)
+position = Vector2(-228.96, -67.31)
 
 [node name="Shelf05" type="Marker2D" parent="." unique_id=1644284789]
-position = Vector2(0, -63.5)
+position = Vector2(0, -67.31)
 
 [node name="Shelf06" type="Marker2D" parent="." unique_id=1243699281]
-position = Vector2(216, -63.5)
+position = Vector2(228.96, -67.31)
 
 [node name="Shelf07" type="Marker2D" parent="." unique_id=1991736720]
-position = Vector2(-216, 63.5)
+position = Vector2(-228.96, 67.31)
 
 [node name="Shelf08" type="Marker2D" parent="." unique_id=472339995]
-position = Vector2(0, 63.5)
+position = Vector2(0, 67.31)
 
 [node name="Shelf09" type="Marker2D" parent="." unique_id=1582299666]
-position = Vector2(216, 63.5)
+position = Vector2(228.96, 67.31)
 
 [node name="MovingRow10" type="Node2D" parent="." unique_id=2092107825]
-position = Vector2(0, 230)
+position = Vector2(0, 243.8)
 script = ExtResource("1_layout_row")
 shelf_count = 5

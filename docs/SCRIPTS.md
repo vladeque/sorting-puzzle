@@ -154,7 +154,9 @@ Important exports:
 Important constants:
 - `SLOT_COUNT`: currently three items per shelf front layer.
 - `SLOT_ITEM_POSITION`: item local position that matches `scenes/shelf.tscn` item snap markers.
-- `SHELF_CELL_SIZE`: reusable shelf scene bounds; three cells in a row are packed to fill most of the 720 px gameplay viewport, with compact vertical row spacing.
+- `SHELF_CELL_VISUAL_SCALE`: slight runtime scale applied to generated shelf instances so shelf art and item children enlarge together.
+- `SHELF_BASE_CELL_SIZE`: unscaled reusable shelf scene bounds from `scenes/shelf.tscn`.
+- `SHELF_CELL_SIZE`: scaled reusable shelf scene bounds; three cells in a row are packed to fill most of the 720 px gameplay viewport, with compact vertical row spacing.
 - `SHELF_SHARED_EDGE_THICKNESS`: shelf boundary thickness that neighboring cells overlap.
 - `SHELF_GRID_STEP`: packed layout spacing after overlapping shared shelf edges.
 - `HUD_*`, `ABILITY_BAR_*`, `SHELVES_*`, `RESULT_LABEL_HEIGHT`, and `PAUSE_MENU_PANEL_SIZE`: responsive layout constants for positioning the HUD, ability bar, result overlays, pause panel, and generated shelf root across portrait viewport sizes, including minimum and maximum shelf layout scale.
@@ -175,7 +177,7 @@ Key responsibilities:
 - Apply responsive layout with `_apply_responsive_layout()`, including safe-area-aware top HUD placement, ability bar placement over the floor/baseboard transition strip, full-screen overlays, centered pause popup, shelf-root scaling, and shelf-root centering between HUD and ability controls.
 - Resize the scene-owned `Background` control so its procedural top strip, shop wall, baseboard, and floor bands fill the active viewport.
 - Load JSON configs with `_load_json_file()`.
-- Instantiate reusable shelf cells with `_add_shelf()` and add generated back layers with `_add_back_layer()`.
+- Instantiate reusable shelf cells with `_add_shelf()`, apply the shared shelf visual scale, and add generated back layers with `_add_back_layer()`.
 - Toggle each shelf scene's hidden `TopCeilingCap`, bottom `Shadow`, and `RightColumnShadow` only when the shelf uses full visuals and has no stacked neighbor above, below, or to the right in the generated layout.
 - Load `layout_preset` scene templates from `scenes/layouts/` and place runtime shelves at their authored `ShelfXX` markers.
 - Build optional `row_layouts` rows with `_add_row_layout_shelves()`, including horizontally wrapping moving rows and static rows mixed in one level.
