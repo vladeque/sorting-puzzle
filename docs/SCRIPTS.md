@@ -176,7 +176,7 @@ Key responsibilities:
 - Resize the scene-owned `Background` control so its procedural top strip, shop wall, baseboard, and floor bands fill the active viewport.
 - Load JSON configs with `_load_json_file()`.
 - Instantiate reusable shelf cells with `_add_shelf()` and add generated back layers with `_add_back_layer()`.
-- Toggle each shelf scene's hidden `TopCeilingCap` only when the shelf uses full visuals and no stacked shelf exists above it in the generated layout.
+- Toggle each shelf scene's hidden `TopCeilingCap` and `RightColumnShadow` only when the shelf uses full visuals and has no stacked neighbor above or to the right in the generated layout.
 - Load `layout_preset` scene templates from `scenes/layouts/` and place runtime shelves at their authored `ShelfXX` markers.
 - Build optional `row_layouts` rows with `_add_row_layout_shelves()`, including horizontally wrapping moving rows and static rows mixed in one level.
 - Build moving rows declared by layout template `MovingRowXX` nodes with `scripts/shelf_layout_row.gd`.

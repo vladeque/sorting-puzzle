@@ -5,8 +5,13 @@
 [node name="Shelf" type="Node2D" unique_id=961540884]
 
 [node name="Shadow" type="Polygon2D" parent="." unique_id=1166351438]
-color = Color(0.03, 0.025, 0.02, 0.18)
-polygon = PackedVector2Array(-110, 44, 114, 44, 114, 58, -110, 58)
+color = Color(0.03, 0.025, 0.02, 0.16)
+polygon = PackedVector2Array(-110, 44, 112, 44, 129, 59, -94, 59)
+
+[node name="RightColumnShadow" type="Polygon2D" parent="." unique_id=356530628]
+visible = false
+color = Color(0.08, 0.055, 0.035, 0.18)
+polygon = PackedVector2Array(111, -88, 126, -78, 128, 59, 112, 46)
 
 [node name="BackWall" type="Polygon2D" parent="." unique_id=251890705]
 z_index = 1
@@ -15,13 +20,8 @@ polygon = PackedVector2Array(-104, -81, 104, -81, 104, 16, -104, 16)
 
 [node name="BackWallTopShade" type="Polygon2D" parent="." unique_id=2086175922]
 z_index = 2
-color = Color(0.22, 0.12, 0.06, 0.24)
-polygon = PackedVector2Array(-104, -81, 104, -81, 104, -61, -104, -61)
-
-[node name="BackWallTopShadeSoft" type="Polygon2D" parent="." unique_id=2067159569]
-z_index = 2
-color = Color(0.22, 0.12, 0.06, 0.1)
-polygon = PackedVector2Array(-104, -61, 104, -61, 104, -45, -104, -45)
+color = Color(0.2, 0.12, 0.065, 0.2)
+polygon = PackedVector2Array(-104, -81, 104, -81, 96, -63, -96, -63)
 
 [node name="BackWallLeftShade" type="Polygon2D" parent="." unique_id=1566344107]
 z_index = 2
@@ -32,38 +32,38 @@ internal_vertex_count = 3
 
 [node name="Ceiling" type="Polygon2D" parent="." unique_id=356773762]
 z_index = 3
-color = Color(0.78, 0.52, 0.29, 1)
-polygon = PackedVector2Array(-112, -89, 112, -89, 112, -81, -112, -81)
+color = Color(0.67, 0.42, 0.2, 1)
+polygon = PackedVector2Array(-104, -89, 104, -89, 112, -81, -112, -81)
 
 [node name="TopCeilingCap" type="Node2D" parent="." unique_id=1045513466]
 visible = false
 z_index = 7
 
 [node name="BackBoard" type="Polygon2D" parent="TopCeilingCap" unique_id=1956528080]
-color = Color(0.86, 0.58, 0.32, 1)
-polygon = PackedVector2Array(-116, -102, 116, -102, 116, -90, -116, -90)
+color = Color(0.42, 0.26, 0.12, 1)
+polygon = PackedVector2Array(-96, -103, 96, -103, 114, -90, -114, -90)
 
 [node name="ShadowEdge" type="Polygon2D" parent="TopCeilingCap" unique_id=931218155]
 z_index = 1
-color = Color(0.39, 0.2, 0.09, 0.32)
-polygon = PackedVector2Array(-116, -94, 116, -94, 116, -90, -116, -90)
+color = Color(0.16, 0.08, 0.035, 0.42)
+polygon = PackedVector2Array(-114, -94, 114, -94, 114, -90, -114, -90)
 
 [node name="FrontLip" type="Polygon2D" parent="TopCeilingCap" unique_id=2115499776]
 z_index = 2
 color = Color(0.78, 0.48, 0.23, 1)
-polygon = PackedVector2Array(-118, -92, 118, -92, 114, -86, -114, -86)
+polygon = PackedVector2Array(-118, -92, 118, -92, 112, -85, -112, -85)
 
 [node name="GrainTop" type="Line2D" parent="TopCeilingCap" unique_id=522215183]
 z_index = 3
-points = PackedVector2Array(-108, -99, -42, -100, 18, -98, 108, -99)
+points = PackedVector2Array(-82, -100, -28, -100, 26, -99, 82, -100)
 width = 1.0
-default_color = Color(0.46, 0.24, 0.11, 0.26)
+default_color = Color(0.22, 0.12, 0.055, 0.32)
 
 [node name="GrainFront" type="Line2D" parent="TopCeilingCap" unique_id=532562069]
 z_index = 3
 points = PackedVector2Array(-110, -91, -36, -90, 52, -91, 110, -90)
 width = 1.0
-default_color = Color(0.98, 0.74, 0.44, 0.28)
+default_color = Color(0.98, 0.74, 0.44, 0.2)
 
 [node name="LeftWall" type="Polygon2D" parent="." unique_id=1529082060]
 z_index = 4

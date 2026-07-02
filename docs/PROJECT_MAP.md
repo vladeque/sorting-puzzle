@@ -127,7 +127,7 @@ Files:
 
 Responsibility:
 - Defines the reusable shelf cell visuals, front slots, and item snap markers.
-- Contains the visible back wall, soft left/top interior shadows, wood floor, frame, floor lip, floor grain nodes, and the hidden top ceiling cap shown by `scripts/level.gd` for shelves with no stacked shelf above.
+- Contains the visible back wall, soft left/top interior shadows, diagonal cast shadows, wood floor, frame, floor lip, floor grain nodes, and hidden edge details shown by `scripts/level.gd` for shelves with no stacked neighbor above or to the right.
 - Contains the hidden lock overlay used by triple-gated shelves; `scripts/level.gd` toggles it and fits the remaining count onto the lock center panel.
 - Keeps the shelf width, height, and slot positions aligned with the level grid constants so a three-shelf row fills most of the gameplay viewport.
 
@@ -144,7 +144,7 @@ Files:
 Responsibility:
 - Represents one sortable item as an `Area2D`.
 - Stores `item_id`.
-- Applies texture and visual scale to its `Sprite2D` and shared contact shadow.
+- Applies texture and visual scale to its `Sprite2D` and shared up-right cast shadow.
 - Draws reusable alpha-based sprite outlines for item highlight states.
 
 Change here when:
