@@ -107,6 +107,7 @@ var _ability_uses: Dictionary = {
 	ABILITY_HIGHLIGHT: 3,
 }
 var _time_remaining := 0.0
+var _has_player_started_timer := false
 var _level_failed := false
 var _level_completed := false
 var _level_paused := false
@@ -453,10 +454,14 @@ func _process(delta: float) -> void:
 	if _level_paused:
 		return
 
-	_time_remaining = maxf(_time_remaining - delta, 0.0)
-	_update_timer_label()
 	_update_highlight_timer(delta)
 	_clear_drag_drop_selection_if_unavailable()
+
+	if not _has_player_started_timer:
+		return
+
+	_time_remaining = maxf(_time_remaining - delta, 0.0)
+	_update_timer_label()
 
 	if _time_remaining <= 0.0:
 		_fail_level()
@@ -540,6 +545,7 @@ func _load_json_file(path: String) -> Dictionary:
 func _apply_level_config(config: Dictionary) -> void:
 	level_duration_seconds = float(config.get("time_seconds", level_duration_seconds))
 	_time_remaining = level_duration_seconds
+	_has_player_started_timer = false
 	_max_layer_count = 1
 	_level_failed = false
 	_level_completed = false
@@ -1109,6 +1115,13 @@ func _update_level_label() -> void:
 	_level_label.text = "Level %d" % selected_level
 
 
+func _start_level_timer_from_player_action() -> void:
+	if _has_player_started_timer:
+		return
+
+	_has_player_started_timer = true
+
+
 func _fail_level() -> void:
 	_level_failed = true
 	_level_paused = false
@@ -1280,6 +1293,7 @@ func _handle_press_at(pointer_global_position: Vector2) -> void:
 	if clicked_item == null:
 		return
 
+	_start_level_timer_from_player_action()
 	_pressed_item = clicked_item
 	_pressed_origin_slot = clicked_item.get_parent() as Node2D
 	_press_position = pointer_global_position
@@ -2006,6 +2020,7 @@ func _on_ability_button_pressed(ability_id: StringName) -> void:
 	if not did_apply:
 		return
 
+	_start_level_timer_from_player_action()
 	_spend_ability_use(ability_id)
 	_update_ability_buttons()
 

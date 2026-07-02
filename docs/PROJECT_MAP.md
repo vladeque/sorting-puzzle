@@ -93,7 +93,7 @@ Responsibility:
 - Plays item placement and triple-clear sound effects.
 - Keeps non-clearing items interactive while match animations run, with pending shelf resolves queued behind the active animation.
 - Promotes back layers when the visible layer clears.
-- Tracks the countdown timer and win/loss overlays.
+- Tracks the countdown timer, starting it only after the first meaningful player action, and win/loss overlays.
 - Wires the in-level pause menu, including the top-right circular menu button, modal overlay, Leave action, and Continue action.
 - Displays a responsive Godot-authored level backdrop with a top HUD strip, monotone shop wall, baseboard, and bottom floor band behind generated shelves.
 

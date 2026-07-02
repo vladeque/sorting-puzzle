@@ -194,7 +194,7 @@ Key responsibilities:
 - Promote back layers with `_promote_back_layer()`, `_play_layer_promotion_animation()`, and `_advance_back_layers()`.
 - Check win/loss state with `_check_level_completed()`, `_fail_level()`, and `_complete_level()`.
 - Save campaign completion through `PlayerProgress` and auto-load the next campaign level when it exists.
-- Format the active timer as zero-padded `MM:SS` text with `_update_timer_label()`.
+- Keep the level countdown idle until the first meaningful player action, then format the active timer as zero-padded `MM:SS` text with `_update_timer_label()`.
 - Pause and resume active gameplay through the top-right menu button, the instanced `UI/PauseMenuOverlay`, `Leave`, and `Continue`.
 - Disable item placement and triple-clear sound effects while the pause menu sound-effects toggle is crossed out.
 - Manage hammer, shuffle, and highlight abilities. Campaign levels read and spend saved ability counts through `PlayerProgress`; dev/test levels use isolated temporary counts.
