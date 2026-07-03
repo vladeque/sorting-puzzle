@@ -48,11 +48,14 @@ const SHELF_RIGHT_STACK_MIN_VERTICAL_OVERLAP := 0.35
 const HUD_TOP_MARGIN := 28.0
 const HUD_SIDE_MARGIN := 24.0
 const COMBO_FILL_INSET := 3.0
+const COMBO_VALUE_PER_TRIPLE := 10
 const LEVEL_LABEL_MARGIN_LEFT := 32.0
 const LEVEL_LABEL_TOP := 42.0
 const LEVEL_LABEL_SIZE := Vector2(194, 40)
 const TIMER_LABEL_HEIGHT := 64.0
 const PAUSE_BUTTON_SIZE := Vector2(64, 64)
+const STAR_COUNTER_SIZE := Vector2(112, 52)
+const STAR_COUNTER_GAP := 12.0
 const ABILITY_BAR_HEIGHT := 126.0
 const ABILITY_BAR_DESIGN_BOTTOM_MARGIN := 96.0
 const ABILITY_BAR_SAFE_BOTTOM_PADDING := 24.0
@@ -94,6 +97,7 @@ var _background: Control
 var _shelves_root: Node2D
 var _timer_label: Label
 var _level_label: Label
+var _star_counter_label: Label
 var _combo_fill: Control
 var _combo_label: Label
 var _failure_panel: Control
@@ -121,6 +125,7 @@ var _returning_to_menu := false
 var _highlight_timer := 0.0
 var _combo_count := 0
 var _combo_time_remaining := 0.0
+var _stars := 0
 var _highlighted_items: Array[ShelfItem] = []
 var _layout_preset := DEFAULT_LAYOUT_PRESET
 var _rng := RandomNumberGenerator.new()
@@ -146,6 +151,7 @@ func _ready() -> void:
 	_drag_layer = get_node("DragLayer") as Node2D
 	_timer_label = get_node("UI/TimerLabel") as Label
 	_level_label = get_node("UI/LevelLabel") as Label
+	_star_counter_label = get_node("UI/StarCounterLabel") as Label
 	_combo_fill = get_node("Background/HudCenterSlot/ComboFill") as Control
 	_combo_label = get_node("Background/HudCenterSlot/ComboLabel") as Label
 	_failure_panel = get_node("UI/FailurePanel") as Control
@@ -169,6 +175,7 @@ func _ready() -> void:
 	_collect_slots()
 	_update_level_label()
 	_update_timer_label()
+	_update_star_counter_label()
 	_update_ability_buttons()
 	_update_pause_menu_button()
 
@@ -227,6 +234,16 @@ func _layout_top_hud(safe_margins: Vector4) -> void:
 		_level_label.offset_top = safe_margins.y + LEVEL_LABEL_TOP
 		_level_label.offset_right = _level_label.offset_left + LEVEL_LABEL_SIZE.x
 		_level_label.offset_bottom = _level_label.offset_top + LEVEL_LABEL_SIZE.y
+
+	if _star_counter_label != null:
+		_star_counter_label.anchor_left = 1.0
+		_star_counter_label.anchor_top = 0.0
+		_star_counter_label.anchor_right = 1.0
+		_star_counter_label.anchor_bottom = 0.0
+		_star_counter_label.offset_right = -(safe_margins.z + HUD_SIDE_MARGIN + PAUSE_BUTTON_SIZE.x + STAR_COUNTER_GAP)
+		_star_counter_label.offset_left = _star_counter_label.offset_right - STAR_COUNTER_SIZE.x
+		_star_counter_label.offset_top = safe_margins.y + HUD_TOP_MARGIN + ((PAUSE_BUTTON_SIZE.y - STAR_COUNTER_SIZE.y) * 0.5)
+		_star_counter_label.offset_bottom = _star_counter_label.offset_top + STAR_COUNTER_SIZE.y
 
 	if _pause_menu_button != null:
 		_pause_menu_button.anchor_left = 1.0
@@ -561,7 +578,9 @@ func _apply_level_config(config: Dictionary) -> void:
 	_level_completed = false
 	_level_paused = false
 	_triples_cleared = 0
+	_stars = 0
 	_reset_combo()
+	_update_star_counter_label()
 	_completion_return_time_remaining = 0.0
 	_returning_to_menu = false
 	_failure_panel.visible = false
@@ -1138,7 +1157,7 @@ func _record_triples_cleared(triple_count: int) -> void:
 
 	_triples_cleared += triple_count
 	if _has_player_started_timer and not _level_failed and not _level_completed:
-		_extend_combo(triple_count)
+		_add_stars(_extend_combo(triple_count))
 
 	var newly_unlocked_shelves := _update_locked_shelves()
 	_queue_shelves_to_resolve(newly_unlocked_shelves)
@@ -1304,17 +1323,49 @@ func _update_level_label() -> void:
 	_level_label.text = "Level %d" % selected_level
 
 
-func _extend_combo(triple_count: int) -> void:
-	if triple_count <= 0:
+func _update_star_counter_label() -> void:
+	if _star_counter_label == null:
 		return
 
-	if _combo_count <= 0 or _combo_time_remaining <= 0.0:
-		_combo_count = triple_count
-	else:
-		_combo_count += triple_count
+	var star_text := "★ %d" % _stars
+	var font_size := 26
+	if star_text.length() >= 8:
+		font_size = 18
+	elif star_text.length() >= 7:
+		font_size = 20
+	elif star_text.length() >= 6:
+		font_size = 22
+
+	_star_counter_label.add_theme_font_size_override("font_size", font_size)
+	_star_counter_label.text = star_text
+
+
+func _add_stars(star_count: int) -> void:
+	if star_count <= 0:
+		return
+
+	_stars += star_count
+	_update_star_counter_label()
+
+
+func _extend_combo(triple_count: int) -> int:
+	if triple_count <= 0:
+		return 0
+
+	var earned_stars := 0
+	var combo_is_active := _combo_count > 0 and _combo_time_remaining > 0.0
+	for _triple_index in range(triple_count):
+		if not combo_is_active:
+			_combo_count = COMBO_VALUE_PER_TRIPLE
+			combo_is_active = true
+		else:
+			_combo_count += COMBO_VALUE_PER_TRIPLE
+
+		earned_stars += _combo_count
 
 	_combo_time_remaining = maxf(combo_window_seconds, 0.0)
 	_update_combo_hud()
+	return earned_stars
 
 
 func _update_combo_timer(delta: float) -> void:

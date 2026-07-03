@@ -188,7 +188,7 @@ Key responsibilities:
 - Hide the active item's contact shadow while the player is dragging it, then restore the shadow when the drag releases, cancels, fails, or completes.
 - Redirect moves aimed at an occupied destination slot on another shelf to the nearest free front slot on that destination shelf; same-shelf occupied targets leave the item in its original slot.
 - Clear triples with `_clear_matching_shelves()` and `_play_match_clear_animation()`.
-- Track the active triple-clear combo with `_extend_combo()`, `_update_combo_timer()`, `_reset_combo()`, and `_update_combo_hud()`, including the shrinking center-slot fill.
+- Track the active triple-clear combo with `_extend_combo()`, `_update_combo_timer()`, `_reset_combo()`, and `_update_combo_hud()`, including the shrinking center-slot fill. Combo value increases by 10 per cleared triple, and each cleared triple adds stars equal to the combo value reached by that triple.
 - Track cleared triples and locked shelf accessibility with `_record_triples_cleared()`, `_update_locked_shelves()`, and shelf metadata from `unlock_after_triples`.
 - Toggle each shelf scene's lock overlay with the remaining triple count, fit that count to the lock art's center panel, and keep locked shelves out of move, match, promotion, and ability targeting.
 - Play placement and triple-clear sound effects with runtime `AudioStreamPlayer` nodes.

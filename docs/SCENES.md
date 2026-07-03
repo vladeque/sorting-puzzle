@@ -53,6 +53,7 @@ Important nodes:
 - `UI`: `CanvasLayer` for gameplay labels, ability buttons, and overlays; top-level controls are anchored or positioned at runtime for non-720x1280 portrait screens.
 - `UI/TimerLabel`: countdown display.
 - `UI/LevelLabel`: current level display.
+- `UI/StarCounterLabel`: top HUD star total, positioned between the timer area and pause button.
 - `UI/PauseMenuButton`: circular top-right button that pauses the active level and opens the pause menu overlay.
 - `UI/AbilityBar/HBoxContainer/HammerButton`: hammer ability button.
 - `UI/AbilityBar/HBoxContainer/ShuffleButton`: shuffle ability button.
