@@ -226,6 +226,21 @@ grow_horizontal = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_hud_center_slot")
 
+[node name="ComboFill" type="ColorRect" parent="Background/HudCenterSlot"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 3.0
+offset_top = 3.0
+offset_right = -3.0
+offset_bottom = -3.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.27, 0.8, 0.25, 0.82)
+
 [node name="ComboLabel" type="Label" parent="Background/HudCenterSlot" unique_id=449182547]
 visible = false
 layout_mode = 1
@@ -234,6 +249,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 theme_override_colors/font_color = Color(1, 0.92, 0.62, 1)
 theme_override_colors/font_shadow_color = Color(0.08, 0.02, 0.01, 0.82)
 theme_override_constants/shadow_offset_x = 0

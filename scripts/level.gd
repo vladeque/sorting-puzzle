@@ -47,6 +47,7 @@ const SHELF_RIGHT_STACK_HORIZONTAL_EPSILON := 4.0
 const SHELF_RIGHT_STACK_MIN_VERTICAL_OVERLAP := 0.35
 const HUD_TOP_MARGIN := 28.0
 const HUD_SIDE_MARGIN := 24.0
+const COMBO_FILL_INSET := 3.0
 const LEVEL_LABEL_MARGIN_LEFT := 32.0
 const LEVEL_LABEL_TOP := 42.0
 const LEVEL_LABEL_SIZE := Vector2(194, 40)
@@ -93,6 +94,7 @@ var _background: Control
 var _shelves_root: Node2D
 var _timer_label: Label
 var _level_label: Label
+var _combo_fill: Control
 var _combo_label: Label
 var _failure_panel: Control
 var _completion_panel: Control
@@ -144,6 +146,7 @@ func _ready() -> void:
 	_drag_layer = get_node("DragLayer") as Node2D
 	_timer_label = get_node("UI/TimerLabel") as Label
 	_level_label = get_node("UI/LevelLabel") as Label
+	_combo_fill = get_node("Background/HudCenterSlot/ComboFill") as Control
 	_combo_label = get_node("Background/HudCenterSlot/ComboLabel") as Label
 	_failure_panel = get_node("UI/FailurePanel") as Control
 	_completion_panel = get_node("UI/CompletionPanel") as Control
@@ -1311,7 +1314,7 @@ func _extend_combo(triple_count: int) -> void:
 		_combo_count += triple_count
 
 	_combo_time_remaining = maxf(combo_window_seconds, 0.0)
-	_update_combo_label()
+	_update_combo_hud()
 
 
 func _update_combo_timer(delta: float) -> void:
@@ -1321,22 +1324,37 @@ func _update_combo_timer(delta: float) -> void:
 	_combo_time_remaining = maxf(_combo_time_remaining - delta, 0.0)
 	if _combo_time_remaining <= 0.0:
 		_reset_combo()
+	else:
+		_update_combo_hud()
 
 
 func _reset_combo() -> void:
 	_combo_count = 0
 	_combo_time_remaining = 0.0
-	_update_combo_label()
+	_update_combo_hud()
 
 
-func _update_combo_label() -> void:
-	if _combo_label == null:
-		return
-
+func _update_combo_hud() -> void:
 	var should_show := _combo_count > 0 and not _level_failed and not _level_completed
-	_combo_label.visible = should_show
-	if should_show:
+	if _combo_fill != null:
+		_combo_fill.visible = should_show
+		_combo_fill.anchor_right = _get_combo_time_ratio() if should_show else 0.0
+		_combo_fill.offset_left = COMBO_FILL_INSET
+		_combo_fill.offset_top = COMBO_FILL_INSET
+		_combo_fill.offset_right = -COMBO_FILL_INSET
+		_combo_fill.offset_bottom = -COMBO_FILL_INSET
+
+	if _combo_label != null:
+		_combo_label.visible = should_show
+	if _combo_label != null and should_show:
 		_combo_label.text = "Combo x%d" % _combo_count
+
+
+func _get_combo_time_ratio() -> float:
+	if combo_window_seconds <= 0.0:
+		return 0.0
+
+	return clampf(_combo_time_remaining / combo_window_seconds, 0.0, 1.0)
 
 
 func _start_level_timer_from_player_action() -> void:
