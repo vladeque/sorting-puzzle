@@ -235,7 +235,7 @@ Attached to:
 Purpose:
 - Owns reusable shelf-cell runtime helpers and back-layer preview presentation.
 - Owns shelf visual switching for `full` versus `floor_only` variants.
-- Owns row-placement visual switching for `left`, `middle`, and `right` shelf cells.
+- Owns row-placement visual switching for `left`, `middle`, and `right` shelf cells by toggling scene-authored `PlacementVisuals` containers.
 - Creates generated back-layer slot nodes for one shelf.
 - Applies back-layer preview item scale, tint, visibility, z-index, and disabled collision state.
 
@@ -249,7 +249,7 @@ Important exports:
 Key methods:
 - `set_visual_variant(visual_variant)`: applies `full` or `floor_only` shelf presentation and records the active variant as metadata for `scripts/level.gd` edge-shadow checks.
 - `get_visual_variant()`: returns the active shelf visual variant.
-- `set_row_placement(row_placement)`: applies `left`, `middle`, or `right` row-edge presentation and records the active placement as metadata.
+- `set_row_placement(row_placement)`: toggles the matching `PlacementVisuals/Left`, `PlacementVisuals/Middle`, or `PlacementVisuals/Right` container and records the active placement as metadata.
 - `get_row_placement()`: returns the active shelf row placement.
 - `add_back_layer(layer_index, front_slots)`: creates a generated back-layer container and slot nodes aligned to the shelf front slots.
 - `get_back_layer(layer_index)`: returns a generated back-layer container by index.

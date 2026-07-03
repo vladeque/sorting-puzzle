@@ -10,22 +10,19 @@ const VISUAL_VARIANT_FLOOR_ONLY := "floor_only"
 const ROW_PLACEMENT_LEFT := "left"
 const ROW_PLACEMENT_MIDDLE := "middle"
 const ROW_PLACEMENT_RIGHT := "right"
+const PLACEMENT_VISUALS_NODE := "PlacementVisuals"
+const LEFT_PLACEMENT_NODE := "PlacementVisuals/Left"
+const MIDDLE_PLACEMENT_NODE := "PlacementVisuals/Middle"
+const RIGHT_PLACEMENT_NODE := "PlacementVisuals/Right"
 const FLOOR_ONLY_HIDDEN_NODES := [
 	"Shadow",
 	"BackWall",
 	"BackWallTopShade",
-	"BackWallLeftShade",
 	"Ceiling",
 	"TopCeilingCap",
 	"RightColumnShadow",
-	"LeftWall",
-	"RightWall",
+	"PlacementVisuals",
 	"Highlight",
-]
-const ROW_PLACEMENT_EDGE_NODES := [
-	"BackWallLeftShade",
-	"LeftWall",
-	"RightWall",
 ]
 
 @export var back_layer_offset := Vector2(0, -10)
@@ -143,13 +140,13 @@ func _apply_visual_variant() -> void:
 
 func _apply_row_placement() -> void:
 	if _visual_variant != VISUAL_VARIANT_FULL:
-		for node_name in ROW_PLACEMENT_EDGE_NODES:
-			_set_node_visible(node_name, false)
+		_set_node_visible(PLACEMENT_VISUALS_NODE, false)
 		return
 
-	_set_node_visible("BackWallLeftShade", _row_placement == ROW_PLACEMENT_LEFT)
-	_set_node_visible("LeftWall", _row_placement == ROW_PLACEMENT_LEFT)
-	_set_node_visible("RightWall", true)
+	_set_node_visible(PLACEMENT_VISUALS_NODE, true)
+	_set_node_visible(LEFT_PLACEMENT_NODE, _row_placement == ROW_PLACEMENT_LEFT)
+	_set_node_visible(MIDDLE_PLACEMENT_NODE, _row_placement == ROW_PLACEMENT_MIDDLE)
+	_set_node_visible(RIGHT_PLACEMENT_NODE, _row_placement == ROW_PLACEMENT_RIGHT)
 
 
 func _set_node_visible(node_name: String, should_show: bool) -> void:

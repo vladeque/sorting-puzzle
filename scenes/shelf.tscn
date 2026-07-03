@@ -28,11 +28,41 @@ z_index = 2
 color = Color(0.7490196, 0.65882355, 0.54901963, 1)
 polygon = PackedVector2Array(-104, -81, 104, -81, 104.0658, -68.57907, -104.16662, -68.57907)
 
-[node name="BackWallLeftShade" type="Polygon2D" parent="." unique_id=1566344107]
+[node name="PlacementVisuals" type="Node2D" parent="."]
+
+[node name="Left" type="Node2D" parent="PlacementVisuals"]
+visible = false
+
+[node name="BackWallLeftShade" type="Polygon2D" parent="PlacementVisuals/Left" unique_id=1566344107]
 z_index = 1
 color = Color(0.7490196, 0.65882355, 0.54901963, 1)
 polygon = PackedVector2Array(-104, -81, -79.955414, -80.9881, -79.886925, 16.17432, -104, 16)
 uv = PackedVector2Array(-54.97803, -80.7905, -54.485466, -74.25448, -87.18676, -74.15928)
+
+[node name="LeftWall" type="Polygon2D" parent="PlacementVisuals/Left" unique_id=1529082060]
+z_index = 4
+color = Color(0.78039217, 0.52156866, 0.2901961, 1)
+polygon = PackedVector2Array(-112, -89, -104, -89, -104, 46, -112, 46)
+
+[node name="RightWall" type="Polygon2D" parent="PlacementVisuals/Left" unique_id=1412430343]
+z_index = 4
+color = Color(0.78039217, 0.52156866, 0.2901961, 1)
+polygon = PackedVector2Array(104, -89, 112, -89, 112, 46, 104, 46)
+
+[node name="Middle" type="Node2D" parent="PlacementVisuals"]
+
+[node name="RightWall" type="Polygon2D" parent="PlacementVisuals/Middle"]
+z_index = 4
+color = Color(0.78039217, 0.52156866, 0.2901961, 1)
+polygon = PackedVector2Array(104, -89, 112, -89, 112, 46, 104, 46)
+
+[node name="Right" type="Node2D" parent="PlacementVisuals"]
+visible = false
+
+[node name="RightWall" type="Polygon2D" parent="PlacementVisuals/Right"]
+z_index = 4
+color = Color(0.78039217, 0.52156866, 0.2901961, 1)
+polygon = PackedVector2Array(104, -89, 112, -89, 112, 46, 104, 46)
 
 [node name="Ceiling" type="Polygon2D" parent="." unique_id=356773762]
 z_index = 3
@@ -67,16 +97,6 @@ z_index = 3
 points = PackedVector2Array(-110, -91, -36, -90, 52, -91, 110, -90)
 width = 1.0
 default_color = Color(0.98, 0.74, 0.44, 0.2)
-
-[node name="LeftWall" type="Polygon2D" parent="." unique_id=1529082060]
-z_index = 4
-color = Color(0.78039217, 0.52156866, 0.2901961, 1)
-polygon = PackedVector2Array(-112, -89, -104, -89, -104, 46, -112, 46)
-
-[node name="RightWall" type="Polygon2D" parent="." unique_id=1412430343]
-z_index = 4
-color = Color(0.78039217, 0.52156866, 0.2901961, 1)
-polygon = PackedVector2Array(104, -89, 112, -89, 112, 46, 104, 46)
 
 [node name="FloorSurface" type="Polygon2D" parent="." unique_id=211239445]
 z_index = 5
