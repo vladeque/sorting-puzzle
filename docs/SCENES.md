@@ -196,7 +196,7 @@ Important nodes:
 - `Ceiling`, `TopCeilingCap`, `LeftWall`, and `RightWall`: wooden cell frame. `TopCeilingCap` is hidden in the scene and shown at runtime only for top shelves.
 - `Shadow` and `RightColumnShadow`: solid-color perspective cast shadows, shown at runtime only for bottom shelves and far-right shelf columns, drawn below generated back-layer item previews.
 - `FloorSurface` and `FloorFrontLip`: wooden floor where items visually rest.
-- `FloorGrain*`: subtle line details on the floor.
+- `FloorGrain*`: subtle line details on the floor; generated back-layer item previews draw above the floor and grain, while active front items draw above back-layer previews.
 - `LockedOverlay`: hidden lock overlay used for triple-gated shelves.
 - `LockedOverlay/LockSprite`: transparent lock image from `assets/ui/lock_shelf_cutout.png`, scaled to fit the shelf overlay.
 - `LockedOverlay/RemainingLabel`: runtime-updated count of triples still needed to unlock the shelf, optically centered over the lock's clear center panel.

@@ -238,7 +238,7 @@ Purpose:
 
 Important exports:
 - `back_layer_offset`: visual offset for generated hidden/upcoming shelf layers.
-- `back_layer_z_index`: z-index used by generated back-layer container nodes.
+- `back_layer_z_index`: z-index used by generated back-layer container nodes, above shelf floor details and below active front items.
 - `back_layer_item_z_index`: z-index used by generated back-layer preview items.
 - `back_layer_item_scale`: scale multiplier for back-layer item previews.
 - `back_layer_item_modulate`: color used for visible back-layer previews.

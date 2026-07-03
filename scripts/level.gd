@@ -1678,7 +1678,7 @@ func _get_slot_item(slot: Node2D) -> ShelfItem:
 func _place_item_in_slot(item: ShelfItem, slot: Node2D, should_play_sound := false) -> void:
 	item.reparent(slot, true)
 	item.position = SLOT_ITEM_POSITION
-	item.z_index = 6
+	item.z_index = 10
 	_apply_item_visual_state(item)
 	if should_play_sound:
 		_play_item_place_sound()
@@ -1699,7 +1699,7 @@ func _play_item_move_animation(item: ShelfItem, target_slot: Node2D) -> void:
 
 	var duration := maxf(item_move_duration_seconds, 0.0)
 	item.reparent(target_slot, true)
-	item.z_index = 9
+	item.z_index = 13
 	item.input_pickable = false
 	_mark_item_transitioning_by_id(item.get_instance_id())
 
@@ -1721,7 +1721,7 @@ func _play_item_move_animation(item: ShelfItem, target_slot: Node2D) -> void:
 		return
 
 	item.position = SLOT_ITEM_POSITION
-	item.z_index = 6
+	item.z_index = 10
 	item.input_pickable = true
 	_unmark_item_transitioning_by_id(item.get_instance_id())
 
@@ -1970,7 +1970,7 @@ func _prepare_layer_promotion_item(item: ShelfItem, front_slot: Node2D) -> Dicti
 		target_visual_scale /= shelf.back_layer_item_scale
 
 	item.reparent(front_slot, true)
-	item.z_index = 8
+	item.z_index = 12
 	item.input_pickable = false
 	_mark_item_transitioning_by_id(item.get_instance_id())
 
@@ -2041,7 +2041,7 @@ func _finish_layer_promotion_item(entry: Dictionary) -> void:
 		return
 
 	item.position = SLOT_ITEM_POSITION
-	item.z_index = 6
+	item.z_index = 10
 	item.modulate = Color.WHITE
 	item.visual_scale = float(entry.get("target_visual_scale", item.visual_scale))
 	item.input_pickable = true

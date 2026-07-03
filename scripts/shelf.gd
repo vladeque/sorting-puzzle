@@ -5,7 +5,7 @@ const BACK_LAYER_PREFIX := "ShelfLayer"
 const FIRST_BACK_LAYER_INDEX := 1
 
 @export var back_layer_offset := Vector2(0, -10)
-@export var back_layer_z_index := 4
+@export var back_layer_z_index := 7
 @export var back_layer_item_z_index := 0
 @export var back_layer_item_scale := 0.86
 @export var back_layer_item_modulate := Color(0.376, 0.376, 0.376, 0.706)
