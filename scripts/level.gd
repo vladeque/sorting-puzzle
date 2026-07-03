@@ -39,6 +39,7 @@ const ROW_LAYOUTS_KEY := "row_layouts"
 const ROW_MOTION_HORIZONTAL_WRAP := "horizontal_wrap"
 const SHELF_VISUAL_VARIANT_FULL := "full"
 const SHELF_VISUAL_VARIANT_FLOOR_ONLY := "floor_only"
+const LAYOUT_ROW_VERTICAL_EPSILON := 8.0
 const SHELF_TOP_STACK_VERTICAL_EPSILON := 4.0
 const SHELF_TOP_STACK_MIN_HORIZONTAL_OVERLAP := 0.35
 const SHELF_BOTTOM_STACK_VERTICAL_EPSILON := 4.0
@@ -63,19 +64,6 @@ const SHELVES_MIN_LAYOUT_SCALE := 0.45
 const SHELVES_MAX_LAYOUT_SCALE := 1.5
 const RESULT_LABEL_HEIGHT := 96.0
 const PAUSE_MENU_PANEL_SIZE := Vector2(520, 363)
-const SHELF_FLOOR_ONLY_HIDDEN_NODES := [
-	"Shadow",
-	"BackWall",
-	"BackWallTopShade",
-	"BackWallLeftShade",
-	"Ceiling",
-	"TopCeilingCap",
-	"RightColumnShadow",
-	"LeftWall",
-	"RightWall",
-	"Highlight",
-]
-
 @export var slot_snap_distance := BASE_SLOT_SNAP_DISTANCE * SHELF_CELL_VISUAL_SCALE
 @export var item_pick_size := BASE_ITEM_PICK_SIZE * SHELF_CELL_VISUAL_SCALE
 @export var drag_start_distance := 12.0
@@ -619,6 +607,7 @@ func _add_preset_layout_shelves(shelves: Node2D, shelves_config: Array) -> void:
 			continue
 
 		var shelf := _add_shelf(shelves, shelf_index + 1, shelf_positions[shelf_index])
+		_apply_shelf_row_placement(shelf, _get_grid_row_shelf_placement(shelf_index, shelves_config.size(), 3))
 		_configure_shelf_from_config(shelf, shelf_config)
 
 
@@ -703,6 +692,7 @@ func _add_static_shelf_row(
 		var shelf_position := Vector2(row_origin_x + float(row_shelf_index) * SHELF_GRID_STEP.x, row_center_y)
 		var shelf := _add_shelf(shelves, shelf_number, shelf_position)
 		_apply_shelf_visual_variant(shelf, visual_variant)
+		_apply_shelf_row_placement(shelf, _get_row_shelf_placement(row_shelf_index, row_shelf_count))
 		_configure_shelf_from_config(shelf, shelf_config)
 
 
@@ -738,6 +728,7 @@ func _add_moving_shelf_row(
 		var shelf := _add_shelf(row, shelf_number, Vector2.ZERO)
 		row.add_shelf(shelf)
 		_apply_shelf_visual_variant(shelf, visual_variant)
+		_apply_shelf_row_placement(shelf, Shelf.ROW_PLACEMENT_MIDDLE)
 		_configure_shelf_from_config(shelf, shelf_config, false)
 
 
@@ -812,6 +803,7 @@ func _add_layout_template_shelves(shelves: Node2D, shelves_config: Array, layout
 		return false
 
 	var shelf_config_index := 0
+	var marker_placements := _get_layout_template_marker_placements(layout_template)
 	for layout_node in layout_template.get_children():
 		if layout_node is ShelfLayoutRow:
 			var layout_row := layout_node as ShelfLayoutRow
@@ -835,6 +827,10 @@ func _add_layout_template_shelves(shelves: Node2D, shelves_config: Array, layout
 			if shelf_config != null:
 				var shelf_marker := layout_node as Node2D
 				var shelf := _add_shelf(shelves, shelf_config_index + 1, shelf_marker.global_position)
+				_apply_shelf_row_placement(
+					shelf,
+					str(marker_placements.get(shelf_marker.get_instance_id(), Shelf.ROW_PLACEMENT_MIDDLE))
+				)
 				_configure_shelf_from_config(shelf, shelf_config)
 
 			shelf_config_index += 1
@@ -866,20 +862,104 @@ func _is_layout_shelf_marker(layout_node: Node) -> bool:
 	return layout_node is Marker2D and str(layout_node.name).begins_with("Shelf")
 
 
+func _get_layout_template_marker_placements(layout_template: Node2D) -> Dictionary:
+	var rows: Array = []
+	for layout_node in layout_template.get_children():
+		if not _is_layout_shelf_marker(layout_node):
+			continue
+
+		var marker := layout_node as Node2D
+		var row_index := _find_layout_marker_row_index(rows, marker.global_position.y)
+		if row_index == -1:
+			rows.append({
+				"y": marker.global_position.y,
+				"markers": [marker],
+			})
+		else:
+			var existing_row := rows[row_index] as Dictionary
+			var row_markers_to_append := existing_row.get("markers", []) as Array
+			row_markers_to_append.append(marker)
+
+	var placements := {}
+	for row_entry in rows:
+		var row_data := row_entry as Dictionary
+		if row_data == null:
+			continue
+
+		var sorted_markers := row_data.get("markers", []) as Array
+		sorted_markers.sort_custom(Callable(self, "_sort_layout_markers_by_x"))
+		for row_shelf_index in range(sorted_markers.size()):
+			var sorted_marker := sorted_markers[row_shelf_index] as Node2D
+			if sorted_marker != null:
+				placements[sorted_marker.get_instance_id()] = _get_row_shelf_placement(row_shelf_index, sorted_markers.size())
+
+	return placements
+
+
+func _find_layout_marker_row_index(rows: Array, marker_y: float) -> int:
+	for row_index in range(rows.size()):
+		var row := rows[row_index] as Dictionary
+		if row == null:
+			continue
+
+		if absf(float(row.get("y", marker_y)) - marker_y) <= LAYOUT_ROW_VERTICAL_EPSILON:
+			return row_index
+
+	return -1
+
+
+func _sort_layout_markers_by_x(left: Node, right: Node) -> bool:
+	var left_marker := left as Node2D
+	var right_marker := right as Node2D
+	if left_marker == null or right_marker == null:
+		return str(left.name) < str(right.name)
+
+	if not is_equal_approx(left_marker.global_position.x, right_marker.global_position.x):
+		return left_marker.global_position.x < right_marker.global_position.x
+
+	return str(left_marker.name) < str(right_marker.name)
+
+
+func _get_grid_row_shelf_placement(shelf_index: int, shelf_count: int, columns: int) -> String:
+	var row_start_index := floori(float(shelf_index) / float(columns)) * columns
+	var row_shelf_index := shelf_index - row_start_index
+	var row_shelf_count := mini(columns, shelf_count - row_start_index)
+	return _get_row_shelf_placement(row_shelf_index, row_shelf_count)
+
+
+func _get_row_shelf_placement(row_shelf_index: int, row_shelf_count: int) -> String:
+	if row_shelf_count <= 1:
+		return Shelf.ROW_PLACEMENT_MIDDLE
+
+	if row_shelf_index <= 0:
+		return Shelf.ROW_PLACEMENT_LEFT
+
+	if row_shelf_index >= row_shelf_count - 1:
+		return Shelf.ROW_PLACEMENT_RIGHT
+
+	return Shelf.ROW_PLACEMENT_MIDDLE
+
+
 func _apply_shelf_visual_variant(shelf: Node2D, visual_variant: String) -> void:
+	var shelf_cell := shelf as Shelf
 	match visual_variant:
-		SHELF_VISUAL_VARIANT_FULL:
-			shelf.set_meta(SHELF_VISUAL_VARIANT_META, SHELF_VISUAL_VARIANT_FULL)
-			return
-		SHELF_VISUAL_VARIANT_FLOOR_ONLY:
-			shelf.set_meta(SHELF_VISUAL_VARIANT_META, SHELF_VISUAL_VARIANT_FLOOR_ONLY)
-			for node_name in SHELF_FLOOR_ONLY_HIDDEN_NODES:
-				var node := shelf.get_node_or_null(node_name) as CanvasItem
-				if node != null:
-					node.visible = false
+		SHELF_VISUAL_VARIANT_FULL, SHELF_VISUAL_VARIANT_FLOOR_ONLY:
+			if shelf_cell != null:
+				shelf_cell.set_visual_variant(visual_variant)
+			else:
+				shelf.set_meta(SHELF_VISUAL_VARIANT_META, visual_variant)
 		_:
-			shelf.set_meta(SHELF_VISUAL_VARIANT_META, SHELF_VISUAL_VARIANT_FULL)
+			if shelf_cell != null:
+				shelf_cell.set_visual_variant(SHELF_VISUAL_VARIANT_FULL)
+			else:
+				shelf.set_meta(SHELF_VISUAL_VARIANT_META, SHELF_VISUAL_VARIANT_FULL)
 			push_warning("Unknown shelf visual_variant '%s'. Using full shelf." % visual_variant)
+
+
+func _apply_shelf_row_placement(shelf: Node2D, row_placement: String) -> void:
+	var shelf_cell := shelf as Shelf
+	if shelf_cell != null:
+		shelf_cell.set_row_placement(row_placement)
 
 
 func _update_shelf_perspective_edges() -> void:
@@ -1011,7 +1091,8 @@ func _add_shelf(parent: Node, shelf_number: int, shelf_position: Vector2) -> She
 	shelf.name = "Shelf%02d" % shelf_number
 	shelf.position = shelf_position
 	shelf.scale = Vector2.ONE * SHELF_CELL_VISUAL_SCALE
-	shelf.set_meta(SHELF_VISUAL_VARIANT_META, SHELF_VISUAL_VARIANT_FULL)
+	shelf.set_visual_variant(SHELF_VISUAL_VARIANT_FULL)
+	shelf.set_row_placement(Shelf.ROW_PLACEMENT_MIDDLE)
 	parent.add_child(shelf)
 
 	return shelf

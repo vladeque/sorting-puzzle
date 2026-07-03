@@ -91,6 +91,7 @@ Purpose:
 - Editor-authored shelf placement templates for `layout_preset` values in level JSON.
 - Keep each preset's shelf markers easy to nudge, align, and review visually in Godot.
 - Own static shelf marker positions and optional moving-row marker positions.
+- Static shelf markers are grouped into horizontal rows by runtime marker position so `scripts/level.gd` can assign left/middle/right shelf visuals from the actual authored layout.
 
 Important nodes:
 - `ShelfXX`: `Marker2D` nodes consumed in scene order by `scripts/level.gd`; their positions become runtime `scenes/shelf.tscn` positions.
@@ -189,11 +190,12 @@ Purpose:
 - Uses wide, slightly shorter cell bounds so three generated shelves span most of the 720 px gameplay viewport with compact row spacing.
 - Runtime shelf instances are scaled slightly by `scripts/level.gd`, with layout template markers and moving-row windows authored to match the scaled cell footprint.
 - Can be switched by `scripts/level.gd` to a `floor_only` visual variant for moving rows by hiding wall and ceiling nodes at runtime.
+- Can be switched by `scripts/level.gd` to `left`, `middle`, or `right` row-placement visuals for static shelves. Moving-row shelves currently stay on the neutral `middle` row-placement visual.
 
 Important nodes:
 - `BackWall`: muted panel behind shelf items.
-- `BackWallLeftShade` and `BackWallTopShade`: soft interior wall shadow layers behind items.
-- `Ceiling`, `TopCeilingCap`, `LeftWall`, and `RightWall`: wooden cell frame. `TopCeilingCap` is hidden in the scene and shown at runtime only for top shelves.
+- `BackWallLeftShade` and `BackWallTopShade`: soft interior wall shadow layers behind items. `BackWallLeftShade` is shown only for left-placement full shelves.
+- `Ceiling`, `TopCeilingCap`, `LeftWall`, and `RightWall`: wooden cell frame. `LeftWall` is shown only for left-placement full shelves, `RightWall` only for right-placement full shelves, and middle-placement full shelves hide both outer side walls. `TopCeilingCap` is hidden in the scene and shown at runtime only for top shelves.
 - `Shadow` and `RightColumnShadow`: solid-color perspective cast shadows, shown at runtime only for bottom shelves and far-right shelf columns, drawn below generated back-layer item previews.
 - `FloorSurface` and `FloorFrontLip`: wooden floor where items visually rest.
 - `FloorGrain*`: subtle line details on the floor; generated back-layer item previews draw above the floor and grain, while active front items draw above back-layer previews.

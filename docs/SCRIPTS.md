@@ -157,6 +157,7 @@ Important constants:
 - `SHELF_CELL_SIZE`: scaled reusable shelf scene bounds; three cells in a row are packed to fill most of the 720 px gameplay viewport, with compact vertical row spacing.
 - `SHELF_SHARED_EDGE_THICKNESS`: shelf boundary thickness that neighboring cells overlap.
 - `SHELF_GRID_STEP`: packed layout spacing after overlapping shared shelf edges.
+- `LAYOUT_ROW_VERTICAL_EPSILON`: tolerance used to group authored layout-template shelf markers into horizontal rows before assigning left/middle/right shelf visuals.
 - `HUD_*`, `ABILITY_BAR_*`, `SHELVES_*`, `RESULT_LABEL_HEIGHT`, and `PAUSE_MENU_PANEL_SIZE`: responsive layout constants for positioning the HUD, ability bar, result overlays, pause panel, and generated shelf root across portrait viewport sizes, including minimum and maximum shelf layout scale.
 - `SHELF_SCENE`: `res://scenes/shelf.tscn`.
 - `MOVING_SHELF_ROW_SCENE`: `res://scenes/moving_shelf_row.tscn`.
@@ -175,11 +176,11 @@ Key responsibilities:
 - Apply responsive layout with `_apply_responsive_layout()`, including safe-area-aware top HUD placement, ability bar placement over the floor/baseboard transition strip, full-screen overlays, centered pause popup, shelf-root scaling, and shelf-root centering between HUD and ability controls.
 - Resize the scene-owned `Background` control so its procedural top strip, shop wall, baseboard, and floor bands fill the active viewport.
 - Load JSON configs with `_load_json_file()`.
-- Instantiate reusable shelf cells with `_add_shelf()`, apply the shared shelf visual scale, and ask `Shelf` to add generated back layers.
+- Instantiate reusable shelf cells with `_add_shelf()`, apply the shared shelf visual scale, assign left/middle/right row placement visuals for static shelves, and ask `Shelf` to add generated back layers.
 - Toggle each shelf scene's hidden `TopCeilingCap`, bottom `Shadow`, and `RightColumnShadow` only when the shelf uses full visuals and has no stacked neighbor above, below, or to the right in the generated layout.
-- Load `layout_preset` scene templates from `scenes/layouts/` and place runtime shelves at their authored `ShelfXX` markers.
-- Build optional `row_layouts` rows with `_add_row_layout_shelves()`, including horizontally wrapping moving rows and static rows mixed in one level.
-- Build moving rows declared by layout template `MovingRowXX` nodes with `scripts/shelf_layout_row.gd`.
+- Load `layout_preset` scene templates from `scenes/layouts/`, group authored `ShelfXX` markers into rows by position, and place runtime shelves with derived row-placement visuals.
+- Build optional `row_layouts` rows with `_add_row_layout_shelves()`, including horizontally wrapping moving rows and static rows mixed in one level. Moving-row shelves currently use the neutral middle row-placement visual.
+- Build moving rows declared by layout template `MovingRowXX` nodes with `scripts/shelf_layout_row.gd`; their shelves also use the neutral middle row-placement visual.
 - Keep moving-row shelves out of drag/drop targeting while they are outside the row's visible window, while abilities still use unlocked shelf items.
 - Spawn configured items with `_add_configured_item()`.
 - Handle mouse and touch input through `_input()` and the press/motion/release helpers.
@@ -233,6 +234,8 @@ Attached to:
 
 Purpose:
 - Owns reusable shelf-cell runtime helpers and back-layer preview presentation.
+- Owns shelf visual switching for `full` versus `floor_only` variants.
+- Owns row-placement visual switching for `left`, `middle`, and `right` shelf cells.
 - Creates generated back-layer slot nodes for one shelf.
 - Applies back-layer preview item scale, tint, visibility, z-index, and disabled collision state.
 
@@ -244,6 +247,10 @@ Important exports:
 - `back_layer_item_modulate`: color used for visible back-layer previews.
 
 Key methods:
+- `set_visual_variant(visual_variant)`: applies `full` or `floor_only` shelf presentation and records the active variant as metadata for `scripts/level.gd` edge-shadow checks.
+- `get_visual_variant()`: returns the active shelf visual variant.
+- `set_row_placement(row_placement)`: applies `left`, `middle`, or `right` row-edge presentation and records the active placement as metadata.
+- `get_row_placement()`: returns the active shelf row placement.
 - `add_back_layer(layer_index, front_slots)`: creates a generated back-layer container and slot nodes aligned to the shelf front slots.
 - `get_back_layer(layer_index)`: returns a generated back-layer container by index.
 - `get_back_layer_name(layer_index)`: centralizes generated back-layer node names.
