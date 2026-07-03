@@ -14,9 +14,6 @@ const PLACEMENT_VISUALS_NODE := "PlacementVisuals"
 const LEFT_PLACEMENT_NODE := "PlacementVisuals/Left"
 const MIDDLE_PLACEMENT_NODE := "PlacementVisuals/Middle"
 const RIGHT_PLACEMENT_NODE := "PlacementVisuals/Right"
-const TOP_CEILING_CAP_NODE := "TopCeilingCap"
-const BOTTOM_SHADOW_NODE := "Shadow"
-const RIGHT_COLUMN_SHADOW_NODE := "RightColumnShadow"
 const FLOOR_ONLY_HIDDEN_NODES := [
 	"BackWall",
 	"BackWallTopShade",
@@ -33,9 +30,6 @@ const FLOOR_ONLY_HIDDEN_NODES := [
 
 var _visual_variant := VISUAL_VARIANT_FULL
 var _row_placement := ROW_PLACEMENT_MIDDLE
-var _should_show_top_ceiling_cap := false
-var _should_show_bottom_shadow := false
-var _should_show_right_column_shadow := false
 
 
 func _ready() -> void:
@@ -54,7 +48,6 @@ func set_visual_variant(visual_variant: String) -> void:
 	set_meta(VISUAL_VARIANT_META, _visual_variant)
 	_apply_visual_variant()
 	_apply_row_placement()
-	_apply_edge_visibility()
 
 
 func get_visual_variant() -> String:
@@ -75,21 +68,6 @@ func set_row_placement(row_placement: String) -> void:
 
 func get_row_placement() -> String:
 	return _row_placement
-
-
-func set_top_ceiling_cap_visible(should_show: bool) -> void:
-	_should_show_top_ceiling_cap = should_show
-	_apply_edge_visibility()
-
-
-func set_bottom_shadow_visible(should_show: bool) -> void:
-	_should_show_bottom_shadow = should_show
-	_apply_edge_visibility()
-
-
-func set_right_column_shadow_visible(should_show: bool) -> void:
-	_should_show_right_column_shadow = should_show
-	_apply_edge_visibility()
 
 
 func add_back_layer(layer_index: int, front_slots: Array[Node2D]) -> Array[Node2D]:
@@ -166,13 +144,6 @@ func _apply_row_placement() -> void:
 	_set_node_visible(LEFT_PLACEMENT_NODE, _row_placement == ROW_PLACEMENT_LEFT)
 	_set_node_visible(MIDDLE_PLACEMENT_NODE, _row_placement == ROW_PLACEMENT_MIDDLE)
 	_set_node_visible(RIGHT_PLACEMENT_NODE, _row_placement == ROW_PLACEMENT_RIGHT)
-
-
-func _apply_edge_visibility() -> void:
-	var uses_full_visuals := _visual_variant == VISUAL_VARIANT_FULL
-	_set_node_visible(TOP_CEILING_CAP_NODE, _should_show_top_ceiling_cap and uses_full_visuals)
-	_set_node_visible(BOTTOM_SHADOW_NODE, _should_show_bottom_shadow and uses_full_visuals)
-	_set_node_visible(RIGHT_COLUMN_SHADOW_NODE, _should_show_right_column_shadow and uses_full_visuals)
 
 
 func _set_node_visible(node_name: String, should_show: bool) -> void:
