@@ -29,6 +29,13 @@ shadow_color = Color(0.2, 0.05, 0.04, 0.36)
 shadow_size = 5
 shadow_offset = Vector2(0, 2)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_combo_fill"]
+bg_color = Color(0.27, 0.8, 0.25, 0.82)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_baseboard"]
 bg_color = Color(0.83, 0.66, 0.47, 1)
 border_width_top = 2
@@ -226,7 +233,7 @@ grow_horizontal = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_hud_center_slot")
 
-[node name="ComboFill" type="ColorRect" parent="Background/HudCenterSlot"]
+[node name="ComboFill" type="Panel" parent="Background/HudCenterSlot"]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -239,7 +246,7 @@ offset_bottom = -3.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.27, 0.8, 0.25, 0.82)
+theme_override_styles/panel = SubResource("StyleBoxFlat_combo_fill")
 
 [node name="ComboLabel" type="Label" parent="Background/HudCenterSlot" unique_id=449182547]
 visible = false
