@@ -33,6 +33,7 @@ const DEFAULT_VISUAL_SCALE := 0.46
 
 var _outline_enabled := false
 var _outline_material: ShaderMaterial
+var _contact_shadow_enabled := true
 
 func _ready() -> void:
 	_prepare_outline_material()
@@ -47,6 +48,11 @@ func set_outline(enabled: bool, color: Color, width: float) -> void:
 	outline_width = width
 
 
+func set_contact_shadow_enabled(enabled: bool) -> void:
+	_contact_shadow_enabled = enabled
+	_apply_texture()
+
+
 func _apply_texture() -> void:
 	var sprite := get_node_or_null("Sprite2D") as Sprite2D
 	if sprite != null:
@@ -58,7 +64,7 @@ func _apply_texture() -> void:
 
 	var shadow := get_node_or_null("Shadow") as CanvasItem
 	if shadow != null:
-		shadow.visible = texture != null
+		shadow.visible = _contact_shadow_enabled and texture != null
 
 
 func _apply_visual_scale() -> void:

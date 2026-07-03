@@ -248,7 +248,7 @@ Key methods:
 - `get_back_layer(layer_index)`: returns a generated back-layer container by index.
 - `get_back_layer_name(layer_index)`: centralizes generated back-layer node names.
 - `configure_back_layer(layer, layer_index)`: shows only the first back layer and hides deeper previews.
-- `configure_back_layer_item(item, should_show)`: applies preview styling and disables input/collision for one back-layer item.
+- `configure_back_layer_item(item, should_show)`: applies preview styling and disables input, collision, and contact shadow rendering for one back-layer item.
 
 Depends on:
 - `ShelfItem` from `scripts/item.gd`.
@@ -356,6 +356,7 @@ Key methods:
 - `_apply_texture()`: updates `Sprite2D.texture` and hides the soft contact shadow when the item has no texture.
 - `_apply_visual_scale()`: updates `Sprite2D`, `OutlineSprite`, and contact-shadow scale.
 - `set_outline(enabled, color, width)`: enables or disables the sprite border highlight.
+- `set_contact_shadow_enabled(enabled)`: toggles the item contact shadow while still respecting texture availability.
 - `_apply_outline()`: sends outline properties to the `OutlineSprite` shader material and keeps the outline node visible only while enabled.
 
 Depends on:

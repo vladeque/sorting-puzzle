@@ -2044,6 +2044,7 @@ func _finish_layer_promotion_item(entry: Dictionary) -> void:
 	item.z_index = 10
 	item.modulate = Color.WHITE
 	item.visual_scale = float(entry.get("target_visual_scale", item.visual_scale))
+	item.set_contact_shadow_enabled(true)
 	item.input_pickable = true
 	_unmark_item_transitioning_by_id(item.get_instance_id())
 

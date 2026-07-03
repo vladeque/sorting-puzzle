@@ -226,7 +226,7 @@ Purpose:
 - In generated shelves, the owning shelf cell scale enlarges the item sprite, shadow, and hit area together with the shelf visuals.
 
 Important nodes:
-- `Shadow`: solid-color up-right cast shadow behind the item sprite and below generated back-layer item previews.
+- `Shadow`: solid-color up-right cast shadow behind front-layer item sprites; generated back-layer previews disable it.
 - `OutlineSprite`: hidden sprite used by `ShelfItem` to draw alpha-based highlight borders.
 - `Sprite2D`: main item sprite; texture and visual scale are controlled by `ShelfItem`.
 - `CollisionShape2D`: rectangular item hitbox used by runtime interaction.

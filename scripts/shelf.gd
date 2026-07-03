@@ -51,6 +51,7 @@ func configure_back_layer_item(item: ShelfItem, should_show: bool) -> void:
 	item.z_index = back_layer_item_z_index
 	item.modulate = back_layer_item_modulate if should_show else Color.TRANSPARENT
 	item.input_pickable = false
+	item.set_contact_shadow_enabled(false)
 	item.visual_scale *= back_layer_item_scale
 
 	var collision := item.get_node_or_null("CollisionShape2D") as CollisionShape2D

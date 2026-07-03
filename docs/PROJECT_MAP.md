@@ -147,7 +147,7 @@ Files:
 Responsibility:
 - Represents one sortable item as an `Area2D`.
 - Stores `item_id`.
-- Applies texture and visual scale to its `Sprite2D` and shared opaque up-right cast shadow, which stays below shelf floor details and generated back-layer item previews.
+- Applies texture and visual scale to its `Sprite2D` and shared opaque up-right cast shadow, which is disabled for generated back-layer item previews.
 - Draws reusable alpha-based sprite outlines for item highlight states.
 
 Change here when:
