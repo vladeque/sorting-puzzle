@@ -195,7 +195,7 @@ Purpose:
 Important nodes:
 - `BackWall`: muted panel behind shelf items.
 - `BackWallLeftShade` and `BackWallTopShade`: soft interior wall shadow layers behind items. `BackWallLeftShade` is shown only for left-placement full shelves.
-- `Ceiling`, `TopCeilingCap`, `LeftWall`, and `RightWall`: wooden cell frame. `LeftWall` is shown only for left-placement full shelves, `RightWall` only for right-placement full shelves, and middle-placement full shelves hide both outer side walls. `TopCeilingCap` is hidden in the scene and shown at runtime only for top shelves.
+- `Ceiling`, `TopCeilingCap`, `LeftWall`, and `RightWall`: wooden cell frame. `LeftWall` is shown only for left-placement full shelves, while `RightWall` stays visible on every full shelf so adjacent shelves keep a shared divider and the last shelf keeps its outer right edge. `TopCeilingCap` is hidden in the scene and shown at runtime only for top shelves.
 - `Shadow` and `RightColumnShadow`: solid-color perspective cast shadows, shown at runtime only for bottom shelves and far-right shelf columns, drawn below generated back-layer item previews.
 - `FloorSurface` and `FloorFrontLip`: wooden floor where items visually rest.
 - `FloorGrain*`: subtle line details on the floor; generated back-layer item previews draw above the floor and grain, while active front items draw above back-layer previews.

@@ -149,7 +149,7 @@ func _apply_row_placement() -> void:
 
 	_set_node_visible("BackWallLeftShade", _row_placement == ROW_PLACEMENT_LEFT)
 	_set_node_visible("LeftWall", _row_placement == ROW_PLACEMENT_LEFT)
-	_set_node_visible("RightWall", _row_placement == ROW_PLACEMENT_RIGHT)
+	_set_node_visible("RightWall", true)
 
 
 func _set_node_visible(node_name: String, should_show: bool) -> void:
