@@ -1356,6 +1356,7 @@ func _fail_level() -> void:
 	_update_pause_menu_button()
 
 	if _dragged_item != null and _origin_slot != null:
+		_dragged_item.set_contact_shadow_enabled(true)
 		_place_item_in_slot(_dragged_item, _origin_slot)
 
 	_dragged_item = null
@@ -1376,6 +1377,8 @@ func _complete_level() -> void:
 		PlayerProgress.complete_level(selected_level)
 	_clear_selected_item()
 	_set_moving_shelf_rows_paused(true)
+	if _dragged_item != null:
+		_dragged_item.set_contact_shadow_enabled(true)
 	_dragged_item = null
 	_origin_slot = null
 	_drag_offset = Vector2.ZERO
@@ -1575,6 +1578,7 @@ func _begin_drag(item: ShelfItem, pointer_global_position: Vector2) -> void:
 	_drag_offset = item.global_position - pointer_global_position
 	item.reparent(_drag_layer, true)
 	item.z_index = 100
+	item.set_contact_shadow_enabled(false)
 	item.global_position = pointer_global_position + _drag_offset
 
 
@@ -1593,6 +1597,7 @@ func _finish_active_drag(pointer_global_position: Vector2) -> void:
 	var item := _dragged_item
 	var origin_slot := _origin_slot
 	var target_slot := _find_nearest_slot(pointer_global_position)
+	item.set_contact_shadow_enabled(true)
 	if target_slot == null:
 		_return_item_to_origin_after_animation(item, origin_slot)
 	elif target_slot == origin_slot:
@@ -2247,6 +2252,7 @@ func _cancel_active_interaction() -> void:
 	_clear_selected_item()
 
 	if _dragged_item != null and _origin_slot != null:
+		_dragged_item.set_contact_shadow_enabled(true)
 		_place_item_in_slot(_dragged_item, _origin_slot)
 
 	_dragged_item = null

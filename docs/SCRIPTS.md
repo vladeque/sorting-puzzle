@@ -185,6 +185,7 @@ Key responsibilities:
 - Spawn configured items with `_add_configured_item()`.
 - Handle mouse and touch input through `_input()` and the press/motion/release helpers.
 - Move items with `_move_item_to_slot()`, `_resolve_move_target_slot()`, `_play_item_move_animation()`, and `_place_item_in_slot()`.
+- Hide the active item's contact shadow while the player is dragging it, then restore the shadow when the drag releases, cancels, fails, or completes.
 - Redirect moves aimed at an occupied destination slot on another shelf to the nearest free front slot on that destination shelf; same-shelf occupied targets leave the item in its original slot.
 - Clear triples with `_clear_matching_shelves()` and `_play_match_clear_animation()`.
 - Track the active triple-clear combo with `_extend_combo()`, `_update_combo_timer()`, `_reset_combo()`, and `_update_combo_label()`.
@@ -364,7 +365,7 @@ Key methods:
 - `_apply_texture()`: updates `Sprite2D.texture` and hides the soft contact shadow when the item has no texture.
 - `_apply_visual_scale()`: updates `Sprite2D`, `OutlineSprite`, and contact-shadow scale.
 - `set_outline(enabled, color, width)`: enables or disables the sprite border highlight.
-- `set_contact_shadow_enabled(enabled)`: toggles the item contact shadow while still respecting texture availability.
+- `set_contact_shadow_enabled(enabled)`: toggles the item contact shadow while still respecting texture availability; used by back-layer previews and active player dragging.
 - `_apply_outline()`: sends outline properties to the `OutlineSprite` shader material and keeps the outline node visible only while enabled.
 
 Depends on:
