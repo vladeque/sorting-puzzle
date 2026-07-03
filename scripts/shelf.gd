@@ -8,7 +8,7 @@ const FIRST_BACK_LAYER_INDEX := 1
 @export var back_layer_z_index := 4
 @export var back_layer_item_z_index := 0
 @export var back_layer_item_scale := 0.86
-@export var back_layer_item_modulate := Color(0.42, 0.42, 0.42, 0.34)
+@export var back_layer_item_modulate := Color(0.376, 0.376, 0.376, 0.706)
 
 
 func add_back_layer(layer_index: int, front_slots: Array[Node2D]) -> Array[Node2D]:
