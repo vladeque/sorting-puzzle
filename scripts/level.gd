@@ -1043,6 +1043,11 @@ func _get_shelf_root_local_position(shelf: Node2D) -> Vector2:
 
 
 func _set_shelf_top_ceiling_cap_visible(shelf: Node2D, should_show: bool) -> void:
+	var shelf_cell := shelf as Shelf
+	if shelf_cell != null:
+		shelf_cell.set_top_ceiling_cap_visible(should_show)
+		return
+
 	var cap := shelf.get_node_or_null(SHELF_TOP_CEILING_CAP_NAME) as CanvasItem
 	if cap == null:
 		return
@@ -1052,6 +1057,11 @@ func _set_shelf_top_ceiling_cap_visible(shelf: Node2D, should_show: bool) -> voi
 
 
 func _set_shelf_bottom_shadow_visible(shelf: Node2D, should_show: bool) -> void:
+	var shelf_cell := shelf as Shelf
+	if shelf_cell != null:
+		shelf_cell.set_bottom_shadow_visible(should_show)
+		return
+
 	var shadow := shelf.get_node_or_null(SHELF_BOTTOM_SHADOW_NAME) as CanvasItem
 	if shadow == null:
 		return
@@ -1061,6 +1071,11 @@ func _set_shelf_bottom_shadow_visible(shelf: Node2D, should_show: bool) -> void:
 
 
 func _set_shelf_right_column_shadow_visible(shelf: Node2D, should_show: bool) -> void:
+	var shelf_cell := shelf as Shelf
+	if shelf_cell != null:
+		shelf_cell.set_right_column_shadow_visible(should_show)
+		return
+
 	var shadow := shelf.get_node_or_null(SHELF_RIGHT_COLUMN_SHADOW_NAME) as CanvasItem
 	if shadow == null:
 		return
