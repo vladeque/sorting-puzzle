@@ -190,7 +190,7 @@ Important nodes:
 - `BackWall`: muted panel behind shelf items.
 - `BackWallLeftShade` and `BackWallTopShade`: soft interior wall shadow layers behind items.
 - `Ceiling`, `TopCeilingCap`, `LeftWall`, and `RightWall`: wooden cell frame. `TopCeilingCap` is hidden in the scene and shown at runtime only for top shelves.
-- `Shadow` and `RightColumnShadow`: solid-color perspective cast shadows, shown at runtime only for bottom shelves and far-right shelf columns.
+- `Shadow` and `RightColumnShadow`: solid-color perspective cast shadows, shown at runtime only for bottom shelves and far-right shelf columns, drawn below generated back-layer item previews.
 - `FloorSurface` and `FloorFrontLip`: wooden floor where items visually rest.
 - `FloorGrain*`: subtle line details on the floor.
 - `LockedOverlay`: hidden lock overlay used for triple-gated shelves.
@@ -221,7 +221,7 @@ Purpose:
 - In generated shelves, the owning shelf cell scale enlarges the item sprite, shadow, and hit area together with the shelf visuals.
 
 Important nodes:
-- `Shadow`: solid-color up-right cast shadow behind the item sprite.
+- `Shadow`: solid-color up-right cast shadow behind the item sprite and below generated back-layer item previews.
 - `OutlineSprite`: hidden sprite used by `ShelfItem` to draw alpha-based highlight borders.
 - `Sprite2D`: main item sprite; texture and visual scale are controlled by `ShelfItem`.
 - `CollisionShape2D`: rectangular item hitbox used by runtime interaction.
