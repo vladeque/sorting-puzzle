@@ -35,6 +35,7 @@ z_index = 10
 script = ExtResource("1_item_script")
 
 [node name="Shadow" type="Polygon2D" parent="." unique_id=1649807921]
+visible = false
 z_index = -4
 position = Vector2(6, 42)
 color = Color(0.5, 0.31, 0.15, 1)
