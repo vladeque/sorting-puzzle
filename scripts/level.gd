@@ -10,8 +10,6 @@ const SHELF_SHARED_EDGE_THICKNESS := SHELF_BASE_SHARED_EDGE_THICKNESS * SHELF_CE
 const SHELF_GRID_STEP := SHELF_CELL_SIZE - Vector2(SHELF_SHARED_EDGE_THICKNESS, SHELF_SHARED_EDGE_THICKNESS)
 const BASE_SLOT_SNAP_DISTANCE := 98.0
 const BASE_ITEM_PICK_SIZE := Vector2(74, 112)
-const BACK_LAYER_PREFIX := "ShelfLayer"
-const FIRST_BACK_LAYER_INDEX := 1
 const ABILITY_HAMMER := &"hammer"
 const ABILITY_SHUFFLE := &"shuffle"
 const ABILITY_HIGHLIGHT := &"highlight"
@@ -81,9 +79,6 @@ const SHELF_FLOOR_ONLY_HIDDEN_NODES := [
 @export var slot_snap_distance := BASE_SLOT_SNAP_DISTANCE * SHELF_CELL_VISUAL_SCALE
 @export var item_pick_size := BASE_ITEM_PICK_SIZE * SHELF_CELL_VISUAL_SCALE
 @export var drag_start_distance := 12.0
-@export var back_layer_offset := Vector2(0, -10)
-@export var back_layer_item_scale := 0.86
-@export var back_layer_item_modulate := Color(0.42, 0.42, 0.42, 0.34)
 @export var layer_promotion_duration_seconds := 0.22
 @export var item_move_duration_seconds := 0.16
 @export var highlight_outline_color := Color(1.0, 0.86, 0.18, 1.0)
@@ -746,7 +741,7 @@ func _add_moving_shelf_row(
 		_configure_shelf_from_config(shelf, shelf_config, false)
 
 
-func _configure_shelf_from_config(shelf: Node2D, shelf_config: Dictionary, allow_locked := true) -> void:
+func _configure_shelf_from_config(shelf: Shelf, shelf_config: Dictionary, allow_locked := true) -> void:
 	var layers := shelf_config.get("layers", []) as Array
 	_max_layer_count = maxi(_max_layer_count, layers.size())
 	_add_configured_layers(shelf, layers)
@@ -1011,8 +1006,8 @@ func _get_grid_layout_positions(columns: int, shelf_count: int) -> Array[Vector2
 	return positions
 
 
-func _add_shelf(parent: Node, shelf_number: int, shelf_position: Vector2) -> Node2D:
-	var shelf := SHELF_SCENE.instantiate() as Node2D
+func _add_shelf(parent: Node, shelf_number: int, shelf_position: Vector2) -> Shelf:
+	var shelf := SHELF_SCENE.instantiate() as Shelf
 	shelf.name = "Shelf%02d" % shelf_number
 	shelf.position = shelf_position
 	shelf.scale = Vector2.ONE * SHELF_CELL_VISUAL_SCALE
@@ -1022,7 +1017,7 @@ func _add_shelf(parent: Node, shelf_number: int, shelf_position: Vector2) -> Nod
 	return shelf
 
 
-func _add_configured_layers(shelf: Node2D, layers: Array) -> void:
+func _add_configured_layers(shelf: Shelf, layers: Array) -> void:
 	for layer_index in range(layers.size()):
 		var item_ids := layers[layer_index] as Array
 		if item_ids == null:
@@ -1032,7 +1027,7 @@ func _add_configured_layers(shelf: Node2D, layers: Array) -> void:
 		if item_ids.size() != SLOT_COUNT:
 			push_warning("%s layer %s expected %s slots, found %s." % [shelf.name, layer_index + 1, SLOT_COUNT, item_ids.size()])
 
-		var layer_slots := _get_front_slots(shelf) if layer_index == 0 else _add_back_layer(shelf, layer_index)
+		var layer_slots := _get_front_slots(shelf) if layer_index == 0 else shelf.add_back_layer(layer_index, _get_front_slots(shelf))
 		var fill_count = mini(SLOT_COUNT, item_ids.size())
 		for slot_index in range(fill_count):
 			_add_configured_item(layer_slots[slot_index], item_ids[slot_index], layer_index, slot_index)
@@ -1167,20 +1162,6 @@ func _update_shelf_input_pickable(shelf: Node, should_enable: bool) -> void:
 		item.input_pickable = should_enable and not _is_item_busy(item)
 
 
-func _add_back_layer(shelf: Node2D, layer_index: int) -> Array[Node2D]:
-	var layer := Node2D.new()
-	layer.name = _get_back_layer_name(layer_index)
-	layer.z_index = 4
-	layer.visible = layer_index == FIRST_BACK_LAYER_INDEX
-	shelf.add_child(layer)
-
-	var layer_slots: Array[Node2D] = []
-	for front_slot in _get_front_slots(shelf):
-		layer_slots.append(_add_layer_slot(layer, front_slot))
-
-	return layer_slots
-
-
 func _add_configured_item(slot: Node2D, item_value, layer_index: int, slot_index: int) -> void:
 	if item_value == null:
 		return
@@ -1200,7 +1181,9 @@ func _add_configured_item(slot: Node2D, item_value, layer_index: int, slot_index
 	slot.add_child(item)
 
 	if layer_index > 0:
-		_configure_back_layer_item(item, layer_index == FIRST_BACK_LAYER_INDEX)
+		var shelf := _get_owning_shelf(slot) as Shelf
+		if shelf != null:
+			shelf.configure_back_layer_item(item, layer_index == Shelf.FIRST_BACK_LAYER_INDEX)
 
 
 func _collect_slots() -> void:
@@ -1211,10 +1194,6 @@ func _collect_slots() -> void:
 			_slots.append(slot)
 
 
-func _get_back_layer_name(layer_index: int) -> String:
-	return "%s%02d" % [BACK_LAYER_PREFIX, layer_index + 1]
-
-
 func _get_front_slots(shelf: Node) -> Array[Node2D]:
 	var front_slots: Array[Node2D] = []
 	for child in shelf.get_children():
@@ -1223,26 +1202,6 @@ func _get_front_slots(shelf: Node) -> Array[Node2D]:
 			front_slots.append(slot)
 
 	return front_slots
-
-
-func _add_layer_slot(layer: Node2D, front_slot: Node2D) -> Node2D:
-	var layer_slot := Node2D.new()
-	layer_slot.name = "Layer%s" % front_slot.name
-	layer_slot.position = front_slot.position + back_layer_offset
-	layer.add_child(layer_slot)
-
-	return layer_slot
-
-
-func _configure_back_layer_item(item: ShelfItem, should_show: bool) -> void:
-	item.z_index = 2
-	item.modulate = back_layer_item_modulate if should_show else Color.TRANSPARENT
-	item.input_pickable = false
-	item.visual_scale *= back_layer_item_scale
-
-	var collision := item.get_node_or_null("CollisionShape2D") as CollisionShape2D
-	if collision != null:
-		collision.disabled = true
 
 
 func _update_timer_label() -> void:
@@ -1977,7 +1936,11 @@ func _front_layer_is_empty(shelf: Node) -> bool:
 
 
 func _promote_back_layer(shelf: Node2D) -> bool:
-	var next_layer := shelf.get_node_or_null(_get_back_layer_name(FIRST_BACK_LAYER_INDEX)) as Node2D
+	var shelf_cell := shelf as Shelf
+	if shelf_cell == null:
+		return false
+
+	var next_layer := shelf_cell.get_back_layer(Shelf.FIRST_BACK_LAYER_INDEX)
 	if next_layer == null:
 		return false
 
@@ -1995,15 +1958,16 @@ func _promote_back_layer(shelf: Node2D) -> bool:
 
 	shelf.remove_child(next_layer)
 	next_layer.free()
-	_advance_back_layers(shelf)
+	_advance_back_layers(shelf_cell)
 	await _play_layer_promotion_animation(promotion_entries)
 	return true
 
 
 func _prepare_layer_promotion_item(item: ShelfItem, front_slot: Node2D) -> Dictionary:
 	var target_visual_scale := item.visual_scale
-	if back_layer_item_scale > 0.0:
-		target_visual_scale /= back_layer_item_scale
+	var shelf := _get_owning_shelf(front_slot) as Shelf
+	if shelf != null and shelf.back_layer_item_scale > 0.0:
+		target_visual_scale /= shelf.back_layer_item_scale
 
 	item.reparent(front_slot, true)
 	item.z_index = 8
@@ -2090,28 +2054,14 @@ func _finish_layer_promotion_item(entry: Dictionary) -> void:
 	_apply_item_visual_state(item)
 
 
-func _advance_back_layers(shelf: Node2D) -> void:
-	for layer_index in range(FIRST_BACK_LAYER_INDEX + 1, _max_layer_count):
-		var layer := shelf.get_node_or_null(_get_back_layer_name(layer_index)) as Node2D
+func _advance_back_layers(shelf: Shelf) -> void:
+	for layer_index in range(Shelf.FIRST_BACK_LAYER_INDEX + 1, _max_layer_count):
+		var layer := shelf.get_back_layer(layer_index)
 		if layer == null:
 			continue
 
-		layer.name = _get_back_layer_name(layer_index - 1)
-		_configure_back_layer(layer, layer_index - 1)
-
-
-func _configure_back_layer(layer: Node2D, layer_index: int) -> void:
-	var should_show := layer_index == FIRST_BACK_LAYER_INDEX
-	layer.visible = should_show
-
-	for layer_slot in layer.get_children():
-		var slot := layer_slot as Node2D
-		if slot == null:
-			continue
-
-		var item := _get_slot_item(slot)
-		if item != null:
-			item.modulate = back_layer_item_modulate if should_show else Color.TRANSPARENT
+		layer.name = shelf.get_back_layer_name(layer_index - 1)
+		shelf.configure_back_layer(layer, layer_index - 1)
 
 
 func _get_shelf_items(shelf: Node) -> Array[ShelfItem]:
@@ -2579,11 +2529,11 @@ func _get_first_back_layer_items() -> Array[ShelfItem]:
 		if _is_shelf_locked(shelf):
 			continue
 
-		var shelf_node := shelf as Node2D
+		var shelf_node := shelf as Shelf
 		if shelf_node == null:
 			continue
 
-		var back_layer := shelf_node.get_node_or_null(_get_back_layer_name(FIRST_BACK_LAYER_INDEX)) as Node2D
+		var back_layer := shelf_node.get_back_layer(Shelf.FIRST_BACK_LAYER_INDEX)
 		if back_layer == null:
 			continue
 

@@ -1,8 +1,10 @@
-[gd_scene format=3 uid="uid://snc20hx11yql"]
+[gd_scene load_steps=3 format=3 uid="uid://snc20hx11yql"]
 
 [ext_resource type="Texture2D" uid="uid://7lmfd8og03cd" path="res://assets/ui/lock_shelf_cutout.png" id="1_lock_shelf"]
+[ext_resource type="Script" path="res://scripts/shelf.gd" id="1_shelf_script"]
 
 [node name="Shelf" type="Node2D" unique_id=961540884]
+script = ExtResource("1_shelf_script")
 
 [node name="Shadow" type="Polygon2D" parent="." unique_id=1166351438]
 visible = false

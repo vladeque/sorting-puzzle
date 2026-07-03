@@ -134,9 +134,6 @@ Important exports:
 - `slot_snap_distance`: maximum snap distance for drag or tap placement, sized for the wider shelf spacing.
 - `item_pick_size`: rectangle used to detect clicked or touched visible items at the default item scale.
 - `drag_start_distance`: pointer movement required to convert a press into a drag.
-- `back_layer_offset`: visual offset for hidden/upcoming shelf layers.
-- `back_layer_item_scale`: scale multiplier for back-layer item previews.
-- `back_layer_item_modulate`: color used for visible back-layer previews.
 - `layer_promotion_duration_seconds`: duration for back-layer items to slide forward into active front slots.
 - `item_move_duration_seconds`: duration for moved items to slide into destination slots after tap or drag placement, including invalid drag returns.
 - `highlight_outline_color`: border color used by the highlight ability.
@@ -178,7 +175,7 @@ Key responsibilities:
 - Apply responsive layout with `_apply_responsive_layout()`, including safe-area-aware top HUD placement, ability bar placement over the floor/baseboard transition strip, full-screen overlays, centered pause popup, shelf-root scaling, and shelf-root centering between HUD and ability controls.
 - Resize the scene-owned `Background` control so its procedural top strip, shop wall, baseboard, and floor bands fill the active viewport.
 - Load JSON configs with `_load_json_file()`.
-- Instantiate reusable shelf cells with `_add_shelf()`, apply the shared shelf visual scale, and add generated back layers with `_add_back_layer()`.
+- Instantiate reusable shelf cells with `_add_shelf()`, apply the shared shelf visual scale, and ask `Shelf` to add generated back layers.
 - Toggle each shelf scene's hidden `TopCeilingCap`, bottom `Shadow`, and `RightColumnShadow` only when the shelf uses full visuals and has no stacked neighbor above, below, or to the right in the generated layout.
 - Load `layout_preset` scene templates from `scenes/layouts/` and place runtime shelves at their authored `ShelfXX` markers.
 - Build optional `row_layouts` rows with `_add_row_layout_shelves()`, including horizontally wrapping moving rows and static rows mixed in one level.
@@ -211,6 +208,7 @@ Key responsibilities:
 Depends on:
 - `level.tscn` node names and paths.
 - `scenes/shelf.tscn` slot names and item snap marker names.
+- `scripts/shelf.gd` for generated back-layer preview setup.
 - `scenes/shelf.tscn` `LockedOverlay/RemainingLabel` for locked shelf progress display on the lock image.
 - `scenes/moving_shelf_row.tscn` for optional row-layout movement and clipping.
 - `scenes/layouts/layout_*.tscn` for named layout preset placement.
@@ -224,6 +222,40 @@ Depends on:
 Do not use for:
 - Offline level generation or solvability search. Keep that in `scripts/tools/`.
 - Save data ownership. Keep that in `scripts/player_progress.gd`.
+
+## `scripts/shelf.gd`
+
+Class:
+- `Shelf`
+
+Attached to:
+- `scenes/shelf.tscn` root `Shelf`.
+
+Purpose:
+- Owns reusable shelf-cell runtime helpers and back-layer preview presentation.
+- Creates generated back-layer slot nodes for one shelf.
+- Applies back-layer preview item scale, tint, visibility, z-index, and disabled collision state.
+
+Important exports:
+- `back_layer_offset`: visual offset for generated hidden/upcoming shelf layers.
+- `back_layer_z_index`: z-index used by generated back-layer container nodes.
+- `back_layer_item_z_index`: z-index used by generated back-layer preview items.
+- `back_layer_item_scale`: scale multiplier for back-layer item previews.
+- `back_layer_item_modulate`: color used for visible back-layer previews.
+
+Key methods:
+- `add_back_layer(layer_index, front_slots)`: creates a generated back-layer container and slot nodes aligned to the shelf front slots.
+- `get_back_layer(layer_index)`: returns a generated back-layer container by index.
+- `get_back_layer_name(layer_index)`: centralizes generated back-layer node names.
+- `configure_back_layer(layer, layer_index)`: shows only the first back layer and hides deeper previews.
+- `configure_back_layer_item(item, should_show)`: applies preview styling and disables input/collision for one back-layer item.
+
+Depends on:
+- `ShelfItem` from `scripts/item.gd`.
+- Front slot node names from `scenes/shelf.tscn`.
+
+Do not use for:
+- Level JSON parsing, item identity assignment, matching, abilities, lock progression, or promotion timing. Those stay in `scripts/level.gd`.
 
 ## `scripts/shelf_layout_row.gd`
 

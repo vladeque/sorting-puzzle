@@ -176,9 +176,13 @@ Do not use for:
 Root:
 - `Shelf` (`Node2D`)
 
+Script:
+- `scripts/shelf.gd`
+
 Purpose:
 - Reusable shelf cell instantiated by `scripts/level.gd` for each configured shelf.
 - Owns the visible shelf back wall, floor, frame, front slot positions, and item snap markers.
+- Owns generated back-layer slot layout and preview styling defaults through `scripts/shelf.gd`.
 - Owns soft internal left/top wall shadows, the hidden diagonal bottom cast shadow, the hidden top ceiling cap, and the hidden right-column cast shadow toggled by `scripts/level.gd`.
 - Uses opaque pre-blended shadow colors so overlapping shadow polygons do not compound into darker patches.
 - Owns the hidden locked-shelf overlay visuals shown by `scripts/level.gd` when a level config gates the shelf behind cleared triples.
@@ -200,11 +204,12 @@ Important nodes:
 - `SlotXX/ItemSlotXX`: marker positions used by `scripts/level.gd` for snap targeting.
 
 Depends on:
+- `scripts/shelf.gd` for generated back-layer preview setup.
 - `assets/ui/lock_shelf_cutout.png` for locked shelf overlay art with a clear center panel for the count label.
 - Runtime item spawning from `scripts/level.gd`.
 
 Do not use for:
-- Level timing, matching, input handling, lock progression, or back-layer promotion. Those stay in `scripts/level.gd`.
+- Level timing, matching, input handling, lock progression, item identity assignment, or back-layer promotion timing. Those stay in `scripts/level.gd`.
 
 ## `scenes/item.tscn`
 

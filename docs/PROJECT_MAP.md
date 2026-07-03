@@ -125,15 +125,17 @@ Change here when:
 
 Files:
 - `scenes/shelf.tscn`
+- `scripts/shelf.gd`
 
 Responsibility:
 - Defines the reusable shelf cell visuals, front slots, and item snap markers.
+- Owns generated back-layer slot layout and preview styling defaults.
 - Contains the visible back wall, opaque non-compounding interior/cast shadows, wood floor, frame, floor lip, floor grain nodes, and hidden edge details shown by `scripts/level.gd` for shelves with no stacked neighbor above, below, or to the right. Shelf cast shadows draw below generated back-layer item previews.
 - Contains the hidden lock overlay used by triple-gated shelves; `scripts/level.gd` toggles it and fits the remaining count onto the lock center panel.
 - Keeps the shelf width, height, and slot positions aligned with the level grid constants so a three-shelf row fills most of the gameplay viewport.
 
 Change here when:
-- Editing shelf visual details, locked shelf overlay visuals, front slot positions, item snap marker positions, or cell art node names.
+- Editing shelf visual details, back-layer preview presentation, locked shelf overlay visuals, front slot positions, item snap marker positions, or cell art node names.
 
 ### Item Runtime
 
