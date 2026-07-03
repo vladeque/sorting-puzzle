@@ -14,6 +14,7 @@ const PLACEMENT_VISUALS_NODE := "PlacementVisuals"
 const LEFT_PLACEMENT_NODE := "PlacementVisuals/Left"
 const MIDDLE_PLACEMENT_NODE := "PlacementVisuals/Middle"
 const RIGHT_PLACEMENT_NODE := "PlacementVisuals/Right"
+const TOP_CEILING_CAP_NODE := "TopCeilingCap"
 const FLOOR_ONLY_HIDDEN_NODES := [
 	"BackWall",
 	"BackWallTopShade",
@@ -30,6 +31,7 @@ const FLOOR_ONLY_HIDDEN_NODES := [
 
 var _visual_variant := VISUAL_VARIANT_FULL
 var _row_placement := ROW_PLACEMENT_MIDDLE
+var _should_show_top_ceiling_cap := false
 
 
 func _ready() -> void:
@@ -48,6 +50,7 @@ func set_visual_variant(visual_variant: String) -> void:
 	set_meta(VISUAL_VARIANT_META, _visual_variant)
 	_apply_visual_variant()
 	_apply_row_placement()
+	_apply_top_ceiling_cap_visibility()
 
 
 func get_visual_variant() -> String:
@@ -64,10 +67,16 @@ func set_row_placement(row_placement: String) -> void:
 
 	set_meta(ROW_PLACEMENT_META, _row_placement)
 	_apply_row_placement()
+	_apply_top_ceiling_cap_visibility()
 
 
 func get_row_placement() -> String:
 	return _row_placement
+
+
+func set_top_ceiling_cap_visible(should_show: bool) -> void:
+	_should_show_top_ceiling_cap = should_show
+	_apply_top_ceiling_cap_visibility()
 
 
 func add_back_layer(layer_index: int, front_slots: Array[Node2D]) -> Array[Node2D]:
@@ -144,6 +153,13 @@ func _apply_row_placement() -> void:
 	_set_node_visible(LEFT_PLACEMENT_NODE, _row_placement == ROW_PLACEMENT_LEFT)
 	_set_node_visible(MIDDLE_PLACEMENT_NODE, _row_placement == ROW_PLACEMENT_MIDDLE)
 	_set_node_visible(RIGHT_PLACEMENT_NODE, _row_placement == ROW_PLACEMENT_RIGHT)
+
+
+func _apply_top_ceiling_cap_visibility() -> void:
+	var should_show := _should_show_top_ceiling_cap and _visual_variant == VISUAL_VARIANT_FULL
+	_set_node_visible(TOP_CEILING_CAP_NODE, should_show)
+	for placement_node in [LEFT_PLACEMENT_NODE, MIDDLE_PLACEMENT_NODE, RIGHT_PLACEMENT_NODE]:
+		_set_node_visible("%s/%s" % [placement_node, TOP_CEILING_CAP_NODE], should_show)
 
 
 func _set_node_visible(node_name: String, should_show: bool) -> void:

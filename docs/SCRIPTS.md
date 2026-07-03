@@ -177,7 +177,7 @@ Key responsibilities:
 - Resize the scene-owned `Background` control so its procedural top strip, shop wall, baseboard, and floor bands fill the active viewport.
 - Load JSON configs with `_load_json_file()`.
 - Instantiate reusable shelf cells with `_add_shelf()`, apply the shared shelf visual scale, assign left/middle/right row placement visuals for static shelves, and ask `Shelf` to add generated back layers.
-- Toggle each shelf scene's hidden `TopCeilingCap`, bottom `Shadow`, and `RightColumnShadow` only when the shelf uses full visuals and has no stacked neighbor above, below, or to the right in the generated layout.
+- Ask each shelf scene to show or hide its placement-specific `TopCeilingCap` when it has no stacked neighbor above. Toggle each shelf scene's hidden bottom `Shadow` and `RightColumnShadow` only when the shelf uses full visuals and has no stacked neighbor below or to the right in the generated layout.
 - Load `layout_preset` scene templates from `scenes/layouts/`, group authored `ShelfXX` markers into rows by position, and place runtime shelves with derived row-placement visuals.
 - Build optional `row_layouts` rows with `_add_row_layout_shelves()`, including horizontally wrapping moving rows and static rows mixed in one level. Moving-row shelves currently use the neutral middle row-placement visual.
 - Build moving rows declared by layout template `MovingRowXX` nodes with `scripts/shelf_layout_row.gd`; their shelves also use the neutral middle row-placement visual.
@@ -251,6 +251,7 @@ Key methods:
 - `get_visual_variant()`: returns the active shelf visual variant.
 - `set_row_placement(row_placement)`: toggles the matching `PlacementVisuals/Left`, `PlacementVisuals/Middle`, or `PlacementVisuals/Right` container and records the active placement as metadata.
 - `get_row_placement()`: returns the active shelf row placement.
+- `set_top_ceiling_cap_visible(should_show)`: applies layout-derived visibility to every placement-specific `TopCeilingCap`, gated by the active shelf visual variant.
 - `add_back_layer(layer_index, front_slots)`: creates a generated back-layer container and slot nodes aligned to the shelf front slots.
 - `get_back_layer(layer_index)`: returns a generated back-layer container by index.
 - `get_back_layer_name(layer_index)`: centralizes generated back-layer node names.
