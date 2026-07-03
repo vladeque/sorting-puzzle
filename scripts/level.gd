@@ -48,7 +48,6 @@ const SHELF_RIGHT_STACK_MIN_VERTICAL_OVERLAP := 0.35
 const HUD_TOP_MARGIN := 28.0
 const HUD_SIDE_MARGIN := 24.0
 const COMBO_FILL_INSET := 3.0
-const COMBO_VALUE_PER_TRIPLE := 10
 const LEVEL_LABEL_MARGIN_LEFT := 32.0
 const LEVEL_LABEL_TOP := 42.0
 const LEVEL_LABEL_SIZE := Vector2(194, 40)
@@ -1356,10 +1355,10 @@ func _extend_combo(triple_count: int) -> int:
 	var combo_is_active := _combo_count > 0 and _combo_time_remaining > 0.0
 	for _triple_index in range(triple_count):
 		if not combo_is_active:
-			_combo_count = COMBO_VALUE_PER_TRIPLE
+			_combo_count = 1
 			combo_is_active = true
 		else:
-			_combo_count += COMBO_VALUE_PER_TRIPLE
+			_combo_count += 1
 
 		earned_stars += _combo_count
 
