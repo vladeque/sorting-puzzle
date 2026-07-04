@@ -21,7 +21,7 @@ Key constants:
 
 Important nodes:
 - `%BottomBar`: bottom-anchored container positioned at runtime with safe-area padding.
-- `%LevelButton`: starts the saved campaign level.
+- `%LevelButton`: `scenes/ui/level_button.tscn` instance that starts the saved campaign level.
 
 Key methods:
 - `_ready()`: loads progress, wires the level button, and applies responsive layout.

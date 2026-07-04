@@ -1,84 +1,8 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Texture2D" uid="uid://dwm7nk7sd3tou" path="res://assets/backgrounds/main_menu.jpeg" id="1_background"]
-[ext_resource type="Script" path="res://scripts/production_main_menu.gd" id="2_menu_script"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_level_button_normal"]
-bg_color = Color(0.04, 0.83, 0.13, 1)
-border_width_left = 8
-border_width_top = 8
-border_width_right = 8
-border_width_bottom = 10
-border_color = Color(0.02, 0.45, 0.07, 1)
-corner_radius_top_left = 32
-corner_radius_top_right = 32
-corner_radius_bottom_right = 32
-corner_radius_bottom_left = 32
-shadow_color = Color(0, 0.12, 0.02, 0.58)
-shadow_size = 12
-shadow_offset = Vector2(0, 7)
-anti_aliasing_size = 1.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_level_button_pressed"]
-bg_color = Color(0.02, 0.65, 0.1, 1)
-border_width_left = 8
-border_width_top = 8
-border_width_right = 8
-border_width_bottom = 10
-border_color = Color(0.01, 0.32, 0.05, 1)
-corner_radius_top_left = 32
-corner_radius_top_right = 32
-corner_radius_bottom_right = 32
-corner_radius_bottom_left = 32
-shadow_color = Color(0, 0.08, 0.01, 0.48)
-shadow_size = 8
-shadow_offset = Vector2(0, 4)
-anti_aliasing_size = 1.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_level_button_hover"]
-bg_color = Color(0.1, 0.92, 0.17, 1)
-border_width_left = 8
-border_width_top = 8
-border_width_right = 8
-border_width_bottom = 10
-border_color = Color(0.03, 0.52, 0.08, 1)
-corner_radius_top_left = 32
-corner_radius_top_right = 32
-corner_radius_bottom_right = 32
-corner_radius_bottom_left = 32
-shadow_color = Color(0, 0.12, 0.02, 0.58)
-shadow_size = 12
-shadow_offset = Vector2(0, 7)
-anti_aliasing_size = 1.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_level_button_disabled"]
-bg_color = Color(0.22, 0.46, 0.24, 0.8)
-border_width_left = 8
-border_width_top = 8
-border_width_right = 8
-border_width_bottom = 10
-border_color = Color(0.12, 0.26, 0.13, 0.82)
-corner_radius_top_left = 32
-corner_radius_top_right = 32
-corner_radius_bottom_right = 32
-corner_radius_bottom_left = 32
-anti_aliasing_size = 1.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_level_button_gloss"]
-bg_color = Color(0.55, 1, 0.46, 0.34)
-corner_radius_top_left = 22
-corner_radius_top_right = 22
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
-anti_aliasing_size = 1.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_level_button_bottom_shade"]
-bg_color = Color(0, 0.42, 0.08, 0.32)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 24
-corner_radius_bottom_left = 24
-anti_aliasing_size = 1.0
+[ext_resource type="Script" uid="uid://cb4p4uex1kp4j" path="res://scripts/production_main_menu.gd" id="2_menu_script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/level_button.tscn" id="3_level_button"]
 
 [node name="ProductionMainMenu" type="Control"]
 layout_mode = 3
@@ -115,51 +39,6 @@ offset_bottom = -52.0
 grow_horizontal = 2
 grow_vertical = 0
 
-[node name="LevelButton" type="Button" parent="BottomBar"]
+[node name="LevelButton" parent="BottomBar" instance=ExtResource("3_level_button")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(420, 122)
 layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_pressed_color = Color(0.92, 1, 0.9, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_colors/font_disabled_color = Color(0.82, 0.92, 0.82, 0.72)
-theme_override_colors/font_outline_color = Color(0.03, 0.25, 0.04, 0.95)
-theme_override_colors/font_shadow_color = Color(0.01, 0.18, 0.03, 0.72)
-theme_override_constants/outline_size = 3
-theme_override_constants/shadow_offset_x = 0
-theme_override_constants/shadow_offset_y = 4
-theme_override_font_sizes/font_size = 44
-theme_override_styles/normal = SubResource("StyleBoxFlat_level_button_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_level_button_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_level_button_pressed")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_level_button_disabled")
-text = "Level 1"
-
-[node name="GlossHighlight" type="Panel" parent="BottomBar/LevelButton"]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_left = 16.0
-offset_top = 12.0
-offset_right = -16.0
-offset_bottom = 39.0
-grow_horizontal = 2
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_level_button_gloss")
-
-[node name="BottomShade" type="Panel" parent="BottomBar/LevelButton"]
-layout_mode = 1
-anchors_preset = 12
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 16.0
-offset_top = -34.0
-offset_right = -16.0
-offset_bottom = -12.0
-grow_horizontal = 2
-grow_vertical = 0
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_level_button_bottom_shade")

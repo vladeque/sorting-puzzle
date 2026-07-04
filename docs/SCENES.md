@@ -19,16 +19,38 @@ Purpose:
 Important nodes:
 - `Background`: fullscreen `TextureRect` using `assets/backgrounds/main_menu.jpeg`.
 - `BottomBar`: bottom-anchored responsive container for the play button.
-- `BottomBar/LevelButton`: unique-name green rounded button that launches the saved campaign level.
+- `BottomBar/LevelButton`: `scenes/ui/level_button.tscn` instance that launches the saved campaign level.
 
 Depends on:
 - `level.tscn` through `scripts/production_main_menu.gd`.
 - `PlayerProgress` autoload for the saved campaign level.
 - `assets/backgrounds/main_menu.jpeg`.
+- `scenes/ui/level_button.tscn` for the reusable production level button visuals.
 
 Do not use for:
 - Dev/test level selection. Use `scenes/main_menu_testing.tscn`.
 - Runtime puzzle rules or shelf state. Put those in `level.tscn` and `scripts/level.gd`.
+
+## `scenes/ui/level_button.tscn`
+
+Root:
+- `LevelButton` (`Button`)
+
+Purpose:
+- Reusable production level-entry button.
+- Owns the glossy green rounded-button visual treatment inspired by the selected generated concept.
+- Keeps the button text dynamic through the normal Godot `Button.text` property, so callers can set labels such as `Level 1` or `Complete`.
+
+Important nodes:
+- `LevelButton`: clickable button root with rounded green style boxes, dark border, white outlined text, and dynamic pressed/hover/disabled states.
+- `GlossHighlight`: non-interactive top highlight panel.
+- `BottomShade`: non-interactive lower shade panel.
+
+Depends on:
+- Caller scenes or scripts for placement, click wiring, and label updates.
+
+Do not use for:
+- Scene navigation, campaign progress lookup, or level launching. Those stay in the owning menu script.
 
 ## `scenes/main_menu_testing.tscn`
 
