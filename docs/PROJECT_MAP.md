@@ -103,7 +103,7 @@ Responsibility:
 - Handles mouse and touch interaction.
 - Resolves matches of three identical visible items on the same shelf, including the gather-and-shrink clear animation.
 - Shows and expires the active combo count and shrinking green time strip in `Background/HudCenterSlot` when triple clears happen within the configured combo window.
-- Shows the current run's star total in `UI/StarCounterLabel`; triple clears add stars equal to the combo value reached by each clear.
+- Shows the current run's star total in `UI/StarCounterLabel` with a small `assets/ui/reward_star.png` icon; triple clears add stars equal to the combo value reached by each clear.
 - Shows the completed-level reward overlay in `UI/CompletionPanel`, using `assets/ui/reward_star.png`, `assets/ui/level_button_blank.png`, and the final run star count for the earned amount label.
 - Tracks cleared triples and unlocks shelves whose configs require progress before becoming accessible.
 - Plays item placement and triple-clear sound effects.
@@ -274,7 +274,7 @@ Change gameplay sound effects:
 
 Change level win or loss flow:
 - Update `_process()`, `_fail_level()`, `_complete_level()`, `_check_level_completed()`, pause-menu helpers, and the panels in `level.tscn`.
-- Keep `assets/ui/reward_star.png` aligned with `UI/CompletionPanel/StarImage` and `assets/ui/level_button_blank.png` aligned with `UI/CompletionPanel/NextButton` when changing completion reward art.
+- Keep `assets/ui/reward_star.png` aligned with both `UI/StarCounterLabel/Icon` and `UI/CompletionPanel/StarImage`, and keep `assets/ui/level_button_blank.png` aligned with `UI/CompletionPanel/NextButton` when changing completion reward art.
 
 Change pause menu layout:
 - Update `scenes/pause_menu.tscn`.

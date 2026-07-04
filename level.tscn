@@ -432,7 +432,7 @@ theme_override_font_sizes/font_size = 28
 text = "Level 1"
 vertical_alignment = 1
 
-[node name="StarCounterLabel" type="Label" parent="UI" unique_id=1248988476]
+[node name="StarCounterLabel" type="Panel" parent="UI" unique_id=1248988476]
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
@@ -444,14 +444,39 @@ offset_right = -100.0
 offset_bottom = 86.0
 grow_horizontal = 0
 grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_star_counter")
+
+[node name="Icon" type="TextureRect" parent="UI/StarCounterLabel" unique_id=2131150893]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 10.0
+offset_top = -17.0
+offset_right = 44.0
+offset_bottom = 17.0
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("6_reward_star")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CountLabel" type="Label" parent="UI/StarCounterLabel" unique_id=1332287251]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 42.0
+offset_right = -12.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_colors/font_color = Color(1, 0.92, 0.5, 1)
 theme_override_colors/font_shadow_color = Color(0.08, 0.03, 0.01, 0.82)
 theme_override_constants/shadow_offset_x = 0
 theme_override_constants/shadow_offset_y = 2
 theme_override_font_sizes/font_size = 26
-theme_override_styles/normal = SubResource("StyleBoxFlat_star_counter")
-text = "★ 0"
-horizontal_alignment = 1
+horizontal_alignment = 2
+text = "0"
 vertical_alignment = 1
 
 [node name="PauseMenuButton" type="Button" parent="UI" unique_id=406101987]

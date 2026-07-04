@@ -105,6 +105,7 @@ var _background: Control
 var _shelves_root: Node2D
 var _timer_label: Label
 var _level_label: Label
+var _star_counter_panel: Control
 var _star_counter_label: Label
 var _combo_fill: Control
 var _combo_label: Label
@@ -162,7 +163,8 @@ func _ready() -> void:
 	_drag_layer = get_node("DragLayer") as Node2D
 	_timer_label = get_node("UI/TimerLabel") as Label
 	_level_label = get_node("UI/LevelLabel") as Label
-	_star_counter_label = get_node("UI/StarCounterLabel") as Label
+	_star_counter_panel = get_node("UI/StarCounterLabel") as Control
+	_star_counter_label = get_node("UI/StarCounterLabel/CountLabel") as Label
 	_combo_fill = get_node("Background/HudCenterSlot/ComboFill") as Control
 	_combo_label = get_node("Background/HudCenterSlot/ComboLabel") as Label
 	_failure_panel = get_node("UI/FailurePanel") as Control
@@ -251,15 +253,15 @@ func _layout_top_hud(safe_margins: Vector4) -> void:
 		_level_label.offset_right = _level_label.offset_left + LEVEL_LABEL_SIZE.x
 		_level_label.offset_bottom = _level_label.offset_top + LEVEL_LABEL_SIZE.y
 
-	if _star_counter_label != null:
-		_star_counter_label.anchor_left = 1.0
-		_star_counter_label.anchor_top = 0.0
-		_star_counter_label.anchor_right = 1.0
-		_star_counter_label.anchor_bottom = 0.0
-		_star_counter_label.offset_right = -(safe_margins.z + HUD_SIDE_MARGIN + PAUSE_BUTTON_SIZE.x + STAR_COUNTER_GAP)
-		_star_counter_label.offset_left = _star_counter_label.offset_right - STAR_COUNTER_SIZE.x
-		_star_counter_label.offset_top = safe_margins.y + HUD_TOP_MARGIN + ((PAUSE_BUTTON_SIZE.y - STAR_COUNTER_SIZE.y) * 0.5)
-		_star_counter_label.offset_bottom = _star_counter_label.offset_top + STAR_COUNTER_SIZE.y
+	if _star_counter_panel != null:
+		_star_counter_panel.anchor_left = 1.0
+		_star_counter_panel.anchor_top = 0.0
+		_star_counter_panel.anchor_right = 1.0
+		_star_counter_panel.anchor_bottom = 0.0
+		_star_counter_panel.offset_right = -(safe_margins.z + HUD_SIDE_MARGIN + PAUSE_BUTTON_SIZE.x + STAR_COUNTER_GAP)
+		_star_counter_panel.offset_left = _star_counter_panel.offset_right - STAR_COUNTER_SIZE.x
+		_star_counter_panel.offset_top = safe_margins.y + HUD_TOP_MARGIN + ((PAUSE_BUTTON_SIZE.y - STAR_COUNTER_SIZE.y) * 0.5)
+		_star_counter_panel.offset_bottom = _star_counter_panel.offset_top + STAR_COUNTER_SIZE.y
 
 	if _pause_menu_button != null:
 		_pause_menu_button.anchor_left = 1.0
@@ -1390,13 +1392,13 @@ func _update_star_counter_label() -> void:
 	if _star_counter_label == null:
 		return
 
-	var star_text := "★ %d" % _stars
+	var star_text := "%d" % _stars
 	var font_size := 26
-	if star_text.length() >= 8:
+	if star_text.length() >= 7:
 		font_size = 18
-	elif star_text.length() >= 7:
-		font_size = 20
 	elif star_text.length() >= 6:
+		font_size = 20
+	elif star_text.length() >= 5:
 		font_size = 22
 
 	_star_counter_label.add_theme_font_size_override("font_size", font_size)
