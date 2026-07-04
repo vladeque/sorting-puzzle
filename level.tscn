@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://dwmyah5l2r82d" path="res://assets/abilities/ability_lantern.png" id="4_lantern_icon"]
 [ext_resource type="PackedScene" uid="uid://g1xsr7chqeg7" path="res://scenes/pause_menu.tscn" id="5_pause_menu"]
 [ext_resource type="Texture2D" path="res://assets/ui/reward_star.png" id="6_reward_star"]
+[ext_resource type="Texture2D" uid="uid://bai63m2evt0sk" path="res://assets/ui/level_button_blank.png" id="7_level_button_blank"]
 [ext_resource type="Script" uid="uid://cy80oincxrrc5" path="res://scripts/level.gd" id="10_level_script"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_top_hud_strip"]
@@ -193,44 +194,8 @@ shadow_color = Color(0, 0, 0, 0.34)
 shadow_size = 5
 shadow_offset = Vector2(0, 2)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_completion_next_normal"]
-bg_color = Color(0.12, 0.82, 0.08, 1)
-border_width_top = 3
-border_width_bottom = 5
-border_color = Color(0.08, 0.47, 0.05, 1)
-corner_radius_top_left = 28
-corner_radius_top_right = 28
-corner_radius_bottom_right = 28
-corner_radius_bottom_left = 28
-shadow_color = Color(0, 0, 0, 0.34)
-shadow_size = 8
-shadow_offset = Vector2(0, 5)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_completion_next_hover"]
-bg_color = Color(0.2, 0.92, 0.12, 1)
-border_width_top = 3
-border_width_bottom = 5
-border_color = Color(0.1, 0.58, 0.06, 1)
-corner_radius_top_left = 28
-corner_radius_top_right = 28
-corner_radius_bottom_right = 28
-corner_radius_bottom_left = 28
-shadow_color = Color(0, 0, 0, 0.38)
-shadow_size = 10
-shadow_offset = Vector2(0, 5)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_completion_next_pressed"]
-bg_color = Color(0.08, 0.65, 0.05, 1)
-border_width_top = 3
-border_width_bottom = 3
-border_color = Color(0.07, 0.38, 0.04, 1)
-corner_radius_top_left = 28
-corner_radius_top_right = 28
-corner_radius_bottom_right = 28
-corner_radius_bottom_left = 28
-shadow_color = Color(0, 0, 0, 0.24)
-shadow_size = 5
-shadow_offset = Vector2(0, 3)
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_completion_next"]
+texture = ExtResource("7_level_button_blank")
 
 [node name="Level" type="Node2D" unique_id=949256860]
 script = ExtResource("10_level_script")
@@ -788,16 +753,18 @@ offset_bottom = 410.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.92, 1, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
-theme_override_colors/font_shadow_color = Color(0.02, 0.17, 0.02, 0.8)
+theme_override_colors/font_outline_color = Color(0.03, 0.25, 0.04, 0.95)
+theme_override_colors/font_shadow_color = Color(0.01, 0.18, 0.03, 0.72)
+theme_override_constants/outline_size = 4
 theme_override_constants/shadow_offset_x = 0
-theme_override_constants/shadow_offset_y = 3
+theme_override_constants/shadow_offset_y = 4
 theme_override_font_sizes/font_size = 42
-theme_override_styles/normal = SubResource("StyleBoxFlat_completion_next_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_completion_next_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_completion_next_pressed")
+theme_override_styles/normal = SubResource("StyleBoxTexture_completion_next")
+theme_override_styles/hover = SubResource("StyleBoxTexture_completion_next")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_completion_next")
 text = "Next"
 
 [node name="PauseMenuOverlay" parent="UI" unique_id=1081173105 instance=ExtResource("5_pause_menu")]
