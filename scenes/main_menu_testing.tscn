@@ -1,0 +1,80 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/main_menu.gd" id="1_main_menu_script"]
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main_menu_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.09, 0.12, 0.16, 1)
+
+[node name="ShelfBackdrop" type="Polygon2D" parent="."]
+position = Vector2(360, 465)
+color = Color(0.31, 0.2, 0.14, 1)
+polygon = PackedVector2Array(-258, -42, 258, -42, 220, 36, -220, 36)
+
+[node name="ShelfLip" type="Polygon2D" parent="."]
+position = Vector2(360, 514)
+color = Color(0.61, 0.38, 0.22, 1)
+polygon = PackedVector2Array(-242, -20, 242, -20, 270, 34, -270, 34)
+
+[node name="Content" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -280.0
+offset_top = -368.0
+offset_right = 280.0
+offset_bottom = 348.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 34
+alignment = 1
+
+[node name="Title" type="Label" parent="Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 5
+theme_override_font_sizes/font_size = 64
+text = "Sorting Puzzle"
+horizontal_alignment = 1
+
+[node name="SelectorLabel" type="Label" parent="Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.78, 0.9, 0.93, 1)
+theme_override_font_sizes/font_size = 30
+text = "Level 1"
+horizontal_alignment = 1
+
+[node name="PlayButton" type="Button" parent="Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 88)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 34
+text = "Play"
+
+[node name="LevelGrid" type="GridContainer" parent="Content"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 16
+columns = 5

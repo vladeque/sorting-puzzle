@@ -4,6 +4,7 @@ const LEVEL_SCENE := preload("res://level.tscn")
 const MIN_LEVEL := 1
 const MAX_LEVEL := 10
 const DEV_LEVEL_SELECT_SETTING := "application/config/dev_level_select_enabled"
+const TESTING_MENU_SCENE := "res://scenes/main_menu_testing.tscn"
 
 @onready var _selector_label := $Content/SelectorLabel as Label
 @onready var _play_button := %PlayButton as Button
@@ -61,6 +62,7 @@ func _launch_level(level_number: int, launched_from_dev_mode: bool) -> void:
 	var level_scene := LEVEL_SCENE.instantiate()
 	level_scene.selected_level = level_number
 	level_scene.launched_from_dev_mode = launched_from_dev_mode
+	level_scene.return_menu_scene_path = TESTING_MENU_SCENE
 
 	var tree := get_tree()
 	var current_scene := tree.current_scene

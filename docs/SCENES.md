@@ -5,13 +5,41 @@ This file maps scenes to their responsibilities, scripts, important nodes, and r
 ## `scenes/main_menu.tscn`
 
 Root:
+- `ProductionMainMenu` (`Control`)
+
+Script:
+- `scripts/production_main_menu.gd`
+
+Purpose:
+- Main project entry scene.
+- Displays `assets/backgrounds/main_menu.jpeg` as a fullscreen production menu background.
+- Provides a bottom `%LevelButton` labeled with the saved campaign level, such as `Level 1`.
+- Starts the saved campaign level when the bottom button is pressed.
+
+Important nodes:
+- `Background`: fullscreen `TextureRect` using `assets/backgrounds/main_menu.jpeg`.
+- `BottomBar`: bottom-anchored responsive container for the play button.
+- `BottomBar/LevelButton`: unique-name button that launches the saved campaign level.
+
+Depends on:
+- `level.tscn` through `scripts/production_main_menu.gd`.
+- `PlayerProgress` autoload for the saved campaign level.
+- `assets/backgrounds/main_menu.jpeg`.
+
+Do not use for:
+- Dev/test level selection. Use `scenes/main_menu_testing.tscn`.
+- Runtime puzzle rules or shelf state. Put those in `level.tscn` and `scripts/level.gd`.
+
+## `scenes/main_menu_testing.tscn`
+
+Root:
 - `MainMenu` (`Control`)
 
 Script:
 - `scripts/main_menu.gd`
 
 Purpose:
-- Main project entry scene.
+- Preserves the previous testing menu layout.
 - Displays title and campaign progress.
 - Provides a campaign play button.
 - Provides a `%LevelGrid` container that the script fills with isolated dev/test level buttons when dev selection is enabled.
@@ -21,7 +49,7 @@ Important nodes:
 - `ShelfBackdrop` and `ShelfLip`: static decorative shelf art.
 - `Content`: centered menu layout container.
 - `Content/SelectorLabel`: campaign current-level label in normal flow, or dev selector label in dev/test mode.
-- `Content/PlayButton`: unique-name button that launches the saved campaign level.
+- `Content/PlayButton`: unique-name button that launches the saved campaign level from the testing menu.
 - `Content/LevelGrid`: unique-name `GridContainer` used by the script for dev/test level selection.
 
 Depends on:
@@ -42,7 +70,7 @@ Script:
 Purpose:
 - Playable puzzle scene.
 - Provides stable top-level nodes that `scripts/level.gd` fills and controls at runtime.
-- Normal campaign launches save completion and auto-advance to the next level; dev/test launches return to the menu and do not touch campaign save data.
+- Normal campaign launches save completion and auto-advance to the next level; dev/test launches return to their configured menu and do not touch campaign save data.
 
 Important nodes:
 - `Background`: fullscreen procedural gameplay backdrop with child nodes for the top HUD strip, simple shop wall, baseboard, and bottom floor band.

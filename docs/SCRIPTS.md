@@ -2,13 +2,52 @@
 
 This file documents what each script owns. Keep script docs focused on responsibilities, exports, dependencies, and boundaries.
 
+## `scripts/production_main_menu.gd`
+
+Attached to:
+- `scenes/main_menu.tscn` root `ProductionMainMenu`.
+
+Purpose:
+- Shows the production campaign entry point over the production menu background.
+- Labels the bottom button with the saved current level.
+- Launches the saved campaign level.
+
+Key constants:
+- `LEVEL_SCENE`: preloads `res://level.tscn`.
+- `MIN_LEVEL`: first campaign level number.
+- `MAX_LEVEL`: last campaign level number.
+- `PRODUCTION_MENU_SCENE`: return path assigned to campaign level instances.
+- `BOTTOM_BAR_*`, `SIDE_MARGIN`, and `LEVEL_BUTTON_MAX_WIDTH`: responsive bottom-button layout values.
+
+Important nodes:
+- `%BottomBar`: bottom-anchored container positioned at runtime with safe-area padding.
+- `%LevelButton`: starts the saved campaign level.
+
+Key methods:
+- `_ready()`: loads progress, wires the level button, and applies responsive layout.
+- `_apply_responsive_layout()`: keeps the bottom button inside the viewport and safe area.
+- `_update_level_button()`: displays the saved current level or the complete state.
+- `_launch_campaign_level()`: instantiates the level, sets campaign launch metadata, swaps current scene, and queues the menu for deletion.
+
+Depends on:
+- `level.tscn`
+- `scripts/level.gd` export `selected_level`
+- `scripts/level.gd` export `launched_from_dev_mode`
+- `scripts/level.gd` export `return_menu_scene_path`
+- `PlayerProgress` autoload
+
+Do not use for:
+- Developer/test level selection. Put that in `scripts/main_menu.gd`.
+- Persistent save data ownership. Put that in `scripts/player_progress.gd`.
+- Puzzle runtime logic.
+
 ## `scripts/main_menu.gd`
 
 Attached to:
-- `scenes/main_menu.tscn` root `MainMenu`.
+- `scenes/main_menu_testing.tscn` root `MainMenu`.
 
 Purpose:
-- Shows the campaign play entry point for the saved current level.
+- Shows the testing-menu campaign play entry point for the saved current level.
 - Builds the developer/test level selection grid when dev level select is enabled.
 - Launches campaign or isolated dev/test levels.
 
@@ -17,6 +56,7 @@ Key constants:
 - `MIN_LEVEL`: first selectable level number.
 - `MAX_LEVEL`: last selectable level number.
 - `DEV_LEVEL_SELECT_SETTING`: optional project setting that overrides debug-build dev level selection.
+- `TESTING_MENU_SCENE`: return path assigned to levels launched from the testing menu.
 
 Important nodes:
 - `%PlayButton`: starts the saved campaign level.
@@ -33,6 +73,7 @@ Depends on:
 - `level.tscn`
 - `scripts/level.gd` export `selected_level`
 - `scripts/level.gd` export `launched_from_dev_mode`
+- `scripts/level.gd` export `return_menu_scene_path`
 - `PlayerProgress` autoload
 
 Do not use for:
@@ -148,6 +189,7 @@ Important exports:
 - `triple_clear_volume_db`: volume for the matched triple clear sound effect.
 - `selected_level`: level number loaded from `configs/levels/level_%03d.json`.
 - `launched_from_dev_mode`: makes a level use isolated temporary ability counts and return to the menu instead of saving campaign progress.
+- `return_menu_scene_path`: menu scene path used by Leave and dev/test completion returns.
 
 Important constants:
 - `SLOT_COUNT`: currently three items per shelf front layer.
@@ -167,7 +209,7 @@ Important constants:
 - `DEFAULT_LEVEL_CONFIG`: fallback level config.
 - `LAYOUT_SCENE_TEMPLATE`: `res://scenes/layouts/layout_%s.tscn` path pattern used by `layout_preset`.
 - `DEFAULT_LAYOUT_PRESET`: fallback layout preset.
-- `MAIN_MENU_SCENE`: scene returned to after completion.
+- `MAIN_MENU_SCENE`: default scene returned to after completion.
 - `LEVEL_SCENE_PATH`: scene loaded when normal campaign play auto-advances to the next level.
 - `ITEM_PLACE_SOUND`: short sound played when the player drops or moves an item into a shelf slot.
 - `TRIPLE_CLEAR_SOUND`: sound played when a matched triple gathers and disappears.
@@ -198,6 +240,7 @@ Key responsibilities:
 - Promote back layers with `_promote_back_layer()`, `_play_layer_promotion_animation()`, and `_advance_back_layers()`.
 - Check win/loss state with `_check_level_completed()`, `_fail_level()`, and `_complete_level()`.
 - Save campaign completion through `PlayerProgress` and auto-load the next campaign level when it exists.
+- Return to the configured menu scene when leaving a level or when dev/test completion finishes.
 - Keep the level countdown idle until the first meaningful player action, then format the active timer as zero-padded `MM:SS` text with `_update_timer_label()`.
 - Pause and resume active gameplay through the top-right menu button, the instanced `UI/PauseMenuOverlay`, `Leave`, and `Continue`.
 - Disable item placement and triple-clear sound effects while the pause menu sound-effects toggle is crossed out.

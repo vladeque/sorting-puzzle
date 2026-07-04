@@ -84,6 +84,7 @@ const PAUSE_MENU_PANEL_SIZE := Vector2(520, 363)
 @export_range(-40.0, 6.0, 0.5) var triple_clear_volume_db := -5.0
 @export_range(1, 10, 1) var selected_level := 1
 @export var launched_from_dev_mode := false
+@export_file("*.tscn") var return_menu_scene_path := MAIN_MENU_SCENE
 
 var _slots: Array[Node2D] = []
 var _item_textures: Dictionary = {}
@@ -1470,10 +1471,11 @@ func _check_level_completed() -> void:
 func _return_to_main_menu() -> void:
 	_level_paused = false
 	_returning_to_menu = true
-	var error := get_tree().change_scene_to_file(MAIN_MENU_SCENE)
+	var menu_scene_path := return_menu_scene_path if return_menu_scene_path != "" else MAIN_MENU_SCENE
+	var error := get_tree().change_scene_to_file(menu_scene_path)
 	if error != OK:
 		_returning_to_menu = false
-		push_error("Could not return to main menu: %s" % MAIN_MENU_SCENE)
+		push_error("Could not return to main menu: %s" % menu_scene_path)
 
 
 func _advance_after_completion() -> void:
@@ -1501,6 +1503,7 @@ func _change_to_level(level_number: int, dev_mode: bool) -> void:
 	var level_scene := level_scene_resource.instantiate()
 	level_scene.selected_level = level_number
 	level_scene.launched_from_dev_mode = dev_mode
+	level_scene.return_menu_scene_path = return_menu_scene_path
 
 	var tree := get_tree()
 	var current_scene := tree.current_scene

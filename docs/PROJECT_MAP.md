@@ -8,7 +8,11 @@ Main scene:
 - `scenes/main_menu.tscn`
 - Configured in `project.godot` as `run/main_scene`.
 - `project.godot` keeps the 720x1280 design viewport and uses `canvas_items` stretch with `keep_width` so portrait devices share a stable logical width while gaining or losing vertical play space.
-- Owns the campaign play entry point, shows developer level selection in dev/test mode, and launches playable levels.
+- Owns the production campaign play entry point over `assets/backgrounds/main_menu.jpeg` and launches the saved campaign level from the bottom level button.
+
+Testing menu:
+- `scenes/main_menu_testing.tscn`
+- Preserves the previous main menu with campaign play and developer/test level selection.
 
 Playable level scene:
 - `level.tscn`
@@ -32,17 +36,20 @@ Reusable item scene:
 
 Files:
 - `scenes/main_menu.tscn`
+- `scenes/main_menu_testing.tscn`
+- `scripts/production_main_menu.gd`
 - `scripts/main_menu.gd`
 - `scripts/player_progress.gd`
 
 Responsibility:
-- Shows a normal campaign `Play` button for `PlayerProgress.current_level`.
-- Hides free level selection from normal campaign play.
-- Builds level buttons for levels 1 through 10 only when dev/test level selection is enabled.
-- Instantiates `level.tscn`, assigns `selected_level` and `launched_from_dev_mode`, swaps it into `SceneTree.current_scene`, and removes the menu.
+- Shows a production bottom button labeled with `PlayerProgress.current_level`.
+- Keeps free level selection out of the production menu.
+- Preserves the old testing menu in `scenes/main_menu_testing.tscn`.
+- Builds testing level buttons for levels 1 through 10 only when dev/test level selection is enabled.
+- Instantiates `level.tscn`, assigns `selected_level`, `launched_from_dev_mode`, and `return_menu_scene_path`, swaps it into `SceneTree.current_scene`, and removes the menu.
 
 Change here when:
-- Adding campaign entry UI, dev/test level selection UI, lock states, stars, level paging, or menu-to-game navigation behavior.
+- Adding production campaign entry UI, dev/test level selection UI, lock states, stars, level paging, or menu-to-game navigation behavior.
 
 ### Player Progression
 
