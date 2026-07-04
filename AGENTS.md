@@ -85,6 +85,18 @@ Use anchors, containers, stretch settings, safe-area padding, and runtime scalin
 
 When changing UI or gameplay layout, test representative resolutions such as 540x960, 720x1280, 1080x1920, 1080x2400, and a squarer tablet-like viewport.
 
+### Image Conversion
+
+Use ImageMagick for repeatable image conversion and cleanup, especially when converting source art to PNG assets with alpha transparency.
+
+Prefer the `magick` CLI when it is available on `PATH`. In this workspace, ImageMagick has been verified at `C:\Program Files\ImageMagick-7.1.2-Q16-HDRI\magick.exe`; use that full path if plain `magick` is not available in the current shell.
+
+For transparent output, preserve or create alpha explicitly. Example:
+
+```powershell
+& 'C:\Program Files\ImageMagick-7.1.2-Q16-HDRI\magick.exe' input.webp -background none output.png
+```
+
 ## Agent Behavior
 
 ### Clarifications
