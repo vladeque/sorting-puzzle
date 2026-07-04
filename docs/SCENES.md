@@ -19,7 +19,7 @@ Purpose:
 Important nodes:
 - `Background`: fullscreen `TextureRect` using `assets/backgrounds/main_menu.jpeg`.
 - `BottomBar`: bottom-anchored responsive container for the play button.
-- `BottomBar/LevelButton`: unique-name button that launches the saved campaign level.
+- `BottomBar/LevelButton`: unique-name green rounded button that launches the saved campaign level.
 
 Depends on:
 - `level.tscn` through `scripts/production_main_menu.gd`.
