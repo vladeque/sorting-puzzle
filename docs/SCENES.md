@@ -13,11 +13,13 @@ Script:
 Purpose:
 - Main project entry scene.
 - Displays `assets/backgrounds/main_menu.jpeg` as a fullscreen production menu background.
+- Provides a top status row with static placeholder icons for profile, coins, lives, and settings.
 - Provides a bottom `%LevelButton` labeled with the saved campaign level, such as `Level 1`.
 - Starts the saved campaign level when the bottom button is pressed.
 
 Important nodes:
 - `Background`: fullscreen `TextureRect` using `assets/backgrounds/main_menu.jpeg`.
+- `TopStatusBar`: top-anchored safe-area-aware container for `scenes/ui/main_menu_top_status.tscn`.
 - `BottomBar`: bottom-anchored responsive container for the play button.
 - `BottomBar/LevelButton`: `scenes/ui/level_button.tscn` instance that launches the saved campaign level.
 
@@ -25,11 +27,34 @@ Depends on:
 - `level.tscn` through `scripts/production_main_menu.gd`.
 - `PlayerProgress` autoload for the saved campaign level.
 - `assets/backgrounds/main_menu.jpeg`.
+- `scenes/ui/main_menu_top_status.tscn` for static top status icons.
 - `scenes/ui/level_button.tscn` for the reusable production level button visuals.
 
 Do not use for:
 - Dev/test level selection. Use `scenes/main_menu_testing.tscn`.
 - Runtime puzzle rules or shelf state. Put those in `level.tscn` and `scripts/level.gd`.
+
+## `scenes/ui/main_menu_top_status.tscn`
+
+Root:
+- `MainMenuTopStatus` (`HBoxContainer`)
+
+Purpose:
+- Reusable static top status row for the production main menu.
+- Displays four non-interactive UI groups from left to right: player profile, gold coins, lives remaining, and settings.
+- Provides placeholder values only; it does not read or write player data.
+
+Important nodes:
+- `ProfileWidget`: circular avatar icon.
+- `CoinsWidget`: gold coin icon, placeholder amount label, and plus badge.
+- `LivesWidget`: heart icon, placeholder life count, and full-status label.
+- `SettingsWidget`: blue settings icon with a small alert badge.
+
+Depends on:
+- Owning menu scene for placement and safe-area layout.
+
+Do not use for:
+- Player inventory, lives logic, settings behavior, or profile data ownership.
 
 ## `scenes/ui/level_button.tscn`
 

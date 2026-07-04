@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Texture2D" uid="uid://dwm7nk7sd3tou" path="res://assets/backgrounds/main_menu.jpeg" id="1_background"]
 [ext_resource type="Script" uid="uid://cb4p4uex1kp4j" path="res://scripts/production_main_menu.gd" id="2_menu_script"]
 [ext_resource type="PackedScene" path="res://scenes/ui/level_button.tscn" id="3_level_button"]
+[ext_resource type="PackedScene" path="res://scenes/ui/main_menu_top_status.tscn" id="4_top_status"]
 
 [node name="ProductionMainMenu" type="Control"]
 layout_mode = 3
@@ -24,6 +25,20 @@ mouse_filter = 2
 texture = ExtResource("1_background")
 expand_mode = 1
 stretch_mode = 6
+
+[node name="TopStatusBar" type="MarginContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 24.0
+offset_top = 28.0
+offset_right = -24.0
+offset_bottom = 114.0
+grow_horizontal = 2
+
+[node name="MainMenuTopStatus" parent="TopStatusBar" instance=ExtResource("4_top_status")]
+layout_mode = 2
 
 [node name="BottomBar" type="MarginContainer" parent="."]
 unique_name_in_owner = true

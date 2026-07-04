@@ -1,0 +1,497 @@
+[gd_scene load_steps=16 format=3]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_profile_ring"]
+bg_color = Color(0.95, 0.9, 0.72, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.52, 0.35, 0.76, 1)
+corner_radius_top_left = 38
+corner_radius_top_right = 38
+corner_radius_bottom_right = 38
+corner_radius_bottom_left = 38
+shadow_color = Color(0.13, 0.17, 0.3, 0.34)
+shadow_size = 5
+shadow_offset = Vector2(0, 3)
+anti_aliasing_size = 1.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_profile_inner"]
+bg_color = Color(0.54, 0.25, 0.8, 1)
+corner_radius_top_left = 31
+corner_radius_top_right = 31
+corner_radius_bottom_right = 31
+corner_radius_bottom_left = 31
+anti_aliasing_size = 1.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_avatar_face"]
+bg_color = Color(1, 0.76, 0.12, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+anti_aliasing_size = 1.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_avatar_body"]
+bg_color = Color(0.98, 0.64, 0.08, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+anti_aliasing_size = 1.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_counter_pill"]
+bg_color = Color(1, 0.78, 0.75, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.62, 0.36, 0.46, 0.7)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0.14, 0.14, 0.2, 0.26)
+shadow_size = 4
+shadow_offset = Vector2(0, 2)
+anti_aliasing_size = 1.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_coin_outer"]
+bg_color = Color(1, 0.65, 0.06, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.79, 0.34, 0.02, 1)
+corner_radius_top_left = 30
+corner_radius_top_right = 30
+corner_radius_bottom_right = 30
+corner_radius_bottom_left = 30
+shadow_color = Color(0.2, 0.11, 0.02, 0.34)
+shadow_size = 5
+shadow_offset = Vector2(0, 3)
+anti_aliasing_size = 1.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_coin_inner"]
+bg_color = Color(1, 0.88, 0.14, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+anti_aliasing_size = 1.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_plus_badge"]
+bg_color = Color(0.25, 0.82, 0.24, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 0.86)
+corner_radius_top_left = 9
+corner_radius_top_right = 9
+corner_radius_bottom_right = 9
+corner_radius_bottom_left = 9
+anti_aliasing_size = 1.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_heart_lobe"]
+bg_color = Color(1, 0.18, 0.08, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.77, 0.05, 0.02, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+anti_aliasing_size = 1.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_heart_shadow_lobe"]
+bg_color = Color(0.62, 0.03, 0.02, 0.62)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+anti_aliasing_size = 1.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_settings_bg"]
+bg_color = Color(0.12, 0.7, 0.92, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.04, 0.42, 0.7, 1)
+corner_radius_top_left = 17
+corner_radius_top_right = 17
+corner_radius_bottom_right = 17
+corner_radius_bottom_left = 17
+shadow_color = Color(0.07, 0.13, 0.25, 0.34)
+shadow_size = 5
+shadow_offset = Vector2(0, 3)
+anti_aliasing_size = 1.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_settings_center"]
+bg_color = Color(0.08, 0.52, 0.78, 1)
+corner_radius_top_left = 9
+corner_radius_top_right = 9
+corner_radius_bottom_right = 9
+corner_radius_bottom_left = 9
+anti_aliasing_size = 1.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_alert_badge"]
+bg_color = Color(0.96, 0.08, 0.05, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.82, 0.68, 1)
+corner_radius_top_left = 11
+corner_radius_top_right = 11
+corner_radius_bottom_right = 11
+corner_radius_bottom_left = 11
+anti_aliasing_size = 1.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eye"]
+bg_color = Color(0.54, 0.22, 0.03, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+anti_aliasing_size = 1.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mouth"]
+bg_color = Color(0.79, 0.32, 0.04, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+anti_aliasing_size = 1.0
+
+[node name="MainMenuTopStatus" type="HBoxContainer"]
+custom_minimum_size = Vector2(452, 78)
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/separation = 0
+
+[node name="ProfileWidget" type="Control" parent="."]
+custom_minimum_size = Vector2(76, 76)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="OuterRing" type="Panel" parent="ProfileWidget"]
+layout_mode = 1
+anchors_preset = 0
+offset_right = 76.0
+offset_bottom = 76.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_profile_ring")
+
+[node name="InnerRing" type="Panel" parent="ProfileWidget"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 7.0
+offset_top = 7.0
+offset_right = 69.0
+offset_bottom = 69.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_profile_inner")
+
+[node name="AvatarBody" type="Panel" parent="ProfileWidget"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 22.0
+offset_top = 42.0
+offset_right = 54.0
+offset_bottom = 60.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_avatar_body")
+
+[node name="AvatarFace" type="Panel" parent="ProfileWidget"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 20.0
+offset_top = 21.0
+offset_right = 56.0
+offset_bottom = 57.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_avatar_face")
+
+[node name="LeftEye" type="Panel" parent="ProfileWidget"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 30.0
+offset_top = 36.0
+offset_right = 34.0
+offset_bottom = 40.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_eye")
+
+[node name="RightEye" type="Panel" parent="ProfileWidget"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 43.0
+offset_top = 36.0
+offset_right = 47.0
+offset_bottom = 40.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_eye")
+
+[node name="Mouth" type="Panel" parent="ProfileWidget"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 33.0
+offset_top = 45.0
+offset_right = 45.0
+offset_bottom = 49.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_mouth")
+
+[node name="Spacer01" type="Control" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="CoinsWidget" type="Control" parent="."]
+custom_minimum_size = Vector2(142, 60)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="CoinPill" type="Panel" parent="CoinsWidget"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 36.0
+offset_top = 12.0
+offset_right = 142.0
+offset_bottom = 54.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_counter_pill")
+
+[node name="CoinOuter" type="Panel" parent="CoinsWidget"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 0.0
+offset_right = 60.0
+offset_bottom = 60.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_coin_outer")
+
+[node name="CoinInner" type="Panel" parent="CoinsWidget"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 52.0
+offset_bottom = 52.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_coin_inner")
+
+[node name="CoinStar" type="Polygon2D" parent="CoinsWidget"]
+position = Vector2(30, 30)
+color = Color(1, 0.68, 0.05, 1)
+polygon = PackedVector2Array(0, -18, 5, -6, 18, -6, 8, 2, 12, 16, 0, 8, -12, 16, -8, 2, -18, -6, -5, -6)
+
+[node name="CoinAmount" type="Label" parent="CoinsWidget"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 62.0
+offset_top = 14.0
+offset_right = 134.0
+offset_bottom = 52.0
+theme_override_colors/font_color = Color(0.42, 0.08, 0.22, 1)
+theme_override_colors/font_shadow_color = Color(1, 1, 1, 0.68)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 27
+text = "1050"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PlusBadge" type="Panel" parent="CoinsWidget"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 39.0
+offset_top = 39.0
+offset_right = 57.0
+offset_bottom = 57.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_plus_badge")
+
+[node name="PlusLabel" type="Label" parent="CoinsWidget/PlusBadge"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.04, 0.27, 0.03, 0.72)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 14
+text = "+"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Spacer02" type="Control" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="LivesWidget" type="Control" parent="."]
+custom_minimum_size = Vector2(150, 60)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="LivesPill" type="Panel" parent="LivesWidget"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 40.0
+offset_top = 12.0
+offset_right = 150.0
+offset_bottom = 54.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_counter_pill")
+
+[node name="HeartShadowLeft" type="Panel" parent="LivesWidget"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 7.0
+offset_top = 7.0
+offset_right = 41.0
+offset_bottom = 41.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_heart_shadow_lobe")
+
+[node name="HeartShadowRight" type="Panel" parent="LivesWidget"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 25.0
+offset_top = 7.0
+offset_right = 59.0
+offset_bottom = 41.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_heart_shadow_lobe")
+
+[node name="HeartShadowPoint" type="Polygon2D" parent="LivesWidget"]
+position = Vector2(33, 39)
+color = Color(0.62, 0.03, 0.02, 0.62)
+polygon = PackedVector2Array(-26, -11, 26, -11, 0, 21)
+
+[node name="HeartLeft" type="Panel" parent="LivesWidget"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 5.0
+offset_top = 5.0
+offset_right = 39.0
+offset_bottom = 39.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_heart_lobe")
+
+[node name="HeartRight" type="Panel" parent="LivesWidget"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 23.0
+offset_top = 5.0
+offset_right = 57.0
+offset_bottom = 39.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_heart_lobe")
+
+[node name="HeartPoint" type="Polygon2D" parent="LivesWidget"]
+position = Vector2(31, 37)
+color = Color(1, 0.18, 0.08, 1)
+polygon = PackedVector2Array(-26, -11, 26, -11, 0, 21)
+
+[node name="LifeCount" type="Label" parent="LivesWidget"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 52.0
+offset_bottom = 54.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.48, 0.05, 0.02, 0.82)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 30
+text = "5"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LifeStatus" type="Label" parent="LivesWidget"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 62.0
+offset_top = 14.0
+offset_right = 140.0
+offset_bottom = 52.0
+theme_override_colors/font_color = Color(0.42, 0.08, 0.22, 1)
+theme_override_colors/font_shadow_color = Color(1, 1, 1, 0.68)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 22
+text = "Full"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Spacer03" type="Control" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="SettingsWidget" type="Control" parent="."]
+custom_minimum_size = Vector2(66, 66)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="SettingsBackground" type="Panel" parent="SettingsWidget"]
+layout_mode = 1
+anchors_preset = 0
+offset_top = 6.0
+offset_right = 56.0
+offset_bottom = 62.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_settings_bg")
+
+[node name="GearShape" type="Polygon2D" parent="SettingsWidget"]
+position = Vector2(28, 34)
+color = Color(0.85, 1, 1, 1)
+polygon = PackedVector2Array(0, -22, 5, -13, 15, -16, 13, -5, 22, 0, 13, 5, 15, 16, 5, 13, 0, 22, -5, 13, -15, 16, -13, 5, -22, 0, -13, -5, -15, -16, -5, -13)
+
+[node name="GearCenter" type="Panel" parent="SettingsWidget"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 19.0
+offset_top = 25.0
+offset_right = 37.0
+offset_bottom = 43.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_settings_center")
+
+[node name="AlertBadge" type="Panel" parent="SettingsWidget"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 43.0
+offset_top = 0.0
+offset_right = 65.0
+offset_bottom = 22.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_alert_badge")
+
+[node name="AlertLabel" type="Label" parent="SettingsWidget/AlertBadge"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "!"
+horizontal_alignment = 1
+vertical_alignment = 1

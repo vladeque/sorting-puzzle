@@ -4,11 +4,15 @@ const LEVEL_SCENE := preload("res://level.tscn")
 const MIN_LEVEL := 1
 const MAX_LEVEL := 10
 const PRODUCTION_MENU_SCENE := "res://scenes/main_menu.tscn"
+const TOP_BAR_HEIGHT := 86.0
+const TOP_MARGIN := 28.0
+const TOP_SIDE_MARGIN := 24.0
 const BOTTOM_BAR_HEIGHT := 220.0
 const BOTTOM_MARGIN := 52.0
 const SIDE_MARGIN := 48.0
 const LEVEL_BUTTON_MAX_WIDTH := 420.0
 
+@onready var _top_status_bar := %TopStatusBar as MarginContainer
 @onready var _bottom_bar := %BottomBar as MarginContainer
 @onready var _level_button := %LevelButton as Button
 
@@ -27,6 +31,7 @@ func _apply_responsive_layout() -> void:
 		return
 
 	var safe_margins := _get_safe_area_margins(viewport_size)
+	_layout_top_status_bar(safe_margins)
 	_bottom_bar.anchor_left = 0.0
 	_bottom_bar.anchor_top = 1.0
 	_bottom_bar.anchor_right = 1.0
@@ -40,6 +45,17 @@ func _apply_responsive_layout() -> void:
 	var button_minimum_size := _level_button.custom_minimum_size
 	button_minimum_size.x = minf(LEVEL_BUTTON_MAX_WIDTH, available_width)
 	_level_button.custom_minimum_size = button_minimum_size
+
+
+func _layout_top_status_bar(safe_margins: Vector4) -> void:
+	_top_status_bar.anchor_left = 0.0
+	_top_status_bar.anchor_top = 0.0
+	_top_status_bar.anchor_right = 1.0
+	_top_status_bar.anchor_bottom = 0.0
+	_top_status_bar.offset_left = safe_margins.x + TOP_SIDE_MARGIN
+	_top_status_bar.offset_top = safe_margins.y + TOP_MARGIN
+	_top_status_bar.offset_right = -(safe_margins.z + TOP_SIDE_MARGIN)
+	_top_status_bar.offset_bottom = safe_margins.y + TOP_MARGIN + TOP_BAR_HEIGHT
 
 
 func _get_safe_area_margins(viewport_size: Vector2) -> Vector4:

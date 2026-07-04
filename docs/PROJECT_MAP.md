@@ -37,6 +37,7 @@ Reusable item scene:
 Files:
 - `scenes/main_menu.tscn`
 - `scenes/main_menu_testing.tscn`
+- `scenes/ui/main_menu_top_status.tscn`
 - `scenes/ui/level_button.tscn`
 - `scripts/production_main_menu.gd`
 - `scripts/main_menu.gd`
@@ -44,6 +45,7 @@ Files:
 
 Responsibility:
 - Shows a production bottom button labeled with `PlayerProgress.current_level`.
+- Shows static production top-row icons for profile, coins, lives, and settings with placeholder values only.
 - Uses `scenes/ui/level_button.tscn` and `assets/ui/level_button_blank.png` for the reusable glossy green level button visuals while keeping the label dynamic.
 - Keeps free level selection out of the production menu.
 - Preserves the old testing menu in `scenes/main_menu_testing.tscn`.

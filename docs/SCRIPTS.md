@@ -20,12 +20,14 @@ Key constants:
 - `BOTTOM_BAR_*`, `SIDE_MARGIN`, and `LEVEL_BUTTON_MAX_WIDTH`: responsive bottom-button layout values.
 
 Important nodes:
+- `%TopStatusBar`: top-anchored container positioned at runtime with safe-area padding; owns only static placeholder icon layout through `scenes/ui/main_menu_top_status.tscn`.
 - `%BottomBar`: bottom-anchored container positioned at runtime with safe-area padding.
 - `%LevelButton`: `scenes/ui/level_button.tscn` instance that starts the saved campaign level.
 
 Key methods:
 - `_ready()`: loads progress, wires the level button, and applies responsive layout.
-- `_apply_responsive_layout()`: keeps the bottom button inside the viewport and safe area.
+- `_apply_responsive_layout()`: keeps the top status row and bottom button inside the viewport and safe area.
+- `_layout_top_status_bar()`: positions the static top status row.
 - `_update_level_button()`: displays the saved current level or the complete state.
 - `_launch_campaign_level()`: instantiates the level, sets campaign launch metadata, swaps current scene, and queues the menu for deletion.
 
