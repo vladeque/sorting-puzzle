@@ -38,15 +38,14 @@ Root:
 
 Purpose:
 - Reusable production level-entry button.
-- Owns the glossy green rounded-button visual treatment inspired by the selected generated concept.
+- Owns the generated glossy green rounded-button texture inspired by the selected generated concept.
 - Keeps the button text dynamic through the normal Godot `Button.text` property, so callers can set labels such as `Level 1` or `Complete`.
 
 Important nodes:
-- `LevelButton`: clickable button root with rounded green style boxes, dark border, white outlined text, and dynamic pressed/hover/disabled states.
-- `GlossHighlight`: non-interactive top highlight panel.
-- `BottomShade`: non-interactive lower shade panel.
+- `LevelButton`: clickable button root with the generated texture style, white outlined text, and dynamic pressed/hover/disabled states.
 
 Depends on:
+- `assets/ui/level_button_blank.png`.
 - Caller scenes or scripts for placement, click wiring, and label updates.
 
 Do not use for:
