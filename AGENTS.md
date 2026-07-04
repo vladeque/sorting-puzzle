@@ -87,9 +87,16 @@ When changing UI or gameplay layout, test representative resolutions such as 540
 
 ### Image Conversion
 
-Use ImageMagick for repeatable image conversion and cleanup, especially when converting source art to PNG assets with alpha transparency.
+For generated project assets that need transparency, prefer ImageMagick for chroma-key removal and PNG alpha cleanup.
 
-Prefer the `magick` CLI when it is available on `PATH`. In this workspace, ImageMagick has been verified at `C:\Program Files\ImageMagick-7.1.2-Q16-HDRI\magick.exe`; use that full path if plain `magick` is not available in the current shell.
+Do not use Python/Pillow helper scripts for image conversion or alpha cleanup unless:
+- ImageMagick is unavailable,
+- ImageMagick produces visibly poor results, or
+- the user explicitly approves the fallback.
+
+If a Codex skill recommends a different conversion helper, pause and ask before using it.
+
+In this workspace, ImageMagick has been verified at `C:\Program Files\ImageMagick-7.1.2-Q16-HDRI\magick.exe`; use that full path if plain `magick` is not available in the current shell.
 
 For transparent output, preserve or create alpha explicitly. Example:
 
@@ -107,5 +114,8 @@ When asking for clarification, briefly explain what is unclear and identify the 
 
 ### Generated Assets
 
-When a task involves generating images or audio, present the user with several clear options first and ask which direction they want to use before proceeding with generation or implementation.
+When a task involves generating images or audio:
+1. First present 2-4 art direction options and ask which direction to use.
+2. After the user chooses a direction, generate 2-3 candidate assets for review.
+3. Do not implement a generated asset until the user selects one candidate, unless the user explicitly asks to proceed with the best candidate.
 
