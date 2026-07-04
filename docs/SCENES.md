@@ -46,11 +46,13 @@ Purpose:
 
 Important nodes:
 - `ProfileWidget`: circular avatar icon.
-- `CoinsWidget`: gold coin icon, placeholder amount label, and plus badge.
-- `LivesWidget`: heart icon, placeholder life count, and full-status label.
-- `SettingsWidget`: blue settings icon with a small alert badge.
+- `CoinsWidget`: generated gold coin icon, placeholder amount label, and plus badge.
+- `LivesWidget`: generated heart icon, placeholder life count, and full-status label.
+- `SettingsWidget`: smaller `PauseMenuButton`-style button with a small alert badge.
 
 Depends on:
+- `assets/ui/main_menu_coin.png`.
+- `assets/ui/main_menu_lives.png`.
 - Owning menu scene for placement and safe-area layout.
 
 Do not use for:
