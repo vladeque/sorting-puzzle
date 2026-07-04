@@ -13,6 +13,7 @@ const TESTING_MENU_SCENE := "res://scenes/main_menu_testing.tscn"
 
 func _ready() -> void:
 	PlayerProgress.load_progress()
+	PlayerProgress.refresh_lives()
 	_play_button.pressed.connect(_launch_campaign_level)
 	_update_campaign_progress()
 	_populate_level_selector()
@@ -22,9 +23,14 @@ func _update_campaign_progress() -> void:
 	var current_level := PlayerProgress.get_current_level()
 	var has_level_to_play := current_level <= MAX_LEVEL and _level_config_exists(current_level)
 	if has_level_to_play:
-		_selector_label.text = "Level %d" % current_level
-		_play_button.text = "Play"
-		_play_button.disabled = false
+		if PlayerProgress.get_lives() <= 0:
+			_selector_label.text = "Level %d" % current_level
+			_play_button.text = "No Lives"
+			_play_button.disabled = true
+		else:
+			_selector_label.text = "Level %d" % current_level
+			_play_button.text = "Play"
+			_play_button.disabled = false
 	else:
 		_selector_label.text = "All Levels Complete"
 		_play_button.text = "Complete"
@@ -51,6 +57,11 @@ func _populate_level_selector() -> void:
 
 
 func _launch_campaign_level() -> void:
+	PlayerProgress.refresh_lives()
+	if PlayerProgress.get_lives() <= 0:
+		_update_campaign_progress()
+		return
+
 	var current_level := PlayerProgress.get_current_level()
 	if current_level > MAX_LEVEL or not _level_config_exists(current_level):
 		return

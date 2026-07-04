@@ -1,6 +1,6 @@
 # Cloud Save
 
-This project uses `PlayerProgress` for campaign progression and ability inventory. `PlayerProgress` delegates persistence to a save provider selected by project settings.
+This project uses `PlayerProgress` for campaign progression, lives, and ability inventory. `PlayerProgress` delegates persistence to a save provider selected by project settings.
 
 ## Provider Selection
 
@@ -95,6 +95,7 @@ Official references:
 For the current progression schema:
 - Prefer the save with the highest `highest_completed_level`.
 - If levels tie, prefer the greater `current_level`.
+- For lives, resolve each candidate through its `next_life_restore_unix` timestamp first, then prefer the greater `lives` count. If lives tie and are below full, prefer the earlier `next_life_restore_unix`.
 - For non-refilling ability inventory, prefer the lower ability count when resolving conflicts to avoid duplicating spent inventory.
 
 If abilities later become purchasable or rewarded, move ability inventory to a server-authoritative flow instead of trusting client-side merge rules.

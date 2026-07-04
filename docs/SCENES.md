@@ -13,8 +13,8 @@ Script:
 Purpose:
 - Main project entry scene.
 - Displays `assets/backgrounds/main_menu.jpeg` as a fullscreen production menu background.
-- Provides a top status row with static placeholder icons for profile, coins, lives, and settings.
-- Provides a bottom `%LevelButton` labeled with the saved campaign level, such as `Level 1`.
+- Provides a top status row for profile, coins, saved campaign lives, and settings.
+- Provides a bottom `%LevelButton` labeled with the saved campaign level, such as `Level 1`, or disabled as `No Lives` when lives are empty.
 - Starts the saved campaign level when the bottom button is pressed.
 
 Important nodes:
@@ -25,9 +25,9 @@ Important nodes:
 
 Depends on:
 - `level.tscn` through `scripts/production_main_menu.gd`.
-- `PlayerProgress` autoload for the saved campaign level.
+- `PlayerProgress` autoload for the saved campaign level, lives count, and life restore countdown.
 - `assets/backgrounds/main_menu.jpeg`.
-- `scenes/ui/main_menu_top_status.tscn` for static top status icons.
+- `scenes/ui/main_menu_top_status.tscn` for top status icons and labels.
 - `scenes/ui/level_button.tscn` for the reusable production level button visuals.
 
 Do not use for:
@@ -40,14 +40,14 @@ Root:
 - `MainMenuTopStatus` (`HBoxContainer`)
 
 Purpose:
-- Reusable static top status row for the production main menu.
+- Reusable top status row for the production main menu.
 - Displays four non-interactive UI groups from left to right: player profile, gold coins, lives remaining, and settings.
-- Provides placeholder values only; it does not read or write player data.
+- Provides labels that the owning menu script updates for campaign lives and life restore status.
 
 Important nodes:
 - `ProfileWidget`: circular avatar icon.
 - `CoinsWidget`: generated gold coin icon, placeholder amount label, and plus badge.
-- `LivesWidget`: generated heart icon, placeholder life count, and full-status label.
+- `LivesWidget`: generated heart icon, current life count label, and `Full` or countdown status label.
 - `SettingsWidget`: smaller `PauseMenuButton`-style button with a small alert badge.
 
 Depends on:
@@ -56,7 +56,7 @@ Depends on:
 - Owning menu scene for placement and safe-area layout.
 
 Do not use for:
-- Player inventory, lives logic, settings behavior, or profile data ownership.
+- Player inventory, lives logic, settings behavior, or profile data ownership. The owning menu script writes display values.
 
 ## `scenes/ui/level_button.tscn`
 
@@ -102,7 +102,7 @@ Important nodes:
 
 Depends on:
 - `level.tscn` through `scripts/main_menu.gd`.
-- `PlayerProgress` autoload for the saved campaign level.
+- `PlayerProgress` autoload for the saved campaign level and lives gate.
 
 Do not use for:
 - Runtime puzzle rules or shelf state. Put those in `level.tscn` and `scripts/level.gd`.

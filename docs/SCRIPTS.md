@@ -10,6 +10,7 @@ Attached to:
 Purpose:
 - Shows the production campaign entry point over the production menu background.
 - Labels the bottom button with the saved current level.
+- Displays saved campaign lives in the top status bar and disables campaign play at zero lives.
 - Launches the saved campaign level.
 
 Key constants:
@@ -17,18 +18,23 @@ Key constants:
 - `MIN_LEVEL`: first campaign level number.
 - `MAX_LEVEL`: last campaign level number.
 - `PRODUCTION_MENU_SCENE`: return path assigned to campaign level instances.
+- `LIFE_STATUS_REFRESH_SECONDS`: cadence for refreshing the lives countdown while the menu is visible.
 - `BOTTOM_BAR_*`, `SIDE_MARGIN`, and `LEVEL_BUTTON_MAX_WIDTH`: responsive bottom-button layout values.
 
 Important nodes:
-- `%TopStatusBar`: top-anchored container positioned at runtime with safe-area padding; owns only static placeholder icon layout through `scenes/ui/main_menu_top_status.tscn`.
+- `%TopStatusBar`: top-anchored container positioned at runtime with safe-area padding; owns the status icon layout through `scenes/ui/main_menu_top_status.tscn`.
+- `MainMenuTopStatus/LivesWidget/LifeCount`: shows current campaign lives.
+- `MainMenuTopStatus/LivesWidget/LifeStatus`: shows `Full` or the countdown until the next restored life.
 - `%BottomBar`: bottom-anchored container positioned at runtime with safe-area padding.
 - `%LevelButton`: `scenes/ui/level_button.tscn` instance that starts the saved campaign level.
 
 Key methods:
 - `_ready()`: loads progress, wires the level button, and applies responsive layout.
+- `_process(delta)`: refreshes the lives display and play button state while the menu is open.
 - `_apply_responsive_layout()`: keeps the top status row and bottom button inside the viewport and safe area.
 - `_layout_top_status_bar()`: positions the static top status row.
-- `_update_level_button()`: displays the saved current level or the complete state.
+- `_update_level_button()`: displays the saved current level, no-lives state, or complete state.
+- `_update_lives_status()`: writes current lives and the next-life countdown into the top status labels.
 - `_launch_campaign_level()`: instantiates the level, sets campaign launch metadata, swaps current scene, and queues the menu for deletion.
 
 Depends on:
@@ -66,7 +72,7 @@ Important nodes:
 
 Key methods:
 - `_ready()`: loads progress, wires the play button, updates campaign progress text, and populates the dev selector when enabled.
-- `_update_campaign_progress()`: displays the saved current level or all-complete state.
+- `_update_campaign_progress()`: displays the saved current level, no-lives state, or all-complete state.
 - `_populate_level_selector()`: clears old buttons and creates one isolated dev/test button per level when dev selection is enabled.
 - `_launch_campaign_level()`: launches `PlayerProgress.current_level`.
 - `_launch_level(level_number, launched_from_dev_mode)`: instantiates the level, sets launch metadata, swaps current scene, and queues the menu for deletion.
@@ -88,13 +94,15 @@ Autoload:
 - Registered as `PlayerProgress` in `project.godot`.
 
 Purpose:
-- Owns saved campaign progression and campaign ability inventory.
+- Owns saved campaign progression, campaign lives, and campaign ability inventory.
 - Persists state through the configured save provider.
 
 Saved fields:
 - `version`: save schema version.
 - `current_level`: next campaign level to play.
 - `highest_completed_level`: highest campaign level completed.
+- `lives`: current campaign lives, clamped from `0` to `5`.
+- `next_life_restore_unix`: Unix timestamp for the next hourly life restore, or `0` when lives are full.
 - `ability_uses`: remaining campaign uses for hammer, shuffle, and highlight.
 
 Key methods:
@@ -102,6 +110,11 @@ Key methods:
 - `save_progress()`: writes the current progress data through the active provider.
 - `get_current_level()`: returns the next campaign level.
 - `get_ability_uses()`: returns remaining campaign ability uses.
+- `get_lives()`: refreshes and returns current campaign lives.
+- `get_max_lives()`: returns the lives cap.
+- `get_next_life_restore_seconds_remaining()`: returns seconds until the next life restore, or `0` when full.
+- `refresh_lives()`: restores one life per elapsed real-time hour while lives are not full.
+- `spend_life()`: immediately spends and saves one campaign life when available.
 - `spend_ability(ability_id)`: immediately spends and saves one campaign ability use.
 - `complete_level(level_number)`: records completion and advances `current_level` when the completed level is the active campaign level.
 - `reset_progress()`: restores default progress and writes it to disk for testing.
@@ -240,6 +253,7 @@ Key responsibilities:
 - Queue shelf resolution requests made while another match animation is still finishing.
 - Promote back layers with `_promote_back_layer()`, `_play_layer_promotion_animation()`, and `_advance_back_layers()`.
 - Check win/loss state with `_check_level_completed()`, `_fail_level()`, and `_complete_level()`.
+- Spend one campaign life on campaign failure and on pause-menu Leave through `_spend_campaign_life_for_run()`, guarded so one level run cannot spend twice.
 - Save campaign completion through `PlayerProgress`, show `UI/CompletionPanel` with the run's earned star count, and load the next campaign level when the completion `Next` button is pressed.
 - Return to the configured menu scene when leaving a level or when the dev/test completion `Next` button is pressed.
 - Keep the level countdown idle until the first meaningful player action, then format the active timer as zero-padded `MM:SS` text with `_update_timer_label()`.
@@ -263,7 +277,7 @@ Depends on:
 - `assets/audio/item_place.wav` and `assets/audio/triple_clear.wav`.
 - `configs/item_sprites.json` item IDs and texture paths.
 - `configs/levels/level_*.json` shelf schema.
-- `PlayerProgress` autoload for campaign progress and ability inventory.
+- `PlayerProgress` autoload for campaign progress, lives, and ability inventory.
 
 Do not use for:
 - Offline level generation or solvability search. Keep that in `scripts/tools/`.

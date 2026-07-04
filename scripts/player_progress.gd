@@ -14,6 +14,8 @@ const SAVE_PROVIDER_CLOUD := "cloud"
 const ABILITY_HAMMER := "hammer"
 const ABILITY_SHUFFLE := "shuffle"
 const ABILITY_HIGHLIGHT := "highlight"
+const MAX_LIVES := 5
+const LIFE_RESTORE_SECONDS := 3600
 const DEFAULT_ABILITY_USES := {
 	ABILITY_HAMMER: 3,
 	ABILITY_SHUFFLE: 3,
@@ -38,6 +40,7 @@ func load_progress() -> void:
 			loaded_data = {}
 
 		_data = _sanitize_data(loaded_data)
+		refresh_lives()
 		return
 
 	push_warning("Could not load %s save: %s" % [_save_provider.get_provider_name(), result.get("error", "")])
@@ -65,6 +68,47 @@ func get_ability_uses() -> Dictionary:
 		return DEFAULT_ABILITY_USES.duplicate()
 
 	return ability_uses.duplicate()
+
+
+func get_lives() -> int:
+	refresh_lives()
+	return int(_data.get("lives", MAX_LIVES))
+
+
+func get_max_lives() -> int:
+	return MAX_LIVES
+
+
+func get_next_life_restore_seconds_remaining() -> int:
+	refresh_lives()
+	if get_lives() >= MAX_LIVES:
+		return 0
+
+	var next_restore_unix := int(_data.get("next_life_restore_unix", 0))
+	if next_restore_unix <= 0:
+		return LIFE_RESTORE_SECONDS
+
+	var now_unix := int(Time.get_unix_time_from_system())
+	return maxi(next_restore_unix - now_unix, 0)
+
+
+func refresh_lives() -> void:
+	if _refresh_lives_state():
+		save_progress()
+
+
+func spend_life() -> bool:
+	refresh_lives()
+	var lives := int(_data.get("lives", MAX_LIVES))
+	if lives <= 0:
+		return false
+
+	_data["lives"] = lives - 1
+	if int(_data.get("lives", 0)) < MAX_LIVES and int(_data.get("next_life_restore_unix", 0)) <= 0:
+		_data["next_life_restore_unix"] = int(Time.get_unix_time_from_system()) + LIFE_RESTORE_SECONDS
+
+	save_progress()
+	return true
 
 
 func spend_ability(ability_id: StringName) -> bool:
@@ -109,6 +153,12 @@ func _sanitize_data(raw_data: Dictionary) -> Dictionary:
 	sanitized["version"] = int(raw_data.get("version", SAVE_VERSION))
 	sanitized["current_level"] = maxi(int(raw_data.get("current_level", MIN_LEVEL)), MIN_LEVEL)
 	sanitized["highest_completed_level"] = maxi(int(raw_data.get("highest_completed_level", 0)), 0)
+	sanitized["lives"] = clampi(int(raw_data.get("lives", MAX_LIVES)), 0, MAX_LIVES)
+	sanitized["next_life_restore_unix"] = maxi(int(raw_data.get("next_life_restore_unix", 0)), 0)
+	if int(sanitized["lives"]) >= MAX_LIVES:
+		sanitized["next_life_restore_unix"] = 0
+	elif int(sanitized["next_life_restore_unix"]) <= 0:
+		sanitized["next_life_restore_unix"] = int(Time.get_unix_time_from_system()) + LIFE_RESTORE_SECONDS
 
 	var raw_ability_uses := raw_data.get("ability_uses", {}) as Dictionary
 	if raw_ability_uses != null:
@@ -124,8 +174,36 @@ func _default_data() -> Dictionary:
 		"version": SAVE_VERSION,
 		"current_level": MIN_LEVEL,
 		"highest_completed_level": 0,
+		"lives": MAX_LIVES,
+		"next_life_restore_unix": 0,
 		"ability_uses": DEFAULT_ABILITY_USES.duplicate(),
 	}
+
+
+func _refresh_lives_state() -> bool:
+	var current_lives := clampi(int(_data.get("lives", MAX_LIVES)), 0, MAX_LIVES)
+	var next_restore_unix := maxi(int(_data.get("next_life_restore_unix", 0)), 0)
+	var original_lives := current_lives
+	var original_next_restore_unix := next_restore_unix
+
+	if current_lives >= MAX_LIVES:
+		next_restore_unix = 0
+	else:
+		var now_unix := int(Time.get_unix_time_from_system())
+		if next_restore_unix <= 0:
+			next_restore_unix = now_unix + LIFE_RESTORE_SECONDS
+		elif next_restore_unix <= now_unix:
+			var elapsed_after_next_restore := now_unix - next_restore_unix
+			var restored_lives := 1 + floori(float(elapsed_after_next_restore) / float(LIFE_RESTORE_SECONDS))
+			current_lives = mini(current_lives + restored_lives, MAX_LIVES)
+			if current_lives >= MAX_LIVES:
+				next_restore_unix = 0
+			else:
+				next_restore_unix += restored_lives * LIFE_RESTORE_SECONDS
+
+	_data["lives"] = current_lives
+	_data["next_life_restore_unix"] = next_restore_unix
+	return current_lives != original_lives or next_restore_unix != original_next_restore_unix
 
 
 func _ensure_save_provider() -> void:

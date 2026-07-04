@@ -23,7 +23,7 @@ Player progression:
 - `scripts/player_progress.gd`
 - `scripts/save_providers/*.gd`
 - Registered in `project.godot` as the `PlayerProgress` autoload.
-- Saves campaign level progress and campaign ability inventory through the configured save provider.
+- Saves campaign level progress, campaign lives, and campaign ability inventory through the configured save provider.
 
 Reusable item scene:
 - `scenes/item.tscn`
@@ -47,7 +47,8 @@ Files:
 
 Responsibility:
 - Shows a production bottom button labeled with `PlayerProgress.current_level`.
-- Shows static production top-row icons for profile, generated coins, generated lives, and a smaller pause-style settings button with placeholder values only.
+- Shows production top-row icons for profile, generated coins, saved lives, and a smaller pause-style settings button.
+- Disables campaign launch when saved lives are zero; the lives widget shows current lives and the countdown until the next hourly restore.
 - Uses `scenes/ui/level_button.tscn` and `assets/ui/level_button_blank.png` for the reusable glossy green level button visuals while keeping the label dynamic.
 - Keeps free level selection out of the production menu.
 - Preserves the old testing menu in `scenes/main_menu_testing.tscn`.
@@ -71,12 +72,14 @@ Responsibility:
 - Loads and saves campaign progress through the configured provider.
 - Uses `LocalSaveProvider` for editor/development saves under `user://player_progress.json`.
 - Uses `CloudSaveProvider` for release cloud saves through native Google Play Games or Apple Game Center bridge singletons.
-- Tracks the current campaign level, highest completed level, and campaign ability uses.
+- Tracks the current campaign level, highest completed level, campaign lives, next life restore timestamp, and campaign ability uses.
+- Restores one missing life per elapsed real-time hour until the five-life cap is reached.
+- Spends one campaign life when a campaign level fails or the player leaves from the pause menu.
 - Spends ability uses immediately so failure or leaving a level does not refund them.
 - Advances `current_level` only when the active campaign level is completed.
 
 Change here when:
-- Adding ability refills, rewards, purchases, reset flows, save migrations, native cloud save hooks, or new persisted player state.
+- Adding life tuning, ability refills, rewards, purchases, reset flows, save migrations, native cloud save hooks, or new persisted player state.
 
 ### Level Runtime
 
@@ -110,7 +113,7 @@ Responsibility:
 - Keeps non-clearing items interactive while match animations run, with pending shelf resolves queued behind the active animation.
 - Promotes back layers when the visible layer clears.
 - Tracks the countdown timer, starting it only after the first meaningful player action, and win/loss overlays.
-- Wires the in-level pause menu, including the top-right circular menu button, modal overlay, Leave action, and Continue action.
+- Wires the in-level pause menu, including the top-right circular menu button, modal overlay, Leave action, Continue action, and campaign life spend for Leave.
 - Displays a responsive Godot-authored level backdrop with a top HUD strip, monotone shop wall, baseboard, and bottom floor band behind generated shelves.
 
 Change here when:

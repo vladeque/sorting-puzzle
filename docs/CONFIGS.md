@@ -146,17 +146,22 @@ py scripts\tools\generate_level_shelves.py --shelf-count 9 --layer-count 2 --dif
 ## `user://player_progress.json`
 
 Purpose:
-- Stores local campaign progression and campaign ability inventory when `application/config/save_provider` is `local`.
+- Stores local campaign progression, campaign lives, and campaign ability inventory when `application/config/save_provider` is `local`.
 - Owned by the `PlayerProgress` autoload in `scripts/player_progress.gd`.
 
 Fields:
 - `version`: save schema version.
 - `current_level`: next normal campaign level to launch from the main menu.
 - `highest_completed_level`: highest normal campaign level completed.
+- `lives`: current campaign lives. Fresh saves start at `5`, and values are clamped from `0` to `5`.
+- `next_life_restore_unix`: Unix timestamp for the next hourly life restore while lives are not full, or `0` when lives are full.
 - `ability_uses`: remaining campaign uses for `hammer`, `shuffle`, and `highlight`.
 
 Runtime behavior:
-- Fresh saves start at level 1 with three uses for each ability.
+- Fresh saves start at level 1 with five lives and three uses for each ability.
+- The main menu blocks campaign level launch at zero lives.
+- Campaign level failure and pause-menu Leave spend one life. Completed levels do not spend lives.
+- Missing lives restore at one life per real-time hour until the five-life cap is reached.
 - Ability uses are spent and saved immediately when an ability successfully applies.
 - Failed or abandoned levels do not refund ability uses.
 - Completing the current campaign level advances `current_level` by one.

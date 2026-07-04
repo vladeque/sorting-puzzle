@@ -11,18 +11,35 @@ const BOTTOM_BAR_HEIGHT := 220.0
 const BOTTOM_MARGIN := 52.0
 const SIDE_MARGIN := 48.0
 const LEVEL_BUTTON_MAX_WIDTH := 420.0
+const LIFE_STATUS_REFRESH_SECONDS := 1.0
 
 @onready var _top_status_bar := %TopStatusBar as MarginContainer
 @onready var _bottom_bar := %BottomBar as MarginContainer
 @onready var _level_button := %LevelButton as Button
+@onready var _life_count_label := %TopStatusBar.get_node("MainMenuTopStatus/LivesWidget/LifeCount") as Label
+@onready var _life_status_label := %TopStatusBar.get_node("MainMenuTopStatus/LivesWidget/LifeStatus") as Label
+
+var _life_status_refresh_time := 0.0
 
 
 func _ready() -> void:
 	PlayerProgress.load_progress()
+	PlayerProgress.refresh_lives()
 	_level_button.pressed.connect(_launch_campaign_level)
 	get_viewport().size_changed.connect(_apply_responsive_layout)
+	_update_lives_status()
 	_update_level_button()
 	_apply_responsive_layout()
+
+
+func _process(delta: float) -> void:
+	_life_status_refresh_time += delta
+	if _life_status_refresh_time < LIFE_STATUS_REFRESH_SECONDS:
+		return
+
+	_life_status_refresh_time = 0.0
+	_update_lives_status()
+	_update_level_button()
 
 
 func _apply_responsive_layout() -> void:
@@ -78,14 +95,41 @@ func _update_level_button() -> void:
 	var current_level := PlayerProgress.get_current_level()
 	var has_level_to_play := current_level >= MIN_LEVEL and current_level <= MAX_LEVEL and _level_config_exists(current_level)
 	if has_level_to_play:
-		_level_button.text = "Level %d" % current_level
-		_level_button.disabled = false
+		if PlayerProgress.get_lives() <= 0:
+			_level_button.text = "No Lives"
+			_level_button.disabled = true
+		else:
+			_level_button.text = "Level %d" % current_level
+			_level_button.disabled = false
 	else:
 		_level_button.text = "Complete"
 		_level_button.disabled = true
 
 
+func _update_lives_status() -> void:
+	var lives := PlayerProgress.get_lives()
+	if _life_count_label != null:
+		_life_count_label.text = str(lives)
+
+	if _life_status_label == null:
+		return
+
+	if lives >= PlayerProgress.get_max_lives():
+		_life_status_label.text = "Full"
+		return
+
+	var seconds_remaining := PlayerProgress.get_next_life_restore_seconds_remaining()
+	var minutes_remaining := maxi(ceili(float(seconds_remaining) / 60.0), 1)
+	_life_status_label.text = "%dm" % minutes_remaining
+
+
 func _launch_campaign_level() -> void:
+	PlayerProgress.refresh_lives()
+	if PlayerProgress.get_lives() <= 0:
+		_update_lives_status()
+		_update_level_button()
+		return
+
 	var current_level := PlayerProgress.get_current_level()
 	if current_level < MIN_LEVEL or current_level > MAX_LEVEL or not _level_config_exists(current_level):
 		return

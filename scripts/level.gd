@@ -134,6 +134,7 @@ var _level_failed := false
 var _level_completed := false
 var _level_paused := false
 var _returning_to_menu := false
+var _life_spent_for_run := false
 var _highlight_timer := 0.0
 var _combo_count := 0
 var _combo_time_remaining := 0.0
@@ -643,6 +644,7 @@ func _apply_level_config(config: Dictionary) -> void:
 	_level_failed = false
 	_level_completed = false
 	_level_paused = false
+	_life_spent_for_run = false
 	_triples_cleared = 0
 	_stars = 0
 	_reset_combo()
@@ -1483,6 +1485,7 @@ func _start_level_timer_from_player_action() -> void:
 func _fail_level() -> void:
 	_level_failed = true
 	_level_paused = false
+	_spend_campaign_life_for_run()
 	_reset_combo()
 	_clear_selected_item()
 	_set_moving_shelf_rows_paused(true)
@@ -1583,6 +1586,15 @@ func _level_config_exists(level_number: int) -> bool:
 	return FileAccess.file_exists(LEVEL_CONFIG_TEMPLATE % level_number)
 
 
+func _spend_campaign_life_for_run() -> void:
+	if launched_from_dev_mode or _life_spent_for_run:
+		return
+
+	_life_spent_for_run = true
+	if not PlayerProgress.spend_life():
+		push_warning("Could not spend campaign life for level %d." % selected_level)
+
+
 func _setup_pause_menu_buttons() -> void:
 	_pause_menu_button.pressed.connect(_on_pause_menu_button_pressed)
 	_leave_button.pressed.connect(_on_pause_menu_leave_pressed)
@@ -1645,6 +1657,7 @@ func _open_pause_menu() -> void:
 
 
 func _on_pause_menu_leave_pressed() -> void:
+	_spend_campaign_life_for_run()
 	_return_to_main_menu()
 
 
