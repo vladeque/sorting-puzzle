@@ -118,7 +118,7 @@ Script:
 Purpose:
 - Playable puzzle scene.
 - Provides stable top-level nodes that `scripts/level.gd` fills and controls at runtime.
-- Normal campaign launches save completion and auto-advance to the next level; dev/test launches return to their configured menu and do not touch campaign save data.
+- Normal campaign launches save completion when the level clears, then wait on the completion reward overlay's `Next` button before loading the next level; dev/test launches return to their configured menu from that button and do not touch campaign save data.
 
 Important nodes:
 - `Background`: fullscreen procedural gameplay backdrop with child nodes for the top HUD strip, simple shop wall, baseboard, and bottom floor band.
@@ -136,7 +136,7 @@ Important nodes:
 - `UI/AbilityBar/HBoxContainer/HighlightButton`: highlight ability button.
 - `UI/AbilityBar/HBoxContainer/HighlightButton/TimerLabel`: active highlight ability countdown.
 - `UI/FailurePanel`: shown when time runs out.
-- `UI/CompletionPanel`: shown after all items clear.
+- `UI/CompletionPanel`: shown after all items clear; contains the `Great job!` title, generated reward star image, earned star count label, and green `Next` button.
 - `UI/PauseMenuOverlay`: `scenes/pause_menu.tscn` instance used for the modal pause menu.
 
 Runtime-created nodes:

@@ -186,7 +186,6 @@ Important exports:
 - `match_shrink_duration_seconds`: duration for the center item shrink-out after a triple gathers.
 - `combo_window_seconds`: time allowed after a triple clear to extend the active combo before the center HUD combo label and fill disappear.
 - `level_duration_seconds`: fallback duration if config does not define `time_seconds`.
-- `completion_return_delay_seconds`: delay before returning to the main menu after completion.
 - `item_place_volume_db`: volume for the item placement sound effect.
 - `triple_clear_volume_db`: volume for the matched triple clear sound effect.
 - `selected_level`: level number loaded from `configs/levels/level_%03d.json`.
@@ -212,7 +211,7 @@ Important constants:
 - `LAYOUT_SCENE_TEMPLATE`: `res://scenes/layouts/layout_%s.tscn` path pattern used by `layout_preset`.
 - `DEFAULT_LAYOUT_PRESET`: fallback layout preset.
 - `MAIN_MENU_SCENE`: default scene returned to after completion.
-- `LEVEL_SCENE_PATH`: scene loaded when normal campaign play auto-advances to the next level.
+- `LEVEL_SCENE_PATH`: scene loaded when the completion `Next` button advances normal campaign play to the next level.
 - `ITEM_PLACE_SOUND`: short sound played when the player drops or moves an item into a shelf slot.
 - `TRIPLE_CLEAR_SOUND`: sound played when a matched triple gathers and disappears.
 
@@ -241,8 +240,8 @@ Key responsibilities:
 - Queue shelf resolution requests made while another match animation is still finishing.
 - Promote back layers with `_promote_back_layer()`, `_play_layer_promotion_animation()`, and `_advance_back_layers()`.
 - Check win/loss state with `_check_level_completed()`, `_fail_level()`, and `_complete_level()`.
-- Save campaign completion through `PlayerProgress` and auto-load the next campaign level when it exists.
-- Return to the configured menu scene when leaving a level or when dev/test completion finishes.
+- Save campaign completion through `PlayerProgress`, show `UI/CompletionPanel` with the run's earned star count, and load the next campaign level when the completion `Next` button is pressed.
+- Return to the configured menu scene when leaving a level or when the dev/test completion `Next` button is pressed.
 - Keep the level countdown idle until the first meaningful player action, then format the active timer as zero-padded `MM:SS` text with `_update_timer_label()`.
 - Pause and resume active gameplay through the top-right menu button, the instanced `UI/PauseMenuOverlay`, `Leave`, and `Continue`.
 - Disable item placement and triple-clear sound effects while the pause menu sound-effects toggle is crossed out.

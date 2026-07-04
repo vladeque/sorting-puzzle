@@ -66,6 +66,15 @@ const SHELVES_SIDE_MARGIN := 16.0
 const SHELVES_MIN_LAYOUT_SCALE := 0.45
 const SHELVES_MAX_LAYOUT_SCALE := 1.5
 const RESULT_LABEL_HEIGHT := 96.0
+const COMPLETION_TITLE_SIZE := Vector2(720, 96)
+const COMPLETION_TITLE_TOP := 108.0
+const COMPLETION_STAR_SIZE := Vector2(340, 340)
+const COMPLETION_STAR_CENTER_Y := 466.0
+const COMPLETION_STARS_LABEL_SIZE := Vector2(320, 84)
+const COMPLETION_STARS_LABEL_OFFSET_Y := 120.0
+const COMPLETION_BUTTON_SIZE := Vector2(300, 90)
+const COMPLETION_BUTTON_CENTER_Y := 850.0
+const COMPLETION_MIN_BUTTON_BOTTOM_MARGIN := 118.0
 const PAUSE_MENU_PANEL_SIZE := Vector2(520, 363)
 @export var slot_snap_distance := BASE_SLOT_SNAP_DISTANCE * SHELF_CELL_VISUAL_SCALE
 @export var item_pick_size := BASE_ITEM_PICK_SIZE * SHELF_CELL_VISUAL_SCALE
@@ -79,7 +88,6 @@ const PAUSE_MENU_PANEL_SIZE := Vector2(520, 363)
 @export var match_shrink_duration_seconds := 0.16
 @export_range(0.25, 30.0, 0.25) var combo_window_seconds := 5.0
 @export var level_duration_seconds := 300.0
-@export var completion_return_delay_seconds := 1.75
 @export_range(-40.0, 6.0, 0.5) var item_place_volume_db := -5.0
 @export_range(-40.0, 6.0, 0.5) var triple_clear_volume_db := -5.0
 @export_range(1, 10, 1) var selected_level := 1
@@ -102,6 +110,10 @@ var _combo_fill: Control
 var _combo_label: Label
 var _failure_panel: Control
 var _completion_panel: Control
+var _completion_title_label: Label
+var _completion_star_image: TextureRect
+var _completion_earned_stars_label: Label
+var _completion_next_button: Button
 var _pause_menu_button: Button
 var _pause_menu_overlay: Control
 var _leave_button: Button
@@ -120,7 +132,6 @@ var _has_player_started_timer := false
 var _level_failed := false
 var _level_completed := false
 var _level_paused := false
-var _completion_return_time_remaining := 0.0
 var _returning_to_menu := false
 var _highlight_timer := 0.0
 var _combo_count := 0
@@ -156,6 +167,10 @@ func _ready() -> void:
 	_combo_label = get_node("Background/HudCenterSlot/ComboLabel") as Label
 	_failure_panel = get_node("UI/FailurePanel") as Control
 	_completion_panel = get_node("UI/CompletionPanel") as Control
+	_completion_title_label = get_node("UI/CompletionPanel/TitleLabel") as Label
+	_completion_star_image = get_node("UI/CompletionPanel/StarImage") as TextureRect
+	_completion_earned_stars_label = get_node("UI/CompletionPanel/EarnedStarsLabel") as Label
+	_completion_next_button = get_node("UI/CompletionPanel/NextButton") as Button
 	_pause_menu_button = get_node("UI/PauseMenuButton") as Button
 	_pause_menu_overlay = get_node("UI/PauseMenuOverlay") as Control
 	_leave_button = get_node("UI/PauseMenuOverlay/PauseMenuPanel/MarginContainer/VBoxContainer/ButtonRow/LeaveButton") as Button
@@ -169,6 +184,7 @@ func _ready() -> void:
 	_rng.randomize()
 	_setup_audio_players()
 	_setup_pause_menu_buttons()
+	_setup_completion_buttons()
 	_setup_ability_buttons()
 	_load_item_textures()
 	_apply_level_config(_load_level_config(selected_level))
@@ -193,7 +209,7 @@ func _apply_responsive_layout() -> void:
 	_layout_top_hud(safe_margins)
 	_layout_ability_bar(safe_margins)
 	_layout_result_panel(_failure_panel, safe_margins)
-	_layout_result_panel(_completion_panel, safe_margins)
+	_layout_completion_panel(safe_margins)
 	_layout_pause_menu_overlay()
 	_layout_shelves(viewport_size, safe_margins)
 
@@ -311,6 +327,57 @@ func _layout_result_panel(panel: Control, safe_margins: Vector4) -> void:
 		label.offset_top = -RESULT_LABEL_HEIGHT * 0.5
 		label.offset_right = -safe_margins.z
 		label.offset_bottom = RESULT_LABEL_HEIGHT * 0.5
+
+
+func _layout_completion_panel(safe_margins: Vector4) -> void:
+	if _completion_panel == null:
+		return
+
+	_completion_panel.anchor_left = 0.0
+	_completion_panel.anchor_top = 0.0
+	_completion_panel.anchor_right = 1.0
+	_completion_panel.anchor_bottom = 1.0
+	_completion_panel.offset_left = 0.0
+	_completion_panel.offset_top = 0.0
+	_completion_panel.offset_right = 0.0
+	_completion_panel.offset_bottom = 0.0
+
+	var viewport_size := get_viewport_rect().size
+	var layout_scale := clampf(minf(viewport_size.x / 720.0, viewport_size.y / 1280.0), 0.75, 1.35)
+	var center_x := viewport_size.x * 0.5
+	var title_top := safe_margins.y + COMPLETION_TITLE_TOP * layout_scale
+	var star_center_y := safe_margins.y + COMPLETION_STAR_CENTER_Y * layout_scale
+	var button_center_y := minf(
+		safe_margins.y + COMPLETION_BUTTON_CENTER_Y * layout_scale,
+		viewport_size.y - safe_margins.w - COMPLETION_MIN_BUTTON_BOTTOM_MARGIN * layout_scale - COMPLETION_BUTTON_SIZE.y * layout_scale * 0.5
+	)
+
+	_layout_centered_control(
+		_completion_title_label,
+		Vector2(center_x, title_top + COMPLETION_TITLE_SIZE.y * layout_scale * 0.5),
+		Vector2(viewport_size.x - safe_margins.x - safe_margins.z, COMPLETION_TITLE_SIZE.y * layout_scale)
+	)
+	_layout_centered_control(_completion_star_image, Vector2(center_x, star_center_y), COMPLETION_STAR_SIZE * layout_scale)
+	_layout_centered_control(
+		_completion_earned_stars_label,
+		Vector2(center_x, star_center_y + COMPLETION_STARS_LABEL_OFFSET_Y * layout_scale),
+		COMPLETION_STARS_LABEL_SIZE * layout_scale
+	)
+	_layout_centered_control(_completion_next_button, Vector2(center_x, button_center_y), COMPLETION_BUTTON_SIZE * layout_scale)
+
+
+func _layout_centered_control(control: Control, center: Vector2, size: Vector2) -> void:
+	if control == null:
+		return
+
+	control.anchor_left = 0.0
+	control.anchor_top = 0.0
+	control.anchor_right = 0.0
+	control.anchor_bottom = 0.0
+	control.offset_left = center.x - size.x * 0.5
+	control.offset_top = center.y - size.y * 0.5
+	control.offset_right = center.x + size.x * 0.5
+	control.offset_bottom = center.y + size.y * 0.5
 
 
 func _layout_pause_menu_overlay() -> void:
@@ -469,9 +536,6 @@ func _stop_sound_effects() -> void:
 
 func _process(delta: float) -> void:
 	if _level_completed:
-		_completion_return_time_remaining = maxf(_completion_return_time_remaining - delta, 0.0)
-		if _completion_return_time_remaining <= 0.0 and not _returning_to_menu:
-			_advance_after_completion()
 		return
 
 	if _level_failed:
@@ -581,7 +645,6 @@ func _apply_level_config(config: Dictionary) -> void:
 	_stars = 0
 	_reset_combo()
 	_update_star_counter_label()
-	_completion_return_time_remaining = 0.0
 	_returning_to_menu = false
 	_failure_panel.visible = false
 	_completion_panel.visible = false
@@ -1441,7 +1504,6 @@ func _complete_level() -> void:
 	_level_completed = true
 	_level_paused = false
 	_reset_combo()
-	_completion_return_time_remaining = maxf(completion_return_delay_seconds, 0.0)
 	if not launched_from_dev_mode:
 		PlayerProgress.complete_level(selected_level)
 	_clear_selected_item()
@@ -1456,6 +1518,7 @@ func _complete_level() -> void:
 	_clear_ability_highlights()
 	_update_ability_buttons()
 	_update_pause_menu_button()
+	_update_completion_reward()
 	_completion_panel.visible = true
 	_pause_menu_overlay.visible = false
 
@@ -1524,6 +1587,34 @@ func _setup_pause_menu_buttons() -> void:
 	_continue_button.pressed.connect(_on_pause_menu_continue_pressed)
 	if _pause_menu_overlay.has_signal(&"setting_toggled"):
 		_pause_menu_overlay.connect(&"setting_toggled", _on_pause_menu_setting_toggled)
+
+
+func _setup_completion_buttons() -> void:
+	_completion_next_button.pressed.connect(_on_completion_next_pressed)
+
+
+func _update_completion_reward() -> void:
+	if _completion_earned_stars_label == null:
+		return
+
+	var earned_text := "x%d" % _stars
+	var font_size := 58
+	if earned_text.length() >= 8:
+		font_size = 42
+	elif earned_text.length() >= 7:
+		font_size = 48
+	elif earned_text.length() >= 6:
+		font_size = 52
+
+	_completion_earned_stars_label.add_theme_font_size_override("font_size", font_size)
+	_completion_earned_stars_label.text = earned_text
+
+
+func _on_completion_next_pressed() -> void:
+	if not _level_completed or _returning_to_menu:
+		return
+
+	_advance_after_completion()
 
 
 func _on_pause_menu_setting_toggled(setting_id: StringName, is_disabled: bool) -> void:
