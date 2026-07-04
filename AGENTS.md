@@ -97,5 +97,3 @@ When asking for clarification, briefly explain what is unclear and identify the 
 
 When a task involves generating images or audio, present the user with several clear options first and ask which direction they want to use before proceeding with generation or implementation.
 
-When a task requires an image asset with real transparency, such as a production-ready transparent PNG with an alpha channel, do not attempt to create or approximate it. Ask the user to provide the transparent source image directly before proceeding.
-
