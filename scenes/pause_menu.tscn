@@ -1,9 +1,9 @@
-[gd_scene load_steps=18 format=3 uid="uid://g1xsr7chqeg7"]
+[gd_scene format=3 uid="uid://g1xsr7chqeg7"]
 
 [ext_resource type="Texture2D" uid="uid://d4dmg42gwviq5" path="res://assets/ui/icon_music.png" id="1_music_icon"]
 [ext_resource type="Texture2D" uid="uid://3hrppla10q8k" path="res://assets/ui/icon_sound_effects.png" id="2_sound_effects_icon"]
 [ext_resource type="Texture2D" uid="uid://djl1f7q7bbgnf" path="res://assets/ui/icon_vibration.png" id="3_vibration_icon"]
-[ext_resource type="Script" path="res://scripts/pause_menu.gd" id="4_pause_menu_script"]
+[ext_resource type="Script" uid="uid://djayncoacexvl" path="res://scripts/pause_menu.gd" id="4_pause_menu_script"]
 [ext_resource type="Texture2D" uid="uid://b386mn58pea5q" path="res://assets/ui/level_button_blank_red.png" id="5_leave_button"]
 [ext_resource type="Texture2D" uid="uid://bai63m2evt0sk" path="res://assets/ui/level_button_blank.png" id="6_continue_button"]
 
@@ -21,6 +21,45 @@ corner_radius_bottom_left = 30
 shadow_color = Color(0, 0, 0, 0.42)
 shadow_size = 18
 shadow_offset = Vector2(0, 8)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_normal"]
+bg_color = Color(0.86, 0.08, 0.06, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(1, 0.58, 0.5, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+shadow_color = Color(0, 0, 0, 0.36)
+shadow_size = 6
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_pressed"]
+bg_color = Color(0.58, 0.04, 0.04, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(1, 0.76, 0.68, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_hover"]
+bg_color = Color(0.98, 0.2, 0.16, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(1, 0.82, 0.72, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inner_panel"]
 bg_color = Color(0.96, 0.9, 0.78, 1)
@@ -76,45 +115,6 @@ corner_radius_top_right = 20
 corner_radius_bottom_right = 20
 corner_radius_bottom_left = 20
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_normal"]
-bg_color = Color(0.86, 0.08, 0.06, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 4
-border_color = Color(1, 0.58, 0.5, 1)
-corner_radius_top_left = 32
-corner_radius_top_right = 32
-corner_radius_bottom_right = 32
-corner_radius_bottom_left = 32
-shadow_color = Color(0, 0, 0, 0.36)
-shadow_size = 6
-shadow_offset = Vector2(0, 3)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_pressed"]
-bg_color = Color(0.58, 0.04, 0.04, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 4
-border_color = Color(1, 0.76, 0.68, 1)
-corner_radius_top_left = 32
-corner_radius_top_right = 32
-corner_radius_bottom_right = 32
-corner_radius_bottom_left = 32
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_hover"]
-bg_color = Color(0.98, 0.2, 0.16, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 4
-border_color = Color(1, 0.82, 0.72, 1)
-corner_radius_top_left = 32
-corner_radius_top_right = 32
-corner_radius_bottom_right = 32
-corner_radius_bottom_left = 32
-
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_leave_button"]
 texture = ExtResource("5_leave_button")
 
@@ -123,7 +123,6 @@ texture = ExtResource("6_continue_button")
 
 [node name="PauseMenuOverlay" type="ColorRect" unique_id=636763679]
 visible = false
-layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -165,16 +164,19 @@ text = "Pause"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CloseButton" type="Button" parent="PauseMenuPanel"]
+[node name="CloseButton" type="Button" parent="PauseMenuPanel" unique_id=975190343]
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
+anchor_top = 1.0
 anchor_right = 1.0
+anchor_bottom = 1.0
 offset_left = -54.0
-offset_top = -18.0
+offset_top = -518.0
 offset_right = 18.0
-offset_bottom = 54.0
+offset_bottom = -446.0
 grow_horizontal = 0
+grow_vertical = 0
 focus_mode = 0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
@@ -187,18 +189,18 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_close_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_close_hover")
 text = "X"
 
-[node name="InnerPanel" type="Panel" parent="PauseMenuPanel"]
+[node name="InnerPanel" type="Panel" parent="PauseMenuPanel" unique_id=1357716807]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
 offset_left = 46.0
 offset_top = 116.0
 offset_right = -46.0
-offset_bottom = 330.0
+offset_bottom = 370.0
 grow_horizontal = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_inner_panel")
 
-[node name="InnerTitleLabel" type="Label" parent="PauseMenuPanel/InnerPanel"]
+[node name="InnerTitleLabel" type="Label" parent="PauseMenuPanel/InnerPanel" unique_id=1478165782]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -221,15 +223,15 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -184.0
-offset_top = -17.0
+offset_top = -42.0
 offset_right = 184.0
-offset_bottom = 108.0
+offset_bottom = 83.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 28
 alignment = 1
 
-[node name="MusicOption" type="VBoxContainer" parent="PauseMenuPanel/InnerPanel/IconRow"]
+[node name="MusicOption" type="VBoxContainer" parent="PauseMenuPanel/InnerPanel/IconRow" unique_id=1504710980]
 custom_minimum_size = Vector2(104, 124)
 layout_mode = 2
 theme_override_constants/separation = 5
@@ -260,14 +262,14 @@ texture = ExtResource("1_music_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="PauseMenuPanel/InnerPanel/IconRow/MusicOption"]
+[node name="Label" type="Label" parent="PauseMenuPanel/InnerPanel/IconRow/MusicOption" unique_id=18740240]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.36, 0.16, 0.1, 1)
 theme_override_font_sizes/font_size = 18
 text = "Music"
 horizontal_alignment = 1
 
-[node name="SoundEffectsOption" type="VBoxContainer" parent="PauseMenuPanel/InnerPanel/IconRow"]
+[node name="SoundEffectsOption" type="VBoxContainer" parent="PauseMenuPanel/InnerPanel/IconRow" unique_id=1413209329]
 custom_minimum_size = Vector2(104, 124)
 layout_mode = 2
 theme_override_constants/separation = 5
@@ -298,14 +300,14 @@ texture = ExtResource("2_sound_effects_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption"]
+[node name="Label" type="Label" parent="PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption" unique_id=1773943702]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.36, 0.16, 0.1, 1)
 theme_override_font_sizes/font_size = 18
 text = "SFX"
 horizontal_alignment = 1
 
-[node name="VibrationOption" type="VBoxContainer" parent="PauseMenuPanel/InnerPanel/IconRow"]
+[node name="VibrationOption" type="VBoxContainer" parent="PauseMenuPanel/InnerPanel/IconRow" unique_id=2050411472]
 custom_minimum_size = Vector2(104, 124)
 layout_mode = 2
 theme_override_constants/separation = 5
@@ -336,7 +338,7 @@ texture = ExtResource("3_vibration_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="PauseMenuPanel/InnerPanel/IconRow/VibrationOption"]
+[node name="Label" type="Label" parent="PauseMenuPanel/InnerPanel/IconRow/VibrationOption" unique_id=1738908670]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.36, 0.16, 0.1, 1)
 theme_override_font_sizes/font_size = 18

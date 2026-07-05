@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3]
+[gd_scene format=3 uid="uid://cblpm4vbgjmfu"]
 
 [ext_resource type="Texture2D" uid="uid://kvmueps1ax4n" path="res://assets/ui/main_menu_lives.png" id="1_lives_icon"]
 [ext_resource type="Texture2D" uid="uid://3vi3qpy12q0w" path="res://assets/ui/reward_star.png" id="2_reward_star"]
@@ -19,48 +19,6 @@ corner_radius_bottom_left = 30
 shadow_color = Color(0, 0, 0, 0.42)
 shadow_size = 18
 shadow_offset = Vector2(0, 8)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inner_panel"]
-bg_color = Color(0.96, 0.9, 0.78, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 4
-border_color = Color(0.45, 0.19, 0.13, 0.52)
-corner_radius_top_left = 24
-corner_radius_top_right = 24
-corner_radius_bottom_right = 24
-corner_radius_bottom_left = 24
-shadow_color = Color(0.24, 0.08, 0.04, 0.22)
-shadow_size = 8
-shadow_offset = Vector2(0, 3)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_count_badge"]
-bg_color = Color(0.54, 0.13, 0.1, 0.96)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(1, 0.92, 0.62, 1)
-corner_radius_top_left = 20
-corner_radius_top_right = 20
-corner_radius_bottom_right = 20
-corner_radius_bottom_left = 20
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_icon_slot"]
-bg_color = Color(0.83, 0.66, 0.47, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 3
-border_color = Color(0.98, 0.87, 0.66, 0.9)
-corner_radius_top_left = 20
-corner_radius_top_right = 20
-corner_radius_bottom_right = 20
-corner_radius_bottom_left = 20
-shadow_color = Color(0.3, 0.12, 0.07, 0.24)
-shadow_size = 5
-shadow_offset = Vector2(0, 3)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_normal"]
 bg_color = Color(0.86, 0.08, 0.06, 1)
@@ -101,15 +59,56 @@ corner_radius_top_right = 32
 corner_radius_bottom_right = 32
 corner_radius_bottom_left = 32
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inner_panel"]
+bg_color = Color(0.96, 0.9, 0.78, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(0.45, 0.19, 0.13, 0.52)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+shadow_color = Color(0.24, 0.08, 0.04, 0.22)
+shadow_size = 8
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_icon_slot"]
+bg_color = Color(0.83, 0.66, 0.47, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 3
+border_color = Color(0.98, 0.87, 0.66, 0.9)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0.3, 0.12, 0.07, 0.24)
+shadow_size = 5
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_count_badge"]
+bg_color = Color(0.54, 0.13, 0.1, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.92, 0.62, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_leave_button"]
 texture = ExtResource("3_leave_button")
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_continue_button"]
 texture = ExtResource("4_continue_button")
 
-[node name="LeaveConfirmationOverlay" type="ColorRect"]
+[node name="LeaveConfirmationOverlay" type="ColorRect" unique_id=433344665]
 visible = false
-layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -117,7 +116,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.02, 0.025, 0.03, 0.66)
 
-[node name="ConfirmationPanel" type="Panel" parent="."]
+[node name="ConfirmationPanel" type="Panel" parent="." unique_id=435234248]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -132,7 +131,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_outer_panel")
 
-[node name="TitleLabel" type="Label" parent="ConfirmationPanel"]
+[node name="TitleLabel" type="Label" parent="ConfirmationPanel" unique_id=209184417]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -150,13 +149,11 @@ text = "Leaving the Level"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CloseButton" type="Button" parent="ConfirmationPanel"]
+[node name="CloseButton" type="Button" parent="ConfirmationPanel" unique_id=887807905]
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
-anchor_top = 0.0
 anchor_right = 1.0
-anchor_bottom = 0.0
 offset_left = -54.0
 offset_top = -18.0
 offset_right = 18.0
@@ -174,18 +171,18 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_close_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_close_hover")
 text = "X"
 
-[node name="InnerPanel" type="Panel" parent="ConfirmationPanel"]
+[node name="InnerPanel" type="Panel" parent="ConfirmationPanel" unique_id=1179642266]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
 offset_left = 46.0
 offset_top = 116.0
 offset_right = -46.0
-offset_bottom = 374.0
+offset_bottom = 426.0
 grow_horizontal = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_inner_panel")
 
-[node name="MessageLabel" type="Label" parent="ConfirmationPanel/InnerPanel"]
+[node name="MessageLabel" type="Label" parent="ConfirmationPanel/InnerPanel" unique_id=1761519229]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -200,7 +197,7 @@ text = "You will lose:"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="LossRow" type="HBoxContainer" parent="ConfirmationPanel/InnerPanel"]
+[node name="LossRow" type="HBoxContainer" parent="ConfirmationPanel/InnerPanel" unique_id=1125034986]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -208,35 +205,35 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -144.0
-offset_top = -12.0
+offset_top = -48.0
 offset_right = 144.0
-offset_bottom = 126.0
+offset_bottom = 78.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 36
 alignment = 1
 
-[node name="LifeLoss" type="Panel" parent="ConfirmationPanel/InnerPanel/LossRow"]
+[node name="LifeLoss" type="Panel" parent="ConfirmationPanel/InnerPanel/LossRow" unique_id=1336556399]
 custom_minimum_size = Vector2(126, 126)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_icon_slot")
 
-[node name="Icon" type="TextureRect" parent="ConfirmationPanel/InnerPanel/LossRow/LifeLoss"]
+[node name="Icon" type="TextureRect" parent="ConfirmationPanel/InnerPanel/LossRow/LifeLoss" unique_id=1261194187]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -43.0
-offset_top = 15.0
+offset_top = 20.0
 offset_right = 43.0
-offset_bottom = 101.0
+offset_bottom = 106.0
 grow_horizontal = 2
 mouse_filter = 2
 texture = ExtResource("1_lives_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="CrossOut" type="ColorRect" parent="ConfirmationPanel/InnerPanel/LossRow/LifeLoss/Icon"]
+[node name="CrossOut" type="ColorRect" parent="ConfirmationPanel/InnerPanel/LossRow/LifeLoss/Icon" unique_id=1762880170]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -254,16 +251,16 @@ pivot_offset = Vector2(48, 6)
 mouse_filter = 2
 color = Color(0.9, 0.08, 0.06, 1)
 
-[node name="CountLabel" type="Label" parent="ConfirmationPanel/InnerPanel/LossRow/LifeLoss"]
+[node name="CountLabel" type="Label" parent="ConfirmationPanel/InnerPanel/LossRow/LifeLoss" unique_id=1520092272]
 z_index = 4
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = 76.0
-offset_top = 76.0
-offset_right = 126.0
-offset_bottom = 126.0
+offset_left = 25.0
+offset_top = 83.0
+offset_right = 75.0
+offset_bottom = 133.0
 grow_horizontal = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.82)
@@ -275,27 +272,27 @@ text = "1"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="StarLoss" type="Panel" parent="ConfirmationPanel/InnerPanel/LossRow"]
+[node name="StarLoss" type="Panel" parent="ConfirmationPanel/InnerPanel/LossRow" unique_id=1197390443]
 custom_minimum_size = Vector2(126, 126)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_icon_slot")
 
-[node name="Icon" type="TextureRect" parent="ConfirmationPanel/InnerPanel/LossRow/StarLoss"]
+[node name="Icon" type="TextureRect" parent="ConfirmationPanel/InnerPanel/LossRow/StarLoss" unique_id=1354293510]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -42.0
-offset_top = 14.0
+offset_top = 20.0
 offset_right = 42.0
-offset_bottom = 98.0
+offset_bottom = 104.0
 grow_horizontal = 2
 mouse_filter = 2
 texture = ExtResource("2_reward_star")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="CrossOut" type="ColorRect" parent="ConfirmationPanel/InnerPanel/LossRow/StarLoss/Icon"]
+[node name="CrossOut" type="ColorRect" parent="ConfirmationPanel/InnerPanel/LossRow/StarLoss/Icon" unique_id=175472998]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -313,16 +310,16 @@ pivot_offset = Vector2(48, 6)
 mouse_filter = 2
 color = Color(0.9, 0.08, 0.06, 1)
 
-[node name="CountLabel" type="Label" parent="ConfirmationPanel/InnerPanel/LossRow/StarLoss"]
+[node name="CountLabel" type="Label" parent="ConfirmationPanel/InnerPanel/LossRow/StarLoss" unique_id=759577385]
 z_index = 4
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = 76.0
-offset_top = 76.0
-offset_right = 126.0
-offset_bottom = 126.0
+offset_left = 25.0
+offset_top = 81.0
+offset_right = 75.0
+offset_bottom = 131.0
 grow_horizontal = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0.47, 0.17, 0.04, 0.98)
@@ -334,7 +331,7 @@ text = "0"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ButtonRow" type="HBoxContainer" parent="ConfirmationPanel"]
+[node name="ButtonRow" type="HBoxContainer" parent="ConfirmationPanel" unique_id=568091413]
 layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0
@@ -349,7 +346,7 @@ grow_vertical = 0
 theme_override_constants/separation = 18
 alignment = 1
 
-[node name="ConfirmLeaveButton" type="Button" parent="ConfirmationPanel/ButtonRow"]
+[node name="ConfirmLeaveButton" type="Button" parent="ConfirmationPanel/ButtonRow" unique_id=1970473122]
 custom_minimum_size = Vector2(194, 76)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
@@ -363,7 +360,7 @@ theme_override_styles/pressed = SubResource("StyleBoxTexture_leave_button")
 theme_override_styles/hover = SubResource("StyleBoxTexture_leave_button")
 text = "Leave"
 
-[node name="ContinueButton" type="Button" parent="ConfirmationPanel/ButtonRow"]
+[node name="ContinueButton" type="Button" parent="ConfirmationPanel/ButtonRow" unique_id=943112863]
 custom_minimum_size = Vector2(214, 76)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
