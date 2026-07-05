@@ -263,8 +263,8 @@ Root:
 
 Purpose:
 - Reusable in-level leave confirmation overlay instanced by `level.tscn`.
-- Reuses the pause popup panel treatment with a dimmed fullscreen modal background, warm outer area, cream inner loss area, and protruding top-right red close button.
-- Shows a `Leaving the Level` title, warning text, crossed-out life and star reward icons, and red `Leave` / green `Continue` image buttons.
+- Reuses the pause popup panel treatment with a dimmed fullscreen modal background, warm outer area, cream inner loss area, and an explicitly top-right anchored protruding red close button.
+- Shows a `Leaving the Level` title, warning text, crossed-out life and star reward icons, readable bottom-right count badges layered above the icons, and red `Leave` / green `Continue` image buttons.
 
 Important nodes:
 - `ConfirmationPanel`: centered popup panel.
