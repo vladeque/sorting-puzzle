@@ -7,13 +7,12 @@
 script = ExtResource("1_shelf_script")
 
 [node name="Shadow" type="Polygon2D" parent="." unique_id=1166351438]
-visible = false
 color = Color(0.74916583, 0.65930223, 0.5507783, 1)
-polygon = PackedVector2Array(-90.24036, 44.01355, 126.45907, 44.272057, 137.25061, 58.82427, -78.578064, 59.016922)
+polygon = PackedVector2Array(-101, 46, 126.45907, 44.272057, 137.25061, 58.82427, -78.578064, 59.016922)
 
 [node name="RightColumnShadow" type="Polygon2D" parent="." unique_id=356530628]
 color = Color(0.7490196, 0.65882355, 0.54901963, 1)
-polygon = PackedVector2Array(111.81738, -87.18291, 128.0911, -71.91666, 128.16081, 54.794724, 112, 46)
+polygon = PackedVector2Array(109, -100, 115, -100, 137, -89, 137.251, 58.824, 109, 45)
 
 [node name="BackWall" type="Polygon2D" parent="." unique_id=251890705]
 z_index = 1
