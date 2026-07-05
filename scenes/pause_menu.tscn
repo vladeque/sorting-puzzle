@@ -44,10 +44,10 @@ border_width_top = 2
 border_width_right = 2
 border_width_bottom = 3
 border_color = Color(0.98, 0.87, 0.66, 0.9)
-corner_radius_top_left = 44
-corner_radius_top_right = 44
-corner_radius_bottom_right = 44
-corner_radius_bottom_left = 44
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
 shadow_color = Color(0.3, 0.12, 0.07, 0.24)
 shadow_size = 5
 shadow_offset = Vector2(0, 3)
@@ -59,10 +59,10 @@ border_width_top = 2
 border_width_right = 2
 border_width_bottom = 3
 border_color = Color(1, 0.92, 0.62, 1)
-corner_radius_top_left = 44
-corner_radius_top_right = 44
-corner_radius_bottom_right = 44
-corner_radius_bottom_left = 44
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_icon_button_hover"]
 bg_color = Color(0.9, 0.72, 0.5, 1)
@@ -71,10 +71,10 @@ border_width_top = 2
 border_width_right = 2
 border_width_bottom = 3
 border_color = Color(1, 0.92, 0.62, 1)
-corner_radius_top_left = 44
-corner_radius_top_right = 44
-corner_radius_bottom_right = 44
-corner_radius_bottom_left = 44
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_normal"]
 bg_color = Color(0.86, 0.08, 0.06, 1)
@@ -170,10 +170,10 @@ layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -74.0
-offset_top = 12.0
-offset_right = -14.0
-offset_bottom = 72.0
+offset_left = -54.0
+offset_top = -18.0
+offset_right = 18.0
+offset_bottom = 54.0
 grow_horizontal = 0
 focus_mode = 0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
@@ -220,9 +220,9 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -166.0
+offset_left = -184.0
 offset_top = -17.0
-offset_right = 166.0
+offset_right = 184.0
 offset_bottom = 108.0
 grow_horizontal = 2
 grow_vertical = 2
@@ -230,13 +230,13 @@ theme_override_constants/separation = 28
 alignment = 1
 
 [node name="MusicOption" type="VBoxContainer" parent="PauseMenuPanel/InnerPanel/IconRow"]
-custom_minimum_size = Vector2(92, 124)
+custom_minimum_size = Vector2(104, 124)
 layout_mode = 2
 theme_override_constants/separation = 5
 alignment = 1
 
 [node name="MusicButton" type="Button" parent="PauseMenuPanel/InnerPanel/IconRow/MusicOption" unique_id=476301978]
-custom_minimum_size = Vector2(82, 82)
+custom_minimum_size = Vector2(96, 82)
 layout_mode = 2
 size_flags_horizontal = 4
 focus_mode = 0
@@ -249,10 +249,10 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 7.0
-offset_top = 7.0
-offset_right = -7.0
-offset_bottom = -7.0
+offset_left = 15.0
+offset_top = 8.0
+offset_right = -15.0
+offset_bottom = -8.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -268,13 +268,13 @@ text = "Music"
 horizontal_alignment = 1
 
 [node name="SoundEffectsOption" type="VBoxContainer" parent="PauseMenuPanel/InnerPanel/IconRow"]
-custom_minimum_size = Vector2(92, 124)
+custom_minimum_size = Vector2(104, 124)
 layout_mode = 2
 theme_override_constants/separation = 5
 alignment = 1
 
 [node name="SoundEffectsButton" type="Button" parent="PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption" unique_id=213460749]
-custom_minimum_size = Vector2(82, 82)
+custom_minimum_size = Vector2(96, 82)
 layout_mode = 2
 size_flags_horizontal = 4
 focus_mode = 0
@@ -287,10 +287,10 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 7.0
-offset_top = 7.0
-offset_right = -7.0
-offset_bottom = -7.0
+offset_left = 15.0
+offset_top = 8.0
+offset_right = -15.0
+offset_bottom = -8.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -306,13 +306,13 @@ text = "SFX"
 horizontal_alignment = 1
 
 [node name="VibrationOption" type="VBoxContainer" parent="PauseMenuPanel/InnerPanel/IconRow"]
-custom_minimum_size = Vector2(92, 124)
+custom_minimum_size = Vector2(104, 124)
 layout_mode = 2
 theme_override_constants/separation = 5
 alignment = 1
 
 [node name="VibrationButton" type="Button" parent="PauseMenuPanel/InnerPanel/IconRow/VibrationOption" unique_id=1013902673]
-custom_minimum_size = Vector2(82, 82)
+custom_minimum_size = Vector2(96, 82)
 layout_mode = 2
 size_flags_horizontal = 4
 focus_mode = 0
@@ -325,10 +325,10 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 7.0
-offset_top = 7.0
-offset_right = -7.0
-offset_bottom = -7.0
+offset_left = 15.0
+offset_top = 8.0
+offset_right = -15.0
+offset_bottom = -8.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2

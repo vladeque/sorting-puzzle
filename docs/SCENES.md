@@ -232,17 +232,17 @@ Script:
 
 Purpose:
 - Reusable in-level pause menu overlay instanced by `level.tscn`.
-- Owns the modal dimmer, warm outer popup panel, cream inner settings panel, `Pause` title, red close button, music / sound-effects / vibration icon buttons, their crossed-out toggle visuals, and `Leave` / `Continue` buttons.
+- Owns the modal dimmer, warm outer popup panel, cream inner settings panel, `Pause` title, protruding top-right red close button, music / sound-effects / vibration rectangular icon slots, their crossed-out toggle visuals, and `Leave` / `Continue` buttons.
 - Uses full-rect overlay anchors and a centered popup panel so it tracks the stretched viewport.
 
 Important nodes:
 - `PauseMenuPanel`: centered popup panel.
 - `PauseMenuPanel/TitleLabel`: pause menu title.
-- `PauseMenuPanel/CloseButton`: red close button wired by `scripts/level.gd` to resume the level.
+- `PauseMenuPanel/CloseButton`: protruding top-right red close button wired by `scripts/level.gd` to resume the level.
 - `PauseMenuPanel/InnerPanel`: cream settings area inside the warm outer popup.
-- `PauseMenuPanel/InnerPanel/IconRow/MusicOption/MusicButton`: circular music toggle placeholder.
-- `PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption/SoundEffectsButton`: circular sound effects toggle that disables or enables gameplay sound effects.
-- `PauseMenuPanel/InnerPanel/IconRow/VibrationOption/VibrationButton`: circular phone vibration toggle placeholder.
+- `PauseMenuPanel/InnerPanel/IconRow/MusicOption/MusicButton`: rectangular music toggle slot.
+- `PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption/SoundEffectsButton`: rectangular sound effects toggle slot that disables or enables gameplay sound effects.
+- `PauseMenuPanel/InnerPanel/IconRow/VibrationOption/VibrationButton`: rectangular phone vibration toggle slot.
 - `PauseMenuPanel/ButtonRow/LeaveButton`: red image button wired by `scripts/level.gd` to open leave confirmation.
 - `PauseMenuPanel/ButtonRow/ContinueButton`: green image button wired by `scripts/level.gd` to resume the level.
 
@@ -263,17 +263,18 @@ Root:
 
 Purpose:
 - Reusable in-level leave confirmation overlay instanced by `level.tscn`.
-- Reuses the pause popup panel treatment with a dimmed fullscreen modal background, warm outer area, cream inner loss area, and top-right red close button.
+- Reuses the pause popup panel treatment with a dimmed fullscreen modal background, warm outer area, cream inner loss area, and protruding top-right red close button.
 - Shows a `Leaving the Level` title, warning text, crossed-out life and star reward icons, and red `Leave` / green `Continue` image buttons.
 
 Important nodes:
 - `ConfirmationPanel`: centered popup panel.
 - `ConfirmationPanel/TitleLabel`: leave confirmation title.
-- `ConfirmationPanel/CloseButton`: red close button wired by `scripts/level.gd` to resume the level.
+- `ConfirmationPanel/CloseButton`: protruding top-right red close button wired by `scripts/level.gd` to resume the level.
 - `ConfirmationPanel/InnerPanel`: cream content area with warning copy and lost-reward icons.
 - `ConfirmationPanel/InnerPanel/MessageLabel`: warning copy shown above the lost-reward icons.
-- `ConfirmationPanel/InnerPanel/LossRow/LifeLoss`: crossed-out life icon with a static count of `1`.
-- `ConfirmationPanel/InnerPanel/LossRow/StarLoss/CountLabel`: current run star count written by `scripts/level.gd`.
+- `ConfirmationPanel/InnerPanel/LossRow/LifeLoss`: rectangular crossed-out life slot with a bottom-right static count of `1`.
+- `ConfirmationPanel/InnerPanel/LossRow/StarLoss`: rectangular crossed-out star slot.
+- `ConfirmationPanel/InnerPanel/LossRow/StarLoss/CountLabel`: bottom-right current run star count written by `scripts/level.gd`.
 - `ConfirmationPanel/ButtonRow/ConfirmLeaveButton`: red image button that confirms leaving.
 - `ConfirmationPanel/ButtonRow/ContinueButton`: green image button that resumes the level.
 

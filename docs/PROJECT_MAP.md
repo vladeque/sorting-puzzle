@@ -205,9 +205,9 @@ Files:
 
 Responsibility:
 - `level.tscn` provides the top-right circular pause button and instances the pause menu scene.
-- `scenes/pause_menu.tscn` owns the popup layout, warm outer area, cream inner settings area, `Pause` title, red close button, music / sound-effects / vibration icon buttons, and Leave/Continue image buttons.
-- `scenes/leave_confirmation_menu.tscn` owns the second-step confirmation popup shown after Leave, including warm outer area, cream inner loss area, red close button, crossed-out lost life/star icons, and red Leave / green Continue image buttons.
-- `scripts/pause_menu.gd` toggles crossed-out visuals on the three settings icon buttons and emits setting state changes.
+- `scenes/pause_menu.tscn` owns the popup layout, warm outer area, cream inner settings area, `Pause` title, protruding top-right red close button, music / sound-effects / vibration rectangular icon slots, and Leave/Continue image buttons.
+- `scenes/leave_confirmation_menu.tscn` owns the second-step confirmation popup shown after Leave, including warm outer area, cream inner loss area, protruding top-right red close button, crossed-out rectangular lost life/star slots, and red Leave / green Continue image buttons.
+- `scripts/pause_menu.gd` toggles crossed-out visuals on the three settings icon-slot buttons and emits setting state changes.
 - `scripts/level.gd` opens and closes the menu, pauses the timer and gameplay input, treats red close buttons like Continue, opens the leave confirmation before routing confirmed Leave back to the main menu, writes the current run star count into that confirmation, and mutes gameplay sound effects when the sound-effects button is crossed out.
 
 Change here when:

@@ -388,7 +388,7 @@ Attached to:
 
 Purpose:
 - Owns local pause menu settings-button visual state.
-- Toggles a crossed-out overlay on the music, sound effects, and vibration buttons when clicked.
+- Toggles a crossed-out overlay on the music, sound effects, and vibration rectangular slot buttons when clicked.
 - Emits `setting_toggled(setting_id, is_disabled)` so owning runtime scripts can apply supported settings.
 
 Important nodes:

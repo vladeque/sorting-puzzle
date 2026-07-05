@@ -49,8 +49,8 @@ func _create_cross_out_marker(button: Button) -> Control:
 	var cross_out := Control.new()
 	cross_out.name = CROSS_OUT_NAME
 	cross_out.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	cross_out.position = Vector2(5, 35)
-	cross_out.size = Vector2(72, 14)
+	cross_out.position = Vector2(6, 34)
+	cross_out.size = Vector2(84, 14)
 	cross_out.pivot_offset = cross_out.size * 0.5
 	cross_out.rotation_degrees = -38.0
 	cross_out.visible = false
