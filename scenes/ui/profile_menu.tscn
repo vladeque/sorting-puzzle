@@ -1,0 +1,104 @@
+[gd_scene load_steps=5 format=3 uid="uid://b5yb0hlfitnqa"]
+
+[ext_resource type="Script" path="res://scripts/profile_menu.gd" id="1_profile_menu"]
+[ext_resource type="PackedScene" path="res://scenes/ui/level_button.tscn" id="2_level_button"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_title_panel"]
+bg_color = Color(0.99, 0.88, 0.67, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.56, 0.34, 0.58, 0.8)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0, 0, 0, 0.22)
+shadow_size = 5
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_scroll"]
+
+[node name="ProfileMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+script = ExtResource("1_profile_menu")
+
+[node name="DimBackground" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+color = Color(0.05, 0.06, 0.1, 0.64)
+
+[node name="ContentMargin" type="MarginContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 36
+theme_override_constants/margin_top = 54
+theme_override_constants/margin_right = 36
+theme_override_constants/margin_bottom = 34
+
+[node name="Content" type="VBoxContainer" parent="ContentMargin"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="TitlePanel" type="Panel" parent="ContentMargin/Content"]
+custom_minimum_size = Vector2(0, 62)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_title_panel")
+
+[node name="TitleLabel" type="Label" parent="ContentMargin/Content/TitlePanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.39, 0.11, 0.33, 1)
+theme_override_colors/font_shadow_color = Color(1, 1, 1, 0.68)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 34
+text = "Profile"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AvatarScroll" type="ScrollContainer" parent="ContentMargin/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+theme_override_styles/panel = SubResource("StyleBoxEmpty_scroll")
+
+[node name="AvatarGrid" type="GridContainer" parent="ContentMargin/Content/AvatarScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+columns = 3
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 14
+
+[node name="SaveButtonWrap" type="CenterContainer" parent="ContentMargin/Content"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SaveButton" parent="ContentMargin/Content/SaveButtonWrap" instance=ExtResource("2_level_button")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Save"

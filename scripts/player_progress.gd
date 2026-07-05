@@ -14,6 +14,28 @@ const SAVE_PROVIDER_CLOUD := "cloud"
 const ABILITY_HAMMER := "hammer"
 const ABILITY_SHUFFLE := "shuffle"
 const ABILITY_HIGHLIGHT := "highlight"
+const DEFAULT_AVATAR_ID := "avatar_cat"
+const AVAILABLE_AVATAR_IDS := [
+	"avatar_bear",
+	"avatar_cat",
+	"avatar_cow",
+	"avatar_deer",
+	"avatar_dog",
+	"avatar_dolphin",
+	"avatar_elephant",
+	"avatar_frog",
+	"avatar_hamster",
+	"avatar_koala",
+	"avatar_lion",
+	"avatar_monkey",
+	"avatar_owl",
+	"avatar_penguin",
+	"avatar_sheep",
+	"avatar_sloth",
+	"avatar_tiger",
+	"avatar_turtle",
+]
+const AVATAR_TEXTURE_PATH_FORMAT := "res://assets/ui/avatars/%s.png"
 const MAX_LIVES := 5
 const LIFE_RESTORE_SECONDS := 3600
 const DEFAULT_ABILITY_USES := {
@@ -68,6 +90,30 @@ func get_ability_uses() -> Dictionary:
 		return DEFAULT_ABILITY_USES.duplicate()
 
 	return ability_uses.duplicate()
+
+
+func get_available_avatar_ids() -> Array:
+	return AVAILABLE_AVATAR_IDS.duplicate()
+
+
+func get_avatar_id() -> String:
+	return _sanitize_avatar_id(str(_data.get("avatar_id", DEFAULT_AVATAR_ID)))
+
+
+func get_avatar_texture_path(avatar_id: String) -> String:
+	return AVATAR_TEXTURE_PATH_FORMAT % _sanitize_avatar_id(avatar_id)
+
+
+func set_avatar_id(avatar_id: String) -> bool:
+	if not AVAILABLE_AVATAR_IDS.has(avatar_id):
+		return false
+
+	if get_avatar_id() == avatar_id:
+		return true
+
+	_data["avatar_id"] = avatar_id
+	save_progress()
+	return true
 
 
 func get_lives() -> int:
@@ -155,6 +201,7 @@ func _sanitize_data(raw_data: Dictionary) -> Dictionary:
 	sanitized["highest_completed_level"] = maxi(int(raw_data.get("highest_completed_level", 0)), 0)
 	sanitized["lives"] = clampi(int(raw_data.get("lives", MAX_LIVES)), 0, MAX_LIVES)
 	sanitized["next_life_restore_unix"] = maxi(int(raw_data.get("next_life_restore_unix", 0)), 0)
+	sanitized["avatar_id"] = _sanitize_avatar_id(str(raw_data.get("avatar_id", DEFAULT_AVATAR_ID)))
 	if int(sanitized["lives"]) >= MAX_LIVES:
 		sanitized["next_life_restore_unix"] = 0
 	elif int(sanitized["next_life_restore_unix"]) <= 0:
@@ -177,7 +224,15 @@ func _default_data() -> Dictionary:
 		"lives": MAX_LIVES,
 		"next_life_restore_unix": 0,
 		"ability_uses": DEFAULT_ABILITY_USES.duplicate(),
+		"avatar_id": DEFAULT_AVATAR_ID,
 	}
+
+
+func _sanitize_avatar_id(avatar_id: String) -> String:
+	if AVAILABLE_AVATAR_IDS.has(avatar_id):
+		return avatar_id
+
+	return DEFAULT_AVATAR_ID
 
 
 func _refresh_lives_state() -> bool:

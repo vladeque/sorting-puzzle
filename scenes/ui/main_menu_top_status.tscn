@@ -1,7 +1,8 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene format=3 uid="uid://76jf8ug6hwj5"]
 
 [ext_resource type="Texture2D" uid="uid://dnlhdgplij67n" path="res://assets/ui/main_menu_coin.png" id="1_coin"]
 [ext_resource type="Texture2D" uid="uid://kvmueps1ax4n" path="res://assets/ui/main_menu_lives.png" id="2_lives"]
+[ext_resource type="Texture2D" uid="uid://d2pn1p1r8alak" path="res://assets/ui/avatars/avatar_cat.png" id="3_avatar_cat"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_profile_ring"]
 bg_color = Color(0.95, 0.9, 0.72, 1)
@@ -17,7 +18,6 @@ corner_radius_bottom_left = 38
 shadow_color = Color(0.13, 0.17, 0.3, 0.34)
 shadow_size = 5
 shadow_offset = Vector2(0, 3)
-anti_aliasing_size = 1.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_profile_inner"]
 bg_color = Color(0.54, 0.25, 0.8, 1)
@@ -25,23 +25,6 @@ corner_radius_top_left = 31
 corner_radius_top_right = 31
 corner_radius_bottom_right = 31
 corner_radius_bottom_left = 31
-anti_aliasing_size = 1.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_avatar_face"]
-bg_color = Color(1, 0.76, 0.12, 1)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-anti_aliasing_size = 1.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_avatar_body"]
-bg_color = Color(0.98, 0.64, 0.08, 1)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
-anti_aliasing_size = 1.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_counter_pill"]
 bg_color = Color(1, 0.78, 0.75, 1)
@@ -57,7 +40,6 @@ corner_radius_bottom_left = 8
 shadow_color = Color(0.14, 0.14, 0.2, 0.26)
 shadow_size = 4
 shadow_offset = Vector2(0, 2)
-anti_aliasing_size = 1.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_plus_badge"]
 bg_color = Color(0.25, 0.82, 0.24, 1)
@@ -70,7 +52,6 @@ corner_radius_top_left = 9
 corner_radius_top_right = 9
 corner_radius_bottom_right = 9
 corner_radius_bottom_left = 9
-anti_aliasing_size = 1.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pause_button_normal"]
 bg_color = Color(0.12, 0.17, 0.22, 0.96)
@@ -128,48 +109,31 @@ corner_radius_top_left = 11
 corner_radius_top_right = 11
 corner_radius_bottom_right = 11
 corner_radius_bottom_left = 11
-anti_aliasing_size = 1.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eye"]
-bg_color = Color(0.54, 0.22, 0.03, 1)
-corner_radius_top_left = 2
-corner_radius_top_right = 2
-corner_radius_bottom_right = 2
-corner_radius_bottom_left = 2
-anti_aliasing_size = 1.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mouth"]
-bg_color = Color(0.79, 0.32, 0.04, 1)
-corner_radius_top_left = 3
-corner_radius_top_right = 3
-corner_radius_bottom_right = 3
-corner_radius_bottom_left = 3
-anti_aliasing_size = 1.0
-
-[node name="MainMenuTopStatus" type="HBoxContainer"]
+[node name="MainMenuTopStatus" type="HBoxContainer" unique_id=1663924301]
 custom_minimum_size = Vector2(452, 78)
 size_flags_horizontal = 3
 size_flags_vertical = 4
 mouse_filter = 2
 theme_override_constants/separation = 0
 
-[node name="ProfileWidget" type="Control" parent="."]
+[node name="ProfileWidget" type="Button" parent="." unique_id=1038659092]
 custom_minimum_size = Vector2(76, 76)
 layout_mode = 2
 size_flags_vertical = 4
-mouse_filter = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+flat = true
 
-[node name="OuterRing" type="Panel" parent="ProfileWidget"]
+[node name="OuterRing" type="Panel" parent="ProfileWidget" unique_id=682311671]
 layout_mode = 1
-anchors_preset = 0
 offset_right = 76.0
 offset_bottom = 76.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_profile_ring")
 
-[node name="InnerRing" type="Panel" parent="ProfileWidget"]
+[node name="InnerRing" type="Panel" parent="ProfileWidget" unique_id=2118487831]
 layout_mode = 1
-anchors_preset = 0
 offset_left = 7.0
 offset_top = 7.0
 offset_right = 69.0
@@ -177,70 +141,31 @@ offset_bottom = 69.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_profile_inner")
 
-[node name="AvatarBody" type="Panel" parent="ProfileWidget"]
+[node name="AvatarTexture" type="TextureRect" parent="ProfileWidget" unique_id=1746863471]
+unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 0
-offset_left = 22.0
-offset_top = 42.0
-offset_right = 54.0
-offset_bottom = 60.0
+offset_left = 9.0
+offset_top = 9.0
+offset_right = 67.0
+offset_bottom = 67.0
 mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_avatar_body")
+texture = ExtResource("3_avatar_cat")
+expand_mode = 1
+stretch_mode = 5
 
-[node name="AvatarFace" type="Panel" parent="ProfileWidget"]
-layout_mode = 1
-anchors_preset = 0
-offset_left = 20.0
-offset_top = 21.0
-offset_right = 56.0
-offset_bottom = 57.0
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_avatar_face")
-
-[node name="LeftEye" type="Panel" parent="ProfileWidget"]
-layout_mode = 1
-anchors_preset = 0
-offset_left = 30.0
-offset_top = 36.0
-offset_right = 34.0
-offset_bottom = 40.0
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_eye")
-
-[node name="RightEye" type="Panel" parent="ProfileWidget"]
-layout_mode = 1
-anchors_preset = 0
-offset_left = 43.0
-offset_top = 36.0
-offset_right = 47.0
-offset_bottom = 40.0
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_eye")
-
-[node name="Mouth" type="Panel" parent="ProfileWidget"]
-layout_mode = 1
-anchors_preset = 0
-offset_left = 33.0
-offset_top = 45.0
-offset_right = 45.0
-offset_bottom = 49.0
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_mouth")
-
-[node name="Spacer01" type="Control" parent="."]
+[node name="Spacer01" type="Control" parent="." unique_id=987735707]
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
 
-[node name="CoinsWidget" type="Control" parent="."]
+[node name="CoinsWidget" type="Control" parent="." unique_id=1248926927]
 custom_minimum_size = Vector2(142, 60)
 layout_mode = 2
 size_flags_vertical = 4
 mouse_filter = 2
 
-[node name="CoinPill" type="Panel" parent="CoinsWidget"]
+[node name="CoinPill" type="Panel" parent="CoinsWidget" unique_id=579669002]
 layout_mode = 1
-anchors_preset = 0
 offset_left = 36.0
 offset_top = 12.0
 offset_right = 142.0
@@ -248,9 +173,8 @@ offset_bottom = 54.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_counter_pill")
 
-[node name="CoinIcon" type="TextureRect" parent="CoinsWidget"]
+[node name="CoinIcon" type="TextureRect" parent="CoinsWidget" unique_id=1471216064]
 layout_mode = 1
-anchors_preset = 0
 offset_left = -4.0
 offset_top = -10.0
 offset_right = 68.0
@@ -260,9 +184,8 @@ texture = ExtResource("1_coin")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="CoinAmount" type="Label" parent="CoinsWidget"]
+[node name="CoinAmount" type="Label" parent="CoinsWidget" unique_id=1009565950]
 layout_mode = 1
-anchors_preset = 0
 offset_left = 62.0
 offset_top = 14.0
 offset_right = 134.0
@@ -276,9 +199,8 @@ text = "1050"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="PlusBadge" type="Panel" parent="CoinsWidget"]
+[node name="PlusBadge" type="Panel" parent="CoinsWidget" unique_id=1752844336]
 layout_mode = 1
-anchors_preset = 0
 offset_left = 39.0
 offset_top = 39.0
 offset_right = 57.0
@@ -286,7 +208,7 @@ offset_bottom = 57.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_plus_badge")
 
-[node name="PlusLabel" type="Label" parent="CoinsWidget/PlusBadge"]
+[node name="PlusLabel" type="Label" parent="CoinsWidget/PlusBadge" unique_id=1093632893]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -302,20 +224,19 @@ text = "+"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Spacer02" type="Control" parent="."]
+[node name="Spacer02" type="Control" parent="." unique_id=318932838]
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
 
-[node name="LivesWidget" type="Control" parent="."]
+[node name="LivesWidget" type="Control" parent="." unique_id=764292924]
 custom_minimum_size = Vector2(150, 60)
 layout_mode = 2
 size_flags_vertical = 4
 mouse_filter = 2
 
-[node name="LivesPill" type="Panel" parent="LivesWidget"]
+[node name="LivesPill" type="Panel" parent="LivesWidget" unique_id=747220015]
 layout_mode = 1
-anchors_preset = 0
 offset_left = 40.0
 offset_top = 12.0
 offset_right = 150.0
@@ -323,9 +244,8 @@ offset_bottom = 54.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_counter_pill")
 
-[node name="LivesIcon" type="TextureRect" parent="LivesWidget"]
+[node name="LivesIcon" type="TextureRect" parent="LivesWidget" unique_id=873680639]
 layout_mode = 1
-anchors_preset = 0
 offset_left = -5.0
 offset_top = -6.0
 offset_right = 67.0
@@ -335,13 +255,12 @@ texture = ExtResource("2_lives")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="LifeCount" type="Label" parent="LivesWidget"]
+[node name="LifeCount" type="Label" parent="LivesWidget" unique_id=2085260670]
 layout_mode = 1
-anchors_preset = 0
 offset_left = 9.0
-offset_top = 10.0
+offset_top = 6.0
 offset_right = 53.0
-offset_bottom = 54.0
+offset_bottom = 50.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0.48, 0.05, 0.02, 0.82)
 theme_override_constants/shadow_offset_x = 0
@@ -351,9 +270,8 @@ text = "5"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="LifeStatus" type="Label" parent="LivesWidget"]
+[node name="LifeStatus" type="Label" parent="LivesWidget" unique_id=624814251]
 layout_mode = 1
-anchors_preset = 0
 offset_left = 62.0
 offset_top = 14.0
 offset_right = 140.0
@@ -367,20 +285,19 @@ text = "Full"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Spacer03" type="Control" parent="."]
+[node name="Spacer03" type="Control" parent="." unique_id=1093057992]
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
 
-[node name="SettingsWidget" type="Control" parent="."]
+[node name="SettingsWidget" type="Control" parent="." unique_id=1288611896]
 custom_minimum_size = Vector2(66, 66)
 layout_mode = 2
 size_flags_vertical = 4
 mouse_filter = 2
 
-[node name="SettingsButton" type="Button" parent="SettingsWidget"]
+[node name="SettingsButton" type="Button" parent="SettingsWidget" unique_id=132950199]
 layout_mode = 1
-anchors_preset = 0
 offset_left = 7.0
 offset_top = 7.0
 offset_right = 61.0
@@ -394,17 +311,15 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_pause_button_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_pause_button_hover")
 text = "II"
 
-[node name="AlertBadge" type="Panel" parent="SettingsWidget"]
+[node name="AlertBadge" type="Panel" parent="SettingsWidget" unique_id=941482646]
 layout_mode = 1
-anchors_preset = 0
 offset_left = 43.0
-offset_top = 0.0
 offset_right = 65.0
 offset_bottom = 22.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_alert_badge")
 
-[node name="AlertLabel" type="Label" parent="SettingsWidget/AlertBadge"]
+[node name="AlertLabel" type="Label" parent="SettingsWidget/AlertBadge" unique_id=1366268903]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

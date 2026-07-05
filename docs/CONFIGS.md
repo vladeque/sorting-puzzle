@@ -146,7 +146,7 @@ py scripts\tools\generate_level_shelves.py --shelf-count 9 --layer-count 2 --dif
 ## `user://player_progress.json`
 
 Purpose:
-- Stores local campaign progression, campaign lives, and campaign ability inventory when `application/config/save_provider` is `local`.
+- Stores local campaign progression, campaign lives, campaign ability inventory, and selected profile avatar when `application/config/save_provider` is `local`.
 - Owned by the `PlayerProgress` autoload in `scripts/player_progress.gd`.
 
 Fields:
@@ -156,10 +156,12 @@ Fields:
 - `lives`: current campaign lives. Fresh saves start at `5`, and values are clamped from `0` to `5`.
 - `next_life_restore_unix`: Unix timestamp for the next hourly life restore while lives are not full, or `0` when lives are full.
 - `ability_uses`: remaining campaign uses for `hammer`, `shuffle`, and `highlight`.
+- `avatar_id`: selected profile avatar id. Fresh saves and old saves without this field use `avatar_cat`.
 
 Runtime behavior:
-- Fresh saves start at level 1 with five lives and three uses for each ability.
+- Fresh saves start at level 1 with five lives, three uses for each ability, and `avatar_cat` selected as the profile avatar.
 - The main menu blocks campaign level launch at zero lives.
+- The production profile menu can save any avatar id from `assets/ui/avatars/*.png`; invalid ids are sanitized back to `avatar_cat`.
 - Campaign level failure and pause-menu Leave spend one life. Completed levels do not spend lives.
 - Missing lives restore at one life per real-time hour until the five-life cap is reached.
 - Ability uses are spent and saved immediately when an ability successfully applies.

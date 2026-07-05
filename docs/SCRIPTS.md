@@ -11,10 +11,12 @@ Purpose:
 - Shows the production campaign entry point over the production menu background.
 - Labels the bottom button with the saved current level.
 - Displays saved campaign lives in the top status bar and disables campaign play at zero lives.
+- Displays the saved profile avatar and opens the profile avatar picker from the top status bar.
 - Launches the saved campaign level.
 
 Key constants:
 - `LEVEL_SCENE`: preloads `res://level.tscn`.
+- `PROFILE_MENU_SCENE`: preloads `res://scenes/ui/profile_menu.tscn`.
 - `MIN_LEVEL`: first campaign level number.
 - `MAX_LEVEL`: last campaign level number.
 - `PRODUCTION_MENU_SCENE`: return path assigned to campaign level instances.
@@ -23,6 +25,8 @@ Key constants:
 
 Important nodes:
 - `%TopStatusBar`: top-anchored container positioned at runtime with safe-area padding; owns the status icon layout through `scenes/ui/main_menu_top_status.tscn`.
+- `MainMenuTopStatus/ProfileWidget`: opens the profile menu.
+- `MainMenuTopStatus/ProfileWidget/AvatarTexture`: displays the saved avatar texture.
 - `MainMenuTopStatus/LivesWidget/LifeCount`: shows current campaign lives.
 - `MainMenuTopStatus/LivesWidget/LifeStatus`: shows `Full` or the countdown until the next restored life.
 - `%BottomBar`: bottom-anchored container positioned at runtime with safe-area padding.
@@ -35,6 +39,9 @@ Key methods:
 - `_layout_top_status_bar()`: positions the static top status row.
 - `_update_level_button()`: displays the saved current level, no-lives state, or complete state.
 - `_update_lives_status()`: writes current lives and the next-life countdown into the top status labels.
+- `_update_profile_avatar()`: loads the saved avatar texture into the top status profile widget.
+- `_open_profile_menu()`: creates the full-screen profile menu overlay and listens for saved avatar changes.
+- `_on_profile_avatar_saved(avatar_id)`: refreshes the top status avatar after the profile menu saves.
 - `_launch_campaign_level()`: instantiates the level, sets campaign launch metadata, swaps current scene, and queues the menu for deletion.
 
 Depends on:
@@ -48,6 +55,41 @@ Do not use for:
 - Developer/test level selection. Put that in `scripts/main_menu.gd`.
 - Persistent save data ownership. Put that in `scripts/player_progress.gd`.
 - Puzzle runtime logic.
+
+## `scripts/profile_menu.gd`
+
+Attached to:
+- `scenes/ui/profile_menu.tscn` root `ProfileMenu`.
+
+Purpose:
+- Builds the player profile avatar picker.
+- Creates one avatar button for each id exposed by `PlayerProgress.get_available_avatar_ids()`.
+- Keeps the avatar grid at three columns and resizes avatar buttons for mobile portrait widths.
+- Emits `avatar_saved(avatar_id)` after the selected avatar is saved.
+
+Key constants:
+- `GRID_COLUMNS`: fixed to `3`.
+- `AVATAR_BUTTON_MIN_SIZE` and `AVATAR_BUTTON_MAX_SIZE`: responsive avatar button bounds.
+- `SAVE_BUTTON_MAX_WIDTH`: width cap for the bottom `Save` button.
+
+Important nodes:
+- `%ContentMargin`: receives safe-area-aware runtime margins.
+- `%AvatarGrid`: `GridContainer` populated with generated avatar buttons.
+- `%SaveButton`: `scenes/ui/level_button.tscn` instance labeled `Save`.
+
+Key methods:
+- `_build_avatar_buttons()`: creates the 18 avatar buttons and loads their textures.
+- `_select_avatar(avatar_id)`: updates the pending avatar selection.
+- `_save_selection()`: writes the selected avatar through `PlayerProgress.set_avatar_id()` and closes the menu.
+- `_apply_responsive_layout()`: updates safe-area margins, avatar button sizes, and save button width.
+
+Depends on:
+- `PlayerProgress`
+- `assets/ui/avatars/*.png`
+- `scenes/ui/level_button.tscn`
+
+Do not use for:
+- Owning saved profile data, campaign progress, lives state, or main menu navigation.
 
 ## `scripts/main_menu.gd`
 
@@ -118,7 +160,7 @@ Autoload:
 - Registered as `PlayerProgress` in `project.godot`.
 
 Purpose:
-- Owns saved campaign progression, campaign lives, and campaign ability inventory.
+- Owns saved campaign progression, campaign lives, campaign ability inventory, and selected profile avatar.
 - Persists state through the configured save provider.
 
 Saved fields:
@@ -128,12 +170,17 @@ Saved fields:
 - `lives`: current campaign lives, clamped from `0` to `5`.
 - `next_life_restore_unix`: Unix timestamp for the next hourly life restore, or `0` when lives are full.
 - `ability_uses`: remaining campaign uses for hammer, shuffle, and highlight.
+- `avatar_id`: selected profile avatar id. Fresh and legacy saves default to `avatar_cat`.
 
 Key methods:
 - `load_progress()`: reads and sanitizes provider data or creates default in-memory progress.
 - `save_progress()`: writes the current progress data through the active provider.
 - `get_current_level()`: returns the next campaign level.
 - `get_ability_uses()`: returns remaining campaign ability uses.
+- `get_available_avatar_ids()`: returns the 18 valid profile avatar ids.
+- `get_avatar_id()`: returns the selected avatar id, sanitized to `avatar_cat` when needed.
+- `get_avatar_texture_path(avatar_id)`: returns the resource path for a valid or sanitized avatar id.
+- `set_avatar_id(avatar_id)`: validates, stores, and saves the selected profile avatar.
 - `get_lives()`: refreshes and returns current campaign lives.
 - `get_max_lives()`: returns the lives cap.
 - `get_next_life_restore_seconds_remaining()`: returns seconds until the next life restore, or `0` when full.
