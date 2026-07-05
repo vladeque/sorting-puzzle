@@ -67,6 +67,7 @@ Purpose:
 - Reusable production level-entry button.
 - Owns the generated glossy green rounded-button texture inspired by the selected generated concept.
 - Keeps the button text dynamic through the normal Godot `Button.text` property, so callers can set labels such as `Level 1` or `Complete`.
+- Uses `scripts/press_scale_button.gd` so the button scales slightly smaller from its center while a click or touch is held.
 
 Important nodes:
 - `LevelButton`: clickable button root with the generated texture style, white outlined text, and dynamic pressed/hover/disabled states.
@@ -74,6 +75,7 @@ Important nodes:
 Depends on:
 - `assets/ui/level_button_blank.png`.
 - `assets/ui/level_button_blank_red.png`, `assets/ui/level_button_blank_light_blue.png`, and `assets/ui/level_button_blank_yellow_orange.png` are matching alternate color blanks for future button states or variants.
+- `scripts/press_scale_button.gd` for the default held-press scale behavior expected by future blank-image buttons.
 - Caller scenes or scripts for placement, click wiring, and label updates.
 
 Do not use for:
@@ -138,6 +140,7 @@ Important nodes:
 - `UI/AbilityBar/HBoxContainer/HighlightButton/TimerLabel`: active highlight ability countdown.
 - `UI/FailurePanel`: shown when time runs out.
 - `UI/CompletionPanel`: shown after all items clear; contains the `Great job!` title, generated reward star image, earned star count label, and green `Next` button.
+- `UI/CompletionPanel/NextButton`: green blank-image button with `scripts/press_scale_button.gd` so it visually shrinks while held.
 - `UI/PauseMenuOverlay`: `scenes/pause_menu.tscn` instance used for the modal pause menu.
 - `UI/LeaveConfirmationOverlay`: `scenes/leave_confirmation_menu.tscn` instance shown after the pause menu's Leave button, before spending a campaign life and returning to the menu.
 
@@ -245,10 +248,12 @@ Important nodes:
 - `PauseMenuPanel/InnerPanel/IconRow/VibrationOption/VibrationButton`: rectangular phone vibration toggle slot.
 - `PauseMenuPanel/ButtonRow/LeaveButton`: red image button wired by `scripts/level.gd` to open leave confirmation.
 - `PauseMenuPanel/ButtonRow/ContinueButton`: green image button wired by `scripts/level.gd` to resume the level.
+- The bottom red and green image buttons use `scripts/press_scale_button.gd` so they visually shrink while held.
 
 Depends on:
 - `assets/ui/icon_music.png`, `assets/ui/icon_sound_effects.png`, and `assets/ui/icon_vibration.png` for settings icon art.
 - `assets/ui/level_button_blank_red.png` and `assets/ui/level_button_blank.png` for pause action buttons.
+- `scripts/press_scale_button.gd` for the default held-press shrink on the bottom image buttons.
 - `assets/ui/pause_menu_option_a_sheet.png` and `assets/ui/pause_menu_option_b_sheet.png` are archived alternate visual directions for these icons.
 - Runtime button wiring from `scripts/level.gd`.
 - Local settings-button visual toggles from `scripts/pause_menu.gd`.
@@ -277,12 +282,14 @@ Important nodes:
 - `ConfirmationPanel/InnerPanel/LossRow/StarLoss/CountLabel`: bottom-right current run star count written by `scripts/level.gd`.
 - `ConfirmationPanel/ButtonRow/ConfirmLeaveButton`: red image button that confirms leaving.
 - `ConfirmationPanel/ButtonRow/ContinueButton`: green image button that resumes the level.
+- The bottom red and green image buttons use `scripts/press_scale_button.gd` so they visually shrink while held.
 
 Depends on:
 - `assets/ui/main_menu_lives.png`.
 - `assets/ui/reward_star.png`.
 - `assets/ui/level_button_blank_red.png`.
 - `assets/ui/level_button_blank.png`.
+- `scripts/press_scale_button.gd` for the default held-press shrink on the bottom image buttons.
 - Runtime button wiring and star-count updates from `scripts/level.gd`.
 
 Do not use for:

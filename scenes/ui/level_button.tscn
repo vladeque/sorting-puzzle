@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Texture2D" uid="uid://bai63m2evt0sk" path="res://assets/ui/level_button_blank.png" id="1_level_button_blank"]
+[ext_resource type="Script" path="res://scripts/press_scale_button.gd" id="2_press_scale_button"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_level_button"]
 texture = ExtResource("1_level_button_blank")
@@ -24,3 +25,4 @@ theme_override_styles/hover = SubResource("StyleBoxTexture_level_button")
 theme_override_styles/pressed = SubResource("StyleBoxTexture_level_button")
 theme_override_styles/disabled = SubResource("StyleBoxTexture_level_button")
 text = "Level 1"
+script = ExtResource("2_press_scale_button")

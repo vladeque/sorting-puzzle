@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://djayncoacexvl" path="res://scripts/pause_menu.gd" id="4_pause_menu_script"]
 [ext_resource type="Texture2D" uid="uid://b386mn58pea5q" path="res://assets/ui/level_button_blank_red.png" id="5_leave_button"]
 [ext_resource type="Texture2D" uid="uid://bai63m2evt0sk" path="res://assets/ui/level_button_blank.png" id="6_continue_button"]
+[ext_resource type="Script" path="res://scripts/press_scale_button.gd" id="7_press_scale_button"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_outer_panel"]
 bg_color = Color(0.67, 0.32, 0.22, 1)
@@ -373,6 +374,7 @@ theme_override_styles/normal = SubResource("StyleBoxTexture_leave_button")
 theme_override_styles/pressed = SubResource("StyleBoxTexture_leave_button")
 theme_override_styles/hover = SubResource("StyleBoxTexture_leave_button")
 text = "Leave"
+script = ExtResource("7_press_scale_button")
 
 [node name="ContinueButton" type="Button" parent="PauseMenuPanel/ButtonRow" unique_id=179584193]
 custom_minimum_size = Vector2(214, 76)
@@ -387,3 +389,4 @@ theme_override_styles/normal = SubResource("StyleBoxTexture_continue_button")
 theme_override_styles/pressed = SubResource("StyleBoxTexture_continue_button")
 theme_override_styles/hover = SubResource("StyleBoxTexture_continue_button")
 text = "Continue"
+script = ExtResource("7_press_scale_button")

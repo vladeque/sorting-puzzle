@@ -42,6 +42,7 @@ Files:
 - `assets/ui/main_menu_coin.png`
 - `assets/ui/main_menu_lives.png`
 - `assets/ui/level_button_blank*.png`
+- `scripts/press_scale_button.gd`
 - `scripts/production_main_menu.gd`
 - `scripts/main_menu.gd`
 - `scripts/player_progress.gd`
@@ -51,6 +52,7 @@ Responsibility:
 - Shows production top-row icons for profile, generated coins, saved lives, and a smaller pause-style settings button.
 - Disables campaign launch when saved lives are zero; the lives widget shows current lives and the countdown until the next hourly restore.
 - Uses `scenes/ui/level_button.tscn` and `assets/ui/level_button_blank.png` for the reusable glossy green level button visuals while keeping the label dynamic; red, light-blue, and yellow-orange variants are available beside the source texture for alternate states or future UI variants.
+- Uses `scripts/press_scale_button.gd` as the default held-press behavior for green and red blank-image buttons so they shrink slightly while a click or touch is held.
 - Keeps free level selection out of the production menu.
 - Preserves the old testing menu in `scenes/main_menu_testing.tscn`.
 - Builds testing level buttons for levels 1 through 10 only when dev/test level selection is enabled.
@@ -110,6 +112,7 @@ Responsibility:
 - Shows and expires the active combo count and shrinking green time strip in `Background/HudCenterSlot` when triple clears happen within the configured combo window.
 - Shows the current run's star total in `UI/StarCounterLabel` with a small `assets/ui/reward_star.png` icon; triple clears add stars equal to the combo value reached by each clear.
 - Shows the completed-level reward overlay in `UI/CompletionPanel`, using `assets/ui/reward_star.png`, `assets/ui/level_button_blank.png`, and the final run star count for the earned amount label.
+- Uses `scripts/press_scale_button.gd` on the completion `Next` button so the green blank-image button shrinks while held.
 - Tracks cleared triples and unlocks shelves whose configs require progress before becoming accessible.
 - Plays item placement and triple-clear sound effects.
 - Keeps non-clearing items interactive while match animations run, with pending shelf resolves queued behind the active animation.
@@ -201,12 +204,14 @@ Files:
 - `scenes/leave_confirmation_menu.tscn`
 - `assets/ui/*.png`
 - `scripts/pause_menu.gd`
+- `scripts/press_scale_button.gd`
 - `scripts/level.gd`
 
 Responsibility:
 - `level.tscn` provides the top-right circular pause button and instances the pause menu scene.
 - `scenes/pause_menu.tscn` owns the popup layout, warm outer area, cream inner settings area, `Pause` title, protruding top-right red close button, music / sound-effects / vibration rectangular icon slots, and Leave/Continue image buttons.
 - `scenes/leave_confirmation_menu.tscn` owns the second-step confirmation popup shown after Leave, including warm outer area, cream inner loss area, protruding top-right red close button, crossed-out rectangular lost life/star slots, and red Leave / green Continue image buttons.
+- `scripts/press_scale_button.gd` provides the default held-press shrink behavior for the red and green bottom image buttons in the pause and leave-confirmation popups.
 - `scripts/pause_menu.gd` toggles crossed-out visuals on the three settings icon-slot buttons and emits setting state changes.
 - `scripts/level.gd` opens and closes the menu, pauses the timer and gameplay input, treats red close buttons like Continue, opens the leave confirmation before routing confirmed Leave back to the main menu, writes the current run star count into that confirmation, and mutes gameplay sound effects when the sound-effects button is crossed out.
 
