@@ -42,6 +42,7 @@ Files:
 - `scenes/ui/level_button.tscn`
 - `assets/ui/main_menu_coin.png`
 - `assets/ui/main_menu_lives.png`
+- `assets/ui/avatar_circle_clip.gdshader`
 - `assets/ui/avatars/*.png`
 - `assets/ui/level_button_blank*.png`
 - `scripts/press_scale_button.gd`
@@ -52,8 +53,8 @@ Files:
 
 Responsibility:
 - Shows a production bottom button labeled with `PlayerProgress.current_level`.
-- Shows production top-row icons for the saved profile avatar, generated coins, saved lives, and a smaller pause-style settings button.
-- Opens `scenes/ui/profile_menu.tscn` from the profile widget, shows all 18 avatars in a 3-column grid, and saves the selected avatar through `PlayerProgress.avatar_id`.
+- Shows production top-row icons for the saved circular-clipped profile avatar, generated coins, saved lives, and a smaller pause-style settings button.
+- Opens `scenes/ui/profile_menu.tscn` from the profile widget, shows all 18 avatars in a centered pause-style window with a 3-column grid, and saves the selected avatar through `PlayerProgress.avatar_id`.
 - Disables campaign launch when saved lives are zero; the lives widget shows current lives and the countdown until the next hourly restore.
 - Uses `scenes/ui/level_button.tscn` and `assets/ui/level_button_blank.png` for the reusable glossy green level button visuals while keeping the label dynamic; red, light-blue, and yellow-orange variants are available beside the source texture for alternate states or future UI variants.
 - Uses `scripts/press_scale_button.gd` as the default held-press behavior for green and red blank-image buttons so they shrink slightly while a click or touch is held.

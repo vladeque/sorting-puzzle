@@ -2,20 +2,23 @@ extends Control
 
 signal avatar_saved(avatar_id: String)
 
+const AVATAR_CLIP_SHADER := preload("res://assets/ui/avatar_circle_clip.gdshader")
 const GRID_COLUMNS := 3
-const SIDE_MARGIN := 36.0
-const TOP_MARGIN := 54.0
-const BOTTOM_MARGIN := 34.0
-const AVATAR_BUTTON_MIN_SIZE := 92.0
-const AVATAR_BUTTON_MAX_SIZE := 132.0
-const GRID_H_SEPARATION := 12
+const PANEL_MAX_WIDTH := 520.0
+const PANEL_MAX_HEIGHT := 740.0
+const PANEL_MIN_MARGIN := 24.0
+const PANEL_HORIZONTAL_PADDING := 140.0
+const AVATAR_BUTTON_MIN_SIZE := 82.0
+const AVATAR_BUTTON_MAX_SIZE := 104.0
+const GRID_H_SEPARATION := 14
 const GRID_V_SEPARATION := 14
 const AVATAR_TEXTURE_INSET := 10.0
-const SAVE_BUTTON_MAX_WIDTH := 420.0
+const SAVE_BUTTON_MAX_WIDTH := 240.0
 
-@onready var _content_margin := %ContentMargin as MarginContainer
+@onready var _panel := %ProfileMenuPanel as Panel
 @onready var _avatar_grid := %AvatarGrid as GridContainer
 @onready var _save_button := %SaveButton as Button
+@onready var _close_button := %CloseButton as Button
 
 var _selected_avatar_id := ""
 var _avatar_buttons := {}
@@ -28,6 +31,7 @@ func _ready() -> void:
 	_avatar_grid.add_theme_constant_override("v_separation", GRID_V_SEPARATION)
 	_save_button.text = "Save"
 	_save_button.pressed.connect(_save_selection)
+	_close_button.pressed.connect(queue_free)
 	resized.connect(_apply_responsive_layout)
 	get_viewport().size_changed.connect(_apply_responsive_layout)
 	_build_avatar_buttons()
@@ -58,6 +62,7 @@ func _build_avatar_buttons() -> void:
 		avatar_texture.texture = load(PlayerProgress.get_avatar_texture_path(avatar_id)) as Texture2D
 		avatar_texture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		avatar_texture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		_apply_avatar_clip_material(avatar_texture)
 
 		button.add_child(avatar_texture)
 		_avatar_grid.add_child(button)
@@ -93,15 +98,18 @@ func _apply_responsive_layout() -> void:
 		return
 
 	var safe_margins := _get_safe_area_margins(viewport_size)
-	var side_margin := minf(SIDE_MARGIN, maxf(viewport_size.x * 0.06, 20.0))
-	_content_margin.add_theme_constant_override("margin_left", roundi(safe_margins.x + side_margin))
-	_content_margin.add_theme_constant_override("margin_top", roundi(safe_margins.y + TOP_MARGIN))
-	_content_margin.add_theme_constant_override("margin_right", roundi(safe_margins.z + side_margin))
-	_content_margin.add_theme_constant_override("margin_bottom", roundi(safe_margins.w + BOTTOM_MARGIN))
+	var available_width := maxf(viewport_size.x - safe_margins.x - safe_margins.z - PANEL_MIN_MARGIN * 2.0, 1.0)
+	var available_height := maxf(viewport_size.y - safe_margins.y - safe_margins.w - PANEL_MIN_MARGIN * 2.0, 1.0)
+	var panel_width := minf(PANEL_MAX_WIDTH, available_width)
+	var panel_height := minf(PANEL_MAX_HEIGHT, available_height)
+	_panel.offset_left = -panel_width * 0.5
+	_panel.offset_top = -panel_height * 0.5
+	_panel.offset_right = panel_width * 0.5
+	_panel.offset_bottom = panel_height * 0.5
 
-	var available_width := maxf(viewport_size.x - safe_margins.x - safe_margins.z - side_margin * 2.0, 1.0)
+	var grid_width := maxf(panel_width - PANEL_HORIZONTAL_PADDING, 1.0)
 	var avatar_size := clampf(
-		floorf((available_width - float(GRID_H_SEPARATION * (GRID_COLUMNS - 1))) / float(GRID_COLUMNS)),
+		floorf((grid_width - float(GRID_H_SEPARATION * (GRID_COLUMNS - 1))) / float(GRID_COLUMNS)),
 		AVATAR_BUTTON_MIN_SIZE,
 		AVATAR_BUTTON_MAX_SIZE
 	)
@@ -113,32 +121,38 @@ func _apply_responsive_layout() -> void:
 	_save_button.custom_minimum_size = save_minimum_size
 
 
+func _apply_avatar_clip_material(avatar_texture: TextureRect) -> void:
+	var clip_material := ShaderMaterial.new()
+	clip_material.shader = AVATAR_CLIP_SHADER
+	avatar_texture.material = clip_material
+
+
 func _create_avatar_style(is_selected: bool, is_hover: bool) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.97, 0.94, 0.88, 0.96)
-	style.border_color = Color(0.54, 0.35, 0.62, 0.78)
-	style.border_width_left = 3
-	style.border_width_top = 3
-	style.border_width_right = 3
+	style.bg_color = Color(0.83, 0.66, 0.47, 1)
+	style.border_color = Color(0.98, 0.87, 0.66, 0.9)
+	style.border_width_left = 2
+	style.border_width_top = 2
+	style.border_width_right = 2
 	style.border_width_bottom = 3
-	style.corner_radius_top_left = 8
-	style.corner_radius_top_right = 8
-	style.corner_radius_bottom_right = 8
-	style.corner_radius_bottom_left = 8
-	style.shadow_color = Color(0.12, 0.12, 0.18, 0.25)
-	style.shadow_size = 4
+	style.corner_radius_top_left = 20
+	style.corner_radius_top_right = 20
+	style.corner_radius_bottom_right = 20
+	style.corner_radius_bottom_left = 20
+	style.shadow_color = Color(0.3, 0.12, 0.07, 0.24)
+	style.shadow_size = 5
 	style.shadow_offset = Vector2(0, 2)
 
 	if is_selected:
-		style.bg_color = Color(0.91, 1.0, 0.84, 0.98)
-		style.border_color = Color(0.2, 0.66, 0.27, 1.0)
-		style.border_width_left = 5
-		style.border_width_top = 5
-		style.border_width_right = 5
-		style.border_width_bottom = 5
+		style.bg_color = Color(0.62, 0.25, 0.18, 1)
+		style.border_color = Color(1.0, 0.92, 0.62, 1.0)
+		style.border_width_left = 3
+		style.border_width_top = 3
+		style.border_width_right = 3
+		style.border_width_bottom = 4
 	elif is_hover:
-		style.bg_color = Color(1.0, 0.97, 0.9, 0.98)
-		style.border_color = Color(0.72, 0.5, 0.38, 0.95)
+		style.bg_color = Color(0.9, 0.72, 0.5, 1)
+		style.border_color = Color(1.0, 0.92, 0.62, 1.0)
 
 	return style
 

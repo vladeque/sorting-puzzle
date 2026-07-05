@@ -40,7 +40,7 @@ Key methods:
 - `_update_level_button()`: displays the saved current level, no-lives state, or complete state.
 - `_update_lives_status()`: writes current lives and the next-life countdown into the top status labels.
 - `_update_profile_avatar()`: loads the saved avatar texture into the top status profile widget.
-- `_open_profile_menu()`: creates the full-screen profile menu overlay and listens for saved avatar changes.
+- `_open_profile_menu()`: creates the centered profile menu window and listens for saved avatar changes.
 - `_on_profile_avatar_saved(avatar_id)`: refreshes the top status avatar after the profile menu saves.
 - `_launch_campaign_level()`: instantiates the level, sets campaign launch metadata, swaps current scene, and queues the menu for deletion.
 
@@ -64,28 +64,34 @@ Attached to:
 Purpose:
 - Builds the player profile avatar picker.
 - Creates one avatar button for each id exposed by `PlayerProgress.get_available_avatar_ids()`.
-- Keeps the avatar grid at three columns and resizes avatar buttons for mobile portrait widths.
+- Keeps the pause-style menu panel responsive, with the avatar grid at three columns.
+- Clips opaque square avatar PNGs to circular display in the top profile widget and picker.
 - Emits `avatar_saved(avatar_id)` after the selected avatar is saved.
 
 Key constants:
+- `AVATAR_CLIP_SHADER`: shader used to hide square avatar texture corners.
 - `GRID_COLUMNS`: fixed to `3`.
+- `PANEL_MAX_WIDTH`, `PANEL_MAX_HEIGHT`, and `PANEL_MIN_MARGIN`: centered popup panel bounds.
 - `AVATAR_BUTTON_MIN_SIZE` and `AVATAR_BUTTON_MAX_SIZE`: responsive avatar button bounds.
 - `SAVE_BUTTON_MAX_WIDTH`: width cap for the bottom `Save` button.
 
 Important nodes:
-- `%ContentMargin`: receives safe-area-aware runtime margins.
+- `%ProfileMenuPanel`: centered pause-style popup panel resized by the script.
 - `%AvatarGrid`: `GridContainer` populated with generated avatar buttons.
 - `%SaveButton`: `scenes/ui/level_button.tscn` instance labeled `Save`.
+- `%CloseButton`: dismisses the picker without saving.
 
 Key methods:
 - `_build_avatar_buttons()`: creates the 18 avatar buttons and loads their textures.
 - `_select_avatar(avatar_id)`: updates the pending avatar selection.
 - `_save_selection()`: writes the selected avatar through `PlayerProgress.set_avatar_id()` and closes the menu.
-- `_apply_responsive_layout()`: updates safe-area margins, avatar button sizes, and save button width.
+- `_apply_responsive_layout()`: updates panel bounds, avatar button sizes, and save button width.
+- `_apply_avatar_clip_material(avatar_texture)`: applies circular clipping to an avatar `TextureRect`.
 
 Depends on:
 - `PlayerProgress`
 - `assets/ui/avatars/*.png`
+- `assets/ui/avatar_circle_clip.gdshader`
 - `scenes/ui/level_button.tscn`
 
 Do not use for:

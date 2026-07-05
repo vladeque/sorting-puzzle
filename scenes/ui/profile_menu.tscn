@@ -1,21 +1,75 @@
-[gd_scene format=3 uid="uid://b5yb0hlfitnqa"]
+[gd_scene load_steps=10 format=3 uid="uid://b5yb0hlfitnqa"]
 
 [ext_resource type="Script" path="res://scripts/profile_menu.gd" id="1_profile_menu"]
 [ext_resource type="PackedScene" path="res://scenes/ui/level_button.tscn" id="2_level_button"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_title_panel"]
-bg_color = Color(0.99, 0.88, 0.67, 0.98)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.56, 0.34, 0.58, 0.8)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-shadow_color = Color(0, 0, 0, 0.22)
-shadow_size = 5
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_outer_panel"]
+bg_color = Color(0.67, 0.32, 0.22, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 6
+border_color = Color(0.43, 0.17, 0.11, 1)
+corner_radius_top_left = 30
+corner_radius_top_right = 30
+corner_radius_bottom_right = 30
+corner_radius_bottom_left = 30
+shadow_color = Color(0, 0, 0, 0.42)
+shadow_size = 18
+shadow_offset = Vector2(0, 8)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_normal"]
+bg_color = Color(0.86, 0.08, 0.06, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(1, 0.58, 0.5, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+shadow_color = Color(0, 0, 0, 0.36)
+shadow_size = 6
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_pressed"]
+bg_color = Color(0.58, 0.04, 0.04, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(1, 0.76, 0.68, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_hover"]
+bg_color = Color(0.98, 0.2, 0.16, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(1, 0.82, 0.72, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inner_panel"]
+bg_color = Color(0.96, 0.9, 0.78, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(0.45, 0.19, 0.13, 0.52)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+shadow_color = Color(0.24, 0.08, 0.04, 0.22)
+shadow_size = 8
 shadow_offset = Vector2(0, 3)
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_scroll"]
@@ -38,67 +92,119 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 0
-color = Color(0.05, 0.06, 0.1, 0.64)
+color = Color(0.02, 0.025, 0.03, 0.66)
 
-[node name="ContentMargin" type="MarginContainer" parent="."]
+[node name="ProfileMenuPanel" type="Panel" parent="."]
 unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -260.0
+offset_top = -360.0
+offset_right = 260.0
+offset_bottom = 360.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 36
-theme_override_constants/margin_top = 54
-theme_override_constants/margin_right = 36
-theme_override_constants/margin_bottom = 34
+theme_override_styles/panel = SubResource("StyleBoxFlat_outer_panel")
 
-[node name="Content" type="VBoxContainer" parent="ContentMargin"]
-layout_mode = 2
-theme_override_constants/separation = 18
-
-[node name="TitlePanel" type="Panel" parent="ContentMargin/Content"]
-custom_minimum_size = Vector2(0, 62)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_title_panel")
-
-[node name="TitleLabel" type="Label" parent="ContentMargin/Content/TitlePanel"]
+[node name="TitleLabel" type="Label" parent="ProfileMenuPanel"]
 layout_mode = 1
-anchors_preset = 15
+anchors_preset = 10
 anchor_right = 1.0
-anchor_bottom = 1.0
+offset_left = 46.0
+offset_top = 25.0
+offset_right = -46.0
+offset_bottom = 86.0
 grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/font_color = Color(0.39, 0.11, 0.33, 1)
-theme_override_colors/font_shadow_color = Color(1, 1, 1, 0.68)
+theme_override_colors/font_color = Color(1, 0.95, 0.78, 1)
+theme_override_colors/font_shadow_color = Color(0.16, 0.04, 0.02, 0.92)
 theme_override_constants/shadow_offset_x = 0
-theme_override_constants/shadow_offset_y = 1
-theme_override_font_sizes/font_size = 34
+theme_override_constants/shadow_offset_y = 3
+theme_override_font_sizes/font_size = 44
 text = "Profile"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="AvatarScroll" type="ScrollContainer" parent="ContentMargin/Content"]
+[node name="CloseButton" type="Button" parent="ProfileMenuPanel"]
 unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -54.0
+offset_top = -18.0
+offset_right = 18.0
+offset_bottom = 54.0
+grow_horizontal = 0
+grow_vertical = 0
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.32, 0.02, 0.02, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxFlat_close_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_close_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_close_hover")
+text = "X"
+
+[node name="InnerPanel" type="Panel" parent="ProfileMenuPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 46.0
+offset_top = 104.0
+offset_right = -46.0
+offset_bottom = -132.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_inner_panel")
+
+[node name="AvatarScroll" type="ScrollContainer" parent="ProfileMenuPanel/InnerPanel"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 2
 horizontal_scroll_mode = 0
 theme_override_styles/panel = SubResource("StyleBoxEmpty_scroll")
 
-[node name="AvatarGrid" type="GridContainer" parent="ContentMargin/Content/AvatarScroll"]
+[node name="AvatarGrid" type="GridContainer" parent="ProfileMenuPanel/InnerPanel/AvatarScroll"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
 columns = 3
-theme_override_constants/h_separation = 12
+theme_override_constants/h_separation = 14
 theme_override_constants/v_separation = 14
 
-[node name="SaveButtonWrap" type="CenterContainer" parent="ContentMargin/Content"]
-layout_mode = 2
-size_flags_horizontal = 3
+[node name="ButtonRow" type="CenterContainer" parent="ProfileMenuPanel"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 56.0
+offset_top = -110.0
+offset_right = -56.0
+offset_bottom = -32.0
+grow_horizontal = 2
+grow_vertical = 0
 
-[node name="SaveButton" parent="ContentMargin/Content/SaveButtonWrap" instance=ExtResource("2_level_button")]
+[node name="SaveButton" parent="ProfileMenuPanel/ButtonRow" instance=ExtResource("2_level_button")]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 82)
 layout_mode = 2
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 32
 text = "Save"

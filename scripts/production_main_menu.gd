@@ -2,6 +2,7 @@ extends Control
 
 const LEVEL_SCENE := preload("res://level.tscn")
 const PROFILE_MENU_SCENE := preload("res://scenes/ui/profile_menu.tscn")
+const AVATAR_CLIP_SHADER := preload("res://assets/ui/avatar_circle_clip.gdshader")
 const MIN_LEVEL := 1
 const MAX_LEVEL := 10
 const PRODUCTION_MENU_SCENE := "res://scenes/main_menu.tscn"
@@ -135,6 +136,10 @@ func _update_profile_avatar() -> void:
 
 	var avatar_id := PlayerProgress.get_avatar_id()
 	_profile_avatar_texture.texture = load(PlayerProgress.get_avatar_texture_path(avatar_id)) as Texture2D
+	if _profile_avatar_texture.material == null:
+		var clip_material := ShaderMaterial.new()
+		clip_material.shader = AVATAR_CLIP_SHADER
+		_profile_avatar_texture.material = clip_material
 
 
 func _open_profile_menu() -> void:
