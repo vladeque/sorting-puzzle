@@ -214,7 +214,7 @@ Important constants:
 - `SHELF_SHARED_EDGE_THICKNESS`: shelf boundary thickness that neighboring cells overlap.
 - `SHELF_GRID_STEP`: packed layout spacing after overlapping shared shelf edges.
 - `LAYOUT_ROW_VERTICAL_EPSILON`: tolerance used to group authored layout-template shelf markers into horizontal rows before assigning left/middle/right shelf visuals.
-- `HUD_*`, `ABILITY_BAR_*`, `SHELVES_*`, `RESULT_LABEL_HEIGHT`, and `PAUSE_MENU_PANEL_SIZE`: responsive layout constants for positioning the HUD, ability bar, result overlays, pause panel, and generated shelf root across portrait viewport sizes, including minimum and maximum shelf layout scale.
+- `HUD_*`, `ABILITY_BAR_*`, `SHELVES_*`, `RESULT_LABEL_HEIGHT`, `PAUSE_MENU_PANEL_SIZE`, and `LEAVE_CONFIRM_PANEL_SIZE`: responsive layout constants for positioning the HUD, ability bar, result overlays, pause panel, leave confirmation panel, and generated shelf root across portrait viewport sizes, including minimum and maximum shelf layout scale.
 - `SHELF_SCENE`: `res://scenes/shelf.tscn`.
 - `MOVING_SHELF_ROW_SCENE`: `res://scenes/moving_shelf_row.tscn`.
 - `ITEM_SCENE`: `res://scenes/item.tscn`.
@@ -229,7 +229,7 @@ Important constants:
 - `TRIPLE_CLEAR_SOUND`: sound played when a matched triple gathers and disappears.
 
 Key responsibilities:
-- Apply responsive layout with `_apply_responsive_layout()`, including safe-area-aware top HUD placement, ability bar placement over the floor/baseboard transition strip, full-screen overlays, centered pause popup, shelf-root scaling, and shelf-root centering between HUD and ability controls.
+- Apply responsive layout with `_apply_responsive_layout()`, including safe-area-aware top HUD placement, ability bar placement over the floor/baseboard transition strip, full-screen overlays, centered pause and leave-confirmation popups, shelf-root scaling, and shelf-root centering between HUD and ability controls.
 - Resize the scene-owned `Background` control so its procedural top strip, shop wall, baseboard, and floor bands fill the active viewport.
 - Load JSON configs with `_load_json_file()`.
 - Instantiate reusable shelf cells with `_add_shelf()`, apply the shared shelf visual scale, assign left/middle/right row placement visuals for static shelves, and ask `Shelf` to add generated back layers.
@@ -253,11 +253,11 @@ Key responsibilities:
 - Queue shelf resolution requests made while another match animation is still finishing.
 - Promote back layers with `_promote_back_layer()`, `_play_layer_promotion_animation()`, and `_advance_back_layers()`.
 - Check win/loss state with `_check_level_completed()`, `_fail_level()`, and `_complete_level()`.
-- Spend one campaign life on campaign failure and on pause-menu Leave through `_spend_campaign_life_for_run()`, guarded so one level run cannot spend twice.
+- Spend one campaign life on campaign failure and on confirmed pause-menu Leave through `_spend_campaign_life_for_run()`, guarded so one level run cannot spend twice.
 - Save campaign completion through `PlayerProgress`, show `UI/CompletionPanel` with the run's earned star count, and load the next campaign level when the completion `Next` button is pressed.
 - Return to the configured menu scene when leaving a level or when the dev/test completion `Next` button is pressed.
 - Keep the level countdown idle until the first meaningful player action, then format the active timer as zero-padded `MM:SS` text with `_update_timer_label()`.
-- Pause and resume active gameplay through the top-right menu button, the instanced `UI/PauseMenuOverlay`, `Leave`, and `Continue`.
+- Pause and resume active gameplay through the top-right menu button, the instanced `UI/PauseMenuOverlay`, `UI/LeaveConfirmationOverlay`, `Leave`, and `Continue`.
 - Disable item placement and triple-clear sound effects while the pause menu sound-effects toggle is crossed out.
 - Manage hammer, shuffle, and highlight abilities. Campaign levels read and spend saved ability counts through `PlayerProgress`; dev/test levels use isolated temporary counts.
 - Hammer targets visible/front triples first, then can supplement visible/front matches with first-back-layer copies of the same item type when no visible item type has three available copies.
@@ -278,6 +278,7 @@ Depends on:
 - `configs/item_sprites.json` item IDs and texture paths.
 - `configs/levels/level_*.json` shelf schema.
 - `PlayerProgress` autoload for campaign progress, lives, and ability inventory.
+- `scenes/leave_confirmation_menu.tscn` button and star-count node names used under `UI/LeaveConfirmationOverlay`.
 
 Do not use for:
 - Offline level generation or solvability search. Keep that in `scripts/tools/`.

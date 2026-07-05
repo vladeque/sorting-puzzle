@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://dwmyah5l2r82d" path="res://assets/abilities/ability_lantern.png" id="4_lantern_icon"]
 [ext_resource type="PackedScene" uid="uid://g1xsr7chqeg7" path="res://scenes/pause_menu.tscn" id="5_pause_menu"]
 [ext_resource type="Texture2D" uid="uid://bai63m2evt0sk" path="res://assets/ui/level_button_blank.png" id="7_level_button_blank"]
+[ext_resource type="PackedScene" path="res://scenes/leave_confirmation_menu.tscn" id="8_leave_confirmation"]
 [ext_resource type="Script" uid="uid://cy80oincxrrc5" path="res://scripts/level.gd" id="10_level_script"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_top_hud_strip"]
@@ -792,3 +793,5 @@ theme_override_styles/hover = SubResource("StyleBoxTexture_completion_next")
 text = "Next"
 
 [node name="PauseMenuOverlay" parent="UI" unique_id=1081173105 instance=ExtResource("5_pause_menu")]
+
+[node name="LeaveConfirmationOverlay" parent="UI" instance=ExtResource("8_leave_confirmation")]

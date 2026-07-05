@@ -73,6 +73,7 @@ const COMPLETION_BUTTON_SIZE := Vector2(340, 124)
 const COMPLETION_BUTTON_CENTER_Y := 850.0
 const COMPLETION_MIN_BUTTON_BOTTOM_MARGIN := 118.0
 const PAUSE_MENU_PANEL_SIZE := Vector2(520, 363)
+const LEAVE_CONFIRM_PANEL_SIZE := Vector2(520, 536)
 @export var slot_snap_distance := BASE_SLOT_SNAP_DISTANCE * SHELF_CELL_VISUAL_SCALE
 @export var item_pick_size := BASE_ITEM_PICK_SIZE * SHELF_CELL_VISUAL_SCALE
 @export var drag_start_distance := 12.0
@@ -116,6 +117,10 @@ var _pause_menu_button: Button
 var _pause_menu_overlay: Control
 var _leave_button: Button
 var _continue_button: Button
+var _leave_confirmation_overlay: Control
+var _confirm_leave_button: Button
+var _confirm_continue_button: Button
+var _leave_confirmation_star_count_label: Label
 var _ability_bar: Control
 var _ability_button_row: Control
 var _ability_buttons: Dictionary = {}
@@ -175,11 +180,16 @@ func _ready() -> void:
 	_pause_menu_overlay = get_node("UI/PauseMenuOverlay") as Control
 	_leave_button = get_node("UI/PauseMenuOverlay/PauseMenuPanel/MarginContainer/VBoxContainer/ButtonRow/LeaveButton") as Button
 	_continue_button = get_node("UI/PauseMenuOverlay/PauseMenuPanel/MarginContainer/VBoxContainer/ButtonRow/ContinueButton") as Button
+	_leave_confirmation_overlay = get_node("UI/LeaveConfirmationOverlay") as Control
+	_confirm_leave_button = get_node("UI/LeaveConfirmationOverlay/ConfirmationPanel/MarginContainer/VBoxContainer/ButtonRow/ConfirmLeaveButton") as Button
+	_confirm_continue_button = get_node("UI/LeaveConfirmationOverlay/ConfirmationPanel/MarginContainer/VBoxContainer/ButtonRow/ContinueButton") as Button
+	_leave_confirmation_star_count_label = get_node("UI/LeaveConfirmationOverlay/ConfirmationPanel/MarginContainer/VBoxContainer/LossRow/StarLoss/CountLabel") as Label
 	_ability_bar = get_node("UI/AbilityBar") as Control
 	_ability_button_row = get_node("UI/AbilityBar/HBoxContainer") as Control
 	_failure_panel.visible = false
 	_completion_panel.visible = false
 	_pause_menu_overlay.visible = false
+	_leave_confirmation_overlay.visible = false
 	get_viewport().size_changed.connect(_apply_responsive_layout)
 	_rng.randomize()
 	_setup_audio_players()
@@ -211,6 +221,7 @@ func _apply_responsive_layout() -> void:
 	_layout_result_panel(_failure_panel, safe_margins)
 	_layout_completion_panel(safe_margins)
 	_layout_pause_menu_overlay()
+	_layout_leave_confirmation_overlay()
 	_layout_shelves(viewport_size, safe_margins)
 
 
@@ -405,6 +416,33 @@ func _layout_pause_menu_overlay() -> void:
 	panel.offset_top = -PAUSE_MENU_PANEL_SIZE.y * 0.5
 	panel.offset_right = PAUSE_MENU_PANEL_SIZE.x * 0.5
 	panel.offset_bottom = PAUSE_MENU_PANEL_SIZE.y * 0.5
+
+
+func _layout_leave_confirmation_overlay() -> void:
+	if _leave_confirmation_overlay == null:
+		return
+
+	_leave_confirmation_overlay.anchor_left = 0.0
+	_leave_confirmation_overlay.anchor_top = 0.0
+	_leave_confirmation_overlay.anchor_right = 1.0
+	_leave_confirmation_overlay.anchor_bottom = 1.0
+	_leave_confirmation_overlay.offset_left = 0.0
+	_leave_confirmation_overlay.offset_top = 0.0
+	_leave_confirmation_overlay.offset_right = 0.0
+	_leave_confirmation_overlay.offset_bottom = 0.0
+
+	var panel := _leave_confirmation_overlay.get_node_or_null("ConfirmationPanel") as Control
+	if panel == null:
+		return
+
+	panel.anchor_left = 0.5
+	panel.anchor_top = 0.5
+	panel.anchor_right = 0.5
+	panel.anchor_bottom = 0.5
+	panel.offset_left = -LEAVE_CONFIRM_PANEL_SIZE.x * 0.5
+	panel.offset_top = -LEAVE_CONFIRM_PANEL_SIZE.y * 0.5
+	panel.offset_right = LEAVE_CONFIRM_PANEL_SIZE.x * 0.5
+	panel.offset_bottom = LEAVE_CONFIRM_PANEL_SIZE.y * 0.5
 
 
 func _layout_shelves(viewport_size: Vector2, safe_margins: Vector4) -> void:
@@ -651,6 +689,8 @@ func _apply_level_config(config: Dictionary) -> void:
 	_completion_panel.visible = false
 	if _pause_menu_overlay != null:
 		_pause_menu_overlay.visible = false
+	if _leave_confirmation_overlay != null:
+		_leave_confirmation_overlay.visible = false
 
 	_clear_ability_highlights()
 	_load_ability_uses()
@@ -1461,6 +1501,7 @@ func _fail_level() -> void:
 	_pressed_origin_slot = null
 	_failure_panel.visible = true
 	_pause_menu_overlay.visible = false
+	_leave_confirmation_overlay.visible = false
 
 
 func _complete_level() -> void:
@@ -1484,6 +1525,7 @@ func _complete_level() -> void:
 	_update_completion_reward()
 	_completion_panel.visible = true
 	_pause_menu_overlay.visible = false
+	_leave_confirmation_overlay.visible = false
 
 
 func _check_level_completed() -> void:
@@ -1557,6 +1599,8 @@ func _setup_pause_menu_buttons() -> void:
 	_pause_menu_button.pressed.connect(_on_pause_menu_button_pressed)
 	_leave_button.pressed.connect(_on_pause_menu_leave_pressed)
 	_continue_button.pressed.connect(_on_pause_menu_continue_pressed)
+	_confirm_leave_button.pressed.connect(_on_leave_confirmation_leave_pressed)
+	_confirm_continue_button.pressed.connect(_on_leave_confirmation_continue_pressed)
 	if _pause_menu_overlay.has_signal(&"setting_toggled"):
 		_pause_menu_overlay.connect(&"setting_toggled", _on_pause_menu_setting_toggled)
 
@@ -1615,8 +1659,47 @@ func _open_pause_menu() -> void:
 
 
 func _on_pause_menu_leave_pressed() -> void:
+	_open_leave_confirmation()
+
+
+func _open_leave_confirmation() -> void:
+	_cancel_active_interaction()
+	_level_paused = true
+	_set_moving_shelf_rows_paused(true)
+	_update_leave_confirmation_reward()
+	_pause_menu_overlay.visible = false
+	_leave_confirmation_overlay.visible = true
+	_update_ability_buttons()
+	_update_pause_menu_button()
+
+
+func _update_leave_confirmation_reward() -> void:
+	if _leave_confirmation_star_count_label == null:
+		return
+
+	var stars_text := "%d" % _stars
+	var font_size := 30
+	if stars_text.length() >= 6:
+		font_size = 22
+	elif stars_text.length() >= 5:
+		font_size = 24
+	elif stars_text.length() >= 4:
+		font_size = 26
+
+	_leave_confirmation_star_count_label.add_theme_font_size_override("font_size", font_size)
+	_leave_confirmation_star_count_label.text = stars_text
+
+
+func _on_leave_confirmation_leave_pressed() -> void:
+	if _returning_to_menu:
+		return
+
 	_spend_campaign_life_for_run()
 	_return_to_main_menu()
+
+
+func _on_leave_confirmation_continue_pressed() -> void:
+	_close_pause_menu()
 
 
 func _on_pause_menu_continue_pressed() -> void:
@@ -1627,6 +1710,7 @@ func _close_pause_menu() -> void:
 	_level_paused = false
 	_set_moving_shelf_rows_paused(false)
 	_pause_menu_overlay.visible = false
+	_leave_confirmation_overlay.visible = false
 	_update_ability_buttons()
 	_update_pause_menu_button()
 

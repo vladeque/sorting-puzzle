@@ -139,6 +139,7 @@ Important nodes:
 - `UI/FailurePanel`: shown when time runs out.
 - `UI/CompletionPanel`: shown after all items clear; contains the `Great job!` title, generated reward star image, earned star count label, and green `Next` button.
 - `UI/PauseMenuOverlay`: `scenes/pause_menu.tscn` instance used for the modal pause menu.
+- `UI/LeaveConfirmationOverlay`: `scenes/leave_confirmation_menu.tscn` instance shown after the pause menu's Leave button, before spending a campaign life and returning to the menu.
 
 Runtime-created nodes:
 - `ShelfXX`: `scenes/shelf.tscn` instances generated under `Shelves`.
@@ -153,6 +154,7 @@ Depends on:
 - `scenes/layouts/layout_*.tscn`
 - `scenes/item.tscn`
 - `scenes/pause_menu.tscn`
+- `scenes/leave_confirmation_menu.tscn`
 - `assets/audio/*.wav`
 - `configs/item_sprites.json`
 - `configs/levels/level_*.json`
@@ -250,6 +252,35 @@ Depends on:
 
 Do not use for:
 - Timer state, scene navigation, gameplay pause rules, music playback, or actual vibration settings. Those stay in owning runtime systems.
+
+## `scenes/leave_confirmation_menu.tscn`
+
+Root:
+- `LeaveConfirmationOverlay` (`ColorRect`)
+
+Purpose:
+- Reusable in-level leave confirmation overlay instanced by `level.tscn`.
+- Reuses the pause popup panel treatment with a dimmed fullscreen modal background.
+- Shows a `Leaving the Level` title, warning text, crossed-out life and star reward icons, and red `Leave` / green `Continue` image buttons.
+
+Important nodes:
+- `ConfirmationPanel`: centered popup panel.
+- `ConfirmationPanel/MarginContainer/VBoxContainer/TitleLabel`: leave confirmation title.
+- `ConfirmationPanel/MarginContainer/VBoxContainer/MessageLabel`: warning copy shown above the lost-reward icons.
+- `ConfirmationPanel/MarginContainer/VBoxContainer/LossRow/LifeLoss`: crossed-out life icon with a static count of `1`.
+- `ConfirmationPanel/MarginContainer/VBoxContainer/LossRow/StarLoss/CountLabel`: current run star count written by `scripts/level.gd`.
+- `ConfirmationPanel/MarginContainer/VBoxContainer/ButtonRow/ConfirmLeaveButton`: red image button that confirms leaving.
+- `ConfirmationPanel/MarginContainer/VBoxContainer/ButtonRow/ContinueButton`: green image button that resumes the level.
+
+Depends on:
+- `assets/ui/main_menu_lives.png`.
+- `assets/ui/reward_star.png`.
+- `assets/ui/level_button_blank_red.png`.
+- `assets/ui/level_button_blank.png`.
+- Runtime button wiring and star-count updates from `scripts/level.gd`.
+
+Do not use for:
+- Spending lives, scene navigation, or pause state ownership. Those stay in `scripts/level.gd`.
 
 ## `scenes/shelf.tscn`
 

@@ -90,6 +90,7 @@ Files:
 - `scenes/moving_shelf_row.tscn`
 - `scenes/layouts/layout_*.tscn`
 - `scenes/pause_menu.tscn`
+- `scenes/leave_confirmation_menu.tscn`
 - `assets/ui/*.png`
 - `scripts/level.gd`
 - `scripts/moving_shelf_row.gd`
@@ -114,7 +115,7 @@ Responsibility:
 - Keeps non-clearing items interactive while match animations run, with pending shelf resolves queued behind the active animation.
 - Promotes back layers when the visible layer clears.
 - Tracks the countdown timer, starting it only after the first meaningful player action, and win/loss overlays.
-- Wires the in-level pause menu, including the top-right circular menu button, modal overlay, Leave action, Continue action, and campaign life spend for Leave.
+- Wires the in-level pause menu, including the top-right circular menu button, modal overlay, Leave action, Continue action, leave confirmation overlay, and campaign life spend for confirmed Leave.
 - Displays a responsive Godot-authored level backdrop with a top HUD strip, monotone shop wall, baseboard, and bottom floor band behind generated shelves.
 
 Change here when:
@@ -197,6 +198,7 @@ Change here when:
 Files:
 - `level.tscn`
 - `scenes/pause_menu.tscn`
+- `scenes/leave_confirmation_menu.tscn`
 - `assets/ui/*.png`
 - `scripts/pause_menu.gd`
 - `scripts/level.gd`
@@ -204,8 +206,9 @@ Files:
 Responsibility:
 - `level.tscn` provides the top-right circular pause button and instances the pause menu scene.
 - `scenes/pause_menu.tscn` owns the popup layout, `Pause` title, music / sound-effects / vibration icon buttons, and Leave/Continue buttons.
+- `scenes/leave_confirmation_menu.tscn` owns the second-step confirmation popup shown after Leave, including crossed-out lost life/star icons and red Leave / green Continue image buttons.
 - `scripts/pause_menu.gd` toggles crossed-out visuals on the three settings icon buttons and emits setting state changes.
-- `scripts/level.gd` opens and closes the menu, pauses the timer and gameplay input, routes Leave back to the main menu, and mutes gameplay sound effects when the sound-effects button is crossed out.
+- `scripts/level.gd` opens and closes the menu, pauses the timer and gameplay input, opens the leave confirmation before routing confirmed Leave back to the main menu, writes the current run star count into that confirmation, and mutes gameplay sound effects when the sound-effects button is crossed out.
 
 Change here when:
 - Restyling the in-level pause popup, adding pause menu actions, or changing pause/resume behavior.
@@ -282,6 +285,7 @@ Change level win or loss flow:
 
 Change pause menu layout:
 - Update `scenes/pause_menu.tscn`.
+- Update `scenes/leave_confirmation_menu.tscn` when changing the leave-confirmation popup.
 - Update `assets/ui/*.png` when changing pause menu icon art.
 - `assets/ui/pause_menu_option_a_sheet.png` and `assets/ui/pause_menu_option_b_sheet.png` are kept as alternate generated style sheets.
 - Keep node paths used by `scripts/level.gd` stable unless the script is updated in the same change.
