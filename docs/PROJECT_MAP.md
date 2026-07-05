@@ -41,6 +41,7 @@ Files:
 - `scenes/ui/level_button.tscn`
 - `assets/ui/main_menu_coin.png`
 - `assets/ui/main_menu_lives.png`
+- `assets/ui/level_button_blank*.png`
 - `scripts/production_main_menu.gd`
 - `scripts/main_menu.gd`
 - `scripts/player_progress.gd`
@@ -49,7 +50,7 @@ Responsibility:
 - Shows a production bottom button labeled with `PlayerProgress.current_level`.
 - Shows production top-row icons for profile, generated coins, saved lives, and a smaller pause-style settings button.
 - Disables campaign launch when saved lives are zero; the lives widget shows current lives and the countdown until the next hourly restore.
-- Uses `scenes/ui/level_button.tscn` and `assets/ui/level_button_blank.png` for the reusable glossy green level button visuals while keeping the label dynamic.
+- Uses `scenes/ui/level_button.tscn` and `assets/ui/level_button_blank.png` for the reusable glossy green level button visuals while keeping the label dynamic; red, light-blue, and yellow-orange variants are available beside the source texture for alternate states or future UI variants.
 - Keeps free level selection out of the production menu.
 - Preserves the old testing menu in `scenes/main_menu_testing.tscn`.
 - Builds testing level buttons for levels 1 through 10 only when dev/test level selection is enabled.

@@ -73,6 +73,7 @@ Important nodes:
 
 Depends on:
 - `assets/ui/level_button_blank.png`.
+- `assets/ui/level_button_blank_red.png`, `assets/ui/level_button_blank_light_blue.png`, and `assets/ui/level_button_blank_yellow_orange.png` are matching alternate color blanks for future button states or variants.
 - Caller scenes or scripts for placement, click wiring, and label updates.
 
 Do not use for:
