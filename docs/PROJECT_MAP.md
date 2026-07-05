@@ -41,6 +41,7 @@ Files:
 - `scenes/ui/level_button.tscn`
 - `assets/ui/main_menu_coin.png`
 - `assets/ui/main_menu_lives.png`
+- `assets/ui/avatars/*.png`
 - `assets/ui/level_button_blank*.png`
 - `scripts/press_scale_button.gd`
 - `scripts/production_main_menu.gd`
@@ -50,6 +51,7 @@ Files:
 Responsibility:
 - Shows a production bottom button labeled with `PlayerProgress.current_level`.
 - Shows production top-row icons for profile, generated coins, saved lives, and a smaller pause-style settings button.
+- Keeps generated circular player avatar options under `assets/ui/avatars/` for future profile selection; the current top status scene still draws its placeholder profile icon from Godot panels.
 - Disables campaign launch when saved lives are zero; the lives widget shows current lives and the countdown until the next hourly restore.
 - Uses `scenes/ui/level_button.tscn` and `assets/ui/level_button_blank.png` for the reusable glossy green level button visuals while keeping the label dynamic; red, light-blue, and yellow-orange variants are available beside the source texture for alternate states or future UI variants.
 - Uses `scripts/press_scale_button.gd` as the default held-press behavior for green and red blank-image buttons so they shrink slightly while a click or touch is held.

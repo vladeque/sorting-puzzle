@@ -51,12 +51,13 @@ Important nodes:
 - `SettingsWidget`: smaller `PauseMenuButton`-style button with a small alert badge.
 
 Depends on:
+- `assets/ui/avatars/*.png` for the generated circular avatar library available to future profile selection UI.
 - `assets/ui/main_menu_coin.png`.
 - `assets/ui/main_menu_lives.png`.
 - Owning menu scene for placement and safe-area layout.
 
 Do not use for:
-- Player inventory, lives logic, settings behavior, or profile data ownership. The owning menu script writes display values.
+- Player inventory, avatar selection logic, lives logic, settings behavior, or profile data ownership. The owning menu script writes display values.
 
 ## `scenes/ui/level_button.tscn`
 
