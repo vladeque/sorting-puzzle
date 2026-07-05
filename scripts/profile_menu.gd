@@ -76,9 +76,10 @@ func _save_selection() -> void:
 
 
 func _update_avatar_button_states() -> void:
-	for avatar_id in _avatar_buttons.keys():
+	for raw_avatar_id in _avatar_buttons.keys():
+		var avatar_id := str(raw_avatar_id)
 		var button := _avatar_buttons[avatar_id] as Button
-		var is_selected := avatar_id == _selected_avatar_id
+		var is_selected: bool = avatar_id == _selected_avatar_id
 		button.button_pressed = is_selected
 		button.add_theme_stylebox_override("normal", _create_avatar_style(is_selected, false))
 		button.add_theme_stylebox_override("hover", _create_avatar_style(is_selected, true))
