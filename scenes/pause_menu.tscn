@@ -1,86 +1,125 @@
-[gd_scene format=3 uid="uid://g1xsr7chqeg7"]
+[gd_scene load_steps=18 format=3 uid="uid://g1xsr7chqeg7"]
 
-[ext_resource type="Texture2D" path="res://assets/ui/icon_music.png" id="1_music_icon"]
-[ext_resource type="Texture2D" path="res://assets/ui/icon_sound_effects.png" id="2_sound_effects_icon"]
-[ext_resource type="Texture2D" path="res://assets/ui/icon_vibration.png" id="3_vibration_icon"]
+[ext_resource type="Texture2D" uid="uid://d4dmg42gwviq5" path="res://assets/ui/icon_music.png" id="1_music_icon"]
+[ext_resource type="Texture2D" uid="uid://3hrppla10q8k" path="res://assets/ui/icon_sound_effects.png" id="2_sound_effects_icon"]
+[ext_resource type="Texture2D" uid="uid://djl1f7q7bbgnf" path="res://assets/ui/icon_vibration.png" id="3_vibration_icon"]
 [ext_resource type="Script" path="res://scripts/pause_menu.gd" id="4_pause_menu_script"]
+[ext_resource type="Texture2D" uid="uid://b386mn58pea5q" path="res://assets/ui/level_button_blank_red.png" id="5_leave_button"]
+[ext_resource type="Texture2D" uid="uid://bai63m2evt0sk" path="res://assets/ui/level_button_blank.png" id="6_continue_button"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pause_panel"]
-bg_color = Color(0.12, 0.16, 0.2, 0.98)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.82, 0.9, 0.74, 0.82)
-corner_radius_top_left = 28
-corner_radius_top_right = 28
-corner_radius_bottom_right = 28
-corner_radius_bottom_left = 28
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_outer_panel"]
+bg_color = Color(0.67, 0.32, 0.22, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 6
+border_color = Color(0.43, 0.17, 0.11, 1)
+corner_radius_top_left = 30
+corner_radius_top_right = 30
+corner_radius_bottom_right = 30
+corner_radius_bottom_left = 30
 shadow_color = Color(0, 0, 0, 0.42)
 shadow_size = 18
 shadow_offset = Vector2(0, 8)
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_icon_button"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_leave_button_normal"]
-bg_color = Color(0.78, 0.18, 0.13, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-shadow_color = Color(0, 0, 0, 0.24)
-shadow_size = 6
-shadow_offset = Vector2(0, 3)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_leave_button_pressed"]
-bg_color = Color(0.56, 0.1, 0.08, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-shadow_color = Color(0, 0, 0, 0.2)
-shadow_size = 4
-shadow_offset = Vector2(0, 2)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_leave_button_hover"]
-bg_color = Color(0.9, 0.24, 0.17, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-shadow_color = Color(0, 0, 0, 0.3)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inner_panel"]
+bg_color = Color(0.96, 0.9, 0.78, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(0.45, 0.19, 0.13, 0.52)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+shadow_color = Color(0.24, 0.08, 0.04, 0.22)
 shadow_size = 8
 shadow_offset = Vector2(0, 3)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_continue_button_normal"]
-bg_color = Color(0.18, 0.62, 0.28, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-shadow_color = Color(0, 0, 0, 0.24)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_icon_button_normal"]
+bg_color = Color(0.83, 0.66, 0.47, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 3
+border_color = Color(0.98, 0.87, 0.66, 0.9)
+corner_radius_top_left = 44
+corner_radius_top_right = 44
+corner_radius_bottom_right = 44
+corner_radius_bottom_left = 44
+shadow_color = Color(0.3, 0.12, 0.07, 0.24)
+shadow_size = 5
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_icon_button_pressed"]
+bg_color = Color(0.62, 0.25, 0.18, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 3
+border_color = Color(1, 0.92, 0.62, 1)
+corner_radius_top_left = 44
+corner_radius_top_right = 44
+corner_radius_bottom_right = 44
+corner_radius_bottom_left = 44
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_icon_button_hover"]
+bg_color = Color(0.9, 0.72, 0.5, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 3
+border_color = Color(1, 0.92, 0.62, 1)
+corner_radius_top_left = 44
+corner_radius_top_right = 44
+corner_radius_bottom_right = 44
+corner_radius_bottom_left = 44
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_normal"]
+bg_color = Color(0.86, 0.08, 0.06, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(1, 0.58, 0.5, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+shadow_color = Color(0, 0, 0, 0.36)
 shadow_size = 6
 shadow_offset = Vector2(0, 3)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_continue_button_pressed"]
-bg_color = Color(0.1, 0.45, 0.2, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-shadow_color = Color(0, 0, 0, 0.2)
-shadow_size = 4
-shadow_offset = Vector2(0, 2)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_pressed"]
+bg_color = Color(0.58, 0.04, 0.04, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(1, 0.76, 0.68, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_continue_button_hover"]
-bg_color = Color(0.24, 0.75, 0.34, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-shadow_color = Color(0, 0, 0, 0.3)
-shadow_size = 8
-shadow_offset = Vector2(0, 3)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_hover"]
+bg_color = Color(0.98, 0.2, 0.16, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(1, 0.82, 0.72, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_leave_button"]
+texture = ExtResource("5_leave_button")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_continue_button"]
+texture = ExtResource("6_continue_button")
 
 [node name="PauseMenuOverlay" type="ColorRect" unique_id=636763679]
 visible = false
@@ -93,7 +132,7 @@ grow_vertical = 2
 color = Color(0.02, 0.025, 0.03, 0.66)
 script = ExtResource("4_pause_menu_script")
 
-[node name="PauseMenuPanel" type="PanelContainer" parent="." unique_id=1355035433]
+[node name="PauseMenuPanel" type="Panel" parent="." unique_id=1355035433]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -101,59 +140,119 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -260.0
-offset_top = -181.5
+offset_top = -250.0
 offset_right = 260.0
-offset_bottom = 181.5
+offset_bottom = 250.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_pause_panel")
+theme_override_styles/panel = SubResource("StyleBoxFlat_outer_panel")
 
-[node name="MarginContainer" type="MarginContainer" parent="PauseMenuPanel" unique_id=302232463]
-layout_mode = 2
-theme_override_constants/margin_left = 42
-theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 42
-theme_override_constants/margin_bottom = 20
-
-[node name="VBoxContainer" type="VBoxContainer" parent="PauseMenuPanel/MarginContainer" unique_id=1095478440]
-layout_mode = 2
-theme_override_constants/separation = 40
-alignment = 1
-
-[node name="TitleLabel" type="Label" parent="PauseMenuPanel/MarginContainer/VBoxContainer" unique_id=1806017559]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.72)
+[node name="TitleLabel" type="Label" parent="PauseMenuPanel" unique_id=1806017559]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 46.0
+offset_top = 25.0
+offset_right = -46.0
+offset_bottom = 86.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.78, 1)
+theme_override_colors/font_shadow_color = Color(0.16, 0.04, 0.02, 0.92)
 theme_override_constants/shadow_offset_x = 0
 theme_override_constants/shadow_offset_y = 3
-theme_override_font_sizes/font_size = 42
+theme_override_font_sizes/font_size = 44
 text = "Pause"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="IconRow" type="HBoxContainer" parent="PauseMenuPanel/MarginContainer/VBoxContainer" unique_id=579782014]
-layout_mode = 2
-theme_override_constants/separation = 36
+[node name="CloseButton" type="Button" parent="PauseMenuPanel"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -74.0
+offset_top = 12.0
+offset_right = -14.0
+offset_bottom = 72.0
+grow_horizontal = 0
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.32, 0.02, 0.02, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxFlat_close_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_close_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_close_hover")
+text = "X"
+
+[node name="InnerPanel" type="Panel" parent="PauseMenuPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 46.0
+offset_top = 116.0
+offset_right = -46.0
+offset_bottom = 330.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_inner_panel")
+
+[node name="InnerTitleLabel" type="Label" parent="PauseMenuPanel/InnerPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 24.0
+offset_top = 22.0
+offset_right = -24.0
+offset_bottom = 60.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.36, 0.16, 0.1, 1)
+theme_override_font_sizes/font_size = 28
+text = "Settings"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="IconRow" type="HBoxContainer" parent="PauseMenuPanel/InnerPanel" unique_id=579782014]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -166.0
+offset_top = -17.0
+offset_right = 166.0
+offset_bottom = 108.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 28
 alignment = 1
 
-[node name="MusicButton" type="Button" parent="PauseMenuPanel/MarginContainer/VBoxContainer/IconRow" unique_id=476301978]
-custom_minimum_size = Vector2(86, 86)
+[node name="MusicOption" type="VBoxContainer" parent="PauseMenuPanel/InnerPanel/IconRow"]
+custom_minimum_size = Vector2(92, 124)
 layout_mode = 2
-focus_mode = 0
-theme_override_styles/normal = SubResource("StyleBoxEmpty_icon_button")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_icon_button")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_icon_button")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_icon_button")
+theme_override_constants/separation = 5
+alignment = 1
 
-[node name="Icon" type="TextureRect" parent="PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/MusicButton" unique_id=1923076712]
+[node name="MusicButton" type="Button" parent="PauseMenuPanel/InnerPanel/IconRow/MusicOption" unique_id=476301978]
+custom_minimum_size = Vector2(82, 82)
+layout_mode = 2
+size_flags_horizontal = 4
+focus_mode = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_icon_button_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_icon_button_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_icon_button_hover")
+
+[node name="Icon" type="TextureRect" parent="PauseMenuPanel/InnerPanel/IconRow/MusicOption/MusicButton" unique_id=1923076712]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -2.0
-offset_top = -2.0
-offset_right = 2.0
-offset_bottom = 2.0
+offset_left = 7.0
+offset_top = 7.0
+offset_right = -7.0
+offset_bottom = -7.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -161,24 +260,37 @@ texture = ExtResource("1_music_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="SoundEffectsButton" type="Button" parent="PauseMenuPanel/MarginContainer/VBoxContainer/IconRow" unique_id=213460749]
-custom_minimum_size = Vector2(86, 86)
+[node name="Label" type="Label" parent="PauseMenuPanel/InnerPanel/IconRow/MusicOption"]
 layout_mode = 2
-focus_mode = 0
-theme_override_styles/normal = SubResource("StyleBoxEmpty_icon_button")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_icon_button")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_icon_button")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_icon_button")
+theme_override_colors/font_color = Color(0.36, 0.16, 0.1, 1)
+theme_override_font_sizes/font_size = 18
+text = "Music"
+horizontal_alignment = 1
 
-[node name="Icon" type="TextureRect" parent="PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/SoundEffectsButton" unique_id=1855192667]
+[node name="SoundEffectsOption" type="VBoxContainer" parent="PauseMenuPanel/InnerPanel/IconRow"]
+custom_minimum_size = Vector2(92, 124)
+layout_mode = 2
+theme_override_constants/separation = 5
+alignment = 1
+
+[node name="SoundEffectsButton" type="Button" parent="PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption" unique_id=213460749]
+custom_minimum_size = Vector2(82, 82)
+layout_mode = 2
+size_flags_horizontal = 4
+focus_mode = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_icon_button_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_icon_button_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_icon_button_hover")
+
+[node name="Icon" type="TextureRect" parent="PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption/SoundEffectsButton" unique_id=1855192667]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -2.0
-offset_top = -2.0
-offset_right = 2.0
-offset_bottom = 2.0
+offset_left = 7.0
+offset_top = 7.0
+offset_right = -7.0
+offset_bottom = -7.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -186,24 +298,37 @@ texture = ExtResource("2_sound_effects_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="VibrationButton" type="Button" parent="PauseMenuPanel/MarginContainer/VBoxContainer/IconRow" unique_id=1013902673]
-custom_minimum_size = Vector2(86, 86)
+[node name="Label" type="Label" parent="PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption"]
 layout_mode = 2
-focus_mode = 0
-theme_override_styles/normal = SubResource("StyleBoxEmpty_icon_button")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_icon_button")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_icon_button")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_icon_button")
+theme_override_colors/font_color = Color(0.36, 0.16, 0.1, 1)
+theme_override_font_sizes/font_size = 18
+text = "SFX"
+horizontal_alignment = 1
 
-[node name="Icon" type="TextureRect" parent="PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/VibrationButton" unique_id=1516946932]
+[node name="VibrationOption" type="VBoxContainer" parent="PauseMenuPanel/InnerPanel/IconRow"]
+custom_minimum_size = Vector2(92, 124)
+layout_mode = 2
+theme_override_constants/separation = 5
+alignment = 1
+
+[node name="VibrationButton" type="Button" parent="PauseMenuPanel/InnerPanel/IconRow/VibrationOption" unique_id=1013902673]
+custom_minimum_size = Vector2(82, 82)
+layout_mode = 2
+size_flags_horizontal = 4
+focus_mode = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_icon_button_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_icon_button_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_icon_button_hover")
+
+[node name="Icon" type="TextureRect" parent="PauseMenuPanel/InnerPanel/IconRow/VibrationOption/VibrationButton" unique_id=1516946932]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -2.0
-offset_top = -2.0
-offset_right = 2.0
-offset_bottom = 2.0
+offset_left = 7.0
+offset_top = 7.0
+offset_right = -7.0
+offset_bottom = -7.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -211,31 +336,52 @@ texture = ExtResource("3_vibration_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="ButtonRow" type="HBoxContainer" parent="PauseMenuPanel/MarginContainer/VBoxContainer" unique_id=400633957]
+[node name="Label" type="Label" parent="PauseMenuPanel/InnerPanel/IconRow/VibrationOption"]
 layout_mode = 2
-theme_override_constants/separation = 22
+theme_override_colors/font_color = Color(0.36, 0.16, 0.1, 1)
+theme_override_font_sizes/font_size = 18
+text = "Vibrate"
+horizontal_alignment = 1
+
+[node name="ButtonRow" type="HBoxContainer" parent="PauseMenuPanel" unique_id=400633957]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 56.0
+offset_top = -108.0
+offset_right = -56.0
+offset_bottom = -32.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 18
 alignment = 1
 
-[node name="LeaveButton" type="Button" parent="PauseMenuPanel/MarginContainer/VBoxContainer/ButtonRow" unique_id=2050016554]
-custom_minimum_size = Vector2(184, 72)
+[node name="LeaveButton" type="Button" parent="PauseMenuPanel/ButtonRow" unique_id=2050016554]
+custom_minimum_size = Vector2(194, 76)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.34, 0.02, 0.02, 0.95)
+theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 30
-theme_override_styles/normal = SubResource("StyleBoxFlat_leave_button_normal")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_leave_button_pressed")
-theme_override_styles/hover = SubResource("StyleBoxFlat_leave_button_hover")
+theme_override_styles/normal = SubResource("StyleBoxTexture_leave_button")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_leave_button")
+theme_override_styles/hover = SubResource("StyleBoxTexture_leave_button")
 text = "Leave"
 
-[node name="ContinueButton" type="Button" parent="PauseMenuPanel/MarginContainer/VBoxContainer/ButtonRow" unique_id=179584193]
-custom_minimum_size = Vector2(184, 72)
+[node name="ContinueButton" type="Button" parent="PauseMenuPanel/ButtonRow" unique_id=179584193]
+custom_minimum_size = Vector2(214, 76)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.92, 1, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.03, 0.25, 0.04, 0.95)
+theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 30
-theme_override_styles/normal = SubResource("StyleBoxFlat_continue_button_normal")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_continue_button_pressed")
-theme_override_styles/hover = SubResource("StyleBoxFlat_continue_button_hover")
+theme_override_styles/normal = SubResource("StyleBoxTexture_continue_button")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_continue_button")
+theme_override_styles/hover = SubResource("StyleBoxTexture_continue_button")
 text = "Continue"

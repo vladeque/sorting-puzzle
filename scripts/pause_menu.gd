@@ -7,15 +7,15 @@ const SETTING_SOUND_EFFECTS := &"sound_effects"
 const SETTING_VIBRATION := &"vibration"
 const SETTINGS_BUTTONS: Array[Dictionary] = [
 	{
-		"path": ^"PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/MusicButton",
+		"path": ^"PauseMenuPanel/InnerPanel/IconRow/MusicOption/MusicButton",
 		"setting_id": SETTING_MUSIC,
 	},
 	{
-		"path": ^"PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/SoundEffectsButton",
+		"path": ^"PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption/SoundEffectsButton",
 		"setting_id": SETTING_SOUND_EFFECTS,
 	},
 	{
-		"path": ^"PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/VibrationButton",
+		"path": ^"PauseMenuPanel/InnerPanel/IconRow/VibrationOption/VibrationButton",
 		"setting_id": SETTING_VIBRATION,
 	},
 ]
@@ -49,8 +49,8 @@ func _create_cross_out_marker(button: Button) -> Control:
 	var cross_out := Control.new()
 	cross_out.name = CROSS_OUT_NAME
 	cross_out.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	cross_out.position = Vector2(6, 38)
-	cross_out.size = Vector2(74, 16)
+	cross_out.position = Vector2(5, 35)
+	cross_out.size = Vector2(72, 14)
 	cross_out.pivot_offset = cross_out.size * 0.5
 	cross_out.rotation_degrees = -38.0
 	cross_out.visible = false

@@ -257,7 +257,7 @@ Key responsibilities:
 - Save campaign completion through `PlayerProgress`, show `UI/CompletionPanel` with the run's earned star count, and load the next campaign level when the completion `Next` button is pressed.
 - Return to the configured menu scene when leaving a level or when the dev/test completion `Next` button is pressed.
 - Keep the level countdown idle until the first meaningful player action, then format the active timer as zero-padded `MM:SS` text with `_update_timer_label()`.
-- Pause and resume active gameplay through the top-right menu button, the instanced `UI/PauseMenuOverlay`, `UI/LeaveConfirmationOverlay`, `Leave`, and `Continue`.
+- Pause and resume active gameplay through the top-right menu button, the instanced `UI/PauseMenuOverlay`, `UI/LeaveConfirmationOverlay`, `Leave`, `Continue`, and red close buttons.
 - Disable item placement and triple-clear sound effects while the pause menu sound-effects toggle is crossed out.
 - Manage hammer, shuffle, and highlight abilities. Campaign levels read and spend saved ability counts through `PlayerProgress`; dev/test levels use isolated temporary counts.
 - Hammer targets visible/front triples first, then can supplement visible/front matches with first-back-layer copies of the same item type when no visible item type has three available copies.
@@ -392,9 +392,9 @@ Purpose:
 - Emits `setting_toggled(setting_id, is_disabled)` so owning runtime scripts can apply supported settings.
 
 Important nodes:
-- `PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/MusicButton`
-- `PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/SoundEffectsButton`
-- `PauseMenuPanel/MarginContainer/VBoxContainer/IconRow/VibrationButton`
+- `PauseMenuPanel/InnerPanel/IconRow/MusicOption/MusicButton`
+- `PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption/SoundEffectsButton`
+- `PauseMenuPanel/InnerPanel/IconRow/VibrationOption/VibrationButton`
 
 Do not use for:
 - Applying actual music or vibration settings until those runtime systems exist.

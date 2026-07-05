@@ -72,8 +72,8 @@ const COMPLETION_STARS_LABEL_OFFSET_Y := 120.0
 const COMPLETION_BUTTON_SIZE := Vector2(340, 124)
 const COMPLETION_BUTTON_CENTER_Y := 850.0
 const COMPLETION_MIN_BUTTON_BOTTOM_MARGIN := 118.0
-const PAUSE_MENU_PANEL_SIZE := Vector2(520, 363)
-const LEAVE_CONFIRM_PANEL_SIZE := Vector2(520, 536)
+const PAUSE_MENU_PANEL_SIZE := Vector2(520, 500)
+const LEAVE_CONFIRM_PANEL_SIZE := Vector2(520, 560)
 @export var slot_snap_distance := BASE_SLOT_SNAP_DISTANCE * SHELF_CELL_VISUAL_SCALE
 @export var item_pick_size := BASE_ITEM_PICK_SIZE * SHELF_CELL_VISUAL_SCALE
 @export var drag_start_distance := 12.0
@@ -115,9 +115,11 @@ var _completion_earned_stars_label: Label
 var _completion_next_button: Button
 var _pause_menu_button: Button
 var _pause_menu_overlay: Control
+var _pause_close_button: Button
 var _leave_button: Button
 var _continue_button: Button
 var _leave_confirmation_overlay: Control
+var _leave_confirmation_close_button: Button
 var _confirm_leave_button: Button
 var _confirm_continue_button: Button
 var _leave_confirmation_star_count_label: Label
@@ -178,12 +180,14 @@ func _ready() -> void:
 	_completion_next_button = get_node("UI/CompletionPanel/NextButton") as Button
 	_pause_menu_button = get_node("UI/PauseMenuButton") as Button
 	_pause_menu_overlay = get_node("UI/PauseMenuOverlay") as Control
-	_leave_button = get_node("UI/PauseMenuOverlay/PauseMenuPanel/MarginContainer/VBoxContainer/ButtonRow/LeaveButton") as Button
-	_continue_button = get_node("UI/PauseMenuOverlay/PauseMenuPanel/MarginContainer/VBoxContainer/ButtonRow/ContinueButton") as Button
+	_pause_close_button = get_node("UI/PauseMenuOverlay/PauseMenuPanel/CloseButton") as Button
+	_leave_button = get_node("UI/PauseMenuOverlay/PauseMenuPanel/ButtonRow/LeaveButton") as Button
+	_continue_button = get_node("UI/PauseMenuOverlay/PauseMenuPanel/ButtonRow/ContinueButton") as Button
 	_leave_confirmation_overlay = get_node("UI/LeaveConfirmationOverlay") as Control
-	_confirm_leave_button = get_node("UI/LeaveConfirmationOverlay/ConfirmationPanel/MarginContainer/VBoxContainer/ButtonRow/ConfirmLeaveButton") as Button
-	_confirm_continue_button = get_node("UI/LeaveConfirmationOverlay/ConfirmationPanel/MarginContainer/VBoxContainer/ButtonRow/ContinueButton") as Button
-	_leave_confirmation_star_count_label = get_node("UI/LeaveConfirmationOverlay/ConfirmationPanel/MarginContainer/VBoxContainer/LossRow/StarLoss/CountLabel") as Label
+	_leave_confirmation_close_button = get_node("UI/LeaveConfirmationOverlay/ConfirmationPanel/CloseButton") as Button
+	_confirm_leave_button = get_node("UI/LeaveConfirmationOverlay/ConfirmationPanel/ButtonRow/ConfirmLeaveButton") as Button
+	_confirm_continue_button = get_node("UI/LeaveConfirmationOverlay/ConfirmationPanel/ButtonRow/ContinueButton") as Button
+	_leave_confirmation_star_count_label = get_node("UI/LeaveConfirmationOverlay/ConfirmationPanel/InnerPanel/LossRow/StarLoss/CountLabel") as Label
 	_ability_bar = get_node("UI/AbilityBar") as Control
 	_ability_button_row = get_node("UI/AbilityBar/HBoxContainer") as Control
 	_failure_panel.visible = false
@@ -1597,8 +1601,10 @@ func _spend_campaign_life_for_run() -> void:
 
 func _setup_pause_menu_buttons() -> void:
 	_pause_menu_button.pressed.connect(_on_pause_menu_button_pressed)
+	_pause_close_button.pressed.connect(_on_pause_menu_continue_pressed)
 	_leave_button.pressed.connect(_on_pause_menu_leave_pressed)
 	_continue_button.pressed.connect(_on_pause_menu_continue_pressed)
+	_leave_confirmation_close_button.pressed.connect(_on_leave_confirmation_continue_pressed)
 	_confirm_leave_button.pressed.connect(_on_leave_confirmation_leave_pressed)
 	_confirm_continue_button.pressed.connect(_on_leave_confirmation_continue_pressed)
 	if _pause_menu_overlay.has_signal(&"setting_toggled"):
