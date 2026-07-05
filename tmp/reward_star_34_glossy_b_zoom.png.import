@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://3vi3qpy12q0w"
-path="res://.godot/imported/reward_star1.png-8e044def53dd695a0fe7977a60eede43.ctex"
+uid="uid://bu2hv3yd1bn63"
+path="res://.godot/imported/reward_star_34_glossy_b_zoom.png-6c8ee0063c3d77ed9ea93c5b4ae2fca5.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/reward_star1.png"
-dest_files=["res://.godot/imported/reward_star1.png-8e044def53dd695a0fe7977a60eede43.ctex"]
+source_file="res://tmp/reward_star_34_glossy_b_zoom.png"
+dest_files=["res://.godot/imported/reward_star_34_glossy_b_zoom.png-6c8ee0063c3d77ed9ea93c5b4ae2fca5.ctex"]
 
 [params]
 

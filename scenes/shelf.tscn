@@ -12,7 +12,6 @@ color = Color(0.74916583, 0.65930223, 0.5507783, 1)
 polygon = PackedVector2Array(-90.24036, 44.01355, 126.45907, 44.272057, 137.25061, 58.82427, -78.578064, 59.016922)
 
 [node name="RightColumnShadow" type="Polygon2D" parent="." unique_id=356530628]
-visible = false
 color = Color(0.7490196, 0.65882355, 0.54901963, 1)
 polygon = PackedVector2Array(111.81738, -87.18291, 128.0911, -71.91666, 128.16081, 54.794724, 112, 46)
 

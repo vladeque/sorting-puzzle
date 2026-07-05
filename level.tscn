@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://bx74wdn60xop5"]
 
 [ext_resource type="Texture2D" uid="uid://h4ru3gdl5338" path="res://assets/abilities/ability_hammer.png" id="2_hammer_icon"]
+[ext_resource type="Texture2D" uid="uid://xbjatvx3natv" path="res://assets/ui/reward_star_34_glossy_b.png" id="2_n6hdu"]
 [ext_resource type="Texture2D" uid="uid://x0qk7pd87bfv" path="res://assets/abilities/ability_shuffle.png" id="3_shuffle_icon"]
 [ext_resource type="Texture2D" uid="uid://dwmyah5l2r82d" path="res://assets/abilities/ability_lantern.png" id="4_lantern_icon"]
 [ext_resource type="PackedScene" uid="uid://g1xsr7chqeg7" path="res://scenes/pause_menu.tscn" id="5_pause_menu"]
-[ext_resource type="Texture2D" uid="uid://dv3e304riacm4" path="res://assets/ui/reward_star1.png" id="6_reward_star"]
 [ext_resource type="Texture2D" uid="uid://bai63m2evt0sk" path="res://assets/ui/level_button_blank.png" id="7_level_button_blank"]
 [ext_resource type="Script" uid="uid://cy80oincxrrc5" path="res://scripts/level.gd" id="10_level_script"]
 
@@ -193,6 +193,9 @@ corner_radius_bottom_left = 22
 shadow_color = Color(0, 0, 0, 0.34)
 shadow_size = 5
 shadow_offset = Vector2(0, 2)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_1ainy"]
+load_path = "res://.godot/imported/reward_star1.png-8e044def53dd695a0fe7977a60eede43.ctex"
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_completion_next"]
 texture = ExtResource("7_level_button_blank")
@@ -456,7 +459,7 @@ offset_right = 44.0
 offset_bottom = 17.0
 grow_vertical = 2
 mouse_filter = 2
-texture = ExtResource("6_reward_star")
+texture = ExtResource("2_n6hdu")
 expand_mode = 1
 stretch_mode = 5
 
@@ -734,7 +737,7 @@ offset_bottom = 160.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-texture = ExtResource("6_reward_star")
+texture = SubResource("CompressedTexture2D_1ainy")
 expand_mode = 1
 stretch_mode = 5
 
