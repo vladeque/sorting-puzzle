@@ -1609,6 +1609,8 @@ func _setup_pause_menu_buttons() -> void:
 	_confirm_continue_button.pressed.connect(_on_leave_confirmation_continue_pressed)
 	if _pause_menu_overlay.has_signal(&"setting_toggled"):
 		_pause_menu_overlay.connect(&"setting_toggled", _on_pause_menu_setting_toggled)
+	if _pause_menu_overlay.has_method(&"is_setting_disabled"):
+		_sound_effects_enabled = not bool(_pause_menu_overlay.call(&"is_setting_disabled", PAUSE_SETTING_SOUND_EFFECTS))
 
 
 func _setup_completion_buttons() -> void:

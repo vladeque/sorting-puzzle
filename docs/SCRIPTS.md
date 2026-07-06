@@ -349,7 +349,7 @@ Key responsibilities:
 - Return to the configured menu scene when leaving a level or when the dev/test completion `Next` button is pressed.
 - Keep the level countdown idle until the first meaningful player action, then format the active timer as zero-padded `MM:SS` text with `_update_timer_label()`.
 - Pause and resume active gameplay through the top-right menu button, the instanced `UI/PauseMenuOverlay`, `UI/LeaveConfirmationOverlay`, `Leave`, `Continue`, and red close buttons.
-- Disable item placement and triple-clear sound effects while the pause menu sound-effects toggle is crossed out.
+- Initialize item placement and triple-clear sound effects from the shared sound-effects setting and keep them disabled while that toggle is crossed out.
 - Manage hammer, shuffle, and highlight abilities. Campaign levels read and spend saved ability counts through `PlayerProgress`; dev/test levels use isolated temporary counts.
 - Hammer targets visible/front triples first, then can supplement visible/front matches with first-back-layer copies of the same item type when no visible item type has three available copies.
 - Count hammer destroys as cleared triples for shelf unlocking.
@@ -479,15 +479,19 @@ Attached to:
 - `scenes/ui/settings_menu.tscn` root `MainMenuSettingsOverlay`.
 
 Purpose:
-- Owns local pause menu settings-button visual state.
+- Owns shared in-memory settings-button visual state for the current app session.
 - Toggles a crossed-out overlay on the music, sound effects, and vibration rectangular slot buttons when clicked.
 - Emits `setting_toggled(setting_id, is_disabled)` so owning runtime scripts can apply supported settings.
 - Also powers the matching visual toggles in the main-menu settings popup, which intentionally keeps the same `PauseMenuPanel/InnerPanel/IconRow` button paths.
+- Initializes every pause-menu and main-menu settings instance from the same disabled-state dictionary so matching buttons stay visually synchronized.
 
 Important nodes:
 - `PauseMenuPanel/InnerPanel/IconRow/MusicOption/MusicButton`
 - `PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption/SoundEffectsButton`
 - `PauseMenuPanel/InnerPanel/IconRow/VibrationOption/VibrationButton`
+
+Key methods:
+- `is_setting_disabled(setting_id)`: returns the shared disabled state for owning scripts such as `scripts/level.gd`.
 
 Do not use for:
 - Applying actual music or vibration settings until those runtime systems exist.

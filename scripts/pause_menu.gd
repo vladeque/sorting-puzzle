@@ -21,6 +21,8 @@ const SETTINGS_BUTTONS: Array[Dictionary] = [
 ]
 const CROSS_OUT_NAME := "CrossOut"
 
+static var _disabled_settings: Dictionary = {}
+
 
 func _ready() -> void:
 	for button_config in SETTINGS_BUTTONS:
@@ -32,18 +34,24 @@ func _ready() -> void:
 			continue
 
 		var cross_out := _create_cross_out_marker(button)
+		cross_out.visible = is_setting_disabled(setting_id)
 		button.pressed.connect(_on_setting_button_pressed.bind(cross_out, setting_id))
 
 
+func is_setting_disabled(setting_id: StringName) -> bool:
+	return bool(_disabled_settings.get(setting_id, false))
+
+
 func _on_setting_button_pressed(cross_out: Control, setting_id: StringName) -> void:
-	cross_out.visible = not cross_out.visible
-	setting_toggled.emit(setting_id, cross_out.visible)
+	var is_disabled := not is_setting_disabled(setting_id)
+	_disabled_settings[setting_id] = is_disabled
+	cross_out.visible = is_disabled
+	setting_toggled.emit(setting_id, is_disabled)
 
 
 func _create_cross_out_marker(button: Button) -> Control:
 	var existing := button.get_node_or_null(CROSS_OUT_NAME) as Control
 	if existing != null:
-		existing.visible = false
 		return existing
 
 	var cross_out := Control.new()

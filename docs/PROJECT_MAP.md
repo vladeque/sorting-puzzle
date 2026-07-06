@@ -220,8 +220,8 @@ Responsibility:
 - `scenes/pause_menu.tscn` owns the popup layout, warm outer area, cream inner settings area, `Pause` title, protruding top-right red close button, music / sound-effects / vibration rectangular icon slots, and Leave/Continue image buttons.
 - `scenes/leave_confirmation_menu.tscn` owns the second-step confirmation popup shown after Leave, including warm outer area, cream inner loss area, protruding top-right red close button, crossed-out rectangular lost life/star slots, and red Leave / green Continue image buttons.
 - `scripts/press_scale_button.gd` provides the default held-press shrink behavior for the red and green bottom image buttons in the pause and leave-confirmation popups.
-- `scripts/pause_menu.gd` toggles crossed-out visuals on the three settings icon-slot buttons and emits setting state changes.
-- `scripts/level.gd` opens and closes the menu, pauses the timer and gameplay input, treats red close buttons like Continue, opens the leave confirmation before routing confirmed Leave back to the main menu, writes the current run star count into that confirmation, and mutes gameplay sound effects when the sound-effects button is crossed out.
+- `scripts/pause_menu.gd` toggles crossed-out visuals on the three settings icon-slot buttons, keeps their current-session disabled states synchronized between the main-menu settings popup and in-level pause menu, and emits setting state changes.
+- `scripts/level.gd` opens and closes the menu, pauses the timer and gameplay input, treats red close buttons like Continue, opens the leave confirmation before routing confirmed Leave back to the main menu, writes the current run star count into that confirmation, initializes gameplay sound effects from the shared setting, and mutes them when the sound-effects button is crossed out.
 
 Change here when:
 - Restyling the in-level pause popup, adding pause menu actions, or changing pause/resume behavior.

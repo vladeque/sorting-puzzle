@@ -91,7 +91,7 @@ Important nodes:
 - `PauseMenuPanel/InnerPanel/ActionColumn/LanguageButton`: wide no-op button using `assets/ui/level_button_blank.png`.
 
 Depends on:
-- `scripts/pause_menu.gd` for the same crossed-out toggle visuals used by the in-level pause menu.
+- `scripts/pause_menu.gd` for the same crossed-out toggle visuals and shared disabled state used by the in-level pause menu.
 - `assets/ui/icon_music.png`, `assets/ui/icon_sound_effects.png`, and `assets/ui/icon_vibration.png`.
 - `assets/ui/level_button_blank.png`.
 - `scripts/press_scale_button.gd` for held-press visuals on the wide buttons.
@@ -329,7 +329,7 @@ Depends on:
 - `scripts/press_scale_button.gd` for the default held-press shrink on the bottom image buttons.
 - `assets/ui/pause_menu_option_a_sheet.png` and `assets/ui/pause_menu_option_b_sheet.png` are archived alternate visual directions for these icons.
 - Runtime button wiring from `scripts/level.gd`.
-- Local settings-button visual toggles from `scripts/pause_menu.gd`.
+- Shared settings-button visual toggles from `scripts/pause_menu.gd`.
 
 Do not use for:
 - Timer state, scene navigation, gameplay pause rules, music playback, or actual vibration settings. Those stay in owning runtime systems.
