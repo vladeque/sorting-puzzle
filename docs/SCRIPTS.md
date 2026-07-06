@@ -12,11 +12,13 @@ Purpose:
 - Labels the bottom button with the saved current level.
 - Displays saved campaign lives in the top status bar and disables campaign play at zero lives.
 - Displays the saved profile avatar and opens the profile editor from the top status bar.
+- Opens the main-menu settings popup from the top status bar.
 - Launches the saved campaign level.
 
 Key constants:
 - `LEVEL_SCENE`: preloads `res://level.tscn`.
 - `PROFILE_MENU_SCENE`: preloads `res://scenes/ui/profile_menu.tscn`.
+- `SETTINGS_MENU_SCENE`: preloads `res://scenes/ui/settings_menu.tscn`.
 - `MIN_LEVEL`: first campaign level number.
 - `MAX_LEVEL`: last campaign level number.
 - `PRODUCTION_MENU_SCENE`: return path assigned to campaign level instances.
@@ -27,6 +29,7 @@ Important nodes:
 - `%TopStatusBar`: top-anchored container positioned at runtime with safe-area padding; owns the status icon layout through `scenes/ui/main_menu_top_status.tscn`.
 - `MainMenuTopStatus/ProfileWidget`: opens the profile menu.
 - `MainMenuTopStatus/ProfileWidget/AvatarTexture`: displays the saved avatar texture.
+- `MainMenuTopStatus/SettingsWidget/SettingsButton`: opens the main-menu settings popup.
 - `MainMenuTopStatus/LivesWidget/LifeCount`: shows current campaign lives.
 - `MainMenuTopStatus/LivesWidget/LifeStatus`: shows `Full` or the `MM:SS` countdown until the next restored life.
 - `%BottomBar`: bottom-anchored container positioned at runtime with safe-area padding.
@@ -42,11 +45,14 @@ Key methods:
 - `_format_life_restore_time(seconds_remaining)`: formats the next-life restore timer as zero-padded minutes and seconds.
 - `_update_profile_avatar()`: loads the saved avatar texture into the top status profile widget.
 - `_open_profile_menu()`: creates the centered profile menu window and listens for saved avatar changes.
+- `_open_settings_menu()`: creates the centered settings popup and wires its close button.
+- `_close_settings_menu()`: dismisses the settings popup.
 - `_on_profile_avatar_saved(avatar_id)`: refreshes the top status avatar after the profile menu saves.
 - `_launch_campaign_level()`: instantiates the level, sets campaign launch metadata, swaps current scene, and queues the menu for deletion.
 
 Depends on:
 - `level.tscn`
+- `scenes/ui/settings_menu.tscn`
 - `scripts/level.gd` export `selected_level`
 - `scripts/level.gd` export `launched_from_dev_mode`
 - `scripts/level.gd` export `return_menu_scene_path`
@@ -470,11 +476,13 @@ Do not use for:
 
 Attached to:
 - `scenes/pause_menu.tscn` root `PauseMenuOverlay`.
+- `scenes/ui/settings_menu.tscn` root `MainMenuSettingsOverlay`.
 
 Purpose:
 - Owns local pause menu settings-button visual state.
 - Toggles a crossed-out overlay on the music, sound effects, and vibration rectangular slot buttons when clicked.
 - Emits `setting_toggled(setting_id, is_disabled)` so owning runtime scripts can apply supported settings.
+- Also powers the matching visual toggles in the main-menu settings popup, which intentionally keeps the same `PauseMenuPanel/InnerPanel/IconRow` button paths.
 
 Important nodes:
 - `PauseMenuPanel/InnerPanel/IconRow/MusicOption/MusicButton`

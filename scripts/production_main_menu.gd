@@ -2,6 +2,7 @@ extends Control
 
 const LEVEL_SCENE := preload("res://level.tscn")
 const PROFILE_MENU_SCENE := preload("res://scenes/ui/profile_menu.tscn")
+const SETTINGS_MENU_SCENE := preload("res://scenes/ui/settings_menu.tscn")
 const AVATAR_CLIP_SHADER := preload("res://assets/ui/avatar_circle_clip.gdshader")
 const MIN_LEVEL := 1
 const MAX_LEVEL := 10
@@ -19,12 +20,14 @@ const LIFE_STATUS_REFRESH_SECONDS := 1.0
 @onready var _bottom_bar := %BottomBar as MarginContainer
 @onready var _level_button := %LevelButton as Button
 @onready var _profile_button := %TopStatusBar.get_node("MainMenuTopStatus/ProfileWidget") as Button
+@onready var _settings_button := %TopStatusBar.get_node("MainMenuTopStatus/SettingsWidget/SettingsButton") as Button
 @onready var _profile_avatar_texture := %TopStatusBar.get_node("MainMenuTopStatus/ProfileWidget/AvatarTexture") as TextureRect
 @onready var _life_count_label := %TopStatusBar.get_node("MainMenuTopStatus/LivesWidget/LifeCount") as Label
 @onready var _life_status_label := %TopStatusBar.get_node("MainMenuTopStatus/LivesWidget/LifeStatus") as Label
 
 var _life_status_refresh_time := 0.0
 var _profile_menu: Control
+var _settings_menu: Control
 
 
 func _ready() -> void:
@@ -32,6 +35,7 @@ func _ready() -> void:
 	PlayerProgress.refresh_lives()
 	_level_button.pressed.connect(_launch_campaign_level)
 	_profile_button.pressed.connect(_open_profile_menu)
+	_settings_button.pressed.connect(_open_settings_menu)
 	get_viewport().size_changed.connect(_apply_responsive_layout)
 	_update_profile_avatar()
 	_update_lives_status()
@@ -158,12 +162,35 @@ func _open_profile_menu() -> void:
 	_profile_menu.tree_exited.connect(_clear_profile_menu_reference)
 
 
+func _open_settings_menu() -> void:
+	if is_instance_valid(_settings_menu):
+		return
+
+	_settings_menu = SETTINGS_MENU_SCENE.instantiate() as Control
+	add_child(_settings_menu)
+
+	var close_button := _settings_menu.get_node_or_null("PauseMenuPanel/CloseButton") as Button
+	if close_button != null:
+		close_button.pressed.connect(_close_settings_menu)
+
+	_settings_menu.tree_exited.connect(_clear_settings_menu_reference)
+
+
+func _close_settings_menu() -> void:
+	if is_instance_valid(_settings_menu):
+		_settings_menu.queue_free()
+
+
 func _on_profile_avatar_saved(_avatar_id: String) -> void:
 	_update_profile_avatar()
 
 
 func _clear_profile_menu_reference() -> void:
 	_profile_menu = null
+
+
+func _clear_settings_menu_reference() -> void:
+	_settings_menu = null
 
 
 func _launch_campaign_level() -> void:

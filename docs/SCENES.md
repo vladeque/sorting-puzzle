@@ -16,6 +16,7 @@ Purpose:
 - Provides a top status row for profile, coins, saved campaign lives, and settings.
 - Provides a bottom `%LevelButton` labeled with the saved campaign level, such as `Level 1`, or disabled as `No Lives` when lives are empty.
 - Opens the player profile menu when the profile widget is pressed.
+- Opens the main settings menu when the settings widget is pressed.
 - Starts the saved campaign level when the bottom button is pressed.
 
 Important nodes:
@@ -24,6 +25,7 @@ Important nodes:
 - `BottomBar`: bottom-anchored responsive container for the play button.
 - `BottomBar/LevelButton`: `scenes/ui/level_button.tscn` instance that launches the saved campaign level.
 - Runtime child `scenes/ui/profile_menu.tscn`: centered pause-style profile editor window created when `ProfileWidget` is pressed.
+- Runtime child `scenes/ui/settings_menu.tscn`: centered pause-style settings window created when `SettingsWidget/SettingsButton` is pressed.
 
 Depends on:
 - `level.tscn` through `scripts/production_main_menu.gd`.
@@ -31,6 +33,7 @@ Depends on:
 - `assets/backgrounds/main_menu.jpeg`.
 - `scenes/ui/main_menu_top_status.tscn` for top status icons and labels.
 - `scenes/ui/profile_menu.tscn` for profile name and avatar editing.
+- `scenes/ui/settings_menu.tscn` for the main-menu settings popup.
 - `scenes/ui/level_button.tscn` for the reusable production level button visuals.
 
 Do not use for:
@@ -64,6 +67,38 @@ Depends on:
 
 Do not use for:
 - Player inventory, avatar selection logic, player-name editing, lives logic, settings behavior, or profile data ownership. The owning menu script writes display values.
+
+## `scenes/ui/settings_menu.tscn`
+
+Root:
+- `MainMenuSettingsOverlay` (`ColorRect`)
+
+Script:
+- `scripts/pause_menu.gd`
+
+Purpose:
+- Centered pause-style settings window opened from the production main menu over a dimmed modal background.
+- Reuses the pause menu visual treatment for the warm outer panel, cream inner panel, `Settings` title, protruding red close button, and music / sound-effects / vibration icon-slot toggles.
+- Adds two no-op wide green blank-image buttons labeled `Support` and `Language` under the settings toggles.
+
+Important nodes:
+- `PauseMenuPanel`: centered popup panel kept named for reuse with `scripts/pause_menu.gd`.
+- `PauseMenuPanel/CloseButton`: protruding red close button wired by `scripts/production_main_menu.gd` to dismiss the settings popup.
+- `PauseMenuPanel/InnerPanel/IconRow/MusicOption/MusicButton`: rectangular music toggle slot.
+- `PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption/SoundEffectsButton`: rectangular sound effects toggle slot.
+- `PauseMenuPanel/InnerPanel/IconRow/VibrationOption/VibrationButton`: rectangular phone vibration toggle slot.
+- `PauseMenuPanel/InnerPanel/ActionColumn/SupportButton`: wide no-op button using `assets/ui/level_button_blank.png`.
+- `PauseMenuPanel/InnerPanel/ActionColumn/LanguageButton`: wide no-op button using `assets/ui/level_button_blank.png`.
+
+Depends on:
+- `scripts/pause_menu.gd` for the same crossed-out toggle visuals used by the in-level pause menu.
+- `assets/ui/icon_music.png`, `assets/ui/icon_sound_effects.png`, and `assets/ui/icon_vibration.png`.
+- `assets/ui/level_button_blank.png`.
+- `scripts/press_scale_button.gd` for held-press visuals on the wide buttons.
+- Runtime open/close wiring from `scripts/production_main_menu.gd`.
+
+Do not use for:
+- Applying actual music, sound effects, vibration, support, or language settings. Those runtime systems are not implemented yet.
 
 ## `scenes/ui/profile_menu.tscn`
 

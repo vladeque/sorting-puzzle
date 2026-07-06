@@ -1,0 +1,389 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" uid="uid://d4dmg42gwviq5" path="res://assets/ui/icon_music.png" id="1_music_icon"]
+[ext_resource type="Texture2D" uid="uid://3hrppla10q8k" path="res://assets/ui/icon_sound_effects.png" id="2_sound_effects_icon"]
+[ext_resource type="Texture2D" uid="uid://djl1f7q7bbgnf" path="res://assets/ui/icon_vibration.png" id="3_vibration_icon"]
+[ext_resource type="Script" uid="uid://djayncoacexvl" path="res://scripts/pause_menu.gd" id="4_pause_menu_script"]
+[ext_resource type="Texture2D" uid="uid://bai63m2evt0sk" path="res://assets/ui/level_button_blank.png" id="5_blank_button"]
+[ext_resource type="Script" path="res://scripts/press_scale_button.gd" id="6_press_scale_button"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_outer_panel"]
+bg_color = Color(0.67, 0.32, 0.22, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 6
+border_color = Color(0.43, 0.17, 0.11, 1)
+corner_radius_top_left = 30
+corner_radius_top_right = 30
+corner_radius_bottom_right = 30
+corner_radius_bottom_left = 30
+shadow_color = Color(0, 0, 0, 0.42)
+shadow_size = 18
+shadow_offset = Vector2(0, 8)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_normal"]
+bg_color = Color(0.86, 0.08, 0.06, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(1, 0.58, 0.5, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+shadow_color = Color(0, 0, 0, 0.36)
+shadow_size = 6
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_pressed"]
+bg_color = Color(0.58, 0.04, 0.04, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(1, 0.76, 0.68, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_hover"]
+bg_color = Color(0.98, 0.2, 0.16, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(1, 0.82, 0.72, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inner_panel"]
+bg_color = Color(0.96, 0.9, 0.78, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(0.45, 0.19, 0.13, 0.52)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+shadow_color = Color(0.24, 0.08, 0.04, 0.22)
+shadow_size = 8
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_icon_button_normal"]
+bg_color = Color(0.83, 0.66, 0.47, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 3
+border_color = Color(0.98, 0.87, 0.66, 0.9)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0.3, 0.12, 0.07, 0.24)
+shadow_size = 5
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_icon_button_pressed"]
+bg_color = Color(0.62, 0.25, 0.18, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 3
+border_color = Color(1, 0.92, 0.62, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_icon_button_hover"]
+bg_color = Color(0.9, 0.72, 0.5, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 3
+border_color = Color(1, 0.92, 0.62, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_blank_button"]
+texture = ExtResource("5_blank_button")
+
+[node name="MainMenuSettingsOverlay" type="ColorRect"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.025, 0.03, 0.66)
+script = ExtResource("4_pause_menu_script")
+
+[node name="PauseMenuPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -260.0
+offset_top = -315.0
+offset_right = 260.0
+offset_bottom = 315.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_outer_panel")
+
+[node name="TitleLabel" type="Label" parent="PauseMenuPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 46.0
+offset_top = 25.0
+offset_right = -46.0
+offset_bottom = 86.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.78, 1)
+theme_override_colors/font_shadow_color = Color(0.16, 0.04, 0.02, 0.92)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 3
+theme_override_font_sizes/font_size = 44
+text = "Settings"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CloseButton" type="Button" parent="PauseMenuPanel"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -54.0
+offset_top = -648.0
+offset_right = 18.0
+offset_bottom = -576.0
+grow_horizontal = 0
+grow_vertical = 0
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.32, 0.02, 0.02, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxFlat_close_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_close_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_close_hover")
+text = "X"
+
+[node name="InnerPanel" type="Panel" parent="PauseMenuPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 46.0
+offset_top = 116.0
+offset_right = -46.0
+offset_bottom = -48.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_inner_panel")
+
+[node name="InnerTitleLabel" type="Label" parent="PauseMenuPanel/InnerPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 24.0
+offset_top = 22.0
+offset_right = -24.0
+offset_bottom = 60.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.36, 0.16, 0.1, 1)
+theme_override_font_sizes/font_size = 28
+text = "Settings"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="IconRow" type="HBoxContainer" parent="PauseMenuPanel/InnerPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 30.0
+offset_top = 86.0
+offset_right = -30.0
+offset_bottom = 211.0
+grow_horizontal = 2
+theme_override_constants/separation = 28
+alignment = 1
+
+[node name="MusicOption" type="VBoxContainer" parent="PauseMenuPanel/InnerPanel/IconRow"]
+custom_minimum_size = Vector2(104, 124)
+layout_mode = 2
+theme_override_constants/separation = 5
+alignment = 1
+
+[node name="MusicButton" type="Button" parent="PauseMenuPanel/InnerPanel/IconRow/MusicOption"]
+custom_minimum_size = Vector2(96, 82)
+layout_mode = 2
+size_flags_horizontal = 4
+focus_mode = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_icon_button_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_icon_button_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_icon_button_hover")
+
+[node name="Icon" type="TextureRect" parent="PauseMenuPanel/InnerPanel/IconRow/MusicOption/MusicButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = 8.0
+offset_right = -15.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("1_music_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="PauseMenuPanel/InnerPanel/IconRow/MusicOption"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.36, 0.16, 0.1, 1)
+theme_override_font_sizes/font_size = 18
+text = "Music"
+horizontal_alignment = 1
+
+[node name="SoundEffectsOption" type="VBoxContainer" parent="PauseMenuPanel/InnerPanel/IconRow"]
+custom_minimum_size = Vector2(104, 124)
+layout_mode = 2
+theme_override_constants/separation = 5
+alignment = 1
+
+[node name="SoundEffectsButton" type="Button" parent="PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption"]
+custom_minimum_size = Vector2(96, 82)
+layout_mode = 2
+size_flags_horizontal = 4
+focus_mode = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_icon_button_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_icon_button_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_icon_button_hover")
+
+[node name="Icon" type="TextureRect" parent="PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption/SoundEffectsButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = 8.0
+offset_right = -15.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_sound_effects_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.36, 0.16, 0.1, 1)
+theme_override_font_sizes/font_size = 18
+text = "SFX"
+horizontal_alignment = 1
+
+[node name="VibrationOption" type="VBoxContainer" parent="PauseMenuPanel/InnerPanel/IconRow"]
+custom_minimum_size = Vector2(104, 124)
+layout_mode = 2
+theme_override_constants/separation = 5
+alignment = 1
+
+[node name="VibrationButton" type="Button" parent="PauseMenuPanel/InnerPanel/IconRow/VibrationOption"]
+custom_minimum_size = Vector2(96, 82)
+layout_mode = 2
+size_flags_horizontal = 4
+focus_mode = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_icon_button_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_icon_button_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_icon_button_hover")
+
+[node name="Icon" type="TextureRect" parent="PauseMenuPanel/InnerPanel/IconRow/VibrationOption/VibrationButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = 8.0
+offset_right = -15.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_vibration_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="PauseMenuPanel/InnerPanel/IconRow/VibrationOption"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.36, 0.16, 0.1, 1)
+theme_override_font_sizes/font_size = 18
+text = "Vibrate"
+horizontal_alignment = 1
+
+[node name="ActionColumn" type="VBoxContainer" parent="PauseMenuPanel/InnerPanel"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 38.0
+offset_top = -178.0
+offset_right = -38.0
+offset_bottom = -34.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 18
+alignment = 1
+
+[node name="SupportButton" type="Button" parent="PauseMenuPanel/InnerPanel/ActionColumn"]
+custom_minimum_size = Vector2(344, 63)
+layout_mode = 2
+size_flags_horizontal = 4
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.92, 1, 0.9, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.03, 0.25, 0.04, 0.95)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxTexture_blank_button")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_blank_button")
+theme_override_styles/hover = SubResource("StyleBoxTexture_blank_button")
+text = "Support"
+script = ExtResource("6_press_scale_button")
+
+[node name="LanguageButton" type="Button" parent="PauseMenuPanel/InnerPanel/ActionColumn"]
+custom_minimum_size = Vector2(344, 63)
+layout_mode = 2
+size_flags_horizontal = 4
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.92, 1, 0.9, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.03, 0.25, 0.04, 0.95)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = SubResource("StyleBoxTexture_blank_button")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_blank_button")
+theme_override_styles/hover = SubResource("StyleBoxTexture_blank_button")
+text = "Language"
+script = ExtResource("6_press_scale_button")
