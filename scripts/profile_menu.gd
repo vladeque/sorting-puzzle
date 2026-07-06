@@ -16,6 +16,7 @@ const AVATAR_TEXTURE_INSET := 10.0
 const SAVE_BUTTON_MAX_WIDTH := 240.0
 
 @onready var _panel := %ProfileMenuPanel as Panel
+@onready var _name_line_edit := %NameLineEdit as LineEdit
 @onready var _avatar_grid := %AvatarGrid as GridContainer
 @onready var _save_button := %SaveButton as Button
 @onready var _close_button := %CloseButton as Button
@@ -26,12 +27,14 @@ var _avatar_buttons := {}
 
 func _ready() -> void:
 	_selected_avatar_id = PlayerProgress.get_avatar_id()
+	_name_line_edit.text = PlayerProgress.get_player_name()
 	_avatar_grid.columns = GRID_COLUMNS
 	_avatar_grid.add_theme_constant_override("h_separation", GRID_H_SEPARATION)
 	_avatar_grid.add_theme_constant_override("v_separation", GRID_V_SEPARATION)
 	_save_button.text = "Save"
 	_save_button.pressed.connect(_save_selection)
 	_close_button.pressed.connect(queue_free)
+	_name_line_edit.text_submitted.connect(_save_from_name_submit)
 	resized.connect(_apply_responsive_layout)
 	get_viewport().size_changed.connect(_apply_responsive_layout)
 	_build_avatar_buttons()
@@ -75,9 +78,13 @@ func _select_avatar(avatar_id: String) -> void:
 
 
 func _save_selection() -> void:
-	if PlayerProgress.set_avatar_id(_selected_avatar_id):
+	if PlayerProgress.set_profile(_selected_avatar_id, _name_line_edit.text):
 		avatar_saved.emit(_selected_avatar_id)
 		queue_free()
+
+
+func _save_from_name_submit(_new_text: String) -> void:
+	_save_selection()
 
 
 func _update_avatar_button_states() -> void:

@@ -23,7 +23,7 @@ Player progression:
 - `scripts/player_progress.gd`
 - `scripts/save_providers/*.gd`
 - Registered in `project.godot` as the `PlayerProgress` autoload.
-- Saves campaign level progress, campaign lives, campaign ability inventory, and selected profile avatar through the configured save provider.
+- Saves campaign level progress, campaign lives, campaign ability inventory, selected profile avatar, and player name through the configured save provider.
 
 Reusable item scene:
 - `scenes/item.tscn`
@@ -54,7 +54,7 @@ Files:
 Responsibility:
 - Shows a production bottom button labeled with `PlayerProgress.current_level`.
 - Shows production top-row icons for the saved circular-clipped profile avatar, generated coins, saved lives, and a smaller pause-style settings button.
-- Opens `scenes/ui/profile_menu.tscn` from the profile widget, shows all 18 avatars in a centered pause-style window with a 3-column grid, and saves the selected avatar through `PlayerProgress.avatar_id`.
+- Opens `scenes/ui/profile_menu.tscn` from the profile widget, shows an editable player-name field above all 18 avatars in a centered pause-style window with a 3-column grid, and saves the name plus selected avatar through `PlayerProgress`.
 - Disables campaign launch when saved lives are zero; the lives widget shows current lives and the countdown until the next hourly restore.
 - Uses `scenes/ui/level_button.tscn` and `assets/ui/level_button_blank.png` for the reusable glossy green level button visuals while keeping the label dynamic; red, light-blue, and yellow-orange variants are available beside the source texture for alternate states or future UI variants.
 - Uses `scripts/press_scale_button.gd` as the default held-press behavior for green and red blank-image buttons so they shrink slightly while a click or touch is held.
@@ -80,15 +80,15 @@ Responsibility:
 - Loads and saves campaign progress through the configured provider.
 - Uses `LocalSaveProvider` for editor/development saves under `user://player_progress.json`.
 - Uses `CloudSaveProvider` for release cloud saves through native Google Play Games or Apple Game Center bridge singletons.
-- Tracks the current campaign level, highest completed level, campaign lives, next life restore timestamp, campaign ability uses, and selected profile avatar.
-- Defaults fresh and legacy profile saves to `avatar_cat`.
+- Tracks the current campaign level, highest completed level, campaign lives, next life restore timestamp, campaign ability uses, selected profile avatar, and player name.
+- Defaults fresh and legacy profile saves to `avatar_cat` and a generated `player_` name with a five-character random suffix.
 - Restores one missing life per elapsed real-time hour until the five-life cap is reached.
 - Spends one campaign life when a campaign level fails or the player leaves from the pause menu.
 - Spends ability uses immediately so failure or leaving a level does not refund them.
 - Advances `current_level` only when the active campaign level is completed.
 
 Change here when:
-- Adding life tuning, ability refills, rewards, purchases, reset flows, save migrations, native cloud save hooks, avatar availability, or new persisted player state.
+- Adding life tuning, ability refills, rewards, purchases, reset flows, save migrations, native cloud save hooks, avatar/name availability, or new persisted player state.
 
 ### Level Runtime
 

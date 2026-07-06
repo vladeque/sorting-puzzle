@@ -11,7 +11,7 @@ Purpose:
 - Shows the production campaign entry point over the production menu background.
 - Labels the bottom button with the saved current level.
 - Displays saved campaign lives in the top status bar and disables campaign play at zero lives.
-- Displays the saved profile avatar and opens the profile avatar picker from the top status bar.
+- Displays the saved profile avatar and opens the profile editor from the top status bar.
 - Launches the saved campaign level.
 
 Key constants:
@@ -62,11 +62,12 @@ Attached to:
 - `scenes/ui/profile_menu.tscn` root `ProfileMenu`.
 
 Purpose:
-- Builds the player profile avatar picker.
+- Builds the player profile name editor and avatar picker.
+- Loads the current player name into an editable field above the avatar section.
 - Creates one avatar button for each id exposed by `PlayerProgress.get_available_avatar_ids()`.
 - Keeps the pause-style menu panel responsive, with the avatar grid at three columns.
 - Clips opaque square avatar PNGs to circular display in the top profile widget and picker.
-- Emits `avatar_saved(avatar_id)` after the selected avatar is saved.
+- Emits `avatar_saved(avatar_id)` after the profile save succeeds so the main menu can refresh the avatar.
 
 Key constants:
 - `AVATAR_CLIP_SHADER`: shader used to hide square avatar texture corners.
@@ -77,6 +78,7 @@ Key constants:
 
 Important nodes:
 - `%ProfileMenuPanel`: centered pause-style popup panel resized by the script.
+- `%NameLineEdit`: editable player-name field populated from `PlayerProgress.get_player_name()`.
 - `%AvatarGrid`: `GridContainer` populated with generated avatar buttons.
 - `%SaveButton`: `scenes/ui/level_button.tscn` instance labeled `Save`.
 - `%CloseButton`: dismisses the picker without saving.
@@ -84,7 +86,8 @@ Important nodes:
 Key methods:
 - `_build_avatar_buttons()`: creates the 18 avatar buttons and loads their textures.
 - `_select_avatar(avatar_id)`: updates the pending avatar selection.
-- `_save_selection()`: writes the selected avatar through `PlayerProgress.set_avatar_id()` and closes the menu.
+- `_save_selection()`: writes the entered player name and selected avatar through `PlayerProgress.set_profile()` and closes the menu.
+- `_save_from_name_submit(new_text)`: saves the full profile when the name field is submitted.
 - `_apply_responsive_layout()`: updates panel bounds, avatar button sizes, and save button width.
 - `_apply_avatar_clip_material(avatar_texture)`: applies circular clipping to an avatar `TextureRect`.
 
@@ -166,7 +169,7 @@ Autoload:
 - Registered as `PlayerProgress` in `project.godot`.
 
 Purpose:
-- Owns saved campaign progression, campaign lives, campaign ability inventory, and selected profile avatar.
+- Owns saved campaign progression, campaign lives, campaign ability inventory, selected profile avatar, and player name.
 - Persists state through the configured save provider.
 
 Saved fields:
@@ -177,6 +180,7 @@ Saved fields:
 - `next_life_restore_unix`: Unix timestamp for the next hourly life restore, or `0` when lives are full.
 - `ability_uses`: remaining campaign uses for hammer, shuffle, and highlight.
 - `avatar_id`: selected profile avatar id. Fresh and legacy saves default to `avatar_cat`.
+- `player_name`: saved profile display name. Fresh and legacy saves without a valid value receive a generated `player_` name with a five-character random suffix, such as `player_g26f3`.
 
 Key methods:
 - `load_progress()`: reads and sanitizes provider data or creates default in-memory progress.
@@ -186,7 +190,10 @@ Key methods:
 - `get_available_avatar_ids()`: returns the 18 valid profile avatar ids.
 - `get_avatar_id()`: returns the selected avatar id, sanitized to `avatar_cat` when needed.
 - `get_avatar_texture_path(avatar_id)`: returns the resource path for a valid or sanitized avatar id.
+- `get_player_name()`: returns a non-empty saved or generated player name.
 - `set_avatar_id(avatar_id)`: validates, stores, and saves the selected profile avatar.
+- `set_player_name(player_name)`: trims, stores, and saves a non-empty player name.
+- `set_profile(avatar_id, player_name)`: validates and saves the avatar and player name together.
 - `get_lives()`: refreshes and returns current campaign lives.
 - `get_max_lives()`: returns the lives cap.
 - `get_next_life_restore_seconds_remaining()`: returns seconds until the next life restore, or `0` when full.

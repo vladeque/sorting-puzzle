@@ -15,6 +15,9 @@ const ABILITY_HAMMER := "hammer"
 const ABILITY_SHUFFLE := "shuffle"
 const ABILITY_HIGHLIGHT := "highlight"
 const DEFAULT_AVATAR_ID := "avatar_cat"
+const PLAYER_NAME_PREFIX := "player_"
+const PLAYER_NAME_RANDOM_ALPHABET := "abcdefghijklmnopqrstuvwxyz0123456789"
+const PLAYER_NAME_RANDOM_LENGTH := 5
 const AVAILABLE_AVATAR_IDS := [
 	"avatar_bear",
 	"avatar_cat",
@@ -61,8 +64,11 @@ func load_progress() -> void:
 		if loaded_data == null:
 			loaded_data = {}
 
-		_data = _sanitize_data(loaded_data)
-		refresh_lives()
+		var sanitized_data := _sanitize_data(loaded_data)
+		var should_save_sanitized_data := loaded_data != sanitized_data
+		_data = sanitized_data
+		if _refresh_lives_state() or should_save_sanitized_data:
+			save_progress()
 		return
 
 	push_warning("Could not load %s save: %s" % [_save_provider.get_provider_name(), result.get("error", "")])
@@ -104,6 +110,10 @@ func get_avatar_texture_path(avatar_id: String) -> String:
 	return AVATAR_TEXTURE_PATH_FORMAT % _sanitize_avatar_id(avatar_id)
 
 
+func get_player_name() -> String:
+	return _sanitize_player_name(str(_data.get("player_name", "")))
+
+
 func set_avatar_id(avatar_id: String) -> bool:
 	if not AVAILABLE_AVATAR_IDS.has(avatar_id):
 		return false
@@ -113,6 +123,35 @@ func set_avatar_id(avatar_id: String) -> bool:
 
 	_data["avatar_id"] = avatar_id
 	save_progress()
+	return true
+
+
+func set_player_name(player_name: String) -> bool:
+	var sanitized_player_name := _sanitize_player_name(player_name, get_player_name())
+	if get_player_name() == sanitized_player_name:
+		return true
+
+	_data["player_name"] = sanitized_player_name
+	save_progress()
+	return true
+
+
+func set_profile(avatar_id: String, player_name: String) -> bool:
+	if not AVAILABLE_AVATAR_IDS.has(avatar_id):
+		return false
+
+	var sanitized_player_name := _sanitize_player_name(player_name, get_player_name())
+	var did_change := false
+	if get_avatar_id() != avatar_id:
+		_data["avatar_id"] = avatar_id
+		did_change = true
+	if get_player_name() != sanitized_player_name:
+		_data["player_name"] = sanitized_player_name
+		did_change = true
+
+	if did_change:
+		save_progress()
+
 	return true
 
 
@@ -202,6 +241,7 @@ func _sanitize_data(raw_data: Dictionary) -> Dictionary:
 	sanitized["lives"] = clampi(int(raw_data.get("lives", MAX_LIVES)), 0, MAX_LIVES)
 	sanitized["next_life_restore_unix"] = maxi(int(raw_data.get("next_life_restore_unix", 0)), 0)
 	sanitized["avatar_id"] = _sanitize_avatar_id(str(raw_data.get("avatar_id", DEFAULT_AVATAR_ID)))
+	sanitized["player_name"] = _sanitize_player_name(str(raw_data.get("player_name", sanitized["player_name"])), sanitized["player_name"])
 	if int(sanitized["lives"]) >= MAX_LIVES:
 		sanitized["next_life_restore_unix"] = 0
 	elif int(sanitized["next_life_restore_unix"]) <= 0:
@@ -225,6 +265,7 @@ func _default_data() -> Dictionary:
 		"next_life_restore_unix": 0,
 		"ability_uses": DEFAULT_ABILITY_USES.duplicate(),
 		"avatar_id": DEFAULT_AVATAR_ID,
+		"player_name": _generate_player_name(),
 	}
 
 
@@ -233,6 +274,26 @@ func _sanitize_avatar_id(avatar_id: String) -> String:
 		return avatar_id
 
 	return DEFAULT_AVATAR_ID
+
+
+func _sanitize_player_name(player_name: String, fallback_name: String = "") -> String:
+	var sanitized_name := player_name.strip_edges()
+	if sanitized_name.is_empty():
+		return fallback_name if not fallback_name.is_empty() else _generate_player_name()
+
+	return sanitized_name
+
+
+func _generate_player_name() -> String:
+	var rng := RandomNumberGenerator.new()
+	rng.randomize()
+
+	var suffix := ""
+	for index in range(PLAYER_NAME_RANDOM_LENGTH):
+		var suffix_index := rng.randi_range(0, PLAYER_NAME_RANDOM_ALPHABET.length() - 1)
+		suffix += PLAYER_NAME_RANDOM_ALPHABET.substr(suffix_index, 1)
+
+	return "%s%s" % [PLAYER_NAME_PREFIX, suffix]
 
 
 func _refresh_lives_state() -> bool:

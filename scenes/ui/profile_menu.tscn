@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://b5yb0hlfitnqa"]
+[gd_scene load_steps=13 format=3 uid="uid://b5yb0hlfitnqa"]
 
 [ext_resource type="Script" path="res://scripts/profile_menu.gd" id="1_profile_menu"]
 [ext_resource type="PackedScene" path="res://scenes/ui/level_button.tscn" id="2_level_button"]
@@ -71,6 +71,50 @@ corner_radius_bottom_left = 24
 shadow_color = Color(0.24, 0.08, 0.04, 0.22)
 shadow_size = 8
 shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_name_section"]
+bg_color = Color(0.9, 0.76, 0.52, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 3
+border_color = Color(0.45, 0.19, 0.13, 0.42)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_name_input_normal"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(1, 0.96, 0.84, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 3
+border_color = Color(0.45, 0.19, 0.13, 0.48)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_name_input_focus"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(1, 0.98, 0.88, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(0.98, 0.87, 0.46, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_scroll"]
 
@@ -165,8 +209,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_inner_panel")
 
-[node name="AvatarScroll" type="ScrollContainer" parent="ProfileMenuPanel/InnerPanel"]
-unique_name_in_owner = true
+[node name="ContentStack" type="VBoxContainer" parent="ProfileMenuPanel/InnerPanel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -177,10 +220,57 @@ offset_right = -24.0
 offset_bottom = -24.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/separation = 18
+
+[node name="NameSection" type="Panel" parent="ProfileMenuPanel/InnerPanel/ContentStack"]
+custom_minimum_size = Vector2(0, 104)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_name_section")
+
+[node name="NameLabel" type="Label" parent="ProfileMenuPanel/InnerPanel/ContentStack/NameSection"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 18.0
+offset_top = 10.0
+offset_right = -18.0
+offset_bottom = 42.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.33, 0.12, 0.08, 1)
+theme_override_font_sizes/font_size = 23
+text = "Player name"
+vertical_alignment = 1
+
+[node name="NameLineEdit" type="LineEdit" parent="ProfileMenuPanel/InnerPanel/ContentStack/NameSection"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 18.0
+offset_top = 47.0
+offset_right = -18.0
+offset_bottom = 91.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.31, 0.11, 0.07, 1)
+theme_override_colors/caret_color = Color(0.31, 0.11, 0.07, 1)
+theme_override_colors/selection_color = Color(0.98, 0.87, 0.46, 0.45)
+theme_override_colors/placeholder_color = Color(0.48, 0.28, 0.2, 0.62)
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_name_input_normal")
+theme_override_styles/focus = SubResource("StyleBoxFlat_name_input_focus")
+text = "player_g26f3"
+placeholder_text = "Player name"
+max_length = 24
+
+[node name="AvatarScroll" type="ScrollContainer" parent="ProfileMenuPanel/InnerPanel/ContentStack"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 horizontal_scroll_mode = 0
 theme_override_styles/panel = SubResource("StyleBoxEmpty_scroll")
 
-[node name="AvatarGrid" type="GridContainer" parent="ProfileMenuPanel/InnerPanel/AvatarScroll"]
+[node name="AvatarGrid" type="GridContainer" parent="ProfileMenuPanel/InnerPanel/ContentStack/AvatarScroll"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
