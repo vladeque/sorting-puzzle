@@ -1,7 +1,14 @@
-[gd_scene load_steps=7 format=3 uid="uid://c6xhf1gyqk2tr"]
+[gd_scene format=3 uid="uid://c6xhf1gyqk2tr"]
 
-[ext_resource type="Script" path="res://scripts/main_menu_reward_chest.gd" id="1_reward_chest_script"]
-[ext_resource type="Texture2D" path="res://assets/ui/main_menu_reward_chest.png" id="2_reward_chest_icon"]
+[ext_resource type="Script" uid="uid://dvm1bhdav30ec" path="res://scripts/main_menu_reward_chest.gd" id="1_reward_chest_script"]
+[ext_resource type="Texture2D" uid="uid://brf3b72bksb8e" path="res://assets/ui/main_menu_reward_chest.png" id="2_reward_chest_icon"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_icon_shadow"]
+bg_color = Color(0.08, 0.05, 0.05, 0.18)
+corner_radius_top_left = 45
+corner_radius_top_right = 45
+corner_radius_bottom_right = 45
+corner_radius_bottom_left = 45
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_progress_track"]
 bg_color = Color(0.98, 0.82, 0.52, 1)
@@ -32,21 +39,14 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_icon_shadow"]
-bg_color = Color(0.08, 0.05, 0.05, 0.18)
-corner_radius_top_left = 45
-corner_radius_top_right = 45
-corner_radius_bottom_right = 45
-corner_radius_bottom_left = 45
-
-[node name="MainMenuRewardChest" type="Control"]
+[node name="MainMenuRewardChest" type="Control" unique_id=100017003]
 custom_minimum_size = Vector2(116, 136)
 layout_mode = 3
 anchors_preset = 0
 mouse_filter = 2
 script = ExtResource("1_reward_chest_script")
 
-[node name="IconShadow" type="Panel" parent="."]
+[node name="IconShadow" type="Panel" parent="." unique_id=1245366181]
 layout_mode = 1
 offset_left = 12.0
 offset_top = 12.0
@@ -55,7 +55,7 @@ offset_bottom = 108.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_icon_shadow")
 
-[node name="ChestIcon" type="TextureRect" parent="."]
+[node name="ChestIcon" type="TextureRect" parent="." unique_id=1371355349]
 layout_mode = 1
 offset_left = 0.0
 offset_top = -2.0
@@ -66,7 +66,7 @@ texture = ExtResource("2_reward_chest_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="ProgressTrack" type="Panel" parent="."]
+[node name="ProgressTrack" type="Panel" parent="." unique_id=2049666495]
 layout_mode = 1
 offset_left = 2.0
 offset_top = 106.0
@@ -75,7 +75,7 @@ offset_bottom = 136.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_progress_track")
 
-[node name="ProgressBar" type="ProgressBar" parent="ProgressTrack"]
+[node name="ProgressBar" type="ProgressBar" parent="ProgressTrack" unique_id=269161698]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -93,7 +93,7 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_bar_fill")
 max_value = 500.0
 show_percentage = false
 
-[node name="AmountLabel" type="Label" parent="ProgressTrack"]
+[node name="AmountLabel" type="Label" parent="ProgressTrack" unique_id=1003013178]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15

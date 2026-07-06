@@ -11,6 +11,7 @@ Purpose:
 - Shows the production campaign entry point over the production menu background.
 - Labels the bottom button with the saved current level.
 - Displays saved campaign lives in the top status bar and disables campaign play at zero lives.
+- Displays saved gold coins in the top status bar.
 - Displays the saved profile avatar and opens the profile editor from the top status bar.
 - Displays the saved reward chest star progress in a separate left-side widget under the profile icon.
 - Opens the main-menu settings popup from the top status bar.
@@ -31,6 +32,7 @@ Important nodes:
 - `%RewardChest`: side-screen `scenes/ui/main_menu_reward_chest.tscn` instance positioned under the profile icon.
 - `MainMenuTopStatus/ProfileWidget`: opens the profile menu.
 - `MainMenuTopStatus/ProfileWidget/AvatarTexture`: displays the saved avatar texture.
+- `MainMenuTopStatus/CoinsWidget/CoinAmount`: shows the saved gold coin balance.
 - `MainMenuTopStatus/SettingsWidget/SettingsButton`: opens the main-menu settings popup.
 - `MainMenuTopStatus/LivesWidget/LifeCount`: shows current campaign lives.
 - `MainMenuTopStatus/LivesWidget/LifeStatus`: shows `Full` or the `MM:SS` countdown until the next restored life.
@@ -44,6 +46,7 @@ Key methods:
 - `_layout_top_status_bar()`: positions the static top status row.
 - `_layout_reward_chest()`: positions the side reward chest under the profile icon without putting it in the top status scene.
 - `_update_level_button()`: displays the saved current level, no-lives state, or complete state.
+- `_update_coin_status()`: writes the saved gold coin balance into the top status label.
 - `_update_lives_status()`: writes current lives and the next-life `MM:SS` countdown into the top status labels.
 - `_update_reward_chest_status()`: writes `PlayerProgress` reward chest progress into the side widget.
 - `_format_life_restore_time(seconds_remaining)`: formats the next-life restore timer as zero-padded minutes and seconds.
@@ -199,7 +202,7 @@ Autoload:
 - Registered as `PlayerProgress` in `project.godot`.
 
 Purpose:
-- Owns saved campaign progression, campaign lives, campaign ability inventory, selected profile avatar, and player name.
+- Owns saved campaign progression, campaign lives, gold coins, campaign ability inventory, selected profile avatar, and player name.
 - Owns saved reward chest star progress and active reward chest goal index.
 - Persists state through the configured save provider.
 
@@ -209,6 +212,7 @@ Saved fields:
 - `highest_completed_level`: highest campaign level completed.
 - `lives`: current campaign lives, clamped from `0` to `5`.
 - `next_life_restore_unix`: Unix timestamp for the next hourly life restore, or `0` when lives are full.
+- `coins`: current gold coin balance. Fresh saves start at `300`.
 - `ability_uses`: remaining campaign uses for hammer, shuffle, and highlight.
 - `avatar_id`: selected profile avatar id. Fresh and legacy saves default to `avatar_cat`.
 - `player_name`: saved profile display name. Fresh and legacy saves without a valid value receive a generated `player_` name with a five-character random suffix, such as `player_g26f3`.
@@ -220,6 +224,7 @@ Key methods:
 - `save_progress()`: writes the current progress data through the active provider.
 - `get_current_level()`: returns the next campaign level.
 - `get_ability_uses()`: returns remaining campaign ability uses.
+- `get_coins()`: returns the saved gold coin balance.
 - `get_reward_chest_progress()`: returns the saved reward chest stars, active goal, and goal index.
 - `add_reward_chest_stars(star_count)`: adds stars to the reward chest and rolls over reached goals.
 - `get_available_avatar_ids()`: returns the 18 valid profile avatar ids.
@@ -235,7 +240,7 @@ Key methods:
 - `refresh_lives()`: restores one life per elapsed real-time hour while lives are not full.
 - `spend_life()`: immediately spends and saves one campaign life when available.
 - `spend_ability(ability_id)`: immediately spends and saves one campaign ability use.
-- `complete_level(level_number, earned_stars)`: records completion, advances `current_level` when the completed level is the active campaign level, and adds earned campaign stars to the reward chest.
+- `complete_level(level_number, earned_stars)`: records completion, advances `current_level` when the completed level is the active campaign level, adds earned campaign stars to the reward chest, and grants configured chest coin rewards when goals are reached.
 - `reset_progress()`: restores default progress and writes it to disk for testing.
 - `get_save_provider_name()`: reports the active provider for diagnostics.
 

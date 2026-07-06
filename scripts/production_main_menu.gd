@@ -26,6 +26,7 @@ const LIFE_STATUS_REFRESH_SECONDS := 1.0
 @onready var _profile_button := %TopStatusBar.get_node("MainMenuTopStatus/ProfileWidget") as Button
 @onready var _settings_button := %TopStatusBar.get_node("MainMenuTopStatus/SettingsWidget/SettingsButton") as Button
 @onready var _profile_avatar_texture := %TopStatusBar.get_node("MainMenuTopStatus/ProfileWidget/AvatarTexture") as TextureRect
+@onready var _coin_amount_label := %TopStatusBar.get_node("MainMenuTopStatus/CoinsWidget/CoinAmount") as Label
 @onready var _life_count_label := %TopStatusBar.get_node("MainMenuTopStatus/LivesWidget/LifeCount") as Label
 @onready var _life_status_label := %TopStatusBar.get_node("MainMenuTopStatus/LivesWidget/LifeStatus") as Label
 
@@ -42,6 +43,7 @@ func _ready() -> void:
 	_settings_button.pressed.connect(_open_settings_menu)
 	get_viewport().size_changed.connect(_apply_responsive_layout)
 	_update_profile_avatar()
+	_update_coin_status()
 	_update_lives_status()
 	_update_reward_chest_status()
 	_update_level_button()
@@ -154,6 +156,23 @@ func _update_lives_status() -> void:
 
 	var seconds_remaining := PlayerProgress.get_next_life_restore_seconds_remaining()
 	_life_status_label.text = _format_life_restore_time(seconds_remaining)
+
+
+func _update_coin_status() -> void:
+	if _coin_amount_label == null:
+		return
+
+	var coins_text := "%d" % PlayerProgress.get_coins()
+	var font_size := 27
+	if coins_text.length() >= 7:
+		font_size = 18
+	elif coins_text.length() >= 6:
+		font_size = 20
+	elif coins_text.length() >= 5:
+		font_size = 23
+
+	_coin_amount_label.add_theme_font_size_override("font_size", font_size)
+	_coin_amount_label.text = coins_text
 
 
 func _update_reward_chest_status() -> void:

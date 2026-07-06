@@ -24,7 +24,7 @@ Player progression:
 - `scripts/player_progress.gd`
 - `scripts/save_providers/*.gd`
 - Registered in `project.godot` as the `PlayerProgress` autoload.
-- Saves campaign level progress, campaign lives, campaign ability inventory, reward chest progress, selected profile avatar, and player name through the configured save provider.
+- Saves campaign level progress, campaign lives, gold coins, campaign ability inventory, reward chest progress, selected profile avatar, and player name through the configured save provider.
 
 Reusable item scene:
 - `scenes/item.tscn`
@@ -58,7 +58,7 @@ Files:
 
 Responsibility:
 - Shows a production bottom button labeled with `PlayerProgress.current_level`.
-- Shows production top-row icons for the saved circular-clipped profile avatar, generated coins, saved lives, and a smaller pause-style settings button.
+- Shows production top-row icons for the saved circular-clipped profile avatar, saved gold coins, saved lives, and a smaller pause-style settings button.
 - Shows a separate side reward chest widget under the profile icon with saved stars versus the active configured goal.
 - Opens `scenes/ui/profile_menu.tscn` from the profile widget, shows an editable player-name field above all 18 avatars in a centered pause-style window with a 3-column grid, and saves the name plus selected avatar through `PlayerProgress`.
 - Opens `scenes/ui/settings_menu.tscn` from the settings widget, with pause-menu-style music, sound-effects, and vibration toggle visuals plus no-op `Support` and `Language` buttons.
@@ -88,13 +88,13 @@ Responsibility:
 - Loads and saves campaign progress through the configured provider.
 - Uses `LocalSaveProvider` for editor/development saves under `user://player_progress.json`.
 - Uses `CloudSaveProvider` for release cloud saves through native Google Play Games or Apple Game Center bridge singletons.
-- Tracks the current campaign level, highest completed level, campaign lives, next life restore timestamp, campaign ability uses, reward chest stars, reward chest goal index, selected profile avatar, and player name.
+- Tracks the current campaign level, highest completed level, campaign lives, next life restore timestamp, gold coins, campaign ability uses, reward chest stars, reward chest goal index, selected profile avatar, and player name.
 - Defaults fresh and legacy profile saves to `avatar_cat` and a generated `player_` name with a five-character random suffix.
 - Restores one missing life per elapsed real-time hour until the five-life cap is reached.
 - Spends one campaign life when a campaign level fails or the player leaves from the pause menu.
 - Spends ability uses immediately so failure or leaving a level does not refund them.
 - Advances `current_level` only when the active campaign level is completed.
-- Adds earned campaign completion stars to the reward chest and rolls progress into the next configured goal when reached.
+- Adds earned campaign completion stars to the reward chest and grants configured gold coin rewards when goals are reached.
 
 Change here when:
 - Adding life tuning, ability refills, rewards, purchases, reset flows, save migrations, native cloud save hooks, avatar/name availability, or new persisted player state.

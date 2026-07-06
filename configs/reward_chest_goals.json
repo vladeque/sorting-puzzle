@@ -1,3 +1,9 @@
 {
-  "goals": [500, 1000, 1500, 2000, 3000]
+  "goals": [
+    { "stars": 500, "coin_reward": 100 },
+    { "stars": 1000, "coin_reward": 225 },
+    { "stars": 1500, "coin_reward": 375 },
+    { "stars": 2000, "coin_reward": 550 },
+    { "stars": 3000, "coin_reward": 900 }
+  ]
 }

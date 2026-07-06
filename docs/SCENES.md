@@ -13,7 +13,7 @@ Script:
 Purpose:
 - Main project entry scene.
 - Displays `assets/backgrounds/main_menu.jpeg` as a fullscreen production menu background.
-- Provides a top status row for profile, coins, saved campaign lives, and settings.
+- Provides a top status row for profile, saved gold coins, saved campaign lives, and settings.
 - Shows a left-side reward chest widget under the profile icon with saved star progress toward the active configured chest goal.
 - Provides a bottom `%LevelButton` labeled with the saved campaign level, such as `Level 1`, or disabled as `No Lives` when lives are empty.
 - Opens the player profile menu when the profile widget is pressed.
@@ -31,7 +31,7 @@ Important nodes:
 
 Depends on:
 - `level.tscn` through `scripts/production_main_menu.gd`.
-- `PlayerProgress` autoload for the saved campaign level, lives count, and life restore countdown.
+- `PlayerProgress` autoload for the saved campaign level, gold coins, lives count, life restore countdown, and reward chest progress.
 - `assets/backgrounds/main_menu.jpeg`.
 - `scenes/ui/main_menu_top_status.tscn` for top status icons and labels.
 - `scenes/ui/main_menu_reward_chest.tscn` for the side reward chest icon and progress bar.
@@ -84,7 +84,7 @@ Purpose:
 Important nodes:
 - `ProfileWidget`: circular avatar button.
 - `ProfileWidget/AvatarTexture`: saved player avatar texture, clipped to a circle at runtime.
-- `CoinsWidget`: generated gold coin icon, placeholder amount label, and plus badge.
+- `CoinsWidget`: generated gold coin icon, saved coin amount label, and plus badge.
 - `LivesWidget`: generated heart icon, current life count label, and `Full` or `MM:SS` countdown status label.
 - `SettingsWidget`: smaller `PauseMenuButton`-style button with a small alert badge.
 

@@ -153,14 +153,19 @@ Shape:
 
 ```json
 {
-  "goals": [500, 1000, 1500, 2000, 3000]
+  "goals": [
+    { "stars": 500, "coin_reward": 100 },
+    { "stars": 1000, "coin_reward": 225 }
+  ]
 }
 ```
 
 Rules:
-- `goals` must be an ordered list of positive integers.
+- `goals` must be an ordered list of objects with a positive `stars` target.
+- `coin_reward` is the number of gold coins granted when that goal is reached.
+- Legacy numeric entries such as `500` are still accepted as star goals with `0` coin reward.
 - The saved `reward_chest_goal_index` selects the active goal.
-- When saved chest stars reach the active goal, the goal starts over with remaining stars carried forward and the next configured goal becomes active.
+- When saved chest stars reach the active goal, the configured coin reward is added to the player's saved coins, the goal starts over with remaining stars carried forward, and the next configured goal becomes active.
 - After the final configured goal is reached, the final goal value repeats.
 
 ## `user://player_progress.json`
@@ -175,6 +180,7 @@ Fields:
 - `highest_completed_level`: highest normal campaign level completed.
 - `lives`: current campaign lives. Fresh saves start at `5`, and values are clamped from `0` to `5`.
 - `next_life_restore_unix`: Unix timestamp for the next hourly life restore while lives are not full, or `0` when lives are full.
+- `coins`: current gold coin balance. Fresh saves start at `300`.
 - `ability_uses`: remaining campaign uses for `hammer`, `shuffle`, and `highlight`.
 - `avatar_id`: selected profile avatar id. Fresh saves and old saves without this field use `avatar_cat`.
 - `player_name`: saved profile display name. Fresh saves and old saves without a non-empty value receive a generated value like `player_g26f3`.
@@ -182,7 +188,7 @@ Fields:
 - `reward_chest_goal_index`: active index in `configs/reward_chest_goals.json`.
 
 Runtime behavior:
-- Fresh saves start at level 1 with five lives, three uses for each ability, `avatar_cat` selected as the profile avatar, and a generated `player_` name with a five-character random suffix.
+- Fresh saves start at level 1 with five lives, 300 gold coins, three uses for each ability, `avatar_cat` selected as the profile avatar, and a generated `player_` name with a five-character random suffix.
 - The main menu blocks campaign level launch at zero lives.
 - The production profile menu can save the player name and any avatar id from `assets/ui/avatars/*.png`; invalid avatar ids are sanitized back to `avatar_cat`.
 - Campaign level failure and pause-menu Leave spend one life. Completed levels do not spend lives.
@@ -190,7 +196,7 @@ Runtime behavior:
 - Ability uses are spent and saved immediately when an ability successfully applies.
 - Failed or abandoned levels do not refund ability uses.
 - Completing the current campaign level advances `current_level` by one and adds the run's earned stars to the reward chest.
-- Reward chest stars roll over when a configured goal is reached, then the next configured goal starts.
+- Reward chest stars roll over when a configured goal is reached, grant that goal's `coin_reward`, then the next configured goal starts.
 - Developer/test level selection is isolated from this save data.
 - Release builds can switch to cloud-only persistence by setting `application/config/save_provider` to `cloud`.
 

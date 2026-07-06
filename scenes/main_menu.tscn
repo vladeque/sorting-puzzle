@@ -3,8 +3,8 @@
 [ext_resource type="Texture2D" uid="uid://dwm7nk7sd3tou" path="res://assets/backgrounds/main_menu.jpeg" id="1_background"]
 [ext_resource type="Script" uid="uid://cb4p4uex1kp4j" path="res://scripts/production_main_menu.gd" id="2_menu_script"]
 [ext_resource type="PackedScene" path="res://scenes/ui/level_button.tscn" id="3_level_button"]
-[ext_resource type="PackedScene" path="res://scenes/ui/main_menu_top_status.tscn" id="4_top_status"]
-[ext_resource type="PackedScene" path="res://scenes/ui/main_menu_reward_chest.tscn" id="5_reward_chest"]
+[ext_resource type="PackedScene" uid="uid://76jf8ug6hwj5" path="res://scenes/ui/main_menu_top_status.tscn" id="4_top_status"]
+[ext_resource type="PackedScene" uid="uid://c6xhf1gyqk2tr" path="res://scenes/ui/main_menu_reward_chest.tscn" id="5_reward_chest"]
 
 [node name="ProductionMainMenu" type="Control" unique_id=1235428546]
 layout_mode = 3
