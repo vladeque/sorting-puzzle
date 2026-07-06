@@ -12,6 +12,7 @@ Purpose:
 - Labels the bottom button with the saved current level.
 - Displays saved campaign lives in the top status bar and disables campaign play at zero lives.
 - Displays the saved profile avatar and opens the profile editor from the top status bar.
+- Displays the saved reward chest star progress in a separate left-side widget under the profile icon.
 - Opens the main-menu settings popup from the top status bar.
 - Launches the saved campaign level.
 
@@ -27,6 +28,7 @@ Key constants:
 
 Important nodes:
 - `%TopStatusBar`: top-anchored container positioned at runtime with safe-area padding; owns the status icon layout through `scenes/ui/main_menu_top_status.tscn`.
+- `%RewardChest`: side-screen `scenes/ui/main_menu_reward_chest.tscn` instance positioned under the profile icon.
 - `MainMenuTopStatus/ProfileWidget`: opens the profile menu.
 - `MainMenuTopStatus/ProfileWidget/AvatarTexture`: displays the saved avatar texture.
 - `MainMenuTopStatus/SettingsWidget/SettingsButton`: opens the main-menu settings popup.
@@ -40,8 +42,10 @@ Key methods:
 - `_process(delta)`: refreshes the lives display and play button state once per elapsed real-time second while the menu is open.
 - `_apply_responsive_layout()`: keeps the top status row and bottom button inside the viewport and safe area.
 - `_layout_top_status_bar()`: positions the static top status row.
+- `_layout_reward_chest()`: positions the side reward chest under the profile icon without putting it in the top status scene.
 - `_update_level_button()`: displays the saved current level, no-lives state, or complete state.
 - `_update_lives_status()`: writes current lives and the next-life `MM:SS` countdown into the top status labels.
+- `_update_reward_chest_status()`: writes `PlayerProgress` reward chest progress into the side widget.
 - `_format_life_restore_time(seconds_remaining)`: formats the next-life restore timer as zero-padded minutes and seconds.
 - `_update_profile_avatar()`: loads the saved avatar texture into the top status profile widget.
 - `_open_profile_menu()`: creates the centered profile menu window and listens for saved avatar changes.
@@ -62,6 +66,25 @@ Do not use for:
 - Developer/test level selection. Put that in `scripts/main_menu.gd`.
 - Persistent save data ownership. Put that in `scripts/player_progress.gd`.
 - Puzzle runtime logic.
+
+## `scripts/main_menu_reward_chest.gd`
+
+Attached to:
+- `scenes/ui/main_menu_reward_chest.tscn` root `MainMenuRewardChest`.
+
+Purpose:
+- Owns the visual state of the main-menu reward chest progress widget.
+- Updates the progress bar value and centered `current/goal` label.
+- Shrinks the label font for longer progress text so it stays inside the bar.
+
+Key methods:
+- `set_reward_progress(current_stars, goal_stars)`: clamps the displayed value to the active goal and updates the bar and label.
+
+Depends on:
+- `scenes/ui/main_menu_reward_chest.tscn` node names `%ProgressBar` and `%AmountLabel`.
+
+Do not use for:
+- Saving stars, loading goal config, or awarding completion stars. Those stay in `PlayerProgress`.
 
 ## `scripts/profile_menu.gd`
 
@@ -177,6 +200,7 @@ Autoload:
 
 Purpose:
 - Owns saved campaign progression, campaign lives, campaign ability inventory, selected profile avatar, and player name.
+- Owns saved reward chest star progress and active reward chest goal index.
 - Persists state through the configured save provider.
 
 Saved fields:
@@ -188,12 +212,16 @@ Saved fields:
 - `ability_uses`: remaining campaign uses for hammer, shuffle, and highlight.
 - `avatar_id`: selected profile avatar id. Fresh and legacy saves default to `avatar_cat`.
 - `player_name`: saved profile display name. Fresh and legacy saves without a valid value receive a generated `player_` name with a five-character random suffix, such as `player_g26f3`.
+- `reward_chest_stars`: stars accumulated toward the active reward chest goal.
+- `reward_chest_goal_index`: index into `configs/reward_chest_goals.json` for the active goal; the final configured goal repeats after it is reached.
 
 Key methods:
 - `load_progress()`: reads and sanitizes provider data or creates default in-memory progress.
 - `save_progress()`: writes the current progress data through the active provider.
 - `get_current_level()`: returns the next campaign level.
 - `get_ability_uses()`: returns remaining campaign ability uses.
+- `get_reward_chest_progress()`: returns the saved reward chest stars, active goal, and goal index.
+- `add_reward_chest_stars(star_count)`: adds stars to the reward chest and rolls over reached goals.
 - `get_available_avatar_ids()`: returns the 18 valid profile avatar ids.
 - `get_avatar_id()`: returns the selected avatar id, sanitized to `avatar_cat` when needed.
 - `get_avatar_texture_path(avatar_id)`: returns the resource path for a valid or sanitized avatar id.
@@ -207,7 +235,7 @@ Key methods:
 - `refresh_lives()`: restores one life per elapsed real-time hour while lives are not full.
 - `spend_life()`: immediately spends and saves one campaign life when available.
 - `spend_ability(ability_id)`: immediately spends and saves one campaign ability use.
-- `complete_level(level_number)`: records completion and advances `current_level` when the completed level is the active campaign level.
+- `complete_level(level_number, earned_stars)`: records completion, advances `current_level` when the completed level is the active campaign level, and adds earned campaign stars to the reward chest.
 - `reset_progress()`: restores default progress and writes it to disk for testing.
 - `get_save_provider_name()`: reports the active provider for diagnostics.
 
@@ -217,6 +245,7 @@ Depends on:
 - `application/config/save_provider`
 - `application/config/cloud_save_name`
 - `application/config/cloud_save_bridge_singleton`
+- `configs/reward_chest_goals.json`
 
 Do not use for:
 - Per-level shelf state, timer state, or dev/test level runtime state.

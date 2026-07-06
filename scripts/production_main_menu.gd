@@ -10,6 +10,9 @@ const PRODUCTION_MENU_SCENE := "res://scenes/main_menu.tscn"
 const TOP_BAR_HEIGHT := 86.0
 const TOP_MARGIN := 28.0
 const TOP_SIDE_MARGIN := 24.0
+const PROFILE_WIDGET_WIDTH := 76.0
+const REWARD_CHEST_SIZE := Vector2(116.0, 136.0)
+const REWARD_CHEST_TOP_GAP := 12.0
 const BOTTOM_BAR_HEIGHT := 220.0
 const BOTTOM_MARGIN := 152.0
 const SIDE_MARGIN := 48.0
@@ -17,6 +20,7 @@ const LEVEL_BUTTON_MAX_WIDTH := 420.0
 const LIFE_STATUS_REFRESH_SECONDS := 1.0
 
 @onready var _top_status_bar := %TopStatusBar as MarginContainer
+@onready var _reward_chest := %RewardChest as Control
 @onready var _bottom_bar := %BottomBar as MarginContainer
 @onready var _level_button := %LevelButton as Button
 @onready var _profile_button := %TopStatusBar.get_node("MainMenuTopStatus/ProfileWidget") as Button
@@ -39,6 +43,7 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_apply_responsive_layout)
 	_update_profile_avatar()
 	_update_lives_status()
+	_update_reward_chest_status()
 	_update_level_button()
 	_apply_responsive_layout()
 
@@ -60,6 +65,7 @@ func _apply_responsive_layout() -> void:
 
 	var safe_margins := _get_safe_area_margins(viewport_size)
 	_layout_top_status_bar(safe_margins)
+	_layout_reward_chest(safe_margins)
 	_bottom_bar.anchor_left = 0.0
 	_bottom_bar.anchor_top = 1.0
 	_bottom_bar.anchor_right = 1.0
@@ -84,6 +90,23 @@ func _layout_top_status_bar(safe_margins: Vector4) -> void:
 	_top_status_bar.offset_top = safe_margins.y + TOP_MARGIN
 	_top_status_bar.offset_right = -(safe_margins.z + TOP_SIDE_MARGIN)
 	_top_status_bar.offset_bottom = safe_margins.y + TOP_MARGIN + TOP_BAR_HEIGHT
+
+
+func _layout_reward_chest(safe_margins: Vector4) -> void:
+	if _reward_chest == null:
+		return
+
+	var centered_left := safe_margins.x + TOP_SIDE_MARGIN + ((PROFILE_WIDGET_WIDTH - REWARD_CHEST_SIZE.x) * 0.5)
+	var left := maxf(centered_left, safe_margins.x + 4.0)
+	var top := safe_margins.y + TOP_MARGIN + PROFILE_WIDGET_WIDTH + REWARD_CHEST_TOP_GAP
+	_reward_chest.anchor_left = 0.0
+	_reward_chest.anchor_top = 0.0
+	_reward_chest.anchor_right = 0.0
+	_reward_chest.anchor_bottom = 0.0
+	_reward_chest.offset_left = left
+	_reward_chest.offset_top = top
+	_reward_chest.offset_right = left + REWARD_CHEST_SIZE.x
+	_reward_chest.offset_bottom = top + REWARD_CHEST_SIZE.y
 
 
 func _get_safe_area_margins(viewport_size: Vector2) -> Vector4:
@@ -131,6 +154,18 @@ func _update_lives_status() -> void:
 
 	var seconds_remaining := PlayerProgress.get_next_life_restore_seconds_remaining()
 	_life_status_label.text = _format_life_restore_time(seconds_remaining)
+
+
+func _update_reward_chest_status() -> void:
+	if _reward_chest == null or not _reward_chest.has_method("set_reward_progress"):
+		return
+
+	var progress := PlayerProgress.get_reward_chest_progress()
+	_reward_chest.call(
+		"set_reward_progress",
+		int(progress.get("stars", 0)),
+		int(progress.get("goal", 1))
+	)
 
 
 func _format_life_restore_time(seconds_remaining: int) -> String:

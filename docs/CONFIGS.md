@@ -143,6 +143,26 @@ Use `--locked-shelves` to add unlock requirements to generated shelves. Entries 
 py scripts\tools\generate_level_shelves.py --shelf-count 9 --layer-count 2 --difficulty medium --locked-shelves 7:3,8:5 --validate
 ```
 
+## `configs/reward_chest_goals.json`
+
+Purpose:
+- Defines the reward chest star goals shown by `scenes/ui/main_menu_reward_chest.tscn`.
+- Owned by `scripts/player_progress.gd`, which loads the configured goal ladder and falls back to built-in defaults if the file is missing or invalid.
+
+Shape:
+
+```json
+{
+  "goals": [500, 1000, 1500, 2000, 3000]
+}
+```
+
+Rules:
+- `goals` must be an ordered list of positive integers.
+- The saved `reward_chest_goal_index` selects the active goal.
+- When saved chest stars reach the active goal, the goal starts over with remaining stars carried forward and the next configured goal becomes active.
+- After the final configured goal is reached, the final goal value repeats.
+
 ## `user://player_progress.json`
 
 Purpose:
@@ -158,6 +178,8 @@ Fields:
 - `ability_uses`: remaining campaign uses for `hammer`, `shuffle`, and `highlight`.
 - `avatar_id`: selected profile avatar id. Fresh saves and old saves without this field use `avatar_cat`.
 - `player_name`: saved profile display name. Fresh saves and old saves without a non-empty value receive a generated value like `player_g26f3`.
+- `reward_chest_stars`: stars accumulated toward the active reward chest goal.
+- `reward_chest_goal_index`: active index in `configs/reward_chest_goals.json`.
 
 Runtime behavior:
 - Fresh saves start at level 1 with five lives, three uses for each ability, `avatar_cat` selected as the profile avatar, and a generated `player_` name with a five-character random suffix.
@@ -167,7 +189,8 @@ Runtime behavior:
 - Missing lives restore at one life per real-time hour until the five-life cap is reached.
 - Ability uses are spent and saved immediately when an ability successfully applies.
 - Failed or abandoned levels do not refund ability uses.
-- Completing the current campaign level advances `current_level` by one.
+- Completing the current campaign level advances `current_level` by one and adds the run's earned stars to the reward chest.
+- Reward chest stars roll over when a configured goal is reached, then the next configured goal starts.
 - Developer/test level selection is isolated from this save data.
 - Release builds can switch to cloud-only persistence by setting `application/config/save_provider` to `cloud`.
 

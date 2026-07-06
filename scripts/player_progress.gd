@@ -18,6 +18,8 @@ const DEFAULT_AVATAR_ID := "avatar_cat"
 const PLAYER_NAME_PREFIX := "player_"
 const PLAYER_NAME_RANDOM_ALPHABET := "abcdefghijklmnopqrstuvwxyz0123456789"
 const PLAYER_NAME_RANDOM_LENGTH := 5
+const REWARD_CHEST_GOALS_CONFIG := "res://configs/reward_chest_goals.json"
+const DEFAULT_REWARD_CHEST_GOALS := [500, 1000, 1500, 2000, 3000]
 const AVAILABLE_AVATAR_IDS := [
 	"avatar_bear",
 	"avatar_cat",
@@ -49,6 +51,7 @@ const DEFAULT_ABILITY_USES := {
 
 var _data := {}
 var _save_provider: SaveProvider
+var _reward_chest_goals := []
 
 
 func _ready() -> void:
@@ -96,6 +99,21 @@ func get_ability_uses() -> Dictionary:
 		return DEFAULT_ABILITY_USES.duplicate()
 
 	return ability_uses.duplicate()
+
+
+func get_reward_chest_progress() -> Dictionary:
+	var goals := _get_reward_chest_goals()
+	var goal_index := _get_reward_chest_goal_index(goals)
+	return {
+		"stars": maxi(int(_data.get("reward_chest_stars", 0)), 0),
+		"goal": int(goals[goal_index]),
+		"goal_index": goal_index,
+	}
+
+
+func add_reward_chest_stars(star_count: int) -> void:
+	if _apply_reward_chest_stars(star_count):
+		save_progress()
 
 
 func get_available_avatar_ids() -> Array:
@@ -212,14 +230,15 @@ func spend_ability(ability_id: StringName) -> bool:
 	return true
 
 
-func complete_level(level_number: int) -> void:
+func complete_level(level_number: int, earned_stars: int = 0) -> void:
 	if level_number < MIN_LEVEL:
 		return
 
+	var completes_current_level := level_number == get_current_level()
 	_data["highest_completed_level"] = maxi(get_highest_completed_level(), level_number)
-	if level_number == get_current_level():
+	if completes_current_level:
 		_data["current_level"] = level_number + 1
-
+		_apply_reward_chest_stars(earned_stars)
 	save_progress()
 
 
@@ -242,6 +261,12 @@ func _sanitize_data(raw_data: Dictionary) -> Dictionary:
 	sanitized["next_life_restore_unix"] = maxi(int(raw_data.get("next_life_restore_unix", 0)), 0)
 	sanitized["avatar_id"] = _sanitize_avatar_id(str(raw_data.get("avatar_id", DEFAULT_AVATAR_ID)))
 	sanitized["player_name"] = _sanitize_player_name(str(raw_data.get("player_name", sanitized["player_name"])), sanitized["player_name"])
+	var reward_chest_state := _normalize_reward_chest_progress(
+		maxi(int(raw_data.get("reward_chest_stars", 0)), 0),
+		maxi(int(raw_data.get("reward_chest_goal_index", 0)), 0)
+	)
+	sanitized["reward_chest_stars"] = reward_chest_state["stars"]
+	sanitized["reward_chest_goal_index"] = reward_chest_state["goal_index"]
 	if int(sanitized["lives"]) >= MAX_LIVES:
 		sanitized["next_life_restore_unix"] = 0
 	elif int(sanitized["next_life_restore_unix"]) <= 0:
@@ -266,6 +291,8 @@ func _default_data() -> Dictionary:
 		"ability_uses": DEFAULT_ABILITY_USES.duplicate(),
 		"avatar_id": DEFAULT_AVATAR_ID,
 		"player_name": _generate_player_name(),
+		"reward_chest_stars": 0,
+		"reward_chest_goal_index": 0,
 	}
 
 
@@ -282,6 +309,79 @@ func _sanitize_player_name(player_name: String, fallback_name: String = "") -> S
 		return fallback_name if not fallback_name.is_empty() else _generate_player_name()
 
 	return sanitized_name
+
+
+func _apply_reward_chest_stars(star_count: int) -> bool:
+	if star_count <= 0:
+		return false
+
+	var normalized := _normalize_reward_chest_progress(
+		maxi(int(_data.get("reward_chest_stars", 0)), 0) + star_count,
+		_get_reward_chest_goal_index(_get_reward_chest_goals())
+	)
+	_data["reward_chest_stars"] = normalized["stars"]
+	_data["reward_chest_goal_index"] = normalized["goal_index"]
+	return true
+
+
+func _normalize_reward_chest_progress(stars: int, goal_index: int) -> Dictionary:
+	var goals := _get_reward_chest_goals()
+	var safe_goal_index := clampi(goal_index, 0, goals.size() - 1)
+	var safe_stars := maxi(stars, 0)
+
+	while safe_stars >= int(goals[safe_goal_index]):
+		safe_stars -= int(goals[safe_goal_index])
+		if safe_goal_index < goals.size() - 1:
+			safe_goal_index += 1
+
+	return {
+		"stars": safe_stars,
+		"goal_index": safe_goal_index,
+	}
+
+
+func _get_reward_chest_goal_index(goals: Array) -> int:
+	return clampi(int(_data.get("reward_chest_goal_index", 0)), 0, goals.size() - 1)
+
+
+func _get_reward_chest_goals() -> Array:
+	if _reward_chest_goals.is_empty():
+		_reward_chest_goals = _load_reward_chest_goals()
+
+	return _reward_chest_goals.duplicate()
+
+
+func _load_reward_chest_goals() -> Array:
+	if not FileAccess.file_exists(REWARD_CHEST_GOALS_CONFIG):
+		return DEFAULT_REWARD_CHEST_GOALS.duplicate()
+
+	var config_file := FileAccess.open(REWARD_CHEST_GOALS_CONFIG, FileAccess.READ)
+	if config_file == null:
+		push_warning("Could not open reward chest goals config: %s" % REWARD_CHEST_GOALS_CONFIG)
+		return DEFAULT_REWARD_CHEST_GOALS.duplicate()
+
+	var parsed_config = JSON.parse_string(config_file.get_as_text())
+	if not (parsed_config is Dictionary):
+		push_warning("Reward chest goals config must contain a JSON object.")
+		return DEFAULT_REWARD_CHEST_GOALS.duplicate()
+
+	var parsed_goals := []
+	var parsed_dictionary := parsed_config as Dictionary
+	var raw_goals = parsed_dictionary.get("goals", [])
+	if not (raw_goals is Array):
+		push_warning("Reward chest goals config must define goals as an array.")
+		return DEFAULT_REWARD_CHEST_GOALS.duplicate()
+
+	for raw_goal in raw_goals:
+		var goal := int(raw_goal)
+		if goal > 0:
+			parsed_goals.append(goal)
+
+	if parsed_goals.is_empty():
+		push_warning("Reward chest goals config does not define positive goals.")
+		return DEFAULT_REWARD_CHEST_GOALS.duplicate()
+
+	return parsed_goals
 
 
 func _generate_player_name() -> String:

@@ -9,6 +9,7 @@ Main scene:
 - Configured in `project.godot` as `run/main_scene`.
 - `project.godot` keeps the 720x1280 design viewport and uses `canvas_items` stretch with `keep_width` so portrait devices share a stable logical width while gaining or losing vertical play space.
 - Owns the production campaign play entry point over `assets/backgrounds/main_menu.jpeg` and launches the saved campaign level from the bottom level button.
+- Shows a separate left-side reward chest progress widget under the profile icon.
 
 Testing menu:
 - `scenes/main_menu_testing.tscn`
@@ -23,7 +24,7 @@ Player progression:
 - `scripts/player_progress.gd`
 - `scripts/save_providers/*.gd`
 - Registered in `project.godot` as the `PlayerProgress` autoload.
-- Saves campaign level progress, campaign lives, campaign ability inventory, selected profile avatar, and player name through the configured save provider.
+- Saves campaign level progress, campaign lives, campaign ability inventory, reward chest progress, selected profile avatar, and player name through the configured save provider.
 
 Reusable item scene:
 - `scenes/item.tscn`
@@ -38,16 +39,19 @@ Files:
 - `scenes/main_menu.tscn`
 - `scenes/main_menu_testing.tscn`
 - `scenes/ui/main_menu_top_status.tscn`
+- `scenes/ui/main_menu_reward_chest.tscn`
 - `scenes/ui/profile_menu.tscn`
 - `scenes/ui/settings_menu.tscn`
 - `scenes/ui/level_button.tscn`
 - `assets/ui/main_menu_coin.png`
 - `assets/ui/main_menu_lives.png`
+- `assets/ui/main_menu_reward_chest.png`
 - `assets/ui/avatar_circle_clip.gdshader`
 - `assets/ui/avatars/*.png`
 - `assets/ui/level_button_blank*.png`
 - `scripts/press_scale_button.gd`
 - `scripts/production_main_menu.gd`
+- `scripts/main_menu_reward_chest.gd`
 - `scripts/profile_menu.gd`
 - `scripts/main_menu.gd`
 - `scripts/player_progress.gd`
@@ -55,6 +59,7 @@ Files:
 Responsibility:
 - Shows a production bottom button labeled with `PlayerProgress.current_level`.
 - Shows production top-row icons for the saved circular-clipped profile avatar, generated coins, saved lives, and a smaller pause-style settings button.
+- Shows a separate side reward chest widget under the profile icon with saved stars versus the active configured goal.
 - Opens `scenes/ui/profile_menu.tscn` from the profile widget, shows an editable player-name field above all 18 avatars in a centered pause-style window with a 3-column grid, and saves the name plus selected avatar through `PlayerProgress`.
 - Opens `scenes/ui/settings_menu.tscn` from the settings widget, with pause-menu-style music, sound-effects, and vibration toggle visuals plus no-op `Support` and `Language` buttons.
 - Disables campaign launch when saved lives are zero; the lives widget shows current lives and the `MM:SS` countdown until the next hourly restore.
@@ -76,18 +81,20 @@ Files:
 - `scripts/save_providers/local_save_provider.gd`
 - `scripts/save_providers/cloud_save_provider.gd`
 - `project.godot`
+- `configs/reward_chest_goals.json`
 - `docs/CLOUD_SAVE.md`
 
 Responsibility:
 - Loads and saves campaign progress through the configured provider.
 - Uses `LocalSaveProvider` for editor/development saves under `user://player_progress.json`.
 - Uses `CloudSaveProvider` for release cloud saves through native Google Play Games or Apple Game Center bridge singletons.
-- Tracks the current campaign level, highest completed level, campaign lives, next life restore timestamp, campaign ability uses, selected profile avatar, and player name.
+- Tracks the current campaign level, highest completed level, campaign lives, next life restore timestamp, campaign ability uses, reward chest stars, reward chest goal index, selected profile avatar, and player name.
 - Defaults fresh and legacy profile saves to `avatar_cat` and a generated `player_` name with a five-character random suffix.
 - Restores one missing life per elapsed real-time hour until the five-life cap is reached.
 - Spends one campaign life when a campaign level fails or the player leaves from the pause menu.
 - Spends ability uses immediately so failure or leaving a level does not refund them.
 - Advances `current_level` only when the active campaign level is completed.
+- Adds earned campaign completion stars to the reward chest and rolls progress into the next configured goal when reached.
 
 Change here when:
 - Adding life tuning, ability refills, rewards, purchases, reset flows, save migrations, native cloud save hooks, avatar/name availability, or new persisted player state.
@@ -120,6 +127,7 @@ Responsibility:
 - Shows and expires the active combo count and shrinking green time strip in `Background/HudCenterSlot` when triple clears happen within the configured combo window.
 - Shows the current run's star total in `UI/StarCounterLabel` with a small `assets/ui/reward_star.png` icon; triple clears add stars equal to the combo value reached by each clear.
 - Shows the completed-level reward overlay in `UI/CompletionPanel`, using `assets/ui/reward_star.png`, `assets/ui/level_button_blank.png`, and the final run star count for the earned amount label.
+- Sends completed campaign stars to `PlayerProgress` so the main-menu reward chest can advance.
 - Uses `scripts/press_scale_button.gd` on the completion `Next` button so the green blank-image button shrinks while held.
 - Tracks cleared triples and unlocks shelves whose configs require progress before becoming accessible.
 - Plays item placement and triple-clear sound effects.

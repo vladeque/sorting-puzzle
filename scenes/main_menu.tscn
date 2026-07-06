@@ -1,9 +1,10 @@
-[gd_scene format=3 uid="uid://8tko3eohxhuc"]
+[gd_scene load_steps=5 format=3 uid="uid://8tko3eohxhuc"]
 
 [ext_resource type="Texture2D" uid="uid://dwm7nk7sd3tou" path="res://assets/backgrounds/main_menu.jpeg" id="1_background"]
 [ext_resource type="Script" uid="uid://cb4p4uex1kp4j" path="res://scripts/production_main_menu.gd" id="2_menu_script"]
 [ext_resource type="PackedScene" path="res://scenes/ui/level_button.tscn" id="3_level_button"]
 [ext_resource type="PackedScene" path="res://scenes/ui/main_menu_top_status.tscn" id="4_top_status"]
+[ext_resource type="PackedScene" path="res://scenes/ui/main_menu_reward_chest.tscn" id="5_reward_chest"]
 
 [node name="ProductionMainMenu" type="Control" unique_id=1235428546]
 layout_mode = 3
@@ -39,6 +40,14 @@ grow_horizontal = 2
 
 [node name="MainMenuTopStatus" parent="TopStatusBar" unique_id=683042393 instance=ExtResource("4_top_status")]
 layout_mode = 2
+
+[node name="RewardChest" parent="." unique_id=1316556187 instance=ExtResource("5_reward_chest")]
+unique_name_in_owner = true
+layout_mode = 1
+offset_left = 4.0
+offset_top = 116.0
+offset_right = 120.0
+offset_bottom = 252.0
 
 [node name="BottomBar" type="MarginContainer" parent="." unique_id=1938053235]
 unique_name_in_owner = true

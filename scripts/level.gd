@@ -1513,7 +1513,7 @@ func _complete_level() -> void:
 	_level_paused = false
 	_reset_combo()
 	if not launched_from_dev_mode:
-		PlayerProgress.complete_level(selected_level)
+		PlayerProgress.complete_level(selected_level, _stars)
 	_clear_selected_item()
 	_set_moving_shelf_rows_paused(true)
 	if _dragged_item != null:

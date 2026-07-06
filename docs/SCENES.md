@@ -14,6 +14,7 @@ Purpose:
 - Main project entry scene.
 - Displays `assets/backgrounds/main_menu.jpeg` as a fullscreen production menu background.
 - Provides a top status row for profile, coins, saved campaign lives, and settings.
+- Shows a left-side reward chest widget under the profile icon with saved star progress toward the active configured chest goal.
 - Provides a bottom `%LevelButton` labeled with the saved campaign level, such as `Level 1`, or disabled as `No Lives` when lives are empty.
 - Opens the player profile menu when the profile widget is pressed.
 - Opens the main settings menu when the settings widget is pressed.
@@ -22,6 +23,7 @@ Purpose:
 Important nodes:
 - `Background`: fullscreen `TextureRect` using `assets/backgrounds/main_menu.jpeg`.
 - `TopStatusBar`: top-anchored safe-area-aware container for `scenes/ui/main_menu_top_status.tscn`.
+- `RewardChest`: left-side `scenes/ui/main_menu_reward_chest.tscn` instance positioned by `scripts/production_main_menu.gd`.
 - `BottomBar`: bottom-anchored responsive container for the play button.
 - `BottomBar/LevelButton`: `scenes/ui/level_button.tscn` instance that launches the saved campaign level.
 - Runtime child `scenes/ui/profile_menu.tscn`: centered pause-style profile editor window created when `ProfileWidget` is pressed.
@@ -32,6 +34,7 @@ Depends on:
 - `PlayerProgress` autoload for the saved campaign level, lives count, and life restore countdown.
 - `assets/backgrounds/main_menu.jpeg`.
 - `scenes/ui/main_menu_top_status.tscn` for top status icons and labels.
+- `scenes/ui/main_menu_reward_chest.tscn` for the side reward chest icon and progress bar.
 - `scenes/ui/profile_menu.tscn` for profile name and avatar editing.
 - `scenes/ui/settings_menu.tscn` for the main-menu settings popup.
 - `scenes/ui/level_button.tscn` for the reusable production level button visuals.
@@ -39,6 +42,33 @@ Depends on:
 Do not use for:
 - Dev/test level selection. Use `scenes/main_menu_testing.tscn`.
 - Runtime puzzle rules or shelf state. Put those in `level.tscn` and `scripts/level.gd`.
+
+## `scenes/ui/main_menu_reward_chest.tscn`
+
+Root:
+- `MainMenuRewardChest` (`Control`)
+
+Script:
+- `scripts/main_menu_reward_chest.gd`
+
+Purpose:
+- Reusable side-screen reward chest widget for the production main menu.
+- Displays `assets/ui/main_menu_reward_chest.png` above a compact progress bar.
+- Shows the saved current star amount versus the active reward chest goal, such as `250/500`.
+
+Important nodes:
+- `ChestIcon`: selected transparent treasure chest PNG.
+- `ProgressTrack`: framed bar container under the chest.
+- `ProgressTrack/ProgressBar`: fill amount controlled by the script.
+- `ProgressTrack/AmountLabel`: centered `current/goal` label with dynamic font sizing.
+
+Depends on:
+- `assets/ui/main_menu_reward_chest.png`.
+- `scripts/main_menu_reward_chest.gd`.
+- Owning menu script for placement and progress data.
+
+Do not use for:
+- Persisting reward stars or choosing the active goal. Those stay in `scripts/player_progress.gd` and `configs/reward_chest_goals.json`.
 
 ## `scenes/ui/main_menu_top_status.tscn`
 
