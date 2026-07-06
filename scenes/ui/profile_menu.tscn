@@ -273,6 +273,7 @@ grow_vertical = 2
 alignment = 1
 
 [node name="NameLineEdit" type="LineEdit" parent="ProfileMenuPanel/InnerPanel2/ContentStack" unique_id=502199877]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.31, 0.11, 0.07, 1)
 theme_override_colors/caret_color = Color(0.31, 0.11, 0.07, 1)
