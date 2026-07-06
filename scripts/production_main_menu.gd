@@ -44,7 +44,7 @@ func _process(delta: float) -> void:
 	if _life_status_refresh_time < LIFE_STATUS_REFRESH_SECONDS:
 		return
 
-	_life_status_refresh_time = 0.0
+	_life_status_refresh_time = fmod(_life_status_refresh_time, LIFE_STATUS_REFRESH_SECONDS)
 	_update_lives_status()
 	_update_level_button()
 
@@ -126,8 +126,14 @@ func _update_lives_status() -> void:
 		return
 
 	var seconds_remaining := PlayerProgress.get_next_life_restore_seconds_remaining()
-	var minutes_remaining := maxi(ceili(float(seconds_remaining) / 60.0), 1)
-	_life_status_label.text = "%dm" % minutes_remaining
+	_life_status_label.text = _format_life_restore_time(seconds_remaining)
+
+
+func _format_life_restore_time(seconds_remaining: int) -> String:
+	var clamped_seconds := maxi(seconds_remaining, 0)
+	var minutes_remaining := floori(float(clamped_seconds) / 60.0)
+	var remaining_seconds := clamped_seconds % 60
+	return "%02d:%02d" % [minutes_remaining, remaining_seconds]
 
 
 func _update_profile_avatar() -> void:

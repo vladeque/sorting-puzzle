@@ -28,17 +28,18 @@ Important nodes:
 - `MainMenuTopStatus/ProfileWidget`: opens the profile menu.
 - `MainMenuTopStatus/ProfileWidget/AvatarTexture`: displays the saved avatar texture.
 - `MainMenuTopStatus/LivesWidget/LifeCount`: shows current campaign lives.
-- `MainMenuTopStatus/LivesWidget/LifeStatus`: shows `Full` or the countdown until the next restored life.
+- `MainMenuTopStatus/LivesWidget/LifeStatus`: shows `Full` or the `MM:SS` countdown until the next restored life.
 - `%BottomBar`: bottom-anchored container positioned at runtime with safe-area padding.
 - `%LevelButton`: `scenes/ui/level_button.tscn` instance that starts the saved campaign level.
 
 Key methods:
 - `_ready()`: loads progress, wires the level button, and applies responsive layout.
-- `_process(delta)`: refreshes the lives display and play button state while the menu is open.
+- `_process(delta)`: refreshes the lives display and play button state once per elapsed real-time second while the menu is open.
 - `_apply_responsive_layout()`: keeps the top status row and bottom button inside the viewport and safe area.
 - `_layout_top_status_bar()`: positions the static top status row.
 - `_update_level_button()`: displays the saved current level, no-lives state, or complete state.
-- `_update_lives_status()`: writes current lives and the next-life countdown into the top status labels.
+- `_update_lives_status()`: writes current lives and the next-life `MM:SS` countdown into the top status labels.
+- `_format_life_restore_time(seconds_remaining)`: formats the next-life restore timer as zero-padded minutes and seconds.
 - `_update_profile_avatar()`: loads the saved avatar texture into the top status profile widget.
 - `_open_profile_menu()`: creates the centered profile menu window and listens for saved avatar changes.
 - `_on_profile_avatar_saved(avatar_id)`: refreshes the top status avatar after the profile menu saves.

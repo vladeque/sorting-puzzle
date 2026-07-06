@@ -52,7 +52,7 @@ Important nodes:
 - `ProfileWidget`: circular avatar button.
 - `ProfileWidget/AvatarTexture`: saved player avatar texture, clipped to a circle at runtime.
 - `CoinsWidget`: generated gold coin icon, placeholder amount label, and plus badge.
-- `LivesWidget`: generated heart icon, current life count label, and `Full` or countdown status label.
+- `LivesWidget`: generated heart icon, current life count label, and `Full` or `MM:SS` countdown status label.
 - `SettingsWidget`: smaller `PauseMenuButton`-style button with a small alert badge.
 
 Depends on:
