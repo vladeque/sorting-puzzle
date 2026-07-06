@@ -1,6 +1,6 @@
-[gd_scene load_steps=13 format=3 uid="uid://b5yb0hlfitnqa"]
+[gd_scene format=3 uid="uid://b5yb0hlfitnqa"]
 
-[ext_resource type="Script" path="res://scripts/profile_menu.gd" id="1_profile_menu"]
+[ext_resource type="Script" uid="uid://cemgcq68qegb" path="res://scripts/profile_menu.gd" id="1_profile_menu"]
 [ext_resource type="PackedScene" path="res://scenes/ui/level_button.tscn" id="2_level_button"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_outer_panel"]
@@ -72,24 +72,14 @@ shadow_color = Color(0.24, 0.08, 0.04, 0.22)
 shadow_size = 8
 shadow_offset = Vector2(0, 3)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_name_section"]
-bg_color = Color(0.9, 0.76, 0.52, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 3
-border_color = Color(0.45, 0.19, 0.13, 0.42)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_scroll"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_name_input_normal"]
 content_margin_left = 16.0
 content_margin_top = 8.0
 content_margin_right = 16.0
 content_margin_bottom = 8.0
-bg_color = Color(1, 0.96, 0.84, 1)
+bg_color = Color(0.9109997, 0.7757055, 0.5475575, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
@@ -116,29 +106,25 @@ corner_radius_top_right = 14
 corner_radius_bottom_right = 14
 corner_radius_bottom_left = 14
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_scroll"]
-
-[node name="ProfileMenu" type="Control"]
+[node name="ProfileMenu" type="Control" unique_id=1689903104]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 0
 script = ExtResource("1_profile_menu")
 
-[node name="DimBackground" type="ColorRect" parent="."]
+[node name="DimBackground" type="ColorRect" parent="." unique_id=1088907992]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 0
 color = Color(0.02, 0.025, 0.03, 0.66)
 
-[node name="ProfileMenuPanel" type="Panel" parent="."]
+[node name="ProfileMenuPanel" type="Panel" parent="." unique_id=1929207294]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 8
@@ -154,7 +140,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_outer_panel")
 
-[node name="TitleLabel" type="Label" parent="ProfileMenuPanel"]
+[node name="TitleLabel" type="Label" parent="ProfileMenuPanel" unique_id=2146492258]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -168,11 +154,11 @@ theme_override_colors/font_shadow_color = Color(0.16, 0.04, 0.02, 0.92)
 theme_override_constants/shadow_offset_x = 0
 theme_override_constants/shadow_offset_y = 3
 theme_override_font_sizes/font_size = 44
-text = "Profile"
+text = "Edit profile"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CloseButton" type="Button" parent="ProfileMenuPanel"]
+[node name="CloseButton" type="Button" parent="ProfileMenuPanel" unique_id=1510929970]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 1
@@ -196,20 +182,20 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_close_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_close_hover")
 text = "X"
 
-[node name="InnerPanel" type="Panel" parent="ProfileMenuPanel"]
+[node name="InnerPanel" type="Panel" parent="ProfileMenuPanel" unique_id=563381852]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 46.0
-offset_top = 104.0
+offset_top = 289.0
 offset_right = -46.0
 offset_bottom = -132.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_inner_panel")
 
-[node name="ContentStack" type="VBoxContainer" parent="ProfileMenuPanel/InnerPanel"]
+[node name="ContentStack" type="VBoxContainer" parent="ProfileMenuPanel/InnerPanel" unique_id=699534495]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -222,63 +208,23 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 18
 
-[node name="NameSection" type="Panel" parent="ProfileMenuPanel/InnerPanel/ContentStack"]
-custom_minimum_size = Vector2(0, 104)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_name_section")
-
-[node name="NameLabel" type="Label" parent="ProfileMenuPanel/InnerPanel/ContentStack/NameSection"]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_left = 18.0
-offset_top = 10.0
-offset_right = -18.0
-offset_bottom = 42.0
-grow_horizontal = 2
-theme_override_colors/font_color = Color(0.33, 0.12, 0.08, 1)
-theme_override_font_sizes/font_size = 23
-text = "Player name"
-vertical_alignment = 1
-
-[node name="NameLineEdit" type="LineEdit" parent="ProfileMenuPanel/InnerPanel/ContentStack/NameSection"]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_left = 18.0
-offset_top = 47.0
-offset_right = -18.0
-offset_bottom = 91.0
-grow_horizontal = 2
-theme_override_colors/font_color = Color(0.31, 0.11, 0.07, 1)
-theme_override_colors/caret_color = Color(0.31, 0.11, 0.07, 1)
-theme_override_colors/selection_color = Color(0.98, 0.87, 0.46, 0.45)
-theme_override_colors/placeholder_color = Color(0.48, 0.28, 0.2, 0.62)
-theme_override_font_sizes/font_size = 24
-theme_override_styles/normal = SubResource("StyleBoxFlat_name_input_normal")
-theme_override_styles/focus = SubResource("StyleBoxFlat_name_input_focus")
-text = "player_g26f3"
-placeholder_text = "Player name"
-max_length = 24
-
-[node name="AvatarScroll" type="ScrollContainer" parent="ProfileMenuPanel/InnerPanel/ContentStack"]
+[node name="AvatarScroll" type="ScrollContainer" parent="ProfileMenuPanel/InnerPanel/ContentStack" unique_id=1557910943]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-horizontal_scroll_mode = 0
 theme_override_styles/panel = SubResource("StyleBoxEmpty_scroll")
+horizontal_scroll_mode = 0
 
-[node name="AvatarGrid" type="GridContainer" parent="ProfileMenuPanel/InnerPanel/ContentStack/AvatarScroll"]
+[node name="AvatarGrid" type="GridContainer" parent="ProfileMenuPanel/InnerPanel/ContentStack/AvatarScroll" unique_id=861553903]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
-columns = 3
 theme_override_constants/h_separation = 14
 theme_override_constants/v_separation = 14
+columns = 3
 
-[node name="ButtonRow" type="CenterContainer" parent="ProfileMenuPanel"]
+[node name="ButtonRow" type="CenterContainer" parent="ProfileMenuPanel" unique_id=727755734]
 layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0
@@ -291,10 +237,49 @@ offset_bottom = -32.0
 grow_horizontal = 2
 grow_vertical = 0
 
-[node name="SaveButton" parent="ProfileMenuPanel/ButtonRow" instance=ExtResource("2_level_button")]
+[node name="SaveButton" parent="ProfileMenuPanel/ButtonRow" unique_id=386735272 instance=ExtResource("2_level_button")]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(240, 82)
 layout_mode = 2
 theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 32
 text = "Save"
+
+[node name="InnerPanel2" type="Panel" parent="ProfileMenuPanel" unique_id=845112539]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 44.0
+offset_top = 101.0
+offset_right = -48.0
+offset_bottom = -478.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_inner_panel")
+
+[node name="ContentStack" type="VBoxContainer" parent="ProfileMenuPanel/InnerPanel2" unique_id=229236084]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = 70.0
+offset_top = -25.0
+offset_right = -80.0
+offset_bottom = 25.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="NameLineEdit" type="LineEdit" parent="ProfileMenuPanel/InnerPanel2/ContentStack" unique_id=502199877]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.31, 0.11, 0.07, 1)
+theme_override_colors/caret_color = Color(0.31, 0.11, 0.07, 1)
+theme_override_colors/selection_color = Color(0.98, 0.87, 0.46, 0.45)
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_name_input_normal")
+theme_override_styles/focus = SubResource("StyleBoxFlat_name_input_focus")
+text = "player_g26f3"
+placeholder_text = "Player name"
+max_length = 24
