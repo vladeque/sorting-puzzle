@@ -109,6 +109,7 @@ Files:
 - `scenes/pause_menu.tscn`
 - `scenes/leave_confirmation_menu.tscn`
 - `assets/ui/*.png`
+- Settings icon assets use rectangular warm candy tile art so they sit cleanly inside the main-menu and pause-menu rectangular slots.
 - `scripts/level.gd`
 - `scripts/moving_shelf_row.gd`
 - `scripts/shelf_layout_row.gd`
@@ -219,6 +220,7 @@ Files:
 - `scenes/pause_menu.tscn`
 - `scenes/leave_confirmation_menu.tscn`
 - `assets/ui/*.png`
+- Settings icon assets use rectangular warm candy tile art so they sit cleanly inside the pause/settings rectangular slots.
 - `scripts/pause_menu.gd`
 - `scripts/press_scale_button.gd`
 - `scripts/level.gd`
