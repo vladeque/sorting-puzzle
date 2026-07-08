@@ -515,7 +515,7 @@ Attached to:
 
 Purpose:
 - Owns shared in-memory settings-button visual state for the current app session.
-- Toggles a crossed-out overlay on the music, sound effects, and vibration rectangular slot buttons when clicked.
+- Toggles a crossed-out overlay on the music, sound effects, and vibration square icon buttons when clicked.
 - Emits `setting_toggled(setting_id, is_disabled)` so owning runtime scripts can apply supported settings.
 - Also powers the matching visual toggles in the main-menu settings popup, which intentionally keeps the same `PauseMenuPanel/InnerPanel/IconRow` button paths.
 - Initializes every pause-menu and main-menu settings instance from the same disabled-state dictionary so matching buttons stay visually synchronized.

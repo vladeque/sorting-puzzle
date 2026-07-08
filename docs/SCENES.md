@@ -108,15 +108,15 @@ Script:
 
 Purpose:
 - Centered pause-style settings window opened from the production main menu over a dimmed modal background.
-- Reuses the pause menu visual treatment for the warm outer panel, cream inner panel, `Settings` title, protruding red close button, and music / sound-effects / vibration icon-slot toggles.
+- Reuses the pause menu visual treatment for the warm outer panel, cream inner panel, `Settings` title, protruding red close button, and music / sound-effects / vibration icon toggles.
 - Adds two no-op wide green blank-image buttons labeled `Support` and `Language` under the settings toggles.
 
 Important nodes:
 - `PauseMenuPanel`: centered popup panel kept named for reuse with `scripts/pause_menu.gd`.
 - `PauseMenuPanel/CloseButton`: protruding red close button wired by `scripts/production_main_menu.gd` to dismiss the settings popup.
-- `PauseMenuPanel/InnerPanel/IconRow/MusicOption/MusicButton`: rectangular music toggle slot.
-- `PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption/SoundEffectsButton`: rectangular sound effects toggle slot.
-- `PauseMenuPanel/InnerPanel/IconRow/VibrationOption/VibrationButton`: rectangular phone vibration toggle slot.
+- `PauseMenuPanel/InnerPanel/IconRow/MusicOption/MusicButton`: square music toggle button with shadow-only button styling.
+- `PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption/SoundEffectsButton`: square sound effects toggle button with shadow-only button styling.
+- `PauseMenuPanel/InnerPanel/IconRow/VibrationOption/VibrationButton`: square phone vibration toggle button with shadow-only button styling.
 - `PauseMenuPanel/InnerPanel/ActionColumn/SupportButton`: wide no-op button using `assets/ui/level_button_blank.png`.
 - `PauseMenuPanel/InnerPanel/ActionColumn/LanguageButton`: wide no-op button using `assets/ui/level_button_blank.png`.
 
@@ -339,7 +339,7 @@ Script:
 
 Purpose:
 - Reusable in-level pause menu overlay instanced by `level.tscn`.
-- Owns the modal dimmer, warm outer popup panel, cream inner settings panel, `Pause` title, protruding top-right red close button, music / sound-effects / vibration rectangular icon slots, their crossed-out toggle visuals, and `Leave` / `Continue` buttons.
+- Owns the modal dimmer, warm outer popup panel, cream inner settings panel, `Pause` title, protruding top-right red close button, music / sound-effects / vibration square icon buttons, their crossed-out toggle visuals, and `Leave` / `Continue` buttons.
 - Uses full-rect overlay anchors and a centered popup panel so it tracks the stretched viewport.
 
 Important nodes:
@@ -347,9 +347,9 @@ Important nodes:
 - `PauseMenuPanel/TitleLabel`: pause menu title.
 - `PauseMenuPanel/CloseButton`: protruding top-right red close button wired by `scripts/level.gd` to resume the level.
 - `PauseMenuPanel/InnerPanel`: cream settings area inside the warm outer popup.
-- `PauseMenuPanel/InnerPanel/IconRow/MusicOption/MusicButton`: rectangular music toggle slot.
-- `PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption/SoundEffectsButton`: rectangular sound effects toggle slot that disables or enables gameplay sound effects.
-- `PauseMenuPanel/InnerPanel/IconRow/VibrationOption/VibrationButton`: rectangular phone vibration toggle slot.
+- `PauseMenuPanel/InnerPanel/IconRow/MusicOption/MusicButton`: square music toggle button with shadow-only button styling.
+- `PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption/SoundEffectsButton`: square sound effects toggle button with shadow-only button styling that disables or enables gameplay sound effects.
+- `PauseMenuPanel/InnerPanel/IconRow/VibrationOption/VibrationButton`: square phone vibration toggle button with shadow-only button styling.
 - `PauseMenuPanel/ButtonRow/LeaveButton`: red image button wired by `scripts/level.gd` to open leave confirmation.
 - `PauseMenuPanel/ButtonRow/ContinueButton`: green image button wired by `scripts/level.gd` to resume the level.
 - The bottom red and green image buttons use `scripts/press_scale_button.gd` so they visually shrink while held.
