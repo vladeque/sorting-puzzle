@@ -77,7 +77,7 @@ const PAUSE_MENU_PANEL_SIZE := Vector2(520, 500)
 const LEAVE_CONFIRM_PANEL_SIZE := Vector2(520, 560)
 const STAR_REWARD_SIZE := Vector2(28, 28)
 const STAR_REWARD_DROP_DURATION_SECONDS := 0.2
-const STAR_REWARD_FLY_DURATION_SECONDS := 0.44
+const STAR_REWARD_FLY_DURATION_SECONDS := 0.62
 const STAR_REWARD_STAGGER_SECONDS := 0.035
 const STAR_REWARD_COUNTER_PULSE_SCALE := Vector2(1.12, 1.12)
 @export var slot_snap_distance := BASE_SLOT_SNAP_DISTANCE * SHELF_CELL_VISUAL_SCALE
@@ -2348,7 +2348,7 @@ func _animate_combo_reward_star(
 		"position",
 		target_position,
 		STAR_REWARD_FLY_DURATION_SECONDS
-	).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
 	fly_tween.tween_property(
 		star,
 		"scale",
