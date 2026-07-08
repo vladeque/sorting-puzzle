@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://8tko3eohxhuc"]
+[gd_scene format=3 uid="uid://8tko3eohxhuc"]
 
 [ext_resource type="Texture2D" uid="uid://dwm7nk7sd3tou" path="res://assets/backgrounds/main_menu.jpeg" id="1_background"]
 [ext_resource type="Script" uid="uid://cb4p4uex1kp4j" path="res://scripts/production_main_menu.gd" id="2_menu_script"]
@@ -44,10 +44,10 @@ layout_mode = 2
 [node name="RewardChest" parent="." unique_id=1316556187 instance=ExtResource("5_reward_chest")]
 unique_name_in_owner = true
 layout_mode = 1
-offset_left = 4.0
-offset_top = 116.0
-offset_right = 120.0
-offset_bottom = 252.0
+offset_left = 11.0
+offset_top = 176.0
+offset_right = 127.0
+offset_bottom = 312.0
 
 [node name="BottomBar" type="MarginContainer" parent="." unique_id=1938053235]
 unique_name_in_owner = true
