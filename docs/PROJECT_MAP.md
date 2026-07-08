@@ -125,7 +125,7 @@ Responsibility:
 - Handles mouse and touch interaction.
 - Resolves matches of three identical visible items on the same shelf, including the gather-and-shrink clear animation.
 - Shows and expires the active combo count and shrinking green time strip in `Background/HudCenterSlot` when triple clears happen within the configured combo window.
-- Shows the current run's star total in `UI/StarCounterLabel` with a small `assets/ui/reward_star.png` icon; triple clears add stars equal to the combo value reached by each clear.
+- Shows the current run's star total in `UI/StarCounterLabel` with a small `assets/ui/reward_star.png` icon; triple clears add stars equal to the combo value reached by each clear and play small `assets/ui/reward_star_34_glossy_b.png` stars that drop from the cleared triple, fly into the counter, and pulse it.
 - Shows the completed-level reward overlay in `UI/CompletionPanel`, using `assets/ui/reward_star.png`, `assets/ui/level_button_blank.png`, and the final run star count for the earned amount label.
 - Sends completed campaign stars to `PlayerProgress` so the main-menu reward chest can advance.
 - Uses `scripts/press_scale_button.gd` on the completion `Next` button so the green blank-image button shrinks while held.

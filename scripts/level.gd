@@ -26,6 +26,7 @@ const LEVEL_SCENE_PATH := "res://level.tscn"
 const MAIN_MENU_SCENE := "res://scenes/main_menu.tscn"
 const ITEM_PLACE_SOUND := preload("res://assets/audio/item_place.wav")
 const TRIPLE_CLEAR_SOUND := preload("res://assets/audio/triple_clear.wav")
+const REWARD_STAR_TEXTURE := preload("res://assets/ui/reward_star_34_glossy_b.png")
 const PAUSE_SETTING_SOUND_EFFECTS := &"sound_effects"
 const SHELF_UNLOCK_REQUIREMENT_META := &"unlock_after_triples"
 const SHELF_LOCKED_META := &"is_locked"
@@ -74,6 +75,11 @@ const COMPLETION_BUTTON_CENTER_Y := 850.0
 const COMPLETION_MIN_BUTTON_BOTTOM_MARGIN := 118.0
 const PAUSE_MENU_PANEL_SIZE := Vector2(520, 500)
 const LEAVE_CONFIRM_PANEL_SIZE := Vector2(520, 560)
+const STAR_REWARD_SIZE := Vector2(28, 28)
+const STAR_REWARD_DROP_DURATION_SECONDS := 0.2
+const STAR_REWARD_FLY_DURATION_SECONDS := 0.44
+const STAR_REWARD_STAGGER_SECONDS := 0.035
+const STAR_REWARD_COUNTER_PULSE_SCALE := Vector2(1.12, 1.12)
 @export var slot_snap_distance := BASE_SLOT_SNAP_DISTANCE * SHELF_CELL_VISUAL_SCALE
 @export var item_pick_size := BASE_ITEM_PICK_SIZE * SHELF_CELL_VISUAL_SCALE
 @export var drag_start_distance := 12.0
@@ -105,6 +111,8 @@ var _timer_label: Label
 var _level_label: Label
 var _star_counter_panel: Control
 var _star_counter_label: Label
+var _star_reward_effect_layer: Control
+var _star_counter_pulse_tween: Tween
 var _combo_fill: Control
 var _combo_label: Label
 var _failure_panel: Control
@@ -194,6 +202,7 @@ func _ready() -> void:
 	_completion_panel.visible = false
 	_pause_menu_overlay.visible = false
 	_leave_confirmation_overlay.visible = false
+	_setup_star_reward_effect_layer()
 	get_viewport().size_changed.connect(_apply_responsive_layout)
 	_rng.randomize()
 	_setup_audio_players()
@@ -226,7 +235,35 @@ func _apply_responsive_layout() -> void:
 	_layout_completion_panel(safe_margins)
 	_layout_pause_menu_overlay()
 	_layout_leave_confirmation_overlay()
+	_layout_star_reward_effect_layer(viewport_size)
 	_layout_shelves(viewport_size, safe_margins)
+
+
+func _setup_star_reward_effect_layer() -> void:
+	var ui_layer := get_node("UI") as CanvasLayer
+	if ui_layer == null:
+		return
+
+	_star_reward_effect_layer = Control.new()
+	_star_reward_effect_layer.name = "StarRewardEffectLayer"
+	_star_reward_effect_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ui_layer.add_child(_star_reward_effect_layer)
+	if _failure_panel != null:
+		ui_layer.move_child(_star_reward_effect_layer, _failure_panel.get_index())
+
+
+func _layout_star_reward_effect_layer(viewport_size: Vector2) -> void:
+	if _star_reward_effect_layer == null:
+		return
+
+	_star_reward_effect_layer.anchor_left = 0.0
+	_star_reward_effect_layer.anchor_top = 0.0
+	_star_reward_effect_layer.anchor_right = 0.0
+	_star_reward_effect_layer.anchor_bottom = 0.0
+	_star_reward_effect_layer.offset_left = 0.0
+	_star_reward_effect_layer.offset_top = 0.0
+	_star_reward_effect_layer.offset_right = viewport_size.x
+	_star_reward_effect_layer.offset_bottom = viewport_size.y
 
 
 func _get_safe_area_margins(viewport_size: Vector2) -> Vector4:
@@ -686,6 +723,7 @@ func _apply_level_config(config: Dictionary) -> void:
 	_life_spent_for_run = false
 	_triples_cleared = 0
 	_stars = 0
+	_clear_star_reward_effects()
 	_reset_combo()
 	_update_star_counter_label()
 	_returning_to_menu = false
@@ -1220,16 +1258,19 @@ func _configure_shelf_unlock(shelf: Node2D, shelf_config: Dictionary, allow_lock
 	shelf.set_meta(SHELF_LOCKED_META, false)
 
 
-func _record_triples_cleared(triple_count: int) -> void:
+func _record_triples_cleared(triple_count: int) -> int:
 	if triple_count <= 0:
-		return
+		return 0
 
 	_triples_cleared += triple_count
+	var earned_stars := 0
 	if _has_player_started_timer and not _level_failed and not _level_completed:
-		_add_stars(_extend_combo(triple_count))
+		earned_stars = _extend_combo(triple_count)
+		_add_stars(earned_stars)
 
 	var newly_unlocked_shelves := _update_locked_shelves()
 	_queue_shelves_to_resolve(newly_unlocked_shelves)
+	return earned_stars
 
 
 func _update_locked_shelves() -> Array[Node]:
@@ -2109,8 +2150,10 @@ func _clear_matching_shelves(shelves_to_check: Array[Node]) -> bool:
 			for item in shelf_items:
 				_highlighted_items.erase(item)
 
+			var star_reward_origin := shelf_items[1].global_position
 			await _play_match_clear_animation(shelf_items)
-			_record_triples_cleared(1)
+			var earned_stars := _record_triples_cleared(1)
+			await _play_combo_star_reward_animation(star_reward_origin, earned_stars)
 
 	return cleared_any
 
@@ -2193,6 +2236,187 @@ func _play_match_clear_animation(shelf_items: Array[ShelfItem]) -> void:
 
 	for item_instance_id in clearing_item_ids:
 		_unmark_item_clearing_by_id(item_instance_id)
+
+
+func _play_combo_star_reward_animation(origin_global_position: Vector2, star_count: int) -> void:
+	if star_count <= 0 or _star_reward_effect_layer == null or _star_counter_panel == null:
+		return
+
+	var target_global_position := _star_counter_panel.get_global_rect().get_center()
+	for star_index in range(star_count):
+		_spawn_combo_reward_star(origin_global_position, target_global_position, star_index, star_count)
+
+	var total_duration := (
+		STAR_REWARD_DROP_DURATION_SECONDS
+		+ STAR_REWARD_FLY_DURATION_SECONDS
+		+ STAR_REWARD_STAGGER_SECONDS * maxf(float(star_count - 1), 0.0)
+	)
+	await get_tree().create_timer(total_duration).timeout
+	_pulse_star_counter()
+
+
+func _spawn_combo_reward_star(
+	origin_global_position: Vector2,
+	target_global_position: Vector2,
+	star_index: int,
+	star_count: int
+) -> void:
+	if _star_reward_effect_layer == null:
+		return
+
+	var star := TextureRect.new()
+	star.texture = REWARD_STAR_TEXTURE
+	star.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	star.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	star.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	star.size = STAR_REWARD_SIZE
+	star.pivot_offset = STAR_REWARD_SIZE * 0.5
+	star.scale = Vector2(0.56, 0.56)
+	star.modulate = Color(1.0, 1.0, 1.0, 0.0)
+	star.rotation = _rng.randf_range(-0.28, 0.28)
+	_star_reward_effect_layer.add_child(star)
+
+	var spread_x := 0.0
+	if star_count > 1:
+		spread_x = lerpf(-34.0, 34.0, float(star_index) / float(star_count - 1))
+	spread_x += _rng.randf_range(-8.0, 8.0)
+
+	var spawn_center := _get_star_effect_layer_position(
+		origin_global_position + Vector2(spread_x, _rng.randf_range(-8.0, 8.0))
+	)
+	var drop_center := spawn_center + Vector2(
+		_rng.randf_range(-18.0, 18.0),
+		_rng.randf_range(40.0, 66.0)
+	)
+	var target_center := _get_star_effect_layer_position(target_global_position)
+	star.position = spawn_center - STAR_REWARD_SIZE * 0.5
+
+	_animate_combo_reward_star(
+		star,
+		drop_center - STAR_REWARD_SIZE * 0.5,
+		target_center - STAR_REWARD_SIZE * 0.5,
+		star_index
+	)
+
+
+func _animate_combo_reward_star(
+	star: TextureRect,
+	drop_position: Vector2,
+	target_position: Vector2,
+	star_index: int
+) -> void:
+	var delay := STAR_REWARD_STAGGER_SECONDS * float(star_index)
+	if delay > 0.0:
+		await get_tree().create_timer(delay).timeout
+	if star == null or not is_instance_valid(star):
+		return
+
+	var drop_tween := star.create_tween()
+	drop_tween.set_parallel(true)
+	drop_tween.tween_property(
+		star,
+		"position",
+		drop_position,
+		STAR_REWARD_DROP_DURATION_SECONDS
+	).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	drop_tween.tween_property(
+		star,
+		"scale",
+		Vector2.ONE,
+		STAR_REWARD_DROP_DURATION_SECONDS
+	).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	drop_tween.tween_property(
+		star,
+		"modulate",
+		Color(1.0, 1.0, 1.0, 1.0),
+		STAR_REWARD_DROP_DURATION_SECONDS * 0.55
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	drop_tween.tween_property(
+		star,
+		"rotation",
+		star.rotation + _rng.randf_range(-0.65, 0.65),
+		STAR_REWARD_DROP_DURATION_SECONDS
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	await drop_tween.finished
+	if star == null or not is_instance_valid(star):
+		return
+
+	var fly_tween := star.create_tween()
+	fly_tween.set_parallel(true)
+	fly_tween.tween_property(
+		star,
+		"position",
+		target_position,
+		STAR_REWARD_FLY_DURATION_SECONDS
+	).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	fly_tween.tween_property(
+		star,
+		"scale",
+		Vector2(0.42, 0.42),
+		STAR_REWARD_FLY_DURATION_SECONDS
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	fly_tween.tween_property(
+		star,
+		"modulate",
+		Color(1.0, 1.0, 1.0, 0.0),
+		STAR_REWARD_FLY_DURATION_SECONDS
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	fly_tween.tween_property(
+		star,
+		"rotation",
+		star.rotation + _rng.randf_range(-1.15, 1.15),
+		STAR_REWARD_FLY_DURATION_SECONDS
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	await fly_tween.finished
+
+	if star != null and is_instance_valid(star):
+		star.queue_free()
+
+
+func _get_star_effect_layer_position(global_position: Vector2) -> Vector2:
+	if _star_reward_effect_layer == null:
+		return global_position
+
+	return global_position - _star_reward_effect_layer.global_position
+
+
+func _pulse_star_counter() -> void:
+	if _star_counter_panel == null or not is_instance_valid(_star_counter_panel):
+		return
+
+	if _star_counter_pulse_tween != null and _star_counter_pulse_tween.is_valid():
+		_star_counter_pulse_tween.kill()
+
+	_star_counter_panel.pivot_offset = _star_counter_panel.size * 0.5
+	_star_counter_panel.scale = Vector2.ONE
+	_star_counter_pulse_tween = _star_counter_panel.create_tween()
+	_star_counter_pulse_tween.tween_property(
+		_star_counter_panel,
+		"scale",
+		STAR_REWARD_COUNTER_PULSE_SCALE,
+		0.08
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_star_counter_pulse_tween.tween_property(
+		_star_counter_panel,
+		"scale",
+		Vector2.ONE,
+		0.12
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+
+
+func _clear_star_reward_effects() -> void:
+	if _star_counter_pulse_tween != null and _star_counter_pulse_tween.is_valid():
+		_star_counter_pulse_tween.kill()
+	_star_counter_pulse_tween = null
+
+	if _star_counter_panel != null:
+		_star_counter_panel.scale = Vector2.ONE
+
+	if _star_reward_effect_layer == null:
+		return
+
+	for child in _star_reward_effect_layer.get_children():
+		child.queue_free()
 
 
 func _mark_item_clearing_by_id(instance_id: int) -> void:
