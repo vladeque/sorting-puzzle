@@ -281,12 +281,15 @@ Script:
 
 Purpose:
 - Reusable fullscreen hammer strike effect spawned by `scripts/level.gd` when the hammer ability is used.
-- Displays the selected high-resolution transparent hammer sprite over gameplay, animates a wind-up, fast strike, rebound, and fade-out, and draws a short radial impact burst.
+- Displays the selected high-resolution transparent hammer sprite over gameplay.
+- Owns the editable `AnimationPlayer` `strike` timeline for wind-up, fast strike, rebound, fade-out, impact signal timing, and burst amount.
 - Emits `impact` exactly when the hammer visually lands so gameplay can destroy the center-screen merged item on the hit frame.
 
 Important nodes:
-- `HammerPivot`: animated pivot positioned over the target items.
-- `HammerPivot/HammerSprite`: transparent hammer asset from `assets/abilities/ability_hammer_impact.png`.
+- `ImpactAnchor`: runtime-positioned target point that scales the full hammer for the current viewport.
+- `ImpactAnchor/HammerPivot`: keyframed by `AnimationPlayer` for wind-up, strike, rebound, and exit motion.
+- `ImpactAnchor/HammerPivot/HammerSprite`: transparent hammer asset from `assets/abilities/ability_hammer_impact.png`.
+- `AnimationPlayer`: owns the `strike` animation; edit this timeline for most hammer motion and timing adjustments.
 
 Depends on:
 - `assets/abilities/ability_hammer_impact.png`.

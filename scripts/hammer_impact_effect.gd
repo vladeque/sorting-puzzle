@@ -6,19 +6,14 @@ signal finished
 
 const DESIGN_WIDTH := 720.0
 const HAMMER_HEAD_CENTER_OFFSET := 364.0
-const WIND_UP_OFFSET := Vector2(156, -268)
-const READY_OFFSET := Vector2(68, -152)
-const RECOVER_OFFSET := Vector2(86, -236)
 const BURST_RAY_COUNT := 10
 
 @export_range(0.1, 1.0, 0.01) var base_hammer_scale := 0.42
-@export_range(0.0, 1.0, 0.01) var appear_seconds := 0.16
-@export_range(0.0, 1.0, 0.01) var strike_seconds := 0.11
-@export_range(0.0, 1.0, 0.01) var rebound_seconds := 0.08
-@export_range(0.0, 1.0, 0.01) var recover_seconds := 0.2
 
+@onready var _impact_anchor: Node2D = %ImpactAnchor
 @onready var _hammer_pivot: Node2D = %HammerPivot
 @onready var _hammer_sprite: Sprite2D = %HammerSprite
+@onready var _animation_player: AnimationPlayer = %AnimationPlayer
 
 var _impact_position := Vector2.ZERO
 var _layout_scale := 1.0
@@ -39,37 +34,13 @@ func play(target_screen_position: Vector2) -> void:
 	_impact_position = target_screen_position
 	_layout_scale = clampf(size.x / DESIGN_WIDTH, 0.75, 1.35)
 	visible = true
-	modulate = Color(1, 1, 1, 0)
 	_burst_amount = 0.0
 
-	var hammer_scale := Vector2.ONE * base_hammer_scale * _layout_scale
-	_hammer_pivot.position = _impact_position + WIND_UP_OFFSET * _layout_scale
-	_hammer_pivot.rotation = deg_to_rad(-34.0)
-	_hammer_pivot.scale = hammer_scale * 0.82
+	_impact_anchor.position = _impact_position
+	_impact_anchor.scale = Vector2.ONE * base_hammer_scale * _layout_scale
 	_hammer_sprite.position = Vector2(0, HAMMER_HEAD_CENTER_OFFSET)
-
-	var tween := create_tween()
-	tween.set_parallel(true)
-	tween.tween_property(self, "modulate", Color.WHITE, appear_seconds)
-	tween.tween_property(_hammer_pivot, "position", _impact_position + READY_OFFSET * _layout_scale, appear_seconds).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tween.tween_property(_hammer_pivot, "rotation", deg_to_rad(-18.0), appear_seconds).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tween.tween_property(_hammer_pivot, "scale", hammer_scale * 1.08, appear_seconds).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	tween.chain().tween_interval(0.04)
-	tween.chain().set_parallel(true)
-	tween.tween_property(_hammer_pivot, "position", _impact_position, strike_seconds).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
-	tween.tween_property(_hammer_pivot, "rotation", deg_to_rad(7.0), strike_seconds).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
-	tween.tween_property(_hammer_pivot, "scale", hammer_scale * 1.18, strike_seconds).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
-	tween.chain().tween_callback(_emit_impact)
-	tween.chain().set_parallel(true)
-	tween.tween_property(_hammer_pivot, "position", _impact_position + Vector2(-10, 12) * _layout_scale, rebound_seconds).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tween.tween_property(_hammer_pivot, "rotation", deg_to_rad(-4.0), rebound_seconds).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tween.tween_property(_hammer_pivot, "scale", hammer_scale * 1.04, rebound_seconds).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tween.chain().set_parallel(true)
-	tween.tween_property(self, "modulate", Color(1, 1, 1, 0), recover_seconds).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	tween.tween_property(_hammer_pivot, "position", _impact_position + RECOVER_OFFSET * _layout_scale, recover_seconds).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	tween.tween_property(_hammer_pivot, "rotation", deg_to_rad(24.0), recover_seconds).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	tween.tween_property(_hammer_pivot, "scale", hammer_scale * 0.92, recover_seconds).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	tween.chain().tween_callback(_emit_finished)
+	_animation_player.stop()
+	_animation_player.play(&"strike")
 
 
 func _draw() -> void:
@@ -92,18 +63,11 @@ func _draw() -> void:
 
 func _emit_impact() -> void:
 	impact.emit()
-	_play_burst()
 
 
 func _emit_finished() -> void:
 	visible = false
 	finished.emit()
-
-
-func _play_burst() -> void:
-	_burst_amount = 1.0
-	var burst_tween := create_tween()
-	burst_tween.tween_property(self, "_burst_amount", 0.0, 0.28).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 
 func _apply_full_rect() -> void:

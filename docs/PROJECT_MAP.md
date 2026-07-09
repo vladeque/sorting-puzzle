@@ -211,7 +211,7 @@ Responsibility:
 - Provides hammer, shuffle, and highlight buttons.
 - Reads campaign ability uses from `PlayerProgress`, spends campaign uses immediately, and uses temporary three-use counts for isolated dev/test levels.
 - Lets hammer clear matching visible/front items first, or supplement visible/front items with first-back-layer copies of the same type if no visible item type can make a triple.
-- Gathers hammer targets to the center of the screen, spawns a fullscreen hammer strike effect there, and waits for the effect's `impact` signal before destroying the merged item and dropping combo reward stars.
+- Gathers hammer targets to the center of the screen, spawns a fullscreen hammer strike effect there, and waits for the effect's scene-authored `AnimationPlayer` `impact` callback before destroying the merged item and dropping combo reward stars.
 - Disables abilities after failure, completion, or when uses run out.
 - Starts the highlight timer even when no current shelf state can be highlighted.
 - Uses `ShelfItem` outline state for border-only highlight ability visuals.

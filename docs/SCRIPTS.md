@@ -427,16 +427,16 @@ Attached to:
 - `scenes/abilities/hammer_impact_effect.tscn` root `HammerImpactEffect`.
 
 Purpose:
-- Owns the hammer ability's fullscreen visual strike.
-- Positions the hammer over a provided screen-space target point, animates wind-up, strike, rebound, and recovery, and draws a short procedural burst on impact.
+- Thin runtime controller for the hammer ability's fullscreen visual strike.
+- Positions and scales the scene over a provided screen-space target point, plays the scene-owned `AnimationPlayer` `strike` timeline, and draws a short procedural burst based on the animated burst amount.
 - Emits `impact` on the visual hit frame and `finished` after the hammer fades out.
 
 Exports:
 - `base_hammer_scale`: base visual size before responsive viewport scaling.
-- `appear_seconds`, `strike_seconds`, `rebound_seconds`, and `recover_seconds`: timing controls for the strike phases.
 
 Depends on:
 - `assets/abilities/ability_hammer_impact.png`.
+- `scenes/abilities/hammer_impact_effect.tscn` `AnimationPlayer` keyframes for hammer motion, opacity, burst amount, and signal callbacks.
 - `scripts/level.gd` for runtime instancing and gameplay response to `impact`.
 
 Do not use for:

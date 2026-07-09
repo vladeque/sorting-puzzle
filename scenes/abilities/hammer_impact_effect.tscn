@@ -1,7 +1,93 @@
-[gd_scene load_steps=3 format=3 uid="uid://bwejmpw6brl73"]
+[gd_scene load_steps=5 format=3 uid="uid://bwejmpw6brl73"]
 
 [ext_resource type="Script" uid="uid://djqf15hllksrw" path="res://scripts/hammer_impact_effect.gd" id="1_hammer_script"]
 [ext_resource type="Texture2D" uid="uid://c63mve57xsc6i" path="res://assets/abilities/ability_hammer_impact.png" id="2_hammer_texture"]
+
+[sub_resource type="Animation" id="Animation_hammer_strike"]
+resource_name = "strike"
+length = 0.59
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.16, 0.39, 0.59),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("ImpactAnchor/HammerPivot:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.16, 0.2, 0.31, 0.39, 0.59),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(156, -268), Vector2(68, -152), Vector2(68, -152), Vector2(0, 0), Vector2(-10, 12), Vector2(86, -236)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("ImpactAnchor/HammerPivot:rotation")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.16, 0.2, 0.31, 0.39, 0.59),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [-0.593412, -0.314159, -0.314159, 0.122173, -0.0698132, 0.418879]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("ImpactAnchor/HammerPivot:scale")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.16, 0.2, 0.31, 0.39, 0.59),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0.82, 0.82), Vector2(1.08, 1.08), Vector2(1.08, 1.08), Vector2(1.18, 1.18), Vector2(1.04, 1.04), Vector2(0.92, 0.92)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath(".:_burst_amount")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.3, 0.31, 0.59),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [0.0, 0.0, 1.0, 0.0]
+}
+tracks/5/type = "method"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath(".")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0.31, 0.59),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": [],
+"method": &"_emit_impact"
+}, {
+"args": [],
+"method": &"_emit_finished"
+}]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_hammer_effect"]
+_data = {
+"strike": SubResource("Animation_hammer_strike")
+}
 
 [node name="HammerImpactEffect" type="Control"]
 layout_mode = 3
@@ -13,9 +99,22 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_hammer_script")
 
-[node name="HammerPivot" type="Node2D" parent="."]
+[node name="ImpactAnchor" type="Node2D" parent="."]
 unique_name_in_owner = true
 
-[node name="HammerSprite" type="Sprite2D" parent="HammerPivot"]
+[node name="HammerPivot" type="Node2D" parent="ImpactAnchor"]
 unique_name_in_owner = true
+position = Vector2(156, -268)
+rotation = -0.593412
+scale = Vector2(0.82, 0.82)
+
+[node name="HammerSprite" type="Sprite2D" parent="ImpactAnchor/HammerPivot"]
+unique_name_in_owner = true
+position = Vector2(0, 364)
 texture = ExtResource("2_hammer_texture")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+unique_name_in_owner = true
+libraries = {
+"": SubResource("AnimationLibrary_hammer_effect")
+}
