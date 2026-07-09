@@ -2738,47 +2738,125 @@ func _play_hammer_ability(items_to_destroy: Array[ShelfItem]) -> void:
 	_hammer_effect_active = true
 	_update_ability_buttons()
 
-	for item in items_to_destroy:
-		if item != null and is_instance_valid(item):
-			_mark_item_transitioning_by_id(item.get_instance_id())
-
+	var shelves_to_check := _get_hammer_shelves_to_check(items_to_destroy)
+	var destroyed_triples := floori(float(_get_valid_item_count(items_to_destroy)) / float(SLOT_COUNT))
+	var impact_screen_position := get_viewport_rect().size * 0.5
+	var impact_global_position := _screen_position_to_global(impact_screen_position)
+	var merged_item := await _play_hammer_gather_animation(items_to_destroy, impact_global_position)
 	var ui_layer := get_node("UI") as CanvasLayer
 	var effect := HAMMER_IMPACT_EFFECT_SCENE.instantiate() as HammerImpactEffect
 	ui_layer.add_child(effect)
-	effect.play(_get_hammer_impact_screen_position(items_to_destroy))
+	effect.play(impact_screen_position)
 
 	await effect.impact
 	_play_hammer_screen_shake()
-	_play_hammer_target_feedback(items_to_destroy)
-	await get_tree().create_timer(0.08).timeout
-
-	for item in items_to_destroy:
-		if item != null and is_instance_valid(item):
-			_unmark_item_transitioning_by_id(item.get_instance_id())
-
-	_destroy_items(items_to_destroy)
+	await _play_hammer_destroy_animation(merged_item, items_to_destroy)
+	var earned_stars := _record_triples_cleared(destroyed_triples)
+	_resolve_shelves(shelves_to_check)
 	await effect.finished
 	effect.queue_free()
+	await _play_combo_star_reward_animation(impact_global_position, earned_stars)
 
 	_hammer_effect_active = false
 	_update_ability_buttons()
 
 
-func _get_hammer_impact_screen_position(items_to_destroy: Array[ShelfItem]) -> Vector2:
-	var target_position := Vector2.ZERO
-	var target_count := 0
+func _get_hammer_shelves_to_check(items_to_destroy: Array[ShelfItem]) -> Array[Node]:
+	var shelves_to_check: Array[Node] = []
+	for item in items_to_destroy:
+		if item == null or not is_instance_valid(item):
+			continue
+
+		var item_slot := item.get_parent() as Node2D
+		if item_slot != null:
+			_add_shelf_to_check(shelves_to_check, item_slot)
+
+	return shelves_to_check
+
+
+func _play_hammer_gather_animation(items_to_destroy: Array[ShelfItem], target_global_position: Vector2) -> ShelfItem:
+	var valid_items := _get_valid_items(items_to_destroy)
+	if valid_items.is_empty():
+		return null
+
+	var merged_item := valid_items[0]
+	for item in valid_items:
+		var item_instance_id := item.get_instance_id()
+		_mark_item_clearing_by_id(item_instance_id)
+		_highlighted_items.erase(item)
+		item.input_pickable = false
+		item.set_contact_shadow_enabled(false)
+		item.modulate = Color.WHITE
+		item.rotation = 0.0
+		item.z_index = 26 if item == merged_item else 25
+
+	var gather_tween := create_tween()
+	gather_tween.set_parallel(true)
+	for item in valid_items:
+		gather_tween.tween_property(
+			item,
+			"global_position",
+			target_global_position,
+			match_gather_duration_seconds
+		).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+		gather_tween.tween_property(
+			item,
+			"scale",
+			Vector2.ONE * 0.82,
+			match_gather_duration_seconds
+		).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+
+	await gather_tween.finished
+
+	for item in valid_items:
+		if item != merged_item and item != null and is_instance_valid(item):
+			_unmark_item_clearing_by_id(item.get_instance_id())
+			item.queue_free()
+
+	return merged_item if merged_item != null and is_instance_valid(merged_item) else null
+
+
+func _play_hammer_destroy_animation(merged_item: ShelfItem, items_to_destroy: Array[ShelfItem]) -> void:
+	_play_triple_clear_sound()
+	if merged_item != null and is_instance_valid(merged_item):
+		var shrink_tween := create_tween()
+		shrink_tween.set_parallel(true)
+		shrink_tween.tween_property(
+			merged_item,
+			"scale",
+			Vector2.ZERO,
+			match_shrink_duration_seconds
+		).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+		shrink_tween.tween_property(
+			merged_item,
+			"modulate",
+			Color(1, 1, 1, 0),
+			match_shrink_duration_seconds
+		).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		await shrink_tween.finished
 
 	for item in items_to_destroy:
 		if item == null or not is_instance_valid(item):
 			continue
 
-		target_position += item.get_global_transform_with_canvas().origin
-		target_count += 1
+		if item == _selected_item:
+			_clear_selected_item()
 
-	if target_count <= 0:
-		return get_viewport_rect().size * 0.5
+		_unmark_item_clearing_by_id(item.get_instance_id())
+		item.queue_free()
 
-	return target_position / float(target_count)
+
+func _get_valid_items(items: Array[ShelfItem]) -> Array[ShelfItem]:
+	var valid_items: Array[ShelfItem] = []
+	for item in items:
+		if item != null and is_instance_valid(item) and not item.is_queued_for_deletion():
+			valid_items.append(item)
+
+	return valid_items
+
+
+func _get_valid_item_count(items: Array[ShelfItem]) -> int:
+	return _get_valid_items(items).size()
 
 
 func _play_hammer_screen_shake() -> void:
@@ -2791,27 +2869,6 @@ func _play_hammer_screen_shake() -> void:
 	tween.tween_property(_shelves_root, "position", original_position + shake_offset, 0.035)
 	tween.tween_property(_shelves_root, "position", original_position - shake_offset * 0.6, 0.045)
 	tween.tween_property(_shelves_root, "position", original_position, 0.055)
-
-
-func _play_hammer_target_feedback(items_to_destroy: Array[ShelfItem]) -> void:
-	var tween := create_tween()
-	tween.set_parallel(true)
-
-	for item in items_to_destroy:
-		if item == null or not is_instance_valid(item):
-			continue
-
-		item.z_index = 24
-		tween.tween_property(item, "scale", Vector2(1.12, 0.88), 0.045).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-		tween.tween_property(item, "rotation", deg_to_rad(_rng.randf_range(-5.0, 5.0)), 0.045).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-
-	tween.chain().set_parallel(true)
-	for item in items_to_destroy:
-		if item == null or not is_instance_valid(item):
-			continue
-
-		tween.tween_property(item, "scale", Vector2(0.2, 0.2), 0.1).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
-		tween.tween_property(item, "modulate", Color(1, 1, 1, 0), 0.1).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 
 
 func _find_hammer_targets(items: Array[ShelfItem]) -> Array[ShelfItem]:

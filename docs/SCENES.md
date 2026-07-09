@@ -282,7 +282,7 @@ Script:
 Purpose:
 - Reusable fullscreen hammer strike effect spawned by `scripts/level.gd` when the hammer ability is used.
 - Displays the selected high-resolution transparent hammer sprite over gameplay, animates a wind-up, fast strike, rebound, and fade-out, and draws a short radial impact burst.
-- Emits `impact` exactly when the hammer visually lands so gameplay can destroy the selected items on the hit frame.
+- Emits `impact` exactly when the hammer visually lands so gameplay can destroy the center-screen merged item on the hit frame.
 
 Important nodes:
 - `HammerPivot`: animated pivot positioned over the target items.

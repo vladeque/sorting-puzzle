@@ -394,7 +394,7 @@ Key responsibilities:
 - Initialize item placement and triple-clear sound effects from the shared sound-effects setting and keep them disabled while that toggle is crossed out.
 - Manage hammer, shuffle, and highlight abilities. Campaign levels read and spend saved ability counts through `PlayerProgress`; dev/test levels use isolated temporary counts.
 - Hammer targets visible/front triples first, then can supplement visible/front matches with first-back-layer copies of the same item type when no visible item type has three available copies.
-- Hammer now plays a fullscreen impact animation before item destruction, blocks new item/ability input while the strike is active, and destroys items on the effect's `impact` signal.
+- Hammer now gathers the chosen three targets into one item at the screen center, plays a fullscreen impact animation there, destroys the merged item on the effect's `impact` signal, and then drops combo reward stars from the impact point.
 - Count hammer destroys as cleared triples for shelf unlocking.
 - Let highlight uses start their timed window even when no immediate triple can currently be highlighted.
 - Apply highlight ability visuals through `ShelfItem.set_outline()` so only item silhouettes receive a border, and update the highlight button countdown label while that window is active.
