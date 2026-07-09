@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://dpefflrm88e6s"]
 
-[ext_resource type="Texture2D" uid="uid://d4dmg42gwviq5" path="res://assets/ui/icon_music.png" id="1_music_icon"]
-[ext_resource type="Texture2D" uid="uid://3hrppla10q8k" path="res://assets/ui/icon_sound_effects.png" id="2_sound_effects_icon"]
-[ext_resource type="Texture2D" uid="uid://djl1f7q7bbgnf" path="res://assets/ui/icon_vibration.png" id="3_vibration_icon"]
+[ext_resource type="Texture2D" uid="uid://sli6yinfrmk5" path="res://assets/ui/icon_music.png" id="1_music_icon"]
+[ext_resource type="Texture2D" uid="uid://cqs8ijno3xqrc" path="res://assets/ui/icon_sound_effects.png" id="2_sound_effects_icon"]
+[ext_resource type="Texture2D" uid="uid://dhu182ygjcxh2" path="res://assets/ui/icon_vibration.png" id="3_vibration_icon"]
 [ext_resource type="Script" uid="uid://djayncoacexvl" path="res://scripts/pause_menu.gd" id="4_pause_menu_script"]
 [ext_resource type="Texture2D" uid="uid://bi6f80uhliep4" path="res://assets/ui/level_button_blank_light_blue.png" id="5_ywggk"]
 [ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="6_press_scale_button"]
@@ -224,10 +224,10 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 2.0
-offset_top = 2.0
-offset_right = -2.0
-offset_bottom = -2.0
+offset_left = -14.0
+offset_top = -10.0
+offset_right = 14.0
+offset_bottom = 18.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -262,10 +262,10 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 2.0
-offset_top = 2.0
-offset_right = -2.0
-offset_bottom = -2.0
+offset_left = -14.0
+offset_top = -10.0
+offset_right = 14.0
+offset_bottom = 18.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -300,10 +300,10 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 2.0
-offset_top = 2.0
-offset_right = -2.0
-offset_bottom = -2.0
+offset_left = -14.0
+offset_top = -10.0
+offset_right = 14.0
+offset_bottom = 18.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
