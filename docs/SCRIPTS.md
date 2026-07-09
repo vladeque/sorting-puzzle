@@ -358,6 +358,7 @@ Important constants:
 - `LEVEL_SCENE_PATH`: scene loaded when the completion `Next` button advances normal campaign play to the next level.
 - `ITEM_PLACE_SOUND`: short sound played when the player drops or moves an item into a shelf slot.
 - `TRIPLE_CLEAR_SOUND`: sound played when a matched triple gathers and disappears.
+- `HAMMER_IMPACT_EFFECT_SCENE`: `res://scenes/abilities/hammer_impact_effect.tscn`, spawned when the hammer ability is used.
 
 Key responsibilities:
 - Apply responsive layout with `_apply_responsive_layout()`, including safe-area-aware top HUD placement, ability bar placement over the floor/baseboard transition strip, full-screen overlays, centered pause and leave-confirmation popups, shelf-root scaling, and shelf-root centering between HUD and ability controls.
@@ -393,6 +394,7 @@ Key responsibilities:
 - Initialize item placement and triple-clear sound effects from the shared sound-effects setting and keep them disabled while that toggle is crossed out.
 - Manage hammer, shuffle, and highlight abilities. Campaign levels read and spend saved ability counts through `PlayerProgress`; dev/test levels use isolated temporary counts.
 - Hammer targets visible/front triples first, then can supplement visible/front matches with first-back-layer copies of the same item type when no visible item type has three available copies.
+- Hammer now plays a fullscreen impact animation before item destruction, blocks new item/ability input while the strike is active, and destroys items on the effect's `impact` signal.
 - Count hammer destroys as cleared triples for shelf unlocking.
 - Let highlight uses start their timed window even when no immediate triple can currently be highlighted.
 - Apply highlight ability visuals through `ShelfItem.set_outline()` so only item silhouettes receive a border, and update the highlight button countdown label while that window is active.
@@ -415,6 +417,30 @@ Depends on:
 Do not use for:
 - Offline level generation or solvability search. Keep that in `scripts/tools/`.
 - Save data ownership. Keep that in `scripts/player_progress.gd`.
+
+## `scripts/hammer_impact_effect.gd`
+
+Class:
+- `HammerImpactEffect`
+
+Attached to:
+- `scenes/abilities/hammer_impact_effect.tscn` root `HammerImpactEffect`.
+
+Purpose:
+- Owns the hammer ability's fullscreen visual strike.
+- Positions the hammer over a provided screen-space target point, animates wind-up, strike, rebound, and recovery, and draws a short procedural burst on impact.
+- Emits `impact` on the visual hit frame and `finished` after the hammer fades out.
+
+Exports:
+- `base_hammer_scale`: base visual size before responsive viewport scaling.
+- `appear_seconds`, `strike_seconds`, `rebound_seconds`, and `recover_seconds`: timing controls for the strike phases.
+
+Depends on:
+- `assets/abilities/ability_hammer_impact.png`.
+- `scripts/level.gd` for runtime instancing and gameplay response to `impact`.
+
+Do not use for:
+- Ability inventory, target selection, item deletion, score/star rules, or shelf resolution.
 
 ## `scripts/shelf.gd`
 

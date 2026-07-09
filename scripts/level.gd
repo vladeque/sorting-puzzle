@@ -17,6 +17,7 @@ const HIGHLIGHT_DURATION_SECONDS := 15.0
 const SHELF_SCENE := preload("res://scenes/shelf.tscn")
 const MOVING_SHELF_ROW_SCENE := preload("res://scenes/moving_shelf_row.tscn")
 const ITEM_SCENE := preload("res://scenes/item.tscn")
+const HAMMER_IMPACT_EFFECT_SCENE := preload("res://scenes/abilities/hammer_impact_effect.tscn")
 const ITEM_SPRITES_CONFIG := "res://configs/item_sprites.json"
 const LEVEL_CONFIG_TEMPLATE := "res://configs/levels/level_%03d.json"
 const DEFAULT_LEVEL_CONFIG := "res://configs/levels/level_001.json"
@@ -168,6 +169,7 @@ var _triple_clear_audio_player: AudioStreamPlayer
 var _sound_effects_enabled := true
 var _triples_cleared := 0
 var _shelves_layout_scale := 1.0
+var _hammer_effect_active := false
 
 
 func _ready() -> void:
@@ -623,6 +625,9 @@ func _process(delta: float) -> void:
 	if _level_paused:
 		return
 
+	if _hammer_effect_active:
+		return
+
 	_update_combo_timer(delta)
 	_update_highlight_timer(delta)
 	_clear_drag_drop_selection_if_unavailable()
@@ -642,6 +647,9 @@ func _input(event: InputEvent) -> void:
 		return
 
 	if _level_paused:
+		return
+
+	if _hammer_effect_active:
 		return
 
 	if event is InputEventMouseButton:
@@ -2677,7 +2685,7 @@ func _register_ability_button(ability_id: StringName, button_path: NodePath) -> 
 
 
 func _on_ability_button_pressed(ability_id: StringName) -> void:
-	if _level_failed or _level_completed or int(_ability_uses.get(ability_id, 0)) <= 0:
+	if _level_failed or _level_completed or _hammer_effect_active or int(_ability_uses.get(ability_id, 0)) <= 0:
 		return
 
 	_cancel_active_interaction()
@@ -2722,8 +2730,88 @@ func _use_hammer() -> bool:
 	if items_to_destroy.is_empty():
 		return false
 
-	_destroy_items(items_to_destroy)
+	_play_hammer_ability(items_to_destroy)
 	return true
+
+
+func _play_hammer_ability(items_to_destroy: Array[ShelfItem]) -> void:
+	_hammer_effect_active = true
+	_update_ability_buttons()
+
+	for item in items_to_destroy:
+		if item != null and is_instance_valid(item):
+			_mark_item_transitioning_by_id(item.get_instance_id())
+
+	var ui_layer := get_node("UI") as CanvasLayer
+	var effect := HAMMER_IMPACT_EFFECT_SCENE.instantiate() as HammerImpactEffect
+	ui_layer.add_child(effect)
+	effect.play(_get_hammer_impact_screen_position(items_to_destroy))
+
+	await effect.impact
+	_play_hammer_screen_shake()
+	_play_hammer_target_feedback(items_to_destroy)
+	await get_tree().create_timer(0.08).timeout
+
+	for item in items_to_destroy:
+		if item != null and is_instance_valid(item):
+			_unmark_item_transitioning_by_id(item.get_instance_id())
+
+	_destroy_items(items_to_destroy)
+	await effect.finished
+	effect.queue_free()
+
+	_hammer_effect_active = false
+	_update_ability_buttons()
+
+
+func _get_hammer_impact_screen_position(items_to_destroy: Array[ShelfItem]) -> Vector2:
+	var target_position := Vector2.ZERO
+	var target_count := 0
+
+	for item in items_to_destroy:
+		if item == null or not is_instance_valid(item):
+			continue
+
+		target_position += item.get_global_transform_with_canvas().origin
+		target_count += 1
+
+	if target_count <= 0:
+		return get_viewport_rect().size * 0.5
+
+	return target_position / float(target_count)
+
+
+func _play_hammer_screen_shake() -> void:
+	if _shelves_root == null:
+		return
+
+	var original_position := _shelves_root.position
+	var shake_offset := Vector2(8.0, -5.0) * clampf(_shelves_layout_scale, 0.75, 1.35)
+	var tween := create_tween()
+	tween.tween_property(_shelves_root, "position", original_position + shake_offset, 0.035)
+	tween.tween_property(_shelves_root, "position", original_position - shake_offset * 0.6, 0.045)
+	tween.tween_property(_shelves_root, "position", original_position, 0.055)
+
+
+func _play_hammer_target_feedback(items_to_destroy: Array[ShelfItem]) -> void:
+	var tween := create_tween()
+	tween.set_parallel(true)
+
+	for item in items_to_destroy:
+		if item == null or not is_instance_valid(item):
+			continue
+
+		item.z_index = 24
+		tween.tween_property(item, "scale", Vector2(1.12, 0.88), 0.045).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		tween.tween_property(item, "rotation", deg_to_rad(_rng.randf_range(-5.0, 5.0)), 0.045).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+	tween.chain().set_parallel(true)
+	for item in items_to_destroy:
+		if item == null or not is_instance_valid(item):
+			continue
+
+		tween.tween_property(item, "scale", Vector2(0.2, 0.2), 0.1).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+		tween.tween_property(item, "modulate", Color(1, 1, 1, 0), 0.1).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 
 
 func _find_hammer_targets(items: Array[ShelfItem]) -> Array[ShelfItem]:
@@ -2992,7 +3080,7 @@ func _update_ability_button(ability_id: StringName) -> void:
 	if uses_label != null:
 		uses_label.text = str(uses_left)
 
-	button.disabled = _level_failed or _level_completed or _level_paused or uses_left <= 0
+	button.disabled = _level_failed or _level_completed or _level_paused or _hammer_effect_active or uses_left <= 0
 
 
 func _set_moving_shelf_rows_paused(should_pause: bool) -> void:

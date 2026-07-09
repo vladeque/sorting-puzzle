@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3 uid="uid://bwejmpw6brl73"]
+
+[ext_resource type="Script" uid="uid://djqf15hllksrw" path="res://scripts/hammer_impact_effect.gd" id="1_hammer_script"]
+[ext_resource type="Texture2D" uid="uid://c63mve57xsc6i" path="res://assets/abilities/ability_hammer_impact.png" id="2_hammer_texture"]
+
+[node name="HammerImpactEffect" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_hammer_script")
+
+[node name="HammerPivot" type="Node2D" parent="."]
+unique_name_in_owner = true
+
+[node name="HammerSprite" type="Sprite2D" parent="HammerPivot"]
+unique_name_in_owner = true
+texture = ExtResource("2_hammer_texture")

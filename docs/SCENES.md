@@ -266,9 +266,34 @@ Depends on:
 - `configs/item_sprites.json`
 - `configs/levels/level_*.json`
 - `assets/abilities/*.png`
+- `scenes/abilities/hammer_impact_effect.tscn` for the hammer ability's fullscreen strike animation.
 
 Do not use for:
 - Static shelf cell visuals. Put those in `scenes/shelf.tscn`.
+
+## `scenes/abilities/hammer_impact_effect.tscn`
+
+Root:
+- `HammerImpactEffect` (`Control`)
+
+Script:
+- `scripts/hammer_impact_effect.gd`
+
+Purpose:
+- Reusable fullscreen hammer strike effect spawned by `scripts/level.gd` when the hammer ability is used.
+- Displays the selected high-resolution transparent hammer sprite over gameplay, animates a wind-up, fast strike, rebound, and fade-out, and draws a short radial impact burst.
+- Emits `impact` exactly when the hammer visually lands so gameplay can destroy the selected items on the hit frame.
+
+Important nodes:
+- `HammerPivot`: animated pivot positioned over the target items.
+- `HammerPivot/HammerSprite`: transparent hammer asset from `assets/abilities/ability_hammer_impact.png`.
+
+Depends on:
+- `assets/abilities/ability_hammer_impact.png`.
+- Runtime instancing and target positioning from `scripts/level.gd`.
+
+Do not use for:
+- Choosing hammer targets, spending ability inventory, destroying items, or resolving shelves. Those stay in `scripts/level.gd`.
 
 ## `scenes/layouts/layout_*.tscn`
 
