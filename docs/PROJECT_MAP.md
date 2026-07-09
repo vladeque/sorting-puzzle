@@ -119,6 +119,7 @@ Files:
 - `scenes/abilities/hammer_impact_effect.tscn`
 - `scripts/hammer_impact_effect.gd`
 - `assets/abilities/ability_hammer_impact.png`
+- `assets/abilities/ability_shuffle_box.png`
 
 Responsibility:
 - Loads level JSON and item sprite config.
@@ -139,6 +140,7 @@ Responsibility:
 - Promotes back layers when the visible layer clears.
 - Tracks the countdown timer, starting it only after the first meaningful player action, and win/loss overlays.
 - Plays the hammer ability by gathering the targeted items into one center-screen item, striking it with the fullscreen hammer, then dropping combo reward stars from the impact point.
+- Plays the shuffle ability by showing a center-screen delivery box, flying visible unlocked items into it, swapping item identities while hidden, flying them back to their slots, then resolving shelf matches.
 - Wires the in-level pause menu, including the top-right circular menu button, modal overlay, Leave action, Continue action, leave confirmation overlay, and campaign life spend for confirmed Leave.
 - Displays a responsive Godot-authored level backdrop with a top HUD strip, monotone shop wall, baseboard, and bottom floor band behind generated shelves.
 
@@ -212,6 +214,7 @@ Responsibility:
 - Reads campaign ability uses from `PlayerProgress`, spends campaign uses immediately, and uses temporary three-use counts for isolated dev/test levels.
 - Lets hammer clear matching visible/front items first, or supplement visible/front items with first-back-layer copies of the same type if no visible item type can make a triple.
 - Gathers hammer targets to the center of the screen, spawns a fullscreen hammer strike effect there, and waits for the effect's scene-authored `AnimationPlayer` `impact` callback before destroying the merged item and dropping combo reward stars.
+- Shows the shuffle delivery box sprite from `assets/abilities/ability_shuffle_box.png` and pauses moving shelf rows while shuffle items fly through the center-screen box.
 - Disables abilities after failure, completion, or when uses run out.
 - Starts the highlight timer even when no current shelf state can be highlighted.
 - Uses `ShelfItem` outline state for border-only highlight ability visuals.

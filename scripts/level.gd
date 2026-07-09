@@ -28,6 +28,7 @@ const MAIN_MENU_SCENE := "res://scenes/main_menu.tscn"
 const ITEM_PLACE_SOUND := preload("res://assets/audio/item_place.wav")
 const TRIPLE_CLEAR_SOUND := preload("res://assets/audio/triple_clear.wav")
 const REWARD_STAR_TEXTURE := preload("res://assets/ui/reward_star_34_glossy_b.png")
+const SHUFFLE_BOX_TEXTURE := preload("res://assets/abilities/ability_shuffle_box.png")
 const PAUSE_SETTING_SOUND_EFFECTS := &"sound_effects"
 const SHELF_UNLOCK_REQUIREMENT_META := &"unlock_after_triples"
 const SHELF_LOCKED_META := &"is_locked"
@@ -81,6 +82,18 @@ const STAR_REWARD_DROP_DURATION_SECONDS := 0.2
 const STAR_REWARD_FLY_DURATION_SECONDS := 0.62
 const STAR_REWARD_STAGGER_SECONDS := 0.035
 const STAR_REWARD_COUNTER_PULSE_SCALE := Vector2(1.12, 1.12)
+const SHUFFLE_BOX_DISPLAY_WIDTH := 272.0
+const SHUFFLE_BOX_OPENING_OFFSET := Vector2(0.0, -52.0)
+const SHUFFLE_BOX_POP_DURATION_SECONDS := 0.16
+const SHUFFLE_BOX_OUT_DURATION_SECONDS := 0.12
+const SHUFFLE_ITEM_GATHER_DURATION_SECONDS := 0.34
+const SHUFFLE_ITEM_RETURN_DURATION_SECONDS := 0.38
+const SHUFFLE_ITEM_STAGGER_SECONDS := 0.008
+const SHUFFLE_ITEM_MAX_STAGGER_SECONDS := 0.18
+const SHUFFLE_ITEM_FLY_IN_Z_INDEX := 28
+const SHUFFLE_ITEM_FLY_OUT_Z_INDEX := 32
+const SHUFFLE_BOX_Z_INDEX := 30
+const SHUFFLE_ITEM_INSIDE_SCALE := Vector2(0.25, 0.25)
 @export var slot_snap_distance := BASE_SLOT_SNAP_DISTANCE * SHELF_CELL_VISUAL_SCALE
 @export var item_pick_size := BASE_ITEM_PICK_SIZE * SHELF_CELL_VISUAL_SCALE
 @export var drag_start_distance := 12.0
@@ -170,6 +183,7 @@ var _sound_effects_enabled := true
 var _triples_cleared := 0
 var _shelves_layout_scale := 1.0
 var _hammer_effect_active := false
+var _shuffle_effect_active := false
 
 
 func _ready() -> void:
@@ -625,7 +639,7 @@ func _process(delta: float) -> void:
 	if _level_paused:
 		return
 
-	if _hammer_effect_active:
+	if _is_ability_effect_active():
 		return
 
 	_update_combo_timer(delta)
@@ -649,7 +663,7 @@ func _input(event: InputEvent) -> void:
 	if _level_paused:
 		return
 
-	if _hammer_effect_active:
+	if _is_ability_effect_active():
 		return
 
 	if event is InputEventMouseButton:
@@ -2685,7 +2699,7 @@ func _register_ability_button(ability_id: StringName, button_path: NodePath) -> 
 
 
 func _on_ability_button_pressed(ability_id: StringName) -> void:
-	if _level_failed or _level_completed or _hammer_effect_active or int(_ability_uses.get(ability_id, 0)) <= 0:
+	if _level_failed or _level_completed or _is_ability_effect_active() or int(_ability_uses.get(ability_id, 0)) <= 0:
 		return
 
 	_cancel_active_interaction()
@@ -2949,23 +2963,317 @@ func _group_hammer_items_by_type(items: Array[ShelfItem]) -> Dictionary:
 
 
 func _use_shuffle() -> bool:
-	var items := _get_unlocked_items()
+	if _is_resolving_shelves:
+		return false
+
+	var items := _get_shuffle_eligible_items()
 	if items.size() < 2:
 		return false
 
+	_play_shuffle_ability(items)
+	return true
+
+
+func _get_shuffle_eligible_items() -> Array[ShelfItem]:
+	var items: Array[ShelfItem] = []
+	for item in _get_unlocked_items():
+		if item == null or not is_instance_valid(item) or item.is_queued_for_deletion():
+			continue
+
+		if item.item_id == &"":
+			continue
+
+		if _is_item_busy(item):
+			return []
+
+		items.append(item)
+
+	return items
+
+
+func _play_shuffle_ability(items_to_shuffle: Array[ShelfItem]) -> void:
+	_shuffle_effect_active = true
+	_set_moving_shelf_rows_paused(true)
+	_update_ability_buttons()
+	_clear_ability_highlights()
+
+	var animation_entries := _prepare_shuffle_animation_entries(items_to_shuffle)
+	var shuffle_box := _create_shuffle_box()
+	if shuffle_box != null:
+		await _play_shuffle_box_intro(shuffle_box)
+
+	if not animation_entries.is_empty():
+		var box_center := _get_shuffle_box_opening_global_position(shuffle_box)
+		await _play_shuffle_items_into_box(animation_entries, box_center)
+		_shuffle_item_id_assignments(items_to_shuffle)
+		await _play_shuffle_items_out_of_box(animation_entries, box_center)
+	else:
+		_shuffle_item_id_assignments(items_to_shuffle)
+
+	_finish_shuffle_animation_entries(animation_entries)
+	if shuffle_box != null:
+		await _play_shuffle_box_outro(shuffle_box)
+		shuffle_box.queue_free()
+
+	_set_moving_shelf_rows_paused(false)
+	_shuffle_effect_active = false
+	_resolve_shelves(_get_all_shelves())
+	_update_ability_buttons()
+
+
+func _prepare_shuffle_animation_entries(items: Array[ShelfItem]) -> Array[Dictionary]:
+	var entries: Array[Dictionary] = []
+	if _drag_layer == null:
+		return entries
+
+	for item in items:
+		if item == null or not is_instance_valid(item) or item.is_queued_for_deletion():
+			continue
+
+		if not item.is_visible_in_tree() or item.modulate.a <= 0.01:
+			continue
+
+		var slot := item.get_parent() as Node2D
+		if slot == null:
+			continue
+
+		var collision := item.get_node_or_null("CollisionShape2D") as CollisionShape2D
+		var shadow := item.get_node_or_null("Shadow") as CanvasItem
+		var entry := {
+			"item": item,
+			"slot": slot,
+			"position": item.position,
+			"global_position": item.global_position,
+			"scale": item.scale,
+			"rotation": item.rotation,
+			"z_index": item.z_index,
+			"modulate": item.modulate,
+			"visual_scale": item.visual_scale,
+			"input_pickable": item.input_pickable,
+			"collision_disabled": collision != null and collision.disabled,
+			"contact_shadow_enabled": shadow != null and shadow.visible,
+			"target_global_position": slot.to_global(SLOT_ITEM_POSITION),
+		}
+
+		_mark_item_transitioning_by_id(item.get_instance_id())
+		_highlighted_items.erase(item)
+		item.reparent(_drag_layer, true)
+		item.global_position = entry["global_position"]
+		item.z_index = SHUFFLE_ITEM_FLY_IN_Z_INDEX
+		item.input_pickable = false
+		item.set_contact_shadow_enabled(false)
+		if collision != null:
+			collision.disabled = true
+
+		entries.append(entry)
+
+	return entries
+
+
+func _create_shuffle_box() -> Sprite2D:
+	if _drag_layer == null:
+		return null
+
+	var box := Sprite2D.new()
+	box.name = "ShuffleBoxEffect"
+	box.texture = SHUFFLE_BOX_TEXTURE
+	box.centered = true
+	box.z_index = SHUFFLE_BOX_Z_INDEX
+	box.global_position = _screen_position_to_global(get_viewport_rect().size * 0.5)
+	box.modulate = Color(1.0, 1.0, 1.0, 0.0)
+
+	var texture_size := SHUFFLE_BOX_TEXTURE.get_size()
+	var target_scale := Vector2.ONE
+	if texture_size.x > 0.0:
+		target_scale = Vector2.ONE * (SHUFFLE_BOX_DISPLAY_WIDTH / texture_size.x)
+
+	box.scale = target_scale * 0.72
+	box.set_meta(&"target_scale", target_scale)
+	_drag_layer.add_child(box)
+	return box
+
+
+func _play_shuffle_box_intro(box: Sprite2D) -> void:
+	if box == null or not is_instance_valid(box):
+		return
+
+	var target_scale: Vector2 = box.get_meta(&"target_scale", box.scale)
+	var tween := create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(box, "scale", target_scale, SHUFFLE_BOX_POP_DURATION_SECONDS).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(box, "modulate", Color.WHITE, SHUFFLE_BOX_POP_DURATION_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	await tween.finished
+
+
+func _play_shuffle_box_outro(box: Sprite2D) -> void:
+	if box == null or not is_instance_valid(box):
+		return
+
+	var tween := create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(box, "scale", box.scale * 0.88, SHUFFLE_BOX_OUT_DURATION_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.tween_property(box, "modulate", Color(1.0, 1.0, 1.0, 0.0), SHUFFLE_BOX_OUT_DURATION_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	await tween.finished
+
+
+func _get_shuffle_box_opening_global_position(box: Sprite2D) -> Vector2:
+	if box == null or not is_instance_valid(box):
+		return _screen_position_to_global(get_viewport_rect().size * 0.5)
+
+	return box.global_position + SHUFFLE_BOX_OPENING_OFFSET * box.scale.x
+
+
+func _play_shuffle_items_into_box(entries: Array[Dictionary], target_global_position: Vector2) -> void:
+	var tween := create_tween()
+	tween.set_parallel(true)
+	var did_add_tween := false
+
+	for entry_index in range(entries.size()):
+		var item := entries[entry_index].get("item") as ShelfItem
+		if item == null or not is_instance_valid(item):
+			continue
+
+		did_add_tween = true
+		var delay := minf(float(entry_index) * SHUFFLE_ITEM_STAGGER_SECONDS, SHUFFLE_ITEM_MAX_STAGGER_SECONDS)
+		var jitter := Vector2(_rng.randf_range(-18.0, 18.0), _rng.randf_range(-10.0, 10.0))
+		item.z_index = SHUFFLE_ITEM_FLY_IN_Z_INDEX
+		tween.tween_property(
+			item,
+			"global_position",
+			target_global_position + jitter,
+			SHUFFLE_ITEM_GATHER_DURATION_SECONDS
+		).set_delay(delay).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+		tween.tween_property(
+			item,
+			"scale",
+			SHUFFLE_ITEM_INSIDE_SCALE,
+			SHUFFLE_ITEM_GATHER_DURATION_SECONDS
+		).set_delay(delay).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		tween.tween_property(
+			item,
+			"rotation",
+			item.rotation + _rng.randf_range(-0.65, 0.65),
+			SHUFFLE_ITEM_GATHER_DURATION_SECONDS
+		).set_delay(delay).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+		tween.tween_property(
+			item,
+			"modulate",
+			Color(1.0, 1.0, 1.0, 0.0),
+			SHUFFLE_ITEM_GATHER_DURATION_SECONDS * 0.45
+		).set_delay(delay + SHUFFLE_ITEM_GATHER_DURATION_SECONDS * 0.55).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+
+	if did_add_tween:
+		await tween.finished
+
+
+func _play_shuffle_items_out_of_box(entries: Array[Dictionary], source_global_position: Vector2) -> void:
+	var tween := create_tween()
+	tween.set_parallel(true)
+	var did_add_tween := false
+
+	for entry_index in range(entries.size()):
+		var item := entries[entry_index].get("item") as ShelfItem
+		if item == null or not is_instance_valid(item):
+			continue
+
+		did_add_tween = true
+		var delay := minf(float(entry_index) * SHUFFLE_ITEM_STAGGER_SECONDS, SHUFFLE_ITEM_MAX_STAGGER_SECONDS)
+		var target_global_position: Vector2 = entries[entry_index].get("target_global_position", source_global_position)
+		var target_scale: Vector2 = entries[entry_index].get("scale", Vector2.ONE)
+		var target_rotation := float(entries[entry_index].get("rotation", 0.0))
+		var target_modulate: Color = entries[entry_index].get("modulate", Color.WHITE)
+
+		item.z_index = SHUFFLE_ITEM_FLY_OUT_Z_INDEX
+		item.global_position = source_global_position + Vector2(_rng.randf_range(-10.0, 10.0), _rng.randf_range(-6.0, 6.0))
+		item.scale = SHUFFLE_ITEM_INSIDE_SCALE
+		item.modulate = Color(target_modulate.r, target_modulate.g, target_modulate.b, 0.0)
+		tween.tween_property(
+			item,
+			"global_position",
+			target_global_position,
+			SHUFFLE_ITEM_RETURN_DURATION_SECONDS
+		).set_delay(delay).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		tween.tween_property(
+			item,
+			"scale",
+			target_scale,
+			SHUFFLE_ITEM_RETURN_DURATION_SECONDS
+		).set_delay(delay).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		tween.tween_property(
+			item,
+			"rotation",
+			target_rotation,
+			SHUFFLE_ITEM_RETURN_DURATION_SECONDS
+		).set_delay(delay).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		tween.tween_property(
+			item,
+			"modulate",
+			target_modulate,
+			SHUFFLE_ITEM_RETURN_DURATION_SECONDS * 0.45
+		).set_delay(delay).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+	if did_add_tween:
+		await tween.finished
+
+
+func _finish_shuffle_animation_entries(entries: Array[Dictionary]) -> void:
+	for entry in entries:
+		var item := entry.get("item") as ShelfItem
+		var slot := entry.get("slot") as Node2D
+		if item == null or slot == null or not is_instance_valid(item):
+			continue
+
+		item.reparent(slot, true)
+		item.position = entry.get("position", SLOT_ITEM_POSITION)
+		item.scale = entry.get("scale", Vector2.ONE)
+		item.rotation = float(entry.get("rotation", 0.0))
+		item.z_index = int(entry.get("z_index", 10))
+		item.modulate = entry.get("modulate", Color.WHITE)
+		item.visual_scale = float(entry.get("visual_scale", item.visual_scale))
+		item.set_contact_shadow_enabled(bool(entry.get("contact_shadow_enabled", true)))
+		_unmark_item_transitioning_by_id(item.get_instance_id())
+		item.input_pickable = bool(entry.get("input_pickable", true))
+
+		var collision := item.get_node_or_null("CollisionShape2D") as CollisionShape2D
+		if collision != null:
+			collision.disabled = bool(entry.get("collision_disabled", false))
+
+		_apply_item_visual_state(item)
+
+
+func _shuffle_item_id_assignments(items: Array[ShelfItem]) -> void:
 	var item_ids: Array[StringName] = []
 	for item in items:
 		item_ids.append(item.item_id)
 
-	_shuffle_array(item_ids)
+	if item_ids.size() < 2:
+		return
+
+	var original_ids := item_ids.duplicate()
+	for attempt_index in range(6):
+		_shuffle_array(item_ids)
+		if not _item_id_arrays_match(original_ids, item_ids):
+			break
+
 	for item_index in range(items.size()):
 		var item := items[item_index]
+		if item == null or not is_instance_valid(item):
+			continue
+
 		var item_id := item_ids[item_index]
 		item.item_id = item_id
 		item.texture = _item_textures.get(String(item_id))
 		_apply_item_visual_state(item)
 
-	_resolve_shelves(_get_all_shelves())
+
+func _item_id_arrays_match(left: Array, right: Array) -> bool:
+	if left.size() != right.size():
+		return false
+
+	for item_index in range(left.size()):
+		if left[item_index] != right[item_index]:
+			return false
+
 	return true
 
 
@@ -3137,7 +3445,11 @@ func _update_ability_button(ability_id: StringName) -> void:
 	if uses_label != null:
 		uses_label.text = str(uses_left)
 
-	button.disabled = _level_failed or _level_completed or _level_paused or _hammer_effect_active or uses_left <= 0
+	button.disabled = _level_failed or _level_completed or _level_paused or _is_ability_effect_active() or uses_left <= 0
+
+
+func _is_ability_effect_active() -> bool:
+	return _hammer_effect_active or _shuffle_effect_active
 
 
 func _set_moving_shelf_rows_paused(should_pause: bool) -> void:
