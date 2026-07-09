@@ -108,7 +108,7 @@ Script:
 
 Purpose:
 - Centered pause-style settings window opened from the production main menu over a dimmed modal background.
-- Reuses the pause menu visual treatment for the warm outer panel, cream inner panel, `Settings` title, protruding red close button, and music / sound-effects / vibration icon toggles.
+- Reuses the pause menu visual treatment for the warm outer panel, cream inner panel, `Settings` title, protruding red close button, and saved music / sound-effects / vibration icon toggles.
 - Adds two no-op wide green blank-image buttons labeled `Support` and `Language` under the settings toggles.
 
 Important nodes:
@@ -360,7 +360,7 @@ Depends on:
 - `scripts/press_scale_button.gd` for the default held-press shrink on settings icon buttons and bottom image buttons.
 - `assets/ui/pause_menu_option_a_sheet.png` and `assets/ui/pause_menu_option_b_sheet.png` are archived alternate visual directions for these icons.
 - Runtime button wiring from `scripts/level.gd`.
-- Shared settings-button visual toggles from `scripts/pause_menu.gd`.
+- Shared settings-button visual toggles from `scripts/pause_menu.gd`, persisted through `PlayerProgress`.
 
 Do not use for:
 - Timer state, scene navigation, gameplay pause rules, music playback, or actual vibration settings. Those stay in owning runtime systems.

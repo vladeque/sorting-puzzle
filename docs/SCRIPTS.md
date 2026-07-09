@@ -204,7 +204,7 @@ Autoload:
 - Registered as `PlayerProgress` in `project.godot`.
 
 Purpose:
-- Owns saved campaign progression, campaign lives, gold coins, campaign ability inventory, selected profile avatar, and player name.
+- Owns saved campaign progression, campaign lives, gold coins, campaign ability inventory, selected profile avatar, player name, and settings-button disabled states.
 - Owns saved reward chest star progress and active reward chest goal index.
 - Persists state through the configured save provider.
 
@@ -218,6 +218,7 @@ Saved fields:
 - `ability_uses`: remaining campaign uses for hammer, shuffle, and highlight.
 - `avatar_id`: selected profile avatar id. Fresh and legacy saves default to `avatar_cat`.
 - `player_name`: saved profile display name. Fresh and legacy saves without a valid value receive a generated `player_` name with a five-character random suffix, such as `player_g26f3`.
+- `settings_disabled`: disabled-state map for `music`, `sound_effects`, and `vibration` settings buttons.
 - `reward_chest_stars`: stars accumulated toward the active reward chest goal.
 - `reward_chest_goal_index`: index into `configs/reward_chest_goals.json` for the active goal; the final configured goal repeats after it is reached.
 
@@ -233,6 +234,9 @@ Key methods:
 - `get_avatar_id()`: returns the selected avatar id, sanitized to `avatar_cat` when needed.
 - `get_avatar_texture_path(avatar_id)`: returns the resource path for a valid or sanitized avatar id.
 - `get_player_name()`: returns a non-empty saved or generated player name.
+- `get_disabled_settings()`: returns saved disabled states for the settings buttons.
+- `is_setting_disabled(setting_id)`: returns one saved settings-button disabled state.
+- `set_setting_disabled(setting_id, is_disabled)`: validates, stores, and saves one settings-button disabled state.
 - `set_avatar_id(avatar_id)`: validates, stores, and saves the selected profile avatar.
 - `set_player_name(player_name)`: trims, stores, and saves a non-empty player name.
 - `set_profile(avatar_id, player_name)`: validates and saves the avatar and player name together.
@@ -516,11 +520,11 @@ Attached to:
 - `scenes/ui/settings_menu.tscn` root `MainMenuSettingsOverlay`.
 
 Purpose:
-- Owns shared in-memory settings-button visual state for the current app session.
+- Owns shared settings-button visual state, initialized from and saved through `PlayerProgress`.
 - Toggles a crossed-out overlay on the music, sound effects, and vibration square icon buttons when clicked.
 - Emits `setting_toggled(setting_id, is_disabled)` so owning runtime scripts can apply supported settings.
 - Also powers the matching visual toggles in the main-menu settings popup, which intentionally keeps the same `PauseMenuPanel/InnerPanel/IconRow` button paths.
-- Initializes every pause-menu and main-menu settings instance from the same disabled-state dictionary so matching buttons stay visually synchronized.
+- Initializes every pause-menu and main-menu settings instance from the saved disabled-state dictionary so matching buttons stay visually synchronized after game restarts.
 
 Important nodes:
 - `PauseMenuPanel/InnerPanel/IconRow/MusicOption/MusicButton`

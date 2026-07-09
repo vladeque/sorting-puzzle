@@ -22,9 +22,11 @@ const SETTINGS_BUTTONS: Array[Dictionary] = [
 const CROSS_OUT_NAME := "CrossOut"
 
 static var _disabled_settings: Dictionary = {}
+static var _settings_loaded_from_save := false
 
 
 func _ready() -> void:
+	_ensure_settings_loaded()
 	for button_config in SETTINGS_BUTTONS:
 		var button_path := button_config.get("path") as NodePath
 		var setting_id := button_config.get("setting_id") as StringName
@@ -39,14 +41,25 @@ func _ready() -> void:
 
 
 func is_setting_disabled(setting_id: StringName) -> bool:
-	return bool(_disabled_settings.get(setting_id, false))
+	_ensure_settings_loaded()
+	return bool(_disabled_settings.get(String(setting_id), false))
 
 
 func _on_setting_button_pressed(cross_out: Control, setting_id: StringName) -> void:
 	var is_disabled := not is_setting_disabled(setting_id)
-	_disabled_settings[setting_id] = is_disabled
+	_disabled_settings[String(setting_id)] = is_disabled
+	if not PlayerProgress.set_setting_disabled(setting_id, is_disabled):
+		push_warning("Ignoring unsupported setting toggle: %s" % setting_id)
 	cross_out.visible = is_disabled
 	setting_toggled.emit(setting_id, is_disabled)
+
+
+static func _ensure_settings_loaded() -> void:
+	if _settings_loaded_from_save:
+		return
+
+	_disabled_settings = PlayerProgress.get_disabled_settings()
+	_settings_loaded_from_save = true
 
 
 func _create_cross_out_marker(button: Button) -> Control:

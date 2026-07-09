@@ -24,7 +24,7 @@ Player progression:
 - `scripts/player_progress.gd`
 - `scripts/save_providers/*.gd`
 - Registered in `project.godot` as the `PlayerProgress` autoload.
-- Saves campaign level progress, campaign lives, gold coins, campaign ability inventory, reward chest progress, selected profile avatar, and player name through the configured save provider.
+- Saves campaign level progress, campaign lives, gold coins, campaign ability inventory, reward chest progress, selected profile avatar, player name, and settings-button disabled states through the configured save provider.
 
 Reusable item scene:
 - `scenes/item.tscn`
@@ -230,7 +230,7 @@ Responsibility:
 - `scenes/pause_menu.tscn` owns the popup layout, warm outer area, cream inner settings area, `Pause` title, protruding top-right red close button, music / sound-effects / vibration square icon buttons with shadow-only button styling, and Leave/Continue image buttons.
 - `scenes/leave_confirmation_menu.tscn` owns the second-step confirmation popup shown after Leave, including warm outer area, cream inner loss area, protruding top-right red close button, crossed-out rectangular lost life/star slots, and red Leave / green Continue image buttons.
 - `scripts/press_scale_button.gd` provides the default held-press shrink behavior for visible game UI buttons, including the pause/settings icon buttons and red/green bottom image buttons.
-- `scripts/pause_menu.gd` toggles crossed-out visuals on the three settings icon buttons, keeps their current-session disabled states synchronized between the main-menu settings popup and in-level pause menu, and emits setting state changes.
+- `scripts/pause_menu.gd` toggles crossed-out visuals on the three settings icon buttons, keeps their saved disabled states synchronized between the main-menu settings popup and in-level pause menu, and emits setting state changes.
 - `scripts/level.gd` opens and closes the menu, pauses the timer and gameplay input, treats red close buttons like Continue, opens the leave confirmation before routing confirmed Leave back to the main menu, writes the current run star count into that confirmation, initializes gameplay sound effects from the shared setting, and mutes them when the sound-effects button is crossed out.
 
 Change here when:

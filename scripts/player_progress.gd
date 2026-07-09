@@ -4,7 +4,7 @@ const LocalSaveProviderScript := preload("res://scripts/save_providers/local_sav
 const CloudSaveProviderScript := preload("res://scripts/save_providers/cloud_save_provider.gd")
 const SAVE_PATH := "user://player_progress.json"
 const SAVE_NAME := "player_progress"
-const SAVE_VERSION := 1
+const SAVE_VERSION := 2
 const MIN_LEVEL := 1
 const SAVE_PROVIDER_SETTING := "application/config/save_provider"
 const CLOUD_SAVE_NAME_SETTING := "application/config/cloud_save_name"
@@ -54,6 +54,11 @@ const DEFAULT_ABILITY_USES := {
 	ABILITY_HAMMER: 3,
 	ABILITY_SHUFFLE: 3,
 	ABILITY_HIGHLIGHT: 3,
+}
+const DEFAULT_DISABLED_SETTINGS := {
+	"music": false,
+	"sound_effects": false,
+	"vibration": false,
 }
 
 var _data := {}
@@ -143,6 +148,34 @@ func get_avatar_texture_path(avatar_id: String) -> String:
 
 func get_player_name() -> String:
 	return _sanitize_player_name(str(_data.get("player_name", "")))
+
+
+func get_disabled_settings() -> Dictionary:
+	var disabled_settings := _data.get("settings_disabled", {}) as Dictionary
+	if disabled_settings == null:
+		return DEFAULT_DISABLED_SETTINGS.duplicate()
+
+	return disabled_settings.duplicate()
+
+
+func is_setting_disabled(setting_id: StringName) -> bool:
+	var disabled_settings := get_disabled_settings()
+	return bool(disabled_settings.get(String(setting_id), false))
+
+
+func set_setting_disabled(setting_id: StringName, is_disabled: bool) -> bool:
+	var setting_key := String(setting_id)
+	if not DEFAULT_DISABLED_SETTINGS.has(setting_key):
+		return false
+
+	var disabled_settings := get_disabled_settings()
+	if bool(disabled_settings.get(setting_key, false)) == is_disabled:
+		return true
+
+	disabled_settings[setting_key] = is_disabled
+	_data["settings_disabled"] = disabled_settings
+	save_progress()
+	return true
 
 
 func set_avatar_id(avatar_id: String) -> bool:
@@ -275,6 +308,7 @@ func _sanitize_data(raw_data: Dictionary) -> Dictionary:
 	sanitized["coins"] = maxi(int(raw_data.get("coins", DEFAULT_COINS)), 0)
 	sanitized["avatar_id"] = _sanitize_avatar_id(str(raw_data.get("avatar_id", DEFAULT_AVATAR_ID)))
 	sanitized["player_name"] = _sanitize_player_name(str(raw_data.get("player_name", sanitized["player_name"])), sanitized["player_name"])
+	sanitized["settings_disabled"] = _sanitize_disabled_settings(raw_data.get("settings_disabled", {}))
 	var reward_chest_state := _normalize_reward_chest_progress(
 		maxi(int(raw_data.get("reward_chest_stars", 0)), 0),
 		maxi(int(raw_data.get("reward_chest_goal_index", 0)), 0)
@@ -306,6 +340,7 @@ func _default_data() -> Dictionary:
 		"ability_uses": DEFAULT_ABILITY_USES.duplicate(),
 		"avatar_id": DEFAULT_AVATAR_ID,
 		"player_name": _generate_player_name(),
+		"settings_disabled": DEFAULT_DISABLED_SETTINGS.duplicate(),
 		"reward_chest_stars": 0,
 		"reward_chest_goal_index": 0,
 	}
@@ -324,6 +359,18 @@ func _sanitize_player_name(player_name: String, fallback_name: String = "") -> S
 		return fallback_name if not fallback_name.is_empty() else _generate_player_name()
 
 	return sanitized_name
+
+
+func _sanitize_disabled_settings(raw_settings) -> Dictionary:
+	var sanitized := DEFAULT_DISABLED_SETTINGS.duplicate()
+	if not (raw_settings is Dictionary):
+		return sanitized
+
+	var raw_dictionary := raw_settings as Dictionary
+	for setting_key in DEFAULT_DISABLED_SETTINGS.keys():
+		sanitized[setting_key] = bool(raw_dictionary.get(setting_key, sanitized[setting_key]))
+
+	return sanitized
 
 
 func _apply_reward_chest_stars(star_count: int) -> bool:

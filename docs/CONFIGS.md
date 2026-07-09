@@ -171,7 +171,7 @@ Rules:
 ## `user://player_progress.json`
 
 Purpose:
-- Stores local campaign progression, campaign lives, campaign ability inventory, selected profile avatar, and player name when `application/config/save_provider` is `local`.
+- Stores local campaign progression, campaign lives, campaign ability inventory, selected profile avatar, player name, and settings-button disabled states when `application/config/save_provider` is `local`.
 - Owned by the `PlayerProgress` autoload in `scripts/player_progress.gd`.
 
 Fields:
@@ -184,16 +184,18 @@ Fields:
 - `ability_uses`: remaining campaign uses for `hammer`, `shuffle`, and `highlight`.
 - `avatar_id`: selected profile avatar id. Fresh saves and old saves without this field use `avatar_cat`.
 - `player_name`: saved profile display name. Fresh saves and old saves without a non-empty value receive a generated value like `player_g26f3`.
+- `settings_disabled`: disabled-state map for `music`, `sound_effects`, and `vibration`. Fresh saves and old saves without this field default all three buttons to enabled.
 - `reward_chest_stars`: stars accumulated toward the active reward chest goal.
 - `reward_chest_goal_index`: active index in `configs/reward_chest_goals.json`.
 
 Runtime behavior:
-- Fresh saves start at level 1 with five lives, 300 gold coins, three uses for each ability, `avatar_cat` selected as the profile avatar, and a generated `player_` name with a five-character random suffix.
+- Fresh saves start at level 1 with five lives, 300 gold coins, three uses for each ability, `avatar_cat` selected as the profile avatar, a generated `player_` name with a five-character random suffix, and all settings buttons enabled.
 - The main menu blocks campaign level launch at zero lives.
 - The production profile menu can save the player name and any avatar id from `assets/ui/avatars/*.png`; invalid avatar ids are sanitized back to `avatar_cat`.
 - Campaign level failure and pause-menu Leave spend one life. Completed levels do not spend lives.
 - Missing lives restore at one life per real-time hour until the five-life cap is reached.
 - Ability uses are spent and saved immediately when an ability successfully applies.
+- Settings button disabled states are saved immediately when toggled and restored by the main-menu settings popup and in-level pause menu on later game starts.
 - Failed or abandoned levels do not refund ability uses.
 - Completing the current campaign level advances `current_level` by one and adds the run's earned stars to the reward chest.
 - Reward chest stars roll over when a configured goal is reached, grant that goal's `coin_reward`, then the next configured goal starts.
