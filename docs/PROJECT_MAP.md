@@ -118,7 +118,7 @@ Files:
 - `configs/item_sprites.json`
 - `scenes/abilities/hammer_impact_effect.tscn`
 - `scripts/hammer_impact_effect.gd`
-- `assets/abilities/ability_hammer_impact.png`
+- `assets/abilities/ability_hammer_swing_*.png`
 - `assets/abilities/ability_shuffle_box.png`
 
 Responsibility:
@@ -213,7 +213,7 @@ Responsibility:
 - Provides hammer, shuffle, and highlight buttons.
 - Reads campaign ability uses from `PlayerProgress`, spends campaign uses immediately, and uses temporary three-use counts for isolated dev/test levels.
 - Lets hammer clear matching visible/front items first, or supplement visible/front items with first-back-layer copies of the same type if no visible item type can make a triple.
-- Gathers hammer targets to the center of the screen, spawns a fullscreen hammer strike effect there, and waits for the effect's scene-authored `AnimationPlayer` `impact` callback before destroying the merged item and dropping combo reward stars.
+- Gathers hammer targets to the center of the screen, spawns a fullscreen hammer strike effect there, swaps through four pseudo-3D hammer angle textures in the scene-authored `AnimationPlayer`, and waits for the `impact` callback before destroying the merged item and dropping combo reward stars.
 - Shows the shuffle delivery box sprite from `assets/abilities/ability_shuffle_box.png` and pauses moving shelf rows while shuffle items fly through the center-screen box.
 - Disables abilities after failure, completion, or when uses run out.
 - Starts the highlight timer even when no current shelf state can be highlighted.

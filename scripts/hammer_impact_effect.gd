@@ -5,10 +5,9 @@ signal impact
 signal finished
 
 const DESIGN_WIDTH := 720.0
-const HAMMER_HEAD_CENTER_OFFSET := 364.0
 const BURST_RAY_COUNT := 10
 
-@export_range(0.1, 1.0, 0.01) var base_hammer_scale := 0.42
+@export_range(0.1, 2.0, 0.01) var base_hammer_scale := 0.82
 
 @onready var _impact_anchor: Node2D = %ImpactAnchor
 @onready var _hammer_pivot: Node2D = %HammerPivot
@@ -37,8 +36,8 @@ func play(target_screen_position: Vector2) -> void:
 	_burst_amount = 0.0
 
 	_impact_anchor.position = _impact_position
-	_impact_anchor.scale = Vector2.ONE * base_hammer_scale * _layout_scale
-	_hammer_sprite.position = Vector2(0, HAMMER_HEAD_CENTER_OFFSET)
+	_impact_anchor.scale = Vector2.ONE
+	_hammer_sprite.scale = Vector2.ONE * base_hammer_scale * _layout_scale
 	_animation_player.stop()
 	_animation_player.play(&"strike")
 

@@ -437,8 +437,8 @@ Exports:
 - `base_hammer_scale`: base visual size before responsive viewport scaling.
 
 Depends on:
-- `assets/abilities/ability_hammer_impact.png`.
-- `scenes/abilities/hammer_impact_effect.tscn` `AnimationPlayer` keyframes for hammer motion, opacity, burst amount, and signal callbacks.
+- `assets/abilities/ability_hammer_swing_*.png` for the four pseudo-3D angle frames.
+- `scenes/abilities/hammer_impact_effect.tscn` `AnimationPlayer` keyframes for hammer motion, opacity, texture swaps, burst amount, and signal callbacks.
 - `scripts/level.gd` for runtime instancing and gameplay response to `impact`.
 
 Do not use for:
