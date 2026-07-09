@@ -114,9 +114,9 @@ Purpose:
 Important nodes:
 - `PauseMenuPanel`: centered popup panel kept named for reuse with `scripts/pause_menu.gd`.
 - `PauseMenuPanel/CloseButton`: protruding red close button wired by `scripts/production_main_menu.gd` to dismiss the settings popup.
-- `PauseMenuPanel/InnerPanel/IconRow/MusicOption/MusicButton`: square music toggle button with shadow-only button styling.
-- `PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption/SoundEffectsButton`: square sound effects toggle button with shadow-only button styling.
-- `PauseMenuPanel/InnerPanel/IconRow/VibrationOption/VibrationButton`: square phone vibration toggle button with shadow-only button styling.
+- `PauseMenuPanel/InnerPanel/IconRow/MusicOption/MusicButton`: square music toggle button with shadow-only button styling and held-press scaling.
+- `PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption/SoundEffectsButton`: square sound effects toggle button with shadow-only button styling and held-press scaling.
+- `PauseMenuPanel/InnerPanel/IconRow/VibrationOption/VibrationButton`: square phone vibration toggle button with shadow-only button styling and held-press scaling.
 - `PauseMenuPanel/InnerPanel/ActionColumn/SupportButton`: wide no-op button using `assets/ui/level_button_blank.png`.
 - `PauseMenuPanel/InnerPanel/ActionColumn/LanguageButton`: wide no-op button using `assets/ui/level_button_blank.png`.
 
@@ -124,7 +124,7 @@ Depends on:
 - `scripts/pause_menu.gd` for the same crossed-out toggle visuals and shared disabled state used by the in-level pause menu.
 - `assets/ui/icon_music.png`, `assets/ui/icon_sound_effects.png`, and `assets/ui/icon_vibration.png` as square textures containing warm rectangular tile art for the settings buttons.
 - `assets/ui/level_button_blank.png`.
-- `scripts/press_scale_button.gd` for held-press visuals on the wide buttons.
+- `scripts/press_scale_button.gd` for held-press visuals on the settings icon and wide buttons.
 - Runtime open/close wiring from `scripts/production_main_menu.gd`.
 
 Do not use for:
@@ -178,7 +178,7 @@ Important nodes:
 Depends on:
 - `assets/ui/level_button_blank.png`.
 - `assets/ui/level_button_blank_red.png`, `assets/ui/level_button_blank_light_blue.png`, and `assets/ui/level_button_blank_yellow_orange.png` are matching alternate color blanks for future button states or variants.
-- `scripts/press_scale_button.gd` for the default held-press scale behavior expected by future blank-image buttons.
+- `scripts/press_scale_button.gd` for the default held-press scale behavior expected by future visible game UI buttons.
 - Caller scenes or scripts for placement, click wiring, and label updates.
 
 Do not use for:
@@ -347,17 +347,17 @@ Important nodes:
 - `PauseMenuPanel/TitleLabel`: pause menu title.
 - `PauseMenuPanel/CloseButton`: protruding top-right red close button wired by `scripts/level.gd` to resume the level.
 - `PauseMenuPanel/InnerPanel`: cream settings area inside the warm outer popup.
-- `PauseMenuPanel/InnerPanel/IconRow/MusicOption/MusicButton`: square music toggle button with shadow-only button styling.
-- `PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption/SoundEffectsButton`: square sound effects toggle button with shadow-only button styling that disables or enables gameplay sound effects.
-- `PauseMenuPanel/InnerPanel/IconRow/VibrationOption/VibrationButton`: square phone vibration toggle button with shadow-only button styling.
+- `PauseMenuPanel/InnerPanel/IconRow/MusicOption/MusicButton`: square music toggle button with shadow-only button styling and held-press scaling.
+- `PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption/SoundEffectsButton`: square sound effects toggle button with shadow-only button styling and held-press scaling that disables or enables gameplay sound effects.
+- `PauseMenuPanel/InnerPanel/IconRow/VibrationOption/VibrationButton`: square phone vibration toggle button with shadow-only button styling and held-press scaling.
 - `PauseMenuPanel/ButtonRow/LeaveButton`: red image button wired by `scripts/level.gd` to open leave confirmation.
 - `PauseMenuPanel/ButtonRow/ContinueButton`: green image button wired by `scripts/level.gd` to resume the level.
-- The bottom red and green image buttons use `scripts/press_scale_button.gd` so they visually shrink while held.
+- The settings icon buttons and bottom red/green image buttons use `scripts/press_scale_button.gd` so they visually shrink while held.
 
 Depends on:
 - `assets/ui/icon_music.png`, `assets/ui/icon_sound_effects.png`, and `assets/ui/icon_vibration.png` as square textures containing warm rectangular tile art for the settings buttons.
 - `assets/ui/level_button_blank_red.png` and `assets/ui/level_button_blank.png` for pause action buttons.
-- `scripts/press_scale_button.gd` for the default held-press shrink on the bottom image buttons.
+- `scripts/press_scale_button.gd` for the default held-press shrink on settings icon buttons and bottom image buttons.
 - `assets/ui/pause_menu_option_a_sheet.png` and `assets/ui/pause_menu_option_b_sheet.png` are archived alternate visual directions for these icons.
 - Runtime button wiring from `scripts/level.gd`.
 - Shared settings-button visual toggles from `scripts/pause_menu.gd`.

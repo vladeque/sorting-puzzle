@@ -235,6 +235,7 @@ focus_mode = 0
 theme_override_styles/normal = SubResource("StyleBoxFlat_1s2dm")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_88e76")
 theme_override_styles/hover = SubResource("StyleBoxFlat_knqa7")
+script = ExtResource("7_press_scale_button")
 
 [node name="Icon" type="TextureRect" parent="PauseMenuPanel/InnerPanel/IconRow/MusicOption/MusicButton" unique_id=839423075]
 layout_mode = 1
@@ -273,6 +274,7 @@ focus_mode = 0
 theme_override_styles/normal = SubResource("StyleBoxFlat_1s2dm")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_88e76")
 theme_override_styles/hover = SubResource("StyleBoxFlat_knqa7")
+script = ExtResource("7_press_scale_button")
 
 [node name="Icon" type="TextureRect" parent="PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption/SoundEffectsButton" unique_id=1247065992]
 layout_mode = 1
@@ -311,6 +313,7 @@ focus_mode = 0
 theme_override_styles/normal = SubResource("StyleBoxFlat_1s2dm")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_88e76")
 theme_override_styles/hover = SubResource("StyleBoxFlat_knqa7")
+script = ExtResource("7_press_scale_button")
 
 [node name="Icon" type="TextureRect" parent="PauseMenuPanel/InnerPanel/IconRow/VibrationOption/VibrationButton" unique_id=620864544]
 layout_mode = 1

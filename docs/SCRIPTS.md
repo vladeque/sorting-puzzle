@@ -180,21 +180,23 @@ Class:
 Attached to:
 - `scenes/ui/level_button.tscn` root `LevelButton`.
 - `level.tscn` `UI/CompletionPanel/NextButton`.
+- `scenes/pause_menu.tscn` `PauseMenuPanel/InnerPanel/IconRow/*/*Button` settings icon buttons.
+- `scenes/ui/settings_menu.tscn` `PauseMenuPanel/InnerPanel/IconRow/*/*Button` settings icon buttons.
 - `scenes/pause_menu.tscn` `PauseMenuPanel/ButtonRow/LeaveButton` and `ContinueButton`.
 - `scenes/leave_confirmation_menu.tscn` `ConfirmationPanel/ButtonRow/ConfirmLeaveButton` and `ContinueButton`.
 
 Purpose:
-- Provides the default held-press visual behavior for buttons using `assets/ui/level_button_blank.png` and `assets/ui/level_button_blank_red.png`.
+- Provides the default held-press visual behavior for game UI buttons.
 - Scales the button slightly smaller from its center on `button_down`, then restores its original scale on `button_up`, visibility changes, or exit from the scene tree.
 
 Exports:
 - `held_scale`: visual scale multiplier while the pointer or touch is held down, defaulting to `0.94`.
 
 Use when:
-- Adding future green or red blank-image level/action buttons that should visually press inward while held.
+- Adding future visible game UI buttons, including image buttons, icon toggles, and generated scene buttons that should visually press inward while held.
 
 Do not use for:
-- Plain text buttons, icon-slot settings buttons, or puzzle item input.
+- Text input controls, non-button puzzle item input, or invisible hit areas where scaling would move the perceived target without a visible button.
 
 ## `scripts/player_progress.gd`
 
