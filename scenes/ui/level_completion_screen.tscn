@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://dlopvf5glhqiu"]
+[gd_scene format=3 uid="uid://dlopvf5glhqiu"]
 
 [ext_resource type="Texture2D" uid="uid://3vi3qpy12q0w" path="res://assets/ui/reward_star.png" id="1_reward_star"]
 [ext_resource type="Texture2D" uid="uid://bai63m2evt0sk" path="res://assets/ui/level_button_blank.png" id="2_level_button_blank"]

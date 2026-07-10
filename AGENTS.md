@@ -46,11 +46,27 @@ Use scripts only when:
 * The behavior is unique or complex enough to require custom GDScript
 * The scene needs runtime state, input handling, scoring logic, spawning logic, or game progression logic
 
+### Scene Extraction Rule
+
+Default to a separate scene when a feature has its own visual hierarchy, lifecycle, inputs, signals, or reusable behavior.
+
+This especially applies to:
+* Result screens such as level complete, level failed, rewards, win/loss, and summary screens
+* Menus, popups, overlays, confirmation dialogs, settings panels, and modals
+* Ability effects, HUD widgets, counters, buttons, item views, shelf rows, and other multi-node UI/gameplay components
+* Any functionality currently built as several nodes inside a larger scene or assembled directly in a script
+
+Scripts such as `scripts/level.gd` should orchestrate these components, not own their internal UI structure. For example, a level script may show a completion screen, pass it earned stars, and listen for its `next_pressed` signal, but the completion screen's labels, buttons, art, layout, and button wiring should live in its own scene and focused script.
+
+Only keep functionality embedded in a larger scene when it is a trivial single node with no independent behavior. If a multi-node feature is intentionally not extracted, document why in the relevant docs.
+
 ### Scripts
 
 Scripts should be kept focused and attached only to the scene or node that owns the related behavior.
 
 Avoid placing unrelated game logic into a single large script.
+
+Do not build multi-node UI screens or overlays directly inside broad gameplay scripts; create a dedicated scene with a focused owner script and have the gameplay script communicate through exported properties, methods, and signals.
 
 ### Git Workflow
 
