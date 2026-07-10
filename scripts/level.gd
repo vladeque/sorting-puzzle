@@ -94,8 +94,18 @@ const COMBO_PRAISE_WORDS := [
 	"Spectacular",
 	"Unstoppable",
 	"Legendary",
+	"Epic",
+	"Brilliant",
+	"Masterful",
+	"Supreme",
+	"Phenomenal",
+	"Mythic",
+	"Majestic",
+	"Radiant",
+	"Divine",
+	"Transcendent",
 ]
-const COMBO_PRAISE_LABEL_SIZE := Vector2(300, 74)
+const COMBO_PRAISE_LABEL_SIZE := Vector2(360, 82)
 const COMBO_PRAISE_OFFSET := Vector2(0, -88)
 const COMBO_PRAISE_EDGE_PADDING := 16.0
 const COMBO_PRAISE_DURATION_SECONDS := 2.0
@@ -2313,8 +2323,8 @@ func _show_combo_praise(origin_global_position: Vector2, combo_count: int) -> vo
 	label.modulate = Color(1.0, 1.0, 1.0, 0.0)
 	label.scale = Vector2(0.72, 0.72)
 	label.add_theme_color_override("font_color", _get_combo_praise_color(combo_count))
-	label.add_theme_color_override("font_outline_color", Color(0.24, 0.08, 0.02, 0.92))
-	label.add_theme_constant_override("outline_size", 6)
+	label.add_theme_color_override("font_outline_color", _get_combo_praise_outline_color(combo_count))
+	label.add_theme_constant_override("outline_size", _get_combo_praise_outline_size(combo_count))
 	label.add_theme_constant_override("shadow_offset_x", 0)
 	label.add_theme_constant_override("shadow_offset_y", 4)
 	label.add_theme_color_override("font_shadow_color", Color(0.05, 0.02, 0.01, 0.55))
@@ -2354,21 +2364,55 @@ func _get_combo_praise_text(combo_count: int) -> String:
 
 
 func _get_combo_praise_color(combo_count: int) -> Color:
+	if combo_count >= 17:
+		return Color(1.0, 0.95, 0.78, 1.0)
+	if combo_count >= 14:
+		return Color(1.0, 0.88, 1.0, 1.0)
 	if combo_count >= 10:
-		return Color(1.0, 0.45, 0.18, 1.0)
-	if combo_count >= 7:
 		return Color(1.0, 0.66, 0.2, 1.0)
+	if combo_count >= 7:
+		return Color(1.0, 0.78, 0.34, 1.0)
 	if combo_count >= 4:
 		return Color(1.0, 0.86, 0.28, 1.0)
 	return Color(0.98, 0.96, 0.72, 1.0)
 
 
+func _get_combo_praise_outline_color(combo_count: int) -> Color:
+	if combo_count >= 17:
+		return Color(0.82, 0.05, 0.04, 0.98)
+	if combo_count >= 14:
+		return Color(0.5, 0.12, 0.88, 0.98)
+	if combo_count >= 10:
+		return Color(0.95, 0.54, 0.02, 0.98)
+	if combo_count >= 7:
+		return Color(0.28, 0.22, 0.48, 0.94)
+	if combo_count >= 4:
+		return Color(0.28, 0.21, 0.1, 0.9)
+	return Color(0.14, 0.3, 0.26, 0.86)
+
+
+func _get_combo_praise_outline_size(combo_count: int) -> int:
+	if combo_count >= 17:
+		return 13
+	if combo_count >= 14:
+		return 11
+	if combo_count >= 10:
+		return 9
+	if combo_count >= 7:
+		return 6
+	if combo_count >= 4:
+		return 5
+	return 4
+
+
 func _get_combo_praise_font_size(praise_text: String) -> int:
+	if praise_text.length() >= 12:
+		return 38
 	if praise_text.length() >= 11:
-		return 42
+		return 40
 	if praise_text.length() >= 9:
-		return 46
-	return 50
+		return 44
+	return 52
 
 
 func _clamp_combo_praise_center(center: Vector2, label_size: Vector2) -> Vector2:

@@ -249,7 +249,7 @@ Important nodes:
 
 Runtime-created nodes:
 - `ShelfXX`: `scenes/shelf.tscn` instances generated under `Shelves`.
-- `UI/StarRewardEffectLayer`: full-screen mouse-ignored effect layer created by `scripts/level.gd`; combo reward stars are spawned here after a triple clear and fly toward `UI/StarCounterLabel`, and 2x+ combo praise labels appear here near the match origin for two seconds.
+- `UI/StarRewardEffectLayer`: full-screen mouse-ignored effect layer created by `scripts/level.gd`; combo reward stars are spawned here after a triple clear and fly toward `UI/StarCounterLabel`, and 2x+ combo praise labels with tiered colored outlines appear here near the match origin for two seconds.
 - `MovingShelfRowXX`: `scenes/moving_shelf_row.tscn` instances generated under `Shelves` when a level config or layout template defines moving rows.
 - `ShelfLayerXX`: generated back layers for hidden or upcoming item rows.
 - `ShelfItem` instances from `scenes/item.tscn`.
