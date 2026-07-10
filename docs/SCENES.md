@@ -288,7 +288,7 @@ Purpose:
 Important nodes:
 - `ImpactAnchor`: runtime-positioned target point that scales the full hammer for the current viewport.
 - `ImpactAnchor/HammerPivot`: keyframed by `AnimationPlayer` for wind-up, strike, rebound, and exit motion.
-- `ImpactAnchor/HammerPivot/HammerSprite`: transparent hammer sprite whose texture is swapped by the `strike` animation.
+- `ImpactAnchor/HammerPivot/HammerSprite`: transparent hammer sprite whose position and texture are value-keyframed by the `strike` animation.
 - `AnimationPlayer`: owns the `strike` animation; edit this timeline for most hammer motion and timing adjustments.
 
 Depends on:
