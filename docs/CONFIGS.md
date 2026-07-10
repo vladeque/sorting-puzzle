@@ -75,9 +75,10 @@ Row layout shape:
 Row layout rules:
 - `shelf_count` is required for each row and consumes shelves in order from the `shelves` array.
 - `visible_count` is optional. Moving rows default to `3` visible shelves, clamped to `shelf_count`; static rows default to their full `shelf_count`.
-- `motion.type` currently supports `horizontal_wrap`.
+- `motion.type` supports `horizontal_wrap` and `vertical_wrap`.
 - `motion.speed` is pixels per second. Use `0` for a row that is structured as a moving row but currently stopped.
-- `motion.direction` supports `right` and `left`.
+- `motion.direction` supports `right` and `left` for `horizontal_wrap`, and `down` and `up` for `vertical_wrap`. Vertical rows default to `down`, moving shelves from top to bottom.
+- A level may use horizontal moving shelves or vertical moving shelves, but not both at the same time.
 - `visual_variant` supports `full` and `floor_only`. Moving rows default to `floor_only`; static rows default to `full`.
 - Locked shelves are not allowed inside moving rows.
 - `grid_3x3_moving_5_bottom` is a shorthand preset for three static rows of three shelves plus the bottom moving row from the example above.
@@ -112,7 +113,7 @@ Runtime behavior:
 - `scripts/level.gd` uses `layout_preset` to load `scenes/layouts/layout_%s.tscn`, then places generated shelf cells at the template's `ShelfXX` markers.
 - Layout template `MovingRowXX` nodes with `scripts/shelf_layout_row.gd` create moving rows from authored row positions and metadata.
 - Static shelf left/middle/right visuals are derived from authored shelf positions or `row_layouts` order at runtime; there is no per-shelf config field for row placement.
-- If `row_layouts` is present, `scripts/level.gd` creates shelves row by row instead. Moving rows are clipped to their visible window and wrap shelves horizontally from right to left or left to right.
+- If `row_layouts` is present, `scripts/level.gd` creates shelves row by row instead. Moving rows are clipped to their visible window and wrap shelves horizontally or vertically according to their motion type.
 - `scripts/level.gd` uses `time_seconds` as the active timer.
 - Locked shelves show a runtime lock overlay with the remaining triple count on the lock and cannot be used as move sources, move targets, match clears, promotions, or ability targets until unlocked.
 - Off-window moving shelves cannot be selected or targeted by drag/drop, but abilities can still target their front-layer items.
@@ -124,7 +125,7 @@ Validation:
 py scripts\tools\validate_level_solvable.py configs\levels\level_001.json --max-states 20000 --max-depth 200
 ```
 
-The validator checks `row_layouts` totals, moving-row motion fields, supported visual variants, and rejects locked shelves inside moving rows. For preset-defined moving rows, the validator mirrors the moving-row metadata from the matching layout template.
+The validator checks `row_layouts` totals, moving-row motion fields, supported visual variants, rejects locked shelves inside moving rows, and rejects levels that mix horizontal and vertical moving shelves. For preset-defined moving rows, the validator mirrors the moving-row metadata from the matching layout template.
 Solvability search treats moving rows as eventually accessible and does not model shelf positions over time.
 
 Generation:

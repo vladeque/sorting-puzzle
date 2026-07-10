@@ -125,7 +125,7 @@ Responsibility:
 - Loads level JSON and item sprite config.
 - Applies responsive layout for the top HUD, ability bar over the floor/baseboard transition strip, overlays, pause menu panel, and scaled shelf root when the viewport size changes.
 - Instantiates `scenes/shelf.tscn` for each configured shelf and places shelf cells from `scenes/layouts/layout_*.tscn` preset templates.
-- Builds optional `row_layouts` or template-authored moving rows, including moving rows that clip and horizontally wrap more shelves than are visible at once.
+- Builds optional `row_layouts` or template-authored moving rows, including moving rows that clip and wrap more shelves than are visible at once.
 - Spawns `ShelfItem` instances from config layers.
 - Handles mouse and touch interaction.
 - Resolves matches of three identical visible items on the same shelf, including the gather-and-shrink clear animation.
@@ -160,7 +160,8 @@ Files:
 
 Responsibility:
 - Clips a shelf row to a configured visible window.
-- Moves shelves horizontally at runtime and wraps them back through the opposite side.
+- Moves shelves horizontally or vertically at runtime and wraps them back through the opposite side.
+- Keeps each level to one moving-shelf axis: horizontal or vertical.
 - Lets layout templates author moving-row center positions and metadata.
 - Lets `scripts/level.gd` decide drag/drop eligibility based on whether a moving shelf is currently inside the row window.
 - Supports the floor-only shelf visual variant by runtime node hiding in `scripts/level.gd`.

@@ -40,6 +40,7 @@ const SHELF_BOTTOM_SHADOW_NAME := "Shadow"
 const SHELF_RIGHT_COLUMN_SHADOW_NAME := "RightColumnShadow"
 const ROW_LAYOUTS_KEY := "row_layouts"
 const ROW_MOTION_HORIZONTAL_WRAP := "horizontal_wrap"
+const ROW_MOTION_VERTICAL_WRAP := "vertical_wrap"
 const SHELF_VISUAL_VARIANT_FULL := "full"
 const SHELF_VISUAL_VARIANT_FLOOR_ONLY := "floor_only"
 const LAYOUT_ROW_VERTICAL_EPSILON := 8.0
@@ -772,6 +773,14 @@ func _add_row_layout_shelves(shelves: Node2D, shelves_config: Array, row_layouts
 		_add_preset_layout_shelves(shelves, shelves_config)
 		return
 
+	if _has_mixed_row_layout_motion_types(row_layouts):
+		push_warning(
+			"%s cannot mix horizontal and vertical moving shelves in one level. Using %s."
+			% [ROW_LAYOUTS_KEY, DEFAULT_LAYOUT_PRESET]
+		)
+		_add_preset_layout_shelves(shelves, shelves_config)
+		return
+
 	var row_origin_y := -float(row_layouts.size() - 1) * SHELF_GRID_STEP.y * 0.5
 	var shelf_config_index := 0
 	for row_index in range(row_layouts.size()):
@@ -825,6 +834,22 @@ func _get_row_layout_shelf_count(row_layouts: Array) -> int:
 	return shelf_count
 
 
+func _has_mixed_row_layout_motion_types(row_layouts: Array) -> bool:
+	var moving_motion_type := ""
+	for row_layout in row_layouts:
+		var row_config := row_layout as Dictionary
+		if row_config == null or not _is_row_layout_moving(row_config):
+			continue
+
+		var row_motion_type := _get_row_motion_type(row_config)
+		if moving_motion_type != "" and row_motion_type != moving_motion_type:
+			return true
+
+		moving_motion_type = row_motion_type
+
+	return false
+
+
 func _add_static_shelf_row(
 	shelves: Node2D,
 	shelves_config: Array,
@@ -861,8 +886,9 @@ func _add_moving_shelf_row(
 	row.name = "MovingShelfRow%02d" % (start_shelf_index + 1)
 	row.configure(
 		visible_count,
-		SHELF_GRID_STEP.x,
+		SHELF_GRID_STEP,
 		SHELF_CELL_SIZE,
+		_get_row_motion_type(row_config),
 		_get_row_motion_speed(row_config),
 		_get_row_motion_direction(row_config)
 	)
@@ -893,7 +919,7 @@ func _configure_shelf_from_config(shelf: Shelf, shelf_config: Dictionary, allow_
 func _is_row_layout_moving(row_config: Dictionary) -> bool:
 	var motion := _get_row_motion_config(row_config)
 	var motion_type := str(motion.get("type", "")).to_lower()
-	if motion_type == ROW_MOTION_HORIZONTAL_WRAP:
+	if motion_type == ROW_MOTION_HORIZONTAL_WRAP or motion_type == ROW_MOTION_VERTICAL_WRAP:
 		return true
 
 	if row_config.has("moving"):
@@ -912,9 +938,23 @@ func _get_row_motion_speed(row_config: Dictionary) -> float:
 	return maxf(float(motion.get("speed", row_config.get("speed", 0.0))), 0.0)
 
 
+func _get_row_motion_type(row_config: Dictionary) -> String:
+	var motion := _get_row_motion_config(row_config)
+	var motion_type := str(motion.get("type", ROW_MOTION_HORIZONTAL_WRAP)).to_lower()
+	if motion_type == ROW_MOTION_VERTICAL_WRAP:
+		return ROW_MOTION_VERTICAL_WRAP
+
+	return ROW_MOTION_HORIZONTAL_WRAP
+
+
 func _get_row_motion_direction(row_config: Dictionary) -> int:
 	var motion := _get_row_motion_config(row_config)
-	var direction_name := str(motion.get("direction", row_config.get("direction", "right"))).to_lower()
+	var motion_type := _get_row_motion_type(row_config)
+	var default_direction := "down" if motion_type == ROW_MOTION_VERTICAL_WRAP else "right"
+	var direction_name := str(motion.get("direction", row_config.get("direction", default_direction))).to_lower()
+	if motion_type == ROW_MOTION_VERTICAL_WRAP:
+		return -1 if direction_name == "up" else 1
+
 	return -1 if direction_name == "left" else 1
 
 
@@ -955,12 +995,23 @@ func _add_layout_template_shelves(shelves: Node2D, shelves_config: Array, layout
 
 	var shelf_config_index := 0
 	var marker_placements := _get_layout_template_marker_placements(layout_template)
+	var moving_motion_type := ""
 	for layout_node in layout_template.get_children():
 		if layout_node is ShelfLayoutRow:
 			var layout_row := layout_node as ShelfLayoutRow
 			var row_shelf_count := layout_row.shelf_count
 			var visible_count := clampi(layout_row.visible_count, 1, row_shelf_count)
 			var row_config := layout_row.to_row_config()
+			var row_motion_type := _get_row_motion_type(row_config)
+			if moving_motion_type != "" and row_motion_type != moving_motion_type:
+				push_warning(
+					"Layout preset '%s' mixes horizontal and vertical moving shelves. Using %s."
+					% [layout_preset, DEFAULT_LAYOUT_PRESET]
+				)
+				layout_template.queue_free()
+				return false
+
+			moving_motion_type = row_motion_type
 			var visual_variant := _get_row_visual_variant(row_config, true)
 			_add_moving_shelf_row(
 				shelves,

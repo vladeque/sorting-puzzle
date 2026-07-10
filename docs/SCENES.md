@@ -368,7 +368,7 @@ Script:
 - `scripts/moving_shelf_row.gd`
 
 Purpose:
-- Runtime row container for shelf rows with horizontal wrap motion.
+- Runtime row container for shelf groups with horizontal or vertical wrap motion.
 - Clips child shelf rendering to the configured visible shelf window.
 - Keeps moving-row bounds separate from individual shelf cell visuals.
 

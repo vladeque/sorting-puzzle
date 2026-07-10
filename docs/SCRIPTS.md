@@ -393,7 +393,7 @@ Key responsibilities:
 - Instantiate reusable shelf cells with `_add_shelf()`, apply the shared shelf visual scale, assign left/middle/right row placement visuals for static shelves, and ask `Shelf` to add generated back layers.
 - Ask each shelf scene to show or hide its placement-specific `TopCeilingCap` when it has no stacked neighbor above. Show each shelf scene's bottom `Shadow` and `RightColumnShadow` whenever the shelf uses full visuals so neighboring shelf bodies and items cover those low-layer cast shadows while exposed wall/background areas still receive them.
 - Load `layout_preset` scene templates from `scenes/layouts/`, group authored `ShelfXX` markers into rows by position, and place runtime shelves with derived row-placement visuals.
-- Build optional `row_layouts` rows with `_add_row_layout_shelves()`, including horizontally wrapping moving rows and static rows mixed in one level. Moving-row shelves currently use the neutral middle row-placement visual.
+- Build optional `row_layouts` rows with `_add_row_layout_shelves()`, including horizontal or vertical moving rows and static rows mixed in one level. Moving-row shelves currently use the neutral middle row-placement visual, and moving rows in a level must all use the same axis.
 - Build moving rows declared by layout template `MovingRowXX` nodes with `scripts/shelf_layout_row.gd`; their shelves also use the neutral middle row-placement visual.
 - Keep moving-row shelves out of drag/drop targeting while they are outside the row's visible window, while abilities still use unlocked shelf items.
 - Spawn configured items with `_add_configured_item()`.
@@ -527,9 +527,9 @@ Purpose:
 Exports:
 - `shelf_count`: number of level shelves consumed by this row.
 - `visible_count`: number of shelf positions visible inside the clipped row window.
-- `motion_type`: currently `horizontal_wrap`.
+- `motion_type`: `horizontal_wrap` or `vertical_wrap`.
 - `speed_pixels_per_second`: row motion speed.
-- `direction`: `right` or `left`.
+- `direction`: `right` or `left` for horizontal motion, `down` or `up` for vertical motion.
 - `visual_variant`: `full` or `floor_only`.
 
 Key methods:
@@ -548,16 +548,17 @@ Attached to:
 - `scenes/moving_shelf_row.tscn` root `MovingShelfRow`.
 
 Purpose:
-- Clips a horizontal shelf row to a visible window.
-- Moves child shelves horizontally and wraps them when they pass the row bounds.
+- Clips a moving shelf group to a visible window.
+- Moves child shelves horizontally or vertically and wraps them when they pass the row bounds.
 - Reports whether a shelf center is inside the visible window for drag/drop targeting.
 
 Exports:
 - `visible_shelf_count`: number of shelf positions in the clipped row window.
 - `shelf_cell_size`: shelf cell bounds supplied by `scripts/level.gd`.
-- `shelf_step_x`: packed horizontal shelf spacing supplied by `scripts/level.gd`.
+- `shelf_step`: packed shelf spacing supplied by `scripts/level.gd`.
+- `motion_type`: `horizontal_wrap` or `vertical_wrap`.
 - `speed_pixels_per_second`: row motion speed.
-- `direction`: `1` for rightward motion, `-1` for leftward motion.
+- `direction`: `1` for rightward or downward motion, `-1` for leftward or upward motion.
 
 Key methods:
 - `configure()`: applies runtime row settings from a level config.

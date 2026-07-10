@@ -14,6 +14,8 @@ from typing import Any, NamedTuple
 SLOTS_PER_SHELF = 3
 DEFAULT_ITEM_CONFIG = Path("configs/item_sprites.json")
 ROW_MOTION_HORIZONTAL_WRAP = "horizontal_wrap"
+ROW_MOTION_VERTICAL_WRAP = "vertical_wrap"
+ROW_MOTION_TYPES = {ROW_MOTION_HORIZONTAL_WRAP, ROW_MOTION_VERTICAL_WRAP}
 ROW_VISUAL_VARIANTS = {"full", "floor_only"}
 LAYOUT_GRID_3X3_MOVING_5_BOTTOM = "grid_3x3_moving_5_bottom"
 LAYOUT_PRESET_ROW_LAYOUTS: dict[str, list[dict[str, Any]]] = {
@@ -108,6 +110,7 @@ def validate_row_layouts_shape(level_data: Any, shelves: list[dict[str, Any]]) -
 
     errors = []
     total_shelf_count = 0
+    moving_motion_type = None
     for row_index, row_layout in enumerate(row_layouts):
         row_number = row_index + 1
         if not isinstance(row_layout, dict):
@@ -142,6 +145,15 @@ def validate_row_layouts_shape(level_data: Any, shelves: list[dict[str, Any]]) -
 
         is_moving = row_layout_is_moving(row_layout)
         if is_moving:
+            row_motion_type = get_row_motion_type(row_layout)
+            if row_motion_type in ROW_MOTION_TYPES:
+                if moving_motion_type is not None and row_motion_type != moving_motion_type:
+                    errors.append(
+                        "moving rows must use only one motion.type per level; "
+                        f"found '{moving_motion_type}' and '{row_motion_type}'"
+                    )
+                moving_motion_type = row_motion_type
+
             row_start = total_shelf_count
             row_end = row_start + shelf_count
             for shelf_index in range(row_start, min(row_end, len(shelves))):
@@ -177,12 +189,17 @@ def validate_row_motion_shape(row_layout: dict[str, Any], row_index: int) -> lis
 
     motion_config = motion if isinstance(motion, dict) else {}
     motion_type = motion_config.get("type")
-    if motion_type is not None and motion_type != ROW_MOTION_HORIZONTAL_WRAP:
-        errors.append(f"row_layouts[{row_index}].motion.type must be '{ROW_MOTION_HORIZONTAL_WRAP}'")
+    if motion_type is not None and motion_type not in ROW_MOTION_TYPES:
+        errors.append(f"row_layouts[{row_index}].motion.type must be one of {sorted(ROW_MOTION_TYPES)}")
 
     direction = motion_config.get("direction", row_layout.get("direction"))
-    if direction is not None and direction not in {"left", "right"}:
-        errors.append(f"row_layouts[{row_index}] direction must be 'left' or 'right'")
+    if direction is not None:
+        row_motion_type = get_row_motion_type(row_layout)
+        allowed_directions = {"up", "down"} if row_motion_type == ROW_MOTION_VERTICAL_WRAP else {"left", "right"}
+        if direction not in allowed_directions:
+            errors.append(
+                f"row_layouts[{row_index}] direction must be one of {sorted(allowed_directions)}"
+            )
 
     for field_path, value in (
         ("speed", row_layout.get("speed")),
@@ -199,13 +216,20 @@ def validate_row_motion_shape(row_layout: dict[str, Any], row_index: int) -> lis
 def row_layout_is_moving(row_layout: dict[str, Any]) -> bool:
     motion = row_layout.get("motion")
     motion_config = motion if isinstance(motion, dict) else {}
-    if motion_config.get("type") == ROW_MOTION_HORIZONTAL_WRAP:
+    if motion_config.get("type") in ROW_MOTION_TYPES:
         return True
     if row_layout.get("moving") is True:
         return True
 
     speed = motion_config.get("speed", row_layout.get("speed", 0))
     return type(speed) in (int, float) and speed > 0
+
+
+def get_row_motion_type(row_layout: dict[str, Any]) -> str | None:
+    motion = row_layout.get("motion")
+    motion_config = motion if isinstance(motion, dict) else {}
+    motion_type = motion_config.get("type", ROW_MOTION_HORIZONTAL_WRAP)
+    return motion_type if motion_type in ROW_MOTION_TYPES else None
 
 
 def validate_shelves_shape(
