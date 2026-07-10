@@ -82,6 +82,25 @@ const STAR_REWARD_DROP_DURATION_SECONDS := 0.2
 const STAR_REWARD_FLY_DURATION_SECONDS := 0.62
 const STAR_REWARD_STAGGER_SECONDS := 0.035
 const STAR_REWARD_COUNTER_PULSE_SCALE := Vector2(1.12, 1.12)
+const COMBO_PRAISE_WORDS := [
+	"",
+	"",
+	"Cool",
+	"Great",
+	"Awesome",
+	"Amazing",
+	"Fantastic",
+	"Incredible",
+	"Spectacular",
+	"Unstoppable",
+	"Legendary",
+]
+const COMBO_PRAISE_LABEL_SIZE := Vector2(300, 74)
+const COMBO_PRAISE_OFFSET := Vector2(0, -88)
+const COMBO_PRAISE_EDGE_PADDING := 16.0
+const COMBO_PRAISE_DURATION_SECONDS := 2.0
+const COMBO_PRAISE_FADE_SECONDS := 0.32
+const COMBO_PRAISE_POP_SCALE := Vector2(1.14, 1.14)
 const SHUFFLE_BOX_DISPLAY_WIDTH := 272.0
 const SHUFFLE_BOX_OPENING_OFFSET := Vector2(0.0, -52.0)
 const SHUFFLE_BOX_POP_DURATION_SECONDS := 0.16
@@ -2175,6 +2194,7 @@ func _clear_matching_shelves(shelves_to_check: Array[Node]) -> bool:
 			var star_reward_origin := shelf_items[1].global_position
 			await _play_match_clear_animation(shelf_items)
 			var earned_stars := _record_triples_cleared(1)
+			_show_combo_praise(star_reward_origin, _combo_count)
 			await _play_combo_star_reward_animation(star_reward_origin, earned_stars)
 
 	return cleared_any
@@ -2275,6 +2295,94 @@ func _play_combo_star_reward_animation(origin_global_position: Vector2, star_cou
 	)
 	await get_tree().create_timer(total_duration).timeout
 	_pulse_star_counter()
+
+
+func _show_combo_praise(origin_global_position: Vector2, combo_count: int) -> void:
+	var praise_text := _get_combo_praise_text(combo_count)
+	if praise_text == "" or _star_reward_effect_layer == null:
+		return
+
+	var label := Label.new()
+	label.text = praise_text
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	label.size = COMBO_PRAISE_LABEL_SIZE
+	label.pivot_offset = COMBO_PRAISE_LABEL_SIZE * 0.5
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.z_index = 3
+	label.modulate = Color(1.0, 1.0, 1.0, 0.0)
+	label.scale = Vector2(0.72, 0.72)
+	label.add_theme_color_override("font_color", _get_combo_praise_color(combo_count))
+	label.add_theme_color_override("font_outline_color", Color(0.24, 0.08, 0.02, 0.92))
+	label.add_theme_constant_override("outline_size", 6)
+	label.add_theme_constant_override("shadow_offset_x", 0)
+	label.add_theme_constant_override("shadow_offset_y", 4)
+	label.add_theme_color_override("font_shadow_color", Color(0.05, 0.02, 0.01, 0.55))
+	label.add_theme_font_size_override("font_size", _get_combo_praise_font_size(praise_text))
+	_star_reward_effect_layer.add_child(label)
+
+	var praise_center := _get_star_effect_layer_position(origin_global_position + COMBO_PRAISE_OFFSET)
+	praise_center = _clamp_combo_praise_center(praise_center, COMBO_PRAISE_LABEL_SIZE)
+	label.position = praise_center - COMBO_PRAISE_LABEL_SIZE * 0.5
+
+	var tween := label.create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(label, "modulate", Color.WHITE, 0.14).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(label, "scale", COMBO_PRAISE_POP_SCALE, 0.18).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(label, "scale", Vector2.ONE, 0.16).set_delay(0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(
+		label,
+		"position",
+		label.position + Vector2(0, -18),
+		COMBO_PRAISE_DURATION_SECONDS
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(
+		label,
+		"modulate",
+		Color(1.0, 1.0, 1.0, 0.0),
+		COMBO_PRAISE_FADE_SECONDS
+	).set_delay(COMBO_PRAISE_DURATION_SECONDS - COMBO_PRAISE_FADE_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.chain().tween_callback(label.queue_free)
+
+
+func _get_combo_praise_text(combo_count: int) -> String:
+	if combo_count < 2:
+		return ""
+
+	var praise_index := mini(combo_count, COMBO_PRAISE_WORDS.size() - 1)
+	return str(COMBO_PRAISE_WORDS[praise_index])
+
+
+func _get_combo_praise_color(combo_count: int) -> Color:
+	if combo_count >= 10:
+		return Color(1.0, 0.45, 0.18, 1.0)
+	if combo_count >= 7:
+		return Color(1.0, 0.66, 0.2, 1.0)
+	if combo_count >= 4:
+		return Color(1.0, 0.86, 0.28, 1.0)
+	return Color(0.98, 0.96, 0.72, 1.0)
+
+
+func _get_combo_praise_font_size(praise_text: String) -> int:
+	if praise_text.length() >= 11:
+		return 42
+	if praise_text.length() >= 9:
+		return 46
+	return 50
+
+
+func _clamp_combo_praise_center(center: Vector2, label_size: Vector2) -> Vector2:
+	var viewport_size := get_viewport_rect().size
+	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
+		return center
+
+	var half_size := label_size * 0.5
+	var min_center := half_size + Vector2.ONE * COMBO_PRAISE_EDGE_PADDING
+	var max_center := viewport_size - half_size - Vector2.ONE * COMBO_PRAISE_EDGE_PADDING
+	var clamped_center := center
+	clamped_center.x = viewport_size.x * 0.5 if max_center.x < min_center.x else clampf(center.x, min_center.x, max_center.x)
+	clamped_center.y = viewport_size.y * 0.5 if max_center.y < min_center.y else clampf(center.y, min_center.y, max_center.y)
+	return clamped_center
 
 
 func _spawn_combo_reward_star(
@@ -2766,6 +2874,7 @@ func _play_hammer_ability(items_to_destroy: Array[ShelfItem]) -> void:
 	_play_hammer_screen_shake()
 	await _play_hammer_destroy_animation(merged_item, items_to_destroy)
 	var earned_stars := _record_triples_cleared(destroyed_triples)
+	_show_combo_praise(impact_global_position, _combo_count)
 	_resolve_shelves(shelves_to_check)
 	await effect.finished
 	effect.queue_free()
