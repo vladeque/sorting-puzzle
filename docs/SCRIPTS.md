@@ -179,7 +179,7 @@ Class:
 
 Attached to:
 - `scenes/ui/level_button.tscn` root `LevelButton`.
-- `level.tscn` `UI/CompletionPanel/NextButton`.
+- `scenes/ui/level_completion_screen.tscn` `NextButton`.
 - `scenes/pause_menu.tscn` `PauseMenuPanel/InnerPanel/IconRow/*/*Button` settings icon buttons.
 - `scenes/ui/settings_menu.tscn` `PauseMenuPanel/InnerPanel/IconRow/*/*Button` settings icon buttons.
 - `scenes/pause_menu.tscn` `PauseMenuPanel/ButtonRow/LeaveButton` and `ContinueButton`.
@@ -197,6 +197,31 @@ Use when:
 
 Do not use for:
 - Text input controls, non-button puzzle item input, or invisible hit areas where scaling would move the perceived target without a visible button.
+
+## `scripts/level_completion_screen.gd`
+
+Class:
+- `LevelCompletionScreen`
+
+Attached to:
+- `scenes/ui/level_completion_screen.tscn` root `LevelCompletionScreen`.
+
+Purpose:
+- Owns the completed-level reward overlay UI shown by `level.tscn` after all items clear.
+- Applies responsive placement for the title, reward star, earned-star label, and `Next` button.
+- Sizes the earned-star label for longer totals and emits `next_pressed` when the player taps `Next`.
+
+Key methods:
+- `apply_responsive_layout(safe_margins)`: fills the viewport and positions the screen contents with the same safe-area margins used by `scripts/level.gd`.
+- `set_earned_stars(stars)`: updates the `xN` reward label and reduces font size when the value is long.
+
+Depends on:
+- `scenes/ui/level_completion_screen.tscn` child node names.
+- `scripts/press_scale_button.gd` on `NextButton`.
+- `assets/ui/reward_star.png` and `assets/ui/level_button_blank.png`.
+
+Do not use for:
+- Level progression or save data. Keep that in `scripts/level.gd` and `scripts/player_progress.gd`.
 
 ## `scripts/player_progress.gd`
 
@@ -389,7 +414,7 @@ Key responsibilities:
 - Promote back layers with `_promote_back_layer()`, `_play_layer_promotion_animation()`, and `_advance_back_layers()`.
 - Check win/loss state with `_check_level_completed()`, `_fail_level()`, and `_complete_level()`.
 - Spend one campaign life on campaign failure and on confirmed pause-menu Leave through `_spend_campaign_life_for_run()`, guarded so one level run cannot spend twice.
-- Save campaign completion through `PlayerProgress`, show `UI/CompletionPanel` with the run's earned star count, and load the next campaign level when the completion `Next` button is pressed.
+- Save campaign completion through `PlayerProgress`, show `UI/CompletionScreen` with the run's earned star count, and load the next campaign level when the completion `Next` button is pressed.
 - Return to the configured menu scene when leaving a level or when the dev/test completion `Next` button is pressed.
 - Keep the level countdown idle until the first meaningful player action, then format the active timer as zero-padded `MM:SS` text with `_update_timer_label()`.
 - Pause and resume active gameplay through the top-right menu button, the instanced `UI/PauseMenuOverlay`, `UI/LeaveConfirmationOverlay`, `Leave`, `Continue`, and red close buttons.
@@ -410,6 +435,7 @@ Depends on:
 - `scenes/moving_shelf_row.tscn` for optional row-layout movement and clipping.
 - `scenes/layouts/layout_*.tscn` for named layout preset placement.
 - `scenes/pause_menu.tscn` button node names used under `UI/PauseMenuOverlay`.
+- `scenes/ui/level_completion_screen.tscn` for completed-level reward UI and its `next_pressed` signal.
 - `scenes/item.tscn` and `ShelfItem`.
 - `assets/audio/item_place.wav` and `assets/audio/triple_clear.wav`.
 - `configs/item_sprites.json` item IDs and texture paths.

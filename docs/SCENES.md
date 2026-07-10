@@ -242,8 +242,7 @@ Important nodes:
 - `UI/AbilityBar/HBoxContainer/HighlightButton`: highlight ability button.
 - `UI/AbilityBar/HBoxContainer/HighlightButton/TimerLabel`: active highlight ability countdown.
 - `UI/FailurePanel`: shown when time runs out.
-- `UI/CompletionPanel`: shown after all items clear; contains the `Great job!` title, generated reward star image, earned star count label, and green `Next` button.
-- `UI/CompletionPanel/NextButton`: green blank-image button with `scripts/press_scale_button.gd` so it visually shrinks while held.
+- `UI/CompletionScreen`: `scenes/ui/level_completion_screen.tscn` instance shown after all items clear.
 - `UI/PauseMenuOverlay`: `scenes/pause_menu.tscn` instance used for the modal pause menu.
 - `UI/LeaveConfirmationOverlay`: `scenes/leave_confirmation_menu.tscn` instance shown after the pause menu's Leave button, before spending a campaign life and returning to the menu.
 
@@ -270,6 +269,33 @@ Depends on:
 
 Do not use for:
 - Static shelf cell visuals. Put those in `scenes/shelf.tscn`.
+
+## `scenes/ui/level_completion_screen.tscn`
+
+Root:
+- `LevelCompletionScreen` (`ColorRect`)
+
+Script:
+- `scripts/level_completion_screen.gd`
+
+Purpose:
+- Reusable completed-level reward overlay instanced by `level.tscn`.
+- Displays the `Great job!` title, reward star image, earned-star count label, and green `Next` button.
+- Emits `next_pressed` so `scripts/level.gd` can advance campaign levels or return dev/test launches to their menu.
+
+Important nodes:
+- `TitleLabel`: completion heading.
+- `StarImage`: large `assets/ui/reward_star.png` reward art.
+- `EarnedStarsLabel`: final run star count formatted as `xN`.
+- `NextButton`: green blank-image button with `scripts/press_scale_button.gd` so it visually shrinks while held.
+
+Depends on:
+- `assets/ui/reward_star.png`
+- `assets/ui/level_button_blank.png`
+- `scripts/press_scale_button.gd`
+
+Do not use for:
+- Puzzle completion checks, campaign save writes, or scene progression. Those stay in `scripts/level.gd`.
 
 ## `scenes/abilities/hammer_impact_effect.tscn`
 

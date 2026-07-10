@@ -66,15 +66,6 @@ const SHELVES_SIDE_MARGIN := 16.0
 const SHELVES_MIN_LAYOUT_SCALE := 0.45
 const SHELVES_MAX_LAYOUT_SCALE := 1.5
 const RESULT_LABEL_HEIGHT := 96.0
-const COMPLETION_TITLE_SIZE := Vector2(720, 96)
-const COMPLETION_TITLE_TOP := 108.0
-const COMPLETION_STAR_SIZE := Vector2(340, 340)
-const COMPLETION_STAR_CENTER_Y := 466.0
-const COMPLETION_STARS_LABEL_SIZE := Vector2(320, 84)
-const COMPLETION_STARS_LABEL_OFFSET_Y := 120.0
-const COMPLETION_BUTTON_SIZE := Vector2(340, 124)
-const COMPLETION_BUTTON_CENTER_Y := 850.0
-const COMPLETION_MIN_BUTTON_BOTTOM_MARGIN := 118.0
 const PAUSE_MENU_PANEL_SIZE := Vector2(520, 500)
 const LEAVE_CONFIRM_PANEL_SIZE := Vector2(520, 560)
 const STAR_REWARD_SIZE := Vector2(28, 28)
@@ -159,11 +150,7 @@ var _star_counter_pulse_tween: Tween
 var _combo_fill: Control
 var _combo_label: Label
 var _failure_panel: Control
-var _completion_panel: Control
-var _completion_title_label: Label
-var _completion_star_image: TextureRect
-var _completion_earned_stars_label: Label
-var _completion_next_button: Button
+var _completion_screen: LevelCompletionScreen
 var _pause_menu_button: Button
 var _pause_menu_overlay: Control
 var _pause_close_button: Button
@@ -226,11 +213,7 @@ func _ready() -> void:
 	_combo_fill = get_node("Background/HudCenterSlot/ComboFill") as Control
 	_combo_label = get_node("Background/HudCenterSlot/ComboLabel") as Label
 	_failure_panel = get_node("UI/FailurePanel") as Control
-	_completion_panel = get_node("UI/CompletionPanel") as Control
-	_completion_title_label = get_node("UI/CompletionPanel/TitleLabel") as Label
-	_completion_star_image = get_node("UI/CompletionPanel/StarImage") as TextureRect
-	_completion_earned_stars_label = get_node("UI/CompletionPanel/EarnedStarsLabel") as Label
-	_completion_next_button = get_node("UI/CompletionPanel/NextButton") as Button
+	_completion_screen = get_node("UI/CompletionScreen") as LevelCompletionScreen
 	_pause_menu_button = get_node("UI/PauseMenuButton") as Button
 	_pause_menu_overlay = get_node("UI/PauseMenuOverlay") as Control
 	_pause_close_button = get_node("UI/PauseMenuOverlay/PauseMenuPanel/CloseButton") as Button
@@ -244,7 +227,7 @@ func _ready() -> void:
 	_ability_bar = get_node("UI/AbilityBar") as Control
 	_ability_button_row = get_node("UI/AbilityBar/HBoxContainer") as Control
 	_failure_panel.visible = false
-	_completion_panel.visible = false
+	_completion_screen.visible = false
 	_pause_menu_overlay.visible = false
 	_leave_confirmation_overlay.visible = false
 	_setup_star_reward_effect_layer()
@@ -277,7 +260,7 @@ func _apply_responsive_layout() -> void:
 	_layout_top_hud(safe_margins)
 	_layout_ability_bar(safe_margins)
 	_layout_result_panel(_failure_panel, safe_margins)
-	_layout_completion_panel(safe_margins)
+	_completion_screen.apply_responsive_layout(safe_margins)
 	_layout_pause_menu_overlay()
 	_layout_leave_confirmation_overlay()
 	_layout_star_reward_effect_layer(viewport_size)
@@ -424,57 +407,6 @@ func _layout_result_panel(panel: Control, safe_margins: Vector4) -> void:
 		label.offset_top = -RESULT_LABEL_HEIGHT * 0.5
 		label.offset_right = -safe_margins.z
 		label.offset_bottom = RESULT_LABEL_HEIGHT * 0.5
-
-
-func _layout_completion_panel(safe_margins: Vector4) -> void:
-	if _completion_panel == null:
-		return
-
-	_completion_panel.anchor_left = 0.0
-	_completion_panel.anchor_top = 0.0
-	_completion_panel.anchor_right = 1.0
-	_completion_panel.anchor_bottom = 1.0
-	_completion_panel.offset_left = 0.0
-	_completion_panel.offset_top = 0.0
-	_completion_panel.offset_right = 0.0
-	_completion_panel.offset_bottom = 0.0
-
-	var viewport_size := get_viewport_rect().size
-	var layout_scale := clampf(minf(viewport_size.x / 720.0, viewport_size.y / 1280.0), 0.75, 1.35)
-	var center_x := viewport_size.x * 0.5
-	var title_top := safe_margins.y + COMPLETION_TITLE_TOP * layout_scale
-	var star_center_y := safe_margins.y + COMPLETION_STAR_CENTER_Y * layout_scale
-	var button_center_y := minf(
-		safe_margins.y + COMPLETION_BUTTON_CENTER_Y * layout_scale,
-		viewport_size.y - safe_margins.w - COMPLETION_MIN_BUTTON_BOTTOM_MARGIN * layout_scale - COMPLETION_BUTTON_SIZE.y * layout_scale * 0.5
-	)
-
-	_layout_centered_control(
-		_completion_title_label,
-		Vector2(center_x, title_top + COMPLETION_TITLE_SIZE.y * layout_scale * 0.5),
-		Vector2(viewport_size.x - safe_margins.x - safe_margins.z, COMPLETION_TITLE_SIZE.y * layout_scale)
-	)
-	_layout_centered_control(_completion_star_image, Vector2(center_x, star_center_y), COMPLETION_STAR_SIZE * layout_scale)
-	_layout_centered_control(
-		_completion_earned_stars_label,
-		Vector2(center_x, star_center_y + COMPLETION_STARS_LABEL_OFFSET_Y * layout_scale),
-		COMPLETION_STARS_LABEL_SIZE * layout_scale
-	)
-	_layout_centered_control(_completion_next_button, Vector2(center_x, button_center_y), COMPLETION_BUTTON_SIZE * layout_scale)
-
-
-func _layout_centered_control(control: Control, center: Vector2, size: Vector2) -> void:
-	if control == null:
-		return
-
-	control.anchor_left = 0.0
-	control.anchor_top = 0.0
-	control.anchor_right = 0.0
-	control.anchor_bottom = 0.0
-	control.offset_left = center.x - size.x * 0.5
-	control.offset_top = center.y - size.y * 0.5
-	control.offset_right = center.x + size.x * 0.5
-	control.offset_bottom = center.y + size.y * 0.5
 
 
 func _layout_pause_menu_overlay() -> void:
@@ -779,7 +711,7 @@ func _apply_level_config(config: Dictionary) -> void:
 	_update_star_counter_label()
 	_returning_to_menu = false
 	_failure_panel.visible = false
-	_completion_panel.visible = false
+	_completion_screen.visible = false
 	if _pause_menu_overlay != null:
 		_pause_menu_overlay.visible = false
 	if _leave_confirmation_overlay != null:
@@ -1618,8 +1550,8 @@ func _complete_level() -> void:
 	_clear_ability_highlights()
 	_update_ability_buttons()
 	_update_pause_menu_button()
-	_update_completion_reward()
-	_completion_panel.visible = true
+	_completion_screen.set_earned_stars(_stars)
+	_completion_screen.visible = true
 	_pause_menu_overlay.visible = false
 	_leave_confirmation_overlay.visible = false
 
@@ -1706,24 +1638,7 @@ func _setup_pause_menu_buttons() -> void:
 
 
 func _setup_completion_buttons() -> void:
-	_completion_next_button.pressed.connect(_on_completion_next_pressed)
-
-
-func _update_completion_reward() -> void:
-	if _completion_earned_stars_label == null:
-		return
-
-	var earned_text := "x%d" % _stars
-	var font_size := 58
-	if earned_text.length() >= 8:
-		font_size = 42
-	elif earned_text.length() >= 7:
-		font_size = 48
-	elif earned_text.length() >= 6:
-		font_size = 52
-
-	_completion_earned_stars_label.add_theme_font_size_override("font_size", font_size)
-	_completion_earned_stars_label.text = earned_text
+	_completion_screen.next_pressed.connect(_on_completion_next_pressed)
 
 
 func _on_completion_next_pressed() -> void:

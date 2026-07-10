@@ -5,9 +5,8 @@
 [ext_resource type="Texture2D" uid="uid://x0qk7pd87bfv" path="res://assets/abilities/ability_shuffle.png" id="3_shuffle_icon"]
 [ext_resource type="Texture2D" uid="uid://dwmyah5l2r82d" path="res://assets/abilities/ability_lantern.png" id="4_lantern_icon"]
 [ext_resource type="PackedScene" uid="uid://g1xsr7chqeg7" path="res://scenes/pause_menu.tscn" id="5_pause_menu"]
-[ext_resource type="Texture2D" uid="uid://bai63m2evt0sk" path="res://assets/ui/level_button_blank.png" id="7_level_button_blank"]
+[ext_resource type="PackedScene" uid="uid://dlopvf5glhqiu" path="res://scenes/ui/level_completion_screen.tscn" id="7_completion_screen"]
 [ext_resource type="PackedScene" path="res://scenes/leave_confirmation_menu.tscn" id="8_leave_confirmation"]
-[ext_resource type="Script" path="res://scripts/press_scale_button.gd" id="9_press_scale_button"]
 [ext_resource type="Script" uid="uid://cy80oincxrrc5" path="res://scripts/level.gd" id="10_level_script"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_top_hud_strip"]
@@ -195,12 +194,6 @@ corner_radius_bottom_left = 22
 shadow_color = Color(0, 0, 0, 0.34)
 shadow_size = 5
 shadow_offset = Vector2(0, 2)
-
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_1ainy"]
-load_path = "res://.godot/imported/reward_star1.png-8e044def53dd695a0fe7977a60eede43.ctex"
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_completion_next"]
-texture = ExtResource("7_level_button_blank")
 
 [node name="Level" type="Node2D" unique_id=949256860]
 script = ExtResource("10_level_script")
@@ -700,99 +693,7 @@ text = "Level Failed"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CompletionPanel" type="ColorRect" parent="UI" unique_id=1385350832]
-visible = false
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.04, 0.035, 0.045, 0.76)
-
-[node name="TitleLabel" type="Label" parent="UI/CompletionPanel" unique_id=2100778384]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_top = 112.0
-offset_bottom = 208.0
-grow_horizontal = 2
-theme_override_colors/font_color = Color(1, 0.87, 0.12, 1)
-theme_override_colors/font_shadow_color = Color(0.32, 0.1, 0.02, 0.95)
-theme_override_constants/shadow_offset_x = 0
-theme_override_constants/shadow_offset_y = 5
-theme_override_font_sizes/font_size = 70
-text = "Great job!"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="StarImage" type="TextureRect" parent="UI/CompletionPanel" unique_id=1011042563]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -170.0
-offset_top = -180.0
-offset_right = 170.0
-offset_bottom = 160.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-texture = SubResource("CompressedTexture2D_1ainy")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="EarnedStarsLabel" type="Label" parent="UI/CompletionPanel" unique_id=1324040291]
-z_index = 1
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -160.0
-offset_top = 58.0
-offset_right = 160.0
-offset_bottom = 142.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_shadow_color = Color(0.47, 0.17, 0.04, 0.98)
-theme_override_colors/font_outline_color = Color(0.64, 0.24, 0.04, 1)
-theme_override_constants/shadow_offset_x = 0
-theme_override_constants/shadow_offset_y = 5
-theme_override_constants/outline_size = 8
-theme_override_font_sizes/font_size = 58
-text = "x0"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="NextButton" type="Button" parent="UI/CompletionPanel" unique_id=1006940504]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -150.0
-offset_top = 320.0
-offset_right = 150.0
-offset_bottom = 410.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
-theme_override_colors/font_pressed_color = Color(0.92, 1, 0.9, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_colors/font_outline_color = Color(0.03, 0.25, 0.04, 0.95)
-theme_override_constants/outline_size = 4
-theme_override_font_sizes/font_size = 42
-theme_override_styles/normal = SubResource("StyleBoxTexture_completion_next")
-theme_override_styles/pressed = SubResource("StyleBoxTexture_completion_next")
-theme_override_styles/hover = SubResource("StyleBoxTexture_completion_next")
-text = "Next"
-script = ExtResource("9_press_scale_button")
+[node name="CompletionScreen" parent="UI" instance=ExtResource("7_completion_screen")]
 
 [node name="PauseMenuOverlay" parent="UI" unique_id=1081173105 instance=ExtResource("5_pause_menu")]
 
