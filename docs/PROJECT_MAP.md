@@ -207,6 +207,9 @@ Files:
 - `level.tscn`
 - `scripts/level.gd`
 - `scripts/player_progress.gd`
+- `scenes/ability_purchase_menu.tscn`
+- `scripts/ability_purchase_menu.gd`
+- `configs/ability_purchase_prices.json`
 - `scenes/abilities/hammer_impact_effect.tscn`
 - `scripts/hammer_impact_effect.gd`
 - `assets/abilities/*.png`
@@ -217,7 +220,8 @@ Responsibility:
 - Lets hammer clear matching visible/front items first, or supplement visible/front items with first-back-layer copies of the same type if no visible item type can make a triple.
 - Gathers hammer targets to the center of the screen, spawns a fullscreen hammer strike effect there, swaps through four pseudo-3D hammer angle textures in the scene-authored `AnimationPlayer`, and waits for the `impact` callback before destroying the merged item and dropping combo reward stars.
 - Shows the shuffle delivery box sprite from `assets/abilities/ability_shuffle_box.png` and pauses moving shelf rows while shuffle items fly through the center-screen box.
-- Disables abilities after failure, completion, or when uses run out.
+- Disables abilities after failure, completion, pause, or active ability animations. A zero-use ability button stays pressable during gameplay so `scenes/ability_purchase_menu.tscn` can offer a paid immediate use.
+- Loads per-ability paid-use prices from `configs/ability_purchase_prices.json`, spends coins through `PlayerProgress.spend_coins()`, and applies the selected paid ability immediately without adding saved inventory.
 - Starts the highlight timer even when no current shelf state can be highlighted.
 - Uses `ShelfItem` outline state for border-only highlight ability visuals.
 - Shows the active highlight countdown in a bottom-right badge on the highlight button.
@@ -231,6 +235,7 @@ Files:
 - `level.tscn`
 - `scenes/pause_menu.tscn`
 - `scenes/leave_confirmation_menu.tscn`
+- `scenes/ability_purchase_menu.tscn`
 - `assets/ui/*.png`
 - Settings icon assets use square textures with warm rectangular tile art, and the pause/settings buttons are square to avoid clipping or stretching.
 - `scripts/pause_menu.gd`
@@ -241,6 +246,7 @@ Responsibility:
 - `level.tscn` provides the top-right circular pause button and instances the pause menu scene.
 - `scenes/pause_menu.tscn` owns the popup layout, warm outer area, cream inner settings area, `Pause` title, protruding top-right red close button, music / sound-effects / vibration square icon buttons with shadow-only button styling, and Leave/Continue image buttons.
 - `scenes/leave_confirmation_menu.tscn` owns the second-step confirmation popup shown after Leave, including warm outer area, cream inner loss area, protruding top-right red close button, crossed-out rectangular lost life/star slots, and red Leave / green Continue image buttons.
+- `scenes/ability_purchase_menu.tscn` owns the zero-ability purchase popup, including warm outer area, cream inner item slot, selected ability icon, `x1` badge, coin-price button, and inactive `Watch ad` button.
 - `scripts/press_scale_button.gd` provides the default held-press shrink behavior for visible game UI buttons, including the pause/settings icon buttons and red/green bottom image buttons.
 - `scripts/pause_menu.gd` toggles crossed-out visuals on the three settings icon buttons, keeps their saved disabled states synchronized between the main-menu settings popup and in-level pause menu, and emits setting state changes.
 - `scripts/level.gd` opens and closes the menu, pauses the timer and gameplay input, treats red close buttons like Continue, opens the leave confirmation before routing confirmed Leave back to the main menu, writes the current run star count into that confirmation, initializes gameplay sound effects from the shared setting, and mutes them when the sound-effects button is crossed out.

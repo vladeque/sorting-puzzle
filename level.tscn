@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://g1xsr7chqeg7" path="res://scenes/pause_menu.tscn" id="5_pause_menu"]
 [ext_resource type="PackedScene" uid="uid://dlopvf5glhqiu" path="res://scenes/ui/level_completion_screen.tscn" id="7_completion_screen"]
 [ext_resource type="PackedScene" path="res://scenes/leave_confirmation_menu.tscn" id="8_leave_confirmation"]
+[ext_resource type="PackedScene" path="res://scenes/ability_purchase_menu.tscn" id="9_ability_purchase"]
 [ext_resource type="Script" uid="uid://cy80oincxrrc5" path="res://scripts/level.gd" id="10_level_script"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_top_hud_strip"]
@@ -698,3 +699,5 @@ vertical_alignment = 1
 [node name="PauseMenuOverlay" parent="UI" unique_id=1081173105 instance=ExtResource("5_pause_menu")]
 
 [node name="LeaveConfirmationOverlay" parent="UI" instance=ExtResource("8_leave_confirmation")]
+
+[node name="AbilityPurchaseOverlay" parent="UI" instance=ExtResource("9_ability_purchase")]

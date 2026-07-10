@@ -245,6 +245,7 @@ Important nodes:
 - `UI/CompletionScreen`: `scenes/ui/level_completion_screen.tscn` instance shown after all items clear.
 - `UI/PauseMenuOverlay`: `scenes/pause_menu.tscn` instance used for the modal pause menu.
 - `UI/LeaveConfirmationOverlay`: `scenes/leave_confirmation_menu.tscn` instance shown after the pause menu's Leave button, before spending a campaign life and returning to the menu.
+- `UI/AbilityPurchaseOverlay`: `scenes/ability_purchase_menu.tscn` instance shown when the player taps an ability with zero saved uses remaining.
 
 Runtime-created nodes:
 - `ShelfXX`: `scenes/shelf.tscn` instances generated under `Shelves`.
@@ -261,14 +262,48 @@ Depends on:
 - `scenes/item.tscn`
 - `scenes/pause_menu.tscn`
 - `scenes/leave_confirmation_menu.tscn`
+- `scenes/ability_purchase_menu.tscn`
 - `assets/audio/*.wav`
 - `configs/item_sprites.json`
+- `configs/ability_purchase_prices.json`
 - `configs/levels/level_*.json`
 - `assets/abilities/*.png`
 - `scenes/abilities/hammer_impact_effect.tscn` for the hammer ability's fullscreen strike animation.
 
 Do not use for:
 - Static shelf cell visuals. Put those in `scenes/shelf.tscn`.
+
+## `scenes/ability_purchase_menu.tscn`
+
+Root:
+- `AbilityPurchaseOverlay` (`ColorRect`)
+
+Script:
+- `scripts/ability_purchase_menu.gd`
+
+Purpose:
+- Reusable in-level purchase modal shown by `scripts/level.gd` when the player tries to use hammer, shuffle, or highlight with zero remaining uses.
+- Reuses the leave-confirmation modal treatment with a dimmed fullscreen background, warm outer popup, cream inner content panel, and protruding red close button.
+- Shows the `Get more items` title, the selected ability icon in a centered slot, a bottom-right `x1` count badge, a green coin-price image button, and a yellow-orange `Watch ad` image button.
+
+Important nodes:
+- `PurchasePanel`: centered popup panel.
+- `PurchasePanel/TitleLabel`: title text.
+- `PurchasePanel/CloseButton`: red close button wired by `scripts/level.gd` to resume gameplay.
+- `PurchasePanel/InnerPanel/AbilitySlot/Icon`: selected ability icon written by `scripts/level.gd`.
+- `PurchasePanel/InnerPanel/AbilitySlot/CountLabel`: static `x1` badge.
+- `PurchasePanel/ButtonRow/BuyButton`: green image button whose child `PriceRow` shows `assets/ui/main_menu_coin.png` and the configured price.
+- `PurchasePanel/ButtonRow/WatchAdButton`: yellow-orange image button labeled `Watch ad`; currently emits a signal but has no gameplay effect.
+
+Depends on:
+- `assets/ui/main_menu_coin.png`.
+- `assets/ui/level_button_blank.png`.
+- `assets/ui/level_button_blank_yellow_orange.png`.
+- `scripts/press_scale_button.gd`.
+- Runtime offer setup, coin spending, and ability execution from `scripts/level.gd`.
+
+Do not use for:
+- Price configuration, coin persistence, or ability execution. Those stay in `configs/ability_purchase_prices.json`, `scripts/player_progress.gd`, and `scripts/level.gd`.
 
 ## `scenes/ui/level_completion_screen.tscn`
 

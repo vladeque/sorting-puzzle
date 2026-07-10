@@ -169,6 +169,29 @@ Rules:
 - When saved chest stars reach the active goal, the configured coin reward is added to the player's saved coins, the goal starts over with remaining stars carried forward, and the next configured goal becomes active.
 - After the final configured goal is reached, the final goal value repeats.
 
+## `configs/ability_purchase_prices.json`
+
+Purpose:
+- Defines the coin price for buying one immediate paid use of an ability from `scenes/ability_purchase_menu.tscn` when the player has no saved uses remaining.
+- Owned by `scripts/level.gd`, which falls back to built-in defaults if the file is missing or invalid.
+
+Shape:
+
+```json
+{
+  "prices": {
+    "hammer": 100,
+    "shuffle": 100,
+    "highlight": 100
+  }
+}
+```
+
+Rules:
+- `prices` is a map from ability id to non-negative coin price.
+- Missing entries use the built-in default price for that ability.
+- Buying from the modal spends coins only when the selected ability can actually start, then uses that one paid ability immediately without adding saved inventory.
+
 ## `user://player_progress.json`
 
 Purpose:
@@ -196,6 +219,7 @@ Runtime behavior:
 - Campaign level failure and pause-menu Leave spend one life. Completed levels do not spend lives.
 - Missing lives restore at one life per real-time hour until the five-life cap is reached.
 - Ability uses are spent and saved immediately when an ability successfully applies.
+- Paid zero-use ability purchases spend configured coins immediately when the selected ability can start, without adding saved ability inventory.
 - Settings button disabled states are saved immediately when toggled and restored by the main-menu settings popup and in-level pause menu on later game starts.
 - Failed or abandoned levels do not refund ability uses.
 - Completing the current campaign level advances `current_level` by one and adds the run's earned stars to the reward chest.

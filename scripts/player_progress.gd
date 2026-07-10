@@ -117,6 +117,20 @@ func get_coins() -> int:
 	return maxi(int(_data.get("coins", DEFAULT_COINS)), 0)
 
 
+func spend_coins(amount: int) -> bool:
+	var normalized_amount := maxi(amount, 0)
+	if normalized_amount <= 0:
+		return true
+
+	var coins := get_coins()
+	if coins < normalized_amount:
+		return false
+
+	_data["coins"] = coins - normalized_amount
+	save_progress()
+	return true
+
+
 func get_reward_chest_progress() -> Dictionary:
 	var goals := _get_reward_chest_goals()
 	var goal_index := _get_reward_chest_goal_index(goals)

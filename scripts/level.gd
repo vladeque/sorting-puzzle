@@ -19,6 +19,7 @@ const MOVING_SHELF_ROW_SCENE := preload("res://scenes/moving_shelf_row.tscn")
 const ITEM_SCENE := preload("res://scenes/item.tscn")
 const HAMMER_IMPACT_EFFECT_SCENE := preload("res://scenes/abilities/hammer_impact_effect.tscn")
 const ITEM_SPRITES_CONFIG := "res://configs/item_sprites.json"
+const ABILITY_PURCHASE_PRICES_CONFIG := "res://configs/ability_purchase_prices.json"
 const LEVEL_CONFIG_TEMPLATE := "res://configs/levels/level_%03d.json"
 const DEFAULT_LEVEL_CONFIG := "res://configs/levels/level_001.json"
 const LAYOUT_SCENE_TEMPLATE := "res://scenes/layouts/layout_%s.tscn"
@@ -69,6 +70,7 @@ const SHELVES_MAX_LAYOUT_SCALE := 1.5
 const RESULT_LABEL_HEIGHT := 96.0
 const PAUSE_MENU_PANEL_SIZE := Vector2(520, 500)
 const LEAVE_CONFIRM_PANEL_SIZE := Vector2(520, 560)
+const ABILITY_PURCHASE_PANEL_SIZE := Vector2(520, 560)
 const STAR_REWARD_SIZE := Vector2(28, 28)
 const STAR_REWARD_DROP_DURATION_SECONDS := 0.2
 const STAR_REWARD_FLY_DURATION_SECONDS := 0.62
@@ -115,6 +117,11 @@ const SHUFFLE_ITEM_FLY_IN_Z_INDEX := 28
 const SHUFFLE_ITEM_FLY_OUT_Z_INDEX := 32
 const SHUFFLE_BOX_Z_INDEX := 30
 const SHUFFLE_ITEM_INSIDE_SCALE := Vector2(0.25, 0.25)
+const DEFAULT_ABILITY_PURCHASE_PRICES := {
+	ABILITY_HAMMER: 100,
+	ABILITY_SHUFFLE: 100,
+	ABILITY_HIGHLIGHT: 100,
+}
 @export var slot_snap_distance := BASE_SLOT_SNAP_DISTANCE * SHELF_CELL_VISUAL_SCALE
 @export var item_pick_size := BASE_ITEM_PICK_SIZE * SHELF_CELL_VISUAL_SCALE
 @export var drag_start_distance := 12.0
@@ -162,6 +169,7 @@ var _leave_confirmation_close_button: Button
 var _confirm_leave_button: Button
 var _confirm_continue_button: Button
 var _leave_confirmation_star_count_label: Label
+var _ability_purchase_overlay: AbilityPurchaseMenu
 var _ability_bar: Control
 var _ability_button_row: Control
 var _ability_buttons: Dictionary = {}
@@ -171,6 +179,9 @@ var _ability_uses: Dictionary = {
 	ABILITY_SHUFFLE: 3,
 	ABILITY_HIGHLIGHT: 3,
 }
+var _ability_purchase_prices: Dictionary = DEFAULT_ABILITY_PURCHASE_PRICES.duplicate()
+var _ability_purchase_pending_id := StringName()
+var _ability_purchase_was_paused := false
 var _time_remaining := 0.0
 var _has_player_started_timer := false
 var _level_failed := false
@@ -225,19 +236,23 @@ func _ready() -> void:
 	_confirm_leave_button = get_node("UI/LeaveConfirmationOverlay/ConfirmationPanel/ButtonRow/ConfirmLeaveButton") as Button
 	_confirm_continue_button = get_node("UI/LeaveConfirmationOverlay/ConfirmationPanel/ButtonRow/ContinueButton") as Button
 	_leave_confirmation_star_count_label = get_node("UI/LeaveConfirmationOverlay/ConfirmationPanel/InnerPanel/LossRow/StarLoss/CountLabel") as Label
+	_ability_purchase_overlay = get_node("UI/AbilityPurchaseOverlay") as AbilityPurchaseMenu
 	_ability_bar = get_node("UI/AbilityBar") as Control
 	_ability_button_row = get_node("UI/AbilityBar/HBoxContainer") as Control
 	_failure_panel.visible = false
 	_completion_screen.visible = false
 	_pause_menu_overlay.visible = false
 	_leave_confirmation_overlay.visible = false
+	_ability_purchase_overlay.visible = false
 	_setup_star_reward_effect_layer()
 	get_viewport().size_changed.connect(_apply_responsive_layout)
 	_rng.randomize()
 	_setup_audio_players()
 	_setup_pause_menu_buttons()
 	_setup_completion_buttons()
+	_setup_ability_purchase_menu()
 	_setup_ability_buttons()
+	_load_ability_purchase_prices()
 	_load_item_textures()
 	_apply_level_config(_load_level_config(selected_level))
 	_collect_slots()
@@ -264,6 +279,7 @@ func _apply_responsive_layout() -> void:
 	_completion_screen.apply_responsive_layout(safe_margins)
 	_layout_pause_menu_overlay()
 	_layout_leave_confirmation_overlay()
+	_layout_ability_purchase_overlay()
 	_layout_star_reward_effect_layer(viewport_size)
 	_layout_shelves(viewport_size, safe_margins)
 
@@ -462,6 +478,33 @@ func _layout_leave_confirmation_overlay() -> void:
 	panel.offset_top = -LEAVE_CONFIRM_PANEL_SIZE.y * 0.5
 	panel.offset_right = LEAVE_CONFIRM_PANEL_SIZE.x * 0.5
 	panel.offset_bottom = LEAVE_CONFIRM_PANEL_SIZE.y * 0.5
+
+
+func _layout_ability_purchase_overlay() -> void:
+	if _ability_purchase_overlay == null:
+		return
+
+	_ability_purchase_overlay.anchor_left = 0.0
+	_ability_purchase_overlay.anchor_top = 0.0
+	_ability_purchase_overlay.anchor_right = 1.0
+	_ability_purchase_overlay.anchor_bottom = 1.0
+	_ability_purchase_overlay.offset_left = 0.0
+	_ability_purchase_overlay.offset_top = 0.0
+	_ability_purchase_overlay.offset_right = 0.0
+	_ability_purchase_overlay.offset_bottom = 0.0
+
+	var panel := _ability_purchase_overlay.get_node_or_null("PurchasePanel") as Control
+	if panel == null:
+		return
+
+	panel.anchor_left = 0.5
+	panel.anchor_top = 0.5
+	panel.anchor_right = 0.5
+	panel.anchor_bottom = 0.5
+	panel.offset_left = -ABILITY_PURCHASE_PANEL_SIZE.x * 0.5
+	panel.offset_top = -ABILITY_PURCHASE_PANEL_SIZE.y * 0.5
+	panel.offset_right = ABILITY_PURCHASE_PANEL_SIZE.x * 0.5
+	panel.offset_bottom = ABILITY_PURCHASE_PANEL_SIZE.y * 0.5
 
 
 func _layout_shelves(viewport_size: Vector2, safe_margins: Vector4) -> void:
@@ -672,6 +715,22 @@ func _load_item_textures() -> void:
 			_item_textures[item_id] = texture
 
 
+func _load_ability_purchase_prices() -> void:
+	_ability_purchase_prices = DEFAULT_ABILITY_PURCHASE_PRICES.duplicate()
+	if not FileAccess.file_exists(ABILITY_PURCHASE_PRICES_CONFIG):
+		return
+
+	var config := _load_json_file(ABILITY_PURCHASE_PRICES_CONFIG)
+	var prices := config.get("prices", {}) as Dictionary
+	if prices == null:
+		push_warning("Ability purchase prices config must define a prices object.")
+		return
+
+	for ability_id in DEFAULT_ABILITY_PURCHASE_PRICES.keys():
+		var ability_key := String(ability_id)
+		_ability_purchase_prices[ability_id] = maxi(int(prices.get(ability_key, _ability_purchase_prices[ability_id])), 0)
+
+
 func _load_level_config(level_number: int) -> Dictionary:
 	var level_config_path := LEVEL_CONFIG_TEMPLATE % level_number
 	if not FileAccess.file_exists(level_config_path):
@@ -717,6 +776,9 @@ func _apply_level_config(config: Dictionary) -> void:
 		_pause_menu_overlay.visible = false
 	if _leave_confirmation_overlay != null:
 		_leave_confirmation_overlay.visible = false
+	if _ability_purchase_overlay != null:
+		_ability_purchase_overlay.visible = false
+	_ability_purchase_pending_id = StringName()
 
 	_clear_ability_highlights()
 	_load_ability_uses()
@@ -1581,6 +1643,8 @@ func _fail_level() -> void:
 	_failure_panel.visible = true
 	_pause_menu_overlay.visible = false
 	_leave_confirmation_overlay.visible = false
+	if _ability_purchase_overlay != null:
+		_ability_purchase_overlay.visible = false
 
 
 func _complete_level() -> void:
@@ -1605,6 +1669,8 @@ func _complete_level() -> void:
 	_completion_screen.visible = true
 	_pause_menu_overlay.visible = false
 	_leave_confirmation_overlay.visible = false
+	if _ability_purchase_overlay != null:
+		_ability_purchase_overlay.visible = false
 
 
 func _check_level_completed() -> void:
@@ -1692,6 +1758,15 @@ func _setup_completion_buttons() -> void:
 	_completion_screen.next_pressed.connect(_on_completion_next_pressed)
 
 
+func _setup_ability_purchase_menu() -> void:
+	if _ability_purchase_overlay == null:
+		return
+
+	_ability_purchase_overlay.close_pressed.connect(_on_ability_purchase_close_pressed)
+	_ability_purchase_overlay.buy_pressed.connect(_on_ability_purchase_buy_pressed)
+	_ability_purchase_overlay.ad_pressed.connect(_on_ability_purchase_ad_pressed)
+
+
 func _on_completion_next_pressed() -> void:
 	if not _level_completed or _returning_to_menu:
 		return
@@ -1720,6 +1795,8 @@ func _open_pause_menu() -> void:
 	_level_paused = true
 	_set_moving_shelf_rows_paused(true)
 	_pause_menu_overlay.visible = true
+	if _ability_purchase_overlay != null:
+		_ability_purchase_overlay.visible = false
 	_update_ability_buttons()
 	_update_pause_menu_button()
 
@@ -1735,6 +1812,8 @@ func _open_leave_confirmation() -> void:
 	_update_leave_confirmation_reward()
 	_pause_menu_overlay.visible = false
 	_leave_confirmation_overlay.visible = true
+	if _ability_purchase_overlay != null:
+		_ability_purchase_overlay.visible = false
 	_update_ability_buttons()
 	_update_pause_menu_button()
 
@@ -1772,11 +1851,87 @@ func _on_pause_menu_continue_pressed() -> void:
 	_close_pause_menu()
 
 
+func _open_ability_purchase_menu(ability_id: StringName) -> void:
+	if _ability_purchase_overlay == null:
+		return
+
+	_cancel_active_interaction()
+	_ability_purchase_pending_id = ability_id
+	_ability_purchase_was_paused = _level_paused
+	_level_paused = true
+	_set_moving_shelf_rows_paused(true)
+	_refresh_ability_purchase_offer()
+	_pause_menu_overlay.visible = false
+	_leave_confirmation_overlay.visible = false
+	_ability_purchase_overlay.visible = true
+	_update_ability_buttons()
+	_update_pause_menu_button()
+
+
+func _refresh_ability_purchase_offer() -> void:
+	if _ability_purchase_overlay == null or _ability_purchase_pending_id == StringName():
+		return
+
+	_ability_purchase_overlay.set_offer(
+		_get_ability_icon_texture(_ability_purchase_pending_id),
+		_get_ability_purchase_price(_ability_purchase_pending_id),
+		PlayerProgress.get_coins()
+	)
+
+
+func _close_ability_purchase_menu(should_resume: bool = true) -> void:
+	if _ability_purchase_overlay != null:
+		_ability_purchase_overlay.visible = false
+
+	_ability_purchase_pending_id = StringName()
+	if should_resume and not _ability_purchase_was_paused and not _level_failed and not _level_completed:
+		_level_paused = false
+		_set_moving_shelf_rows_paused(false)
+
+	_update_ability_buttons()
+	_update_pause_menu_button()
+
+
+func _on_ability_purchase_close_pressed() -> void:
+	_close_ability_purchase_menu()
+
+
+func _on_ability_purchase_buy_pressed() -> void:
+	if _ability_purchase_pending_id == StringName():
+		return
+
+	var ability_id := _ability_purchase_pending_id
+	var price := _get_ability_purchase_price(ability_id)
+	if PlayerProgress.get_coins() < price:
+		_refresh_ability_purchase_offer()
+		return
+
+	_level_paused = false
+	_set_moving_shelf_rows_paused(false)
+	if not _apply_paid_ability(ability_id):
+		_level_paused = true
+		_set_moving_shelf_rows_paused(true)
+		_refresh_ability_purchase_offer()
+		return
+
+	if not PlayerProgress.spend_coins(price):
+		push_warning("Could not spend coins for ability purchase: %s" % String(ability_id))
+
+	_close_ability_purchase_menu(false)
+
+
+func _on_ability_purchase_ad_pressed() -> void:
+	pass
+
+
 func _close_pause_menu() -> void:
 	_level_paused = false
 	_set_moving_shelf_rows_paused(false)
 	_pause_menu_overlay.visible = false
 	_leave_confirmation_overlay.visible = false
+	if _ability_purchase_overlay != null:
+		_ability_purchase_overlay.visible = false
+	_ability_purchase_pending_id = StringName()
 	_update_ability_buttons()
 	_update_pause_menu_button()
 
@@ -2817,9 +2972,17 @@ func _register_ability_button(ability_id: StringName, button_path: NodePath) -> 
 
 
 func _on_ability_button_pressed(ability_id: StringName) -> void:
-	if _level_failed or _level_completed or _is_ability_effect_active() or int(_ability_uses.get(ability_id, 0)) <= 0:
+	if _level_failed or _level_completed or _level_paused or _is_ability_effect_active():
 		return
 
+	if int(_ability_uses.get(ability_id, 0)) <= 0:
+		_open_ability_purchase_menu(ability_id)
+		return
+
+	_apply_ability_from_button(ability_id)
+
+
+func _apply_ability_from_button(ability_id: StringName) -> bool:
 	_cancel_active_interaction()
 
 	var did_apply := false
@@ -2832,11 +2995,32 @@ func _on_ability_button_pressed(ability_id: StringName) -> void:
 			did_apply = _use_highlight()
 
 	if not did_apply:
-		return
+		return false
 
 	_start_level_timer_from_player_action()
 	_spend_ability_use(ability_id)
 	_update_ability_buttons()
+	return true
+
+
+func _apply_paid_ability(ability_id: StringName) -> bool:
+	_cancel_active_interaction()
+
+	var did_apply := false
+	match ability_id:
+		ABILITY_HAMMER:
+			did_apply = _use_hammer()
+		ABILITY_SHUFFLE:
+			did_apply = _use_shuffle()
+		ABILITY_HIGHLIGHT:
+			did_apply = _use_highlight()
+
+	if not did_apply:
+		return false
+
+	_start_level_timer_from_player_action()
+	_update_ability_buttons()
+	return true
 
 
 func _cancel_active_interaction() -> void:
@@ -3564,7 +3748,20 @@ func _update_ability_button(ability_id: StringName) -> void:
 	if uses_label != null:
 		uses_label.text = str(uses_left)
 
-	button.disabled = _level_failed or _level_completed or _level_paused or _is_ability_effect_active() or uses_left <= 0
+	button.disabled = _level_failed or _level_completed or _level_paused or _is_ability_effect_active()
+
+
+func _get_ability_icon_texture(ability_id: StringName) -> Texture2D:
+	var button := _ability_buttons.get(ability_id) as Button
+	if button == null:
+		return null
+
+	var icon := button.get_node_or_null("Icon") as TextureRect
+	return icon.texture if icon != null else null
+
+
+func _get_ability_purchase_price(ability_id: StringName) -> int:
+	return maxi(int(_ability_purchase_prices.get(ability_id, DEFAULT_ABILITY_PURCHASE_PRICES.get(ability_id, 0))), 0)
 
 
 func _is_ability_effect_active() -> bool:

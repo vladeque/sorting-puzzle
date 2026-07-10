@@ -253,6 +253,7 @@ Key methods:
 - `get_current_level()`: returns the next campaign level.
 - `get_ability_uses()`: returns remaining campaign ability uses.
 - `get_coins()`: returns the saved gold coin balance.
+- `spend_coins(amount)`: immediately subtracts and saves the requested gold coin amount when enough coins are available.
 - `get_reward_chest_progress()`: returns the saved reward chest stars, active goal, and goal index.
 - `add_reward_chest_stars(star_count)`: adds stars to the reward chest and rolls over reached goals.
 - `get_available_avatar_ids()`: returns the 18 valid profile avatar ids.
@@ -370,11 +371,12 @@ Important constants:
 - `SHELF_SHARED_EDGE_THICKNESS`: shelf boundary thickness that neighboring cells overlap.
 - `SHELF_GRID_STEP`: packed layout spacing after overlapping shared shelf edges.
 - `LAYOUT_ROW_VERTICAL_EPSILON`: tolerance used to group authored layout-template shelf markers into horizontal rows before assigning left/middle/right shelf visuals.
-- `HUD_*`, `ABILITY_BAR_*`, `SHELVES_*`, `RESULT_LABEL_HEIGHT`, `PAUSE_MENU_PANEL_SIZE`, and `LEAVE_CONFIRM_PANEL_SIZE`: responsive layout constants for positioning the HUD, ability bar, result overlays, pause panel, leave confirmation panel, and generated shelf root across portrait viewport sizes, including minimum and maximum shelf layout scale.
+- `HUD_*`, `ABILITY_BAR_*`, `SHELVES_*`, `RESULT_LABEL_HEIGHT`, `PAUSE_MENU_PANEL_SIZE`, `LEAVE_CONFIRM_PANEL_SIZE`, and `ABILITY_PURCHASE_PANEL_SIZE`: responsive layout constants for positioning the HUD, ability bar, result overlays, pause panel, leave confirmation panel, ability purchase panel, and generated shelf root across portrait viewport sizes, including minimum and maximum shelf layout scale.
 - `SHELF_SCENE`: `res://scenes/shelf.tscn`.
 - `MOVING_SHELF_ROW_SCENE`: `res://scenes/moving_shelf_row.tscn`.
 - `ITEM_SCENE`: `res://scenes/item.tscn`.
 - `ITEM_SPRITES_CONFIG`: `res://configs/item_sprites.json`.
+- `ABILITY_PURCHASE_PRICES_CONFIG`: `res://configs/ability_purchase_prices.json`.
 - `LEVEL_CONFIG_TEMPLATE`: `res://configs/levels/level_%03d.json`.
 - `DEFAULT_LEVEL_CONFIG`: fallback level config.
 - `LAYOUT_SCENE_TEMPLATE`: `res://scenes/layouts/layout_%s.tscn` path pattern used by `layout_preset`.
@@ -420,6 +422,8 @@ Key responsibilities:
 - Pause and resume active gameplay through the top-right menu button, the instanced `UI/PauseMenuOverlay`, `UI/LeaveConfirmationOverlay`, `Leave`, `Continue`, and red close buttons.
 - Initialize item placement and triple-clear sound effects from the shared sound-effects setting and keep them disabled while that toggle is crossed out.
 - Manage hammer, shuffle, and highlight abilities. Campaign levels read and spend saved ability counts through `PlayerProgress`; dev/test levels use isolated temporary counts.
+- Keep zero-use ability buttons pressable during active gameplay so `_open_ability_purchase_menu()` can pause the level and show `UI/AbilityPurchaseOverlay` with the tapped ability icon, configured coin price, and current affordability state.
+- Apply paid ability uses through `_apply_paid_ability()` and `PlayerProgress.spend_coins()`: coins are spent only after the ability can start, and the paid use is consumed immediately without adding saved ability inventory.
 - Hammer targets visible/front triples first, then can supplement visible/front matches with first-back-layer copies of the same item type when no visible item type has three available copies.
 - Hammer now gathers the chosen three targets into one item at the screen center, plays a fullscreen impact animation there, destroys the merged item on the effect's `impact` signal, and then drops combo reward stars from the impact point.
 - Shuffle now pauses moving shelf rows, shows the center-screen delivery box, flies visible unlocked items into the box, changes unlocked item identity assignments while they are hidden, flies them back to their original slots, and resolves shelves only after the return animation completes.
@@ -439,9 +443,11 @@ Depends on:
 - `scenes/item.tscn` and `ShelfItem`.
 - `assets/audio/item_place.wav` and `assets/audio/triple_clear.wav`.
 - `configs/item_sprites.json` item IDs and texture paths.
+- `configs/ability_purchase_prices.json` paid-use prices for zero-use ability purchases.
 - `configs/levels/level_*.json` shelf schema.
-- `PlayerProgress` autoload for campaign progress, lives, and ability inventory.
+- `PlayerProgress` autoload for campaign progress, lives, coin spending, and ability inventory.
 - `scenes/leave_confirmation_menu.tscn` button and star-count node names used under `UI/LeaveConfirmationOverlay`.
+- `scenes/ability_purchase_menu.tscn` button, icon, and price node names used under `UI/AbilityPurchaseOverlay`.
 
 Do not use for:
 - Offline level generation or solvability search. Keep that in `scripts/tools/`.
