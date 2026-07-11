@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/level_button.tscn" id="3_level_button"]
 [ext_resource type="PackedScene" uid="uid://76jf8ug6hwj5" path="res://scenes/ui/main_menu_top_status.tscn" id="4_top_status"]
 [ext_resource type="PackedScene" uid="uid://c6xhf1gyqk2tr" path="res://scenes/ui/main_menu_reward_chest.tscn" id="5_reward_chest"]
+[ext_resource type="PackedScene" path="res://scenes/ui/main_menu_reward_coin_flyer.tscn" id="6_reward_coin_flyer"]
 
 [node name="ProductionMainMenu" type="Control" unique_id=1235428546]
 layout_mode = 3
@@ -66,3 +67,17 @@ grow_vertical = 0
 [node name="LevelButton" parent="BottomBar" unique_id=1123251713 instance=ExtResource("3_level_button")]
 unique_name_in_owner = true
 layout_mode = 2
+
+[node name="HouseRewardOrigin" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 0
+anchor_left = 0.5
+anchor_top = 0.59
+anchor_right = 0.5
+anchor_bottom = 0.59
+mouse_filter = 2
+
+[node name="RewardCoinFlyer" parent="." instance=ExtResource("6_reward_coin_flyer")]
+unique_name_in_owner = true
+layout_mode = 1

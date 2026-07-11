@@ -24,7 +24,6 @@ const LEVEL_CONFIG_TEMPLATE := "res://configs/levels/level_%03d.json"
 const DEFAULT_LEVEL_CONFIG := "res://configs/levels/level_001.json"
 const LAYOUT_SCENE_TEMPLATE := "res://scenes/layouts/layout_%s.tscn"
 const DEFAULT_LAYOUT_PRESET := "grid_3x3"
-const LEVEL_SCENE_PATH := "res://level.tscn"
 const MAIN_MENU_SCENE := "res://scenes/main_menu.tscn"
 const ITEM_PLACE_SOUND := preload("res://assets/audio/item_place.wav")
 const TRIPLE_CLEAR_SOUND := preload("res://assets/audio/triple_clear.wav")
@@ -1691,46 +1690,6 @@ func _return_to_main_menu() -> void:
 		push_error("Could not return to main menu: %s" % menu_scene_path)
 
 
-func _advance_after_completion() -> void:
-	if launched_from_dev_mode:
-		_return_to_main_menu()
-		return
-
-	var next_level := selected_level + 1
-	if not _level_config_exists(next_level):
-		_return_to_main_menu()
-		return
-
-	_change_to_level(next_level, false)
-
-
-func _change_to_level(level_number: int, dev_mode: bool) -> void:
-	_level_paused = false
-	_returning_to_menu = true
-	var level_scene_resource := load(LEVEL_SCENE_PATH) as PackedScene
-	if level_scene_resource == null:
-		_returning_to_menu = false
-		push_error("Could not load level scene: %s" % LEVEL_SCENE_PATH)
-		return
-
-	var level_scene := level_scene_resource.instantiate()
-	level_scene.selected_level = level_number
-	level_scene.launched_from_dev_mode = dev_mode
-	level_scene.return_menu_scene_path = return_menu_scene_path
-
-	var tree := get_tree()
-	var current_scene := tree.current_scene
-	tree.root.add_child(level_scene)
-	tree.current_scene = level_scene
-
-	if current_scene != null:
-		current_scene.queue_free()
-
-
-func _level_config_exists(level_number: int) -> bool:
-	return FileAccess.file_exists(LEVEL_CONFIG_TEMPLATE % level_number)
-
-
 func _spend_campaign_life_for_run() -> void:
 	if launched_from_dev_mode or _life_spent_for_run:
 		return
@@ -1771,7 +1730,7 @@ func _on_completion_next_pressed() -> void:
 	if not _level_completed or _returning_to_menu:
 		return
 
-	_advance_after_completion()
+	_return_to_main_menu()
 
 
 func _on_pause_menu_setting_toggled(setting_id: StringName, is_disabled: bool) -> void:

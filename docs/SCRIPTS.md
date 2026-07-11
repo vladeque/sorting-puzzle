@@ -14,6 +14,7 @@ Purpose:
 - Displays saved gold coins in the top status bar.
 - Displays the saved profile avatar and opens the profile editor from the top status bar.
 - Displays the saved reward chest star progress in a separate left-side widget under the profile icon.
+- Consumes completed-level reward payloads, displays the pre-reward chest value, and advances it once for each clover coin that reaches the chest.
 - Opens the main-menu settings popup from the top status bar.
 - Launches the saved campaign level.
 
@@ -30,6 +31,8 @@ Key constants:
 Important nodes:
 - `%TopStatusBar`: top-anchored container positioned at runtime with safe-area padding; owns the status icon layout through `scenes/ui/main_menu_top_status.tscn`.
 - `%RewardChest`: side-screen `scenes/ui/main_menu_reward_chest.tscn` instance positioned under the profile icon.
+- `%HouseRewardOrigin`: normalized marker over the background house.
+- `%RewardCoinFlyer`: dedicated fullscreen completed-level coin effect.
 - `MainMenuTopStatus/ProfileWidget`: opens the profile menu.
 - `MainMenuTopStatus/ProfileWidget/AvatarTexture`: displays the saved avatar texture.
 - `MainMenuTopStatus/CoinsWidget/CoinAmount`: shows the saved gold coin balance.
@@ -49,6 +52,8 @@ Key methods:
 - `_update_coin_status()`: writes the saved gold coin balance into the top status label.
 - `_update_lives_status()`: writes current lives and the next-life `MM:SS` countdown into the top status labels.
 - `_update_reward_chest_status()`: writes `PlayerProgress` reward chest progress into the side widget.
+- `_play_pending_reward_animation()`: flies earned clover coins from the house to the chest after scene entry.
+- `_on_reward_coin_arrived()`: advances the displayed chest count and handles configured goal rollover on impact.
 - `_format_life_restore_time(seconds_remaining)`: formats the next-life restore timer as zero-padded minutes and seconds.
 - `_update_profile_avatar()`: loads the saved avatar texture into the top status profile widget.
 - `_open_profile_menu()`: creates the centered profile menu window and listens for saved avatar changes.
@@ -70,6 +75,20 @@ Do not use for:
 - Persistent save data ownership. Put that in `scripts/player_progress.gd`.
 - Puzzle runtime logic.
 
+## `scripts/main_menu_reward_coin_flyer.gd`
+
+Attached to:
+- `scenes/ui/main_menu_reward_coin_flyer.tscn` root `MainMenuRewardCoinFlyer`.
+
+Purpose:
+- Creates and animates one clover coin for every star earned in the just-completed level.
+- Staggers arcing coin tweens between menu-provided global positions.
+- Emits `coin_arrived` for count updates and `animation_finished` for final saved-state reconciliation.
+
+Depends on:
+- `assets/ui/clover_coin_transparent_96x96.png`.
+- The production menu for start and target positions.
+
 ## `scripts/main_menu_reward_chest.gd`
 
 Attached to:
@@ -82,6 +101,8 @@ Purpose:
 
 Key methods:
 - `set_reward_progress(current_stars, goal_stars)`: clamps the displayed value to the active goal and updates the bar and label.
+- `get_coin_target_global_position()`: returns the center of the chest art for reward flights.
+- `play_receive_pulse()`: briefly pulses the chest when a reward coin arrives.
 
 Depends on:
 - `scenes/ui/main_menu_reward_chest.tscn` node names `%ProgressBar` and `%AmountLabel`.
@@ -255,6 +276,8 @@ Key methods:
 - `get_coins()`: returns the saved gold coin balance.
 - `spend_coins(amount)`: immediately subtracts and saves the requested gold coin amount when enough coins are available.
 - `get_reward_chest_progress()`: returns the saved reward chest stars, active goal, and goal index.
+- `get_reward_chest_goal_at_index(goal_index)`: exposes a configured goal threshold for menu animation rollover.
+- `consume_pending_reward_chest_animation()`: returns and clears the in-memory completed-level animation payload.
 - `add_reward_chest_stars(star_count)`: adds stars to the reward chest and rolls over reached goals.
 - `get_available_avatar_ids()`: returns the 18 valid profile avatar ids.
 - `get_avatar_id()`: returns the selected avatar id, sanitized to `avatar_cat` when needed.
@@ -272,7 +295,7 @@ Key methods:
 - `refresh_lives()`: restores one life per elapsed real-time hour while lives are not full.
 - `spend_life()`: immediately spends and saves one campaign life when available.
 - `spend_ability(ability_id)`: immediately spends and saves one campaign ability use.
-- `complete_level(level_number, earned_stars)`: records completion, advances `current_level` when the completed level is the active campaign level, adds earned campaign stars to the reward chest, and grants configured chest coin rewards when goals are reached.
+- `complete_level(level_number, earned_stars)`: records completion, advances the active campaign level, saves earned stars and goal rewards, and records the pre-reward chest state for the next main-menu animation.
 - `reset_progress()`: restores default progress and writes it to disk for testing.
 - `get_save_provider_name()`: reports the active provider for diagnostics.
 
@@ -416,7 +439,7 @@ Key responsibilities:
 - Promote back layers with `_promote_back_layer()`, `_play_layer_promotion_animation()`, and `_advance_back_layers()`.
 - Check win/loss state with `_check_level_completed()`, `_fail_level()`, and `_complete_level()`.
 - Spend one campaign life on campaign failure and on confirmed pause-menu Leave through `_spend_campaign_life_for_run()`, guarded so one level run cannot spend twice.
-- Save campaign completion through `PlayerProgress`, show `UI/CompletionScreen` with the run's earned star count, and load the next campaign level when the completion `Next` button is pressed.
+- Save campaign completion through `PlayerProgress`, show `UI/CompletionScreen` with the run's earned star count, and return to the main menu when the completion `Next` button is pressed.
 - Return to the configured menu scene when leaving a level or when the dev/test completion `Next` button is pressed.
 - Keep the level countdown idle until the first meaningful player action, then format the active timer as zero-padded `MM:SS` text with `_update_timer_label()`.
 - Pause and resume active gameplay through the top-right menu button, the instanced `UI/PauseMenuOverlay`, `UI/LeaveConfirmationOverlay`, `Leave`, `Continue`, and red close buttons.

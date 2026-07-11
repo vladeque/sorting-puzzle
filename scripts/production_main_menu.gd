@@ -21,6 +21,8 @@ const LIFE_STATUS_REFRESH_SECONDS := 1.0
 
 @onready var _top_status_bar := %TopStatusBar as MarginContainer
 @onready var _reward_chest := %RewardChest as Control
+@onready var _house_reward_origin := %HouseRewardOrigin as Control
+@onready var _reward_coin_flyer := %RewardCoinFlyer as Control
 @onready var _bottom_bar := %BottomBar as MarginContainer
 @onready var _level_button := %LevelButton as Button
 @onready var _profile_button := %TopStatusBar.get_node("MainMenuTopStatus/ProfileWidget") as Button
@@ -32,20 +34,28 @@ const LIFE_STATUS_REFRESH_SECONDS := 1.0
 var _life_status_refresh_time := 0.0
 var _profile_menu: Control
 var _settings_menu: Control
+var _animated_reward_stars := 0
+var _animated_reward_goal_index := 0
 
 
 func _ready() -> void:
 	PlayerProgress.load_progress()
 	PlayerProgress.refresh_lives()
+	var pending_reward_animation := PlayerProgress.consume_pending_reward_chest_animation()
 	_level_button.pressed.connect(_launch_campaign_level)
 	_profile_button.pressed.connect(_open_profile_menu)
 	_settings_button.pressed.connect(_open_settings_menu)
 	get_viewport().size_changed.connect(_apply_responsive_layout)
 	_update_profile_avatar()
 	_update_lives_status()
-	_update_reward_chest_status()
+	if pending_reward_animation.is_empty():
+		_update_reward_chest_status()
+	else:
+		_prepare_pending_reward_animation(pending_reward_animation)
 	_update_level_button()
 	_apply_responsive_layout()
+	if not pending_reward_animation.is_empty():
+		_play_pending_reward_animation.call_deferred(pending_reward_animation)
 
 
 func _process(delta: float) -> void:
@@ -165,6 +175,60 @@ func _update_reward_chest_status() -> void:
 		"set_reward_progress",
 		int(progress.get("stars", 0)),
 		int(progress.get("goal", 1))
+	)
+
+
+func _prepare_pending_reward_animation(pending: Dictionary) -> void:
+	_animated_reward_stars = maxi(int(pending.get("start_stars", 0)), 0)
+	_animated_reward_goal_index = maxi(int(pending.get("start_goal_index", 0)), 0)
+	_set_animated_reward_chest_status()
+
+
+func _play_pending_reward_animation(pending: Dictionary) -> void:
+	var amount := maxi(int(pending.get("amount", 0)), 0)
+	if amount <= 0 or _reward_coin_flyer == null or _house_reward_origin == null:
+		_update_reward_chest_status()
+		return
+
+	if not _reward_coin_flyer.coin_arrived.is_connected(_on_reward_coin_arrived):
+		_reward_coin_flyer.coin_arrived.connect(_on_reward_coin_arrived)
+	if not _reward_coin_flyer.animation_finished.is_connected(_on_reward_coin_animation_finished):
+		_reward_coin_flyer.animation_finished.connect(_on_reward_coin_animation_finished)
+
+	var start_position := _house_reward_origin.get_global_rect().get_center()
+	var target_position := _reward_chest.get_global_rect().get_center()
+	if _reward_chest.has_method("get_coin_target_global_position"):
+		target_position = _reward_chest.call("get_coin_target_global_position") as Vector2
+	_reward_coin_flyer.call("play", amount, start_position, target_position)
+
+
+func _on_reward_coin_arrived() -> void:
+	_animated_reward_stars += 1
+	var goal := PlayerProgress.get_reward_chest_goal_at_index(_animated_reward_goal_index)
+	if _animated_reward_stars >= goal:
+		_animated_reward_stars -= goal
+		_animated_reward_goal_index = mini(
+			_animated_reward_goal_index + 1,
+			PlayerProgress.get_reward_chest_last_goal_index()
+		)
+
+	_set_animated_reward_chest_status()
+	if _reward_chest.has_method("play_receive_pulse"):
+		_reward_chest.call("play_receive_pulse")
+
+
+func _on_reward_coin_animation_finished() -> void:
+	_update_reward_chest_status()
+
+
+func _set_animated_reward_chest_status() -> void:
+	if _reward_chest == null or not _reward_chest.has_method("set_reward_progress"):
+		return
+
+	_reward_chest.call(
+		"set_reward_progress",
+		_animated_reward_stars,
+		PlayerProgress.get_reward_chest_goal_at_index(_animated_reward_goal_index)
 	)
 
 

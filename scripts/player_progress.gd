@@ -64,6 +64,7 @@ const DEFAULT_DISABLED_SETTINGS := {
 var _data := {}
 var _save_provider: SaveProvider
 var _reward_chest_goals := []
+var _pending_reward_chest_animation := {}
 
 
 func _ready() -> void:
@@ -141,6 +142,21 @@ func get_reward_chest_progress() -> Dictionary:
 		"goal_index": goal_index,
 		"coin_reward": int(active_goal.get("coin_reward", 0)),
 	}
+
+
+func get_reward_chest_goal_at_index(goal_index: int) -> int:
+	var goals := _get_reward_chest_goals()
+	return _get_reward_chest_goal_stars(goals, clampi(goal_index, 0, goals.size() - 1))
+
+
+func get_reward_chest_last_goal_index() -> int:
+	return maxi(_get_reward_chest_goals().size() - 1, 0)
+
+
+func consume_pending_reward_chest_animation() -> Dictionary:
+	var pending := _pending_reward_chest_animation.duplicate()
+	_pending_reward_chest_animation.clear()
+	return pending
 
 
 func add_reward_chest_stars(star_count: int) -> void:
@@ -298,12 +314,20 @@ func complete_level(level_number: int, earned_stars: int = 0) -> void:
 	_data["highest_completed_level"] = maxi(get_highest_completed_level(), level_number)
 	if completes_current_level:
 		_data["current_level"] = level_number + 1
+		var starting_progress := get_reward_chest_progress()
 		_apply_reward_chest_stars(earned_stars)
+		if earned_stars > 0:
+			_pending_reward_chest_animation = {
+				"amount": earned_stars,
+				"start_stars": int(starting_progress.get("stars", 0)),
+				"start_goal_index": int(starting_progress.get("goal_index", 0)),
+			}
 	save_progress()
 
 
 func reset_progress() -> void:
 	_data = _default_data()
+	_pending_reward_chest_animation.clear()
 	save_progress()
 
 

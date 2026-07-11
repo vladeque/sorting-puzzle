@@ -15,6 +15,7 @@ Purpose:
 - Displays `assets/backgrounds/main_menu.jpeg` as a fullscreen production menu background.
 - Provides a top status row for profile, saved gold coins, saved campaign lives, and settings.
 - Shows a left-side reward chest widget under the profile icon with saved star progress toward the active configured chest goal.
+- After a completed level returns here, launches one clover coin per earned star from the background house into the reward chest and advances the visible chest count on impact.
 - Provides a bottom `%LevelButton` labeled with the saved campaign level, such as `Level 1`, or disabled as `No Lives` when lives are empty.
 - Opens the player profile menu when the profile widget is pressed.
 - Opens the main settings menu when the settings widget is pressed.
@@ -24,6 +25,8 @@ Important nodes:
 - `Background`: fullscreen `TextureRect` using `assets/backgrounds/main_menu.jpeg`.
 - `TopStatusBar`: top-anchored safe-area-aware container for `scenes/ui/main_menu_top_status.tscn`.
 - `RewardChest`: left-side `scenes/ui/main_menu_reward_chest.tscn` instance positioned by `scripts/production_main_menu.gd`.
+- `HouseRewardOrigin`: responsive marker over the background house used as the reward animation origin.
+- `RewardCoinFlyer`: fullscreen `scenes/ui/main_menu_reward_coin_flyer.tscn` effect layer.
 - `BottomBar`: bottom-anchored responsive container for the play button.
 - `BottomBar/LevelButton`: `scenes/ui/level_button.tscn` instance that launches the saved campaign level.
 - Runtime child `scenes/ui/profile_menu.tscn`: centered pause-style profile editor window created when `ProfileWidget` is pressed.
@@ -35,6 +38,7 @@ Depends on:
 - `assets/backgrounds/main_menu.jpeg`.
 - `scenes/ui/main_menu_top_status.tscn` for top status icons and labels.
 - `scenes/ui/main_menu_reward_chest.tscn` for the side reward chest icon and progress bar.
+- `scenes/ui/main_menu_reward_coin_flyer.tscn` for the clover-coin flight effect.
 - `scenes/ui/profile_menu.tscn` for profile name and avatar editing.
 - `scenes/ui/settings_menu.tscn` for the main-menu settings popup.
 - `scenes/ui/level_button.tscn` for the reusable production level button visuals.
@@ -42,6 +46,21 @@ Depends on:
 Do not use for:
 - Dev/test level selection. Use `scenes/main_menu_testing.tscn`.
 - Runtime puzzle rules or shelf state. Put those in `level.tscn` and `scripts/level.gd`.
+
+## `scenes/ui/main_menu_reward_coin_flyer.tscn`
+
+Root:
+- `MainMenuRewardCoinFlyer` (`Control`)
+
+Script:
+- `scripts/main_menu_reward_coin_flyer.gd`
+
+Purpose:
+- Owns the fullscreen completed-level reward effect on the production menu.
+- Creates one `clover_coin_transparent_96x96.png` view per earned star, staggers flights from the house marker to the reward chest, and emits an arrival for each coin so the menu can advance the count.
+
+Do not use for:
+- Saving or calculating reward chest progress. Those remain in `PlayerProgress`.
 
 ## `scenes/ui/main_menu_reward_chest.tscn`
 
