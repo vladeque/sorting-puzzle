@@ -340,7 +340,7 @@ Purpose:
 Important nodes:
 - `TitleLabel`: completion heading.
 - `StarImage`: large `assets/ui/reward_star.png` reward art.
-- `EarnedStarsLabel`: final run star count formatted as `xN`.
+- `EarnedStarsLabel`: final run star count formatted as `xN`; its responsive center sits 150 design pixels below the reward star center.
 - `NextButton`: green blank-image button with `scripts/press_scale_button.gd` so it visually shrinks while held.
 
 Depends on:
