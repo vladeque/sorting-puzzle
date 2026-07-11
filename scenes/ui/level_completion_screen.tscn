@@ -2,14 +2,13 @@
 
 [ext_resource type="Texture2D" uid="uid://3vi3qpy12q0w" path="res://assets/ui/reward_star.png" id="1_reward_star"]
 [ext_resource type="Texture2D" uid="uid://bai63m2evt0sk" path="res://assets/ui/level_button_blank.png" id="2_level_button_blank"]
-[ext_resource type="Script" path="res://scripts/level_completion_screen.gd" id="3_completion_screen_script"]
+[ext_resource type="Script" uid="uid://cp7jmwiig6qtc" path="res://scripts/level_completion_screen.gd" id="3_completion_screen_script"]
 [ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="4_press_scale_button"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_completion_next"]
 texture = ExtResource("2_level_button_blank")
 
-[node name="LevelCompletionScreen" type="ColorRect"]
-visible = false
+[node name="LevelCompletionScreen" type="ColorRect" unique_id=39553239]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -18,7 +17,7 @@ grow_vertical = 2
 color = Color(0.04, 0.035, 0.045, 0.76)
 script = ExtResource("3_completion_screen_script")
 
-[node name="TitleLabel" type="Label" parent="."]
+[node name="TitleLabel" type="Label" parent="." unique_id=878357026]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -34,7 +33,7 @@ text = "Great job!"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="StarImage" type="TextureRect" parent="."]
+[node name="StarImage" type="TextureRect" parent="." unique_id=1376141176]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -52,7 +51,7 @@ texture = ExtResource("1_reward_star")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="EarnedStarsLabel" type="Label" parent="."]
+[node name="EarnedStarsLabel" type="Label" parent="." unique_id=1762046095]
 z_index = 1
 layout_mode = 1
 anchors_preset = 8
@@ -61,9 +60,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -160.0
-offset_top = 58.0
+offset_top = 83.0
 offset_right = 160.0
-offset_bottom = 142.0
+offset_bottom = 167.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
@@ -77,7 +76,7 @@ text = "x0"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="NextButton" type="Button" parent="."]
+[node name="NextButton" type="Button" parent="." unique_id=50723726]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
