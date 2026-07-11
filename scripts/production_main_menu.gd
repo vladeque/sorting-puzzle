@@ -17,6 +17,7 @@ const BOTTOM_BAR_HEIGHT := 220.0
 const BOTTOM_MARGIN := 152.0
 const SIDE_MARGIN := 48.0
 const LEVEL_BUTTON_MAX_WIDTH := 420.0
+const BOTTOM_NAVIGATION_HEIGHT := 132.0
 const LIFE_STATUS_REFRESH_SECONDS := 1.0
 
 @onready var _top_status_bar := %TopStatusBar as MarginContainer
@@ -25,6 +26,7 @@ const LIFE_STATUS_REFRESH_SECONDS := 1.0
 @onready var _reward_coin_flyer := %RewardCoinFlyer as Control
 @onready var _bottom_bar := %BottomBar as MarginContainer
 @onready var _level_button := %LevelButton as Button
+@onready var _bottom_navigation := %BottomNavigation as MarginContainer
 @onready var _profile_button := %TopStatusBar.get_node("MainMenuTopStatus/ProfileWidget") as Button
 @onready var _settings_button := %TopStatusBar.get_node("MainMenuTopStatus/SettingsWidget/SettingsButton") as Button
 @onready var _profile_avatar_texture := %TopStatusBar.get_node("MainMenuTopStatus/ProfileWidget/AvatarTexture") as TextureRect
@@ -76,6 +78,7 @@ func _apply_responsive_layout() -> void:
 	var safe_margins := _get_safe_area_margins(viewport_size)
 	_layout_top_status_bar(safe_margins)
 	_layout_reward_chest(safe_margins)
+	_layout_bottom_navigation(safe_margins)
 	_bottom_bar.anchor_left = 0.0
 	_bottom_bar.anchor_top = 1.0
 	_bottom_bar.anchor_right = 1.0
@@ -89,6 +92,23 @@ func _apply_responsive_layout() -> void:
 	var button_minimum_size := _level_button.custom_minimum_size
 	button_minimum_size.x = minf(LEVEL_BUTTON_MAX_WIDTH, available_width)
 	_level_button.custom_minimum_size = button_minimum_size
+
+
+func _layout_bottom_navigation(safe_margins: Vector4) -> void:
+	if _bottom_navigation == null:
+		return
+
+	var safe_bottom := maxf(safe_margins.w, 0.0)
+	_bottom_navigation.anchor_left = 0.0
+	_bottom_navigation.anchor_top = 1.0
+	_bottom_navigation.anchor_right = 1.0
+	_bottom_navigation.anchor_bottom = 1.0
+	_bottom_navigation.offset_left = 0.0
+	_bottom_navigation.offset_top = -(BOTTOM_NAVIGATION_HEIGHT + safe_bottom)
+	_bottom_navigation.offset_right = 0.0
+	_bottom_navigation.offset_bottom = 0.0
+	if _bottom_navigation.has_method("set_safe_bottom_margin"):
+		_bottom_navigation.call("set_safe_bottom_margin", safe_bottom)
 
 
 func _layout_top_status_bar(safe_margins: Vector4) -> void:

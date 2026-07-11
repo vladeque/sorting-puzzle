@@ -1,0 +1,151 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://scripts/main_menu_bottom_navigation.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/ui/nav_shop.png" id="2_shop"]
+[ext_resource type="Texture2D" path="res://assets/ui/nav_home.svg" id="3_home"]
+[ext_resource type="Texture2D" path="res://assets/ui/nav_leaderboard.png" id="4_leaderboard"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar"]
+bg_color = Color(0.36, 0.13, 0.28, 1)
+border_width_top = 5
+border_color = Color(1, 0.78, 0.32, 1)
+shadow_color = Color(0.16, 0.05, 0.13, 0.42)
+shadow_size = 10
+shadow_offset = Vector2(0, -4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_shop"]
+bg_color = Color(0.96, 0.54, 0.3, 1)
+border_width_top = 4
+border_width_right = 2
+border_color = Color(0.42, 0.16, 0.33, 0.75)
+corner_radius_top_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_shop_hover"]
+bg_color = Color(1, 0.62, 0.34, 1)
+border_width_top = 5
+border_width_right = 2
+border_color = Color(1, 0.86, 0.44, 1)
+corner_radius_top_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_shop_pressed"]
+bg_color = Color(0.84, 0.39, 0.23, 1)
+border_width_top = 7
+border_width_right = 2
+border_color = Color(0.42, 0.16, 0.33, 0.9)
+corner_radius_top_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_home"]
+bg_color = Color(1, 0.76, 0.27, 1)
+border_width_left = 2
+border_width_top = 7
+border_width_right = 2
+border_color = Color(1, 0.94, 0.65, 1)
+shadow_color = Color(0.35, 0.1, 0.25, 0.28)
+shadow_size = 6
+shadow_offset = Vector2(0, -2)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_home_hover"]
+bg_color = Color(1, 0.82, 0.34, 1)
+border_width_left = 2
+border_width_top = 8
+border_width_right = 2
+border_color = Color(1, 0.98, 0.79, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_home_pressed"]
+bg_color = Color(0.93, 0.61, 0.17, 1)
+border_width_left = 2
+border_width_top = 9
+border_width_right = 2
+border_color = Color(0.42, 0.16, 0.33, 0.72)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_leaderboard"]
+bg_color = Color(0.91, 0.39, 0.32, 1)
+border_width_left = 2
+border_width_top = 4
+border_color = Color(0.42, 0.16, 0.33, 0.75)
+corner_radius_top_right = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_leaderboard_hover"]
+bg_color = Color(0.98, 0.48, 0.38, 1)
+border_width_left = 2
+border_width_top = 5
+border_color = Color(1, 0.77, 0.43, 1)
+corner_radius_top_right = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_leaderboard_pressed"]
+bg_color = Color(0.78, 0.28, 0.25, 1)
+border_width_left = 2
+border_width_top = 7
+border_color = Color(0.42, 0.16, 0.33, 0.9)
+corner_radius_top_right = 18
+
+[node name="MainMenuBottomNavigation" type="MarginContainer"]
+custom_minimum_size = Vector2(0, 132)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+script = ExtResource("1_script")
+
+[node name="BarBackground" type="Panel" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_bar")
+
+[node name="Buttons" type="HBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="ShopButton" type="Button" parent="Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 132)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_shop")
+theme_override_styles/hover = SubResource("StyleBoxFlat_shop_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_shop_pressed")
+theme_override_styles/focus = SubResource("StyleBoxFlat_shop_hover")
+icon = ExtResource("2_shop")
+expand_icon = true
+icon_max_width = 104
+
+[node name="HomeButton" type="Button" parent="Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 132)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_home")
+theme_override_styles/hover = SubResource("StyleBoxFlat_home_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_home_pressed")
+theme_override_styles/focus = SubResource("StyleBoxFlat_home_hover")
+icon = ExtResource("3_home")
+expand_icon = true
+icon_max_width = 92
+
+[node name="LeaderboardButton" type="Button" parent="Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 132)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_leaderboard")
+theme_override_styles/hover = SubResource("StyleBoxFlat_leaderboard_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_leaderboard_pressed")
+theme_override_styles/focus = SubResource("StyleBoxFlat_leaderboard_hover")
+icon = ExtResource("4_leaderboard")
+expand_icon = true
+icon_max_width = 98

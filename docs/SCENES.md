@@ -62,6 +62,27 @@ Purpose:
 Do not use for:
 - Saving or calculating reward chest progress. Those remain in `PlayerProgress`.
 
+## `scenes/ui/main_menu_bottom_navigation.tscn`
+
+Root:
+- `MainMenuBottomNavigation` (`MarginContainer`)
+
+Script:
+- `scripts/main_menu_bottom_navigation.gd`
+
+Purpose:
+- Owns the full-width, icon-only bottom navigation bar on the production main menu.
+- Presents Shop, selected Home, and Leaderboard buttons as equal-width warm-colored segments.
+- Adds bottom safe-area padding supplied by the production menu without narrowing the full-width background.
+- Emits focused button signals so future Shop and Leaderboard screens can connect without moving button wiring into the main-menu script.
+
+Depends on:
+- `assets/ui/nav_shop.png` and `assets/ui/nav_leaderboard.png`, cleaned from the supplied source art.
+- `assets/ui/nav_home.svg` for the matching Home symbol.
+
+Do not use for:
+- Owning Shop or Leaderboard screen navigation. Those destination scenes are not implemented yet.
+
 ## `scenes/ui/main_menu_reward_chest.tscn`
 
 Root:

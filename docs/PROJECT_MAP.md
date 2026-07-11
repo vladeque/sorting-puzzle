@@ -67,6 +67,7 @@ Responsibility:
 - Uses `scripts/press_scale_button.gd` as the default held-press behavior for visible game UI buttons so they shrink slightly while a click or touch is held.
 - Keeps free level selection out of the production menu.
 - Preserves the old testing menu in `scenes/main_menu_testing.tscn`.
+- Keeps Shop, Home, and Leaderboard entry points in the reusable full-width `scenes/ui/main_menu_bottom_navigation.tscn`; Home is the current selected destination and the other destinations are visual hooks until their screens are implemented.
 - Builds testing level buttons for levels 1 through 10 only when dev/test level selection is enabled.
 - Instantiates `level.tscn`, assigns `selected_level`, `launched_from_dev_mode`, and `return_menu_scene_path`, swaps it into `SceneTree.current_scene`, and removes the menu.
 

@@ -41,6 +41,7 @@ Important nodes:
 - `MainMenuTopStatus/LivesWidget/LifeStatus`: shows `Full` or the `MM:SS` countdown until the next restored life.
 - `%BottomBar`: bottom-anchored container positioned at runtime with safe-area padding.
 - `%LevelButton`: `scenes/ui/level_button.tscn` instance that starts the saved campaign level.
+- `%BottomNavigation`: full-width `scenes/ui/main_menu_bottom_navigation.tscn` instance aligned to the viewport bottom and extended through the device safe area.
 
 Key methods:
 - `_ready()`: loads progress, wires the level button, and applies responsive layout.
@@ -48,6 +49,7 @@ Key methods:
 - `_apply_responsive_layout()`: keeps the top status row and bottom button inside the viewport and safe area.
 - `_layout_top_status_bar()`: positions the static top status row.
 - `_layout_reward_chest()`: positions the side reward chest under the profile icon without putting it in the top status scene.
+- `_layout_bottom_navigation()`: sizes the full-width navigation bar and passes its safe-bottom inset to the scene-owned layout.
 - `_update_level_button()`: displays the saved current level, no-lives state, or complete state.
 - `_update_coin_status()`: writes the saved gold coin balance into the top status label.
 - `_update_lives_status()`: writes current lives and the next-life `MM:SS` countdown into the top status labels.
@@ -74,6 +76,18 @@ Do not use for:
 - Developer/test level selection. Put that in `scripts/main_menu.gd`.
 - Persistent save data ownership. Put that in `scripts/player_progress.gd`.
 - Puzzle runtime logic.
+
+## `scripts/main_menu_bottom_navigation.gd`
+
+Attached to:
+- `scenes/ui/main_menu_bottom_navigation.tscn` root `MainMenuBottomNavigation`.
+
+Purpose:
+- Wires the three scene-owned icon buttons to `shop_pressed`, `home_pressed`, and `leaderboard_pressed` signals.
+- Applies runtime bottom safe-area padding while preserving three equal-width button segments.
+
+Do not use for:
+- Loading destination scenes or owning menu progression.
 
 ## `scripts/main_menu_reward_coin_flyer.gd`
 
