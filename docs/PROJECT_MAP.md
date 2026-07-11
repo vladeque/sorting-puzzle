@@ -137,8 +137,8 @@ Responsibility:
 - Uses `scripts/press_scale_button.gd` on the completion `Next` button so the green blank-image button shrinks while held.
 - Tracks cleared triples and unlocks shelves whose configs require progress before becoming accessible.
 - Plays item placement and triple-clear sound effects.
-- Keeps non-clearing items interactive while match animations run, with pending shelf resolves queued behind the active animation.
-- Promotes back layers when the visible layer clears.
+- Keeps non-clearing items interactive while match animations run, resolves different shelves concurrently, and queues only repeated work for a shelf that is already resolving.
+- Promotes back layers as soon as their own visible shelf layer clears, without waiting for match or reward animations on other shelves.
 - Tracks the countdown timer, starting it only after the first meaningful player action, and win/loss overlays.
 - Plays the hammer ability by gathering the targeted items into one center-screen item, striking it with the fullscreen hammer, then dropping combo reward stars from the impact point.
 - Plays the shuffle ability by showing a center-screen delivery box, flying visible unlocked items into it, swapping item identities while hidden, flying them back to their slots, then resolving shelf matches.

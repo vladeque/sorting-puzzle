@@ -202,6 +202,7 @@ var _selected_item: ShelfItem
 var _selected_slot: Node2D
 var _is_resolving_shelves := false
 var _shelves_pending_resolve: Array[Node] = []
+var _shelves_resolving_ids: Array[int] = []
 var _clearing_item_ids: Array[int] = []
 var _transitioning_item_ids: Array[int] = []
 var _item_place_audio_player: AudioStreamPlayer
@@ -778,6 +779,9 @@ func _apply_level_config(config: Dictionary) -> void:
 	if _ability_purchase_overlay != null:
 		_ability_purchase_overlay.visible = false
 	_ability_purchase_pending_id = StringName()
+	_is_resolving_shelves = false
+	_shelves_pending_resolve.clear()
+	_shelves_resolving_ids.clear()
 
 	_clear_ability_highlights()
 	_load_ability_uses()
@@ -1364,7 +1368,7 @@ func _record_triples_cleared(triple_count: int) -> int:
 		_add_stars(earned_stars)
 
 	var newly_unlocked_shelves := _update_locked_shelves()
-	_queue_shelves_to_resolve(newly_unlocked_shelves)
+	_resolve_shelves(newly_unlocked_shelves)
 	return earned_stars
 
 
@@ -2230,22 +2234,39 @@ func _add_shelf_to_check(shelves_to_check: Array[Node], slot: Node2D) -> void:
 
 
 func _resolve_shelves(shelves_to_check: Array[Node]) -> void:
-	_queue_shelves_to_resolve(shelves_to_check)
-	if _is_resolving_shelves:
-		return
+	for shelf in shelves_to_check:
+		if shelf == null or not is_instance_valid(shelf):
+			continue
 
-	_is_resolving_shelves = true
-	while not _shelves_pending_resolve.is_empty():
-		var active_shelves := _shelves_pending_resolve.duplicate()
-		_shelves_pending_resolve.clear()
+		var shelf_instance_id := shelf.get_instance_id()
+		if _shelves_resolving_ids.has(shelf_instance_id):
+			_queue_shelves_to_resolve([shelf])
+			continue
 
+		_shelves_resolving_ids.append(shelf_instance_id)
+		_resolve_shelf(shelf, shelf_instance_id)
+
+	_is_resolving_shelves = not _shelves_resolving_ids.is_empty()
+
+
+func _resolve_shelf(shelf: Node, shelf_instance_id: int) -> void:
+	while shelf != null and is_instance_valid(shelf):
 		while true:
-			var cleared := await _clear_matching_shelves(active_shelves)
-			var promoted := await _promote_empty_front_layers(active_shelves)
+			var cleared := await _clear_matching_shelves([shelf])
+			var promoted := await _promote_empty_front_layers([shelf])
 			if not cleared and not promoted:
 				break
 
-	_is_resolving_shelves = false
+		if not _shelves_pending_resolve.has(shelf):
+			break
+
+		_shelves_pending_resolve.erase(shelf)
+
+	_shelves_resolving_ids.erase(shelf_instance_id)
+	_is_resolving_shelves = not _shelves_resolving_ids.is_empty()
+	if _is_resolving_shelves:
+		return
+
 	_refresh_ability_highlights()
 	_check_level_completed()
 	_update_ability_buttons()
@@ -2285,7 +2306,7 @@ func _clear_matching_shelves(shelves_to_check: Array[Node]) -> bool:
 			await _play_match_clear_animation(shelf_items)
 			var earned_stars := _record_triples_cleared(1)
 			_show_combo_praise(star_reward_origin, _combo_count)
-			await _play_combo_star_reward_animation(star_reward_origin, earned_stars)
+			_play_combo_star_reward_animation(star_reward_origin, earned_stars)
 
 	return cleared_any
 
