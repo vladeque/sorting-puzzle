@@ -86,7 +86,7 @@ border_color = Color(0.42, 0.16, 0.33, 0.9)
 corner_radius_top_right = 18
 
 [node name="MainMenuBottomNavigation" type="MarginContainer"]
-custom_minimum_size = Vector2(0, 132)
+custom_minimum_size = Vector2(0, 96)
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -107,7 +107,7 @@ theme_override_constants/separation = 0
 
 [node name="ShopButton" type="Button" parent="Buttons"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 132)
+custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
 size_flags_horizontal = 3
 focus_mode = 0
@@ -118,11 +118,11 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_shop_pressed")
 theme_override_styles/focus = SubResource("StyleBoxFlat_shop_hover")
 icon = ExtResource("2_shop")
 expand_icon = true
-icon_max_width = 104
+icon_max_width = 76
 
 [node name="HomeButton" type="Button" parent="Buttons"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 132)
+custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
 size_flags_horizontal = 3
 focus_mode = 0
@@ -133,11 +133,11 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_home_pressed")
 theme_override_styles/focus = SubResource("StyleBoxFlat_home_hover")
 icon = ExtResource("3_home")
 expand_icon = true
-icon_max_width = 92
+icon_max_width = 68
 
 [node name="LeaderboardButton" type="Button" parent="Buttons"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 132)
+custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
 size_flags_horizontal = 3
 focus_mode = 0
@@ -148,4 +148,4 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_leaderboard_pressed")
 theme_override_styles/focus = SubResource("StyleBoxFlat_leaderboard_hover")
 icon = ExtResource("4_leaderboard")
 expand_icon = true
-icon_max_width = 98
+icon_max_width = 72

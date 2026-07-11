@@ -13,11 +13,11 @@ const TOP_SIDE_MARGIN := 24.0
 const PROFILE_WIDGET_WIDTH := 76.0
 const REWARD_CHEST_SIZE := Vector2(116.0, 136.0)
 const REWARD_CHEST_TOP_GAP := 72.0
-const BOTTOM_BAR_HEIGHT := 220.0
-const BOTTOM_MARGIN := 152.0
+const BOTTOM_BAR_HEIGHT := 184.0
+const BOTTOM_MARGIN := 116.0
 const SIDE_MARGIN := 48.0
 const LEVEL_BUTTON_MAX_WIDTH := 420.0
-const BOTTOM_NAVIGATION_HEIGHT := 132.0
+const BOTTOM_NAVIGATION_HEIGHT := 96.0
 const LIFE_STATUS_REFRESH_SECONDS := 1.0
 
 @onready var _top_status_bar := %TopStatusBar as MarginContainer
