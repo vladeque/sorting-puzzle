@@ -7,6 +7,7 @@ const AVATAR_CLIP_SHADER := preload("res://assets/ui/avatar_circle_clip.gdshader
 const MIN_LEVEL := 1
 const MAX_LEVEL := 10
 const PRODUCTION_MENU_SCENE := "res://scenes/main_menu.tscn"
+const LEADERBOARD_SCENE := "res://scenes/ui/leaderboard_screen.tscn"
 const TOP_BAR_HEIGHT := 86.0
 const TOP_MARGIN := 28.0
 const TOP_SIDE_MARGIN := 24.0
@@ -47,6 +48,7 @@ func _ready() -> void:
 	_level_button.pressed.connect(_launch_campaign_level)
 	_profile_button.pressed.connect(_open_profile_menu)
 	_settings_button.pressed.connect(_open_settings_menu)
+	_bottom_navigation.connect("leaderboard_pressed", Callable(self, "_open_leaderboard"))
 	if _bottom_navigation.has_method("set_active_tab"):
 		_bottom_navigation.call("set_active_tab", &"home")
 	get_viewport().size_changed.connect(_apply_responsive_layout)
@@ -312,6 +314,10 @@ func _clear_profile_menu_reference() -> void:
 
 func _clear_settings_menu_reference() -> void:
 	_settings_menu = null
+
+
+func _open_leaderboard() -> void:
+	get_tree().change_scene_to_file(LEADERBOARD_SCENE)
 
 
 func _launch_campaign_level() -> void:

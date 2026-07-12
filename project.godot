@@ -17,6 +17,7 @@ config/icon="res://icon.svg"
 config/save_provider="local"
 config/cloud_save_name="player_progress"
 config/cloud_save_bridge_singleton=""
+config/leaderboard_provider="mock"
 
 [autoload]
 

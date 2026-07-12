@@ -20,6 +20,7 @@ Purpose:
 - Opens the player profile menu when the profile widget is pressed.
 - Opens the main settings menu when the settings widget is pressed.
 - Starts the saved campaign level when the bottom button is pressed.
+- Opens `scenes/ui/leaderboard_screen.tscn` when the bottom navigation trophy is pressed.
 
 Important nodes:
 - `Background`: fullscreen `TextureRect` using `assets/backgrounds/main_menu.jpeg`.
@@ -42,10 +43,60 @@ Depends on:
 - `scenes/ui/profile_menu.tscn` for profile name and avatar editing.
 - `scenes/ui/settings_menu.tscn` for the main-menu settings popup.
 - `scenes/ui/level_button.tscn` for the reusable production level button visuals.
+- `scenes/ui/leaderboard_screen.tscn` for the dedicated ranking destination.
 
 Do not use for:
 - Dev/test level selection. Use `scenes/main_menu_testing.tscn`.
 - Runtime puzzle rules or shelf state. Put those in `level.tscn` and `scripts/level.gd`.
+
+## `scenes/ui/leaderboard_screen.tscn`
+
+Root:
+- `LeaderboardScreen` (`Control`)
+
+Script:
+- `scripts/leaderboard_screen.gd`
+
+Purpose:
+- Owns the dedicated leaderboard destination reached from the production menu trophy tab.
+- Shows the required `Leaderboard` title and Weekly, Country, and World segmented buttons.
+- Gives the central `LeaderboardScroll` the remaining vertical space between the tabs and the reusable bottom navigation.
+- Builds up to 50 mock ranking rows in `RowsContainer` and keeps the local player visible through `PinnedPlayerRow` when outside that range.
+- Shows a weekly reset countdown, all-time scope descriptions, loading state, empty state, and retryable error state.
+- Centers content to a 720-pixel maximum logical width, compacts rows on short viewports, and applies Android/iOS safe-area padding.
+
+Important nodes:
+- `%WeeklyButton`, `%CountryButton`, `%WorldButton`: leaderboard scope controls.
+- `%PeriodLabel`: weekly countdown or all-time scope description.
+- `%LeaderboardScroll`: vertical-only ranking list.
+- `%RowsContainer`: runtime parent for reusable row instances.
+- `%StatusContainer`, `%StatusLabel`, `%RetryButton`: loading, empty, and error presentation.
+- `%PinnedPlayerRow`: highlighted local-player entry outside the scroll view.
+- `%BottomNavigation`: shared navigation instance with Leaderboard selected.
+
+Depends on:
+- `scenes/ui/leaderboard_row.tscn`.
+- `scenes/ui/main_menu_bottom_navigation.tscn`.
+- `scripts/leaderboards/leaderboard_service.gd`.
+- `PlayerProgress` for the local player's name, avatar, lifetime stars, and weekly stars.
+
+## `scenes/ui/leaderboard_row.tscn`
+
+Root:
+- `LeaderboardRow` (`Control`)
+
+Script:
+- `scripts/leaderboard_row.gd`
+
+Purpose:
+- Reusable ranking entry with rank, circular-clipped avatar, ellipsized player name, reward-star icon, and formatted score.
+- Keeps normal cream row art and the green local-player highlight authored in the scene.
+- Supports regular and compact heights selected by the owning leaderboard screen.
+
+Depends on:
+- `assets/ui/avatars/*.png`.
+- `assets/ui/avatar_circle_clip.gdshader`.
+- `assets/ui/reward_star_34_glossy_b.png`.
 
 ## `scenes/ui/main_menu_reward_coin_flyer.tscn`
 
@@ -85,7 +136,7 @@ Depends on:
 - `assets/ui/trophy_icon_128x128.png`.
 
 Do not use for:
-- Owning Shop or Leaderboard screen navigation. Those destination scenes are not implemented yet.
+- Owning destination scenes. The production menu and leaderboard screen connect the signals and perform navigation.
 
 ## `scenes/ui/main_menu_reward_chest.tscn`
 

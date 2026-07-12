@@ -24,7 +24,7 @@ Player progression:
 - `scripts/player_progress.gd`
 - `scripts/save_providers/*.gd`
 - Registered in `project.godot` as the `PlayerProgress` autoload.
-- Saves campaign level progress, campaign lives, gold coins, campaign ability inventory, reward chest progress, selected profile avatar, player name, and settings-button disabled states through the configured save provider.
+- Saves campaign level progress, campaign lives, gold coins, campaign ability inventory, reward chest progress, lifetime and weekly leaderboard stars, selected profile avatar, player name, and settings-button disabled states through the configured save provider.
 
 Reusable item scene:
 - `scenes/item.tscn`
@@ -67,7 +67,7 @@ Responsibility:
 - Uses `scripts/press_scale_button.gd` as the default held-press behavior for visible game UI buttons so they shrink slightly while a click or touch is held.
 - Keeps free level selection out of the production menu.
 - Preserves the old testing menu in `scenes/main_menu_testing.tscn`.
-- Keeps Shop, Home, and Leaderboard entry points in the reusable full-width `scenes/ui/main_menu_bottom_navigation.tscn`; Home is the current selected destination and the other destinations are visual hooks until their screens are implemented.
+- Keeps Shop, Home, and Leaderboard entry points in the reusable full-width `scenes/ui/main_menu_bottom_navigation.tscn`; Home and Leaderboard route between their dedicated screens while Shop remains a visual hook.
 - Builds testing level buttons for levels 1 through 10 only when dev/test level selection is enabled.
 - Instantiates `level.tscn`, assigns `selected_level`, `launched_from_dev_mode`, and `return_menu_scene_path`, swaps it into `SceneTree.current_scene`, and removes the menu.
 
@@ -96,9 +96,35 @@ Responsibility:
 - Spends ability uses immediately so failure or leaving a level does not refund them.
 - Advances `current_level` only when the active campaign level is completed.
 - Adds earned campaign completion stars to the reward chest and grants configured gold coin rewards when goals are reached.
+- Adds the same earned campaign completion stars to a non-spending lifetime total and a Monday-UTC weekly total for leaderboard scoring.
 
 Change here when:
 - Adding life tuning, ability refills, rewards, purchases, reset flows, save migrations, native cloud save hooks, avatar/name availability, or new persisted player state.
+
+### Leaderboards
+
+Files:
+- `scenes/ui/leaderboard_screen.tscn`
+- `scenes/ui/leaderboard_row.tscn`
+- `scenes/ui/main_menu_bottom_navigation.tscn`
+- `scripts/leaderboard_screen.gd`
+- `scripts/leaderboard_row.gd`
+- `scripts/leaderboards/leaderboard_provider.gd`
+- `scripts/leaderboards/mock_leaderboard_provider.gd`
+- `scripts/leaderboards/leaderboard_service.gd`
+- `scripts/player_progress.gd`
+- `docs/LEADERBOARDS.md`
+
+Responsibility:
+- Opens a dedicated responsive leaderboard screen from the production menu trophy tab and returns through Home.
+- Presents Weekly, Country, and World scopes above a large scrollable ranking list.
+- Shows rank, saved avatar, display name, and earned-star score for each entry.
+- Pins the local player's highlighted entry above the bottom navigation when it falls outside the fetched top 50.
+- Uses a mock provider selected by `application/config/leaderboard_provider` while preserving a provider boundary for later backend integration.
+- Uses Monday 00:00 UTC through the following Monday as the mock weekly scoring period; Country and World use lifetime stars.
+
+Change here when:
+- Replacing mock data, adding backend requests or pagination, changing leaderboard scopes, or changing ranking-row presentation.
 
 ### Level Runtime
 

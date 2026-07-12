@@ -1,0 +1,312 @@
+[gd_scene load_steps=14 format=3]
+
+[ext_resource type="Script" path="res://scripts/leaderboard_screen.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/backgrounds/main_menu.jpeg" id="2_background"]
+[ext_resource type="PackedScene" path="res://scenes/ui/leaderboard_row.tscn" id="3_row"]
+[ext_resource type="PackedScene" path="res://scenes/ui/main_menu_bottom_navigation.tscn" id="4_navigation"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_normal"]
+bg_color = Color(0.39, 0.17, 0.2, 0.96)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(0.18, 0.055, 0.075, 0.95)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_hover"]
+bg_color = Color(0.52, 0.24, 0.24, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(1, 0.74, 0.38, 0.9)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_pressed"]
+bg_color = Color(1, 0.66, 0.17, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 5
+border_color = Color(1, 0.91, 0.53, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+shadow_color = Color(0.18, 0.04, 0.02, 0.42)
+shadow_size = 5
+shadow_offset = Vector2(0, 2)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_focus"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_list"]
+bg_color = Color(0.16, 0.055, 0.08, 0.72)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.7, 0.31, 0.58)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_scroll"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_retry_normal"]
+bg_color = Color(0.93, 0.45, 0.22, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(1, 0.78, 0.36, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_retry_pressed"]
+bg_color = Color(0.7, 0.25, 0.14, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(1, 0.86, 0.56, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[node name="LeaderboardScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_background")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="BackgroundShade" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.13, 0.035, 0.045, 0.7)
+
+[node name="ContentMargin" type="MarginContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 18.0
+offset_right = -16.0
+offset_bottom = -108.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ContentStack" type="VBoxContainer" parent="ContentMargin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TitleLabel" type="Label" parent="ContentMargin/ContentStack"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.73, 1)
+theme_override_colors/font_shadow_color = Color(0.12, 0.02, 0.025, 0.95)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 4
+theme_override_font_sizes/font_size = 44
+text = "Leaderboard"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Tabs" type="HBoxContainer" parent="ContentMargin/ContentStack"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="WeeklyButton" type="Button" parent="ContentMargin/ContentStack/Tabs"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+mouse_default_cursor_shape = 2
+toggle_mode = true
+button_pressed = true
+theme_override_colors/font_color = Color(1, 0.94, 0.76, 1)
+theme_override_colors/font_hover_color = Color(1, 0.97, 0.82, 1)
+theme_override_colors/font_pressed_color = Color(0.29, 0.08, 0.04, 1)
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_tab_pressed")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+text = "Weekly"
+
+[node name="CountryButton" type="Button" parent="ContentMargin/ContentStack/Tabs"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+mouse_default_cursor_shape = 2
+toggle_mode = true
+theme_override_colors/font_color = Color(1, 0.94, 0.76, 1)
+theme_override_colors/font_hover_color = Color(1, 0.97, 0.82, 1)
+theme_override_colors/font_pressed_color = Color(0.29, 0.08, 0.04, 1)
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_tab_pressed")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+text = "Country"
+
+[node name="WorldButton" type="Button" parent="ContentMargin/ContentStack/Tabs"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+mouse_default_cursor_shape = 2
+toggle_mode = true
+theme_override_colors/font_color = Color(1, 0.94, 0.76, 1)
+theme_override_colors/font_hover_color = Color(1, 0.97, 0.82, 1)
+theme_override_colors/font_pressed_color = Color(0.29, 0.08, 0.04, 1)
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_tab_pressed")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+text = "World"
+
+[node name="PeriodLabel" type="Label" parent="ContentMargin/ContentStack"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.84, 0.57, 1)
+theme_override_colors/font_outline_color = Color(0.16, 0.03, 0.025, 0.94)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 20
+text = "Weekly reset in 1d 4h"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ListArea" type="Control" parent="ContentMargin/ContentStack"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ListBackground" type="Panel" parent="ContentMargin/ContentStack/ListArea"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_list")
+
+[node name="LeaderboardScroll" type="ScrollContainer" parent="ContentMargin/ContentStack/ListArea"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_scroll")
+horizontal_scroll_mode = 0
+
+[node name="RowsContainer" type="VBoxContainer" parent="ContentMargin/ContentStack/ListArea/LeaderboardScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="StatusContainer" type="CenterContainer" parent="ContentMargin/ContentStack/ListArea"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="StatusStack" type="VBoxContainer" parent="ContentMargin/ContentStack/ListArea/StatusContainer"]
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="StatusLabel" type="Label" parent="ContentMargin/ContentStack/ListArea/StatusContainer/StatusStack"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 54)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.69, 1)
+theme_override_colors/font_outline_color = Color(0.12, 0.02, 0.025, 0.95)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 26
+text = "Loading leaderboard…"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="RetryButton" type="Button" parent="ContentMargin/ContentStack/ListArea/StatusContainer/StatusStack"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(180, 54)
+layout_mode = 2
+size_flags_horizontal = 4
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 0.96, 0.78, 1)
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_retry_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_retry_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_retry_pressed")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+text = "Retry"
+
+[node name="PinnedPlayerRow" parent="ContentMargin/ContentStack" instance=ExtResource("3_row")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="BottomNavigation" parent="." instance=ExtResource("4_navigation")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -96.0
+grow_horizontal = 2
+grow_vertical = 0
+active_tab = "leaderboard"

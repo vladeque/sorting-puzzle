@@ -211,6 +211,9 @@ Fields:
 - `settings_disabled`: disabled-state map for `music`, `sound_effects`, and `vibration`. Fresh saves and old saves without this field default all three buttons to enabled.
 - `reward_chest_stars`: stars accumulated toward the active reward chest goal.
 - `reward_chest_goal_index`: active index in `configs/reward_chest_goals.json`.
+- `total_earned_stars`: non-spending lifetime total used by Country and World leaderboards.
+- `leaderboard_week_start_unix`: Monday 00:00 UTC timestamp for the active leaderboard week.
+- `weekly_earned_stars`: stars earned during the active leaderboard week.
 
 Runtime behavior:
 - Fresh saves start at level 1 with five lives, 300 gold coins, three uses for each ability, `avatar_cat` selected as the profile avatar, a generated `player_` name with a five-character random suffix, and all settings buttons enabled.
@@ -223,6 +226,9 @@ Runtime behavior:
 - Settings button disabled states are saved immediately when toggled and restored by the main-menu settings popup and in-level pause menu on later game starts.
 - Failed or abandoned levels do not refund ability uses.
 - Completing the current campaign level advances `current_level` by one and adds the run's earned stars to the reward chest.
+- The same completion adds stars to `total_earned_stars` and `weekly_earned_stars`; neither is reduced by reward chest rollover.
+- Save schema 3 seeds missing lifetime totals from retained `reward_chest_stars` for development-save compatibility and starts missing weekly totals at zero.
+- Weekly stars reset when the saved Monday-UTC boundary no longer matches the current week.
 - Reward chest stars roll over when a configured goal is reached, grant that goal's `coin_reward`, then the next configured goal starts.
 - Developer/test level selection is isolated from this save data.
 - Release builds can switch to cloud-only persistence by setting `application/config/save_provider` to `cloud`.
@@ -244,6 +250,17 @@ Cloud bridge defaults:
 
 See:
 - `docs/CLOUD_SAVE.md`
+
+## Leaderboard Provider Setting
+
+Purpose:
+- Selects the data source used by `LeaderboardService` without coupling the UI to backend details.
+
+Field:
+- `application/config/leaderboard_provider`: currently supports `mock` and defaults to it. Unsupported values warn and fall back to mock data until another provider is implemented.
+
+See:
+- `docs/LEADERBOARDS.md`
 
 ## Documentation Update Checklist
 

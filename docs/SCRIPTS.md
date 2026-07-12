@@ -17,6 +17,7 @@ Purpose:
 - Consumes completed-level reward payloads, displays the pre-reward chest value, and advances it once for each clover coin that reaches the chest.
 - Opens the main-menu settings popup from the top status bar.
 - Launches the saved campaign level.
+- Opens the dedicated leaderboard scene from the bottom navigation trophy signal.
 
 Key constants:
 - `LEVEL_SCENE`: preloads `res://level.tscn`.
@@ -25,6 +26,7 @@ Key constants:
 - `MIN_LEVEL`: first campaign level number.
 - `MAX_LEVEL`: last campaign level number.
 - `PRODUCTION_MENU_SCENE`: return path assigned to campaign level instances.
+- `LEADERBOARD_SCENE`: destination path for the trophy tab.
 - `LIFE_STATUS_REFRESH_SECONDS`: cadence for refreshing the lives countdown while the menu is visible.
 - `BOTTOM_BAR_*`, `SIDE_MARGIN`, and `LEVEL_BUTTON_MAX_WIDTH`: responsive bottom-button layout values.
 
@@ -44,7 +46,7 @@ Important nodes:
 - `%BottomNavigation`: full-width `scenes/ui/main_menu_bottom_navigation.tscn` instance aligned to the viewport bottom and extended through the device safe area.
 
 Key methods:
-- `_ready()`: loads progress, wires the level button, selects Home in the bottom navigation, and applies responsive layout.
+- `_ready()`: loads progress, wires the level and trophy buttons, selects Home in the bottom navigation, and applies responsive layout.
 - `_process(delta)`: refreshes the lives display and play button state once per elapsed real-time second while the menu is open.
 - `_apply_responsive_layout()`: keeps the top status row and bottom button inside the viewport and safe area.
 - `_layout_top_status_bar()`: positions the static top status row.
@@ -61,6 +63,7 @@ Key methods:
 - `_open_profile_menu()`: creates the centered profile menu window and listens for saved avatar changes.
 - `_open_settings_menu()`: creates the centered settings popup and wires its close button.
 - `_close_settings_menu()`: dismisses the settings popup.
+- `_open_leaderboard()`: replaces the production menu with the dedicated leaderboard scene.
 - `_on_profile_avatar_saved(avatar_id)`: refreshes the top status avatar after the profile menu saves.
 - `_launch_campaign_level()`: instantiates the level, sets campaign launch metadata, swaps current scene, and queues the menu for deletion.
 
@@ -89,6 +92,65 @@ Purpose:
 
 Do not use for:
 - Loading destination scenes or owning menu progression.
+
+## `scripts/leaderboard_screen.gd`
+
+Attached to:
+- `scenes/ui/leaderboard_screen.tscn` root `LeaderboardScreen`.
+
+Purpose:
+- Owns Weekly, Country, and World selection and asynchronous provider requests.
+- Builds ranking rows from provider dictionaries and pins the local player when absent from the returned top 50.
+- Updates the weekly reset countdown and loading, empty, and retry states.
+- Applies responsive content width, compact row sizing, bottom-navigation placement, and mobile safe-area margins.
+- Routes the shared Home tab back to `scenes/main_menu.tscn`.
+
+Depends on:
+- `scripts/leaderboards/leaderboard_service.gd`.
+- `scenes/ui/leaderboard_row.tscn`.
+- `PlayerProgress` leaderboard and profile getters.
+
+## `scripts/leaderboard_row.gd`
+
+Class:
+- `LeaderboardRow`
+
+Attached to:
+- `scenes/ui/leaderboard_row.tscn` root `LeaderboardRow`.
+
+Purpose:
+- Binds one provider entry to rank, avatar, display name, and comma-formatted star score controls.
+- Toggles the scene-authored current-player highlight.
+- Applies compact or regular row and font sizing.
+
+## `scripts/leaderboards/leaderboard_provider.gd`
+
+Class:
+- `LeaderboardProvider`
+
+Purpose:
+- Defines the provider contract and shared Weekly, Country, and World scope identifiers.
+- Normalizes provider results as `ok`, `entries`, `player_entry`, `period_end_unix`, `has_more`, and `error` fields.
+
+## `scripts/leaderboards/mock_leaderboard_provider.gd`
+
+Class:
+- `MockLeaderboardProvider`
+
+Purpose:
+- Produces 50 deterministic mock competitors plus the current player for all three scopes.
+- Sorts scores descending, assigns competition ranks, and returns the current player separately for pinned presentation.
+- Uses weekly stars for Weekly and lifetime stars for Country and World.
+
+## `scripts/leaderboards/leaderboard_service.gd`
+
+Class:
+- `LeaderboardService`
+
+Purpose:
+- Selects the configured provider and exposes the asynchronous fetch method used by the screen.
+- Falls back to the mock provider when an unsupported provider id is configured.
+- Is the replacement point for a later HTTP or platform-backed provider.
 
 ## `scripts/main_menu_reward_coin_flyer.gd`
 
@@ -267,6 +329,7 @@ Autoload:
 Purpose:
 - Owns saved campaign progression, campaign lives, gold coins, campaign ability inventory, selected profile avatar, player name, and settings-button disabled states.
 - Owns saved reward chest star progress and active reward chest goal index.
+- Owns non-spending lifetime earned stars and the current Monday-UTC weekly earned-star total used by leaderboards.
 - Persists state through the configured save provider.
 
 Saved fields:
@@ -282,6 +345,9 @@ Saved fields:
 - `settings_disabled`: disabled-state map for `music`, `sound_effects`, and `vibration` settings buttons.
 - `reward_chest_stars`: stars accumulated toward the active reward chest goal.
 - `reward_chest_goal_index`: index into `configs/reward_chest_goals.json` for the active goal; the final configured goal repeats after it is reached.
+- `total_earned_stars`: lifetime campaign stars; unlike chest stars, this value never rolls over or spends.
+- `leaderboard_week_start_unix`: Monday 00:00 UTC boundary for the saved weekly counter.
+- `weekly_earned_stars`: campaign stars earned since the saved weekly boundary.
 
 Key methods:
 - `load_progress()`: reads and sanitizes provider data or creates default in-memory progress.
@@ -289,6 +355,10 @@ Key methods:
 - `get_current_level()`: returns the next campaign level.
 - `get_ability_uses()`: returns remaining campaign ability uses.
 - `get_coins()`: returns the saved gold coin balance.
+- `get_total_earned_stars()`: returns the lifetime leaderboard score.
+- `get_weekly_earned_stars()`: resets an expired weekly period when needed and returns the current weekly score.
+- `get_current_leaderboard_week_start_unix()`: returns the current Monday 00:00 UTC boundary.
+- `get_current_leaderboard_week_end_unix()`: returns the next Monday boundary used by the UI countdown.
 - `spend_coins(amount)`: immediately subtracts and saves the requested gold coin amount when enough coins are available.
 - `get_reward_chest_progress()`: returns the saved reward chest stars, active goal, and goal index.
 - `get_reward_chest_goal_at_index(goal_index)`: exposes a configured goal threshold for menu animation rollover.
@@ -310,7 +380,7 @@ Key methods:
 - `refresh_lives()`: restores one life per elapsed real-time hour while lives are not full.
 - `spend_life()`: immediately spends and saves one campaign life when available.
 - `spend_ability(ability_id)`: immediately spends and saves one campaign ability use.
-- `complete_level(level_number, earned_stars)`: records completion, advances the active campaign level, saves earned stars and goal rewards, and records the pre-reward chest state for the next main-menu animation.
+- `complete_level(level_number, earned_stars)`: records completion, advances the active campaign level, adds earned stars to lifetime, weekly, and reward-chest totals, saves goal rewards, and records the pre-reward chest state for the next main-menu animation.
 - `reset_progress()`: restores default progress and writes it to disk for testing.
 - `get_save_provider_name()`: reports the active provider for diagnostics.
 

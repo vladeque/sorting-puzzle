@@ -4,7 +4,7 @@ const LocalSaveProviderScript := preload("res://scripts/save_providers/local_sav
 const CloudSaveProviderScript := preload("res://scripts/save_providers/cloud_save_provider.gd")
 const SAVE_PATH := "user://player_progress.json"
 const SAVE_NAME := "player_progress"
-const SAVE_VERSION := 2
+const SAVE_VERSION := 3
 const MIN_LEVEL := 1
 const SAVE_PROVIDER_SETTING := "application/config/save_provider"
 const CLOUD_SAVE_NAME_SETTING := "application/config/cloud_save_name"
@@ -20,6 +20,8 @@ const PLAYER_NAME_RANDOM_ALPHABET := "abcdefghijklmnopqrstuvwxyz0123456789"
 const PLAYER_NAME_RANDOM_LENGTH := 5
 const REWARD_CHEST_GOALS_CONFIG := "res://configs/reward_chest_goals.json"
 const DEFAULT_COINS := 300
+const LEADERBOARD_WEEK_SECONDS := 7 * 24 * 60 * 60
+const UNIX_EPOCH_MONDAY_OFFSET_DAYS := 3
 const DEFAULT_REWARD_CHEST_GOALS := [
 	{"stars": 500, "coin_reward": 100},
 	{"stars": 1000, "coin_reward": 225},
@@ -116,6 +118,28 @@ func get_ability_uses() -> Dictionary:
 
 func get_coins() -> int:
 	return maxi(int(_data.get("coins", DEFAULT_COINS)), 0)
+
+
+func get_total_earned_stars() -> int:
+	return maxi(int(_data.get("total_earned_stars", 0)), 0)
+
+
+func get_weekly_earned_stars() -> int:
+	if _refresh_leaderboard_week_state():
+		save_progress()
+
+	return maxi(int(_data.get("weekly_earned_stars", 0)), 0)
+
+
+func get_current_leaderboard_week_start_unix() -> int:
+	var now_unix := int(Time.get_unix_time_from_system())
+	var day_number := floori(float(now_unix) / float(24 * 60 * 60))
+	var days_since_monday := posmod(day_number + UNIX_EPOCH_MONDAY_OFFSET_DAYS, 7)
+	return (day_number - days_since_monday) * 24 * 60 * 60
+
+
+func get_current_leaderboard_week_end_unix() -> int:
+	return get_current_leaderboard_week_start_unix() + LEADERBOARD_WEEK_SECONDS
 
 
 func spend_coins(amount: int) -> bool:
@@ -317,6 +341,9 @@ func complete_level(level_number: int, earned_stars: int = 0) -> void:
 		var starting_progress := get_reward_chest_progress()
 		_apply_reward_chest_stars(earned_stars)
 		if earned_stars > 0:
+			_refresh_leaderboard_week_state()
+			_data["total_earned_stars"] = get_total_earned_stars() + earned_stars
+			_data["weekly_earned_stars"] = get_weekly_earned_stars() + earned_stars
 			_pending_reward_chest_animation = {
 				"amount": earned_stars,
 				"start_stars": int(starting_progress.get("stars", 0)),
@@ -338,7 +365,7 @@ func get_save_provider_name() -> String:
 
 func _sanitize_data(raw_data: Dictionary) -> Dictionary:
 	var sanitized := _default_data()
-	sanitized["version"] = int(raw_data.get("version", SAVE_VERSION))
+	sanitized["version"] = SAVE_VERSION
 	sanitized["current_level"] = maxi(int(raw_data.get("current_level", MIN_LEVEL)), MIN_LEVEL)
 	sanitized["highest_completed_level"] = maxi(int(raw_data.get("highest_completed_level", 0)), 0)
 	sanitized["lives"] = clampi(int(raw_data.get("lives", MAX_LIVES)), 0, MAX_LIVES)
@@ -347,6 +374,18 @@ func _sanitize_data(raw_data: Dictionary) -> Dictionary:
 	sanitized["avatar_id"] = _sanitize_avatar_id(str(raw_data.get("avatar_id", DEFAULT_AVATAR_ID)))
 	sanitized["player_name"] = _sanitize_player_name(str(raw_data.get("player_name", sanitized["player_name"])), sanitized["player_name"])
 	sanitized["settings_disabled"] = _sanitize_disabled_settings(raw_data.get("settings_disabled", {}))
+	sanitized["total_earned_stars"] = maxi(
+		int(raw_data.get("total_earned_stars", raw_data.get("reward_chest_stars", 0))),
+		0
+	)
+	var current_week_start := get_current_leaderboard_week_start_unix()
+	var saved_week_start := int(raw_data.get("leaderboard_week_start_unix", current_week_start))
+	if saved_week_start == current_week_start:
+		sanitized["leaderboard_week_start_unix"] = current_week_start
+		sanitized["weekly_earned_stars"] = maxi(int(raw_data.get("weekly_earned_stars", 0)), 0)
+	else:
+		sanitized["leaderboard_week_start_unix"] = current_week_start
+		sanitized["weekly_earned_stars"] = 0
 	var reward_chest_state := _normalize_reward_chest_progress(
 		maxi(int(raw_data.get("reward_chest_stars", 0)), 0),
 		maxi(int(raw_data.get("reward_chest_goal_index", 0)), 0)
@@ -379,6 +418,9 @@ func _default_data() -> Dictionary:
 		"avatar_id": DEFAULT_AVATAR_ID,
 		"player_name": _generate_player_name(),
 		"settings_disabled": DEFAULT_DISABLED_SETTINGS.duplicate(),
+		"total_earned_stars": 0,
+		"leaderboard_week_start_unix": get_current_leaderboard_week_start_unix(),
+		"weekly_earned_stars": 0,
 		"reward_chest_stars": 0,
 		"reward_chest_goal_index": 0,
 	}
@@ -557,6 +599,16 @@ func _refresh_lives_state() -> bool:
 	_data["lives"] = current_lives
 	_data["next_life_restore_unix"] = next_restore_unix
 	return current_lives != original_lives or next_restore_unix != original_next_restore_unix
+
+
+func _refresh_leaderboard_week_state() -> bool:
+	var current_week_start := get_current_leaderboard_week_start_unix()
+	if int(_data.get("leaderboard_week_start_unix", current_week_start)) == current_week_start:
+		return false
+
+	_data["leaderboard_week_start_unix"] = current_week_start
+	_data["weekly_earned_stars"] = 0
+	return true
 
 
 func _ensure_save_provider() -> void:
