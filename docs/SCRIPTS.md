@@ -44,7 +44,7 @@ Important nodes:
 - `%BottomNavigation`: full-width `scenes/ui/main_menu_bottom_navigation.tscn` instance aligned to the viewport bottom and extended through the device safe area.
 
 Key methods:
-- `_ready()`: loads progress, wires the level button, and applies responsive layout.
+- `_ready()`: loads progress, wires the level button, selects Home in the bottom navigation, and applies responsive layout.
 - `_process(delta)`: refreshes the lives display and play button state once per elapsed real-time second while the menu is open.
 - `_apply_responsive_layout()`: keeps the top status row and bottom button inside the viewport and safe area.
 - `_layout_top_status_bar()`: positions the static top status row.
@@ -85,6 +85,7 @@ Attached to:
 Purpose:
 - Wires the three scene-owned icon buttons to `shop_pressed`, `home_pressed`, and `leaderboard_pressed` signals.
 - Applies runtime bottom safe-area padding while preserving three equal-width button segments.
+- Owns the reusable active-tab presentation: `set_active_tab(tab_name)` raises the selected icon beyond the bar height, shows its label, and restores the other icons to centered unlabeled states.
 
 Do not use for:
 - Loading destination scenes or owning menu progression.

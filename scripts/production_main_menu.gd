@@ -47,6 +47,8 @@ func _ready() -> void:
 	_level_button.pressed.connect(_launch_campaign_level)
 	_profile_button.pressed.connect(_open_profile_menu)
 	_settings_button.pressed.connect(_open_settings_menu)
+	if _bottom_navigation.has_method("set_active_tab"):
+		_bottom_navigation.call("set_active_tab", &"home")
 	get_viewport().size_changed.connect(_apply_responsive_layout)
 	_update_profile_avatar()
 	_update_lives_status()

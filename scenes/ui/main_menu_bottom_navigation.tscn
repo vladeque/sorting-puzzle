@@ -20,13 +20,10 @@ corner_detail = 1
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_home"]
 bg_color = Color(0.88235295, 0.5254902, 0.3529412, 1)
 border_width_left = 3
-border_width_top = 5
+border_width_top = 4
 border_width_right = 3
-border_color = Color(1, 0.94, 0.65, 1)
+border_color = Color(0.42, 0.16, 0.33, 0.75)
 corner_detail = 1
-shadow_color = Color(0.35, 0.1, 0.25, 0.28)
-shadow_size = 6
-shadow_offset = Vector2(0, -2)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_leaderboard"]
 bg_color = Color(0.88235295, 0.5254902, 0.3529412, 1)
@@ -84,6 +81,26 @@ texture = ExtResource("2_xh1q6")
 expand_mode = 1
 stretch_mode = 5
 
+[node name="ActiveLabel" type="Label" parent="Buttons/ShopButton"]
+visible = false
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -26.0
+offset_bottom = -2.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.96, 0.78, 1)
+theme_override_colors/font_outline_color = Color(0.42, 0.16, 0.33, 0.95)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 18
+text = "Shop"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="HomeButton" type="Button" parent="Buttons" unique_id=586148991]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 96)
@@ -115,6 +132,26 @@ texture = ExtResource("3_xh1q6")
 expand_mode = 1
 stretch_mode = 5
 
+[node name="ActiveLabel" type="Label" parent="Buttons/HomeButton"]
+visible = false
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -26.0
+offset_bottom = -2.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.96, 0.78, 1)
+theme_override_colors/font_outline_color = Color(0.42, 0.16, 0.33, 0.95)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 18
+text = "Home"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="LeaderboardButton" type="Button" parent="Buttons" unique_id=1364709518]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 96)
@@ -145,3 +182,23 @@ mouse_filter = 2
 texture = ExtResource("4_4cxw6")
 expand_mode = 1
 stretch_mode = 5
+
+[node name="ActiveLabel" type="Label" parent="Buttons/LeaderboardButton"]
+visible = false
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -26.0
+offset_bottom = -2.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.96, 0.78, 1)
+theme_override_colors/font_outline_color = Color(0.42, 0.16, 0.33, 0.95)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 18
+text = "Leaderboard"
+horizontal_alignment = 1
+vertical_alignment = 1

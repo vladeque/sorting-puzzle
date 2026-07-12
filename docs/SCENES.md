@@ -71,15 +71,18 @@ Script:
 - `scripts/main_menu_bottom_navigation.gd`
 
 Purpose:
-- Owns the compact 96-pixel-high, full-width, icon-only bottom navigation bar on the production main menu.
-- Presents Shop, selected Home, and Leaderboard as equal-width segments on one warm coral-orange bar, separated by strong outlines and identifiable icons.
+- Owns the compact 96-pixel-high, full-width, icon-led bottom navigation bar on the production main menu.
+- Presents Shop, Home, and Leaderboard as equal-width segments on one warm coral-orange bar, separated by strong outlines and identifiable icons.
 - Uses enlarged scene-owned `TextureRect` icon controls without hover, focus, or pressed visual effects; the button hit areas remain fully interactive.
+- Raises the active screen's icon above the bar height and reveals its small `Shop`, `Home`, or `Leaderboard` label underneath; inactive icons remain centered with labels hidden.
+- Defaults to Home and exposes `set_active_tab(tab_name)` so future Shop and Leaderboard screens can select their matching visual state.
 - Adds bottom safe-area padding supplied by the production menu without narrowing the full-width background.
 - Emits focused button signals so future Shop and Leaderboard screens can connect without moving button wiring into the main-menu script.
 
 Depends on:
-- `assets/ui/nav_shop.png` and `assets/ui/nav_leaderboard.png`, cleaned from the supplied source art.
-- `assets/ui/nav_home.svg` for the matching Home symbol.
+- `assets/ui/shopping_cart_icon_128x128.png`.
+- `assets/ui/home_navigation_icon_1_128x128.png`.
+- `assets/ui/trophy_icon_128x128.png`.
 
 Do not use for:
 - Owning Shop or Leaderboard screen navigation. Those destination scenes are not implemented yet.
