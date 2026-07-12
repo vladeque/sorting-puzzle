@@ -11,14 +11,14 @@ border_width_top = 3
 border_color = Color(1, 0.78, 0.32, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_shop"]
-bg_color = Color(0.95, 0.48, 0.29, 1)
+bg_color = Color(0.88235295, 0.5254902, 0.3529412, 1)
 border_width_top = 4
 border_width_right = 3
 border_color = Color(0.42, 0.16, 0.33, 0.75)
 corner_detail = 1
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_home"]
-bg_color = Color(0.95, 0.48, 0.29, 1)
+bg_color = Color(0.88235295, 0.5254902, 0.3529412, 1)
 border_width_left = 3
 border_width_top = 5
 border_width_right = 3
@@ -29,7 +29,7 @@ shadow_size = 6
 shadow_offset = Vector2(0, -2)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_leaderboard"]
-bg_color = Color(0.95, 0.48, 0.29, 1)
+bg_color = Color(0.88235295, 0.5254902, 0.3529412, 1)
 border_width_left = 3
 border_width_top = 4
 border_color = Color(0.42, 0.16, 0.33, 0.75)
@@ -61,12 +61,12 @@ size_flags_horizontal = 3
 focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_shop")
-theme_override_styles/hover = SubResource("StyleBoxFlat_shop")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_shop")
-theme_override_styles/focus = SubResource("StyleBoxFlat_shop")
+theme_override_styles/hover = SubResource("StyleBoxFlat_shop")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_shop")
+theme_override_styles/focus = SubResource("StyleBoxFlat_shop")
 
-[node name="Icon" type="TextureRect" parent="Buttons/ShopButton"]
+[node name="Icon" type="TextureRect" parent="Buttons/ShopButton" unique_id=1629281181]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -92,12 +92,12 @@ size_flags_horizontal = 3
 focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_home")
-theme_override_styles/hover = SubResource("StyleBoxFlat_home")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_home")
-theme_override_styles/focus = SubResource("StyleBoxFlat_home")
+theme_override_styles/hover = SubResource("StyleBoxFlat_home")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_home")
+theme_override_styles/focus = SubResource("StyleBoxFlat_home")
 
-[node name="Icon" type="TextureRect" parent="Buttons/HomeButton"]
+[node name="Icon" type="TextureRect" parent="Buttons/HomeButton" unique_id=991485767]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -123,12 +123,12 @@ size_flags_horizontal = 3
 focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_leaderboard")
-theme_override_styles/hover = SubResource("StyleBoxFlat_leaderboard")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_leaderboard")
-theme_override_styles/focus = SubResource("StyleBoxFlat_leaderboard")
+theme_override_styles/hover = SubResource("StyleBoxFlat_leaderboard")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_leaderboard")
+theme_override_styles/focus = SubResource("StyleBoxFlat_leaderboard")
 
-[node name="Icon" type="TextureRect" parent="Buttons/LeaderboardButton"]
+[node name="Icon" type="TextureRect" parent="Buttons/LeaderboardButton" unique_id=1880946225]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
