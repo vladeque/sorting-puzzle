@@ -73,6 +73,7 @@ Script:
 Purpose:
 - Owns the compact 96-pixel-high, full-width, icon-only bottom navigation bar on the production main menu.
 - Presents Shop, selected Home, and Leaderboard as equal-width segments on one warm coral-orange bar, separated by strong outlines and identifiable icons.
+- Uses enlarged scene-owned `TextureRect` icon controls without hover, focus, or pressed visual effects; the button hit areas remain fully interactive.
 - Adds bottom safe-area padding supplied by the production menu without narrowing the full-width background.
 - Emits focused button signals so future Shop and Leaderboard screens can connect without moving button wiring into the main-menu script.
 

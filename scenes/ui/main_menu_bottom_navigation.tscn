@@ -10,6 +10,13 @@ bg_color = Color(0.9490196, 0.47843137, 0.2901961, 1)
 border_width_top = 3
 border_color = Color(1, 0.78, 0.32, 1)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_shop"]
+bg_color = Color(0.95, 0.48, 0.29, 1)
+border_width_top = 4
+border_width_right = 3
+border_color = Color(0.42, 0.16, 0.33, 0.75)
+corner_detail = 1
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_home"]
 bg_color = Color(0.95, 0.48, 0.29, 1)
 border_width_left = 3
@@ -21,28 +28,12 @@ shadow_color = Color(0.35, 0.1, 0.25, 0.28)
 shadow_size = 6
 shadow_offset = Vector2(0, -2)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_home_pressed"]
-bg_color = Color(0.82, 0.34, 0.22, 1)
-border_width_left = 2
-border_width_top = 9
-border_width_right = 2
-border_color = Color(0.42, 0.16, 0.33, 0.72)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_leaderboard"]
 bg_color = Color(0.95, 0.48, 0.29, 1)
 border_width_left = 3
 border_width_top = 4
 border_color = Color(0.42, 0.16, 0.33, 0.75)
 corner_detail = 1
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_leaderboard_pressed"]
-bg_color = Color(0.82, 0.34, 0.22, 1)
-border_width_left = 3
-border_width_top = 7
-border_color = Color(0.42, 0.16, 0.33, 0.9)
-corner_radius_top_right = 18
 
 [node name="MainMenuBottomNavigation" type="MarginContainer" unique_id=2132627779]
 custom_minimum_size = Vector2(0, 96)
@@ -69,9 +60,29 @@ layout_mode = 2
 size_flags_horizontal = 3
 focus_mode = 0
 mouse_default_cursor_shape = 2
-icon = ExtResource("2_xh1q6")
-icon_alignment = 1
-expand_icon = true
+theme_override_styles/normal = SubResource("StyleBoxFlat_shop")
+theme_override_styles/hover = SubResource("StyleBoxFlat_shop")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_shop")
+theme_override_styles/focus = SubResource("StyleBoxFlat_shop")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_shop")
+
+[node name="Icon" type="TextureRect" parent="Buttons/ShopButton"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -50.0
+offset_top = -50.0
+offset_right = 50.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_xh1q6")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="HomeButton" type="Button" parent="Buttons" unique_id=586148991]
 unique_name_in_owner = true
@@ -81,10 +92,28 @@ size_flags_horizontal = 3
 focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_home")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_home_pressed")
-icon = ExtResource("3_xh1q6")
-icon_alignment = 1
-expand_icon = true
+theme_override_styles/hover = SubResource("StyleBoxFlat_home")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_home")
+theme_override_styles/focus = SubResource("StyleBoxFlat_home")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_home")
+
+[node name="Icon" type="TextureRect" parent="Buttons/HomeButton"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -50.0
+offset_top = -50.0
+offset_right = 50.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_xh1q6")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="LeaderboardButton" type="Button" parent="Buttons" unique_id=1364709518]
 unique_name_in_owner = true
@@ -94,7 +123,25 @@ size_flags_horizontal = 3
 focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_leaderboard")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_leaderboard_pressed")
-icon = ExtResource("4_4cxw6")
-icon_alignment = 1
-expand_icon = true
+theme_override_styles/hover = SubResource("StyleBoxFlat_leaderboard")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_leaderboard")
+theme_override_styles/focus = SubResource("StyleBoxFlat_leaderboard")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_leaderboard")
+
+[node name="Icon" type="TextureRect" parent="Buttons/LeaderboardButton"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -50.0
+offset_top = -50.0
+offset_right = 50.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("4_4cxw6")
+expand_mode = 1
+stretch_mode = 5
