@@ -6,7 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://76jf8ug6hwj5" path="res://scenes/ui/main_menu_top_status.tscn" id="4_top_status"]
 [ext_resource type="PackedScene" uid="uid://c6xhf1gyqk2tr" path="res://scenes/ui/main_menu_reward_chest.tscn" id="5_reward_chest"]
 [ext_resource type="PackedScene" path="res://scenes/ui/main_menu_reward_coin_flyer.tscn" id="6_reward_coin_flyer"]
-[ext_resource type="PackedScene" path="res://scenes/ui/main_menu_bottom_navigation.tscn" id="7_bottom_navigation"]
+[ext_resource type="PackedScene" uid="uid://cuq4oceh2x5if" path="res://scenes/ui/main_menu_bottom_navigation.tscn" id="7_bottom_navigation"]
 
 [node name="ProductionMainMenu" type="Control" unique_id=1235428546]
 layout_mode = 3
@@ -59,9 +59,9 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 48.0
-offset_top = -184.0
+offset_top = -326.0
 offset_right = -48.0
-offset_bottom = -116.0
+offset_bottom = -173.0
 grow_horizontal = 2
 grow_vertical = 0
 
@@ -69,27 +69,27 @@ grow_vertical = 0
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="BottomNavigation" parent="." instance=ExtResource("7_bottom_navigation")]
+[node name="BottomNavigation" parent="." unique_id=1621185412 instance=ExtResource("7_bottom_navigation")]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
 offset_top = -96.0
-grow_horizontal = 2
 grow_vertical = 0
 
-[node name="HouseRewardOrigin" type="Control" parent="."]
+[node name="HouseRewardOrigin" type="Control" parent="." unique_id=822827452]
 unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 0
 anchor_left = 0.5
 anchor_top = 0.59
 anchor_right = 0.5
 anchor_bottom = 0.59
 mouse_filter = 2
 
-[node name="RewardCoinFlyer" parent="." instance=ExtResource("6_reward_coin_flyer")]
+[node name="RewardCoinFlyer" parent="." unique_id=188070023 instance=ExtResource("6_reward_coin_flyer")]
 unique_name_in_owner = true
 layout_mode = 1
+offset_left = -1.0
+offset_top = -25.0
+offset_right = -1.0
+offset_bottom = -25.0

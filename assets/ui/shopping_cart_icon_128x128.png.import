@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://1rjnbqsyupm"
-path="res://.godot/imported/nav_leaderboard.png-e4df1d4e53df26ef7f80e224063ea6ff.ctex"
+uid="uid://yltncpgta1v1"
+path="res://.godot/imported/shopping_cart_icon_128x128.png-89af637fd6964ff9fb2169d729318b2a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/nav_leaderboard.png"
-dest_files=["res://.godot/imported/nav_leaderboard.png-e4df1d4e53df26ef7f80e224063ea6ff.ctex"]
+source_file="res://assets/ui/shopping_cart_icon_128x128.png"
+dest_files=["res://.godot/imported/shopping_cart_icon_128x128.png-89af637fd6964ff9fb2169d729318b2a.ctex"]
 
 [params]
 
