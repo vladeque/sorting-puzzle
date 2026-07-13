@@ -21,6 +21,7 @@ Purpose:
 - Opens the main settings menu when the settings widget is pressed.
 - Starts the saved campaign level when the bottom button is pressed.
 - Opens `scenes/ui/leaderboard_screen.tscn` when the bottom navigation trophy is pressed.
+- Opens `scenes/ui/shop_screen.tscn` when the bottom navigation cart is pressed.
 
 Important nodes:
 - `Background`: fullscreen `TextureRect` using `assets/backgrounds/main_menu.jpeg`.
@@ -98,6 +99,46 @@ Depends on:
 - `assets/ui/avatar_circle_clip.gdshader`.
 - `assets/ui/reward_star_34_glossy_b.png`.
 
+## `scenes/ui/shop_screen.tscn`
+
+Root:
+- `ShopScreen` (`Control`)
+
+Script:
+- `scripts/shop_screen.gd`
+
+Purpose:
+- Owns the dedicated Shop destination with the `Shop` title, live coin balance, scrollable bundle and coin-offer sections, loading/error states, purchase result dialog, and shared bottom navigation.
+- Builds offer views from `configs/shop_catalog.json` after `StoreService` attaches the active provider's formatted regional prices.
+- Centers content to a 720-pixel maximum logical width, compacts offers below 1100 logical pixels high, and applies mobile safe-area margins.
+
+Runtime children:
+- `shop_bundle_card.tscn` for each bundle.
+- `shop_coin_offer_row.tscn` for each coin-only offer.
+
+## `scenes/ui/shop_bundle_card.tscn`
+
+- Reusable full-width featured offer card with title, purchase button, and fixed reward cells for hammer, shuffle, lantern (`highlight` internally), and coins.
+- The scene owns reward art and styling; `scripts/shop_bundle_card.gd` binds quantities and the store-formatted price.
+
+## `scenes/ui/shop_coin_offer_row.tscn`
+
+- Reusable compact row with coin art, formatted coin quantity, and store-formatted purchase button.
+- `scripts/shop_coin_offer_row.gd` emits the bound offer id without granting rewards itself.
+
+## `scenes/ui/coin_balance_widget.tscn`
+
+- Reusable clover-coin pill used by the Shop header and updated from `PlayerProgress.get_coins()`.
+
+## `scenes/ui/shop_purchase_dialog.tscn`
+
+- Dedicated modal overlay for mock purchase success and error results.
+- Keeps dialog hierarchy and button wiring out of `shop_screen.gd`.
+
+## `scenes/shop_verification.tscn`
+
+- Automated verification entry scene for regional prices, required viewport sizes, offer counts, mock grants, purchase dialog display, and duplicate-transaction handling.
+
 ## `scenes/ui/main_menu_reward_coin_flyer.tscn`
 
 Root:
@@ -126,9 +167,9 @@ Purpose:
 - Presents Shop, Home, and Leaderboard as equal-width segments on one warm coral-orange bar, separated by strong outlines and identifiable icons.
 - Uses enlarged scene-owned `TextureRect` icon controls without hover, focus, or pressed visual effects; the button hit areas remain fully interactive.
 - Raises the active screen's icon above the bar height and reveals its small `Shop`, `Home`, or `Leaderboard` label underneath; inactive icons remain centered with labels hidden.
-- Defaults to Home and exposes `set_active_tab(tab_name)` so future Shop and Leaderboard screens can select their matching visual state.
+- Defaults to Home and exposes `set_active_tab(tab_name)` so Shop and Leaderboard screens can select their matching visual state.
 - Adds bottom safe-area padding supplied by the production menu without narrowing the full-width background.
-- Emits focused button signals so future Shop and Leaderboard screens can connect without moving button wiring into the main-menu script.
+- Emits focused button signals so each destination can route without moving navigation ownership into the shared component.
 
 Depends on:
 - `assets/ui/shopping_cart_icon_128x128.png`.
@@ -136,7 +177,7 @@ Depends on:
 - `assets/ui/trophy_icon_128x128.png`.
 
 Do not use for:
-- Owning destination scenes. The production menu and leaderboard screen connect the signals and perform navigation.
+- Owning destination scenes. The production menu, Shop, and Leaderboard screens connect the signals and perform navigation.
 
 ## `scenes/ui/main_menu_reward_chest.tscn`
 

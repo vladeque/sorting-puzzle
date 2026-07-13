@@ -192,6 +192,20 @@ Rules:
 - Missing entries use the built-in default price for that ability.
 - Buying from the modal spends coins only when the selected ability can actually start, then uses that one paid ability immediately without adding saved inventory.
 
+## `configs/shop_catalog.json`
+
+Purpose:
+- Defines ordered Shop offers, product ids, display titles, reward contents, and development-only regional mock prices.
+- Does not make the UI authoritative for a purchase; `StoreService` attaches provider product details and `PlayerProgress` applies the returned reward payload.
+
+Rules:
+- `type` is `bundle` or `coins`.
+- `rewards.coins` is a non-negative coin grant.
+- `rewards.abilities` may grant `hammer`, `shuffle`, and `highlight`; the UI labels `highlight` as Lantern.
+- `mock_prices` is keyed by mock country code and contains the complete `formatted_price` plus ISO currency code. Missing regions fall back to `US` in the development provider.
+- Real providers must ignore `mock_prices` and display the formatted string returned by Google Play or the App Store.
+- Current mock catalog: one 3-hammer, 3-shuffle, 3-lantern, 1,000-coin starter bundle and five coin-only offers.
+
 ## `user://player_progress.json`
 
 Purpose:
@@ -206,6 +220,7 @@ Fields:
 - `next_life_restore_unix`: Unix timestamp for the next hourly life restore while lives are not full, or `0` when lives are full.
 - `coins`: current gold coin balance. Fresh saves start at `300`.
 - `ability_uses`: remaining campaign uses for `hammer`, `shuffle`, and `highlight`.
+- `processed_shop_purchase_ids`: unique transaction ids already granted by the local mock purchase flow.
 - `avatar_id`: selected profile avatar id. Fresh saves and old saves without this field use `avatar_cat`.
 - `player_name`: saved profile display name. Fresh saves and old saves without a non-empty value receive a generated value like `player_g26f3`.
 - `settings_disabled`: disabled-state map for `music`, `sound_effects`, and `vibration`. Fresh saves and old saves without this field default all three buttons to enabled.
@@ -227,7 +242,7 @@ Runtime behavior:
 - Failed or abandoned levels do not refund ability uses.
 - Completing the current campaign level advances `current_level` by one and adds the run's earned stars to the reward chest.
 - The same completion adds stars to `total_earned_stars` and `weekly_earned_stars`; neither is reduced by reward chest rollover.
-- Save schema 3 seeds missing lifetime totals from retained `reward_chest_stars` for development-save compatibility and starts missing weekly totals at zero.
+- Save schema 4 retains the schema 3 leaderboard migration and adds an empty processed-Shop-transaction ledger to older saves.
 - Weekly stars reset when the saved Monday-UTC boundary no longer matches the current week.
 - Reward chest stars roll over when a configured goal is reached, grant that goal's `coin_reward`, then the next configured goal starts.
 - Developer/test level selection is isolated from this save data.
@@ -261,6 +276,14 @@ Field:
 
 See:
 - `docs/LEADERBOARDS.md`
+
+## Store Provider Settings
+
+Fields:
+- `application/config/store_provider`: currently supports `mock` and defaults to it. Unsupported values warn and fall back to the mock provider.
+- `application/config/mock_store_country`: mock storefront country used to select development price strings. Defaults to `US`; the catalog also defines `UA`, `DE`, and `JP` examples.
+
+Production integration must replace the mock provider with platform product queries and verified, server-idempotent purchase grants rather than trusting these development settings.
 
 ## Documentation Update Checklist
 

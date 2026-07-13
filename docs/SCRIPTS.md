@@ -46,7 +46,7 @@ Important nodes:
 - `%BottomNavigation`: full-width `scenes/ui/main_menu_bottom_navigation.tscn` instance aligned to the viewport bottom and extended through the device safe area.
 
 Key methods:
-- `_ready()`: loads progress, wires the level and trophy buttons, selects Home in the bottom navigation, and applies responsive layout.
+- `_ready()`: loads progress, wires level and bottom-navigation buttons, refreshes the saved coin label, selects Home, and applies responsive layout.
 - `_process(delta)`: refreshes the lives display and play button state once per elapsed real-time second while the menu is open.
 - `_apply_responsive_layout()`: keeps the top status row and bottom button inside the viewport and safe area.
 - `_layout_top_status_bar()`: positions the static top status row.
@@ -64,6 +64,7 @@ Key methods:
 - `_open_settings_menu()`: creates the centered settings popup and wires its close button.
 - `_close_settings_menu()`: dismisses the settings popup.
 - `_open_leaderboard()`: replaces the production menu with the dedicated leaderboard scene.
+- `_open_shop()`: replaces the production menu with the dedicated Shop scene.
 - `_on_profile_avatar_saved(avatar_id)`: refreshes the top status avatar after the profile menu saves.
 - `_launch_campaign_level()`: instantiates the level, sets campaign launch metadata, swaps current scene, and queues the menu for deletion.
 
@@ -104,11 +105,36 @@ Purpose:
 - Updates the weekly reset countdown and loading, empty, and retry states.
 - Applies responsive content width, compact row sizing, bottom-navigation placement, and mobile safe-area margins.
 - Routes the shared Home tab back to `scenes/main_menu.tscn`.
+- Routes the shared Shop tab to `scenes/ui/shop_screen.tscn`.
 
 Depends on:
 - `scripts/leaderboards/leaderboard_service.gd`.
 - `scenes/ui/leaderboard_row.tscn`.
 - `PlayerProgress` leaderboard and profile getters.
+
+## `scripts/shop_screen.gd`
+
+- Owns Shop loading/error states, creates reusable offer scenes, coordinates one purchase at a time, and routes the shared navigation.
+- Passes purchase results to `PlayerProgress.apply_shop_purchase()` and refreshes the visible balance after a grant.
+- Applies maximum content width, compact offer sizing, fixed bottom navigation, and mobile safe-area margins.
+
+## Shop component scripts
+
+- `scripts/shop_bundle_card.gd`: binds one bundle's title, rewards, formatted price, and purchase signal.
+- `scripts/shop_coin_offer_row.gd`: binds a coin quantity, formatted price, and purchase signal.
+- `scripts/coin_balance_widget.gd`: formats and displays a non-negative coin balance.
+- `scripts/shop_purchase_dialog.gd`: shows and dismisses a focused purchase result modal.
+
+## Store scripts
+
+- `scripts/store/store_provider.gd`: provider contract for product loading and purchase requests.
+- `scripts/store/mock_store_provider.gd`: resolves config prices for `application/config/mock_store_country` and returns unique mock transaction ids after a short asynchronous delay.
+- `scripts/store/store_service.gd`: validates `configs/shop_catalog.json`, joins catalog rewards with provider product details, and returns normalized purchase results. This is the client replacement point for later platform integrations.
+
+## `scripts/tools/verify_shop.gd`
+
+- Runs through `scenes/shop_verification.tscn` with an isolated test user-data directory.
+- Verifies US, Ukrainian, German, and Japanese mock price strings; five representative portrait viewports; offer population; coin and bundle purchases; and duplicate transaction protection.
 
 ## `scripts/leaderboard_row.gd`
 
@@ -340,6 +366,7 @@ Saved fields:
 - `next_life_restore_unix`: Unix timestamp for the next hourly life restore, or `0` when lives are full.
 - `coins`: current gold coin balance. Fresh saves start at `300`.
 - `ability_uses`: remaining campaign uses for hammer, shuffle, and highlight.
+- `processed_shop_purchase_ids`: transaction ids whose Shop rewards were already applied locally.
 - `avatar_id`: selected profile avatar id. Fresh and legacy saves default to `avatar_cat`.
 - `player_name`: saved profile display name. Fresh and legacy saves without a valid value receive a generated `player_` name with a five-character random suffix, such as `player_g26f3`.
 - `settings_disabled`: disabled-state map for `music`, `sound_effects`, and `vibration` settings buttons.
@@ -360,6 +387,7 @@ Key methods:
 - `get_current_leaderboard_week_start_unix()`: returns the current Monday 00:00 UTC boundary.
 - `get_current_leaderboard_week_end_unix()`: returns the next Monday boundary used by the UI countdown.
 - `spend_coins(amount)`: immediately subtracts and saves the requested gold coin amount when enough coins are available.
+- `apply_shop_purchase(transaction_id, rewards)`: atomically grants configured coins and valid ability uses once per transaction id, then saves the result.
 - `get_reward_chest_progress()`: returns the saved reward chest stars, active goal, and goal index.
 - `get_reward_chest_goal_at_index(goal_index)`: exposes a configured goal threshold for menu animation rollover.
 - `consume_pending_reward_chest_animation()`: returns and clears the in-memory completed-level animation payload.

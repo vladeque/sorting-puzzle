@@ -7,6 +7,7 @@ const AVATAR_CLIP_SHADER := preload("res://assets/ui/avatar_circle_clip.gdshader
 const MIN_LEVEL := 1
 const MAX_LEVEL := 10
 const PRODUCTION_MENU_SCENE := "res://scenes/main_menu.tscn"
+const SHOP_SCENE := "res://scenes/ui/shop_screen.tscn"
 const LEADERBOARD_SCENE := "res://scenes/ui/leaderboard_screen.tscn"
 const TOP_BAR_HEIGHT := 86.0
 const TOP_MARGIN := 28.0
@@ -31,6 +32,7 @@ const LIFE_STATUS_REFRESH_SECONDS := 1.0
 @onready var _profile_button := %TopStatusBar.get_node("MainMenuTopStatus/ProfileWidget") as Button
 @onready var _settings_button := %TopStatusBar.get_node("MainMenuTopStatus/SettingsWidget/SettingsButton") as Button
 @onready var _profile_avatar_texture := %TopStatusBar.get_node("MainMenuTopStatus/ProfileWidget/AvatarTexture") as TextureRect
+@onready var _coin_amount_label := %TopStatusBar.get_node("MainMenuTopStatus/CoinsWidget/CoinAmount") as Label
 @onready var _life_count_label := %TopStatusBar.get_node("MainMenuTopStatus/LivesWidget/LifeCount") as Label
 @onready var _life_status_label := %TopStatusBar.get_node("MainMenuTopStatus/LivesWidget/LifeStatus") as Label
 
@@ -48,11 +50,13 @@ func _ready() -> void:
 	_level_button.pressed.connect(_launch_campaign_level)
 	_profile_button.pressed.connect(_open_profile_menu)
 	_settings_button.pressed.connect(_open_settings_menu)
+	_bottom_navigation.connect("shop_pressed", Callable(self, "_open_shop"))
 	_bottom_navigation.connect("leaderboard_pressed", Callable(self, "_open_leaderboard"))
 	if _bottom_navigation.has_method("set_active_tab"):
 		_bottom_navigation.call("set_active_tab", &"home")
 	get_viewport().size_changed.connect(_apply_responsive_layout)
 	_update_profile_avatar()
+	_update_coin_balance()
 	_update_lives_status()
 	if pending_reward_animation.is_empty():
 		_update_reward_chest_status()
@@ -263,6 +267,15 @@ func _format_life_restore_time(seconds_remaining: int) -> String:
 	return "%02d:%02d" % [minutes_remaining, remaining_seconds]
 
 
+func _format_count(value: int) -> String:
+	var value_text := str(maxi(value, 0))
+	var formatted := ""
+	while value_text.length() > 3:
+		formatted = ",%s%s" % [value_text.right(3), formatted]
+		value_text = value_text.substr(0, value_text.length() - 3)
+	return value_text + formatted
+
+
 func _update_profile_avatar() -> void:
 	if _profile_avatar_texture == null:
 		return
@@ -273,6 +286,18 @@ func _update_profile_avatar() -> void:
 		var clip_material := ShaderMaterial.new()
 		clip_material.shader = AVATAR_CLIP_SHADER
 		_profile_avatar_texture.material = clip_material
+
+
+func _update_coin_balance() -> void:
+	if _coin_amount_label != null:
+		var amount_text := _format_count(PlayerProgress.get_coins())
+		_coin_amount_label.text = amount_text
+		var font_size := 27
+		if amount_text.length() > 5:
+			font_size = 18
+		elif amount_text.length() > 3:
+			font_size = 22
+		_coin_amount_label.add_theme_font_size_override("font_size", font_size)
 
 
 func _open_profile_menu() -> void:
@@ -318,6 +343,10 @@ func _clear_settings_menu_reference() -> void:
 
 func _open_leaderboard() -> void:
 	get_tree().change_scene_to_file(LEADERBOARD_SCENE)
+
+
+func _open_shop() -> void:
+	get_tree().change_scene_to_file(SHOP_SCENE)
 
 
 func _launch_campaign_level() -> void:

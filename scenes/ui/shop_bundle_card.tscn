@@ -1,0 +1,225 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://scripts/shop_bundle_card.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/abilities/ability_hammer.png" id="2_hammer"]
+[ext_resource type="Texture2D" path="res://assets/abilities/ability_shuffle.png" id="3_shuffle"]
+[ext_resource type="Texture2D" path="res://assets/abilities/ability_lantern.png" id="4_lantern"]
+[ext_resource type="Texture2D" path="res://assets/ui/clover_coin_transparent_96x96.png" id="5_coin"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
+bg_color = Color(0.42, 0.13, 0.18, 0.98)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 6
+border_color = Color(1, 0.69, 0.27, 1)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+shadow_color = Color(0.08, 0.01, 0.02, 0.48)
+shadow_size = 7
+shadow_offset = Vector2(0, 5)
+content_margin_left = 18.0
+content_margin_top = 14.0
+content_margin_right = 18.0
+content_margin_bottom = 16.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_reward"]
+bg_color = Color(1, 0.89, 0.67, 0.14)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.83, 0.48, 0.5)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+content_margin_left = 4.0
+content_margin_top = 5.0
+content_margin_right = 4.0
+content_margin_bottom = 5.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button"]
+bg_color = Color(0.24, 0.7, 0.22, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 5
+border_color = Color(0.65, 1, 0.38, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+shadow_color = Color(0.03, 0.16, 0.03, 0.6)
+shadow_size = 4
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_pressed"]
+bg_color = Color(0.14, 0.48, 0.13, 1)
+border_width_left = 3
+border_width_top = 5
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.55, 0.92, 0.31, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_focus"]
+
+[node name="ShopBundleCard" type="PanelContainer"]
+custom_minimum_size = Vector2(0, 246)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+script = ExtResource("1_script")
+
+[node name="CardStack" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Header" type="HBoxContainer" parent="CardStack"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="CardStack/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 0.94, 0.73, 1)
+theme_override_colors/font_shadow_color = Color(0.1, 0.01, 0.02, 1)
+theme_override_constants/shadow_offset_y = 3
+theme_override_font_sizes/font_size = 30
+text = "Starter Bundle"
+vertical_alignment = 1
+
+[node name="PurchaseButton" type="Button" parent="CardStack/Header"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(178, 58)
+layout_mode = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_disabled_color = Color(1, 1, 1, 0.72)
+theme_override_colors/font_shadow_color = Color(0.02, 0.12, 0.02, 0.9)
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 25
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_button_pressed")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+text = "$4.99"
+
+[node name="Rewards" type="HBoxContainer" parent="CardStack"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="HammerReward" type="PanelContainer" parent="CardStack/Rewards"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_reward")
+
+[node name="Stack" type="VBoxContainer" parent="CardStack/Rewards/HammerReward"]
+layout_mode = 2
+theme_override_constants/separation = -4
+
+[node name="Icon" type="TextureRect" parent="CardStack/Rewards/HammerReward/Stack"]
+custom_minimum_size = Vector2(72, 82)
+layout_mode = 2
+texture = ExtResource("2_hammer")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HammerCount" type="Label" parent="CardStack/Rewards/HammerReward/Stack"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.12, 0.01, 0.02, 1)
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 24
+text = "×3"
+horizontal_alignment = 1
+
+[node name="ShuffleReward" type="PanelContainer" parent="CardStack/Rewards"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_reward")
+
+[node name="Stack" type="VBoxContainer" parent="CardStack/Rewards/ShuffleReward"]
+layout_mode = 2
+theme_override_constants/separation = -4
+
+[node name="Icon" type="TextureRect" parent="CardStack/Rewards/ShuffleReward/Stack"]
+custom_minimum_size = Vector2(72, 82)
+layout_mode = 2
+texture = ExtResource("3_shuffle")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ShuffleCount" type="Label" parent="CardStack/Rewards/ShuffleReward/Stack"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.12, 0.01, 0.02, 1)
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 24
+text = "×3"
+horizontal_alignment = 1
+
+[node name="LanternReward" type="PanelContainer" parent="CardStack/Rewards"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_reward")
+
+[node name="Stack" type="VBoxContainer" parent="CardStack/Rewards/LanternReward"]
+layout_mode = 2
+theme_override_constants/separation = -4
+
+[node name="Icon" type="TextureRect" parent="CardStack/Rewards/LanternReward/Stack"]
+custom_minimum_size = Vector2(72, 82)
+layout_mode = 2
+texture = ExtResource("4_lantern")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="LanternCount" type="Label" parent="CardStack/Rewards/LanternReward/Stack"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.12, 0.01, 0.02, 1)
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 24
+text = "×3"
+horizontal_alignment = 1
+
+[node name="CoinReward" type="PanelContainer" parent="CardStack/Rewards"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_reward")
+
+[node name="Stack" type="VBoxContainer" parent="CardStack/Rewards/CoinReward"]
+layout_mode = 2
+theme_override_constants/separation = -4
+
+[node name="Icon" type="TextureRect" parent="CardStack/Rewards/CoinReward/Stack"]
+custom_minimum_size = Vector2(72, 82)
+layout_mode = 2
+texture = ExtResource("5_coin")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CoinCount" type="Label" parent="CardStack/Rewards/CoinReward/Stack"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.93, 0.5, 1)
+theme_override_colors/font_shadow_color = Color(0.12, 0.01, 0.02, 1)
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 22
+text = "1,000"
+horizontal_alignment = 1

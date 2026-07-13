@@ -3,6 +3,7 @@ extends Control
 const LeaderboardServiceScript := preload("res://scripts/leaderboards/leaderboard_service.gd")
 const ROW_SCENE := preload("res://scenes/ui/leaderboard_row.tscn")
 const MAIN_MENU_SCENE := "res://scenes/main_menu.tscn"
+const SHOP_SCENE := "res://scenes/ui/shop_screen.tscn"
 const SCOPE_WEEKLY := &"weekly"
 const SCOPE_COUNTRY := &"country"
 const SCOPE_WORLD := &"world"
@@ -42,6 +43,7 @@ func _ready() -> void:
 	_country_button.pressed.connect(_select_scope.bind(SCOPE_COUNTRY))
 	_world_button.pressed.connect(_select_scope.bind(SCOPE_WORLD))
 	_retry_button.pressed.connect(_load_selected_scope)
+	_bottom_navigation.connect("shop_pressed", Callable(self, "_open_shop"))
 	_bottom_navigation.connect("home_pressed", Callable(self, "_return_to_main_menu"))
 	_bottom_navigation.connect("leaderboard_pressed", Callable(self, "_load_selected_scope"))
 	if _bottom_navigation.has_method("set_active_tab"):
@@ -239,3 +241,7 @@ func _get_safe_area_margins(viewport_size: Vector2) -> Vector4:
 
 func _return_to_main_menu() -> void:
 	get_tree().change_scene_to_file(MAIN_MENU_SCENE)
+
+
+func _open_shop() -> void:
+	get_tree().change_scene_to_file(SHOP_SCENE)

@@ -1,0 +1,89 @@
+{
+  "offers": [
+    {
+      "id": "starter_bundle",
+      "product_id": "sorting_puzzle.starter_bundle",
+      "type": "bundle",
+      "title": "Starter Bundle",
+      "rewards": {
+        "coins": 1000,
+        "abilities": {
+          "hammer": 3,
+          "shuffle": 3,
+          "highlight": 3
+        }
+      },
+      "mock_prices": {
+        "US": {"formatted_price": "$4.99", "currency_code": "USD"},
+        "UA": {"formatted_price": "₴199.99", "currency_code": "UAH"},
+        "DE": {"formatted_price": "4,99 €", "currency_code": "EUR"},
+        "JP": {"formatted_price": "¥800", "currency_code": "JPY"}
+      }
+    },
+    {
+      "id": "coins_100",
+      "product_id": "sorting_puzzle.coins_100",
+      "type": "coins",
+      "title": "100 Coins",
+      "rewards": {"coins": 100},
+      "mock_prices": {
+        "US": {"formatted_price": "$0.99", "currency_code": "USD"},
+        "UA": {"formatted_price": "₴39.99", "currency_code": "UAH"},
+        "DE": {"formatted_price": "0,99 €", "currency_code": "EUR"},
+        "JP": {"formatted_price": "¥160", "currency_code": "JPY"}
+      }
+    },
+    {
+      "id": "coins_300",
+      "product_id": "sorting_puzzle.coins_300",
+      "type": "coins",
+      "title": "300 Coins",
+      "rewards": {"coins": 300},
+      "mock_prices": {
+        "US": {"formatted_price": "$2.49", "currency_code": "USD"},
+        "UA": {"formatted_price": "₴99.99", "currency_code": "UAH"},
+        "DE": {"formatted_price": "2,49 €", "currency_code": "EUR"},
+        "JP": {"formatted_price": "¥400", "currency_code": "JPY"}
+      }
+    },
+    {
+      "id": "coins_750",
+      "product_id": "sorting_puzzle.coins_750",
+      "type": "coins",
+      "title": "750 Coins",
+      "rewards": {"coins": 750},
+      "mock_prices": {
+        "US": {"formatted_price": "$4.99", "currency_code": "USD"},
+        "UA": {"formatted_price": "₴199.99", "currency_code": "UAH"},
+        "DE": {"formatted_price": "4,99 €", "currency_code": "EUR"},
+        "JP": {"formatted_price": "¥800", "currency_code": "JPY"}
+      }
+    },
+    {
+      "id": "coins_1600",
+      "product_id": "sorting_puzzle.coins_1600",
+      "type": "coins",
+      "title": "1,600 Coins",
+      "rewards": {"coins": 1600},
+      "mock_prices": {
+        "US": {"formatted_price": "$9.99", "currency_code": "USD"},
+        "UA": {"formatted_price": "₴399.99", "currency_code": "UAH"},
+        "DE": {"formatted_price": "9,99 €", "currency_code": "EUR"},
+        "JP": {"formatted_price": "¥1,600", "currency_code": "JPY"}
+      }
+    },
+    {
+      "id": "coins_3500",
+      "product_id": "sorting_puzzle.coins_3500",
+      "type": "coins",
+      "title": "3,500 Coins",
+      "rewards": {"coins": 3500},
+      "mock_prices": {
+        "US": {"formatted_price": "$19.99", "currency_code": "USD"},
+        "UA": {"formatted_price": "₴799.99", "currency_code": "UAH"},
+        "DE": {"formatted_price": "19,99 €", "currency_code": "EUR"},
+        "JP": {"formatted_price": "¥3,200", "currency_code": "JPY"}
+      }
+    }
+  ]
+}

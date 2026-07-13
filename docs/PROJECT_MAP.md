@@ -67,7 +67,7 @@ Responsibility:
 - Uses `scripts/press_scale_button.gd` as the default held-press behavior for visible game UI buttons so they shrink slightly while a click or touch is held.
 - Keeps free level selection out of the production menu.
 - Preserves the old testing menu in `scenes/main_menu_testing.tscn`.
-- Keeps Shop, Home, and Leaderboard entry points in the reusable full-width `scenes/ui/main_menu_bottom_navigation.tscn`; Home and Leaderboard route between their dedicated screens while Shop remains a visual hook.
+- Keeps Shop, Home, and Leaderboard entry points in the reusable full-width `scenes/ui/main_menu_bottom_navigation.tscn`; all three route between dedicated screens.
 - Builds testing level buttons for levels 1 through 10 only when dev/test level selection is enabled.
 - Instantiates `level.tscn`, assigns `selected_level`, `launched_from_dev_mode`, and `return_menu_scene_path`, swaps it into `SceneTree.current_scene`, and removes the menu.
 
@@ -125,6 +125,30 @@ Responsibility:
 
 Change here when:
 - Replacing mock data, adding backend requests or pagination, changing leaderboard scopes, or changing ranking-row presentation.
+
+### Shop
+
+Files:
+- `scenes/ui/shop_screen.tscn`
+- `scenes/ui/shop_bundle_card.tscn`
+- `scenes/ui/shop_coin_offer_row.tscn`
+- `scenes/ui/coin_balance_widget.tscn`
+- `scenes/ui/shop_purchase_dialog.tscn`
+- `scripts/shop_*.gd`
+- `scripts/coin_balance_widget.gd`
+- `scripts/store/*.gd`
+- `configs/shop_catalog.json`
+- `scripts/player_progress.gd`
+
+Responsibility:
+- Opens a dedicated responsive Shop destination from every shared bottom navigation bar.
+- Shows configured ability-and-coin bundles before compact coin purchase offers in one vertical scroll view.
+- Uses `StoreService` and a provider boundary so UI code never owns regional pricing or transaction behavior.
+- Uses the `mock` provider and configurable mock storefront country during development; real Google Play and App Store providers can replace it later.
+- Applies mock purchase rewards atomically through `PlayerProgress.apply_shop_purchase()` and retains processed transaction ids so callbacks are idempotent.
+
+Change here when:
+- Adding offers, changing bundle presentation, integrating a real platform store, or moving purchase grants to a verified backend.
 
 ### Level Runtime
 

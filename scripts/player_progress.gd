@@ -4,7 +4,7 @@ const LocalSaveProviderScript := preload("res://scripts/save_providers/local_sav
 const CloudSaveProviderScript := preload("res://scripts/save_providers/cloud_save_provider.gd")
 const SAVE_PATH := "user://player_progress.json"
 const SAVE_NAME := "player_progress"
-const SAVE_VERSION := 3
+const SAVE_VERSION := 4
 const MIN_LEVEL := 1
 const SAVE_PROVIDER_SETTING := "application/config/save_provider"
 const CLOUD_SAVE_NAME_SETTING := "application/config/cloud_save_name"
@@ -154,6 +154,40 @@ func spend_coins(amount: int) -> bool:
 	_data["coins"] = coins - normalized_amount
 	save_progress()
 	return true
+
+
+func apply_shop_purchase(transaction_id: String, rewards: Dictionary) -> Dictionary:
+	var normalized_transaction_id := transaction_id.strip_edges()
+	if normalized_transaction_id.is_empty():
+		return {"ok": false, "applied": false, "error": "Purchase transaction id is empty."}
+
+	var processed_ids := _get_processed_shop_purchase_ids()
+	if processed_ids.has(normalized_transaction_id):
+		return {"ok": true, "applied": false}
+
+	var granted_coins := maxi(int(rewards.get("coins", 0)), 0)
+	var granted_abilities := {}
+	var raw_abilities = rewards.get("abilities", {})
+	if raw_abilities is Dictionary:
+		var ability_uses := get_ability_uses()
+		for ability_id in DEFAULT_ABILITY_USES.keys():
+			var granted_uses := maxi(int((raw_abilities as Dictionary).get(ability_id, 0)), 0)
+			if granted_uses <= 0:
+				continue
+			ability_uses[ability_id] = int(ability_uses.get(ability_id, 0)) + granted_uses
+			granted_abilities[ability_id] = granted_uses
+		_data["ability_uses"] = ability_uses
+
+	_data["coins"] = get_coins() + granted_coins
+	processed_ids.append(normalized_transaction_id)
+	_data["processed_shop_purchase_ids"] = processed_ids
+	save_progress()
+	return {
+		"ok": true,
+		"applied": true,
+		"coins": granted_coins,
+		"abilities": granted_abilities,
+	}
 
 
 func get_reward_chest_progress() -> Dictionary:
@@ -371,6 +405,9 @@ func _sanitize_data(raw_data: Dictionary) -> Dictionary:
 	sanitized["lives"] = clampi(int(raw_data.get("lives", MAX_LIVES)), 0, MAX_LIVES)
 	sanitized["next_life_restore_unix"] = maxi(int(raw_data.get("next_life_restore_unix", 0)), 0)
 	sanitized["coins"] = maxi(int(raw_data.get("coins", DEFAULT_COINS)), 0)
+	sanitized["processed_shop_purchase_ids"] = _sanitize_processed_shop_purchase_ids(
+		raw_data.get("processed_shop_purchase_ids", [])
+	)
 	sanitized["avatar_id"] = _sanitize_avatar_id(str(raw_data.get("avatar_id", DEFAULT_AVATAR_ID)))
 	sanitized["player_name"] = _sanitize_player_name(str(raw_data.get("player_name", sanitized["player_name"])), sanitized["player_name"])
 	sanitized["settings_disabled"] = _sanitize_disabled_settings(raw_data.get("settings_disabled", {}))
@@ -414,6 +451,7 @@ func _default_data() -> Dictionary:
 		"lives": MAX_LIVES,
 		"next_life_restore_unix": 0,
 		"coins": DEFAULT_COINS,
+		"processed_shop_purchase_ids": [],
 		"ability_uses": DEFAULT_ABILITY_USES.duplicate(),
 		"avatar_id": DEFAULT_AVATAR_ID,
 		"player_name": _generate_player_name(),
@@ -449,6 +487,23 @@ func _sanitize_disabled_settings(raw_settings) -> Dictionary:
 	var raw_dictionary := raw_settings as Dictionary
 	for setting_key in DEFAULT_DISABLED_SETTINGS.keys():
 		sanitized[setting_key] = bool(raw_dictionary.get(setting_key, sanitized[setting_key]))
+
+	return sanitized
+
+
+func _get_processed_shop_purchase_ids() -> Array:
+	return _sanitize_processed_shop_purchase_ids(_data.get("processed_shop_purchase_ids", []))
+
+
+func _sanitize_processed_shop_purchase_ids(raw_ids) -> Array:
+	var sanitized := []
+	if not (raw_ids is Array):
+		return sanitized
+
+	for raw_id in raw_ids as Array:
+		var transaction_id := str(raw_id).strip_edges()
+		if not transaction_id.is_empty() and not sanitized.has(transaction_id):
+			sanitized.append(transaction_id)
 
 	return sanitized
 

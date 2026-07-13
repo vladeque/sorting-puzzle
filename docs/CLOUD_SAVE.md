@@ -98,4 +98,6 @@ For the current progression schema:
 - For lives, resolve each candidate through its `next_life_restore_unix` timestamp first, then prefer the greater `lives` count. If lives tie and are below full, prefer the earlier `next_life_restore_unix`.
 - For non-refilling ability inventory, prefer the lower ability count when resolving conflicts to avoid duplicating spent inventory.
 
-If abilities later become purchasable or rewarded, move ability inventory to a server-authoritative flow instead of trusting client-side merge rules.
+Shop mock purchases currently add paid coins and abilities through a locally persisted transaction-id ledger. This prevents duplicate mock callbacks but is not a production security boundary and can conflict across devices.
+
+Before enabling real-money products, replace local Shop grants with a server-authoritative entitlement flow that verifies platform transactions, records every transaction idempotently, and returns the authoritative balance/inventory state. Cloud-save conflict rules must not be used to reconcile real-money purchases.

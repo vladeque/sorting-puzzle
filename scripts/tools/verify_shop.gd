@@ -1,0 +1,126 @@
+extends Node
+
+const StoreServiceScript := preload("res://scripts/store/store_service.gd")
+const SHOP_SCENE := preload("res://scenes/ui/shop_screen.tscn")
+const TEST_REGIONS := {
+	"US": "$0.99",
+	"UA": "₴39.99",
+	"DE": "0,99 €",
+	"JP": "¥160",
+}
+const TEST_RESOLUTIONS := [
+	Vector2i(540, 960),
+	Vector2i(720, 1280),
+	Vector2i(1080, 1920),
+	Vector2i(1080, 2400),
+	Vector2i(1200, 1600),
+]
+
+var _failures := []
+
+
+func _ready() -> void:
+	_run.call_deferred()
+
+
+func _run() -> void:
+	await _verify_regional_prices()
+	ProjectSettings.set_setting("application/config/mock_store_country", "US")
+	PlayerProgress.reset_progress()
+
+	var shop := SHOP_SCENE.instantiate() as Control
+	get_tree().root.add_child(shop)
+	get_tree().current_scene = shop
+	for _frame in range(5):
+		await get_tree().process_frame
+
+	var bundles := shop.get_node("%BundlesContainer") as VBoxContainer
+	var coin_offers := shop.get_node("%CoinOffersContainer") as VBoxContainer
+	_check(bundles.get_child_count() == 1, "Expected one configured bundle card.")
+	_check(coin_offers.get_child_count() == 5, "Expected five configured coin offers.")
+	_check((shop.get_node("%TitleLabel") as Label).text == "Shop", "Shop title is missing.")
+
+	for resolution in TEST_RESOLUTIONS:
+		get_tree().root.size = resolution
+		for _frame in range(3):
+			await get_tree().process_frame
+		var logical_size := shop.get_viewport_rect().size
+		var navigation := shop.get_node("%BottomNavigation") as Control
+		var content := shop.get_node("%ContentMargin") as Control
+		_check(content.position.x >= 0.0, "Content escaped the left edge at %s." % resolution)
+		_check(content.position.x + content.size.x <= logical_size.x + 1.0, "Content escaped the right edge at %s." % resolution)
+		_check(navigation.position.y + navigation.size.y <= logical_size.y + 1.0, "Navigation escaped the bottom edge at %s." % resolution)
+		print("Shop layout %s -> logical %s" % [resolution, logical_size])
+
+	get_tree().root.size = Vector2i(720, 1280)
+	for _frame in range(3):
+		await get_tree().process_frame
+	if DisplayServer.get_name() != "headless":
+		var image := get_viewport().get_texture().get_image()
+		var screenshot_error := image.save_png("res://tmp/shop_720x1280.png")
+		_check(screenshot_error == OK, "Could not save the shop verification screenshot.")
+
+	var starting_coins := PlayerProgress.get_coins()
+	shop.call("_purchase_offer", &"coins_100")
+	await get_tree().create_timer(0.35).timeout
+	_check(PlayerProgress.get_coins() == starting_coins + 100, "Mock coin purchase did not grant 100 coins.")
+	_check((shop.get_node("%PurchaseDialog") as Control).visible, "Purchase result dialog did not open.")
+	if DisplayServer.get_name() != "headless":
+		var dialog_image := get_viewport().get_texture().get_image()
+		var dialog_screenshot_error := dialog_image.save_png("res://tmp/shop_purchase_dialog_720x1280.png")
+		_check(dialog_screenshot_error == OK, "Could not save the purchase dialog verification screenshot.")
+
+	var bundle_starting_coins := PlayerProgress.get_coins()
+	var bundle_starting_abilities := PlayerProgress.get_ability_uses()
+	shop.call("_purchase_offer", &"starter_bundle")
+	await get_tree().create_timer(0.35).timeout
+	_check(PlayerProgress.get_coins() == bundle_starting_coins + 1000, "Mock bundle did not grant 1,000 coins.")
+	var bundle_abilities := PlayerProgress.get_ability_uses()
+	for ability_id in ["hammer", "shuffle", "highlight"]:
+		_check(
+			int(bundle_abilities.get(ability_id, 0)) == int(bundle_starting_abilities.get(ability_id, 0)) + 3,
+			"Mock bundle did not grant three %s uses." % ability_id
+		)
+
+	var duplicate_start := PlayerProgress.get_coins()
+	var first_grant := PlayerProgress.apply_shop_purchase("verify_duplicate_transaction", {"coins": 7})
+	var duplicate_grant := PlayerProgress.apply_shop_purchase("verify_duplicate_transaction", {"coins": 7})
+	_check(bool(first_grant.get("applied", false)), "First transaction grant was not applied.")
+	_check(not bool(duplicate_grant.get("applied", true)), "Duplicate transaction was applied twice.")
+	_check(PlayerProgress.get_coins() == duplicate_start + 7, "Duplicate transaction changed the balance twice.")
+
+	if _failures.is_empty():
+		print("SHOP VERIFICATION PASSED")
+		get_tree().quit(0)
+		return
+
+	for failure in _failures:
+		push_error(failure)
+	get_tree().quit(1)
+
+
+func _verify_regional_prices() -> void:
+	for country_code in TEST_REGIONS:
+		ProjectSettings.set_setting("application/config/mock_store_country", country_code)
+		var service = StoreServiceScript.new()
+		var result: Dictionary = await service.load_catalog()
+		_check(bool(result.get("ok", false)), "Catalog failed to load for %s." % country_code)
+		var offers := result.get("offers", []) as Array
+		var coin_offer := _find_offer(offers, "coins_100")
+		var store := coin_offer.get("store", {}) as Dictionary
+		_check(
+			str(store.get("formatted_price", "")) == TEST_REGIONS[country_code],
+			"Unexpected mock price for %s." % country_code
+		)
+
+
+func _find_offer(offers: Array, offer_id: String) -> Dictionary:
+	for raw_offer in offers:
+		if raw_offer is Dictionary and str((raw_offer as Dictionary).get("id", "")) == offer_id:
+			return raw_offer as Dictionary
+	return {}
+
+
+func _check(condition: bool, message: String) -> void:
+	if not condition:
+		_failures.append(message)

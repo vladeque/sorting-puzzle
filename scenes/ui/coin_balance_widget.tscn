@@ -1,0 +1,61 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/coin_balance_widget.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/ui/clover_coin_transparent_96x96.png" id="2_coin"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pill"]
+bg_color = Color(1, 0.91, 0.67, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(0.55, 0.14, 0.17, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0.12, 0.02, 0.03, 0.35)
+shadow_size = 4
+shadow_offset = Vector2(0, 3)
+
+[node name="CoinBalanceWidget" type="Control"]
+custom_minimum_size = Vector2(158, 68)
+layout_mode = 3
+anchors_preset = 0
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Pill" type="Panel" parent="."]
+layout_mode = 1
+offset_left = 30.0
+offset_top = 10.0
+offset_right = 158.0
+offset_bottom = 62.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_pill")
+
+[node name="CoinIcon" type="TextureRect" parent="."]
+layout_mode = 1
+offset_left = -2.0
+offset_top = -2.0
+offset_right = 70.0
+offset_bottom = 70.0
+mouse_filter = 2
+texture = ExtResource("2_coin")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="AmountLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+offset_left = 65.0
+offset_top = 14.0
+offset_right = 151.0
+offset_bottom = 58.0
+theme_override_colors/font_color = Color(0.39, 0.07, 0.14, 1)
+theme_override_colors/font_shadow_color = Color(1, 1, 1, 0.75)
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 25
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
