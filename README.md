@@ -2,7 +2,7 @@
 
 ## Project documentation
 
-Start with `docs/PROJECT_MAP.md` to identify which scene, script, config, or tool owns a feature. Supporting inventories live in `docs/SCENES.md`, `docs/SCRIPTS.md`, and `docs/CONFIGS.md`.
+Start with `docs/PROJECT_MAP.md` to identify which scene, script, config, or tool owns a feature. Supporting inventories live in `docs/SCENES.md`, `docs/SCRIPTS.md`, and `docs/CONFIGS.md`. Production server planning and implementation requirements live in `docs/BACKEND_REQUIREMENTS.md`.
 
 ## Level shelf generation
 

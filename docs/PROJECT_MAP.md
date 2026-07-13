@@ -33,6 +33,18 @@ Reusable item scene:
 
 ## Core Systems
 
+### Backend Planning
+
+Files:
+- `docs/BACKEND_REQUIREMENTS.md`
+
+Responsibility:
+- Defines the approved production backend requirements for identity, authoritative progression and economy, offline synchronization, Shop offers and purchases, leaderboards, profile moderation, privacy, administration, operations, testing, and phased implementation.
+- Records confirmed product decisions and the remaining policies that must be finalized during the protocol-design phase.
+
+Change here when:
+- Backend authority boundaries, platform integrations, offline behavior, offer types, leaderboard rules, or implementation phases change.
+
 ### Level Selection
 
 Files:
