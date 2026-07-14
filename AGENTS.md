@@ -15,6 +15,27 @@ The gameplay is built around "triple sorting": the player organizes objects such
 /scripts  GDScript files used by scenes
 ```
 
+## Related Backend Repository
+
+The authoritative backend repository is expected as a sibling at `../sorting-puzzle-backend`.
+
+Before changing networking, authentication, save synchronization, authoritative progression, economy, inventory, the Shop, purchases, leaderboards, player profiles, or gameplay-proof generation, read the backend repository's `AGENTS.md` and the relevant canonical documents:
+
+- `../sorting-puzzle-backend/BACKEND_REQUIREMENTS.md`
+- `../sorting-puzzle-backend/docs/PROTOCOL_BOUNDARY.md`
+- `../sorting-puzzle-backend/docs/GAMEPLAY_VALIDATOR_BOUNDARY.md`
+- `../sorting-puzzle-backend/docs/IMPLEMENTATION_TICKETS.md`
+
+The backend copy of `BACKEND_REQUIREMENTS.md` is canonical. Any copy retained in this game repository is a client-facing snapshot and must not be edited independently.
+
+For cross-repository work:
+
+- Read and follow the sibling repository's `AGENTS.md` before changing its files.
+- Keep game and backend changes in separate commits in their respective repositories.
+- Make protocol changes backward-compatible with supported released clients unless an approved migration explicitly says otherwise.
+- Do not modify the sibling repository unless the task explicitly includes backend or cross-repository changes.
+- Keep shared protocol and gameplay-validator behavior synchronized through versioned schemas and conformance fixtures once those boundaries are approved.
+
 ## Godot Version
 
 This project uses Godot 4.6.2. Do not introduce APIs that are only available in incompatible Godot versions.
