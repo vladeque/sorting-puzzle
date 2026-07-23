@@ -22,9 +22,10 @@ Playable level scene:
 
 Player progression:
 - `scripts/player_progress.gd`
-- `scripts/save_providers/*.gd`
+- `scripts/save/*.gd`
 - Registered in `project.godot` as the `PlayerProgress` autoload.
-- Saves campaign level progress, campaign lives, gold coins, campaign ability inventory, reward chest progress, lifetime and weekly leaderboard stars, selected profile avatar, player name, and settings-button disabled states through the configured save provider.
+- Always saves account-scoped gameplay locally with atomic generations and a signed operation
+  journal; backend synchronization is a silent recovery/merge destination.
 
 Reusable item scene:
 - `scenes/item.tscn`
@@ -90,28 +91,40 @@ Change here when:
 
 Files:
 - `scripts/player_progress.gd`
-- `scripts/save_providers/save_provider.gd`
-- `scripts/save_providers/local_save_provider.gd`
-- `scripts/save_providers/cloud_save_provider.gd`
+- `scripts/save/local_save_codec.gd`
+- `scripts/save/local_save_store.gd`
+- `scripts/save/secure_session_store.gd`
+- `scripts/save/account_save_coordinator.gd`
+- `scripts/save/guest_session_bootstrap_service.gd`
+- `scripts/save/save_sync_service.gd`
+- `platform/android/secure-store-plugin/`
+- `platform/ios/secure-store-plugin/`
 - `project.godot`
 - `configs/reward_chest_goals.json`
 - `docs/CLOUD_SAVE.md`
 
 Responsibility:
-- Loads and saves campaign progress through the configured provider.
-- Uses `LocalSaveProvider` for editor/development saves under `user://player_progress.json`.
-- Uses `CloudSaveProvider` for release cloud saves through native Google Play Games or Apple Game Center bridge singletons.
+- Keeps local persistence active in every build and namespaces progress by installation guest or
+  immutable backend player id.
+- Commits snapshot and journal operations through crash-safe current/previous/temporary generations.
+- Stores device preferences separately and keeps keys/tokens behind Android Keystore or iOS
+  Keychain bridge code.
+- Registers installation guests with the backend challenge/proof flow and rebinds their local
+  journal exactly once to the immutable backend player id.
+- Uploads BE-307 v2 batches silently, persists exact retries, reconciles checkpoints/cursors, and
+  retains inactive account journals.
 - Tracks the current campaign level, highest completed level, campaign lives, next life restore timestamp, gold coins, campaign ability uses, reward chest stars, reward chest goal index, selected profile avatar, and player name.
 - Defaults fresh and legacy profile saves to `avatar_cat` and a generated `player_` name with a five-character random suffix.
 - Restores one missing life per elapsed real-time hour until the five-life cap is reached.
 - Spends one campaign life when a campaign level fails or the player leaves from the pause menu.
-- Spends ability uses immediately so failure or leaving a level does not refund them.
+- Commits ability/coin spends after effect preflight and before starting the gameplay effect.
 - Advances `current_level` only when the active campaign level is completed.
 - Adds earned campaign completion stars to the reward chest and grants configured gold coin rewards when goals are reached.
 - Adds the same earned campaign completion stars to a non-spending lifetime total and a Monday-UTC weekly total for leaderboard scoring.
 
 Change here when:
-- Adding life tuning, ability refills, rewards, purchases, reset flows, save migrations, native cloud save hooks, avatar/name availability, or new persisted player state.
+- Adding life tuning, operations, account flows, recovery, secure native storage, retries,
+  checkpoint mapping, migrations, rewards, purchases, reset flows, or new persisted state.
 
 ### Leaderboards
 

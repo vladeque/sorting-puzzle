@@ -360,7 +360,10 @@ Script:
 Purpose:
 - Playable puzzle scene.
 - Provides stable top-level nodes that `scripts/level.gd` fills and controls at runtime.
-- Normal campaign launches save completion when the level clears, then wait on the completion reward overlay's `Next` button before loading the next level; dev/test launches return to their configured menu from that button and do not touch campaign save data.
+- Normal campaign launches atomically commit the snapshot and completion journal operation before
+  showing the completion reward overlay, then wait on `Next` before loading the next level. A failed
+  local commit keeps the level active and does not render success. Dev/test launches return to their
+  configured menu and do not touch campaign save data.
 
 Important nodes:
 - `Background`: fullscreen procedural gameplay backdrop with child nodes for the top HUD strip, simple shop wall, baseboard, and bottom floor band.

@@ -78,7 +78,8 @@ Depends on:
 
 Do not use for:
 - Developer/test level selection. Put that in `scripts/main_menu.gd`.
-- Persistent save data ownership. Put that in `scripts/player_progress.gd`.
+- Persistent save data ownership. Put that in `scripts/save/local_save_store.gd`; use
+  `PlayerProgress` only as the gameplay facade.
 - Puzzle runtime logic.
 
 ## `scripts/main_menu_bottom_navigation.gd`
@@ -293,7 +294,8 @@ Depends on:
 - `PlayerProgress` autoload
 
 Do not use for:
-- Persistent save data ownership. Put that in `scripts/player_progress.gd`.
+- Persistent save data ownership. Put that in `scripts/save/local_save_store.gd`; use
+  `PlayerProgress` only as the gameplay facade.
 - Puzzle runtime logic.
 
 ## `scripts/press_scale_button.gd`
@@ -353,13 +355,14 @@ Autoload:
 - Registered as `PlayerProgress` in `project.godot`.
 
 Purpose:
-- Owns saved campaign progression, campaign lives, gold coins, campaign ability inventory, selected profile avatar, player name, and settings-button disabled states.
-- Owns saved reward chest star progress and active reward chest goal index.
-- Owns non-spending lifetime earned stars and the current Monday-UTC weekly earned-star total used by leaderboards.
-- Persists state through the configured save provider.
+- Gameplay-facing facade over the active account-scoped local snapshot.
+- Keeps scene APIs stable while delegating generations/journal, secure identity, account selection,
+  and backend transport to focused owners under `scripts/save/`.
+- Maps a BE-307 checkpoint into gameplay state and reapplies only local operations beyond its
+  acknowledged device cursor.
 
 Saved fields:
-- `version`: save schema version.
+- `version`: gameplay snapshot schema version retained through legacy migration.
 - `current_level`: next campaign level to play.
 - `highest_completed_level`: highest campaign level completed.
 - `lives`: current campaign lives, clamped from `0` to `5`.
@@ -372,13 +375,15 @@ Saved fields:
 - `settings_disabled`: disabled-state map for `music`, `sound_effects`, and `vibration` settings buttons.
 - `reward_chest_stars`: stars accumulated toward the active reward chest goal.
 - `reward_chest_goal_index`: index into `configs/reward_chest_goals.json` for the active goal; the final configured goal repeats after it is reached.
+- `reward_chest_completed_cycles`: completed goal count represented in recovery checkpoints.
 - `total_earned_stars`: lifetime campaign stars; unlike chest stars, this value never rolls over or spends.
 - `leaderboard_week_start_unix`: Monday 00:00 UTC boundary for the saved weekly counter.
 - `weekly_earned_stars`: campaign stars earned since the saved weekly boundary.
+- `moderation_state`: last server checkpoint's profile moderation state.
 
 Key methods:
-- `load_progress()`: reads and sanitizes provider data or creates default in-memory progress.
-- `save_progress()`: writes the current progress data through the active provider.
+- `load_progress()`: opens/recover/migrates the active namespace and starts silent background sync.
+- `save_progress()`: writes an atomic local generation without creating an operation.
 - `get_current_level()`: returns the next campaign level.
 - `get_ability_uses()`: returns remaining campaign ability uses.
 - `get_coins()`: returns the saved gold coin balance.
@@ -386,8 +391,9 @@ Key methods:
 - `get_weekly_earned_stars()`: resets an expired weekly period when needed and returns the current weekly score.
 - `get_current_leaderboard_week_start_unix()`: returns the current Monday 00:00 UTC boundary.
 - `get_current_leaderboard_week_end_unix()`: returns the next Monday boundary used by the UI countdown.
-- `spend_coins(amount)`: immediately subtracts and saves the requested gold coin amount when enough coins are available.
-- `apply_shop_purchase(transaction_id, rewards)`: atomically grants configured coins and valid ability uses once per transaction id, then saves the result.
+- `spend_coins(amount, reason)`: atomically subtracts coins and appends a resource-spend operation.
+- `apply_shop_purchase(transaction_id, rewards)`: development-mock/server-fact compatibility path;
+  production grants must originate from a verified checkpoint.
 - `get_reward_chest_progress()`: returns the saved reward chest stars, active goal, and goal index.
 - `get_reward_chest_goal_at_index(goal_index)`: exposes a configured goal threshold for menu animation rollover.
 - `consume_pending_reward_chest_animation()`: returns and clears the in-memory completed-level animation payload.
@@ -406,69 +412,95 @@ Key methods:
 - `get_max_lives()`: returns the lives cap.
 - `get_next_life_restore_seconds_remaining()`: returns seconds until the next life restore, or `0` when full.
 - `refresh_lives()`: restores one life per elapsed real-time hour while lives are not full.
-- `spend_life()`: immediately spends and saves one campaign life when available.
+- `spend_life(level_number, outcome)`: atomically appends the attempt and resulting life state.
 - `spend_ability(ability_id)`: immediately spends and saves one campaign ability use.
-- `complete_level(level_number, earned_stars)`: records completion, advances the active campaign level, adds earned stars to lifetime, weekly, and reward-chest totals, saves goal rewards, and records the pre-reward chest state for the next main-menu animation.
+- `complete_level(level_number, earned_stars)`: atomically records completion, advancement,
+  lifetime/weekly/chest totals, immediate chest coins, and reward-animation metadata; returns false
+  before result UI if persistence fails.
+- `bind_registered_guest()`, `switch_to_player()`, and `sign_out()`: activate account-scoped
+  namespaces without deleting inactive journals.
+- `get_local_save_diagnostics()`: returns non-secret namespace/recovery/support state.
 - `reset_progress()`: restores default progress and writes it to disk for testing.
-- `get_save_provider_name()`: reports the active provider for diagnostics.
+- `get_save_provider_name()`: returns `local_first_v2`.
 
 Depends on:
-- `scripts/save_providers/local_save_provider.gd`
-- `scripts/save_providers/cloud_save_provider.gd`
-- `application/config/save_provider`
-- `application/config/cloud_save_name`
-- `application/config/cloud_save_bridge_singleton`
+- `scripts/save/*.gd`
 - `configs/reward_chest_goals.json`
 
 Do not use for:
 - Per-level shelf state, timer state, or dev/test level runtime state.
 
-## `scripts/save_providers/save_provider.gd`
+## `scripts/save/local_save_codec.gd`
 
 Class:
-- `SaveProvider`
+- `LocalSaveCodec`
 
 Purpose:
-- Base interface for progress persistence providers.
+- Canonical protocol JSON with recursively sorted object keys.
+- SHA-256, UUID, timestamp, opaque-id, and namespace helpers shared by persistence and sync.
 
-Key methods:
-- `get_provider_name()`: returns a diagnostic provider name.
-- `is_available()`: reports whether the provider can be used.
-- `load_data()`: returns `{ "ok": bool, "data": Dictionary, "error": String }`.
-- `save_data(data)`: writes a progress dictionary using the same result shape.
-
-## `scripts/save_providers/local_save_provider.gd`
+## `scripts/save/local_save_store.gd`
 
 Class:
-- `LocalSaveProvider`
+- `LocalSaveStore`
 
 Purpose:
-- Reads and writes local development progress at `user://player_progress.json`.
+- Validates the four-part `sorting-puzzle-local-save/1` container.
+- Appends signed, hash-chained operations in the same generation as snapshot changes.
+- Flushes/validates/promotes `pending.tmp`, retains `previous.json`, and recovers the newest valid
+  generation.
+- Applies checkpoint/cursor transactions, compacts acknowledged history, and migrates schema 4.
 
-Do not use for:
-- Release cloud persistence that must survive uninstall/reinstall.
-
-## `scripts/save_providers/cloud_save_provider.gd`
+## `scripts/save/secure_session_store.gd`
 
 Class:
-- `CloudSaveProvider`
+- `SecureSessionStore`
 
 Purpose:
-- Routes progress JSON to a platform-native cloud save bridge.
-- Uses Google Play Games on Android and Apple Game Center on iOS when the matching Godot native singleton exists.
+- Persists public installation/device UUIDs outside account saves.
+- Delegates P-256 signing and player sessions to `SortingPuzzleSecureStoreBridge`.
+- Refuses mobile synchronization without secure native storage; desktop signatures are
+  development-only crash-test markers.
 
-Bridge singleton names:
-- `GooglePlayGamesSaveBridge` on Android.
-- `GameCenterSaveBridge` on iOS.
-- `CloudSaveBridge` fallback for tests or custom plugins.
+## `scripts/save/account_save_coordinator.gd`
 
-Bridge method contract:
-- Optional sign-in method: `is_signed_in()` or `is_authenticated()`.
-- Load method: `load_save(save_name)`, `load_game(save_name)`, `load_progress(save_name)`, or `load_data(save_name)`.
-- Save method: `save_save(save_name, json_payload)`, `save_game(save_name, json_payload)`, `save_progress(save_name, json_payload)`, or `save_data(save_name, json_payload)`.
+Class:
+- `AccountSaveCoordinator`
+
+Purpose:
+- Bootstraps installation guest progress and rebinds it exactly once after registration.
+- Switches player A/B and signed-out guest namespaces without leaking or deleting snapshots,
+  profiles, balances, sessions, or unsynchronized journals.
+
+## `scripts/save/guest_session_bootstrap_service.gd`
+
+Class:
+- `GuestSessionBootstrapService`
+
+Purpose:
+- Owns the feature-gated protocol-1.1 guest challenge and bootstrap HTTP flow.
+- Persists exact challenge/bootstrap retry payloads, signs the ordered
+  `guest-registration-proof/1` payload through the native bridge, validates the returned
+  player/device/session binding, and hands the transition to `AccountSaveCoordinator`.
+
+## `scripts/save/save_sync_service.gd`
+
+Class:
+- `SaveSyncService`
+
+Purpose:
+- Owns feature-gated `POST /v2/saves/sync` and recovery `GET /v2/saves/state`.
+- Caps batches at 500 operations/1 MiB and persists exact payload/idempotency values before send.
+- Owns timeout, full-jitter/`Retry-After`, session-refresh hooks, cursor conflict recovery, response
+  validation, checkpoint reconciliation, continuation, and silent batching.
+
+## `scripts/save_providers/*.gd`
+
+Purpose:
+- Legacy provider adapters retained only as migration/test inputs.
+- Not used by `PlayerProgress` or release persistence after GAME-001.
 
 Depends on:
-- A native Godot Android/iOS plugin for real platform API calls.
 - `docs/CLOUD_SAVE.md` for release setup details.
 
 ## `scripts/level.gd`
@@ -559,7 +591,9 @@ Key responsibilities:
 - Initialize item placement and triple-clear sound effects from the shared sound-effects setting and keep them disabled while that toggle is crossed out.
 - Manage hammer, shuffle, and highlight abilities. Campaign levels read and spend saved ability counts through `PlayerProgress`; dev/test levels use isolated temporary counts.
 - Keep zero-use ability buttons pressable during active gameplay so `_open_ability_purchase_menu()` can pause the level and show `UI/AbilityPurchaseOverlay` with the tapped ability icon, configured coin price, and current affordability state.
-- Apply paid ability uses through `_apply_paid_ability()` and `PlayerProgress.spend_coins()`: coins are spent only after the ability can start, and the paid use is consumed immediately without adding saved ability inventory.
+- Apply paid ability uses through `_can_apply_ability()`, `PlayerProgress.spend_coins()`, and
+  `_apply_paid_ability()`: the local spend commits after successful preflight and before the
+  gameplay effect starts, without adding saved ability inventory.
 - Hammer targets visible/front triples first, then can supplement visible/front matches with first-back-layer copies of the same item type when no visible item type has three available copies.
 - Hammer now gathers the chosen three targets into one item at the screen center, plays a fullscreen impact animation there, destroys the merged item on the effect's `impact` signal, and then drops combo reward stars from the impact point.
 - Shuffle now pauses moving shelf rows, shows the center-screen delivery box, flies visible unlocked items into the box, changes unlocked item identity assignments while they are hidden, flies them back to their original slots, and resolves shelves only after the return animation completes.
@@ -587,7 +621,8 @@ Depends on:
 
 Do not use for:
 - Offline level generation or solvability search. Keep that in `scripts/tools/`.
-- Save data ownership. Keep that in `scripts/player_progress.gd`.
+- Save data ownership. Keep that in `scripts/save/local_save_store.gd`; route gameplay access
+  through `PlayerProgress`.
 
 ## `scripts/hammer_impact_effect.gd`
 

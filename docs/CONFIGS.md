@@ -206,29 +206,32 @@ Rules:
 - Real providers must ignore `mock_prices` and display the formatted string returned by Google Play or the App Store.
 - Current mock catalog: one 3-hammer, 3-shuffle, 3-lantern, 1,000-coin starter bundle and five coin-only offers.
 
-## `user://player_progress.json`
+## `user://save_v2/<namespace>/current.json`
 
 Purpose:
-- Stores local campaign progression, campaign lives, campaign ability inventory, selected profile avatar, player name, and settings-button disabled states when `application/config/save_provider` is `local`.
-- Owned by the `PlayerProgress` autoload in `scripts/player_progress.gd`.
+- Always-active, account-scoped local-first save owned by `scripts/save/local_save_store.gd`.
+- Replaces `user://player_progress.json`; the old schema-4 file is a one-time migration input.
 
-Fields:
-- `version`: save schema version.
-- `current_level`: next normal campaign level to launch from the main menu.
-- `highest_completed_level`: highest normal campaign level completed.
-- `lives`: current campaign lives. Fresh saves start at `5`, and values are clamped from `0` to `5`.
-- `next_life_restore_unix`: Unix timestamp for the next hourly life restore while lives are not full, or `0` when lives are full.
-- `coins`: current gold coin balance. Fresh saves start at `300`.
-- `ability_uses`: remaining campaign uses for `hammer`, `shuffle`, and `highlight`.
-- `processed_shop_purchase_ids`: unique transaction ids already granted by the local mock purchase flow.
-- `avatar_id`: selected profile avatar id. Fresh saves and old saves without this field use `avatar_cat`.
-- `player_name`: saved profile display name. Fresh saves and old saves without a non-empty value receive a generated value like `player_g26f3`.
-- `settings_disabled`: disabled-state map for `music`, `sound_effects`, and `vibration`. Fresh saves and old saves without this field default all three buttons to enabled.
-- `reward_chest_stars`: stars accumulated toward the active reward chest goal.
-- `reward_chest_goal_index`: active index in `configs/reward_chest_goals.json`.
-- `total_earned_stars`: non-spending lifetime total used by Country and World leaderboards.
-- `leaderboard_week_start_unix`: Monday 00:00 UTC timestamp for the active leaderboard week.
-- `weekly_earned_stars`: stars earned during the active leaderboard week.
+Top-level contract:
+- `format`: `sorting-puzzle-local-save/1`.
+- `schema_version`: local container schema version.
+- `namespace`: either immutable backend `player_id` or stable installation guest id.
+- `generation`: strictly increasing atomic local generation.
+- `snapshot`: player-facing campaign, economy, lives, chest, leaderboard, purchase provenance, and profile.
+- `journal`: append-ordered BE-307 `save-operation/2` entries.
+- `sync`: device chain/cursor, exact pending retry, checkpoint, adjustment, and migration metadata.
+- `preferences`: device-only settings-button disabled states.
+- `integrity.sha256`: canonical SHA-256 of every other top-level field.
+
+Runtime files:
+- `current.json`: active fully validated generation.
+- `previous.json`: previous-good generation.
+- `pending.tmp`: flushed and validated candidate awaiting promotion.
+- `legacy_v4.previous.json`: retained read-only copy of the migrated schema-4 file.
+
+The gameplay snapshot retains the former schema-4 fields, adds
+`reward_chest_completed_cycles` and `moderation_state`, and intentionally excludes
+`settings_disabled`, which now belongs to `preferences`.
 
 Runtime behavior:
 - Fresh saves start at level 1 with five lives, 300 gold coins, three uses for each ability, `avatar_cat` selected as the profile avatar, a generated `player_` name with a five-character random suffix, and all settings buttons enabled.
@@ -242,26 +245,27 @@ Runtime behavior:
 - Failed or abandoned levels do not refund ability uses.
 - Completing the current campaign level advances `current_level` by one and adds the run's earned stars to the reward chest.
 - The same completion adds stars to `total_earned_stars` and `weekly_earned_stars`; neither is reduced by reward chest rollover.
-- Save schema 4 retains the schema 3 leaderboard migration and adds an empty processed-Shop-transaction ledger to older saves.
+- Schema-4 migration retains campaign, coins, lives/timer, ability inventory, processed mock
+  transaction ids, profile, settings, chest progress, and lifetime/weekly stars.
 - Weekly stars reset when the saved Monday-UTC boundary no longer matches the current week.
 - Reward chest stars roll over when a configured goal is reached, grant that goal's `coin_reward`, then the next configured goal starts.
 - Developer/test level selection is isolated from this save data.
-- Release builds can switch to cloud-only persistence by setting `application/config/save_provider` to `cloud`.
+- Local persistence remains active in all builds; there is no cloud-only mode.
 
-## Save Provider Settings
+## Local-first sync settings
 
 Purpose:
-- Selects how `PlayerProgress` persists campaign data.
+- Gates asynchronous BE-307 recovery without changing offline gameplay behavior.
 
 Fields:
-- `application/config/save_provider`: `local` or `cloud`. The project default is `local` while the game is in development.
-- `application/config/cloud_save_name`: save slot name sent to cloud APIs. Defaults to `player_progress`.
-- `application/config/cloud_save_bridge_singleton`: optional native singleton override. Leave empty to use platform defaults.
-
-Cloud bridge defaults:
-- Android uses `GooglePlayGamesSaveBridge`.
-- iOS uses `GameCenterSaveBridge`.
-- Other platforms fall back to `CloudSaveBridge`.
+- `application/config/backend_base_url`: backend origin; empty disables transport.
+- `application/config/save_sync_v2_enabled`: protocol-1.1 guest registration plus BE-307
+  synchronization rollout gate. Defaults to `false`.
+- `application/config/secure_storage_bridge_singleton`: native secure bridge override; empty uses
+  `SortingPuzzleSecureStoreBridge`.
+- `application/config/game_configuration_version`: closed operation provenance.
+- `application/config/game_rules_version`: closed operation rules provenance.
+- `application/config/build_number`: positive mobile build number sent in request metadata.
 
 See:
 - `docs/CLOUD_SAVE.md`

@@ -21,7 +21,8 @@ Unless a ticket explicitly narrows its scope, it is complete when:
 ## GAME-001 — Implement unrestricted offline-first saves and background cloud sync
 
 **Type:** Product/Foundation
-**Status:** Planned — product policy approved on 2026-07-23; implementation not started
+**Status:** Implemented on 2026-07-23 — Godot/local automation passes; Android and iOS native
+device/export verification remains a release gate
 **Description:** Replace the mutually exclusive local/cloud snapshot provider and monolithic
 `PlayerProgress` state with a crash-safe local snapshot, append-only operation journal, silent
 background synchronization, deterministic account-scoped merge, and backend recovery. Players can

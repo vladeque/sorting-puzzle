@@ -1627,7 +1627,7 @@ func _start_level_timer_from_player_action() -> void:
 func _fail_level() -> void:
 	_level_failed = true
 	_level_paused = false
-	_spend_campaign_life_for_run()
+	_spend_campaign_life_for_run("failed")
 	_reset_combo()
 	_clear_selected_item()
 	_set_moving_shelf_rows_paused(true)
@@ -1651,11 +1651,13 @@ func _fail_level() -> void:
 
 
 func _complete_level() -> void:
+	if not launched_from_dev_mode and not PlayerProgress.complete_level(selected_level, _stars):
+		push_error("Level completion could not be committed; keeping the level active.")
+		return
+
 	_level_completed = true
 	_level_paused = false
 	_reset_combo()
-	if not launched_from_dev_mode:
-		PlayerProgress.complete_level(selected_level, _stars)
 	_clear_selected_item()
 	_set_moving_shelf_rows_paused(true)
 	if _dragged_item != null:
@@ -1694,12 +1696,13 @@ func _return_to_main_menu() -> void:
 		push_error("Could not return to main menu: %s" % menu_scene_path)
 
 
-func _spend_campaign_life_for_run() -> void:
+func _spend_campaign_life_for_run(outcome: String = "left") -> void:
 	if launched_from_dev_mode or _life_spent_for_run:
 		return
 
-	_life_spent_for_run = true
-	if not PlayerProgress.spend_life():
+	if PlayerProgress.spend_life(selected_level, outcome):
+		_life_spent_for_run = true
+	else:
 		push_warning("Could not spend campaign life for level %d." % selected_level)
 
 
@@ -1868,17 +1871,23 @@ func _on_ability_purchase_buy_pressed() -> void:
 	if PlayerProgress.get_coins() < price:
 		_refresh_ability_purchase_offer()
 		return
+	if not _can_apply_ability(ability_id):
+		_refresh_ability_purchase_offer()
+		return
 
 	_level_paused = false
 	_set_moving_shelf_rows_paused(false)
-	if not _apply_paid_ability(ability_id):
+	if not PlayerProgress.spend_coins(price, "ability_use"):
 		_level_paused = true
 		_set_moving_shelf_rows_paused(true)
 		_refresh_ability_purchase_offer()
 		return
-
-	if not PlayerProgress.spend_coins(price):
-		push_warning("Could not spend coins for ability purchase: %s" % String(ability_id))
+	if not _apply_paid_ability(ability_id):
+		_level_paused = true
+		_set_moving_shelf_rows_paused(true)
+		push_error("Paid ability passed preflight but could not start: %s" % String(ability_id))
+		_refresh_ability_purchase_offer()
+		return
 
 	_close_ability_purchase_menu(false)
 
@@ -2963,6 +2972,12 @@ func _on_ability_button_pressed(ability_id: StringName) -> void:
 
 
 func _apply_ability_from_button(ability_id: StringName) -> bool:
+	if not _can_apply_ability(ability_id):
+		return false
+	if launched_from_dev_mode:
+		_ability_uses[ability_id] = maxi(int(_ability_uses.get(ability_id, 0)) - 1, 0)
+	elif not PlayerProgress.spend_ability(ability_id):
+		return false
 	_cancel_active_interaction()
 
 	var did_apply := false
@@ -2975,15 +2990,19 @@ func _apply_ability_from_button(ability_id: StringName) -> bool:
 			did_apply = _use_highlight()
 
 	if not did_apply:
+		push_error("Ability passed preflight but could not start: %s" % String(ability_id))
 		return false
 
 	_start_level_timer_from_player_action()
-	_spend_ability_use(ability_id)
+	if not launched_from_dev_mode:
+		_load_ability_uses()
 	_update_ability_buttons()
 	return true
 
 
 func _apply_paid_ability(ability_id: StringName) -> bool:
+	if not _can_apply_ability(ability_id):
+		return false
 	_cancel_active_interaction()
 
 	var did_apply := false
@@ -3001,6 +3020,24 @@ func _apply_paid_ability(ability_id: StringName) -> bool:
 	_start_level_timer_from_player_action()
 	_update_ability_buttons()
 	return true
+
+
+func _can_apply_ability(ability_id: StringName) -> bool:
+	match ability_id:
+		ABILITY_HAMMER:
+			var front_groups := _group_hammer_items_by_type(_get_visible_items())
+			var back_groups := _group_hammer_items_by_type(_get_first_back_layer_items())
+			for item_id in front_groups.keys():
+				var front_count := (front_groups[item_id] as Array).size()
+				var back_count := (back_groups.get(item_id, []) as Array).size()
+				if front_count >= SLOT_COUNT or (front_count > 0 and front_count + back_count >= SLOT_COUNT):
+					return true
+			return false
+		ABILITY_SHUFFLE:
+			return not _is_resolving_shelves and _get_shuffle_eligible_items().size() >= 2
+		ABILITY_HIGHLIGHT:
+			return true
+	return false
 
 
 func _cancel_active_interaction() -> void:
@@ -3705,17 +3742,6 @@ func _load_ability_uses() -> void:
 		ABILITY_SHUFFLE: maxi(int(saved_uses.get(String(ABILITY_SHUFFLE), 3)), 0),
 		ABILITY_HIGHLIGHT: maxi(int(saved_uses.get(String(ABILITY_HIGHLIGHT), 3)), 0),
 	}
-
-
-func _spend_ability_use(ability_id: StringName) -> void:
-	if launched_from_dev_mode:
-		_ability_uses[ability_id] = maxi(int(_ability_uses.get(ability_id, 0)) - 1, 0)
-		return
-
-	if not PlayerProgress.spend_ability(ability_id):
-		push_warning("Could not spend ability use: %s" % String(ability_id))
-
-	_load_ability_uses()
 
 
 func _update_ability_button(ability_id: StringName) -> void:

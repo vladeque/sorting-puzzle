@@ -1,0 +1,15 @@
+[config]
+name="SortingPuzzleSecureStoreBridge"
+binary="SortingPuzzleSecureStore.xcframework"
+initialization="init_sorting_puzzle_secure_store"
+deinitialization="deinit_sorting_puzzle_secure_store"
+
+[dependencies]
+linked=[]
+embedded=[]
+system=["Foundation.framework", "Security.framework"]
+capabilities=[]
+files=[]
+linker_flags=["-ObjC"]
+
+[plist]

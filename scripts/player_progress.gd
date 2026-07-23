@@ -1,19 +1,21 @@
 extends Node
 
-const LocalSaveProviderScript := preload("res://scripts/save_providers/local_save_provider.gd")
-const CloudSaveProviderScript := preload("res://scripts/save_providers/cloud_save_provider.gd")
+const LocalSaveCodecScript := preload("res://scripts/save/local_save_codec.gd")
+const SecureSessionStoreScript := preload("res://scripts/save/secure_session_store.gd")
+const AccountSaveCoordinatorScript := preload("res://scripts/save/account_save_coordinator.gd")
+const GuestSessionBootstrapServiceScript := preload("res://scripts/save/guest_session_bootstrap_service.gd")
+const SaveSyncServiceScript := preload("res://scripts/save/save_sync_service.gd")
 const SAVE_PATH := "user://player_progress.json"
-const SAVE_NAME := "player_progress"
 const SAVE_VERSION := 4
 const MIN_LEVEL := 1
-const SAVE_PROVIDER_SETTING := "application/config/save_provider"
-const CLOUD_SAVE_NAME_SETTING := "application/config/cloud_save_name"
-const CLOUD_SAVE_BRIDGE_SETTING := "application/config/cloud_save_bridge_singleton"
-const SAVE_PROVIDER_LOCAL := "local"
-const SAVE_PROVIDER_CLOUD := "cloud"
 const ABILITY_HAMMER := "hammer"
 const ABILITY_SHUFFLE := "shuffle"
 const ABILITY_HIGHLIGHT := "highlight"
+const GAME_CONFIGURATION_VERSION_SETTING := "application/config/game_configuration_version"
+const GAME_RULES_VERSION_SETTING := "application/config/game_rules_version"
+const DEFAULT_GAME_CONFIGURATION_VERSION := "client-bundled-2026-07-23"
+const DEFAULT_GAME_RULES_VERSION := "triple-sort-rules-1"
+const LEVEL_VERSION_FORMAT := "level-%03d-client-1"
 const DEFAULT_AVATAR_ID := "avatar_cat"
 const PLAYER_NAME_PREFIX := "player_"
 const PLAYER_NAME_RANDOM_ALPHABET := "abcdefghijklmnopqrstuvwxyz0123456789"
@@ -64,40 +66,72 @@ const DEFAULT_DISABLED_SETTINGS := {
 }
 
 var _data := {}
-var _save_provider: SaveProvider
 var _reward_chest_goals := []
 var _pending_reward_chest_animation := {}
+var _session_store
+var _account_coordinator
+var _local_store
+var _guest_bootstrap_service
+var _sync_service
 
 
 func _ready() -> void:
-	_save_provider = _create_save_provider()
 	load_progress()
 
 
 func load_progress() -> void:
-	_ensure_save_provider()
-	var result := _save_provider.load_data()
-	if bool(result.get("ok", false)):
-		var loaded_data := result.get("data", {}) as Dictionary
-		if loaded_data == null:
-			loaded_data = {}
+	if _session_store == null:
+		_session_store = SecureSessionStoreScript.new()
+		var identity_result: Dictionary = _session_store.initialize()
+		if not bool(identity_result.get("ok", false)):
+			push_error("Could not initialize installation identity: %s" % identity_result.get("error", ""))
+			_data = _default_data()
+			return
 
-		var sanitized_data := _sanitize_data(loaded_data)
-		var should_save_sanitized_data := loaded_data != sanitized_data
-		_data = sanitized_data
-		if _refresh_lives_state() or should_save_sanitized_data:
-			save_progress()
+	var legacy_data := _load_legacy_data()
+	var initial_data := _sanitize_data(legacy_data if not legacy_data.is_empty() else _default_data())
+	var initial_preferences := {
+		"settings_disabled": initial_data.get("settings_disabled", DEFAULT_DISABLED_SETTINGS).duplicate(true),
+	}
+	initial_data.erase("settings_disabled")
+	if _account_coordinator == null:
+		_account_coordinator = AccountSaveCoordinatorScript.new(_session_store)
+	var open_result: Dictionary = _account_coordinator.initialize(
+		initial_data,
+		initial_preferences,
+		SAVE_PATH if not legacy_data.is_empty() else "",
+		int(legacy_data.get("version", 0)),
+		_snapshot_without_preferences(_sanitize_data(_default_data()))
+	)
+	if not bool(open_result.get("ok", false)):
+		push_error("Could not open local-first progress: %s" % open_result.get("error", ""))
+		_data = _sanitize_data(legacy_data if not legacy_data.is_empty() else _default_data())
 		return
 
-	push_warning("Could not load %s save: %s" % [_save_provider.get_provider_name(), result.get("error", "")])
-	_data = _default_data()
+	_local_store = _account_coordinator.get_store()
+	_apply_loaded_partitions(
+		open_result.get("snapshot", {}) as Dictionary,
+		open_result.get("preferences", {}) as Dictionary
+	)
+	if _sync_service == null:
+		_sync_service = SaveSyncServiceScript.new()
+		add_child(_sync_service)
+		_sync_service.reconciliation_applied.connect(_on_reconciliation_applied)
+	_sync_service.configure(_local_store, _session_store, _map_checkpoint_to_snapshot)
+	if _guest_bootstrap_service == null:
+		_guest_bootstrap_service = GuestSessionBootstrapServiceScript.new()
+		add_child(_guest_bootstrap_service)
+		_guest_bootstrap_service.guest_registered.connect(_on_guest_registered)
+	_guest_bootstrap_service.configure(_local_store, _session_store, _account_coordinator)
+	if _refresh_lives_state():
+		_commit_current_state([_life_state_operation()])
+	_guest_bootstrap_service.request_registration()
+	_sync_service.request_background_sync()
 
 
 func save_progress() -> void:
-	_ensure_save_provider()
-	var result := _save_provider.save_data(_data)
-	if not bool(result.get("ok", false)):
-		push_error("Could not save %s progress: %s" % [_save_provider.get_provider_name(), result.get("error", "")])
+	if not _commit_current_state():
+		push_error("Could not save local-first progress.")
 
 
 func get_current_level() -> int:
@@ -142,7 +176,7 @@ func get_current_leaderboard_week_end_unix() -> int:
 	return get_current_leaderboard_week_start_unix() + LEADERBOARD_WEEK_SECONDS
 
 
-func spend_coins(amount: int) -> bool:
+func spend_coins(amount: int, reason: String = "gameplay") -> bool:
 	var normalized_amount := maxi(amount, 0)
 	if normalized_amount <= 0:
 		return true
@@ -151,9 +185,16 @@ func spend_coins(amount: int) -> bool:
 	if coins < normalized_amount:
 		return false
 
+	var previous_data := _data.duplicate(true)
 	_data["coins"] = coins - normalized_amount
-	save_progress()
-	return true
+	return _commit_or_restore(previous_data, [{
+		"operation_type": "resource_spend",
+		"payload": {
+			"asset": "coins",
+			"amount": normalized_amount,
+			"reason": reason if ["ability_use", "gameplay", "shop"].has(reason) else "gameplay",
+		},
+	}])
 
 
 func apply_shop_purchase(transaction_id: String, rewards: Dictionary) -> Dictionary:
@@ -165,6 +206,7 @@ func apply_shop_purchase(transaction_id: String, rewards: Dictionary) -> Diction
 	if processed_ids.has(normalized_transaction_id):
 		return {"ok": true, "applied": false}
 
+	var previous_data := _data.duplicate(true)
 	var granted_coins := maxi(int(rewards.get("coins", 0)), 0)
 	var granted_abilities := {}
 	var raw_abilities = rewards.get("abilities", {})
@@ -181,7 +223,8 @@ func apply_shop_purchase(transaction_id: String, rewards: Dictionary) -> Diction
 	_data["coins"] = get_coins() + granted_coins
 	processed_ids.append(normalized_transaction_id)
 	_data["processed_shop_purchase_ids"] = processed_ids
-	save_progress()
+	if not _commit_or_restore(previous_data):
+		return {"ok": false, "applied": false, "error": "Could not persist the verified purchase fact."}
 	return {
 		"ok": true,
 		"applied": true,
@@ -218,8 +261,9 @@ func consume_pending_reward_chest_animation() -> Dictionary:
 
 
 func add_reward_chest_stars(star_count: int) -> void:
+	var previous_data := _data.duplicate(true)
 	if _apply_reward_chest_stars(star_count):
-		save_progress()
+		_commit_or_restore(previous_data)
 
 
 func get_available_avatar_ids() -> Array:
@@ -261,9 +305,9 @@ func set_setting_disabled(setting_id: StringName, is_disabled: bool) -> bool:
 		return true
 
 	disabled_settings[setting_key] = is_disabled
+	var previous_data := _data.duplicate(true)
 	_data["settings_disabled"] = disabled_settings
-	save_progress()
-	return true
+	return _commit_or_restore(previous_data)
 
 
 func set_avatar_id(avatar_id: String) -> bool:
@@ -273,9 +317,12 @@ func set_avatar_id(avatar_id: String) -> bool:
 	if get_avatar_id() == avatar_id:
 		return true
 
+	var previous_data := _data.duplicate(true)
 	_data["avatar_id"] = avatar_id
-	save_progress()
-	return true
+	return _commit_or_restore(previous_data, [{
+		"operation_type": "profile_edit",
+		"payload": {"avatar_id": avatar_id},
+	}])
 
 
 func set_player_name(player_name: String) -> bool:
@@ -283,9 +330,12 @@ func set_player_name(player_name: String) -> bool:
 	if get_player_name() == sanitized_player_name:
 		return true
 
+	var previous_data := _data.duplicate(true)
 	_data["player_name"] = sanitized_player_name
-	save_progress()
-	return true
+	return _commit_or_restore(previous_data, [{
+		"operation_type": "profile_edit",
+		"payload": {"display_name": sanitized_player_name},
+	}])
 
 
 func set_profile(avatar_id: String, player_name: String) -> bool:
@@ -293,16 +343,23 @@ func set_profile(avatar_id: String, player_name: String) -> bool:
 		return false
 
 	var sanitized_player_name := _sanitize_player_name(player_name, get_player_name())
+	var previous_data := _data.duplicate(true)
 	var did_change := false
+	var profile_payload := {}
 	if get_avatar_id() != avatar_id:
 		_data["avatar_id"] = avatar_id
+		profile_payload["avatar_id"] = avatar_id
 		did_change = true
 	if get_player_name() != sanitized_player_name:
 		_data["player_name"] = sanitized_player_name
+		profile_payload["display_name"] = sanitized_player_name
 		did_change = true
 
 	if did_change:
-		save_progress()
+		return _commit_or_restore(previous_data, [{
+			"operation_type": "profile_edit",
+			"payload": profile_payload,
+		}])
 
 	return true
 
@@ -330,22 +387,30 @@ func get_next_life_restore_seconds_remaining() -> int:
 
 
 func refresh_lives() -> void:
+	var previous_data := _data.duplicate(true)
 	if _refresh_lives_state():
-		save_progress()
+		_commit_or_restore(previous_data, [_life_state_operation()])
 
 
-func spend_life() -> bool:
+func spend_life(level_number: int = 0, outcome: String = "left") -> bool:
 	refresh_lives()
 	var lives := int(_data.get("lives", MAX_LIVES))
 	if lives <= 0:
 		return false
 
+	var previous_data := _data.duplicate(true)
 	_data["lives"] = lives - 1
 	if int(_data.get("lives", 0)) < MAX_LIVES and int(_data.get("next_life_restore_unix", 0)) <= 0:
 		_data["next_life_restore_unix"] = int(Time.get_unix_time_from_system()) + LIFE_RESTORE_SECONDS
 
-	save_progress()
-	return true
+	var operations := []
+	if level_number >= MIN_LEVEL:
+		operations.append({
+			"operation_type": "campaign_attempt",
+			"payload": _campaign_attempt_payload(level_number, outcome),
+		})
+	operations.append(_life_state_operation())
+	return _commit_or_restore(previous_data, operations)
 
 
 func spend_ability(ability_id: StringName) -> bool:
@@ -359,42 +424,62 @@ func spend_ability(ability_id: StringName) -> bool:
 	if uses_left <= 0:
 		return false
 
+	var previous_data := _data.duplicate(true)
 	ability_uses[ability_key] = uses_left - 1
-	save_progress()
-	return true
+	return _commit_or_restore(previous_data, [{
+		"operation_type": "resource_spend",
+		"payload": {
+			"asset": ability_key,
+			"amount": 1,
+			"reason": "ability_use",
+		},
+	}])
 
 
-func complete_level(level_number: int, earned_stars: int = 0) -> void:
+func complete_level(level_number: int, earned_stars: int = 0) -> bool:
 	if level_number < MIN_LEVEL:
-		return
+		return false
 
+	var safe_earned_stars := clampi(earned_stars, 0, 3)
+	var previous_data := _data.duplicate(true)
+	var previous_animation := _pending_reward_chest_animation.duplicate(true)
 	var completes_current_level := level_number == get_current_level()
 	_data["highest_completed_level"] = maxi(get_highest_completed_level(), level_number)
 	if completes_current_level:
 		_data["current_level"] = level_number + 1
 		var starting_progress := get_reward_chest_progress()
-		_apply_reward_chest_stars(earned_stars)
-		if earned_stars > 0:
+		_apply_reward_chest_stars(safe_earned_stars)
+		if safe_earned_stars > 0:
 			_refresh_leaderboard_week_state()
-			_data["total_earned_stars"] = get_total_earned_stars() + earned_stars
-			_data["weekly_earned_stars"] = get_weekly_earned_stars() + earned_stars
+			_data["total_earned_stars"] = get_total_earned_stars() + safe_earned_stars
+			_data["weekly_earned_stars"] = get_weekly_earned_stars() + safe_earned_stars
 			_pending_reward_chest_animation = {
-				"amount": earned_stars,
+				"amount": safe_earned_stars,
 				"start_stars": int(starting_progress.get("stars", 0)),
 				"start_goal_index": int(starting_progress.get("goal_index", 0)),
 			}
-	save_progress()
+	var result := _commit_current_state([{
+		"operation_type": "campaign_completion",
+		"payload": _campaign_completion_payload(level_number, safe_earned_stars),
+	}])
+	if not bool(result.get("ok", false)):
+		_data = previous_data
+		_pending_reward_chest_animation = previous_animation
+		push_error("Could not atomically save completed level %d." % level_number)
+		return false
+	return true
 
 
 func reset_progress() -> void:
+	var previous_data := _data.duplicate(true)
 	_data = _default_data()
 	_pending_reward_chest_animation.clear()
-	save_progress()
+	if not _commit_current_state().get("ok", false):
+		_data = previous_data
 
 
 func get_save_provider_name() -> String:
-	_ensure_save_provider()
-	return _save_provider.get_provider_name()
+	return "local_first_v2"
 
 
 func _sanitize_data(raw_data: Dictionary) -> Dictionary:
@@ -410,6 +495,7 @@ func _sanitize_data(raw_data: Dictionary) -> Dictionary:
 	)
 	sanitized["avatar_id"] = _sanitize_avatar_id(str(raw_data.get("avatar_id", DEFAULT_AVATAR_ID)))
 	sanitized["player_name"] = _sanitize_player_name(str(raw_data.get("player_name", sanitized["player_name"])), sanitized["player_name"])
+	sanitized["moderation_state"] = str(raw_data.get("moderation_state", "active"))
 	sanitized["settings_disabled"] = _sanitize_disabled_settings(raw_data.get("settings_disabled", {}))
 	sanitized["total_earned_stars"] = maxi(
 		int(raw_data.get("total_earned_stars", raw_data.get("reward_chest_stars", 0))),
@@ -429,6 +515,10 @@ func _sanitize_data(raw_data: Dictionary) -> Dictionary:
 	)
 	sanitized["reward_chest_stars"] = reward_chest_state["stars"]
 	sanitized["reward_chest_goal_index"] = reward_chest_state["goal_index"]
+	sanitized["reward_chest_completed_cycles"] = maxi(
+		int(raw_data.get("reward_chest_completed_cycles", 0)),
+		0
+	)
 	if int(sanitized["lives"]) >= MAX_LIVES:
 		sanitized["next_life_restore_unix"] = 0
 	elif int(sanitized["next_life_restore_unix"]) <= 0:
@@ -455,12 +545,14 @@ func _default_data() -> Dictionary:
 		"ability_uses": DEFAULT_ABILITY_USES.duplicate(),
 		"avatar_id": DEFAULT_AVATAR_ID,
 		"player_name": _generate_player_name(),
+		"moderation_state": "active",
 		"settings_disabled": DEFAULT_DISABLED_SETTINGS.duplicate(),
 		"total_earned_stars": 0,
 		"leaderboard_week_start_unix": get_current_leaderboard_week_start_unix(),
 		"weekly_earned_stars": 0,
 		"reward_chest_stars": 0,
 		"reward_chest_goal_index": 0,
+		"reward_chest_completed_cycles": 0,
 	}
 
 
@@ -476,7 +568,7 @@ func _sanitize_player_name(player_name: String, fallback_name: String = "") -> S
 	if sanitized_name.is_empty():
 		return fallback_name if not fallback_name.is_empty() else _generate_player_name()
 
-	return sanitized_name
+	return sanitized_name.left(24)
 
 
 func _sanitize_disabled_settings(raw_settings) -> Dictionary:
@@ -518,6 +610,9 @@ func _apply_reward_chest_stars(star_count: int) -> bool:
 	)
 	_data["reward_chest_stars"] = normalized["stars"]
 	_data["reward_chest_goal_index"] = normalized["goal_index"]
+	_data["reward_chest_completed_cycles"] = int(
+		_data.get("reward_chest_completed_cycles", 0)
+	) + int(normalized.get("completed_cycles", 0))
 	_data["coins"] = get_coins() + int(normalized.get("coin_reward", 0))
 	return true
 
@@ -527,10 +622,12 @@ func _normalize_reward_chest_progress(stars: int, goal_index: int) -> Dictionary
 	var safe_goal_index := clampi(goal_index, 0, goals.size() - 1)
 	var safe_stars := maxi(stars, 0)
 	var coin_reward := 0
+	var completed_cycles := 0
 
 	while safe_stars >= _get_reward_chest_goal_stars(goals, safe_goal_index):
 		safe_stars -= _get_reward_chest_goal_stars(goals, safe_goal_index)
 		coin_reward += _get_reward_chest_goal_coin_reward(goals, safe_goal_index)
+		completed_cycles += 1
 		if safe_goal_index < goals.size() - 1:
 			safe_goal_index += 1
 
@@ -538,6 +635,7 @@ func _normalize_reward_chest_progress(stars: int, goal_index: int) -> Dictionary
 		"stars": safe_stars,
 		"goal_index": safe_goal_index,
 		"coin_reward": coin_reward,
+		"completed_cycles": completed_cycles,
 	}
 
 
@@ -666,24 +764,274 @@ func _refresh_leaderboard_week_state() -> bool:
 	return true
 
 
-func _ensure_save_provider() -> void:
-	if _save_provider == null:
-		_save_provider = _create_save_provider()
+func bind_registered_guest(player_id: String, session: Dictionary) -> bool:
+	var result: Dictionary = _account_coordinator.bind_registered_guest(player_id, session)
+	if not bool(result.get("ok", false)):
+		push_warning("Could not bind guest progress: %s" % result.get("error", ""))
+		return false
+	_activate_coordinator_result(result)
+	return true
 
 
-func _create_save_provider() -> SaveProvider:
-	var provider_id := str(_get_project_setting(SAVE_PROVIDER_SETTING, SAVE_PROVIDER_LOCAL)).to_lower()
-	if provider_id == SAVE_PROVIDER_CLOUD:
-		return CloudSaveProviderScript.new(
-			str(_get_project_setting(CLOUD_SAVE_NAME_SETTING, SAVE_NAME)),
-			str(_get_project_setting(CLOUD_SAVE_BRIDGE_SETTING, ""))
-		)
+func switch_to_player(
+	player_id: String,
+	session: Dictionary = {},
+	remote_checkpoint: Dictionary = {}
+) -> bool:
+	var result: Dictionary = _account_coordinator.switch_to_player(player_id, session, remote_checkpoint)
+	if not bool(result.get("ok", false)):
+		push_warning("Could not switch player save: %s" % result.get("error", ""))
+		return false
+	_activate_coordinator_result(result)
+	var checkpoint = result.get("remote_checkpoint")
+	if checkpoint is Dictionary and not checkpoint.is_empty():
+		var mapped := _map_checkpoint_to_snapshot(checkpoint, _local_store.get_snapshot(), [])
+		var cursor := {
+			"device_id": _session_store.get_device_id(),
+			"acknowledged_sequence": 0,
+			"acknowledged_hash": null,
+		}
+		if bool(_local_store.apply_reconciliation(mapped, cursor, checkpoint, []).get("ok", false)):
+			_apply_loaded_partitions(mapped, _local_store.get_preferences())
+	return true
 
-	return LocalSaveProviderScript.new(SAVE_PATH)
+
+func sign_out() -> bool:
+	var result: Dictionary = _account_coordinator.sign_out()
+	if not bool(result.get("ok", false)):
+		push_warning("Could not activate signed-out guest progress: %s" % result.get("error", ""))
+		return false
+	_activate_coordinator_result(result)
+	return true
 
 
-func _get_project_setting(setting_name: String, default_value):
-	if ProjectSettings.has_setting(setting_name):
-		return ProjectSettings.get_setting(setting_name)
+func get_active_save_namespace() -> Dictionary:
+	return _account_coordinator.get_active_namespace() if _account_coordinator != null else {}
 
-	return default_value
+
+func get_local_save_diagnostics() -> Dictionary:
+	if _local_store == null:
+		return {}
+	var sync: Dictionary = _local_store.get_sync_metadata()
+	var cursor := sync.get("cursor", {}) as Dictionary
+	return {
+		"namespace": _local_store.get_namespace(),
+		"generation": _local_store.get_generation(),
+		"journal_entries": _local_store.get_journal().size(),
+		"journal_head_sequence": int(sync.get("journal_head_sequence", 0)),
+		"acknowledged_sequence": int(cursor.get("acknowledged_sequence", 0)),
+		"retry_attempt": int(sync.get("retry_attempt", 0)),
+		"terminal_error": (sync.get("terminal_error", {}) as Dictionary).duplicate(true),
+		"merge_adjustment_count": (sync.get("adjustments", []) as Array).size(),
+		"migration": (sync.get("migration", {}) as Dictionary).duplicate(true),
+	}
+
+
+func _activate_coordinator_result(result: Dictionary) -> void:
+	_local_store = _account_coordinator.get_store()
+	_apply_loaded_partitions(
+		result.get("snapshot", {}) as Dictionary,
+		result.get("preferences", {}) as Dictionary
+	)
+	if _sync_service != null:
+		_sync_service.replace_store(_local_store)
+		_sync_service.request_background_sync()
+	if _guest_bootstrap_service != null:
+		_guest_bootstrap_service.replace_store(_local_store)
+		_guest_bootstrap_service.request_registration()
+
+
+func _load_legacy_data() -> Dictionary:
+	if not FileAccess.file_exists(SAVE_PATH):
+		return {}
+	var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
+	if file == null:
+		return {}
+	var parsed = JSON.parse_string(file.get_as_text())
+	return parsed as Dictionary if parsed is Dictionary else {}
+
+
+func _apply_loaded_partitions(snapshot: Dictionary, preferences: Dictionary) -> void:
+	var combined := snapshot.duplicate(true)
+	combined["settings_disabled"] = preferences.get(
+		"settings_disabled",
+		DEFAULT_DISABLED_SETTINGS
+	)
+	_data = _sanitize_data(combined)
+
+
+func _snapshot_for_storage() -> Dictionary:
+	return _snapshot_without_preferences(_data)
+
+
+func _snapshot_without_preferences(source: Dictionary) -> Dictionary:
+	var snapshot := source.duplicate(true)
+	snapshot.erase("settings_disabled")
+	return snapshot
+
+
+func _preferences_for_storage() -> Dictionary:
+	return {
+		"settings_disabled": get_disabled_settings(),
+	}
+
+
+func _commit_current_state(operation_specs: Array = []) -> Dictionary:
+	if _local_store == null:
+		return {"ok": false, "error": "Local save store is unavailable."}
+	var result: Dictionary = _local_store.commit_snapshot(
+		_snapshot_for_storage(),
+		_preferences_for_storage(),
+		operation_specs
+	)
+	if bool(result.get("ok", false)) and not operation_specs.is_empty() and _sync_service != null:
+		_sync_service.notify_local_mutation()
+	return result
+
+
+func _commit_or_restore(previous_data: Dictionary, operation_specs: Array = []) -> bool:
+	var result := _commit_current_state(operation_specs)
+	if bool(result.get("ok", false)):
+		return true
+	_data = previous_data
+	push_error("Could not commit local-first mutation: %s" % result.get("error", ""))
+	return false
+
+
+func _campaign_completion_payload(level_number: int, earned_stars: int) -> Dictionary:
+	return {
+		"campaign_level": level_number,
+		"stars": clampi(earned_stars, 0, 3),
+		"configuration_version": str(ProjectSettings.get_setting(
+			GAME_CONFIGURATION_VERSION_SETTING,
+			DEFAULT_GAME_CONFIGURATION_VERSION
+		)),
+		"level_version": LEVEL_VERSION_FORMAT % level_number,
+		"rules_version": str(ProjectSettings.get_setting(
+			GAME_RULES_VERSION_SETTING,
+			DEFAULT_GAME_RULES_VERSION
+		)),
+	}
+
+
+func _campaign_attempt_payload(level_number: int, outcome: String) -> Dictionary:
+	var payload := _campaign_completion_payload(level_number, 0)
+	payload.erase("stars")
+	payload["outcome"] = outcome if outcome == "failed" else "left"
+	return payload
+
+
+func _life_state_operation() -> Dictionary:
+	var next_restore_unix := int(_data.get("next_life_restore_unix", 0))
+	return {
+		"operation_type": "life_state",
+		"payload": {
+			"available_lives": clampi(int(_data.get("lives", MAX_LIVES)), 0, MAX_LIVES),
+			"maximum_lives": MAX_LIVES,
+			"restore_interval_seconds": LIFE_RESTORE_SECONDS,
+			"next_restore_at": (
+				LocalSaveCodecScript.iso_timestamp(next_restore_unix)
+				if next_restore_unix > 0
+				else null
+			),
+			"observed_at": LocalSaveCodecScript.iso_timestamp(),
+		},
+	}
+
+
+func _map_checkpoint_to_snapshot(
+	checkpoint: Dictionary,
+	current_snapshot: Dictionary,
+	remaining_operations: Array
+) -> Dictionary:
+	var mapped := current_snapshot.duplicate(true)
+	var campaign := checkpoint.get("campaign", {}) as Dictionary
+	var balances := checkpoint.get("balances", {}) as Dictionary
+	var abilities := checkpoint.get("abilities", {}) as Dictionary
+	var lives := checkpoint.get("lives", {}) as Dictionary
+	var chest := checkpoint.get("reward_chest", {}) as Dictionary
+	var leaderboards := checkpoint.get("leaderboards", {}) as Dictionary
+	var profile := checkpoint.get("profile", {}) as Dictionary
+	mapped["version"] = SAVE_VERSION
+	mapped["current_level"] = int(campaign.get("current_level", MIN_LEVEL))
+	mapped["highest_completed_level"] = int(campaign.get("highest_completed_level", 0))
+	mapped["coins"] = int(balances.get("coins", DEFAULT_COINS))
+	mapped["ability_uses"] = {
+		ABILITY_HAMMER: int(abilities.get(ABILITY_HAMMER, 0)),
+		ABILITY_SHUFFLE: int(abilities.get(ABILITY_SHUFFLE, 0)),
+		ABILITY_HIGHLIGHT: int(abilities.get(ABILITY_HIGHLIGHT, 0)),
+	}
+	mapped["lives"] = int(lives.get("available_lives", MAX_LIVES))
+	mapped["next_life_restore_unix"] = LocalSaveCodecScript.unix_from_timestamp(
+		lives.get("next_restore_at")
+	)
+	mapped["reward_chest_stars"] = int(chest.get("stars", 0))
+	mapped["reward_chest_goal_index"] = int(chest.get("goal_index", 0))
+	mapped["reward_chest_completed_cycles"] = int(chest.get("completed_cycles", 0))
+	mapped["total_earned_stars"] = int(leaderboards.get("lifetime_stars", 0))
+	mapped["weekly_earned_stars"] = int(leaderboards.get("weekly_stars", 0))
+	mapped["leaderboard_week_start_unix"] = LocalSaveCodecScript.unix_from_timestamp(
+		leaderboards.get("weekly_period_start")
+	)
+	mapped["avatar_id"] = str(profile.get("avatar_id", DEFAULT_AVATAR_ID))
+	mapped["player_name"] = str(profile.get("display_name", mapped.get("player_name", "")))
+	mapped["moderation_state"] = str(profile.get("moderation_state", "active"))
+	for operation in remaining_operations:
+		mapped = _apply_unacknowledged_operation(mapped, operation as Dictionary)
+	return _sanitize_data(mapped)
+
+
+func _apply_unacknowledged_operation(snapshot: Dictionary, operation: Dictionary) -> Dictionary:
+	var result := snapshot.duplicate(true)
+	var payload := operation.get("payload", {}) as Dictionary
+	match str(operation.get("operation_type", "")):
+		"campaign_completion":
+			var level_number := int(payload.get("campaign_level", 0))
+			var stars := clampi(int(payload.get("stars", 0)), 0, 3)
+			result["highest_completed_level"] = maxi(
+				int(result.get("highest_completed_level", 0)),
+				level_number
+			)
+			if level_number == int(result.get("current_level", MIN_LEVEL)):
+				result["current_level"] = level_number + 1
+				var normalized := _normalize_reward_chest_progress(
+					int(result.get("reward_chest_stars", 0)) + stars,
+					int(result.get("reward_chest_goal_index", 0))
+				)
+				result["reward_chest_stars"] = normalized["stars"]
+				result["reward_chest_goal_index"] = normalized["goal_index"]
+				result["reward_chest_completed_cycles"] = int(
+					result.get("reward_chest_completed_cycles", 0)
+				) + int(normalized.get("completed_cycles", 0))
+				result["coins"] = int(result.get("coins", 0)) + int(normalized.get("coin_reward", 0))
+				result["total_earned_stars"] = int(result.get("total_earned_stars", 0)) + stars
+				result["weekly_earned_stars"] = int(result.get("weekly_earned_stars", 0)) + stars
+		"resource_spend":
+			var asset := str(payload.get("asset", ""))
+			var amount := maxi(int(payload.get("amount", 0)), 0)
+			if asset == "coins":
+				result["coins"] = maxi(int(result.get("coins", 0)) - amount, 0)
+			else:
+				var uses := result.get("ability_uses", {}) as Dictionary
+				uses[asset] = maxi(int(uses.get(asset, 0)) - amount, 0)
+				result["ability_uses"] = uses
+		"life_state":
+			result["lives"] = int(payload.get("available_lives", MAX_LIVES))
+			result["next_life_restore_unix"] = LocalSaveCodecScript.unix_from_timestamp(
+				payload.get("next_restore_at")
+			)
+		"profile_edit":
+			if payload.has("display_name"):
+				result["player_name"] = str(payload.get("display_name"))
+			if payload.has("avatar_id"):
+				result["avatar_id"] = str(payload.get("avatar_id"))
+	return result
+
+
+func _on_reconciliation_applied() -> void:
+	if _local_store != null:
+		_apply_loaded_partitions(_local_store.get_snapshot(), _local_store.get_preferences())
+
+
+func _on_guest_registered(result: Dictionary) -> void:
+	_activate_coordinator_result(result)

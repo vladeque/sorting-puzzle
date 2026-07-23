@@ -1,107 +1,185 @@
-# Cloud Save
+# Local-first saves and cloud recovery
 
-> Planned replacement: `GAME-001` in `docs/IMPLEMENTATION_TICKETS.md` introduces always-on local
-> persistence plus unrestricted background backend synchronization. The provider selection below
-> documents the current legacy implementation until that ticket ships.
+`GAME-001` makes local persistence always active. Campaign play, ordinary rewards, resource
+spending, lives, profiles, and installed content never wait for connectivity. The BE-307 v2 backend
+is an asynchronous recovery/merge destination, not an alternative runtime save provider.
 
-This project uses `PlayerProgress` for campaign progression, lives, and ability inventory. `PlayerProgress` delegates persistence to a save provider selected by project settings.
+## Ownership
 
-## Provider Selection
+- `scripts/player_progress.gd`: gameplay-facing facade and checkpoint-to-gameplay mapping.
+- `scripts/save/local_save_store.gd`: schema validation, atomic generations, journal append,
+  checkpoint transactions, compaction, recovery, and schema-4 migration.
+- `scripts/save/local_save_codec.gd`: canonical JSON, SHA-256, UUIDs, timestamps, and namespace keys.
+- `scripts/save/secure_session_store.gd`: focused bridge adapter for installation signing keys and
+  player sessions.
+- `scripts/save/guest_session_bootstrap_service.gd`: persisted protocol-1.1 guest challenge,
+  installation proof, idempotent bootstrap, and coordinator handoff.
+- `scripts/save/save_sync_service.gd`: v2 batching, identical-request idempotency, connectivity
+  failure handling, refresh hooks, persisted full-jitter retry, cursors, and reconciliation.
+- `scripts/save/account_save_coordinator.gd`: installation guest bootstrap, one-time guest rebind,
+  player namespace switching, sign-out, and clean-install restore selection.
+- `platform/android/secure-store-plugin/`: Godot Android plugin v2 source using Android Keystore.
+- `platform/ios/secure-store-plugin/`: Godot iOS `.gdip` plugin source using Keychain.
 
-Project settings:
-- `application/config/save_provider`: `local` or `cloud`.
-- `application/config/cloud_save_name`: save slot name passed to platform cloud APIs. Defaults to `player_progress`.
-- `application/config/cloud_save_bridge_singleton`: optional override for the native Godot singleton used by `CloudSaveProvider`.
+The old scripts under `scripts/save_providers/` remain only as legacy migration/test adapters.
+Release gameplay no longer reads `application/config/save_provider` and must not switch to a
+cloud-only runtime save.
 
-Development builds should use:
+## Local schema and files
+
+Every account has a separate directory:
 
 ```text
-application/config/save_provider = "local"
+user://save_v2/guest_<installation_id>/
+user://save_v2/player_<player_id>/
 ```
 
-Release builds that require cloud-only progress should use:
+Each `sorting-puzzle-local-save/1` generation contains four explicit partitions:
 
-```text
-application/config/save_provider = "cloud"
+1. `snapshot`: the current gameplay-facing state;
+2. `journal`: ordered BE-307 `save-operation/2` operations;
+3. `sync`: device cursor, hash-chain head, retry request, checkpoint, adjustments, and migration
+   metadata;
+4. `preferences`: device-only music, sound-effect, and vibration state.
+
+`current.json`, `previous.json`, and `pending.tmp` implement temporary-write, flush, validate,
+previous-generation rotation, and atomic promotion. Startup validates every checksum and journal
+hash, then selects the highest fully valid generation. A partial write or corrupt newest generation
+therefore recovers a valid generation instead of silently resetting progress.
+
+Journal operations use a UUID, strictly increasing per-device sequence, closed versioned payload,
+configuration/level/rules provenance where applicable, previous hash, canonical SHA-256 hash, and
+P-256 signature. These fields detect corruption and casual editing; they are not represented as
+proof that gameplay occurred.
+
+## Legacy migration
+
+On the first local-first launch, `PlayerProgress` sanitizes schema-4
+`user://player_progress.json`, splits settings into `preferences`, and creates generation 1 in the
+stable installation guest namespace. The original JSON is copied to
+`legacy_v4.previous.json` inside that namespace and retained read-only.
+
+Migration metadata becomes complete only after the local-first generation is loaded and validated
+on a later restart. Repeating migration or restarting during any atomic-save stage is idempotent.
+The legacy blob is never uploaded as a balance replacement.
+
+## Immediate gameplay transaction path
+
+The following mutations update the snapshot and append their operation(s) in one recoverable local
+generation:
+
+- campaign completion, reward-chest rollover/coins, lifetime stars, weekly stars, and reward
+  animation metadata;
+- campaign failure/leave plus the resulting life state;
+- coin and ability spending;
+- automatic life restoration observations;
+- avatar and display-name edits.
+
+Level completion is not shown until `PlayerProgress.complete_level()` confirms the atomic commit.
+Ability and coin spending are committed after a successful preflight and before starting the
+gameplay effect. Connectivity does not choose a different mutation path.
+
+Verified purchase/refund facts are server-originated and idempotent. The development-only mock
+store retains its schema-4 processed-transaction ledger, but production store code must never call
+`apply_shop_purchase()` with client-invented rewards.
+
+## Secure identity bridge
+
+The gameplay save contains public installation/device/player identifiers only. It never contains
+installation private keys, access/refresh tokens, platform credentials, or raw store evidence.
+
+The `SortingPuzzleSecureStoreBridge` contract is:
+
+- `ensure_installation_key(installation_id) -> bool`
+- `set_installation_id(installation_id) -> bool`
+- `get_installation_public_key_der(installation_id) -> String`
+- `sign_save_operation_hash(operation_hash) -> String`
+- `sign_installation_payload(payload) -> String`
+- `store_player_session(player_id, session_json) -> bool`
+- `load_player_session(player_id) -> String`
+- `clear_player_session(player_id) -> bool`
+
+Android keeps P-256/AES keys in Android Keystore and only AES-GCM ciphertext in private
+SharedPreferences. iOS keeps the P-256 key and session JSON in Keychain using
+`AfterFirstUnlockThisDeviceOnly`. Desktop builds create schema-shaped development signatures for
+crash tests, but `can_synchronize()` remains false and those signatures are never sent to the
+backend.
+
+## Background synchronization
+
+Synchronization is enabled only when all of these are true:
+
+- `application/config/save_sync_v2_enabled` is `true`;
+- `application/config/backend_base_url` is non-empty;
+- a player namespace and secure session are active;
+- the mobile secure bridge can sign operations.
+
+While the installation guest namespace is active, the same gate starts
+`POST /v1/sessions/guest/challenge` followed by `POST /v1/sessions/guest`. The challenge request and
+the final bootstrap payload/idempotency key are persisted before transport. The bridge signs the
+exact `guest-registration-proof/1` JSON array with the installation key; only its DER public key is
+sent. A validated bootstrap response stores its session securely and asks
+`AccountSaveCoordinator` to rebind the guest journal to the returned immutable `player_id`.
+
+`POST /v2/saves/sync` sends at most 500 operations and 1 MiB. The exact JSON payload, request UUID,
+and `Idempotency-Key` are stored before transport; timeout, response loss, force-close, or reboot
+replays those identical values. Eligible failures use persisted full-jitter exponential backoff,
+`Retry-After` takes precedence, and no retry blocks scene changes.
+
+An access-token `401` permits one rotating-refresh attempt and then replays the still-identical
+save request. Because refresh tokens are single-use, an unknown refresh transport outcome is
+recorded as a non-secret terminal authentication diagnostic rather than risking credential reuse
+and session-family revocation.
+
+Successful responses validate the protocol/request/device/player binding, apply the merged
+checkpoint and cursor atomically, replay only local operations beyond the acknowledged cursor, and
+retain the latest 100 acknowledged operations for recovery/support. Cursor conflicts fetch
+`GET /v2/saves/state` and reconcile before retry. Merge adjustments are retained in diagnostics;
+ordinary UI simply shows the reconciled zero-floor amount.
+
+The feature flag may be turned off without changing local play. The client never downgrades its v2
+journal into the legacy provisional lease protocol.
+
+## Account switching and recovery
+
+The active namespace is persisted separately from all account payloads. Switching:
+
+1. leaves the current valid generation and unsynchronized journal intact;
+2. activates only the selected player directory, or a fresh player bootstrap;
+3. applies a remote checkpoint only for the matching immutable `player_id`;
+4. replays that player's later local journal entries.
+
+An installation guest namespace can be rebound exactly once after guest registration. Repeating
+the same binding reopens the existing player generation and cannot replace newer player progress.
+Sign-out activates the installation guest namespace without deleting any player namespace. No routine sync
+path opens modal UI; a future destructive/ambiguous platform-identity merge must use a dedicated
+dialog scene.
+
+## Support and release verification
+
+`PlayerProgress.get_local_save_diagnostics()` exposes non-secret namespace, generation, journal
+head/cursor, retry count, adjustment count, and migration state. Never request gameplay-save files,
+tokens, private keys, or screenshots of platform credentials from players.
+
+Support sequence:
+
+1. Confirm the active namespace and that migration completed.
+2. Compare journal head with acknowledged cursor.
+3. If retry count grows, check feature capability, session refresh, HTTP status, and platform
+   connectivity without deleting local data.
+4. If checksum recovery occurred, preserve `current.json`, `previous.json`, and `pending.tmp` for
+   engineering; do not reset progress.
+5. For account mismatch, switch to the intended identity; never copy another namespace's snapshot.
+
+Automated verification:
+
+```powershell
+& 'D:\Godot\godot.exe' --headless --verbose --path . --script tests/save/test_game_001.gd
+& 'D:\Godot\godot.exe' --headless --verbose --path . --script tests/save/test_player_progress_facade.gd
 ```
 
-## Local Provider
-
-Files:
-- `scripts/save_providers/local_save_provider.gd`
-
-Behavior:
-- Reads and writes `user://player_progress.json`.
-- Works offline and in the editor.
-- Does not survive normal mobile uninstall/reinstall flows.
-
-## Cloud Provider
-
-Files:
-- `scripts/save_providers/cloud_save_provider.gd`
-
-Behavior:
-- Selects a platform bridge singleton:
-  - Android: `GooglePlayGamesSaveBridge`
-  - iOS: `GameCenterSaveBridge`
-  - Fallback/testing: `CloudSaveBridge`
-- Serializes the same progress dictionary as JSON.
-- Expects native bridge code to convert the JSON string to the platform API's save payload format.
-
-Native bridge methods:
-- `is_signed_in() -> bool` or `is_authenticated() -> bool` is optional.
-- `load_save(save_name: String)` is preferred. `load_game()`, `load_progress()`, and `load_data()` are also accepted.
-- `save_save(save_name: String, json_payload: String)` is preferred. `save_game()`, `save_progress()`, and `save_data()` are also accepted.
-
-Accepted load return values:
-- A progress `Dictionary`.
-- A JSON `String`.
-- A UTF-8 `PackedByteArray`.
-- A wrapper dictionary like `{ "ok": true, "data": "..." }`.
-
-Accepted save return values:
-- `true` / `false`.
-- A wrapper dictionary like `{ "ok": true }` or `{ "ok": false, "error": "..." }`.
-- `null` for native bridges that throw/report errors elsewhere.
-
-## Android
-
-Use Google Play Games Services Saved Games / Snapshots in the native Android bridge. Google documents Saved Games as binary save data plus metadata stored on Google's servers, with offline writes syncing later when connectivity returns.
-
-Required release setup:
-- Configure Play Games Services in Google Play Console.
-- Enable Saved Games for the game.
-- Authenticate the player before the first cloud load/save.
-- Add a Godot Android plugin that exposes `GooglePlayGamesSaveBridge`.
-- Implement conflict handling in native code or return the resolved payload to Godot.
-
-Official references:
-- Google Play Games Services cloud save overview: `https://developer.android.com/games/pgs/savedgames`
-- Android saved games / snapshots guide: `https://developer.android.com/games/pgs/android/saved-games`
-
-## iOS
-
-Use Apple GameKit saved games from the native iOS bridge.
-
-Required release setup:
-- Enable the Game Center capability for the app.
-- Authenticate the local player.
-- Add a Godot iOS plugin that exposes `GameCenterSaveBridge`.
-- Use GameKit saved-game APIs to read and write the JSON payload.
-- Implement conflict handling in native code or return the resolved payload to Godot.
-
-Official references:
-- GameKit saved games guide: `https://developer.apple.com/documentation/gamekit/saving-the-player-s-game-data-to-an-icloud-account`
-- `GKLocalPlayer` saved-game APIs: `https://developer.apple.com/documentation/gamekit/gklocalplayer`
-
-## Conflict Policy
-
-For the current progression schema:
-- Prefer the save with the highest `highest_completed_level`.
-- If levels tie, prefer the greater `current_level`.
-- For lives, resolve each candidate through its `next_life_restore_unix` timestamp first, then prefer the greater `lives` count. If lives tie and are below full, prefer the earlier `next_life_restore_unix`.
-- For non-refilling ability inventory, prefer the lower ability count when resolving conflicts to avoid duplicating spent inventory.
-
-Shop mock purchases currently add paid coins and abilities through a locally persisted transaction-id ledger. This prevents duplicate mock callbacks but is not a production security boundary and can conflict across devices.
-
-Before enabling real-money products, replace local Shop grants with a server-authoritative entitlement flow that verifies platform transactions, records every transaction idempotently, and returns the authoritative balance/inventory state. Cloud-save conflict rules must not be used to reconcile real-money purchases.
+Android release verification requires JDK 17, Android SDK 36, the Gradle export path, and physical
+device tests for Keystore, airplane-mode transitions, process death/reboot, account switching, and
+uninstall/reinstall. iOS verification requires macOS/Xcode, a device/simulator xcframework, and the
+corresponding Keychain/background/account tests. These device matrices are release gates; Windows
+headless tests do not claim to replace them.
