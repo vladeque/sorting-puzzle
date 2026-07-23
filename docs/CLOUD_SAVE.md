@@ -1,5 +1,9 @@
 # Cloud Save
 
+> Planned replacement: `GAME-001` in `docs/IMPLEMENTATION_TICKETS.md` introduces always-on local
+> persistence plus unrestricted background backend synchronization. The provider selection below
+> documents the current legacy implementation until that ticket ships.
+
 This project uses `PlayerProgress` for campaign progression, lives, and ability inventory. `PlayerProgress` delegates persistence to a save provider selected by project settings.
 
 ## Provider Selection
