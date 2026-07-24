@@ -165,6 +165,40 @@ Change here when:
   `docs/LOCAL_BACKEND_INTEGRATION.md`; identity/session and save-sync end-to-end verification are
   `GAME-004`-`GAME-006` (Phase L2), not this system.
 
+### Local Backend Identity/Session Verification (GAME-004)
+
+Files:
+- `scripts/save/guest_session_bootstrap_service.gd`
+- `scripts/save/save_sync_service.gd`
+- `scripts/save/secure_session_store.gd`
+- `scripts/save/local_backend_debug_bootstrap.gd`
+- `scripts/tools/android_local_backend_identity_smoke_check.ps1`
+- `tests/save/test_game_004.gd`
+
+Responsibility:
+- Exercises the GAME-001 guest challenge/bootstrap and rotating-refresh code against the real local
+  backend and a real Android Keystore-backed installation key, closing gaps found only by driving
+  the real HTTP entry points: malformed/expired-challenge/replayed/binding-mismatched bootstrap and
+  session-refresh responses (`tests/save/test_game_004.gd`), non-secret identity/session
+  diagnostics (server `correlation_id`, error codes, retry state -- see `PlayerProgress
+  .get_local_save_diagnostics()` and `LocalBackendDebugBootstrap`'s periodic `identity
+  diagnostics:` logcat line), and a one-time-rebind/restart-resumption proof at the
+  `AccountSaveCoordinator` layer.
+- `scripts/tools/android_local_backend_identity_smoke_check.ps1` extends the GAME-003 smoke check
+  with a real guest-bootstrap wait and a force-stop/relaunch check that the same `player_id` and
+  `device_id` are resumed (no second guest).
+- Found and fixed two real on-device defects: `SecureSessionStore` gating bridge calls behind
+  `_bridge.has_method(...)` (returned `false` on-device for a working bridge) and a missing
+  `application/config/version` project setting (every protocol request's `meta.app.version` was
+  empty and failed backend schema validation). See `docs/CLOUD_SAVE.md` and the GAME-004 entry in
+  `docs/IMPLEMENTATION_TICKETS.md` for the full verification notes, including an unresolved
+  emulator/`HTTPRequest` POST reliability issue that blocked a full live bootstrap observation.
+
+Change here when:
+- Changing the guest bootstrap/refresh identity flow, its non-secret diagnostics, or the identity
+  smoke-check script. Save-sync end-to-end verification against PostgreSQL is `GAME-005`, not this
+  system.
+
 ### Leaderboards
 
 Files:

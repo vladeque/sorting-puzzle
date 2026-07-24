@@ -461,6 +461,10 @@ Purpose:
 - Delegates P-256 signing and player sessions to `SortingPuzzleSecureStoreBridge`.
 - Refuses mobile synchronization without secure native storage; desktop signatures are
   development-only crash-test markers.
+- Calls bridge methods directly rather than gating on `Object.has_method()`: GAME-004 found that
+  `has_method()` returns `false` on a real Android device for this native plugin singleton even
+  though the methods work correctly, which was silently disabling `can_synchronize()` and every
+  installation-key/session call. A `null`/failed bridge result is now treated as an error instead.
 
 ## `scripts/save/local_backend_debug_bootstrap.gd`
 
@@ -479,6 +483,12 @@ Purpose:
 - On a valid override, logs one non-secret `[LocalBackendDebug]` diagnostic line and fires a
   best-effort `/health/live` HTTPRequest, then logs the result plus whether
   `SortingPuzzleSecureStoreBridge` is available -- never tokens, signatures, or key material.
+- GAME-004: also starts a 3-second periodic timer that logs `PlayerProgress
+  .get_local_save_diagnostics()` as one `identity diagnostics:` line (namespace kind, opaque
+  player/device ids, generation, guest-registration phase/retry/terminal-error, save-sync
+  retry/terminal-error, server `correlation_id`, and the `sync_gate` precondition booleans) so an
+  emulator smoke check can prove real guest bootstrap and restart resumption via `adb logcat`
+  alone, again without ever exposing tokens, signatures, or key material.
 
 Do not use for:
 - Anything that should affect a release export; a missing file or a non-debug build is always a
@@ -505,6 +515,11 @@ Purpose:
 - Persists exact challenge/bootstrap retry payloads, signs the ordered
   `guest-registration-proof/1` payload through the native bridge, validates the returned
   player/device/session binding, and hands the transition to `AccountSaveCoordinator`.
+- GAME-004: records the server's `meta.correlation_id` and stable error code from every parsed
+  response (`sync.guest_registration.terminal_error.correlation_id`,
+  `sync.identity_diagnostics`), and rejects device-binding-mismatched or expired-challenge
+  responses without ever binding a foreign device/player. Covered end to end (not just via private
+  helpers) by `tests/save/test_game_004.gd`.
 
 ## `scripts/save/save_sync_service.gd`
 
@@ -517,6 +532,10 @@ Purpose:
 - Caps batches at 500 operations/1 MiB and persists exact payload/idempotency values before send.
 - Owns timeout, full-jitter/`Retry-After`, session-refresh hooks, cursor conflict recovery, response
   validation, checkpoint reconciliation, continuation, and silent batching.
+- GAME-004: records the server's `meta.correlation_id` (`sync.last_correlation_id`) from every
+  parsed response, and the single-refresh-attempt guard, malformed/replayed
+  (`auth.refresh_reuse_detected`)/binding-mismatched refresh-response handling are covered end to
+  end by `tests/save/test_game_004.gd`.
 
 ## `scripts/save/content_provenance_manifest.gd`
 
@@ -551,6 +570,18 @@ Purpose:
   `scripts/save/local_backend_debug_bootstrap.gd`.
 - Resolves adb from `-AdbPath`, PATH, `ANDROID_SDK_ROOT`, `ANDROID_HOME`, or the standard Windows
   user SDK location.
+
+## `scripts/tools/android_local_backend_identity_smoke_check.ps1`
+
+Purpose:
+- GAME-004 emulator smoke check: builds on the GAME-003 connectivity/bridge check and additionally
+  waits for the `identity diagnostics:` logcat line to show `namespace_kind=player` with a real
+  `player_id` (proving guest bootstrap), then force-stops and relaunches the app and confirms the
+  same `player_id`/`device_id` are observed again (proving restart resumption without a second
+  guest).
+- As of 2026-07-24 this could not be driven to a passing end because of an emulator/`HTTPRequest`
+  POST reliability issue documented in the GAME-004 ticket entry; it remains the intended
+  automation once that is resolved.
 - Exits `0` only once a local override, `/health/live` HTTP 200, and
   `secure_bridge_available=true` are all observed in logcat, or `1` after a timeout.
 - Fails immediately if Android runtime logs show `PlayerProgress` rejected the packaged GAME-002

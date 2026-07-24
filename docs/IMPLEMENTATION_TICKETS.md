@@ -234,7 +234,9 @@ that can reach the developer-hosted API from an Android emulator.
 ## GAME-004 — Prove local guest registration and session persistence
 
 **Type:** Identity integration
-**Status:** Planned
+**Status:** Implemented and gap-tested on 2026-07-24. Two real on-device defects were found and
+fixed. A live device receipt of a real `player_id`/session remains unverified — see "Device
+verification notes" below.
 **Description:** Exercise the existing guest challenge/bootstrap and rotating-session code against
 the real local API using Android Keystore signatures.
 
@@ -245,12 +247,67 @@ the real local API using Android Keystore signatures.
 **Acceptance criteria:**
 
 - A new emulator installation completes the signed challenge/bootstrap flow and receives a real
-  guest player, device, and session.
-- The installation guest namespace is rebound exactly once to the returned `player_id`.
-- Session ciphertext and the installation private key remain inside the Android secure boundary.
+  guest player, device, and session. **Not yet observed end to end on-device; see notes.**
+- The installation guest namespace is rebound exactly once to the returned `player_id`. Proven by
+  `AccountSaveCoordinator.bind_registered_guest()`/`rebind_guest_to_player()` coverage in
+  `tests/save/test_game_001.gd` and the new restart-resumption test in `tests/save/test_game_004.gd`.
+- Session ciphertext and the installation private key remain inside the Android secure boundary
+  (unchanged Android Keystore/`SharedPreferences` design; see `docs/CLOUD_SAVE.md`).
 - Killing and restarting the app resumes the same player session without creating a second guest.
+  Proven at the `AccountSaveCoordinator` layer by `tests/save/test_game_004.gd`; not yet observed
+  through a live device kill/restart because it depends on a completed bootstrap (see notes).
 - Access-token expiry performs one successful rotating refresh and stores the replacement session.
+  The single-refresh-attempt guard and a valid-refresh round trip are proven by
+  `tests/save/test_game_001.gd` and `tests/save/test_game_004.gd`; forcing a live 401 requires
+  either the real ~5 minute access-token TTL or a backend dev-only short-TTL hook, neither of which
+  exists yet.
 - Malformed, expired, replayed, and binding-mismatched bootstrap/session responses are covered.
+  Proven by `tests/save/test_game_004.gd`, which drives `GuestSessionBootstrapService` and
+  `SaveSyncService`'s real `_on_request_completed` handlers with malformed envelopes, an
+  `auth.guest_challenge_expired` response, an `auth.refresh_reuse_detected` (replay) response, and
+  device-binding-mismatched bootstrap/refresh responses.
+
+**Real defects found and fixed while gap-testing:**
+
+1. `SecureSessionStore` gated every Android bridge call (`ensure_installation_key`,
+   `get_installation_public_key_der`, `sign_save_operation_hash`, `sign_installation_payload`,
+   `store_player_session`, `load_player_session`, `clear_player_session`) behind
+   `_bridge.has_method(...)`. On a real device this returned `false` for a bridge that was
+   genuinely present and fully functional, silently disabling `can_synchronize()` and the
+   installation key/public-key lookup with no error surfaced anywhere. Fixed by calling the bridge
+   directly and treating a `null`/failed result as an error, matching the tolerant-result pattern
+   already used elsewhere in the file.
+2. `application/config/version` was never declared in `project.godot`. Every protocol request's
+   `meta.app.version` was therefore an empty string, which the backend's schema rejects
+   (`request.invalid` / `request.schema.minlength` on `/meta/app/version`), so the guest challenge
+   request failed on every real device before this fix. Fixed by declaring
+   `config/version="0.1.0"` (matching the export preset's `version/name`).
+
+Both were only discoverable by actually dispatching signed requests from a real Android Keystore
+against the real backend — exactly what this ticket exists to do.
+
+**Device verification notes (2026-07-24):**
+
+- `GET /health/live` from the app (via `LocalBackendDebugBootstrap`'s health probe) succeeded
+  reliably on every run.
+- Two clean runs (fresh install, fresh `device_id`) sent the real signed `POST
+  /v1/sessions/guest/challenge` request and received a real backend response within ~200ms. Before
+  the version fix, the backend correctly returned `400 request.invalid` with the exact
+  `/meta/app/version` violation, which is what led to defect #2 above; the client correctly
+  recorded the server's error code and `correlation_id` as a non-secret terminal diagnostic.
+- On roughly a dozen subsequent clean-install attempts (including an `adb kill-server` restart and
+  `pm clear` data wipes to rule out stale state), the same POST request was accepted by
+  `HTTPRequest.request()` (`request_error == OK`) but its `request_completed` signal never fired —
+  not even Godot's own 30-second request timeout — while `GET` requests continued to succeed
+  reliably throughout. This was reproduced identically with and without extra diagnostic
+  `print()` calls near the request (ruling out a print-timing theory considered mid-investigation).
+  This looks like emulator/Godot-Android `HTTPRequest` POST-with-body flakiness specific to this
+  workstation's `adb reverse` setup, not an application defect; it blocks a live end-to-end
+  bootstrap/kill-restart/refresh-rotation proof for now. `GAME-005`/`GAME-006` also depend on POST
+  (`/v2/saves/sync`), so this is worth a focused retest (different emulator image, physical device,
+  or a native `nc`-based reproduction) before those tickets attempt device verification.
+- `scripts/tools/android_local_backend_identity_smoke_check.ps1` automates the intended proof
+  (bootstrap + kill/restart) once the above is resolved.
 
 ## GAME-005 — Prove protocol-v2 save synchronization against PostgreSQL
 

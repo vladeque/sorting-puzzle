@@ -206,6 +206,7 @@ func _on_request_completed(
 			_schedule_retry()
 		return
 	var parsed = JSON.parse_string(body.get_string_from_utf8())
+	_record_response_diagnostics(parsed)
 	if _request_mode.begins_with("refresh_"):
 		_handle_refresh_response(response_code, parsed)
 		return
@@ -222,7 +223,7 @@ func _on_request_completed(
 		_schedule_retry(_retry_after_seconds(headers) if response_code == 429 else -1)
 		return
 	if response_code != 200 or not (parsed is Dictionary):
-		_stop_terminal_retry(_response_error_code(parsed))
+		_stop_terminal_retry(_response_error_code(parsed), _response_correlation_id(parsed))
 		return
 	var apply_result := _apply_response(parsed as Dictionary)
 	if not bool(apply_result.get("ok", false)):
@@ -265,7 +266,7 @@ func _handle_state_response(
 		_schedule_retry(_retry_after_seconds(headers) if response_code == 429 else -1)
 		return
 	if response_code != 200 or not (parsed is Dictionary):
-		_stop_terminal_retry(_response_error_code(parsed))
+		_stop_terminal_retry(_response_error_code(parsed), _response_correlation_id(parsed))
 		return
 	var result := _apply_state_response(parsed as Dictionary)
 	if not bool(result.get("ok", false)):
@@ -403,11 +404,14 @@ func _handle_refresh_response(response_code: int, parsed: Variant) -> void:
 		_stop_terminal_retry("auth.session_refresh_failed")
 		return
 	if response_code != 200 or not (parsed is Dictionary):
-		_stop_terminal_retry(_response_error_code(parsed))
+		_stop_terminal_retry(_response_error_code(parsed), _response_correlation_id(parsed))
 		return
 	var refresh_result := _validate_and_store_refresh_response(parsed as Dictionary)
 	if not bool(refresh_result.get("ok", false)):
-		_stop_terminal_retry(str(refresh_result.get("error_code", "auth.refresh_response_malformed")))
+		_stop_terminal_retry(
+			str(refresh_result.get("error_code", "auth.refresh_response_malformed")),
+			_response_correlation_id(parsed)
+		)
 		return
 	var refreshed_session := refresh_result.get("session", {}) as Dictionary
 	if replay_mode == "state":
@@ -465,6 +469,15 @@ func _response_error_code(parsed: Variant) -> String:
 	if error is Dictionary:
 		return str((error as Dictionary).get("code", ""))
 	return str(document.get("code", ""))
+
+
+func _response_correlation_id(parsed: Variant) -> String:
+	if not (parsed is Dictionary):
+		return ""
+	var meta = (parsed as Dictionary).get("meta")
+	if not (meta is Dictionary):
+		return ""
+	return str((meta as Dictionary).get("correlation_id", ""))
 
 
 func _apply_response(envelope: Dictionary) -> Dictionary:
@@ -559,13 +572,25 @@ func _schedule_persisted_retry() -> void:
 	_retry_timer.start(maxf(float(retry_unix - int(Time.get_unix_time_from_system())), 0.1))
 
 
-func _stop_terminal_retry(error_code: String = "save_sync.terminal") -> void:
+func _stop_terminal_retry(error_code: String = "save_sync.terminal", correlation_id: String = "") -> void:
 	var sync := _store.get_sync_metadata()
 	sync["next_retry_unix"] = 0
 	sync["terminal_error"] = {
 		"code": error_code if not error_code.is_empty() else "save_sync.terminal",
+		"correlation_id": correlation_id,
 		"recorded_at": LocalSaveCodecScript.iso_timestamp(),
 	}
+	_store.persist_sync_metadata(sync)
+
+
+func _record_response_diagnostics(parsed: Variant) -> void:
+	if _store == null:
+		return
+	var correlation_id := _response_correlation_id(parsed)
+	if correlation_id.is_empty():
+		return
+	var sync := _store.get_sync_metadata()
+	sync["last_correlation_id"] = correlation_id
 	_store.persist_sync_metadata(sync)
 
 

@@ -216,6 +216,7 @@ func _on_request_completed(
 		_schedule_retry()
 		return
 	var parsed = JSON.parse_string(body.get_string_from_utf8())
+	_record_response_diagnostics(response_code, parsed)
 	if response_code == 429 or response_code >= 500:
 		_schedule_retry(_retry_after_seconds(headers) if response_code == 429 else -1)
 		return
@@ -223,7 +224,7 @@ func _on_request_completed(
 		if _response_error_code(parsed) == "auth.guest_challenge_expired":
 			_restart_challenge()
 		else:
-			_stop_terminal(_response_error_code(parsed))
+			_stop_terminal(_response_error_code(parsed), _response_correlation_id(parsed))
 		return
 	var registration := (
 		_store.get_sync_metadata().get("guest_registration", {}) as Dictionary
@@ -300,7 +301,7 @@ func _handle_bootstrap_response(envelope: Dictionary, registration: Dictionary) 
 		session
 	)
 	if not bool(bind_result.get("ok", false)):
-		_stop_terminal("guest.local_rebind_failed")
+		_stop_terminal("guest.local_rebind_failed", _response_correlation_id(envelope))
 		return
 	var player_store = _coordinator.get_store()
 	_store = player_store
@@ -355,7 +356,7 @@ func _schedule_persisted_retry() -> void:
 	_retry_timer.start(maxf(float(retry_unix - int(Time.get_unix_time_from_system())), 0.1))
 
 
-func _stop_terminal(error_code: String) -> void:
+func _stop_terminal(error_code: String, correlation_id: String = "") -> void:
 	if _store == null:
 		return
 	var sync: Dictionary = _store.get_sync_metadata()
@@ -363,9 +364,25 @@ func _stop_terminal(error_code: String) -> void:
 	registration["next_retry_unix"] = 0
 	registration["terminal_error"] = {
 		"code": error_code if not error_code.is_empty() else "guest.registration_failed",
+		"correlation_id": correlation_id,
 		"recorded_at": LocalSaveCodecScript.iso_timestamp(),
 	}
 	sync["guest_registration"] = registration
+	_store.persist_sync_metadata(sync)
+
+
+func _record_response_diagnostics(response_code: int, parsed: Variant) -> void:
+	if _store == null:
+		return
+	var correlation_id := _response_correlation_id(parsed)
+	if correlation_id.is_empty():
+		return
+	var sync: Dictionary = _store.get_sync_metadata()
+	sync["identity_diagnostics"] = {
+		"last_correlation_id": correlation_id,
+		"last_response_code": response_code,
+		"recorded_at": LocalSaveCodecScript.iso_timestamp(),
+	}
 	_store.persist_sync_metadata(sync)
 
 
@@ -377,6 +394,15 @@ func _response_error_code(parsed: Variant) -> String:
 	if error is Dictionary:
 		return str((error as Dictionary).get("code", ""))
 	return str(document.get("code", ""))
+
+
+func _response_correlation_id(parsed: Variant) -> String:
+	if not (parsed is Dictionary):
+		return ""
+	var meta = (parsed as Dictionary).get("meta")
+	if not (meta is Dictionary):
+		return ""
+	return str((meta as Dictionary).get("correlation_id", ""))
 
 
 func _retry_after_seconds(headers: PackedStringArray) -> int:

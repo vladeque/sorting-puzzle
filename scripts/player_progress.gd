@@ -831,14 +831,36 @@ func get_local_save_diagnostics() -> Dictionary:
 		return {}
 	var sync: Dictionary = _local_store.get_sync_metadata()
 	var cursor := sync.get("cursor", {}) as Dictionary
+	var registration := sync.get("guest_registration", {}) as Dictionary
 	return {
 		"namespace": _local_store.get_namespace(),
+		"device_id": _session_store.get_device_id() if _session_store != null else "",
 		"generation": _local_store.get_generation(),
 		"journal_entries": _local_store.get_journal().size(),
 		"journal_head_sequence": int(sync.get("journal_head_sequence", 0)),
 		"acknowledged_sequence": int(cursor.get("acknowledged_sequence", 0)),
 		"retry_attempt": int(sync.get("retry_attempt", 0)),
 		"terminal_error": (sync.get("terminal_error", {}) as Dictionary).duplicate(true),
+		"last_correlation_id": str(sync.get("last_correlation_id", "")),
+		"guest_registration": {
+			"phase": str(registration.get("phase", "")),
+			"retry_attempt": int(registration.get("retry_attempt", 0)),
+			"terminal_error": (registration.get("terminal_error", {}) as Dictionary).duplicate(true),
+		},
+		"identity_diagnostics": (sync.get("identity_diagnostics", {}) as Dictionary).duplicate(true),
+		"sync_gate": {
+			"feature_enabled": bool(ProjectSettings.get_setting("application/config/save_sync_v2_enabled", false)),
+			"backend_url_configured": not str(
+				ProjectSettings.get_setting("application/config/backend_base_url", "")
+			).strip_edges().is_empty(),
+			"can_synchronize": _session_store.can_synchronize() if _session_store != null else false,
+			"installation_public_key_present": (
+				not _session_store.get_installation_public_key_der_base64().is_empty()
+				if _session_store != null
+				else false
+			),
+			"content_manifest_valid": _content_provenance != null and _content_provenance.is_valid(),
+		},
 		"merge_adjustment_count": (sync.get("adjustments", []) as Array).size(),
 		"migration": (sync.get("migration", {}) as Dictionary).duplicate(true),
 		"content_manifest_valid": _content_provenance != null and _content_provenance.is_valid(),

@@ -27,19 +27,18 @@ func initialize() -> Dictionary:
 		if not bool(save_result.get("ok", false)):
 			return save_result
 
-	if _bridge != null and _bridge.has_method("ensure_installation_key"):
+	if _bridge != null:
 		var bridge_result = _bridge.call(
 			"ensure_installation_key",
 			str(_public_identity.get("installation_id", ""))
 		)
 		if bridge_result is Dictionary and not bool(bridge_result.get("ok", true)):
 			return _error(str(bridge_result.get("error", "Secure installation key setup failed.")))
-		if bridge_result is bool and not bridge_result:
+		if (bridge_result is bool and not bridge_result) or bridge_result == null:
 			return _error("Secure installation key setup failed.")
-		if _bridge.has_method("set_installation_id"):
-			var set_result = _bridge.call("set_installation_id", get_installation_id())
-			if set_result is bool and not set_result:
-				return _error("Secure installation identity binding failed.")
+		var set_result = _bridge.call("set_installation_id", get_installation_id())
+		if (set_result is bool and not set_result) or set_result == null:
+			return _error("Secure installation identity binding failed.")
 
 	return _success({
 		"installation_id": get_installation_id(),
@@ -63,15 +62,11 @@ func is_secure_bridge_available() -> bool:
 func can_synchronize() -> bool:
 	if OS.get_name() != "Android" and OS.get_name() != "iOS":
 		return false
-	return (
-		_bridge != null
-		and _bridge.has_method("sign_save_operation_hash")
-		and _bridge.has_method("sign_installation_payload")
-	)
+	return _bridge != null
 
 
 func get_installation_public_key_der_base64() -> String:
-	if _bridge == null or not _bridge.has_method("get_installation_public_key_der"):
+	if _bridge == null:
 		return ""
 	return str(_bridge.call("get_installation_public_key_der", get_installation_id()))
 
@@ -80,7 +75,7 @@ func sign_operation_hash(operation_hash: String) -> Dictionary:
 	if not LocalSaveCodecScript.is_hash(operation_hash):
 		return _error("Operation hash is invalid.")
 
-	if _bridge != null and _bridge.has_method("sign_save_operation_hash"):
+	if _bridge != null:
 		var result = _bridge.call("sign_save_operation_hash", operation_hash)
 		if result is Dictionary:
 			if not bool(result.get("ok", false)):
@@ -108,7 +103,7 @@ func sign_operation_hash(operation_hash: String) -> Dictionary:
 func sign_installation_payload(payload: String) -> Dictionary:
 	if payload.is_empty():
 		return _error("Installation proof payload is empty.")
-	if _bridge == null or not _bridge.has_method("sign_installation_payload"):
+	if _bridge == null:
 		return _error("Secure installation proof signing is unavailable.")
 	var result = _bridge.call("sign_installation_payload", payload)
 	if result is Dictionary:
@@ -128,7 +123,7 @@ func sign_installation_payload(payload: String) -> Dictionary:
 func store_session(player_id: String, session: Dictionary) -> Dictionary:
 	if not LocalSaveCodecScript.is_uuid(player_id):
 		return _error("Player id is invalid.")
-	if _bridge != null and _bridge.has_method("store_player_session"):
+	if _bridge != null:
 		var result = _bridge.call("store_player_session", player_id, JSON.stringify(session))
 		return _normalize_bridge_result(result, "Secure session write failed.")
 	if OS.get_name() == "Android" or OS.get_name() == "iOS":
@@ -138,7 +133,7 @@ func store_session(player_id: String, session: Dictionary) -> Dictionary:
 
 
 func load_session(player_id: String) -> Dictionary:
-	if _bridge != null and _bridge.has_method("load_player_session"):
+	if _bridge != null:
 		var result = _bridge.call("load_player_session", player_id)
 		if result is Dictionary and bool(result.get("ok", false)):
 			var session = result.get("session", result.get("data", {}))
@@ -156,29 +151,13 @@ func load_session(player_id: String) -> Dictionary:
 
 
 func clear_session(player_id: String) -> Dictionary:
-	if _bridge != null and _bridge.has_method("clear_player_session"):
+	if _bridge != null:
 		return _normalize_bridge_result(
 			_bridge.call("clear_player_session", player_id),
 			"Secure session removal failed."
 		)
 	_development_sessions.erase(player_id)
 	return _success()
-
-
-func refresh_session(player_id: String) -> Dictionary:
-	if _bridge == null or not _bridge.has_method("refresh_player_session"):
-		return _error("Secure session refresh is unavailable.")
-	var result = _bridge.call("refresh_player_session", player_id)
-	if not (result is Dictionary) or not bool(result.get("ok", false)):
-		return _error(
-			str(result.get("error", "Secure session refresh failed."))
-			if result is Dictionary
-			else "Secure session refresh failed."
-		)
-	var session = result.get("session", result.get("data", {}))
-	if not (session is Dictionary):
-		return _error("Secure session refresh returned invalid data.")
-	return _success({"session": (session as Dictionary).duplicate(true)})
 
 
 func _find_bridge() -> Object:

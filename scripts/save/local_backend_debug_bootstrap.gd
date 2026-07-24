@@ -19,6 +19,7 @@ const SYNC_ENABLED_SETTING := "application/config/save_sync_v2_enabled"
 const SECURE_BRIDGE_SINGLETON := "SortingPuzzleSecureStoreBridge"
 const LOG_TAG := "[LocalBackendDebug]"
 const HEALTH_PROBE_TIMEOUT_SECONDS := 5.0
+const IDENTITY_DIAGNOSTICS_POLL_INTERVAL_SECONDS := 3.0
 
 
 func _ready() -> void:
@@ -46,6 +47,7 @@ func _ready() -> void:
 		% [LOG_TAG, base_url, sync_enabled, OVERRIDE_PATH]
 	)
 	_run_health_probe(base_url)
+	_start_identity_diagnostics_timer()
 
 
 ## Pure validation of one [backend] section. Kept separate from _ready() so it can be unit tested
@@ -102,3 +104,55 @@ func _on_health_probe_completed(
 		]
 	)
 	request.queue_free()
+
+
+## GAME-004: periodically surfaces PlayerProgress's non-secret identity/save-sync diagnostics
+## (namespace kind, opaque player/device ids, generation, retry state, error codes, correlation
+## id) via logcat so an emulator smoke check can prove real guest bootstrap, one-time rebind, and
+## restart resumption without reading any secret storage on the device.
+func _start_identity_diagnostics_timer() -> void:
+	var timer := Timer.new()
+	timer.wait_time = IDENTITY_DIAGNOSTICS_POLL_INTERVAL_SECONDS
+	timer.one_shot = false
+	timer.timeout.connect(_log_identity_diagnostics)
+	add_child(timer)
+	timer.start()
+
+
+func _log_identity_diagnostics() -> void:
+	var progress := get_node_or_null("/root/PlayerProgress")
+	if progress == null or not progress.has_method("get_local_save_diagnostics"):
+		return
+	var diagnostics: Dictionary = progress.get_local_save_diagnostics()
+	if diagnostics.is_empty():
+		return
+	var save_namespace := diagnostics.get("namespace", {}) as Dictionary
+	var registration := diagnostics.get("guest_registration", {}) as Dictionary
+	var registration_terminal := registration.get("terminal_error", {}) as Dictionary
+	var terminal_error := diagnostics.get("terminal_error", {}) as Dictionary
+	var sync_gate := diagnostics.get("sync_gate", {}) as Dictionary
+	print(
+		(
+			"%s identity diagnostics: namespace_kind=%s player_id=%s device_id=%s generation=%d "
+			+ "guest_phase=%s guest_retry_attempt=%d guest_terminal_error=%s "
+			+ "retry_attempt=%d terminal_error=%s last_correlation_id=%s "
+			+ "gate_feature=%s gate_url=%s gate_can_sync=%s gate_key=%s gate_manifest=%s"
+		) % [
+			LOG_TAG,
+			str(save_namespace.get("kind", "")),
+			str(save_namespace.get("player_id", "")),
+			str(diagnostics.get("device_id", "")),
+			int(diagnostics.get("generation", 0)),
+			str(registration.get("phase", "")),
+			int(registration.get("retry_attempt", 0)),
+			str(registration_terminal.get("code", "")),
+			int(diagnostics.get("retry_attempt", 0)),
+			str(terminal_error.get("code", "")),
+			str(diagnostics.get("last_correlation_id", "")),
+			bool(sync_gate.get("feature_enabled", false)),
+			bool(sync_gate.get("backend_url_configured", false)),
+			bool(sync_gate.get("can_synchronize", false)),
+			bool(sync_gate.get("installation_public_key_present", false)),
+			bool(sync_gate.get("content_manifest_valid", false)),
+		]
+	)

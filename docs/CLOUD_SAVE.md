@@ -23,7 +23,8 @@ is an asynchronous recovery/merge destination, not an alternative runtime save p
 - `addons/sorting_puzzle_secure_store_bridge/`: GAME-003 `EditorExportPlugin` that packages the
   built Android secure-store AAR into Gradle-build exports.
 - `scripts/save/local_backend_debug_bootstrap.gd`: GAME-003 local-only, debug-build-only backend
-  URL/sync override loader (`local/backend_debug.cfg`; see `docs/CONFIGS.md`).
+  URL/sync override loader (`local/backend_debug.cfg`; see `docs/CONFIGS.md`) and, for GAME-004, a
+  periodic non-secret identity/save-sync diagnostics log line for emulator verification.
 
 The old scripts under `scripts/save_providers/` remain only as legacy migration/test adapters.
 Release gameplay no longer reads `application/config/save_provider` and must not switch to a
@@ -161,10 +162,17 @@ dialog scene.
 
 ## Support and release verification
 
-`PlayerProgress.get_local_save_diagnostics()` exposes non-secret namespace, generation, journal
-head/cursor, retry count, adjustment count, migration state, and content-manifest
+`PlayerProgress.get_local_save_diagnostics()` exposes non-secret namespace, device id, generation,
+journal head/cursor, retry count, terminal error code, last server correlation id, guest
+registration phase/retry/terminal error, adjustment count, migration state, and content-manifest
 validity/digest/environment/diagnostic. Never request gameplay-save files, tokens, private keys, or
 screenshots of platform credentials from players.
+
+`GuestSessionBootstrapService` and `SaveSyncService` record the server's `meta.correlation_id` from
+every parsed response alongside their own stable error codes (`sync.guest_registration.terminal_error`,
+`sync.terminal_error`, `sync.last_correlation_id`, `sync.identity_diagnostics`). This is the
+non-secret identity/session diagnostic surface GAME-004 requires; it never stores tokens,
+signatures, or request bodies.
 
 `ContentProvenanceManifest` validates
 `configs/backend/content_provenance.json` before `PlayerProgress` configures guest bootstrap or save
@@ -193,8 +201,15 @@ Automated verification:
 & 'D:\Godot\godot.exe' --headless --verbose --path . --script tests/save/test_player_progress_facade.gd
 & 'D:\Godot\godot.exe' --headless --path . --script scripts/tools/check_content_provenance.gd
 & 'D:\Godot\godot.exe' --headless --verbose --path . --script tests/save/test_local_backend_debug_bootstrap.gd
+& 'D:\Godot\godot.exe' --headless --verbose --path . --script tests/save/test_game_004.gd
 pnpm --dir ..\sorting-puzzle-backend check:development-client-manifest
 ```
+
+`tests/save/test_game_004.gd` drives `GuestSessionBootstrapService._on_request_completed` and
+`SaveSyncService._on_request_completed` directly with malformed, expired-challenge, replayed
+(`auth.refresh_reuse_detected`), and device-binding-mismatched response bodies, and proves the
+one-time guest rebind and the single-refresh-attempt guard survive a simulated app restart
+(`AccountSaveCoordinator` reopened against the same installation).
 
 Android release verification requires JDK 17, Android SDK 36, the Gradle export path, and physical
 device tests for Keystore, airplane-mode transitions, process death/reboot, account switching, and
@@ -207,3 +222,17 @@ GAME-003 packages that same Android bridge into a debug-only local-backend expor
 `scripts/tools/android_local_backend_smoke_check.ps1` for the emulator smoke check. On 2026-07-24,
 the debug AAR/APK were built and the smoke check passed against a live local backend; release
 security/persistence behavior still belongs to the broader device matrix above.
+
+GAME-004 exercised that same debug build against the real guest challenge/bootstrap and
+rotating-refresh endpoints and found two real defects, both fixed on 2026-07-24: `SecureSessionStore`
+gated every Android bridge call behind `_bridge.has_method(...)`, which returned `false` on-device
+for a bridge that genuinely worked, silently disabling synchronization; and
+`application/config/version` was never declared in `project.godot`, so every protocol request's
+`meta.app.version` was empty and failed backend schema validation. `scripts/tools/
+android_local_backend_identity_smoke_check.ps1` automates the intended end-to-end proof (real
+bootstrap, then kill/restart resumption), but a device/emulator `HTTPRequest` POST-with-body
+reliability issue on this workstation (GET requests always completed; POST requests intermittently
+never signaled completion, even past their own timeout) prevented a full live observation as of
+that date -- see the GAME-004 entry in `docs/IMPLEMENTATION_TICKETS.md` for details. The malformed,
+expired-challenge, replayed, and device-binding-mismatched response handling this ticket also
+requires is proven by `tests/save/test_game_004.gd` independently of that device flakiness.
