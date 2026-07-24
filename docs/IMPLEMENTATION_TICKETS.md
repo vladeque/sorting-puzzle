@@ -157,3 +157,46 @@ indefinitely without connectivity or player-visible pending-reward state.
   and platform backup interactions.
 - Update `docs/CLOUD_SAVE.md`, `docs/SCRIPTS.md`, `docs/PROJECT_MAP.md`, relevant scene documentation,
   and release/support troubleshooting instructions to identify each new owner and recovery path.
+
+## GAME-002 — Integrate the Godot client with the local backend on Android
+
+**Type:** Product/Foundation
+**Status:** Planned
+**Description:** Package the Android secure bridge, align immutable content provenance, run the
+existing guest/session and protocol-v2 save path against the PostgreSQL-backed local API, and add
+backend catalog and leaderboard adapters without making campaign play connectivity-dependent.
+
+**Plan:** [`LOCAL_BACKEND_INTEGRATION.md`](LOCAL_BACKEND_INTEGRATION.md)
+
+**Depends on:**
+
+- `GAME-001`
+- Backend `BE-102`, `BE-103`, `BE-307`, `BE-401`, and `BE-502`
+- A reproducible backend development-secret and content/catalog bootstrap
+- Backend materialization of protocol-v2 selected completions into leaderboard query state
+
+**Local scope:**
+
+- Android emulator debug builds connected to the developer-hosted API through `adb reverse`.
+- Real Android Keystore installation signatures, real access/refresh sessions, and real
+  PostgreSQL save checkpoints.
+- Development game configuration and Shop catalog publication.
+- Read-only server catalog and leaderboard integration.
+
+**Deferred:** Production deployment, platform account authentication/linking, real purchases,
+provider notifications, attestation, iOS, privacy/administration UI, and deterministic gameplay
+replay.
+
+**Acceptance criteria:**
+
+- A clean local stack can be bootstrapped idempotently and reaches ready state.
+- A debug APK registers a guest, binds the installation namespace, uploads signed v2 operations,
+  survives app/API interruption, refreshes its session once when required, and reconciles the
+  returned checkpoint without duplicate effects.
+- Campaign operations use backend-generated immutable configuration, level, and rules identifiers.
+- The Shop consumes the active backend development catalog while mock price/purchase behavior stays
+  visibly development-only.
+- Backend leaderboards reflect selected unique v2 completions and preserve existing pagination and
+  current-player behavior.
+- Shared v1/v1.1/v2 fixtures pass in TypeScript and Godot, and no local integration diagnostic
+  exposes credentials, signatures, or request bodies.
