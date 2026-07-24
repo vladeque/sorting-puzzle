@@ -5,17 +5,15 @@ const SecureSessionStoreScript := preload("res://scripts/save/secure_session_sto
 const AccountSaveCoordinatorScript := preload("res://scripts/save/account_save_coordinator.gd")
 const GuestSessionBootstrapServiceScript := preload("res://scripts/save/guest_session_bootstrap_service.gd")
 const SaveSyncServiceScript := preload("res://scripts/save/save_sync_service.gd")
+const ContentProvenanceManifestScript := preload(
+	"res://scripts/save/content_provenance_manifest.gd"
+)
 const SAVE_PATH := "user://player_progress.json"
 const SAVE_VERSION := 4
 const MIN_LEVEL := 1
 const ABILITY_HAMMER := "hammer"
 const ABILITY_SHUFFLE := "shuffle"
 const ABILITY_HIGHLIGHT := "highlight"
-const GAME_CONFIGURATION_VERSION_SETTING := "application/config/game_configuration_version"
-const GAME_RULES_VERSION_SETTING := "application/config/game_rules_version"
-const DEFAULT_GAME_CONFIGURATION_VERSION := "client-bundled-2026-07-23"
-const DEFAULT_GAME_RULES_VERSION := "triple-sort-rules-1"
-const LEVEL_VERSION_FORMAT := "level-%03d-client-1"
 const DEFAULT_AVATAR_ID := "avatar_cat"
 const PLAYER_NAME_PREFIX := "player_"
 const PLAYER_NAME_RANDOM_ALPHABET := "abcdefghijklmnopqrstuvwxyz0123456789"
@@ -73,6 +71,8 @@ var _account_coordinator
 var _local_store
 var _guest_bootstrap_service
 var _sync_service
+var _content_provenance
+var _content_operation_diagnostic := {}
 
 
 func _ready() -> void:
@@ -80,6 +80,7 @@ func _ready() -> void:
 
 
 func load_progress() -> void:
+	_load_content_provenance()
 	if _session_store == null:
 		_session_store = SecureSessionStoreScript.new()
 		var identity_result: Dictionary = _session_store.initialize()
@@ -117,12 +118,22 @@ func load_progress() -> void:
 		_sync_service = SaveSyncServiceScript.new()
 		add_child(_sync_service)
 		_sync_service.reconciliation_applied.connect(_on_reconciliation_applied)
-	_sync_service.configure(_local_store, _session_store, _map_checkpoint_to_snapshot)
+	_sync_service.configure(
+		_local_store,
+		_session_store,
+		_map_checkpoint_to_snapshot,
+		_content_provenance.is_valid()
+	)
 	if _guest_bootstrap_service == null:
 		_guest_bootstrap_service = GuestSessionBootstrapServiceScript.new()
 		add_child(_guest_bootstrap_service)
 		_guest_bootstrap_service.guest_registered.connect(_on_guest_registered)
-	_guest_bootstrap_service.configure(_local_store, _session_store, _account_coordinator)
+	_guest_bootstrap_service.configure(
+		_local_store,
+		_session_store,
+		_account_coordinator,
+		_content_provenance.is_valid()
+	)
 	if _refresh_lives_state():
 		_commit_current_state([_life_state_operation()])
 	_guest_bootstrap_service.request_registration()
@@ -405,10 +416,12 @@ func spend_life(level_number: int = 0, outcome: String = "left") -> bool:
 
 	var operations := []
 	if level_number >= MIN_LEVEL:
-		operations.append({
-			"operation_type": "campaign_attempt",
-			"payload": _campaign_attempt_payload(level_number, outcome),
-		})
+		var attempt_payload := _campaign_attempt_payload(level_number, outcome)
+		if not attempt_payload.is_empty():
+			operations.append({
+				"operation_type": "campaign_attempt",
+				"payload": attempt_payload,
+			})
 	operations.append(_life_state_operation())
 	return _commit_or_restore(previous_data, operations)
 
@@ -458,10 +471,14 @@ func complete_level(level_number: int, earned_stars: int = 0) -> bool:
 				"start_stars": int(starting_progress.get("stars", 0)),
 				"start_goal_index": int(starting_progress.get("goal_index", 0)),
 			}
-	var result := _commit_current_state([{
-		"operation_type": "campaign_completion",
-		"payload": _campaign_completion_payload(level_number, safe_earned_stars),
-	}])
+	var operations := []
+	var completion_payload := _campaign_completion_payload(level_number, safe_earned_stars)
+	if not completion_payload.is_empty():
+		operations.append({
+			"operation_type": "campaign_completion",
+			"payload": completion_payload,
+		})
+	var result := _commit_current_state(operations)
 	if not bool(result.get("ok", false)):
 		_data = previous_data
 		_pending_reward_chest_animation = previous_animation
@@ -824,6 +841,14 @@ func get_local_save_diagnostics() -> Dictionary:
 		"terminal_error": (sync.get("terminal_error", {}) as Dictionary).duplicate(true),
 		"merge_adjustment_count": (sync.get("adjustments", []) as Array).size(),
 		"migration": (sync.get("migration", {}) as Dictionary).duplicate(true),
+		"content_manifest_valid": _content_provenance != null and _content_provenance.is_valid(),
+		"content_manifest_digest": (
+			_content_provenance.get_manifest_digest() if _content_provenance != null else ""
+		),
+		"content_manifest_environment": (
+			_content_provenance.get_environment() if _content_provenance != null else ""
+		),
+		"content_diagnostic": _current_content_diagnostic(),
 	}
 
 
@@ -899,26 +924,56 @@ func _commit_or_restore(previous_data: Dictionary, operation_specs: Array = []) 
 
 
 func _campaign_completion_payload(level_number: int, earned_stars: int) -> Dictionary:
+	var provenance := _campaign_provenance(level_number)
+	if provenance.is_empty():
+		return {}
 	return {
 		"campaign_level": level_number,
 		"stars": clampi(earned_stars, 0, 3),
-		"configuration_version": str(ProjectSettings.get_setting(
-			GAME_CONFIGURATION_VERSION_SETTING,
-			DEFAULT_GAME_CONFIGURATION_VERSION
-		)),
-		"level_version": LEVEL_VERSION_FORMAT % level_number,
-		"rules_version": str(ProjectSettings.get_setting(
-			GAME_RULES_VERSION_SETTING,
-			DEFAULT_GAME_RULES_VERSION
-		)),
+		"configuration_version": provenance.get("configuration_version"),
+		"level_version": provenance.get("level_version"),
+		"rules_version": provenance.get("rules_version"),
 	}
 
 
 func _campaign_attempt_payload(level_number: int, outcome: String) -> Dictionary:
 	var payload := _campaign_completion_payload(level_number, 0)
+	if payload.is_empty():
+		return {}
 	payload.erase("stars")
 	payload["outcome"] = outcome if outcome == "failed" else "left"
 	return payload
+
+
+func _load_content_provenance() -> void:
+	_content_operation_diagnostic.clear()
+	_content_provenance = ContentProvenanceManifestScript.new()
+	var result: Dictionary = _content_provenance.load_manifest()
+	if not bool(result.get("ok", false)):
+		push_warning(
+			"Backend synchronization disabled [%s]: %s" % [
+				result.get("code", "content_manifest.invalid"),
+				result.get("error", "Bundled content provenance is invalid."),
+			]
+		)
+
+
+func _campaign_provenance(level_number: int) -> Dictionary:
+	if _content_provenance == null or not _content_provenance.is_valid():
+		return {}
+	var provenance: Dictionary = _content_provenance.get_level_provenance(level_number)
+	if provenance.is_empty() and _content_operation_diagnostic.is_empty():
+		_content_operation_diagnostic = {
+			"code": "content_manifest.level_unsupported",
+			"message": "Campaign progress remains local because this level is not integration-ready.",
+		}
+	return provenance
+
+
+func _current_content_diagnostic() -> Dictionary:
+	if _content_provenance != null and not _content_provenance.is_valid():
+		return _content_provenance.get_diagnostic()
+	return _content_operation_diagnostic.duplicate(true)
 
 
 func _life_state_operation() -> Dictionary:

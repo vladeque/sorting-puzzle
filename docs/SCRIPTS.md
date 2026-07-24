@@ -479,6 +479,7 @@ Class:
 
 Purpose:
 - Owns the feature-gated protocol-1.1 guest challenge and bootstrap HTTP flow.
+- Requires valid bundled content provenance before issuing network requests.
 - Persists exact challenge/bootstrap retry payloads, signs the ordered
   `guest-registration-proof/1` payload through the native bridge, validates the returned
   player/device/session binding, and hands the transition to `AccountSaveCoordinator`.
@@ -490,9 +491,31 @@ Class:
 
 Purpose:
 - Owns feature-gated `POST /v2/saves/sync` and recovery `GET /v2/saves/state`.
+- Requires valid bundled content provenance before issuing network requests.
 - Caps batches at 500 operations/1 MiB and persists exact payload/idempotency values before send.
 - Owns timeout, full-jitter/`Retry-After`, session-refresh hooks, cursor conflict recovery, response
   validation, checkpoint reconciliation, continuation, and silent batching.
+
+## `scripts/save/content_provenance_manifest.gd`
+
+Class:
+- `ContentProvenanceManifest`
+
+Purpose:
+- Loads the generated GAME-002 manifest from `configs/backend/content_provenance.json`.
+- Validates its closed schema, canonical digest, content-addressed configuration identity,
+  source-file hashes, complete levels 1-8 mapping, and explicit levels 9-10 exclusion.
+- Returns exact immutable campaign provenance to `PlayerProgress` without constructing fallback
+  protocol identifiers.
+- Exposes only bounded non-secret diagnostics when invalid; the caller keeps local play available
+  and disables network synchronization.
+
+## `scripts/tools/check_content_provenance.gd`
+
+Purpose:
+- Headless pre-export check for missing, stale, incomplete, or digest-mismatched provenance.
+- Exits unsuccessfully before export when the packaged campaign sources differ from the backend
+  publication.
 
 ## `scripts/save_providers/*.gd`
 

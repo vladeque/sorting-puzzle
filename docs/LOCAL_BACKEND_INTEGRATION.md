@@ -149,6 +149,8 @@ Owner: game repository
 
 Tracking: `GAME-002` and `GAME-003`.
 
+Status: `GAME-002` complete on 2026-07-24; `GAME-003` remains planned.
+
 Deliverables:
 
 - Packaged Android secure-store plugin and debug export preset.

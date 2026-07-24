@@ -20,12 +20,14 @@ var _http_request: HTTPRequest
 var _retry_timer: Timer
 var _busy := false
 var _request_store
+var _content_provenance_valid := true
 
 
-func configure(store, session_store, coordinator) -> void:
+func configure(store, session_store, coordinator, content_provenance_valid: bool = true) -> void:
 	_store = store
 	_session_store = session_store
 	_coordinator = coordinator
+	_content_provenance_valid = content_provenance_valid
 	if _http_request == null:
 		_http_request = HTTPRequest.new()
 		_http_request.timeout = REQUEST_TIMEOUT_SECONDS
@@ -77,6 +79,8 @@ func request_registration() -> void:
 
 func _can_register() -> bool:
 	if _store == null or _session_store == null or _coordinator == null:
+		return false
+	if not _content_provenance_valid:
 		return false
 	if str((_store.get_namespace() as Dictionary).get("kind", "")) != "installation_guest":
 		return false

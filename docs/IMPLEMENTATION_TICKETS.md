@@ -161,7 +161,7 @@ indefinitely without connectivity or player-visible pending-reward state.
 ## GAME-002 — Consume canonical backend content provenance
 
 **Type:** Foundation
-**Status:** Planned
+**Status:** Complete - implemented on 2026-07-24
 **Description:** Replace synthetic configuration, level, and rules identifiers with a generated
 client manifest produced from the same immutable backend publication used by local development.
 

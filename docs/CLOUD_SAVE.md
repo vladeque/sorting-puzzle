@@ -158,8 +158,15 @@ dialog scene.
 ## Support and release verification
 
 `PlayerProgress.get_local_save_diagnostics()` exposes non-secret namespace, generation, journal
-head/cursor, retry count, adjustment count, and migration state. Never request gameplay-save files,
-tokens, private keys, or screenshots of platform credentials from players.
+head/cursor, retry count, adjustment count, migration state, and content-manifest
+validity/digest/environment/diagnostic. Never request gameplay-save files, tokens, private keys, or
+screenshots of platform credentials from players.
+
+`ContentProvenanceManifest` validates
+`configs/backend/content_provenance.json` before `PlayerProgress` configures guest bootstrap or save
+synchronization. A missing, stale, incomplete, or digest-mismatched manifest fails closed for
+networking but does not block snapshot commits or campaign play. Campaign levels outside the
+manifest remain local and do not append an uploadable completion/attempt operation.
 
 Support sequence:
 
@@ -175,7 +182,10 @@ Automated verification:
 
 ```powershell
 & 'D:\Godot\godot.exe' --headless --verbose --path . --script tests/save/test_game_001.gd
+& 'D:\Godot\godot.exe' --headless --verbose --path . --script tests/save/test_game_002.gd
 & 'D:\Godot\godot.exe' --headless --verbose --path . --script tests/save/test_player_progress_facade.gd
+& 'D:\Godot\godot.exe' --headless --path . --script scripts/tools/check_content_provenance.gd
+pnpm --dir ..\sorting-puzzle-backend check:development-client-manifest
 ```
 
 Android release verification requires JDK 17, Android SDK 36, the Gradle export path, and physical

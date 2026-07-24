@@ -36,10 +36,41 @@ func _run() -> void:
 	_check(progress.spend_coins(100), "offline-earned reward can be spent immediately")
 
 	var diagnostics: Dictionary = progress.get_local_save_diagnostics()
-	_check(int(diagnostics.get("journal_entries", 0)) >= 175, "facade mutations share the journal path")
+	_check(
+		bool(diagnostics.get("content_manifest_valid", false)),
+		"generated content provenance enables the synchronization gate"
+	)
+	_check(
+		str(diagnostics.get("content_manifest_digest", "")).length() == 64,
+		"content provenance exposes a non-secret diagnostic digest"
+	)
+	var journal = progress.get("_local_store").get_journal()
+	var campaign_operations := []
+	for raw_operation in journal:
+		var operation := raw_operation as Dictionary
+		if str(operation.get("operation_type", "")).begins_with("campaign_"):
+			campaign_operations.append(operation)
+	_check(campaign_operations.size() == 9, "only published levels produce campaign journal entries")
+	for raw_operation in campaign_operations:
+		var payload := (raw_operation as Dictionary).get("payload", {}) as Dictionary
+		var campaign_level := int(payload.get("campaign_level", 0))
+		_check(campaign_level >= 1 and campaign_level <= 8, "campaign operation is integration-ready")
+		_check(
+			str(payload.get("configuration_version", "")).begins_with("config_"),
+			"campaign operation uses canonical configuration provenance"
+		)
+		_check(
+			not str(payload.get("level_version", "")).contains("-client-"),
+			"campaign operation does not invent a synthetic level version"
+		)
 	_check(
 		int(diagnostics.get("journal_head_sequence", 0)) == int(diagnostics.get("journal_entries", 0)),
 		"facade journal remains contiguous"
+	)
+	_check(
+		str((diagnostics.get("content_diagnostic", {}) as Dictionary).get("code", ""))
+		== "content_manifest.level_unsupported",
+		"unsupported campaign levels remain local with a stable diagnostic"
 	)
 
 	progress.load_progress()

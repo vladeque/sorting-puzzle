@@ -26,16 +26,19 @@ var _active_session := {}
 var _state_refresh_attempted := false
 var _request_store
 var _refresh_request_id := ""
+var _content_provenance_valid := true
 
 
 func configure(
 	store: LocalSaveStore,
 	session_store: SecureSessionStore,
-	checkpoint_mapper: Callable
+	checkpoint_mapper: Callable,
+	content_provenance_valid: bool = true
 ) -> void:
 	_store = store
 	_session_store = session_store
 	_checkpoint_mapper = checkpoint_mapper
+	_content_provenance_valid = content_provenance_valid
 	if _http_request == null:
 		_http_request = HTTPRequest.new()
 		_http_request.timeout = REQUEST_TIMEOUT_SECONDS
@@ -94,6 +97,8 @@ func request_background_sync() -> void:
 
 func _can_sync() -> bool:
 	if _store == null or _session_store == null:
+		return false
+	if not _content_provenance_valid:
 		return false
 	if not bool(ProjectSettings.get_setting(FEATURE_SETTING, false)):
 		return false
