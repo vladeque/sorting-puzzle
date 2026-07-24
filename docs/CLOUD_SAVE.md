@@ -20,6 +20,10 @@ is an asynchronous recovery/merge destination, not an alternative runtime save p
   player namespace switching, sign-out, and clean-install restore selection.
 - `platform/android/secure-store-plugin/`: Godot Android plugin v2 source using Android Keystore.
 - `platform/ios/secure-store-plugin/`: Godot iOS `.gdip` plugin source using Keychain.
+- `addons/sorting_puzzle_secure_store_bridge/`: GAME-003 `EditorExportPlugin` that packages the
+  built Android secure-store AAR into Gradle-build exports.
+- `scripts/save/local_backend_debug_bootstrap.gd`: GAME-003 local-only, debug-build-only backend
+  URL/sync override loader (`local/backend_debug.cfg`; see `docs/CONFIGS.md`).
 
 The old scripts under `scripts/save_providers/` remain only as legacy migration/test adapters.
 Release gameplay no longer reads `application/config/save_provider` and must not switch to a
@@ -185,6 +189,7 @@ Automated verification:
 & 'D:\Godot\godot.exe' --headless --verbose --path . --script tests/save/test_game_002.gd
 & 'D:\Godot\godot.exe' --headless --verbose --path . --script tests/save/test_player_progress_facade.gd
 & 'D:\Godot\godot.exe' --headless --path . --script scripts/tools/check_content_provenance.gd
+& 'D:\Godot\godot.exe' --headless --verbose --path . --script tests/save/test_local_backend_debug_bootstrap.gd
 pnpm --dir ..\sorting-puzzle-backend check:development-client-manifest
 ```
 
@@ -193,3 +198,9 @@ device tests for Keystore, airplane-mode transitions, process death/reboot, acco
 uninstall/reinstall. iOS verification requires macOS/Xcode, a device/simulator xcframework, and the
 corresponding Keychain/background/account tests. These device matrices are release gates; Windows
 headless tests do not claim to replace them.
+
+GAME-003 packages that same Android bridge into a debug-only local-backend export. See
+`platform/android/secure-store-plugin/README.md` for the build/export/`adb reverse` workflow and
+`scripts/tools/android_local_backend_smoke_check.ps1` for the emulator smoke check. On 2026-07-24,
+the debug AAR/APK were built and the smoke check passed against a live local backend; release
+security/persistence behavior still belongs to the broader device matrix above.

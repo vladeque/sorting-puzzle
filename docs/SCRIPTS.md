@@ -462,6 +462,28 @@ Purpose:
 - Refuses mobile synchronization without secure native storage; desktop signatures are
   development-only crash-test markers.
 
+## `scripts/save/local_backend_debug_bootstrap.gd`
+
+Autoload:
+- Registered as `LocalBackendDebugBootstrap` in `project.godot`, first in the autoload list so it
+  runs before `PlayerProgress`/`SaveSyncService` read backend settings.
+
+Purpose:
+- GAME-003 local-only configuration path: in debug builds only, reads the gitignored
+  `res://local/backend_debug.cfg` and overrides `application/config/backend_base_url` and
+  `application/config/save_sync_v2_enabled` for that run without touching the committed
+  `project.godot` defaults.
+- `parse_override(config)` is a pure static validator (base_url must be `http://`/`https://`,
+  `sync_enabled` must be boolean) covered by
+  `tests/save/test_local_backend_debug_bootstrap.gd`.
+- On a valid override, logs one non-secret `[LocalBackendDebug]` diagnostic line and fires a
+  best-effort `/health/live` HTTPRequest, then logs the result plus whether
+  `SortingPuzzleSecureStoreBridge` is available -- never tokens, signatures, or key material.
+
+Do not use for:
+- Anything that should affect a release export; a missing file or a non-debug build is always a
+  no-op.
+
 ## `scripts/save/account_save_coordinator.gd`
 
 Class:
@@ -516,6 +538,19 @@ Purpose:
 - Headless pre-export check for missing, stale, incomplete, or digest-mismatched provenance.
 - Exits unsuccessfully before export when the packaged campaign sources differ from the backend
   publication.
+
+## `scripts/tools/android_local_backend_smoke_check.ps1`
+
+Purpose:
+- GAME-003 emulator smoke check: waits for an adb device, sets up `adb reverse tcp:8080 tcp:8080`,
+  installs/launches the debug APK, and tails `adb logcat` for the `[LocalBackendDebug]` lines from
+  `scripts/save/local_backend_debug_bootstrap.gd`.
+- Resolves adb from `-AdbPath`, PATH, `ANDROID_SDK_ROOT`, `ANDROID_HOME`, or the standard Windows
+  user SDK location.
+- Exits `0` only once a local override, `/health/live` HTTP 200, and
+  `secure_bridge_available=true` are all observed in logcat, or `1` after a timeout.
+- Covers only the Android-side half of the local-backend flow; does not start the backend itself
+  or provision PostgreSQL/the API (`GAME-010`).
 
 ## `scripts/save_providers/*.gd`
 

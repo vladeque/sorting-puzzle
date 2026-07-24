@@ -272,6 +272,42 @@ operations load their exact configuration/level/rules identities from
 See:
 - `docs/CLOUD_SAVE.md`
 
+## `local/backend_debug.cfg` (GAME-003, gitignored)
+
+Purpose:
+- Local-only override for `application/config/backend_base_url` and
+  `application/config/save_sync_v2_enabled`, applied only in debug builds, so the committed
+  `project.godot` defaults (empty URL, sync disabled) never need to change for local Android
+  local-backend testing.
+- Owned by `scripts/save/local_backend_debug_bootstrap.gd`, registered as the first autoload so the
+  override lands before `SaveSyncService` reads either setting.
+
+Shape (template at `local/backend_debug.example.cfg`; copy it to `local/backend_debug.cfg` and
+edit the copy):
+
+```ini
+[backend]
+
+base_url="http://127.0.0.1:8080"
+sync_enabled=true
+```
+
+Rules:
+- `local/backend_debug.cfg` itself is gitignored and must never be committed with a real value.
+- The Android export plugin injects it only into debug exports. A release export does not package
+  the file even when the local copy exists.
+- `base_url` must start with `http://` or `https://`; anything else is rejected and the committed
+  defaults stay active.
+- `sync_enabled` must be a literal `true`/`false`; a non-boolean value is rejected.
+- The file is only read when `OS.is_debug_build()` is true and only if it exists; a missing file or
+  a release export both leave `project.godot`'s committed defaults untouched.
+- With `adb reverse tcp:8080 tcp:8080` running, `http://127.0.0.1:8080` reaches the developer
+  machine's backend from the Android emulator; `http://10.0.2.2:8080` is the documented fallback.
+
+See:
+- `platform/android/secure-store-plugin/README.md`
+- `docs/LOCAL_BACKEND_INTEGRATION.md`
+
 ## `configs/backend/content_provenance.json`
 
 Purpose:

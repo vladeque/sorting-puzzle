@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Debug-variant-only manifest fragment for the SortingPuzzleSecureStoreBridge plugin module.
+
+  Gradle's manifest merger combines this with plugin/src/main/AndroidManifest.xml only when the
+  *debug* AAR is assembled (`./gradlew :plugin:assembleDebug`). The release AAR
+  (`./gradlew :plugin:assembleRelease`) is built from src/main alone and therefore requests neither
+  INTERNET nor cleartext traffic. GAME-003's export_plugin.gd selects the debug AAR only for debug
+  Godot exports, so this keeps "debug-only cleartext HTTP" tied to which artifact gets packaged
+  instead of a runtime flag that could be left on by accident.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application android:usesCleartextTraffic="true" />
+</manifest>

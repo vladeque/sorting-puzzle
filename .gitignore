@@ -2,6 +2,12 @@
 .godot/
 /android/
 
+# GAME-003 local-only backend debug override (see local/backend_debug.example.cfg for the template)
+/local/backend_debug.cfg
+
+# GAME-003 Android export output (see export_presets.cfg export_path)
+/build/
+
 # Python tooling
 __pycache__/
 *.py[cod]

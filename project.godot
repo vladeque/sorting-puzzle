@@ -24,6 +24,7 @@ config/mock_store_country="US"
 
 [autoload]
 
+LocalBackendDebugBootstrap="*res://scripts/save/local_backend_debug_bootstrap.gd"
 PlayerProgress="*res://scripts/player_progress.gd"
 
 [display]
@@ -34,6 +35,10 @@ window/stretch/mode="canvas_items"
 window/stretch/aspect="keep_width"
 window/handheld/orientation=1
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/sorting_puzzle_secure_store_bridge/plugin.cfg")
+
 [physics]
 
 3d/physics_engine="Jolt Physics"
@@ -42,3 +47,4 @@ window/handheld/orientation=1
 
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="mobile"
+textures/vram_compression/import_etc2_astc=true

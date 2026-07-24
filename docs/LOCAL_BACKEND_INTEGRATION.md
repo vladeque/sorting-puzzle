@@ -25,8 +25,9 @@ installed campaign play, local rewards, lives, or local spending.
   `application/config/save_sync_v2_enabled` is `false`.
 - Desktop Godot deliberately cannot synchronize. The real signing and secure-session contract is
   implemented by the Android and iOS native bridge sources.
-- The Android bridge source exists, but there is no checked-in Android export preset or packaged
-  Godot Android plugin.
+- The Android bridge source exists. As of `GAME-003` (2026-07-24), the checked-in Android export
+  preset and Godot Android plugin (`addons/sorting_puzzle_secure_store_bridge/`) have been built
+  and verified against a live local backend in an Android emulator.
 - Leaderboards and the Shop still select mock providers. There is no shared authenticated HTTP
   client for these features.
 
@@ -149,7 +150,8 @@ Owner: game repository
 
 Tracking: `GAME-002` and `GAME-003`.
 
-Status: `GAME-002` complete on 2026-07-24; `GAME-003` remains planned.
+Status: `GAME-002` complete on 2026-07-24. `GAME-003` complete and emulator-verified on
+2026-07-24.
 
 Deliverables:
 
@@ -160,10 +162,16 @@ Deliverables:
 
 Exit gate:
 
-- The emulator reports `SortingPuzzleSecureStoreBridge` available.
-- No private key leaves Android Keystore.
-- A debug build can reach `/health/live` through the documented host route.
-- A release/default run still has network integration disabled.
+- The emulator reports `SortingPuzzleSecureStoreBridge` available. Verified by the GAME-003 smoke
+  check.
+- The bridge exposes signing operations but no private-key export API; smoke diagnostics contain no
+  token, signature, or key material. Persistence/security behavior remains part of the later
+  identity device-test gate.
+- A debug build reaches `/health/live` through `adb reverse` and receives HTTP 200. Verified by the
+  GAME-003 smoke check.
+- A release/default run still has network integration disabled. Committed `project.godot` keeps
+  `backend_base_url` empty and `save_sync_v2_enabled` false; the local override is gitignored,
+  injected only into debug exports, and applied only when `OS.is_debug_build()` is true.
 
 ### Phase L2 - Prove identity and cloud-save synchronization
 

@@ -130,6 +130,41 @@ Change here when:
 - Adding life tuning, operations, account flows, recovery, secure native storage, retries,
   checkpoint mapping, migrations, rewards, purchases, reset flows, or new persisted state.
 
+### Android Local Backend Debug Export (GAME-003)
+
+Files:
+- `addons/sorting_puzzle_secure_store_bridge/plugin.cfg`
+- `addons/sorting_puzzle_secure_store_bridge/export_plugin.gd`
+- `platform/android/secure-store-plugin/.gdignore`
+- `platform/android/secure-store-plugin/gradle.properties`
+- `platform/android/secure-store-plugin/gradlew`, `gradlew.bat`, `gradle/wrapper/`
+- `platform/android/secure-store-plugin/plugin/src/debug/AndroidManifest.xml`
+- `export_presets.cfg`
+- `local/backend_debug.example.cfg`
+- `scripts/save/local_backend_debug_bootstrap.gd`
+- `scripts/tools/android_local_backend_smoke_check.ps1`
+- `platform/android/secure-store-plugin/README.md`
+
+Responsibility:
+- Packages the built `SortingPuzzleSecureStoreBridge` AAR as a Godot Android v2
+  `EditorExportPlugin`, selecting the debug AAR (INTERNET permission +
+  `usesCleartextTraffic="true"`) for debug exports and the release AAR (neither) otherwise.
+- Excludes the native plugin's Gradle source/output tree from Godot resources via `.gdignore`; the
+  selected AAR is still passed directly to the Android Gradle export.
+- Defines a committed "Android (Local Backend Debug)" export preset with Gradle Build enabled.
+- Supplies backend URL/sync-enabled overrides only through the gitignored, debug-build-only
+  `local/backend_debug.cfg`. The export plugin injects the file only for debug builds; committed
+  `project.godot` release defaults are never touched by this system.
+- Documents and automates the `adb reverse tcp:8080 tcp:8080` local routing (with `10.0.2.2` as the
+  fallback) and an emulator smoke check for `/health/live` reachability and secure-bridge
+  availability.
+
+Change here when:
+- Changing how the secure-store AAR is built/packaged, the debug export preset, the local override
+  mechanism, or the emulator smoke-check flow. This is Phase L1 of
+  `docs/LOCAL_BACKEND_INTEGRATION.md`; identity/session and save-sync end-to-end verification are
+  `GAME-004`-`GAME-006` (Phase L2), not this system.
+
 ### Leaderboards
 
 Files:

@@ -183,7 +183,7 @@ client manifest produced from the same immutable backend publication used by loc
 ## GAME-003 — Package the Android local-backend debug target
 
 **Type:** Platform/Foundation
-**Status:** Planned
+**Status:** Complete and emulator-verified on 2026-07-24.
 **Description:** Package the existing Android secure-store bridge and create a safe debug export
 that can reach the developer-hosted API from an Android emulator.
 
@@ -201,6 +201,29 @@ that can reach the developer-hosted API from an Android emulator.
 - Committed release defaults keep the backend URL empty and synchronization disabled.
 - An emulator smoke check reaches the local `/health/live` endpoint and confirms bridge
   availability without exporting private key material.
+
+**Implementation notes:**
+
+- `addons/sorting_puzzle_secure_store_bridge/` is a Godot Android v2 `EditorExportPlugin` (the
+  current packaging mechanism; the older `.gdap` format is deprecated) that loads
+  `SortingPuzzleSecureStoreBridge-debug.aar` for debug exports and `-release.aar` otherwise.
+- `plugin/src/debug/AndroidManifest.xml` is the only source of the INTERNET permission and
+  `usesCleartextTraffic="true"` to the debug AAR specifically (via Gradle's own debug/release
+  source-set manifest merge). The export preset does not request Internet itself, so a release
+  export using the same preset receives neither permission nor cleartext opt-in.
+- The AAR builds with JDK 17 and Android SDK Platform 36. The Godot 4.6.2 Gradle export targets
+  Android SDK 35, matching that engine release's installed build template.
+- `local/backend_debug.cfg` (gitignored; template at `local/backend_debug.example.cfg`) is the
+  local-only configuration path. The export plugin injects it only into debug exports, and the
+  `LocalBackendDebugBootstrap` autoload also refuses to apply it outside debug builds.
+- `scripts/tools/android_local_backend_smoke_check.ps1` automates the emulator smoke check via adb
+  + logcat and resolves adb from an explicit path, PATH, or the standard Android SDK locations.
+- The emulator smoke check passed against a live local backend: the override activated,
+  `/health/live` returned HTTP 200, and `SortingPuzzleSecureStoreBridge` was available. Diagnostics
+  contain no token, signature, or private-key material.
+- An unsigned release verification build contains the release bridge but does not contain the
+  local override, INTERNET permission, or cleartext opt-in. A signed release still requires the
+  project's release keystore and remains part of the release pipeline.
 
 ## GAME-004 — Prove local guest registration and session persistence
 
