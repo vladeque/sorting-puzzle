@@ -422,9 +422,13 @@ Key methods:
 - `get_local_save_diagnostics()`: returns non-secret namespace/recovery/support state.
 - `reset_progress()`: restores default progress and writes it to disk for testing.
 - `get_save_provider_name()`: returns `local_first_v2`.
+- `get_backend_transport()`: GAME-007, returns the configured `BackendTransport` shared by backend
+  read features outside the focused save services (catalog, leaderboards, purchase status, device
+  list); wired once here to the existing `SecureSessionStore` and active player id.
 
 Depends on:
 - `scripts/save/*.gd`
+- `scripts/backend/backend_transport.gd`
 - `configs/reward_chest_goals.json`
 
 Do not use for:
@@ -623,6 +627,70 @@ Purpose:
 - Complements the Android-only smoke checks above: proves the server/database half of protocol-v2
   save synchronization directly, independent of the emulator `HTTPRequest` POST reliability issue
   that still blocks a real on-device proof (see the GAME-004/GAME-005 ticket entries).
+
+## `scripts/backend/backend_transport.gd`
+
+Class:
+- `BackendTransport`
+
+Purpose:
+- GAME-007 shared authenticated read transport for bodyless authenticated v1 `GET` reads used by
+  backend features outside the focused save services (`scripts/save/*`).
+- `configure(session_store, active_player_id_provider)` wires an existing `SecureSessionStore` and
+  a `Callable` that resolves the current active player id; `PlayerProgress` is the only configured
+  owner today (`get_backend_transport()`).
+- `get_json(path)` issues one bodyless `GET` at `path` (e.g. `/v1/catalog`) with an
+  `Authorization: Bearer` header and a client-generated `X-Correlation-ID`, never an invented
+  request body or protocol/app header. Returns `{"ok": true, "data", "meta"}` or
+  `{"ok": false, "error": {"code", "category", "message", "retryable", "retry_after_seconds",
+  "correlation_id", "http_status"}}`.
+- Retries network failures, `429` (honoring `Retry-After` over backoff), and `502`/`503`/`504` up
+  to one initial try plus four retries within a 30-second wall-clock budget, matching the backend's
+  documented client read retry policy; every other status (`400`/`403`/`404`/`409`/`413`/`415`/
+  `426`/`500`, or a malformed envelope) is terminal and never auto-retried.
+- Attempts exactly one refresh-and-replay on `401` via `POST /v1/sessions/refresh`, storing the
+  refreshed session back through `SecureSessionStore.store_session()`; a second `401` after that
+  refresh, a transport failure during refresh, or a malformed/mismatched refresh response are all
+  terminal (`auth.*` codes), never retried, mirroring `save_sync_service.gd`'s single-refresh-guard
+  reasoning without sharing its persisted mutation-retry state.
+- `_send_get`/`_send_post`/`_wait_before_retry` are the only network/timing seams; test doubles
+  override them to avoid a real socket or a real delay, the same pattern
+  `tests/save/test_game_006.gd` uses for `SaveSyncService`.
+
+Depends on:
+- `scripts/save/secure_session_store.gd` for bearer tokens and refresh storage (duck-typed, not a
+  static dependency).
+- `scripts/save/local_save_codec.gd` for UUID generation and timestamp validation.
+
+Do not use for:
+- `POST`/mutation traffic, save-sync idempotency/retry, or guest bootstrap. Those stay in
+  `scripts/save/save_sync_service.gd` and `scripts/save/guest_session_bootstrap_service.gd`.
+
+## `scripts/backend/backend_read_operations.gd`
+
+Class:
+- `BackendReadOperations`
+
+Purpose:
+- GAME-007 closed protocol adapters for the five bodyless authenticated v1 `GET` reads: player
+  state, player devices, catalog, one purchase by transaction id, and one leaderboard scope.
+- Static `*_path()` builders return the exact request path (including any query string) for
+  `BackendTransport.get_json()`; they never invent a request body or protocol/app headers.
+- Static `parse_*(data)` functions validate every required field's Godot `Variant` type against the
+  backend's `packages/protocol/schemas/v1/protocol.schema.json` definitions, read only the specific
+  keys they expose (so additive response fields are ignored by construction), and map unrecognized
+  enum values (`account_kind`, `moderation_state`, `avatar_id`, device `platform`, offer `type`/
+  `limit_period`, purchase `status`, grant `source`, leaderboard `scope`) to `"unknown"`.
+- `parse_purchase()` optionally parses a nested `restriction` and a nested `state` (the same
+  `PlayerState` shape as `parse_player_state()`) when the server includes them.
+
+Depends on:
+- `scripts/save/local_save_codec.gd` for UUID/opaque-id/timestamp format validation.
+
+Do not use for:
+- Issuing HTTP requests (`scripts/backend/backend_transport.gd` owns that), UI presentation, or
+  offline caching -- those belong to the catalog (`GAME-008`) and leaderboard (`GAME-009`)
+  providers that will consume these adapters.
 
 ## `scripts/save_providers/*.gd`
 

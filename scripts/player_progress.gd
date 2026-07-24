@@ -5,6 +5,7 @@ const SecureSessionStoreScript := preload("res://scripts/save/secure_session_sto
 const AccountSaveCoordinatorScript := preload("res://scripts/save/account_save_coordinator.gd")
 const GuestSessionBootstrapServiceScript := preload("res://scripts/save/guest_session_bootstrap_service.gd")
 const SaveSyncServiceScript := preload("res://scripts/save/save_sync_service.gd")
+const BackendTransportScript := preload("res://scripts/backend/backend_transport.gd")
 const ContentProvenanceManifestScript := preload(
 	"res://scripts/save/content_provenance_manifest.gd"
 )
@@ -71,6 +72,7 @@ var _account_coordinator
 var _local_store
 var _guest_bootstrap_service
 var _sync_service
+var _backend_transport
 var _content_provenance
 var _content_operation_diagnostic := {}
 
@@ -134,6 +136,10 @@ func load_progress() -> void:
 		_account_coordinator,
 		_content_provenance.is_valid()
 	)
+	if _backend_transport == null:
+		_backend_transport = BackendTransportScript.new()
+		add_child(_backend_transport)
+	_backend_transport.configure(_session_store, _active_player_id)
 	if _refresh_lives_state():
 		_commit_current_state([_life_state_operation()])
 	_guest_bootstrap_service.request_registration()
@@ -826,6 +832,13 @@ func get_active_save_namespace() -> Dictionary:
 	return _account_coordinator.get_active_namespace() if _account_coordinator != null else {}
 
 
+## GAME-007: shared authenticated read transport for backend features outside the focused save
+## services (Shop catalog, leaderboards, purchase status, device list). Session lifecycle and
+## active-player resolution are wired once here; callers only issue reads.
+func get_backend_transport():
+	return _backend_transport
+
+
 func get_local_save_diagnostics() -> Dictionary:
 	if _local_store == null:
 		return {}
@@ -872,6 +885,13 @@ func get_local_save_diagnostics() -> Dictionary:
 		),
 		"content_diagnostic": _current_content_diagnostic(),
 	}
+
+
+func _active_player_id() -> String:
+	if _local_store == null:
+		return ""
+	var save_namespace: Dictionary = _local_store.get_namespace()
+	return str(save_namespace.get("player_id", "")) if str(save_namespace.get("kind", "")) == "player" else ""
 
 
 func _activate_coordinator_result(result: Dictionary) -> void:

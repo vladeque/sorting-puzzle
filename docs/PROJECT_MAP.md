@@ -199,6 +199,35 @@ Change here when:
   smoke-check script. Save-sync end-to-end verification against PostgreSQL is `GAME-005`, not this
   system.
 
+### Shared Backend Transport (GAME-007)
+
+Files:
+- `scripts/backend/backend_transport.gd`
+- `scripts/backend/backend_read_operations.gd`
+- `scripts/player_progress.gd`
+- `tests/backend/test_game_007.gd`
+
+Responsibility:
+- Provides one reusable authenticated read transport for bodyless authenticated v1 `GET` reads
+  (`/v1/player/state`, `/v1/player/devices`, `/v1/catalog`, `/v1/purchases/{transaction_id}`,
+  `/v1/leaderboards/{scope}`), for backend features outside the focused save services owned by
+  `GAME-001`/`GAME-004`-`GAME-006`.
+- Owns bearer headers, a client-generated `X-Correlation-ID`, timeouts, response-envelope
+  validation, structured errors, retry classification, and exactly one refresh-and-replay on `401`.
+  Never invents a request body or protocol/app headers for these bodyless reads.
+- Retries only network failures, `429` (honoring `Retry-After`), and `502`/`503`/`504`, bounded to
+  one initial try plus four retries within 30 seconds, per the backend's documented read retry
+  policy; every other outcome (including `500`, which is mutation-retry-only) is terminal.
+- `scripts/backend/backend_read_operations.gd` holds closed protocol adapters that validate every
+  field they expose and map unrecognized response enum values to `"unknown"`.
+- `PlayerProgress.get_backend_transport()` exposes one configured instance wired to the existing
+  `SecureSessionStore` and active player id; it does not read or write save state itself.
+- Does not touch `scripts/save/save_sync_service.gd`'s mutation idempotency/retry behavior.
+
+Change here when:
+- Adding a new authenticated backend read, changing read retry/refresh policy, or building the
+  catalog (`GAME-008`) or leaderboard (`GAME-009`) providers that consume this transport.
+
 ### Leaderboards
 
 Files:

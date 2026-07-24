@@ -28,8 +28,10 @@ installed campaign play, local rewards, lives, or local spending.
 - The Android bridge source exists. As of `GAME-003` (2026-07-24), the checked-in Android export
   preset and Godot Android plugin (`addons/sorting_puzzle_secure_store_bridge/`) have been built
   and verified against a live local backend in an Android emulator.
-- Leaderboards and the Shop still select mock providers. There is no shared authenticated HTTP
-  client for these features.
+- Leaderboards and the Shop still select mock providers. `GAME-007` added a shared authenticated
+  read transport and closed protocol adapters (`scripts/backend/backend_transport.gd`,
+  `scripts/backend/backend_read_operations.gd`) for these features, but no provider yet uses it;
+  that is `GAME-008` (catalog) and `GAME-009` (leaderboards).
 
 ### Backend repository
 
@@ -218,6 +220,13 @@ Owner: both repositories
 
 Tracking: `GAME-007`, `GAME-008`, and `GAME-009`, plus a focused backend ticket for protocol-v2
 checkpoint-to-leaderboard materialization.
+
+Status: `GAME-007` implemented on 2026-07-25 -- the shared authenticated read transport
+(`scripts/backend/backend_transport.gd`) and its closed protocol adapters
+(`scripts/backend/backend_read_operations.gd`) exist and are proven against the real backend
+contract fixtures plus synthetic transport-fault coverage (`tests/backend/test_game_007.gd`).
+`GAME-008` and `GAME-009` (catalog/leaderboard providers, offline caching, UI wiring) remain
+planned.
 
 Deliverables:
 

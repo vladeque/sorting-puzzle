@@ -456,7 +456,7 @@ Automated verification:
 ## GAME-007 — Add a shared authenticated backend transport
 
 **Type:** Networking/Foundation
-**Status:** Planned
+**Status:** Implemented on 2026-07-25.
 **Description:** Provide reusable authenticated read transport and closed protocol adapters for
 backend features outside the focused save services.
 
@@ -473,6 +473,51 @@ backend features outside the focused save services.
   map unknown response enums to `unknown`.
 - Reads retry only on the approved network, rate-limit, and retryable dependency outcomes.
 - Shared v1 and v1.1 success/error fixtures pass in Godot.
+
+**Implementation notes:**
+
+- `scripts/backend/backend_transport.gd` (`BackendTransport`) is a new `Node`, wired once by
+  `PlayerProgress` (`get_backend_transport()`) alongside the existing `SecureSessionStore`. It
+  issues bodyless authenticated v1 `GET` reads with an `Authorization: Bearer` header and a
+  client-generated `X-Correlation-ID`, validates the success/error envelope shape (including the
+  bodyless-GET rule that `request_id` equals the final `correlation_id`), and classifies retries
+  per the backend's documented client read policy: network failures, `429` (honoring
+  `Retry-After`), and `502`/`503`/`504` retry up to one initial try plus four retries within 30
+  seconds; every other outcome, including `500` (mutation-retry-only per the backend's status
+  table), is terminal. Exactly one refresh-and-replay is attempted on `401` via
+  `POST /v1/sessions/refresh`, self-contained to this file so `scripts/save/save_sync_service.gd`'s
+  existing mutation idempotency/retry behavior is untouched, as `LOCAL_BACKEND_INTEGRATION.md`
+  requires.
+- `scripts/backend/backend_read_operations.gd` (`BackendReadOperations`) adapts the five bodyless
+  v1 reads named in the backend's `PROTOCOL_BOUNDARY.md` (player state, player devices, catalog,
+  one purchase, one leaderboard scope) against the exact required-field/enum definitions in the
+  backend's `packages/protocol/schemas/v1/protocol.schema.json`. Every adapter type-checks its
+  required fields (reusing `LocalSaveCodec.is_uuid`/`is_opaque_id`/`is_timestamp`, and the
+  established `value is int or (value is float and integral)` check for JSON-decoded integers),
+  reads only the keys it exposes so additive response fields are ignored by construction, and maps
+  unrecognized enum values to `"unknown"`.
+- `tests/backend/test_game_007.gd` feeds the real backend contract fixtures from the sibling
+  `../sorting-puzzle-backend/contracts/fixtures/v1/{success,error}/*.json` straight into the
+  adapters (proving the shared fixtures parse in Godot, per the acceptance criterion) and a
+  duplicated player-state fixture with unrecognized `account_kind`/`moderation_state` values into
+  `parse_player_state()` (proving the `unknown` mapping). A `BackendTransport` subclass overriding
+  only the `_send_get`/`_send_post`/`_wait_before_retry` network/timing seams (the same test-double
+  pattern `tests/save/test_game_006.gd` uses for `SaveSyncService`) drives network-failure retry,
+  `429` `Retry-After` handling, `502`/`503`/`504` retry, terminal `400`/`403`/`404`/`426`/`500`
+  handling, retry-budget exhaustion, a full `401` -> refresh -> replay round trip, a second `401`
+  after refresh, an unknown refresh transport outcome, and a malformed refresh response, all
+  without opening a real socket or a real delay.
+- No new project settings were added; the transport reuses `application/config/backend_base_url`
+  and requires a valid stored session for the active player, which is already gated by
+  `application/config/save_sync_v2_enabled` at guest-registration time (`GAME-004`).
+- Catalog (`GAME-008`) and leaderboard (`GAME-009`) provider integration, offline caching, and
+  UI wiring are explicitly out of scope for this ticket.
+
+Automated verification:
+
+```powershell
+& 'D:\Godot\godot.exe' --headless --verbose --path . --script tests/backend/test_game_007.gd
+```
 
 ## GAME-008 — Integrate the backend Shop catalog locally
 
