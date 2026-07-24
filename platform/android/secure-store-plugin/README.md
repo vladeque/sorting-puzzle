@@ -84,8 +84,9 @@ tails `adb logcat` for the non-secret `[LocalBackendDebug]` lines emitted by
 It only covers the Android-side half of the flow (your backend must already be running locally);
 the script resolves adb from an explicit `-AdbPath`, PATH, Android SDK environment variables, or
 the standard Windows user SDK location. It succeeds only after observing the local override,
-`/health/live` HTTP 200, and the secure bridge in logcat. Full PostgreSQL/API/emulator
-orchestration is `GAME-010`, not this script.
+`/health/live` HTTP 200, and the secure bridge in logcat. It fails if the exported runtime rejects
+the packaged GAME-002 content manifest. Full PostgreSQL/API/emulator orchestration is `GAME-010`,
+not this script.
 
 Verified on 2026-07-24 with Godot 4.6.2, JDK 17, Android SDK Platforms 35/36, and an Android
 emulator against the live local backend. An unsigned release verification build also confirmed

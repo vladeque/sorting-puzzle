@@ -327,6 +327,11 @@ Contract:
 - `levels` maps campaign levels 1-8 to exact opaque configuration, level, and rules versions.
 - `source.files` pins the authored Godot files used by that publication.
 - Levels 9-10 remain explicitly excluded and produce no uploadable campaign operation.
+- Runtime validates the packaged manifest's closed schema, self-digest, publication identity, and
+  level mappings. It deliberately does not hash raw authored `.gd`/`.tscn` files because Godot
+  export templates compile/remap them.
+- The pre-export check runs with raw-source verification enabled and remains responsible for
+  rejecting stale source hashes before an APK is produced.
 
 Verification:
 
@@ -335,8 +340,10 @@ Verification:
 pnpm --dir ..\sorting-puzzle-backend check:development-client-manifest
 ```
 
-Both commands must pass before export. Missing, incomplete, stale, or digest-mismatched content
-disables guest registration and synchronization while local campaign state remains writable.
+Both commands must pass before export. At runtime, missing, incomplete, digest-mismatched, or
+provenance-invalid packaged content disables guest registration and synchronization while local
+campaign state remains writable. Source staleness is rejected before export while the authored
+source tree is available.
 
 ## Leaderboard Provider Setting
 

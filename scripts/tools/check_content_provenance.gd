@@ -7,7 +7,7 @@ const ContentProvenanceManifestScript := preload(
 
 func _init() -> void:
 	var manifest = ContentProvenanceManifestScript.new()
-	var result: Dictionary = manifest.load_manifest()
+	var result: Dictionary = manifest.load_manifest_with_source_verification()
 	if not bool(result.get("ok", false)):
 		push_error(
 			"GAME-002 content provenance check failed [%s]: %s" % [

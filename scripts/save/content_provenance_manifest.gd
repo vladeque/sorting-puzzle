@@ -14,7 +14,22 @@ var _levels := {}
 var _diagnostic := {}
 
 
-func load_manifest(path: String = DEFAULT_PATH, verify_source_files: bool = true) -> Dictionary:
+## Runtime validation is export-stable: it verifies the packaged manifest's closed schema,
+## self-digest, publication identity, and complete level mapping, but does not re-hash authored
+## `.gd`/`.tscn` inputs because export templates compile/remap those files.
+##
+## Pre-export tooling must call `load_manifest_with_source_verification()` while the authored
+## source tree is available. That remains the fail-closed gate for stale source/publication
+## mappings.
+func load_manifest(path: String = DEFAULT_PATH) -> Dictionary:
+	return _load_manifest(path, false)
+
+
+func load_manifest_with_source_verification(path: String = DEFAULT_PATH) -> Dictionary:
+	return _load_manifest(path, true)
+
+
+func _load_manifest(path: String, verify_source_files: bool) -> Dictionary:
 	_reset()
 	var file := FileAccess.open(path, FileAccess.READ)
 	if file == null:

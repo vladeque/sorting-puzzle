@@ -526,7 +526,10 @@ Class:
 Purpose:
 - Loads the generated GAME-002 manifest from `configs/backend/content_provenance.json`.
 - Validates its closed schema, canonical digest, content-addressed configuration identity,
-  source-file hashes, complete levels 1-8 mapping, and explicit levels 9-10 exclusion.
+  complete levels 1-8 mapping, and explicit levels 9-10 exclusion at runtime.
+- Does not require raw authored `.gd`/`.tscn` files at runtime because Godot export templates
+  compile/remap them. `load_manifest_with_source_verification()` is reserved for pre-export
+  tooling and tests, where it validates every pinned source-file hash.
 - Returns exact immutable campaign provenance to `PlayerProgress` without constructing fallback
   protocol identifiers.
 - Exposes only bounded non-secret diagnostics when invalid; the caller keeps local play available
@@ -536,6 +539,7 @@ Purpose:
 
 Purpose:
 - Headless pre-export check for missing, stale, incomplete, or digest-mismatched provenance.
+- Explicitly enables raw-source verification while the authored project tree is available.
 - Exits unsuccessfully before export when the packaged campaign sources differ from the backend
   publication.
 
@@ -549,6 +553,8 @@ Purpose:
   user SDK location.
 - Exits `0` only once a local override, `/health/live` HTTP 200, and
   `secure_bridge_available=true` are all observed in logcat, or `1` after a timeout.
+- Fails immediately if Android runtime logs show `PlayerProgress` rejected the packaged GAME-002
+  content manifest.
 - Covers only the Android-side half of the local-backend flow; does not start the backend itself
   or provision PostgreSQL/the API (`GAME-010`).
 

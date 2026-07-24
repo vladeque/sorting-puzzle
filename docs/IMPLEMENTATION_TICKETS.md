@@ -161,7 +161,8 @@ indefinitely without connectivity or player-visible pending-reward state.
 ## GAME-002 — Consume canonical backend content provenance
 
 **Type:** Foundation
-**Status:** Complete - implemented on 2026-07-24
+**Status:** Complete - implemented on 2026-07-24; exported-runtime verification corrected on
+2026-07-24.
 **Description:** Replace synthetic configuration, level, and rules identifiers with a generated
 client manifest produced from the same immutable backend publication used by local development.
 
@@ -177,6 +178,11 @@ client manifest produced from the same immutable backend publication used by loc
 - A check command rejects a stale, incomplete, or digest-mismatched manifest before export.
 - Runtime code never invents fallback protocol provenance. An invalid manifest disables
   synchronization with a non-secret diagnostic while local campaign play remains available.
+- Runtime validation checks the packaged manifest's schema, digest, publication identity, and
+  mappings without requiring raw authored `.gd`/`.tscn` files that Godot compiles/remaps during
+  export. Raw source hashes remain mandatory in the pre-export check.
+- Android regression coverage exports/installs the real debug APK and makes the local-backend smoke
+  check fail if runtime rejects the packaged manifest.
 - The first integration slice covers levels 1-8; levels 9-10 are not marked integration-ready
   until their duplicate campaign-level declarations are corrected and republished.
 

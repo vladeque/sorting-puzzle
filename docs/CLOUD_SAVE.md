@@ -168,7 +168,10 @@ screenshots of platform credentials from players.
 
 `ContentProvenanceManifest` validates
 `configs/backend/content_provenance.json` before `PlayerProgress` configures guest bootstrap or save
-synchronization. A missing, stale, incomplete, or digest-mismatched manifest fails closed for
+synchronization. Runtime validation covers the packaged manifest's schema, digest, immutable
+publication identity, and complete level mapping; raw authored source hashes are checked by the
+mandatory pre-export command because Godot compiles/remaps `.gd`/`.tscn` files in exported builds.
+A missing, incomplete, digest-mismatched, or provenance-invalid packaged manifest fails closed for
 networking but does not block snapshot commits or campaign play. Campaign levels outside the
 manifest remain local and do not append an uploadable completion/attempt operation.
 

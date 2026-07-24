@@ -64,6 +64,9 @@ installed campaign play, local rewards, lives, or local spending.
    - Load the generated manifest in `PlayerProgress` when creating campaign operations. Missing or
      mismatched provenance must fail locally with a diagnostic instead of uploading an invalid
      operation forever.
+   - Verify authored source hashes before export. Exported runtime validation must use the
+     manifest's schema/self-digest/publication mapping and must not depend on raw `.gd`/`.tscn`
+     files that Godot compiles or remaps.
    - For the first slice, publish levels 1-8 and constrain integration tests to those levels.
      Correct and validate levels 9-10 before claiming full bundled-campaign coverage.
 

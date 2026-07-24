@@ -8,7 +8,8 @@
   tails logcat for the non-secret [LocalBackendDebug] diagnostic lines emitted by
   scripts/save/local_backend_debug_bootstrap.gd. Exits 0 once a local override, a health-probe
   HTTP 200 response, and secure_bridge_available=true have all been observed, or exits 1 after
-  the timeout.
+  the timeout. It also fails immediately if PlayerProgress rejects the packaged content manifest,
+  which protects the exported-runtime GAME-002 provenance gate.
 
   This does not start the backend itself (see the sibling sorting-puzzle-backend repository's local
   bootstrap docs for that) and does not automate PostgreSQL/API/emulator provisioning end-to-end;
@@ -101,7 +102,15 @@ $sawHealthyResponse = $false
 $sawBridge = $false
 
 while ((Get-Date) -lt $deadline) {
-    $matches = & $adb logcat -d 2>$null | Select-String "\[LocalBackendDebug\]"
+    $logcat = & $adb logcat -d 2>$null
+    $provenanceFailure = $logcat |
+        Select-String "Backend synchronization disabled \[content_manifest\." |
+        Select-Object -First 1
+    if ($null -ne $provenanceFailure) {
+        Write-Error "The packaged content manifest was rejected: $($provenanceFailure.Line)"
+        exit 1
+    }
+    $matches = $logcat | Select-String "\[LocalBackendDebug\]"
     foreach ($entry in $matches) {
         if ($entry -match "local override active") { $sawOverride = $true }
         if ($entry -match "health probe result=0 response_code=200") {

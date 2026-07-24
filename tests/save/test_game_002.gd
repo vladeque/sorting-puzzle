@@ -14,7 +14,7 @@ var _failures := PackedStringArray()
 
 func _init() -> void:
 	var manifest = ContentProvenanceManifestScript.new()
-	var result: Dictionary = manifest.load_manifest()
+	var result: Dictionary = manifest.load_manifest_with_source_verification()
 	_check(bool(result.get("ok", false)), "generated manifest loads with source verification")
 	_check(manifest.is_valid(), "generated manifest is integration-ready")
 	_check(
@@ -77,6 +77,7 @@ func _init() -> void:
 		str(stale_result.get("code", "")) == "content_manifest.source_stale",
 		"stale source mapping has a stable non-secret diagnostic"
 	)
+	_test_export_runtime_validation(source_document)
 	_test_invalid_provenance_network_gates()
 
 	if _failures.is_empty():
@@ -97,6 +98,34 @@ func _read_manifest() -> Dictionary:
 		return {}
 	var parsed = JSON.parse_string(file.get_as_text())
 	return parsed as Dictionary if parsed is Dictionary else {}
+
+
+func _test_export_runtime_validation(source_document: Dictionary) -> void:
+	var remapped := source_document.duplicate(true)
+	var source := remapped.get("source", {}) as Dictionary
+	var source_files := source.get("files", []) as Array
+	(source_files[0] as Dictionary)["path"] = "scripts/source_unavailable_after_export.gd"
+	var hashable := remapped.duplicate(true)
+	hashable.erase("digest_sha256")
+	remapped["digest_sha256"] = Codec.sha256_json(hashable)
+
+	var runtime_manifest = ContentProvenanceManifestScript.new()
+	var runtime_result: Dictionary = runtime_manifest.load_document(remapped)
+	_check(
+		bool(runtime_result.get("ok", false)),
+		"export runtime accepts an integrity-valid manifest without authored source files"
+	)
+
+	var pre_export_manifest = ContentProvenanceManifestScript.new()
+	var pre_export_result: Dictionary = pre_export_manifest.load_document(remapped, true)
+	_check(
+		not bool(pre_export_result.get("ok", false)),
+		"pre-export validation still rejects an unavailable authored source file"
+	)
+	_check(
+		str(pre_export_result.get("code", "")) == "content_manifest.source_stale",
+		"pre-export missing source uses the stable source-stale diagnostic"
+	)
 
 
 func _test_invalid_provenance_network_gates() -> void:
