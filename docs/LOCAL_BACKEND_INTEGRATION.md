@@ -123,6 +123,9 @@ installed campaign play, local rewards, lives, or local spending.
 
 Owner: backend repository
 
+Tracking: create a focused backend-local bootstrap ticket in the backend backlog. This work is not
+owned by a `GAME-*` ticket.
+
 Deliverables:
 
 - An ignored local-secret generator and a documented `SORTING_PUZZLE_SECRET_ROOT`.
@@ -144,6 +147,8 @@ Exit gate:
 
 Owner: game repository
 
+Tracking: `GAME-002` and `GAME-003`.
+
 Deliverables:
 
 - Packaged Android secure-store plugin and debug export preset.
@@ -161,6 +166,8 @@ Exit gate:
 ### Phase L2 - Prove identity and cloud-save synchronization
 
 Owner: game repository with backend fixtures and local stack
+
+Tracking: `GAME-004`, `GAME-005`, and `GAME-006`.
 
 Deliverables:
 
@@ -186,6 +193,9 @@ Exit gate:
 
 Owner: both repositories
 
+Tracking: `GAME-007`, `GAME-008`, and `GAME-009`, plus a focused backend ticket for protocol-v2
+checkpoint-to-leaderboard materialization.
+
 Deliverables:
 
 - Shared authenticated Godot transport used by server catalog and leaderboard adapters.
@@ -207,6 +217,8 @@ Exit gate:
 ### Phase L4 - Automate the local integration gate
 
 Owner: both repositories
+
+Tracking: `GAME-010`, with any backend-owned orchestration support committed separately.
 
 Deliverables:
 
@@ -260,9 +272,11 @@ provider boundaries created locally must remain suitable for their later impleme
 
 ## Recommended first implementation batch
 
-Implement Phase L0 and Phase L1 together as the first meaningful batch. They are the critical path:
-until the backend has active development content and the emulator can sign and reach it, higher
-level client adapters cannot be tested against reality.
+Implement the backend Phase L0 ticket first, followed by `GAME-002` and `GAME-003`. They are the
+critical path: until the backend has active development content, the game has matching provenance,
+and the emulator can sign and reach the API, higher-level client adapters cannot be tested against
+reality.
 
-Do not begin Shop purchase integration during this batch. After the first successful real
-guest-and-save sync, implement Phase L2 reliability cases, then add catalog and leaderboard reads.
+Do not begin Shop purchase integration during this batch. Complete `GAME-004` through `GAME-006`
+for real guest-and-save synchronization and recovery, then add the read-only transport, catalog,
+and leaderboard tickets.

@@ -158,45 +158,195 @@ indefinitely without connectivity or player-visible pending-reward state.
 - Update `docs/CLOUD_SAVE.md`, `docs/SCRIPTS.md`, `docs/PROJECT_MAP.md`, relevant scene documentation,
   and release/support troubleshooting instructions to identify each new owner and recovery path.
 
-## GAME-002 — Integrate the Godot client with the local backend on Android
+## GAME-002 — Consume canonical backend content provenance
 
-**Type:** Product/Foundation
+**Type:** Foundation
 **Status:** Planned
-**Description:** Package the Android secure bridge, align immutable content provenance, run the
-existing guest/session and protocol-v2 save path against the PostgreSQL-backed local API, and add
-backend catalog and leaderboard adapters without making campaign play connectivity-dependent.
+**Description:** Replace synthetic configuration, level, and rules identifiers with a generated
+client manifest produced from the same immutable backend publication used by local development.
 
-**Plan:** [`LOCAL_BACKEND_INTEGRATION.md`](LOCAL_BACKEND_INTEGRATION.md)
+**Plan phase:** L1 in [`LOCAL_BACKEND_INTEGRATION.md`](LOCAL_BACKEND_INTEGRATION.md)
 
-**Depends on:**
-
-- `GAME-001`
-- Backend `BE-102`, `BE-103`, `BE-307`, `BE-401`, and `BE-502`
-- A reproducible backend development-secret and content/catalog bootstrap
-- Backend materialization of protocol-v2 selected completions into leaderboard query state
-
-**Local scope:**
-
-- Android emulator debug builds connected to the developer-hosted API through `adb reverse`.
-- Real Android Keystore installation signatures, real access/refresh sessions, and real
-  PostgreSQL save checkpoints.
-- Development game configuration and Shop catalog publication.
-- Read-only server catalog and leaderboard integration.
-
-**Deferred:** Production deployment, platform account authentication/linking, real purchases,
-provider notifications, attestation, iOS, privacy/administration UI, and deterministic gameplay
-replay.
+**Depends on:** `GAME-001` and the backend development-configuration bootstrap.
 
 **Acceptance criteria:**
 
-- A clean local stack can be bootstrapped idempotently and reaches ready state.
-- A debug APK registers a guest, binds the installation namespace, uploads signed v2 operations,
-  survives app/API interruption, refreshes its session once when required, and reconciles the
-  returned checkpoint without duplicate effects.
-- Campaign operations use backend-generated immutable configuration, level, and rules identifiers.
-- The Shop consumes the active backend development catalog while mock price/purchase behavior stays
-  visibly development-only.
-- Backend leaderboards reflect selected unique v2 completions and preserve existing pagination and
-  current-player behavior.
-- Shared v1/v1.1/v2 fixtures pass in TypeScript and Godot, and no local integration diagnostic
-  exposes credentials, signatures, or request bodies.
+- The bundled manifest maps every supported campaign level to one exact opaque
+  `configuration_version`, `level_version`, and `rules_version`.
+- `PlayerProgress` uses the mapping for campaign completion and attempt journal operations.
+- A check command rejects a stale, incomplete, or digest-mismatched manifest before export.
+- Runtime code never invents fallback protocol provenance. An invalid manifest disables
+  synchronization with a non-secret diagnostic while local campaign play remains available.
+- The first integration slice covers levels 1-8; levels 9-10 are not marked integration-ready
+  until their duplicate campaign-level declarations are corrected and republished.
+
+## GAME-003 — Package the Android local-backend debug target
+
+**Type:** Platform/Foundation
+**Status:** Planned
+**Description:** Package the existing Android secure-store bridge and create a safe debug export
+that can reach the developer-hosted API from an Android emulator.
+
+**Plan phase:** L1 in [`LOCAL_BACKEND_INTEGRATION.md`](LOCAL_BACKEND_INTEGRATION.md)
+
+**Depends on:** `GAME-001`
+
+**Acceptance criteria:**
+
+- The secure-store AAR is built and loaded as `SortingPuzzleSecureStoreBridge`.
+- The debug export enables Gradle Build, Internet access, and debug-only cleartext HTTP.
+- The documented default uses `adb reverse tcp:8080 tcp:8080`; `10.0.2.2` is documented as a
+  fallback.
+- Backend URL and synchronization enablement are supplied through a local-only configuration path.
+- Committed release defaults keep the backend URL empty and synchronization disabled.
+- An emulator smoke check reaches the local `/health/live` endpoint and confirms bridge
+  availability without exporting private key material.
+
+## GAME-004 — Prove local guest registration and session persistence
+
+**Type:** Identity integration
+**Status:** Planned
+**Description:** Exercise the existing guest challenge/bootstrap and rotating-session code against
+the real local API using Android Keystore signatures.
+
+**Plan phase:** L2 in [`LOCAL_BACKEND_INTEGRATION.md`](LOCAL_BACKEND_INTEGRATION.md)
+
+**Depends on:** `GAME-003`, backend `BE-102` and `BE-103`, and the backend local-secret bootstrap.
+
+**Acceptance criteria:**
+
+- A new emulator installation completes the signed challenge/bootstrap flow and receives a real
+  guest player, device, and session.
+- The installation guest namespace is rebound exactly once to the returned `player_id`.
+- Session ciphertext and the installation private key remain inside the Android secure boundary.
+- Killing and restarting the app resumes the same player session without creating a second guest.
+- Access-token expiry performs one successful rotating refresh and stores the replacement session.
+- Malformed, expired, replayed, and binding-mismatched bootstrap/session responses are covered.
+
+## GAME-005 — Prove protocol-v2 save synchronization against PostgreSQL
+
+**Type:** Save integration
+**Status:** Planned
+**Description:** Run the existing local-first operation journal and checkpoint reconciliation
+against the real protocol-v2 API and database.
+
+**Plan phase:** L2 in [`LOCAL_BACKEND_INTEGRATION.md`](LOCAL_BACKEND_INTEGRATION.md)
+
+**Depends on:** `GAME-002`, `GAME-004`, and backend `BE-307`
+
+**Acceptance criteria:**
+
+- Empty sync and signed completion, attempt, spend, life, and profile operations are accepted.
+- The acknowledged cursor advances to the submitted sequence and the returned checkpoint is applied
+  atomically.
+- Operations beyond the acknowledged cursor remain local and replay over the checkpoint.
+- Multi-batch continuation reaches the journal head without blocking scene changes.
+- PostgreSQL contains the expected player/device stream, deduplicated operations, cursor snapshots,
+  checkpoint, and outbox relationship.
+- Existing Godot save tests and shared protocol-v2 fixtures continue to pass.
+
+## GAME-006 — Harden local save synchronization recovery
+
+**Type:** Reliability
+**Status:** Planned
+**Description:** Verify that authentication, network, server, and cursor failures preserve local
+play and converge without duplicate effects.
+
+**Plan phase:** L2 in [`LOCAL_BACKEND_INTEGRATION.md`](LOCAL_BACKEND_INTEGRATION.md)
+
+**Depends on:** `GAME-005`
+
+**Acceptance criteria:**
+
+- Request timeout, response loss, app kill, API restart, database outage, `429`, and retryable
+  `5xx` cases persist retry state and replay the identical payload/idempotency tuple.
+- A `401` performs at most one refresh/replay and unknown refresh outcomes do not reuse a rotating
+  credential.
+- Cursor conflict fetches remote state and reconciles before retry.
+- Disabling v2 ingestion never blocks local play; re-enabling it later drains the journal.
+- Overspend adjustments clamp the affected asset without rolling back completed campaign levels.
+- Diagnostics expose stable error and correlation identifiers but no tokens, signatures, request
+  bodies, or secret paths.
+
+## GAME-007 — Add a shared authenticated backend transport
+
+**Type:** Networking/Foundation
+**Status:** Planned
+**Description:** Provide reusable authenticated read transport and closed protocol adapters for
+backend features outside the focused save services.
+
+**Plan phase:** L3 in [`LOCAL_BACKEND_INTEGRATION.md`](LOCAL_BACKEND_INTEGRATION.md)
+
+**Depends on:** `GAME-004`
+
+**Acceptance criteria:**
+
+- The transport owns bearer headers, request metadata where applicable, correlation IDs, timeouts,
+  response-envelope validation, structured errors, retry classification, and one refresh/replay.
+- Bodyless v1 GET requests send no invented request body or protocol headers.
+- Operation adapters validate required Godot `Variant` types, ignore additive response fields, and
+  map unknown response enums to `unknown`.
+- Reads retry only on the approved network, rate-limit, and retryable dependency outcomes.
+- Shared v1 and v1.1 success/error fixtures pass in Godot.
+
+## GAME-008 — Integrate the backend Shop catalog locally
+
+**Type:** Commerce read integration
+**Status:** Planned
+**Description:** Populate the existing Shop from the authenticated backend development catalog
+while keeping price lookup and purchasing explicitly local/mock.
+
+**Plan phase:** L3 in [`LOCAL_BACKEND_INTEGRATION.md`](LOCAL_BACKEND_INTEGRATION.md)
+
+**Depends on:** `GAME-007`, backend `BE-401`, and an active development catalog.
+
+**Acceptance criteria:**
+
+- The Shop displays only eligible offers returned by `GET /v1/catalog`.
+- Backend rewards and product IDs are joined with mock provider-formatted regional prices without
+  trusting local catalog eligibility.
+- No purchase-intent or verification endpoint is called in this ticket.
+- Mock grants remain visibly development-only and cannot be represented as verified purchases.
+- Loading, empty, unavailable, unauthorized, cached, and malformed catalog responses are covered.
+
+## GAME-009 — Integrate backend leaderboards locally
+
+**Type:** Ranking read integration
+**Status:** Planned
+**Description:** Replace mock ranking data in backend-enabled debug builds with authenticated
+weekly, country, and world leaderboard reads.
+
+**Plan phase:** L3 in [`LOCAL_BACKEND_INTEGRATION.md`](LOCAL_BACKEND_INTEGRATION.md)
+
+**Depends on:** `GAME-007`, backend `BE-502`, and backend protocol-v2 completion materialization.
+
+**Acceptance criteria:**
+
+- The provider normalizes entries, current-player row, period end, limit, and opaque cursor fields
+  for the existing leaderboard screen.
+- Pagination, ties, current player outside the page, empty rankings, and cursor expiry are covered.
+- The most recent successful page is available offline and refreshes silently after synchronization.
+- Country scope follows the backend's no-country behavior and never infers country locally.
+- Two local players with different selected v2 completions appear in deterministic score order.
+
+## GAME-010 — Automate the Android local-backend integration gate
+
+**Type:** Tooling/Verification
+**Status:** Planned
+**Description:** Turn the clean-start Android emulator flow into a repeatable local verification
+command and troubleshooting runbook.
+
+**Plan phase:** L4 in [`LOCAL_BACKEND_INTEGRATION.md`](LOCAL_BACKEND_INTEGRATION.md)
+
+**Depends on:** `GAME-006`, `GAME-008`, and `GAME-009`
+
+**Acceptance criteria:**
+
+- One documented flow starts PostgreSQL, migrates and bootstraps development data, starts and waits
+  for the API, configures `adb reverse`, installs the debug APK, and runs the smoke scenario.
+- The flow verifies persisted identity/session, save cursor/checkpoint, outbox, catalog, and
+  leaderboard results.
+- Cleanup targets only a dedicated disposable integration database or explicitly named test data.
+- Failures identify the phase, stable error code, and correlation ID without exposing secrets.
+- Client and backend changes remain separate commits and identify the shared content/fixture
+  versions used by the run.
