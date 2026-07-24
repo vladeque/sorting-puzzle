@@ -1,0 +1,1 @@
+Follow AGENTS.md for all conventions in this repo, including the git workflow section
