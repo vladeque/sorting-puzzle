@@ -202,6 +202,8 @@ Automated verification:
 & 'D:\Godot\godot.exe' --headless --path . --script scripts/tools/check_content_provenance.gd
 & 'D:\Godot\godot.exe' --headless --verbose --path . --script tests/save/test_local_backend_debug_bootstrap.gd
 & 'D:\Godot\godot.exe' --headless --verbose --path . --script tests/save/test_game_004.gd
+& 'D:\Godot\godot.exe' --headless --verbose --path . --script tests/save/test_game_005.gd
+& 'D:\Godot\godot.exe' --headless --verbose --path . --script tests/save/test_game_006.gd
 pnpm --dir ..\sorting-puzzle-backend check:development-client-manifest
 ```
 
@@ -210,6 +212,18 @@ pnpm --dir ..\sorting-puzzle-backend check:development-client-manifest
 (`auth.refresh_reuse_detected`), and device-binding-mismatched response bodies, and proves the
 one-time guest rebind and the single-refresh-attempt guard survive a simulated app restart
 (`AccountSaveCoordinator` reopened against the same installation).
+
+`tests/save/test_game_006.gd` (GAME-006) feeds `SaveSyncService._on_request_completed` every
+non-success `HTTPRequest.Result` (timeout, response loss, connection refused) plus `429`/`500`/`503`
+and confirms the identical pending payload/idempotency tuple persists and replays, including across
+a simulated app kill/restart; drives a full `401` -> refresh -> replay round trip plus the
+transport-failure-during-refresh (`auth.refresh_result_unknown`) path GAME-004 did not exercise;
+drives a `409 save_sync.cursor_mismatch` through the real `GET /v2/saves/state` fetch-and-reconcile
+flow; proves the v2 feature flag never blocks a local commit and that re-enabling it drains the
+accumulated journal in one request; calls `PlayerProgress._map_checkpoint_to_snapshot` directly (the
+real mapper, not the no-op one other suites use) to prove an overspend clamp never rolls back
+completed campaign levels; and confirms `get_local_save_diagnostics()` never serializes an injected
+access token, refresh token, signature, or raw request body.
 
 Android release verification requires JDK 17, Android SDK 36, the Gradle export path, and physical
 device tests for Keystore, airplane-mode transitions, process death/reboot, account switching, and

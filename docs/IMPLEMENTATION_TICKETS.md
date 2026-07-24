@@ -400,7 +400,11 @@ GAME-004 already found real defects with.
 ## GAME-006 — Harden local save synchronization recovery
 
 **Type:** Reliability
-**Status:** Planned
+**Status:** Implemented and gap-tested on 2026-07-25. No production defect was found: GAME-001,
+GAME-004, and GAME-005 had already implemented every behavior this ticket requires
+(`SaveSyncService`'s persisted pending-request replay, single-refresh guard, `auth.refresh_result_unknown`
+transport-failure branch, cursor-mismatch state fetch, and the feature-flag gate; `PlayerProgress`'s
+checkpoint mapper). None of it was exercised end-to-end by an existing test until now.
 **Description:** Verify that authentication, network, server, and cursor failures preserve local
 play and converge without duplicate effects.
 
@@ -411,14 +415,43 @@ play and converge without duplicate effects.
 **Acceptance criteria:**
 
 - Request timeout, response loss, app kill, API restart, database outage, `429`, and retryable
-  `5xx` cases persist retry state and replay the identical payload/idempotency tuple.
+  `5xx` cases persist retry state and replay the identical payload/idempotency tuple. Proven by
+  `tests/save/test_game_006.gd` feeding `SaveSyncService._on_request_completed()` every non-success
+  `HTTPRequest.Result` plus `429`/`500`/`503`, and by reopening a `LocalSaveStore`/`SaveSyncService`
+  pair against the same on-disk namespace to simulate an app kill/restart.
 - A `401` performs at most one refresh/replay and unknown refresh outcomes do not reuse a rotating
-  credential.
-- Cursor conflict fetches remote state and reconciles before retry.
-- Disabling v2 ingestion never blocks local play; re-enabling it later drains the journal.
+  credential. GAME-004 already proved the single-refresh-attempt guard and malformed/replayed
+  refresh handling; GAME-006 adds the previously untested paths: a full 401 -> refresh -> replay
+  round trip that reuses the identical pending payload/idempotency tuple with the rotated access
+  token, and a transport-level failure *during* the refresh call itself
+  (`auth.refresh_result_unknown`), which never retries and never overwrites the stored session.
+- Cursor conflict fetches remote state and reconciles before retry. Proven end-to-end: a `409
+  save_sync.cursor_mismatch` triggers `GET /v2/saves/state`, and only after that response
+  reconciles (cursor adopted, pending request cleared, `reconciliation_applied` emitted) does any
+  further sync attempt become possible.
+- Disabling v2 ingestion never blocks local play; re-enabling it later drains the journal. Proven
+  by committing local mutations with the feature flag off (commits succeed, no request is built),
+  then flipping the flag and confirming the next `request_background_sync()` drains the full
+  accumulated journal in one request. Draining is event-driven (the next local mutation or the next
+  app start calls `request_background_sync()` again), not a mid-session flag-change listener; there
+  is no requirement for one and none was added.
 - Overspend adjustments clamp the affected asset without rolling back completed campaign levels.
+  Every existing test had configured `SaveSyncService` with a no-op checkpoint mapper
+  (`func(checkpoint, current, remaining): return current`), so `PlayerProgress._map_checkpoint_to_snapshot()`
+  /`_apply_unacknowledged_operation()` — where the actual clamp-without-rollback behavior lives —
+  was untested end-to-end. GAME-006 calls the real mapper directly and confirms a checkpoint with a
+  floored `balances.coins` leaves `campaign.highest_completed_level`/`current_level` untouched, and
+  that replaying a further local overspend on top floors at zero instead of going negative.
 - Diagnostics expose stable error and correlation identifiers but no tokens, signatures, request
-  bodies, or secret paths.
+  bodies, or secret paths. Proven by seeding a terminal error, correlation id, adjustment, pending
+  request, and a real access/refresh token, then asserting `PlayerProgress.get_local_save_diagnostics()`'s
+  serialized output exposes the stable identifiers but contains none of the injected secret values.
+
+Automated verification:
+
+```powershell
+& 'D:\Godot\godot.exe' --headless --verbose --path . --script tests/save/test_game_006.gd
+```
 
 ## GAME-007 — Add a shared authenticated backend transport
 

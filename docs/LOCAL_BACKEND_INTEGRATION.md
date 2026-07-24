@@ -186,7 +186,11 @@ Status: `GAME-004` implemented and gap-tested on 2026-07-24 (live device end-to-
 by an emulator `HTTPRequest` POST issue; see the ticket entry). `GAME-005` implemented and
 gap-tested on 2026-07-25 -- the server/database half of protocol-v2 save synchronization is proven
 directly against a real running local backend and PostgreSQL; the same emulator POST issue blocks a
-live Godot-client-driven proof.
+live Godot-client-driven proof. `GAME-006` implemented and gap-tested on 2026-07-25 -- every
+reliability behavior this phase requires (persisted-replay retry, single-refresh guard, cursor-
+conflict reconciliation, feature-flag gating, overspend clamp, secret-free diagnostics) was already
+correctly implemented by `GAME-001`/`GAME-004`/`GAME-005`; no production defect was found, only test
+coverage was missing.
 
 Deliverables:
 
