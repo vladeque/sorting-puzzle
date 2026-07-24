@@ -536,6 +536,20 @@ Purpose:
   parsed response, and the single-refresh-attempt guard, malformed/replayed
   (`auth.refresh_reuse_detected`)/binding-mismatched refresh-response handling are covered end to
   end by `tests/save/test_game_004.gd`.
+- GAME-005: `_apply_response()`/`_apply_state_response()` were verified against a real
+  protocol-v2 API and PostgreSQL instance (empty sync, all five signed operation types, atomic
+  checkpoint/cursor application, two-request multi-batch continuation, idempotent replay, and a
+  stale-cursor conflict) by
+  `scripts/tools/local_backend_save_sync_integration_check.mjs`, and against the exact response
+  bodies it captured by `tests/save/test_game_005.gd`
+  (`tests/fixtures/save_sync_v2/*.json`). That gap-testing found and fixed two real defects in
+  `scripts/save/local_save_codec.gd`: `iso_timestamp()` used `Time.get_datetime_string_from_unix_time`'s
+  `use_space` argument backwards, emitting a space instead of the required ISO-8601 `T` separator
+  in every `meta.client_time`/`occurred_at`/`observed_at` value this client has ever sent (the live
+  backend confirmed this is rejected outright: `400 request.invalid` /
+  `request.schema.pattern`), and `is_timestamp()` only checked string length and a literal
+  `.000Z` suffix, so it never caught the malformed format and additionally rejected any
+  genuine non-`.000` millisecond value a real backend or another platform's clock could produce.
 
 ## `scripts/save/content_provenance_manifest.gd`
 
@@ -588,6 +602,27 @@ Purpose:
   content manifest.
 - Covers only the Android-side half of the local-backend flow; does not start the backend itself
   or provision PostgreSQL/the API (`GAME-010`).
+
+## `scripts/tools/local_backend_save_sync_integration_check.mjs`
+
+Purpose:
+- GAME-005 live-backend proof: a standalone Node.js script (no Godot runtime involved) that
+  performs genuine HTTP calls against a running local backend with a real generated P-256
+  installation key -- real guest challenge/bootstrap, real signed `campaign_completion` /
+  `campaign_attempt` / `resource_spend` / `life_state` / `profile_edit` operations, empty sync,
+  idempotent replay, two-request multi-batch continuation past the 500-operation limit, and a
+  stale-cursor conflict -- against the real protocol-v2 API and PostgreSQL.
+- Reads campaign-level provenance from `configs/backend/content_provenance.json` so
+  `campaign_completion`/`campaign_attempt` payloads reference the currently-published development
+  configuration.
+- Run with `node scripts/tools/local_backend_save_sync_integration_check.mjs` against a backend
+  started per `../../sorting-puzzle-backend/docs/LOCAL_DEVELOPMENT.md`
+  (`pnpm db:up && pnpm bootstrap:local && pnpm generate:local-secrets && pnpm dev:api`). Optional
+  `--base-url` and `--dump-fixtures <dir>` flags; the latter captures every real request/response
+  body used to produce `tests/fixtures/save_sync_v2/*.json`.
+- Complements the Android-only smoke checks above: proves the server/database half of protocol-v2
+  save synchronization directly, independent of the emulator `HTTPRequest` POST reliability issue
+  that still blocks a real on-device proof (see the GAME-004/GAME-005 ticket entries).
 
 ## `scripts/save_providers/*.gd`
 

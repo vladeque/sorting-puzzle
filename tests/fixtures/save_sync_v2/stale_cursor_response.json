@@ -1,0 +1,20 @@
+{
+  "status": 409,
+  "body": {
+    "meta": {
+      "protocol_version": "2.0",
+      "request_id": "64e74c5a-ac1c-423a-a2d3-545a8c3aca10",
+      "correlation_id": "c9f0575e-3724-46b1-b022-2fed9f3a58b4",
+      "server_time": "2026-07-24T21:41:30.794Z"
+    },
+    "error": {
+      "code": "save_sync.cursor_mismatch",
+      "category": "conflict",
+      "message": "The save journal cursor or operation conflicts with stored history",
+      "retryable": true,
+      "recovery": {
+        "action": "synchronize"
+      }
+    }
+  }
+}

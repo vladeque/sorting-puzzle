@@ -312,7 +312,9 @@ against the real backend — exactly what this ticket exists to do.
 ## GAME-005 — Prove protocol-v2 save synchronization against PostgreSQL
 
 **Type:** Save integration
-**Status:** Planned
+**Status:** Implemented and gap-tested on 2026-07-25. Two real defects were found and fixed. A live
+on-device (Android emulator) proof of the same POST path remains blocked by the `HTTPRequest`
+issue already documented under GAME-004; see "Device verification notes" below.
 **Description:** Run the existing local-first operation journal and checkpoint reconciliation
 against the real protocol-v2 API and database.
 
@@ -323,13 +325,77 @@ against the real protocol-v2 API and database.
 **Acceptance criteria:**
 
 - Empty sync and signed completion, attempt, spend, life, and profile operations are accepted.
+  Proven directly against the real API/database by
+  `scripts/tools/local_backend_save_sync_integration_check.mjs` using a genuine generated P-256
+  installation key (real guest challenge/bootstrap, then a real signed operation of each of the
+  five v2 types in one batch).
 - The acknowledged cursor advances to the submitted sequence and the returned checkpoint is applied
-  atomically.
-- Operations beyond the acknowledged cursor remain local and replay over the checkpoint.
-- Multi-batch continuation reaches the journal head without blocking scene changes.
+  atomically. Proven live (cursor reaches the submitted sequence; checkpoint reflects the merged
+  campaign completion, coin spend, and profile edit) and replayed through the real
+  `SaveSyncService._apply_response()`/`LocalSaveStore.apply_reconciliation()` code paths against the
+  exact captured response bodies by `tests/save/test_game_005.gd`.
+- Operations beyond the acknowledged cursor remain local and replay over the checkpoint. This
+  journal-retention behavior is unchanged GAME-001 `LocalSaveStore` logic (cursor advancement never
+  deletes unacknowledged entries; `compact_journal()` only trims already-acknowledged history) and
+  remains covered by `tests/save/test_game_001.gd`; GAME-005 additionally confirms the real
+  acknowledged-cursor values this logic reconciles against.
+- Multi-batch continuation reaches the journal head without blocking scene changes. Proven live
+  with a 520-operation continuation (two real `POST /v2/saves/sync` requests: 500 operations then
+  the remaining 20), confirming `continuation.has_more`/`next_device_sequence` match
+  `SaveSyncService`'s cursor-driven re-invocation (via `call_deferred("request_background_sync")`)
+  exactly.
 - PostgreSQL contains the expected player/device stream, deduplicated operations, cursor snapshots,
-  checkpoint, and outbox relationship.
-- Existing Godot save tests and shared protocol-v2 fixtures continue to pass.
+  checkpoint, and outbox relationship. Confirmed directly via `docker exec ... psql`: one row each
+  in `players`/`devices`/`sessions`, 525 deduplicated rows in `save_operations`
+  (`count(*) = count(DISTINCT operation_id)`), `save_device_streams.acknowledged_sequence = 525`
+  matching the journal head, five incrementing `save_checkpoints` generations (0 initial + 4 real
+  synchronize calls; the idempotent replay call correctly produced no new generation), and a
+  `save_checkpoint_outbox_events` -> `outbox_events` `save.checkpoint_merged.v1` row for each of the
+  four mutating generations.
+- Existing Godot save tests and shared protocol-v2 fixtures continue to pass. Reran
+  `test_game_001.gd`, `test_game_002.gd`, `test_game_004.gd`,
+  `test_local_backend_debug_bootstrap.gd`, and `test_player_progress_facade.gd` headless; all pass
+  alongside the new `test_game_005.gd`.
+
+**Real defects found and fixed while gap-testing:**
+
+1. `LocalSaveCodec.iso_timestamp()` (`scripts/save/local_save_codec.gd`) called
+   `Time.get_datetime_string_from_unix_time(timestamp, true)`. That second argument is
+   `use_space`, not a UTC flag (Godot's unix-time-based `Time` functions are already UTC) --
+   passing `true` renders a space (`"2026-07-24 21:54:02"`) instead of the ISO-8601 `T` separator
+   the backend's `Timestamp` schema requires everywhere this client sends a timestamp
+   (`meta.client_time` on every request envelope, plus every operation's `occurred_at` and
+   `life_state`'s `observed_at`). A direct request to the live backend with the exact malformed
+   value confirmed the real-world impact: `400 request.invalid` /
+   `request.schema.pattern` on the violating field, every time. This means every real backend
+   request this client has ever attempted to send -- including the guest challenge/bootstrap calls
+   GAME-004 drove from a real Android Keystore -- would have been rejected before today's fix.
+   Fixed by passing `false` (ISO-8601 `T` separator).
+2. `LocalSaveCodec.is_timestamp()` only checked the string length and a literal `.000Z` suffix, so
+   it neither caught defect #1 (a space-separated string is also 24 characters ending in `.000Z`)
+   nor accepted any genuine non-`.000` millisecond value a real backend timestamp or another
+   platform's clock could produce. Fixed by matching the backend's exact `Timestamp` regex
+   (`^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$`).
+
+Both were only discoverable by validating this client's own timestamp-producing code against a
+real backend's schema enforcement -- exactly what this ticket exists to do, and the same pattern
+GAME-004 already found real defects with.
+
+**Device verification notes (2026-07-25):**
+
+- The server/database half of protocol-v2 save synchronization is proven directly and repeatably
+  against a real, currently-running local backend + PostgreSQL by
+  `scripts/tools/local_backend_save_sync_integration_check.mjs` (38/38 checks passing), independent
+  of the Godot/Android runtime.
+- A live, Godot-client-driven, real-Android-Keystore-signed `POST /v2/saves/sync` end-to-end proof
+  was not attempted in this environment (no attached Android emulator/device) and remains subject
+  to the same emulator/Godot-Android `HTTPRequest` POST reliability issue GAME-004 documented and
+  explicitly flagged as relevant to `GAME-005`/`GAME-006`. `tests/save/test_game_005.gd` closes as
+  much of that gap as is possible without a device: it replays the exact response bodies the live
+  backend returned (`tests/fixtures/save_sync_v2/*.json`) through the real on-device reconciliation
+  code, rather than hand-authored/synthetic envelopes.
+- `scripts/tools/local_backend_save_sync_integration_check.mjs --dump-fixtures <dir>` regenerates
+  the committed fixtures from a fresh live run if the backend's response shape ever changes.
 
 ## GAME-006 — Harden local save synchronization recovery
 

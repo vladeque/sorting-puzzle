@@ -182,6 +182,12 @@ Owner: game repository with backend fixtures and local stack
 
 Tracking: `GAME-004`, `GAME-005`, and `GAME-006`.
 
+Status: `GAME-004` implemented and gap-tested on 2026-07-24 (live device end-to-end proof blocked
+by an emulator `HTTPRequest` POST issue; see the ticket entry). `GAME-005` implemented and
+gap-tested on 2026-07-25 -- the server/database half of protocol-v2 save synchronization is proven
+directly against a real running local backend and PostgreSQL; the same emulator POST issue blocks a
+live Godot-client-driven proof.
+
 Deliverables:
 
 - Real guest bootstrap and secure session persistence across app process restart.

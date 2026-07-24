@@ -1,0 +1,114 @@
+{
+  "meta": {
+    "protocol_version": "2.0",
+    "request_id": "94d78d0e-4182-4f9a-b855-31e4b9a56c8b",
+    "device_id": "cc6a8b68-5cd0-42ef-97a9-b5b3487ef22c",
+    "session_id": "c29eae29-9e2b-4466-b921-51fe67249d53",
+    "app": {
+      "platform": "android",
+      "version": "1.0.0",
+      "build": 1
+    },
+    "locale": "en-US",
+    "client_time": "2026-07-24T21:41:29.984Z"
+  },
+  "data": {
+    "source_namespace": {
+      "kind": "player",
+      "player_id": "681c6b85-3f63-4230-bcb6-c4707edd9772"
+    },
+    "cursor": {
+      "device_id": "cc6a8b68-5cd0-42ef-97a9-b5b3487ef22c",
+      "acknowledged_sequence": 0,
+      "acknowledged_hash": null
+    },
+    "journal_head_sequence": 5,
+    "operations": [
+      {
+        "format": "save-operation/2",
+        "operation_id": "0f29a8dc-8869-4888-afb7-c233837adeb9",
+        "device_id": "cc6a8b68-5cd0-42ef-97a9-b5b3487ef22c",
+        "device_sequence": 1,
+        "operation_type": "campaign_completion",
+        "occurred_at": "2026-07-24T21:41:29.983Z",
+        "previous_operation_hash": null,
+        "payload": {
+          "campaign_level": 1,
+          "stars": 3,
+          "configuration_version": "config_f454c34a33f2eead69b6f13025e46b6af0d9561295c5b483e3cc867df10be71c",
+          "level_version": "level_0bab361392b04021ad2f20d5602e2d4b8e3919c454fac940159db00146e2cefd",
+          "rules_version": "rules_13f216697fa66f93689e2a4f31a082629896cc699cf97b560c3c9928f1ab3601"
+        },
+        "operation_hash": "a1cb7cb39a60abf862b496b5be2d4a4b9ee73c9c3489df60f3ce496550592717",
+        "signature": "MEUCIHzdPGaQHjR3qBnn86+g3iSunFCZfWuTHI1AV6uvKbFZAiEAzjYMAyfnjaSH50TItsJ+gA1YOdHC0snRvcxMu5hoDsE="
+      },
+      {
+        "format": "save-operation/2",
+        "operation_id": "2506260c-b1ee-4802-9210-beca20e363a8",
+        "device_id": "cc6a8b68-5cd0-42ef-97a9-b5b3487ef22c",
+        "device_sequence": 2,
+        "operation_type": "campaign_attempt",
+        "occurred_at": "2026-07-24T21:41:29.983Z",
+        "previous_operation_hash": "a1cb7cb39a60abf862b496b5be2d4a4b9ee73c9c3489df60f3ce496550592717",
+        "payload": {
+          "campaign_level": 2,
+          "outcome": "failed",
+          "configuration_version": "config_f454c34a33f2eead69b6f13025e46b6af0d9561295c5b483e3cc867df10be71c",
+          "level_version": "level_a867d7b0ff30f9076621c3ba9c40cd44b77b80d72c368b22cb59ef07c12790da",
+          "rules_version": "rules_13f216697fa66f93689e2a4f31a082629896cc699cf97b560c3c9928f1ab3601"
+        },
+        "operation_hash": "a4575029b8cd78a4e5747d54925c68b586d495032eecd4a8f8b420b0cadb929b",
+        "signature": "MEYCIQDtQn+EpcqxlF97KBO3r6ho9II+ZJdxnZ0djJhJ6RsvJAIhAN8gjRRIEYdKQMk/Fgeu7srBuHAWxXtcnp428P2EIJCb"
+      },
+      {
+        "format": "save-operation/2",
+        "operation_id": "8e0924f9-59f5-4068-b006-ea360ee89921",
+        "device_id": "cc6a8b68-5cd0-42ef-97a9-b5b3487ef22c",
+        "device_sequence": 3,
+        "operation_type": "resource_spend",
+        "occurred_at": "2026-07-24T21:41:29.984Z",
+        "previous_operation_hash": "a4575029b8cd78a4e5747d54925c68b586d495032eecd4a8f8b420b0cadb929b",
+        "payload": {
+          "asset": "coins",
+          "amount": 50,
+          "reason": "shop"
+        },
+        "operation_hash": "fa87147251982c9983cdf2acce3b85d4e36d380ca7e6c70dccab2d3d030387e3",
+        "signature": "MEYCIQC0huyoah+qHFC3HunU/NI1T7vMEpHphmfh4b9Aca2TZgIhAJYFXihk1Kzr26YmWbjx9/V78++SZQapyEukO4amYrog"
+      },
+      {
+        "format": "save-operation/2",
+        "operation_id": "ea0d2a0a-6af1-4e42-b05d-ffc6595194e7",
+        "device_id": "cc6a8b68-5cd0-42ef-97a9-b5b3487ef22c",
+        "device_sequence": 4,
+        "operation_type": "life_state",
+        "occurred_at": "2026-07-24T21:41:29.984Z",
+        "previous_operation_hash": "fa87147251982c9983cdf2acce3b85d4e36d380ca7e6c70dccab2d3d030387e3",
+        "payload": {
+          "available_lives": 4,
+          "maximum_lives": 5,
+          "restore_interval_seconds": 3600,
+          "next_restore_at": null,
+          "observed_at": "2026-07-24T21:41:29.984Z"
+        },
+        "operation_hash": "f7e13a4a28ba2011ef07f702a2b26a502b6ad5bcf208d883e5a1e7ff9a352336",
+        "signature": "MEYCIQCkWsZBcejlaY//YiapN89jKR8Rl+F/8Kz5R5Mux8JTqAIhAPcjFyHQeIxEXdUQlx24MBM2PAmBZPnn3wypF5NiKH/b"
+      },
+      {
+        "format": "save-operation/2",
+        "operation_id": "412fc2af-e873-41bb-ad54-4f960aa4f0d7",
+        "device_id": "cc6a8b68-5cd0-42ef-97a9-b5b3487ef22c",
+        "device_sequence": 5,
+        "operation_type": "profile_edit",
+        "occurred_at": "2026-07-24T21:41:29.984Z",
+        "previous_operation_hash": "f7e13a4a28ba2011ef07f702a2b26a502b6ad5bcf208d883e5a1e7ff9a352336",
+        "payload": {
+          "display_name": "Integration Tester",
+          "avatar_id": "avatar_cat"
+        },
+        "operation_hash": "f82527106ad92926edba608036181532486890c635f3ffd6df5f1e93800506c4",
+        "signature": "MEYCIQC1UyVSsBT8XUTMgCsdrX5rkzhUfvq6tJRfOFEYvyGJPgIhAIpo4Xb5wxkM0nPJOKMe2X6L+xdkZnyK62z+EQlrIMuf"
+      }
+    ]
+  }
+}

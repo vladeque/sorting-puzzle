@@ -1,0 +1,73 @@
+{
+  "meta": {
+    "protocol_version": "2.0",
+    "request_id": "5969f1c6-471f-4179-bdcf-fca41f42a366",
+    "correlation_id": "0a83c5a1-00e1-460a-ab83-809bac1aa8ea",
+    "server_time": "2026-07-24T21:41:30.712Z"
+  },
+  "data": {
+    "acknowledged_cursor": {
+      "device_id": "cc6a8b68-5cd0-42ef-97a9-b5b3487ef22c",
+      "acknowledged_sequence": 505,
+      "acknowledged_hash": "58f7fad2deff87bcc74a200fa282271ce859729fcba363f500732745d1346259"
+    },
+    "checkpoint": {
+      "format": "save-checkpoint/2",
+      "checkpoint_id": "9bf030d6-e88f-4302-a1ae-4e11eea40a4e",
+      "player_id": "681c6b85-3f63-4230-bcb6-c4707edd9772",
+      "generation": 3,
+      "created_at": "2026-07-24T21:41:30.102Z",
+      "campaign": {
+        "current_level": 2,
+        "highest_completed_level": 1,
+        "selected_completions": [
+          {
+            "campaign_level": 1,
+            "stars": 3,
+            "operation_id": "0f29a8dc-8869-4888-afb7-c233837adeb9"
+          }
+        ]
+      },
+      "balances": {
+        "coins": 250
+      },
+      "abilities": {
+        "hammer": 3,
+        "shuffle": 3,
+        "highlight": 3
+      },
+      "lives": {
+        "available_lives": 5,
+        "maximum_lives": 5,
+        "restore_interval_seconds": 3600,
+        "next_restore_at": null
+      },
+      "reward_chest": {
+        "configuration_version": "chest_7bb60a32b1586fe7acfddc24d5a828e273a8bbeed59201a20315ec93577459e4",
+        "stars": 3,
+        "goal_index": 0,
+        "completed_cycles": 0,
+        "goal_stars": 500,
+        "coin_reward": 100
+      },
+      "leaderboards": {
+        "lifetime_stars": 3,
+        "weekly_stars": 3,
+        "weekly_period_id": "weekly-2026-07-20",
+        "weekly_period_start": "2026-07-20T00:00:00.000Z",
+        "weekly_period_end": "2026-07-27T00:00:00.000Z"
+      },
+      "profile": {
+        "display_name": "Integration Tester",
+        "avatar_id": "avatar_cat",
+        "moderation_state": "active"
+      }
+    },
+    "adjustments": [],
+    "continuation": {
+      "has_more": true,
+      "next_device_sequence": 506,
+      "maximum_operations_per_request": 500
+    }
+  }
+}

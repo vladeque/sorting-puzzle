@@ -5,6 +5,7 @@ const OPERATION_FORMAT := "save-operation/2"
 const UUID_PATTERN := "^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
 const HASH_PATTERN := "^[a-f0-9]{64}$"
 const OPAQUE_ID_PATTERN := "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+const TIMESTAMP_PATTERN := "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
 
 
 static func canonical_json(value: Variant) -> String:
@@ -98,7 +99,13 @@ static func iso_timestamp(unix_time: int = -1) -> String:
 	var timestamp := unix_time
 	if timestamp < 0:
 		timestamp = int(Time.get_unix_time_from_system())
-	return "%s.000Z" % Time.get_datetime_string_from_unix_time(timestamp, true)
+	# get_datetime_string_from_unix_time's second argument is `use_space`: true renders a space
+	# separator ("YYYY-MM-DD HH:MM:SS"), not UTC. It must stay false to produce the ISO-8601 "T"
+	# separator the backend's Timestamp schema requires everywhere this client sends a timestamp
+	# (meta.client_time, occurred_at, observed_at, ...). A real backend round-trip confirmed the
+	# space-separated form is rejected outright: 400 request.invalid / request.schema.pattern on
+	# the violating field.
+	return "%s.000Z" % Time.get_datetime_string_from_unix_time(timestamp, false)
 
 
 static func unix_from_timestamp(value: Variant) -> int:
@@ -127,7 +134,10 @@ static func is_opaque_id(value: Variant) -> bool:
 
 static func is_timestamp(value: Variant) -> bool:
 	var text := str(value)
-	if text.length() != 24 or not text.ends_with(".000Z"):
+	# Matches the backend's Timestamp schema exactly (any millisecond value, not just this
+	# client's own always-".000Z" iso_timestamp() output) so genuine server-issued or
+	# real-millisecond-precision timestamps validate correctly, not just self-authored ones.
+	if not _matches(text, TIMESTAMP_PATTERN):
 		return false
 	return unix_from_timestamp(text) > 0
 
