@@ -2,20 +2,47 @@ extends RefCounted
 class_name StoreService
 
 const MockStoreProviderScript := preload("res://scripts/store/mock_store_provider.gd")
+const BackendCatalogSourceScript := preload("res://scripts/store/backend_catalog_source.gd")
 const CATALOG_PATH := "res://configs/shop_catalog.json"
 const STORE_PROVIDER_SETTING := "application/config/store_provider"
 const MOCK_COUNTRY_SETTING := "application/config/mock_store_country"
+const CATALOG_SOURCE_SETTING := "application/config/shop_catalog_source"
 const PROVIDER_MOCK := "mock"
+const CATALOG_SOURCE_LOCAL := "local"
+const CATALOG_SOURCE_BACKEND := "backend"
 
 var _provider: RefCounted
+var _catalog_source: RefCounted
 var _offers_by_id := {}
 
 
 func _init() -> void:
 	_provider = _create_provider()
+	_catalog_source = _create_catalog_source()
 
 
+## GAME-008: when `shop_catalog_source` selects `backend`, offers come from the authenticated
+## backend development catalog (eligibility, rewards, and product IDs are authoritative there);
+## price formatting and purchase execution still go through `_provider` (mock), unchanged. The
+## default `local` source keeps reading the bundled `configs/shop_catalog.json` exactly as before.
 func load_catalog() -> Dictionary:
+	var result: Dictionary = (
+		await _catalog_source.load_catalog(_provider)
+		if _catalog_source != null
+		else await _load_local_catalog()
+	)
+	if not bool(result.get("ok", false)):
+		return result
+
+	_offers_by_id.clear()
+	for raw_offer in result.get("offers", []) as Array:
+		if raw_offer is Dictionary:
+			_offers_by_id[str((raw_offer as Dictionary).get("id", ""))] = raw_offer
+
+	return result
+
+
+func _load_local_catalog() -> Dictionary:
 	var catalog_result := _load_catalog_file()
 	if not bool(catalog_result.get("ok", false)):
 		return catalog_result
@@ -31,7 +58,6 @@ func load_catalog() -> Dictionary:
 			var product := raw_product as Dictionary
 			products_by_id[str(product.get("product_id", ""))] = product
 
-	_offers_by_id.clear()
 	var available_offers := []
 	for raw_offer in offers:
 		if not (raw_offer is Dictionary):
@@ -46,7 +72,6 @@ func load_catalog() -> Dictionary:
 		offer.erase("mock_prices")
 		offer["store"] = (product as Dictionary).duplicate(true)
 		available_offers.append(offer)
-		_offers_by_id[str(offer.get("id", ""))] = offer
 
 	return {
 		"ok": true,
@@ -131,3 +156,27 @@ func _create_provider() -> RefCounted:
 
 	var country_code := str(ProjectSettings.get_setting(MOCK_COUNTRY_SETTING, "US"))
 	return MockStoreProviderScript.new(country_code)
+
+
+## GAME-008: `shop_catalog_source` is independent of `store_provider` -- it only selects where the
+## offer list/eligibility/rewards come from. Price formatting and purchase execution always go
+## through `_provider` (mock), even when offers come from the backend, per this ticket's
+## requirement to keep price lookup and purchasing explicitly local/mock.
+func _create_catalog_source() -> RefCounted:
+	var source_id := str(ProjectSettings.get_setting(CATALOG_SOURCE_SETTING, CATALOG_SOURCE_LOCAL)).to_lower()
+	if source_id == CATALOG_SOURCE_BACKEND:
+		return BackendCatalogSourceScript.new(_find_backend_transport())
+	if source_id != CATALOG_SOURCE_LOCAL:
+		push_warning("Unknown shop catalog source '%s'; using the local catalog." % source_id)
+	return null
+
+
+## Looks up the `PlayerProgress` autoload by name instead of the bare global identifier, so this
+## script (which headless tooling/tests may `preload()` before autoloads are registered) never
+## takes a hard compile-time dependency on singleton resolution order.
+func _find_backend_transport():
+	var main_loop := Engine.get_main_loop()
+	if not (main_loop is SceneTree):
+		return null
+	var player_progress = (main_loop as SceneTree).root.get_node_or_null("PlayerProgress")
+	return player_progress.get_backend_transport() if player_progress != null else null

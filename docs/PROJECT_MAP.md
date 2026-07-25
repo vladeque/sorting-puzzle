@@ -265,6 +265,9 @@ Files:
 - `scripts/coin_balance_widget.gd`
 - `scripts/store/*.gd`
 - `configs/shop_catalog.json`
+- `configs/backend/shop_catalog_prices.json`
+- `scripts/backend/backend_transport.gd`
+- `scripts/backend/backend_read_operations.gd`
 - `scripts/player_progress.gd`
 
 Responsibility:
@@ -273,9 +276,11 @@ Responsibility:
 - Uses `StoreService` and a provider boundary so UI code never owns regional pricing or transaction behavior.
 - Uses the `mock` provider and configurable mock storefront country during development; real Google Play and App Store providers can replace it later.
 - Applies mock purchase rewards atomically through `PlayerProgress.apply_shop_purchase()` and retains processed transaction ids so callbacks are idempotent.
+- GAME-008: `application/config/shop_catalog_source` independently selects where the *offer list* comes from. `local` (default) reads `configs/shop_catalog.json` unchanged. `backend` sources eligibility, rewards, and product IDs from the authenticated backend development catalog (`GET /v1/catalog`, via the shared `BackendTransport`/`BackendReadOperations` from GAME-007) through `scripts/store/backend_catalog_source.gd`, joins each eligible offer to `configs/backend/shop_catalog_prices.json` by `platform_product_id` for its display title and mock regional price, and still prices/purchases through the local `mock` provider. `scripts/store/backend_catalog_cache.gd` persists the last successful backend catalog to `user://shop_catalog_backend_cache.json` so an unavailable, unauthorized, or malformed later read falls back to an offline cached view instead of failing outright.
 
 Change here when:
 - Adding offers, changing bundle presentation, integrating a real platform store, or moving purchase grants to a verified backend.
+- Changing the backend development catalog join (GAME-008): update `configs/backend/shop_catalog_prices.json` to match the sibling backend's `contracts/configuration/v1/local-development-shop-catalog.json` seed content.
 
 ### Level Runtime
 

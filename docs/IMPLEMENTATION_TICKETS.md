@@ -522,7 +522,7 @@ Automated verification:
 ## GAME-008 — Integrate the backend Shop catalog locally
 
 **Type:** Commerce read integration
-**Status:** Planned
+**Status:** Implemented on 2026-07-25.
 **Description:** Populate the existing Shop from the authenticated backend development catalog
 while keeping price lookup and purchasing explicitly local/mock.
 
@@ -538,6 +538,55 @@ while keeping price lookup and purchasing explicitly local/mock.
 - No purchase-intent or verification endpoint is called in this ticket.
 - Mock grants remain visibly development-only and cannot be represented as verified purchases.
 - Loading, empty, unavailable, unauthorized, cached, and malformed catalog responses are covered.
+
+**Implementation notes:**
+
+- `application/config/shop_catalog_source` (new, default `local`) independently selects the Shop's
+  *offer* source; `application/config/store_provider` (unchanged, still `mock`-only) continues to
+  own regional price formatting and purchase execution regardless of catalog source, so this ticket
+  never widens the mock-purchase surface.
+- `scripts/store/backend_catalog_source.gd` (`BackendCatalogSource`) is the `backend` catalog
+  source. It reads `GET /v1/catalog` through the existing GAME-007 `BackendTransport`/
+  `BackendReadOperations.parse_catalog()`, keeps only offers with `eligible: true` (defense in
+  depth -- the backend's `SHOP_CATALOGS.md` already guarantees every returned offer is eligible,
+  but this class never trusts a local file for that decision either), maps the backend `starter`/
+  `timed_bundle`/`evergreen_bundle`/`coin_pack` enum to the UI's `bundle`/`coins` grouping (an
+  offer with an unrecognized/`unknown` type is excluded, not rendered blindly), and joins each
+  offer to `configs/backend/shop_catalog_prices.json` by `platform_product_id` for its display
+  title and mock regional price -- reusing the exact same `MockStoreProvider.load_products()` the
+  local catalog already uses, so pricing/currency formatting code is not duplicated. An offer with
+  no matching local presentation entry is excluded rather than shown without a price.
+- `scripts/store/backend_catalog_cache.gd` (`BackendCatalogCache`) persists the last successful
+  join to `user://shop_catalog_backend_cache.json` (offers/prices only, never a token or
+  signature). Any failed read -- an empty/unset `backend_base_url`, a network/dependency failure
+  (including "no active catalog", which the backend's `catalog.controller.ts` returns as a
+  retryable `503 dependency.catalog_unavailable`), an exhausted `401` refresh, or a catalog
+  response that fails `parse_catalog()` validation -- falls back to this cache; only surfaces an
+  error to the Shop when no prior cache exists either.
+- `StoreService.load_catalog()`/`purchase_offer()` are otherwise unchanged: `purchase_offer()`
+  always calls the mock provider's `purchase()` regardless of catalog source, so a backend-sourced
+  offer is bought exactly the same mock-transaction-id way a local-catalog offer already was, and
+  no purchase-intent or verification endpoint is ever called.
+- `configs/backend/shop_catalog_prices.json` presents the two offers the sibling backend's
+  `pnpm bootstrap:local` seed actually publishes (`../sorting-puzzle-backend/contracts/configuration/v1/local-development-shop-catalog.json`):
+  `sorting_puzzle.local.starter_bundle` and `sorting_puzzle.local.coin_pack_small`. It must be kept
+  in sync with that seed file if the backend's local development catalog content changes.
+- `tests/backend/test_game_008.gd` drives `BackendCatalogSource` with the same synthetic-transport
+  test-double pattern `tests/backend/test_game_007.gd` established (a `BackendTransport` subclass
+  overriding only `_send_get`/`_send_post`/`_wait_before_retry`), covering: eligible-offer join and
+  pricing, ineligible-offer exclusion, unrecognized-offer-type exclusion, missing-local-price
+  exclusion, an empty catalog, an unavailable catalog with and without a prior cache, an exhausted
+  `401`, a malformed response falling back to cache, and a disabled/unset backend short-circuiting.
+  It also proves `StoreService._create_catalog_source()`'s `local`/`backend`/unknown-value
+  selection. A live, Godot-client-driven proof against a real running local backend was not
+  attempted in this environment (no attached local backend/Android device), consistent with the
+  same environment limitation GAME-004/005/006/007 already documented.
+
+Automated verification:
+
+```powershell
+& 'D:\Godot\godot.exe' --headless --path . --script tests/backend/test_game_008.gd
+```
 
 ## GAME-009 — Integrate backend leaderboards locally
 

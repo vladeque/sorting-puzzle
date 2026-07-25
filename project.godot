@@ -22,6 +22,7 @@ config/build_number=1
 config/leaderboard_provider="mock"
 config/store_provider="mock"
 config/mock_store_country="US"
+config/shop_catalog_source="local"
 
 [autoload]
 

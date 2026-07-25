@@ -130,7 +130,9 @@ Depends on:
 
 - `scripts/store/store_provider.gd`: provider contract for product loading and purchase requests.
 - `scripts/store/mock_store_provider.gd`: resolves config prices for `application/config/mock_store_country` and returns unique mock transaction ids after a short asynchronous delay.
-- `scripts/store/store_service.gd`: validates `configs/shop_catalog.json`, joins catalog rewards with provider product details, and returns normalized purchase results. This is the client replacement point for later platform integrations.
+- `scripts/store/store_service.gd`: selects a catalog source via `application/config/shop_catalog_source` (`local` default or `backend`), joins its offers with `_provider` (always the mock provider), and returns normalized purchase results. `purchase_offer()`/pricing behavior is unchanged by the catalog source. This is the client replacement point for later platform integrations.
+- `scripts/store/backend_catalog_source.gd` (GAME-008): `shop_catalog_source=backend`'s offer source. Reads the authenticated backend development catalog (`GET /v1/catalog`) through the shared `BackendTransport`/`BackendReadOperations` (GAME-007), keeps only offers with `eligible: true`, maps the backend `type` enum to the UI's `bundle`/`coins` grouping, and joins each offer to `configs/backend/shop_catalog_prices.json` by `platform_product_id` for its display title and mock regional price via the same `MockStoreProvider.load_products()` the local catalog uses. Offers with an unrecognized type or no local price-table entry are silently excluded rather than rendered without a price. Any failed read (unavailable, unauthorized, malformed, or an empty local `backend_base_url`) falls back to `BackendCatalogCache`; only surfaces an error when no cache exists either.
+- `scripts/store/backend_catalog_cache.gd` (GAME-008): persists the last successfully joined/priced backend catalog to `user://shop_catalog_backend_cache.json` (offers/prices only, never a token or signature) for the offline-cache fallback above.
 
 ## `scripts/tools/verify_shop.gd`
 

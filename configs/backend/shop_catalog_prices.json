@@ -1,0 +1,24 @@
+{
+  "prices": [
+    {
+      "platform_product_id": "sorting_puzzle.local.starter_bundle",
+      "title": "Starter Bundle",
+      "mock_prices": {
+        "US": {"formatted_price": "$4.99", "currency_code": "USD"},
+        "UA": {"formatted_price": "₴199.99", "currency_code": "UAH"},
+        "DE": {"formatted_price": "4,99 €", "currency_code": "EUR"},
+        "JP": {"formatted_price": "¥800", "currency_code": "JPY"}
+      }
+    },
+    {
+      "platform_product_id": "sorting_puzzle.local.coin_pack_small",
+      "title": "500 Coins",
+      "mock_prices": {
+        "US": {"formatted_price": "$2.49", "currency_code": "USD"},
+        "UA": {"formatted_price": "₴99.99", "currency_code": "UAH"},
+        "DE": {"formatted_price": "2,49 €", "currency_code": "EUR"},
+        "JP": {"formatted_price": "¥400", "currency_code": "JPY"}
+      }
+    }
+  ]
+}

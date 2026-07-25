@@ -225,8 +225,12 @@ Status: `GAME-007` implemented on 2026-07-25 -- the shared authenticated read tr
 (`scripts/backend/backend_transport.gd`) and its closed protocol adapters
 (`scripts/backend/backend_read_operations.gd`) exist and are proven against the real backend
 contract fixtures plus synthetic transport-fault coverage (`tests/backend/test_game_007.gd`).
-`GAME-008` and `GAME-009` (catalog/leaderboard providers, offline caching, UI wiring) remain
-planned.
+`GAME-008` implemented on 2026-07-25 -- `application/config/shop_catalog_source=backend` sources
+Shop offers from `GET /v1/catalog` (`scripts/store/backend_catalog_source.gd`), joins them against
+`configs/backend/shop_catalog_prices.json` for local/mock pricing, and caches the last successful
+join for offline display (`scripts/store/backend_catalog_cache.gd`); mock remains the default and
+purchase execution stays local/mock regardless of catalog source (`tests/backend/test_game_008.gd`).
+`GAME-009` (leaderboard provider, offline caching, UI wiring) remains planned.
 
 Deliverables:
 

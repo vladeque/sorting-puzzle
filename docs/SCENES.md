@@ -109,7 +109,7 @@ Script:
 
 Purpose:
 - Owns the dedicated Shop destination with the `Shop` title, live coin balance, scrollable bundle and coin-offer sections, loading/error states, purchase result dialog, and shared bottom navigation.
-- Builds offer views from `configs/shop_catalog.json` after `StoreService` attaches the active provider's formatted regional prices.
+- Builds offer views from `StoreService.load_catalog()`, which sources offers from `configs/shop_catalog.json` by default or from the authenticated backend development catalog when `application/config/shop_catalog_source` is `backend` (GAME-008), and always attaches the mock provider's formatted regional prices.
 - Centers content to a 720-pixel maximum logical width, compacts offers below 1100 logical pixels high, and applies mobile safe-area margins.
 
 Runtime children:

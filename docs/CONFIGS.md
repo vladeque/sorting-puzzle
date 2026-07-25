@@ -359,10 +359,49 @@ See:
 ## Store Provider Settings
 
 Fields:
-- `application/config/store_provider`: currently supports `mock` and defaults to it. Unsupported values warn and fall back to the mock provider.
+- `application/config/store_provider`: currently supports `mock` and defaults to it. Unsupported values warn and fall back to the mock provider. Always used for regional price formatting and purchase execution, regardless of `shop_catalog_source`.
 - `application/config/mock_store_country`: mock storefront country used to select development price strings. Defaults to `US`; the catalog also defines `UA`, `DE`, and `JP` examples.
+- `application/config/shop_catalog_source` (GAME-008): selects where the Shop's *offer list* comes from, independently of `store_provider`. `local` (default) reads `configs/shop_catalog.json` exactly as before. `backend` sources eligibility, rewards, and product IDs from the authenticated backend development catalog through `scripts/store/backend_catalog_source.gd`; unsupported values warn and fall back to `local`.
 
 Production integration must replace the mock provider with platform product queries and verified, server-idempotent purchase grants rather than trusting these development settings.
+
+## `configs/backend/shop_catalog_prices.json`
+
+Purpose:
+- Local-only presentation join table used when `application/config/shop_catalog_source` is `backend`. The backend catalog (`GET /v1/catalog`) is authoritative for offer eligibility, rewards, and product IDs but never returns a display title or a price (see `../sorting-puzzle-backend/docs/SHOP_CATALOGS.md`); this file supplies both for local development.
+- Owned by `scripts/store/backend_catalog_source.gd`, which joins each eligible backend offer to one entry here by `platform_product_id`.
+
+Shape:
+
+```json
+{
+  "prices": [
+    {
+      "platform_product_id": "sorting_puzzle.local.starter_bundle",
+      "title": "Starter Bundle",
+      "mock_prices": {
+        "US": {"formatted_price": "$4.99", "currency_code": "USD"}
+      }
+    }
+  ]
+}
+```
+
+Rules:
+- `platform_product_id` must match a `platform_product_id` value the backend's active development catalog actually returns (see `../sorting-puzzle-backend/contracts/configuration/v1/local-development-shop-catalog.json`, the seed `pnpm bootstrap:local` publishes).
+- `mock_prices` follows the exact same shape as `configs/shop_catalog.json`'s `mock_prices` and is formatted by the same `MockStoreProvider`.
+- A backend offer whose `platform_product_id` has no matching entry here is silently excluded from the Shop rather than shown without a price.
+- This file is never treated as an eligibility source; only the backend's `eligible: true` field decides whether an offer is shown.
+
+## `user://shop_catalog_backend_cache.json`
+
+Purpose:
+- Offline cache of the last successfully joined/priced backend Shop catalog, owned by `scripts/store/backend_catalog_cache.gd`. Only used when `shop_catalog_source` is `backend`.
+
+Rules:
+- Written after every successful `GET /v1/catalog` join (including an empty-catalog result).
+- Read only when a later fetch fails (unavailable, unauthorized, or malformed); a failure with no prior cache surfaces as a Shop load error instead.
+- Contains only already-public catalog/offer/mock-price data; never a token, signature, or other secret.
 
 ## Documentation Update Checklist
 
