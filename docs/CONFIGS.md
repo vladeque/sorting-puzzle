@@ -351,10 +351,20 @@ Purpose:
 - Selects the data source used by `LeaderboardService` without coupling the UI to backend details.
 
 Field:
-- `application/config/leaderboard_provider`: currently supports `mock` and defaults to it. Unsupported values warn and fall back to mock data until another provider is implemented.
+- `application/config/leaderboard_provider`: `mock` (default) or `backend` (GAME-009). Unsupported values warn and fall back to mock data. `backend` sources Weekly/Country/World pages from the authenticated backend development leaderboard through `scripts/leaderboards/backend_leaderboard_provider.gd`; entries, rank, and current-player placement are authoritative from the response and are never re-derived locally.
 
 See:
 - `docs/LEADERBOARDS.md`
+
+## `user://leaderboard_backend_cache.json`
+
+Purpose:
+- Offline cache of the last successfully fetched backend leaderboard page per scope, owned by `scripts/leaderboards/backend_leaderboard_cache.gd`. Only used when `leaderboard_provider` is `backend`.
+
+Rules:
+- Written after every successful `GET /v1/leaderboards/{scope}` read that returns at least one entry.
+- Read only when a later fetch for that scope fails (unavailable, unauthorized, expired/invalid cursor, or malformed); a failure with no prior cache surfaces as a leaderboard load error instead.
+- Contains only already-public entries, current-player row, and period-end data; never a token, signature, or pagination cursor.
 
 ## Store Provider Settings
 

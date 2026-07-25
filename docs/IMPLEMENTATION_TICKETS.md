@@ -591,7 +591,7 @@ Automated verification:
 ## GAME-009 — Integrate backend leaderboards locally
 
 **Type:** Ranking read integration
-**Status:** Planned
+**Status:** Implemented on 2026-07-25.
 **Description:** Replace mock ranking data in backend-enabled debug builds with authenticated
 weekly, country, and world leaderboard reads.
 
@@ -607,6 +607,63 @@ weekly, country, and world leaderboard reads.
 - The most recent successful page is available offline and refreshes silently after synchronization.
 - Country scope follows the backend's no-country behavior and never infers country locally.
 - Two local players with different selected v2 completions appear in deterministic score order.
+
+**Implementation notes:**
+
+- `application/config/leaderboard_provider` (unchanged setting, new `backend` value; default stays
+  `mock`) selects `scripts/leaderboards/backend_leaderboard_provider.gd`
+  (`BackendLeaderboardProvider`) in `LeaderboardService._create_provider()`, mirroring
+  `StoreService`'s GAME-008 `_find_backend_transport()` lookup so the provider never takes a hard
+  compile-time dependency on `PlayerProgress` autoload resolution order.
+- `BackendLeaderboardProvider` implements the existing `LeaderboardProvider.fetch_leaderboard(scope,
+  current_player, limit)` contract unchanged, so `leaderboard_screen.gd` needed no changes. It reads
+  `GET /v1/leaderboards/{scope}` through the shared GAME-007 `BackendTransport`/
+  `BackendReadOperations.parse_leaderboard()` (already contract-tested against the real backend
+  fixture by `tests/backend/test_game_007.gd`) and passes entries through unchanged -- rank, score,
+  and tie ordering are authoritative from the backend, never re-derived locally. `current_player` is
+  read from the response's `current_player` field when the backend omits the player from `entries`
+  (outside-page placement) and otherwise recovered from the matching `is_current_player` row inside
+  `entries`, matching the backend's `playerIsInPage` behavior in `leaderboard-query-store.ts`.
+  `period_end` is converted through the existing `LocalSaveCodecScript.unix_from_timestamp()` helper
+  into the screen's expected `period_end_unix`. `has_more` reflects whether the response's
+  `next_cursor` is non-empty; a `fetch_page(scope, limit, cursor)` method exposes cursor forwarding
+  and cursor-expiry (`request.invalid_cursor`) error handling for a later "load more" page even
+  though the screen only requests the backend's single 50-row max page today. The country scope's
+  documented no-country response (`entries: []`, no `period_id`/`period_end`/`current_player`) is
+  never special-cased or defaulted locally -- it renders as an ordinary empty board.
+- `scripts/leaderboards/backend_leaderboard_cache.gd` (`BackendLeaderboardCache`) persists the last
+  successful page per scope to `user://leaderboard_backend_cache.json` (entries, current-player row,
+  and period end only -- never a token, signature, or pagination cursor). Any failed read -- an
+  empty/unset `backend_base_url`, a network/dependency failure (including `503
+  dependency.leaderboard_unavailable`), an exhausted `401` refresh, an invalid/expired cursor
+  (`400 request.invalid_cursor`), or a response that fails `parse_leaderboard()` validation -- falls
+  back to this cache; only surfaces an error to the screen when no prior cache exists either. An
+  empty cached page (no prior successful fetch with entries) is treated as no usable cache, matching
+  `BackendCatalogCache`'s GAME-008 behavior.
+- `tests/backend/test_game_009.gd` drives `BackendLeaderboardProvider` with the same synthetic-
+  transport test-double pattern `tests/backend/test_game_007.gd`/`test_game_008.gd` established,
+  covering: current player outside and inside the page, tie rank/order passthrough, empty rankings,
+  the country no-country response, `next_cursor`/`has_more`, an unavailable leaderboard with and
+  without a prior cache, an exhausted `401`, a malformed response falling back to cache, an
+  invalid/expired cursor, an unrecognized scope, and a disabled/unset backend short-circuiting. It
+  also proves `LeaderboardService._create_provider()`'s `mock`/`backend`/unknown-value selection.
+- Backend v2 checkpoint-to-leaderboard materialization (`LOCAL_BACKEND_INTEGRATION.md` gap 7) is a
+  backend-owned gap this ticket does not close: the backend's current score model is populated from
+  accepted run completions, while this game repository's save-sync path produces a
+  `save.checkpoint_merged.v1` outbox event. Per this repository's `AGENTS.md`, the sibling backend
+  repository is not modified as part of this ticket. Until that backend materialization ships, two
+  local players with different selected v2 completions cannot be proven to appear in deterministic
+  score order against a real running backend; this is the same kind of environment/cross-repository
+  gap GAME-004/005/006 already documented, not a defect in this ticket's client-side provider,
+  cache, or selection logic, all of which are proven by `tests/backend/test_game_009.gd`. A live,
+  Godot-client-driven proof against a real running local backend was not attempted in this
+  environment (no attached local backend/Android device), consistent with GAME-004/005/006/007/008.
+
+Automated verification:
+
+```powershell
+& 'D:\Godot\godot.exe' --headless --path . --script tests/backend/test_game_009.gd
+```
 
 ## GAME-010 — Automate the Android local-backend integration gate
 

@@ -171,6 +171,25 @@ Purpose:
 - Sorts scores descending, assigns competition ranks, and returns the current player separately for pinned presentation.
 - Uses weekly stars for Weekly and lifetime stars for Country and World.
 
+## `scripts/leaderboards/backend_leaderboard_provider.gd`
+
+Class:
+- `BackendLeaderboardProvider`
+
+Purpose:
+- GAME-009 `leaderboard_provider=backend` provider. Reads `GET /v1/leaderboards/{scope}` through the shared `BackendTransport`/`BackendReadOperations.parse_leaderboard()` (GAME-007) and implements the same `fetch_leaderboard(scope, current_player, limit)` contract as `MockLeaderboardProvider`, so `leaderboard_screen.gd` is unchanged.
+- Passes entries, rank, score, and tie order through unchanged; resolves `player_entry` from the response's `current_player` field (outside-page placement) or from the matching `is_current_player` row in `entries` (inside-page placement); converts `period_end` to `period_end_unix`; and sets `has_more` from a non-empty `next_cursor`.
+- Exposes `fetch_page(scope, limit, cursor)` for cursor-forwarded pagination, not yet used by the screen.
+- Falls back to `BackendLeaderboardCache` on any unavailable, unauthorized, expired-cursor, or malformed read; only surfaces an error when no cache exists either.
+
+## `scripts/leaderboards/backend_leaderboard_cache.gd`
+
+Class:
+- `BackendLeaderboardCache`
+
+Purpose:
+- Persists the last successfully fetched backend leaderboard page per scope to `user://leaderboard_backend_cache.json` (entries/current-player/period end only, never a token, signature, or cursor) for the offline-cache fallback above.
+
 ## `scripts/leaderboards/leaderboard_service.gd`
 
 Class:
@@ -179,6 +198,7 @@ Class:
 Purpose:
 - Selects the configured provider and exposes the asynchronous fetch method used by the screen.
 - Falls back to the mock provider when an unsupported provider id is configured.
+- GAME-009: `application/config/leaderboard_provider=backend` selects `BackendLeaderboardProvider`, looking up the shared `BackendTransport` through the `PlayerProgress` autoload by name (mirrors `scripts/store/store_service.gd`'s `_find_backend_transport()`).
 - Is the replacement point for a later HTTP or platform-backed provider.
 
 ## `scripts/main_menu_reward_coin_flyer.gd`

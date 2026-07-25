@@ -238,7 +238,11 @@ Files:
 - `scripts/leaderboard_row.gd`
 - `scripts/leaderboards/leaderboard_provider.gd`
 - `scripts/leaderboards/mock_leaderboard_provider.gd`
+- `scripts/leaderboards/backend_leaderboard_provider.gd`
+- `scripts/leaderboards/backend_leaderboard_cache.gd`
 - `scripts/leaderboards/leaderboard_service.gd`
+- `scripts/backend/backend_transport.gd`
+- `scripts/backend/backend_read_operations.gd`
 - `scripts/player_progress.gd`
 - `docs/LEADERBOARDS.md`
 
@@ -247,11 +251,13 @@ Responsibility:
 - Presents Weekly, Country, and World scopes above a large scrollable ranking list.
 - Shows rank, saved avatar, display name, and earned-star score for each entry.
 - Pins the local player's highlighted entry above the bottom navigation when it falls outside the fetched top 50.
-- Uses a mock provider selected by `application/config/leaderboard_provider` while preserving a provider boundary for later backend integration.
+- Uses a provider selected by `application/config/leaderboard_provider` (`mock` default, or `backend`) while preserving a provider boundary for later backend integration.
 - Uses Monday 00:00 UTC through the following Monday as the mock weekly scoring period; Country and World use lifetime stars.
+- GAME-009: `backend` sources Weekly/Country/World pages from the authenticated backend development leaderboard (`GET /v1/leaderboards/{scope}`, via the shared `BackendTransport`/`BackendReadOperations` from GAME-007) through `scripts/leaderboards/backend_leaderboard_provider.gd`, passing entries/rank/score/tie order through unchanged and never inferring country locally for the no-country response. `scripts/leaderboards/backend_leaderboard_cache.gd` persists the last successful page per scope to `user://leaderboard_backend_cache.json` so an unavailable, unauthorized, expired-cursor, or malformed later read falls back to an offline cached view instead of failing outright.
 
 Change here when:
 - Replacing mock data, adding backend requests or pagination, changing leaderboard scopes, or changing ranking-row presentation.
+- Changing the backend leaderboard read (GAME-009): update `scripts/leaderboards/backend_leaderboard_provider.gd`/`backend_leaderboard_cache.gd` and their tests if the backend response shape or cursor semantics change.
 
 ### Shop
 

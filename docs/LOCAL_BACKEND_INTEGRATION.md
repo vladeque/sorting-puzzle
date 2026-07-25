@@ -230,7 +230,15 @@ Shop offers from `GET /v1/catalog` (`scripts/store/backend_catalog_source.gd`), 
 `configs/backend/shop_catalog_prices.json` for local/mock pricing, and caches the last successful
 join for offline display (`scripts/store/backend_catalog_cache.gd`); mock remains the default and
 purchase execution stays local/mock regardless of catalog source (`tests/backend/test_game_008.gd`).
-`GAME-009` (leaderboard provider, offline caching, UI wiring) remains planned.
+`GAME-009` implemented on 2026-07-25 -- `application/config/leaderboard_provider=backend` sources
+Weekly/Country/World pages from `GET /v1/leaderboards/{scope}`
+(`scripts/leaderboards/backend_leaderboard_provider.gd`) through the same shared transport, passing
+entries/current-player placement/period end/pagination cursor through unchanged, and caches the last
+successful page per scope for offline display
+(`scripts/leaderboards/backend_leaderboard_cache.gd`); mock remains the default and the existing
+leaderboard screen is unchanged (`tests/backend/test_game_009.gd`). The backend-owned v2
+checkpoint-to-leaderboard materialization gap (item 7 below) is not closed by this ticket, so
+deterministic cross-player score ordering cannot yet be proven against a real running backend.
 
 Deliverables:
 
