@@ -6,6 +6,13 @@ This backlog tracks implementation work owned by the Godot client. Cross-reposit
 identity, purchase, progression, and synchronization work must remain aligned with the canonical
 backend requirements and contracts in `../../sorting-puzzle-backend`.
 
+The next deployed development-environment integration batch is tracked separately so code changes
+and project-owner console/setup work remain unambiguous:
+
+- [`DEV_BACKEND_INTEGRATION_PLAN.md`](DEV_BACKEND_INTEGRATION_PLAN.md)
+- [`DEV_BACKEND_CODE_TICKETS.md`](DEV_BACKEND_CODE_TICKETS.md)
+- [`DEV_BACKEND_OWNER_TICKETS.md`](DEV_BACKEND_OWNER_TICKETS.md)
+
 ## Shared definition of done
 
 Unless a ticket explicitly narrows its scope, it is complete when:

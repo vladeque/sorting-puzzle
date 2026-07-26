@@ -5,6 +5,10 @@ Status: Proposed
 Target: Godot Android debug build running in an Android emulator and connecting to the sibling
 backend repository on the development machine.
 
+The successor plan for a deployed shared development environment, Android and iOS platform
+identity, and store sandbox integration is
+[`DEV_BACKEND_INTEGRATION_PLAN.md`](DEV_BACKEND_INTEGRATION_PLAN.md).
+
 ## Goal
 
 Prove the launch client/backend path locally before adding production deployment, platform

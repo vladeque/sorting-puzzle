@@ -42,13 +42,23 @@ Reusable item scene:
 
 Files:
 - `docs/BACKEND_REQUIREMENTS.md`
+- `docs/LOCAL_BACKEND_INTEGRATION.md`
+- `docs/DEV_BACKEND_INTEGRATION_PLAN.md`
+- `docs/DEV_BACKEND_CODE_TICKETS.md`
+- `docs/DEV_BACKEND_OWNER_TICKETS.md`
 
 Responsibility:
 - Defines the approved production backend requirements for identity, authoritative progression and economy, offline synchronization, Shop offers and purchases, leaderboards, profile moderation, privacy, administration, operations, testing, and phased implementation.
 - Records confirmed product decisions and the remaining policies that must be finalized during the protocol-design phase.
+- Separates the completed/in-progress local Android integration from the planned deployed
+  development environment for Android and iOS.
+- Tracks source-controlled integration work independently from project-owner actions in Google
+  Cloud, Google Play Console, Apple Developer, and App Store Connect.
 
 Change here when:
 - Backend authority boundaries, platform integrations, offline behavior, offer types, leaderboard rules, or implementation phases change.
+- Deployed development-environment dependencies, ownership, ticket status, or qualification gates
+  change.
 
 ### Level Selection
 
