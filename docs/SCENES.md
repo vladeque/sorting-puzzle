@@ -25,7 +25,7 @@ Purpose:
 
 Important nodes:
 - `Background`: fullscreen `TextureRect` using `assets/backgrounds/main_menu.jpeg`.
-- `TopStatusBar`: top-anchored container that places `scenes/ui/main_menu_top_status.tscn` directly at the device safe-area edge.
+- `TopStatusBar`: top-anchored container that places `scenes/ui/main_menu_top_status.tscn` inside the display's top inset region while avoiding exact camera cutouts.
 - `RewardChest`: left-side `scenes/ui/main_menu_reward_chest.tscn` instance positioned by `scripts/production_main_menu.gd`.
 - `HouseRewardOrigin`: responsive marker over the background house used as the reward animation origin.
 - `RewardCoinFlyer`: fullscreen `scenes/ui/main_menu_reward_coin_flyer.tscn` effect layer.
@@ -211,9 +211,13 @@ Do not use for:
 Root:
 - `MainMenuTopStatus` (`HBoxContainer`)
 
+Script:
+- `scripts/main_menu_top_status.gd`
+
 Purpose:
 - Reusable top status row for the production main menu.
 - Displays four UI groups from left to right: player profile, gold coins, lives remaining, and settings.
+- Keeps a runtime-sized center corridor clear for a camera cutout while the owning menu positions the row.
 - Provides labels that the owning menu script updates for campaign lives and life restore status.
 - Provides a clickable `ProfileWidget` button whose avatar texture is updated from `PlayerProgress.avatar_id`.
 
@@ -221,6 +225,7 @@ Important nodes:
 - `ProfileWidget`: circular avatar button.
 - `ProfileWidget/AvatarTexture`: saved player avatar texture, clipped to a circle at runtime.
 - `CoinsWidget`: generated gold coin icon, saved coin amount label, and plus badge.
+- `Spacer02`: non-expanding center exclusion corridor resized around camera cutouts.
 - `LivesWidget`: generated heart icon, current life count label, and `Full` or `MM:SS` countdown status label.
 - `SettingsWidget`: smaller `PauseMenuButton`-style button with a small alert badge.
 

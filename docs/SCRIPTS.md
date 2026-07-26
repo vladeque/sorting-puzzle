@@ -28,10 +28,12 @@ Key constants:
 - `PRODUCTION_MENU_SCENE`: return path assigned to campaign level instances.
 - `LEADERBOARD_SCENE`: destination path for the trophy tab.
 - `LIFE_STATUS_REFRESH_SECONDS`: cadence for refreshing the lives countdown while the menu is visible.
+- `TOP_MARGIN`: preferred distance from the physical top edge for the status row.
+- `CAMERA_CUTOUT_PADDING`: empty space reserved around each reported display cutout.
 - `BOTTOM_BAR_*`, `SIDE_MARGIN`, and `LEVEL_BUTTON_MAX_WIDTH`: responsive bottom-button layout values.
 
 Important nodes:
-- `%TopStatusBar`: top-anchored container positioned at runtime with safe-area padding; owns the status icon layout through `scenes/ui/main_menu_top_status.tscn`.
+- `%TopStatusBar`: top-anchored container positioned inside the display's top inset region while avoiding exact camera cutout rectangles.
 - `%RewardChest`: side-screen `scenes/ui/main_menu_reward_chest.tscn` instance positioned under the profile icon.
 - `%HouseRewardOrigin`: normalized marker over the background house.
 - `%RewardCoinFlyer`: dedicated fullscreen completed-level coin effect.
@@ -48,8 +50,8 @@ Important nodes:
 Key methods:
 - `_ready()`: loads progress, wires level and bottom-navigation buttons, refreshes the saved coin label, selects Home, and applies responsive layout.
 - `_process(delta)`: refreshes the lives display and play button state once per elapsed real-time second while the menu is open.
-- `_apply_responsive_layout()`: keeps the top status row and bottom button inside the viewport and safe area.
-- `_layout_top_status_bar()`: positions the static top status row directly at the device safe-area edge, without additional top padding.
+- `_apply_responsive_layout()`: keeps the top status row cutout-aware and the bottom button inside the viewport safe area.
+- `_layout_top_status_bar()`: places the status row at `TOP_MARGIN`, expands its center exclusion gap around camera cutouts, and falls below a cutout only when the row cannot fit around it.
 - `_layout_reward_chest()`: positions the side reward chest under the profile icon without putting it in the top status scene.
 - `_layout_bottom_navigation()`: sizes the full-width navigation bar and passes its safe-bottom inset to the scene-owned layout.
 - `_update_level_button()`: displays the saved current level, no-lives state, or complete state.
@@ -81,6 +83,19 @@ Do not use for:
 - Persistent save data ownership. Put that in `scripts/save/local_save_store.gd`; use
   `PlayerProgress` only as the gameplay facade.
 - Puzzle runtime logic.
+
+## `scripts/main_menu_top_status.gd`
+
+Attached to:
+- `scenes/ui/main_menu_top_status.tscn` root `MainMenuTopStatus`.
+
+Purpose:
+- Owns the status row's center exclusion spacer.
+- Applies the requested camera corridor while preserving the minimum visual gap between the coin and lives widgets.
+- Reports the exclusion width that fits after accounting for the four fixed-width status widgets.
+
+Do not use for:
+- Querying display cutouts or positioning the row vertically. The owning menu performs those screen-level layout decisions.
 
 ## `scripts/main_menu_bottom_navigation.gd`
 

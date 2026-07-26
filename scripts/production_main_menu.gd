@@ -10,7 +10,11 @@ const PRODUCTION_MENU_SCENE := "res://scenes/main_menu.tscn"
 const SHOP_SCENE := "res://scenes/ui/shop_screen.tscn"
 const LEADERBOARD_SCENE := "res://scenes/ui/leaderboard_screen.tscn"
 const TOP_BAR_HEIGHT := 86.0
+const TOP_MARGIN := 28.0
 const TOP_SIDE_MARGIN := 24.0
+const CAMERA_CUTOUT_PADDING := 12.0
+const STATUS_CENTER_VISUAL_OVERFLOW := 6.0
+const CUTOUT_LAYOUT_TOLERANCE := 0.5
 const PROFILE_WIDGET_WIDTH := 76.0
 const REWARD_CHEST_SIZE := Vector2(116.0, 136.0)
 const REWARD_CHEST_TOP_GAP := 72.0
@@ -28,6 +32,7 @@ const LIFE_STATUS_REFRESH_SECONDS := 1.0
 @onready var _bottom_bar := %BottomBar as MarginContainer
 @onready var _level_button := %LevelButton as Button
 @onready var _bottom_navigation := %BottomNavigation as MarginContainer
+@onready var _top_status := %TopStatusBar.get_node("MainMenuTopStatus") as HBoxContainer
 @onready var _profile_button := %TopStatusBar.get_node("MainMenuTopStatus/ProfileWidget") as Button
 @onready var _settings_button := %TopStatusBar.get_node("MainMenuTopStatus/SettingsWidget/SettingsButton") as Button
 @onready var _profile_avatar_texture := %TopStatusBar.get_node("MainMenuTopStatus/ProfileWidget/AvatarTexture") as TextureRect
@@ -83,7 +88,8 @@ func _apply_responsive_layout() -> void:
 		return
 
 	var safe_margins := _get_safe_area_margins(viewport_size)
-	_layout_top_status_bar(safe_margins)
+	var display_cutouts := _get_display_cutouts(viewport_size)
+	_layout_top_status_bar(safe_margins, viewport_size, display_cutouts)
 	_layout_reward_chest(safe_margins)
 	_layout_bottom_navigation(safe_margins)
 	_bottom_bar.anchor_left = 0.0
@@ -118,15 +124,57 @@ func _layout_bottom_navigation(safe_margins: Vector4) -> void:
 		_bottom_navigation.call("set_safe_bottom_margin", safe_bottom)
 
 
-func _layout_top_status_bar(safe_margins: Vector4) -> void:
+func _layout_top_status_bar(
+	safe_margins: Vector4,
+	viewport_size: Vector2,
+	display_cutouts: Array[Rect2]
+) -> void:
+	var bar_left := safe_margins.x + TOP_SIDE_MARGIN
+	var bar_right := viewport_size.x - safe_margins.z - TOP_SIDE_MARGIN
+	var bar_width := maxf(bar_right - bar_left, 0.0)
+	var bar_center_x := (bar_left + bar_right) * 0.5
+	var default_bar_rect := Rect2(
+		Vector2(bar_left, TOP_MARGIN),
+		Vector2(bar_width, TOP_BAR_HEIGHT)
+	)
+	var required_center_exclusion := 0.0
+	var cutout_fallback_top := TOP_MARGIN
+
+	for cutout: Rect2 in display_cutouts:
+		var padded_cutout := cutout.grow(CAMERA_CUTOUT_PADDING)
+		if not padded_cutout.intersects(default_bar_rect):
+			continue
+
+		var farthest_horizontal_edge := maxf(
+			absf(padded_cutout.position.x - bar_center_x),
+			absf(padded_cutout.end.x - bar_center_x)
+		)
+		required_center_exclusion = maxf(
+			required_center_exclusion,
+			(farthest_horizontal_edge + STATUS_CENTER_VISUAL_OVERFLOW) * 2.0
+		)
+		cutout_fallback_top = maxf(cutout_fallback_top, padded_cutout.end.y)
+
+	var actual_center_exclusion := 0.0
+	if _top_status.has_method("set_center_exclusion_width"):
+		actual_center_exclusion = float(
+			_top_status.call("set_center_exclusion_width", required_center_exclusion, bar_width)
+		)
+
+	var bar_top := TOP_MARGIN
+	if required_center_exclusion > actual_center_exclusion + CUTOUT_LAYOUT_TOLERANCE:
+		bar_top = cutout_fallback_top
+		if _top_status.has_method("set_center_exclusion_width"):
+			_top_status.call("set_center_exclusion_width", 0.0, bar_width)
+
 	_top_status_bar.anchor_left = 0.0
 	_top_status_bar.anchor_top = 0.0
 	_top_status_bar.anchor_right = 1.0
 	_top_status_bar.anchor_bottom = 0.0
-	_top_status_bar.offset_left = safe_margins.x + TOP_SIDE_MARGIN
-	_top_status_bar.offset_top = safe_margins.y
+	_top_status_bar.offset_left = bar_left
+	_top_status_bar.offset_top = bar_top
 	_top_status_bar.offset_right = -(safe_margins.z + TOP_SIDE_MARGIN)
-	_top_status_bar.offset_bottom = safe_margins.y + TOP_BAR_HEIGHT
+	_top_status_bar.offset_bottom = bar_top + TOP_BAR_HEIGHT
 
 
 func _layout_reward_chest(safe_margins: Vector4) -> void:
@@ -135,7 +183,7 @@ func _layout_reward_chest(safe_margins: Vector4) -> void:
 
 	var centered_left := safe_margins.x + TOP_SIDE_MARGIN + ((PROFILE_WIDGET_WIDTH - REWARD_CHEST_SIZE.x) * 0.5)
 	var left := maxf(centered_left, safe_margins.x + 26.0)
-	var top := safe_margins.y + PROFILE_WIDGET_WIDTH + REWARD_CHEST_TOP_GAP
+	var top := _top_status_bar.offset_top + PROFILE_WIDGET_WIDTH + REWARD_CHEST_TOP_GAP
 	_reward_chest.anchor_left = 0.0
 	_reward_chest.anchor_top = 0.0
 	_reward_chest.anchor_right = 0.0
@@ -160,6 +208,21 @@ func _get_safe_area_margins(viewport_size: Vector2) -> Vector4:
 		maxf(float(window_size.x - safe_end.x) * scale.x, 0.0),
 		maxf(float(window_size.y - safe_end.y) * scale.y, 0.0)
 	)
+
+
+func _get_display_cutouts(viewport_size: Vector2) -> Array[Rect2]:
+	var logical_cutouts: Array[Rect2] = []
+	var window_size := Vector2(DisplayServer.window_get_size())
+	if window_size.x <= 0.0 or window_size.y <= 0.0:
+		return logical_cutouts
+
+	var scale := Vector2(viewport_size.x / window_size.x, viewport_size.y / window_size.y)
+	for display_cutout: Rect2 in DisplayServer.get_display_cutouts():
+		logical_cutouts.append(Rect2(
+			Vector2(display_cutout.position) * scale,
+			Vector2(display_cutout.size) * scale
+		))
+	return logical_cutouts
 
 
 func _update_level_button() -> void:
