@@ -4,6 +4,19 @@
 
 Start with `docs/PROJECT_MAP.md` to identify which scene, script, config, or tool owns a feature. Supporting inventories live in `docs/SCENES.md`, `docs/SCRIPTS.md`, and `docs/CONFIGS.md`. Production server planning and implementation requirements live in `docs/BACKEND_REQUIREMENTS.md`.
 
+## One-click Android local development
+
+Double-click `run_android_local_development.cmd`, or run:
+
+```powershell
+.\scripts\tools\run_android_local_development.ps1
+```
+
+The launcher starts or reuses the `sorting-puzzle-api36` emulator, persistent local PostgreSQL
+database and backend API, exports the debug APK, installs it, and launches the game. The emulator,
+database container, and API remain running after the launcher exits. See
+`docs/LOCAL_BACKEND_INTEGRATION.md` for prerequisites and troubleshooting.
+
 ## Level shelf generation
 
 Use `scripts/tools/generate_level_shelves.py` with Python 3.10+ to generate the `shelves` array for a level config.

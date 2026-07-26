@@ -610,6 +610,36 @@ Purpose:
   `scripts/save/local_backend_debug_bootstrap.gd`.
 - Resolves adb from `-AdbPath`, PATH, `ANDROID_SDK_ROOT`, `ANDROID_HOME`, or the standard Windows
   user SDK location.
+- Accepts `-DeviceSerial` when multiple devices are connected and `-HostPort` when emulator
+  tcp:8080 should reverse to a different host API port.
+
+## `scripts/tools/run_android_local_development.ps1`
+
+Purpose:
+- Daily one-command Windows launcher used by `run_android_local_development.cmd`.
+- Starts or reuses the `sorting-puzzle-api36` AVD, starts the persistent PostgreSQL Compose
+  service, validates or creates the complete persistent ignored secret set, runs the idempotent
+  backend development bootstrap, and reuses a healthy Sorting Puzzle API or starts one.
+- Rebuilds the Android secure-store debug AAR, writes the ignored debug-only backend override,
+  exports the configured Android debug APK, and delegates targeted install/launch verification to
+  `android_local_backend_smoke_check.ps1`.
+- Preserves emulator app data, the `sorting_puzzle` database, and local secrets across launches.
+  It leaves the emulator, database container, and API running after completion.
+- Fails instead of overwriting partial secrets, using a mismatched secret/database pair, reusing an
+  unrelated listener, selecting the wrong AVD, or exporting with an incompatible Godot/Node
+  version.
+
+Parameters:
+- `-AvdName`, `-GodotPath`, `-BackendPath`, and `-ApiPort` override workstation paths/routing.
+- `-SkipInstall` and `-SkipPluginBuild` shorten repeat runs only when those outputs are current.
+- `-EmulatorTimeoutSeconds` and `-BackendTimeoutSeconds` control readiness waits.
+
+## `run_android_local_development.cmd`
+
+Purpose:
+- Double-click entry point for the PowerShell daily-development launcher.
+- Keeps the console open on failure so the actionable phase error remains visible; closes after a
+  successful launch while the emulator/backend continue running.
 
 ## `scripts/tools/android_local_backend_identity_smoke_check.ps1`
 

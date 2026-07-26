@@ -303,6 +303,8 @@ Rules:
   a release export both leave `project.godot`'s committed defaults untouched.
 - With `adb reverse tcp:8080 tcp:8080` running, `http://127.0.0.1:8080` reaches the developer
   machine's backend from the Android emulator; `http://10.0.2.2:8080` is the documented fallback.
+- `scripts/tools/run_android_local_development.ps1` regenerates this ignored file for the selected
+  host port workflow before every daily-development debug export; release exports still exclude it.
 
 See:
 - `platform/android/secure-store-plugin/README.md`

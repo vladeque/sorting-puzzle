@@ -153,6 +153,8 @@ Files:
 - `local/backend_debug.example.cfg`
 - `scripts/save/local_backend_debug_bootstrap.gd`
 - `scripts/tools/android_local_backend_smoke_check.ps1`
+- `scripts/tools/run_android_local_development.ps1`
+- `run_android_local_development.cmd`
 - `platform/android/secure-store-plugin/README.md`
 
 Responsibility:
@@ -168,6 +170,10 @@ Responsibility:
 - Documents and automates the `adb reverse tcp:8080 tcp:8080` local routing (with `10.0.2.2` as the
   fallback) and an emulator smoke check for `/health/live` reachability and secure-bridge
   availability.
+- Provides a double-click daily-development launcher that starts or reuses the configured AVD,
+  persistent backend database/secrets, and API before exporting, installing, and launching the
+  debug game. Unlike the disposable GAME-010 gate, it preserves developer and app state and leaves
+  its services running.
 
 Change here when:
 - Changing how the secure-store AAR is built/packaged, the debug export preset, the local override

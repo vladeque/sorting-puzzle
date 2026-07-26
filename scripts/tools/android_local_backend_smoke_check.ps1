@@ -26,6 +26,12 @@
   Optional explicit path to adb.exe. When omitted, the script checks PATH, ANDROID_SDK_ROOT,
   ANDROID_HOME, and the standard per-user Windows Android SDK location.
 
+.PARAMETER DeviceSerial
+  Optional adb serial. Use this when more than one emulator/device is connected.
+
+.PARAMETER HostPort
+  Host API port mapped to emulator tcp:8080. Defaults to 8080.
+
 .PARAMETER TimeoutSeconds
   How long to wait for the expected logcat lines before failing. Defaults to 60.
 #>
@@ -33,6 +39,8 @@ param(
     [string]$ApkPath = "build\android\sorting_puzzle_local_backend_debug.apk",
     [string]$PackageName = "com.sortingpuzzle.game",
     [string]$AdbPath = "",
+    [string]$DeviceSerial = "",
+    [int]$HostPort = 8080,
     [int]$TimeoutSeconds = 60
 )
 
@@ -68,6 +76,10 @@ function Resolve-AdbPath {
 }
 
 $adb = Resolve-AdbPath
+$adbTargetArguments = @()
+if (-not [string]::IsNullOrWhiteSpace($DeviceSerial)) {
+    $adbTargetArguments = @("-s", $DeviceSerial)
+}
 
 if (-not (Test-Path -LiteralPath $ApkPath -PathType Leaf)) {
     Write-Error "Debug APK not found at $ApkPath. Export it first in Godot with the 'Android (Local Backend Debug)' preset (Project > Export > Export Debug)."
@@ -75,22 +87,22 @@ if (-not (Test-Path -LiteralPath $ApkPath -PathType Leaf)) {
 }
 
 Write-Host "Waiting for an adb device..."
-& $adb wait-for-device
+& $adb @adbTargetArguments wait-for-device
 if ($LASTEXITCODE -ne 0) { exit 1 }
 
-Write-Host "adb reverse tcp:8080 tcp:8080"
-& $adb reverse tcp:8080 tcp:8080
+Write-Host "adb reverse tcp:8080 tcp:$HostPort"
+& $adb @adbTargetArguments reverse tcp:8080 "tcp:$HostPort"
 if ($LASTEXITCODE -ne 0) {
     Write-Warning "adb reverse failed. Falling back to the documented http://10.0.2.2:8080 route -- update local/backend_debug.cfg accordingly (see local/backend_debug.example.cfg)."
 }
 
 Write-Host "Installing $ApkPath"
-& $adb install -r $ApkPath
+& $adb @adbTargetArguments install -r $ApkPath
 if ($LASTEXITCODE -ne 0) { exit 1 }
 
 Write-Host "Clearing logcat and launching $PackageName"
-& $adb logcat -c
-& $adb shell monkey -p $PackageName -c android.intent.category.LAUNCHER 1 | Out-Null
+& $adb @adbTargetArguments logcat -c
+& $adb @adbTargetArguments shell monkey -p $PackageName -c android.intent.category.LAUNCHER 1 | Out-Null
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Failed to launch $PackageName."
     exit 1
@@ -102,7 +114,7 @@ $sawHealthyResponse = $false
 $sawBridge = $false
 
 while ((Get-Date) -lt $deadline) {
-    $logcat = & $adb logcat -d 2>$null
+    $logcat = & $adb @adbTargetArguments logcat -d 2>$null
     $provenanceFailure = $logcat |
         Select-String "Backend synchronization disabled \[content_manifest\." |
         Select-Object -First 1

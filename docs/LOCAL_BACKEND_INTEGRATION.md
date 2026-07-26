@@ -19,6 +19,47 @@ save synchronization.
 The local backend remains a recovery and merge destination. It must not become a requirement for
 installed campaign play, local rewards, lives, or local spending.
 
+## Daily one-click Android workflow
+
+For routine development on the configured Windows workstation, double-click:
+
+```text
+run_android_local_development.cmd
+```
+
+The equivalent terminal command is:
+
+```powershell
+.\scripts\tools\run_android_local_development.ps1
+```
+
+The launcher uses the confirmed `sorting-puzzle-api36` AVD, Godot at `D:\Godot\godot.exe`, and the
+sibling `../sorting-puzzle-backend` checkout by default. It starts or reuses the emulator, starts
+the backend PostgreSQL Compose service with its persistent named volume, reuses or creates the
+ignored persistent backend secrets, applies migrations and the idempotent development bootstrap,
+starts or reuses the API, exports the debug APK, installs it, and opens the game. It verifies the
+debug override, `/health/live`, and Android secure-store bridge through logcat before reporting
+success.
+
+The emulator, PostgreSQL container, and API remain running after the command finishes. Re-running
+the command preserves the emulator's app data, backend database, and signing/encryption secrets.
+It does not run the destructive/disposable GAME-010 integration scenario and never clears app data.
+Use `-SkipInstall` or `-SkipPluginBuild` only when the corresponding dependencies/artifacts are
+known to be current. Other AVDs, tool paths, sibling paths, and host API ports can be passed through
+the script parameters.
+
+Prerequisites:
+
+- Godot 4.6.2 with the Android build template already installed for this project.
+- Android SDK with platform-tools, emulator, and the named AVD.
+- JDK 17 and Android SDK Platform 36 for the secure-store plugin.
+- Node.js 24, pnpm 11, and a running Docker Engine with Compose v2.
+
+If launch fails, the error identifies its phase. Backend process logs created by the launcher are
+under ignored `build/local-development/`. The double-click wrapper pauses on failure so the error
+remains visible. If port 8080 is already owned by another service, stop it or pass an unused
+`-ApiPort`; emulator tcp:8080 is still mapped to that host port with `adb reverse`.
+
 ## Confirmed baseline
 
 ### Game repository
