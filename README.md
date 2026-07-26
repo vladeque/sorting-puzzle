@@ -17,6 +17,15 @@ database and backend API, exports the debug APK, installs it, and launches the g
 database container, and API remain running after the launcher exits. See
 `docs/LOCAL_BACKEND_INTEGRATION.md` for prerequisites and troubleshooting.
 
+After changing only the game, double-click `redeploy_android_game.cmd`, or run:
+
+```powershell
+.\scripts\tools\redeploy_android_game.ps1
+```
+
+This faster path requires the emulator and backend to already be running. It exports and installs
+the updated APK, preserves app data, and restarts the game without repeating backend setup.
+
 ## Level shelf generation
 
 Use `scripts/tools/generate_level_shelves.py` with Python 3.10+ to generate the `shelves` array for a level config.

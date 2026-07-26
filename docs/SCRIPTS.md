@@ -656,6 +656,30 @@ Purpose:
 - Keeps the console open on failure so the actionable phase error remains visible; closes after a
   successful launch while the emulator/backend continue running.
 
+## `scripts/tools/redeploy_android_game.ps1`
+
+Purpose:
+- Fast game-only Android iteration path used after the full local-development workflow is already
+  running.
+- Requires the named AVD, persistent backend API, ignored debug config, Android build template, and
+  secure-store debug AAR to exist and be ready; it does not start or rebuild any of them.
+- Runs the authored-source content-provenance gate before exporting so level/config changes that
+  require a backend republication fail instead of producing a stale network-enabled APK.
+- Exports the Android debug preset, refreshes `adb reverse`, force-stops the installed game,
+  installs the APK with `adb install -r`, relaunches it, and waits for the Android process.
+- Preserves Android app data and therefore the existing installation identity, secure session, and
+  local save.
+
+Parameters:
+- `-AvdName`, `-GodotPath`, `-ApiPort`, and `-PackageName` override workstation/target defaults.
+- `-LaunchTimeoutSeconds` controls the final process-start wait.
+
+## `redeploy_android_game.cmd`
+
+Purpose:
+- Double-click entry point for the fast game-only redeploy script.
+- Keeps the console open on failure and closes after the updated game is running.
+
 ## `scripts/tools/android_local_backend_identity_smoke_check.ps1`
 
 Purpose:

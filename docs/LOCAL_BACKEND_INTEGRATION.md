@@ -60,6 +60,30 @@ under ignored `build/local-development/`. The double-click wrapper pauses on fai
 remains visible. If port 8080 is already owned by another service, stop it or pass an unused
 `-ApiPort`; emulator tcp:8080 is still mapped to that host port with `adb reverse`.
 
+### Fast redeploy after game-only changes
+
+When the full workflow is already running and only game files changed, double-click:
+
+```text
+redeploy_android_game.cmd
+```
+
+or run:
+
+```powershell
+.\scripts\tools\redeploy_android_game.ps1
+```
+
+This path does not start the emulator or modify Docker, PostgreSQL, backend processes, backend
+dependencies, secrets, or the native Android plugin. It requires the configured emulator and API
+to already be ready, runs the content-provenance pre-export check, exports the new debug APK,
+refreshes `adb reverse`, installs with `adb install -r`, and restarts the game. Android app data is
+not cleared, so the installation identity, secure session, and local save are preserved.
+
+If a level or other backend-published content source changed, the provenance check intentionally
+fails. Run the full `run_android_local_development.cmd` workflow to republish/bootstrap matching
+development content before redeploying.
+
 ## Confirmed baseline
 
 ### Game repository
