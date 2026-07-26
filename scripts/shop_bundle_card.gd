@@ -7,6 +7,7 @@ signal purchase_pressed(offer_id: StringName)
 @onready var _hammer_count := %HammerCount as Label
 @onready var _shuffle_count := %ShuffleCount as Label
 @onready var _lantern_count := %LanternCount as Label
+@onready var _freezer_count := %FreezerCount as Label
 @onready var _coin_count := %CoinCount as Label
 @onready var _purchase_button := %PurchaseButton as Button
 
@@ -26,6 +27,7 @@ func set_offer(offer: Dictionary) -> void:
 	_hammer_count.text = "×%d" % maxi(int(abilities.get("hammer", 0)), 0)
 	_shuffle_count.text = "×%d" % maxi(int(abilities.get("shuffle", 0)), 0)
 	_lantern_count.text = "×%d" % maxi(int(abilities.get("highlight", 0)), 0)
+	_freezer_count.text = "×%d" % maxi(int(abilities.get("freezer", 0)), 0)
 	_coin_count.text = _format_count(maxi(int(rewards.get("coins", 0)), 0))
 	var store := offer.get("store", {}) as Dictionary
 	_formatted_price = str(store.get("formatted_price", "Unavailable"))

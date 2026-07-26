@@ -39,6 +39,11 @@ func _run() -> void:
 	_check(bundles.get_child_count() == 1, "Expected one configured bundle card.")
 	_check(coin_offers.get_child_count() == 5, "Expected five configured coin offers.")
 	_check((shop.get_node("%TitleLabel") as Label).text == "Shop", "Shop title is missing.")
+	var bundle_card := bundles.get_child(0) as Control
+	_check(
+		(bundle_card.get_node("%FreezerCount") as Label).text == "×3",
+		"Starter bundle card does not show three Freezers."
+	)
 
 	for resolution in TEST_RESOLUTIONS:
 		get_tree().root.size = resolution
@@ -47,9 +52,14 @@ func _run() -> void:
 		var logical_size := shop.get_viewport_rect().size
 		var navigation := shop.get_node("%BottomNavigation") as Control
 		var content := shop.get_node("%ContentMargin") as Control
+		var reward_row := bundle_card.get_node("CardStack/Rewards") as HBoxContainer
 		_check(content.position.x >= 0.0, "Content escaped the left edge at %s." % resolution)
 		_check(content.position.x + content.size.x <= logical_size.x + 1.0, "Content escaped the right edge at %s." % resolution)
 		_check(navigation.position.y + navigation.size.y <= logical_size.y + 1.0, "Navigation escaped the bottom edge at %s." % resolution)
+		_check(
+			reward_row.size.x <= bundle_card.size.x + 1.0,
+			"Five starter rewards overflowed the bundle card at %s." % resolution
+		)
 		print("Shop layout %s -> logical %s" % [resolution, logical_size])
 
 	get_tree().root.size = Vector2i(720, 1280)

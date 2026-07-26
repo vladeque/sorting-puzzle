@@ -118,8 +118,11 @@ Runtime children:
 
 ## `scenes/ui/shop_bundle_card.tscn`
 
-- Reusable full-width featured offer card with title, purchase button, and fixed reward cells for hammer, shuffle, lantern (`highlight` internally), and coins.
+- Reusable full-width featured offer card with title, purchase button, and fixed reward cells for
+  Hammer, Shuffle, Lantern (`highlight` internally), Freezer, and coins.
 - The scene owns reward art and styling; `scripts/shop_bundle_card.gd` binds quantities and the store-formatted price.
+- The Freezer reward cell uses an explicit art-review placeholder until the generated icon
+  candidate is approved; no generated artwork is referenced yet.
 
 ## `scenes/ui/shop_coin_offer_row.tscn`
 
@@ -137,7 +140,9 @@ Runtime children:
 
 ## `scenes/shop_verification.tscn`
 
-- Automated verification entry scene for regional prices, required viewport sizes, offer counts, mock grants, purchase dialog display, and duplicate-transaction handling.
+- Automated verification entry scene for regional prices, required viewport sizes, five-cell
+  starter reward layout, offer counts, mock grants (including three Freezers), purchase dialog
+  display, and duplicate-transaction handling.
 
 ## `scenes/ui/main_menu_reward_coin_flyer.tscn`
 

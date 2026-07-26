@@ -198,6 +198,45 @@ theme_override_font_sizes/font_size = 24
 text = "×3"
 horizontal_alignment = 1
 
+[node name="FreezerReward" type="PanelContainer" parent="CardStack/Rewards"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_reward")
+
+[node name="Stack" type="VBoxContainer" parent="CardStack/Rewards/FreezerReward"]
+layout_mode = 2
+theme_override_constants/separation = -4
+
+[node name="Icon" type="TextureRect" parent="CardStack/Rewards/FreezerReward/Stack"]
+custom_minimum_size = Vector2(72, 82)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ArtPendingLabel" type="Label" parent="CardStack/Rewards/FreezerReward/Stack/Icon"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.72, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 12
+text = "FREEZE"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FreezerCount" type="Label" parent="CardStack/Rewards/FreezerReward/Stack"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.12, 0.01, 0.02, 1)
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 24
+text = "×3"
+horizontal_alignment = 1
+
 [node name="CoinReward" type="PanelContainer" parent="CardStack/Rewards"]
 layout_mode = 2
 size_flags_horizontal = 3

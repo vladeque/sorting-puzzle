@@ -136,7 +136,8 @@ Depends on:
 
 ## Shop component scripts
 
-- `scripts/shop_bundle_card.gd`: binds one bundle's title, rewards, formatted price, and purchase signal.
+- `scripts/shop_bundle_card.gd`: binds one bundle's title, Hammer/Shuffle/Lantern/Freezer/coin
+  rewards, formatted price, and purchase signal.
 - `scripts/shop_coin_offer_row.gd`: binds a coin quantity, formatted price, and purchase signal.
 - `scripts/coin_balance_widget.gd`: formats and displays a non-negative coin balance.
 - `scripts/shop_purchase_dialog.gd`: shows and dismisses a focused purchase result modal.
@@ -152,7 +153,9 @@ Depends on:
 ## `scripts/tools/verify_shop.gd`
 
 - Runs through `scenes/shop_verification.tscn` with an isolated test user-data directory.
-- Verifies US, Ukrainian, German, and Japanese mock price strings; five representative portrait viewports; offer population; coin and bundle purchases; and duplicate transaction protection.
+- Verifies US, Ukrainian, German, and Japanese mock price strings; five representative portrait
+  viewports; the five-reward starter layout; offer population; coin and bundle purchases including
+  three Freezers; and duplicate transaction protection.
 
 ## `scripts/leaderboard_row.gd`
 

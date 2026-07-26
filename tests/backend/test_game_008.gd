@@ -105,6 +105,7 @@ func _finish() -> void:
 
 func _run_source_tests() -> void:
 	await _check_eligible_offers_are_joined_and_priced()
+	await _check_historic_bundle_without_freezer_remains_compatible()
 	await _check_ineligible_offers_are_excluded()
 	await _check_unknown_offer_type_is_excluded()
 	await _check_offer_without_local_price_entry_is_excluded()
@@ -134,10 +135,38 @@ func _check_eligible_offers_are_joined_and_priced() -> void:
 	_check(str(starter.get("type", "")) == "bundle", "starter offer type maps to bundle")
 	_check(str(starter.get("title", "")) == "Starter Bundle", "starter offer title comes from the local presentation table")
 	_check(int((starter.get("rewards", {}) as Dictionary).get("coins", -1)) == 1000, "starter offer rewards come from the backend")
+	_check(
+		int(
+			((starter.get("rewards", {}) as Dictionary).get("abilities", {}) as Dictionary).get(
+				"freezer",
+				-1
+			)
+		) == 3,
+		"new starter catalog versions retain three Freezer rewards"
+	)
 	var starter_store := starter.get("store", {}) as Dictionary
 	_check(str(starter_store.get("formatted_price", "")) == "$4.99", "starter offer price is joined from the mock price table")
 	var coins := _find_offer(offers, "coin_pack_small")
 	_check(str(coins.get("type", "")) == "coins", "coin pack offer type maps to coins")
+
+
+func _check_historic_bundle_without_freezer_remains_compatible() -> void:
+	var source := _make_source(_next_cache_path())
+	var historic_offer := _backend_offer(
+		"starter_bundle",
+		"starter",
+		"sorting_puzzle.local.starter_bundle",
+		true
+	)
+	((historic_offer.get("rewards", {}) as Dictionary).get("abilities", {}) as Dictionary).erase(
+		"freezer"
+	)
+	(source.get("transport") as FakeTransport).get_queue = [_catalog_success([historic_offer])]
+	var result: Dictionary = await source.get("source").load_catalog(_price_provider())
+	_check(bool(result.get("ok", false)), "historic starter catalog without Freezer remains valid")
+	var starter := _find_offer(result.get("offers", []) as Array, "starter_bundle")
+	var abilities := (starter.get("rewards", {}) as Dictionary).get("abilities", {}) as Dictionary
+	_check(int(abilities.get("freezer", -1)) == 0, "historic starter catalog grants no Freezer")
 
 
 func _check_ineligible_offers_are_excluded() -> void:
@@ -341,7 +370,7 @@ func _backend_offer(offer_id: String, offer_type: String, platform_product_id: S
 		"title_key": "shop.offer.%s.title" % offer_id,
 		"rewards": {
 			"coins": 1000,
-			"abilities": {"hammer": 3, "shuffle": 3, "highlight": 3},
+			"abilities": {"hammer": 3, "shuffle": 3, "highlight": 3, "freezer": 3},
 		},
 		"platform_product_id": platform_product_id,
 		"limit_period": "lifetime",
