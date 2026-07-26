@@ -13,7 +13,9 @@ const BASE_ITEM_PICK_SIZE := Vector2(74, 112)
 const ABILITY_HAMMER := &"hammer"
 const ABILITY_SHUFFLE := &"shuffle"
 const ABILITY_HIGHLIGHT := &"highlight"
+const ABILITY_FREEZER := &"freezer"
 const HIGHLIGHT_DURATION_SECONDS := 15.0
+const FREEZER_DURATION_SECONDS := 30.0
 const SHELF_SCENE := preload("res://scenes/shelf.tscn")
 const MOVING_SHELF_ROW_SCENE := preload("res://scenes/moving_shelf_row.tscn")
 const ITEM_SCENE := preload("res://scenes/item.tscn")
@@ -59,8 +61,6 @@ const STAR_COUNTER_GAP := 40.0
 const ABILITY_BAR_HEIGHT := 126.0
 const ABILITY_BAR_DESIGN_BOTTOM_MARGIN := 96.0
 const ABILITY_BAR_SAFE_BOTTOM_PADDING := 24.0
-const ABILITY_BUTTON_ROW_SIZE := Vector2(396, 100)
-const ABILITY_BUTTON_ROW_TOP := 12.0
 const SHELVES_TOP_CLEARANCE := 128.0
 const SHELVES_BOTTOM_CLEARANCE := 52.0
 const SHELVES_SIDE_MARGIN := 16.0
@@ -120,6 +120,7 @@ const DEFAULT_ABILITY_PURCHASE_PRICES := {
 	ABILITY_HAMMER: 100,
 	ABILITY_SHUFFLE: 100,
 	ABILITY_HIGHLIGHT: 100,
+	ABILITY_FREEZER: 100,
 }
 @export var slot_snap_distance := BASE_SLOT_SNAP_DISTANCE * SHELF_CELL_VISUAL_SCALE
 @export var item_pick_size := BASE_ITEM_PICK_SIZE * SHELF_CELL_VISUAL_SCALE
@@ -169,14 +170,12 @@ var _confirm_leave_button: Button
 var _confirm_continue_button: Button
 var _leave_confirmation_star_count_label: Label
 var _ability_purchase_overlay: AbilityPurchaseMenu
-var _ability_bar: Control
-var _ability_button_row: Control
-var _ability_buttons: Dictionary = {}
-var _highlight_timer_label: Label
+var _ability_bar: AbilityBar
 var _ability_uses: Dictionary = {
 	ABILITY_HAMMER: 3,
 	ABILITY_SHUFFLE: 3,
 	ABILITY_HIGHLIGHT: 3,
+	ABILITY_FREEZER: 3,
 }
 var _ability_purchase_prices: Dictionary = DEFAULT_ABILITY_PURCHASE_PRICES.duplicate()
 var _ability_purchase_pending_id := StringName()
@@ -189,6 +188,8 @@ var _level_paused := false
 var _returning_to_menu := false
 var _life_spent_for_run := false
 var _highlight_timer := 0.0
+var _freezer_time_remaining := 0.0
+var _app_interrupted := false
 var _combo_count := 0
 var _combo_time_remaining := 0.0
 var _stars := 0
@@ -237,8 +238,7 @@ func _ready() -> void:
 	_confirm_continue_button = get_node("UI/LeaveConfirmationOverlay/ConfirmationPanel/ButtonRow/ContinueButton") as Button
 	_leave_confirmation_star_count_label = get_node("UI/LeaveConfirmationOverlay/ConfirmationPanel/InnerPanel/LossRow/StarLoss/CountLabel") as Label
 	_ability_purchase_overlay = get_node("UI/AbilityPurchaseOverlay") as AbilityPurchaseMenu
-	_ability_bar = get_node("UI/AbilityBar") as Control
-	_ability_button_row = get_node("UI/AbilityBar/HBoxContainer") as Control
+	_ability_bar = get_node("UI/AbilityBar") as AbilityBar
 	_failure_panel.visible = false
 	_completion_screen.visible = false
 	_pause_menu_overlay.visible = false
@@ -382,16 +382,7 @@ func _layout_ability_bar(safe_margins: Vector4) -> void:
 	_ability_bar.offset_top = -(bottom_margin + ABILITY_BAR_HEIGHT)
 	_ability_bar.offset_right = -safe_margins.z
 	_ability_bar.offset_bottom = -bottom_margin
-
-	if _ability_button_row != null:
-		_ability_button_row.anchor_left = 0.5
-		_ability_button_row.anchor_top = 0.0
-		_ability_button_row.anchor_right = 0.5
-		_ability_button_row.anchor_bottom = 0.0
-		_ability_button_row.offset_left = -ABILITY_BUTTON_ROW_SIZE.x * 0.5
-		_ability_button_row.offset_top = ABILITY_BUTTON_ROW_TOP
-		_ability_button_row.offset_right = ABILITY_BUTTON_ROW_SIZE.x * 0.5
-		_ability_button_row.offset_bottom = ABILITY_BUTTON_ROW_TOP + ABILITY_BUTTON_ROW_SIZE.y
+	_ability_bar.apply_responsive_layout(get_viewport_rect().size.x)
 
 
 func _get_ability_bar_bottom_margin(safe_margins: Vector4) -> float:
@@ -644,6 +635,11 @@ func _process(delta: float) -> void:
 	if _level_paused:
 		return
 
+	if _app_interrupted:
+		return
+
+	var countdown_delta := _update_freezer_timer(delta)
+
 	if _is_ability_effect_active():
 		return
 
@@ -654,11 +650,22 @@ func _process(delta: float) -> void:
 	if not _has_player_started_timer:
 		return
 
-	_time_remaining = maxf(_time_remaining - delta, 0.0)
+	_time_remaining = maxf(_time_remaining - countdown_delta, 0.0)
 	_update_timer_label()
 
 	if _time_remaining <= 0.0:
 		_fail_level()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_PAUSED:
+		_app_interrupted = true
+	elif what == NOTIFICATION_APPLICATION_RESUMED:
+		_app_interrupted = false
+
+
+func _exit_tree() -> void:
+	_clear_freezer()
 
 
 func _input(event: InputEvent) -> void:
@@ -763,6 +770,7 @@ func _apply_level_config(config: Dictionary) -> void:
 	_level_failed = false
 	_level_completed = false
 	_level_paused = false
+	_app_interrupted = false
 	_life_spent_for_run = false
 	_triples_cleared = 0
 	_stars = 0
@@ -784,6 +792,7 @@ func _apply_level_config(config: Dictionary) -> void:
 	_shelves_resolving_ids.clear()
 
 	_clear_ability_highlights()
+	_clear_freezer()
 	_load_ability_uses()
 
 	var shelves_config := config.get("shelves", []) as Array
@@ -1627,6 +1636,7 @@ func _start_level_timer_from_player_action() -> void:
 func _fail_level() -> void:
 	_level_failed = true
 	_level_paused = false
+	_clear_freezer()
 	_spend_campaign_life_for_run("failed")
 	_reset_combo()
 	_clear_selected_item()
@@ -1657,6 +1667,7 @@ func _complete_level() -> void:
 
 	_level_completed = true
 	_level_paused = false
+	_clear_freezer()
 	_reset_combo()
 	_clear_selected_item()
 	_set_moving_shelf_rows_paused(true)
@@ -1689,6 +1700,7 @@ func _check_level_completed() -> void:
 func _return_to_main_menu() -> void:
 	_level_paused = false
 	_returning_to_menu = true
+	_clear_freezer()
 	var menu_scene_path := return_menu_scene_path if return_menu_scene_path != "" else MAIN_MENU_SCENE
 	var error := get_tree().change_scene_to_file(menu_scene_path)
 	if error != OK:
@@ -2943,25 +2955,18 @@ func _apply_item_visual_state(item: ShelfItem) -> void:
 
 
 func _setup_ability_buttons() -> void:
-	_register_ability_button(ABILITY_HAMMER, "UI/AbilityBar/HBoxContainer/HammerButton")
-	_register_ability_button(ABILITY_SHUFFLE, "UI/AbilityBar/HBoxContainer/ShuffleButton")
-	_register_ability_button(ABILITY_HIGHLIGHT, "UI/AbilityBar/HBoxContainer/HighlightButton")
-	_highlight_timer_label = get_node_or_null("UI/AbilityBar/HBoxContainer/HighlightButton/TimerLabel") as Label
-	_update_highlight_timer_label()
-
-
-func _register_ability_button(ability_id: StringName, button_path: NodePath) -> void:
-	var button := get_node_or_null(button_path) as Button
-	if button == null:
-		push_warning("Missing ability button: %s" % button_path)
+	if _ability_bar == null:
+		push_warning("Missing reusable ability bar.")
 		return
-
-	_ability_buttons[ability_id] = button
-	button.pressed.connect(_on_ability_button_pressed.bind(ability_id))
+	_ability_bar.ability_pressed.connect(_on_ability_button_pressed)
+	_update_highlight_timer_label()
+	_update_freezer_visuals()
 
 
 func _on_ability_button_pressed(ability_id: StringName) -> void:
 	if _level_failed or _level_completed or _level_paused or _is_ability_effect_active():
+		return
+	if ability_id == ABILITY_FREEZER and _is_freezer_active():
 		return
 
 	if int(_ability_uses.get(ability_id, 0)) <= 0:
@@ -2988,6 +2993,8 @@ func _apply_ability_from_button(ability_id: StringName) -> bool:
 			did_apply = _use_shuffle()
 		ABILITY_HIGHLIGHT:
 			did_apply = _use_highlight()
+		ABILITY_FREEZER:
+			did_apply = _use_freezer()
 
 	if not did_apply:
 		push_error("Ability passed preflight but could not start: %s" % String(ability_id))
@@ -3013,6 +3020,8 @@ func _apply_paid_ability(ability_id: StringName) -> bool:
 			did_apply = _use_shuffle()
 		ABILITY_HIGHLIGHT:
 			did_apply = _use_highlight()
+		ABILITY_FREEZER:
+			did_apply = _use_freezer()
 
 	if not did_apply:
 		return false
@@ -3037,6 +3046,8 @@ func _can_apply_ability(ability_id: StringName) -> bool:
 			return not _is_resolving_shelves and _get_shuffle_eligible_items().size() >= 2
 		ABILITY_HIGHLIGHT:
 			return true
+		ABILITY_FREEZER:
+			return not _is_freezer_active()
 	return false
 
 
@@ -3609,6 +3620,14 @@ func _use_highlight() -> bool:
 	return true
 
 
+func _use_freezer() -> bool:
+	if _is_freezer_active():
+		return false
+	_freezer_time_remaining = FREEZER_DURATION_SECONDS
+	_update_freezer_visuals()
+	return true
+
+
 func _destroy_items(items_to_destroy: Array[ShelfItem]) -> void:
 	var shelves_to_check: Array[Node] = []
 	var destroyed_count := 0
@@ -3705,22 +3724,60 @@ func _clear_ability_highlights() -> void:
 
 
 func _update_highlight_timer_label() -> void:
-	if _highlight_timer_label == null:
+	if _ability_bar == null:
 		return
+	_ability_bar.set_active_seconds(
+		ABILITY_HIGHLIGHT,
+		_highlight_timer if not _level_failed and not _level_completed else 0.0
+	)
 
-	var should_show := _highlight_timer > 0.0 and not _level_failed and not _level_completed
-	_highlight_timer_label.visible = should_show
-	if not should_show:
+
+func _update_freezer_timer(delta: float) -> float:
+	if not _is_freezer_active():
+		return delta
+	var frozen_delta := minf(maxf(delta, 0.0), _freezer_time_remaining)
+	_freezer_time_remaining = maxf(_freezer_time_remaining - frozen_delta, 0.0)
+	_update_freezer_visuals()
+	return maxf(delta - frozen_delta, 0.0)
+
+
+func _is_freezer_active() -> bool:
+	return _freezer_time_remaining > 0.0
+
+
+func _clear_freezer() -> void:
+	_freezer_time_remaining = 0.0
+	_update_freezer_visuals()
+
+
+func _update_freezer_visuals() -> void:
+	var is_active := _is_freezer_active() and not _level_failed and not _level_completed
+	if _ability_bar != null:
+		_ability_bar.set_active_seconds(
+			ABILITY_FREEZER,
+			_freezer_time_remaining if is_active else 0.0
+		)
+	if _timer_label == null or not is_instance_valid(_timer_label):
 		return
-
-	_highlight_timer_label.text = "%ds" % ceili(_highlight_timer)
+	if is_active:
+		_timer_label.add_theme_color_override("font_color", Color(0.68, 0.96, 1.0, 1.0))
+		_timer_label.add_theme_color_override("font_outline_color", Color(0.08, 0.34, 0.52, 0.95))
+		_timer_label.add_theme_constant_override("outline_size", 5)
+	else:
+		_timer_label.remove_theme_color_override("font_color")
+		_timer_label.remove_theme_color_override("font_outline_color")
+		_timer_label.remove_theme_constant_override("outline_size")
 
 
 func _update_ability_buttons() -> void:
-	_update_ability_button(ABILITY_HAMMER)
-	_update_ability_button(ABILITY_SHUFFLE)
-	_update_ability_button(ABILITY_HIGHLIGHT)
+	if _ability_bar != null:
+		_ability_bar.set_uses(_ability_uses)
+		_ability_bar.set_interaction_blocked(
+			_level_failed or _level_completed or _level_paused or _is_ability_effect_active(),
+			_is_freezer_active()
+		)
 	_update_highlight_timer_label()
+	_update_freezer_visuals()
 
 
 func _reset_ability_uses() -> void:
@@ -3728,6 +3785,7 @@ func _reset_ability_uses() -> void:
 		ABILITY_HAMMER: 3,
 		ABILITY_SHUFFLE: 3,
 		ABILITY_HIGHLIGHT: 3,
+		ABILITY_FREEZER: 3,
 	}
 
 
@@ -3741,29 +3799,10 @@ func _load_ability_uses() -> void:
 		ABILITY_HAMMER: maxi(int(saved_uses.get(String(ABILITY_HAMMER), 3)), 0),
 		ABILITY_SHUFFLE: maxi(int(saved_uses.get(String(ABILITY_SHUFFLE), 3)), 0),
 		ABILITY_HIGHLIGHT: maxi(int(saved_uses.get(String(ABILITY_HIGHLIGHT), 3)), 0),
+		ABILITY_FREEZER: maxi(int(saved_uses.get(String(ABILITY_FREEZER), 3)), 0),
 	}
-
-
-func _update_ability_button(ability_id: StringName) -> void:
-	var button := _ability_buttons.get(ability_id) as Button
-	if button == null:
-		return
-
-	var uses_left := int(_ability_uses.get(ability_id, 0))
-	var uses_label := button.get_node_or_null("UsesLabel") as Label
-	if uses_label != null:
-		uses_label.text = str(uses_left)
-
-	button.disabled = _level_failed or _level_completed or _level_paused or _is_ability_effect_active()
-
-
 func _get_ability_icon_texture(ability_id: StringName) -> Texture2D:
-	var button := _ability_buttons.get(ability_id) as Button
-	if button == null:
-		return null
-
-	var icon := button.get_node_or_null("Icon") as TextureRect
-	return icon.texture if icon != null else null
+	return _ability_bar.get_icon_texture(ability_id) if _ability_bar != null else null
 
 
 func _get_ability_purchase_price(ability_id: StringName) -> int:

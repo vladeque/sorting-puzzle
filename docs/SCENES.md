@@ -376,15 +376,14 @@ Important nodes:
 - `Background/HudCenterSlot/ComboLabel`: hidden until the player clears a triple, then shows the active combo count.
 - `Shelves`: parent for generated shelf nodes and optional moving shelf row containers; `scripts/level.gd` scales and centers it in the available play area for the current viewport size.
 - `DragLayer`: temporary parent for dragged items, drawn above shelves.
-- `UI`: `CanvasLayer` for gameplay labels, ability buttons, and overlays; top-level controls are anchored or positioned at runtime for non-720x1280 portrait screens.
+- `UI`: `CanvasLayer` for gameplay labels, the reusable ability bar, and overlays; top-level
+  controls are anchored or positioned at runtime for non-720x1280 portrait screens.
 - `UI/TimerLabel`: countdown display.
 - `UI/LevelLabel`: current level display.
 - `UI/StarCounterLabel`: top HUD star total panel, positioned between the timer area and pause button, with a small `reward_star.png` icon and numeric `CountLabel`.
 - `UI/PauseMenuButton`: circular top-right button that pauses the active level and opens the pause menu overlay.
-- `UI/AbilityBar/HBoxContainer/HammerButton`: hammer ability button.
-- `UI/AbilityBar/HBoxContainer/ShuffleButton`: shuffle ability button.
-- `UI/AbilityBar/HBoxContainer/HighlightButton`: highlight ability button.
-- `UI/AbilityBar/HBoxContainer/HighlightButton/TimerLabel`: active highlight ability countdown.
+- `UI/AbilityBar`: `scenes/ui/ability_bar.tscn` instance; its focused owner script owns all four
+  buttons, use badges, timed badges, touch-target sizing, and the `ability_pressed` signal.
 - `UI/FailurePanel`: shown when time runs out.
 - `UI/CompletionScreen`: `scenes/ui/level_completion_screen.tscn` instance shown after all items clear.
 - `UI/PauseMenuOverlay`: `scenes/pause_menu.tscn` instance used for the modal pause menu.
@@ -407,6 +406,7 @@ Depends on:
 - `scenes/pause_menu.tscn`
 - `scenes/leave_confirmation_menu.tscn`
 - `scenes/ability_purchase_menu.tscn`
+- `scenes/ui/ability_bar.tscn`
 - `assets/audio/*.wav`
 - `configs/item_sprites.json`
 - `configs/ability_purchase_prices.json`
@@ -417,6 +417,35 @@ Depends on:
 Do not use for:
 - Static shelf cell visuals. Put those in `scenes/shelf.tscn`.
 
+## `scenes/ui/ability_bar.tscn`
+
+Root:
+- `AbilityBar` (`Control`)
+
+Script:
+- `scripts/ability_bar.gd`
+
+Purpose:
+- Reusable four-ability gameplay control extracted from `level.tscn`.
+- Owns Hammer, Shuffle, Lantern/highlight, and Freezer buttons; each has a minimum 82x82 compact
+  touch target and a 96x96 regular target.
+- Owns remaining-use badges plus independent Lantern and Freezer active countdown badges.
+- Emits `ability_pressed(ability_id)` and exposes focused state/layout methods; `scripts/level.gd`
+  remains the gameplay/economy orchestrator.
+- The Freezer button currently carries an explicit text-only art-review placeholder. The selected
+  generated icon will replace it together with the focused Freezer effect scene after product
+  approval.
+
+Important nodes:
+- `ButtonRow/HammerButton`
+- `ButtonRow/ShuffleButton`
+- `ButtonRow/HighlightButton/TimerLabel`
+- `ButtonRow/FreezerButton/TimerLabel`
+
+Do not use for:
+- Spending inventory, opening purchase UI, or applying effects. Those remain in
+  `scripts/level.gd` and `PlayerProgress`.
+
 ## `scenes/ability_purchase_menu.tscn`
 
 Root:
@@ -426,7 +455,8 @@ Script:
 - `scripts/ability_purchase_menu.gd`
 
 Purpose:
-- Reusable in-level purchase modal shown by `scripts/level.gd` when the player tries to use hammer, shuffle, or highlight with zero remaining uses.
+- Reusable in-level purchase modal shown by `scripts/level.gd` when the player tries to use
+  hammer, shuffle, highlight/Lantern, or Freezer with zero remaining uses.
 - Reuses the leave-confirmation modal treatment with a dimmed fullscreen background, warm outer popup, cream inner content panel, and protruding red close button.
 - Shows the `Get more items` title, the selected ability icon in a centered slot, a bottom-right `x1` count badge, a green coin-price image button, and a yellow-orange `Watch ad` image button.
 

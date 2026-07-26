@@ -730,3 +730,54 @@ Verification on 2026-07-26:
   the same Godot Android POST request never emitted `request_completed`. This is the existing
   workstation/emulator transport limitation documented under GAME-004, not a failure of the new
   orchestration, disposable cleanup, contract runner, or backend assertions.
+
+## GAME-011 — Add the Freezer countdown ability
+
+**Type:** Product/Gameplay
+**Status:** Client implementation in progress on 2026-07-26; generated art selection and the
+backend v2.1/catalog publication remain open dependencies.
+**Description:** Add `freezer` as the fourth first-class ability. A successful use freezes only
+the level countdown for 30 seconds of active gameplay while normal puzzle interaction and all
+other gameplay timers continue.
+
+**Backend dependencies:**
+- [`BE-208`](../../sorting-puzzle-backend/docs/IMPLEMENTATION_TICKETS.md#be-208--implement-authoritative-ability-spending)
+  for canonical ability inventory/economy handling.
+- [`BE-307`](../../sorting-puzzle-backend/docs/IMPLEMENTATION_TICKETS.md#be-307--implement-unrestricted-local-first-save-synchronization)
+  for journal/checkpoint merge semantics.
+- The product-requested backend Freezer/v2.1 catalog ticket is not yet present in the checked-out
+  sibling repository. Its eventual identifier/publication must be linked here before release.
+
+**Timing contract:**
+- Activation sets a 30-second active-gameplay window and starts the level timer if it was idle.
+- While active, only `_time_remaining` is suppressed. Item input/moves, moving shelf rows,
+  matches, animations, combo expiration, and Lantern expiration continue normally.
+- Pause, leave/purchase modals, and application interruption suspend the Freezer window.
+- Freezer cannot stack or refresh. Preflight rejects an active use before inventory or coins are
+  spent.
+- A delta that crosses expiry freezes only the exact remaining portion; its remainder advances the
+  level countdown.
+- Completion, failure, leave, load/reset, and scene teardown clear runtime state and visuals.
+
+**Ownership:**
+- `scenes/ui/ability_bar.tscn` and `scripts/ability_bar.gd`: four-button visual hierarchy,
+  responsive touch targets, uses badges, and active countdown badges.
+- `scripts/level.gd`: activation preflight, exact timing, countdown gating, pause/interruption, and
+  terminal cleanup.
+- `scripts/player_progress.gd` and `scripts/save/*`: schema-5 migration, immediate persistence,
+  `resource_spend`, crash recovery, and v2.1/v2.0-compatible reconciliation.
+- `configs/ability_purchase_prices.json`: 100-coin paid immediate use.
+- Shop/catalog adapters: additive three-Freezer starter rewards for new catalog versions while
+  historic versions without the field remain valid.
+
+**Automated verification:**
+
+```powershell
+& 'D:\Godot\godot.exe' --headless --path . --script tests/gameplay/test_game_011.gd
+```
+
+The accelerated-delta suite covers activation before the first move, exact countdown suppression,
+other timers and moving rows continuing, pause/purchase/app-interruption suspension, non-stacking
+and no accidental spend, terminal cleanup, zero-inventory coin purchase, insufficient coins,
+offline persistence/restart, v2.1 request/reconciliation plus v2.0 checkpoint compatibility,
+starter-grant idempotency, and layout assertions at the required portrait sizes.

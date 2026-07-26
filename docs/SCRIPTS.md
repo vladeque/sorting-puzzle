@@ -830,6 +830,28 @@ Purpose:
 Depends on:
 - `docs/CLOUD_SAVE.md` for release setup details.
 
+## `scripts/ability_bar.gd`
+
+Class:
+- `AbilityBar`
+
+Attached to:
+- `scenes/ui/ability_bar.tscn`.
+
+Purpose:
+- Owns the four-button visual hierarchy, per-ability remaining-use badges, Lantern/Freezer active
+  countdown badges, button enablement, icon lookup, responsive touch-target sizing, and the
+  `ability_pressed(ability_id)` signal.
+- Keeps gameplay preflight, persistence, purchase, and effect execution out of the UI component.
+
+Key methods:
+- `set_uses(ability_uses)`.
+- `set_interaction_blocked(is_blocked, freezer_active)`.
+- `set_active_seconds(ability_id, seconds_remaining)`.
+- `get_icon_texture(ability_id)`.
+- `get_ability_button(ability_id)`.
+- `apply_responsive_layout(viewport_width)`.
+
 ## `scripts/level.gd`
 
 Attached to:
@@ -916,7 +938,9 @@ Key responsibilities:
 - Keep the level countdown idle until the first meaningful player action, then format the active timer as zero-padded `MM:SS` text with `_update_timer_label()`.
 - Pause and resume active gameplay through the top-right menu button, the instanced `UI/PauseMenuOverlay`, `UI/LeaveConfirmationOverlay`, `Leave`, `Continue`, and red close buttons.
 - Initialize item placement and triple-clear sound effects from the shared sound-effects setting and keep them disabled while that toggle is crossed out.
-- Manage hammer, shuffle, and highlight abilities. Campaign levels read and spend saved ability counts through `PlayerProgress`; dev/test levels use isolated temporary counts.
+- Manage Hammer, Shuffle, Lantern/highlight, and Freezer abilities. Campaign levels read and
+  spend saved ability counts through `PlayerProgress`; dev/test levels use isolated temporary
+  counts.
 - Keep zero-use ability buttons pressable during active gameplay so `_open_ability_purchase_menu()` can pause the level and show `UI/AbilityPurchaseOverlay` with the tapped ability icon, configured coin price, and current affordability state.
 - Apply paid ability uses through `_can_apply_ability()`, `PlayerProgress.spend_coins()`, and
   `_apply_paid_ability()`: the local spend commits after successful preflight and before the
@@ -927,6 +951,13 @@ Key responsibilities:
 - Count hammer destroys as cleared triples for shelf unlocking.
 - Let highlight uses start their timed window even when no immediate triple can currently be highlighted.
 - Apply highlight ability visuals through `ShelfItem.set_outline()` so only item silhouettes receive a border, and update the highlight button countdown label while that window is active.
+- Activate Freezer for exactly 30 seconds of active gameplay. Only `_time_remaining` is gated;
+  item interaction, combo expiry, Lantern expiry, moving shelf rows, animations, matching, and
+  other abilities continue. Pause menus, the ability-purchase modal, and application interruption
+  suspend only the Freezer window. A partial expiry delta suppresses only its frozen portion.
+- Treat Freezer activation before the first move as the first meaningful action, disable only its
+  button while active, and clear runtime state/visuals on level load, completion, failure, leave,
+  application scene teardown, or a new level configuration.
 
 Depends on:
 - `level.tscn` node names and paths.
@@ -945,6 +976,7 @@ Depends on:
 - `PlayerProgress` autoload for campaign progress, lives, coin spending, and ability inventory.
 - `scenes/leave_confirmation_menu.tscn` button and star-count node names used under `UI/LeaveConfirmationOverlay`.
 - `scenes/ability_purchase_menu.tscn` button, icon, and price node names used under `UI/AbilityPurchaseOverlay`.
+- `scenes/ui/ability_bar.tscn` for button visuals, use badges, and timed badges.
 
 Do not use for:
 - Offline level generation or solvability search. Keep that in `scripts/tools/`.
