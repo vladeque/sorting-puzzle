@@ -31,19 +31,33 @@
   Optional explicit path to adb.exe. When omitted, checks PATH, ANDROID_SDK_ROOT, ANDROID_HOME,
   and the standard per-user Windows Android SDK location.
 
+.PARAMETER HostPort
+  Host API port mapped to emulator tcp:8080. Defaults to 8080.
+
 .PARAMETER TimeoutSeconds
   How long to wait for the initial connectivity/bridge/bootstrap diagnostics. Defaults to 90.
 
 .PARAMETER RestartTimeoutSeconds
   How long to wait, after force-stop and relaunch, for the resumed identity diagnostics line.
   Defaults to 60.
+
+.PARAMETER ClearAppData
+  Clears this package's emulator data after installation so the gate starts from a clean Android
+  installation namespace. GAME-010 uses this switch with its disposable database.
+
+.PARAMETER ResultPath
+  Optional JSON result path. Contains only opaque player/device identifiers and non-secret
+  diagnostics needed by the GAME-010 backend assertions.
 #>
 param(
     [string]$ApkPath = "build\android\sorting_puzzle_local_backend_debug.apk",
     [string]$PackageName = "com.sortingpuzzle.game",
     [string]$AdbPath = "",
+    [int]$HostPort = 8080,
     [int]$TimeoutSeconds = 90,
-    [int]$RestartTimeoutSeconds = 60
+    [int]$RestartTimeoutSeconds = 60,
+    [switch]$ClearAppData,
+    [string]$ResultPath = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -113,8 +127,8 @@ Write-Host "Waiting for an adb device..."
 & $adb wait-for-device
 if ($LASTEXITCODE -ne 0) { exit 1 }
 
-Write-Host "adb reverse tcp:8080 tcp:8080"
-& $adb reverse tcp:8080 tcp:8080
+Write-Host "adb reverse tcp:8080 tcp:$HostPort"
+& $adb reverse tcp:8080 "tcp:$HostPort"
 if ($LASTEXITCODE -ne 0) {
     Write-Warning "adb reverse failed. Falling back to the documented http://10.0.2.2:8080 route -- update local/backend_debug.cfg accordingly (see local/backend_debug.example.cfg)."
 }
@@ -122,6 +136,15 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "Installing $ApkPath"
 & $adb install -r $ApkPath
 if ($LASTEXITCODE -ne 0) { exit 1 }
+
+if ($ClearAppData) {
+    Write-Host "Clearing app data for clean-start verification"
+    & $adb shell pm clear $PackageName | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Failed to clear app data for $PackageName."
+        exit 1
+    }
+}
 
 Write-Host "Clearing logcat and launching $PackageName"
 & $adb logcat -c
@@ -209,6 +232,20 @@ if ($resumedIdentity.PlayerId -ne $firstIdentity.PlayerId) {
 if ($resumedIdentity.DeviceId -ne $firstIdentity.DeviceId) {
     Write-Error "Restart reported a different device id (before=$($firstIdentity.DeviceId) after=$($resumedIdentity.DeviceId))."
     exit 1
+}
+
+if (-not [string]::IsNullOrWhiteSpace($ResultPath)) {
+    $resultDirectory = Split-Path -Parent $ResultPath
+    if (-not [string]::IsNullOrWhiteSpace($resultDirectory)) {
+        New-Item -ItemType Directory -Force -Path $resultDirectory | Out-Null
+    }
+    @{
+        schema = "sorting-puzzle-game010-android-result/1"
+        player_id = $firstIdentity.PlayerId
+        device_id = $firstIdentity.DeviceId
+        generation = $resumedIdentity.Generation
+        last_correlation_id = $resumedIdentity.LastCorrelationId
+    } | ConvertTo-Json | Set-Content -LiteralPath $ResultPath -Encoding utf8
 }
 
 Write-Host "Smoke check passed: real guest bootstrap observed (player_id=$($firstIdentity.PlayerId)), and killing/restarting the app resumed the same player session without creating a second guest."

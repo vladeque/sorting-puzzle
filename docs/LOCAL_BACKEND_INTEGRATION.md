@@ -264,6 +264,23 @@ Owner: both repositories
 
 Tracking: `GAME-010`, with any backend-owned orchestration support committed separately.
 
+Status: implemented and backend-gate verified on 2026-07-26. The full Android exit remains blocked
+on the current emulator by the GAME-004/005 `HTTPRequest` POST-with-body issue. From the game
+repository on Windows, run:
+
+```powershell
+.\scripts\tools\run_local_backend_integration_gate.ps1
+```
+
+The default command is intentionally destructive only to the fixed local database
+`sorting_puzzle_game010`, the generated ignored secret directory `local-secrets/game010`, and the
+Sorting Puzzle package's emulator app data. It restores any existing ignored
+`local/backend_debug.cfg` after the run. Use `-SkipInstall` only after the backend pnpm workspace is
+installed. `-SkipAndroid` is a contract/backend diagnostic subset and does not satisfy the full L4
+exit gate. `-KeepIntegrationDatabase` is an explicit troubleshooting choice. Port 8080 is the
+default; if another local API already owns it, pass an unused `-ApiPort` (the runner maps emulator
+tcp:8080 to that host port with `adb reverse` and refuses to reuse an occupied listener).
+
 Deliverables:
 
 - One documented command or orchestration script to start PostgreSQL, migrate/bootstrap data,
@@ -282,6 +299,19 @@ Exit gate:
   signatures, request bodies, or secret paths.
 - Client and backend commits remain separate and reference the corresponding content manifest and
   fixture versions.
+
+The fixture versions currently pinned by the gate are protocol v1 `1.0.0`, v1.1 `1.1.6`, and v2
+`save-sync-fixtures/1`. Successful output also records the active content configuration version
+and bundled manifest SHA-256. Troubleshooting artifacts are under ignored `build/game010/`; the
+top-level failure line identifies the phase, stable `game010.<phase>.failed` code, and run
+correlation ID without echoing credentials, bearer/refresh tokens, signatures, request bodies, or
+the secret root.
+
+Development publications are intentionally ranking-ineligible. The backend preparation phase
+therefore adds one production-eligible publication and one bounded projection checkpoint for each
+of the same two explicitly named fixture players, only inside `sorting_puzzle_game010`. This proves
+the real worker/outbox/leaderboard path without weakening environment isolation or changing the
+real development save checkpoints, cursor assertions, or bundled manifest.
 
 ## Local test matrix
 

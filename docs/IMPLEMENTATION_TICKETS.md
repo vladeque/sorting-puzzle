@@ -668,7 +668,8 @@ Automated verification:
 ## GAME-010 — Automate the Android local-backend integration gate
 
 **Type:** Tooling/Verification
-**Status:** Planned
+**Status:** Implemented and backend-gate verified on 2026-07-26; full Android exit remains blocked
+by the previously documented emulator `HTTPRequest` POST-with-body issue from GAME-004/005.
 **Description:** Turn the clean-start Android emulator flow into a repeatable local verification
 command and troubleshooting runbook.
 
@@ -686,3 +687,39 @@ command and troubleshooting runbook.
 - Failures identify the phase, stable error code, and correlation ID without exposing secrets.
 - Client and backend changes remain separate commits and identify the shared content/fixture
   versions used by the run.
+
+**Implementation:** `scripts/tools/run_local_backend_integration_gate.ps1` is the single Windows
+developer command. It uses the fixed disposable `sorting_puzzle_game010` database, runs the
+Godot fixture runner at `tests/backend/test_game_010.gd`, exports and installs the local-backend
+debug APK, clears only this package's emulator data, proves Android guest/session restart
+resumption, executes two signed protocol-v2 save scenarios, and delegates database promotion and
+assertions to the sibling backend's `game010:*` commands. The two repository changes are committed
+separately.
+
+The gate reports the pinned v1 `1.0.0`, v1.1 `1.1.6`, and v2 `save-sync-fixtures/1` fixture
+versions plus the generated content manifest digest/configuration version. Its default cleanup
+stops only the API process it started, drops only `sorting_puzzle_game010`, removes only
+`local-secrets/game010`, and restores a pre-existing `local/backend_debug.cfg` byte-for-byte.
+`-KeepIntegrationDatabase` is an explicit troubleshooting opt-out. Failure output contains the
+phase, a stable `game010.<phase>.failed` code, and a per-run correlation ID; tokens, signatures,
+request bodies, credential values, and secret paths are not emitted by the gate.
+
+Automated verification:
+
+```powershell
+& 'D:\Godot\godot.exe' --headless --path . --script tests/backend/test_game_010.gd
+.\scripts\tools\run_local_backend_integration_gate.ps1
+```
+
+Verification on 2026-07-26:
+
+- `tests/backend/test_game_010.gd` passed all 48 fixture documents.
+- `run_local_backend_integration_gate.ps1 -SkipInstall -SkipAndroid -ApiPort 18080` completed from
+  disposable database creation through 16/16 persistence/catalog/outbox/leaderboard assertions and
+  bounded cleanup.
+- The full command on the attached `emulator-5554` successfully exported/installed the APK,
+  cleared app data, configured `adb reverse tcp:8080 tcp:18080`, launched the debug app, and entered
+  `guest_phase=challenge`. It then failed at the stable `android_identity` phase because
+  the same Godot Android POST request never emitted `request_completed`. This is the existing
+  workstation/emulator transport limitation documented under GAME-004, not a failure of the new
+  orchestration, disposable cleanup, contract runner, or backend assertions.

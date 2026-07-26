@@ -628,6 +628,9 @@ Purpose:
   content manifest.
 - Covers only the Android-side half of the local-backend flow; does not start the backend itself
   or provision PostgreSQL/the API (`GAME-010`).
+- GAME-010 can pass `-ClearAppData` for a clean installation namespace and `-ResultPath` to write
+  only the opaque player/device IDs and non-secret diagnostics required by backend persistence
+  assertions.
 
 ## `scripts/tools/local_backend_save_sync_integration_check.mjs`
 
@@ -649,6 +652,34 @@ Purpose:
 - Complements the Android-only smoke checks above: proves the server/database half of protocol-v2
   save synchronization directly, independent of the emulator `HTTPRequest` POST reliability issue
   that still blocks a real on-device proof (see the GAME-004/GAME-005 ticket entries).
+- GAME-010 adds `--completion-stars`, `--result-file`, and `--redacted-output`. The result file
+  contains opaque fixture IDs, cursor/checkpoint facts, and content versions but no session or
+  bearer/refresh credentials; redacted output suppresses session IDs and response bodies.
+
+## `scripts/tools/run_local_backend_integration_gate.ps1`
+
+Purpose:
+- GAME-010's one-command L4 gate. Starts PostgreSQL, recreates only
+  `sorting_puzzle_game010`, migrates/bootstraps development data, generates ignored disposable
+  secrets, runs the v1/v1.1/v2 Godot contract manifests, builds/starts/waits for the API, exports
+  the Android debug APK, configures `adb reverse` through the identity smoke script, installs the
+  APK, clears this package's app data, and proves identity/session resumption.
+- Runs two real signed save scenarios with distinct completion scores, invokes the backend worker,
+  and asks the backend assertion command to verify player/device/session, cursor/checkpoint,
+  checkpoint outbox/consumption, active development catalog, and deterministic leaderboard rows.
+- Restores any existing local debug config and defaults to bounded disposable cleanup. Every phase
+  and terminal failure carries a stable error code plus one run correlation ID. Detailed logs live
+  under ignored `build/game010/`.
+- Refuses to start on an occupied API port. `-ApiPort` selects another host port while Android
+  continues to use `127.0.0.1:8080` through an adjusted `adb reverse` mapping.
+
+## `tests/backend/test_game_010.gd`
+
+Purpose:
+- Godot fixture runner for every document named by the authoritative sibling backend's protocol v1
+  `1.0.0`, v1.1 `1.1.6`, and v2 `save-sync-fixtures/1` manifests.
+- Round-trips each object through Godot JSON and additionally checks protocol-v2 batch bounds,
+  operation format, contiguous device sequence, and previous-operation hash chaining.
 
 ## `scripts/backend/backend_transport.gd`
 

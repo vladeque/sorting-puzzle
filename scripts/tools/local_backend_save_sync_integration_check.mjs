@@ -12,18 +12,31 @@
 //   [--base-url http://127.0.0.1:8080] [--provenance ../../configs/backend/content_provenance.json]
 
 import { createHash, generateKeyPairSync, randomUUID, sign as cryptoSign } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 
 function parseArgs(argv) {
-  const args = { baseUrl: "http://127.0.0.1:8080", provenance: null, dumpFixtures: null };
+  const args = {
+    baseUrl: "http://127.0.0.1:8080",
+    provenance: null,
+    dumpFixtures: null,
+    resultFile: null,
+    completionStars: 3,
+    redactedOutput: false,
+  };
   for (let index = 0; index < argv.length; index += 1) {
     if (argv[index] === "--base-url") args.baseUrl = argv[++index];
     else if (argv[index] === "--provenance") args.provenance = argv[++index];
     else if (argv[index] === "--dump-fixtures") args.dumpFixtures = argv[++index];
+    else if (argv[index] === "--result-file") args.resultFile = argv[++index];
+    else if (argv[index] === "--completion-stars") args.completionStars = Number(argv[++index]);
+    else if (argv[index] === "--redacted-output") args.redactedOutput = true;
+  }
+  if (!Number.isInteger(args.completionStars) || args.completionStars < 1 || args.completionStars > 3) {
+    throw new Error("--completion-stars must be an integer between 1 and 3");
   }
   return args;
 }
@@ -169,8 +182,10 @@ async function callApi(method, requestPath, { body, headers = {} } = {}) {
 }
 
 function fail(message, response) {
-  console.error(`\nFATAL: ${message}`);
-  if (response) console.error(JSON.stringify(response, null, 2));
+  const code = response?.error?.code ?? "game010.save_scenario_failed";
+  const correlationId = response?.meta?.correlation_id ?? "none";
+  console.error(`\nFATAL: ${message} code=${code} correlation_id=${correlationId}`);
+  if (response && !args.redactedOutput) console.error(JSON.stringify(response, null, 2));
   process.exit(1);
 }
 
@@ -251,7 +266,7 @@ async function main() {
   let sessionId = bootstrap.session_id;
   let accessToken = bootstrap.tokens.access_token;
   console.log(`Registered player_id: ${playerId}`);
-  console.log(`Session_id: ${sessionId}`);
+  if (!args.redactedOutput) console.log(`Session_id: ${sessionId}`);
 
   function authHeaders(idempotencyKey) {
     const headers = { Authorization: `Bearer ${accessToken}` };
@@ -310,7 +325,7 @@ async function main() {
     "campaign_completion",
     {
       campaign_level: 1,
-      stars: 3,
+      stars: args.completionStars,
       configuration_version: level1.configuration_version,
       level_version: level1.level_version,
       rules_version: level1.rules_version,
@@ -553,6 +568,29 @@ async function main() {
 
   captureFixture("final_state_response", finalState.json);
   captureFixture("identity", { player_id: playerId, device_id: deviceId, session_id: sessionId });
+
+  if (args.resultFile) {
+    writeFileSync(
+      args.resultFile,
+      `${JSON.stringify(
+        {
+          schema: "sorting-puzzle-game010-save-result/1",
+          player_id: playerId,
+          device_id: deviceId,
+          completion_stars: args.completionStars,
+          acknowledged_sequence: journalHeadSequence,
+          checkpoint_id: secondContinuationData.checkpoint.checkpoint_id,
+          checkpoint_generation: secondContinuationData.checkpoint.generation,
+          last_correlation_id: finalState.json?.meta?.correlation_id ?? "",
+          configuration_version: provenance.publication.configuration_version,
+          content_manifest_sha256: provenance.digest_sha256,
+        },
+        null,
+        2,
+      )}\n`,
+      { encoding: "utf8", mode: 0o600 },
+    );
+  }
 
   console.log(`\nPlayer id for Postgres inspection: ${playerId}`);
   console.log(`Device id for Postgres inspection: ${deviceId}`);
