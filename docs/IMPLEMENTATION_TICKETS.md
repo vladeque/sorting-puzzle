@@ -779,5 +779,7 @@ other gameplay timers continue.
 The accelerated-delta suite covers activation before the first move, exact countdown suppression,
 other timers and moving rows continuing, pause/purchase/app-interruption suspension, non-stacking
 and no accidental spend, terminal cleanup, zero-inventory coin purchase, insufficient coins,
-offline persistence/restart, v2.1 request/reconciliation plus v2.0 checkpoint compatibility,
-starter-grant idempotency, and layout assertions at the required portrait sizes.
+offline persistence/restart and promoted-generation crash recovery, v2.1
+request/reconciliation plus v2.0 checkpoint compatibility, starter-grant idempotency, and layout
+assertions at the required portrait sizes. `tests/backend/test_game_010.gd` separately loads the
+client v2.1 goldens while retaining the sibling backend's v2.0 compatibility manifest gate.

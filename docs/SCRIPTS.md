@@ -714,12 +714,16 @@ Purpose:
 ## `scripts/tools/local_backend_save_sync_integration_check.mjs`
 
 Purpose:
-- GAME-005 live-backend proof: a standalone Node.js script (no Godot runtime involved) that
+- GAME-005/GAME-011 live-backend proof: a standalone Node.js script (no Godot runtime involved) that
   performs genuine HTTP calls against a running local backend with a real generated P-256
   installation key -- real guest challenge/bootstrap, real signed `campaign_completion` /
   `campaign_attempt` / `resource_spend` / `life_state` / `profile_edit` operations, empty sync,
   idempotent replay, two-request multi-batch continuation past the 500-operation limit, and a
   stale-cursor conflict -- against the real protocol-v2 API and PostgreSQL.
+- Save requests now select additive protocol v2.1 and include a signed Freezer spend plus a
+  fourth-ability checkpoint assertion. The checked-out sibling backend still advertises v2.0, so
+  this live branch remains a release dependency until its Freezer contract/catalog publication
+  lands; the Godot client continues to accept supported v2.0 responses.
 - Reads campaign-level provenance from `configs/backend/content_provenance.json` so
   `campaign_completion`/`campaign_attempt` payloads reference the currently-published development
   configuration.

@@ -17,6 +17,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
+const SAVE_PROTOCOL_VERSION = "2.1";
 
 function parseArgs(argv) {
   const args = {
@@ -293,7 +294,7 @@ async function main() {
 
   section("Empty sync (POST /v2/saves/sync with zero operations)");
   const emptySyncRequest = {
-    meta: { ...requestMeta({ protocolVersion: "2.0", sessionId }) },
+    meta: { ...requestMeta({ protocolVersion: SAVE_PROTOCOL_VERSION, sessionId }) },
     data: {
       source_namespace: { kind: "player", player_id: playerId },
       cursor: { device_id: deviceId, acknowledged_sequence: 0, acknowledged_hash: null },
@@ -360,6 +361,15 @@ async function main() {
   operations.push(spend);
   previousHash = spend.operation_hash;
 
+  const freezerSpend = buildOperation(
+    "resource_spend",
+    { asset: "freezer", amount: 1, reason: "ability_use" },
+    sequence++,
+    previousHash,
+  );
+  operations.push(freezerSpend);
+  previousHash = freezerSpend.operation_hash;
+
   const life = buildOperation(
     "life_state",
     {
@@ -385,7 +395,7 @@ async function main() {
   previousHash = profileEdit.operation_hash;
 
   const batchRequest = {
-    meta: requestMeta({ protocolVersion: "2.0", sessionId }),
+    meta: requestMeta({ protocolVersion: SAVE_PROTOCOL_VERSION, sessionId }),
     data: {
       source_namespace: { kind: "player", player_id: playerId },
       cursor: { device_id: deviceId, acknowledged_sequence: 0, acknowledged_hash: null },
@@ -417,6 +427,10 @@ async function main() {
     "the checkpoint reflects the selected campaign completion",
   );
   check(batchData.checkpoint.balances.coins === 250, "the checkpoint reflects the resource spend (300 - 50)");
+  check(
+    batchData.checkpoint.abilities.freezer === 2,
+    "the v2.1 checkpoint reflects the Freezer spend (3 - 1)",
+  );
   // mergeLives (packages/domain/src/local-first-save.ts) trusts the highest reported
   // available_lives among the base checkpoint and every submitted life_state operation --
   // an offline client can never sync itself DOWN to fewer lives than the server already
@@ -472,7 +486,7 @@ async function main() {
   const firstContinuationSync = await callApi("POST", "/v2/saves/sync", {
     headers: authHeaders(randomUUID()),
     body: {
-      meta: requestMeta({ protocolVersion: "2.0", sessionId }),
+      meta: requestMeta({ protocolVersion: SAVE_PROTOCOL_VERSION, sessionId }),
       data: {
         source_namespace: { kind: "player", player_id: playerId },
         cursor: {
@@ -505,7 +519,7 @@ async function main() {
   const secondContinuationSync = await callApi("POST", "/v2/saves/sync", {
     headers: authHeaders(randomUUID()),
     body: {
-      meta: requestMeta({ protocolVersion: "2.0", sessionId }),
+      meta: requestMeta({ protocolVersion: SAVE_PROTOCOL_VERSION, sessionId }),
       data: {
         source_namespace: { kind: "player", player_id: playerId },
         cursor: {
@@ -535,7 +549,7 @@ async function main() {
   const staleCursorSync = await callApi("POST", "/v2/saves/sync", {
     headers: authHeaders(randomUUID()),
     body: {
-      meta: requestMeta({ protocolVersion: "2.0", sessionId }),
+      meta: requestMeta({ protocolVersion: SAVE_PROTOCOL_VERSION, sessionId }),
       data: {
         source_namespace: { kind: "player", player_id: playerId },
         cursor: { device_id: deviceId, acknowledged_sequence: 0, acknowledged_hash: null },

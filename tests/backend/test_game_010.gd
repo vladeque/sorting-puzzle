@@ -2,7 +2,9 @@ extends SceneTree
 
 ## GAME-010 cross-runtime fixture gate. Loads every document named by the authoritative backend
 ## v1, v1.1, and v2 manifests through Godot's JSON implementation and performs the protocol-v2
-## hash-chain invariants used by the shipped save client.
+## hash-chain invariants used by the shipped save client. GAME-011 additionally checks the
+## client-owned additive v2.1 Freezer goldens while the checked-out backend manifest remains the
+## supported v2.0 compatibility gate.
 
 const EXPECTED_MANIFESTS := {
 	"v1": {"protocol_version": "1.0", "fixture_version": "1.0.0"},
@@ -25,6 +27,7 @@ func _init() -> void:
 
 	for directory: String in EXPECTED_MANIFESTS:
 		_check_manifest(fixtures_root.path_join(directory).path_join("manifest.json"), directory)
+	_check_client_v21_fixtures()
 
 	if _failures.is_empty():
 		print(
@@ -111,6 +114,71 @@ func _check_v2_save_request(document: Dictionary) -> void:
 		_check(
 			operation.get("previous_operation_hash") == previous_hash,
 			"v2 previous hash chains from the cursor"
+		)
+		expected_sequence += 1
+		previous_hash = operation.get("operation_hash")
+
+
+func _check_client_v21_fixtures() -> void:
+	var fixture_root := ProjectSettings.globalize_path("res://tests/fixtures/save_sync_v2")
+	var request: Variant = _parse_object(fixture_root.path_join("batch_sync_request.json"))
+	if request is Dictionary:
+		var request_meta := (request as Dictionary).get("meta", {}) as Dictionary
+		_check(
+			str(request_meta.get("protocol_version", "")) == "2.1",
+			"client Freezer request selects protocol 2.1"
+		)
+		_check_v2_save_request_chain(request as Dictionary)
+
+	for response_name in [
+		"batch_sync_response.json",
+		"empty_sync_response.json",
+		"continuation_first_response.json",
+		"continuation_second_response.json",
+		"final_state_response.json",
+	]:
+		var response: Variant = _parse_object(fixture_root.path_join(response_name))
+		if not (response is Dictionary):
+			continue
+		var response_document := response as Dictionary
+		var meta := response_document.get("meta", {}) as Dictionary
+		var data := response_document.get("data", {}) as Dictionary
+		var checkpoint := data.get("checkpoint", {}) as Dictionary
+		var abilities := checkpoint.get("abilities", {}) as Dictionary
+		_check(
+			str(meta.get("protocol_version", "")) == "2.1",
+			"%s selects protocol 2.1" % response_name
+		)
+		_check(
+			int(abilities.get("freezer", -1)) == 3,
+			"%s checkpoints the fourth ability" % response_name
+		)
+
+	var compatibility: Variant = _parse_object(fixture_root.path_join("stale_cursor_response.json"))
+	if compatibility is Dictionary:
+		var compatibility_body := (compatibility as Dictionary).get("body", {}) as Dictionary
+		var compatibility_meta := compatibility_body.get("meta", {}) as Dictionary
+		_check(
+			str(compatibility_meta.get("protocol_version", "")) == "2.0",
+			"client retains an explicit supported v2.0 response fixture"
+		)
+
+
+func _check_v2_save_request_chain(document: Dictionary) -> void:
+	var data := document.get("data", {}) as Dictionary
+	var operations := data.get("operations", []) as Array
+	var cursor := data.get("cursor", {}) as Dictionary
+	var expected_sequence := int(cursor.get("acknowledged_sequence", 0)) + 1
+	var previous_hash = cursor.get("acknowledged_hash")
+	for raw_operation in operations:
+		var operation := raw_operation as Dictionary
+		_check(
+			int(operation.get("device_sequence", 0)) == expected_sequence,
+			"client v2.1 device sequence is contiguous"
+		)
+		_check(
+			operation.get("previous_operation_hash") == previous_hash,
+			"client v2.1 previous hash chains from the cursor"
 		)
 		expected_sequence += 1
 		previous_hash = operation.get("operation_hash")

@@ -1,6 +1,7 @@
 extends SceneTree
 
 const Codec := preload("res://scripts/save/local_save_codec.gd")
+const SaveStore := preload("res://scripts/save/local_save_store.gd")
 const SyncService := preload("res://scripts/save/save_sync_service.gd")
 
 const ABILITY_HIGHLIGHT := &"highlight"
@@ -16,6 +17,7 @@ func _init() -> void:
 func _run() -> void:
 	await process_frame
 	await _test_freezer_runtime_semantics()
+	_test_freezer_crash_recovery()
 	await _test_paid_use_and_persistence()
 	await _test_responsive_ability_bar()
 	if _failures.is_empty():
@@ -255,6 +257,61 @@ func _test_paid_use_and_persistence() -> void:
 
 	level.queue_free()
 	await process_frame
+
+
+func _test_freezer_crash_recovery() -> void:
+	var progress = get_root().get_node_or_null("PlayerProgress")
+	if progress == null:
+		_check(false, "PlayerProgress is available for crash recovery")
+		return
+	var session_store = progress.get("_session_store")
+	var save_namespace := {"kind": "player", "player_id": Codec.create_uuid()}
+	var snapshot := {
+		"version": 5,
+		"ability_uses": {"hammer": 3, "shuffle": 3, "highlight": 3, "freezer": 3},
+	}
+	var preferences := {"settings_disabled": {}}
+	var store = SaveStore.new(session_store)
+	_check(
+		bool(store.open_namespace(save_namespace, snapshot, preferences).get("ok", false)),
+		"Freezer crash fixture opens"
+	)
+	var spent_snapshot := snapshot.duplicate(true)
+	spent_snapshot["ability_uses"]["freezer"] = 2
+	store.set("_test_interrupt_stage", "after_current_promotion")
+	var interrupted := store.commit_snapshot(spent_snapshot, preferences, [{
+		"operation_type": "resource_spend",
+		"payload": {"asset": "freezer", "amount": 1, "reason": "ability_use"},
+	}]) as Dictionary
+	_check(not bool(interrupted.get("ok", true)), "simulated crash interrupts commit acknowledgement")
+
+	var recovered = SaveStore.new(session_store)
+	var recovery_result := recovered.open_namespace(save_namespace, snapshot, preferences) as Dictionary
+	_check(bool(recovery_result.get("ok", false)), "promoted Freezer generation recovers after crash")
+	_check(
+		int(
+			((recovery_result.get("snapshot", {}) as Dictionary).get(
+				"ability_uses",
+				{}
+			) as Dictionary).get("freezer", -1)
+		) == 2,
+		"crash recovery keeps the successful Freezer spend"
+	)
+	_check(recovered.get_journal().size() == 1, "crash recovery keeps one Freezer operation")
+
+	var restarted = SaveStore.new(session_store)
+	var restart_result := restarted.open_namespace(save_namespace, snapshot, preferences) as Dictionary
+	_check(bool(restart_result.get("ok", false)), "recovered Freezer namespace restarts")
+	_check(
+		int(
+			((restart_result.get("snapshot", {}) as Dictionary).get(
+				"ability_uses",
+				{}
+			) as Dictionary).get("freezer", -1)
+		) == 2,
+		"second restart neither refunds nor duplicates the recovered spend"
+	)
+	_check(restarted.get_journal().size() == 1, "second restart still has one Freezer operation")
 
 
 func _test_responsive_ability_bar() -> void:
