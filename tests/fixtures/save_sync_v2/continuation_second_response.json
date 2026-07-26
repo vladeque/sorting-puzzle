@@ -1,6 +1,6 @@
 {
   "meta": {
-    "protocol_version": "2.0",
+    "protocol_version": "2.1",
     "request_id": "6284021a-efb0-4e3c-9e51-19a987b7c783",
     "correlation_id": "feaaeb09-b645-4c01-8ba3-fdd7a36eca85",
     "server_time": "2026-07-24T21:41:30.780Z"
@@ -34,7 +34,8 @@
       "abilities": {
         "hammer": 3,
         "shuffle": 3,
-        "highlight": 3
+        "highlight": 3,
+        "freezer": 3
       },
       "lives": {
         "available_lives": 5,

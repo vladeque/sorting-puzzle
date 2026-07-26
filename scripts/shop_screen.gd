@@ -147,8 +147,9 @@ func _format_reward_message(rewards: Dictionary) -> String:
 		"hammer": "hammers",
 		"shuffle": "shuffles",
 		"highlight": "lanterns",
+		"freezer": "freezers",
 	}
-	for ability_id in ["hammer", "shuffle", "highlight"]:
+	for ability_id in ["hammer", "shuffle", "highlight", "freezer"]:
 		var amount := maxi(int(abilities.get(ability_id, 0)), 0)
 		if amount > 0:
 			reward_lines.append("%d %s" % [amount, labels[ability_id]])

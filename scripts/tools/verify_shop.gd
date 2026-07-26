@@ -76,7 +76,7 @@ func _run() -> void:
 	await get_tree().create_timer(0.35).timeout
 	_check(PlayerProgress.get_coins() == bundle_starting_coins + 1000, "Mock bundle did not grant 1,000 coins.")
 	var bundle_abilities := PlayerProgress.get_ability_uses()
-	for ability_id in ["hammer", "shuffle", "highlight"]:
+	for ability_id in ["hammer", "shuffle", "highlight", "freezer"]:
 		_check(
 			int(bundle_abilities.get(ability_id, 0)) == int(bundle_starting_abilities.get(ability_id, 0)) + 3,
 			"Mock bundle did not grant three %s uses." % ability_id

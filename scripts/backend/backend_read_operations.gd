@@ -271,12 +271,19 @@ static func _parse_abilities(value: Variant) -> Dictionary:
 	var hammer = abilities.get("hammer")
 	var shuffle = abilities.get("shuffle")
 	var highlight = abilities.get("highlight")
-	if not _is_integer(hammer) or not _is_integer(shuffle) or not _is_integer(highlight):
+	var freezer = abilities.get("freezer", 0)
+	if (
+		not _is_integer(hammer)
+		or not _is_integer(shuffle)
+		or not _is_integer(highlight)
+		or not _is_integer(freezer)
+	):
 		return _error("Player state abilities has a malformed field.")
 	return _success({"abilities": {
 		"hammer": int(hammer),
 		"shuffle": int(shuffle),
 		"highlight": int(highlight),
+		"freezer": int(freezer),
 	}})
 
 
@@ -396,7 +403,13 @@ static func _parse_catalog_offer(value: Variant) -> Dictionary:
 	var hammer = ability_data.get("hammer")
 	var shuffle = ability_data.get("shuffle")
 	var highlight = ability_data.get("highlight")
-	if not _is_integer(hammer) or not _is_integer(shuffle) or not _is_integer(highlight):
+	var freezer = ability_data.get("freezer", 0)
+	if (
+		not _is_integer(hammer)
+		or not _is_integer(shuffle)
+		or not _is_integer(highlight)
+		or not _is_integer(freezer)
+	):
 		return _error("Catalog offer ability rewards are malformed.")
 	var result := {
 		"offer_id": str(offer.get("offer_id", "")),
@@ -408,6 +421,7 @@ static func _parse_catalog_offer(value: Variant) -> Dictionary:
 				"hammer": int(hammer),
 				"shuffle": int(shuffle),
 				"highlight": int(highlight),
+				"freezer": int(freezer),
 			},
 		},
 		"platform_product_id": platform_product_id,

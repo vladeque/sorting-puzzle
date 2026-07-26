@@ -10,11 +10,12 @@ const ContentProvenanceManifestScript := preload(
 	"res://scripts/save/content_provenance_manifest.gd"
 )
 const SAVE_PATH := "user://player_progress.json"
-const SAVE_VERSION := 4
+const SAVE_VERSION := 5
 const MIN_LEVEL := 1
 const ABILITY_HAMMER := "hammer"
 const ABILITY_SHUFFLE := "shuffle"
 const ABILITY_HIGHLIGHT := "highlight"
+const ABILITY_FREEZER := "freezer"
 const DEFAULT_AVATAR_ID := "avatar_cat"
 const PLAYER_NAME_PREFIX := "player_"
 const PLAYER_NAME_RANDOM_ALPHABET := "abcdefghijklmnopqrstuvwxyz0123456789"
@@ -57,6 +58,7 @@ const DEFAULT_ABILITY_USES := {
 	ABILITY_HAMMER: 3,
 	ABILITY_SHUFFLE: 3,
 	ABILITY_HIGHLIGHT: 3,
+	ABILITY_FREEZER: 3,
 }
 const DEFAULT_DISABLED_SETTINGS := {
 	"music": false,
@@ -112,10 +114,14 @@ func load_progress() -> void:
 		return
 
 	_local_store = _account_coordinator.get_store()
+	var opened_snapshot := open_result.get("snapshot", {}) as Dictionary
+	var requires_schema_migration := int(opened_snapshot.get("version", 0)) < SAVE_VERSION
 	_apply_loaded_partitions(
-		open_result.get("snapshot", {}) as Dictionary,
+		opened_snapshot,
 		open_result.get("preferences", {}) as Dictionary
 	)
+	if requires_schema_migration and not bool(_commit_current_state().get("ok", false)):
+		push_error("Could not persist the gameplay save schema-5 migration.")
 	if _sync_service == null:
 		_sync_service = SaveSyncServiceScript.new()
 		add_child(_sync_service)
@@ -434,6 +440,8 @@ func spend_life(level_number: int = 0, outcome: String = "left") -> bool:
 
 func spend_ability(ability_id: StringName) -> bool:
 	var ability_key := String(ability_id)
+	if not DEFAULT_ABILITY_USES.has(ability_key):
+		return false
 	var ability_uses := _data.get("ability_uses", {}) as Dictionary
 	if ability_uses == null:
 		ability_uses = DEFAULT_ABILITY_USES.duplicate()
@@ -507,6 +515,7 @@ func get_save_provider_name() -> String:
 
 func _sanitize_data(raw_data: Dictionary) -> Dictionary:
 	var sanitized := _default_data()
+	var source_version := maxi(int(raw_data.get("version", 0)), 0)
 	sanitized["version"] = SAVE_VERSION
 	sanitized["current_level"] = maxi(int(raw_data.get("current_level", MIN_LEVEL)), MIN_LEVEL)
 	sanitized["highest_completed_level"] = maxi(int(raw_data.get("highest_completed_level", 0)), 0)
@@ -552,6 +561,11 @@ func _sanitize_data(raw_data: Dictionary) -> Dictionary:
 		var ability_uses := sanitized["ability_uses"] as Dictionary
 		for ability_key in DEFAULT_ABILITY_USES.keys():
 			ability_uses[ability_key] = maxi(int(raw_ability_uses.get(ability_key, ability_uses[ability_key])), 0)
+		if source_version > 0 and source_version < SAVE_VERSION:
+			ability_uses[ABILITY_FREEZER] = maxi(
+				int(raw_ability_uses.get(ABILITY_FREEZER, 0)),
+				0
+			) + DEFAULT_ABILITY_USES[ABILITY_FREEZER]
 
 	return sanitized
 
@@ -1057,6 +1071,15 @@ func _map_checkpoint_to_snapshot(
 		ABILITY_HAMMER: int(abilities.get(ABILITY_HAMMER, 0)),
 		ABILITY_SHUFFLE: int(abilities.get(ABILITY_SHUFFLE, 0)),
 		ABILITY_HIGHLIGHT: int(abilities.get(ABILITY_HIGHLIGHT, 0)),
+		ABILITY_FREEZER: int(
+			abilities.get(
+				ABILITY_FREEZER,
+				(current_snapshot.get("ability_uses", {}) as Dictionary).get(
+					ABILITY_FREEZER,
+					DEFAULT_ABILITY_USES[ABILITY_FREEZER]
+				)
+			)
+		),
 	}
 	mapped["lives"] = int(lives.get("available_lives", MAX_LIVES))
 	mapped["next_life_restore_unix"] = LocalSaveCodecScript.unix_from_timestamp(

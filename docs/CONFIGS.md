@@ -182,7 +182,8 @@ Shape:
   "prices": {
     "hammer": 100,
     "shuffle": 100,
-    "highlight": 100
+    "highlight": 100,
+    "freezer": 100
   }
 }
 ```
@@ -201,10 +202,13 @@ Purpose:
 Rules:
 - `type` is `bundle` or `coins`.
 - `rewards.coins` is a non-negative coin grant.
-- `rewards.abilities` may grant `hammer`, `shuffle`, and `highlight`; the UI labels `highlight` as Lantern.
+- `rewards.abilities` may grant `hammer`, `shuffle`, `highlight`, and `freezer`; the UI labels
+  `highlight` as Lantern.
 - `mock_prices` is keyed by mock country code and contains the complete `formatted_price` plus ISO currency code. Missing regions fall back to `US` in the development provider.
 - Real providers must ignore `mock_prices` and display the formatted string returned by Google Play or the App Store.
-- Current mock catalog: one 3-hammer, 3-shuffle, 3-lantern, 1,000-coin starter bundle and five coin-only offers.
+- Current mock catalog: one 3-hammer, 3-shuffle, 3-lantern, 3-freezer, 1,000-coin starter bundle
+  and five coin-only offers. Historic backend catalog versions without `freezer` remain valid and
+  parse as a zero-Freezer reward.
 
 ## `user://save_v2/<namespace>/current.json`
 
@@ -229,8 +233,8 @@ Runtime files:
 - `pending.tmp`: flushed and validated candidate awaiting promotion.
 - `legacy_v4.previous.json`: retained read-only copy of the migrated schema-4 file.
 
-The gameplay snapshot retains the former schema-4 fields, adds
-`reward_chest_completed_cycles` and `moderation_state`, and intentionally excludes
+The gameplay snapshot schema is version 5. It retains the former schema-4 fields, adds Freezer to
+`ability_uses`, retains `reward_chest_completed_cycles` and `moderation_state`, and intentionally excludes
 `settings_disabled`, which now belongs to `preferences`.
 
 Runtime behavior:
@@ -245,8 +249,10 @@ Runtime behavior:
 - Failed or abandoned levels do not refund ability uses.
 - Completing the current campaign level advances `current_level` by one and adds the run's earned stars to the reward chest.
 - The same completion adds stars to `total_earned_stars` and `weekly_earned_stars`; neither is reduced by reward chest rollover.
-- Schema-4 migration retains campaign, coins, lives/timer, ability inventory, processed mock
-  transaction ids, profile, settings, chest progress, and lifetime/weekly stars.
+- Schema-4 migration retains campaign, coins, lives/timer, existing ability inventory, processed
+  mock transaction ids, profile, settings, chest progress, and lifetime/weekly stars, advances the
+  snapshot to schema 5, and grants exactly three Freezer uses once. Schema-5 sanitization never
+  repeats that grant.
 - Weekly stars reset when the saved Monday-UTC boundary no longer matches the current week.
 - Reward chest stars roll over when a configured goal is reached, grant that goal's `coin_reward`, then the next configured goal starts.
 - Developer/test level selection is isolated from this save data.

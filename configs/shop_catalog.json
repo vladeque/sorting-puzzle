@@ -10,7 +10,8 @@
         "abilities": {
           "hammer": 3,
           "shuffle": 3,
-          "highlight": 3
+          "highlight": 3,
+          "freezer": 3
         }
       },
       "mock_prices": {

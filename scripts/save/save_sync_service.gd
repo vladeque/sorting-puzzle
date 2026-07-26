@@ -4,7 +4,8 @@ class_name SaveSyncService
 signal reconciliation_applied
 
 const LocalSaveCodecScript := preload("res://scripts/save/local_save_codec.gd")
-const PROTOCOL_VERSION := "2.0"
+const PROTOCOL_VERSION := "2.1"
+const SUPPORTED_RESPONSE_PROTOCOL_VERSIONS := ["2.0", PROTOCOL_VERSION]
 const MAX_OPERATIONS := 500
 const MAX_REQUEST_BYTES := 1024 * 1024
 const REQUEST_TIMEOUT_SECONDS := 30.0
@@ -282,7 +283,7 @@ func _apply_state_response(envelope: Dictionary) -> Dictionary:
 	var meta := envelope.get("meta", {}) as Dictionary
 	var data := envelope.get("data", {}) as Dictionary
 	if (
-		str(meta.get("protocol_version", "")) != PROTOCOL_VERSION
+		not SUPPORTED_RESPONSE_PROTOCOL_VERSIONS.has(str(meta.get("protocol_version", "")))
 		or not (data.get("checkpoint") is Dictionary)
 		or not (data.get("device_cursors") is Array)
 		or not (data.get("capabilities") is Dictionary)
@@ -488,7 +489,7 @@ func _apply_response(envelope: Dictionary) -> Dictionary:
 	var sync := _store.get_sync_metadata()
 	var pending := sync.get("pending_request", {}) as Dictionary
 	if (
-		str(meta.get("protocol_version", "")) != PROTOCOL_VERSION
+		not SUPPORTED_RESPONSE_PROTOCOL_VERSIONS.has(str(meta.get("protocol_version", "")))
 		or str(meta.get("request_id", "")) != str(pending.get("request_id", ""))
 		or not (data.get("acknowledged_cursor") is Dictionary)
 		or not (data.get("checkpoint") is Dictionary)

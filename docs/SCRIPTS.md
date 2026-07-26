@@ -405,7 +405,7 @@ Saved fields:
 - `lives`: current campaign lives, clamped from `0` to `5`.
 - `next_life_restore_unix`: Unix timestamp for the next hourly life restore, or `0` when lives are full.
 - `coins`: current gold coin balance. Fresh saves start at `300`.
-- `ability_uses`: remaining campaign uses for hammer, shuffle, and highlight.
+- `ability_uses`: remaining campaign uses for hammer, shuffle, highlight/Lantern, and Freezer.
 - `processed_shop_purchase_ids`: transaction ids whose Shop rewards were already applied locally.
 - `avatar_id`: selected profile avatar id. Fresh and legacy saves default to `avatar_cat`.
 - `player_name`: saved profile display name. Fresh and legacy saves without a valid value receive a generated `player_` name with a five-character random suffix, such as `player_g26f3`.
@@ -450,7 +450,8 @@ Key methods:
 - `get_next_life_restore_seconds_remaining()`: returns seconds until the next life restore, or `0` when full.
 - `refresh_lives()`: restores one life per elapsed real-time hour while lives are not full.
 - `spend_life(level_number, outcome)`: atomically appends the attempt and resulting life state.
-- `spend_ability(ability_id)`: immediately spends and saves one campaign ability use.
+- `spend_ability(ability_id)`: validates one of the four canonical ability ids, then immediately
+  spends, journals, and saves one campaign ability use.
 - `complete_level(level_number, earned_stars)`: atomically records completion, advancement,
   lifetime/weekly/chest totals, immediate chest coins, and reward-animation metadata; returns false
   before result UI if persistence fails.
@@ -569,6 +570,10 @@ Class:
 
 Purpose:
 - Owns feature-gated `POST /v2/saves/sync` and recovery `GET /v2/saves/state`.
+- Emits additive protocol v2.1 save envelopes so `resource_spend.asset = freezer` and the fourth
+  checkpoint ability are preserved. It accepts supported v2.0 responses during rollout; a v2.0
+  checkpoint with no Freezer field preserves the local schema-5 Freezer balance before replaying
+  unacknowledged operations.
 - Requires valid bundled content provenance before issuing network requests.
 - Caps batches at 500 operations/1 MiB and persists exact payload/idempotency values before send.
 - Owns timeout, full-jitter/`Retry-After`, session-refresh hooks, cursor conflict recovery, response

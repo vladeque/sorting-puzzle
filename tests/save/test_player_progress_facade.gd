@@ -19,11 +19,29 @@ func _run() -> void:
 	var player_id := Codec.create_uuid()
 	_check(progress.switch_to_player(player_id), "isolated player namespace activates")
 	progress.reset_progress()
+	var migrated_v4 := progress.call("_sanitize_data", {
+		"version": 4,
+		"ability_uses": {"hammer": 7, "shuffle": 6, "highlight": 5},
+	}) as Dictionary
+	var migrated_uses := migrated_v4.get("ability_uses", {}) as Dictionary
+	_check(int(migrated_v4.get("version", 0)) == 5, "schema-4 snapshots migrate to schema 5")
+	_check(int(migrated_uses.get("freezer", 0)) == 3, "schema-4 migration grants exactly three freezers")
+	var sanitized_v5 := progress.call("_sanitize_data", {
+		"version": 5,
+		"ability_uses": {"hammer": 3, "shuffle": 3, "highlight": 3, "freezer": 8},
+	}) as Dictionary
+	_check(
+		int((sanitized_v5.get("ability_uses", {}) as Dictionary).get("freezer", 0)) == 8,
+		"schema-5 sanitization never repeats the freezer migration grant"
+	)
 	_check(progress.get_coins() == 300, "fresh local snapshot has coins")
 	_check(progress.spend_coins(25), "coin spending commits")
 	_check(progress.get_coins() == 275, "coin spending is immediate")
 	_check(progress.spend_ability(&"hammer"), "ability spending commits")
 	_check(int(progress.get_ability_uses().get("hammer", 0)) == 2, "ability spend is immediate")
+	_check(progress.spend_ability(&"freezer"), "offline freezer spending commits")
+	_check(int(progress.get_ability_uses().get("freezer", 0)) == 2, "freezer spend is immediate")
+	_check(not progress.spend_ability(&"unknown"), "unknown ability spending is rejected")
 	_check(progress.spend_life(1, "left"), "life loss and attempt commit")
 	_check(progress.get_lives() == 4, "life loss is immediate")
 	_check(progress.set_profile("avatar_bear", "Offline Player"), "profile edit commits")
@@ -76,6 +94,10 @@ func _run() -> void:
 	progress.load_progress()
 	_check(progress.get_current_level() == 171, "facade snapshot survives restart load")
 	_check(progress.get_player_name() == "Offline Player", "profile remains account-scoped")
+	_check(
+		int(progress.get_ability_uses().get("freezer", 0)) == 2,
+		"freezer spend survives restart without refund or duplication"
+	)
 
 	if _failures.is_empty():
 		print("PlayerProgress GAME-001 facade tests passed.")

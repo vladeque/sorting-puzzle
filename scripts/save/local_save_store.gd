@@ -508,7 +508,7 @@ func _validate_operation_payload(operation_type: String, payload: Dictionary) ->
 			if not _has_exact_keys(payload, ["asset", "amount", "reason"]):
 				return _error("Resource-spend payload fields are invalid.")
 			if (
-				not ["coins", "hammer", "shuffle", "highlight"].has(str(payload.get("asset", "")))
+				not ["coins", "hammer", "shuffle", "highlight", "freezer"].has(str(payload.get("asset", "")))
 				or int(payload.get("amount", 0)) <= 0
 				or not ["ability_use", "gameplay", "shop"].has(str(payload.get("reason", "")))
 			):
