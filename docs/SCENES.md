@@ -25,7 +25,7 @@ Purpose:
 
 Important nodes:
 - `Background`: fullscreen `TextureRect` using `assets/backgrounds/main_menu.jpeg`.
-- `TopStatusBar`: top-anchored safe-area-aware container for `scenes/ui/main_menu_top_status.tscn`.
+- `TopStatusBar`: top-anchored container that places `scenes/ui/main_menu_top_status.tscn` directly at the device safe-area edge.
 - `RewardChest`: left-side `scenes/ui/main_menu_reward_chest.tscn` instance positioned by `scripts/production_main_menu.gd`.
 - `HouseRewardOrigin`: responsive marker over the background house used as the reward animation origin.
 - `RewardCoinFlyer`: fullscreen `scenes/ui/main_menu_reward_coin_flyer.tscn` effect layer.

@@ -10,7 +10,6 @@ const PRODUCTION_MENU_SCENE := "res://scenes/main_menu.tscn"
 const SHOP_SCENE := "res://scenes/ui/shop_screen.tscn"
 const LEADERBOARD_SCENE := "res://scenes/ui/leaderboard_screen.tscn"
 const TOP_BAR_HEIGHT := 86.0
-const TOP_MARGIN := 28.0
 const TOP_SIDE_MARGIN := 24.0
 const PROFILE_WIDGET_WIDTH := 76.0
 const REWARD_CHEST_SIZE := Vector2(116.0, 136.0)
@@ -125,9 +124,9 @@ func _layout_top_status_bar(safe_margins: Vector4) -> void:
 	_top_status_bar.anchor_right = 1.0
 	_top_status_bar.anchor_bottom = 0.0
 	_top_status_bar.offset_left = safe_margins.x + TOP_SIDE_MARGIN
-	_top_status_bar.offset_top = safe_margins.y + TOP_MARGIN
+	_top_status_bar.offset_top = safe_margins.y
 	_top_status_bar.offset_right = -(safe_margins.z + TOP_SIDE_MARGIN)
-	_top_status_bar.offset_bottom = safe_margins.y + TOP_MARGIN + TOP_BAR_HEIGHT
+	_top_status_bar.offset_bottom = safe_margins.y + TOP_BAR_HEIGHT
 
 
 func _layout_reward_chest(safe_margins: Vector4) -> void:
@@ -136,7 +135,7 @@ func _layout_reward_chest(safe_margins: Vector4) -> void:
 
 	var centered_left := safe_margins.x + TOP_SIDE_MARGIN + ((PROFILE_WIDGET_WIDTH - REWARD_CHEST_SIZE.x) * 0.5)
 	var left := maxf(centered_left, safe_margins.x + 26.0)
-	var top := safe_margins.y + TOP_MARGIN + PROFILE_WIDGET_WIDTH + REWARD_CHEST_TOP_GAP
+	var top := safe_margins.y + PROFILE_WIDGET_WIDTH + REWARD_CHEST_TOP_GAP
 	_reward_chest.anchor_left = 0.0
 	_reward_chest.anchor_top = 0.0
 	_reward_chest.anchor_right = 0.0

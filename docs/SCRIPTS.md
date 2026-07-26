@@ -49,7 +49,7 @@ Key methods:
 - `_ready()`: loads progress, wires level and bottom-navigation buttons, refreshes the saved coin label, selects Home, and applies responsive layout.
 - `_process(delta)`: refreshes the lives display and play button state once per elapsed real-time second while the menu is open.
 - `_apply_responsive_layout()`: keeps the top status row and bottom button inside the viewport and safe area.
-- `_layout_top_status_bar()`: positions the static top status row.
+- `_layout_top_status_bar()`: positions the static top status row directly at the device safe-area edge, without additional top padding.
 - `_layout_reward_chest()`: positions the side reward chest under the profile icon without putting it in the top status scene.
 - `_layout_bottom_navigation()`: sizes the full-width navigation bar and passes its safe-bottom inset to the scene-owned layout.
 - `_update_level_button()`: displays the saved current level, no-lives state, or complete state.
