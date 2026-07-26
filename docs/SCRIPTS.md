@@ -665,8 +665,10 @@ Purpose:
   secure-store debug AAR to exist and be ready; it does not start or rebuild any of them.
 - Runs the authored-source content-provenance gate before exporting so level/config changes that
   require a backend republication fail instead of producing a stale network-enabled APK.
-- Exports the Android debug preset, refreshes `adb reverse`, force-stops the installed game,
-  installs the APK with `adb install -r`, relaunches it, and waits for the Android process.
+- Exports the Android debug preset, refreshes `adb reverse` with bounded retries for transient ADB
+  transport/rebind failures, force-stops the installed game, installs the APK with
+  `adb install -r`, relaunches it, and waits for the Android process. A terminal reverse failure
+  reports the selected serial, exit code, and ADB diagnostic text.
 - Preserves Android app data and therefore the existing installation identity, secure session, and
   local save.
 

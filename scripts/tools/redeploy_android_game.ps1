@@ -108,6 +108,78 @@ function Test-BackendReady {
     }
 }
 
+function Set-AdbReverse {
+    param(
+        [string]$AdbExe,
+        [string]$DeviceSerial,
+        [int]$HostPort,
+        [int]$MaximumAttempts = 3
+    )
+
+    $lastExitCode = -1
+    $lastDetail = "no diagnostic output"
+    for ($attempt = 1; $attempt -le $MaximumAttempts; $attempt++) {
+        $process = New-Object System.Diagnostics.Process
+        try {
+            $process.StartInfo = New-Object System.Diagnostics.ProcessStartInfo
+            $process.StartInfo.FileName = $AdbExe
+            $process.StartInfo.Arguments = (
+                "-s $DeviceSerial reverse tcp:8080 tcp:$HostPort"
+            )
+            $process.StartInfo.UseShellExecute = $false
+            $process.StartInfo.CreateNoWindow = $true
+            $process.StartInfo.RedirectStandardOutput = $true
+            $process.StartInfo.RedirectStandardError = $true
+            if (-not $process.Start()) {
+                throw "adb reverse process could not be started."
+            }
+            if (-not $process.WaitForExit(10000)) {
+                $process.Kill()
+                $process.WaitForExit()
+                $lastExitCode = -1
+                $reverseOutput = @("adb reverse timed out after 10 seconds")
+            } else {
+                $lastExitCode = $process.ExitCode
+                $reverseOutput = @(
+                    $process.StandardOutput.ReadToEnd(),
+                    $process.StandardError.ReadToEnd()
+                )
+            }
+        } finally {
+            $process.Dispose()
+        }
+
+        $detailLines = @(
+            $reverseOutput | ForEach-Object {
+                "$_".Trim()
+            } | Where-Object {
+                -not [string]::IsNullOrWhiteSpace($_)
+            }
+        )
+        if ($detailLines.Count -gt 0) {
+            $lastDetail = $detailLines -join " "
+        }
+        if ($lastExitCode -eq 0) {
+            if ($attempt -gt 1) {
+                Write-Host "adb reverse recovered on attempt $attempt."
+            }
+            return
+        }
+        if ($attempt -lt $MaximumAttempts) {
+            Write-Warning (
+                "adb reverse attempt $attempt failed for $DeviceSerial " +
+                "(exit=$lastExitCode); retrying..."
+            )
+            Start-Sleep -Seconds 1
+        }
+    }
+
+    throw (
+        "adb reverse tcp:8080 tcp:$HostPort failed for $DeviceSerial after " +
+        "$MaximumAttempts attempts (exit=$lastExitCode, detail=$lastDetail)."
+    )
+}
+
 function Invoke-GodotCommand {
     param(
         [string]$Executable,
@@ -224,10 +296,10 @@ try {
     ) $gameRoot "android-redeploy-export"
 
     Set-Phase "android_install"
-    & $adb -s $deviceSerial reverse tcp:8080 "tcp:$ApiPort" | Out-Null
-    if ($LASTEXITCODE -ne 0) {
-        throw "adb reverse failed for $deviceSerial."
-    }
+    Set-AdbReverse `
+        -AdbExe $adb `
+        -DeviceSerial $deviceSerial `
+        -HostPort $ApiPort
     & $adb -s $deviceSerial shell am force-stop $PackageName
     if ($LASTEXITCODE -ne 0) {
         throw "Failed to stop $PackageName on $deviceSerial."
@@ -249,7 +321,12 @@ try {
     $launchDeadline = (Get-Date).AddSeconds($LaunchTimeoutSeconds)
     $gameProcessId = ""
     while ((Get-Date) -lt $launchDeadline) {
-        $gameProcessId = (& $adb -s $deviceSerial shell pidof $PackageName 2>$null).Trim()
+        $pidOutput = & $adb -s $deviceSerial shell pidof $PackageName 2>$null
+        if ($null -eq $pidOutput) {
+            $gameProcessId = ""
+        } else {
+            $gameProcessId = "$pidOutput".Trim()
+        }
         if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace($gameProcessId)) {
             break
         }
