@@ -1,9 +1,10 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene format=3 uid="uid://db6gp1qpotd1l"]
 
-[ext_resource type="Script" path="res://scripts/ability_bar.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/abilities/ability_hammer.png" id="2_hammer"]
-[ext_resource type="Texture2D" path="res://assets/abilities/ability_shuffle.png" id="3_shuffle"]
-[ext_resource type="Texture2D" path="res://assets/abilities/ability_lantern.png" id="4_lantern"]
+[ext_resource type="Script" uid="uid://ds3bn4yx251fv" path="res://scripts/ability_bar.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://h4ru3gdl5338" path="res://assets/abilities/ability_hammer.png" id="2_hammer"]
+[ext_resource type="Texture2D" uid="uid://x0qk7pd87bfv" path="res://assets/abilities/ability_shuffle.png" id="3_shuffle"]
+[ext_resource type="Texture2D" uid="uid://dwmyah5l2r82d" path="res://assets/abilities/ability_lantern.png" id="4_lantern"]
+[ext_resource type="Texture2D" uid="uid://x6rx0xrv78dw" path="res://assets/abilities/ice_clock_icon_256x256.png" id="5_bymt5"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ability_normal"]
 bg_color = Color(0.16, 0.21, 0.27, 0.94)
@@ -92,7 +93,7 @@ shadow_color = Color(0, 0, 0, 0.34)
 shadow_size = 5
 shadow_offset = Vector2(0, 2)
 
-[node name="AbilityBar" type="Control"]
+[node name="AbilityBar" type="Control" unique_id=2085968]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -101,7 +102,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_script")
 
-[node name="ButtonRow" type="HBoxContainer" parent="."]
+[node name="ButtonRow" type="HBoxContainer" parent="." unique_id=1225377698]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 8
@@ -118,7 +119,7 @@ grow_vertical = 2
 theme_override_constants/separation = 34
 alignment = 1
 
-[node name="HammerButton" type="Button" parent="ButtonRow"]
+[node name="HammerButton" type="Button" parent="ButtonRow" unique_id=1629184474]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
@@ -128,7 +129,7 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_ability_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_ability_hover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_ability_disabled")
 
-[node name="Icon" type="TextureRect" parent="ButtonRow/HammerButton"]
+[node name="Icon" type="TextureRect" parent="ButtonRow/HammerButton" unique_id=1532768853]
 layout_mode = 0
 offset_left = 11.0
 offset_top = 15.0
@@ -139,7 +140,7 @@ texture = ExtResource("2_hammer")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="UsesLabel" type="Label" parent="ButtonRow/HammerButton"]
+[node name="UsesLabel" type="Label" parent="ButtonRow/HammerButton" unique_id=1079942988]
 z_index = 1
 layout_mode = 0
 offset_left = 66.0
@@ -155,7 +156,7 @@ text = "3"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ShuffleButton" type="Button" parent="ButtonRow"]
+[node name="ShuffleButton" type="Button" parent="ButtonRow" unique_id=1736558978]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
@@ -165,7 +166,7 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_ability_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_ability_hover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_ability_disabled")
 
-[node name="Icon" type="TextureRect" parent="ButtonRow/ShuffleButton"]
+[node name="Icon" type="TextureRect" parent="ButtonRow/ShuffleButton" unique_id=1787090029]
 layout_mode = 0
 offset_left = 13.0
 offset_top = 13.0
@@ -176,7 +177,7 @@ texture = ExtResource("3_shuffle")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="UsesLabel" type="Label" parent="ButtonRow/ShuffleButton"]
+[node name="UsesLabel" type="Label" parent="ButtonRow/ShuffleButton" unique_id=1810139897]
 z_index = 1
 layout_mode = 0
 offset_left = 66.0
@@ -192,7 +193,7 @@ text = "3"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="HighlightButton" type="Button" parent="ButtonRow"]
+[node name="HighlightButton" type="Button" parent="ButtonRow" unique_id=122419423]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
@@ -202,7 +203,7 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_ability_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_ability_hover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_ability_disabled")
 
-[node name="Icon" type="TextureRect" parent="ButtonRow/HighlightButton"]
+[node name="Icon" type="TextureRect" parent="ButtonRow/HighlightButton" unique_id=185698927]
 layout_mode = 0
 offset_left = 13.0
 offset_top = 9.0
@@ -213,7 +214,7 @@ texture = ExtResource("4_lantern")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="UsesLabel" type="Label" parent="ButtonRow/HighlightButton"]
+[node name="UsesLabel" type="Label" parent="ButtonRow/HighlightButton" unique_id=552036959]
 z_index = 1
 layout_mode = 0
 offset_left = 66.0
@@ -229,7 +230,7 @@ text = "3"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="TimerLabel" type="Label" parent="ButtonRow/HighlightButton"]
+[node name="TimerLabel" type="Label" parent="ButtonRow/HighlightButton" unique_id=242069480]
 visible = false
 z_index = 1
 layout_mode = 0
@@ -246,7 +247,7 @@ text = "15s"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="FreezerButton" type="Button" parent="ButtonRow"]
+[node name="FreezerButton" type="Button" parent="ButtonRow" unique_id=509051586]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
@@ -260,17 +261,18 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_ability_hover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_ability_disabled")
 text = "Freeze"
 
-[node name="Icon" type="TextureRect" parent="ButtonRow/FreezerButton"]
+[node name="Icon" type="TextureRect" parent="ButtonRow/FreezerButton" unique_id=956361512]
 layout_mode = 0
 offset_left = 13.0
 offset_top = 13.0
 offset_right = 83.0
 offset_bottom = 83.0
 mouse_filter = 2
+texture = ExtResource("5_bymt5")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="UsesLabel" type="Label" parent="ButtonRow/FreezerButton"]
+[node name="UsesLabel" type="Label" parent="ButtonRow/FreezerButton" unique_id=564941140]
 z_index = 1
 layout_mode = 0
 offset_left = 66.0
@@ -286,7 +288,7 @@ text = "3"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="TimerLabel" type="Label" parent="ButtonRow/FreezerButton"]
+[node name="TimerLabel" type="Label" parent="ButtonRow/FreezerButton" unique_id=1424811219]
 visible = false
 z_index = 1
 layout_mode = 0
