@@ -19,6 +19,7 @@ Purpose:
 - Provides a bottom `%LevelButton` labeled with the saved campaign level, such as `Level 1`, or disabled as `No Lives` when lives are empty.
 - Opens the player profile menu when the profile widget is pressed.
 - Opens the main settings menu when the settings widget is pressed.
+- Opens the reward chest detail modal when the reward chest widget is pressed.
 - Starts the saved campaign level when the bottom button is pressed.
 - Opens `scenes/ui/leaderboard_screen.tscn` when the bottom navigation trophy is pressed.
 - Opens `scenes/ui/shop_screen.tscn` when the bottom navigation cart is pressed.
@@ -33,6 +34,7 @@ Important nodes:
 - `BottomBar/LevelButton`: `scenes/ui/level_button.tscn` instance that launches the saved campaign level.
 - Runtime child `scenes/ui/profile_menu.tscn`: centered pause-style profile editor window created when `ProfileWidget` is pressed.
 - Runtime child `scenes/ui/settings_menu.tscn`: centered pause-style settings window created when `SettingsWidget/SettingsButton` is pressed.
+- Runtime child `scenes/ui/reward_chest_menu.tscn`: centered pause-style reward chest detail modal created when the `RewardChest` widget emits `chest_pressed`.
 
 Depends on:
 - `level.tscn` through `scripts/production_main_menu.gd`.
@@ -43,6 +45,7 @@ Depends on:
 - `scenes/ui/main_menu_reward_coin_flyer.tscn` for the clover-coin flight effect.
 - `scenes/ui/profile_menu.tscn` for profile name and avatar editing.
 - `scenes/ui/settings_menu.tscn` for the main-menu settings popup.
+- `scenes/ui/reward_chest_menu.tscn` for the reward chest detail modal.
 - `scenes/ui/level_button.tscn` for the reusable production level button visuals.
 - `scenes/ui/leaderboard_screen.tscn` for the dedicated ranking destination.
 
@@ -196,12 +199,15 @@ Purpose:
 - Reusable side-screen reward chest widget for the production main menu.
 - Displays `assets/ui/main_menu_reward_chest.png` above a compact progress bar.
 - Shows the saved current star amount versus the active reward chest goal, such as `250/500`.
+- Emits `chest_pressed` when tapped so the owning menu can open `scenes/ui/reward_chest_menu.tscn`.
 
 Important nodes:
 - `ChestIcon`: selected transparent treasure chest PNG.
 - `ProgressTrack`: framed bar container under the chest.
 - `ProgressTrack/ProgressBar`: fill amount controlled by the script.
 - `ProgressTrack/AmountLabel`: centered `current/goal` label with dynamic font sizing.
+- `ChestButton`: full-rect flat, focus-less tap target layered above the icon and progress bar (the
+  other nodes stay `mouse_filter = Ignore`); forwards its `pressed` signal as `chest_pressed`.
 
 Depends on:
 - `assets/ui/main_menu_reward_chest.png`.
@@ -210,6 +216,49 @@ Depends on:
 
 Do not use for:
 - Persisting reward stars or choosing the active goal. Those stay in `scripts/player_progress.gd` and `configs/reward_chest_goals.json`.
+- Owning the detail modal's layout. That is `scenes/ui/reward_chest_menu.tscn`.
+
+## `scenes/ui/reward_chest_menu.tscn`
+
+Root:
+- `RewardChestMenu` (`Control`)
+
+Script:
+- `scripts/reward_chest_menu.gd`
+
+Purpose:
+- Centered pause-style detail modal opened from the main menu's reward chest widget.
+- Reads live progress from `PlayerProgress.get_reward_chest_progress()` itself in `_ready()`, the
+  same way `scenes/ui/profile_menu.tscn` reads its own data; the opening menu does not push data in.
+- Shows the `Chest rewards` title, a large decorative chest illustration, the same `current/goal`
+  progress bar shown by the side widget (scaled up), a `stars to go` caption, and the coin payout
+  waiting at the active goal.
+- Purely informational: coins are still granted automatically on goal rollover in
+  `scripts/player_progress.gd`, so there is no claim/collect action here.
+- The chest illustration is a placeholder composited from already-approved icons (chest, coin,
+  hammer, lantern, shuffle) in the "Bursting Open" composition, arranged with static rotated
+  `TextureRect`s and a procedural `GradientTexture2D` glow — no new binary art asset. A future
+  single hand-illustrated asset can replace `ChestStage`'s children without touching layout,
+  progress, or close behavior.
+
+Important nodes:
+- `RewardChestPanel`: centered outer popup panel, styled like `scenes/ui/profile_menu.tscn`'s panel.
+- `CloseButton`: protruding red circular close button; the script wires it to `queue_free()`.
+- `InnerPanel/ContentStack/ChestStage`: fixed-size (360x300) free-positioned illustration area;
+  `GlowRect` is a procedural radial `GradientTexture2D`, the rest are existing icon textures.
+- `InnerPanel/ContentStack/ProgressTrack/ProgressBar`, `.../AmountLabel`: bound to the active goal.
+- `InnerPanel/ContentStack/GoalCaptionLabel`: `"<n> stars to go"`.
+- `InnerPanel/ContentStack/NextRewardRow/NextRewardLabel`: `"Next reward: +<n> coins"` from the
+  active goal's `coin_reward`.
+
+Depends on:
+- `assets/ui/main_menu_reward_chest.png`, `assets/ui/main_menu_coin.png`.
+- `assets/abilities/ability_hammer.png`, `ability_lantern.png`, `ability_shuffle.png`.
+- `PlayerProgress` for `get_reward_chest_progress()`.
+
+Do not use for:
+- Saving stars, loading goal config, or awarding completion stars. Those stay in
+  `scripts/player_progress.gd` and `configs/reward_chest_goals.json`.
 
 ## `scenes/ui/main_menu_top_status.tscn`
 

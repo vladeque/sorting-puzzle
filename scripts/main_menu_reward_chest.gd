@@ -1,5 +1,7 @@
 extends Control
 
+signal chest_pressed
+
 const DEFAULT_GOAL := 1
 const DEFAULT_FONT_SIZE := 18
 const MEDIUM_FONT_SIZE := 16
@@ -7,8 +9,17 @@ const SMALL_FONT_SIZE := 14
 
 @onready var _progress_bar := %ProgressBar as ProgressBar
 @onready var _amount_label := %AmountLabel as Label
+@onready var _chest_button := %ChestButton as Button
 
 var _receive_pulse_tween: Tween
+
+
+func _ready() -> void:
+	_chest_button.pressed.connect(_on_chest_button_pressed)
+
+
+func _on_chest_button_pressed() -> void:
+	chest_pressed.emit()
 
 
 func set_reward_progress(current_stars: int, goal_stars: int) -> void:

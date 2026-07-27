@@ -1,0 +1,414 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/reward_chest_menu.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/ui/main_menu_reward_chest.png" id="2_chest"]
+[ext_resource type="Texture2D" path="res://assets/ui/main_menu_coin.png" id="3_coin"]
+[ext_resource type="Texture2D" path="res://assets/abilities/ability_hammer.png" id="4_hammer"]
+[ext_resource type="Texture2D" path="res://assets/abilities/ability_lantern.png" id="5_lantern"]
+[ext_resource type="Texture2D" path="res://assets/abilities/ability_shuffle.png" id="6_shuffle"]
+
+[sub_resource type="Gradient" id="Gradient_glow"]
+colors = PackedColorArray(1, 0.89, 0.6, 0.55, 1, 0.89, 0.6, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_glow"]
+gradient = SubResource("Gradient_glow")
+width = 128
+height = 128
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_outer_panel"]
+bg_color = Color(0.67, 0.32, 0.22, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 6
+border_color = Color(0.43, 0.17, 0.11, 1)
+corner_radius_top_left = 30
+corner_radius_top_right = 30
+corner_radius_bottom_right = 30
+corner_radius_bottom_left = 30
+shadow_color = Color(0, 0, 0, 0.42)
+shadow_size = 18
+shadow_offset = Vector2(0, 8)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_normal"]
+bg_color = Color(0.86, 0.08, 0.06, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(1, 0.58, 0.5, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+shadow_color = Color(0, 0, 0, 0.36)
+shadow_size = 6
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_pressed"]
+bg_color = Color(0.58, 0.04, 0.04, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(1, 0.76, 0.68, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_hover"]
+bg_color = Color(0.98, 0.2, 0.16, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(1, 0.82, 0.72, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inner_panel"]
+bg_color = Color(0.96, 0.9, 0.78, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(0.45, 0.19, 0.13, 0.52)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+shadow_color = Color(0.24, 0.08, 0.04, 0.22)
+shadow_size = 8
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_progress_track"]
+bg_color = Color(0.98, 0.82, 0.52, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.52, 0.27, 0.18, 0.88)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_color = Color(0.08, 0.05, 0.05, 0.34)
+shadow_size = 5
+shadow_offset = Vector2(0, 2)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_background"]
+bg_color = Color(0.4, 0.17, 0.22, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_fill"]
+bg_color = Color(0.22, 0.77, 0.22, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="RewardChestMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="DimBackground" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.025, 0.03, 0.66)
+
+[node name="RewardChestPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -350.0
+offset_right = 240.0
+offset_bottom = 350.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_outer_panel")
+
+[node name="TitleLabel" type="Label" parent="RewardChestPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 46.0
+offset_top = 25.0
+offset_right = -46.0
+offset_bottom = 86.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.78, 1)
+theme_override_colors/font_shadow_color = Color(0.16, 0.04, 0.02, 0.92)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 3
+theme_override_font_sizes/font_size = 40
+text = "Chest rewards"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CloseButton" type="Button" parent="RewardChestPanel"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -54.0
+offset_top = -18.0
+offset_right = 18.0
+offset_bottom = 54.0
+grow_horizontal = 0
+grow_vertical = 0
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.32, 0.02, 0.02, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxFlat_close_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_close_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_close_hover")
+text = "X"
+
+[node name="InnerPanel" type="Panel" parent="RewardChestPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 36.0
+offset_top = 100.0
+offset_right = -36.0
+offset_bottom = -32.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_inner_panel")
+
+[node name="ContentStack" type="VBoxContainer" parent="RewardChestPanel/InnerPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 14
+
+[node name="ChestStage" type="Control" parent="RewardChestPanel/InnerPanel/ContentStack"]
+custom_minimum_size = Vector2(360, 300)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="GlowRect" type="TextureRect" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage"]
+layout_mode = 1
+offset_left = 70.0
+offset_top = 93.0
+offset_right = 290.0
+offset_bottom = 313.0
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_glow")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="BurstCoin1" type="TextureRect" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage"]
+layout_mode = 1
+offset_left = 79.0
+offset_top = 42.0
+offset_right = 119.0
+offset_bottom = 82.0
+pivot_offset = Vector2(20, 20)
+rotation = -0.314159
+mouse_filter = 2
+texture = ExtResource("3_coin")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="BurstCoin2" type="TextureRect" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage"]
+layout_mode = 1
+offset_left = 209.0
+offset_top = 24.0
+offset_right = 249.0
+offset_bottom = 64.0
+pivot_offset = Vector2(20, 20)
+rotation = 0.174533
+mouse_filter = 2
+texture = ExtResource("3_coin")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="BurstCoin3" type="TextureRect" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage"]
+layout_mode = 1
+offset_left = 43.0
+offset_top = 90.0
+offset_right = 83.0
+offset_bottom = 130.0
+pivot_offset = Vector2(20, 20)
+rotation = -0.139626
+mouse_filter = 2
+texture = ExtResource("3_coin")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="BurstCoin4" type="TextureRect" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage"]
+layout_mode = 1
+offset_left = 266.0
+offset_top = 78.0
+offset_right = 306.0
+offset_bottom = 118.0
+pivot_offset = Vector2(20, 20)
+rotation = 0.244346
+mouse_filter = 2
+texture = ExtResource("3_coin")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="BurstHammer" type="TextureRect" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage"]
+layout_mode = 1
+offset_left = 144.0
+offset_top = 48.0
+offset_right = 198.0
+offset_bottom = 102.0
+pivot_offset = Vector2(27, 27)
+rotation = -0.174533
+mouse_filter = 2
+texture = ExtResource("4_hammer")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="BurstLantern" type="TextureRect" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage"]
+layout_mode = 1
+offset_left = 223.0
+offset_top = 60.0
+offset_right = 277.0
+offset_bottom = 114.0
+pivot_offset = Vector2(27, 27)
+rotation = 0.279253
+mouse_filter = 2
+texture = ExtResource("5_lantern")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="BurstShuffle" type="TextureRect" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage"]
+layout_mode = 1
+offset_left = 86.0
+offset_top = 120.0
+offset_right = 140.0
+offset_bottom = 174.0
+pivot_offset = Vector2(27, 27)
+rotation = -0.244346
+mouse_filter = 2
+texture = ExtResource("6_shuffle")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ChestIcon" type="TextureRect" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage"]
+layout_mode = 1
+offset_left = 119.0
+offset_top = 142.0
+offset_right = 241.0
+offset_bottom = 264.0
+pivot_offset = Vector2(61, 61)
+rotation = -0.069813
+mouse_filter = 2
+texture = ExtResource("2_chest")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PlaceholderTagLabel" type="Label" parent="RewardChestPanel/InnerPanel/ContentStack"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.36, 0.24, 0.78)
+theme_override_font_sizes/font_size = 12
+text = "Illustration placeholder — composited from existing icons"
+horizontal_alignment = 1
+
+[node name="ProgressTrack" type="Panel" parent="RewardChestPanel/InnerPanel/ContentStack"]
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_progress_track")
+
+[node name="ProgressBar" type="ProgressBar" parent="RewardChestPanel/InnerPanel/ContentStack/ProgressTrack"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 6.0
+offset_top = 6.0
+offset_right = -6.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_bar_background")
+theme_override_styles/fill = SubResource("StyleBoxFlat_bar_fill")
+max_value = 500.0
+show_percentage = false
+
+[node name="AmountLabel" type="Label" parent="RewardChestPanel/InnerPanel/ContentStack/ProgressTrack"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.2, 0.07, 0.1, 0.8)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 22
+text = "0/500"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GoalCaptionLabel" type="Label" parent="RewardChestPanel/InnerPanel/ContentStack"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.16, 0.08, 1)
+theme_override_font_sizes/font_size = 18
+text = "500 stars to go"
+horizontal_alignment = 1
+
+[node name="NextRewardRow" type="HBoxContainer" parent="RewardChestPanel/InnerPanel/ContentStack"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 8
+
+[node name="CoinIcon" type="TextureRect" parent="RewardChestPanel/InnerPanel/ContentStack/NextRewardRow"]
+custom_minimum_size = Vector2(38, 38)
+layout_mode = 2
+texture = ExtResource("3_coin")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NextRewardLabel" type="Label" parent="RewardChestPanel/InnerPanel/ContentStack/NextRewardRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.55, 0.32, 0.05, 1)
+theme_override_font_sizes/font_size = 22
+text = "Next reward: +100 coins"

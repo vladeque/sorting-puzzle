@@ -3,6 +3,7 @@ extends Control
 const LEVEL_SCENE := preload("res://level.tscn")
 const PROFILE_MENU_SCENE := preload("res://scenes/ui/profile_menu.tscn")
 const SETTINGS_MENU_SCENE := preload("res://scenes/ui/settings_menu.tscn")
+const REWARD_CHEST_MENU_SCENE := preload("res://scenes/ui/reward_chest_menu.tscn")
 const AVATAR_CLIP_SHADER := preload("res://assets/ui/avatar_circle_clip.gdshader")
 const MIN_LEVEL := 1
 const MAX_LEVEL := 10
@@ -43,6 +44,7 @@ const LIFE_STATUS_REFRESH_SECONDS := 1.0
 var _life_status_refresh_time := 0.0
 var _profile_menu: Control
 var _settings_menu: Control
+var _reward_chest_menu: Control
 var _animated_reward_stars := 0
 var _animated_reward_goal_index := 0
 
@@ -54,6 +56,8 @@ func _ready() -> void:
 	_level_button.pressed.connect(_launch_campaign_level)
 	_profile_button.pressed.connect(_open_profile_menu)
 	_settings_button.pressed.connect(_open_settings_menu)
+	if _reward_chest.has_signal("chest_pressed"):
+		_reward_chest.connect("chest_pressed", Callable(self, "_open_reward_chest_menu"))
 	_bottom_navigation.connect("shop_pressed", Callable(self, "_open_shop"))
 	_bottom_navigation.connect("leaderboard_pressed", Callable(self, "_open_leaderboard"))
 	if _bottom_navigation.has_method("set_active_tab"):
@@ -389,6 +393,19 @@ func _open_settings_menu() -> void:
 func _close_settings_menu() -> void:
 	if is_instance_valid(_settings_menu):
 		_settings_menu.queue_free()
+
+
+func _open_reward_chest_menu() -> void:
+	if is_instance_valid(_reward_chest_menu):
+		return
+
+	_reward_chest_menu = REWARD_CHEST_MENU_SCENE.instantiate() as Control
+	add_child(_reward_chest_menu)
+	_reward_chest_menu.tree_exited.connect(_clear_reward_chest_menu_reference)
+
+
+func _clear_reward_chest_menu_reference() -> void:
+	_reward_chest_menu = null
 
 
 func _on_profile_avatar_saved(_avatar_id: String) -> void:

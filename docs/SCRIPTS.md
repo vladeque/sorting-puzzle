@@ -15,6 +15,7 @@ Purpose:
 - Displays the saved profile avatar and opens the profile editor from the top status bar.
 - Displays the saved reward chest star progress in a separate left-side widget under the profile icon.
 - Consumes completed-level reward payloads, displays the pre-reward chest value, and advances it once for each clover coin that reaches the chest.
+- Opens the reward chest detail modal when the reward chest widget emits `chest_pressed`.
 - Opens the main-menu settings popup from the top status bar.
 - Launches the saved campaign level.
 - Opens the dedicated leaderboard scene from the bottom navigation trophy signal.
@@ -23,6 +24,7 @@ Key constants:
 - `LEVEL_SCENE`: preloads `res://level.tscn`.
 - `PROFILE_MENU_SCENE`: preloads `res://scenes/ui/profile_menu.tscn`.
 - `SETTINGS_MENU_SCENE`: preloads `res://scenes/ui/settings_menu.tscn`.
+- `REWARD_CHEST_MENU_SCENE`: preloads `res://scenes/ui/reward_chest_menu.tscn`.
 - `MIN_LEVEL`: first campaign level number.
 - `MAX_LEVEL`: last campaign level number.
 - `PRODUCTION_MENU_SCENE`: return path assigned to campaign level instances.
@@ -65,6 +67,7 @@ Key methods:
 - `_open_profile_menu()`: creates the centered profile menu window and listens for saved avatar changes.
 - `_open_settings_menu()`: creates the centered settings popup and wires its close button.
 - `_close_settings_menu()`: dismisses the settings popup.
+- `_open_reward_chest_menu()`: creates the centered reward chest detail modal; the modal reads its own progress and wires its own close button.
 - `_open_leaderboard()`: replaces the production menu with the dedicated leaderboard scene.
 - `_open_shop()`: replaces the production menu with the dedicated Shop scene.
 - `_on_profile_avatar_saved(avatar_id)`: refreshes the top status avatar after the profile menu saves.
@@ -242,6 +245,8 @@ Purpose:
 - Owns the visual state of the main-menu reward chest progress widget.
 - Updates the progress bar value and centered `current/goal` label.
 - Shrinks the label font for longer progress text so it stays inside the bar.
+- Emits `chest_pressed` when the widget's full-rect `%ChestButton` overlay is tapped; the icon and
+  progress bar underneath stay `mouse_filter = Ignore` and never receive input directly.
 
 Key methods:
 - `set_reward_progress(current_stars, goal_stars)`: clamps the displayed value to the active goal and updates the bar and label.
@@ -249,10 +254,36 @@ Key methods:
 - `play_receive_pulse()`: briefly pulses the chest when a reward coin arrives.
 
 Depends on:
-- `scenes/ui/main_menu_reward_chest.tscn` node names `%ProgressBar` and `%AmountLabel`.
+- `scenes/ui/main_menu_reward_chest.tscn` node names `%ProgressBar`, `%AmountLabel`, and `%ChestButton`.
 
 Do not use for:
 - Saving stars, loading goal config, or awarding completion stars. Those stay in `PlayerProgress`.
+- Owning the detail modal. `scripts/reward_chest_menu.gd` reads `PlayerProgress` itself once opened.
+
+## `scripts/reward_chest_menu.gd`
+
+Attached to:
+- `scenes/ui/reward_chest_menu.tscn` root `RewardChestMenu`.
+
+Purpose:
+- Self-contained reward chest detail modal, opened from the main menu's reward chest widget.
+- Reads `PlayerProgress.get_reward_chest_progress()` directly in `_ready()`, the same self-contained
+  pattern as `scripts/profile_menu.gd`, rather than having the opening menu push data in.
+- Read-only: there is no claim/collect action, since `scripts/player_progress.gd` already grants the
+  configured coin reward automatically when a goal is reached.
+
+Key methods:
+- `_apply_reward_progress(progress)`: writes the clamped `current/goal` values into the progress bar
+  and label, the remaining-stars caption, and the next coin reward line.
+
+Depends on:
+- `scenes/ui/reward_chest_menu.tscn` node names `%CloseButton`, `%ProgressBar`, `%AmountLabel`,
+  `%GoalCaptionLabel`, and `%NextRewardLabel`.
+- `PlayerProgress.get_reward_chest_progress()`.
+
+Do not use for:
+- Persisting reward stars, loading goal config, or awarding completion stars. Those stay in
+  `scripts/player_progress.gd` and `configs/reward_chest_goals.json`.
 
 ## `scripts/profile_menu.gd`
 
