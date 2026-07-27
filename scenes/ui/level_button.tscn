@@ -1,12 +1,12 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene format=3 uid="uid://cfpyljokiei7h"]
 
-[ext_resource type="Texture2D" uid="uid://bai63m2evt0sk" path="res://assets/ui/level_button_blank.png" id="1_level_button_blank"]
-[ext_resource type="Script" path="res://scripts/press_scale_button.gd" id="2_press_scale_button"]
+[ext_resource type="Texture2D" uid="uid://borxe8m7bwoqf" path="res://assets/ui/green_button_840x306.png" id="1_0pgek"]
+[ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="2_press_scale_button"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_level_button"]
-texture = ExtResource("1_level_button_blank")
+texture = ExtResource("1_0pgek")
 
-[node name="LevelButton" type="Button"]
+[node name="LevelButton" type="Button" unique_id=548605628]
 custom_minimum_size = Vector2(420, 153)
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -15,14 +15,11 @@ theme_override_colors/font_pressed_color = Color(0.92, 1, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_colors/font_disabled_color = Color(0.82, 0.92, 0.82, 0.72)
 theme_override_colors/font_outline_color = Color(0.03, 0.25, 0.04, 0.95)
-theme_override_colors/font_shadow_color = Color(0.01, 0.18, 0.03, 0.72)
 theme_override_constants/outline_size = 4
-theme_override_constants/shadow_offset_x = 0
-theme_override_constants/shadow_offset_y = 4
 theme_override_font_sizes/font_size = 50
 theme_override_styles/normal = SubResource("StyleBoxTexture_level_button")
-theme_override_styles/hover = SubResource("StyleBoxTexture_level_button")
 theme_override_styles/pressed = SubResource("StyleBoxTexture_level_button")
+theme_override_styles/hover = SubResource("StyleBoxTexture_level_button")
 theme_override_styles/disabled = SubResource("StyleBoxTexture_level_button")
 text = "Level 1"
 script = ExtResource("2_press_scale_button")
