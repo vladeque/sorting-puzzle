@@ -313,12 +313,11 @@ stretch_mode = 5
 
 [node name="HeroBodyLabel" type="Label" parent="RewardChestPanel/InnerPanel/ContentStack" unique_id=734205756]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.96, 0.88, 1)
-theme_override_colors/font_shadow_color = Color(0.08, 0.02, 0.01, 0.9)
+theme_override_colors/font_color = Color(0.36078432, 0.16078432, 0.101960786, 1)
 theme_override_constants/shadow_offset_x = 0
 theme_override_constants/shadow_offset_y = 1
 theme_override_font_sizes/font_size = 18
-text = "Collect stars to unlock it and claim your reward"
+text = "Collect stars to unlock a chest and claim your reward"
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
@@ -354,7 +353,7 @@ anchor_right = 1.0
 offset_left = 20.0
 offset_top = 20.0
 offset_right = -20.0
-offset_bottom = 130.0
+offset_bottom = 90.0
 grow_horizontal = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_text_overlay")

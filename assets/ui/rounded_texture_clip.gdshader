@@ -1,6 +1,6 @@
 shader_type canvas_item;
 
-uniform vec2 rect_size = vec2(536.0, 559.0);
+uniform vec2 rect_size = vec2(536.0, 522.0);
 uniform float corner_radius : hint_range(0.0, 64.0, 1.0) = 16.0;
 uniform float edge_softness : hint_range(0.5, 4.0, 0.25) = 1.25;
 
