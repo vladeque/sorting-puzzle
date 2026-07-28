@@ -3685,32 +3685,28 @@ func _find_immediate_triple_items() -> Array[ShelfItem]:
 		if group.size() < SLOT_COUNT:
 			continue
 
-		return _build_triple(shelf_items, group)
+		return _merge_highlight_items(shelf_items, group)
 
-	# Otherwise, settle for any three visible items of the same type, even if
+	# Otherwise, settle for any visible items of the same type, even if
 	# gathering them takes more than one move.
 	for item_id in items_by_id:
 		var group: Array = items_by_id[item_id]
 		if group.size() >= SLOT_COUNT:
-			return _build_triple([], group)
+			return _merge_highlight_items([], group)
 
 	return []
 
 
-func _build_triple(priority_items: Array, candidates: Array) -> Array[ShelfItem]:
-	var triple: Array[ShelfItem] = []
+func _merge_highlight_items(priority_items: Array, candidates: Array) -> Array[ShelfItem]:
+	var merged: Array[ShelfItem] = []
 	for item in priority_items:
-		if triple.size() >= SLOT_COUNT:
-			break
-		triple.append(item)
+		merged.append(item)
 
 	for item in candidates:
-		if triple.size() >= SLOT_COUNT:
-			break
-		if not triple.has(item):
-			triple.append(item)
+		if not merged.has(item):
+			merged.append(item)
 
-	return triple
+	return merged
 
 
 func _update_highlight_timer(delta: float) -> void:
