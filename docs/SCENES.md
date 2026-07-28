@@ -230,27 +230,32 @@ Purpose:
 - Centered pause-style detail modal opened from the main menu's reward chest widget.
 - Reads live progress from `PlayerProgress.get_reward_chest_progress()` itself in `_ready()`, the
   same way `scenes/ui/profile_menu.tscn` reads its own data; the opening menu does not push data in.
-- Shows the `Chest rewards` title, a large decorative chest illustration, the same `current/goal`
-  progress bar shown by the side widget (scaled up), a `stars to go` caption, and the coin payout
-  waiting at the active goal.
+- Shows the `Chest rewards` title, a star-to-chest `current/goal` progress row, a bordered hero
+  illustration with explanatory copy over the image, the coin payout waiting at the active goal,
+  and a large `Continue` button.
 - Purely informational: coins are still granted automatically on goal rollover in
-  `scripts/player_progress.gd`, so there is no claim/collect action here.
-- The `ChestStage` uses the dedicated generated
-  `assets/ui/reward_chest_menu_illustration.png` artwork. The small main-menu reward chest keeps
-  its separate `assets/ui/main_menu_reward_chest.png` icon.
+  `scripts/player_progress.gd`, so `Continue` only closes the modal and does not claim anything.
+- The 640x820 logical-pixel outer panel occupies most of the 720-wide design viewport while still
+  fitting the shorter tablet-like logical viewport produced by the project's `keep_width` stretch.
+- The `ChestStage` uses `assets/ui/Treasure_chest_with_game_items_202607280535.jpeg`. The small
+  main-menu reward chest remains a separate icon and also marks the goal end of the progress row.
 
 Important nodes:
 - `RewardChestPanel`: centered outer popup panel, styled like `scenes/ui/profile_menu.tscn`'s panel.
 - `CloseButton`: protruding red circular close button; the script wires it to `queue_free()`.
-- `InnerPanel/ContentStack/ChestStage`: fixed-size (360x300) illustration area containing one
-  aspect-covered `TextureRect`.
-- `InnerPanel/ContentStack/ProgressTrack/ProgressBar`, `.../AmountLabel`: bound to the active goal.
-- `InnerPanel/ContentStack/GoalCaptionLabel`: `"<n> stars to go"`.
-- `InnerPanel/ContentStack/NextRewardRow/NextRewardLabel`: `"Next reward: +<n> coins"` from the
-  active goal's `coin_reward`.
+- `InnerPanel/ContentStack/ProgressRow`: star icon, progress column, and reward-chest goal icon.
+- `ProgressRow/ProgressColumn/ProgressTrack/ProgressBar` and `.../AmountLabel`: bound to the active
+  goal; `ProgressColumn/GoalCaptionLabel` shows `"<n> stars to go"`.
+- `InnerPanel/ContentStack/ChestStage`: bordered, aspect-covered hero image with a translucent
+  headline/body overlay and bottom reward badge.
+- `ChestStage/RewardBadge/NextRewardRow/NextRewardLabel`: `"Reward: +<n> coins"` from the active
+  goal's `coin_reward`.
+- `ContinueButton`: large green action below the content card; closes the modal like `CloseButton`.
 
 Depends on:
-- `assets/ui/reward_chest_menu_illustration.png`, `assets/ui/main_menu_coin.png`.
+- `assets/ui/Treasure_chest_with_game_items_202607280535.jpeg`,
+  `assets/ui/reward_star_84x84.png`, `assets/ui/main_menu_reward_chest.png`,
+  `assets/ui/main_menu_coin.png`, and `assets/ui/level_button_blank_new.png`.
 - `PlayerProgress` for `get_reward_chest_progress()`.
 
 Do not use for:

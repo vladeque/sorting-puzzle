@@ -1,6 +1,7 @@
 extends Control
 
 @onready var _close_button := %CloseButton as Button
+@onready var _continue_button := %ContinueButton as Button
 @onready var _progress_bar := %ProgressBar as ProgressBar
 @onready var _amount_label := %AmountLabel as Label
 @onready var _goal_caption_label := %GoalCaptionLabel as Label
@@ -9,6 +10,7 @@ extends Control
 
 func _ready() -> void:
 	_close_button.pressed.connect(queue_free)
+	_continue_button.pressed.connect(queue_free)
 	_apply_reward_progress(PlayerProgress.get_reward_chest_progress())
 
 
@@ -21,4 +23,4 @@ func _apply_reward_progress(progress: Dictionary) -> void:
 	_progress_bar.value = stars
 	_amount_label.text = "%d/%d" % [stars, goal]
 	_goal_caption_label.text = "%d stars to go" % (goal - stars)
-	_next_reward_label.text = "Next reward: +%d coins" % coin_reward
+	_next_reward_label.text = "Reward: +%d coins" % coin_reward

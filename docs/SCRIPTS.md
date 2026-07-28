@@ -270,15 +270,16 @@ Purpose:
 - Reads `PlayerProgress.get_reward_chest_progress()` directly in `_ready()`, the same self-contained
   pattern as `scripts/profile_menu.gd`, rather than having the opening menu push data in.
 - Read-only: there is no claim/collect action, since `scripts/player_progress.gd` already grants the
-  configured coin reward automatically when a goal is reached.
+  configured coin reward automatically when a goal is reached. Both the close and `Continue`
+  buttons only dismiss the modal.
 
 Key methods:
 - `_apply_reward_progress(progress)`: writes the clamped `current/goal` values into the progress bar
-  and label, the remaining-stars caption, and the next coin reward line.
+  and label, the remaining-stars caption, and the hero image's reward badge.
 
 Depends on:
-- `scenes/ui/reward_chest_menu.tscn` node names `%CloseButton`, `%ProgressBar`, `%AmountLabel`,
-  `%GoalCaptionLabel`, and `%NextRewardLabel`.
+- `scenes/ui/reward_chest_menu.tscn` node names `%CloseButton`, `%ContinueButton`, `%ProgressBar`,
+  `%AmountLabel`, `%GoalCaptionLabel`, and `%NextRewardLabel`.
 - `PlayerProgress.get_reward_chest_progress()`.
 
 Do not use for:
