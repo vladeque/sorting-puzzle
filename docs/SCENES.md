@@ -248,7 +248,8 @@ Important nodes:
   goal; `ProgressColumn/GoalCaptionLabel` shows `"<n> stars to go"`.
 - `InnerPanel/ContentStack/ChestStage`: bordered, aspect-covered hero image with a translucent
   headline/body overlay and bottom reward badge. The image uses
-  `assets/ui/rounded_texture_clip.gdshader` so its corners follow the rounded frame.
+  `assets/ui/rounded_texture_clip.gdshader` with a 16-pixel image radius inside the frame's
+  8-pixel inset, keeping it concentric with the frame's 24-pixel radius.
 - `ChestStage/RewardBadge/NextRewardRow/NextRewardLabel`: `"Reward: +<n> coins"` from the active
   goal's `coin_reward`.
 - `ContinueButton`: large green action in the outer panel's reserved footer area; closes the modal

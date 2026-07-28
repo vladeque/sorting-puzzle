@@ -276,10 +276,12 @@ Purpose:
 Key methods:
 - `_apply_reward_progress(progress)`: writes the clamped `current/goal` values into the progress bar
   and label, the remaining-stars caption, and the hero image's reward badge.
+- `_sync_illustration_corner_mask()`: updates the image shader with the illustration's actual
+  runtime size and 16-pixel corner radius whenever container layout resizes it.
 
 Depends on:
 - `scenes/ui/reward_chest_menu.tscn` node names `%CloseButton`, `%ContinueButton`, `%ProgressBar`,
-  `%AmountLabel`, `%GoalCaptionLabel`, and `%NextRewardLabel`.
+  `%Illustration`, `%AmountLabel`, `%GoalCaptionLabel`, and `%NextRewardLabel`.
 - `PlayerProgress.get_reward_chest_progress()`.
 
 Do not use for:
