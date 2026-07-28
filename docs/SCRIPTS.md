@@ -990,6 +990,7 @@ Key responsibilities:
 - Count hammer destroys as cleared triples for shelf unlocking.
 - Let highlight uses start their timed window even when no immediate triple can currently be highlighted.
 - Find items to highlight with `_find_immediate_triple_items()`: prefer a shelf that is one item away from a full match plus a loose match elsewhere (single-move triple), otherwise fall back to any visible items sharing a type. Only one item type is ever highlighted at a time even when several types qualify, but every visible item of that chosen type is highlighted, not just three.
+- After every move, `_refresh_ability_highlights()` calls `_find_current_highlight_type_items()` first so the highlighted item type stays put as long as it still has enough visible matches; it only calls `_find_immediate_triple_items()` for a new type once the current one can no longer complete a triple. This stops the highlight from jumping to an unrelated item type after an unconnected move.
 - Apply highlight ability visuals through `ShelfItem.set_outline()` and `ShelfItem.set_highlight_scale()` so highlighted items get an even border and a slightly larger sprite, and update the highlight button countdown label while that window is active.
 - Activate Freezer for exactly 30 seconds of active gameplay. Only `_time_remaining` is gated;
   item interaction, combo expiry, Lantern expiry, moving shelf rows, animations, matching, and

@@ -3724,7 +3724,14 @@ func _refresh_ability_highlights() -> void:
 		return
 
 	var previous_items := _highlighted_items.duplicate()
-	_highlighted_items = _find_immediate_triple_items()
+	# Keep highlighting the same item type across unrelated moves instead of
+	# jumping to a different candidate every time shelves resolve; only pick
+	# a new type once the current one can no longer complete a triple.
+	var next_items := _find_current_highlight_type_items()
+	if next_items.is_empty():
+		next_items = _find_immediate_triple_items()
+
+	_highlighted_items = next_items
 	for item in previous_items:
 		if item != null and is_instance_valid(item):
 			_apply_item_visual_state(item)
@@ -3732,6 +3739,27 @@ func _refresh_ability_highlights() -> void:
 	for item in _highlighted_items:
 		if item != null and is_instance_valid(item):
 			_apply_item_visual_state(item)
+
+
+func _find_current_highlight_type_items() -> Array[ShelfItem]:
+	var current_id: StringName = &""
+	for item in _highlighted_items:
+		if item != null and is_instance_valid(item) and not item.is_queued_for_deletion():
+			current_id = item.item_id
+			break
+
+	if current_id == &"":
+		return []
+
+	var matches: Array[ShelfItem] = []
+	for item in _get_visible_items():
+		if item.item_id == current_id:
+			matches.append(item)
+
+	if matches.size() < SLOT_COUNT:
+		return []
+
+	return matches
 
 
 func _clear_ability_highlights() -> void:
