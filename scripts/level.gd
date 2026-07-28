@@ -129,7 +129,8 @@ const DEFAULT_ABILITY_PURCHASE_PRICES := {
 @export var item_move_duration_seconds := 0.16
 @export var highlight_outline_color := Color(1.0, 0.86, 0.18, 1.0)
 @export var selected_highlight_outline_color := Color(1.0, 0.96, 0.36, 1.0)
-@export_range(0.0, 8.0, 0.25) var highlight_outline_width := 4.0
+@export_range(0.0, 8.0, 0.25) var highlight_outline_width := 6.0
+@export_range(1.0, 1.5, 0.01) var highlight_item_scale := 1.15
 @export var match_gather_duration_seconds := 0.18
 @export var match_shrink_duration_seconds := 0.16
 @export_range(0.25, 30.0, 0.25) var combo_window_seconds := 8.0
@@ -2952,6 +2953,7 @@ func _apply_item_visual_state(item: ShelfItem) -> void:
 
 	var outline_color := selected_highlight_outline_color if is_selected else highlight_outline_color
 	item.set_outline(is_highlighted, outline_color, highlight_outline_width)
+	item.set_highlight_scale(highlight_item_scale if is_highlighted else 1.0)
 
 
 func _setup_ability_buttons() -> void:
@@ -3653,14 +3655,17 @@ func _destroy_items(items_to_destroy: Array[ShelfItem]) -> void:
 
 
 func _find_immediate_triple_items() -> Array[ShelfItem]:
-	var visible_counts := {}
+	var items_by_id := {}
 	for item in _get_visible_items():
-		if not visible_counts.has(item.item_id):
-			visible_counts[item.item_id] = 0
+		if item.item_id == &"":
+			continue
 
-		visible_counts[item.item_id] = int(visible_counts[item.item_id]) + 1
+		var group: Array = items_by_id.get(item.item_id, [])
+		group.append(item)
+		items_by_id[item.item_id] = group
 
-	var triplable_ids := {}
+	# Prefer a triple that can be completed in a single move: a shelf that is
+	# one item away from a full match, plus a loose match elsewhere.
 	for shelf in _get_all_shelves():
 		if _is_shelf_locked(shelf):
 			continue
@@ -3670,21 +3675,42 @@ func _find_immediate_triple_items() -> Array[ShelfItem]:
 			continue
 
 		var first_id := shelf_items[0].item_id
-		if first_id == &"" or int(visible_counts.get(first_id, 0)) < SLOT_COUNT:
+		if first_id == &"":
 			continue
 
-		if shelf_items.all(func(item: ShelfItem) -> bool: return item.item_id == first_id):
-			triplable_ids[first_id] = true
+		if not shelf_items.all(func(item: ShelfItem) -> bool: return item.item_id == first_id):
+			continue
 
-	if triplable_ids.is_empty():
-		return []
+		var group: Array = items_by_id.get(first_id, [])
+		if group.size() < SLOT_COUNT:
+			continue
 
-	var highlighted: Array[ShelfItem] = []
-	for item in _get_visible_items():
-		if triplable_ids.has(item.item_id):
-			highlighted.append(item)
+		return _build_triple(shelf_items, group)
 
-	return highlighted
+	# Otherwise, settle for any three visible items of the same type, even if
+	# gathering them takes more than one move.
+	for item_id in items_by_id:
+		var group: Array = items_by_id[item_id]
+		if group.size() >= SLOT_COUNT:
+			return _build_triple([], group)
+
+	return []
+
+
+func _build_triple(priority_items: Array, candidates: Array) -> Array[ShelfItem]:
+	var triple: Array[ShelfItem] = []
+	for item in priority_items:
+		if triple.size() >= SLOT_COUNT:
+			break
+		triple.append(item)
+
+	for item in candidates:
+		if triple.size() >= SLOT_COUNT:
+			break
+		if not triple.has(item):
+			triple.append(item)
+
+	return triple
 
 
 func _update_highlight_timer(delta: float) -> void:

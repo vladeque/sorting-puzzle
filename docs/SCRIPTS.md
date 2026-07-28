@@ -906,7 +906,8 @@ Important exports:
 - `item_move_duration_seconds`: duration for moved items to slide into destination slots after tap or drag placement, including invalid drag returns.
 - `highlight_outline_color`: border color used by the highlight ability.
 - `selected_highlight_outline_color`: border color used when a highlighted item is also selected.
-- `highlight_outline_width`: screen-pixel expansion used by the item outline sprite.
+- `highlight_outline_width`: screen-pixel thickness of the item outline border, kept even around the item silhouette by the outline shader's dilation.
+- `highlight_item_scale`: scale multiplier applied to a highlighted item's sprite and outline so it visually stands out.
 - `match_gather_duration_seconds`: duration for side items to pull into the center item when a triple clears.
 - `match_shrink_duration_seconds`: duration for the center item shrink-out after a triple gathers.
 - `combo_window_seconds`: time allowed after a triple clear to extend the active combo before the center HUD combo label and fill disappear.
@@ -988,7 +989,8 @@ Key responsibilities:
 - Shuffle now pauses moving shelf rows, shows the center-screen delivery box, flies visible unlocked items into the box, changes unlocked item identity assignments while they are hidden, flies them back to their original slots, and resolves shelves only after the return animation completes.
 - Count hammer destroys as cleared triples for shelf unlocking.
 - Let highlight uses start their timed window even when no immediate triple can currently be highlighted.
-- Apply highlight ability visuals through `ShelfItem.set_outline()` so only item silhouettes receive a border, and update the highlight button countdown label while that window is active.
+- Find the triple to highlight with `_find_immediate_triple_items()`: prefer a shelf that is one item away from a full match plus a loose match elsewhere (single-move triple), otherwise fall back to any three visible items sharing a type. Only one triple's items are ever highlighted at a time, even when multiple qualify.
+- Apply highlight ability visuals through `ShelfItem.set_outline()` and `ShelfItem.set_highlight_scale()` so highlighted items get an even border and a slightly larger sprite, and update the highlight button countdown label while that window is active.
 - Activate Freezer for exactly 30 seconds of active gameplay. Only `_time_remaining` is gated;
   item interaction, combo expiry, Lantern expiry, moving shelf rows, animations, matching, and
   other abilities continue. Pause menus, the ability-purchase modal, and application interruption
@@ -1184,16 +1186,17 @@ Exports:
 - `texture`: assigned by `scripts/level.gd`; setter updates `Sprite2D.texture`.
 - `visual_scale`: scalar applied to `Sprite2D.scale`.
 - `outline_color`: color passed to the item outline shader.
-- `outline_width`: screen-pixel expansion used when the outline sprite is enabled.
+- `outline_width`: desired on-screen outline thickness in pixels; converted to a source-texture texel radius for the outline shader so thickness stays constant regardless of the item's current scale.
 - `outline_alpha_threshold`: alpha cutoff used to detect the item silhouette.
 
 Key methods:
 - `_ready()`: applies current texture and scale.
 - `_apply_texture()`: updates `Sprite2D.texture` and hides the soft contact shadow when the item has no texture.
-- `_apply_visual_scale()`: updates `Sprite2D`, `OutlineSprite`, and contact-shadow scale.
+- `_apply_visual_scale()`: updates `Sprite2D`, `OutlineSprite`, and contact-shadow scale from `visual_scale * highlight scale multiplier`, then refreshes the outline.
 - `set_outline(enabled, color, width)`: enables or disables the sprite border highlight.
+- `set_highlight_scale(multiplier)`: scales the sprite and outline up (without changing the persistent `visual_scale`) while an item is highlighted by the Lantern ability.
 - `set_contact_shadow_enabled(enabled)`: toggles the item contact shadow while still respecting texture availability; used by back-layer previews and active player dragging.
-- `_apply_outline()`: sends outline properties to the `OutlineSprite` shader material and keeps the outline node visible only while enabled.
+- `_apply_outline()`: sends outline color/threshold and the computed dilation radius to the `OutlineSprite` shader material, and keeps the outline node visible only while enabled. The `OutlineSprite` shader dilates the alpha mask by sampling a ring of points around each pixel (in source-texture texels) rather than scaling the whole sprite up, so the border thickness stays even around irregular silhouettes.
 
 Depends on:
 - Child node `Sprite2D`.

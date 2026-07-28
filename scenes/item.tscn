@@ -5,19 +5,34 @@
 [sub_resource type="Shader" id="Shader_item_outline"]
 code = "shader_type canvas_item;
 
+// Draws a uniform-thickness outline by dilating the sprite's alpha mask:
+// a pixel becomes part of the outline if any sample on a ring around it
+// (in source-texture texels) hits opaque texture. This keeps the border
+// an even thickness around irregular item silhouettes, unlike scaling the
+// whole sprite up (which stretches corners more than flat edges).
 uniform vec4 outline_color : source_color = vec4(1.0, 0.86, 0.18, 1.0);
 uniform float alpha_threshold : hint_range(0.0, 1.0, 0.01) = 0.1;
+uniform float outline_radius_px : hint_range(0.0, 32.0, 0.5) = 4.0;
+
+const int OUTLINE_SAMPLE_COUNT = 16;
+const float OUTLINE_TAU = 6.283185307179586;
 
 void fragment() {
-	vec4 vertex_color = COLOR;
-	vec4 base_color = texture(TEXTURE, UV);
-	vec4 final_color = vec4(0.0);
+	float coverage = texture(TEXTURE, UV).a;
 
-	if (base_color.a > alpha_threshold) {
-		final_color = vec4(outline_color.rgb, outline_color.a * base_color.a * vertex_color.a);
+	if (outline_radius_px > 0.0) {
+		for (int i = 0; i < OUTLINE_SAMPLE_COUNT; i++) {
+			float angle = float(i) / float(OUTLINE_SAMPLE_COUNT) * OUTLINE_TAU;
+			vec2 offset = vec2(cos(angle), sin(angle)) * outline_radius_px * TEXTURE_PIXEL_SIZE;
+			coverage = max(coverage, texture(TEXTURE, UV + offset).a);
+		}
 	}
 
-	COLOR = final_color;
+	// coverage is the dilated mask, not this pixel's own texture alpha, so the
+	// outline's opacity must come from outline_color alone (not multiplied by
+	// the original per-pixel alpha, which is 0 for most of the halo).
+	float coverage_alpha = smoothstep(alpha_threshold, 1.0, coverage);
+	COLOR = vec4(outline_color.rgb, outline_color.a * coverage_alpha);
 }
 "
 
@@ -26,6 +41,7 @@ resource_local_to_scene = true
 shader = SubResource("Shader_item_outline")
 shader_parameter/outline_color = Color(1, 0.86, 0.18, 1)
 shader_parameter/alpha_threshold = 0.1
+shader_parameter/outline_radius_px = 4.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_item_hitbox"]
 size = Vector2(74, 112)
