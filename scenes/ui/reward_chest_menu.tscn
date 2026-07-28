@@ -2,8 +2,7 @@
 
 [ext_resource type="Script" uid="uid://c6n0a2l1kd14e" path="res://scripts/reward_chest_menu.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://0mtvk246lq4q" path="res://assets/ui/Treasure_chest_with_game_items_202607280535.jpeg" id="2_tbf2t"]
-[ext_resource type="Texture2D" uid="uid://dnlhdgplij67n" path="res://assets/ui/main_menu_coin.png" id="3_coin"]
-[ext_resource type="Texture2D" uid="uid://bct74q4wd0rtq" path="res://assets/ui/reward_star_84x84.png" id="4_star"]
+[ext_resource type="Texture2D" uid="uid://co4g6sf3ggawc" path="res://assets/ui/reward_star_84x84.png" id="4_star"]
 [ext_resource type="Texture2D" uid="uid://brf3b72bksb8e" path="res://assets/ui/main_menu_reward_chest.png" id="5_chest"]
 [ext_resource type="Texture2D" uid="uid://borxe8m7bwoqf" path="res://assets/ui/level_button_blank_new.png" id="6_continue_button"]
 [ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="7_press_scale_button"]
@@ -122,6 +121,12 @@ shadow_color = Color(0.24, 0.08, 0.04, 0.3)
 shadow_size = 8
 shadow_offset = Vector2(0, 4)
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_rounded_image"]
+shader = ExtResource("8_rounded_texture")
+shader_parameter/rect_size = Vector2(536, 559)
+shader_parameter/corner_radius = 16.0
+shader_parameter/edge_softness = 1.25
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_text_overlay"]
 bg_color = Color(0.18, 0.065, 0.035, 0.76)
 border_width_left = 2
@@ -134,29 +139,8 @@ corner_radius_top_right = 16
 corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_reward_badge"]
-bg_color = Color(0.96, 0.9, 0.78, 0.96)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 4
-border_color = Color(0.45, 0.19, 0.13, 0.82)
-corner_radius_top_left = 22
-corner_radius_top_right = 22
-corner_radius_bottom_right = 22
-corner_radius_bottom_left = 22
-shadow_color = Color(0.08, 0.03, 0.02, 0.42)
-shadow_size = 6
-shadow_offset = Vector2(0, 3)
-
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_continue_button"]
 texture = ExtResource("6_continue_button")
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_rounded_image"]
-shader = ExtResource("8_rounded_texture")
-shader_parameter/rect_size = Vector2(536, 559)
-shader_parameter/corner_radius = 16.0
-shader_parameter/edge_softness = 1.25
 
 [node name="RewardChestMenu" type="Control" unique_id=1443664996]
 layout_mode = 3
@@ -259,13 +243,13 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 12
 
-[node name="ProgressRow" type="HBoxContainer" parent="RewardChestPanel/InnerPanel/ContentStack"]
+[node name="ProgressRow" type="HBoxContainer" parent="RewardChestPanel/InnerPanel/ContentStack" unique_id=1965573686]
 custom_minimum_size = Vector2(0, 66)
 layout_mode = 2
 theme_override_constants/separation = 10
 alignment = 1
 
-[node name="StarIcon" type="TextureRect" parent="RewardChestPanel/InnerPanel/ContentStack/ProgressRow"]
+[node name="StarIcon" type="TextureRect" parent="RewardChestPanel/InnerPanel/ContentStack/ProgressRow" unique_id=499595503]
 custom_minimum_size = Vector2(58, 58)
 layout_mode = 2
 size_flags_vertical = 4
@@ -273,7 +257,7 @@ texture = ExtResource("4_star")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="ProgressColumn" type="VBoxContainer" parent="RewardChestPanel/InnerPanel/ContentStack/ProgressRow"]
+[node name="ProgressColumn" type="VBoxContainer" parent="RewardChestPanel/InnerPanel/ContentStack/ProgressRow" unique_id=10269914]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 2
@@ -319,15 +303,7 @@ text = "0/500"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="GoalCaptionLabel" type="Label" parent="RewardChestPanel/InnerPanel/ContentStack/ProgressRow/ProgressColumn" unique_id=1897710741]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.35, 0.16, 0.08, 1)
-theme_override_font_sizes/font_size = 16
-text = "500 stars to go"
-horizontal_alignment = 1
-
-[node name="GoalChestIcon" type="TextureRect" parent="RewardChestPanel/InnerPanel/ContentStack/ProgressRow"]
+[node name="GoalChestIcon" type="TextureRect" parent="RewardChestPanel/InnerPanel/ContentStack/ProgressRow" unique_id=1660119917]
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 size_flags_vertical = 4
@@ -359,7 +335,7 @@ texture = ExtResource("2_tbf2t")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="TextOverlay" type="Panel" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage"]
+[node name="TextOverlay" type="Panel" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage" unique_id=323051213]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -371,7 +347,7 @@ grow_horizontal = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_text_overlay")
 
-[node name="TextStack" type="VBoxContainer" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage/TextOverlay"]
+[node name="TextStack" type="VBoxContainer" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage/TextOverlay" unique_id=988586992]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -385,7 +361,7 @@ grow_vertical = 2
 theme_override_constants/separation = 4
 alignment = 1
 
-[node name="HeroTitleLabel" type="Label" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage/TextOverlay/TextStack"]
+[node name="HeroTitleLabel" type="Label" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage/TextOverlay/TextStack" unique_id=1203882086]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.95, 0.78, 1)
 theme_override_colors/font_shadow_color = Color(0.08, 0.02, 0.01, 0.9)
@@ -396,7 +372,7 @@ text = "A REWARD CHEST AWAITS!"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="HeroBodyLabel" type="Label" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage/TextOverlay/TextStack"]
+[node name="HeroBodyLabel" type="Label" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage/TextOverlay/TextStack" unique_id=734205756]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.96, 0.88, 1)
 theme_override_colors/font_shadow_color = Color(0.08, 0.02, 0.01, 0.9)
@@ -408,41 +384,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
 
-[node name="RewardBadge" type="PanelContainer" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage"]
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -126.0
-offset_top = -78.0
-offset_right = 126.0
-offset_bottom = -20.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_override_styles/panel = SubResource("StyleBoxFlat_reward_badge")
-
-[node name="NextRewardRow" type="HBoxContainer" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage/RewardBadge" unique_id=97630826]
-layout_mode = 2
-theme_override_constants/separation = 8
-alignment = 1
-
-[node name="CoinIcon" type="TextureRect" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage/RewardBadge/NextRewardRow" unique_id=326823557]
-custom_minimum_size = Vector2(42, 42)
-layout_mode = 2
-texture = ExtResource("3_coin")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="NextRewardLabel" type="Label" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage/RewardBadge/NextRewardRow" unique_id=1384334312]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.55, 0.32, 0.05, 1)
-theme_override_font_sizes/font_size = 24
-text = "Reward: +100 coins"
-
-[node name="ContinueButton" type="Button" parent="RewardChestPanel"]
+[node name="ContinueButton" type="Button" parent="RewardChestPanel" unique_id=1725894573]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(240, 82)
 layout_mode = 1
