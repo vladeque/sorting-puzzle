@@ -230,9 +230,9 @@ Purpose:
 - Centered pause-style detail modal opened from the main menu's reward chest widget.
 - Reads live progress from `PlayerProgress.get_reward_chest_progress()` itself in `_ready()`, the
   same way `scenes/ui/profile_menu.tscn` reads its own data; the opening menu does not push data in.
-- Shows the `Chest rewards` title, a star-to-chest `current/goal` progress row, a bordered hero
-  illustration with explanatory copy over the image, the coin payout waiting at the active goal,
-  and a large `Continue` button.
+- Shows the `Chest rewards` title, a star-to-chest `current/goal` progress row, explanatory copy
+  between the progress row and bordered hero illustration, the coin payout waiting at the active
+  goal, and a large `Continue` button.
 - Purely informational: coins are still granted automatically on goal rollover in
   `scripts/player_progress.gd`, so `Continue` only closes the modal and does not claim anything.
 - The 640x900 logical-pixel outer panel occupies most of the 720-wide design viewport while still
@@ -246,8 +246,10 @@ Important nodes:
 - `InnerPanel/ContentStack/ProgressRow`: star icon, progress column, and reward-chest goal icon.
 - `ProgressRow/ProgressColumn/ProgressTrack/ProgressBar` and `.../AmountLabel`: bound to the active
   goal; `ProgressColumn/GoalCaptionLabel` shows `"<n> stars to go"`.
+- `InnerPanel/ContentStack/HeroBodyLabel`: centered unlock guidance between the progress row and
+  hero image.
 - `InnerPanel/ContentStack/ChestStage`: bordered, aspect-covered hero image with a translucent
-  headline/body overlay and bottom reward badge. The image uses
+  headline overlay and bottom reward badge. The image uses
   `assets/ui/rounded_texture_clip.gdshader` with a 16-pixel image radius inside the frame's
   8-pixel inset, keeping it concentric with the frame's 24-pixel radius.
 - `ChestStage/RewardBadge/NextRewardRow/NextRewardLabel`: `"Reward: +<n> coins"` from the active

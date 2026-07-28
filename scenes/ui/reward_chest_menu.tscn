@@ -311,6 +311,18 @@ texture = ExtResource("5_chest")
 expand_mode = 1
 stretch_mode = 5
 
+[node name="HeroBodyLabel" type="Label" parent="RewardChestPanel/InnerPanel/ContentStack" unique_id=734205756]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.96, 0.88, 1)
+theme_override_colors/font_shadow_color = Color(0.08, 0.02, 0.01, 0.9)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 18
+text = "Collect stars to unlock it and claim your reward"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
 [node name="ChestStage" type="Panel" parent="RewardChestPanel/InnerPanel/ContentStack" unique_id=188516105]
 custom_minimum_size = Vector2(0, 500)
 layout_mode = 2
@@ -371,18 +383,6 @@ theme_override_font_sizes/font_size = 28
 text = "A REWARD CHEST AWAITS!"
 horizontal_alignment = 1
 vertical_alignment = 1
-
-[node name="HeroBodyLabel" type="Label" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage/TextOverlay/TextStack" unique_id=734205756]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.96, 0.88, 1)
-theme_override_colors/font_shadow_color = Color(0.08, 0.02, 0.01, 0.9)
-theme_override_constants/shadow_offset_x = 0
-theme_override_constants/shadow_offset_y = 1
-theme_override_font_sizes/font_size = 18
-text = "Collect stars to unlock it and claim your reward"
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 2
 
 [node name="ContinueButton" type="Button" parent="RewardChestPanel" unique_id=1725894573]
 unique_name_in_owner = true
