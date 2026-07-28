@@ -4,8 +4,8 @@
 [ext_resource type="Texture2D" uid="uid://cqs8ijno3xqrc" path="res://assets/ui/icon_sound_effects.png" id="2_sound_effects_icon"]
 [ext_resource type="Texture2D" uid="uid://dhu182ygjcxh2" path="res://assets/ui/icon_vibration.png" id="3_vibration_icon"]
 [ext_resource type="Script" uid="uid://djayncoacexvl" path="res://scripts/pause_menu.gd" id="4_pause_menu_script"]
-[ext_resource type="Texture2D" uid="uid://b386mn58pea5q" path="res://assets/ui/level_button_blank_red.png" id="5_leave_button"]
-[ext_resource type="Texture2D" uid="uid://bai63m2evt0sk" path="res://assets/ui/level_button_blank.png" id="6_continue_button"]
+[ext_resource type="Texture2D" uid="uid://cgebkwbjfmtsd" path="res://assets/ui/level_button_blank_red_new.png" id="5_leave_button"]
+[ext_resource type="Texture2D" uid="uid://borxe8m7bwoqf" path="res://assets/ui/level_button_blank_new.png" id="6_continue_button"]
 [ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="7_press_scale_button"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_outer_panel"]

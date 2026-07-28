@@ -415,7 +415,7 @@ Key methods:
 Depends on:
 - `scenes/ui/level_completion_screen.tscn` child node names.
 - `scripts/press_scale_button.gd` on `NextButton`.
-- `assets/ui/reward_star.png` and `assets/ui/level_button_blank.png`.
+- `assets/ui/reward_star.png` and `assets/ui/level_button_blank_new.png`.
 
 Do not use for:
 - Level progression or save data. Keep that in `scripts/level.gd` and `scripts/player_progress.gd`.

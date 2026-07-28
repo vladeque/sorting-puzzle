@@ -312,13 +312,13 @@ Important nodes:
 - `PauseMenuPanel/InnerPanel/IconRow/MusicOption/MusicButton`: square music toggle button with shadow-only button styling and held-press scaling.
 - `PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption/SoundEffectsButton`: square sound effects toggle button with shadow-only button styling and held-press scaling.
 - `PauseMenuPanel/InnerPanel/IconRow/VibrationOption/VibrationButton`: square phone vibration toggle button with shadow-only button styling and held-press scaling.
-- `PauseMenuPanel/InnerPanel/ActionColumn/SupportButton`: wide no-op button using `assets/ui/level_button_blank.png`.
-- `PauseMenuPanel/InnerPanel/ActionColumn/LanguageButton`: wide no-op button using `assets/ui/level_button_blank.png`.
+- `PauseMenuPanel/InnerPanel/ActionColumn/SupportButton`: wide no-op button using `assets/ui/level_button_blank_new.png`.
+- `PauseMenuPanel/InnerPanel/ActionColumn/LanguageButton`: wide no-op button using `assets/ui/level_button_blank_new.png`.
 
 Depends on:
 - `scripts/pause_menu.gd` for the same crossed-out toggle visuals and shared disabled state used by the in-level pause menu.
 - `assets/ui/icon_music.png`, `assets/ui/icon_sound_effects.png`, and `assets/ui/icon_vibration.png` as square textures containing warm rectangular tile art for the settings buttons.
-- `assets/ui/level_button_blank.png`.
+- `assets/ui/level_button_blank_new.png`.
 - `scripts/press_scale_button.gd` for held-press visuals on the settings icon and wide buttons.
 - Runtime open/close wiring from `scripts/production_main_menu.gd`.
 
@@ -371,8 +371,8 @@ Important nodes:
 - `LevelButton`: clickable button root with the generated texture style, white outlined text, and dynamic pressed/hover/disabled states.
 
 Depends on:
-- `assets/ui/level_button_blank.png`.
-- `assets/ui/level_button_blank_red.png`, `assets/ui/level_button_blank_light_blue.png`, and `assets/ui/level_button_blank_yellow_orange.png` are matching alternate color blanks for future button states or variants.
+- `assets/ui/level_button_blank_new.png`.
+- `assets/ui/level_button_blank_red_new.png`, `assets/ui/level_button_blank_light_blue_new.png`, and `assets/ui/level_button_blank_yellow_orange_new.png` are matching alternate color blanks for future button states or variants.
 - `scripts/press_scale_button.gd` for the default held-press scale behavior expected by future visible game UI buttons.
 - Caller scenes or scripts for placement, click wiring, and label updates.
 
@@ -525,8 +525,8 @@ Important nodes:
 
 Depends on:
 - `assets/ui/main_menu_coin.png`.
-- `assets/ui/level_button_blank.png`.
-- `assets/ui/level_button_blank_yellow_orange.png`.
+- `assets/ui/level_button_blank_new.png`.
+- `assets/ui/level_button_blank_yellow_orange_new.png`.
 - `scripts/press_scale_button.gd`.
 - Runtime offer setup, coin spending, and ability execution from `scripts/level.gd`.
 
@@ -554,7 +554,7 @@ Important nodes:
 
 Depends on:
 - `assets/ui/reward_star.png`
-- `assets/ui/level_button_blank.png`
+- `assets/ui/level_button_blank_new.png`
 - `scripts/press_scale_button.gd`
 
 Do not use for:
@@ -676,7 +676,7 @@ Important nodes:
 
 Depends on:
 - `assets/ui/icon_music.png`, `assets/ui/icon_sound_effects.png`, and `assets/ui/icon_vibration.png` as square textures containing warm rectangular tile art for the settings buttons.
-- `assets/ui/level_button_blank_red.png` and `assets/ui/level_button_blank.png` for pause action buttons.
+- `assets/ui/level_button_blank_red_new.png` and `assets/ui/level_button_blank_new.png` for pause action buttons.
 - `scripts/press_scale_button.gd` for the default held-press shrink on settings icon buttons and bottom image buttons.
 - `assets/ui/pause_menu_option_a_sheet.png` and `assets/ui/pause_menu_option_b_sheet.png` are archived alternate visual directions for these icons.
 - Runtime button wiring from `scripts/level.gd`.
@@ -711,8 +711,8 @@ Important nodes:
 Depends on:
 - `assets/ui/main_menu_lives.png`.
 - `assets/ui/reward_star.png`.
-- `assets/ui/level_button_blank_red.png`.
-- `assets/ui/level_button_blank.png`.
+- `assets/ui/level_button_blank_red_new.png`.
+- `assets/ui/level_button_blank_new.png`.
 - `scripts/press_scale_button.gd` for the default held-press shrink on the bottom image buttons.
 - Runtime button wiring and star-count updates from `scripts/level.gd`.
 

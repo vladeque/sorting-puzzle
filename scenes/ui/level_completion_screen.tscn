@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dlopvf5glhqiu"]
 
 [ext_resource type="Texture2D" uid="uid://3vi3qpy12q0w" path="res://assets/ui/reward_star.png" id="1_reward_star"]
-[ext_resource type="Texture2D" uid="uid://bai63m2evt0sk" path="res://assets/ui/level_button_blank.png" id="2_level_button_blank"]
+[ext_resource type="Texture2D" uid="uid://borxe8m7bwoqf" path="res://assets/ui/level_button_blank_new.png" id="2_level_button_blank"]
 [ext_resource type="Script" uid="uid://cp7jmwiig6qtc" path="res://scripts/level_completion_screen.gd" id="3_completion_screen_script"]
 [ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="4_press_scale_button"]
 

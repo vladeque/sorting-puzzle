@@ -95,7 +95,7 @@ Responsibility:
 - Opens `scenes/ui/profile_menu.tscn` from the profile widget, shows an editable player-name field above all 18 avatars in a centered pause-style window with a 3-column grid, and saves the name plus selected avatar through `PlayerProgress`.
 - Opens `scenes/ui/settings_menu.tscn` from the settings widget, with pause-menu-style music, sound-effects, and vibration toggle visuals plus no-op `Support` and `Language` buttons.
 - Disables campaign launch when saved lives are zero; the lives widget shows current lives and the `MM:SS` countdown until the next hourly restore.
-- Uses `scenes/ui/level_button.tscn` and `assets/ui/level_button_blank.png` for the reusable glossy green level button visuals while keeping the label dynamic; red, light-blue, and yellow-orange variants are available beside the source texture for alternate states or future UI variants.
+- Uses `scenes/ui/level_button.tscn` and `assets/ui/level_button_blank_new.png` for the reusable glossy green level button visuals while keeping the label dynamic; red, light-blue, and yellow-orange variants are available beside the source texture for alternate states or future UI variants.
 - Uses `scripts/press_scale_button.gd` as the default held-press behavior for visible game UI buttons so they shrink slightly while a click or touch is held.
 - Keeps free level selection out of the production menu.
 - Preserves the old testing menu in `scenes/main_menu_testing.tscn`.
@@ -347,7 +347,7 @@ Responsibility:
 - Shows and expires the active combo count and shrinking green time strip in `Background/HudCenterSlot` when triple clears happen within the configured combo window.
 - Shows the current run's star total in `UI/StarCounterLabel` with a small `assets/ui/reward_star.png` icon; triple clears add stars equal to the combo value reached by each clear and play small `assets/ui/reward_star_34_glossy_b.png` stars that drop from the cleared triple, fly into the counter, and pulse it.
 - Shows short praise words near the clear location for 2x+ combos, with unique wording through 20x and stronger colored outlines as the combo rises.
-- Shows the completed-level reward overlay through the `UI/CompletionScreen` instance of `scenes/ui/level_completion_screen.tscn`, using `assets/ui/reward_star.png`, `assets/ui/level_button_blank.png`, and the final run star count for the earned amount label.
+- Shows the completed-level reward overlay through the `UI/CompletionScreen` instance of `scenes/ui/level_completion_screen.tscn`, using `assets/ui/reward_star.png`, `assets/ui/level_button_blank_new.png`, and the final run star count for the earned amount label.
 - Sends completed campaign stars to `PlayerProgress`; completion `Next` returns to the main menu, where one clover coin per earned star flies from the house to the reward chest and advances its visible count.
 - Uses `scripts/press_scale_button.gd` on the completion `Next` button so the green blank-image button shrinks while held.
 - Tracks cleared triples and unlocks shelves whose configs require progress before becoming accessible.
@@ -537,7 +537,7 @@ Change gameplay sound effects:
 
 Change level win or loss flow:
 - Update `_process()`, `_fail_level()`, `_complete_level()`, `_check_level_completed()`, pause-menu helpers, `level.tscn`, and `scenes/ui/level_completion_screen.tscn`.
-- Keep `assets/ui/reward_star.png` aligned with both `UI/StarCounterLabel/Icon` and `scenes/ui/level_completion_screen.tscn` `StarImage`, and keep `assets/ui/level_button_blank.png` aligned with `NextButton` when changing completion reward art.
+- Keep `assets/ui/reward_star.png` aligned with both `UI/StarCounterLabel/Icon` and `scenes/ui/level_completion_screen.tscn` `StarImage`, and keep `assets/ui/level_button_blank_new.png` aligned with `NextButton` when changing completion reward art.
 
 Change pause menu layout:
 - Update `scenes/pause_menu.tscn`.
