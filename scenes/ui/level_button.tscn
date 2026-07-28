@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cfpyljokiei7h"]
 
-[ext_resource type="Texture2D" uid="uid://borxe8m7bwoqf" path="res://assets/ui/green_button_840x306.png" id="1_0pgek"]
+[ext_resource type="Texture2D" uid="uid://borxe8m7bwoqf" path="res://assets/ui/level_button_blank_new.png" id="1_0pgek"]
 [ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="2_press_scale_button"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_level_button"]

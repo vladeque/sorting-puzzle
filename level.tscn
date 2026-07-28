@@ -3,10 +3,10 @@
 [ext_resource type="Texture2D" uid="uid://xbjatvx3natv" path="res://assets/ui/reward_star_34_glossy_b.png" id="2_n6hdu"]
 [ext_resource type="PackedScene" uid="uid://g1xsr7chqeg7" path="res://scenes/pause_menu.tscn" id="5_pause_menu"]
 [ext_resource type="PackedScene" uid="uid://dlopvf5glhqiu" path="res://scenes/ui/level_completion_screen.tscn" id="7_completion_screen"]
-[ext_resource type="PackedScene" path="res://scenes/leave_confirmation_menu.tscn" id="8_leave_confirmation"]
-[ext_resource type="PackedScene" path="res://scenes/ability_purchase_menu.tscn" id="9_ability_purchase"]
+[ext_resource type="PackedScene" uid="uid://cblpm4vbgjmfu" path="res://scenes/leave_confirmation_menu.tscn" id="8_leave_confirmation"]
+[ext_resource type="PackedScene" uid="uid://bh2wtx7clqdgd" path="res://scenes/ability_purchase_menu.tscn" id="9_ability_purchase"]
 [ext_resource type="Script" uid="uid://cy80oincxrrc5" path="res://scripts/level.gd" id="10_level_script"]
-[ext_resource type="PackedScene" path="res://scenes/ui/ability_bar.tscn" id="11_ability_bar"]
+[ext_resource type="PackedScene" uid="uid://db6gp1qpotd1l" path="res://scenes/ui/ability_bar.tscn" id="11_ability_bar"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_top_hud_strip"]
 bg_color = Color(0.7, 0.34, 0.24, 1)
@@ -409,7 +409,7 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_pause_button_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_pause_button_hover")
 text = "II"
 
-[node name="AbilityBar" parent="UI" instance=ExtResource("11_ability_bar")]
+[node name="AbilityBar" parent="UI" unique_id=135995489 instance=ExtResource("11_ability_bar")]
 offset_top = -222.0
 offset_bottom = -96.0
 
@@ -441,10 +441,10 @@ text = "Level Failed"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CompletionScreen" parent="UI" instance=ExtResource("7_completion_screen")]
+[node name="CompletionScreen" parent="UI" unique_id=620620184 instance=ExtResource("7_completion_screen")]
 
 [node name="PauseMenuOverlay" parent="UI" unique_id=1081173105 instance=ExtResource("5_pause_menu")]
 
-[node name="LeaveConfirmationOverlay" parent="UI" instance=ExtResource("8_leave_confirmation")]
+[node name="LeaveConfirmationOverlay" parent="UI" unique_id=840119744 instance=ExtResource("8_leave_confirmation")]
 
-[node name="AbilityPurchaseOverlay" parent="UI" instance=ExtResource("9_ability_purchase")]
+[node name="AbilityPurchaseOverlay" parent="UI" unique_id=38239463 instance=ExtResource("9_ability_purchase")]

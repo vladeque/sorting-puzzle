@@ -4,8 +4,8 @@
 [ext_resource type="Texture2D" uid="uid://cqs8ijno3xqrc" path="res://assets/ui/icon_sound_effects.png" id="2_sound_effects_icon"]
 [ext_resource type="Texture2D" uid="uid://dhu182ygjcxh2" path="res://assets/ui/icon_vibration.png" id="3_vibration_icon"]
 [ext_resource type="Script" uid="uid://djayncoacexvl" path="res://scripts/pause_menu.gd" id="4_pause_menu_script"]
-[ext_resource type="Texture2D" uid="uid://bi6f80uhliep4" path="res://assets/ui/level_button_blank_light_blue.png" id="5_ywggk"]
 [ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="6_press_scale_button"]
+[ext_resource type="Texture2D" uid="uid://c16rnlemnr47n" path="res://assets/ui/level_button_blank_light_blue_new.png" id="6_ywggk"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_outer_panel"]
 bg_color = Color(0.67, 0.32, 0.22, 1)
@@ -110,7 +110,7 @@ shadow_size = 7
 shadow_offset = Vector2(0, 3)
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_blank_button"]
-texture = ExtResource("5_ywggk")
+texture = ExtResource("6_ywggk")
 
 [node name="MainMenuSettingsOverlay" type="ColorRect" unique_id=1528203024]
 anchors_preset = 15
