@@ -126,6 +126,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_reward")
 [node name="Stack" type="VBoxContainer" parent="CardStack/Rewards/HammerReward" unique_id=1858107192]
 layout_mode = 2
 theme_override_constants/separation = -4
+alignment = 1
 
 [node name="Icon" type="TextureRect" parent="CardStack/Rewards/HammerReward/Stack" unique_id=702875276]
 custom_minimum_size = Vector2(72, 82)
@@ -152,6 +153,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_reward")
 [node name="Stack" type="VBoxContainer" parent="CardStack/Rewards/ShuffleReward" unique_id=803402534]
 layout_mode = 2
 theme_override_constants/separation = -4
+alignment = 1
 
 [node name="Icon" type="TextureRect" parent="CardStack/Rewards/ShuffleReward/Stack" unique_id=1998410384]
 custom_minimum_size = Vector2(72, 82)
@@ -178,6 +180,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_reward")
 [node name="Stack" type="VBoxContainer" parent="CardStack/Rewards/LanternReward" unique_id=2119830576]
 layout_mode = 2
 theme_override_constants/separation = -4
+alignment = 1
 
 [node name="Icon" type="TextureRect" parent="CardStack/Rewards/LanternReward/Stack" unique_id=1503845685]
 custom_minimum_size = Vector2(72, 82)
@@ -204,6 +207,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_reward")
 [node name="Stack" type="VBoxContainer" parent="CardStack/Rewards/FreezerReward" unique_id=608025019]
 layout_mode = 2
 theme_override_constants/separation = -4
+alignment = 1
 
 [node name="Icon" type="TextureRect" parent="CardStack/Rewards/FreezerReward/Stack" unique_id=1517493974]
 custom_minimum_size = Vector2(72, 82)
@@ -230,6 +234,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_reward")
 [node name="Stack" type="VBoxContainer" parent="CardStack/Rewards/CoinReward" unique_id=204282156]
 layout_mode = 2
 theme_override_constants/separation = -4
+alignment = 1
 
 [node name="Icon" type="TextureRect" parent="CardStack/Rewards/CoinReward/Stack" unique_id=1066467120]
 custom_minimum_size = Vector2(72, 82)
