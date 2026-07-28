@@ -74,6 +74,7 @@ Files:
 - `assets/ui/main_menu_coin.png`
 - `assets/ui/main_menu_lives.png`
 - `assets/ui/main_menu_reward_chest.png`
+- `assets/ui/reward_chest_menu_illustration.png`
 - `assets/abilities/ability_hammer.png`
 - `assets/abilities/ability_lantern.png`
 - `assets/abilities/ability_shuffle.png`
@@ -91,7 +92,7 @@ Files:
 Responsibility:
 - Shows a production bottom button labeled with `PlayerProgress.current_level`.
 - Shows production top-row icons for the saved circular-clipped profile avatar, saved gold coins, saved lives, and a smaller pause-style settings button.
-- Shows a separate side reward chest widget under the profile icon with saved stars versus the active configured goal; tapping it opens `scenes/ui/reward_chest_menu.tscn`, a read-only centered modal showing the same progress at a larger size, a decorative chest illustration, and the coin payout waiting at the next goal. The illustration is a placeholder composited from existing chest/coin/ability icons pending a custom asset.
+- Shows a separate side reward chest widget under the profile icon with saved stars versus the active configured goal; tapping it opens `scenes/ui/reward_chest_menu.tscn`, a read-only centered modal showing the same progress at a larger size, the dedicated `assets/ui/reward_chest_menu_illustration.png` artwork, and the coin payout waiting at the next goal.
 - Opens `scenes/ui/profile_menu.tscn` from the profile widget, shows an editable player-name field above all 18 avatars in a centered pause-style window with a 3-column grid, and saves the name plus selected avatar through `PlayerProgress`.
 - Opens `scenes/ui/settings_menu.tscn` from the settings widget, with pause-menu-style music, sound-effects, and vibration toggle visuals plus no-op `Support` and `Language` buttons.
 - Disables campaign launch when saved lives are zero; the lives widget shows current lives and the `MM:SS` countdown until the next hourly restore.

@@ -235,25 +235,22 @@ Purpose:
   waiting at the active goal.
 - Purely informational: coins are still granted automatically on goal rollover in
   `scripts/player_progress.gd`, so there is no claim/collect action here.
-- The chest illustration is a placeholder composited from already-approved icons (chest, coin,
-  hammer, lantern, shuffle) in the "Bursting Open" composition, arranged with static rotated
-  `TextureRect`s and a procedural `GradientTexture2D` glow — no new binary art asset. A future
-  single hand-illustrated asset can replace `ChestStage`'s children without touching layout,
-  progress, or close behavior.
+- The `ChestStage` uses the dedicated generated
+  `assets/ui/reward_chest_menu_illustration.png` artwork. The small main-menu reward chest keeps
+  its separate `assets/ui/main_menu_reward_chest.png` icon.
 
 Important nodes:
 - `RewardChestPanel`: centered outer popup panel, styled like `scenes/ui/profile_menu.tscn`'s panel.
 - `CloseButton`: protruding red circular close button; the script wires it to `queue_free()`.
-- `InnerPanel/ContentStack/ChestStage`: fixed-size (360x300) free-positioned illustration area;
-  `GlowRect` is a procedural radial `GradientTexture2D`, the rest are existing icon textures.
+- `InnerPanel/ContentStack/ChestStage`: fixed-size (360x300) illustration area containing one
+  aspect-covered `TextureRect`.
 - `InnerPanel/ContentStack/ProgressTrack/ProgressBar`, `.../AmountLabel`: bound to the active goal.
 - `InnerPanel/ContentStack/GoalCaptionLabel`: `"<n> stars to go"`.
 - `InnerPanel/ContentStack/NextRewardRow/NextRewardLabel`: `"Next reward: +<n> coins"` from the
   active goal's `coin_reward`.
 
 Depends on:
-- `assets/ui/main_menu_reward_chest.png`, `assets/ui/main_menu_coin.png`.
-- `assets/abilities/ability_hammer.png`, `ability_lantern.png`, `ability_shuffle.png`.
+- `assets/ui/reward_chest_menu_illustration.png`, `assets/ui/main_menu_coin.png`.
 - `PlayerProgress` for `get_reward_chest_progress()`.
 
 Do not use for:

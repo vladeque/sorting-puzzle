@@ -1,22 +1,8 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/reward_chest_menu.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/ui/main_menu_reward_chest.png" id="2_chest"]
+[ext_resource type="Texture2D" path="res://assets/ui/reward_chest_menu_illustration.png" id="2_illustration"]
 [ext_resource type="Texture2D" path="res://assets/ui/main_menu_coin.png" id="3_coin"]
-[ext_resource type="Texture2D" path="res://assets/abilities/ability_hammer.png" id="4_hammer"]
-[ext_resource type="Texture2D" path="res://assets/abilities/ability_lantern.png" id="5_lantern"]
-[ext_resource type="Texture2D" path="res://assets/abilities/ability_shuffle.png" id="6_shuffle"]
-
-[sub_resource type="Gradient" id="Gradient_glow"]
-colors = PackedColorArray(1, 0.89, 0.6, 0.55, 1, 0.89, 0.6, 0)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_glow"]
-gradient = SubResource("Gradient_glow")
-width = 128
-height = 128
-fill = 1
-fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_outer_panel"]
 bg_color = Color(0.67, 0.32, 0.22, 1)
@@ -222,127 +208,17 @@ custom_minimum_size = Vector2(360, 300)
 layout_mode = 2
 size_flags_horizontal = 4
 
-[node name="GlowRect" type="TextureRect" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage"]
+[node name="Illustration" type="TextureRect" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage"]
 layout_mode = 1
-offset_left = 70.0
-offset_top = 93.0
-offset_right = 290.0
-offset_bottom = 313.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
-texture = SubResource("GradientTexture2D_glow")
+texture = ExtResource("2_illustration")
 expand_mode = 1
-stretch_mode = 5
-
-[node name="BurstCoin1" type="TextureRect" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage"]
-layout_mode = 1
-offset_left = 79.0
-offset_top = 42.0
-offset_right = 119.0
-offset_bottom = 82.0
-pivot_offset = Vector2(20, 20)
-rotation = -0.314159
-mouse_filter = 2
-texture = ExtResource("3_coin")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="BurstCoin2" type="TextureRect" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage"]
-layout_mode = 1
-offset_left = 209.0
-offset_top = 24.0
-offset_right = 249.0
-offset_bottom = 64.0
-pivot_offset = Vector2(20, 20)
-rotation = 0.174533
-mouse_filter = 2
-texture = ExtResource("3_coin")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="BurstCoin3" type="TextureRect" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage"]
-layout_mode = 1
-offset_left = 43.0
-offset_top = 90.0
-offset_right = 83.0
-offset_bottom = 130.0
-pivot_offset = Vector2(20, 20)
-rotation = -0.139626
-mouse_filter = 2
-texture = ExtResource("3_coin")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="BurstCoin4" type="TextureRect" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage"]
-layout_mode = 1
-offset_left = 266.0
-offset_top = 78.0
-offset_right = 306.0
-offset_bottom = 118.0
-pivot_offset = Vector2(20, 20)
-rotation = 0.244346
-mouse_filter = 2
-texture = ExtResource("3_coin")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="BurstHammer" type="TextureRect" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage"]
-layout_mode = 1
-offset_left = 144.0
-offset_top = 48.0
-offset_right = 198.0
-offset_bottom = 102.0
-pivot_offset = Vector2(27, 27)
-rotation = -0.174533
-mouse_filter = 2
-texture = ExtResource("4_hammer")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="BurstLantern" type="TextureRect" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage"]
-layout_mode = 1
-offset_left = 223.0
-offset_top = 60.0
-offset_right = 277.0
-offset_bottom = 114.0
-pivot_offset = Vector2(27, 27)
-rotation = 0.279253
-mouse_filter = 2
-texture = ExtResource("5_lantern")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="BurstShuffle" type="TextureRect" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage"]
-layout_mode = 1
-offset_left = 86.0
-offset_top = 120.0
-offset_right = 140.0
-offset_bottom = 174.0
-pivot_offset = Vector2(27, 27)
-rotation = -0.244346
-mouse_filter = 2
-texture = ExtResource("6_shuffle")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="ChestIcon" type="TextureRect" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage"]
-layout_mode = 1
-offset_left = 119.0
-offset_top = 142.0
-offset_right = 241.0
-offset_bottom = 264.0
-pivot_offset = Vector2(61, 61)
-rotation = -0.069813
-mouse_filter = 2
-texture = ExtResource("2_chest")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="PlaceholderTagLabel" type="Label" parent="RewardChestPanel/InnerPanel/ContentStack"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.5, 0.36, 0.24, 0.78)
-theme_override_font_sizes/font_size = 12
-text = "Illustration placeholder — composited from existing icons"
-horizontal_alignment = 1
+stretch_mode = 6
 
 [node name="ProgressTrack" type="Panel" parent="RewardChestPanel/InnerPanel/ContentStack"]
 custom_minimum_size = Vector2(0, 46)
