@@ -235,7 +235,7 @@ Purpose:
   and a large `Continue` button.
 - Purely informational: coins are still granted automatically on goal rollover in
   `scripts/player_progress.gd`, so `Continue` only closes the modal and does not claim anything.
-- The 640x820 logical-pixel outer panel occupies most of the 720-wide design viewport while still
+- The 640x900 logical-pixel outer panel occupies most of the 720-wide design viewport while still
   fitting the shorter tablet-like logical viewport produced by the project's `keep_width` stretch.
 - The `ChestStage` uses `assets/ui/Treasure_chest_with_game_items_202607280535.jpeg`. The small
   main-menu reward chest remains a separate icon and also marks the goal end of the progress row.
@@ -247,15 +247,18 @@ Important nodes:
 - `ProgressRow/ProgressColumn/ProgressTrack/ProgressBar` and `.../AmountLabel`: bound to the active
   goal; `ProgressColumn/GoalCaptionLabel` shows `"<n> stars to go"`.
 - `InnerPanel/ContentStack/ChestStage`: bordered, aspect-covered hero image with a translucent
-  headline/body overlay and bottom reward badge.
+  headline/body overlay and bottom reward badge. The image uses
+  `assets/ui/rounded_texture_clip.gdshader` so its corners follow the rounded frame.
 - `ChestStage/RewardBadge/NextRewardRow/NextRewardLabel`: `"Reward: +<n> coins"` from the active
   goal's `coin_reward`.
-- `ContinueButton`: large green action below the content card; closes the modal like `CloseButton`.
+- `ContinueButton`: large green action in the outer panel's reserved footer area; closes the modal
+  like `CloseButton`.
 
 Depends on:
 - `assets/ui/Treasure_chest_with_game_items_202607280535.jpeg`,
   `assets/ui/reward_star_84x84.png`, `assets/ui/main_menu_reward_chest.png`,
-  `assets/ui/main_menu_coin.png`, and `assets/ui/level_button_blank_new.png`.
+  `assets/ui/main_menu_coin.png`, `assets/ui/level_button_blank_new.png`, and
+  `assets/ui/rounded_texture_clip.gdshader`.
 - `PlayerProgress` for `get_reward_chest_progress()`.
 
 Do not use for:

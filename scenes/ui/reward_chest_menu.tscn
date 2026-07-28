@@ -7,7 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://brf3b72bksb8e" path="res://assets/ui/main_menu_reward_chest.png" id="5_chest"]
 [ext_resource type="Texture2D" uid="uid://borxe8m7bwoqf" path="res://assets/ui/level_button_blank_new.png" id="6_continue_button"]
 [ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="7_press_scale_button"]
-[ext_resource type="Shader" path="res://assets/ui/rounded_texture_clip.gdshader" id="8_rounded_texture"]
+[ext_resource type="Shader" uid="uid://c71yjdn13xeka" path="res://assets/ui/rounded_texture_clip.gdshader" id="8_rounded_texture"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_outer_panel"]
 bg_color = Color(0.67, 0.32, 0.22, 1)
