@@ -1,0 +1,133 @@
+{
+    "level":  2,
+    "time_seconds":  300,
+    "layout_preset":  "grid_3x3",
+    "shelves":  [
+                    {
+                        "layers":  [
+                                       [
+                                           "item_01",
+                                           null,
+                                           null
+                                       ],
+                                       [
+                                           "item_02",
+                                           "item_03",
+                                           "item_04"
+                                       ]
+                                   ]
+                    },
+                    {
+                        "layers":  [
+                                       [
+                                           "item_01",
+                                           "item_03",
+                                           "item_02"
+                                       ],
+                                       [
+                                           "item_05",
+                                           "item_02",
+                                           null
+                                       ]
+                                   ]
+                    },
+                    {
+                        "layers":  [
+                                       [
+                                           null,
+                                           "item_03",
+                                           "item_03"
+                                       ],
+                                       [
+                                           "item_06",
+                                           "item_07",
+                                           "item_01"
+                                       ]
+                                   ]
+                    },
+                    {
+                        "layers":  [
+                                       [
+                                           null,
+                                           "item_01",
+                                           "item_07"
+                                       ],
+                                       [
+                                           "item_06",
+                                           "item_06",
+                                           "item_02"
+                                       ]
+                                   ]
+                    },
+                    {
+                        "layers":  [
+                                       [
+                                           "item_04",
+                                           null,
+                                           "item_02"
+                                       ],
+                                       [
+                                           "item_04",
+                                           "item_02",
+                                           "item_04"
+                                       ]
+                                   ]
+                    },
+                    {
+                        "layers":  [
+                                       [
+                                           "item_04",
+                                           "item_02",
+                                           "item_01"
+                                       ],
+                                       [
+                                           "item_02",
+                                           "item_06",
+                                           "item_01"
+                                       ]
+                                   ]
+                    },
+                    {
+                        "layers":  [
+                                       [
+                                           "item_07",
+                                           "item_03",
+                                           null
+                                       ],
+                                       [
+                                           "item_02",
+                                           null,
+                                           "item_04"
+                                       ]
+                                   ]
+                    },
+                    {
+                        "layers":  [
+                                       [
+                                           "item_05",
+                                           "item_05",
+                                           "item_06"
+                                       ],
+                                       [
+                                           "item_02",
+                                           null,
+                                           "item_02"
+                                       ]
+                                   ]
+                    },
+                    {
+                        "layers":  [
+                                       [
+                                           "item_05",
+                                           "item_02",
+                                           "item_03"
+                                       ],
+                                       [
+                                           "item_06",
+                                           "item_05",
+                                           "item_05"
+                                       ]
+                                   ]
+                    }
+                ]
+}

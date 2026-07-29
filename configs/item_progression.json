@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "mapping_salt": "sorting-puzzle-item-progression-v1",
+  "milestones": [
+    {
+      "from_level": 1,
+      "unlock": [
+        "milk_carton",
+        "soda_bottle",
+        "orange_juice_box",
+        "water_bottle",
+        "chips_can",
+        "cookie_box",
+        "candy_bag",
+        "chocolate_bar",
+        "cupcake",
+        "ice_cream_cup"
+      ]
+    },
+    {
+      "from_level": 6,
+      "unlock": [
+        "ketchup_bottle",
+        "cereal_box",
+        "toy_unicorn",
+        "teddy_bear",
+        "toy_robot"
+      ]
+    },
+    {
+      "from_level": 9,
+      "unlock": [
+        "golden_cat_figurine",
+        "rubber_duck",
+        "plant_pot",
+        "soap_pump"
+      ]
+    },
+    {
+      "from_level": 12,
+      "unlock": [
+        "toothpaste_box",
+        "shampoo_bottle",
+        "canned_food",
+        "jam_jar",
+        "gift_box"
+      ]
+    }
+  ]
+}

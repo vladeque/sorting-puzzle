@@ -473,18 +473,24 @@ Change here when:
 ### Level Data And Tooling
 
 Files:
+- `configs/item_progression.json`
+- `configs/level_templates/level_*.json`
 - `configs/levels/level_*.json`
 - `scenes/layouts/layout_*.tscn`
 - `scripts/tools/generate_level_shelves.py`
+- `scripts/tools/level_item_progression.py`
+- `scripts/tools/materialize_level_templates.py`
 - `scripts/tools/validate_level_solvable.py`
 
 Responsibility:
-- Stores level number, time limit, layout preset, and shelf layers.
+- Stores cumulative campaign item unlock milestones.
+- Stores abstract level number, time limit, layout preset, and logical shelf layers.
+- Materializes abstract item identities into concrete runtime item IDs using each level's available pool.
 - Stores named layout preset positions in Godot scene templates.
 - Supports optional row layout configs for static and moving shelf rows.
 - Supports the `grid_3x3_moving_5_bottom` preset for a 3x3 static grid plus a five-shelf moving bottom row.
 - Supports optional per-shelf triple-clear unlock requirements.
-- Generates shelf configs from difficulty, item, shelf, and layer settings.
+- Generates shelf configs from difficulty, logical-item-count, shelf, and layer settings.
 - Validates shelf shape, known item IDs, row layout shape, item counts, and bounded solvability.
 
 Change here when:
@@ -495,10 +501,12 @@ Change here when:
 Add a new item type:
 - Add the item image under `assets/items/`.
 - Add an entry to `configs/item_sprites.json`.
-- Use the item ID in `configs/levels/level_*.json` or pass it to the generator.
+- Schedule the item exactly once in `configs/item_progression.json`.
+- Rematerialize runtime levels if the item should affect an existing milestone.
 
 Add a new level:
-- Create `configs/levels/level_011.json` or the next numbered file.
+- Generate `configs/level_templates/level_011.json` or the next numbered template.
+- Run `scripts/tools/materialize_level_templates.py` to create the runtime level.
 - Update `MAX_LEVEL` in `scripts/main_menu.gd`.
 - Validate the level with `scripts/tools/validate_level_solvable.py`.
 

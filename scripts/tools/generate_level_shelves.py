@@ -12,12 +12,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from validate_level_solvable import load_item_ids as load_known_item_ids
+from level_item_progression import logical_item_ids
 from validate_level_solvable import solve_level, shelves_to_state, validate_shelves_shape
 
 
 SLOTS_PER_SHELF = 3
-DEFAULT_ITEM_CONFIG = Path("configs/item_sprites.json")
 LAYOUT_PRESETS = (
     "grid_2x3",
     "grid_3x3",
@@ -74,33 +73,6 @@ DIFFICULTIES = {
         shuffle_passes=6,
     ),
 }
-
-
-def load_item_ids(item_config_path: Path) -> list[str]:
-    with item_config_path.open("r", encoding="utf-8") as config_file:
-        config = json.load(config_file)
-
-    item_ids = []
-    for item in config.get("items", []):
-        item_id = item.get("id")
-        if isinstance(item_id, str) and item_id:
-            item_ids.append(item_id)
-
-    if not item_ids:
-        raise ValueError(f"No items found in {item_config_path}")
-
-    return item_ids
-
-
-def parse_item_types(raw_item_types: str | None, item_config_path: Path) -> list[str]:
-    if raw_item_types:
-        item_ids = [item_id.strip() for item_id in raw_item_types.split(",")]
-        item_ids = [item_id for item_id in item_ids if item_id]
-        if not item_ids:
-            raise ValueError("--item-types did not contain any item IDs")
-        return item_ids
-
-    return load_item_ids(item_config_path)
 
 
 def parse_locked_shelves(raw_locked_shelves: str | None) -> dict[int, int]:
@@ -160,15 +132,15 @@ def round_down_to_triple_count(item_count: int) -> int:
 
 def calculate_max_items_per_type(
     preset: DifficultyPreset,
-    filled_layer_count: int,
     max_items_per_type_override: int | None,
-) -> int:
-    derived_max_items = preset.max_same_item_per_layer * filled_layer_count
-    configured_limits = [derived_max_items]
+) -> int | None:
+    configured_limits = []
     if preset.max_items_per_type is not None:
         configured_limits.append(preset.max_items_per_type)
     if max_items_per_type_override is not None:
         configured_limits.append(max_items_per_type_override)
+    if not configured_limits:
+        return None
 
     max_items_per_type = round_down_to_triple_count(min(configured_limits))
     if max_items_per_type < SLOTS_PER_SHELF:
@@ -264,10 +236,11 @@ def generate_shelves(
     target_filled_slots = calculate_filled_slots(eligible_slots, preset, rng)
     max_items_per_type = calculate_max_items_per_type(
         preset=preset,
-        filled_layer_count=filled_layer_count,
         max_items_per_type_override=max_items_per_type_override,
     )
-    filled_slots = min(target_filled_slots, len(item_types) * max_items_per_type)
+    filled_slots = target_filled_slots
+    if max_items_per_type is not None:
+        filled_slots = min(filled_slots, len(item_types) * max_items_per_type)
     filled_slots -= filled_slots % SLOTS_PER_SHELF
     empty_slots = eligible_slots - filled_slots
     item_pool = build_item_pool_with_limit(
@@ -334,15 +307,13 @@ def generate_shelves(
 
 def validate_generated_shelves(
     shelves: list[dict[str, Any]],
-    item_config_path: Path,
     max_states: int,
     max_depth: int,
 ) -> dict[str, Any]:
-    known_item_ids = load_known_item_ids(item_config_path)
     errors, item_counts = validate_shelves_shape(
         shelves=shelves,
-        known_item_ids=known_item_ids,
-        skip_known_items=False,
+        known_item_ids=set(),
+        skip_known_items=True,
     )
     if errors:
         return {
@@ -386,7 +357,6 @@ def generate_with_optional_validation(
     max_attempts: int,
     max_items_per_type_override: int | None,
     min_front_visible_triples: int,
-    item_config_path: Path,
     max_states: int,
     max_depth: int,
     locked_shelves: dict[int, int] | None = None,
@@ -420,7 +390,6 @@ def generate_with_optional_validation(
         if should_validate or require_solvable:
             validation = validate_generated_shelves(
                 shelves=shelves,
-                item_config_path=item_config_path,
                 max_states=max_states,
                 max_depth=max_depth,
             )
@@ -439,13 +408,11 @@ def generate_with_optional_validation(
 def build_item_pool_with_limit(
     item_types: list[str],
     filled_slots: int,
-    max_items_per_type: int,
+    max_items_per_type: int | None,
     rng: random.Random,
 ) -> list[str]:
     triple_count = filled_slots // SLOTS_PER_SHELF
-    max_triples_per_item = max_items_per_type // SLOTS_PER_SHELF
-    required_type_count = (triple_count + max_triples_per_item - 1) // max_triples_per_item
-    usable_count = min(len(item_types), triple_count, required_type_count)
+    usable_count = min(len(item_types), triple_count)
     if usable_count <= 0:
         raise ValueError("At least one item type and one item triple are required")
 
@@ -455,7 +422,13 @@ def build_item_pool_with_limit(
 
     triples_by_item: Counter[str] = Counter()
     for triple_index in range(triple_count):
-        triples_by_item[selected_item_types[triple_index % usable_count]] += 1
+        item_id = selected_item_types[triple_index % usable_count]
+        triples_by_item[item_id] += 1
+        if (
+            max_items_per_type is not None
+            and triples_by_item[item_id] * SLOTS_PER_SHELF > max_items_per_type
+        ):
+            raise ValueError("Generated item pool exceeds --max-items-per-type")
 
     item_pool = []
     for item_id, triples in triples_by_item.items():
@@ -904,12 +877,8 @@ def build_stats(
         for item_id, count in sorted(item_counts.items())
         if count % SLOTS_PER_SHELF != 0
     }
-    derived_max_items_per_type = round_down_to_triple_count(
-        preset.max_same_item_per_layer * filled_layer_count
-    )
     effective_max_items_per_type = calculate_max_items_per_type(
         preset=preset,
-        filled_layer_count=filled_layer_count,
         max_items_per_type_override=max_items_per_type_override,
     )
 
@@ -927,7 +896,6 @@ def build_stats(
         "item_counts": dict(sorted(item_counts.items())),
         "invalid_item_counts": invalid_counts,
         "max_same_item_per_layer": preset.max_same_item_per_layer,
-        "derived_max_items_per_type": derived_max_items_per_type,
         "preset_max_items_per_type": preset.max_items_per_type,
         "requested_max_items_per_type": max_items_per_type_override,
         "effective_max_items_per_type": effective_max_items_per_type,
@@ -977,14 +945,10 @@ def parse_args() -> argparse.Namespace:
         help="Number of top layers that can contain generated items. Defaults to --layer-count.",
     )
     parser.add_argument(
-        "--item-types",
-        help="Comma-separated item IDs. Defaults to all IDs from configs/item_sprites.json.",
-    )
-    parser.add_argument(
-        "--item-config",
-        type=Path,
-        default=DEFAULT_ITEM_CONFIG,
-        help="Path to item_sprites.json when --item-types is omitted.",
+        "--item-type-count",
+        type=int,
+        required=True,
+        help="Number of abstract item_NN identities available to the generated level.",
     )
     parser.add_argument(
         "--difficulty",
@@ -1045,7 +1009,7 @@ def main() -> int:
         filled_layer_count = args.layer_count
 
     try:
-        item_types = parse_item_types(args.item_types, args.item_config)
+        item_types = logical_item_ids(args.item_type_count)
         locked_shelves = parse_locked_shelves(args.locked_shelves)
         shelves, stats, validation, used_seed = generate_with_optional_validation(
             shelf_count=args.shelf_count,
@@ -1059,7 +1023,6 @@ def main() -> int:
             max_attempts=args.max_generation_attempts,
             max_items_per_type_override=args.max_items_per_type,
             min_front_visible_triples=args.min_front_visible_triples,
-            item_config_path=args.item_config,
             max_states=args.validator_max_states,
             max_depth=args.validator_max_depth,
             locked_shelves=locked_shelves,

@@ -28,21 +28,30 @@ the updated APK, preserves app data, and restarts the game without repeating bac
 
 ## Level shelf generation
 
-Use `scripts/tools/generate_level_shelves.py` with Python 3.10+ to generate the `shelves` array for a level config.
+Use `scripts/tools/generate_level_shelves.py` with Python 3.10+ to generate an abstract
+level template. The generator works only with logical `item_NN` identities and does not choose
+item art.
 
 ```powershell
-py scripts\tools\generate_level_shelves.py --shelf-count 9 --layer-count 2 --difficulty medium --seed 123 --stats
+py scripts\tools\generate_level_shelves.py --shelf-count 9 --layer-count 2 --item-type-count 7 --difficulty medium --seed 123 --full-level --level-number 2 --output configs\level_templates\level_002.json --require-solvable --stats
 ```
 
-By default the tool prints only the JSON array that belongs in a level file's `shelves` field. Add `--full-level --output configs\levels\level_002.json` to write a complete level config.
+By default the tool prints only the abstract JSON array that belongs in a template's `shelves`
+field. `--item-type-count` controls how many distinct logical types the board uses.
 
 Add `--validate` to run the solvability validator once after generation. Add `--require-solvable --max-generation-attempts 25` to retry generation until a solvable layout is found.
 
 Available layout presets are `grid_2x3`, `grid_3x3`, `grid_3x4`, `grid_3x5`, and `grid_4x3`.
 
+Materialize every template through the campaign item progression after generation:
+
 ```powershell
-py scripts\tools\generate_level_shelves.py --shelf-count 9 --layer-count 2 --difficulty medium --seed 123 --require-solvable --stats
+py scripts\tools\materialize_level_templates.py
+py scripts\tools\materialize_level_templates.py --check
 ```
+
+The materializer writes concrete runtime files under `configs/levels/`. Commit templates and their
+materialized runtime files together.
 
 ## Level solvability validation
 

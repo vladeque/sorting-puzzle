@@ -24,10 +24,51 @@ Contract:
 - IDs should remain stable once used by levels.
 - Texture paths should point to imported Godot image assets.
 
+## `configs/item_progression.json`
+
+Purpose:
+- Defines the cumulative item-art pool available to each campaign level during level materialization.
+- Keeps progression tuning separate from abstract shelf generation and the texture catalog.
+
+Top-level fields:
+- `schema_version`: currently `1`.
+- `mapping_salt`: stable non-empty string used for deterministic level-specific item selection.
+- `milestones`: strictly increasing item unlock milestones.
+
+Milestone fields:
+- `from_level`: first campaign level that can use the milestone's items.
+- `unlock`: non-empty list of item IDs from `configs/item_sprites.json`.
+
+Contract:
+- The first milestone starts at level `1`.
+- Every catalog item is scheduled exactly once.
+- A level's available pool is the cumulative union of milestones whose `from_level` is not greater
+  than that level number.
+- Materialization selects a deterministic subset and maps logical item tokens one-to-one. Different
+  logical identities never collapse into the same concrete item.
+- The mapping follows the level's own `level` field, not the player's current or highest progress.
+
+## `configs/level_templates/level_*.json`
+
+Purpose:
+- Stores abstract authored/generated campaign levels.
+- Uses canonical `item_NN` logical identities so shelf generation does not choose item art.
+
+Contract:
+- Templates otherwise use the same level, shelf, layer, lock, and layout shape as runtime levels.
+- Every non-null slot is a logical token such as `item_01`; concrete catalog IDs are rejected.
+- Logical identities are local to one level and must have a one-to-one mapping into that level's
+  progression pool.
+- Run `py scripts\tools\materialize_level_templates.py` after changing templates or item progression.
+- Run `py scripts\tools\materialize_level_templates.py --check` to detect missing or stale runtime
+  outputs.
+
 ## `configs/levels/level_*.json`
 
 Purpose:
-- Defines one playable level.
+- Contains materialized runtime levels loaded by Godot and published to the backend.
+- These files are generated from `configs/level_templates/level_*.json` and
+  `configs/item_progression.json`; do not independently choose or edit their item identities.
 
 File naming:
 - Runtime loader expects `configs/levels/level_%03d.json`.
@@ -131,10 +172,14 @@ Solvability search treats moving rows as eventually accessible and does not mode
 Generation:
 
 ```powershell
-py scripts\tools\generate_level_shelves.py --shelf-count 9 --layer-count 2 --difficulty medium --seed 123 --require-solvable --stats
+py scripts\tools\generate_level_shelves.py --shelf-count 9 --layer-count 2 --item-type-count 7 --difficulty medium --seed 123 --full-level --level-number 2 --output configs\level_templates\level_002.json --require-solvable --stats
+py scripts\tools\materialize_level_templates.py
 ```
 
-Use `--max-items-per-type` when a generated level should have a lower global item repetition cap than the layer-based default. If the item catalog cannot fill the board within that cap, the generator leaves additional slots empty rather than exceeding the requested cap.
+`--item-type-count` is required and creates `item_01` through the requested count. By default the
+generator distributes triples across all logical types and fills the difficulty preset's target
+slot count. Use `--max-items-per-type` to impose a lower global repetition cap; the generator adds
+empty slots rather than exceeding an explicit cap.
 
 Generated levels default to `--min-front-visible-triples 1`, so at least one item type starts with three visible front-layer copies across shelves. Use `--min-front-visible-triples 0` for layouts that should not force a starter visible triple candidate.
 

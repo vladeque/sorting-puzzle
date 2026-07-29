@@ -1214,24 +1214,30 @@ Do not use for:
 ## `scripts/tools/generate_level_shelves.py`
 
 Purpose:
-- Generates level `shelves` arrays or complete level JSON from CLI arguments.
+- Generates abstract level-template `shelves` arrays or complete template JSON from CLI arguments.
+- Uses logical `item_NN` identities and never reads the item-art catalog.
 
 Key inputs:
-- Shelf count, layer count, filled layer count, difficulty, seed, layout preset, item type filters, and optional solvability requirements.
+- Shelf count, layer count, filled layer count, difficulty, seed, layout preset, required
+  `--item-type-count`, and optional solvability requirements.
 - Layout preset values mirror the runtime layout template names in `scenes/layouts/`, including fixed-count staggered presets for 14-shelf `staggered_5_4_5`, 13-shelf `staggered_4_5_4`, and 14-shelf `grid_3x3_moving_5_bottom` layouts.
 
 Generation constraints:
 - Difficulty presets cap how many copies of the same item can appear on one filled layer.
-- The generator derives the default total item cap per type from the per-layer cap and the filled layer count, then rounds that cap down to a valid multiple of three.
-- `--max-items-per-type` can lower the derived total cap for special levels that need less overall repetition, such as limiting a four-layer level to six copies of each item type.
+- The generator uses all requested logical types when the board contains enough triples and
+  distributes triples evenly across them.
+- `--max-items-per-type` adds an explicit global cap for special levels that need less overall
+  repetition. Without it, the target filled-slot count is not reduced merely because a progression
+  pool is small.
 - `--min-front-visible-triples` defaults to `1` and guarantees at least that many item types have three visible front-layer copies somewhere across shelves, which gives generated levels an intuitive starting move without requiring a completed shelf match. Use `0` to disable the guarantee.
 - `--locked-shelves` can add per-shelf `unlock_after_triples` requirements using 1-based shelf numbers such as `7:3,8:5`.
-- When the item catalog cannot satisfy the target filled-slot count within the effective per-type cap, the generator adds extra empty slots instead of exceeding the cap.
+- When the logical item set cannot satisfy the target filled-slot count within an explicit
+  per-type cap, the generator adds extra empty slots instead of exceeding the cap.
 - Generated layouts reshuffle shelf slots to reduce same-item concentration on a single filled layer, using an adaptive per-layer limit so constrained levels remain possible.
-- Hard and expert difficulties still avoid shelves that start with a complete front-layer match.
+- Expert difficulty avoids shelves that start with a complete front-layer match.
 
 Depends on:
-- `configs/item_sprites.json` for known item IDs by default.
+- `scripts/tools/level_item_progression.py` for canonical logical item IDs.
 - `scripts/tools/validate_level_solvable.py` for validation and optional solvability checks.
 
 Use when:
@@ -1239,6 +1245,35 @@ Use when:
 
 Do not use for:
 - Runtime game logic.
+
+## `scripts/tools/level_item_progression.py`
+
+Purpose:
+- Validates the item catalog and cumulative milestone config.
+- Selects a deterministic level-specific subset from the available item pool.
+- Maps template `item_NN` identities one-to-one into concrete item IDs.
+- Provides a single-template materialization CLI.
+
+Key behavior:
+- Rejects unknown, duplicated, or unscheduled catalog items.
+- Rejects concrete item IDs inside templates and templates that require more identities than their
+  campaign-level pool provides.
+- Hash-selects the concrete subset using `mapping_salt` and campaign level, then assigns the subset
+  in stable item-ID order so solvability and deterministic replay tie-breaking are preserved.
+
+Depends on:
+- `configs/item_progression.json`.
+- `configs/item_sprites.json`.
+
+## `scripts/tools/materialize_level_templates.py`
+
+Purpose:
+- Materializes every `configs/level_templates/level_*.json` file into the matching
+  `configs/levels/level_*.json` runtime file.
+- Supports `--check` for CI and pre-publication stale-output detection.
+
+Use when:
+- A template, item milestone, mapping salt, or item catalog changes.
 
 ## `scripts/tools/validate_level_solvable.py`
 

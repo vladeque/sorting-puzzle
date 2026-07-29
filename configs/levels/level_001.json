@@ -3,20 +3,32 @@
   "time_seconds": 300,
   "layout_preset": "grid_3x3",
   "shelves": [
-	{
-	  "layers": [
-		["milk_carton"]
-	  ]
-	},
-	{
-	  "layers": [
-		["milk_carton"]
-	  ]
-	},
-	{
-	  "layers": [
-		["milk_carton"]
-	  ]
-	}
+    {
+      "layers": [
+        [
+          "soda_bottle",
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "soda_bottle",
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "soda_bottle",
+          null,
+          null
+        ]
+      ]
+    }
   ]
 }
