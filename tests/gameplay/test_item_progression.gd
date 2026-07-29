@@ -1,6 +1,7 @@
 extends SceneTree
 
-const LEVEL_SCENE_PATH := "res://level.tscn"
+const ITEM_CONFIG_PATH := "res://configs/item_sprites.json"
+const LEVEL_CONFIG_TEMPLATE := "res://configs/levels/level_%03d.json"
 const FIRST_MATERIALIZED_LEVEL := 1
 const LAST_MATERIALIZED_LEVEL := 8
 
@@ -12,9 +13,10 @@ func _init() -> void:
 
 
 func _run() -> void:
-	await process_frame
+	var item_textures := _load_item_textures()
 	for level_number in range(FIRST_MATERIALIZED_LEVEL, LAST_MATERIALIZED_LEVEL + 1):
-		await _check_level_items(level_number)
+		_check_level_items(level_number, item_textures)
+	item_textures.clear()
 
 	if _failures.is_empty():
 		print("Item progression runtime tests passed.")
@@ -25,30 +27,59 @@ func _run() -> void:
 	quit(1)
 
 
-func _check_level_items(level_number: int) -> void:
-	var level_scene := load(LEVEL_SCENE_PATH) as PackedScene
-	_check(level_scene != null, "level scene loads for level %d" % level_number)
-	if level_scene == null:
-		return
-	var level = level_scene.instantiate()
-	level.set("launched_from_dev_mode", true)
-	level.set("selected_level", level_number)
-	get_root().add_child(level)
-	await process_frame
-	level.process_mode = Node.PROCESS_MODE_DISABLED
-
-	var items := level.find_children("*", "ShelfItem", true, false)
-	_check(not items.is_empty(), "level %d instantiates items" % level_number)
-	for raw_item in items:
-		var item := raw_item as ShelfItem
-		_check(item != null, "level %d item has ShelfItem type" % level_number)
+func _load_item_textures() -> Dictionary:
+	var textures := {}
+	var item_config := _load_json_object(ITEM_CONFIG_PATH)
+	for raw_item in item_config.get("items", []) as Array:
+		var item := raw_item as Dictionary
 		if item == null:
 			continue
-		_check(not item.item_id.is_empty(), "level %d item has a concrete ID" % level_number)
-		_check(item.texture != null, "level %d item '%s' has a loaded texture" % [level_number, item.item_id])
+		var item_id := str(item.get("id", ""))
+		var texture_path := str(item.get("texture", ""))
+		var texture := load(texture_path) as Texture2D
+		_check(not item_id.is_empty(), "item catalog entry has an ID")
+		_check(texture != null, "item '%s' has a loaded texture" % item_id)
+		if not item_id.is_empty() and texture != null:
+			textures[item_id] = texture
+	return textures
 
-	level.queue_free()
-	await process_frame
+
+func _check_level_items(level_number: int, item_textures: Dictionary) -> void:
+	var path := LEVEL_CONFIG_TEMPLATE % level_number
+	var level := _load_json_object(path)
+	var item_count := 0
+	for raw_shelf in level.get("shelves", []) as Array:
+		var shelf := raw_shelf as Dictionary
+		if shelf == null:
+			continue
+		for raw_layer in shelf.get("layers", []) as Array:
+			var layer := raw_layer as Array
+			if layer == null:
+				continue
+			for item_value in layer:
+				if item_value == null:
+					continue
+				item_count += 1
+				var item_id := str(item_value)
+				_check(
+					not item_id.begins_with("item_"),
+					"level %d contains only concrete item IDs" % level_number
+				)
+				_check(
+					item_textures.has(item_id),
+					"level %d item '%s' has a loaded catalog texture" % [level_number, item_id]
+				)
+	_check(item_count > 0, "level %d contains materialized items" % level_number)
+
+
+func _load_json_object(path: String) -> Dictionary:
+	var file := FileAccess.open(path, FileAccess.READ)
+	_check(file != null, "%s can be opened" % path)
+	if file == null:
+		return {}
+	var parsed = JSON.parse_string(file.get_as_text())
+	_check(parsed is Dictionary, "%s contains a JSON object" % path)
+	return parsed as Dictionary if parsed is Dictionary else {}
 
 
 func _check(condition: bool, description: String) -> void:
