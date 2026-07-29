@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "mapping_salt": "sorting-puzzle-item-progression-v1",
+  "mapping_salt": "sorting-puzzle-campaign-items-v1",
   "milestones": [
     {
       "from_level": 1,
