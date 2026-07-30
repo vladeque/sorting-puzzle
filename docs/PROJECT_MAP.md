@@ -500,6 +500,8 @@ Change here when:
 
 Add a new item type:
 - Add the item image under `assets/items/`.
+- Use a transparent `256x256` canvas and keep the visible artwork within approximately `132x220`
+  pixels, centered on the canvas, so the shared shelf-item scale fits every slot consistently.
 - Add an entry to `configs/item_sprites.json`.
 - Schedule the item exactly once in `configs/item_progression.json`.
 - Rematerialize runtime levels if the item should affect an existing milestone.
