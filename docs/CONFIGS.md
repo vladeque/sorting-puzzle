@@ -188,7 +188,7 @@ Generated levels default to `--min-front-visible-triples 1`, so at least one ite
 
 Current authored generation parameters:
 
-- Level 2 uses 9 shelves, 2 filled layers, 7 logical item types, medium difficulty, and a maximum of 6 copies per logical item type.
+- Level 2 uses 9 shelves, 2 filled layers, 7 logical item types, easy difficulty, and a maximum of 6 copies per logical item type.
 
 Use `--locked-shelves` to add unlock requirements to generated shelves. Entries are 1-based shelf numbers and required cleared triples:
 

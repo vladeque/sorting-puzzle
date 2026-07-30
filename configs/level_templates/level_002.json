@@ -2,46 +2,60 @@
   "level": 2,
   "time_seconds": 300,
   "layout_preset": "grid_3x3",
-  "difficulty": "medium",
+  "difficulty": "easy",
   "shelves": [
     {
       "layers": [
         [
+          "item_02",
           null,
-          "item_06",
-          "item_01"
+          "item_05"
         ],
+        [
+          null,
+          "item_01",
+          "item_06"
+        ]
+      ]
+    },
+    {
+      "layers": [
         [
           "item_01",
-          "item_06",
-          null
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "item_02",
           "item_04",
-          "item_03"
+          "item_06"
         ],
-        [
-          "item_06",
-          null,
-          null
-        ]
-      ]
-    },
-    {
-      "layers": [
         [
           "item_03",
-          "item_04",
-          "item_02"
+          null,
+          "item_05"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "item_06",
+          "item_05",
+          "item_04"
         ],
         [
-          "item_04",
+          "item_02",
           "item_06",
+          "item_05"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "item_01",
+          "item_03",
+          null
+        ],
+        [
+          "item_02",
+          "item_07",
           "item_02"
         ]
       ]
@@ -49,9 +63,23 @@
     {
       "layers": [
         [
-          "item_07",
+          "item_04",
+          "item_02",
+          null
+        ],
+        [
           "item_01",
-          "item_02"
+          null,
+          "item_03"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "item_06",
+          null,
+          "item_03"
         ],
         [
           null,
@@ -63,27 +91,13 @@
     {
       "layers": [
         [
-          "item_06",
-          "item_04",
-          "item_05"
-        ],
-        [
-          "item_05",
-          "item_01",
-          "item_05"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
           "item_07",
-          "item_05",
+          "item_01",
           null
         ],
         [
-          "item_02",
-          "item_07",
+          "item_04",
+          "item_04",
           "item_07"
         ]
       ]
@@ -91,14 +105,14 @@
     {
       "layers": [
         [
+          "item_02",
           null,
-          null,
-          null
+          "item_05"
         ],
         [
-          "item_02",
+          "item_04",
           "item_05",
-          "item_03"
+          "item_06"
         ]
       ]
     },
@@ -106,26 +120,12 @@
       "layers": [
         [
           "item_07",
-          "item_01",
-          "item_05"
+          "item_07",
+          "item_03"
         ],
         [
+          null,
           "item_03",
-          "item_04",
-          null
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "item_06",
-          "item_03",
-          null
-        ],
-        [
-          "item_03",
-          "item_04",
           null
         ]
       ]
