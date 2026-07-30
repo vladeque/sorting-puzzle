@@ -190,6 +190,7 @@ Current authored generation parameters:
 
 - Level 2 uses 9 shelves, 2 filled layers, 7 logical item types, easy difficulty, and a maximum of 6 copies per logical item type.
 - Level 3 uses 12 shelves, 2 filled layers, 7 logical item types, medium difficulty, and a maximum of 6 copies per logical item type.
+- Level 4 uses 15 shelves, 3 filled layers, 10 logical item types, medium difficulty, seed 4004, and a maximum of 9 copies per logical item type.
 
 Use `--locked-shelves` to add unlock requirements to generated shelves. Entries are 1-based shelf numbers and required cleared triples:
 
