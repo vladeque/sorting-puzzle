@@ -44,6 +44,8 @@ Contract:
 - Every catalog item is scheduled exactly once.
 - A level's available pool is the cumulative union of milestones whose `from_level` is not greater
   than that level number.
+- The 17-item market-icon expansion is grouped in the level `15` milestone so its unlock timing can
+  be retuned as one block without changing the item catalog.
 - Materialization selects a deterministic subset and maps logical item tokens one-to-one. Different
   logical identities never collapse into the same concrete item.
 - The mapping follows the level's own `level` field, not the player's current or highest progress.

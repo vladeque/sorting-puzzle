@@ -126,6 +126,91 @@
 	  "id": "gift_box",
 	  "category": "toy",
 	  "texture": "res://assets/items/item_gift_box.png"
+	},
+	{
+	  "id": "orange_soda_bottle",
+	  "category": "drink",
+	  "texture": "res://assets/items/item_orange_soda_bottle.png"
+	},
+	{
+	  "id": "wrapped_rainbow_lollipop",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_wrapped_rainbow_lollipop.png"
+	},
+	{
+	  "id": "gummy_bears_bag",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_gummy_bears_bag.png"
+	},
+	{
+	  "id": "blue_cookie_box",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_blue_cookie_box.png"
+	},
+	{
+	  "id": "rainbow_chocolate_bar",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_rainbow_chocolate_bar.png"
+	},
+	{
+	  "id": "orange_yogurt_cup",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_orange_yogurt_cup.png"
+	},
+	{
+	  "id": "grape_juice_box",
+	  "category": "drink",
+	  "texture": "res://assets/items/item_grape_juice_box.png"
+	},
+	{
+	  "id": "rainbow_lollipop",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_rainbow_lollipop.png"
+	},
+	{
+	  "id": "green_smoothie_cup",
+	  "category": "drink",
+	  "texture": "res://assets/items/item_green_smoothie_cup.png"
+	},
+	{
+	  "id": "blue_frozen_yogurt_cup",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_blue_frozen_yogurt_cup.png"
+	},
+	{
+	  "id": "blueberry_jam_jar",
+	  "category": "everyday",
+	  "texture": "res://assets/items/item_blueberry_jam_jar.png"
+	},
+	{
+	  "id": "rainbow_cereal_box",
+	  "category": "everyday",
+	  "texture": "res://assets/items/item_rainbow_cereal_box.png"
+	},
+	{
+	  "id": "coffee_cup",
+	  "category": "drink",
+	  "texture": "res://assets/items/item_coffee_cup.png"
+	},
+	{
+	  "id": "pink_ice_cream_tub",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_pink_ice_cream_tub.png"
+	},
+	{
+	  "id": "popcorn_box",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_popcorn_box.png"
+	},
+	{
+	  "id": "strawberry_yogurt_cup",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_strawberry_yogurt_cup.png"
+	},
+	{
+	  "id": "lime_soda_can",
+	  "category": "drink",
+	  "texture": "res://assets/items/item_lime_soda_can.png"
 	}
   ]
 }

@@ -45,6 +45,28 @@
         "jam_jar",
         "gift_box"
       ]
+    },
+    {
+      "from_level": 15,
+      "unlock": [
+        "orange_soda_bottle",
+        "wrapped_rainbow_lollipop",
+        "gummy_bears_bag",
+        "blue_cookie_box",
+        "rainbow_chocolate_bar",
+        "orange_yogurt_cup",
+        "grape_juice_box",
+        "rainbow_lollipop",
+        "green_smoothie_cup",
+        "blue_frozen_yogurt_cup",
+        "blueberry_jam_jar",
+        "rainbow_cereal_box",
+        "coffee_cup",
+        "pink_ice_cream_tub",
+        "popcorn_box",
+        "strawberry_yogurt_cup",
+        "lime_soda_can"
+      ]
     }
   ]
 }
