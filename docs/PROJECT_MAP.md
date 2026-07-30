@@ -407,12 +407,15 @@ Files:
 - `scenes/item.tscn`
 - `scripts/item.gd`
 - `assets/items/*.png`
+- `docs/ITEM_ASSET_REQUIREMENTS.md`
 
 Responsibility:
 - Represents one sortable item as an `Area2D`.
 - Stores `item_id`.
 - Applies texture and visual scale to its `Sprite2D` and shared opaque up-right cast shadow, which is disabled for generated back-layer item previews.
 - Draws reusable alpha-based sprite outlines for item highlight states.
+- Defines the canonical texture size, visible bounds, shelf baseline, alpha, naming, import, and
+  validation requirements for item art.
 
 Change here when:
 - Adjusting item hitboxes, sprite scale behavior, item identity storage, outline rendering, or common item visuals.
@@ -500,9 +503,7 @@ Change here when:
 
 Add a new item type:
 - Add the item image under `assets/items/`.
-- Use a transparent `256x256` canvas and keep the visible artwork within approximately `132x220`
-  pixels. Center it horizontally and align the visible bottom edge near canvas Y=`240` so the shared
-  shelf-item scale fits every slot and every item rests on the same shelf baseline.
+- Follow `docs/ITEM_ASSET_REQUIREMENTS.md`.
 - Add an entry to `configs/item_sprites.json`.
 - Schedule the item exactly once in `configs/item_progression.json`.
 - Rematerialize runtime levels if the item should affect an existing milestone.
@@ -560,6 +561,7 @@ Change pause menu layout:
 
 ## Related Docs
 
+- `docs/ITEM_ASSET_REQUIREMENTS.md`: canonical item texture, alignment, import, and validation rules.
 - `docs/SCENES.md`: scene and node ownership inventory.
 - `docs/SCRIPTS.md`: script responsibilities, exports, and dependencies.
 - `docs/CONFIGS.md`: config file schema and data contracts.
