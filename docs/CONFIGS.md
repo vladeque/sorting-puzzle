@@ -81,6 +81,7 @@ Top-level fields:
 - `level`: numeric level identifier.
 - `time_seconds`: countdown duration for the level.
 - `layout_preset`: shelf placement preset used by `scripts/level.gd`; preset positions are authored in matching `scenes/layouts/layout_*.tscn` template scenes.
+- `difficulty`: generation metadata recording the difficulty preset used to create the shelf layout.
 - `row_layouts`: optional row-by-row shelf placement and motion config. When present, its `shelf_count` total must equal the `shelves` length and it replaces `layout_preset` placement at runtime.
 - `shelves`: ordered shelf list.
 
@@ -184,6 +185,10 @@ slot count. Use `--max-items-per-type` to impose a lower global repetition cap; 
 empty slots rather than exceeding an explicit cap.
 
 Generated levels default to `--min-front-visible-triples 1`, so at least one item type starts with three visible front-layer copies across shelves. Use `--min-front-visible-triples 0` for layouts that should not force a starter visible triple candidate.
+
+Current authored generation parameters:
+
+- Level 2 uses 9 shelves, 2 filled layers, 7 logical item types, medium difficulty, and a maximum of 6 copies per logical item type.
 
 Use `--locked-shelves` to add unlock requirements to generated shelves. Entries are 1-based shelf numbers and required cleared triples:
 

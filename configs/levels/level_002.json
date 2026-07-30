@@ -2,31 +2,18 @@
   "level": 2,
   "time_seconds": 300,
   "layout_preset": "grid_3x3",
+  "difficulty": "medium",
   "shelves": [
     {
       "layers": [
         [
-          "candy_bag",
           null,
-          null
+          "orange_juice_box",
+          "candy_bag"
         ],
-        [
-          "chips_can",
-          "chocolate_bar",
-          "cupcake"
-        ]
-      ]
-    },
-    {
-      "layers": [
         [
           "candy_bag",
-          "chocolate_bar",
-          "chips_can"
-        ],
-        [
-          "milk_carton",
-          "chips_can",
+          "orange_juice_box",
           null
         ]
       ]
@@ -34,56 +21,56 @@
     {
       "layers": [
         [
-          null,
-          "chocolate_bar",
+          "chips_can",
+          "cupcake",
           "chocolate_bar"
         ],
         [
           "orange_juice_box",
-          "soda_bottle",
-          "candy_bag"
+          null,
+          null
         ]
       ]
     },
     {
       "layers": [
+        [
+          "chocolate_bar",
+          "cupcake",
+          "chips_can"
+        ],
+        [
+          "cupcake",
+          "orange_juice_box",
+          "chips_can"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "soda_bottle",
+          "candy_bag",
+          "chips_can"
+        ],
         [
           null,
           "candy_bag",
           "soda_bottle"
-        ],
-        [
-          "orange_juice_box",
-          "orange_juice_box",
-          "chips_can"
         ]
       ]
     },
     {
       "layers": [
         [
-          "cupcake",
-          null,
-          "chips_can"
-        ],
-        [
-          "cupcake",
-          "chips_can",
-          "cupcake"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "cupcake",
-          "chips_can",
-          "candy_bag"
-        ],
-        [
-          "chips_can",
           "orange_juice_box",
-          "candy_bag"
+          "cupcake",
+          "milk_carton"
+        ],
+        [
+          "milk_carton",
+          "candy_bag",
+          "milk_carton"
         ]
       ]
     },
@@ -91,41 +78,55 @@
       "layers": [
         [
           "soda_bottle",
-          "chocolate_bar",
+          "milk_carton",
           null
         ],
         [
           "chips_can",
-          null,
-          "cupcake"
+          "soda_bottle",
+          "soda_bottle"
         ]
       ]
     },
     {
       "layers": [
         [
-          "milk_carton",
-          "milk_carton",
-          "orange_juice_box"
+          null,
+          null,
+          null
         ],
         [
           "chips_can",
-          null,
-          "chips_can"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
           "milk_carton",
-          "chips_can",
           "chocolate_bar"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "soda_bottle",
+          "candy_bag",
+          "milk_carton"
         ],
+        [
+          "chocolate_bar",
+          "cupcake",
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
         [
           "orange_juice_box",
-          "milk_carton",
-          "milk_carton"
+          "chocolate_bar",
+          null
+        ],
+        [
+          "chocolate_bar",
+          "cupcake",
+          null
         ]
       ]
     }
