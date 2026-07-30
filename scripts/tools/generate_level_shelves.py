@@ -41,15 +41,15 @@ class DifficultyPreset:
 
 DIFFICULTIES = {
     "easy": DifficultyPreset(
-        empty_ratio_min=0.22,
-        empty_ratio_max=0.32,
+        empty_ratio_min=0.20,
+        empty_ratio_max=0.25,
         max_same_item_per_layer=5,
         max_items_per_type=None,
         allow_front_layer_matches=True,
         shuffle_passes=1,
     ),
     "medium": DifficultyPreset(
-        empty_ratio_min=0.12,
+        empty_ratio_min=0.15,
         empty_ratio_max=0.20,
         max_same_item_per_layer=4,
         max_items_per_type=None,
@@ -57,16 +57,16 @@ DIFFICULTIES = {
         shuffle_passes=2,
     ),
     "hard": DifficultyPreset(
-        empty_ratio_min=0.10,
-        empty_ratio_max=0.15,
+        empty_ratio_min=0.15,
+        empty_ratio_max=0.20,
         max_same_item_per_layer=3,
         max_items_per_type=None,
         allow_front_layer_matches=True,
         shuffle_passes=4,
     ),
     "expert": DifficultyPreset(
-        empty_ratio_min=0.05,
-        empty_ratio_max=0.10,
+        empty_ratio_min=0.10,
+        empty_ratio_max=0.15,
         max_same_item_per_layer=3,
         max_items_per_type=None,
         allow_front_layer_matches=False,

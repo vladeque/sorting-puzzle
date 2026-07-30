@@ -4,173 +4,173 @@
   "layout_preset": "grid_3x4",
   "difficulty": "medium",
   "shelves": [
-    {
-      "layers": [
-        [
-          null,
-          "candy_bag",
-          null
-        ],
-        [
-          "chips_can",
-          "chips_can",
+	{
+	  "layers": [
+		[
+		  null,
+		  "candy_bag",
+		  null
+		],
+		[
+		  "chips_can",
+		  "chips_can",
           "chocolate_bar"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "chocolate_bar",
-          "cookie_box",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "chocolate_bar",
+		  "cookie_box",
           "cookie_box"
-        ],
-        [
-          "cupcake",
-          null,
+		],
+		[
+		  "cupcake",
+		  null,
           "orange_juice_box"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "candy_bag",
-          "water_bottle",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "candy_bag",
+		  "water_bottle",
           "chocolate_bar"
-        ],
-        [
-          null,
-          "orange_juice_box",
+		],
+		[
+		  null,
+		  "orange_juice_box",
           "candy_bag"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "chocolate_bar",
-          "cupcake",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "chocolate_bar",
+		  "cupcake",
           "orange_juice_box"
-        ],
-        [
-          "chips_can",
-          "cookie_box",
+		],
+		[
+		  "chips_can",
+		  "cookie_box",
           "chips_can"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "candy_bag",
-          "water_bottle",
-          null
-        ],
-        [
-          "water_bottle",
-          "cupcake",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "candy_bag",
+		  "water_bottle",
+		  null
+		],
+		[
+		  "water_bottle",
+		  "cupcake",
           "cookie_box"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "orange_juice_box",
-          "orange_juice_box",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "orange_juice_box",
+		  "orange_juice_box",
           "chips_can"
-        ],
-        [
-          null,
-          "orange_juice_box",
-          null
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "water_bottle",
-          "cupcake",
+		],
+		[
+		  null,
+		  "orange_juice_box",
+		  null
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "water_bottle",
+		  "cupcake",
           "chips_can"
-        ],
-        [
-          "candy_bag",
-          "cupcake",
+		],
+		[
+		  "candy_bag",
+		  "cupcake",
           "orange_juice_box"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "candy_bag",
-          "cookie_box",
-          null
-        ],
-        [
-          null,
-          "chips_can",
-          null
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "orange_juice_box",
-          "chocolate_bar",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "candy_bag",
+		  "cookie_box",
+		  null
+		],
+		[
+		  null,
+		  "chips_can",
+		  null
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "orange_juice_box",
+		  "chocolate_bar",
           "chips_can"
-        ],
-        [
-          "orange_juice_box",
-          "cookie_box",
+		],
+		[
+		  "orange_juice_box",
+		  "cookie_box",
           "water_bottle"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          null,
-          "orange_juice_box",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  null,
+		  "orange_juice_box",
           "chocolate_bar"
-        ],
-        [
-          "chips_can",
-          "cupcake",
+		],
+		[
+		  "chips_can",
+		  "cupcake",
           "orange_juice_box"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "chips_can",
-          "cupcake",
-          null
-        ],
-        [
-          "chips_can",
-          "candy_bag",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "chips_can",
+		  "cupcake",
+		  null
+		],
+		[
+		  "chips_can",
+		  "candy_bag",
           "water_bottle"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "candy_bag",
-          "candy_bag",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "candy_bag",
+		  "candy_bag",
           "cupcake"
-        ],
-        [
-          "chips_can",
-          "cupcake",
+		],
+		[
+		  "chips_can",
+		  "cupcake",
           "orange_juice_box"
-        ]
-      ]
-    }
+		]
+	  ]
+	}
   ]
 }

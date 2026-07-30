@@ -467,7 +467,7 @@ func complete_level(level_number: int, earned_stars: int = 0) -> bool:
 	if level_number < MIN_LEVEL:
 		return false
 
-	var safe_earned_stars := clampi(earned_stars, 0, 3)
+	var safe_earned_stars := maxi(earned_stars, 0)
 	var previous_data := _data.duplicate(true)
 	var previous_animation := _pending_reward_chest_animation.duplicate(true)
 	var completes_current_level := level_number == get_current_level()
@@ -985,7 +985,7 @@ func _campaign_completion_payload(level_number: int, earned_stars: int) -> Dicti
 		return {}
 	return {
 		"campaign_level": level_number,
-		"stars": clampi(earned_stars, 0, 3),
+		"stars": maxi(earned_stars, 0),
 		"configuration_version": provenance.get("configuration_version"),
 		"level_version": provenance.get("level_version"),
 		"rules_version": provenance.get("rules_version"),
@@ -1107,7 +1107,7 @@ func _apply_unacknowledged_operation(snapshot: Dictionary, operation: Dictionary
 	match str(operation.get("operation_type", "")):
 		"campaign_completion":
 			var level_number := int(payload.get("campaign_level", 0))
-			var stars := clampi(int(payload.get("stars", 0)), 0, 3)
+			var stars := maxi(int(payload.get("stars", 0)), 0)
 			result["highest_completed_level"] = maxi(
 				int(result.get("highest_completed_level", 0)),
 				level_number

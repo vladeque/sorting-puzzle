@@ -485,7 +485,6 @@ func _validate_operation_payload(operation_type: String, payload: Dictionary) ->
 			if (
 				int(payload.get("campaign_level", 0)) <= 0
 				or int(payload.get("stars", -1)) < 0
-				or int(payload.get("stars", -1)) > 3
 				or not _has_valid_provenance(payload)
 			):
 				return _error("Campaign completion payload values are invalid.")
