@@ -141,6 +141,7 @@ grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_outer_panel")
 
 [node name="TitleLabel" type="Label" parent="PauseMenuPanel" unique_id=1806017559]
+theme_type_variation = &"GameTitleLabel"
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -154,7 +155,7 @@ theme_override_colors/font_shadow_color = Color(0.16, 0.04, 0.02, 0.92)
 theme_override_constants/shadow_offset_x = 0
 theme_override_constants/shadow_offset_y = 3
 theme_override_font_sizes/font_size = 44
-text = "Pause"
+text = "PAUSE"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -195,6 +196,7 @@ grow_horizontal = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_inner_panel")
 
 [node name="InnerTitleLabel" type="Label" parent="PauseMenuPanel/InnerPanel" unique_id=1478165782]
+theme_type_variation = &"GameSectionLabel"
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -205,7 +207,7 @@ offset_bottom = 60.0
 grow_horizontal = 2
 theme_override_colors/font_color = Color(0.36, 0.16, 0.1, 1)
 theme_override_font_sizes/font_size = 28
-text = "Settings"
+text = "SETTINGS"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -254,6 +256,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="Label" type="Label" parent="PauseMenuPanel/InnerPanel/IconRow/MusicOption" unique_id=1169088267]
+theme_type_variation = &"GameSmallLabel"
 layout_mode = 2
 theme_override_colors/font_color = Color(0.36, 0.16, 0.1, 1)
 theme_override_font_sizes/font_size = 18
@@ -293,6 +296,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="Label" type="Label" parent="PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption" unique_id=1886069866]
+theme_type_variation = &"GameSmallLabel"
 layout_mode = 2
 theme_override_colors/font_color = Color(0.36, 0.16, 0.1, 1)
 theme_override_font_sizes/font_size = 18
@@ -332,6 +336,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="Label" type="Label" parent="PauseMenuPanel/InnerPanel/IconRow/VibrationOption" unique_id=505956906]
+theme_type_variation = &"GameSmallLabel"
 layout_mode = 2
 theme_override_colors/font_color = Color(0.36, 0.16, 0.1, 1)
 theme_override_font_sizes/font_size = 18

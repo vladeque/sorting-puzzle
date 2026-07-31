@@ -4,173 +4,173 @@
   "layout_preset": "grid_3x4",
   "difficulty": "medium",
   "shelves": [
-    {
-      "layers": [
-        [
-          "cookie_box",
-          "candy_bag",
+	{
+	  "layers": [
+		[
+		  "cookie_box",
+		  "candy_bag",
           "cupcake"
-        ],
-        [
-          "water_bottle",
-          "chips_can",
+		],
+		[
+		  "water_bottle",
+		  "chips_can",
           "chips_can"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          null,
-          "chocolate_bar",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  null,
+		  "chocolate_bar",
           "cookie_box"
-        ],
-        [
-          "candy_bag",
-          null,
-          null
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "chocolate_bar",
-          "candy_bag",
-          null
-        ],
-        [
-          null,
-          "cookie_box",
+		],
+		[
+		  "candy_bag",
+		  null,
+		  null
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "chocolate_bar",
+		  "candy_bag",
+		  null
+		],
+		[
+		  null,
+		  "cookie_box",
           "chocolate_bar"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          null,
-          null,
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  null,
+		  null,
           "chips_can"
-        ],
-        [
-          null,
-          null,
+		],
+		[
+		  null,
+		  null,
           "candy_bag"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          null,
-          null,
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  null,
+		  null,
           "chips_can"
-        ],
-        [
-          null,
-          "cupcake",
+		],
+		[
+		  null,
+		  "cupcake",
           "cookie_box"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          null,
-          null,
-          null
-        ],
-        [
-          "cupcake",
-          "chocolate_bar",
-          null
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "water_bottle",
-          "water_bottle",
-          null
-        ],
-        [
-          null,
-          "orange_juice_box",
-          null
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "chocolate_bar",
-          null,
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  null,
+		  null,
+		  null
+		],
+		[
+		  "cupcake",
+		  "chocolate_bar",
+		  null
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "water_bottle",
+		  "water_bottle",
+		  null
+		],
+		[
+		  null,
+		  "orange_juice_box",
+		  null
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "chocolate_bar",
+		  null,
           "candy_bag"
-        ],
-        [
-          null,
-          "cookie_box",
-          null
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "water_bottle",
-          null,
+		],
+		[
+		  null,
+		  "cookie_box",
+		  null
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "water_bottle",
+		  null,
           "cookie_box"
-        ],
-        [
-          null,
-          null,
+		],
+		[
+		  null,
+		  null,
           "orange_juice_box"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "chips_can",
-          "cupcake",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "chips_can",
+		  "cupcake",
           "orange_juice_box"
-        ],
-        [
-          "orange_juice_box",
-          "chips_can",
+		],
+		[
+		  "orange_juice_box",
+		  "chips_can",
           "candy_bag"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "orange_juice_box",
-          null,
-          null
-        ],
-        [
-          "water_bottle",
-          null,
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "orange_juice_box",
+		  null,
+		  null
+		],
+		[
+		  "water_bottle",
+		  null,
           "cupcake"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "cupcake",
-          "orange_juice_box",
-          null
-        ],
-        [
-          "water_bottle",
-          "chocolate_bar",
-          null
-        ]
-      ]
-    }
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "cupcake",
+		  "orange_juice_box",
+		  null
+		],
+		[
+		  "water_bottle",
+		  "chocolate_bar",
+		  null
+		]
+	  ]
+	}
   ]
 }

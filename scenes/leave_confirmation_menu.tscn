@@ -148,6 +148,7 @@ grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_outer_panel")
 
 [node name="TitleLabel" type="Label" parent="ConfirmationPanel" unique_id=209184417]
+theme_type_variation = &"GameTitleLabel"
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -161,7 +162,7 @@ theme_override_colors/font_shadow_color = Color(0.16, 0.04, 0.02, 0.92)
 theme_override_constants/shadow_offset_x = 0
 theme_override_constants/shadow_offset_y = 3
 theme_override_font_sizes/font_size = 40
-text = "Leaving the Level"
+text = "LEAVING THE LEVEL"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -199,6 +200,7 @@ grow_horizontal = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_inner_panel")
 
 [node name="MessageLabel" type="Label" parent="ConfirmationPanel/InnerPanel" unique_id=1761519229]
+theme_type_variation = &"GameBodyLabel"
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -250,6 +252,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="CountLabel" type="Label" parent="ConfirmationPanel/InnerPanel/LossRow/LifeLoss" unique_id=1520092272]
+theme_type_variation = &"GameNumberLabel"
 z_index = 4
 layout_mode = 1
 anchors_preset = 5
@@ -291,6 +294,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="CountLabel" type="Label" parent="ConfirmationPanel/InnerPanel/LossRow/StarLoss" unique_id=759577385]
+theme_type_variation = &"GameNumberLabel"
 z_index = 4
 layout_mode = 1
 anchors_preset = 5

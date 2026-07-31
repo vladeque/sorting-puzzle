@@ -45,6 +45,10 @@ enabled=PackedStringArray("res://addons/sorting_puzzle_secure_store_bridge/plugi
 
 3d/physics_engine="Jolt Physics"
 
+[gui]
+
+theme/custom="res://assets/themes/game_typography.tres"
+
 [rendering]
 
 rendering_device/driver.windows="d3d12"

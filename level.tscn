@@ -179,6 +179,7 @@ mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_combo_fill")
 
 [node name="ComboLabel" type="Label" parent="Background/HudCenterSlot" unique_id=449182547]
+theme_type_variation = &"GameNumberLabel"
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -191,7 +192,7 @@ theme_override_colors/font_shadow_color = Color(0.08, 0.02, 0.01, 0.82)
 theme_override_constants/shadow_offset_x = 0
 theme_override_constants/shadow_offset_y = 2
 theme_override_font_sizes/font_size = 22
-text = "Combo x1"
+text = "COMBO ×1"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -314,6 +315,7 @@ z_index = 100
 layer = 10
 
 [node name="TimerLabel" type="Label" parent="UI" unique_id=272348979]
+theme_type_variation = &"GameNumberLabel"
 anchors_preset = 10
 anchor_right = 1.0
 offset_top = 28.0
@@ -329,6 +331,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="LevelLabel" type="Label" parent="UI" unique_id=1053243000]
+theme_type_variation = &"GameNumberLabel"
 offset_left = 32.0
 offset_top = 42.0
 offset_right = 226.0
@@ -338,7 +341,7 @@ theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.72)
 theme_override_constants/shadow_offset_x = 0
 theme_override_constants/shadow_offset_y = 3
 theme_override_font_sizes/font_size = 28
-text = "Level 1"
+text = "LEVEL 1"
 vertical_alignment = 1
 
 [node name="StarCounterLabel" type="Panel" parent="UI" unique_id=1248988476]
@@ -371,6 +374,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="CountLabel" type="Label" parent="UI/StarCounterLabel" unique_id=1332287251]
+theme_type_variation = &"GameNumberLabel"
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -423,6 +427,7 @@ grow_vertical = 2
 color = Color(0.04, 0.04, 0.05, 0.68)
 
 [node name="FailureLabel" type="Label" parent="UI/FailurePanel" unique_id=1144242749]
+theme_type_variation = &"GameTitleLabel"
 layout_mode = 1
 anchors_preset = 14
 anchor_top = 0.5
@@ -437,7 +442,7 @@ theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
 theme_override_constants/shadow_offset_x = 0
 theme_override_constants/shadow_offset_y = 4
 theme_override_font_sizes/font_size = 58
-text = "Level Failed"
+text = "LEVEL FAILED"
 horizontal_alignment = 1
 vertical_alignment = 1
 
