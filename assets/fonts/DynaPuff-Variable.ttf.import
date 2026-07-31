@@ -2,13 +2,13 @@
 
 importer="font_data_dynamic"
 type="FontFile"
-uid="uid://b3utwajp2j3oo"
-path="res://.godot/imported/Fredoka-Variable.ttf-be82ba9dfdb46f07e2455d8b62d90c28.fontdata"
+uid="uid://dselji28dxa0v"
+path="res://.godot/imported/DynaPuff-Variable.ttf-859b48c8df063e4e3e3cf539c339fd82.fontdata"
 
 [deps]
 
-source_file="res://assets/fonts/Fredoka-Variable.ttf"
-dest_files=["res://.godot/imported/Fredoka-Variable.ttf-be82ba9dfdb46f07e2455d8b62d90c28.fontdata"]
+source_file="res://assets/fonts/DynaPuff-Variable.ttf"
+dest_files=["res://.godot/imported/DynaPuff-Variable.ttf-859b48c8df063e4e3e3cf539c339fd82.fontdata"]
 
 [params]
 

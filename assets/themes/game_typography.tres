@@ -1,31 +1,38 @@
-[gd_resource type="Theme" load_steps=8 format=3]
+[gd_resource type="Theme" load_steps=9 format=3]
 
-[ext_resource type="FontFile" path="res://assets/fonts/Fredoka-Variable.ttf" id="1_fredoka"]
+[ext_resource type="FontFile" path="res://assets/fonts/DynaPuff-Variable.ttf" id="1_dynapuff"]
 [ext_resource type="FontFile" path="res://assets/fonts/Nunito-Variable.ttf" id="2_nunito"]
 
-[sub_resource type="FontVariation" id="FontVariation_fredoka_medium"]
-base_font = ExtResource("1_fredoka")
+[sub_resource type="FontVariation" id="FontVariation_dynapuff_medium"]
+base_font = ExtResource("1_dynapuff")
 variation_opentype = {
 2003072104: 100.0,
 2003265652: 500.0
 }
 
-[sub_resource type="FontVariation" id="FontVariation_fredoka_semibold"]
-base_font = ExtResource("1_fredoka")
+[sub_resource type="FontVariation" id="FontVariation_dynapuff_semibold"]
+base_font = ExtResource("1_dynapuff")
 variation_opentype = {
 2003072104: 100.0,
 2003265652: 600.0
 }
 
-[sub_resource type="FontVariation" id="FontVariation_fredoka_bold"]
-base_font = ExtResource("1_fredoka")
+[sub_resource type="FontVariation" id="FontVariation_dynapuff_bold"]
+base_font = ExtResource("1_dynapuff")
 variation_opentype = {
 2003072104: 100.0,
 2003265652: 700.0
 }
 
-[sub_resource type="FontVariation" id="FontVariation_fredoka_number"]
-base_font = ExtResource("1_fredoka")
+[sub_resource type="FontVariation" id="FontVariation_dynapuff_title"]
+base_font = ExtResource("1_dynapuff")
+variation_opentype = {
+2003072104: 92.0,
+2003265652: 700.0
+}
+
+[sub_resource type="FontVariation" id="FontVariation_dynapuff_number"]
+base_font = ExtResource("1_dynapuff")
 opentype_features = {
 1953396077: 1
 }
@@ -47,18 +54,18 @@ variation_opentype = {
 }
 
 [resource]
-default_font = SubResource("FontVariation_fredoka_medium")
-Button/fonts/font = SubResource("FontVariation_fredoka_bold")
+default_font = SubResource("FontVariation_dynapuff_medium")
+Button/fonts/font = SubResource("FontVariation_dynapuff_bold")
 LineEdit/fonts/font = SubResource("FontVariation_nunito_semibold")
 TextEdit/fonts/font = SubResource("FontVariation_nunito_semibold")
 GameTitleLabel/base_type = &"Label"
-GameTitleLabel/fonts/font = SubResource("FontVariation_fredoka_bold")
+GameTitleLabel/fonts/font = SubResource("FontVariation_dynapuff_title")
 GameSectionLabel/base_type = &"Label"
-GameSectionLabel/fonts/font = SubResource("FontVariation_fredoka_bold")
+GameSectionLabel/fonts/font = SubResource("FontVariation_dynapuff_title")
 GameHudLabel/base_type = &"Label"
-GameHudLabel/fonts/font = SubResource("FontVariation_fredoka_semibold")
+GameHudLabel/fonts/font = SubResource("FontVariation_dynapuff_semibold")
 GameNumberLabel/base_type = &"Label"
-GameNumberLabel/fonts/font = SubResource("FontVariation_fredoka_number")
+GameNumberLabel/fonts/font = SubResource("FontVariation_dynapuff_number")
 GameBodyLabel/base_type = &"Label"
 GameBodyLabel/fonts/font = SubResource("FontVariation_nunito_semibold")
 GameSmallLabel/base_type = &"Label"
