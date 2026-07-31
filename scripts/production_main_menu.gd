@@ -234,13 +234,13 @@ func _update_level_button() -> void:
 	var has_level_to_play := current_level >= MIN_LEVEL and current_level <= MAX_LEVEL and _level_config_exists(current_level)
 	if has_level_to_play:
 		if PlayerProgress.get_lives() <= 0:
-			_level_button.text = "No Lives"
+			_level_button.text = "NO LIVES"
 			_level_button.disabled = true
 		else:
-			_level_button.text = "Level %d" % current_level
+			_level_button.text = "LEVEL %d" % current_level
 			_level_button.disabled = false
 	else:
-		_level_button.text = "Complete"
+		_level_button.text = "COMPLETE"
 		_level_button.disabled = true
 
 

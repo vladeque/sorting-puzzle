@@ -2,6 +2,12 @@
 
 This file maps scenes to their responsibilities, scripts, important nodes, and runtime relationships.
 
+All UI scenes inherit the project typography theme from
+`assets/themes/game_typography.tres`. Scene labels select semantic variations
+such as `GameTitleLabel`, `GameNumberLabel`, and `GameBodyLabel`; see
+`docs/TYPOGRAPHY.md`. Scene-owned color, size, outline, and shadow overrides
+remain responsible for contrast against each component's art.
+
 ## `scenes/main_menu.tscn`
 
 Root:

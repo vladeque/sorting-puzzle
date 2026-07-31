@@ -141,6 +141,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="UsesLabel" type="Label" parent="ButtonRow/HammerButton" unique_id=1079942988]
+theme_type_variation = &"GameNumberLabel"
 z_index = 1
 layout_mode = 0
 offset_left = 66.0
@@ -178,6 +179,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="UsesLabel" type="Label" parent="ButtonRow/ShuffleButton" unique_id=1810139897]
+theme_type_variation = &"GameNumberLabel"
 z_index = 1
 layout_mode = 0
 offset_left = 66.0
@@ -215,6 +217,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="UsesLabel" type="Label" parent="ButtonRow/HighlightButton" unique_id=552036959]
+theme_type_variation = &"GameNumberLabel"
 z_index = 1
 layout_mode = 0
 offset_left = 66.0
@@ -231,6 +234,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="TimerLabel" type="Label" parent="ButtonRow/HighlightButton" unique_id=242069480]
+theme_type_variation = &"GameNumberLabel"
 visible = false
 z_index = 1
 layout_mode = 0
@@ -273,6 +277,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="UsesLabel" type="Label" parent="ButtonRow/FreezerButton" unique_id=564941140]
+theme_type_variation = &"GameNumberLabel"
 z_index = 1
 layout_mode = 0
 offset_left = 66.0
@@ -289,6 +294,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="TimerLabel" type="Label" parent="ButtonRow/FreezerButton" unique_id=1424811219]
+theme_type_variation = &"GameNumberLabel"
 visible = false
 z_index = 1
 layout_mode = 0

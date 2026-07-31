@@ -137,6 +137,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="CoinAmount" type="Label" parent="CoinsWidget" unique_id=1009565950]
+theme_type_variation = &"GameNumberLabel"
 layout_mode = 1
 offset_left = 62.0
 offset_top = 14.0
@@ -161,6 +162,7 @@ mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_plus_badge")
 
 [node name="PlusLabel" type="Label" parent="CoinsWidget/PlusBadge" unique_id=1093632893]
+theme_type_variation = &"GameNumberLabel"
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -208,6 +210,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="LifeCount" type="Label" parent="LivesWidget" unique_id=2085260670]
+theme_type_variation = &"GameNumberLabel"
 layout_mode = 1
 offset_left = 9.0
 offset_top = 6.0
@@ -223,6 +226,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="LifeStatus" type="Label" parent="LivesWidget" unique_id=624814251]
+theme_type_variation = &"GameSmallLabel"
 layout_mode = 1
 offset_left = 62.0
 offset_top = 14.0

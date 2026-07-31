@@ -38,7 +38,7 @@ func _run() -> void:
 	var coin_offers := shop.get_node("%CoinOffersContainer") as VBoxContainer
 	_check(bundles.get_child_count() == 1, "Expected one configured bundle card.")
 	_check(coin_offers.get_child_count() == 5, "Expected five configured coin offers.")
-	_check((shop.get_node("%TitleLabel") as Label).text == "Shop", "Shop title is missing.")
+	_check((shop.get_node("%TitleLabel") as Label).text == "SHOP", "Shop title is missing.")
 	var bundle_card := bundles.get_child(0) as Control
 	_check(
 		(bundle_card.get_node("%FreezerCount") as Label).text == "×3",

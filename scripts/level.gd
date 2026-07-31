@@ -1539,7 +1539,7 @@ func _update_timer_label() -> void:
 
 
 func _update_level_label() -> void:
-	_level_label.text = "Level %d" % selected_level
+	_level_label.text = "LEVEL %d" % selected_level
 
 
 func _update_star_counter_label() -> void:
@@ -1617,7 +1617,7 @@ func _update_combo_hud() -> void:
 	if _combo_label != null:
 		_combo_label.visible = should_show
 	if _combo_label != null and should_show:
-		_combo_label.text = "Combo x%d" % _combo_count
+		_combo_label.text = "COMBO ×%d" % _combo_count
 
 
 func _get_combo_time_ratio() -> float:

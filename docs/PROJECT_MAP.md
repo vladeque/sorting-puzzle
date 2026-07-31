@@ -559,6 +559,12 @@ Change pause menu layout:
 - `assets/ui/pause_menu_option_a_sheet.png` and `assets/ui/pause_menu_option_b_sheet.png` are kept as alternate generated style sheets.
 - Keep node paths used by `scripts/level.gd` stable unless the script is updated in the same change.
 
+Change fonts or text hierarchy:
+- Update `assets/themes/game_typography.tres` for shared font families, weights, and semantic type variations.
+- Apply an existing theme type variation in the owning scene instead of attaching font files directly.
+- Keep uppercase title rules and the `×` multiplier convention synchronized with dynamic strings in the owning scripts.
+- Follow `docs/TYPOGRAPHY.md` and recheck the representative mobile and tablet resolutions.
+
 ## Related Docs
 
 - `docs/ITEM_ASSET_REQUIREMENTS.md`: canonical item texture, alignment, import, and validation rules.
@@ -566,3 +572,4 @@ Change pause menu layout:
 - `docs/SCRIPTS.md`: script responsibilities, exports, and dependencies.
 - `docs/CONFIGS.md`: config file schema and data contracts.
 - `docs/CLOUD_SAVE.md`: platform cloud-save setup and bridge contract.
+- `docs/TYPOGRAPHY.md`: global font assets, semantic theme roles, casing, numeric style, and responsive typography checks.

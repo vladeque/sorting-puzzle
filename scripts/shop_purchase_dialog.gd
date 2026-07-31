@@ -11,6 +11,6 @@ func _ready() -> void:
 
 
 func show_result(title: String, message: String) -> void:
-	_title_label.text = title
+	_title_label.text = title.to_upper()
 	_message_label.text = message
 	show()

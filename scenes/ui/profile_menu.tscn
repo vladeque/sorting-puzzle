@@ -141,6 +141,7 @@ grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_outer_panel")
 
 [node name="TitleLabel" type="Label" parent="ProfileMenuPanel" unique_id=2146492258]
+theme_type_variation = &"GameTitleLabel"
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -154,7 +155,7 @@ theme_override_colors/font_shadow_color = Color(0.16, 0.04, 0.02, 0.92)
 theme_override_constants/shadow_offset_x = 0
 theme_override_constants/shadow_offset_y = 3
 theme_override_font_sizes/font_size = 44
-text = "Edit profile"
+text = "EDIT PROFILE"
 horizontal_alignment = 1
 vertical_alignment = 1
 

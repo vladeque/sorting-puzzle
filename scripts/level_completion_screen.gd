@@ -58,7 +58,7 @@ func apply_responsive_layout(safe_margins: Vector4) -> void:
 
 
 func set_earned_stars(stars: int) -> void:
-	var earned_text := "x%d" % stars
+	var earned_text := "×%d" % stars
 	var font_size := 58
 	if earned_text.length() >= 8:
 		font_size = 42

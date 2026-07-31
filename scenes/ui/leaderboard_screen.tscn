@@ -133,6 +133,7 @@ layout_mode = 2
 theme_override_constants/separation = 10
 
 [node name="TitleLabel" type="Label" parent="ContentMargin/ContentStack"]
+theme_type_variation = &"GameTitleLabel"
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
@@ -141,7 +142,7 @@ theme_override_colors/font_shadow_color = Color(0.12, 0.02, 0.025, 0.95)
 theme_override_constants/shadow_offset_x = 0
 theme_override_constants/shadow_offset_y = 4
 theme_override_font_sizes/font_size = 44
-text = "Leaderboard"
+text = "LEADERBOARD"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -205,6 +206,7 @@ theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
 text = "World"
 
 [node name="PeriodLabel" type="Label" parent="ContentMargin/ContentStack"]
+theme_type_variation = &"GameBodyLabel"
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 30)
 layout_mode = 2
@@ -266,6 +268,7 @@ theme_override_constants/separation = 14
 alignment = 1
 
 [node name="StatusLabel" type="Label" parent="ContentMargin/ContentStack/ListArea/StatusContainer/StatusStack"]
+theme_type_variation = &"GameBodyLabel"
 unique_name_in_owner = true
 custom_minimum_size = Vector2(260, 54)
 layout_mode = 2

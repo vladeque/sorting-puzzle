@@ -46,6 +46,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="AmountLabel" type="Label" parent="."]
+theme_type_variation = &"GameNumberLabel"
 unique_name_in_owner = true
 layout_mode = 1
 offset_left = 65.0

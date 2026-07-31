@@ -210,6 +210,7 @@ scale = Vector2(0.43, 0.43)
 texture = ExtResource("1_lock_shelf")
 
 [node name="RemainingLabel" type="Label" parent="LockedOverlay" unique_id=2143987069]
+theme_type_variation = &"GameNumberLabel"
 z_index = 3
 offset_left = -36.0
 offset_top = -20.0

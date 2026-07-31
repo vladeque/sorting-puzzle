@@ -21,7 +21,7 @@ func _ready() -> void:
 
 func set_offer(offer: Dictionary) -> void:
 	_offer_id = StringName(str(offer.get("id", "")))
-	_title_label.text = str(offer.get("title", "Bundle"))
+	_title_label.text = str(offer.get("title", "Bundle")).to_upper()
 	var rewards := offer.get("rewards", {}) as Dictionary
 	var abilities := rewards.get("abilities", {}) as Dictionary
 	_hammer_count.text = "×%d" % maxi(int(abilities.get("hammer", 0)), 0)

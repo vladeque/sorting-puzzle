@@ -24,16 +24,16 @@ func _update_campaign_progress() -> void:
 	var has_level_to_play := current_level <= MAX_LEVEL and _level_config_exists(current_level)
 	if has_level_to_play:
 		if PlayerProgress.get_lives() <= 0:
-			_selector_label.text = "Level %d" % current_level
-			_play_button.text = "No Lives"
+			_selector_label.text = "LEVEL %d" % current_level
+			_play_button.text = "NO LIVES"
 			_play_button.disabled = true
 		else:
-			_selector_label.text = "Level %d" % current_level
+			_selector_label.text = "LEVEL %d" % current_level
 			_play_button.text = "Play"
 			_play_button.disabled = false
 	else:
-		_selector_label.text = "All Levels Complete"
-		_play_button.text = "Complete"
+		_selector_label.text = "ALL LEVELS COMPLETE"
+		_play_button.text = "COMPLETE"
 		_play_button.disabled = true
 
 
@@ -46,7 +46,7 @@ func _populate_level_selector() -> void:
 	if not dev_level_select_enabled:
 		return
 
-	_selector_label.text = "Developer Levels"
+	_selector_label.text = "DEVELOPER LEVELS"
 	for level_number in range(MIN_LEVEL, MAX_LEVEL + 1):
 		var button := Button.new()
 		button.text = str(level_number)

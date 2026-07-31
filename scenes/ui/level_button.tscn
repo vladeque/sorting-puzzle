@@ -21,5 +21,5 @@ theme_override_styles/normal = SubResource("StyleBoxTexture_level_button")
 theme_override_styles/pressed = SubResource("StyleBoxTexture_level_button")
 theme_override_styles/hover = SubResource("StyleBoxTexture_level_button")
 theme_override_styles/disabled = SubResource("StyleBoxTexture_level_button")
-text = "Level 1"
+text = "LEVEL 1"
 script = ExtResource("2_press_scale_button")

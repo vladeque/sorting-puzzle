@@ -1,4 +1,4 @@
-[gd_resource load_steps=8 format=3]
+[gd_resource type="Theme" load_steps=8 format=3]
 
 [ext_resource type="FontFile" path="res://assets/fonts/Fredoka-Variable.ttf" id="1_fredoka"]
 [ext_resource type="FontFile" path="res://assets/fonts/Nunito-Variable.ttf" id="2_nunito"]

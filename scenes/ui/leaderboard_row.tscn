@@ -102,6 +102,7 @@ mouse_filter = 2
 theme_override_constants/separation = 10
 
 [node name="RankLabel" type="Label" parent="ContentMargin/Content"]
+theme_type_variation = &"GameNumberLabel"
 unique_name_in_owner = true
 custom_minimum_size = Vector2(64, 0)
 layout_mode = 2
@@ -130,6 +131,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="NameLabel" type="Label" parent="ContentMargin/Content"]
+theme_type_variation = &"GameBodyLabel"
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -157,6 +159,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="ScoreLabel" type="Label" parent="ContentMargin/Content/ScoreBox"]
+theme_type_variation = &"GameNumberLabel"
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.22, 0.06, 0.03, 1)
