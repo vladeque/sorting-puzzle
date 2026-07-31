@@ -6,13 +6,13 @@ The game uses a project-wide typography theme at
 
 ## Font Families
 
-- `assets/fonts/DynaPuff-Variable.ttf` is the primary game face. It is used for
-  controls, screen and modal titles, section headings, HUD labels, counters,
-  prices, ranks, scores, and other short high-emphasis text.
-- `assets/fonts/Nunito-Variable.ttf` is the supporting reading face. It is used
-  for instructions, statuses, player names, navigation captions, small settings
-  captions, and editable text.
-- The corresponding `DynaPuff-OFL.txt` and `Nunito-OFL.txt` files must remain
+- `assets/fonts/LilitaOne-Regular.ttf` is the display face. It is used for
+  screen and modal titles plus section and card headings.
+- `assets/fonts/Nunito-Variable.ttf` is the interface and reading face. It is
+  used for controls, HUD labels, counters, prices, ranks, scores, instructions,
+  statuses, player names, navigation captions, small settings captions, and
+  editable text.
+- The corresponding `LilitaOne-OFL.txt` and `Nunito-OFL.txt` files must remain
   beside the fonts in distributed source copies.
 
 Both font files are vendored from the official Google Fonts repository. Do not
@@ -33,11 +33,11 @@ scenes.
 | `GameBodyLabel` | `Label` | Instructions, status text, and player names |
 | `GameSmallLabel` | `Label` | Navigation and compact option captions |
 
-Ordinary `Button` text uses bold DynaPuff. `LineEdit` and `TextEdit` use semibold
-Nunito. Labels without a variation inherit medium DynaPuff. Title and section
-roles use DynaPuff's 92% width axis so long uppercase headings retain comfortable
-side margins without scene-specific font substitutions. Other DynaPuff roles use
-the natural 100% width.
+Ordinary `Button` text uses extra-bold Nunito. `LineEdit` and `TextEdit` use
+semibold Nunito. Labels without a variation also inherit semibold Nunito. Title
+and section roles use Lilita One's single display weight; do not synthesize
+additional Lilita weights. Long uppercase headings should use responsive sizing
+or container space instead of horizontal font scaling.
 
 Existing scene-owned font sizes, colors, outlines, and shadows remain local to
 the component because they depend on the background and control art.
@@ -51,7 +51,8 @@ the component because they depend on the background and control art.
 - Use the multiplication sign `×`, never the letter `x`, for reward and combo
   multipliers.
 - Use `GameNumberLabel` for changing values. It requests tabular figures where
-  the font supports them and uses DynaPuff's bold weight for a solid silhouette.
+  the font supports them and uses Nunito's extra-bold weight for a solid
+  silhouette.
 - Preserve store-provided localized price strings rather than rebuilding price
   punctuation or currency placement in the UI.
 
