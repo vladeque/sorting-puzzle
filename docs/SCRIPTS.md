@@ -298,11 +298,11 @@ Purpose:
 - Loads the current player name into an editable field above the avatar section.
 - Creates one avatar button for each id exposed by `PlayerProgress.get_available_avatar_ids()`.
 - Keeps the pause-style menu panel responsive, with the avatar grid at three columns.
-- Clips opaque square avatar PNGs to circular display in the top profile widget and picker.
+- Displays alpha-cleaned circular avatar PNGs in the top profile widget and picker.
 - Emits `avatar_saved(avatar_id)` after the profile save succeeds so the main menu can refresh the avatar.
 
 Key constants:
-- `AVATAR_CLIP_SHADER`: shader used to hide square avatar texture corners.
+- `AVATAR_CLIP_SHADER`: defensive circular clip that keeps avatar edges consistent at runtime.
 - `GRID_COLUMNS`: fixed to `3`.
 - `PANEL_MAX_WIDTH`, `PANEL_MAX_HEIGHT`, and `PANEL_MIN_MARGIN`: centered popup panel bounds.
 - `AVATAR_BUTTON_MIN_SIZE` and `AVATAR_BUTTON_MAX_SIZE`: responsive avatar button bounds.

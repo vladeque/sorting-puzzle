@@ -293,7 +293,7 @@ Important nodes:
 
 Depends on:
 - `assets/ui/avatars/avatar_cat.png` for the default editor/display texture. The owning menu script replaces it with the saved avatar at runtime.
-- `assets/ui/avatar_circle_clip.gdshader` for hiding the opaque square corners in avatar PNGs.
+- `assets/ui/avatar_circle_clip.gdshader` as a defensive runtime clip around the alpha-cleaned avatar PNGs.
 - `assets/ui/main_menu_coin.png`.
 - `assets/ui/main_menu_lives.png`.
 - Owning menu scene for placement and safe-area layout.
@@ -356,7 +356,7 @@ Important nodes:
 - `ButtonRow/SaveButton`: `scenes/ui/level_button.tscn` instance labeled `Save`.
 
 Depends on:
-- `assets/ui/avatars/*.png`.
+- `assets/ui/avatars/*.png`, stored with transparent pixels outside each circular badge.
 - `assets/ui/avatar_circle_clip.gdshader`.
 - `scenes/ui/level_button.tscn`.
 - `PlayerProgress` for available avatar ids, texture paths, current avatar, current player name, generated defaults, and saving.
