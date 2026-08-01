@@ -37,7 +37,11 @@ py scripts\tools\generate_level_shelves.py --shelf-count 9 --layer-count 2 --ite
 ```
 
 By default the tool prints only the abstract JSON array that belongs in a template's `shelves`
-field. `--item-type-count` controls how many distinct logical types the board uses.
+field. `--item-type-count` explicitly controls how many distinct logical types the board uses.
+When it is omitted, the generator infers the count as
+`ceil(target_filled_slots / preferred_copies_per_type)`, using
+`--preferred-copies-per-type 6` by default. The preferred value accepts fractions and represents a
+target average; actual item counts remain multiples of three.
 
 Add `--validate` to run the solvability validator once after generation. Add `--require-solvable --max-generation-attempts 25` to retry generation until a solvable layout is found.
 

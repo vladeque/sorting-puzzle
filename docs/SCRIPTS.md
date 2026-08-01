@@ -1235,14 +1235,19 @@ Purpose:
 - Uses logical `item_NN` identities and never reads the item-art catalog.
 
 Key inputs:
-- Shelf count, layer count, filled layer count, difficulty, seed, layout preset, required
+- Shelf count, layer count, filled layer count, difficulty, seed, layout preset, optional explicit
   `--item-type-count`, and optional solvability requirements.
+- When `--item-type-count` is omitted, the generator infers it as
+  `ceil(target_filled_slots / preferred_copies_per_type)`. `--preferred-copies-per-type` accepts
+  fractional values of at least `3` and defaults to `6`; an explicit type count takes precedence.
 - Layout preset values mirror the runtime layout template names in `scenes/layouts/`, including fixed-count staggered presets for 14-shelf `staggered_5_4_5`, 13-shelf `staggered_4_5_4`, and 14-shelf `grid_3x3_moving_5_bottom` layouts.
 
 Generation constraints:
 - Difficulty presets cap how many copies of the same item can appear on one filled layer.
 - The generator uses all requested logical types when the board contains enough triples and
   distributes triples evenly across them.
+- Inferred type counts target the requested average copies per type, while actual per-type counts
+  remain multiples of three.
 - `--max-items-per-type` adds an explicit global cap for special levels that need less overall
   repetition. Without it, the target filled-slot count is not reduced merely because a progression
   pool is small.

@@ -179,10 +179,15 @@ py scripts\tools\generate_level_shelves.py --shelf-count 9 --layer-count 2 --ite
 py scripts\tools\materialize_level_templates.py
 ```
 
-`--item-type-count` is required and creates `item_01` through the requested count. By default the
-generator distributes triples across all logical types and fills the difficulty preset's target
-slot count. Use `--max-items-per-type` to impose a lower global repetition cap; the generator adds
-empty slots rather than exceeding an explicit cap.
+`--item-type-count` creates `item_01` through the requested count. When it is omitted, the generator
+uses `ceil(target_filled_slots / preferred_copies_per_type)` to infer the logical type count.
+`--preferred-copies-per-type` accepts integers or fractions of at least `3` and defaults to `6`.
+It is a target average because each logical type's actual copy count must remain a multiple of three.
+An explicit `--item-type-count` overrides this inference.
+
+The generator distributes triples across all logical types and fills the difficulty preset's target
+slot count. Use `--max-items-per-type` to impose a lower global repetition cap; the generator applies
+that cap after type-count inference and adds empty slots rather than exceeding it.
 
 Generated levels default to `--min-front-visible-triples 1`, so at least one item type starts with three visible front-layer copies across shelves. Use `--min-front-visible-triples 0` for layouts that should not force a starter visible triple candidate.
 

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import random
 import sys
 from collections import Counter
@@ -17,6 +18,7 @@ from validate_level_solvable import solve_level, shelves_to_state, validate_shel
 
 
 SLOTS_PER_SHELF = 3
+DEFAULT_PREFERRED_COPIES_PER_TYPE = 6.0
 LAYOUT_PRESETS = (
     "grid_2x3",
     "grid_3x3",
@@ -126,6 +128,21 @@ def calculate_filled_slots(total_slots: int, preset: DifficultyPreset, rng: rand
     return total_slots - empty_slots
 
 
+def infer_item_type_count(target_filled_slots: int, preferred_copies_per_type: float) -> int:
+    if (
+        not math.isfinite(preferred_copies_per_type)
+        or preferred_copies_per_type < SLOTS_PER_SHELF
+    ):
+        raise ValueError("--preferred-copies-per-type must be finite and at least 3")
+
+    triple_count = target_filled_slots // SLOTS_PER_SHELF
+    if triple_count <= 0:
+        raise ValueError("At least one item triple is required to infer the item type count")
+
+    preferred_type_count = math.ceil(target_filled_slots / preferred_copies_per_type)
+    return min(triple_count, preferred_type_count)
+
+
 def round_down_to_triple_count(item_count: int) -> int:
     return item_count - (item_count % SLOTS_PER_SHELF)
 
@@ -215,11 +232,12 @@ def generate_shelves(
     shelf_count: int,
     layer_count: int,
     filled_layer_count: int,
-    item_types: list[str],
+    item_types: list[str] | None,
     difficulty: str,
     seed: int | None,
     max_items_per_type_override: int | None,
     min_front_visible_triples: int,
+    preferred_copies_per_type: float = DEFAULT_PREFERRED_COPIES_PER_TYPE,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     if shelf_count <= 0:
         raise ValueError("--shelf-count must be greater than 0")
@@ -234,6 +252,20 @@ def generate_shelves(
     rng = random.Random(seed)
     eligible_slots = shelf_count * filled_layer_count * SLOTS_PER_SHELF
     target_filled_slots = calculate_filled_slots(eligible_slots, preset, rng)
+    item_type_count_source = "explicit"
+    if item_types is None:
+        item_type_count = infer_item_type_count(
+            target_filled_slots=target_filled_slots,
+            preferred_copies_per_type=preferred_copies_per_type,
+        )
+        item_types = logical_item_ids(item_type_count)
+        item_type_count_source = "inferred"
+    elif (
+        not math.isfinite(preferred_copies_per_type)
+        or preferred_copies_per_type < SLOTS_PER_SHELF
+    ):
+        raise ValueError("--preferred-copies-per-type must be finite and at least 3")
+
     max_items_per_type = calculate_max_items_per_type(
         preset=preset,
         max_items_per_type_override=max_items_per_type_override,
@@ -301,6 +333,9 @@ def generate_shelves(
         max_items_per_type_override=max_items_per_type_override,
         min_front_visible_triples=min_front_visible_triples,
         target_filled_slots=target_filled_slots,
+        item_type_count=len(item_types),
+        item_type_count_source=item_type_count_source,
+        preferred_copies_per_type=preferred_copies_per_type,
     )
     return shelves, stats
 
@@ -349,7 +384,7 @@ def generate_with_optional_validation(
     shelf_count: int,
     layer_count: int,
     filled_layer_count: int,
-    item_types: list[str],
+    item_types: list[str] | None,
     difficulty: str,
     seed: int | None,
     should_validate: bool,
@@ -359,6 +394,7 @@ def generate_with_optional_validation(
     min_front_visible_triples: int,
     max_states: int,
     max_depth: int,
+    preferred_copies_per_type: float = DEFAULT_PREFERRED_COPIES_PER_TYPE,
     locked_shelves: dict[int, int] | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any], dict[str, Any] | None, int | None]:
     attempts = max(1, max_attempts if require_solvable else 1)
@@ -377,6 +413,7 @@ def generate_with_optional_validation(
             seed=attempt_seed,
             max_items_per_type_override=max_items_per_type_override,
             min_front_visible_triples=min_front_visible_triples,
+            preferred_copies_per_type=preferred_copies_per_type,
         )
         apply_locked_shelves(shelves, locked_shelves)
         stats["attempt"] = attempt_index + 1
@@ -869,6 +906,9 @@ def build_stats(
     max_items_per_type_override: int | None,
     min_front_visible_triples: int,
     target_filled_slots: int,
+    item_type_count: int,
+    item_type_count_source: str,
+    preferred_copies_per_type: float,
 ) -> dict[str, Any]:
     values = flatten_shelves(shelves)
     item_counts = Counter(value for value in values if value is not None)
@@ -892,6 +932,9 @@ def build_stats(
         "target_filled_slots": target_filled_slots,
         "filled_slots": sum(1 for value in values if value is not None),
         "empty_slots": sum(1 for value in values if value is None),
+        "item_type_count": item_type_count,
+        "item_type_count_source": item_type_count_source,
+        "preferred_copies_per_type": preferred_copies_per_type,
         "item_cap_added_empty_slots": target_filled_slots - sum(1 for value in values if value is not None),
         "item_counts": dict(sorted(item_counts.items())),
         "invalid_item_counts": invalid_counts,
@@ -947,8 +990,19 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--item-type-count",
         type=int,
-        required=True,
-        help="Number of abstract item_NN identities available to the generated level.",
+        help=(
+            "Number of abstract item_NN identities available to the generated level. "
+            "When omitted, infer it from the target filled slots and --preferred-copies-per-type."
+        ),
+    )
+    parser.add_argument(
+        "--preferred-copies-per-type",
+        type=float,
+        default=DEFAULT_PREFERRED_COPIES_PER_TYPE,
+        help=(
+            "Target average copies per item type when --item-type-count is omitted. "
+            "Accepts fractional values and defaults to 6."
+        ),
     )
     parser.add_argument(
         "--difficulty",
@@ -1009,7 +1063,9 @@ def main() -> int:
         filled_layer_count = args.layer_count
 
     try:
-        item_types = logical_item_ids(args.item_type_count)
+        item_types = None
+        if args.item_type_count is not None:
+            item_types = logical_item_ids(args.item_type_count)
         locked_shelves = parse_locked_shelves(args.locked_shelves)
         shelves, stats, validation, used_seed = generate_with_optional_validation(
             shelf_count=args.shelf_count,
@@ -1025,6 +1081,7 @@ def main() -> int:
             min_front_visible_triples=args.min_front_visible_triples,
             max_states=args.validator_max_states,
             max_depth=args.validator_max_depth,
+            preferred_copies_per_type=args.preferred_copies_per_type,
             locked_shelves=locked_shelves,
         )
     except (OSError, ValueError, KeyError) as error:
