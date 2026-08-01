@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://scripts/leaderboard_row.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://assets/ui/avatars/avatar_cat.png" id="2_avatar"]
@@ -49,6 +49,51 @@ corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gold"]
+bg_color = Color(1, 0.82, 0.25, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(0.72, 0.48, 0.06, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+shadow_color = Color(0.4, 0.24, 0.02, 0.4)
+shadow_size = 4
+shadow_offset = Vector2(0, 2)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_silver"]
+bg_color = Color(0.85, 0.88, 0.92, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(0.55, 0.59, 0.64, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+shadow_color = Color(0.25, 0.27, 0.3, 0.35)
+shadow_size = 4
+shadow_offset = Vector2(0, 2)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bronze"]
+bg_color = Color(0.82, 0.52, 0.28, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(0.55, 0.32, 0.14, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+shadow_color = Color(0.35, 0.18, 0.04, 0.4)
+shadow_size = 4
+shadow_offset = Vector2(0, 2)
 
 [node name="LeaderboardRow" type="Control"]
 custom_minimum_size = Vector2(0, 92)
@@ -101,11 +146,59 @@ layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 10
 
-[node name="RankLabel" type="Label" parent="ContentMargin/Content"]
+[node name="RankSlot" type="Control" parent="ContentMargin/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="GoldCircle" type="Panel" parent="ContentMargin/Content/RankSlot"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_gold")
+
+[node name="SilverCircle" type="Panel" parent="ContentMargin/Content/RankSlot"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_silver")
+
+[node name="BronzeCircle" type="Panel" parent="ContentMargin/Content/RankSlot"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_bronze")
+
+[node name="RankLabel" type="Label" parent="ContentMargin/Content/RankSlot"]
 theme_type_variation = &"GameNumberLabel"
 unique_name_in_owner = true
-custom_minimum_size = Vector2(64, 0)
-layout_mode = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 theme_override_colors/font_color = Color(0.31, 0.1, 0.06, 1)
 theme_override_colors/font_outline_color = Color(1, 0.96, 0.77, 0.82)
 theme_override_constants/outline_size = 3

@@ -7,6 +7,10 @@ const DEFAULT_AVATAR_SIZE := 64.0
 const COMPACT_AVATAR_SIZE := 54.0
 
 @onready var _current_background := %CurrentBackground as Panel
+@onready var _rank_slot := %RankSlot as Control
+@onready var _gold_circle := %GoldCircle as Control
+@onready var _silver_circle := %SilverCircle as Control
+@onready var _bronze_circle := %BronzeCircle as Control
 @onready var _rank_label := %RankLabel as Label
 @onready var _avatar_frame := %AvatarFrame as PanelContainer
 @onready var _avatar_texture := %AvatarTexture as TextureRect
@@ -21,7 +25,10 @@ func set_entry(entry: Dictionary) -> void:
 	if display_name.is_empty():
 		display_name = "Player"
 
-	_rank_label.text = "#%d" % rank if rank > 0 else "—"
+	_gold_circle.visible = rank == 1
+	_silver_circle.visible = rank == 2
+	_bronze_circle.visible = rank == 3
+	_rank_label.text = str(rank) if rank in [1, 2, 3] else ("#%d" % rank if rank > 0 else "—")
 	_name_label.text = display_name
 	_score_label.text = _format_number(score)
 	_avatar_texture.texture = load(
@@ -35,6 +42,7 @@ func set_compact(is_compact: bool) -> void:
 	custom_minimum_size.y = COMPACT_ROW_HEIGHT if is_compact else DEFAULT_ROW_HEIGHT
 	var avatar_size := COMPACT_AVATAR_SIZE if is_compact else DEFAULT_AVATAR_SIZE
 	_avatar_frame.custom_minimum_size = Vector2(avatar_size, avatar_size)
+	_rank_slot.custom_minimum_size = Vector2(avatar_size, avatar_size)
 	_rank_label.add_theme_font_size_override("font_size", 24 if is_compact else 28)
 	_name_label.add_theme_font_size_override("font_size", 24 if is_compact else 28)
 	_score_label.add_theme_font_size_override("font_size", 26 if is_compact else 30)

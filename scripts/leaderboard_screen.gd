@@ -14,6 +14,10 @@ const CONTENT_TOP_MARGIN := 18.0
 const CONTENT_BOTTOM_GAP := 12.0
 const BOTTOM_NAVIGATION_HEIGHT := 96.0
 const COMPACT_VIEWPORT_HEIGHT := 1100.0
+## Ranks at or below this are assumed visible without scrolling (about how many rows fit above
+## the fold at the reference 720x1280 viewport); beyond it the pinned row keeps the player's
+## standing visible without requiring a scroll.
+const PINNED_ROW_RANK_THRESHOLD := 10
 
 @onready var _content_margin := %ContentMargin as MarginContainer
 @onready var _title_label := %TitleLabel as Label
@@ -128,7 +132,12 @@ func _populate_entries(entries: Array, player_entry: Dictionary) -> void:
 	_status_label.text = "No scores yet" if not has_entries else ""
 	_retry_button.visible = false
 
-	var should_pin_player := not player_entry.is_empty() and not contains_current_player
+	var player_rank := int(player_entry.get("rank", 0))
+	var should_pin_player := not player_entry.is_empty() and (
+		not contains_current_player
+		or player_rank <= 0
+		or player_rank > PINNED_ROW_RANK_THRESHOLD
+	)
 	_pinned_player_row.visible = should_pin_player
 	if should_pin_player:
 		_pinned_player_row.call("set_entry", player_entry)
