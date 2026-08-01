@@ -4,9 +4,13 @@ class_name ShopBundleCard
 signal purchase_pressed(offer_id: StringName)
 signal info_requested(ability_id: StringName)
 
+## Keeps the title clear of %DiscountBadge, which overlaps the card's top-left corner.
+const DISCOUNT_BADGE_TITLE_INSET := 62.0
+
 @onready var _title_label := %TitleLabel as Label
-@onready var _discount_ribbon := %DiscountRibbon as Control
-@onready var _ribbon_label := %RibbonLabel as Label
+@onready var _title_spacer := %TitleSpacer as Control
+@onready var _discount_badge := %DiscountBadge as Control
+@onready var _percent_label := %PercentLabel as Label
 @onready var _compare_at_price_label := %CompareAtPriceLabel as RichTextLabel
 @onready var _hammer_count := %HammerCount as Label
 @onready var _shuffle_count := %ShuffleCount as Label
@@ -48,9 +52,10 @@ func set_offer(offer: Dictionary) -> void:
 	_purchase_button.text = _formatted_price
 
 	var discount_percent := maxi(int(offer.get("discount_percent", 0)), 0)
-	_discount_ribbon.visible = discount_percent > 0
+	_discount_badge.visible = discount_percent > 0
+	_title_spacer.custom_minimum_size.x = DISCOUNT_BADGE_TITLE_INSET if discount_percent > 0 else 0.0
 	if discount_percent > 0:
-		_ribbon_label.text = "SAVE %d%%" % discount_percent
+		_percent_label.text = "%d%%" % discount_percent
 
 	var compare_at_price := str(store.get("compare_at_formatted_price", ""))
 	_compare_at_price_label.visible = not compare_at_price.is_empty()

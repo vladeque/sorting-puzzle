@@ -128,11 +128,18 @@ Runtime children:
 ## `scenes/ui/shop_bundle_card.tscn`
 
 - Reusable full-width featured offer card with title, purchase button, and fixed reward cells for
-  Hammer, Shuffle, Lantern (`highlight` internally), Freezer, and coins.
+  coins, Hammer, Shuffle, Lantern (`highlight` internally), and Freezer, in that display order
+  (coins first, as the bundle's headline reward).
 - The scene owns reward art and styling; `scripts/shop_bundle_card.gd` binds quantities and the store-formatted price.
-- An optional `DiscountRibbon` strip above the header and a struck-through `CompareAtPriceLabel`
-  above the purchase button show a "SAVE X%" callout and "was" price; both stay hidden when the
-  bound offer has no `discount_percent`/`compare_at_formatted_price`.
+- The root is `ShopBundleCard(PanelContainer) > CardBody(Control) > [CardStack, DiscountBadge]` so
+  `DiscountBadge` can overlap the card's top-left corner instead of being confined to `CardStack`'s
+  normal vertical flow.
+- `DiscountBadge` is a rotated starburst sticker (two overlapping rounded squares behind a
+  gold-bordered circle) showing "X% / OFF"; a struck-through `CompareAtPriceLabel` above the
+  purchase button shows the "was" price. Both stay hidden when the bound offer has no
+  `discount_percent`/`compare_at_formatted_price`. A `TitleSpacer` before the title label is widened
+  by `scripts/shop_bundle_card.gd` whenever the badge is showing, so the badge never overlaps the
+  bundle title text.
 - Each of the four ability reward cells (not coins) carries a transparent full-cell `*InfoButton`
   overlay so tapping the icon emits `ShopBundleCard.info_requested(ability_id)`; a small `InfoHint`
   caption below the rewards row tells the player they can tap for details.

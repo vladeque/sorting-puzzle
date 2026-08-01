@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://d4mopl1b3mss7"]
+[gd_scene load_steps=11 format=3 uid="uid://d4mopl1b3mss7"]
 
 [ext_resource type="Script" uid="uid://ctwbrdwrme8jm" path="res://scripts/shop_bundle_card.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://h4ru3gdl5338" path="res://assets/abilities/ability_hammer.png" id="2_hammer"]
@@ -26,21 +26,27 @@ shadow_color = Color(0.08, 0.01, 0.02, 0.48)
 shadow_size = 7
 shadow_offset = Vector2(0, 5)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ribbon"]
-content_margin_left = 10.0
-content_margin_top = 4.0
-content_margin_right = 10.0
-content_margin_bottom = 6.0
-bg_color = Color(0.94, 0.44, 0.19, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 3
-border_color = Color(1, 0.79, 0.39, 1)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_burst"]
+bg_color = Color(0.86, 0.14, 0.16, 1)
 corner_radius_top_left = 14
 corner_radius_top_right = 14
 corner_radius_bottom_right = 14
 corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_circle"]
+bg_color = Color(0.86, 0.14, 0.16, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.85, 0.35, 1)
+corner_radius_top_left = 30
+corner_radius_top_right = 30
+corner_radius_bottom_right = 30
+corner_radius_bottom_left = 30
+shadow_color = Color(0.08, 0.01, 0.02, 0.45)
+shadow_size = 5
+shadow_offset = Vector2(0, 3)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button"]
 bg_color = Color(0.24, 0.7, 0.22, 1)
@@ -92,32 +98,27 @@ custom_minimum_size = Vector2(0, 246)
 theme_override_styles/panel = SubResource("StyleBoxFlat_card")
 script = ExtResource("1_script")
 
-[node name="CardStack" type="VBoxContainer" parent="." unique_id=1658340845]
+[node name="CardBody" type="Control" parent="."]
 layout_mode = 2
+
+[node name="CardStack" type="VBoxContainer" parent="CardBody"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_constants/separation = 10
 
-[node name="DiscountRibbon" type="PanelContainer" parent="CardStack"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_ribbon")
-
-[node name="RibbonLabel" type="Label" parent="CardStack/DiscountRibbon"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_shadow_color = Color(0.1, 0.01, 0.02, 1)
-theme_override_constants/shadow_offset_y = 2
-theme_override_font_sizes/font_size = 22
-text = "SAVE 67%"
-horizontal_alignment = 1
-
-[node name="Header" type="HBoxContainer" parent="CardStack" unique_id=2093809261]
+[node name="Header" type="HBoxContainer" parent="CardBody/CardStack" unique_id=2093809261]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="TitleLabel" type="Label" parent="CardStack/Header" unique_id=151217595]
+[node name="TitleSpacer" type="Control" parent="CardBody/CardStack/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="CardBody/CardStack/Header" unique_id=151217595]
 theme_type_variation = &"GameSectionLabel"
 unique_name_in_owner = true
 layout_mode = 2
@@ -129,12 +130,12 @@ theme_override_font_sizes/font_size = 30
 text = "STARTER BUNDLE"
 vertical_alignment = 1
 
-[node name="PriceStack" type="VBoxContainer" parent="CardStack/Header"]
+[node name="PriceStack" type="VBoxContainer" parent="CardBody/CardStack/Header"]
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_constants/separation = 0
 
-[node name="CompareAtPriceLabel" type="RichTextLabel" parent="CardStack/Header/PriceStack"]
+[node name="CompareAtPriceLabel" type="RichTextLabel" parent="CardBody/CardStack/Header/PriceStack"]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(0, 22)
@@ -147,7 +148,7 @@ scroll_active = false
 theme_override_colors/default_color = Color(1, 0.87, 0.68, 0.8)
 theme_override_font_sizes/normal_font_size = 19
 
-[node name="PurchaseButton" type="Button" parent="CardStack/Header/PriceStack" unique_id=1852880686]
+[node name="PurchaseButton" type="Button" parent="CardBody/CardStack/Header/PriceStack" unique_id=1852880686]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(178, 58)
 layout_mode = 2
@@ -165,193 +166,29 @@ theme_override_styles/disabled = SubResource("StyleBoxFlat_button_pressed")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
 text = "$4.99"
 
-[node name="Rewards" type="HBoxContainer" parent="CardStack" unique_id=1210093075]
+[node name="Rewards" type="HBoxContainer" parent="CardBody/CardStack" unique_id=1210093075]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 8
 
-[node name="HammerReward" type="PanelContainer" parent="CardStack/Rewards" unique_id=1723403800]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-mouse_default_cursor_shape = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_reward")
-
-[node name="Stack" type="VBoxContainer" parent="CardStack/Rewards/HammerReward" unique_id=1858107192]
-layout_mode = 2
-theme_override_constants/separation = -4
-alignment = 1
-
-[node name="Icon" type="TextureRect" parent="CardStack/Rewards/HammerReward/Stack" unique_id=702875276]
-custom_minimum_size = Vector2(72, 82)
-layout_mode = 2
-texture = ExtResource("2_hammer")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="HammerCount" type="Label" parent="CardStack/Rewards/HammerReward/Stack" unique_id=1629700746]
-theme_type_variation = &"GameNumberLabel"
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_shadow_color = Color(0.12, 0.01, 0.02, 1)
-theme_override_constants/shadow_offset_y = 2
-theme_override_font_sizes/font_size = 24
-text = "×3"
-horizontal_alignment = 1
-
-[node name="HammerInfoButton" type="Button" parent="CardStack/Rewards/HammerReward"]
-unique_name_in_owner = true
-layout_mode = 2
-focus_mode = 0
-mouse_default_cursor_shape = 2
-flat = true
-theme_override_styles/normal = SubResource("StyleBoxEmpty_focus")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_focus")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_focus")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
-
-[node name="ShuffleReward" type="PanelContainer" parent="CardStack/Rewards" unique_id=1847635692]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-mouse_default_cursor_shape = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_reward")
-
-[node name="Stack" type="VBoxContainer" parent="CardStack/Rewards/ShuffleReward" unique_id=803402534]
-layout_mode = 2
-theme_override_constants/separation = -4
-alignment = 1
-
-[node name="Icon" type="TextureRect" parent="CardStack/Rewards/ShuffleReward/Stack" unique_id=1998410384]
-custom_minimum_size = Vector2(72, 82)
-layout_mode = 2
-texture = ExtResource("3_shuffle")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="ShuffleCount" type="Label" parent="CardStack/Rewards/ShuffleReward/Stack" unique_id=67903146]
-theme_type_variation = &"GameNumberLabel"
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_shadow_color = Color(0.12, 0.01, 0.02, 1)
-theme_override_constants/shadow_offset_y = 2
-theme_override_font_sizes/font_size = 24
-text = "×3"
-horizontal_alignment = 1
-
-[node name="ShuffleInfoButton" type="Button" parent="CardStack/Rewards/ShuffleReward"]
-unique_name_in_owner = true
-layout_mode = 2
-focus_mode = 0
-mouse_default_cursor_shape = 2
-flat = true
-theme_override_styles/normal = SubResource("StyleBoxEmpty_focus")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_focus")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_focus")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
-
-[node name="LanternReward" type="PanelContainer" parent="CardStack/Rewards" unique_id=86008521]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-mouse_default_cursor_shape = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_reward")
-
-[node name="Stack" type="VBoxContainer" parent="CardStack/Rewards/LanternReward" unique_id=2119830576]
-layout_mode = 2
-theme_override_constants/separation = -4
-alignment = 1
-
-[node name="Icon" type="TextureRect" parent="CardStack/Rewards/LanternReward/Stack" unique_id=1503845685]
-custom_minimum_size = Vector2(72, 82)
-layout_mode = 2
-texture = ExtResource("4_lantern")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="LanternCount" type="Label" parent="CardStack/Rewards/LanternReward/Stack" unique_id=1081869248]
-theme_type_variation = &"GameNumberLabel"
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_shadow_color = Color(0.12, 0.01, 0.02, 1)
-theme_override_constants/shadow_offset_y = 2
-theme_override_font_sizes/font_size = 24
-text = "×3"
-horizontal_alignment = 1
-
-[node name="LanternInfoButton" type="Button" parent="CardStack/Rewards/LanternReward"]
-unique_name_in_owner = true
-layout_mode = 2
-focus_mode = 0
-mouse_default_cursor_shape = 2
-flat = true
-theme_override_styles/normal = SubResource("StyleBoxEmpty_focus")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_focus")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_focus")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
-
-[node name="FreezerReward" type="PanelContainer" parent="CardStack/Rewards" unique_id=1041077588]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-mouse_default_cursor_shape = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_reward")
-
-[node name="Stack" type="VBoxContainer" parent="CardStack/Rewards/FreezerReward" unique_id=608025019]
-layout_mode = 2
-theme_override_constants/separation = -4
-alignment = 1
-
-[node name="Icon" type="TextureRect" parent="CardStack/Rewards/FreezerReward/Stack" unique_id=1517493974]
-custom_minimum_size = Vector2(72, 82)
-layout_mode = 2
-texture = ExtResource("5_d3y3u")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="FreezerCount" type="Label" parent="CardStack/Rewards/FreezerReward/Stack" unique_id=1313314302]
-theme_type_variation = &"GameNumberLabel"
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_shadow_color = Color(0.12, 0.01, 0.02, 1)
-theme_override_constants/shadow_offset_y = 2
-theme_override_font_sizes/font_size = 24
-text = "×3"
-horizontal_alignment = 1
-
-[node name="FreezerInfoButton" type="Button" parent="CardStack/Rewards/FreezerReward"]
-unique_name_in_owner = true
-layout_mode = 2
-focus_mode = 0
-mouse_default_cursor_shape = 2
-flat = true
-theme_override_styles/normal = SubResource("StyleBoxEmpty_focus")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_focus")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_focus")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
-
-[node name="CoinReward" type="PanelContainer" parent="CardStack/Rewards" unique_id=1190262120]
+[node name="CoinReward" type="PanelContainer" parent="CardBody/CardStack/Rewards" unique_id=1190262120]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_reward")
 
-[node name="Stack" type="VBoxContainer" parent="CardStack/Rewards/CoinReward" unique_id=204282156]
+[node name="Stack" type="VBoxContainer" parent="CardBody/CardStack/Rewards/CoinReward" unique_id=204282156]
 layout_mode = 2
 theme_override_constants/separation = -4
 alignment = 1
 
-[node name="Icon" type="TextureRect" parent="CardStack/Rewards/CoinReward/Stack" unique_id=1066467120]
+[node name="Icon" type="TextureRect" parent="CardBody/CardStack/Rewards/CoinReward/Stack" unique_id=1066467120]
 custom_minimum_size = Vector2(72, 82)
 layout_mode = 2
 texture = ExtResource("5_coin")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="CoinCount" type="Label" parent="CardStack/Rewards/CoinReward/Stack" unique_id=2066107440]
+[node name="CoinCount" type="Label" parent="CardBody/CardStack/Rewards/CoinReward/Stack" unique_id=2066107440]
 theme_type_variation = &"GameNumberLabel"
 unique_name_in_owner = true
 layout_mode = 2
@@ -362,10 +199,251 @@ theme_override_font_sizes/font_size = 22
 text = "1,000"
 horizontal_alignment = 1
 
-[node name="InfoHint" type="Label" parent="CardStack"]
+[node name="HammerReward" type="PanelContainer" parent="CardBody/CardStack/Rewards" unique_id=1723403800]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_reward")
+
+[node name="Stack" type="VBoxContainer" parent="CardBody/CardStack/Rewards/HammerReward" unique_id=1858107192]
+layout_mode = 2
+theme_override_constants/separation = -4
+alignment = 1
+
+[node name="Icon" type="TextureRect" parent="CardBody/CardStack/Rewards/HammerReward/Stack" unique_id=702875276]
+custom_minimum_size = Vector2(72, 82)
+layout_mode = 2
+texture = ExtResource("2_hammer")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HammerCount" type="Label" parent="CardBody/CardStack/Rewards/HammerReward/Stack" unique_id=1629700746]
+theme_type_variation = &"GameNumberLabel"
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.12, 0.01, 0.02, 1)
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 24
+text = "×3"
+horizontal_alignment = 1
+
+[node name="HammerInfoButton" type="Button" parent="CardBody/CardStack/Rewards/HammerReward"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+flat = true
+theme_override_styles/normal = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+
+[node name="ShuffleReward" type="PanelContainer" parent="CardBody/CardStack/Rewards" unique_id=1847635692]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_reward")
+
+[node name="Stack" type="VBoxContainer" parent="CardBody/CardStack/Rewards/ShuffleReward" unique_id=803402534]
+layout_mode = 2
+theme_override_constants/separation = -4
+alignment = 1
+
+[node name="Icon" type="TextureRect" parent="CardBody/CardStack/Rewards/ShuffleReward/Stack" unique_id=1998410384]
+custom_minimum_size = Vector2(72, 82)
+layout_mode = 2
+texture = ExtResource("3_shuffle")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ShuffleCount" type="Label" parent="CardBody/CardStack/Rewards/ShuffleReward/Stack" unique_id=67903146]
+theme_type_variation = &"GameNumberLabel"
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.12, 0.01, 0.02, 1)
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 24
+text = "×3"
+horizontal_alignment = 1
+
+[node name="ShuffleInfoButton" type="Button" parent="CardBody/CardStack/Rewards/ShuffleReward"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+flat = true
+theme_override_styles/normal = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+
+[node name="LanternReward" type="PanelContainer" parent="CardBody/CardStack/Rewards" unique_id=86008521]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_reward")
+
+[node name="Stack" type="VBoxContainer" parent="CardBody/CardStack/Rewards/LanternReward" unique_id=2119830576]
+layout_mode = 2
+theme_override_constants/separation = -4
+alignment = 1
+
+[node name="Icon" type="TextureRect" parent="CardBody/CardStack/Rewards/LanternReward/Stack" unique_id=1503845685]
+custom_minimum_size = Vector2(72, 82)
+layout_mode = 2
+texture = ExtResource("4_lantern")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="LanternCount" type="Label" parent="CardBody/CardStack/Rewards/LanternReward/Stack" unique_id=1081869248]
+theme_type_variation = &"GameNumberLabel"
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.12, 0.01, 0.02, 1)
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 24
+text = "×3"
+horizontal_alignment = 1
+
+[node name="LanternInfoButton" type="Button" parent="CardBody/CardStack/Rewards/LanternReward"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+flat = true
+theme_override_styles/normal = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+
+[node name="FreezerReward" type="PanelContainer" parent="CardBody/CardStack/Rewards" unique_id=1041077588]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_reward")
+
+[node name="Stack" type="VBoxContainer" parent="CardBody/CardStack/Rewards/FreezerReward" unique_id=608025019]
+layout_mode = 2
+theme_override_constants/separation = -4
+alignment = 1
+
+[node name="Icon" type="TextureRect" parent="CardBody/CardStack/Rewards/FreezerReward/Stack" unique_id=1517493974]
+custom_minimum_size = Vector2(72, 82)
+layout_mode = 2
+texture = ExtResource("5_d3y3u")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="FreezerCount" type="Label" parent="CardBody/CardStack/Rewards/FreezerReward/Stack" unique_id=1313314302]
+theme_type_variation = &"GameNumberLabel"
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.12, 0.01, 0.02, 1)
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 24
+text = "×3"
+horizontal_alignment = 1
+
+[node name="FreezerInfoButton" type="Button" parent="CardBody/CardStack/Rewards/FreezerReward"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+flat = true
+theme_override_styles/normal = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_focus")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+
+[node name="InfoHint" type="Label" parent="CardBody/CardStack"]
 theme_type_variation = &"GameSmallLabel"
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.92, 0.79, 0.72)
 theme_override_font_sizes/font_size = 18
 text = "Tap an ability to see what it does"
+horizontal_alignment = 1
+
+[node name="DiscountBadge" type="Control" parent="CardBody"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+offset_left = -22.0
+offset_top = -22.0
+offset_right = 54.0
+offset_bottom = 54.0
+rotation_degrees = -12.0
+mouse_filter = 2
+
+[node name="BurstA" type="Panel" parent="CardBody/DiscountBadge"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_burst")
+
+[node name="BurstB" type="Panel" parent="CardBody/DiscountBadge"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+rotation_degrees = 45.0
+pivot_offset = Vector2(38, 38)
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_burst")
+
+[node name="CircleBadge" type="Panel" parent="CardBody/DiscountBadge"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_circle")
+
+[node name="TextStack" type="VBoxContainer" parent="CardBody/DiscountBadge/CircleBadge"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = -2
+alignment = 1
+
+[node name="PercentLabel" type="Label" parent="CardBody/DiscountBadge/CircleBadge/TextStack"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.3, 0.02, 0.02, 1)
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 19
+text = "67%"
+horizontal_alignment = 1
+
+[node name="OffLabel" type="Label" parent="CardBody/DiscountBadge/CircleBadge/TextStack"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.3, 0.02, 0.02, 1)
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 13
+text = "OFF"
 horizontal_alignment = 1

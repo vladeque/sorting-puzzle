@@ -45,12 +45,16 @@ func _run() -> void:
 		"Starter bundle card does not show three Freezers."
 	)
 	_check(
-		(bundle_card.get_node("%DiscountRibbon") as Control).visible,
-		"Starter bundle discount ribbon did not show for a discounted offer."
+		(bundle_card.get_node("%DiscountBadge") as Control).visible,
+		"Starter bundle discount badge did not show for a discounted offer."
 	)
 	_check(
-		(bundle_card.get_node("%RibbonLabel") as Label).text == "SAVE 67%",
-		"Starter bundle discount ribbon text is wrong."
+		(bundle_card.get_node("%PercentLabel") as Label).text == "67%",
+		"Starter bundle discount badge percent text is wrong."
+	)
+	_check(
+		(bundle_card.get_node("CardBody/CardStack/Rewards") as HBoxContainer).get_child(0).name == "CoinReward",
+		"Coins should be the first reward shown in the bundle card."
 	)
 	_check(
 		(bundle_card.get_node("%CompareAtPriceLabel") as Control).visible,
@@ -92,7 +96,7 @@ func _run() -> void:
 		var logical_size := shop.get_viewport_rect().size
 		var navigation := shop.get_node("%BottomNavigation") as Control
 		var content := shop.get_node("%ContentMargin") as Control
-		var reward_row := bundle_card.get_node("CardStack/Rewards") as HBoxContainer
+		var reward_row := bundle_card.get_node("CardBody/CardStack/Rewards") as HBoxContainer
 		_check(content.position.x >= 0.0, "Content escaped the left edge at %s." % resolution)
 		_check(content.position.x + content.size.x <= logical_size.x + 1.0, "Content escaped the right edge at %s." % resolution)
 		_check(navigation.position.y + navigation.size.y <= logical_size.y + 1.0, "Navigation escaped the bottom edge at %s." % resolution)
