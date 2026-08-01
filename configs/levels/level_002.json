@@ -2,130 +2,130 @@
   "level": 2,
   "time_seconds": 300,
   "layout_preset": "grid_3x3",
-  "difficulty": "easy",
+  "difficulty": "medium",
   "shelves": [
 	{
 	  "layers": [
 		[
-		  "chips_can",
 		  null,
-          "milk_carton"
+		  "teddy_bear",
+          "candy_bag"
 		],
 		[
-		  null,
 		  "candy_bag",
-          "orange_juice_box"
+		  "teddy_bear",
+		  null
 		]
 	  ]
 	},
 	{
 	  "layers": [
-		[
-		  "candy_bag",
-		  "cupcake",
-          "orange_juice_box"
-		],
 		[
 		  "chocolate_bar",
-		  null,
-          "milk_carton"
-		]
-	  ]
-	},
-	{
-	  "layers": [
-		[
-		  "orange_juice_box",
 		  "milk_carton",
           "cupcake"
 		],
 		[
-		  "chips_can",
-		  "orange_juice_box",
-          "milk_carton"
+		  "teddy_bear",
+		  null,
+		  null
 		]
 	  ]
 	},
 	{
 	  "layers": [
 		[
+		  "cupcake",
+		  "milk_carton",
+          "chocolate_bar"
+		],
+		[
+		  "milk_carton",
+		  "teddy_bear",
+          "chocolate_bar"
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "toy_robot",
 		  "candy_bag",
+          "chocolate_bar"
+		],
+		[
+		  null,
+		  "candy_bag",
+          "toy_robot"
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "teddy_bear",
+		  "milk_carton",
+          "soda_bottle"
+		],
+		[
+		  "soda_bottle",
+		  "candy_bag",
+          "soda_bottle"
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "toy_robot",
+		  "soda_bottle",
+		  null
+		],
+		[
 		  "chocolate_bar",
+		  "toy_robot",
+          "toy_robot"
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  null,
+		  null,
 		  null
 		],
 		[
-		  "chips_can",
+		  "chocolate_bar",
 		  "soda_bottle",
-          "chips_can"
+          "cupcake"
 		]
 	  ]
 	},
 	{
 	  "layers": [
 		[
-		  "cupcake",
-		  "chips_can",
-		  null
-		],
-		[
-		  "candy_bag",
-		  null,
-          "chocolate_bar"
-		]
-	  ]
-	},
-	{
-	  "layers": [
-		[
-		  "orange_juice_box",
-		  null,
-          "chocolate_bar"
-		],
-		[
-		  null,
+		  "toy_robot",
 		  "candy_bag",
           "soda_bottle"
-		]
-	  ]
-	},
-	{
-	  "layers": [
-		[
-		  "soda_bottle",
-		  "candy_bag",
-		  null
-		],
-		[
-		  "cupcake",
-		  "cupcake",
-          "soda_bottle"
-		]
-	  ]
-	},
-	{
-	  "layers": [
-		[
-		  "chips_can",
-		  null,
-          "milk_carton"
 		],
 		[
 		  "cupcake",
 		  "milk_carton",
-          "orange_juice_box"
+		  null
 		]
 	  ]
 	},
 	{
 	  "layers": [
 		[
-		  "soda_bottle",
-		  "soda_bottle",
-          "chocolate_bar"
+		  "teddy_bear",
+		  "cupcake",
+		  null
 		],
 		[
-		  null,
-		  "chocolate_bar",
+		  "cupcake",
+		  "milk_carton",
 		  null
 		]
 	  ]

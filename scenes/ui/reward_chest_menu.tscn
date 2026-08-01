@@ -176,7 +176,6 @@ grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_outer_panel")
 
 [node name="TitleLabel" type="Label" parent="RewardChestPanel" unique_id=1178061668]
-theme_type_variation = &"GameTitleLabel"
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -185,6 +184,7 @@ offset_top = 20.0
 offset_right = -46.0
 offset_bottom = 82.0
 grow_horizontal = 2
+theme_type_variation = &"GameTitleLabel"
 theme_override_colors/font_color = Color(1, 0.95, 0.78, 1)
 theme_override_colors/font_shadow_color = Color(0.16, 0.04, 0.02, 0.92)
 theme_override_constants/shadow_offset_x = 0
@@ -288,7 +288,6 @@ max_value = 500.0
 show_percentage = false
 
 [node name="AmountLabel" type="Label" parent="RewardChestPanel/InnerPanel/ContentStack/ProgressRow/ProgressColumn/ProgressTrack" unique_id=100753000]
-theme_type_variation = &"GameNumberLabel"
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -296,6 +295,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_type_variation = &"GameNumberLabel"
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0.2, 0.07, 0.1, 0.8)
 theme_override_constants/shadow_offset_x = 0
@@ -314,8 +314,8 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="HeroBodyLabel" type="Label" parent="RewardChestPanel/InnerPanel/ContentStack" unique_id=734205756]
-theme_type_variation = &"GameBodyLabel"
 layout_mode = 2
+theme_type_variation = &"GameBodyLabel"
 theme_override_colors/font_color = Color(0.36078432, 0.16078432, 0.101960786, 1)
 theme_override_constants/shadow_offset_x = 0
 theme_override_constants/shadow_offset_y = 1
@@ -376,8 +376,8 @@ theme_override_constants/separation = 4
 alignment = 1
 
 [node name="HeroTitleLabel" type="Label" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage/TextOverlay/TextStack" unique_id=1203882086]
-theme_type_variation = &"GameSectionLabel"
 layout_mode = 2
+theme_type_variation = &"GameSectionLabel"
 theme_override_colors/font_color = Color(1, 0.95, 0.78, 1)
 theme_override_colors/font_shadow_color = Color(0.08, 0.02, 0.01, 0.9)
 theme_override_constants/shadow_offset_x = 0

@@ -14,52 +14,62 @@
 		"candy_bag",
 		"chocolate_bar",
 		"cupcake",
-        "ice_cream_cup"
-	  ]
-	},
-	{
-	  "from_level": 6,
-	  "unlock": [
+		"ice_cream_cup",
 		"ketchup_bottle",
 		"cereal_box",
 		"toy_unicorn",
 		"teddy_bear",
-        "toy_robot"
-	  ]
-	},
-	{
-	  "from_level": 9,
-	  "unlock": [
+		"toy_robot",
 		"plant_pot",
         "soap_pump"
 	  ]
 	},
 	{
-	  "from_level": 12,
+	  "from_level": 4,
 	  "unlock": [
 		"toothpaste_box",
 		"shampoo_bottle",
-		"canned_food",
+		"canned_food"
+	  ]
+	},
+	{
+	  "from_level": 7,
+	  "unlock": [
 		"jam_jar",
-        "gift_box"
+		"gift_box",
+		"orange_soda_bottle"
+	  ]
+	},
+	{
+	  "from_level": 10,
+	  "unlock": [
+		"wrapped_rainbow_lollipop",
+		"gummy_bears_bag",
+		"blue_cookie_box"
 	  ]
 	},
 	{
 	  "from_level": 15,
 	  "unlock": [
-		"orange_soda_bottle",
-		"wrapped_rainbow_lollipop",
-		"gummy_bears_bag",
-		"blue_cookie_box",
 		"rainbow_chocolate_bar",
 		"orange_yogurt_cup",
 		"grape_juice_box",
 		"rainbow_lollipop",
-		"green_smoothie_cup",
+		"green_smoothie_cup"
+	  ]
+	},
+	{
+	  "from_level": 20,
+	  "unlock": [
 		"blue_frozen_yogurt_cup",
 		"blueberry_jam_jar",
 		"rainbow_cereal_box",
-		"coffee_cup",
+		"coffee_cup"
+	  ]
+	},
+		{
+	  "from_level": 30,
+	  "unlock": [
 		"pink_ice_cream_tub",
 		"popcorn_box",
 		"strawberry_yogurt_cup",

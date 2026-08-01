@@ -74,7 +74,7 @@ func set_shop_locked(is_locked: bool, is_active_purchase: bool = false) -> void:
 
 
 func set_compact(is_compact: bool) -> void:
-	custom_minimum_size.y = 216.0 if is_compact else 246.0
+	custom_minimum_size.y = 246.0 if is_compact else 286.0
 
 
 func _emit_purchase() -> void:
