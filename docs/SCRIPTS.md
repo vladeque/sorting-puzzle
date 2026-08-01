@@ -136,29 +136,46 @@ Depends on:
 - Owns Shop loading/error states, creates reusable offer scenes, coordinates one purchase at a time, and routes the shared navigation.
 - Passes purchase results to `PlayerProgress.apply_shop_purchase()` and refreshes the visible balance after a grant.
 - Applies maximum content width, compact offer sizing, fixed bottom navigation, and mobile safe-area margins.
+- Owns the `ABILITY_INFO` display copy (name + one-line description) for Hammer/Shuffle/Lantern/
+  Freezer and shows it through `%PurchaseDialog` when a bundle card's `info_requested` signal fires.
 
 ## Shop component scripts
 
 - `scripts/shop_bundle_card.gd`: binds one bundle's title, Hammer/Shuffle/Lantern/Freezer/coin
-  rewards, formatted price, and purchase signal.
+  rewards, formatted price, and purchase signal. Also binds the optional discount ribbon/compare-at
+  price from `offer.discount_percent`/`offer.store.compare_at_formatted_price`, and emits
+  `info_requested(ability_id)` when a reward cell's transparent info button is tapped.
 - `scripts/shop_coin_offer_row.gd`: binds a coin quantity, formatted price, and purchase signal.
+  Also binds an optional `tag` banner (for example "BEST VALUE").
 - `scripts/coin_balance_widget.gd`: formats and displays a non-negative coin balance.
-- `scripts/shop_purchase_dialog.gd`: shows and dismisses a focused purchase result modal.
+- `scripts/shop_purchase_dialog.gd`: shows and dismisses a focused result modal; `show_result()`
+  takes an optional `button_text` (defaults to "Continue") so the same dialog reads correctly for
+  both purchase results and ability info lookups ("Got it").
 
 ## Store scripts
 
 - `scripts/store/store_provider.gd`: provider contract for product loading and purchase requests.
-- `scripts/store/mock_store_provider.gd`: resolves config prices for `application/config/mock_store_country` and returns unique mock transaction ids after a short asynchronous delay.
+- `scripts/store/mock_store_provider.gd`: resolves config prices for `application/config/mock_store_country` and returns unique mock transaction ids after a short asynchronous delay. Also resolves an offer's optional `compare_at_prices` into `compare_at_formatted_price` the same way it resolves `mock_prices` into `formatted_price`; omitted when the offer has no compare-at price.
 - `scripts/store/store_service.gd`: selects a catalog source via `application/config/shop_catalog_source` (`local` default or `backend`), joins its offers with `_provider` (always the mock provider), and returns normalized purchase results. `purchase_offer()`/pricing behavior is unchanged by the catalog source. This is the client replacement point for later platform integrations.
-- `scripts/store/backend_catalog_source.gd` (GAME-008): `shop_catalog_source=backend`'s offer source. Reads the authenticated backend development catalog (`GET /v1/catalog`) through the shared `BackendTransport`/`BackendReadOperations` (GAME-007), keeps only offers with `eligible: true`, maps the backend `type` enum to the UI's `bundle`/`coins` grouping, and joins each offer to `configs/backend/shop_catalog_prices.json` by `platform_product_id` for its display title and mock regional price via the same `MockStoreProvider.load_products()` the local catalog uses. Offers with an unrecognized type or no local price-table entry are silently excluded rather than rendered without a price. Any failed read (unavailable, unauthorized, malformed, or an empty local `backend_base_url`) falls back to `BackendCatalogCache`; only surfaces an error when no cache exists either.
+- `scripts/store/backend_catalog_source.gd` (GAME-008): `shop_catalog_source=backend`'s offer source. Reads the authenticated backend development catalog (`GET /v1/catalog`) through the shared `BackendTransport`/`BackendReadOperations` (GAME-007), keeps only offers with `eligible: true`, maps the backend `type` enum to the UI's `bundle`/`coins` grouping, and joins each offer to `configs/backend/shop_catalog_prices.json` by `platform_product_id` for its display title and mock regional price via the same `MockStoreProvider.load_products()` the local catalog uses. Also carries that presentation entry's optional `compare_at_prices` (through the same price-provider resolution), `discount_percent`, and `tag` onto the joined offer, so the Shop's discount ribbon and value tag work the same regardless of `shop_catalog_source`. Offers with an unrecognized type or no local price-table entry are silently excluded rather than rendered without a price. Any failed read (unavailable, unauthorized, malformed, or an empty local `backend_base_url`) falls back to `BackendCatalogCache`; only surfaces an error when no cache exists either.
 - `scripts/store/backend_catalog_cache.gd` (GAME-008): persists the last successfully joined/priced backend catalog to `user://shop_catalog_backend_cache.json` (offers/prices only, never a token or signature) for the offline-cache fallback above.
 
 ## `scripts/tools/verify_shop.gd`
 
 - Runs through `scenes/shop_verification.tscn` with an isolated test user-data directory.
 - Verifies US, Ukrainian, German, and Japanese mock price strings; five representative portrait
-  viewports; the five-reward starter layout; offer population; coin and bundle purchases including
-  three Freezers; and duplicate transaction protection.
+  viewports; the five-reward starter layout; offer population; the starter bundle's discount
+  ribbon/compare-at price and the `coins_3500` best-value tag (and that untagged offers stay
+  untagged); the ability info dialog opening with the right title when a reward icon is tapped;
+  coin and bundle purchases including three Freezers; and duplicate transaction protection.
+
+Run:
+
+```powershell
+& 'D:\Godot\godot.exe' --headless --path . scenes/shop_verification.tscn --user-data-dir <scratch-dir>
+```
+
+Prints `SHOP VERIFICATION PASSED` and exits `0` on success; otherwise prints each failed check and exits `1`.
 
 ## `scripts/leaderboard_row.gd`
 

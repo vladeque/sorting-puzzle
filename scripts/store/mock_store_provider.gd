@@ -37,18 +37,38 @@ func load_products(catalog_offers: Array) -> Dictionary:
 		if formatted_price.is_empty():
 			continue
 
-		products.append({
+		var product := {
 			"product_id": product_id,
 			"formatted_price": formatted_price,
 			"currency_code": str(price.get("currency_code", "")),
 			"country_code": _country_code,
-		})
+		}
+		var compare_at_formatted_price := _resolve_compare_at_price(offer)
+		if not compare_at_formatted_price.is_empty():
+			product["compare_at_formatted_price"] = compare_at_formatted_price
+		products.append(product)
 
 	return {
 		"ok": true,
 		"products": products,
 		"country_code": _country_code,
 	}
+
+
+## Resolves an optional "was" price shown struck through next to the real price. Purely
+## promotional presentation data authored alongside `mock_prices`; never store-authoritative and
+## safe to omit.
+func _resolve_compare_at_price(offer: Dictionary) -> String:
+	var compare_at_prices = offer.get("compare_at_prices", {})
+	if not (compare_at_prices is Dictionary):
+		return ""
+
+	var compare_at_map := compare_at_prices as Dictionary
+	var raw_price = compare_at_map.get(_country_code, compare_at_map.get(DEFAULT_COUNTRY_CODE, {}))
+	if not (raw_price is Dictionary):
+		return ""
+
+	return str((raw_price as Dictionary).get("formatted_price", ""))
 
 
 func purchase(product_id: String) -> Dictionary:

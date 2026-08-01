@@ -260,9 +260,19 @@ Rules:
   `highlight` as Lantern.
 - `mock_prices` is keyed by mock country code and contains the complete `formatted_price` plus ISO currency code. Missing regions fall back to `US` in the development provider.
 - Real providers must ignore `mock_prices` and display the formatted string returned by Google Play or the App Store.
+- `discount_percent` (optional, integer) and `compare_at_prices` (optional, same per-region
+  `formatted_price` shape as `mock_prices`) drive the Shop's "SAVE X%" ribbon and struck-through
+  "was" price on `shop_bundle_card.tscn`. Both are presentation-only promotional copy, authored by
+  the game team; they are never store-authoritative and an offer without them simply shows no
+  ribbon/compare price. `MockStoreProvider` resolves `compare_at_prices` into
+  `store.compare_at_formatted_price` the same way it resolves `mock_prices`.
+- `tag` (optional, string, e.g. `"BEST VALUE"`) shows a small banner on `shop_coin_offer_row.tscn`.
+  Also presentation-only; omit it for offers that shouldn't call out a tag.
 - Current mock catalog: one 3-hammer, 3-shuffle, 3-lantern, 3-freezer, 1,000-coin starter bundle
-  and five coin-only offers. Historic backend catalog versions without `freezer` remain valid and
-  parse as a zero-Freezer reward.
+  (67% off its authored `compare_at_prices`) and five coin-only offers, with `coins_3500` tagged
+  `BEST VALUE` as the best coins-per-dollar pack. Historic backend catalog versions without
+  `freezer`, `discount_percent`, `compare_at_prices`, or `tag` remain valid; the first parses as a
+  zero-Freezer reward and the rest simply show no promotional decoration.
 
 ## `user://save_v2/<namespace>/current.json`
 
@@ -453,6 +463,10 @@ Shape:
       "title": "Starter Bundle",
       "mock_prices": {
         "US": {"formatted_price": "$4.99", "currency_code": "USD"}
+      },
+      "discount_percent": 67,
+      "compare_at_prices": {
+        "US": {"formatted_price": "$14.99"}
       }
     }
   ]
@@ -462,6 +476,12 @@ Shape:
 Rules:
 - `platform_product_id` must match a `platform_product_id` value the backend's active development catalog actually returns (see `../sorting-puzzle-backend/contracts/configuration/v1/local-development-shop-catalog.json`, the seed `pnpm bootstrap:local` publishes).
 - `mock_prices` follows the exact same shape as `configs/shop_catalog.json`'s `mock_prices` and is formatted by the same `MockStoreProvider`.
+- `discount_percent`, `compare_at_prices`, and `tag` are optional and follow the same shape and
+  presentation-only semantics as their `configs/shop_catalog.json` counterparts.
+  `scripts/store/backend_catalog_source.gd` copies them onto the joined offer (`compare_at_prices`
+  through the same `MockStoreProvider` price resolution as `mock_prices`; `discount_percent`/`tag`
+  directly) so the Shop's discount ribbon and tag banner behave the same regardless of
+  `shop_catalog_source`. An entry that omits them simply shows no ribbon/tag.
 - A backend offer whose `platform_product_id` has no matching entry here is silently excluded from the Shop rather than shown without a price.
 - This file is never treated as an eligibility source; only the backend's `eligible: true` field decides whether an offer is shown.
 

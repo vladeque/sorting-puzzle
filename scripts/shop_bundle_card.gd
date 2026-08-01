@@ -2,14 +2,24 @@ extends PanelContainer
 class_name ShopBundleCard
 
 signal purchase_pressed(offer_id: StringName)
+signal info_requested(ability_id: StringName)
 
 @onready var _title_label := %TitleLabel as Label
+@onready var _discount_ribbon := %DiscountRibbon as Control
+@onready var _ribbon_label := %RibbonLabel as Label
+@onready var _compare_at_price_label := %CompareAtPriceLabel as RichTextLabel
 @onready var _hammer_count := %HammerCount as Label
 @onready var _shuffle_count := %ShuffleCount as Label
 @onready var _lantern_count := %LanternCount as Label
 @onready var _freezer_count := %FreezerCount as Label
 @onready var _coin_count := %CoinCount as Label
 @onready var _purchase_button := %PurchaseButton as Button
+@onready var _ability_info_buttons := {
+	&"hammer": %HammerInfoButton as Button,
+	&"shuffle": %ShuffleInfoButton as Button,
+	&"highlight": %LanternInfoButton as Button,
+	&"freezer": %FreezerInfoButton as Button,
+}
 
 var _offer_id := &""
 var _formatted_price := ""
@@ -17,6 +27,10 @@ var _formatted_price := ""
 
 func _ready() -> void:
 	_purchase_button.pressed.connect(_emit_purchase)
+	for ability_id in _ability_info_buttons:
+		var button := _ability_info_buttons[ability_id] as Button
+		if button != null:
+			button.pressed.connect(info_requested.emit.bind(ability_id))
 
 
 func set_offer(offer: Dictionary) -> void:
@@ -32,6 +46,16 @@ func set_offer(offer: Dictionary) -> void:
 	var store := offer.get("store", {}) as Dictionary
 	_formatted_price = str(store.get("formatted_price", "Unavailable"))
 	_purchase_button.text = _formatted_price
+
+	var discount_percent := maxi(int(offer.get("discount_percent", 0)), 0)
+	_discount_ribbon.visible = discount_percent > 0
+	if discount_percent > 0:
+		_ribbon_label.text = "SAVE %d%%" % discount_percent
+
+	var compare_at_price := str(store.get("compare_at_formatted_price", ""))
+	_compare_at_price_label.visible = not compare_at_price.is_empty()
+	if not compare_at_price.is_empty():
+		_compare_at_price_label.text = "[center][s]%s[/s][/center]" % compare_at_price
 
 
 func get_offer_id() -> StringName:

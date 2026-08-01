@@ -11,6 +11,24 @@ const CONTENT_TOP_MARGIN := 18.0
 const CONTENT_BOTTOM_GAP := 12.0
 const BOTTOM_NAVIGATION_HEIGHT := 96.0
 const COMPACT_VIEWPORT_HEIGHT := 1100.0
+const ABILITY_INFO := {
+	&"hammer": {
+		"name": "Hammer",
+		"description": "Instantly clears one matching set of items off the shelves.",
+	},
+	&"shuffle": {
+		"name": "Shuffle",
+		"description": "Shuffles shelf items into new spots to help you find a match.",
+	},
+	&"highlight": {
+		"name": "Lantern",
+		"description": "Highlights a matching triple you can clear for 15 seconds.",
+	},
+	&"freezer": {
+		"name": "Freezer",
+		"description": "Freezes the level timer for 30 seconds.",
+	},
+}
 
 @onready var _content_margin := %ContentMargin as MarginContainer
 @onready var _title_label := %TitleLabel as Label
@@ -86,7 +104,17 @@ func _add_bundle_offer(offer: Dictionary) -> void:
 	_bundles_container.add_child(card)
 	card.call("set_offer", offer)
 	card.connect("purchase_pressed", Callable(self, "_purchase_offer"))
+	card.connect("info_requested", Callable(self, "_show_ability_info"))
 	_offer_views.append(card)
+
+
+func _show_ability_info(ability_id: StringName) -> void:
+	var info: Dictionary = ABILITY_INFO.get(ability_id, {})
+	if info.is_empty():
+		return
+	_purchase_dialog.call(
+		"show_result", str(info.get("name", "")), str(info.get("description", "")), "Got it"
+	)
 
 
 func _add_coin_offer(offer: Dictionary) -> void:

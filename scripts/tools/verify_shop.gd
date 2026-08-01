@@ -44,6 +44,46 @@ func _run() -> void:
 		(bundle_card.get_node("%FreezerCount") as Label).text == "×3",
 		"Starter bundle card does not show three Freezers."
 	)
+	_check(
+		(bundle_card.get_node("%DiscountRibbon") as Control).visible,
+		"Starter bundle discount ribbon did not show for a discounted offer."
+	)
+	_check(
+		(bundle_card.get_node("%RibbonLabel") as Label).text == "SAVE 67%",
+		"Starter bundle discount ribbon text is wrong."
+	)
+	_check(
+		(bundle_card.get_node("%CompareAtPriceLabel") as Control).visible,
+		"Starter bundle compare-at price did not show for a discounted offer."
+	)
+
+	var best_value_row := _find_coin_offer_row(coin_offers, &"coins_3500")
+	_check(best_value_row != null, "Could not find the coins_3500 row to check its tag.")
+	if best_value_row != null:
+		_check(
+			(best_value_row.get_node("%TagBanner") as Control).visible,
+			"coins_3500 should show a BEST VALUE tag."
+		)
+		_check(
+			(best_value_row.get_node("%TagLabel") as Label).text == "BEST VALUE",
+			"coins_3500 tag text is wrong."
+		)
+	var other_row := _find_coin_offer_row(coin_offers, &"coins_100")
+	_check(other_row != null, "Could not find the coins_100 row to check its tag.")
+	if other_row != null:
+		_check(
+			not (other_row.get_node("%TagBanner") as Control).visible,
+			"coins_100 should not show a value tag."
+		)
+
+	var dialog := shop.get_node("%PurchaseDialog") as Control
+	(bundle_card.get_node("%HammerInfoButton") as Button).emit_signal("pressed")
+	_check(dialog.visible, "Tapping the Hammer icon did not open the info dialog.")
+	_check(
+		(dialog.get_node("%TitleLabel") as Label).text == "HAMMER",
+		"Hammer info dialog title is wrong."
+	)
+	dialog.hide()
 
 	for resolution in TEST_RESOLUTIONS:
 		get_tree().root.size = resolution
@@ -122,6 +162,13 @@ func _verify_regional_prices() -> void:
 			str(store.get("formatted_price", "")) == TEST_REGIONS[country_code],
 			"Unexpected mock price for %s." % country_code
 		)
+
+
+func _find_coin_offer_row(coin_offers: VBoxContainer, offer_id: StringName) -> Control:
+	for child in coin_offers.get_children():
+		if child is Control and (child as Control).call("get_offer_id") == offer_id:
+			return child as Control
+	return null
 
 
 func _find_offer(offers: Array, offer_id: String) -> Dictionary:

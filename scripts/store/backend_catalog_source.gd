@@ -96,6 +96,7 @@ func _join_offers(offers: Array, price_provider) -> Dictionary:
 		priceable.append({
 			"product_id": product_id,
 			"mock_prices": (presentation_entry as Dictionary).get("mock_prices", {}),
+			"compare_at_prices": (presentation_entry as Dictionary).get("compare_at_prices", {}),
 		})
 
 	var product_result: Dictionary = await price_provider.load_products(priceable)
@@ -117,14 +118,21 @@ func _join_offers(offers: Array, price_provider) -> Dictionary:
 			continue
 
 		var presentation_entry := entry.get("presentation") as Dictionary
-		joined.append({
+		var joined_offer := {
 			"id": str(offer.get("offer_id", "")),
 			"product_id": product_id,
 			"type": str(entry.get("ui_type", "")),
 			"title": str(presentation_entry.get("title", "")),
 			"rewards": (offer.get("rewards", {}) as Dictionary).duplicate(true),
 			"store": (product as Dictionary).duplicate(true),
-		})
+		}
+		var discount_percent := int(presentation_entry.get("discount_percent", 0))
+		if discount_percent > 0:
+			joined_offer["discount_percent"] = discount_percent
+		var tag := str(presentation_entry.get("tag", ""))
+		if not tag.is_empty():
+			joined_offer["tag"] = tag
+		joined.append(joined_offer)
 
 	return {
 		"ok": true,
@@ -164,7 +172,14 @@ func _load_presentation() -> Dictionary:
 		var mock_prices = entry.get("mock_prices", {})
 		if product_id.is_empty() or title.is_empty() or not (mock_prices is Dictionary):
 			continue
-		by_product_id[product_id] = {"title": title, "mock_prices": mock_prices}
+		var compare_at_prices = entry.get("compare_at_prices", {})
+		by_product_id[product_id] = {
+			"title": title,
+			"mock_prices": mock_prices,
+			"compare_at_prices": compare_at_prices if compare_at_prices is Dictionary else {},
+			"discount_percent": int(entry.get("discount_percent", 0)),
+			"tag": str(entry.get("tag", "")),
+		}
 	return by_product_id
 
 

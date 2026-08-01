@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/shop_coin_offer_row.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://assets/ui/clover_coin_transparent_96x96.png" id="2_coin"]
@@ -21,6 +21,22 @@ content_margin_left = 12.0
 content_margin_top = 8.0
 content_margin_right = 12.0
 content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tag"]
+bg_color = Color(0.94, 0.44, 0.19, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 3
+border_color = Color(1, 0.79, 0.39, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+content_margin_left = 10.0
+content_margin_top = 3.0
+content_margin_right = 10.0
+content_margin_bottom = 4.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button"]
 bg_color = Color(0.24, 0.7, 0.22, 1)
@@ -57,18 +73,40 @@ layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_row")
 script = ExtResource("1_script")
 
-[node name="Content" type="HBoxContainer" parent="."]
+[node name="RowStack" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TagBanner" type="PanelContainer" parent="RowStack"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_tag")
+
+[node name="TagLabel" type="Label" parent="RowStack/TagBanner"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.1, 0.01, 0.02, 1)
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 16
+text = "BEST VALUE"
+horizontal_alignment = 1
+
+[node name="Content" type="HBoxContainer" parent="RowStack"]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="CoinIcon" type="TextureRect" parent="Content"]
+[node name="CoinIcon" type="TextureRect" parent="RowStack/Content"]
 custom_minimum_size = Vector2(82, 82)
 layout_mode = 2
 texture = ExtResource("2_coin")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="AmountLabel" type="Label" parent="Content"]
+[node name="AmountLabel" type="Label" parent="RowStack/Content"]
 theme_type_variation = &"GameNumberLabel"
 unique_name_in_owner = true
 layout_mode = 2
@@ -80,7 +118,7 @@ theme_override_font_sizes/font_size = 34
 text = "100"
 vertical_alignment = 1
 
-[node name="PurchaseButton" type="Button" parent="Content"]
+[node name="PurchaseButton" type="Button" parent="RowStack/Content"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(178, 64)
 layout_mode = 2

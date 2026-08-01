@@ -130,13 +130,19 @@ Runtime children:
 - Reusable full-width featured offer card with title, purchase button, and fixed reward cells for
   Hammer, Shuffle, Lantern (`highlight` internally), Freezer, and coins.
 - The scene owns reward art and styling; `scripts/shop_bundle_card.gd` binds quantities and the store-formatted price.
-- The Freezer reward cell uses an explicit art-review placeholder until the generated icon
-  candidate is approved; no generated artwork is referenced yet.
+- An optional `DiscountRibbon` strip above the header and a struck-through `CompareAtPriceLabel`
+  above the purchase button show a "SAVE X%" callout and "was" price; both stay hidden when the
+  bound offer has no `discount_percent`/`compare_at_formatted_price`.
+- Each of the four ability reward cells (not coins) carries a transparent full-cell `*InfoButton`
+  overlay so tapping the icon emits `ShopBundleCard.info_requested(ability_id)`; a small `InfoHint`
+  caption below the rewards row tells the player they can tap for details.
 
 ## `scenes/ui/shop_coin_offer_row.tscn`
 
 - Reusable compact row with coin art, formatted coin quantity, and store-formatted purchase button.
 - `scripts/shop_coin_offer_row.gd` emits the bound offer id without granting rewards itself.
+- An optional `TagBanner` pill above the row content shows a short promotional tag (for example
+  "BEST VALUE"); it stays hidden when the bound offer has no `tag`.
 
 ## `scenes/ui/coin_balance_widget.tscn`
 
@@ -144,14 +150,16 @@ Runtime children:
 
 ## `scenes/ui/shop_purchase_dialog.tscn`
 
-- Dedicated modal overlay for mock purchase success and error results.
+- Dedicated modal overlay for mock purchase success/error results and ability info lookups (a
+  titled message with a configurable close-button label).
 - Keeps dialog hierarchy and button wiring out of `shop_screen.gd`.
 
 ## `scenes/shop_verification.tscn`
 
 - Automated verification entry scene for regional prices, required viewport sizes, five-cell
-  starter reward layout, offer counts, mock grants (including three Freezers), purchase dialog
-  display, and duplicate-transaction handling.
+  starter reward layout, offer counts, the starter bundle's discount ribbon/compare-at price, the
+  best-value coin tag, the ability info dialog, mock grants (including three Freezers), purchase
+  dialog display, and duplicate-transaction handling.
 
 ## `scenes/ui/main_menu_reward_coin_flyer.tscn`
 

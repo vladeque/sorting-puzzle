@@ -3,6 +3,8 @@ class_name ShopCoinOfferRow
 
 signal purchase_pressed(offer_id: StringName)
 
+@onready var _tag_banner := %TagBanner as Control
+@onready var _tag_label := %TagLabel as Label
 @onready var _amount_label := %AmountLabel as Label
 @onready var _purchase_button := %PurchaseButton as Button
 
@@ -21,6 +23,11 @@ func set_offer(offer: Dictionary) -> void:
 	var store := offer.get("store", {}) as Dictionary
 	_formatted_price = str(store.get("formatted_price", "Unavailable"))
 	_purchase_button.text = _formatted_price
+
+	var tag := str(offer.get("tag", ""))
+	_tag_banner.visible = not tag.is_empty()
+	if not tag.is_empty():
+		_tag_label.text = tag
 
 
 func get_offer_id() -> StringName:

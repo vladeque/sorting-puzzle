@@ -8,6 +8,13 @@
         "UA": {"formatted_price": "₴199.99", "currency_code": "UAH"},
         "DE": {"formatted_price": "4,99 €", "currency_code": "EUR"},
         "JP": {"formatted_price": "¥800", "currency_code": "JPY"}
+      },
+      "discount_percent": 67,
+      "compare_at_prices": {
+        "US": {"formatted_price": "$14.99"},
+        "UA": {"formatted_price": "₴599.99"},
+        "DE": {"formatted_price": "14,99 €"},
+        "JP": {"formatted_price": "¥2,400"}
       }
     },
     {

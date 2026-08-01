@@ -10,7 +10,8 @@ func _ready() -> void:
 	_close_button.pressed.connect(hide)
 
 
-func show_result(title: String, message: String) -> void:
+func show_result(title: String, message: String, button_text: String = "Continue") -> void:
 	_title_label.text = title.to_upper()
 	_message_label.text = message
+	_close_button.text = button_text
 	show()
