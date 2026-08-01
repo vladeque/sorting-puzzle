@@ -6,7 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://dwmyah5l2r82d" path="res://assets/abilities/ability_lantern.png" id="4_lantern"]
 [ext_resource type="Texture2D" uid="uid://ce5g86tlfcvli" path="res://assets/ui/clover_coin_transparent_96x96.png" id="5_coin"]
 [ext_resource type="Texture2D" uid="uid://x6rx0xrv78dw" path="res://assets/abilities/ice_clock_icon_256x256.png" id="5_d3y3u"]
-[ext_resource type="Texture2D" path="res://assets/ui/discount_badge_pinned.png" id="6_discount_badge"]
+[ext_resource type="Texture2D" uid="uid://nm6j8p75d3hn" path="res://assets/ui/discount_badge_pinned.png" id="6_discount_badge"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
 content_margin_left = 18.0
@@ -356,14 +356,14 @@ visible = false
 layout_mode = 1
 anchors_preset = 0
 offset_left = -22.0
-offset_top = -32.0
+offset_top = -22.0
 offset_right = 54.0
-offset_bottom = 72.0
+offset_bottom = 82.0
 rotation = -0.10471976
 pivot_offset = Vector2(38, 52)
 mouse_filter = 2
 
-[node name="BadgeTexture" type="TextureRect" parent="CardBody/DiscountBadge"]
+[node name="BadgeTexture" type="TextureRect" parent="CardBody/DiscountBadge" unique_id=764262293]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
