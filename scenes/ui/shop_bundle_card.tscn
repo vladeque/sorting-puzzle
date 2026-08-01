@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://dwmyah5l2r82d" path="res://assets/abilities/ability_lantern.png" id="4_lantern"]
 [ext_resource type="Texture2D" uid="uid://ce5g86tlfcvli" path="res://assets/ui/clover_coin_transparent_96x96.png" id="5_coin"]
 [ext_resource type="Texture2D" uid="uid://x6rx0xrv78dw" path="res://assets/abilities/ice_clock_icon_256x256.png" id="5_d3y3u"]
+[ext_resource type="Texture2D" path="res://assets/ui/discount_badge_pinned.png" id="6_discount_badge"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
 content_margin_left = 18.0
@@ -70,28 +71,6 @@ corner_radius_top_left = 15
 corner_radius_top_right = 15
 corner_radius_bottom_right = 15
 corner_radius_bottom_left = 15
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_burst"]
-bg_color = Color(0.86, 0.14, 0.16, 1)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_circle"]
-bg_color = Color(0.86, 0.14, 0.16, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(1, 0.85, 0.35, 1)
-corner_radius_top_left = 30
-corner_radius_top_right = 30
-corner_radius_bottom_right = 30
-corner_radius_bottom_left = 30
-shadow_color = Color(0.08, 0.01, 0.02, 0.45)
-shadow_size = 5
-shadow_offset = Vector2(0, 3)
 
 [node name="ShopBundleCard" type="PanelContainer" unique_id=1914459394]
 custom_minimum_size = Vector2(0, 246)
@@ -377,13 +356,14 @@ visible = false
 layout_mode = 1
 anchors_preset = 0
 offset_left = -22.0
-offset_top = -22.0
+offset_top = -32.0
 offset_right = 54.0
-offset_bottom = 54.0
-rotation = -0.20943952
+offset_bottom = 72.0
+rotation = -0.10471976
+pivot_offset = Vector2(38, 52)
 mouse_filter = 2
 
-[node name="BurstA" type="Panel" parent="CardBody/DiscountBadge" unique_id=989591050]
+[node name="BadgeTexture" type="TextureRect" parent="CardBody/DiscountBadge"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -391,60 +371,42 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_burst")
+texture = ExtResource("6_discount_badge")
+expand_mode = 1
+stretch_mode = 5
 
-[node name="BurstB" type="Panel" parent="CardBody/DiscountBadge" unique_id=1608238292]
+[node name="TextStack" type="VBoxContainer" parent="CardBody/DiscountBadge" unique_id=1788611370]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-rotation = 0.7853982
-pivot_offset = Vector2(38, 38)
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_burst")
-
-[node name="CircleBadge" type="Panel" parent="CardBody/DiscountBadge" unique_id=1916168212]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 8.0
-offset_top = 8.0
-offset_right = -8.0
-offset_bottom = -8.0
+offset_left = 7.0
+offset_top = 24.0
+offset_right = -7.0
+offset_bottom = -10.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_circle")
-
-[node name="TextStack" type="VBoxContainer" parent="CardBody/DiscountBadge/CircleBadge" unique_id=1788611370]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-theme_override_constants/separation = -2
+theme_override_constants/separation = -3
 alignment = 1
 
-[node name="PercentLabel" type="Label" parent="CardBody/DiscountBadge/CircleBadge/TextStack" unique_id=1012362863]
+[node name="PercentLabel" type="Label" parent="CardBody/DiscountBadge/TextStack" unique_id=1012362863]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_shadow_color = Color(0.3, 0.02, 0.02, 1)
-theme_override_constants/shadow_offset_y = 1
-theme_override_font_sizes/font_size = 19
+theme_override_colors/font_shadow_color = Color(0.28, 0.02, 0.02, 0.95)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 20
 text = "67%"
 horizontal_alignment = 1
 
-[node name="OffLabel" type="Label" parent="CardBody/DiscountBadge/CircleBadge/TextStack" unique_id=1116133802]
+[node name="OffLabel" type="Label" parent="CardBody/DiscountBadge/TextStack" unique_id=1116133802]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_shadow_color = Color(0.3, 0.02, 0.02, 1)
-theme_override_constants/shadow_offset_y = 1
-theme_override_font_sizes/font_size = 13
+theme_override_colors/font_shadow_color = Color(0.28, 0.02, 0.02, 0.95)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 14
 text = "OFF"
 horizontal_alignment = 1

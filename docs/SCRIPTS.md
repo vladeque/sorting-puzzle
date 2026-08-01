@@ -166,10 +166,11 @@ Depends on:
 
 - Runs through `scenes/shop_verification.tscn` with an isolated test user-data directory.
 - Verifies US, Ukrainian, German, and Japanese mock price strings; five representative portrait
-  viewports; the five-reward starter layout (coins first) and its discount badge/compare-at price;
-  offer population; the `coins_3500` best-value tag (and that untagged offers stay untagged); the
-  ability info dialog opening with the right title when a reward icon is tapped; coin and bundle
-  purchases including three Freezers; and duplicate transaction protection.
+  viewports; the five-reward starter layout (coins first), its loaded discount badge texture, and
+  compare-at price; offer population; the `coins_3500` best-value tag (and that untagged offers
+  stay untagged); the ability info dialog opening with the right title when a reward icon is
+  tapped; coin and bundle purchases including three Freezers; and duplicate transaction
+  protection.
 
 Run:
 

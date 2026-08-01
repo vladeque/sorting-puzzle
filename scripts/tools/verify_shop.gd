@@ -49,6 +49,10 @@ func _run() -> void:
 		"Starter bundle discount badge did not show for a discounted offer."
 	)
 	_check(
+		(bundle_card.get_node("CardBody/DiscountBadge/BadgeTexture") as TextureRect).texture != null,
+		"Starter bundle discount badge texture did not load."
+	)
+	_check(
 		(bundle_card.get_node("%PercentLabel") as Label).text == "67%",
 		"Starter bundle discount badge percent text is wrong."
 	)

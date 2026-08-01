@@ -134,9 +134,10 @@ Runtime children:
 - The root is `ShopBundleCard(PanelContainer) > CardBody(Control) > [CardStack, DiscountBadge]` so
   `DiscountBadge` can overlap the card's top-left corner instead of being confined to `CardStack`'s
   normal vertical flow.
-- `DiscountBadge` is a rotated starburst sticker (two overlapping rounded squares behind a
-  gold-bordered circle) showing "X% / OFF"; a struck-through `CompareAtPriceLabel` above the
-  purchase button shows the "was" price. Both stay hidden when the bound offer has no
+- `DiscountBadge` is a slightly rotated, pinned red-and-gold tag using
+  `assets/ui/discount_badge_pinned.png`, with live Godot labels showing "X% / OFF" so catalog
+  discounts remain dynamic; a struck-through `CompareAtPriceLabel` above the purchase button
+  shows the "was" price. Both stay hidden when the bound offer has no
   `discount_percent`/`compare_at_formatted_price`. A `TitleSpacer` before the title label is widened
   by `scripts/shop_bundle_card.gd` whenever the badge is showing, so the badge never overlaps the
   bundle title text.
