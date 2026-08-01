@@ -83,16 +83,6 @@
 	  "texture": "res://assets/items/item_toy_robot.png"
 	},
 	{
-	  "id": "golden_cat_figurine",
-	  "category": "figurine",
-	  "texture": "res://assets/items/item_golden_cat_figurine.png"
-	},
-	{
-	  "id": "rubber_duck",
-	  "category": "toy",
-	  "texture": "res://assets/items/item_rubber_duck.png"
-	},
-	{
 	  "id": "plant_pot",
 	  "category": "everyday",
 	  "texture": "res://assets/items/item_plant_pot.png"
