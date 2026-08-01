@@ -120,7 +120,9 @@ Attached to:
 
 Purpose:
 - Owns Weekly, Country, and World selection and asynchronous provider requests.
-- Builds ranking rows from provider dictionaries and pins the local player when absent from the returned top 50.
+- Builds ranking rows from provider dictionaries and pins the local player via `%PinnedPlayerRow`
+  when absent from the returned entries or ranked beyond `PINNED_ROW_RANK_THRESHOLD` (10) -- being
+  technically present on a 50-row page doesn't mean the player is visible without scrolling.
 - Updates the weekly reset countdown and loading, empty, and retry states.
 - Applies responsive content width, compact row sizing, bottom-navigation placement, and mobile safe-area margins.
 - Routes the shared Home tab back to `scenes/main_menu.tscn`.
@@ -191,7 +193,9 @@ Attached to:
 Purpose:
 - Binds one provider entry to rank, avatar, display name, and comma-formatted star score controls.
 - Toggles the scene-authored current-player highlight.
-- Applies compact or regular row and font sizing.
+- Toggles the scene-authored gold/silver/bronze `RankSlot` medal circle for rank 1/2/3 and switches
+  `RankLabel` between a bare number (top 3) and "#N" (rank 4+).
+- Applies compact or regular row and font sizing, including `RankSlot`'s size to match the avatar.
 
 ## `scripts/leaderboards/leaderboard_provider.gd`
 

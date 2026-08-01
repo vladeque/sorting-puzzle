@@ -71,7 +71,7 @@ Purpose:
 - Owns the dedicated leaderboard destination reached from the production menu trophy tab.
 - Shows the required `Leaderboard` title and Weekly, Country, and World segmented buttons.
 - Gives the central `LeaderboardScroll` the remaining vertical space between the tabs and the reusable bottom navigation.
-- Builds up to 50 mock ranking rows in `RowsContainer` and keeps the local player visible through `PinnedPlayerRow` when outside that range.
+- Builds up to 50 mock ranking rows in `RowsContainer` and keeps the local player visible through `PinnedPlayerRow` whenever their rank is absent or beyond the "visible without scrolling" threshold.
 - Shows a weekly reset countdown, all-time scope descriptions, loading state, empty state, and retryable error state.
 - Centers content to a 720-pixel maximum logical width, compacts rows on short viewports, and applies Android/iOS safe-area padding.
 
@@ -101,6 +101,10 @@ Script:
 Purpose:
 - Reusable ranking entry with rank, circular-clipped avatar, ellipsized player name, reward-star icon, and formatted score.
 - Keeps normal cream row art and the green local-player highlight authored in the scene.
+- `RankSlot` layers three hidden gold/silver/bronze medal circles behind `RankLabel`; exactly one
+  shows for rank 1/2/3 (with the label reading a bare "1"/"2"/"3"), none for rank 4+ (label reads
+  "#4" as before). Independent of the current-player highlight, so a top-3 row that is also the
+  local player shows both.
 - Supports regular and compact heights selected by the owning leaderboard screen.
 
 Depends on:

@@ -11,7 +11,9 @@ Scopes with the default `mock` provider:
 
 Scopes with `backend`: all three scopes read `GET /v1/leaderboards/{scope}` from the authenticated backend; see "Backend provider (GAME-009)" below.
 
-The provider returns up to 50 entries plus the current player's entry. If the player is not in the returned range, the screen pins the highlighted player row above the bottom navigation.
+The provider returns up to 50 entries plus the current player's entry. `leaderboard_screen.gd` pins the highlighted player row above the bottom navigation whenever the player is absent from the returned entries *or* their rank is beyond `PINNED_ROW_RANK_THRESHOLD` (10, approximating how many rows are visible without scrolling on the reference viewport) -- being technically present on a 50-row page is not the same as being visible without scrolling, so rank alone decides pin visibility for anyone buried past the fold.
+
+Ranks 1-3 additionally get a gold/silver/bronze medal circle behind the rank number (`scenes/ui/leaderboard_row.tscn`'s `RankSlot`, toggled by `scripts/leaderboard_row.gd`), independent of the current-player highlight so a top-3 row that's also the local player shows both cues at once.
 
 ## Score ownership
 
