@@ -33,6 +33,7 @@ const LIFE_STATUS_REFRESH_SECONDS := 1.0
 @onready var _bottom_bar := %BottomBar as MarginContainer
 @onready var _level_button := %LevelButton as Button
 @onready var _bottom_navigation := %BottomNavigation as MarginContainer
+@onready var _leaderboard_reward_dialog := %LeaderboardRewardDialog as Control
 @onready var _top_status := %TopStatusBar.get_node("MainMenuTopStatus") as HBoxContainer
 @onready var _profile_button := %TopStatusBar.get_node("MainMenuTopStatus/ProfileWidget") as Button
 @onready var _settings_button := %TopStatusBar.get_node("MainMenuTopStatus/SettingsWidget/SettingsButton") as Button
@@ -53,6 +54,7 @@ func _ready() -> void:
 	PlayerProgress.load_progress()
 	PlayerProgress.refresh_lives()
 	var pending_reward_animation := PlayerProgress.consume_pending_reward_chest_animation()
+	var pending_leaderboard_reward := PlayerProgress.consume_pending_leaderboard_reward()
 	_level_button.pressed.connect(_launch_campaign_level)
 	_profile_button.pressed.connect(_open_profile_menu)
 	_settings_button.pressed.connect(_open_settings_menu)
@@ -74,6 +76,12 @@ func _ready() -> void:
 	_apply_responsive_layout()
 	if not pending_reward_animation.is_empty():
 		_play_pending_reward_animation.call_deferred(pending_reward_animation)
+	if not pending_leaderboard_reward.is_empty():
+		_leaderboard_reward_dialog.call(
+			"show_reward",
+			int(pending_leaderboard_reward.get("rank", 0)),
+			int(pending_leaderboard_reward.get("coin_reward", 0))
+		)
 
 
 func _process(delta: float) -> void:

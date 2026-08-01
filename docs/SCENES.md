@@ -29,6 +29,8 @@ Purpose:
 - Starts the saved campaign level when the bottom button is pressed.
 - Opens `scenes/ui/leaderboard_screen.tscn` when the bottom navigation trophy is pressed.
 - Opens `scenes/ui/shop_screen.tscn` when the bottom navigation cart is pressed.
+- Shows `LeaderboardRewardDialog` on launch when a weekly leaderboard rollover granted a reward
+  since the app was last opened.
 
 Important nodes:
 - `Background`: fullscreen `TextureRect` using `assets/backgrounds/main_menu.jpeg`.
@@ -38,6 +40,8 @@ Important nodes:
 - `RewardCoinFlyer`: fullscreen `scenes/ui/main_menu_reward_coin_flyer.tscn` effect layer.
 - `BottomBar`: bottom-anchored responsive container for the play button.
 - `BottomBar/LevelButton`: `scenes/ui/level_button.tscn` instance that launches the saved campaign level.
+- `LeaderboardRewardDialog`: `scenes/ui/leaderboard_reward_dialog.tscn` instance, hidden until a
+  weekly reward is pending.
 - Runtime child `scenes/ui/profile_menu.tscn`: centered pause-style profile editor window created when `ProfileWidget` is pressed.
 - Runtime child `scenes/ui/settings_menu.tscn`: centered pause-style settings window created when `SettingsWidget/SettingsButton` is pressed.
 - Runtime child `scenes/ui/reward_chest_menu.tscn`: centered pause-style reward chest detail modal created when the `RewardChest` widget emits `chest_pressed`.
@@ -53,6 +57,7 @@ Depends on:
 - `scenes/ui/settings_menu.tscn` for the main-menu settings popup.
 - `scenes/ui/reward_chest_menu.tscn` for the reward chest detail modal.
 - `scenes/ui/level_button.tscn` for the reusable production level button visuals.
+- `scenes/ui/leaderboard_reward_dialog.tscn` for the weekly reward notification.
 - `scenes/ui/leaderboard_screen.tscn` for the dedicated ranking destination.
 
 Do not use for:
@@ -78,6 +83,8 @@ Purpose:
 Important nodes:
 - `%WeeklyButton`, `%CountryButton`, `%WorldButton`: leaderboard scope controls.
 - `%PeriodLabel`: weekly countdown or all-time scope description.
+- `%RewardTiersLabel`: Weekly-only summary of `PlayerProgress.get_leaderboard_reward_tiers()`, for
+  example "Weekly rewards — #1: 500 coins · #2-3: 300 coins · ...". Hidden on Country/World.
 - `%LeaderboardScroll`: vertical-only ranking list.
 - `%RowsContainer`: runtime parent for reusable row instances.
 - `%StatusContainer`, `%StatusLabel`, `%RetryButton`: loading, empty, and error presentation.
@@ -111,6 +118,20 @@ Depends on:
 - `assets/ui/avatars/*.png`.
 - `assets/ui/avatar_circle_clip.gdshader`.
 - `assets/ui/reward_star_34_glossy_b.png`.
+
+## `scenes/ui/leaderboard_reward_dialog.tscn`
+
+Root:
+- `LeaderboardRewardDialog` (`Control`)
+
+Script:
+- `scripts/leaderboard_reward_dialog.gd`
+
+Purpose:
+- Dedicated modal overlay announcing a granted weekly leaderboard reward, structurally identical
+  to `scenes/ui/shop_purchase_dialog.tscn` (title/message/close) but kept as its own scene since
+  it lives on the main menu, not the Shop.
+- Instantiated once as `main_menu.tscn`'s `%LeaderboardRewardDialog`.
 
 ## `scenes/ui/shop_screen.tscn`
 

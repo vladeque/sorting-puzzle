@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://c6xhf1gyqk2tr" path="res://scenes/ui/main_menu_reward_chest.tscn" id="5_reward_chest"]
 [ext_resource type="PackedScene" path="res://scenes/ui/main_menu_reward_coin_flyer.tscn" id="6_reward_coin_flyer"]
 [ext_resource type="PackedScene" uid="uid://cuq4oceh2x5if" path="res://scenes/ui/main_menu_bottom_navigation.tscn" id="7_bottom_navigation"]
+[ext_resource type="PackedScene" path="res://scenes/ui/leaderboard_reward_dialog.tscn" id="8_leaderboard_reward_dialog"]
 
 [node name="ProductionMainMenu" type="Control" unique_id=1235428546]
 layout_mode = 3
@@ -93,3 +94,7 @@ offset_left = -1.0
 offset_top = -25.0
 offset_right = -1.0
 offset_bottom = -25.0
+
+[node name="LeaderboardRewardDialog" parent="." instance=ExtResource("8_leaderboard_reward_dialog")]
+unique_name_in_owner = true
+layout_mode = 1

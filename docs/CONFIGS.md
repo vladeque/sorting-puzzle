@@ -228,6 +228,37 @@ Rules:
 - When saved chest stars reach the active goal, the configured coin reward is added to the player's saved coins, the goal starts over with remaining stars carried forward, and the next configured goal becomes active.
 - After the final configured goal is reached, the final goal value repeats.
 
+## `configs/leaderboard_reward_tiers.json`
+
+Purpose:
+- Defines the coin reward paid out for a Weekly leaderboard rank range when the leaderboard week
+  rolls over.
+- Owned by `scripts/player_progress.gd`, which loads the tier ladder and falls back to built-in
+  defaults if the file is missing or invalid. Also drives `leaderboard_screen.gd`'s `%RewardTiersLabel`
+  summary, so the displayed promise and the actual payout always read from the same source.
+
+Shape:
+
+```json
+{
+  "tiers": [
+    { "min_rank": 1, "max_rank": 1, "coin_reward": 500 },
+    { "min_rank": 2, "max_rank": 3, "coin_reward": 300 }
+  ]
+}
+```
+
+Rules:
+- `tiers` must be an ordered list of objects with `min_rank <= max_rank` and a positive `coin_reward`;
+  invalid entries are dropped.
+- A rank is paid the `coin_reward` of the first tier whose `[min_rank, max_rank]` range contains it;
+  a rank matching no tier gets nothing.
+- Ranks are **locally observed, not backend-verified**: `record_weekly_leaderboard_rank()` tracks the
+  best Weekly rank `leaderboard_screen.gd` has seen since the current week started, and that
+  observation (if any) is what gets paid when the week rolls over -- see "Weekly rewards" in
+  `docs/LEADERBOARDS.md` for the gap this approximates and why a player who never opens the
+  leaderboard in a given week is paid nothing for it.
+
 ## `configs/ability_purchase_prices.json`
 
 Purpose:

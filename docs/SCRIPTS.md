@@ -19,6 +19,7 @@ Purpose:
 - Opens the main-menu settings popup from the top status bar.
 - Launches the saved campaign level.
 - Opens the dedicated leaderboard scene from the bottom navigation trophy signal.
+- Consumes `PlayerProgress.consume_pending_leaderboard_reward()` and shows `%LeaderboardRewardDialog` when a weekly leaderboard rollover granted a coin reward since the last launch.
 
 Key constants:
 - `LEVEL_SCENE`: preloads `res://level.tscn`.
@@ -124,6 +125,10 @@ Purpose:
   when absent from the returned entries or ranked beyond `PINNED_ROW_RANK_THRESHOLD` (10) -- being
   technically present on a 50-row page doesn't mean the player is visible without scrolling.
 - Updates the weekly reset countdown and loading, empty, and retry states.
+- Reports the player's Weekly rank to `PlayerProgress.record_weekly_leaderboard_rank()` after every
+  successful Weekly fetch, and populates `%RewardTiersLabel` from
+  `PlayerProgress.get_leaderboard_reward_tiers()` (Weekly scope only -- Country/World are all-time
+  boards with no reset/payout moment).
 - Applies responsive content width, compact row sizing, bottom-navigation placement, and mobile safe-area margins.
 - Routes the shared Home tab back to `scenes/main_menu.tscn`.
 - Routes the shared Shop tab to `scenes/ui/shop_screen.tscn`.
@@ -196,6 +201,19 @@ Purpose:
 - Toggles the scene-authored gold/silver/bronze `RankSlot` medal circle for rank 1/2/3 and switches
   `RankLabel` between a bare number (top 3) and "#N" (rank 4+).
 - Applies compact or regular row and font sizing, including `RankSlot`'s size to match the avatar.
+
+## `scripts/leaderboard_reward_dialog.gd`
+
+Class:
+- `LeaderboardRewardDialog`
+
+Attached to:
+- `scenes/ui/leaderboard_reward_dialog.tscn` root `LeaderboardRewardDialog`.
+
+Purpose:
+- Generic titled-message modal shown once per granted weekly reward, mirroring
+  `shop_purchase_dialog.gd`'s structure. `show_reward(rank, coin_reward)` builds the message from
+  the actual granted values; `scripts/production_main_menu.gd` is the only caller.
 
 ## `scripts/leaderboards/leaderboard_provider.gd`
 
@@ -477,6 +495,10 @@ Saved fields:
 - `total_earned_stars`: lifetime campaign stars; unlike chest stars, this value never rolls over or spends.
 - `leaderboard_week_start_unix`: Monday 00:00 UTC boundary for the saved weekly counter.
 - `weekly_earned_stars`: campaign stars earned since the saved weekly boundary.
+- `last_weekly_rank_observation`: `{week_start_unix, rank}` for the best (lowest-numbered) Weekly
+  rank `leaderboard_screen.gd` has reported this week via `record_weekly_leaderboard_rank()`. Cleared
+  every rollover; see "Weekly rewards" in `docs/LEADERBOARDS.md` for why this is a local
+  approximation rather than a backend-verified final standing.
 - `moderation_state`: last server checkpoint's profile moderation state.
 
 Key methods:
@@ -492,6 +514,14 @@ Key methods:
 - `spend_coins(amount, reason)`: atomically subtracts coins and appends a resource-spend operation.
 - `apply_shop_purchase(transaction_id, rewards)`: development-mock/server-fact compatibility path;
   production grants must originate from a verified checkpoint.
+- `record_weekly_leaderboard_rank(rank)`: records `rank` as this week's best-known standing if it
+  improves on (or starts) the current week's observation. Called by `leaderboard_screen.gd` after
+  every successful Weekly fetch.
+- `consume_pending_leaderboard_reward()`: drains and returns the `{rank, coin_reward, week_start_unix}`
+  granted by the most recent weekly rollover, or `{}` if none is pending. Consuming clears it.
+- `get_leaderboard_reward_tiers()`: returns the configured `{min_rank, max_rank, coin_reward}` tiers
+  from `configs/leaderboard_reward_tiers.json`, used both to grant rewards and to render the Shop-style
+  "Weekly rewards" summary so the displayed promise can't drift from the payout.
 - `get_reward_chest_progress()`: returns the saved reward chest stars, active goal, and goal index.
 - `get_reward_chest_goal_at_index(goal_index)`: exposes a configured goal threshold for menu animation rollover.
 - `consume_pending_reward_chest_animation()`: returns and clears the in-memory completed-level animation payload.

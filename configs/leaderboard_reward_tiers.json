@@ -1,0 +1,8 @@
+{
+  "tiers": [
+    {"min_rank": 1, "max_rank": 1, "coin_reward": 500},
+    {"min_rank": 2, "max_rank": 3, "coin_reward": 300},
+    {"min_rank": 4, "max_rank": 10, "coin_reward": 150},
+    {"min_rank": 11, "max_rank": 50, "coin_reward": 50}
+  ]
+}

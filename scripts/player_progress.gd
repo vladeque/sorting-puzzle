@@ -21,6 +21,7 @@ const PLAYER_NAME_PREFIX := "player_"
 const PLAYER_NAME_RANDOM_ALPHABET := "abcdefghijklmnopqrstuvwxyz0123456789"
 const PLAYER_NAME_RANDOM_LENGTH := 5
 const REWARD_CHEST_GOALS_CONFIG := "res://configs/reward_chest_goals.json"
+const LEADERBOARD_REWARD_TIERS_CONFIG := "res://configs/leaderboard_reward_tiers.json"
 const DEFAULT_COINS := 300
 const LEADERBOARD_WEEK_SECONDS := 7 * 24 * 60 * 60
 const UNIX_EPOCH_MONDAY_OFFSET_DAYS := 3
@@ -30,6 +31,15 @@ const DEFAULT_REWARD_CHEST_GOALS := [
 	{"stars": 1500, "coin_reward": 375},
 	{"stars": 2000, "coin_reward": 550},
 	{"stars": 3000, "coin_reward": 900},
+]
+## Weekly leaderboard placement rewards. Ranks are local-observation-based (see
+## `record_weekly_leaderboard_rank()`), not a backend-authoritative final standing -- see
+## `docs/LEADERBOARDS.md` for the gap this approximates.
+const DEFAULT_LEADERBOARD_REWARD_TIERS := [
+	{"min_rank": 1, "max_rank": 1, "coin_reward": 500},
+	{"min_rank": 2, "max_rank": 3, "coin_reward": 300},
+	{"min_rank": 4, "max_rank": 10, "coin_reward": 150},
+	{"min_rank": 11, "max_rank": 50, "coin_reward": 50},
 ]
 const AVAILABLE_AVATAR_IDS := [
 	"avatar_bear",
@@ -69,6 +79,8 @@ const DEFAULT_DISABLED_SETTINGS := {
 var _data := {}
 var _reward_chest_goals := []
 var _pending_reward_chest_animation := {}
+var _pending_leaderboard_reward := {}
+var _leaderboard_reward_tiers: Array = []
 var _session_store
 var _account_coordinator
 var _local_store
@@ -281,6 +293,48 @@ func consume_pending_reward_chest_animation() -> Dictionary:
 	var pending := _pending_reward_chest_animation.duplicate()
 	_pending_reward_chest_animation.clear()
 	return pending
+
+
+## Records the best (lowest-numbered) Weekly rank the leaderboard screen has observed this week,
+## so a reward can be granted for it once the week rolls over even if the player never has the
+## leaderboard open at the exact reset moment. Call this whenever a Weekly fetch resolves with a
+## valid player rank.
+func record_weekly_leaderboard_rank(rank: int) -> void:
+	var safe_rank := maxi(rank, 0)
+	if safe_rank <= 0:
+		return
+
+	_refresh_leaderboard_week_state()
+	var current_week_start := get_current_leaderboard_week_start_unix()
+	var observation := _data.get("last_weekly_rank_observation", {}) as Dictionary
+	var has_better_observation := (
+		int(observation.get("week_start_unix", -1)) == current_week_start
+		and int(observation.get("rank", 0)) > 0
+		and int(observation.get("rank", 0)) <= safe_rank
+	)
+	if has_better_observation:
+		return
+
+	_data["last_weekly_rank_observation"] = {
+		"week_start_unix": current_week_start,
+		"rank": safe_rank,
+	}
+	save_progress()
+
+
+## Drains the coin reward granted by the most recent weekly rollover, if any. Consuming clears it
+## so it is only ever shown once.
+func consume_pending_leaderboard_reward() -> Dictionary:
+	var pending := _pending_leaderboard_reward.duplicate()
+	_pending_leaderboard_reward.clear()
+	return pending
+
+
+func get_leaderboard_reward_tiers() -> Array:
+	if _leaderboard_reward_tiers.is_empty():
+		_leaderboard_reward_tiers = _load_leaderboard_reward_tiers()
+
+	return _leaderboard_reward_tiers.duplicate(true)
 
 
 func add_reward_chest_stars(star_count: int) -> void:
@@ -505,6 +559,7 @@ func reset_progress() -> void:
 	var previous_data := _data.duplicate(true)
 	_data = _default_data()
 	_pending_reward_chest_animation.clear()
+	_pending_leaderboard_reward.clear()
 	if not _commit_current_state().get("ok", false):
 		_data = previous_data
 
@@ -535,12 +590,14 @@ func _sanitize_data(raw_data: Dictionary) -> Dictionary:
 	)
 	var current_week_start := get_current_leaderboard_week_start_unix()
 	var saved_week_start := int(raw_data.get("leaderboard_week_start_unix", current_week_start))
-	if saved_week_start == current_week_start:
-		sanitized["leaderboard_week_start_unix"] = current_week_start
-		sanitized["weekly_earned_stars"] = maxi(int(raw_data.get("weekly_earned_stars", 0)), 0)
-	else:
-		sanitized["leaderboard_week_start_unix"] = current_week_start
-		sanitized["weekly_earned_stars"] = 0
+	sanitized["leaderboard_week_start_unix"] = saved_week_start
+	sanitized["weekly_earned_stars"] = maxi(int(raw_data.get("weekly_earned_stars", 0)), 0)
+	sanitized["last_weekly_rank_observation"] = _sanitize_rank_observation(
+		raw_data.get("last_weekly_rank_observation", {})
+	)
+	var granted_reward := _apply_leaderboard_week_rollover(sanitized, saved_week_start)
+	if not granted_reward.is_empty():
+		_pending_leaderboard_reward = granted_reward
 	var reward_chest_state := _normalize_reward_chest_progress(
 		maxi(int(raw_data.get("reward_chest_stars", 0)), 0),
 		maxi(int(raw_data.get("reward_chest_goal_index", 0)), 0)
@@ -587,6 +644,7 @@ func _default_data() -> Dictionary:
 		"total_earned_stars": 0,
 		"leaderboard_week_start_unix": get_current_leaderboard_week_start_unix(),
 		"weekly_earned_stars": 0,
+		"last_weekly_rank_observation": {},
 		"reward_chest_stars": 0,
 		"reward_chest_goal_index": 0,
 		"reward_chest_completed_cycles": 0,
@@ -753,6 +811,66 @@ func _parse_reward_chest_goal(raw_goal) -> Dictionary:
 	}
 
 
+func _load_leaderboard_reward_tiers() -> Array:
+	if not FileAccess.file_exists(LEADERBOARD_REWARD_TIERS_CONFIG):
+		return DEFAULT_LEADERBOARD_REWARD_TIERS.duplicate(true)
+
+	var config_file := FileAccess.open(LEADERBOARD_REWARD_TIERS_CONFIG, FileAccess.READ)
+	if config_file == null:
+		push_warning(
+			"Could not open leaderboard reward tiers config: %s" % LEADERBOARD_REWARD_TIERS_CONFIG
+		)
+		return DEFAULT_LEADERBOARD_REWARD_TIERS.duplicate(true)
+
+	var parsed_config = JSON.parse_string(config_file.get_as_text())
+	if not (parsed_config is Dictionary):
+		push_warning("Leaderboard reward tiers config must contain a JSON object.")
+		return DEFAULT_LEADERBOARD_REWARD_TIERS.duplicate(true)
+
+	var raw_tiers = (parsed_config as Dictionary).get("tiers", [])
+	if not (raw_tiers is Array):
+		push_warning("Leaderboard reward tiers config must define tiers as an array.")
+		return DEFAULT_LEADERBOARD_REWARD_TIERS.duplicate(true)
+
+	var parsed_tiers := []
+	for raw_tier in raw_tiers as Array:
+		var parsed_tier := _parse_leaderboard_reward_tier(raw_tier)
+		if not parsed_tier.is_empty():
+			parsed_tiers.append(parsed_tier)
+
+	if parsed_tiers.is_empty():
+		push_warning("Leaderboard reward tiers config does not define valid tiers.")
+		return DEFAULT_LEADERBOARD_REWARD_TIERS.duplicate(true)
+
+	return parsed_tiers
+
+
+func _parse_leaderboard_reward_tier(raw_tier) -> Dictionary:
+	if not (raw_tier is Dictionary):
+		return {}
+
+	var tier := raw_tier as Dictionary
+	var min_rank := maxi(int(tier.get("min_rank", 0)), 1)
+	var max_rank := maxi(int(tier.get("max_rank", 0)), min_rank)
+	var coin_reward := maxi(int(tier.get("coin_reward", 0)), 0)
+	if coin_reward <= 0:
+		return {}
+
+	return {"min_rank": min_rank, "max_rank": max_rank, "coin_reward": coin_reward}
+
+
+func _get_leaderboard_reward_tier_coins(rank: int) -> int:
+	if rank <= 0:
+		return 0
+
+	for raw_tier in get_leaderboard_reward_tiers():
+		var tier := raw_tier as Dictionary
+		if rank >= int(tier.get("min_rank", 1)) and rank <= int(tier.get("max_rank", 0)):
+			return int(tier.get("coin_reward", 0))
+
+	return 0
+
+
 func _generate_player_name() -> String:
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
@@ -793,12 +911,56 @@ func _refresh_lives_state() -> bool:
 
 func _refresh_leaderboard_week_state() -> bool:
 	var current_week_start := get_current_leaderboard_week_start_unix()
-	if int(_data.get("leaderboard_week_start_unix", current_week_start)) == current_week_start:
+	var previous_week_start := int(_data.get("leaderboard_week_start_unix", current_week_start))
+	if previous_week_start == current_week_start:
 		return false
 
-	_data["leaderboard_week_start_unix"] = current_week_start
-	_data["weekly_earned_stars"] = 0
+	var granted_reward := _apply_leaderboard_week_rollover(_data, previous_week_start)
+	if not granted_reward.is_empty():
+		_pending_leaderboard_reward = granted_reward
 	return true
+
+
+## Shared by both places a leaderboard week rollover can be detected: `_sanitize_data()` (the
+## load-time path, taken whenever the app was closed across the boundary -- the common case) and
+## `_refresh_leaderboard_week_state()` (the runtime path, taken if the app stays open across it).
+## Resets the weekly score in `target` and, if `target` carries a rank observation from the week
+## that just ended, grants that rank's configured coin reward. Mutates `target` in place and
+## returns the granted reward (empty if the week did not roll over, there was no observation for
+## it, or no tier matched).
+func _apply_leaderboard_week_rollover(target: Dictionary, previous_week_start: int) -> Dictionary:
+	var current_week_start := get_current_leaderboard_week_start_unix()
+	if previous_week_start == current_week_start:
+		return {}
+
+	target["leaderboard_week_start_unix"] = current_week_start
+	target["weekly_earned_stars"] = 0
+
+	var observation := target.get("last_weekly_rank_observation", {}) as Dictionary
+	target["last_weekly_rank_observation"] = {}
+	if int(observation.get("week_start_unix", -1)) != previous_week_start:
+		return {}
+
+	var rank := maxi(int(observation.get("rank", 0)), 0)
+	var coin_reward := _get_leaderboard_reward_tier_coins(rank)
+	if coin_reward <= 0:
+		return {}
+
+	target["coins"] = maxi(int(target.get("coins", DEFAULT_COINS)), 0) + coin_reward
+	return {"rank": rank, "coin_reward": coin_reward, "week_start_unix": previous_week_start}
+
+
+func _sanitize_rank_observation(raw_observation) -> Dictionary:
+	if not (raw_observation is Dictionary):
+		return {}
+
+	var observation := raw_observation as Dictionary
+	var week_start := int(observation.get("week_start_unix", 0))
+	var rank := int(observation.get("rank", 0))
+	if week_start <= 0 or rank <= 0:
+		return {}
+
+	return {"week_start_unix": week_start, "rank": rank}
 
 
 func bind_registered_guest(player_id: String, session: Dictionary) -> bool:

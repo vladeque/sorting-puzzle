@@ -26,6 +26,40 @@ Only normal campaign completion updates leaderboard totals. Developer/test launc
 
 Save schema 3 migrates an older development save by using its retained `reward_chest_stars` as the initial lifetime total and starting its weekly total at zero. This is an approximate development migration because completed chest cycles are not recoverable from the previous schema.
 
+## Weekly rewards
+
+`configs/leaderboard_reward_tiers.json` maps Weekly rank ranges to a coin reward (defaults: #1 500,
+#2-3 300, #4-10 150, #11-50 50). `leaderboard_screen.gd` renders the same config as
+`%RewardTiersLabel` ("Weekly rewards — #1: 500 coins · ...") so the on-screen promise can never
+drift from what actually gets paid. Country/World show nothing here since they're all-time boards
+with no reset/payout moment.
+
+**This is a local approximation, not a backend-verified final standing.** There is currently no
+backend job (and, per the Known Gap below, not yet even a fully populated backend leaderboard
+score model) that computes an authoritative rank at the exact moment a Weekly period ends. Instead:
+
+- Every successful Weekly fetch calls `PlayerProgress.record_weekly_leaderboard_rank(rank)`, which
+  keeps the *best* (lowest-numbered) rank observed so far this week in the saved
+  `last_weekly_rank_observation`. Because the mock roster's scores never change on their own, a
+  player's true rank can only improve or hold steady as the week progresses, so "best observed" can
+  under-pay (if they improve further after their last check) but never over-pays.
+- The reward is granted when the week rolls over -- detected either at load time
+  (`_sanitize_data()`, the common case: the app was closed across the boundary) or at runtime
+  (`_refresh_leaderboard_week_state()`, if the app happens to stay open across it). Both paths share
+  `_apply_leaderboard_week_rollover()` so the grant can't be skipped depending on which one notices
+  first.
+- A player who never opens the leaderboard during a given week has no observation and is paid
+  nothing for it, even if their `weekly_earned_stars` would have ranked well. The reward is
+  therefore best understood as "what you were seen to have earned," not "what you actually finished
+  with."
+- The granted `{rank, coin_reward, week_start_unix}` is queued as `_pending_leaderboard_reward` and
+  shown once via `%LeaderboardRewardDialog` on `scenes/main_menu.tscn`'s next `_ready()`
+  (`consume_pending_leaderboard_reward()` drains it so it can't repeat).
+
+Revisit this once the backend leaderboard score model (see the Known Gap below) is real: an
+authoritative server-computed final rank, delivered through a real payout endpoint, should replace
+this client-side observation-based approximation.
+
 ## Provider contract
 
 `LeaderboardProvider.fetch_leaderboard(scope, current_player, limit)` is asynchronous and returns:
