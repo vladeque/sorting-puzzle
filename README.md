@@ -43,6 +43,11 @@ When it is omitted, the generator infers the count as
 `--preferred-copies-per-type 6` by default. The preferred value accepts fractions and represents a
 target average; actual item counts remain multiples of three.
 
+Layer placement favors difficulty-specific proportions of items that can form triples without
+crossing a layer boundary: about 65% for easy, 50% for medium, 40% for hard, and 30% for expert.
+These are soft targets. Remaining copies stay in a compact range of adjacent layers whenever the
+board capacity allows it.
+
 Add `--validate` to run the solvability validator once after generation. Add `--require-solvable --max-generation-attempts 25` to retry generation until a solvable layout is found.
 
 Available layout presets are `grid_2x3`, `grid_3x3`, `grid_3x4`, `grid_3x5`, and `grid_4x3`.

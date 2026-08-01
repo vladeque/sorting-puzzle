@@ -189,13 +189,19 @@ The generator distributes triples across all logical types and fills the difficu
 slot count. Use `--max-items-per-type` to impose a lower global repetition cap; the generator applies
 that cap after type-count inference and adds empty slots rather than exceeding it.
 
+Item placement uses soft per-layer triple-readiness targets of approximately 65% for easy, 50% for
+medium, 40% for hard, and 30% for expert. The generator balances toward those ratios without rejecting
+otherwise valid constrained boards. Copies that are not part of a preferred local triple expand into
+adjacent layers before more distant layers, so each item normally occupies one compact layer range.
+`--stats` reports the target, actual readiness for every layer, and any non-adjacent item spreads.
+
 Generated levels default to `--min-front-visible-triples 1`, so at least one item type starts with three visible front-layer copies across shelves. Use `--min-front-visible-triples 0` for layouts that should not force a starter visible triple candidate.
 
 Current authored generation parameters:
 
 - Level 2 uses 9 shelves, 2 filled layers, 7 logical item types, easy difficulty, and a maximum of 6 copies per logical item type.
 - Level 3 uses 12 shelves, 2 filled layers, 7 logical item types, medium difficulty, and a maximum of 6 copies per logical item type.
-- Level 4 uses 15 shelves, 3 filled layers, 10 logical item types, medium difficulty, seed 4004, and a maximum of 9 copies per logical item type.
+- Level 4 uses 15 shelves, 3 filled layers, 19 logical item types, medium difficulty, and seed 4004.
 
 Use `--locked-shelves` to add unlock requirements to generated shelves. Entries are 1-based shelf numbers and required cleared triples:
 

@@ -19,6 +19,7 @@ from validate_level_solvable import solve_level, shelves_to_state, validate_shel
 
 SLOTS_PER_SHELF = 3
 DEFAULT_PREFERRED_COPIES_PER_TYPE = 6.0
+LAYER_TRIPLE_RATIO_TOLERANCE = 0.05
 LAYOUT_PRESETS = (
     "grid_2x3",
     "grid_3x3",
@@ -35,6 +36,7 @@ LAYOUT_PRESETS = (
 class DifficultyPreset:
     empty_ratio_min: float
     empty_ratio_max: float
+    preferred_layer_triple_ratio: float
     max_same_item_per_layer: int
     max_items_per_type: int | None
     allow_front_layer_matches: bool
@@ -45,6 +47,7 @@ DIFFICULTIES = {
     "easy": DifficultyPreset(
         empty_ratio_min=0.20,
         empty_ratio_max=0.25,
+        preferred_layer_triple_ratio=0.65,
         max_same_item_per_layer=5,
         max_items_per_type=None,
         allow_front_layer_matches=True,
@@ -53,6 +56,7 @@ DIFFICULTIES = {
     "medium": DifficultyPreset(
         empty_ratio_min=0.15,
         empty_ratio_max=0.20,
+        preferred_layer_triple_ratio=0.50,
         max_same_item_per_layer=4,
         max_items_per_type=None,
         allow_front_layer_matches=True,
@@ -61,6 +65,7 @@ DIFFICULTIES = {
     "hard": DifficultyPreset(
         empty_ratio_min=0.15,
         empty_ratio_max=0.20,
+        preferred_layer_triple_ratio=0.40,
         max_same_item_per_layer=3,
         max_items_per_type=None,
         allow_front_layer_matches=True,
@@ -69,6 +74,7 @@ DIFFICULTIES = {
     "expert": DifficultyPreset(
         empty_ratio_min=0.10,
         empty_ratio_max=0.15,
+        preferred_layer_triple_ratio=0.30,
         max_same_item_per_layer=3,
         max_items_per_type=None,
         allow_front_layer_matches=False,
@@ -286,7 +292,9 @@ def generate_shelves(
         empty_slots=empty_slots,
         shelf_count=shelf_count,
         filled_layer_count=filled_layer_count,
+        preferred_layer_triple_ratio=preset.preferred_layer_triple_ratio,
         max_same_item_per_layer=preset.max_same_item_per_layer,
+        min_front_visible_triples=min_front_visible_triples,
         rng=rng,
     )
     ensure_min_front_visible_triples(
@@ -533,63 +541,499 @@ def shuffle_values_within_layers(
     )
 
 
-def spread_values_across_layers(
-    item_pool: list[str],
-    empty_slots: int,
-    shelf_count: int,
-    filled_layer_count: int,
-    max_same_item_per_layer: int,
+def build_balanced_layer_targets(
+    value_count: int,
+    layer_count: int,
     rng: random.Random,
-) -> list[str | None]:
-    layer_capacity = shelf_count * SLOTS_PER_SHELF
-    layer_values: list[list[str | None]] = [[] for _ in range(filled_layer_count)]
-    layer_item_counts: list[Counter[str]] = [Counter() for _ in range(filled_layer_count)]
-    item_counts = Counter(item_pool)
+) -> list[int]:
+    base_count, extra_count = divmod(value_count, layer_count)
+    targets = [base_count] * layer_count
+    layer_order = list(range(layer_count))
+    rng.shuffle(layer_order)
+    for layer_index in layer_order[:extra_count]:
+        targets[layer_index] += 1
+    return targets
+
+
+def count_ready_triples_in_pattern(pattern: tuple[int, ...]) -> list[int]:
+    return [count // SLOTS_PER_SHELF for count in pattern]
+
+
+def build_compact_layer_order(
+    layer_count: int,
+    first_layer: int,
+    last_layer: int,
+    prefer_lower_layers: bool,
+) -> list[int]:
+    outside_layers = [
+        layer_index
+        for layer_index in range(layer_count)
+        if layer_index < first_layer or layer_index > last_layer
+    ]
+
+    def sort_key(layer_index: int) -> tuple[int, int]:
+        if layer_index < first_layer:
+            distance = first_layer - layer_index
+            preferred_side = 0 if prefer_lower_layers else 1
+        else:
+            distance = layer_index - last_layer
+            preferred_side = 1 if prefer_lower_layers else 0
+        return distance, preferred_side
+
+    return sorted(outside_layers, key=sort_key)
+
+
+def build_compact_item_patterns(
+    item_count: int,
+    preferred_local_triples: int,
+    layer_count: int,
+    per_layer_limit: int,
+) -> list[tuple[int, ...]]:
+    if layer_count == 1:
+        return [(item_count,)]
+
+    anchored_layer_count = min(
+        preferred_local_triples,
+        item_count // SLOTS_PER_SHELF,
+        layer_count,
+    )
+    pattern_keys: set[tuple[int, ...]] = set()
+    anchor_starts: list[int | None]
+    if anchored_layer_count > 0:
+        anchor_starts = list(range(layer_count - anchored_layer_count + 1))
+    else:
+        anchor_starts = [None]
+
+    for anchor_start in anchor_starts:
+        origins = range(layer_count) if anchor_start is None else [anchor_start]
+        for origin in origins:
+            for prefer_lower_layers in (False, True):
+                for scatter_limit in range(2, per_layer_limit + 1):
+                    pattern = [0] * layer_count
+                    anchor_layers: list[int] = []
+                    if anchor_start is None:
+                        first_layer = origin
+                        last_layer = origin
+                        compact_order = [origin]
+                        compact_order.extend(
+                            build_compact_layer_order(
+                                layer_count=layer_count,
+                                first_layer=origin,
+                                last_layer=origin,
+                                prefer_lower_layers=prefer_lower_layers,
+                            )
+                        )
+                    else:
+                        first_layer = anchor_start
+                        last_layer = anchor_start + anchored_layer_count - 1
+                        anchor_layers = list(range(first_layer, last_layer + 1))
+                        for layer_index in anchor_layers:
+                            pattern[layer_index] = SLOTS_PER_SHELF
+                        compact_order = build_compact_layer_order(
+                            layer_count=layer_count,
+                            first_layer=first_layer,
+                            last_layer=last_layer,
+                            prefer_lower_layers=prefer_lower_layers,
+                        )
+
+                    remaining_count = item_count - sum(pattern)
+                    for layer_index in compact_order:
+                        if remaining_count <= 0:
+                            break
+                        soft_room = max(
+                            0,
+                            min(scatter_limit, per_layer_limit) - pattern[layer_index],
+                        )
+                        added_count = min(remaining_count, soft_room)
+                        pattern[layer_index] += added_count
+                        remaining_count -= added_count
+
+                    overflow_order = compact_order + anchor_layers
+                    for layer_index in overflow_order:
+                        if remaining_count <= 0:
+                            break
+                        hard_room = max(0, per_layer_limit - pattern[layer_index])
+                        added_count = min(remaining_count, hard_room)
+                        pattern[layer_index] += added_count
+                        remaining_count -= added_count
+
+                    if remaining_count == 0:
+                        pattern_keys.add(tuple(pattern))
+
+    return sorted(pattern_keys)
+
+
+def allocate_preferred_local_triples(
+    item_counts: Counter[str],
+    item_limits: dict[str, int],
+    target_triple_count: int,
+    filled_layer_count: int,
+    rng: random.Random,
+) -> dict[str, int]:
+    capacities = {
+        item_id: min(
+            item_count // SLOTS_PER_SHELF,
+            filled_layer_count * (item_limits[item_id] // SLOTS_PER_SHELF),
+        )
+        for item_id, item_count in item_counts.items()
+    }
+    available_triples = [
+        item_id
+        for item_id, capacity in capacities.items()
+        for _triple_index in range(capacity)
+    ]
+    rng.shuffle(available_triples)
+    selected_triples = available_triples[: min(target_triple_count, len(available_triples))]
+    selected_counts = Counter(selected_triples)
+    return {
+        item_id: selected_counts[item_id]
+        for item_id in item_counts
+    }
+
+
+def score_layer_allocation(
+    layer_item_counts: list[int],
+    layer_ready_triples: list[int],
+    target_item_counts: list[int],
+    preferred_layer_triple_ratio: float,
+    min_front_visible_triples: int,
+) -> tuple[int, int, int, int, int, int, int]:
+    item_deviations = [
+        abs(actual_count - target_count)
+        for actual_count, target_count in zip(layer_item_counts, target_item_counts)
+    ]
+    ratio_deviations = [
+        round(
+            abs(
+                ready_triple_count * SLOTS_PER_SHELF / max(1, item_count)
+                - preferred_layer_triple_ratio
+            )
+            * 10_000
+        )
+        for item_count, ready_triple_count in zip(layer_item_counts, layer_ready_triples)
+    ]
+    tolerated_ratio_deviation = round(LAYER_TRIPLE_RATIO_TOLERANCE * 10_000)
+    ratio_overages = [
+        max(0, deviation - tolerated_ratio_deviation)
+        for deviation in ratio_deviations
+    ]
+    return (
+        max(0, min_front_visible_triples - layer_ready_triples[0]),
+        max(ratio_overages, default=0),
+        sum(ratio_overages),
+        max(item_deviations, default=0),
+        sum(item_deviations),
+        max(ratio_deviations, default=0),
+        sum(ratio_deviations),
+    )
+
+
+def build_preferred_layer_item_counts(
+    item_counts: Counter[str],
+    layer_capacity: int,
+    filled_layer_count: int,
+    preferred_layer_triple_ratio: float,
+    max_same_item_per_layer: int,
+    min_front_visible_triples: int,
+    rng: random.Random,
+) -> list[Counter[str]]:
+    filled_slot_count = sum(item_counts.values())
+    target_item_counts = build_balanced_layer_targets(
+        value_count=filled_slot_count,
+        layer_count=filled_layer_count,
+        rng=rng,
+    )
+    target_ready_triple_count = min(
+        filled_slot_count // SLOTS_PER_SHELF,
+        int(
+            math.floor(
+                filled_slot_count * preferred_layer_triple_ratio / SLOTS_PER_SHELF + 0.5
+            )
+        ),
+    )
     item_limits = build_layer_item_limits(
         item_counts=item_counts,
         filled_layer_count=filled_layer_count,
         max_same_item_per_layer=max_same_item_per_layer,
     )
-    shuffled_item_ids = list(item_counts)
-    rng.shuffle(shuffled_item_ids)
+    best_item_patterns: dict[str, tuple[int, ...]] | None = None
+    best_score: tuple[int, int, int, int, int, int, int] | None = None
+    attempt_count = max(12, min(32, len(item_counts)))
+    beam_width = 64
 
-    for item_id in shuffled_item_ids:
-        for _copy_index in range(item_counts[item_id]):
-            candidates = [
-                layer_index
-                for layer_index in range(filled_layer_count)
-                if len(layer_values[layer_index]) < layer_capacity
-                and layer_item_counts[layer_index][item_id] < item_limits[item_id]
+    for _attempt_index in range(attempt_count):
+        target_ready_triples = build_balanced_layer_targets(
+            value_count=target_ready_triple_count,
+            layer_count=filled_layer_count,
+            rng=rng,
+        )
+        if target_ready_triples[0] < min_front_visible_triples:
+            needed_front_triples = min_front_visible_triples - target_ready_triples[0]
+            target_ready_triples[0] += needed_front_triples
+            for layer_index in range(filled_layer_count - 1, 0, -1):
+                moved_count = min(needed_front_triples, target_ready_triples[layer_index])
+                target_ready_triples[layer_index] -= moved_count
+                needed_front_triples -= moved_count
+                if needed_front_triples == 0:
+                    break
+        preferred_triples = allocate_preferred_local_triples(
+            item_counts=item_counts,
+            item_limits=item_limits,
+            target_triple_count=sum(target_ready_triples),
+            filled_layer_count=filled_layer_count,
+            rng=rng,
+        )
+        item_order = list(item_counts)
+        rng.shuffle(item_order)
+        patterns_by_item = {
+            item_id: build_compact_item_patterns(
+                item_count=item_counts[item_id],
+                preferred_local_triples=preferred_triples[item_id],
+                layer_count=filled_layer_count,
+                per_layer_limit=item_limits[item_id],
+            )
+            for item_id in item_order
+        }
+        item_order.sort(
+            key=lambda item_id: (
+                len(patterns_by_item[item_id]),
+                -item_counts[item_id],
+            )
+        )
+        beam: list[
+            tuple[
+                tuple[int, ...],
+                tuple[int, ...],
+                dict[str, tuple[int, ...]],
+                int,
             ]
-            if not candidates:
-                candidates = [
-                    layer_index
-                    for layer_index in range(filled_layer_count)
-                    if len(layer_values[layer_index]) < layer_capacity
-                ]
+        ] = [
+            (
+                tuple(0 for _layer_index in range(filled_layer_count)),
+                tuple(0 for _layer_index in range(filled_layer_count)),
+                {},
+                0,
+            )
+        ]
 
-            candidates.sort(
-                key=lambda layer_index: (
-                    layer_item_counts[layer_index][item_id],
-                    len(layer_values[layer_index]),
+        for item_id in item_order:
+            expanded_states: dict[
+                tuple[tuple[int, ...], tuple[int, ...]],
+                tuple[
+                    tuple[int, ...],
+                    tuple[int, ...],
+                    dict[str, tuple[int, ...]],
+                    int,
+                ],
+            ] = {}
+            for layer_item_counts, layer_ready_triples, item_patterns, local_error in beam:
+                for pattern in patterns_by_item[item_id]:
+                    projected_items = tuple(
+                        layer_item_counts[layer_index] + pattern[layer_index]
+                        for layer_index in range(filled_layer_count)
+                    )
+                    if any(count > layer_capacity for count in projected_items):
+                        continue
+
+                    pattern_triples = count_ready_triples_in_pattern(pattern)
+                    projected_triples = tuple(
+                        layer_ready_triples[layer_index] + pattern_triples[layer_index]
+                        for layer_index in range(filled_layer_count)
+                    )
+                    projected_local_error = local_error + abs(
+                        sum(pattern_triples) - preferred_triples[item_id]
+                    )
+                    projected_patterns = dict(item_patterns)
+                    projected_patterns[item_id] = pattern
+                    state = (
+                        projected_items,
+                        projected_triples,
+                        projected_patterns,
+                        projected_local_error,
+                    )
+                    state_key = projected_items, projected_triples
+                    previous_state = expanded_states.get(state_key)
+                    if previous_state is None or projected_local_error < previous_state[3]:
+                        expanded_states[state_key] = state
+
+            if not expanded_states:
+                beam = []
+                break
+
+            def quality_score(
+                state: tuple[
+                    tuple[int, ...],
+                    tuple[int, ...],
+                    dict[str, tuple[int, ...]],
+                    int,
+                ],
+            ) -> tuple[int, int, int, int, int, int, float]:
+                projected_items, projected_triples, _patterns, local_error = state
+                triple_overage = sum(
+                    max(0, actual_count - target_count)
+                    for actual_count, target_count in zip(
+                        projected_triples,
+                        target_ready_triples,
+                    )
+                )
+                triple_error = sum(
+                    abs(actual_count - target_count)
+                    for actual_count, target_count in zip(
+                        projected_triples,
+                        target_ready_triples,
+                    )
+                )
+                item_overage = sum(
+                    max(0, actual_count - target_count)
+                    for actual_count, target_count in zip(projected_items, target_item_counts)
+                )
+                largest_item_error = max(
+                    (
+                        abs(actual_count - target_count)
+                        for actual_count, target_count in zip(
+                            projected_items,
+                            target_item_counts,
+                        )
+                    ),
+                    default=0,
+                )
+                item_error = sum(
+                    abs(actual_count - target_count)
+                    for actual_count, target_count in zip(projected_items, target_item_counts)
+                )
+                return (
+                    local_error,
+                    triple_overage,
+                    triple_error,
+                    item_overage,
+                    largest_item_error,
+                    item_error,
                     rng.random(),
                 )
-            )
-            layer_index = candidates[0]
-            layer_values[layer_index].append(item_id)
-            layer_item_counts[layer_index][item_id] += 1
 
-    for _empty_index in range(empty_slots):
-        candidates = [
-            layer_index
-            for layer_index in range(filled_layer_count)
-            if len(layer_values[layer_index]) < layer_capacity
+            def feasibility_score(
+                state: tuple[
+                    tuple[int, ...],
+                    tuple[int, ...],
+                    dict[str, tuple[int, ...]],
+                    int,
+                ],
+            ) -> tuple[int, int, int, int, int, float]:
+                projected_items, projected_triples, _patterns, local_error = state
+                item_overage = sum(
+                    max(0, actual_count - target_count)
+                    for actual_count, target_count in zip(projected_items, target_item_counts)
+                )
+                largest_item_error = max(
+                    (
+                        abs(actual_count - target_count)
+                        for actual_count, target_count in zip(
+                            projected_items,
+                            target_item_counts,
+                        )
+                    ),
+                    default=0,
+                )
+                item_error = sum(
+                    abs(actual_count - target_count)
+                    for actual_count, target_count in zip(projected_items, target_item_counts)
+                )
+                triple_error = sum(
+                    abs(actual_count - target_count)
+                    for actual_count, target_count in zip(
+                        projected_triples,
+                        target_ready_triples,
+                    )
+                )
+                return (
+                    item_overage,
+                    largest_item_error,
+                    item_error,
+                    local_error,
+                    triple_error,
+                    rng.random(),
+                )
+
+            expanded = list(expanded_states.values())
+            quality_states = sorted(expanded, key=quality_score)[: beam_width // 2]
+            feasibility_states = sorted(expanded, key=feasibility_score)[: beam_width // 2]
+            beam = []
+            seen_state_keys = set()
+            for state in quality_states + feasibility_states:
+                state_key = state[0], state[1]
+                if state_key not in seen_state_keys:
+                    beam.append(state)
+                    seen_state_keys.add(state_key)
+
+        if not beam:
+            continue
+
+        candidate_state = min(
+            beam,
+            key=lambda state: score_layer_allocation(
+                layer_item_counts=list(state[0]),
+                layer_ready_triples=list(state[1]),
+                target_item_counts=target_item_counts,
+                preferred_layer_triple_ratio=preferred_layer_triple_ratio,
+                min_front_visible_triples=min_front_visible_triples,
+            ),
+        )
+        score = score_layer_allocation(
+            layer_item_counts=list(candidate_state[0]),
+            layer_ready_triples=list(candidate_state[1]),
+            target_item_counts=target_item_counts,
+            preferred_layer_triple_ratio=preferred_layer_triple_ratio,
+            min_front_visible_triples=min_front_visible_triples,
+        )
+        if best_score is None or score < best_score:
+            best_score = score
+            best_item_patterns = candidate_state[2]
+
+    if best_item_patterns is None:
+        raise ValueError("Could not arrange item copies across adjacent filled layers")
+
+    layer_item_counters: list[Counter[str]] = [Counter() for _ in range(filled_layer_count)]
+    for item_id, pattern in best_item_patterns.items():
+        for layer_index, count in enumerate(pattern):
+            if count > 0:
+                layer_item_counters[layer_index][item_id] = count
+    return layer_item_counters
+
+
+def spread_values_across_layers(
+    item_pool: list[str],
+    empty_slots: int,
+    shelf_count: int,
+    filled_layer_count: int,
+    preferred_layer_triple_ratio: float,
+    max_same_item_per_layer: int,
+    min_front_visible_triples: int,
+    rng: random.Random,
+) -> list[str | None]:
+    layer_capacity = shelf_count * SLOTS_PER_SHELF
+    item_counts = Counter(item_pool)
+    layer_item_counts = build_preferred_layer_item_counts(
+        item_counts=item_counts,
+        layer_capacity=layer_capacity,
+        filled_layer_count=filled_layer_count,
+        preferred_layer_triple_ratio=preferred_layer_triple_ratio,
+        max_same_item_per_layer=max_same_item_per_layer,
+        min_front_visible_triples=min_front_visible_triples,
+        rng=rng,
+    )
+    layer_values: list[list[str | None]] = []
+    for item_counter in layer_item_counts:
+        values = [
+            item_id
+            for item_id, count in item_counter.items()
+            for _copy_index in range(count)
         ]
-        candidates.sort(key=lambda layer_index: (len(layer_values[layer_index]), rng.random()))
-        layer_values[candidates[0]].append(None)
-
-    for values in layer_values:
+        values.extend([None] * (layer_capacity - len(values)))
         rng.shuffle(values)
+        layer_values.append(values)
+
+    if sum(value is None for values in layer_values for value in values) != empty_slots:
+        raise ValueError("Layer allocation produced an unexpected empty-slot count")
 
     return rebuild_values_from_layers(
         layer_values=layer_values,
@@ -721,6 +1165,7 @@ def find_front_layer_swap(
             if source_item_id == item_id:
                 source_candidates.append((layer_index, source_position))
     rng.shuffle(source_candidates)
+    source_candidates.sort(key=lambda candidate: candidate[0])
 
     target_positions = [
         target_position
@@ -763,6 +1208,57 @@ def build_layer_item_counts(
             layer_counts[layer_index].update(value for value in layer if value is not None)
 
     return layer_counts
+
+
+def build_layer_triple_readiness(
+    shelves: list[dict[str, Any]],
+    filled_layer_count: int,
+) -> list[dict[str, int | float]]:
+    readiness = []
+    for layer_index, layer_counts in enumerate(
+        build_layer_item_counts(shelves, filled_layer_count)
+    ):
+        filled_item_count = sum(layer_counts.values())
+        ready_triple_count = sum(
+            count // SLOTS_PER_SHELF
+            for count in layer_counts.values()
+        )
+        ready_item_count = ready_triple_count * SLOTS_PER_SHELF
+        ready_ratio = ready_item_count / filled_item_count if filled_item_count > 0 else 0.0
+        readiness.append(
+            {
+                "layer": layer_index + 1,
+                "filled_items": filled_item_count,
+                "triple_ready_items": ready_item_count,
+                "triple_ready_count": ready_triple_count,
+                "triple_ready_ratio": round(ready_ratio, 4),
+            }
+        )
+    return readiness
+
+
+def find_non_adjacent_item_spreads(
+    shelves: list[dict[str, Any]],
+    filled_layer_count: int,
+) -> dict[str, list[int]]:
+    layer_counts = build_layer_item_counts(shelves, filled_layer_count)
+    item_ids = sorted(
+        {
+            item_id
+            for counts in layer_counts
+            for item_id in counts
+        }
+    )
+    non_adjacent_spreads = {}
+    for item_id in item_ids:
+        occupied_layers = [
+            layer_index + 1
+            for layer_index, counts in enumerate(layer_counts)
+            if counts[item_id] > 0
+        ]
+        if occupied_layers and occupied_layers[-1] - occupied_layers[0] + 1 != len(occupied_layers):
+            non_adjacent_spreads[item_id] = occupied_layers
+    return non_adjacent_spreads
 
 
 def build_layer_item_limits(
@@ -938,6 +1434,7 @@ def build_stats(
         "item_cap_added_empty_slots": target_filled_slots - sum(1 for value in values if value is not None),
         "item_counts": dict(sorted(item_counts.items())),
         "invalid_item_counts": invalid_counts,
+        "preferred_layer_triple_ratio": preset.preferred_layer_triple_ratio,
         "max_same_item_per_layer": preset.max_same_item_per_layer,
         "preset_max_items_per_type": preset.max_items_per_type,
         "requested_max_items_per_type": max_items_per_type_override,
@@ -948,6 +1445,14 @@ def build_stats(
             dict(sorted(layer_counts.items()))
             for layer_counts in build_layer_item_counts(shelves, filled_layer_count)
         ],
+        "layer_triple_readiness": build_layer_triple_readiness(
+            shelves=shelves,
+            filled_layer_count=filled_layer_count,
+        ),
+        "non_adjacent_item_spreads": find_non_adjacent_item_spreads(
+            shelves=shelves,
+            filled_layer_count=filled_layer_count,
+        ),
         "layer_item_overloads": find_layer_item_overloads(
             shelves=shelves,
             filled_layer_count=filled_layer_count,

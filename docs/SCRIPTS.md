@@ -1281,6 +1281,11 @@ Key inputs:
 
 Generation constraints:
 - Difficulty presets cap how many copies of the same item can appear on one filled layer.
+- Difficulty presets softly target per-layer triple-ready item ratios: `0.65` for easy, `0.50` for
+  medium, `0.40` for hard, and `0.30` for expert. Constrained boards use the closest feasible layout
+  instead of failing solely because the preferred ratio cannot be reached.
+- Copies outside a preferred local triple spread through adjacent layers first. Each item therefore
+  occupies a compact contiguous layer range unless a later hard starter-triple repair is unavoidable.
 - The generator uses all requested logical types when the board contains enough triples and
   distributes triples evenly across them.
 - Inferred type counts target the requested average copies per type, while actual per-type counts
@@ -1292,7 +1297,9 @@ Generation constraints:
 - `--locked-shelves` can add per-shelf `unlock_after_triples` requirements using 1-based shelf numbers such as `7:3,8:5`.
 - When the logical item set cannot satisfy the target filled-slot count within an explicit
   per-type cap, the generator adds extra empty slots instead of exceeding the cap.
-- Generated layouts reshuffle shelf slots to reduce same-item concentration on a single filled layer, using an adaptive per-layer limit so constrained levels remain possible.
+- `--stats` includes each layer's filled count, triple-ready count and ratio, plus any item types whose
+  copies ended up on non-adjacent layers.
+- Generated layouts preserve adaptive per-layer same-item limits so constrained levels remain possible.
 - Expert difficulty avoids shelves that start with a complete front-layer match.
 
 Depends on:
