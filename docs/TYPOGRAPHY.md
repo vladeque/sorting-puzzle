@@ -39,6 +39,12 @@ roles use DynaPuff's 92% width axis so long uppercase headings retain comfortabl
 side margins without scene-specific font substitutions. Other DynaPuff roles use
 the natural 100% width.
 
+DynaPuff's contextual alternates (`calt`) deliberately move successive letters
+to different vertical positions. They are disabled for buttons and the
+`GameTitleLabel`, `GameSectionLabel`, `GameHudLabel`, and `GameNumberLabel`
+roles so functional, high-emphasis text keeps an even baseline. Unclassified
+labels inherit medium DynaPuff with the playful contextual alternates intact.
+
 Existing scene-owned font sizes, colors, outlines, and shadows remain local to
 the component because they depend on the background and control art.
 
