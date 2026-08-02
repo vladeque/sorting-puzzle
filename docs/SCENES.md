@@ -129,7 +129,8 @@ Script:
 - `scripts/leaderboard_rank_reward.gd`
 
 Purpose:
-- Focused compact reward panel with a clover-coin pile image and formatted coin amount.
+- Focused compact reward group with a transparent clover-coin pile and formatted coin amount,
+  placed directly on the owning row without an additional colored card background.
 - Exposes regular and compact sizing for use inside responsive leaderboard rows.
 - Starts hidden and is presentation-only; payout eligibility and amounts remain owned by the
   leaderboard screen and `PlayerProgress` reward-tier configuration.
