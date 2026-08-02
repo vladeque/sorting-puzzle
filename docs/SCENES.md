@@ -212,12 +212,16 @@ Runtime children:
   starter reward layout, offer counts, amount-based coin-pile icon selection, the starter bundle's
   discount ribbon/compare-at price, the best-value coin tag, the ability info dialog, mock grants
   (including three Freezers), purchase dialog display, and duplicate-transaction handling.
+- Must be launched with `scripts/tools/run_isolated_godot_test.ps1`; its verifier refuses the live
+  `SortingPuzzle` project identity so mock purchases cannot mutate development player data.
 
 ## `scenes/leaderboard_verification.tscn`
 
 - Automated verification entry scene for Weekly top-three reward images and configured amounts,
   Country reward hiding, removal of the former tier-summary label, and required portrait viewport
   bounds.
+- Must be launched with `scripts/tools/run_isolated_godot_test.ps1`; its verifier refuses the live
+  `SortingPuzzle` project identity because it resets progress while preparing leaderboard data.
 
 ## `scenes/ui/main_menu_reward_coin_flyer.tscn`
 

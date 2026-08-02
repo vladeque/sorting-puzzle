@@ -1,11 +1,20 @@
 extends SceneTree
 
 const Codec := preload("res://scripts/save/local_save_codec.gd")
+const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
 
 var _failures := PackedStringArray()
 
 
 func _init() -> void:
+	if not str(ProjectSettings.get_setting("application/config/name", "")).begins_with(
+		ISOLATED_TEST_PROJECT_PREFIX
+	):
+		push_error(
+			"PlayerProgress facade tests must run through scripts/tools/run_isolated_godot_test.ps1."
+		)
+		quit(1)
+		return
 	call_deferred("_run")
 
 

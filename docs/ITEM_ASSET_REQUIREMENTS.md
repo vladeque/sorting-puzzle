@@ -163,7 +163,7 @@ Then:
 5. Run the Godot catalog texture-loading check:
 
    ```powershell
-   godot --headless --path . --script res://tests/gameplay/test_item_progression.gd
+   & .\scripts\tools\run_isolated_godot_test.ps1 -Script tests/gameplay/test_item_progression.gd
    ```
 
 6. Run the progression tests:

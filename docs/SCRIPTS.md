@@ -172,9 +172,29 @@ Depends on:
 - `scripts/store/backend_catalog_source.gd` (GAME-008): `shop_catalog_source=backend`'s offer source. Reads the authenticated backend development catalog (`GET /v1/catalog`) through the shared `BackendTransport`/`BackendReadOperations` (GAME-007), keeps only offers with `eligible: true`, maps the backend `type` enum to the UI's `bundle`/`coins` grouping, and joins each offer to `configs/backend/shop_catalog_prices.json` by `platform_product_id` for its display title and mock regional price via the same `MockStoreProvider.load_products()` the local catalog uses. Also carries that presentation entry's optional `compare_at_prices` (through the same price-provider resolution), `discount_percent`, and `tag` onto the joined offer, so the Shop's discount badge and value tag work the same regardless of `shop_catalog_source`. Offers with an unrecognized type or no local price-table entry are silently excluded rather than rendered without a price. Any failed read (unavailable, unauthorized, malformed, or an empty local `backend_base_url`) falls back to `BackendCatalogCache`; only surfaces an error when no cache exists either.
 - `scripts/store/backend_catalog_cache.gd` (GAME-008): persists the last successfully joined/priced backend catalog to `user://shop_catalog_backend_cache.json` (offers/prices only, never a token or signature) for the offline-cache fallback above.
 
+## `scripts/tools/run_isolated_godot_test.ps1`
+
+- Runs a Godot test scene or script under a generated `SortingPuzzleTest_<id>` project name, which
+  gives the process a unique `user://` directory instead of the live `SortingPuzzle` player data.
+- Copies the existing `.godot` import cache into a temporary project, links only the runtime/test
+  resource directories, and deliberately leaves out `local/backend_debug.cfg`.
+- Removes the temporary project and test user data after the process exits; pass `-KeepArtifacts`
+  only when the isolated files are needed for diagnosis.
+- Use this wrapper for save-aware headless tests. This Godot build does not support the previously
+  documented `--user-data-dir` argument; the ignored argument allowed verification data to reach
+  the live development save.
+
+Examples:
+
+```powershell
+& .\scripts\tools\run_isolated_godot_test.ps1 -Scene scenes/shop_verification.tscn
+& .\scripts\tools\run_isolated_godot_test.ps1 -Script tests/save/test_player_progress_facade.gd -GodotArguments '--verbose'
+```
+
 ## `scripts/tools/verify_shop.gd`
 
-- Runs through `scenes/shop_verification.tscn` with an isolated test user-data directory.
+- Runs through `scenes/shop_verification.tscn` with the isolated test wrapper above and refuses to
+  run under the production `SortingPuzzle` project identity.
 - Verifies US, Ukrainian, German, and Japanese mock price strings; five representative portrait
   viewports; the five-reward starter layout (coins first), its loaded discount badge texture, and
   compare-at price; offer population; the `coins_3500` best-value tag (and that untagged offers
@@ -186,7 +206,7 @@ Depends on:
 Run:
 
 ```powershell
-& 'D:\Godot\godot.exe' --headless --path . scenes/shop_verification.tscn --user-data-dir <scratch-dir>
+& .\scripts\tools\run_isolated_godot_test.ps1 -Scene scenes/shop_verification.tscn
 ```
 
 Prints `SHOP VERIFICATION PASSED` and exits `0` on success; otherwise prints each failed check and exits `1`.
@@ -221,7 +241,8 @@ Purpose:
 
 ## `scripts/tools/verify_leaderboard.gd`
 
-- Runs through `scenes/leaderboard_verification.tscn` with an isolated test user-data directory.
+- Runs through `scenes/leaderboard_verification.tscn` with the isolated test wrapper above and
+  refuses to run under the production `SortingPuzzle` project identity.
 - Verifies that the old reward summary label is gone, Weekly ranks 1-3 show 500/300/300 with tier
   04/03/02 artwork respectively, rank 4 has no preview, Country rows hide Weekly rewards, and the
   leaderboard remains within bounds at five representative portrait resolutions.
@@ -229,7 +250,7 @@ Purpose:
 Run:
 
 ```powershell
-& 'D:\Godot\godot.exe' --headless --path . scenes/leaderboard_verification.tscn --user-data-dir <scratch-dir>
+& .\scripts\tools\run_isolated_godot_test.ps1 -Scene scenes/leaderboard_verification.tscn
 ```
 
 Prints `LEADERBOARD VERIFICATION PASSED` and exits `0` on success; otherwise prints each failed

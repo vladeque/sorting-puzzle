@@ -196,14 +196,14 @@ Support sequence:
 Automated verification:
 
 ```powershell
-& 'D:\Godot\godot.exe' --headless --verbose --path . --script tests/save/test_game_001.gd
-& 'D:\Godot\godot.exe' --headless --verbose --path . --script tests/save/test_game_002.gd
-& 'D:\Godot\godot.exe' --headless --verbose --path . --script tests/save/test_player_progress_facade.gd
-& 'D:\Godot\godot.exe' --headless --path . --script scripts/tools/check_content_provenance.gd
-& 'D:\Godot\godot.exe' --headless --verbose --path . --script tests/save/test_local_backend_debug_bootstrap.gd
-& 'D:\Godot\godot.exe' --headless --verbose --path . --script tests/save/test_game_004.gd
-& 'D:\Godot\godot.exe' --headless --verbose --path . --script tests/save/test_game_005.gd
-& 'D:\Godot\godot.exe' --headless --verbose --path . --script tests/save/test_game_006.gd
+& .\scripts\tools\run_isolated_godot_test.ps1 -Script tests/save/test_game_001.gd -GodotArguments '--verbose'
+& .\scripts\tools\run_isolated_godot_test.ps1 -Script tests/save/test_game_002.gd -GodotArguments '--verbose'
+& .\scripts\tools\run_isolated_godot_test.ps1 -Script tests/save/test_player_progress_facade.gd -GodotArguments '--verbose'
+& .\scripts\tools\run_isolated_godot_test.ps1 -Script scripts/tools/check_content_provenance.gd
+& .\scripts\tools\run_isolated_godot_test.ps1 -Script tests/save/test_local_backend_debug_bootstrap.gd -GodotArguments '--verbose'
+& .\scripts\tools\run_isolated_godot_test.ps1 -Script tests/save/test_game_004.gd -GodotArguments '--verbose'
+& .\scripts\tools\run_isolated_godot_test.ps1 -Script tests/save/test_game_005.gd -GodotArguments '--verbose'
+& .\scripts\tools\run_isolated_godot_test.ps1 -Script tests/save/test_game_006.gd -GodotArguments '--verbose'
 pnpm --dir ..\sorting-puzzle-backend check:development-client-manifest
 ```
 

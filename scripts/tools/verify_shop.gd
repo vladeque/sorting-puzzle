@@ -3,6 +3,7 @@ extends Node
 const StoreServiceScript := preload("res://scripts/store/store_service.gd")
 const SHOP_SCENE := preload("res://scenes/ui/shop_screen.tscn")
 const COIN_OFFER_ROW_SCENE := preload("res://scenes/ui/shop_coin_offer_row.tscn")
+const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
 const TEST_REGIONS := {
 	"US": "$0.99",
 	"UA": "₴39.99",
@@ -38,6 +39,14 @@ var _failures := []
 
 
 func _ready() -> void:
+	if not str(ProjectSettings.get_setting("application/config/name", "")).begins_with(
+		ISOLATED_TEST_PROJECT_PREFIX
+	):
+		push_error(
+			"Shop verification must run through scripts/tools/run_isolated_godot_test.ps1."
+		)
+		get_tree().quit(1)
+		return
 	_run.call_deferred()
 
 

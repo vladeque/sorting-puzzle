@@ -1,6 +1,7 @@
 extends Node
 
 const LEADERBOARD_SCENE := preload("res://scenes/ui/leaderboard_screen.tscn")
+const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
 const TEST_RESOLUTIONS := [
 	Vector2i(540, 960),
 	Vector2i(720, 1280),
@@ -27,6 +28,14 @@ var _failures := []
 
 
 func _ready() -> void:
+	if not str(ProjectSettings.get_setting("application/config/name", "")).begins_with(
+		ISOLATED_TEST_PROJECT_PREFIX
+	):
+		push_error(
+			"Leaderboard verification must run through scripts/tools/run_isolated_godot_test.ps1."
+		)
+		get_tree().quit(1)
+		return
 	_run.call_deferred()
 
 

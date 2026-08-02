@@ -457,7 +457,7 @@ play and converge without duplicate effects.
 Automated verification:
 
 ```powershell
-& 'D:\Godot\godot.exe' --headless --verbose --path . --script tests/save/test_game_006.gd
+& .\scripts\tools\run_isolated_godot_test.ps1 -Script tests/save/test_game_006.gd -GodotArguments '--verbose'
 ```
 
 ## GAME-007 — Add a shared authenticated backend transport
@@ -523,7 +523,7 @@ backend features outside the focused save services.
 Automated verification:
 
 ```powershell
-& 'D:\Godot\godot.exe' --headless --verbose --path . --script tests/backend/test_game_007.gd
+& .\scripts\tools\run_isolated_godot_test.ps1 -Script tests/backend/test_game_007.gd -GodotArguments '--verbose'
 ```
 
 ## GAME-008 — Integrate the backend Shop catalog locally
@@ -592,7 +592,7 @@ while keeping price lookup and purchasing explicitly local/mock.
 Automated verification:
 
 ```powershell
-& 'D:\Godot\godot.exe' --headless --path . --script tests/backend/test_game_008.gd
+& .\scripts\tools\run_isolated_godot_test.ps1 -Script tests/backend/test_game_008.gd
 ```
 
 ## GAME-009 — Integrate backend leaderboards locally
@@ -669,7 +669,7 @@ weekly, country, and world leaderboard reads.
 Automated verification:
 
 ```powershell
-& 'D:\Godot\godot.exe' --headless --path . --script tests/backend/test_game_009.gd
+& .\scripts\tools\run_isolated_godot_test.ps1 -Script tests/backend/test_game_009.gd
 ```
 
 ## GAME-010 — Automate the Android local-backend integration gate
@@ -714,7 +714,7 @@ request bodies, credential values, and secret paths are not emitted by the gate.
 Automated verification:
 
 ```powershell
-& 'D:\Godot\godot.exe' --headless --path . --script tests/backend/test_game_010.gd
+& .\scripts\tools\run_isolated_godot_test.ps1 -Script tests/backend/test_game_010.gd
 .\scripts\tools\run_local_backend_integration_gate.ps1
 ```
 
@@ -773,7 +773,7 @@ other gameplay timers continue.
 **Automated verification:**
 
 ```powershell
-& 'D:\Godot\godot.exe' --headless --path . --script tests/gameplay/test_game_011.gd
+& .\scripts\tools\run_isolated_godot_test.ps1 -Script tests/gameplay/test_game_011.gd
 ```
 
 The accelerated-delta suite covers activation before the first move, exact countdown suppression,

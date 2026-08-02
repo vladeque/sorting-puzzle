@@ -146,6 +146,26 @@ Change here when:
 - Adding life tuning, operations, account flows, recovery, secure native storage, retries,
   checkpoint mapping, migrations, rewards, purchases, reset flows, or new persisted state.
 
+### Headless Test Isolation
+
+Files:
+- `scripts/tools/run_isolated_godot_test.ps1`
+- `scripts/tools/verify_shop.gd`
+- `scripts/tools/verify_leaderboard.gd`
+- `tests/save/test_player_progress_facade.gd`
+
+Responsibility:
+- Runs save-aware headless verification under a unique `SortingPuzzleTest_<id>` project identity so
+  Godot resolves `user://` outside the live development player's `SortingPuzzle` data.
+- Excludes the local backend override, reuses the import cache in a temporary project, and removes
+  isolated project/user-data artifacts after each run.
+- Refuses direct production-identity execution for the Shop, leaderboard, and PlayerProgress facade
+  checks that intentionally purchase or reset progress.
+
+Change here when:
+- Adding a headless test that writes `user://`, changing the project name, or changing which project
+  resource directories tests require.
+
 ### Android Local Backend Debug Export (GAME-003)
 
 Files:

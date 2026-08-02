@@ -457,7 +457,7 @@ Contract:
 Verification:
 
 ```powershell
-& 'D:\Godot\godot.exe' --headless --path . --script scripts/tools/check_content_provenance.gd
+& .\scripts\tools\run_isolated_godot_test.ps1 -Script scripts/tools/check_content_provenance.gd
 pnpm --dir ..\sorting-puzzle-backend check:development-client-manifest
 ```
 
