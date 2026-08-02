@@ -172,8 +172,11 @@ Runtime children:
 
 ## `scenes/ui/shop_coin_offer_row.tscn`
 
-- Reusable compact row with coin art, formatted coin quantity, and store-formatted purchase button.
+- Reusable compact row with amount-scaled coin-pile art, formatted coin quantity, and store-formatted purchase button.
 - `scripts/shop_coin_offer_row.gd` emits the bound offer id without granting rewards itself.
+- `%CoinIcon` selects one of the seven transparent A1 clover-coin assets under
+  `assets/ui/shop_coin_offers/` from the bound `rewards.coins` amount. The tier ceilings are 100,
+  300, 750, 1,600, 3,500, and 13,000 coins; larger offers use the seventh overflowing-pouch tier.
 - An optional `TagBanner` pill above the row content shows a short promotional tag (for example
   "BEST VALUE"); it stays hidden when the bound offer has no `tag`.
 
@@ -190,9 +193,9 @@ Runtime children:
 ## `scenes/shop_verification.tscn`
 
 - Automated verification entry scene for regional prices, required viewport sizes, five-cell
-  starter reward layout, offer counts, the starter bundle's discount ribbon/compare-at price, the
-  best-value coin tag, the ability info dialog, mock grants (including three Freezers), purchase
-  dialog display, and duplicate-transaction handling.
+  starter reward layout, offer counts, amount-based coin-pile icon selection, the starter bundle's
+  discount ribbon/compare-at price, the best-value coin tag, the ability info dialog, mock grants
+  (including three Freezers), purchase dialog display, and duplicate-transaction handling.
 
 ## `scenes/ui/main_menu_reward_coin_flyer.tscn`
 

@@ -154,8 +154,10 @@ Depends on:
   `offer.discount_percent`/`offer.store.compare_at_formatted_price` and widens `%TitleSpacer` while
   the badge is visible so it never overlaps the title, and emits `info_requested(ability_id)` when a
   reward cell's transparent info button is tapped.
-- `scripts/shop_coin_offer_row.gd`: binds a coin quantity, formatted price, and purchase signal.
-  Also binds an optional `tag` banner (for example "BEST VALUE").
+- `scripts/shop_coin_offer_row.gd`: binds a coin quantity, its amount-scaled seven-tier clover-coin
+  pile texture, formatted price, and purchase signal. The texture ladder uses 100, 300, 750, 1,600,
+  3,500, and 13,000 as upper bounds before the largest overflowing-pouch fallback. Also binds an
+  optional `tag` banner (for example "BEST VALUE").
 - `scripts/coin_balance_widget.gd`: formats and displays a non-negative coin balance.
 - `scripts/shop_purchase_dialog.gd`: shows and dismisses a focused result modal; `show_result()`
   takes an optional `button_text` (defaults to "Continue") so the same dialog reads correctly for

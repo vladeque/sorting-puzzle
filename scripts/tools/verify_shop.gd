@@ -2,6 +2,7 @@ extends Node
 
 const StoreServiceScript := preload("res://scripts/store/store_service.gd")
 const SHOP_SCENE := preload("res://scenes/ui/shop_screen.tscn")
+const COIN_OFFER_ROW_SCENE := preload("res://scenes/ui/shop_coin_offer_row.tscn")
 const TEST_REGIONS := {
 	"US": "$0.99",
 	"UA": "₴39.99",
@@ -14,6 +15,23 @@ const TEST_RESOLUTIONS := [
 	Vector2i(1080, 1920),
 	Vector2i(1080, 2400),
 	Vector2i(1200, 1600),
+]
+const EXPECTED_COIN_OFFER_ICONS := {
+	&"coins_100": "res://assets/ui/shop_coin_offers/shop_coin_offer_tier_01.png",
+	&"coins_300": "res://assets/ui/shop_coin_offers/shop_coin_offer_tier_02.png",
+	&"coins_750": "res://assets/ui/shop_coin_offers/shop_coin_offer_tier_03.png",
+	&"coins_1600": "res://assets/ui/shop_coin_offers/shop_coin_offer_tier_04.png",
+	&"coins_3500": "res://assets/ui/shop_coin_offers/shop_coin_offer_tier_05.png",
+}
+const HIGH_TIER_COIN_OFFER_ICONS := [
+	{
+		"amount": 13000,
+		"path": "res://assets/ui/shop_coin_offers/shop_coin_offer_tier_06.png",
+	},
+	{
+		"amount": 13001,
+		"path": "res://assets/ui/shop_coin_offers/shop_coin_offer_tier_07.png",
+	},
 ]
 
 var _failures := []
@@ -39,6 +57,18 @@ func _run() -> void:
 	_check(bundles.get_child_count() == 1, "Expected one configured bundle card.")
 	_check(coin_offers.get_child_count() == 5, "Expected five configured coin offers.")
 	_check((shop.get_node("%TitleLabel") as Label).text == "SHOP", "Shop title is missing.")
+	for offer_id in EXPECTED_COIN_OFFER_ICONS:
+		var icon_row := _find_coin_offer_row(coin_offers, offer_id)
+		_check(icon_row != null, "Could not find %s to verify its amount-based icon." % offer_id)
+		if icon_row != null:
+			var icon_texture := (icon_row.get_node("%CoinIcon") as TextureRect).texture
+			_check(icon_texture != null, "%s has no coin-offer icon." % offer_id)
+			if icon_texture != null:
+				_check(
+					icon_texture.resource_path == EXPECTED_COIN_OFFER_ICONS[offer_id],
+					"%s selected the wrong amount-based coin-offer icon." % offer_id
+				)
+	_verify_high_tier_coin_offer_icons()
 	var bundle_card := bundles.get_child(0) as Control
 	_check(
 		(bundle_card.get_node("%FreezerCount") as Label).text == "×3",
@@ -170,6 +200,29 @@ func _verify_regional_prices() -> void:
 			str(store.get("formatted_price", "")) == TEST_REGIONS[country_code],
 			"Unexpected mock price for %s." % country_code
 		)
+
+
+func _verify_high_tier_coin_offer_icons() -> void:
+	var row := COIN_OFFER_ROW_SCENE.instantiate() as Control
+	get_tree().root.add_child(row)
+	for test_case in HIGH_TIER_COIN_OFFER_ICONS:
+		var amount := int(test_case.get("amount", 0))
+		row.call(
+			"set_offer",
+			{
+				"id": "verify_coins_%d" % amount,
+				"rewards": {"coins": amount},
+				"store": {"formatted_price": "$0.00"},
+			}
+		)
+		var icon_texture := (row.get_node("%CoinIcon") as TextureRect).texture
+		_check(icon_texture != null, "%d-coin test offer has no icon." % amount)
+		if icon_texture != null:
+			_check(
+				icon_texture.resource_path == str(test_case.get("path", "")),
+				"%d-coin test offer selected the wrong high-tier icon." % amount
+			)
+	row.queue_free()
 
 
 func _find_coin_offer_row(coin_offers: VBoxContainer, offer_id: StringName) -> Control:

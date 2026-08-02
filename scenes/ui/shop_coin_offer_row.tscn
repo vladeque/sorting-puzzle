@@ -1,7 +1,7 @@
 [gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/shop_coin_offer_row.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/ui/clover_coin_transparent_96x96.png" id="2_coin"]
+[ext_resource type="Texture2D" path="res://assets/ui/shop_coin_offers/shop_coin_offer_tier_01.png" id="2_coin"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_row"]
 bg_color = Color(0.37, 0.12, 0.18, 0.96)
@@ -101,6 +101,7 @@ size_flags_vertical = 3
 theme_override_constants/separation = 12
 
 [node name="CoinIcon" type="TextureRect" parent="RowStack/Content"]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(82, 82)
 layout_mode = 2
 texture = ExtResource("2_coin")
