@@ -141,7 +141,8 @@ Depends on:
 ## `scripts/shop_screen.gd`
 
 - Owns Shop loading/error states, creates reusable offer scenes, coordinates one purchase at a time, and routes the shared navigation.
-- Passes purchase results to `PlayerProgress.apply_shop_purchase()` and refreshes the visible balance after a grant.
+- Passes purchase results and their offer ids to `PlayerProgress.apply_shop_purchase()`, refreshes
+  the visible balance after a grant, and reloads the catalog so a claimed one-time offer disappears.
 - Applies maximum content width, compact offer sizing, fixed bottom navigation, and mobile safe-area margins.
 - Owns the `ABILITY_INFO` display copy (name + one-line description) for Hammer/Shuffle/Lantern/
   Freezer and shows it through `%PurchaseDialog` when a bundle card's `info_requested` signal fires.
@@ -167,7 +168,7 @@ Depends on:
 
 - `scripts/store/store_provider.gd`: provider contract for product loading and purchase requests.
 - `scripts/store/mock_store_provider.gd`: resolves config prices for `application/config/mock_store_country` and returns unique mock transaction ids after a short asynchronous delay. Also resolves an offer's optional `compare_at_prices` into `compare_at_formatted_price` the same way it resolves `mock_prices` into `formatted_price`; omitted when the offer has no compare-at price.
-- `scripts/store/store_service.gd`: selects a catalog source via `application/config/shop_catalog_source` (`local` default or `backend`), joins its offers with `_provider` (always the mock provider), and returns normalized purchase results. `purchase_offer()`/pricing behavior is unchanged by the catalog source. This is the client replacement point for later platform integrations.
+- `scripts/store/store_service.gd`: selects a catalog source via `application/config/shop_catalog_source` (`local` default or `backend`), joins its offers with `_provider` (always the mock provider), and returns normalized purchase results. Local/mock offers marked with a lifetime purchase limit of one are filtered against `PlayerProgress` on load and checked again before purchase. This is the client replacement point for later platform integrations.
 - `scripts/store/backend_catalog_source.gd` (GAME-008): `shop_catalog_source=backend`'s offer source. Reads the authenticated backend development catalog (`GET /v1/catalog`) through the shared `BackendTransport`/`BackendReadOperations` (GAME-007), keeps only offers with `eligible: true`, maps the backend `type` enum to the UI's `bundle`/`coins` grouping, and joins each offer to `configs/backend/shop_catalog_prices.json` by `platform_product_id` for its display title and mock regional price via the same `MockStoreProvider.load_products()` the local catalog uses. Also carries that presentation entry's optional `compare_at_prices` (through the same price-provider resolution), `discount_percent`, and `tag` onto the joined offer, so the Shop's discount badge and value tag work the same regardless of `shop_catalog_source`. Offers with an unrecognized type or no local price-table entry are silently excluded rather than rendered without a price. Any failed read (unavailable, unauthorized, malformed, or an empty local `backend_base_url`) falls back to `BackendCatalogCache`; only surfaces an error when no cache exists either.
 - `scripts/store/backend_catalog_cache.gd` (GAME-008): persists the last successfully joined/priced backend catalog to `user://shop_catalog_backend_cache.json` (offers/prices only, never a token or signature) for the offline-cache fallback above.
 
@@ -178,7 +179,8 @@ Depends on:
   viewports; the five-reward starter layout (coins first), its loaded discount badge texture, and
   compare-at price; offer population; the `coins_3500` best-value tag (and that untagged offers
   stay untagged); the ability info dialog opening with the right title when a reward icon is
-  tapped; coin and bundle purchases including three Freezers; and duplicate transaction
+  tapped; coin and bundle purchases including the 2,500-coin New Player Bundle; lifetime
+  one-time visibility across a reload; three Freezers per bundle; and duplicate transaction
   protection.
 
 Run:
@@ -517,6 +519,8 @@ Saved fields:
 - `coins`: current gold coin balance. Fresh saves start at `300`.
 - `ability_uses`: remaining campaign uses for hammer, shuffle, highlight/Lantern, and Freezer.
 - `processed_shop_purchase_ids`: transaction ids whose Shop rewards were already applied locally.
+- `purchased_shop_offer_ids`: offer ids purchased through the local/mock Shop, used to persist
+  once-per-account lifetime eligibility across reloads.
 - `avatar_id`: selected profile avatar id. Fresh and legacy saves default to `avatar_cat`.
 - `player_name`: saved profile display name. Fresh and legacy saves without a valid value receive a generated `player_` name with a five-character random suffix, such as `player_g26f3`.
 - `settings_disabled`: disabled-state map for `music`, `sound_effects`, and `vibration` settings buttons.
@@ -694,7 +698,7 @@ Purpose:
 - Owns feature-gated `POST /v2/saves/sync` and recovery `GET /v2/saves/state`.
 - Emits additive protocol v2.1 save envelopes so `resource_spend.asset = freezer` and the fourth
   checkpoint ability are preserved. It accepts supported v2.0 responses during rollout; a v2.0
-  checkpoint with no Freezer field preserves the local schema-5 Freezer balance before replaying
+  checkpoint with no Freezer field preserves the local schema-5-or-newer Freezer balance before replaying
   unacknowledged operations.
 - Requires valid bundled content provenance before issuing network requests.
 - Caps batches at 500 operations/1 MiB and persists exact payload/idempotency values before send.

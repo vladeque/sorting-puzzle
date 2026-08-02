@@ -24,7 +24,7 @@ func _run() -> void:
 		"ability_uses": {"hammer": 7, "shuffle": 6, "highlight": 5},
 	}) as Dictionary
 	var migrated_uses := migrated_v4.get("ability_uses", {}) as Dictionary
-	_check(int(migrated_v4.get("version", 0)) == 5, "schema-4 snapshots migrate to schema 5")
+	_check(int(migrated_v4.get("version", 0)) == 6, "schema-4 snapshots migrate to schema 6")
 	_check(int(migrated_uses.get("freezer", 0)) == 3, "schema-4 migration grants exactly three freezers")
 	var sanitized_v5 := progress.call("_sanitize_data", {
 		"version": 5,
@@ -32,7 +32,11 @@ func _run() -> void:
 	}) as Dictionary
 	_check(
 		int((sanitized_v5.get("ability_uses", {}) as Dictionary).get("freezer", 0)) == 8,
-		"schema-5 sanitization never repeats the freezer migration grant"
+		"schema-5 to schema-6 migration never repeats the freezer grant"
+	)
+	_check(
+		(sanitized_v5.get("purchased_shop_offer_ids", []) as Array).is_empty(),
+		"schema-5 to schema-6 migration starts with no locally purchased offers"
 	)
 	_check(progress.get_coins() == 300, "fresh local snapshot has coins")
 	_check(progress.spend_coins(25), "coin spending commits")
@@ -45,6 +49,16 @@ func _run() -> void:
 	_check(progress.spend_life(1, "left"), "life loss and attempt commit")
 	_check(progress.get_lives() == 4, "life loss is immediate")
 	_check(progress.set_profile("avatar_bear", "Offline Player"), "profile edit commits")
+	var offer_claim := progress.apply_shop_purchase(
+		"facade-new-player-bundle",
+		{},
+		"new_player_bundle"
+	) as Dictionary
+	_check(bool(offer_claim.get("applied", false)), "shop offer claim commits")
+	_check(
+		progress.has_purchased_shop_offer(&"new_player_bundle"),
+		"purchased shop offer is available to catalog eligibility"
+	)
 
 	for level_number in range(1, 171):
 		_check(progress.complete_level(level_number, 3), "offline completion %d commits" % level_number)
@@ -94,6 +108,10 @@ func _run() -> void:
 	progress.load_progress()
 	_check(progress.get_current_level() == 171, "facade snapshot survives restart load")
 	_check(progress.get_player_name() == "Offline Player", "profile remains account-scoped")
+	_check(
+		progress.has_purchased_shop_offer(&"new_player_bundle"),
+		"purchased shop offer survives restart load"
+	)
 	_check(
 		int(progress.get_ability_uses().get("freezer", 0)) == 2,
 		"freezer spend survives restart without refund or duplication"

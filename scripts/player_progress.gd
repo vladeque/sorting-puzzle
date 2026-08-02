@@ -10,7 +10,7 @@ const ContentProvenanceManifestScript := preload(
 	"res://scripts/save/content_provenance_manifest.gd"
 )
 const SAVE_PATH := "user://player_progress.json"
-const SAVE_VERSION := 5
+const SAVE_VERSION := 6
 const MIN_LEVEL := 1
 const ABILITY_HAMMER := "hammer"
 const ABILITY_SHUFFLE := "shuffle"
@@ -133,7 +133,7 @@ func load_progress() -> void:
 		open_result.get("preferences", {}) as Dictionary
 	)
 	if requires_schema_migration and not bool(_commit_current_state().get("ok", false)):
-		push_error("Could not persist the gameplay save schema-5 migration.")
+		push_error("Could not persist the gameplay save schema-6 migration.")
 	if _sync_service == null:
 		_sync_service = SaveSyncServiceScript.new()
 		add_child(_sync_service)
@@ -232,7 +232,11 @@ func spend_coins(amount: int, reason: String = "gameplay") -> bool:
 	}])
 
 
-func apply_shop_purchase(transaction_id: String, rewards: Dictionary) -> Dictionary:
+func apply_shop_purchase(
+	transaction_id: String,
+	rewards: Dictionary,
+	offer_id: String = ""
+) -> Dictionary:
 	var normalized_transaction_id := transaction_id.strip_edges()
 	if normalized_transaction_id.is_empty():
 		return {"ok": false, "applied": false, "error": "Purchase transaction id is empty."}
@@ -258,6 +262,12 @@ func apply_shop_purchase(transaction_id: String, rewards: Dictionary) -> Diction
 	_data["coins"] = get_coins() + granted_coins
 	processed_ids.append(normalized_transaction_id)
 	_data["processed_shop_purchase_ids"] = processed_ids
+	var normalized_offer_id := offer_id.strip_edges()
+	if not normalized_offer_id.is_empty():
+		var purchased_offer_ids := _get_purchased_shop_offer_ids()
+		if not purchased_offer_ids.has(normalized_offer_id):
+			purchased_offer_ids.append(normalized_offer_id)
+		_data["purchased_shop_offer_ids"] = purchased_offer_ids
 	if not _commit_or_restore(previous_data):
 		return {"ok": false, "applied": false, "error": "Could not persist the verified purchase fact."}
 	return {
@@ -266,6 +276,14 @@ func apply_shop_purchase(transaction_id: String, rewards: Dictionary) -> Diction
 		"coins": granted_coins,
 		"abilities": granted_abilities,
 	}
+
+
+func has_purchased_shop_offer(offer_id: StringName) -> bool:
+	var normalized_offer_id := String(offer_id).strip_edges()
+	return (
+		not normalized_offer_id.is_empty()
+		and _get_purchased_shop_offer_ids().has(normalized_offer_id)
+	)
 
 
 func get_reward_chest_progress() -> Dictionary:
@@ -580,6 +598,9 @@ func _sanitize_data(raw_data: Dictionary) -> Dictionary:
 	sanitized["processed_shop_purchase_ids"] = _sanitize_processed_shop_purchase_ids(
 		raw_data.get("processed_shop_purchase_ids", [])
 	)
+	sanitized["purchased_shop_offer_ids"] = _sanitize_purchased_shop_offer_ids(
+		raw_data.get("purchased_shop_offer_ids", [])
+	)
 	sanitized["avatar_id"] = _sanitize_avatar_id(str(raw_data.get("avatar_id", DEFAULT_AVATAR_ID)))
 	sanitized["player_name"] = _sanitize_player_name(str(raw_data.get("player_name", sanitized["player_name"])), sanitized["player_name"])
 	sanitized["moderation_state"] = str(raw_data.get("moderation_state", "active"))
@@ -618,7 +639,7 @@ func _sanitize_data(raw_data: Dictionary) -> Dictionary:
 		var ability_uses := sanitized["ability_uses"] as Dictionary
 		for ability_key in DEFAULT_ABILITY_USES.keys():
 			ability_uses[ability_key] = maxi(int(raw_ability_uses.get(ability_key, ability_uses[ability_key])), 0)
-		if source_version > 0 and source_version < SAVE_VERSION:
+		if source_version > 0 and source_version < 5:
 			ability_uses[ABILITY_FREEZER] = maxi(
 				int(raw_ability_uses.get(ABILITY_FREEZER, 0)),
 				0
@@ -636,6 +657,7 @@ func _default_data() -> Dictionary:
 		"next_life_restore_unix": 0,
 		"coins": DEFAULT_COINS,
 		"processed_shop_purchase_ids": [],
+		"purchased_shop_offer_ids": [],
 		"ability_uses": DEFAULT_ABILITY_USES.duplicate(),
 		"avatar_id": DEFAULT_AVATAR_ID,
 		"player_name": _generate_player_name(),
@@ -691,6 +713,23 @@ func _sanitize_processed_shop_purchase_ids(raw_ids) -> Array:
 		var transaction_id := str(raw_id).strip_edges()
 		if not transaction_id.is_empty() and not sanitized.has(transaction_id):
 			sanitized.append(transaction_id)
+
+	return sanitized
+
+
+func _get_purchased_shop_offer_ids() -> Array:
+	return _sanitize_purchased_shop_offer_ids(_data.get("purchased_shop_offer_ids", []))
+
+
+func _sanitize_purchased_shop_offer_ids(raw_ids) -> Array:
+	var sanitized := []
+	if not (raw_ids is Array):
+		return sanitized
+
+	for raw_id in raw_ids as Array:
+		var offer_id := str(raw_id).strip_edges()
+		if not offer_id.is_empty() and not sanitized.has(offer_id):
+			sanitized.append(offer_id)
 
 	return sanitized
 

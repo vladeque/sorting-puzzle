@@ -144,7 +144,8 @@ func _purchase_offer(offer_id: StringName) -> void:
 
 	var grant_result := PlayerProgress.apply_shop_purchase(
 		str(purchase_result.get("transaction_id", "")),
-		purchase_result.get("rewards", {}) as Dictionary
+		purchase_result.get("rewards", {}) as Dictionary,
+		str(purchase_result.get("offer_id", ""))
 	)
 	if not bool(grant_result.get("ok", false)):
 		_purchase_dialog.call(
@@ -161,7 +162,10 @@ func _purchase_offer(offer_id: StringName) -> void:
 		)
 
 	_purchase_in_progress = false
-	_set_offers_locked(false)
+	if bool(grant_result.get("ok", false)):
+		await _load_shop()
+	else:
+		_set_offers_locked(false)
 
 
 func _format_reward_message(rewards: Dictionary) -> String:

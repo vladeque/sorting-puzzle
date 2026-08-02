@@ -35,9 +35,16 @@ func load_catalog() -> Dictionary:
 		return result
 
 	_offers_by_id.clear()
+	var available_offers := []
 	for raw_offer in result.get("offers", []) as Array:
-		if raw_offer is Dictionary:
-			_offers_by_id[str((raw_offer as Dictionary).get("id", ""))] = raw_offer
+		if not (raw_offer is Dictionary):
+			continue
+		var offer := raw_offer as Dictionary
+		if _catalog_source == null and not _is_local_offer_available(offer):
+			continue
+		_offers_by_id[str(offer.get("id", ""))] = offer
+		available_offers.append(offer)
+	result["offers"] = available_offers
 
 	return result
 
@@ -86,6 +93,9 @@ func purchase_offer(offer_id: StringName) -> Dictionary:
 		return {"ok": false, "error": "This shop offer is unavailable."}
 
 	var offer_dictionary := offer as Dictionary
+	if _catalog_source == null and not _is_local_offer_available(offer_dictionary):
+		_offers_by_id.erase(String(offer_id))
+		return {"ok": false, "error": "This one-time shop offer has already been purchased."}
 	var purchase_result: Dictionary = await _provider.purchase(str(offer_dictionary.get("product_id", "")))
 	if not bool(purchase_result.get("ok", false)):
 		return purchase_result
@@ -146,7 +156,39 @@ func _sanitize_offer(raw_offer) -> Dictionary:
 	sanitized["product_id"] = product_id
 	sanitized["type"] = offer_type
 	sanitized["title"] = str(offer.get("title", offer_id))
+	if offer.has("purchase_limit"):
+		var purchase_limit := int(offer.get("purchase_limit", 0))
+		if purchase_limit <= 0:
+			return {}
+		sanitized["purchase_limit"] = purchase_limit
+		var limit_period := str(offer.get("limit_period", "")).to_lower()
+		if limit_period not in ["lifetime", "campaign", "day", "week", "offer_window"]:
+			return {}
+		sanitized["limit_period"] = limit_period
 	return sanitized
+
+
+func _is_local_offer_available(offer: Dictionary) -> bool:
+	if not _is_lifetime_single_purchase_offer(offer):
+		return true
+	var player_progress = _find_player_progress()
+	return (
+		player_progress == null
+		or not player_progress.has_method("has_purchased_shop_offer")
+		or not bool(
+			player_progress.call(
+				"has_purchased_shop_offer",
+				StringName(str(offer.get("id", "")))
+			)
+		)
+	)
+
+
+func _is_lifetime_single_purchase_offer(offer: Dictionary) -> bool:
+	return (
+		int(offer.get("purchase_limit", 0)) == 1
+		and str(offer.get("limit_period", "")).to_lower() == "lifetime"
+	)
 
 
 func _create_provider() -> RefCounted:
@@ -175,8 +217,12 @@ func _create_catalog_source() -> RefCounted:
 ## script (which headless tooling/tests may `preload()` before autoloads are registered) never
 ## takes a hard compile-time dependency on singleton resolution order.
 func _find_backend_transport():
+	var player_progress = _find_player_progress()
+	return player_progress.get_backend_transport() if player_progress != null else null
+
+
+func _find_player_progress():
 	var main_loop := Engine.get_main_loop()
 	if not (main_loop is SceneTree):
 		return null
-	var player_progress = (main_loop as SceneTree).root.get_node_or_null("PlayerProgress")
-	return player_progress.get_backend_transport() if player_progress != null else null
+	return (main_loop as SceneTree).root.get_node_or_null("PlayerProgress")

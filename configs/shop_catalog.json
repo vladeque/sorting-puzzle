@@ -29,6 +29,26 @@
       }
     },
     {
+      "id": "new_player_bundle",
+      "product_id": "sorting_puzzle.new_player_bundle",
+      "type": "bundle",
+      "title": "New Player Bundle",
+      "purchase_limit": 1,
+      "limit_period": "lifetime",
+      "rewards": {
+        "coins": 2500,
+        "abilities": {
+          "hammer": 3,
+          "shuffle": 3,
+          "highlight": 3,
+          "freezer": 3
+        }
+      },
+      "mock_prices": {
+        "US": {"formatted_price": "$7.99", "currency_code": "USD"}
+      }
+    },
+    {
       "id": "coins_100",
       "product_id": "sorting_puzzle.coins_100",
       "type": "coins",

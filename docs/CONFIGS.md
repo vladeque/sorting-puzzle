@@ -301,6 +301,10 @@ Rules:
 - `rewards.coins` is a non-negative coin grant.
 - `rewards.abilities` may grant `hammer`, `shuffle`, `highlight`, and `freezer`; the UI labels
   `highlight` as Lantern.
+- `purchase_limit: 1` together with `limit_period: "lifetime"` marks a local/mock offer as a
+  once-per-account purchase. Its offer id is saved with the purchase grant, the offer is removed
+  from later catalog loads, and purchase execution rechecks the claim before contacting the mock
+  provider. Backend-sourced eligibility remains server-authoritative.
 - `mock_prices` is keyed by mock country code and contains the complete `formatted_price` plus ISO currency code. Missing regions fall back to `US` in the development provider.
 - Real providers must ignore `mock_prices` and display the formatted string returned by Google Play or the App Store.
 - `discount_percent` (optional, integer) and `compare_at_prices` (optional, same per-region
@@ -311,11 +315,12 @@ Rules:
   `store.compare_at_formatted_price` the same way it resolves `mock_prices`.
 - `tag` (optional, string, e.g. `"BEST VALUE"`) shows a small banner on `shop_coin_offer_row.tscn`.
   Also presentation-only; omit it for offers that shouldn't call out a tag.
-- Current mock catalog: one 3-hammer, 3-shuffle, 3-lantern, 3-freezer, 1,000-coin starter bundle
-  (67% off its authored `compare_at_prices`) and five coin-only offers, with `coins_3500` tagged
-  `BEST VALUE` as the best coins-per-dollar pack. Historic backend catalog versions without
-  `freezer`, `discount_percent`, `compare_at_prices`, or `tag` remain valid; the first parses as a
-  zero-Freezer reward and the rest simply show no promotional decoration.
+- Current mock catalog: the existing 3-hammer, 3-shuffle, 3-lantern, 3-freezer, 1,000-coin starter
+  bundle (67% off its authored `compare_at_prices`); a once-per-account New Player Bundle with
+  2,500 coins and three of every ability for US `$7.99`; and five coin-only offers, with
+  `coins_3500` tagged `BEST VALUE` as the best coins-per-dollar pack. Historic backend catalog
+  versions without `freezer`, `discount_percent`, `compare_at_prices`, or `tag` remain valid; the
+  first parses as a zero-Freezer reward and the rest simply show no promotional decoration.
 
 ## `user://save_v2/<namespace>/current.json`
 
@@ -340,8 +345,9 @@ Runtime files:
 - `pending.tmp`: flushed and validated candidate awaiting promotion.
 - `legacy_v4.previous.json`: retained read-only copy of the migrated schema-4 file.
 
-The gameplay snapshot schema is version 5. It retains the former schema-4 fields, adds Freezer to
-`ability_uses`, retains `reward_chest_completed_cycles` and `moderation_state`, and intentionally excludes
+The gameplay snapshot schema is version 6. It retains the former schema-5 fields, adds
+`purchased_shop_offer_ids` for account-scoped local/mock lifetime-offer claims, retains
+`reward_chest_completed_cycles` and `moderation_state`, and intentionally excludes
 `settings_disabled`, which now belongs to `preferences`.
 
 Runtime behavior:
@@ -358,8 +364,8 @@ Runtime behavior:
 - The same completion adds stars to `total_earned_stars` and `weekly_earned_stars`; neither is reduced by reward chest rollover.
 - Schema-4 migration retains campaign, coins, lives/timer, existing ability inventory, processed
   mock transaction ids, profile, settings, chest progress, and lifetime/weekly stars, advances the
-  snapshot to schema 5, and grants exactly three Freezer uses once. Schema-5 sanitization never
-  repeats that grant.
+  snapshot to schema 6, and grants exactly three Freezer uses once. Schema-5 migration advances to
+  schema 6 with an empty purchased-offer claim list and never repeats the Freezer grant.
 - Weekly stars reset when the saved Monday-UTC boundary no longer matches the current week.
 - Reward chest stars roll over when a configured goal is reached, grant that goal's `coin_reward`, then the next configured goal starts.
 - Developer/test level selection is isolated from this save data.

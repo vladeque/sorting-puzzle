@@ -54,7 +54,7 @@ func _run() -> void:
 
 	var bundles := shop.get_node("%BundlesContainer") as VBoxContainer
 	var coin_offers := shop.get_node("%CoinOffersContainer") as VBoxContainer
-	_check(bundles.get_child_count() == 1, "Expected one configured bundle card.")
+	_check(bundles.get_child_count() == 2, "Expected two configured bundle cards.")
 	_check(coin_offers.get_child_count() == 5, "Expected five configured coin offers.")
 	_check((shop.get_node("%TitleLabel") as Label).text == "SHOP", "Shop title is missing.")
 	for offer_id in EXPECTED_COIN_OFFER_ICONS:
@@ -69,7 +69,24 @@ func _run() -> void:
 					"%s selected the wrong amount-based coin-offer icon." % offer_id
 				)
 	_verify_high_tier_coin_offer_icons()
-	var bundle_card := bundles.get_child(0) as Control
+	var bundle_card := _find_bundle_card(bundles, &"starter_bundle")
+	var new_player_bundle_card := _find_bundle_card(bundles, &"new_player_bundle")
+	_check(bundle_card != null, "Could not find the starter bundle card.")
+	_check(new_player_bundle_card != null, "Could not find the new-player bundle card.")
+	if new_player_bundle_card != null:
+		_check(
+			(new_player_bundle_card.get_node("%CoinCount") as Label).text == "2,500",
+			"New-player bundle card does not show 2,500 coins."
+		)
+		_check(
+			(new_player_bundle_card.get_node("%PurchaseButton") as Button).text == "$7.99",
+			"New-player bundle card does not show the requested US price."
+		)
+		for ability_count_name in ["HammerCount", "ShuffleCount", "LanternCount", "FreezerCount"]:
+			_check(
+				(new_player_bundle_card.get_node("%%%s" % ability_count_name) as Label).text.ends_with("3"),
+				"New-player bundle card does not show three uses in %s." % ability_count_name
+			)
 	_check(
 		(bundle_card.get_node("%FreezerCount") as Label).text == "×3",
 		"Starter bundle card does not show three Freezers."
@@ -170,6 +187,40 @@ func _run() -> void:
 			"Mock bundle did not grant three %s uses." % ability_id
 		)
 
+	var new_player_starting_coins := PlayerProgress.get_coins()
+	var new_player_starting_abilities := PlayerProgress.get_ability_uses()
+	shop.call("_purchase_offer", &"new_player_bundle")
+	await get_tree().create_timer(0.4).timeout
+	_check(
+		PlayerProgress.get_coins() == new_player_starting_coins + 2500,
+		"Mock new-player bundle did not grant 2,500 coins."
+	)
+	var new_player_abilities := PlayerProgress.get_ability_uses()
+	for ability_id in ["hammer", "shuffle", "highlight", "freezer"]:
+		_check(
+			int(new_player_abilities.get(ability_id, 0))
+			== int(new_player_starting_abilities.get(ability_id, 0)) + 3,
+			"Mock new-player bundle did not grant three %s uses." % ability_id
+		)
+	_check(
+		_find_bundle_card(bundles, &"new_player_bundle") == null,
+		"Purchased new-player bundle remained visible after its lifetime claim."
+	)
+	var repeat_purchase_coins := PlayerProgress.get_coins()
+	shop.call("_purchase_offer", &"new_player_bundle")
+	await get_tree().create_timer(0.05).timeout
+	_check(
+		PlayerProgress.get_coins() == repeat_purchase_coins,
+		"Purchased new-player bundle granted rewards a second time."
+	)
+	PlayerProgress.load_progress()
+	var reloaded_service = StoreServiceScript.new()
+	var reloaded_catalog: Dictionary = await reloaded_service.load_catalog()
+	_check(
+		_find_offer(reloaded_catalog.get("offers", []) as Array, "new_player_bundle").is_empty(),
+		"Purchased new-player bundle returned after progress reload."
+	)
+
 	var duplicate_start := PlayerProgress.get_coins()
 	var first_grant := PlayerProgress.apply_shop_purchase("verify_duplicate_transaction", {"coins": 7})
 	var duplicate_grant := PlayerProgress.apply_shop_purchase("verify_duplicate_transaction", {"coins": 7})
@@ -227,6 +278,13 @@ func _verify_high_tier_coin_offer_icons() -> void:
 
 func _find_coin_offer_row(coin_offers: VBoxContainer, offer_id: StringName) -> Control:
 	for child in coin_offers.get_children():
+		if child is Control and (child as Control).call("get_offer_id") == offer_id:
+			return child as Control
+	return null
+
+
+func _find_bundle_card(bundles: VBoxContainer, offer_id: StringName) -> Control:
+	for child in bundles.get_children():
 		if child is Control and (child as Control).call("get_offer_id") == offer_id:
 			return child as Control
 	return null

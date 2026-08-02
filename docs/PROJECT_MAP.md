@@ -312,7 +312,9 @@ Responsibility:
 - Shows configured ability-and-coin bundles before compact coin purchase offers in one vertical scroll view.
 - Uses `StoreService` and a provider boundary so UI code never owns regional pricing or transaction behavior.
 - Uses the `mock` provider and configurable mock storefront country during development; real Google Play and App Store providers can replace it later.
-- Applies mock purchase rewards atomically through `PlayerProgress.apply_shop_purchase()` and retains processed transaction ids so callbacks are idempotent.
+- Applies mock purchase rewards atomically through `PlayerProgress.apply_shop_purchase()`, retains
+  processed transaction ids so callbacks are idempotent, and persists offer ids so local/mock
+  lifetime offers disappear after their first account purchase.
 - GAME-008: `application/config/shop_catalog_source` independently selects where the *offer list* comes from. `local` (default) reads `configs/shop_catalog.json` unchanged. `backend` sources eligibility, rewards, and product IDs from the authenticated backend development catalog (`GET /v1/catalog`, via the shared `BackendTransport`/`BackendReadOperations` from GAME-007) through `scripts/store/backend_catalog_source.gd`, joins each eligible offer to `configs/backend/shop_catalog_prices.json` by `platform_product_id` for its display title and mock regional price, and still prices/purchases through the local `mock` provider. `scripts/store/backend_catalog_cache.gd` persists the last successful backend catalog to `user://shop_catalog_backend_cache.json` so an unavailable, unauthorized, or malformed later read falls back to an offline cached view instead of failing outright.
 
 Change here when:
