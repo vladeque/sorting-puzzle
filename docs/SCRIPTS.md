@@ -126,9 +126,9 @@ Purpose:
   technically present on a 50-row page doesn't mean the player is visible without scrolling.
 - Updates the weekly reset countdown and loading, empty, and retry states.
 - Reports the player's Weekly rank to `PlayerProgress.record_weekly_leaderboard_rank()` after every
-  successful Weekly fetch, and populates `%RewardTiersLabel` from
-  `PlayerProgress.get_leaderboard_reward_tiers()` (Weekly scope only -- Country/World are all-time
-  boards with no reset/payout moment).
+  successful Weekly fetch. For Weekly ranks 1-3 it binds the configured reward amount and the
+  requested rank-specific Shop coin-pile art to each row; Country/World remain reward-free because
+  those all-time boards have no reset/payout moment.
 - Applies responsive content width, compact row sizing, bottom-navigation placement, and mobile safe-area margins.
 - Routes the shared Home tab back to `scenes/main_menu.tscn`.
 - Routes the shared Shop tab to `scenes/ui/shop_screen.tscn`.
@@ -202,7 +202,36 @@ Purpose:
 - Toggles the scene-authored current-player highlight.
 - Toggles the scene-authored gold/silver/bronze `RankSlot` medal circle for rank 1/2/3 and switches
   `RankLabel` between a bare number (top 3) and "#N" (rank 4+).
+- Forwards reward image/amount binding and compact sizing to the focused `%RankReward` component.
 - Applies compact or regular row and font sizing, including `RankSlot`'s size to match the avatar.
+
+## `scripts/leaderboard_rank_reward.gd`
+
+Class:
+- `LeaderboardRankReward`
+
+Attached to:
+- `scenes/ui/leaderboard_rank_reward.tscn` root `LeaderboardRankReward`.
+
+Purpose:
+- Shows or clears one rank reward's coin-pile texture and comma-formatted amount.
+- Applies the component's regular or compact icon, label, and panel sizing.
+
+## `scripts/tools/verify_leaderboard.gd`
+
+- Runs through `scenes/leaderboard_verification.tscn` with an isolated test user-data directory.
+- Verifies that the old reward summary label is gone, Weekly ranks 1-3 show 500/300/300 with tier
+  04/03/02 artwork respectively, rank 4 has no preview, Country rows hide Weekly rewards, and the
+  leaderboard remains within bounds at five representative portrait resolutions.
+
+Run:
+
+```powershell
+& 'D:\Godot\godot.exe' --headless --path . scenes/leaderboard_verification.tscn --user-data-dir <scratch-dir>
+```
+
+Prints `LEADERBOARD VERIFICATION PASSED` and exits `0` on success; otherwise prints each failed
+check and exits `1`.
 
 ## `scripts/leaderboard_reward_dialog.gd`
 

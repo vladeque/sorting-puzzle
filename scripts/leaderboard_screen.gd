@@ -8,6 +8,11 @@ const SCOPE_WEEKLY := &"weekly"
 const SCOPE_COUNTRY := &"country"
 const SCOPE_WORLD := &"world"
 const ROW_LIMIT := 50
+const RANK_REWARD_TEXTURES := {
+	1: preload("res://assets/ui/shop_coin_offers/shop_coin_offer_tier_04.png"),
+	2: preload("res://assets/ui/shop_coin_offers/shop_coin_offer_tier_03.png"),
+	3: preload("res://assets/ui/shop_coin_offers/shop_coin_offer_tier_02.png"),
+}
 const CONTENT_MAX_WIDTH := 720.0
 const CONTENT_SIDE_MARGIN := 16.0
 const CONTENT_TOP_MARGIN := 18.0
@@ -25,7 +30,6 @@ const PINNED_ROW_RANK_THRESHOLD := 10
 @onready var _country_button := %CountryButton as Button
 @onready var _world_button := %WorldButton as Button
 @onready var _period_label := %PeriodLabel as Label
-@onready var _reward_tiers_label := %RewardTiersLabel as Label
 @onready var _leaderboard_scroll := %LeaderboardScroll as ScrollContainer
 @onready var _rows_container := %RowsContainer as VBoxContainer
 @onready var _status_container := %StatusContainer as CenterContainer
@@ -98,7 +102,6 @@ func _load_selected_scope() -> void:
 	var player_entry := result.get("player_entry", {}) as Dictionary
 	_populate_entries(result.get("entries", []) as Array, player_entry)
 	_update_period_label()
-	_update_reward_tiers_label()
 
 	if _selected_scope == SCOPE_WEEKLY and int(player_entry.get("rank", 0)) > 0:
 		PlayerProgress.record_weekly_leaderboard_rank(int(player_entry.get("rank", 0)))
@@ -128,6 +131,7 @@ func _populate_entries(entries: Array, player_entry: Dictionary) -> void:
 		var row := ROW_SCENE.instantiate() as Control
 		_rows_container.add_child(row)
 		row.call("set_entry", entry)
+		_configure_row_reward(row, int(entry.get("rank", 0)))
 		row.call("set_compact", is_compact)
 		_rows.append(row)
 		contains_current_player = contains_current_player or bool(entry.get("is_current_player", false))
@@ -147,6 +151,7 @@ func _populate_entries(entries: Array, player_entry: Dictionary) -> void:
 	_pinned_player_row.visible = should_pin_player
 	if should_pin_player:
 		_pinned_player_row.call("set_entry", player_entry)
+		_configure_row_reward(_pinned_player_row, player_rank)
 		_pinned_player_row.call("set_compact", is_compact)
 
 
@@ -186,42 +191,28 @@ func _update_period_label() -> void:
 			_period_label.text = "Worldwide · All-time stars"
 
 
-## Builds the tier summary directly from `PlayerProgress.get_leaderboard_reward_tiers()` so the
-## displayed promise can never drift from what actually gets paid out at reset. Weekly-only: the
-## reward mechanism keys off the Weekly reset boundary, so Country/World (all-time, no reset) show
-## nothing here.
-func _update_reward_tiers_label() -> void:
-	if _selected_scope != SCOPE_WEEKLY:
-		_reward_tiers_label.visible = false
+## Weekly payouts are shown directly on ranks 1-3. The coin amount still comes from the shared
+## reward-tier configuration, while this screen owns the presentation-only rank-to-art mapping.
+func _configure_row_reward(row: Control, rank: int) -> void:
+	if _selected_scope != SCOPE_WEEKLY or not RANK_REWARD_TEXTURES.has(rank):
+		row.call("clear_rank_reward")
 		return
 
-	var tiers := PlayerProgress.get_leaderboard_reward_tiers()
-	if tiers.is_empty():
-		_reward_tiers_label.visible = false
+	var coin_reward := _get_weekly_coin_reward(rank)
+	if coin_reward <= 0:
+		row.call("clear_rank_reward")
 		return
 
-	var segments: Array[String] = []
-	for raw_tier in tiers:
+	row.call("set_rank_reward", RANK_REWARD_TEXTURES[rank] as Texture2D, coin_reward)
+
+
+func _get_weekly_coin_reward(rank: int) -> int:
+	for raw_tier in PlayerProgress.get_leaderboard_reward_tiers():
 		var tier := raw_tier as Dictionary
-		var min_rank := int(tier.get("min_rank", 0))
-		var max_rank := int(tier.get("max_rank", 0))
-		var coin_reward := int(tier.get("coin_reward", 0))
-		var rank_text := "#%d" % min_rank if min_rank == max_rank else "#%d-%d" % [min_rank, max_rank]
-		segments.append("%s: %s coins" % [rank_text, _format_coin_count(coin_reward)])
+		if rank >= int(tier.get("min_rank", 0)) and rank <= int(tier.get("max_rank", 0)):
+			return maxi(int(tier.get("coin_reward", 0)), 0)
 
-	_reward_tiers_label.text = "Weekly rewards — %s" % " · ".join(segments)
-	_reward_tiers_label.visible = true
-
-
-func _format_coin_count(value: int) -> String:
-	var digits := str(maxi(value, 0))
-	var formatted := ""
-	for index in range(digits.length()):
-		if index > 0 and (digits.length() - index) % 3 == 0:
-			formatted += ","
-		formatted += digits[index]
-
-	return formatted
+	return 0
 
 
 func _format_duration(seconds: int) -> String:

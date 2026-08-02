@@ -1,9 +1,10 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://scripts/leaderboard_row.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://assets/ui/avatars/avatar_cat.png" id="2_avatar"]
 [ext_resource type="Texture2D" path="res://assets/ui/reward_star_34_glossy_b.png" id="3_star"]
 [ext_resource type="Shader" path="res://assets/ui/avatar_circle_clip.gdshader" id="4_clip_shader"]
+[ext_resource type="PackedScene" path="res://scenes/ui/leaderboard_rank_reward.tscn" id="5_reward"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_avatar_clip"]
 shader = ExtResource("4_clip_shader")
@@ -235,6 +236,10 @@ theme_override_font_sizes/font_size = 28
 text = "Player"
 vertical_alignment = 1
 text_overrun_behavior = 3
+
+[node name="RankReward" parent="ContentMargin/Content" instance=ExtResource("5_reward")]
+unique_name_in_owner = true
+layout_mode = 2
 
 [node name="ScoreBox" type="HBoxContainer" parent="ContentMargin/Content"]
 custom_minimum_size = Vector2(118, 0)

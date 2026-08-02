@@ -258,11 +258,15 @@ Change here when:
 ### Leaderboards
 
 Files:
+- `scenes/leaderboard_verification.tscn`
+- `scenes/ui/leaderboard_rank_reward.tscn`
 - `scenes/ui/leaderboard_screen.tscn`
 - `scenes/ui/leaderboard_row.tscn`
 - `scenes/ui/main_menu_bottom_navigation.tscn`
+- `scripts/leaderboard_rank_reward.gd`
 - `scripts/leaderboard_screen.gd`
 - `scripts/leaderboard_row.gd`
+- `scripts/tools/verify_leaderboard.gd`
 - `scripts/leaderboards/leaderboard_provider.gd`
 - `scripts/leaderboards/mock_leaderboard_provider.gd`
 - `scripts/leaderboards/backend_leaderboard_provider.gd`

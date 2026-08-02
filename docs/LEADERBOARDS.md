@@ -13,7 +13,12 @@ Scopes with `backend`: all three scopes read `GET /v1/leaderboards/{scope}` from
 
 The provider returns up to 50 entries plus the current player's entry. `leaderboard_screen.gd` pins the highlighted player row above the bottom navigation whenever the player is absent from the returned entries *or* their rank is beyond `PINNED_ROW_RANK_THRESHOLD` (10, approximating how many rows are visible without scrolling on the reference viewport) -- being technically present on a 50-row page is not the same as being visible without scrolling, so rank alone decides pin visibility for anyone buried past the fold.
 
-Ranks 1-3 additionally get a gold/silver/bronze medal circle behind the rank number (`scenes/ui/leaderboard_row.tscn`'s `RankSlot`, toggled by `scripts/leaderboard_row.gd`), independent of the current-player highlight so a top-3 row that's also the local player shows both cues at once.
+Ranks 1-3 additionally get a gold/silver/bronze medal circle behind the rank number
+(`scenes/ui/leaderboard_row.tscn`'s `RankSlot`, toggled by `scripts/leaderboard_row.gd`), independent
+of the current-player highlight so a top-3 row that's also the local player shows both cues at once.
+On the Weekly scope, those same three rows also instance `leaderboard_rank_reward.tscn`: first place
+uses `shop_coin_offer_tier_04.png`, second uses tier 03, and third uses tier 02. Country and World do
+not show the reward section because they have no reset payout.
 
 ## Score ownership
 
@@ -29,10 +34,12 @@ Save schema 3 migrates an older development save by using its retained `reward_c
 ## Weekly rewards
 
 `configs/leaderboard_reward_tiers.json` maps Weekly rank ranges to a coin reward (defaults: #1 500,
-#2-3 300, #4-10 150, #11-50 50). `leaderboard_screen.gd` renders the same config as
-`%RewardTiersLabel` ("Weekly rewards — #1: 500 coins · ...") so the on-screen promise can never
-drift from what actually gets paid. Country/World show nothing here since they're all-time boards
-with no reset/payout moment.
+#2-3 300, #4-10 150, #11-50 50). `leaderboard_screen.gd` reads that same config when it binds the
+amount displayed inside each Weekly top-three row's reward section, so the on-screen promise cannot
+drift from what actually gets paid. The former full-width `%RewardTiersLabel` summary is intentionally
+gone; ranks below third still receive their configured payout even though they do not get a row
+reward preview. Country/World show no reward preview since they're all-time boards with no
+reset/payout moment.
 
 **This is a local approximation, not a backend-verified final standing.** There is currently no
 backend job (and, per the Known Gap below, not yet even a fully populated backend leaderboard

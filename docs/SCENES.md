@@ -83,8 +83,6 @@ Purpose:
 Important nodes:
 - `%WeeklyButton`, `%CountryButton`, `%WorldButton`: leaderboard scope controls.
 - `%PeriodLabel`: weekly countdown or all-time scope description.
-- `%RewardTiersLabel`: Weekly-only summary of `PlayerProgress.get_leaderboard_reward_tiers()`, for
-  example "Weekly rewards — #1: 500 coins · #2-3: 300 coins · ...". Hidden on Country/World.
 - `%LeaderboardScroll`: vertical-only ranking list.
 - `%RowsContainer`: runtime parent for reusable row instances.
 - `%StatusContainer`, `%StatusLabel`, `%RetryButton`: loading, empty, and error presentation.
@@ -112,12 +110,29 @@ Purpose:
   shows for rank 1/2/3 (with the label reading a bare "1"/"2"/"3"), none for rank 4+ (label reads
   "#4" as before). Independent of the current-player highlight, so a top-3 row that is also the
   local player shows both.
+- Instances `%RankReward` from `scenes/ui/leaderboard_rank_reward.tscn`. The owning screen binds it
+  only for Weekly ranks 1-3; it remains hidden for all other rows and scopes.
 - Supports regular and compact heights selected by the owning leaderboard screen.
 
 Depends on:
 - `assets/ui/avatars/*.png`.
 - `assets/ui/avatar_circle_clip.gdshader`.
 - `assets/ui/reward_star_34_glossy_b.png`.
+- `scenes/ui/leaderboard_rank_reward.tscn`.
+
+## `scenes/ui/leaderboard_rank_reward.tscn`
+
+Root:
+- `LeaderboardRankReward` (`PanelContainer`)
+
+Script:
+- `scripts/leaderboard_rank_reward.gd`
+
+Purpose:
+- Focused compact reward panel with a clover-coin pile image and formatted coin amount.
+- Exposes regular and compact sizing for use inside responsive leaderboard rows.
+- Starts hidden and is presentation-only; payout eligibility and amounts remain owned by the
+  leaderboard screen and `PlayerProgress` reward-tier configuration.
 
 ## `scenes/ui/leaderboard_reward_dialog.tscn`
 
@@ -196,6 +211,12 @@ Runtime children:
   starter reward layout, offer counts, amount-based coin-pile icon selection, the starter bundle's
   discount ribbon/compare-at price, the best-value coin tag, the ability info dialog, mock grants
   (including three Freezers), purchase dialog display, and duplicate-transaction handling.
+
+## `scenes/leaderboard_verification.tscn`
+
+- Automated verification entry scene for Weekly top-three reward images and configured amounts,
+  Country reward hiding, removal of the former tier-summary label, and required portrait viewport
+  bounds.
 
 ## `scenes/ui/main_menu_reward_coin_flyer.tscn`
 

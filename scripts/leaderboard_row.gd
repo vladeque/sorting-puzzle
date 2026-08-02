@@ -15,6 +15,7 @@ const COMPACT_AVATAR_SIZE := 54.0
 @onready var _avatar_frame := %AvatarFrame as PanelContainer
 @onready var _avatar_texture := %AvatarTexture as TextureRect
 @onready var _name_label := %NameLabel as Label
+@onready var _rank_reward := %RankReward as LeaderboardRankReward
 @onready var _score_label := %ScoreLabel as Label
 
 
@@ -34,8 +35,17 @@ func set_entry(entry: Dictionary) -> void:
 	_avatar_texture.texture = load(
 		PlayerProgress.get_avatar_texture_path(str(entry.get("avatar_id", "avatar_cat")))
 	) as Texture2D
+	_rank_reward.clear_reward()
 	_current_background.visible = bool(entry.get("is_current_player", false))
 	tooltip_text = "Rank %d, %s, %d stars" % [rank, display_name, score]
+
+
+func set_rank_reward(texture: Texture2D, coin_amount: int) -> void:
+	_rank_reward.set_reward(texture, coin_amount)
+
+
+func clear_rank_reward() -> void:
+	_rank_reward.clear_reward()
 
 
 func set_compact(is_compact: bool) -> void:
@@ -45,6 +55,7 @@ func set_compact(is_compact: bool) -> void:
 	_rank_slot.custom_minimum_size = Vector2(avatar_size, avatar_size)
 	_rank_label.add_theme_font_size_override("font_size", 24 if is_compact else 28)
 	_name_label.add_theme_font_size_override("font_size", 24 if is_compact else 28)
+	_rank_reward.set_compact(is_compact)
 	_score_label.add_theme_font_size_override("font_size", 26 if is_compact else 30)
 
 

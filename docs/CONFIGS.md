@@ -240,8 +240,9 @@ Purpose:
 - Defines the coin reward paid out for a Weekly leaderboard rank range when the leaderboard week
   rolls over.
 - Owned by `scripts/player_progress.gd`, which loads the tier ladder and falls back to built-in
-  defaults if the file is missing or invalid. Also drives `leaderboard_screen.gd`'s `%RewardTiersLabel`
-  summary, so the displayed promise and the actual payout always read from the same source.
+  defaults if the file is missing or invalid. Also drives the amount shown by
+  `leaderboard_screen.gd` in the Weekly top-three row reward sections, so the displayed promise and
+  the actual payout always read from the same source.
 
 Shape:
 
