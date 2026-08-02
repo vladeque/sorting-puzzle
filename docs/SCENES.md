@@ -129,8 +129,8 @@ Script:
 - `scripts/leaderboard_rank_reward.gd`
 
 Purpose:
-- Focused compact reward group with a transparent clover-coin pile and formatted coin amount,
-  placed directly on the owning row without an additional colored card background.
+- Focused compact reward cell with a subtle translucent brown background that darkens the owning
+  row, a large transparent clover-coin pile, and an overlapping formatted coin amount.
 - Exposes regular and compact sizing for use inside responsive leaderboard rows.
 - Starts hidden and is presentation-only; payout eligibility and amounts remain owned by the
   leaderboard screen and `PlayerProgress` reward-tier configuration.
