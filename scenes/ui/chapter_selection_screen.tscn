@@ -2,6 +2,7 @@
 
 [ext_resource type="Texture2D" path="res://assets/backgrounds/main_menu.jpeg" id="1_background"]
 [ext_resource type="Script" path="res://scripts/chapters/chapter_selection_screen.gd" id="2_script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/horizontal_pager.tscn" id="3_pager"]
 
 [sub_resource type="StyleBoxFlat" id="Style_back"]
 bg_color = Color(1, 0.92, 0.68, 1)
@@ -60,7 +61,7 @@ grow_vertical = 2
 
 [node name="Layout" type="VBoxContainer" parent="SafeMargins"]
 layout_mode = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 16
 
 [node name="Header" type="HBoxContainer" parent="SafeMargins/Layout"]
 layout_mode = 2
@@ -80,29 +81,17 @@ text = "<"
 [node name="Title" type="Label" parent="SafeMargins/Layout/Header"]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_type_variation = &"GameTitleLabel"
 theme_override_colors/font_color = Color(1, 0.95, 0.8, 1)
 theme_override_colors/font_shadow_color = Color(0.08, 0.02, 0, 0.9)
 theme_override_constants/shadow_offset_x = 0
 theme_override_constants/shadow_offset_y = 4
 theme_override_font_sizes/font_size = 44
-text = "Choose Chapter"
+text = "CHOOSE CHAPTER"
 vertical_alignment = 1
 
-[node name="Subtitle" type="Label" parent="SafeMargins/Layout"]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.85, 0.56, 1)
-theme_override_font_sizes/font_size = 21
-text = "Complete levels to unlock the next adventure"
-autowrap_mode = 2
-
-[node name="Scroll" type="ScrollContainer" parent="SafeMargins/Layout"]
-layout_mode = 2
-size_flags_vertical = 3
-horizontal_scroll_mode = 0
-
-[node name="CardList" type="VBoxContainer" parent="SafeMargins/Layout/Scroll"]
+[node name="Pager" parent="SafeMargins/Layout" instance=ExtResource("3_pager")]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 22
-
+size_flags_vertical = 3

@@ -3,10 +3,10 @@ extends Control
 signal chapter_selected(chapter_id: String)
 signal closed
 
-const CHAPTER_CARD_SCENE := preload("res://scenes/ui/chapter_card.tscn")
+const CHAPTER_COVER_CARD_SCENE := preload("res://scenes/ui/chapter_cover_card.tscn")
 
 @onready var _back_button := %BackButton as Button
-@onready var _card_list := %CardList as VBoxContainer
+@onready var _pager := %Pager as HorizontalPager
 
 
 func _ready() -> void:
@@ -22,12 +22,18 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _populate() -> void:
 	var selected_id := PlayerProgress.get_selected_chapter_id()
-	for chapter in ChapterCatalog.get_chapters():
+	var chapters := ChapterCatalog.get_chapters()
+	var initial_index := 0
+	for chapter_index in chapters.size():
+		var chapter := chapters[chapter_index]
 		var chapter_id := str(chapter.get("id", ""))
-		var card := CHAPTER_CARD_SCENE.instantiate()
-		_card_list.add_child(card)
-		card.call("configure", chapter, PlayerProgress.get_chapter_progress(chapter_id), chapter_id == selected_id)
-		card.connect("selected", Callable(self, "_select_chapter"))
+		var card := CHAPTER_COVER_CARD_SCENE.instantiate() as ChapterCoverCard
+		_pager.add_page(card)
+		card.configure(chapter, PlayerProgress.get_chapter_progress(chapter_id), chapter_id == selected_id)
+		card.selected.connect(_select_chapter)
+		if chapter_id == selected_id:
+			initial_index = chapter_index
+	_pager.go_to_page(initial_index, false)
 
 
 func _select_chapter(chapter_id: String) -> void:
@@ -40,4 +46,3 @@ func _select_chapter(chapter_id: String) -> void:
 func _close() -> void:
 	closed.emit()
 	queue_free()
-
