@@ -50,8 +50,9 @@ Important nodes:
 - Runtime child `scenes/ui/profile_menu.tscn`: centered pause-style profile editor window created when `ProfileWidget` is pressed.
 - Runtime child `scenes/ui/settings_menu.tscn`: centered pause-style settings window created when `SettingsWidget/SettingsButton` is pressed.
 - Runtime child `scenes/ui/reward_chest_menu.tscn`: centered pause-style reward chest detail modal created when the `RewardChest` widget emits `chest_pressed`.
-- Runtime child `scenes/ui/chapter_selection_screen.tscn`: full-screen chapter picker with reusable
-  `chapter_card.tscn` cards, selected/locked states, and exact prerequisite progress.
+- Runtime child `scenes/ui/chapter_selection_screen.tscn`: full-screen chapter picker showing one
+  swipeable `chapter_cover_card.tscn` cover at a time, with selected/locked states and exact
+  prerequisite progress.
 
 Depends on:
 - `level.tscn` through `scripts/production_main_menu.gd`.
@@ -64,14 +65,94 @@ Depends on:
 - `scenes/ui/settings_menu.tscn` for the main-menu settings popup.
 - `scenes/ui/reward_chest_menu.tscn` for the reward chest detail modal.
 - `scenes/ui/level_button.tscn` for the reusable production level button visuals.
-- `scenes/ui/main_menu_chapter_button.tscn`, `scenes/ui/chapter_selection_screen.tscn`, and
-  `scenes/ui/chapter_card.tscn` for chapter navigation.
+- `scenes/ui/main_menu_chapter_button.tscn`, `scenes/ui/chapter_selection_screen.tscn`,
+  `scenes/ui/chapter_cover_card.tscn`, and `scenes/ui/horizontal_pager.tscn` for chapter navigation.
 - `scenes/ui/leaderboard_reward_dialog.tscn` for the weekly reward notification.
 - `scenes/ui/leaderboard_screen.tscn` for the dedicated ranking destination.
 
 Do not use for:
 - Dev/test level selection. Use `scenes/main_menu_testing.tscn`.
 - Runtime puzzle rules or shelf state. Put those in `level.tscn` and `scripts/level.gd`.
+
+## `scenes/ui/chapter_selection_screen.tscn`
+
+Root:
+- `ChapterSelectionScreen` (`Control`)
+
+Script:
+- `scripts/chapters/chapter_selection_screen.gd`
+
+Purpose:
+- Full-screen chapter picker opened from the main menu's `%ChapterButton`.
+- Builds one `scenes/ui/chapter_cover_card.tscn` instance per `configs/chapters.json` entry and
+  hands each to a `scenes/ui/horizontal_pager.tscn` instance as a page.
+- Opens directly on the currently selected chapter's cover.
+- Emits `chapter_selected(chapter_id)` and persists the pick through `PlayerProgress.select_chapter()`
+  when a cover's CTA button is pressed.
+- Closes on the back button, `ui_cancel`, or a successful selection, emitting `closed`.
+
+Important nodes:
+- `%BackButton`.
+- `%Pager`: the `scenes/ui/horizontal_pager.tscn` instance holding one `chapter_cover_card` per
+  chapter.
+
+Depends on:
+- `ChapterCatalog` autoload for chapter order and metadata.
+- `PlayerProgress` autoload for selection state and per-chapter progress (`get_chapter_progress()`,
+  `get_selected_chapter_id()`, `select_chapter()`).
+- `scenes/ui/chapter_cover_card.tscn`, `scenes/ui/horizontal_pager.tscn`.
+
+## `scenes/ui/horizontal_pager.tscn`
+
+Root:
+- `HorizontalPager` (`Control`)
+
+Script:
+- `scripts/horizontal_pager.gd`
+
+Purpose:
+- Generic, content-agnostic swipeable pager: holds arbitrary `Control` pages side by side and lets
+  the player drag/swipe or tap the arrow buttons to move between them, snapping to the nearest page
+  on release. Not chapter-specific — reusable anywhere a one-item-at-a-time browsing UI is needed
+  (e.g. Shop or Rewards).
+
+Important nodes:
+- `%Clip`: clips `%Track` to the pager's bounds.
+- `%Track`: absolutely positions each added page edge to edge; its `position.x` is tweened to snap
+  between pages.
+- `%PrevArrow`, `%NextArrow`: `press_scale_button.gd` buttons, hidden at the first/last page.
+- `%Dots`: paging indicator with one dot per page.
+
+Public API:
+- `add_page(control: Control)`: appends a page.
+- `go_to_page(index: int, animate: bool = true)`: jumps to a page, optionally animated.
+- `page_changed(index: int)` signal.
+
+Depends on:
+- `scripts/press_scale_button.gd` for the arrow buttons.
+
+## `scenes/ui/chapter_cover_card.tscn`
+
+Root:
+- `ChapterCoverCard` (`Control`)
+
+Script:
+- `scripts/chapters/chapter_cover_card.gd`
+
+Purpose:
+- One full-bleed chapter "cover": chapter art, a bottom gradient scrim, a circular
+  `scripts/progress_ring.gd` progress readout (or `assets/ui/lock_shelf_cutout.png` when locked),
+  title/eyebrow/caption labels, and a single CTA button that confirms the pick.
+- `configure(chapter, progress, is_selected)` mirrors the three states the retired `chapter_card.gd`
+  used: locked, unlocked-with-no-levels-yet ("coming soon"), and unlocked-with-levels.
+- Emits `selected(chapter_id)` when its CTA is pressed; the CTA stays disabled while locked.
+
+Important nodes:
+- `%Art`, `%Ring`, `%LockIcon`, `%EyebrowLabel`, `%TitleLabel`, `%CaptionLabel`, `%CtaButton`.
+
+Depends on:
+- `ChapterCatalog.get_selection_preview_path()` for the cover art.
+- `scripts/progress_ring.gd`, `assets/ui/lock_shelf_cutout.png`, `scripts/press_scale_button.gd`.
 
 ## `scenes/ui/leaderboard_screen.tscn`
 

@@ -80,10 +80,12 @@ Key methods:
 Purpose:
 - `chapter_catalog.gd` validates `configs/chapters.json` and exposes global-to-chapter/local-level
   lookup; it is registered as the `ChapterCatalog` autoload before `PlayerProgress`.
-- `chapter_selection_screen.gd` populates the dedicated selection screen and persists unlocked
-  selections through `PlayerProgress`.
-- `chapter_card.gd` and `main_menu_chapter_button.gd` render chapter art, completion counts, selected
-  state, and exact lock progress.
+- `chapter_selection_screen.gd` builds one `chapter_cover_card.gd` page per chapter into a shared
+  `scripts/horizontal_pager.gd` pager, opens on the currently selected chapter, and persists a new
+  pick through `PlayerProgress`.
+- `chapter_cover_card.gd` and `main_menu_chapter_button.gd` render chapter art, completion counts,
+  selected state, and exact lock progress; `chapter_cover_card.gd` shows a `scripts/progress_ring.gd`
+  readout (or the lock icon) instead of `main_menu_chapter_button.gd`'s plain text.
 - `chapter_level_background.gd` loads the selected level's configured chapter artwork.
 
 Depends on:
@@ -92,6 +94,7 @@ Depends on:
 - `scripts/level.gd` export `selected_level`
 - `scripts/level.gd` export `launched_from_dev_mode`
 - `scripts/level.gd` export `return_menu_scene_path`
+- `scripts/horizontal_pager.gd`, `scripts/progress_ring.gd`
 - `PlayerProgress` autoload
 
 Do not use for:
@@ -99,6 +102,63 @@ Do not use for:
 - Persistent save data ownership. Put that in `scripts/save/local_save_store.gd`; use
   `PlayerProgress` only as the gameplay facade.
 - Puzzle runtime logic.
+
+## `scripts/horizontal_pager.gd`
+
+Class:
+- `HorizontalPager`
+
+Attached to:
+- `scenes/ui/horizontal_pager.tscn` root `HorizontalPager`.
+
+Purpose:
+- Generic, content-agnostic swipeable pager. Holds arbitrary `Control` pages side by side inside a
+  clipped track, and lets the player drag/swipe or tap the built-in arrow buttons to move between
+  them, snapping to the nearest page on release. Not chapter-specific.
+- Input handling mirrors `scripts/level.gd`'s press/motion/release drag idiom (a slop distance before
+  a press becomes a drag, `accept_event()` on every handled branch) adapted to `Control._gui_input`.
+
+Exports:
+- `peek_width`: how much of the neighboring page is visible at the pager's edges.
+- `drag_start_distance`: pointer travel required before a press becomes a drag.
+- `commit_fraction`: fraction of a page's width a drag must cross to commit to the next/previous page
+  instead of snapping back.
+
+API:
+- `add_page(page: Control)`: appends a page.
+- `go_to_page(index: int, animate: bool = true)`: jumps to a page, optionally animated.
+- `page_changed(index: int)` signal.
+
+Use when:
+- Browsing one item at a time out of a small set (chapter covers today; Shop or Rewards could reuse
+  it later).
+
+Do not use for:
+- Long scrollable lists. Use a `ScrollContainer` instead.
+
+## `scripts/progress_ring.gd`
+
+Class:
+- `ProgressRing`
+
+Attached to:
+- `scenes/ui/chapter_cover_card.tscn` `%Ring`.
+
+Purpose:
+- Draws a circular progress readout with `Control._draw()`/`draw_arc()`: a full track circle plus a
+  partial fill arc starting at the top. The first percentage-driven `_draw()` component in the
+  project (the only prior `draw_arc()` usage, `scripts/hammer_impact_effect.gd`, is a decorative
+  full-sweep burst, not progress-driven).
+- Recomputes its radius from `size` on `NOTIFICATION_RESIZED`, so it stays correct across the five
+  responsive test resolutions without a hardcoded pixel radius.
+
+Exports:
+- `ring_width`, `track_color`, `fill_color`.
+
+API:
+- `set_progress(current: int, total: int)`: sets the fill fraction; `total <= 0` draws an empty ring.
+- `get_progress_current()`, `get_progress_total()`: the exact values passed to `set_progress()`, for
+  callers (including tests) that need to assert on the numbers rather than the derived fraction.
 
 ## `scripts/main_menu_top_status.gd`
 
@@ -493,6 +553,8 @@ Attached to:
 - `scenes/ui/settings_menu.tscn` `PauseMenuPanel/InnerPanel/IconRow/*/*Button` settings icon buttons.
 - `scenes/pause_menu.tscn` `PauseMenuPanel/ButtonRow/LeaveButton` and `ContinueButton`.
 - `scenes/leave_confirmation_menu.tscn` `ConfirmationPanel/ButtonRow/ConfirmLeaveButton` and `ContinueButton`.
+- `scenes/ui/horizontal_pager.tscn` `%PrevArrow` and `%NextArrow`.
+- `scenes/ui/chapter_cover_card.tscn` `%CtaButton`.
 
 Purpose:
 - Provides the default held-press visual behavior for game UI buttons.

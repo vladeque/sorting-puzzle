@@ -50,14 +50,33 @@ func _run() -> void:
 	var selection := menu.get_node_or_null("ChapterSelectionScreen") as Control
 	_check(selection != null, "The chapter button did not open the selection screen.")
 	if selection != null:
-		var card_list := selection.get_node("%CardList") as VBoxContainer
-		_check(card_list.get_child_count() == 2, "Expected two configured chapter cards.")
-		if card_list.get_child_count() == 2:
-			var locked_card := card_list.get_child(1) as Button
-			_check(locked_card.disabled, "Chapter 2 should be locked for a new player.")
+		var pager := selection.get_node("%Pager") as Control
+		var track := pager.get_node("%Track") as Control
+		_check(track.get_child_count() == 2, "Expected two configured chapter covers.")
+		if track.get_child_count() == 2:
+			var current_card := track.get_child(0) as Control
+			var current_cta := current_card.get_node("%CtaButton") as Button
+			_check(not current_cta.disabled, "Chapter 1 should be playable for a new player.")
 			_check(
-				str(locked_card.get_node("%LockLabel").text) == "LOCKED  ·  0/25",
+				current_card.size.x > 100.0 and current_card.size.x <= pager.size.x,
+				"The current chapter cover was not sized by the pager (got %s)." % current_card.size
+			)
+
+			var locked_card := track.get_child(1)
+			var locked_cta := locked_card.get_node("%CtaButton") as Button
+			_check(locked_cta.disabled, "Chapter 2 should be locked for a new player.")
+			_check(
+				str(locked_cta.text) == "LOCKED",
+				"Chapter 2's CTA should read LOCKED while it is locked."
+			)
+			var locked_ring := locked_card.get_node("%Ring") as ProgressRing
+			_check(
+				locked_ring.get_progress_current() == 0 and locked_ring.get_progress_total() == 25,
 				"Chapter 2 does not show its exact unlock progress."
+			)
+			_check(
+				str(locked_card.get_node("%CaptionLabel").text) == "Complete 25 levels in the previous chapter",
+				"Chapter 2 does not show its exact unlock requirement."
 			)
 
 	for resolution in TEST_RESOLUTIONS:
@@ -76,6 +95,16 @@ func _run() -> void:
 			bottom_bar.position.y + bottom_bar.size.y <= navigation.position.y + 1.0,
 			"Chapter actions overlap bottom navigation at %s." % resolution
 		)
+		if selection != null:
+			var pager := selection.get_node("%Pager") as Control
+			_check(
+				pager.global_position.x >= 0.0,
+				"The chapter pager escaped the left edge at %s." % resolution
+			)
+			_check(
+				pager.global_position.x + pager.size.x <= logical_size.x + 1.0,
+				"The chapter pager escaped the right edge at %s." % resolution
+			)
 
 	var background_scene := load("res://scenes/backgrounds/chapter_level_background.tscn") as PackedScene
 	var chapter_background := background_scene.instantiate() as TextureRect

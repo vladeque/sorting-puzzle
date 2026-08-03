@@ -77,7 +77,8 @@ Files:
 - `scenes/ui/level_button.tscn`
 - `scenes/ui/main_menu_chapter_button.tscn`
 - `scenes/ui/chapter_selection_screen.tscn`
-- `scenes/ui/chapter_card.tscn`
+- `scenes/ui/chapter_cover_card.tscn`
+- `scenes/ui/horizontal_pager.tscn`
 - `assets/ui/main_menu_coin.png`
 - `assets/ui/main_menu_lives.png`
 - `assets/ui/main_menu_reward_chest.png`
@@ -89,6 +90,8 @@ Files:
 - `assets/ui/avatars/*.png`
 - `assets/ui/level_button_blank*.png`
 - `scripts/press_scale_button.gd`
+- `scripts/horizontal_pager.gd`
+- `scripts/progress_ring.gd`
 - `scripts/production_main_menu.gd`
 - `scripts/chapters/*.gd`
 - `scripts/main_menu_reward_chest.gd`
