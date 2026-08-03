@@ -1,14 +1,18 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene format=3 uid="uid://b68mutsmn2nae"]
 
-[ext_resource type="Script" path="res://scripts/shop_screen.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/backgrounds/main_menu.jpeg" id="2_background"]
+[ext_resource type="Script" uid="uid://dn2jgb7ar364x" path="res://scripts/shop_screen.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://dwm7nk7sd3tou" path="res://assets/backgrounds/main_menu.jpeg" id="2_background"]
 [ext_resource type="PackedScene" path="res://scenes/ui/coin_balance_widget.tscn" id="3_coin_balance"]
-[ext_resource type="PackedScene" path="res://scenes/ui/main_menu_bottom_navigation.tscn" id="4_navigation"]
+[ext_resource type="PackedScene" uid="uid://cuq4oceh2x5if" path="res://scenes/ui/main_menu_bottom_navigation.tscn" id="4_navigation"]
 [ext_resource type="PackedScene" path="res://scenes/ui/shop_purchase_dialog.tscn" id="5_dialog"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_scroll"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_status"]
+content_margin_left = 24.0
+content_margin_top = 24.0
+content_margin_right = 24.0
+content_margin_bottom = 24.0
 bg_color = Color(0.25, 0.065, 0.1, 0.9)
 border_width_left = 3
 border_width_top = 3
@@ -19,10 +23,6 @@ corner_radius_top_left = 22
 corner_radius_top_right = 22
 corner_radius_bottom_right = 22
 corner_radius_bottom_left = 22
-content_margin_left = 24.0
-content_margin_top = 24.0
-content_margin_right = 24.0
-content_margin_bottom = 24.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_retry"]
 bg_color = Color(0.94, 0.44, 0.19, 1)
@@ -50,7 +50,7 @@ corner_radius_bottom_left = 16
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_focus"]
 
-[node name="ShopScreen" type="Control"]
+[node name="ShopScreen" type="Control" unique_id=1007849924]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -59,7 +59,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_script")
 
-[node name="Background" type="TextureRect" parent="."]
+[node name="Background" type="TextureRect" parent="." unique_id=1669006478]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -71,7 +71,7 @@ texture = ExtResource("2_background")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="BackgroundShade" type="ColorRect" parent="."]
+[node name="BackgroundShade" type="ColorRect" parent="." unique_id=1067617113]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -81,7 +81,7 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0.13, 0.025, 0.045, 0.66)
 
-[node name="ContentMargin" type="MarginContainer" parent="."]
+[node name="ContentMargin" type="MarginContainer" parent="." unique_id=1281134873]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -94,16 +94,15 @@ offset_bottom = -108.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ContentStack" type="VBoxContainer" parent="ContentMargin"]
+[node name="ContentStack" type="VBoxContainer" parent="ContentMargin" unique_id=1552013122]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Header" type="Control" parent="ContentMargin/ContentStack"]
+[node name="Header" type="Control" parent="ContentMargin/ContentStack" unique_id=1560731111]
 custom_minimum_size = Vector2(0, 78)
 layout_mode = 2
 
-[node name="TitleLabel" type="Label" parent="ContentMargin/ContentStack/Header"]
-theme_type_variation = &"GameTitleLabel"
+[node name="TitleLabel" type="Label" parent="ContentMargin/ContentStack/Header" unique_id=559809547]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -111,7 +110,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
+theme_type_variation = &"GameTitleLabel"
 theme_override_colors/font_color = Color(1, 0.95, 0.73, 1)
 theme_override_colors/font_shadow_color = Color(0.12, 0.02, 0.025, 0.95)
 theme_override_constants/shadow_offset_y = 4
@@ -120,24 +119,28 @@ text = "SHOP"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CoinBalance" parent="ContentMargin/ContentStack/Header" instance=ExtResource("3_coin_balance")]
+[node name="CoinBalance" parent="ContentMargin/ContentStack/Header" unique_id=103238742 instance=ExtResource("3_coin_balance")]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 6
 anchor_left = 1.0
+anchor_top = 0.5
 anchor_right = 1.0
+anchor_bottom = 0.5
 offset_left = -158.0
+offset_top = -34.0
 offset_bottom = 68.0
 grow_horizontal = 0
+grow_vertical = 2
 
-[node name="ShopScroll" type="ScrollContainer" parent="ContentMargin/ContentStack"]
+[node name="ShopScroll" type="ScrollContainer" parent="ContentMargin/ContentStack" unique_id=257140844]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-horizontal_scroll_mode = 0
 theme_override_styles/panel = SubResource("StyleBoxEmpty_scroll")
+horizontal_scroll_mode = 0
 
-[node name="ScrollMargin" type="MarginContainer" parent="ContentMargin/ContentStack/ShopScroll"]
+[node name="ScrollMargin" type="MarginContainer" parent="ContentMargin/ContentStack/ShopScroll" unique_id=1420057851]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/margin_left = 4
@@ -145,75 +148,75 @@ theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 4
 theme_override_constants/margin_bottom = 28
 
-[node name="Sections" type="VBoxContainer" parent="ContentMargin/ContentStack/ShopScroll/ScrollMargin"]
+[node name="Sections" type="VBoxContainer" parent="ContentMargin/ContentStack/ShopScroll/ScrollMargin" unique_id=1097273841]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 18
 
-[node name="BundlesSection" type="VBoxContainer" parent="ContentMargin/ContentStack/ShopScroll/ScrollMargin/Sections"]
+[node name="BundlesSection" type="VBoxContainer" parent="ContentMargin/ContentStack/ShopScroll/ScrollMargin/Sections" unique_id=1082366172]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="SectionLabel" type="Label" parent="ContentMargin/ContentStack/ShopScroll/ScrollMargin/Sections/BundlesSection"]
-theme_type_variation = &"GameSectionLabel"
+[node name="SectionLabel" type="Label" parent="ContentMargin/ContentStack/ShopScroll/ScrollMargin/Sections/BundlesSection" unique_id=2037779111]
 layout_mode = 2
+theme_type_variation = &"GameSectionLabel"
 theme_override_colors/font_color = Color(1, 0.83, 0.42, 1)
 theme_override_colors/font_shadow_color = Color(0.1, 0.01, 0.02, 0.95)
 theme_override_constants/shadow_offset_y = 2
 theme_override_font_sizes/font_size = 27
 text = "SPECIAL BUNDLES"
 
-[node name="BundlesContainer" type="VBoxContainer" parent="ContentMargin/ContentStack/ShopScroll/ScrollMargin/Sections/BundlesSection"]
+[node name="BundlesContainer" type="VBoxContainer" parent="ContentMargin/ContentStack/ShopScroll/ScrollMargin/Sections/BundlesSection" unique_id=711549383]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 14
 
-[node name="CoinOffersSection" type="VBoxContainer" parent="ContentMargin/ContentStack/ShopScroll/ScrollMargin/Sections"]
+[node name="CoinOffersSection" type="VBoxContainer" parent="ContentMargin/ContentStack/ShopScroll/ScrollMargin/Sections" unique_id=627034719]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="SectionLabel" type="Label" parent="ContentMargin/ContentStack/ShopScroll/ScrollMargin/Sections/CoinOffersSection"]
-theme_type_variation = &"GameSectionLabel"
+[node name="SectionLabel" type="Label" parent="ContentMargin/ContentStack/ShopScroll/ScrollMargin/Sections/CoinOffersSection" unique_id=1225574030]
 layout_mode = 2
+theme_type_variation = &"GameSectionLabel"
 theme_override_colors/font_color = Color(1, 0.83, 0.42, 1)
 theme_override_colors/font_shadow_color = Color(0.1, 0.01, 0.02, 0.95)
 theme_override_constants/shadow_offset_y = 2
 theme_override_font_sizes/font_size = 27
 text = "COINS"
 
-[node name="CoinOffersContainer" type="VBoxContainer" parent="ContentMargin/ContentStack/ShopScroll/ScrollMargin/Sections/CoinOffersSection"]
+[node name="CoinOffersContainer" type="VBoxContainer" parent="ContentMargin/ContentStack/ShopScroll/ScrollMargin/Sections/CoinOffersSection" unique_id=174897590]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="StatusContainer" type="CenterContainer" parent="ContentMargin/ContentStack"]
+[node name="StatusContainer" type="CenterContainer" parent="ContentMargin/ContentStack" unique_id=1356942832]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="StatusPanel" type="PanelContainer" parent="ContentMargin/ContentStack/StatusContainer"]
+[node name="StatusPanel" type="PanelContainer" parent="ContentMargin/ContentStack/StatusContainer" unique_id=1091682858]
 custom_minimum_size = Vector2(420, 0)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_status")
 
-[node name="StatusStack" type="VBoxContainer" parent="ContentMargin/ContentStack/StatusContainer/StatusPanel"]
+[node name="StatusStack" type="VBoxContainer" parent="ContentMargin/ContentStack/StatusContainer/StatusPanel" unique_id=2146619088]
 layout_mode = 2
 theme_override_constants/separation = 18
 
-[node name="StatusLabel" type="Label" parent="ContentMargin/ContentStack/StatusContainer/StatusPanel/StatusStack"]
-theme_type_variation = &"GameBodyLabel"
+[node name="StatusLabel" type="Label" parent="ContentMargin/ContentStack/StatusContainer/StatusPanel/StatusStack" unique_id=633853284]
 unique_name_in_owner = true
 layout_mode = 2
+theme_type_variation = &"GameBodyLabel"
 theme_override_colors/font_color = Color(1, 0.92, 0.77, 1)
 theme_override_font_sizes/font_size = 24
 text = "Loading regional prices..."
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="RetryButton" type="Button" parent="ContentMargin/ContentStack/StatusContainer/StatusPanel/StatusStack"]
+[node name="RetryButton" type="Button" parent="ContentMargin/ContentStack/StatusContainer/StatusPanel/StatusStack" unique_id=322060682]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(0, 62)
@@ -221,27 +224,24 @@ layout_mode = 2
 focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 25
 theme_override_styles/normal = SubResource("StyleBoxFlat_retry")
-theme_override_styles/hover = SubResource("StyleBoxFlat_retry")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_retry_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_retry")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
 text = "Retry"
 
-[node name="BottomNavigation" parent="." instance=ExtResource("4_navigation")]
+[node name="BottomNavigation" parent="." unique_id=1931831526 instance=ExtResource("4_navigation")]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
 offset_top = -96.0
-grow_horizontal = 2
 grow_vertical = 0
 active_tab = "shop"
 
-[node name="PurchaseDialog" parent="." instance=ExtResource("5_dialog")]
+[node name="PurchaseDialog" parent="." unique_id=913139129 instance=ExtResource("5_dialog")]
 unique_name_in_owner = true
 layout_mode = 1
