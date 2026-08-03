@@ -8,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://x6rx0xrv78dw" path="res://assets/abilities/ice_clock_icon_256x256.png" id="5_d3y3u"]
 [ext_resource type="Texture2D" uid="uid://nm6j8p75d3hn" path="res://assets/ui/discount_badge_pinned.png" id="6_discount_badge"]
 [ext_resource type="Texture2D" uid="uid://borxe8m7bwoqf" path="res://assets/ui/level_button_blank_new.png" id="7_purchase_button"]
+[ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="8_press_scale_button"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
 content_margin_left = 18.0
@@ -121,6 +122,7 @@ theme_override_styles/hover = SubResource("StyleBoxTexture_purchase_button")
 theme_override_styles/disabled = SubResource("StyleBoxTexture_purchase_button")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
 text = "$4.99"
+script = ExtResource("8_press_scale_button")
 
 [node name="Rewards" type="HBoxContainer" parent="CardBody/CardStack" unique_id=1210093075]
 layout_mode = 2

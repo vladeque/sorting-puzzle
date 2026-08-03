@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://ciqjqbx7cu4ly" path="res://scripts/shop_coin_offer_row.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://bdaxnw2vms0li" path="res://assets/ui/shop_coin_offers/shop_coin_offer_tier_01.png" id="2_coin"]
 [ext_resource type="Texture2D" uid="uid://borxe8m7bwoqf" path="res://assets/ui/level_button_blank_new.png" id="3_purchase_button"]
+[ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="4_press_scale_button"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_row"]
 content_margin_left = 12.0
@@ -114,3 +115,4 @@ theme_override_styles/hover = SubResource("StyleBoxTexture_purchase_button")
 theme_override_styles/disabled = SubResource("StyleBoxTexture_purchase_button")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
 text = "$0.99"
+script = ExtResource("4_press_scale_button")
