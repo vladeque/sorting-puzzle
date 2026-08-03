@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "default_unlock_required_levels": 25,
+  "chapters": [
+    {
+      "id": "chapter_01",
+      "order": 1,
+      "title": "Grocery Town",
+      "level_ids": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      "unlock": {
+        "previous_chapter_id": null,
+        "required_completed_levels": 0
+      },
+      "background_texture": "res://assets/backgrounds/level_bg_option_02_warm_grocery.png",
+      "selection_preview": "res://assets/backgrounds/level_bg_option_02_warm_grocery.png"
+    },
+    {
+      "id": "chapter_02",
+      "order": 2,
+      "title": "Candy Corner",
+      "level_ids": [],
+      "unlock": {
+        "previous_chapter_id": "chapter_01",
+        "required_completed_levels": 25
+      },
+      "background_texture": "res://assets/backgrounds/level_bg_option_04_cozy_candy.png",
+      "selection_preview": "res://assets/backgrounds/level_bg_option_04_cozy_candy.png"
+    }
+  ]
+}

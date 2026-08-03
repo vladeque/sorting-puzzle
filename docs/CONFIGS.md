@@ -2,6 +2,23 @@
 
 This file describes data files that drive gameplay and tooling.
 
+## `configs/chapters.json`
+
+Purpose:
+- Defines ordered chapters, chapter-local level lists, presentation art, and unlock rules.
+- Keeps global campaign level IDs stable for save/protocol compatibility while allowing each
+  chapter to contain hundreds of levels with chapter-local numbering in the UI.
+
+Contract:
+- Chapter IDs and orders are unique; order starts at `1` without gaps.
+- Chapter 1 is unlocked by default. Every later chapter names the immediately previous chapter and
+  uses `default_unlock_required_levels` (`25`) when its own positive requirement is omitted.
+- `level_ids` contains global campaign IDs. Every referenced runtime level must exist and declare
+  the same ID in its `level` field.
+- A future locked chapter may have an empty `level_ids` list so it can be previewed before content
+  ships.
+- `background_texture` and `selection_preview` must reference existing Godot textures.
+
 ## `configs/item_sprites.json`
 
 Purpose:
@@ -27,28 +44,29 @@ Contract:
 ## `configs/item_progression.json`
 
 Purpose:
-- Defines the cumulative item-art pool available to each campaign level during level materialization.
+- Defines the exclusive item-art pool available to each chapter during level materialization.
 - Keeps progression tuning separate from abstract shelf generation and the texture catalog.
 
 Top-level fields:
-- `schema_version`: currently `1`.
+- `schema_version`: currently `2`.
 - `mapping_salt`: stable non-empty string used for deterministic level-specific item selection.
-- `milestones`: strictly increasing item unlock milestones.
+- `chapters`: one entry per chapter in `configs/chapters.json`.
 
 Milestone fields:
-- `from_level`: first campaign level that can use the milestone's items.
+- `from_chapter_level`: first chapter-local level that can use the milestone's items.
 - `unlock`: non-empty list of item IDs from `configs/item_sprites.json`.
 
 Contract:
-- The first milestone starts at level `1`.
-- Every catalog item is scheduled exactly once.
-- A level's available pool is the cumulative union of milestones whose `from_level` is not greater
-  than that level number.
-- The 17-item market-icon expansion is grouped in the level `15` milestone so its unlock timing can
-  be retuned as one block without changing the item catalog.
+- Every configured chapter has a progression entry whose first milestone starts at local level `1`.
+- Every catalog item is scheduled exactly once across all chapters, so chapter pools never overlap.
+- A level's available pool is the cumulative union of its chapter milestones whose
+  `from_chapter_level` is not greater than that level's chapter-local number.
+- Chapter 1 owns the 20 item types used by levels 1-10; Chapter 2 owns the remaining 19 catalog
+  types.
 - Materialization selects a deterministic subset and maps logical item tokens one-to-one. Different
   logical identities never collapse into the same concrete item.
-- The mapping follows the level's own `level` field, not the player's current or highest progress.
+- The mapping follows the global level's catalog location and chapter-local number, not the
+  player's current or highest progress.
 
 ## `configs/level_templates/level_*.json`
 
@@ -61,7 +79,8 @@ Contract:
 - Every non-null slot is a logical token such as `item_01`; concrete catalog IDs are rejected.
 - Logical identities are local to one level and must have a one-to-one mapping into that level's
   progression pool.
-- Run `py scripts\tools\materialize_level_templates.py` after changing templates or item progression.
+- Run `py scripts\tools\materialize_level_templates.py` after changing templates, chapters, or
+  item progression.
 - Run `py scripts\tools\materialize_level_templates.py --check` to detect missing or stale runtime
   outputs.
 

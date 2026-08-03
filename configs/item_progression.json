@@ -1,80 +1,65 @@
 {
-  "schema_version": 1,
-  "mapping_salt": "sorting-puzzle-campaign-items-v1",
-  "milestones": [
-	{
-	  "from_level": 1,
-	  "unlock": [
-		"milk_carton",
-		"soda_bottle",
-		"orange_juice_box",
-		"water_bottle",
-		"chips_can",
-		"cookie_box",
-		"candy_bag",
-		"chocolate_bar",
-		"cupcake",
-		"ice_cream_cup",
-		"ketchup_bottle",
-		"cereal_box",
-		"toy_unicorn",
-		"teddy_bear",
-		"toy_robot",
-		"plant_pot",
-        "soap_pump"
-	  ]
-	},
-	{
-	  "from_level": 4,
-	  "unlock": [
-		"toothpaste_box",
-		"shampoo_bottle",
-		"canned_food"
-	  ]
-	},
-	{
-	  "from_level": 7,
-	  "unlock": [
-		"jam_jar",
-		"gift_box",
-		"orange_soda_bottle"
-	  ]
-	},
-	{
-	  "from_level": 10,
-	  "unlock": [
-		"wrapped_rainbow_lollipop",
-		"gummy_bears_bag",
-		"blue_cookie_box"
-	  ]
-	},
-	{
-	  "from_level": 15,
-	  "unlock": [
-		"rainbow_chocolate_bar",
-		"orange_yogurt_cup",
-		"grape_juice_box",
-		"rainbow_lollipop",
-		"green_smoothie_cup"
-	  ]
-	},
-	{
-	  "from_level": 20,
-	  "unlock": [
-		"blue_frozen_yogurt_cup",
-		"blueberry_jam_jar",
-		"rainbow_cereal_box",
-		"coffee_cup"
-	  ]
-	},
-		{
-	  "from_level": 30,
-	  "unlock": [
-		"pink_ice_cream_tub",
-		"popcorn_box",
-		"strawberry_yogurt_cup",
-        "lime_soda_can"
-	  ]
-	}
+  "schema_version": 2,
+  "mapping_salt": "sorting-puzzle-chapter-items-v2",
+  "chapters": [
+    {
+      "chapter_id": "chapter_01",
+      "milestones": [
+        {
+          "from_chapter_level": 1,
+          "unlock": [
+            "candy_bag",
+            "canned_food",
+            "cereal_box",
+            "chips_can",
+            "chocolate_bar",
+            "cookie_box",
+            "cupcake",
+            "ice_cream_cup",
+            "ketchup_bottle",
+            "milk_carton",
+            "orange_juice_box",
+            "plant_pot",
+            "shampoo_bottle",
+            "soap_pump",
+            "soda_bottle",
+            "teddy_bear",
+            "toothpaste_box",
+            "toy_robot",
+            "toy_unicorn",
+            "water_bottle"
+          ]
+        }
+      ]
+    },
+    {
+      "chapter_id": "chapter_02",
+      "milestones": [
+        {
+          "from_chapter_level": 1,
+          "unlock": [
+            "blue_cookie_box",
+            "blue_frozen_yogurt_cup",
+            "blueberry_jam_jar",
+            "coffee_cup",
+            "gift_box",
+            "grape_juice_box",
+            "green_smoothie_cup",
+            "gummy_bears_bag",
+            "jam_jar",
+            "lime_soda_can",
+            "orange_soda_bottle",
+            "orange_yogurt_cup",
+            "pink_ice_cream_tub",
+            "popcorn_box",
+            "rainbow_cereal_box",
+            "rainbow_chocolate_bar",
+            "rainbow_lollipop",
+            "strawberry_yogurt_cup",
+            "wrapped_rainbow_lollipop"
+          ]
+        }
+      ]
+    }
   ]
 }

@@ -22,7 +22,10 @@ Purpose:
 - Provides a top status row for profile, saved gold coins, saved campaign lives, and settings.
 - Shows a left-side reward chest widget under the profile icon with saved star progress toward the active configured chest goal.
 - After a completed level returns here, launches one clover coin per earned star from the background house into the reward chest and advances the visible chest count on impact.
-- Provides a bottom `%LevelButton` labeled with the saved campaign level, such as `Level 1`, or disabled as `No Lives` when lives are empty.
+- Provides a bottom `%LevelButton` labeled with the selected chapter's next local level, such as
+  `Level 1`, or disabled as `No Lives`, `Chapter Complete`, or `Coming Soon`.
+- Places `%ChapterButton` immediately below the level button and opens the dedicated chapter
+  selection screen.
 - Opens the player profile menu when the profile widget is pressed.
 - Opens the main settings menu when the settings widget is pressed.
 - Opens the reward chest detail modal when the reward chest widget is pressed.
@@ -38,13 +41,17 @@ Important nodes:
 - `RewardChest`: left-side `scenes/ui/main_menu_reward_chest.tscn` instance positioned by `scripts/production_main_menu.gd`.
 - `HouseRewardOrigin`: responsive marker over the background house used as the reward animation origin.
 - `RewardCoinFlyer`: fullscreen `scenes/ui/main_menu_reward_coin_flyer.tscn` effect layer.
-- `BottomBar`: bottom-anchored responsive container for the play button.
-- `BottomBar/LevelButton`: `scenes/ui/level_button.tscn` instance that launches the saved campaign level.
+- `BottomBar/ActionColumn`: bottom-anchored responsive stack for campaign actions.
+- `BottomBar/ActionColumn/LevelButton`: launches the selected chapter's first incomplete level.
+- `BottomBar/ActionColumn/ChapterButton`: compact selected-chapter summary from
+  `scenes/ui/main_menu_chapter_button.tscn`.
 - `LeaderboardRewardDialog`: `scenes/ui/leaderboard_reward_dialog.tscn` instance, hidden until a
   weekly reward is pending.
 - Runtime child `scenes/ui/profile_menu.tscn`: centered pause-style profile editor window created when `ProfileWidget` is pressed.
 - Runtime child `scenes/ui/settings_menu.tscn`: centered pause-style settings window created when `SettingsWidget/SettingsButton` is pressed.
 - Runtime child `scenes/ui/reward_chest_menu.tscn`: centered pause-style reward chest detail modal created when the `RewardChest` widget emits `chest_pressed`.
+- Runtime child `scenes/ui/chapter_selection_screen.tscn`: full-screen chapter picker with reusable
+  `chapter_card.tscn` cards, selected/locked states, and exact prerequisite progress.
 
 Depends on:
 - `level.tscn` through `scripts/production_main_menu.gd`.
@@ -57,6 +64,8 @@ Depends on:
 - `scenes/ui/settings_menu.tscn` for the main-menu settings popup.
 - `scenes/ui/reward_chest_menu.tscn` for the reward chest detail modal.
 - `scenes/ui/level_button.tscn` for the reusable production level button visuals.
+- `scenes/ui/main_menu_chapter_button.tscn`, `scenes/ui/chapter_selection_screen.tscn`, and
+  `scenes/ui/chapter_card.tscn` for chapter navigation.
 - `scenes/ui/leaderboard_reward_dialog.tscn` for the weekly reward notification.
 - `scenes/ui/leaderboard_screen.tscn` for the dedicated ranking destination.
 

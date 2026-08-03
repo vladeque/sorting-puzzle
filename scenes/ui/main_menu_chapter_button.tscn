@@ -1,0 +1,90 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/chapters/main_menu_chapter_button.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="Style_normal"]
+bg_color = Color(0.99, 0.93, 0.78, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.45, 0.22, 0.11, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0.18, 0.07, 0.03, 0.36)
+shadow_size = 7
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="Style_pressed"]
+bg_color = Color(0.93, 0.84, 0.65, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.38, 0.16, 0.08, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[node name="ChapterButton" type="Button"]
+custom_minimum_size = Vector2(420, 80)
+size_flags_horizontal = 4
+focus_mode = 1
+theme_override_styles/normal = SubResource("Style_normal")
+theme_override_styles/hover = SubResource("Style_normal")
+theme_override_styles/pressed = SubResource("Style_pressed")
+script = ExtResource("1_script")
+
+[node name="Content" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 8.0
+offset_right = -14.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="Preview" type="TextureRect" parent="Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(76, 60)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Text" type="VBoxContainer" parent="Content"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/separation = 0
+
+[node name="ChapterLabel" type="Label" parent="Content/Text"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.31, 0.12, 0.06, 1)
+theme_override_font_sizes/font_size = 23
+text = "CHAPTER 1  ·  GROCERY TOWN"
+
+[node name="ProgressLabel" type="Label" parent="Content/Text"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.46, 0.29, 0.18, 1)
+theme_override_font_sizes/font_size = 16
+text = "0/10 LEVELS COMPLETE"
+
+[node name="Chevron" type="Label" parent="Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.39, 0.17, 0.08, 1)
+theme_override_font_sizes/font_size = 34
+text = ">"
+vertical_alignment = 1
+

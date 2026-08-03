@@ -33,7 +33,7 @@ func _run() -> void:
 		"ability_uses": {"hammer": 7, "shuffle": 6, "highlight": 5},
 	}) as Dictionary
 	var migrated_uses := migrated_v4.get("ability_uses", {}) as Dictionary
-	_check(int(migrated_v4.get("version", 0)) == 6, "schema-4 snapshots migrate to schema 6")
+	_check(int(migrated_v4.get("version", 0)) == 7, "schema-4 snapshots migrate to schema 7")
 	_check(int(migrated_uses.get("freezer", 0)) == 3, "schema-4 migration grants exactly three freezers")
 	var sanitized_v5 := progress.call("_sanitize_data", {
 		"version": 5,
@@ -45,7 +45,16 @@ func _run() -> void:
 	)
 	_check(
 		(sanitized_v5.get("purchased_shop_offer_ids", []) as Array).is_empty(),
-		"schema-5 to schema-6 migration starts with no locally purchased offers"
+		"schema-5 to schema-7 migration starts with no locally purchased offers"
+	)
+	var migrated_campaign := progress.call("_sanitize_data", {
+		"version": 6,
+		"current_level": 8,
+		"highest_completed_level": 7,
+	}) as Dictionary
+	_check(
+		(migrated_campaign.get("completion_stars_by_level", {}) as Dictionary).size() == 7,
+		"schema-6 campaign cursor migrates to seven explicit completions"
 	)
 	_check(progress.get_coins() == 300, "fresh local snapshot has coins")
 	_check(progress.spend_coins(25), "coin spending commits")
@@ -69,12 +78,25 @@ func _run() -> void:
 		"purchased shop offer is available to catalog eligibility"
 	)
 
-	for level_number in range(1, 171):
+	_check(progress.get_selected_chapter_id() == "chapter_01", "Chapter 1 is initially selected")
+	_check(not progress.select_chapter("chapter_02"), "locked Chapter 2 cannot be selected")
+	for level_number in range(1, 11):
 		_check(progress.complete_level(level_number, 3), "offline completion %d commits" % level_number)
-	_check(progress.get_current_level() == 171, "more than 100 consecutive completions are unrestricted")
-	_check(progress.get_total_earned_stars() == 510, "lifetime stars update immediately")
-	_check(progress.get_coins() >= 375, "reward chest coin grant is immediate")
-	_check(progress.spend_coins(100), "offline-earned reward can be spent immediately")
+	_check(not progress.complete_level(1, 3), "completed levels cannot be replayed")
+	_check(not progress.complete_level(11, 3), "unconfigured levels cannot be completed")
+	_check(progress.get_current_level() == 11, "legacy campaign cursor follows contiguous completions")
+	_check(progress.get_total_earned_stars() == 30, "lifetime stars update immediately")
+	var chapter_one_progress := progress.get_chapter_progress("chapter_01") as Dictionary
+	var chapter_two_progress := progress.get_chapter_progress("chapter_02") as Dictionary
+	_check(bool(chapter_one_progress.get("complete", false)), "Chapter 1 is complete at current content end")
+	_check(
+		int(chapter_two_progress.get("previous_completed_levels", 0)) == 10
+		and int(chapter_two_progress.get("required_completed_levels", 0)) == 25
+		and not bool(chapter_two_progress.get("unlocked", true)),
+		"Chapter 2 remains locked at 10 of 25 required completions"
+	)
+	_check(progress.get_coins() == 275, "chapter completion does not invent an early chest reward")
+	_check(progress.spend_coins(100), "saved coins remain spendable after chapter completion")
 
 	var diagnostics: Dictionary = progress.get_local_save_diagnostics()
 	_check(
@@ -115,7 +137,8 @@ func _run() -> void:
 	)
 
 	progress.load_progress()
-	_check(progress.get_current_level() == 171, "facade snapshot survives restart load")
+	_check(progress.get_current_level() == 11, "facade snapshot survives restart load")
+	_check(progress.get_completed_level_stars().size() == 10, "completion history survives restart")
 	_check(progress.get_player_name() == "Offline Player", "profile remains account-scoped")
 	_check(
 		progress.has_purchased_shop_offer(&"new_player_bundle"),

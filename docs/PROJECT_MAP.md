@@ -8,7 +8,8 @@ Main scene:
 - `scenes/main_menu.tscn`
 - Configured in `project.godot` as `run/main_scene`.
 - `project.godot` keeps the 720x1280 design viewport and uses `canvas_items` stretch with `keep_width` so portrait devices share a stable logical width while gaining or losing vertical play space.
-- Owns the production campaign play entry point over `assets/backgrounds/main_menu.jpeg` and launches the saved campaign level from the bottom level button.
+- Owns the production campaign entry point over `assets/backgrounds/main_menu.jpeg`, launches the
+  selected chapter's next level, and opens the chapter picker from the action beneath the level button.
 - Shows a separate left-side reward chest progress widget under the profile icon.
 
 Testing menu:
@@ -24,6 +25,7 @@ Player progression:
 - `scripts/player_progress.gd`
 - `scripts/save/*.gd`
 - `configs/backend/content_provenance.json`
+- `configs/chapters.json`
 - Registered in `project.godot` as the `PlayerProgress` autoload.
 - Always saves account-scoped gameplay locally with atomic generations and a signed operation
   journal; backend synchronization is a silent recovery/merge destination.
@@ -71,6 +73,9 @@ Files:
 - `scenes/ui/profile_menu.tscn`
 - `scenes/ui/settings_menu.tscn`
 - `scenes/ui/level_button.tscn`
+- `scenes/ui/main_menu_chapter_button.tscn`
+- `scenes/ui/chapter_selection_screen.tscn`
+- `scenes/ui/chapter_card.tscn`
 - `assets/ui/main_menu_coin.png`
 - `assets/ui/main_menu_lives.png`
 - `assets/ui/main_menu_reward_chest.png`
@@ -83,6 +88,7 @@ Files:
 - `assets/ui/level_button_blank*.png`
 - `scripts/press_scale_button.gd`
 - `scripts/production_main_menu.gd`
+- `scripts/chapters/*.gd`
 - `scripts/main_menu_reward_chest.gd`
 - `scripts/reward_chest_menu.gd`
 - `scripts/profile_menu.gd`
@@ -90,7 +96,9 @@ Files:
 - `scripts/player_progress.gd`
 
 Responsibility:
-- Shows a production bottom button labeled with `PlayerProgress.current_level`.
+- Shows the selected chapter's next chapter-local level and a chapter summary button directly below.
+- Shows all configured chapters on a dedicated screen; locked cards expose exact previous-chapter
+  progress toward the default 25-level requirement.
 - Shows production top-row icons for the saved circular-clipped profile avatar, saved gold coins, saved lives, and a smaller pause-style settings button.
 - Shows a separate side reward chest widget under the profile icon with saved stars versus the active configured goal; tapping it opens `scenes/ui/reward_chest_menu.tscn`, a read-only centered modal showing the same progress at a larger size, the dedicated `assets/ui/reward_chest_menu_illustration.png` artwork, and the coin payout waiting at the next goal.
 - Opens `scenes/ui/profile_menu.tscn` from the profile widget, shows an editable player-name field above all 18 avatars in a centered pause-style window with a 3-column grid, and saves the name plus selected avatar through `PlayerProgress`.
@@ -133,12 +141,14 @@ Responsibility:
   journal exactly once to the immutable backend player id.
 - Uploads BE-307 v2 batches silently, persists exact retries, reconciles checkpoints/cursors, and
   retains inactive account journals.
-- Tracks the current campaign level, highest completed level, campaign lives, next life restore timestamp, gold coins, campaign ability uses, reward chest stars, reward chest goal index, selected profile avatar, and player name.
+- Tracks explicit per-level completions, selected chapter, compatibility campaign cursors, lives,
+  economy, abilities, reward chest, leaderboard totals, and profile state.
 - Defaults fresh and legacy profile saves to `avatar_cat` and a generated `player_` name with a five-character random suffix.
 - Restores one missing life per elapsed real-time hour until the five-life cap is reached.
 - Spends one campaign life when a campaign level fails or the player leaves from the pause menu.
 - Commits ability/coin spends after effect preflight and before starting the gameplay effect.
-- Advances `current_level` only when the active campaign level is completed.
+- Accepts only the selected chapter's first incomplete level, prevents replay after completion, and
+  derives later-chapter access from distinct previous-chapter completions.
 - Adds earned campaign completion stars to the reward chest and grants configured gold coin rewards when goals are reached.
 - Adds the same earned campaign completion stars to a non-spending lifetime total and a Monday-UTC weekly total for leaderboard scoring.
 
@@ -502,6 +512,7 @@ Change here when:
 ### Level Data And Tooling
 
 Files:
+- `configs/chapters.json`
 - `configs/item_progression.json`
 - `configs/level_templates/level_*.json`
 - `configs/levels/level_*.json`
@@ -512,7 +523,8 @@ Files:
 - `scripts/tools/validate_level_solvable.py`
 
 Responsibility:
-- Stores cumulative campaign item unlock milestones.
+- Stores ordered chapter/global-level membership and chapter presentation/unlock metadata.
+- Stores exclusive per-chapter item unlock milestones.
 - Stores abstract level number, time limit, layout preset, and logical shelf layers.
 - Materializes abstract item identities into concrete runtime item IDs using each level's available pool.
 - Stores named layout preset positions in Godot scene templates.
@@ -536,8 +548,8 @@ Add a new item type:
 
 Add a new level:
 - Generate `configs/level_templates/level_011.json` or the next numbered template.
+- Add its global ID to the owning chapter's `level_ids` in `configs/chapters.json`.
 - Run `scripts/tools/materialize_level_templates.py` to create the runtime level.
-- Update `MAX_LEVEL` in `scripts/main_menu.gd`.
 - Validate the level with `scripts/tools/validate_level_solvable.py`.
 
 Change shelf layout spacing:

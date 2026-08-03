@@ -1,0 +1,108 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" path="res://assets/backgrounds/main_menu.jpeg" id="1_background"]
+[ext_resource type="Script" path="res://scripts/chapters/chapter_selection_screen.gd" id="2_script"]
+
+[sub_resource type="StyleBoxFlat" id="Style_back"]
+bg_color = Color(1, 0.92, 0.68, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.44, 0.19, 0.08, 1)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[node name="ChapterSelectionScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_script")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("1_background")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Shade" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.18, 0.07, 0.02, 0.72)
+
+[node name="SafeMargins" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 30.0
+offset_top = 32.0
+offset_right = -30.0
+offset_bottom = -32.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Layout" type="VBoxContainer" parent="SafeMargins"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Header" type="HBoxContainer" parent="SafeMargins/Layout"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="BackButton" type="Button" parent="SafeMargins/Layout/Header"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(74, 64)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.32, 0.12, 0.05, 1)
+theme_override_font_sizes/font_size = 34
+theme_override_styles/normal = SubResource("Style_back")
+theme_override_styles/hover = SubResource("Style_back")
+theme_override_styles/pressed = SubResource("Style_back")
+text = "<"
+
+[node name="Title" type="Label" parent="SafeMargins/Layout/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 0.95, 0.8, 1)
+theme_override_colors/font_shadow_color = Color(0.08, 0.02, 0, 0.9)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 4
+theme_override_font_sizes/font_size = 44
+text = "Choose Chapter"
+vertical_alignment = 1
+
+[node name="Subtitle" type="Label" parent="SafeMargins/Layout"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.56, 1)
+theme_override_font_sizes/font_size = 21
+text = "Complete levels to unlock the next adventure"
+autowrap_mode = 2
+
+[node name="Scroll" type="ScrollContainer" parent="SafeMargins/Layout"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="CardList" type="VBoxContainer" parent="SafeMargins/Layout/Scroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 22
+

@@ -16,25 +16,74 @@ from typing import Any
 
 DEFAULT_PROGRESSION_CONFIG = Path("configs/item_progression.json")
 DEFAULT_ITEM_CONFIG = Path("configs/item_sprites.json")
+DEFAULT_CHAPTERS_CONFIG = Path("configs/chapters.json")
 LOGICAL_ITEM_PATTERN = re.compile(r"^item_(\d{2,})$")
 SLOTS_PER_SHELF = 3
 
 
 @dataclass(frozen=True)
-class ItemProgression:
-    mapping_salt: str
-    milestones: tuple[tuple[int, tuple[str, ...]], ...]
+class ChapterDefinition:
+    chapter_id: str
+    order: int
+    title: str
+    level_ids: tuple[int, ...]
+    previous_chapter_id: str | None
+    required_completed_levels: int
 
-    def available_items(self, level_number: int) -> tuple[str, ...]:
+
+@dataclass(frozen=True)
+class CampaignChapters:
+    chapters: tuple[ChapterDefinition, ...]
+
+    def chapter_for_level(self, level_number: int) -> tuple[ChapterDefinition, int]:
         if level_number < 1:
             raise ValueError("level number must be at least 1")
+        for chapter in self.chapters:
+            try:
+                chapter_level = chapter.level_ids.index(level_number) + 1
+            except ValueError:
+                continue
+            return chapter, chapter_level
+        raise ValueError(f"campaign level {level_number} is not assigned to a chapter")
 
+
+@dataclass(frozen=True)
+class ChapterItemProgression:
+    chapter_id: str
+    milestones: tuple[tuple[int, tuple[str, ...]], ...]
+
+    def available_items(self, chapter_level: int) -> tuple[str, ...]:
+        if chapter_level < 1:
+            raise ValueError("chapter level must be at least 1")
         available: list[str] = []
-        for from_level, unlocked_items in self.milestones:
-            if from_level > level_number:
+        for from_chapter_level, unlocked_items in self.milestones:
+            if from_chapter_level > chapter_level:
                 break
             available.extend(unlocked_items)
         return tuple(available)
+
+
+@dataclass(frozen=True)
+class ItemProgression:
+    mapping_salt: str
+    campaign_chapters: CampaignChapters
+    chapter_progressions: tuple[ChapterItemProgression, ...]
+
+    def available_items(self, level_number: int) -> tuple[str, ...]:
+        chapter, chapter_level = self.campaign_chapters.chapter_for_level(level_number)
+        for progression in self.chapter_progressions:
+            if progression.chapter_id == chapter.chapter_id:
+                return progression.available_items(chapter_level)
+        raise ValueError(f"chapter '{chapter.chapter_id}' has no item progression")
+
+    def chapter_item_ids(self, chapter_id: str) -> tuple[str, ...]:
+        for progression in self.chapter_progressions:
+            if progression.chapter_id == chapter_id:
+                result: list[str] = []
+                for _from_level, item_ids in progression.milestones:
+                    result.extend(item_ids)
+                return tuple(result)
+        raise ValueError(f"unknown chapter '{chapter_id}'")
 
 
 def load_json_object(path: Path) -> dict[str, Any]:
@@ -66,61 +115,161 @@ def load_item_catalog_ids(path: Path = DEFAULT_ITEM_CONFIG) -> tuple[str, ...]:
     return tuple(item_ids)
 
 
+def load_chapter_catalog(path: Path = DEFAULT_CHAPTERS_CONFIG) -> CampaignChapters:
+    document = load_json_object(path)
+    if set(document) != {"schema_version", "default_unlock_required_levels", "chapters"}:
+        raise ValueError(f"{path} has unexpected or missing fields")
+    if document.get("schema_version") != 1:
+        raise ValueError(f"{path} schema_version must be 1")
+    default_requirement = document.get("default_unlock_required_levels")
+    if type(default_requirement) is not int or default_requirement < 1:
+        raise ValueError(f"{path} default unlock requirement must be a positive integer")
+
+    raw_chapters = document.get("chapters")
+    if not isinstance(raw_chapters, list) or not raw_chapters:
+        raise ValueError(f"{path} must define a non-empty chapters array")
+
+    chapters: list[ChapterDefinition] = []
+    seen_ids: set[str] = set()
+    seen_levels: set[int] = set()
+    for index, raw_chapter in enumerate(raw_chapters):
+        expected_fields = {
+            "id",
+            "order",
+            "title",
+            "level_ids",
+            "unlock",
+            "background_texture",
+            "selection_preview",
+        }
+        if not isinstance(raw_chapter, dict) or set(raw_chapter) != expected_fields:
+            raise ValueError(f"{path} chapters[{index}] has invalid fields")
+        chapter_id = raw_chapter.get("id")
+        order = raw_chapter.get("order")
+        title = raw_chapter.get("title")
+        if not isinstance(chapter_id, str) or not chapter_id or chapter_id in seen_ids:
+            raise ValueError(f"{path} chapters[{index}].id must be unique and non-empty")
+        if type(order) is not int or order != index + 1:
+            raise ValueError(f"{path} chapter order must be contiguous starting at 1")
+        if not isinstance(title, str) or not title.strip():
+            raise ValueError(f"{path} chapters[{index}].title must be non-empty")
+        for presentation_key in ("background_texture", "selection_preview"):
+            presentation_path = raw_chapter.get(presentation_key)
+            if not isinstance(presentation_path, str) or not presentation_path.startswith("res://"):
+                raise ValueError(f"{path} chapters[{index}].{presentation_key} must be a res:// path")
+
+        raw_level_ids = raw_chapter.get("level_ids")
+        if not isinstance(raw_level_ids, list):
+            raise ValueError(f"{path} chapters[{index}].level_ids must be an array")
+        level_ids: list[int] = []
+        for level_id in raw_level_ids:
+            if type(level_id) is not int or level_id < 1 or level_id in seen_levels:
+                raise ValueError(f"{path} chapter levels must be unique positive integers")
+            seen_levels.add(level_id)
+            level_ids.append(level_id)
+        if index == 0 and not level_ids:
+            raise ValueError(f"{path} first chapter must contain at least one level")
+
+        raw_unlock = raw_chapter.get("unlock")
+        if not isinstance(raw_unlock, dict) or not set(raw_unlock).issubset(
+            {"previous_chapter_id", "required_completed_levels"}
+        ) or "previous_chapter_id" not in raw_unlock:
+            raise ValueError(f"{path} chapters[{index}].unlock has invalid fields")
+        previous_chapter_id = raw_unlock.get("previous_chapter_id")
+        required_completed_levels = raw_unlock.get(
+            "required_completed_levels", 0 if index == 0 else default_requirement
+        )
+        if index == 0:
+            if previous_chapter_id is not None or required_completed_levels != 0:
+                raise ValueError(f"{path} first chapter must be unlocked by default")
+        else:
+            expected_previous_id = chapters[index - 1].chapter_id
+            if previous_chapter_id != expected_previous_id:
+                raise ValueError(f"{path} chapter unlocks must reference the previous chapter")
+            if type(required_completed_levels) is not int or required_completed_levels < 1:
+                raise ValueError(f"{path} chapter unlock requirement must be positive")
+
+        seen_ids.add(chapter_id)
+        chapters.append(
+            ChapterDefinition(
+                chapter_id=chapter_id,
+                order=order,
+                title=title.strip(),
+                level_ids=tuple(level_ids),
+                previous_chapter_id=previous_chapter_id,
+                required_completed_levels=required_completed_levels,
+            )
+        )
+    return CampaignChapters(chapters=tuple(chapters))
+
+
 def load_item_progression(
     progression_path: Path = DEFAULT_PROGRESSION_CONFIG,
     item_config_path: Path = DEFAULT_ITEM_CONFIG,
+    chapters_path: Path = DEFAULT_CHAPTERS_CONFIG,
 ) -> ItemProgression:
     document = load_json_object(progression_path)
-    if set(document) != {"schema_version", "mapping_salt", "milestones"}:
+    if set(document) != {"schema_version", "mapping_salt", "chapters"}:
         raise ValueError(f"{progression_path} has unexpected or missing fields")
-    if document.get("schema_version") != 1:
-        raise ValueError(f"{progression_path} schema_version must be 1")
+    if document.get("schema_version") != 2:
+        raise ValueError(f"{progression_path} schema_version must be 2")
 
     mapping_salt = document.get("mapping_salt")
     if not isinstance(mapping_salt, str) or not mapping_salt:
         raise ValueError(f"{progression_path} mapping_salt must be a non-empty string")
 
-    raw_milestones = document.get("milestones")
-    if not isinstance(raw_milestones, list) or not raw_milestones:
-        raise ValueError(f"{progression_path} must define a non-empty milestones array")
-
+    campaign_chapters = load_chapter_catalog(chapters_path)
     known_items = set(load_item_catalog_ids(item_config_path))
     assigned_items: set[str] = set()
-    milestones: list[tuple[int, tuple[str, ...]]] = []
-    previous_level = 0
-    for index, raw_milestone in enumerate(raw_milestones):
-        if not isinstance(raw_milestone, dict) or set(raw_milestone) != {"from_level", "unlock"}:
-            raise ValueError(f"{progression_path} milestones[{index}] has invalid fields")
+    raw_chapters = document.get("chapters")
+    if not isinstance(raw_chapters, list) or not raw_chapters:
+        raise ValueError(f"{progression_path} must define chapter progressions")
+    expected_chapter_ids = [chapter.chapter_id for chapter in campaign_chapters.chapters]
+    chapter_progressions: list[ChapterItemProgression] = []
+    for chapter_index, raw_chapter in enumerate(raw_chapters):
+        if not isinstance(raw_chapter, dict) or set(raw_chapter) != {"chapter_id", "milestones"}:
+            raise ValueError(f"{progression_path} chapters[{chapter_index}] has invalid fields")
+        chapter_id = raw_chapter.get("chapter_id")
+        if chapter_index >= len(expected_chapter_ids) or chapter_id != expected_chapter_ids[chapter_index]:
+            raise ValueError(f"{progression_path} chapter order must match {chapters_path}")
+        raw_milestones = raw_chapter.get("milestones")
+        if not isinstance(raw_milestones, list) or not raw_milestones:
+            raise ValueError(f"{progression_path} chapter '{chapter_id}' must define milestones")
 
-        from_level = raw_milestone.get("from_level")
-        if type(from_level) is not int or from_level <= previous_level:
-            raise ValueError(
-                f"{progression_path} milestone levels must be strictly increasing positive integers"
-            )
-        if index == 0 and from_level != 1:
-            raise ValueError(f"{progression_path} first milestone must start at level 1")
+        milestones: list[tuple[int, tuple[str, ...]]] = []
+        previous_level = 0
+        for milestone_index, raw_milestone in enumerate(raw_milestones):
+            if not isinstance(raw_milestone, dict) or set(raw_milestone) != {
+                "from_chapter_level",
+                "unlock",
+            }:
+                raise ValueError(f"{progression_path} chapter milestone has invalid fields")
+            from_level = raw_milestone.get("from_chapter_level")
+            if type(from_level) is not int or from_level <= previous_level:
+                raise ValueError(f"{progression_path} chapter milestones must be strictly increasing")
+            if milestone_index == 0 and from_level != 1:
+                raise ValueError(f"{progression_path} first chapter milestone must start at level 1")
+            raw_unlocks = raw_milestone.get("unlock")
+            if not isinstance(raw_unlocks, list) or not raw_unlocks:
+                raise ValueError(f"{progression_path} chapter milestone unlock must not be empty")
+            unlocked_items: list[str] = []
+            for raw_item_id in raw_unlocks:
+                if not isinstance(raw_item_id, str) or not raw_item_id:
+                    raise ValueError(f"{progression_path} contains an invalid item ID")
+                if raw_item_id not in known_items:
+                    raise ValueError(f"{progression_path} references unknown item '{raw_item_id}'")
+                if raw_item_id in assigned_items:
+                    raise ValueError(f"{progression_path} assigns item '{raw_item_id}' more than once")
+                assigned_items.add(raw_item_id)
+                unlocked_items.append(raw_item_id)
+            milestones.append((from_level, tuple(unlocked_items)))
+            previous_level = from_level
+        chapter_progressions.append(
+            ChapterItemProgression(chapter_id=chapter_id, milestones=tuple(milestones))
+        )
 
-        raw_unlocks = raw_milestone.get("unlock")
-        if not isinstance(raw_unlocks, list) or not raw_unlocks:
-            raise ValueError(f"{progression_path} milestones[{index}].unlock must not be empty")
-
-        unlocked_items: list[str] = []
-        for raw_item_id in raw_unlocks:
-            if not isinstance(raw_item_id, str) or not raw_item_id:
-                raise ValueError(
-                    f"{progression_path} milestones[{index}].unlock contains an invalid item ID"
-                )
-            if raw_item_id not in known_items:
-                raise ValueError(f"{progression_path} references unknown item '{raw_item_id}'")
-            if raw_item_id in assigned_items:
-                raise ValueError(
-                    f"{progression_path} assigns item '{raw_item_id}' more than once"
-                )
-            assigned_items.add(raw_item_id)
-            unlocked_items.append(raw_item_id)
-
-        milestones.append((from_level, tuple(unlocked_items)))
-        previous_level = from_level
+    if len(chapter_progressions) != len(expected_chapter_ids):
+        raise ValueError(f"{progression_path} must define every configured chapter")
 
     missing_items = known_items - assigned_items
     if missing_items:
@@ -128,7 +277,11 @@ def load_item_progression(
             f"{progression_path} does not schedule catalog items: {', '.join(sorted(missing_items))}"
         )
 
-    return ItemProgression(mapping_salt=mapping_salt, milestones=tuple(milestones))
+    return ItemProgression(
+        mapping_salt=mapping_salt,
+        campaign_chapters=campaign_chapters,
+        chapter_progressions=tuple(chapter_progressions),
+    )
 
 
 def logical_item_ids(item_type_count: int) -> list[str]:
@@ -197,11 +350,15 @@ def build_item_mapping(
             f"but only {len(available_items)} item types are available"
         )
 
+    chapter, chapter_level = progression.campaign_chapters.chapter_for_level(level_number)
     ranked_items = sorted(
         available_items,
         key=lambda item_id: (
             hashlib.sha256(
-                f"{progression.mapping_salt}:{level_number}:{item_id}".encode("utf-8")
+                (
+                    f"{progression.mapping_salt}:{chapter.chapter_id}:"
+                    f"{chapter_level}:{level_number}:{item_id}"
+                ).encode("utf-8")
             ).digest(),
             item_id.encode("utf-8"),
         ),
@@ -262,6 +419,7 @@ def parse_args() -> argparse.Namespace:
         default=DEFAULT_PROGRESSION_CONFIG,
     )
     parser.add_argument("--item-config", type=Path, default=DEFAULT_ITEM_CONFIG)
+    parser.add_argument("--chapters-config", type=Path, default=DEFAULT_CHAPTERS_CONFIG)
     parser.add_argument(
         "--mapping",
         action="store_true",
@@ -273,7 +431,11 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     try:
-        progression = load_item_progression(args.progression_config, args.item_config)
+        progression = load_item_progression(
+            args.progression_config,
+            args.item_config,
+            args.chapters_config,
+        )
         abstract_level = load_json_object(args.input)
         materialized, mapping = materialize_level(abstract_level, progression)
         write_json(args.output, materialized)

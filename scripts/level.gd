@@ -137,7 +137,7 @@ const DEFAULT_ABILITY_PURCHASE_PRICES := {
 @export var level_duration_seconds := 300.0
 @export_range(-40.0, 6.0, 0.5) var item_place_volume_db := -5.0
 @export_range(-40.0, 6.0, 0.5) var triple_clear_volume_db := -5.0
-@export_range(1, 10, 1) var selected_level := 1
+@export var selected_level := 1
 @export var launched_from_dev_mode := false
 @export_file("*.tscn") var return_menu_scene_path := MAIN_MENU_SCENE
 
@@ -149,6 +149,7 @@ var _origin_slot: Node2D
 var _drag_offset := Vector2.ZERO
 var _drag_layer: Node2D
 var _background: Control
+var _chapter_artwork: TextureRect
 var _shelves_root: Node2D
 var _timer_label: Label
 var _level_label: Label
@@ -218,6 +219,7 @@ var _shuffle_effect_active := false
 
 func _ready() -> void:
 	_background = get_node("Background") as Control
+	_chapter_artwork = get_node("Background/ChapterArtwork") as TextureRect
 	_shelves_root = get_node("Shelves") as Node2D
 	_drag_layer = get_node("DragLayer") as Node2D
 	_timer_label = get_node("UI/TimerLabel") as Label
@@ -255,6 +257,7 @@ func _ready() -> void:
 	_setup_ability_buttons()
 	_load_ability_purchase_prices()
 	_load_item_textures()
+	_apply_chapter_background()
 	_apply_level_config(_load_level_config(selected_level))
 	_collect_slots()
 	_update_level_label()
@@ -262,6 +265,15 @@ func _ready() -> void:
 	_update_star_counter_label()
 	_update_ability_buttons()
 	_update_pause_menu_button()
+
+
+func _apply_chapter_background() -> void:
+	var chapter_id := ChapterCatalog.get_chapter_id_for_level(selected_level)
+	if chapter_id.is_empty():
+		push_warning("Level %d is not assigned to a chapter." % selected_level)
+		return
+	if _chapter_artwork.has_method("show_chapter"):
+		_chapter_artwork.call("show_chapter", chapter_id)
 
 
 func _apply_responsive_layout() -> void:
@@ -1539,7 +1551,8 @@ func _update_timer_label() -> void:
 
 
 func _update_level_label() -> void:
-	_level_label.text = "LEVEL %d" % selected_level
+	var local_level := ChapterCatalog.get_local_level_number(selected_level)
+	_level_label.text = "LEVEL %d" % (local_level if local_level > 0 else selected_level)
 
 
 func _update_star_counter_label() -> void:

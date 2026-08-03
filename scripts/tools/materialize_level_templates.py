@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 from level_item_progression import (
+    DEFAULT_CHAPTERS_CONFIG,
     DEFAULT_ITEM_CONFIG,
     DEFAULT_PROGRESSION_CONFIG,
     format_json,
@@ -41,6 +42,7 @@ def parse_args() -> argparse.Namespace:
         default=DEFAULT_PROGRESSION_CONFIG,
     )
     parser.add_argument("--item-config", type=Path, default=DEFAULT_ITEM_CONFIG)
+    parser.add_argument("--chapters-config", type=Path, default=DEFAULT_CHAPTERS_CONFIG)
     parser.add_argument(
         "--check",
         action="store_true",
@@ -52,7 +54,11 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     try:
-        progression = load_item_progression(args.progression_config, args.item_config)
+        progression = load_item_progression(
+            args.progression_config,
+            args.item_config,
+            args.chapters_config,
+        )
         template_paths = sorted(args.templates_directory.glob("level_*.json"))
         if not template_paths:
             raise ValueError(

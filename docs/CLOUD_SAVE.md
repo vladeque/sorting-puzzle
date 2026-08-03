@@ -47,6 +47,12 @@ Each `sorting-puzzle-local-save/1` generation contains four explicit partitions:
    metadata;
 4. `preferences`: device-only music, sound-effect, and vibration state.
 
+The snapshot stores `completion_stars_by_level` as the explicit source of truth for completed
+global level IDs and `selected_chapter_id` as a device preference. `current_level` and
+`highest_completed_level` remain compatibility summaries. Checkpoint recovery rebuilds the
+explicit completion map from `campaign.selected_completions`, so chapter-shaped progress does not
+depend on one contiguous campaign cursor.
+
 `current.json`, `previous.json`, and `pending.tmp` implement temporary-write, flush, validate,
 previous-generation rotation, and atomic promotion. Startup validates every checksum and journal
 hash, then selects the highest fully valid generation. A partial write or corrupt newest generation
@@ -81,6 +87,9 @@ generation:
 - avatar and display-name edits.
 
 Level completion is not shown until `PlayerProgress.complete_level()` confirms the atomic commit.
+That method accepts only the first incomplete level in an unlocked chapter and rejects an already
+completed level, so production campaign levels are not replayable. Chapter unlock state is derived
+from distinct completions in the immediately previous chapter; the default threshold is 25.
 Ability and coin spending are committed after a successful preflight and before starting the
 gameplay effect. Connectivity does not choose a different mutation path.
 

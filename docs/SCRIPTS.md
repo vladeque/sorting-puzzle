@@ -17,7 +17,8 @@ Purpose:
 - Consumes completed-level reward payloads, displays the pre-reward chest value, and advances it once for each clover coin that reaches the chest.
 - Opens the reward chest detail modal when the reward chest widget emits `chest_pressed`.
 - Opens the main-menu settings popup from the top status bar.
-- Launches the saved campaign level.
+- Launches the first incomplete level in the selected unlocked chapter.
+- Opens the chapter selection screen and refreshes the level/chapter actions after selection.
 - Opens the dedicated leaderboard scene from the bottom navigation trophy signal.
 - Consumes `PlayerProgress.consume_pending_leaderboard_reward()` and shows `%LeaderboardRewardDialog` when a weekly leaderboard rollover granted a coin reward since the last launch.
 
@@ -26,8 +27,6 @@ Key constants:
 - `PROFILE_MENU_SCENE`: preloads `res://scenes/ui/profile_menu.tscn`.
 - `SETTINGS_MENU_SCENE`: preloads `res://scenes/ui/settings_menu.tscn`.
 - `REWARD_CHEST_MENU_SCENE`: preloads `res://scenes/ui/reward_chest_menu.tscn`.
-- `MIN_LEVEL`: first campaign level number.
-- `MAX_LEVEL`: last campaign level number.
 - `PRODUCTION_MENU_SCENE`: return path assigned to campaign level instances.
 - `LEADERBOARD_SCENE`: destination path for the trophy tab.
 - `LIFE_STATUS_REFRESH_SECONDS`: cadence for refreshing the lives countdown while the menu is visible.
@@ -48,6 +47,7 @@ Important nodes:
 - `MainMenuTopStatus/LivesWidget/LifeStatus`: shows `Full` or the `MM:SS` countdown until the next restored life.
 - `%BottomBar`: bottom-anchored container positioned at runtime with safe-area padding.
 - `%LevelButton`: `scenes/ui/level_button.tscn` instance that starts the saved campaign level.
+- `%ChapterButton`: selected-chapter summary that opens `chapter_selection_screen.tscn`.
 - `%BottomNavigation`: full-width `scenes/ui/main_menu_bottom_navigation.tscn` instance aligned to the viewport bottom and extended through the device safe area.
 
 Key methods:
@@ -72,7 +72,19 @@ Key methods:
 - `_open_leaderboard()`: replaces the production menu with the dedicated leaderboard scene.
 - `_open_shop()`: replaces the production menu with the dedicated Shop scene.
 - `_on_profile_avatar_saved(avatar_id)`: refreshes the top status avatar after the profile menu saves.
-- `_launch_campaign_level()`: instantiates the level, sets campaign launch metadata, swaps current scene, and queues the menu for deletion.
+- `_launch_campaign_level()`: resolves the selected chapter's next incomplete global level,
+  instantiates it, sets campaign launch metadata, swaps current scene, and queues the menu.
+
+## `scripts/chapters/*.gd`
+
+Purpose:
+- `chapter_catalog.gd` validates `configs/chapters.json` and exposes global-to-chapter/local-level
+  lookup; it is registered as the `ChapterCatalog` autoload before `PlayerProgress`.
+- `chapter_selection_screen.gd` populates the dedicated selection screen and persists unlocked
+  selections through `PlayerProgress`.
+- `chapter_card.gd` and `main_menu_chapter_button.gd` render chapter art, completion counts, selected
+  state, and exact lock progress.
+- `chapter_level_background.gd` loads the selected level's configured chapter artwork.
 
 Depends on:
 - `level.tscn`
@@ -536,6 +548,9 @@ Saved fields:
 - `version`: gameplay snapshot schema version retained through legacy migration.
 - `current_level`: next campaign level to play.
 - `highest_completed_level`: highest campaign level completed.
+- `completion_stars_by_level`: explicit completed global-level set and earned stars; source of truth
+  for chapter progress and replay prevention.
+- `selected_chapter_id`: currently selected unlocked chapter, stored with device preferences.
 - `lives`: current campaign lives, clamped from `0` to `5`.
 - `next_life_restore_unix`: Unix timestamp for the next hourly life restore, or `0` when lives are full.
 - `coins`: current gold coin balance. Fresh saves start at `300`.
@@ -562,6 +577,10 @@ Key methods:
 - `load_progress()`: opens/recover/migrates the active namespace and starts silent background sync.
 - `save_progress()`: writes an atomic local generation without creating an operation.
 - `get_current_level()`: returns the next campaign level.
+- `get_completed_level_stars()` / `is_level_completed()`: expose the explicit completion set.
+- `get_selected_chapter_id()` / `select_chapter()`: read or persist an unlocked chapter selection.
+- `is_chapter_unlocked()`, `get_completed_level_count()`, `get_next_level_for_chapter()`, and
+  `get_chapter_progress()`: derive chapter access and UI progress from explicit completions.
 - `get_ability_uses()`: returns remaining campaign ability uses.
 - `get_coins()`: returns the saved gold coin balance.
 - `get_total_earned_stars()`: returns the lifetime leaderboard score.
@@ -600,9 +619,9 @@ Key methods:
 - `spend_life(level_number, outcome)`: atomically appends the attempt and resulting life state.
 - `spend_ability(ability_id)`: validates one of the four canonical ability ids, then immediately
   spends, journals, and saves one campaign ability use.
-- `complete_level(level_number, earned_stars)`: atomically records completion, advancement,
-  lifetime/weekly/chest totals, immediate chest coins, and reward-animation metadata; returns false
-  before result UI if persistence fails.
+- `complete_level(level_number, earned_stars)`: accepts only the next incomplete level in an
+  unlocked chapter, rejects replay, and atomically records completion, advancement,
+  lifetime/weekly/chest totals, immediate chest coins, and reward-animation metadata.
 - `bind_registered_guest()`, `switch_to_player()`, and `sign_out()`: activate account-scoped
   namespaces without deleting inactive journals.
 - `get_local_save_diagnostics()`: returns non-secret namespace/recovery/support state.
@@ -616,6 +635,7 @@ Depends on:
 - `scripts/save/*.gd`
 - `scripts/backend/backend_transport.gd`
 - `configs/reward_chest_goals.json`
+- `ChapterCatalog` autoload and `configs/chapters.json`
 
 Do not use for:
 - Per-level shelf state, timer state, or dev/test level runtime state.
@@ -1028,7 +1048,8 @@ Important exports:
 - `level_duration_seconds`: fallback duration if config does not define `time_seconds`.
 - `item_place_volume_db`: volume for the item placement sound effect.
 - `triple_clear_volume_db`: volume for the matched triple clear sound effect.
-- `selected_level`: level number loaded from `configs/levels/level_%03d.json`.
+- `selected_level`: global campaign level ID loaded from `configs/levels/level_%03d.json`; the HUD
+  displays its chapter-local level number.
 - `launched_from_dev_mode`: makes a level use isolated temporary ability counts and return to the menu instead of saving campaign progress.
 - `return_menu_scene_path`: menu scene path used by Leave and dev/test completion returns.
 
@@ -1060,7 +1081,8 @@ Important constants:
 
 Key responsibilities:
 - Apply responsive layout with `_apply_responsive_layout()`, including safe-area-aware top HUD placement, ability bar placement over the floor/baseboard transition strip, full-screen overlays, centered pause and leave-confirmation popups, shelf-root scaling, and shelf-root centering between HUD and ability controls.
-- Resize the scene-owned `Background` control so its procedural top strip, shop wall, baseboard, and floor bands fill the active viewport.
+- Resize the scene-owned `Background` control and apply the active level's configured chapter
+  artwork through `Background/ChapterArtwork`; the HUD strip remains scene-owned above it.
 - Load JSON configs with `_load_json_file()`.
 - Instantiate reusable shelf cells with `_add_shelf()`, apply the shared shelf visual scale, assign left/middle/right row placement visuals for static shelves, and ask `Shelf` to add generated back layers.
 - Ask each shelf scene to show or hide its placement-specific `TopCeilingCap` when it has no stacked neighbor above. Show each shelf scene's bottom `Shadow` and `RightColumnShadow` whenever the shelf uses full visuals so neighboring shelf bodies and items cover those low-layer cast shadows while exposed wall/background areas still receive them.
@@ -1128,6 +1150,7 @@ Depends on:
 - `configs/item_sprites.json` item IDs and texture paths.
 - `configs/ability_purchase_prices.json` paid-use prices for zero-use ability purchases.
 - `configs/levels/level_*.json` shelf schema.
+- `ChapterCatalog` for chapter-local numbering and gameplay background selection.
 - `PlayerProgress` autoload for campaign progress, lives, coin spending, and ability inventory.
 - `scenes/leave_confirmation_menu.tscn` button and star-count node names used under `UI/LeaveConfirmationOverlay`.
 - `scenes/ability_purchase_menu.tscn` button, icon, and price node names used under `UI/AbilityPurchaseOverlay`.
@@ -1372,21 +1395,22 @@ Do not use for:
 ## `scripts/tools/level_item_progression.py`
 
 Purpose:
-- Validates the item catalog and cumulative milestone config.
+- Validates the chapter catalog, item catalog, and per-chapter milestone config.
 - Selects a deterministic level-specific subset from the available item pool.
 - Maps template `item_NN` identities one-to-one into concrete item IDs.
 - Provides a single-template materialization CLI.
 
 Key behavior:
-- Rejects unknown, duplicated, or unscheduled catalog items.
+- Rejects unknown, duplicated, unscheduled, or cross-chapter-overlapping catalog items.
 - Rejects concrete item IDs inside templates and templates that require more identities than their
   campaign-level pool provides.
-- Hash-selects the concrete subset using `mapping_salt` and campaign level, then assigns the subset
-  in stable item-ID order so solvability and deterministic replay tie-breaking are preserved.
+- Resolves the global level to its chapter/local number, hash-selects the concrete subset using
+  `mapping_salt`, then assigns it in stable item-ID order.
 
 Depends on:
 - `configs/item_progression.json`.
 - `configs/item_sprites.json`.
+- `configs/chapters.json`.
 
 ## `scripts/tools/materialize_level_templates.py`
 

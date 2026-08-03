@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://bh2wtx7clqdgd" path="res://scenes/ability_purchase_menu.tscn" id="9_ability_purchase"]
 [ext_resource type="Script" uid="uid://cy80oincxrrc5" path="res://scripts/level.gd" id="10_level_script"]
 [ext_resource type="PackedScene" uid="uid://db6gp1qpotd1l" path="res://scenes/ui/ability_bar.tscn" id="11_ability_bar"]
+[ext_resource type="PackedScene" path="res://scenes/backgrounds/chapter_level_background.tscn" id="12_chapter_background"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_top_hud_strip"]
 bg_color = Color(0.7, 0.34, 0.24, 1)
@@ -119,7 +120,11 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
+[node name="ChapterArtwork" parent="Background" instance=ExtResource("12_chapter_background")]
+layout_mode = 1
+
 [node name="Wall" type="ColorRect" parent="Background" unique_id=1791137621]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -130,6 +135,7 @@ mouse_filter = 2
 color = Color(0.78, 0.67, 0.55, 1)
 
 [node name="PlayWall" type="ColorRect" parent="Background" unique_id=923511134]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -197,6 +203,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Baseboard" type="Panel" parent="Background" unique_id=616197814]
+visible = false
 layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0
@@ -210,6 +217,7 @@ mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_baseboard")
 
 [node name="Floor" type="ColorRect" parent="Background" unique_id=1982383889]
+visible = false
 layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0

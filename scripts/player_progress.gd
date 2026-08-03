@@ -10,7 +10,7 @@ const ContentProvenanceManifestScript := preload(
 	"res://scripts/save/content_provenance_manifest.gd"
 )
 const SAVE_PATH := "user://player_progress.json"
-const SAVE_VERSION := 6
+const SAVE_VERSION := 7
 const MIN_LEVEL := 1
 const ABILITY_HAMMER := "hammer"
 const ABILITY_SHUFFLE := "shuffle"
@@ -109,8 +109,10 @@ func load_progress() -> void:
 	var initial_data := _sanitize_data(legacy_data if not legacy_data.is_empty() else _default_data())
 	var initial_preferences := {
 		"settings_disabled": initial_data.get("settings_disabled", DEFAULT_DISABLED_SETTINGS).duplicate(true),
+		"selected_chapter_id": initial_data.get("selected_chapter_id", _default_chapter_id()),
 	}
 	initial_data.erase("settings_disabled")
+	initial_data.erase("selected_chapter_id")
 	if _account_coordinator == null:
 		_account_coordinator = AccountSaveCoordinatorScript.new(_session_store)
 	var open_result: Dictionary = _account_coordinator.initialize(
@@ -175,6 +177,95 @@ func get_current_level() -> int:
 
 func get_highest_completed_level() -> int:
 	return int(_data.get("highest_completed_level", 0))
+
+
+func get_completed_level_stars() -> Dictionary:
+	return (_data.get("completion_stars_by_level", {}) as Dictionary).duplicate(true)
+
+
+func is_level_completed(level_number: int) -> bool:
+	return (_data.get("completion_stars_by_level", {}) as Dictionary).has(str(level_number))
+
+
+func get_selected_chapter_id() -> String:
+	var selected := str(_data.get("selected_chapter_id", _default_chapter_id()))
+	if _can_select_chapter(selected):
+		return selected
+	return _latest_selectable_chapter_id()
+
+
+func select_chapter(chapter_id: String) -> bool:
+	if not _can_select_chapter(chapter_id):
+		return false
+	if get_selected_chapter_id() == chapter_id:
+		return true
+	var previous_data := _data.duplicate(true)
+	_data["selected_chapter_id"] = chapter_id
+	return _commit_or_restore(previous_data)
+
+
+func is_chapter_unlocked(chapter_id: String) -> bool:
+	return _is_chapter_unlocked_with_completions(
+		chapter_id,
+		_data.get("completion_stars_by_level", {}) as Dictionary
+	)
+
+
+func _is_chapter_unlocked_with_completions(chapter_id: String, completions: Dictionary) -> bool:
+	var chapter := ChapterCatalog.get_chapter(chapter_id)
+	if chapter.is_empty():
+		return false
+	if int(chapter.get("order", 0)) == 1:
+		return true
+	var previous_chapter_id := str(chapter.get("previous_chapter_id", ""))
+	var requirement := maxi(int(chapter.get("required_completed_levels", 0)), 0)
+	return _completed_level_count_from(completions, previous_chapter_id) >= requirement
+
+
+func get_completed_level_count(chapter_id: String) -> int:
+	return _completed_level_count_from(
+		_data.get("completion_stars_by_level", {}) as Dictionary,
+		chapter_id
+	)
+
+
+func _completed_level_count_from(completions: Dictionary, chapter_id: String) -> int:
+	var count := 0
+	for level_id in ChapterCatalog.get_level_ids(chapter_id):
+		if completions.has(str(level_id)):
+			count += 1
+	return count
+
+
+func get_next_level_for_chapter(chapter_id: String) -> int:
+	if not is_chapter_unlocked(chapter_id):
+		return 0
+	for level_id in ChapterCatalog.get_level_ids(chapter_id):
+		if not is_level_completed(level_id):
+			return level_id
+	return 0
+
+
+func get_chapter_progress(chapter_id: String) -> Dictionary:
+	var chapter := ChapterCatalog.get_chapter(chapter_id)
+	if chapter.is_empty():
+		return {}
+	var previous_chapter_id := str(chapter.get("previous_chapter_id", ""))
+	var level_ids := ChapterCatalog.get_level_ids(chapter_id)
+	var completed := get_completed_level_count(chapter_id)
+	var previous_completed := get_completed_level_count(previous_chapter_id)
+	var requirement := maxi(int(chapter.get("required_completed_levels", 0)), 0)
+	return {
+		"chapter_id": chapter_id,
+		"completed_levels": completed,
+		"total_levels": level_ids.size(),
+		"previous_completed_levels": previous_completed,
+		"required_completed_levels": requirement,
+		"unlocked": is_chapter_unlocked(chapter_id),
+		"complete": not level_ids.is_empty() and completed >= level_ids.size(),
+		"has_levels": not level_ids.is_empty(),
+		"next_level": get_next_level_for_chapter(chapter_id),
+	}
 
 
 func get_ability_uses() -> Dictionary:
@@ -536,27 +627,27 @@ func spend_ability(ability_id: StringName) -> bool:
 
 
 func complete_level(level_number: int, earned_stars: int = 0) -> bool:
-	if level_number < MIN_LEVEL:
+	var chapter_id := ChapterCatalog.get_chapter_id_for_level(level_number)
+	if chapter_id.is_empty() or not is_chapter_unlocked(chapter_id):
+		return false
+	if is_level_completed(level_number) or get_next_level_for_chapter(chapter_id) != level_number:
 		return false
 
 	var safe_earned_stars := maxi(earned_stars, 0)
 	var previous_data := _data.duplicate(true)
 	var previous_animation := _pending_reward_chest_animation.duplicate(true)
-	var completes_current_level := level_number == get_current_level()
-	_data["highest_completed_level"] = maxi(get_highest_completed_level(), level_number)
-	if completes_current_level:
-		_data["current_level"] = level_number + 1
-		var starting_progress := get_reward_chest_progress()
-		_apply_reward_chest_stars(safe_earned_stars)
-		if safe_earned_stars > 0:
-			_refresh_leaderboard_week_state()
-			_data["total_earned_stars"] = get_total_earned_stars() + safe_earned_stars
-			_data["weekly_earned_stars"] = get_weekly_earned_stars() + safe_earned_stars
-			_pending_reward_chest_animation = {
-				"amount": safe_earned_stars,
-				"start_stars": int(starting_progress.get("stars", 0)),
-				"start_goal_index": int(starting_progress.get("goal_index", 0)),
-			}
+	var starting_progress := get_reward_chest_progress()
+	_record_level_completion(level_number, safe_earned_stars)
+	_apply_reward_chest_stars(safe_earned_stars)
+	if safe_earned_stars > 0:
+		_refresh_leaderboard_week_state()
+		_data["total_earned_stars"] = get_total_earned_stars() + safe_earned_stars
+		_data["weekly_earned_stars"] = get_weekly_earned_stars() + safe_earned_stars
+		_pending_reward_chest_animation = {
+			"amount": safe_earned_stars,
+			"start_stars": int(starting_progress.get("stars", 0)),
+			"start_goal_index": int(starting_progress.get("goal_index", 0)),
+		}
 	var operations := []
 	var completion_payload := _campaign_completion_payload(level_number, safe_earned_stars)
 	if not completion_payload.is_empty():
@@ -590,8 +681,16 @@ func _sanitize_data(raw_data: Dictionary) -> Dictionary:
 	var sanitized := _default_data()
 	var source_version := maxi(int(raw_data.get("version", 0)), 0)
 	sanitized["version"] = SAVE_VERSION
-	sanitized["current_level"] = maxi(int(raw_data.get("current_level", MIN_LEVEL)), MIN_LEVEL)
-	sanitized["highest_completed_level"] = maxi(int(raw_data.get("highest_completed_level", 0)), 0)
+	var legacy_highest_completed := maxi(int(raw_data.get("highest_completed_level", 0)), 0)
+	legacy_highest_completed = maxi(
+		legacy_highest_completed,
+		maxi(int(raw_data.get("current_level", MIN_LEVEL)) - 1, 0)
+	)
+	sanitized["completion_stars_by_level"] = _sanitize_completion_stars(
+		raw_data.get("completion_stars_by_level", {}),
+		legacy_highest_completed
+	)
+	_apply_legacy_cursor(sanitized)
 	sanitized["lives"] = clampi(int(raw_data.get("lives", MAX_LIVES)), 0, MAX_LIVES)
 	sanitized["next_life_restore_unix"] = maxi(int(raw_data.get("next_life_restore_unix", 0)), 0)
 	sanitized["coins"] = maxi(int(raw_data.get("coins", DEFAULT_COINS)), 0)
@@ -605,6 +704,10 @@ func _sanitize_data(raw_data: Dictionary) -> Dictionary:
 	sanitized["player_name"] = _sanitize_player_name(str(raw_data.get("player_name", sanitized["player_name"])), sanitized["player_name"])
 	sanitized["moderation_state"] = str(raw_data.get("moderation_state", "active"))
 	sanitized["settings_disabled"] = _sanitize_disabled_settings(raw_data.get("settings_disabled", {}))
+	sanitized["selected_chapter_id"] = _sanitize_selected_chapter_id(
+		str(raw_data.get("selected_chapter_id", _default_chapter_id())),
+		sanitized["completion_stars_by_level"] as Dictionary
+	)
 	sanitized["total_earned_stars"] = maxi(
 		int(raw_data.get("total_earned_stars", raw_data.get("reward_chest_stars", 0))),
 		0
@@ -653,6 +756,7 @@ func _default_data() -> Dictionary:
 		"version": SAVE_VERSION,
 		"current_level": MIN_LEVEL,
 		"highest_completed_level": 0,
+		"completion_stars_by_level": {},
 		"lives": MAX_LIVES,
 		"next_life_restore_unix": 0,
 		"coins": DEFAULT_COINS,
@@ -663,6 +767,7 @@ func _default_data() -> Dictionary:
 		"player_name": _generate_player_name(),
 		"moderation_state": "active",
 		"settings_disabled": DEFAULT_DISABLED_SETTINGS.duplicate(),
+		"selected_chapter_id": _default_chapter_id(),
 		"total_earned_stars": 0,
 		"leaderboard_week_start_unix": get_current_leaderboard_week_start_unix(),
 		"weekly_earned_stars": 0,
@@ -1139,6 +1244,10 @@ func _apply_loaded_partitions(snapshot: Dictionary, preferences: Dictionary) -> 
 		"settings_disabled",
 		DEFAULT_DISABLED_SETTINGS
 	)
+	combined["selected_chapter_id"] = preferences.get(
+		"selected_chapter_id",
+		_default_chapter_id()
+	)
 	_data = _sanitize_data(combined)
 
 
@@ -1149,12 +1258,14 @@ func _snapshot_for_storage() -> Dictionary:
 func _snapshot_without_preferences(source: Dictionary) -> Dictionary:
 	var snapshot := source.duplicate(true)
 	snapshot.erase("settings_disabled")
+	snapshot.erase("selected_chapter_id")
 	return snapshot
 
 
 func _preferences_for_storage() -> Dictionary:
 	return {
 		"settings_disabled": get_disabled_settings(),
+		"selected_chapter_id": get_selected_chapter_id(),
 	}
 
 
@@ -1267,6 +1378,17 @@ func _map_checkpoint_to_snapshot(
 	mapped["version"] = SAVE_VERSION
 	mapped["current_level"] = int(campaign.get("current_level", MIN_LEVEL))
 	mapped["highest_completed_level"] = int(campaign.get("highest_completed_level", 0))
+	var checkpoint_completions := {}
+	for level_number in range(1, int(mapped["highest_completed_level"]) + 1):
+		checkpoint_completions[str(level_number)] = 0
+	for raw_completion in campaign.get("selected_completions", []) as Array:
+		var completion := raw_completion as Dictionary
+		if completion == null:
+			continue
+		var completed_level := int(completion.get("campaign_level", 0))
+		if completed_level >= MIN_LEVEL:
+			checkpoint_completions[str(completed_level)] = maxi(int(completion.get("stars", 0)), 0)
+	mapped["completion_stars_by_level"] = checkpoint_completions
 	mapped["coins"] = int(balances.get("coins", DEFAULT_COINS))
 	mapped["ability_uses"] = {
 		ABILITY_HAMMER: int(abilities.get(ABILITY_HAMMER, 0)),
@@ -1309,12 +1431,11 @@ func _apply_unacknowledged_operation(snapshot: Dictionary, operation: Dictionary
 		"campaign_completion":
 			var level_number := int(payload.get("campaign_level", 0))
 			var stars := maxi(int(payload.get("stars", 0)), 0)
-			result["highest_completed_level"] = maxi(
-				int(result.get("highest_completed_level", 0)),
-				level_number
-			)
-			if level_number == int(result.get("current_level", MIN_LEVEL)):
-				result["current_level"] = level_number + 1
+			var completions := result.get("completion_stars_by_level", {}) as Dictionary
+			if level_number >= MIN_LEVEL and not completions.has(str(level_number)):
+				completions[str(level_number)] = stars
+				result["completion_stars_by_level"] = completions
+				_apply_legacy_cursor(result)
 				var normalized := _normalize_reward_chest_progress(
 					int(result.get("reward_chest_stars", 0)) + stars,
 					int(result.get("reward_chest_goal_index", 0))
@@ -1347,6 +1468,74 @@ func _apply_unacknowledged_operation(snapshot: Dictionary, operation: Dictionary
 			if payload.has("avatar_id"):
 				result["avatar_id"] = str(payload.get("avatar_id"))
 	return result
+
+
+func _record_level_completion(level_number: int, earned_stars: int) -> void:
+	var completions := _data.get("completion_stars_by_level", {}) as Dictionary
+	completions[str(level_number)] = maxi(earned_stars, 0)
+	_data["completion_stars_by_level"] = completions
+	_apply_legacy_cursor(_data)
+
+
+func _apply_legacy_cursor(target: Dictionary) -> void:
+	var completions := target.get("completion_stars_by_level", {}) as Dictionary
+	var highest_contiguous := 0
+	while completions.has(str(highest_contiguous + 1)):
+		highest_contiguous += 1
+	target["highest_completed_level"] = highest_contiguous
+	target["current_level"] = highest_contiguous + 1
+
+
+func _sanitize_completion_stars(raw_value: Variant, legacy_highest_completed: int) -> Dictionary:
+	var sanitized := {}
+	if raw_value is Dictionary:
+		for raw_key in (raw_value as Dictionary).keys():
+			var level_number := int(str(raw_key))
+			if level_number >= MIN_LEVEL:
+				sanitized[str(level_number)] = maxi(int((raw_value as Dictionary).get(raw_key, 0)), 0)
+	for level_number in range(1, legacy_highest_completed + 1):
+		if not sanitized.has(str(level_number)):
+			sanitized[str(level_number)] = 0
+	return sanitized
+
+
+func _sanitize_selected_chapter_id(chapter_id: String, completions: Dictionary) -> String:
+	if _can_select_chapter_with_completions(chapter_id, completions):
+		return chapter_id
+	return _latest_selectable_chapter_id_with_completions(completions)
+
+
+func _can_select_chapter(chapter_id: String) -> bool:
+	return _can_select_chapter_with_completions(
+		chapter_id,
+		_data.get("completion_stars_by_level", {}) as Dictionary
+	)
+
+
+func _can_select_chapter_with_completions(chapter_id: String, completions: Dictionary) -> bool:
+	return (
+		_is_chapter_unlocked_with_completions(chapter_id, completions)
+		and not ChapterCatalog.get_level_ids(chapter_id).is_empty()
+	)
+
+
+func _latest_selectable_chapter_id() -> String:
+	return _latest_selectable_chapter_id_with_completions(
+		_data.get("completion_stars_by_level", {}) as Dictionary
+	)
+
+
+func _latest_selectable_chapter_id_with_completions(completions: Dictionary) -> String:
+	var latest := _default_chapter_id()
+	for chapter in ChapterCatalog.get_chapters():
+		var chapter_id := str(chapter.get("id", ""))
+		if _can_select_chapter_with_completions(chapter_id, completions):
+			latest = chapter_id
+	return latest
+
+
+func _default_chapter_id() -> String:
+	return ChapterCatalog.get_first_chapter_id() if ChapterCatalog != null else "chapter_01"
 
 
 func _on_reconciliation_applied() -> void:

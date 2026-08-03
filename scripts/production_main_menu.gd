@@ -4,9 +4,8 @@ const LEVEL_SCENE := preload("res://level.tscn")
 const PROFILE_MENU_SCENE := preload("res://scenes/ui/profile_menu.tscn")
 const SETTINGS_MENU_SCENE := preload("res://scenes/ui/settings_menu.tscn")
 const REWARD_CHEST_MENU_SCENE := preload("res://scenes/ui/reward_chest_menu.tscn")
+const CHAPTER_SELECTION_SCENE := preload("res://scenes/ui/chapter_selection_screen.tscn")
 const AVATAR_CLIP_SHADER := preload("res://assets/ui/avatar_circle_clip.gdshader")
-const MIN_LEVEL := 1
-const MAX_LEVEL := 10
 const PRODUCTION_MENU_SCENE := "res://scenes/main_menu.tscn"
 const SHOP_SCENE := "res://scenes/ui/shop_screen.tscn"
 const LEADERBOARD_SCENE := "res://scenes/ui/leaderboard_screen.tscn"
@@ -19,8 +18,8 @@ const CUTOUT_LAYOUT_TOLERANCE := 0.5
 const PROFILE_WIDGET_WIDTH := 76.0
 const REWARD_CHEST_SIZE := Vector2(116.0, 136.0)
 const REWARD_CHEST_TOP_GAP := 72.0
-const BOTTOM_BAR_HEIGHT := 184.0
-const BOTTOM_MARGIN := 166.0
+const BOTTOM_BAR_HEIGHT := 245.0
+const BOTTOM_MARGIN := 112.0
 const SIDE_MARGIN := 48.0
 const LEVEL_BUTTON_MAX_WIDTH := 420.0
 const BOTTOM_NAVIGATION_HEIGHT := 96.0
@@ -32,6 +31,7 @@ const LIFE_STATUS_REFRESH_SECONDS := 1.0
 @onready var _reward_coin_flyer := %RewardCoinFlyer as Control
 @onready var _bottom_bar := %BottomBar as MarginContainer
 @onready var _level_button := %LevelButton as Button
+@onready var _chapter_button := %ChapterButton as Button
 @onready var _bottom_navigation := %BottomNavigation as MarginContainer
 @onready var _leaderboard_reward_dialog := %LeaderboardRewardDialog as Control
 @onready var _top_status := %TopStatusBar.get_node("MainMenuTopStatus") as HBoxContainer
@@ -46,6 +46,7 @@ var _life_status_refresh_time := 0.0
 var _profile_menu: Control
 var _settings_menu: Control
 var _reward_chest_menu: Control
+var _chapter_selection_screen: Control
 var _animated_reward_stars := 0
 var _animated_reward_goal_index := 0
 
@@ -56,6 +57,7 @@ func _ready() -> void:
 	var pending_reward_animation := PlayerProgress.consume_pending_reward_chest_animation()
 	var pending_leaderboard_reward := PlayerProgress.consume_pending_leaderboard_reward()
 	_level_button.pressed.connect(_launch_campaign_level)
+	_chapter_button.pressed.connect(_open_chapter_selection)
 	_profile_button.pressed.connect(_open_profile_menu)
 	_settings_button.pressed.connect(_open_settings_menu)
 	if _reward_chest.has_signal("chest_pressed"):
@@ -73,6 +75,7 @@ func _ready() -> void:
 	else:
 		_prepare_pending_reward_animation(pending_reward_animation)
 	_update_level_button()
+	_update_chapter_button()
 	_apply_responsive_layout()
 	if not pending_reward_animation.is_empty():
 		_play_pending_reward_animation.call_deferred(pending_reward_animation)
@@ -92,6 +95,7 @@ func _process(delta: float) -> void:
 	_life_status_refresh_time = fmod(_life_status_refresh_time, LIFE_STATUS_REFRESH_SECONDS)
 	_update_lives_status()
 	_update_level_button()
+	_update_chapter_button()
 
 
 func _apply_responsive_layout() -> void:
@@ -109,7 +113,7 @@ func _apply_responsive_layout() -> void:
 	_bottom_bar.anchor_right = 1.0
 	_bottom_bar.anchor_bottom = 1.0
 	_bottom_bar.offset_left = safe_margins.x + SIDE_MARGIN
-	_bottom_bar.offset_top = -(BOTTOM_BAR_HEIGHT + maxf(safe_margins.w, 0.0))
+	_bottom_bar.offset_top = -(BOTTOM_MARGIN + BOTTOM_BAR_HEIGHT + maxf(safe_margins.w, 0.0))
 	_bottom_bar.offset_right = -(safe_margins.z + SIDE_MARGIN)
 	_bottom_bar.offset_bottom = -(BOTTOM_MARGIN + maxf(safe_margins.w, 0.0))
 
@@ -117,6 +121,9 @@ func _apply_responsive_layout() -> void:
 	var button_minimum_size := _level_button.custom_minimum_size
 	button_minimum_size.x = minf(LEVEL_BUTTON_MAX_WIDTH, available_width)
 	_level_button.custom_minimum_size = button_minimum_size
+	var chapter_minimum_size := _chapter_button.custom_minimum_size
+	chapter_minimum_size.x = minf(LEVEL_BUTTON_MAX_WIDTH, available_width)
+	_chapter_button.custom_minimum_size = chapter_minimum_size
 
 
 func _layout_bottom_navigation(safe_margins: Vector4) -> void:
@@ -238,18 +245,28 @@ func _get_display_cutouts(viewport_size: Vector2) -> Array[Rect2]:
 
 
 func _update_level_button() -> void:
-	var current_level := PlayerProgress.get_current_level()
-	var has_level_to_play := current_level >= MIN_LEVEL and current_level <= MAX_LEVEL and _level_config_exists(current_level)
-	if has_level_to_play:
+	var chapter_id := PlayerProgress.get_selected_chapter_id()
+	var next_level := PlayerProgress.get_next_level_for_chapter(chapter_id)
+	if next_level > 0:
 		if PlayerProgress.get_lives() <= 0:
 			_level_button.text = "NO LIVES"
 			_level_button.disabled = true
 		else:
-			_level_button.text = "LEVEL %d" % current_level
+			_level_button.text = "LEVEL %d" % ChapterCatalog.get_local_level_number(next_level)
 			_level_button.disabled = false
 	else:
-		_level_button.text = "COMPLETE"
+		var progress := PlayerProgress.get_chapter_progress(chapter_id)
+		_level_button.text = "CHAPTER COMPLETE" if bool(progress.get("complete", false)) else "COMING SOON"
 		_level_button.disabled = true
+
+
+func _update_chapter_button() -> void:
+	var chapter_id := PlayerProgress.get_selected_chapter_id()
+	var chapter := ChapterCatalog.get_chapter(chapter_id)
+	if chapter.is_empty():
+		return
+	if _chapter_button.has_method("set_chapter"):
+		_chapter_button.call("set_chapter", chapter, PlayerProgress.get_chapter_progress(chapter_id))
 
 
 func _update_lives_status() -> void:
@@ -412,6 +429,24 @@ func _open_reward_chest_menu() -> void:
 	_reward_chest_menu.tree_exited.connect(_clear_reward_chest_menu_reference)
 
 
+func _open_chapter_selection() -> void:
+	if is_instance_valid(_chapter_selection_screen):
+		return
+	_chapter_selection_screen = CHAPTER_SELECTION_SCENE.instantiate() as Control
+	add_child(_chapter_selection_screen)
+	_chapter_selection_screen.connect("chapter_selected", Callable(self, "_on_chapter_selected"))
+	_chapter_selection_screen.tree_exited.connect(_clear_chapter_selection_reference)
+
+
+func _on_chapter_selected(_chapter_id: String) -> void:
+	_update_level_button()
+	_update_chapter_button()
+
+
+func _clear_chapter_selection_reference() -> void:
+	_chapter_selection_screen = null
+
+
 func _clear_reward_chest_menu_reference() -> void:
 	_reward_chest_menu = null
 
@@ -443,12 +478,13 @@ func _launch_campaign_level() -> void:
 		_update_level_button()
 		return
 
-	var current_level := PlayerProgress.get_current_level()
-	if current_level < MIN_LEVEL or current_level > MAX_LEVEL or not _level_config_exists(current_level):
+	var chapter_id := PlayerProgress.get_selected_chapter_id()
+	var next_level := PlayerProgress.get_next_level_for_chapter(chapter_id)
+	if next_level <= 0:
 		return
 
 	var level_scene := LEVEL_SCENE.instantiate()
-	level_scene.selected_level = current_level
+	level_scene.selected_level = next_level
 	level_scene.launched_from_dev_mode = false
 	level_scene.return_menu_scene_path = PRODUCTION_MENU_SCENE
 
@@ -459,7 +495,3 @@ func _launch_campaign_level() -> void:
 
 	if current_scene != null:
 		current_scene.queue_free()
-
-
-func _level_config_exists(level_number: int) -> bool:
-	return FileAccess.file_exists("res://configs/levels/level_%03d.json" % level_number)
