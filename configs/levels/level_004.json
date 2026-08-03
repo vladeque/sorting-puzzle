@@ -5,290 +5,290 @@
   "seed": 4004,
   "difficulty": "medium",
   "shelves": [
-    {
-      "layers": [
-        [
-          "soda_bottle",
-          "cereal_box",
-          null
-        ],
-        [
-          "chips_can",
-          "water_bottle",
+	{
+	  "layers": [
+		[
+		  "soda_bottle",
+		  "cereal_box",
+		  null
+		],
+		[
+		  "chips_can",
+		  "water_bottle",
           "cookie_box"
-        ],
-        [
-          null,
-          null,
+		],
+		[
+		  null,
+		  null,
           "toothpaste_box"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "cupcake",
-          "chips_can",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "cupcake",
+		  "chips_can",
           "chips_can"
-        ],
-        [
-          "toy_robot",
-          "canned_food",
+		],
+		[
+		  "toy_robot",
+		  "canned_food",
           "candy_bag"
-        ],
-        [
-          null,
-          "milk_carton",
-          null
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          null,
-          "cookie_box",
+		],
+		[
+		  null,
+		  "milk_carton",
+		  null
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  null,
+		  "cookie_box",
           "orange_juice_box"
-        ],
-        [
-          "toothpaste_box",
-          "soda_bottle",
+		],
+		[
+		  "toothpaste_box",
+		  "soda_bottle",
           "toy_unicorn"
-        ],
-        [
-          null,
-          null,
+		],
+		[
+		  null,
+		  null,
           "soap_pump"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "cookie_box",
-          "cookie_box",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "cookie_box",
+		  "cookie_box",
           "soap_pump"
-        ],
-        [
-          "cereal_box",
-          "milk_carton",
+		],
+		[
+		  "cereal_box",
+		  "milk_carton",
           "cupcake"
-        ],
-        [
-          "soap_pump",
-          "plant_pot",
-          null
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "plant_pot",
-          "canned_food",
-          null
-        ],
-        [
-          "milk_carton",
-          "toy_unicorn",
+		],
+		[
+		  "soap_pump",
+		  "plant_pot",
+		  null
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "plant_pot",
+		  "canned_food",
+		  null
+		],
+		[
+		  "milk_carton",
+		  "toy_unicorn",
           "toothpaste_box"
-        ],
-        [
-          "soda_bottle",
-          null,
-          null
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "toothpaste_box",
-          "toothpaste_box",
+		],
+		[
+		  "soda_bottle",
+		  null,
+		  null
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "toothpaste_box",
+		  "toothpaste_box",
           "orange_juice_box"
-        ],
-        [
-          "ketchup_bottle",
-          "plant_pot",
+		],
+		[
+		  "ketchup_bottle",
+		  "plant_pot",
           "candy_bag"
-        ],
-        [
-          "canned_food",
-          "cookie_box",
+		],
+		[
+		  "canned_food",
+		  "cookie_box",
           "chocolate_bar"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          null,
-          "water_bottle",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  null,
+		  "water_bottle",
           "chocolate_bar"
-        ],
-        [
-          "soda_bottle",
-          "ketchup_bottle",
+		],
+		[
+		  "soda_bottle",
+		  "ketchup_bottle",
           "cookie_box"
-        ],
-        [
-          "water_bottle",
-          "water_bottle",
+		],
+		[
+		  "water_bottle",
+		  "water_bottle",
           "orange_juice_box"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "cereal_box",
-          "chocolate_bar",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "cereal_box",
+		  "chocolate_bar",
           "soda_bottle"
-        ],
-        [
-          "toy_robot",
-          "chips_can",
+		],
+		[
+		  "toy_robot",
+		  "chips_can",
           "chocolate_bar"
-        ],
-        [
-          "ketchup_bottle",
-          "candy_bag",
+		],
+		[
+		  "ketchup_bottle",
+		  "candy_bag",
           "toy_unicorn"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          null,
-          null,
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  null,
+		  null,
           "soap_pump"
-        ],
-        [
-          "orange_juice_box",
-          "ketchup_bottle",
+		],
+		[
+		  "orange_juice_box",
+		  "ketchup_bottle",
           "teddy_bear"
-        ],
-        [
-          "canned_food",
-          "milk_carton",
+		],
+		[
+		  "canned_food",
+		  "milk_carton",
           "plant_pot"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "candy_bag",
-          "soda_bottle",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "candy_bag",
+		  "soda_bottle",
           "toy_unicorn"
-        ],
-        [
-          "shampoo_bottle",
-          "shampoo_bottle",
+		],
+		[
+		  "shampoo_bottle",
+		  "shampoo_bottle",
           "shampoo_bottle"
-        ],
-        [
-          null,
-          "teddy_bear",
+		],
+		[
+		  null,
+		  "teddy_bear",
           "plant_pot"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "teddy_bear",
-          "toothpaste_box",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "teddy_bear",
+		  "toothpaste_box",
           "water_bottle"
-        ],
-        [
-          "cereal_box",
-          "chips_can",
+		],
+		[
+		  "cereal_box",
+		  "chips_can",
           "cupcake"
-        ],
-        [
-          "toy_robot",
-          "chocolate_bar",
+		],
+		[
+		  "toy_robot",
+		  "chocolate_bar",
           "toy_unicorn"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "chips_can",
-          "milk_carton",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "chips_can",
+		  "milk_carton",
           "toy_robot"
-        ],
-        [
-          "canned_food",
-          "cereal_box",
+		],
+		[
+		  "canned_food",
+		  "cereal_box",
           "toy_robot"
-        ],
-        [
-          "shampoo_bottle",
-          "shampoo_bottle",
+		],
+		[
+		  "shampoo_bottle",
+		  "shampoo_bottle",
           "ketchup_bottle"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "cupcake",
-          null,
-          null
-        ],
-        [
-          "water_bottle",
-          "soap_pump",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "cupcake",
+		  null,
+		  null
+		],
+		[
+		  "water_bottle",
+		  "soap_pump",
           "chocolate_bar"
-        ],
-        [
-          "toy_unicorn",
-          "canned_food",
+		],
+		[
+		  "toy_unicorn",
+		  "canned_food",
           "candy_bag"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          null,
-          null,
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  null,
+		  null,
           "milk_carton"
-        ],
-        [
-          "cupcake",
-          "teddy_bear",
+		],
+		[
+		  "cupcake",
+		  "teddy_bear",
           "orange_juice_box"
-        ],
-        [
-          null,
-          "shampoo_bottle",
+		],
+		[
+		  null,
+		  "shampoo_bottle",
           "teddy_bear"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "cereal_box",
-          "orange_juice_box",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "cereal_box",
+		  "orange_juice_box",
           "toy_robot"
-        ],
-        [
-          "plant_pot",
-          "teddy_bear",
+		],
+		[
+		  "plant_pot",
+		  "teddy_bear",
           "soap_pump"
-        ],
-        [
-          "candy_bag",
-          "cupcake",
+		],
+		[
+		  "candy_bag",
+		  "cupcake",
           "ketchup_bottle"
-        ]
-      ]
-    }
+		]
+	  ]
+	}
   ]
 }

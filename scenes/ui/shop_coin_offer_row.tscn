@@ -1,9 +1,13 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene format=3 uid="uid://dwkkil8im45mm"]
 
-[ext_resource type="Script" path="res://scripts/shop_coin_offer_row.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/ui/shop_coin_offers/shop_coin_offer_tier_01.png" id="2_coin"]
+[ext_resource type="Script" uid="uid://ciqjqbx7cu4ly" path="res://scripts/shop_coin_offer_row.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://bdaxnw2vms0li" path="res://assets/ui/shop_coin_offers/shop_coin_offer_tier_01.png" id="2_coin"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_row"]
+content_margin_left = 12.0
+content_margin_top = 8.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
 bg_color = Color(0.37, 0.12, 0.18, 0.96)
 border_width_left = 3
 border_width_top = 3
@@ -17,12 +21,12 @@ corner_radius_bottom_left = 20
 shadow_color = Color(0.08, 0.01, 0.02, 0.4)
 shadow_size = 5
 shadow_offset = Vector2(0, 3)
-content_margin_left = 12.0
-content_margin_top = 8.0
-content_margin_right = 12.0
-content_margin_bottom = 10.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tag"]
+content_margin_left = 10.0
+content_margin_top = 3.0
+content_margin_right = 10.0
+content_margin_bottom = 4.0
 bg_color = Color(0.94, 0.44, 0.19, 1)
 border_width_left = 2
 border_width_top = 2
@@ -33,10 +37,6 @@ corner_radius_top_left = 12
 corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
-content_margin_left = 10.0
-content_margin_top = 3.0
-content_margin_right = 10.0
-content_margin_bottom = 4.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button"]
 bg_color = Color(0.24, 0.7, 0.22, 1)
@@ -67,17 +67,16 @@ corner_radius_bottom_left = 15
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_focus"]
 
-[node name="ShopCoinOfferRow" type="PanelContainer"]
+[node name="ShopCoinOfferRow" type="PanelContainer" unique_id=367468828]
 custom_minimum_size = Vector2(0, 108)
-layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_row")
 script = ExtResource("1_script")
 
-[node name="RowStack" type="VBoxContainer" parent="."]
+[node name="RowStack" type="VBoxContainer" parent="." unique_id=1486192719]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="TagBanner" type="PanelContainer" parent="RowStack"]
+[node name="TagBanner" type="PanelContainer" parent="RowStack" unique_id=409083455]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
@@ -85,7 +84,7 @@ size_flags_horizontal = 0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_tag")
 
-[node name="TagLabel" type="Label" parent="RowStack/TagBanner"]
+[node name="TagLabel" type="Label" parent="RowStack/TagBanner" unique_id=1204101537]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
@@ -95,12 +94,12 @@ theme_override_font_sizes/font_size = 16
 text = "BEST VALUE"
 horizontal_alignment = 1
 
-[node name="Content" type="HBoxContainer" parent="RowStack"]
+[node name="Content" type="HBoxContainer" parent="RowStack" unique_id=28518864]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 12
 
-[node name="CoinIcon" type="TextureRect" parent="RowStack/Content"]
+[node name="CoinIcon" type="TextureRect" parent="RowStack/Content" unique_id=1881263566]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(82, 82)
 layout_mode = 2
@@ -108,11 +107,11 @@ texture = ExtResource("2_coin")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="AmountLabel" type="Label" parent="RowStack/Content"]
-theme_type_variation = &"GameNumberLabel"
+[node name="AmountLabel" type="Label" parent="RowStack/Content" unique_id=221473683]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+theme_type_variation = &"GameNumberLabel"
 theme_override_colors/font_color = Color(1, 0.94, 0.72, 1)
 theme_override_colors/font_shadow_color = Color(0.1, 0.01, 0.02, 1)
 theme_override_constants/shadow_offset_y = 3
@@ -120,7 +119,7 @@ theme_override_font_sizes/font_size = 34
 text = "100"
 vertical_alignment = 1
 
-[node name="PurchaseButton" type="Button" parent="RowStack/Content"]
+[node name="PurchaseButton" type="Button" parent="RowStack/Content" unique_id=1768761006]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(178, 64)
 layout_mode = 2
@@ -128,15 +127,13 @@ size_flags_vertical = 4
 focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_colors/font_disabled_color = Color(1, 1, 1, 0.72)
-theme_override_colors/font_shadow_color = Color(0.02, 0.12, 0.02, 0.9)
-theme_override_constants/shadow_offset_y = 2
 theme_override_font_sizes/font_size = 25
 theme_override_styles/normal = SubResource("StyleBoxFlat_button")
-theme_override_styles/hover = SubResource("StyleBoxFlat_button")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_button_pressed")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
 text = "$0.99"

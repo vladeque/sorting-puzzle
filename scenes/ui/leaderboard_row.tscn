@@ -1,13 +1,10 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene format=3 uid="uid://c0ucphw26bcxj"]
 
-[ext_resource type="Script" path="res://scripts/leaderboard_row.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/ui/avatars/avatar_cat.png" id="2_avatar"]
-[ext_resource type="Texture2D" path="res://assets/ui/reward_star_34_glossy_b.png" id="3_star"]
-[ext_resource type="Shader" path="res://assets/ui/avatar_circle_clip.gdshader" id="4_clip_shader"]
-[ext_resource type="PackedScene" path="res://scenes/ui/leaderboard_rank_reward.tscn" id="5_reward"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_avatar_clip"]
-shader = ExtResource("4_clip_shader")
+[ext_resource type="Script" uid="uid://djyj6d35bwfjf" path="res://scripts/leaderboard_row.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://d2pn1p1r8alak" path="res://assets/ui/avatars/avatar_cat.png" id="2_avatar"]
+[ext_resource type="Texture2D" uid="uid://xbjatvx3natv" path="res://assets/ui/reward_star_34_glossy_b.png" id="3_star"]
+[ext_resource type="Shader" uid="uid://mwkm0trr4gi1" path="res://assets/ui/avatar_circle_clip.gdshader" id="4_clip_shader"]
+[ext_resource type="PackedScene" uid="uid://c7mgnix3e7sha" path="res://scenes/ui/leaderboard_rank_reward.tscn" id="5_reward"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_row"]
 bg_color = Color(0.97, 0.91, 0.76, 1)
@@ -38,18 +35,6 @@ corner_radius_bottom_left = 20
 shadow_color = Color(0.08, 0.22, 0.03, 0.35)
 shadow_size = 6
 shadow_offset = Vector2(0, 3)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_avatar"]
-bg_color = Color(0.56, 0.32, 0.31, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(1, 0.9, 0.65, 0.92)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gold"]
 bg_color = Color(1, 0.82, 0.25, 1)
@@ -96,7 +81,22 @@ shadow_color = Color(0.35, 0.18, 0.04, 0.4)
 shadow_size = 4
 shadow_offset = Vector2(0, 2)
 
-[node name="LeaderboardRow" type="Control"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_avatar"]
+bg_color = Color(0.56, 0.32, 0.31, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.9, 0.65, 0.92)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_avatar_clip"]
+shader = ExtResource("4_clip_shader")
+
+[node name="LeaderboardRow" type="Control" unique_id=1491207903]
 custom_minimum_size = Vector2(0, 92)
 layout_mode = 3
 anchors_preset = 15
@@ -107,7 +107,7 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_script")
 
-[node name="Background" type="Panel" parent="."]
+[node name="Background" type="Panel" parent="." unique_id=1316189832]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -117,7 +117,7 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_row")
 
-[node name="CurrentBackground" type="Panel" parent="."]
+[node name="CurrentBackground" type="Panel" parent="." unique_id=1740469686]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
@@ -129,7 +129,7 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_current")
 
-[node name="ContentMargin" type="MarginContainer" parent="."]
+[node name="ContentMargin" type="MarginContainer" parent="." unique_id=377947946]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -142,19 +142,19 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 12
 
-[node name="Content" type="HBoxContainer" parent="ContentMargin"]
+[node name="Content" type="HBoxContainer" parent="ContentMargin" unique_id=1540820711]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 10
 
-[node name="RankSlot" type="Control" parent="ContentMargin/Content"]
+[node name="RankSlot" type="Control" parent="ContentMargin/Content" unique_id=1423564837]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 size_flags_vertical = 4
 mouse_filter = 2
 
-[node name="GoldCircle" type="Panel" parent="ContentMargin/Content/RankSlot"]
+[node name="GoldCircle" type="Panel" parent="ContentMargin/Content/RankSlot" unique_id=1629902616]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
@@ -166,7 +166,7 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_gold")
 
-[node name="SilverCircle" type="Panel" parent="ContentMargin/Content/RankSlot"]
+[node name="SilverCircle" type="Panel" parent="ContentMargin/Content/RankSlot" unique_id=1908188455]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
@@ -178,7 +178,7 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_silver")
 
-[node name="BronzeCircle" type="Panel" parent="ContentMargin/Content/RankSlot"]
+[node name="BronzeCircle" type="Panel" parent="ContentMargin/Content/RankSlot" unique_id=149214307]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
@@ -190,8 +190,7 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_bronze")
 
-[node name="RankLabel" type="Label" parent="ContentMargin/Content/RankSlot"]
-theme_type_variation = &"GameNumberLabel"
+[node name="RankLabel" type="Label" parent="ContentMargin/Content/RankSlot" unique_id=1965339802]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -199,7 +198,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
+theme_type_variation = &"GameNumberLabel"
 theme_override_colors/font_color = Color(0.31, 0.1, 0.06, 1)
 theme_override_colors/font_outline_color = Color(1, 0.96, 0.77, 0.82)
 theme_override_constants/outline_size = 3
@@ -208,14 +207,14 @@ text = "#1"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="AvatarFrame" type="PanelContainer" parent="ContentMargin/Content"]
+[node name="AvatarFrame" type="PanelContainer" parent="ContentMargin/Content" unique_id=243598047]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_avatar")
 
-[node name="AvatarTexture" type="TextureRect" parent="ContentMargin/Content/AvatarFrame"]
+[node name="AvatarTexture" type="TextureRect" parent="ContentMargin/Content/AvatarFrame" unique_id=1802136640]
 unique_name_in_owner = true
 material = SubResource("ShaderMaterial_avatar_clip")
 layout_mode = 2
@@ -224,11 +223,11 @@ texture = ExtResource("2_avatar")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="NameLabel" type="Label" parent="ContentMargin/Content"]
-theme_type_variation = &"GameBodyLabel"
+[node name="NameLabel" type="Label" parent="ContentMargin/Content" unique_id=427903482]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+theme_type_variation = &"GameBodyLabel"
 theme_override_colors/font_color = Color(0.25, 0.075, 0.045, 1)
 theme_override_colors/font_outline_color = Color(1, 0.96, 0.77, 0.72)
 theme_override_constants/outline_size = 2
@@ -237,18 +236,17 @@ text = "Player"
 vertical_alignment = 1
 text_overrun_behavior = 3
 
-[node name="RankReward" parent="ContentMargin/Content" instance=ExtResource("5_reward")]
+[node name="RankReward" parent="ContentMargin/Content" unique_id=1559555185 instance=ExtResource("5_reward")]
 unique_name_in_owner = true
-layout_mode = 2
 
-[node name="ScoreBox" type="HBoxContainer" parent="ContentMargin/Content"]
+[node name="ScoreBox" type="HBoxContainer" parent="ContentMargin/Content" unique_id=1109317038]
 custom_minimum_size = Vector2(118, 0)
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 5
 alignment = 2
 
-[node name="StarIcon" type="TextureRect" parent="ContentMargin/Content/ScoreBox"]
+[node name="StarIcon" type="TextureRect" parent="ContentMargin/Content/ScoreBox" unique_id=481307104]
 custom_minimum_size = Vector2(34, 34)
 layout_mode = 2
 mouse_filter = 2
@@ -256,10 +254,10 @@ texture = ExtResource("3_star")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="ScoreLabel" type="Label" parent="ContentMargin/Content/ScoreBox"]
-theme_type_variation = &"GameNumberLabel"
+[node name="ScoreLabel" type="Label" parent="ContentMargin/Content/ScoreBox" unique_id=178552473]
 unique_name_in_owner = true
 layout_mode = 2
+theme_type_variation = &"GameNumberLabel"
 theme_override_colors/font_color = Color(0.22, 0.06, 0.03, 1)
 theme_override_colors/font_outline_color = Color(1, 0.96, 0.77, 0.82)
 theme_override_constants/outline_size = 3
