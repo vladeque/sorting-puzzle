@@ -165,6 +165,7 @@ class LevelItemProgressionTests(unittest.TestCase):
                     "title": "One",
                     "level_ids": [1],
                     "unlock": {"previous_chapter_id": None, "required_completed_levels": 0},
+                    "gameplay_background_mode": "legacy",
                     "background_texture": "res://one.png",
                     "selection_preview": "res://one.png",
                 }

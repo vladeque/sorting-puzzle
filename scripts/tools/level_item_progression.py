@@ -139,6 +139,7 @@ def load_chapter_catalog(path: Path = DEFAULT_CHAPTERS_CONFIG) -> CampaignChapte
             "title",
             "level_ids",
             "unlock",
+            "gameplay_background_mode",
             "background_texture",
             "selection_preview",
         }
@@ -153,6 +154,11 @@ def load_chapter_catalog(path: Path = DEFAULT_CHAPTERS_CONFIG) -> CampaignChapte
             raise ValueError(f"{path} chapter order must be contiguous starting at 1")
         if not isinstance(title, str) or not title.strip():
             raise ValueError(f"{path} chapters[{index}].title must be non-empty")
+        gameplay_background_mode = raw_chapter.get("gameplay_background_mode")
+        if gameplay_background_mode not in {"legacy", "artwork"}:
+            raise ValueError(
+                f"{path} chapters[{index}].gameplay_background_mode must be legacy or artwork"
+            )
         for presentation_key in ("background_texture", "selection_preview"):
             presentation_path = raw_chapter.get(presentation_key)
             if not isinstance(presentation_path, str) or not presentation_path.startswith("res://"):

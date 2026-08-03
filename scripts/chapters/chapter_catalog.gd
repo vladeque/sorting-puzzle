@@ -106,6 +106,14 @@ func get_background_texture_path(chapter_id: String) -> String:
 	return str((_chapters_by_id.get(chapter_id, {}) as Dictionary).get("background_texture", ""))
 
 
+func get_gameplay_background_mode(chapter_id: String) -> String:
+	return str(
+		(_chapters_by_id.get(chapter_id, {}) as Dictionary).get(
+			"gameplay_background_mode", "artwork"
+		)
+	)
+
+
 func get_selection_preview_path(chapter_id: String) -> String:
 	return str((_chapters_by_id.get(chapter_id, {}) as Dictionary).get("selection_preview", ""))
 
@@ -123,6 +131,10 @@ func _normalize_chapter(raw: Dictionary, chapter_index: int) -> Dictionary:
 
 	var background_texture := str(raw.get("background_texture", ""))
 	var selection_preview := str(raw.get("selection_preview", ""))
+	var gameplay_background_mode := str(raw.get("gameplay_background_mode", ""))
+	if gameplay_background_mode not in ["legacy", "artwork"]:
+		_fail("Chapter '%s' has an invalid gameplay background mode." % chapter_id)
+		return {}
 	if not ResourceLoader.exists(background_texture) or not ResourceLoader.exists(selection_preview):
 		_fail("Chapter '%s' references a missing presentation texture." % chapter_id)
 		return {}
@@ -172,6 +184,7 @@ func _normalize_chapter(raw: Dictionary, chapter_index: int) -> Dictionary:
 		"level_ids": level_ids,
 		"previous_chapter_id": str(previous_chapter_id),
 		"required_completed_levels": required_completed_levels,
+		"gameplay_background_mode": gameplay_background_mode,
 		"background_texture": background_texture,
 		"selection_preview": selection_preview,
 	}

@@ -90,8 +90,26 @@ func _run() -> void:
 		"Chapters 1 and 2 should have different gameplay backgrounds."
 	)
 
+	var level_scene := load("res://level.tscn") as PackedScene
+	var chapter_one_level = level_scene.instantiate()
+	chapter_one_level.selected_level = 1
+	chapter_one_level.launched_from_dev_mode = true
+	root.add_child(chapter_one_level)
+	for _frame in range(3):
+		await process_frame
+	_check(
+		not (chapter_one_level.get_node("Background/ChapterArtwork") as CanvasItem).visible,
+		"Chapter 1 should not show full-screen chapter artwork during gameplay."
+	)
+	for legacy_node_path in ["Wall", "PlayWall", "Baseboard", "Floor"]:
+		_check(
+			(chapter_one_level.get_node("Background/%s" % legacy_node_path) as CanvasItem).visible,
+			"Chapter 1 should restore its original %s background layer." % legacy_node_path
+		)
+
 	menu.queue_free()
 	chapter_background.queue_free()
+	chapter_one_level.queue_free()
 	await process_frame
 	if _failures.is_empty():
 		print("Chapter UI verification passed.")

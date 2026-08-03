@@ -20,6 +20,14 @@ func _run() -> void:
 		_check(catalog.get_unlock_requirement("chapter_02") == 25, "Chapter 2 requires 25 completions")
 		_check(catalog.get_level_ids("chapter_02").is_empty(), "future Chapter 2 content may be empty")
 		_check(
+			catalog.get_gameplay_background_mode("chapter_01") == "legacy",
+			"Chapter 1 uses the original procedural gameplay background"
+		)
+		_check(
+			catalog.get_gameplay_background_mode("chapter_02") == "artwork",
+			"Chapter 2 keeps its configured gameplay artwork"
+		)
+		_check(
 			ResourceLoader.exists(catalog.get_background_texture_path("chapter_01")),
 			"Chapter 1 background texture exists"
 		)

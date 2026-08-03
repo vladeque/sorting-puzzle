@@ -11,6 +11,7 @@
         "previous_chapter_id": null,
         "required_completed_levels": 0
       },
+      "gameplay_background_mode": "legacy",
       "background_texture": "res://assets/backgrounds/level_bg_option_02_warm_grocery.png",
       "selection_preview": "res://assets/backgrounds/level_bg_option_02_warm_grocery.png"
     },
@@ -23,6 +24,7 @@
         "previous_chapter_id": "chapter_01",
         "required_completed_levels": 25
       },
+      "gameplay_background_mode": "artwork",
       "background_texture": "res://assets/backgrounds/level_bg_option_04_cozy_candy.png",
       "selection_preview": "res://assets/backgrounds/level_bg_option_04_cozy_candy.png"
     }

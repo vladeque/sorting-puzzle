@@ -272,8 +272,15 @@ func _apply_chapter_background() -> void:
 	if chapter_id.is_empty():
 		push_warning("Level %d is not assigned to a chapter." % selected_level)
 		return
-	if _chapter_artwork.has_method("show_chapter"):
+	var uses_artwork := ChapterCatalog.get_gameplay_background_mode(chapter_id) == "artwork"
+	_chapter_artwork.visible = uses_artwork
+	for legacy_node_path in ["Wall", "PlayWall", "Baseboard", "Floor"]:
+		var legacy_node := _background.get_node(legacy_node_path) as CanvasItem
+		legacy_node.visible = not uses_artwork
+	if uses_artwork and _chapter_artwork.has_method("show_chapter"):
 		_chapter_artwork.call("show_chapter", chapter_id)
+	else:
+		_chapter_artwork.texture = null
 
 
 func _apply_responsive_layout() -> void:

@@ -20,6 +20,8 @@ Playable level scene:
 - `level.tscn`
 - Instantiated by `scripts/main_menu.gd` and by `scripts/level.gd` when the completion reward overlay's `Next` button loads the next normal campaign level.
 - Owns shelf layout, timer, drag and tap movement, triple matching, abilities, pause-menu wiring, failure, and completion flow.
+- Uses the original procedural gameplay background for Chapter 1 and chapter artwork for chapters
+  whose catalog entry selects `artwork` mode.
 
 Player progression:
 - `scripts/player_progress.gd`

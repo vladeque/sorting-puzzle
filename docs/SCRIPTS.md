@@ -1081,8 +1081,9 @@ Important constants:
 
 Key responsibilities:
 - Apply responsive layout with `_apply_responsive_layout()`, including safe-area-aware top HUD placement, ability bar placement over the floor/baseboard transition strip, full-screen overlays, centered pause and leave-confirmation popups, shelf-root scaling, and shelf-root centering between HUD and ability controls.
-- Resize the scene-owned `Background` control and apply the active level's configured chapter
-  artwork through `Background/ChapterArtwork`; the HUD strip remains scene-owned above it.
+- Resize the scene-owned `Background` control. Chapter 1 restores the original procedural wall,
+  play wall, baseboard, and floor; chapters configured for `artwork` use
+  `Background/ChapterArtwork`. The HUD strip remains scene-owned above either presentation.
 - Load JSON configs with `_load_json_file()`.
 - Instantiate reusable shelf cells with `_add_shelf()`, apply the shared shelf visual scale, assign left/middle/right row placement visuals for static shelves, and ask `Shelf` to add generated back layers.
 - Ask each shelf scene to show or hide its placement-specific `TopCeilingCap` when it has no stacked neighbor above. Show each shelf scene's bottom `Shadow` and `RightColumnShadow` whenever the shelf uses full visuals so neighboring shelf bodies and items cover those low-layer cast shadows while exposed wall/background areas still receive them.
