@@ -22,7 +22,7 @@ func _init() -> void:
 		"generated manifest exposes its non-secret digest"
 	)
 
-	for campaign_level in range(1, 9):
+	for campaign_level in range(1, 11):
 		var provenance: Dictionary = manifest.get_level_provenance(campaign_level)
 		_check(provenance.size() == 3, "level %d has one exact provenance mapping" % campaign_level)
 		_check(
@@ -37,8 +37,7 @@ func _init() -> void:
 			Codec.is_opaque_id(provenance.get("rules_version")),
 			"level %d rules version is opaque" % campaign_level
 		)
-	_check(manifest.get_level_provenance(9).is_empty(), "level 9 is not integration-ready")
-	_check(manifest.get_level_provenance(10).is_empty(), "level 10 is not integration-ready")
+	_check(manifest.get_level_provenance(11).is_empty(), "unpublished level 11 has no provenance")
 
 	var source_document := _read_manifest()
 	var digest_mismatch := source_document.duplicate(true)

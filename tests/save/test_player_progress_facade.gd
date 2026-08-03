@@ -113,11 +113,11 @@ func _run() -> void:
 		var operation := raw_operation as Dictionary
 		if str(operation.get("operation_type", "")).begins_with("campaign_"):
 			campaign_operations.append(operation)
-	_check(campaign_operations.size() == 9, "only published levels produce campaign journal entries")
+	_check(campaign_operations.size() == 11, "all Chapter 1 campaign mutations are journaled")
 	for raw_operation in campaign_operations:
 		var payload := (raw_operation as Dictionary).get("payload", {}) as Dictionary
 		var campaign_level := int(payload.get("campaign_level", 0))
-		_check(campaign_level >= 1 and campaign_level <= 8, "campaign operation is integration-ready")
+		_check(campaign_level >= 1 and campaign_level <= 10, "campaign operation is integration-ready")
 		_check(
 			str(payload.get("configuration_version", "")).begins_with("config_"),
 			"campaign operation uses canonical configuration provenance"
@@ -131,9 +131,8 @@ func _run() -> void:
 		"facade journal remains contiguous"
 	)
 	_check(
-		str((diagnostics.get("content_diagnostic", {}) as Dictionary).get("code", ""))
-		== "content_manifest.level_unsupported",
-		"unsupported campaign levels remain local with a stable diagnostic"
+		(diagnostics.get("content_diagnostic", {}) as Dictionary).is_empty(),
+		"all configured Chapter 1 levels have publishable provenance"
 	)
 
 	progress.load_progress()

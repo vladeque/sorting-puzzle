@@ -2,23 +2,27 @@
   "schema_version": "1.0.0",
   "environment": "development",
   "publication": {
-    "configuration_version": "config_58e87ecd65ad54ec5d41a0b0f1e9a96b5893492acaab65a31c47ac68434847e9",
-    "digest_sha256": "58e87ecd65ad54ec5d41a0b0f1e9a96b5893492acaab65a31c47ac68434847e9",
-    "source_candidate_sha256": "bd9dd97da7504cb0716299d08bf7288ed7f6c8a716781b39368ee94e181bb38d"
+    "configuration_version": "config_6728256279aa7460b948c83b810f47db8160a76430327073c4b714e83f451fbb",
+    "digest_sha256": "6728256279aa7460b948c83b810f47db8160a76430327073c4b714e83f451fbb",
+    "source_candidate_sha256": "ee6899a2042213dca90551d2e2822e5aed472d0098b4f7d5f57e493f8b3af5af"
   },
-  "supported_campaign_levels": [1, 2, 3, 4, 5, 6, 7, 8],
-  "excluded_campaign_levels": [9, 10],
+  "supported_campaign_levels": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+  "excluded_campaign_levels": [],
   "source": {
     "repository": "sorting-puzzle",
-    "commit": "4ccd32b9787d2a3eeba4ab81c831156e5e496b3a",
+    "commit": "99045aa82ab093b2f3634869cdb475dfc5bb9f04",
     "files": [
       {
         "path": "configs/item_sprites.json",
-        "sha256": "3b021ae8cd08b1e051e6fbadaa1512723325c577d90a82a5adfc3ae7205a979b"
+        "sha256": "9032b393c520bd7a0ff5549d93c009335077eb3e25a3a7af3df2046ba33e954d"
+      },
+      {
+        "path": "configs/chapters.json",
+        "sha256": "cd46c929312b9618385423da472aeac1a0275968caaf4688598ff225005f6e57"
       },
       {
         "path": "configs/item_progression.json",
-        "sha256": "6d67599029f16d2a28f02f07750742dc942d37c57604fd133454ef8806f12f83"
+        "sha256": "5cf103cee69ac7734d5725dd73fb1db677919919094ab499018bfc4b6f6c4d9b"
       },
       {
         "path": "configs/ability_purchase_prices.json",
@@ -30,19 +34,19 @@
       },
       {
         "path": "configs/level_templates/level_001.json",
-        "sha256": "cf037f377d12acd4b699d19b245ba507a888173e5b9900db2355b5f457e521e3"
+        "sha256": "eb093d41f675d96efe861da8bae7b7d85a6978845fcac6955dca8e53858d5501"
       },
       {
         "path": "configs/level_templates/level_002.json",
-        "sha256": "7cb234a8396ae718d880b149982e065af8f5e6f4e5d7fd80e47baae21c7e7ee0"
+        "sha256": "163a10d1a25c262ecb85fc5590c85c511f8d732c708a2bbe5cdc854ed73c958d"
       },
       {
         "path": "configs/level_templates/level_003.json",
-        "sha256": "c04cdc47ca24189b5e4671778c7e400dbcf57b03d66ae73efb94753842c5c3f8"
+        "sha256": "cc652293e06d7a1a2efcf2f5f496b5ab5938771d52ae72e5f2e08dd8ceabeaed"
       },
       {
         "path": "configs/level_templates/level_004.json",
-        "sha256": "a0a7aa8b140b34c3c3eeffd744089c737f023940bab3e8bad33e6e6ae1da7a00"
+        "sha256": "7f387b725d23bcfa203c1d83e05047fe3ee752189fa9cc0ba407c54d0985ad7e"
       },
       {
         "path": "configs/level_templates/level_005.json",
@@ -62,59 +66,59 @@
       },
       {
         "path": "configs/levels/level_001.json",
-        "sha256": "bb58bd1f3cb980c5ace07c1eb36f72ea844f9262d63eb756997bd659fa5c38a6"
+        "sha256": "9190c6c6348aabecbbaa1df081cb75115bfa2dbd08874742281930ec6b3e3e7d"
       },
       {
         "path": "configs/levels/level_002.json",
-        "sha256": "3a73f5bb798f93a7a94434c4e7942697855a28c1c87bc6cb9833befb687f2e56"
+        "sha256": "4f6f5391452f356f3217979bda734f730851e6497f24c9979e19713a3866946a"
       },
       {
         "path": "configs/levels/level_003.json",
-        "sha256": "1f92cc978b10a456db694672d797c46b9ea65d69252218ef06da96a1cce722e2"
+        "sha256": "ddd40e7dd51f963c5f0725fcd3d2d03215c414d83628e3f36a45282f04573142"
       },
       {
         "path": "configs/levels/level_004.json",
-        "sha256": "034346bc51b528e38836e3dfed45288c263b20e997c9ef6cc9cfca761864610b"
+        "sha256": "9634848bf0794612ff281b0e4e6fa4be228ef276388969b5839b9b40ad4fa33a"
       },
       {
         "path": "configs/levels/level_005.json",
-        "sha256": "55428980d0ae41c20c500502fb26fab2507c5dd8b5f32373b48f4c9aec222062"
+        "sha256": "27b8d6d338499d29d618153c072904487159e0abe0d23903f42e0648f45da3b6"
       },
       {
         "path": "configs/levels/level_006.json",
-        "sha256": "0b7ea892f43d6461f49b4d346e2c5157e1cf1195f6b2428e0a2259d1d02868f3"
+        "sha256": "392f6c289e2c2b6606eebb9a0f1777f3d7fbb100a3a13fe3c2857b0dede646ad"
       },
       {
         "path": "configs/levels/level_007.json",
-        "sha256": "95c1a4bba17a44b0472fcaf94feda549396094ce5cd6fd17649d542d0e69df03"
+        "sha256": "3dd049ce24cb285553e23f720086bd732b667b2b91791c18f5e48cd7dded9eae"
       },
       {
         "path": "configs/levels/level_008.json",
-        "sha256": "a54a577a62ea3bd616ac98e44d3fd2ad857135b2b3d096dac47cbbcb9aaa9926"
+        "sha256": "252505daa2c1c3481e78914f99d3d5e7bae10ff2b90319db1a8e158cc13762d0"
       },
       {
         "path": "configs/levels/level_009.json",
-        "sha256": "95fde96b02be474d4bd7fc83ac28c6ffc6a3591f8da5b228f42a4f122be4d3e2"
+        "sha256": "4ca9a56c002439f1f27a254fb23cc61caf9ccacfc8d4e7d7be789ea2f596a86e"
       },
       {
         "path": "configs/levels/level_010.json",
-        "sha256": "95fde96b02be474d4bd7fc83ac28c6ffc6a3591f8da5b228f42a4f122be4d3e2"
+        "sha256": "1fc9892e67e75801f3b2942dcc4aca8e3b47691b3ce69a7d3279e4c9c454da7d"
       },
       {
         "path": "scripts/tools/generate_level_shelves.py",
-        "sha256": "aabfff3993723d17ef822ad219f2edb4b938a9497921c25d9fdaa66e66279ac7"
+        "sha256": "cc8370d08b50026d7a73d096ce9addb85a3b956be456ab66308296a47eb477d2"
       },
       {
         "path": "scripts/tools/level_item_progression.py",
-        "sha256": "9613fcd2363dd98c0feb2ba12246e3172540430ca221c5d4ad401bb7654b0b22"
+        "sha256": "1ea07fbcd660c3a911a3e0a0a5a93b8a0ede6aa484c511584b0f9942ec9a6627"
       },
       {
         "path": "scripts/tools/materialize_level_templates.py",
-        "sha256": "36bbd8a1978b1ad20db0349571562f8b78d8a8c9f8f383121ce4738e377ad77b"
+        "sha256": "af54f65accf6083733714551dd6310b41a0786ac2802b065c604737550ed7c9b"
       },
       {
         "path": "scripts/level.gd",
-        "sha256": "76a8a529535ff3ef2cf0f0642b1c1fc8a9f82679600fcb700a876b562568e0df"
+        "sha256": "969318f4775c21882a20579ed1d75ccb9c1653de6f46a8d2808cbcc41452191b"
       },
       {
         "path": "scripts/shelf_layout_row.gd",
@@ -129,52 +133,64 @@
   "levels": [
     {
       "campaign_level": 1,
-      "configuration_version": "config_58e87ecd65ad54ec5d41a0b0f1e9a96b5893492acaab65a31c47ac68434847e9",
-      "level_version": "level_0bab361392b04021ad2f20d5602e2d4b8e3919c454fac940159db00146e2cefd",
+      "configuration_version": "config_6728256279aa7460b948c83b810f47db8160a76430327073c4b714e83f451fbb",
+      "level_version": "level_282e48eacaedc8b2916692962520e63eaa15347e00085ac3fdb342d49dbf0e54",
       "rules_version": "rules_13f216697fa66f93689e2a4f31a082629896cc699cf97b560c3c9928f1ab3601"
     },
     {
       "campaign_level": 2,
-      "configuration_version": "config_58e87ecd65ad54ec5d41a0b0f1e9a96b5893492acaab65a31c47ac68434847e9",
-      "level_version": "level_89623197ed3814df924d46a39bc1be9c4cb5d22bd71821dab6be6cd91421df71",
+      "configuration_version": "config_6728256279aa7460b948c83b810f47db8160a76430327073c4b714e83f451fbb",
+      "level_version": "level_0ebe31ca06b3ba831e4cb0c2cadf827d780fa5936ec3b1174134482492c18102",
       "rules_version": "rules_13f216697fa66f93689e2a4f31a082629896cc699cf97b560c3c9928f1ab3601"
     },
     {
       "campaign_level": 3,
-      "configuration_version": "config_58e87ecd65ad54ec5d41a0b0f1e9a96b5893492acaab65a31c47ac68434847e9",
-      "level_version": "level_b8b2de9e488a53fa0cb1e0bdfbeb773a76caf8a8c0ff90e232f000422d7810d1",
+      "configuration_version": "config_6728256279aa7460b948c83b810f47db8160a76430327073c4b714e83f451fbb",
+      "level_version": "level_7410716389a3a971df2d8d54318482292544b41ee6fbae664cf4748c3338b504",
       "rules_version": "rules_13f216697fa66f93689e2a4f31a082629896cc699cf97b560c3c9928f1ab3601"
     },
     {
       "campaign_level": 4,
-      "configuration_version": "config_58e87ecd65ad54ec5d41a0b0f1e9a96b5893492acaab65a31c47ac68434847e9",
-      "level_version": "level_8304761d57da39ef149c459712ab254709478a179511c02cb956d2ecdc7eb61d",
+      "configuration_version": "config_6728256279aa7460b948c83b810f47db8160a76430327073c4b714e83f451fbb",
+      "level_version": "level_2cea44bf41dd2659a04a6cd67bf0159d3aae1b93b5c4ef02a8af0cf4556ffa7f",
       "rules_version": "rules_13f216697fa66f93689e2a4f31a082629896cc699cf97b560c3c9928f1ab3601"
     },
     {
       "campaign_level": 5,
-      "configuration_version": "config_58e87ecd65ad54ec5d41a0b0f1e9a96b5893492acaab65a31c47ac68434847e9",
-      "level_version": "level_0b6c8f6accc25f35dc258682151f60b2dc45ccf8ae7c87172f78abe2441af3f6",
+      "configuration_version": "config_6728256279aa7460b948c83b810f47db8160a76430327073c4b714e83f451fbb",
+      "level_version": "level_8a0c629abd852bf31c9c315f4febb34d1b574752887fced623656563747a70f4",
       "rules_version": "rules_13f216697fa66f93689e2a4f31a082629896cc699cf97b560c3c9928f1ab3601"
     },
     {
       "campaign_level": 6,
-      "configuration_version": "config_58e87ecd65ad54ec5d41a0b0f1e9a96b5893492acaab65a31c47ac68434847e9",
-      "level_version": "level_95514352c3d7682f64c1484798264f08a3151858df9b24962adc44cd6df8c950",
+      "configuration_version": "config_6728256279aa7460b948c83b810f47db8160a76430327073c4b714e83f451fbb",
+      "level_version": "level_6ea6607619fc45cf5eae3b2ea6b978f5a0e61423b8fcd8a1a997f1900d55cda0",
       "rules_version": "rules_13f216697fa66f93689e2a4f31a082629896cc699cf97b560c3c9928f1ab3601"
     },
     {
       "campaign_level": 7,
-      "configuration_version": "config_58e87ecd65ad54ec5d41a0b0f1e9a96b5893492acaab65a31c47ac68434847e9",
-      "level_version": "level_75ffa3a312022f8afaacddc63463b141746f1e04a32d7b78dd949efe4e01227a",
+      "configuration_version": "config_6728256279aa7460b948c83b810f47db8160a76430327073c4b714e83f451fbb",
+      "level_version": "level_6bcebc382506fbc66716665efaa73b4990c5741020749a64522ca02e9afd91ca",
       "rules_version": "rules_13f216697fa66f93689e2a4f31a082629896cc699cf97b560c3c9928f1ab3601"
     },
     {
       "campaign_level": 8,
-      "configuration_version": "config_58e87ecd65ad54ec5d41a0b0f1e9a96b5893492acaab65a31c47ac68434847e9",
-      "level_version": "level_39ecfff5bf03515f86497c6d8b8190a254521ed69861a3936c87a1bfc1e89731",
+      "configuration_version": "config_6728256279aa7460b948c83b810f47db8160a76430327073c4b714e83f451fbb",
+      "level_version": "level_fc4ea0acb264a05a5d7a455d1194e40a3f316b57dfe3763bb71cb9cf02d9a8c1",
+      "rules_version": "rules_13f216697fa66f93689e2a4f31a082629896cc699cf97b560c3c9928f1ab3601"
+    },
+    {
+      "campaign_level": 9,
+      "configuration_version": "config_6728256279aa7460b948c83b810f47db8160a76430327073c4b714e83f451fbb",
+      "level_version": "level_35a4842fe68ed41b68f761c498425e191284019e077fef9b154dcb3ad9bace5d",
+      "rules_version": "rules_13f216697fa66f93689e2a4f31a082629896cc699cf97b560c3c9928f1ab3601"
+    },
+    {
+      "campaign_level": 10,
+      "configuration_version": "config_6728256279aa7460b948c83b810f47db8160a76430327073c4b714e83f451fbb",
+      "level_version": "level_31b8b2e3b03f0371b08b6ac6a1fb4fbd20d683f2fe5b2ad6a572ff725cbffe35",
       "rules_version": "rules_13f216697fa66f93689e2a4f31a082629896cc699cf97b560c3c9928f1ab3601"
     }
   ],
-  "digest_sha256": "1088af44e2fc9340b7956aec494ddb5e10bcf1f61daf0220b5ac0047b67cc999"
+  "digest_sha256": "3fe2a59668b0e962b484c0b50e30611fcf626b8a99d32051b32eeb02d3955961"
 }

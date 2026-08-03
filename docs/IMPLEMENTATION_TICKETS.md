@@ -190,8 +190,8 @@ client manifest produced from the same immutable backend publication used by loc
   export. Raw source hashes remain mandatory in the pre-export check.
 - Android regression coverage exports/installs the real debug APK and makes the local-backend smoke
   check fail if runtime rejects the packaged manifest.
-- The first integration slice covers levels 1-8; levels 9-10 are not marked integration-ready
-  until their duplicate campaign-level declarations are corrected and republished.
+- The integration slice covers all current Chapter 1 levels 1-10; future levels are not marked
+  integration-ready until added to a regenerated immutable publication.
 
 ## GAME-003 — Package the Android local-backend debug target
 

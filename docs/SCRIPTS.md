@@ -773,7 +773,7 @@ Class:
 Purpose:
 - Loads the generated GAME-002 manifest from `configs/backend/content_provenance.json`.
 - Validates its closed schema, canonical digest, content-addressed configuration identity,
-  complete levels 1-8 mapping, and explicit levels 9-10 exclusion at runtime.
+  complete Chapter 1 levels 1-10 mapping at runtime.
 - Does not require raw authored `.gd`/`.tscn` files at runtime because Godot export templates
   compile/remap them. `load_manifest_with_source_verification()` is reserved for pre-export
   tooling and tests, where it validates every pinned source-file hash.

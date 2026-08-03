@@ -12,6 +12,8 @@ commits.
 
 ## DEV-CODE-001 - Publish complete campaign provenance for levels 1-10
 
+**Status:** Complete on 2026-08-03
+
 **Owner:** Game and backend
 
 **Repositories:** `sorting-puzzle`, then `sorting-puzzle-backend`

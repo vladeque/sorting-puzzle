@@ -4,8 +4,8 @@ class_name ContentProvenanceManifest
 const LocalSaveCodecScript := preload("res://scripts/save/local_save_codec.gd")
 const DEFAULT_PATH := "res://configs/backend/content_provenance.json"
 const EXPECTED_SCHEMA_VERSION := "1.0.0"
-const EXPECTED_SUPPORTED_LEVELS := [1, 2, 3, 4, 5, 6, 7, 8]
-const EXPECTED_EXCLUDED_LEVELS := [9, 10]
+const EXPECTED_SUPPORTED_LEVELS := [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+const EXPECTED_EXCLUDED_LEVELS := []
 
 var _valid := false
 var _manifest_digest := ""
@@ -65,7 +65,7 @@ func load_document(document: Dictionary, verify_source_files: bool = false) -> D
 	if supported != EXPECTED_SUPPORTED_LEVELS or excluded != EXPECTED_EXCLUDED_LEVELS:
 		return _fail(
 			"content_manifest.incomplete",
-			"Bundled content provenance must support levels 1-8 and exclude levels 9-10."
+			"Bundled content provenance must support all Chapter 1 levels 1-10."
 		)
 
 	var mappings := {}

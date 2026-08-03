@@ -112,8 +112,8 @@ development content before redeploying.
   offline-lease, and data-encryption keyrings.
 - Protocol v2 validates campaign operation provenance against published immutable configuration,
   level, and rules IDs.
-- The current launch candidate contains levels 1-8 only. Client levels 9 and 10 both declare
-  campaign level `1`, so they cannot be published as unique campaign levels.
+- The current launch candidate and development manifest contain all Chapter 1 levels 1-10 with
+  unique global campaign IDs.
 - The deterministic replay validator is dormant under ADR 0019 and must not be added to this
   integration.
 
@@ -138,8 +138,8 @@ development content before redeploying.
    - Verify authored source hashes before export. Exported runtime validation must use the
      manifest's schema/self-digest/publication mapping and must not depend on raw `.gd`/`.tscn`
      files that Godot compiles or remaps.
-   - For the first slice, publish levels 1-8 and constrain integration tests to those levels.
-     Correct and validate levels 9-10 before claiming full bundled-campaign coverage.
+   - Publish and validate all current Chapter 1 levels 1-10. Future content must be added through
+     a regenerated immutable candidate and client manifest before synchronization is enabled for it.
 
 3. **Android debug packaging and host networking**
    - Build the existing secure-store AAR with JDK 17 and Android SDK 36.
