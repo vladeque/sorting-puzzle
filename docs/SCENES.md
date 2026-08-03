@@ -173,6 +173,7 @@ Runtime children:
   coins, Hammer, Shuffle, Lantern (`highlight` internally), and Freezer, in that display order
   (coins first, as the bundle's headline reward).
 - The scene owns reward art and styling; `scripts/shop_bundle_card.gd` binds quantities and the store-formatted price.
+- The purchase button uses `assets/ui/level_button_blank_new.png` for its normal, hover, pressed, and disabled backgrounds.
 - The root is `ShopBundleCard(PanelContainer) > CardBody(Control) > [CardStack, DiscountBadge]` so
   `DiscountBadge` can overlap the card's top-left corner instead of being confined to `CardStack`'s
   normal vertical flow.
@@ -190,6 +191,7 @@ Runtime children:
 ## `scenes/ui/shop_coin_offer_row.tscn`
 
 - Reusable compact row with amount-scaled coin-pile art, formatted coin quantity, and store-formatted purchase button.
+- The purchase button uses `assets/ui/level_button_blank_new.png` for its normal, hover, pressed, and disabled backgrounds.
 - `scripts/shop_coin_offer_row.gd` emits the bound offer id without granting rewards itself.
 - `%CoinIcon` selects one of the seven transparent A1 clover-coin assets under
   `assets/ui/shop_coin_offers/` from the bound `rewards.coins` amount. The tier ceilings are 100,
