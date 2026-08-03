@@ -130,7 +130,8 @@ Script:
 
 Purpose:
 - Focused compact reward cell with a subtle translucent brown background that darkens the owning
-  row, a large transparent clover-coin pile, and an overlapping formatted coin amount.
+  row, a transparent clover-coin pile that fills the available cell, and a formatted coin amount
+  layered above the lower part of the artwork.
 - Exposes regular and compact sizing for use inside responsive leaderboard rows.
 - Starts hidden and is presentation-only; payout eligibility and amounts remain owned by the
   leaderboard screen and `PlayerProgress` reward-tier configuration.

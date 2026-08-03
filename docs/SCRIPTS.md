@@ -237,7 +237,8 @@ Attached to:
 
 Purpose:
 - Shows or clears one rank reward's coin-pile texture and comma-formatted amount.
-- Applies the component's regular or compact icon, label, and panel sizing.
+- Applies the component's regular or compact panel and overlaid-label sizing; the scene-authored
+  coin image fills the available content area in both modes.
 
 ## `scripts/tools/verify_leaderboard.gd`
 

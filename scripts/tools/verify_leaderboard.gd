@@ -124,6 +124,20 @@ func _verify_weekly_rewards(rows: VBoxContainer) -> void:
 			"Weekly rank %d reward amount is wrong." % (index + 1)
 		)
 		_check(coin_image.texture != null, "Weekly rank %d reward image is missing." % (index + 1))
+		_check(
+			coin_image.size.x >= 80.0 and coin_image.size.y >= 60.0,
+			"Weekly rank %d reward image does not fill the regular reward cell." % (index + 1)
+		)
+		_check(
+			Rect2(coin_image.position, coin_image.size).encloses(
+				Rect2(amount_label.position, amount_label.size)
+			),
+			"Weekly rank %d reward amount is not overlaid on the coin image." % (index + 1)
+		)
+		_check(
+			amount_label.z_index > coin_image.z_index,
+			"Weekly rank %d reward amount is not drawn above the coin image." % (index + 1)
+		)
 		if coin_image.texture != null:
 			_check(
 				coin_image.texture.resource_path == str(expected.get("texture", "")),
