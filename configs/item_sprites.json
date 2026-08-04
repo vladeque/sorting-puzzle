@@ -73,16 +73,6 @@
 	  "texture": "res://assets/items/item_smoothie_cup_green.png"
 	},
 	{
-	  "id": "smoothie_cup_strawberry",
-	  "category": "drink",
-	  "texture": "res://assets/items/item_smoothie_cup_strawberry.png"
-	},
-	{
-	  "id": "smoothie_cup_blueberry",
-	  "category": "drink",
-	  "texture": "res://assets/items/item_smoothie_cup_blueberry.png"
-	},
-	{
 	  "id": "smoothie_cup_strawberry_banana",
 	  "category": "drink",
 	  "texture": "res://assets/items/item_smoothie_cup_strawberry_banana.png"
@@ -143,11 +133,6 @@
 	  "texture": "res://assets/items/item_chocolate_bar_classic.png"
 	},
 	{
-	  "id": "chocolate_bar_rainbow",
-	  "category": "snack",
-	  "texture": "res://assets/items/item_chocolate_bar_rainbow.png"
-	},
-	{
 	  "id": "chocolate_bar_hazelnut",
 	  "category": "snack",
 	  "texture": "res://assets/items/item_chocolate_bar_hazelnut.png"
@@ -203,19 +188,14 @@
 	  "texture": "res://assets/items/item_frozen_yogurt_cup_vanilla.png"
 	},
 	{
-	  "id": "soft_serve_cup_chocolate",
+	  "id": "item_ice_cream_cup_chocolate",
 	  "category": "snack",
-	  "texture": "res://assets/items/item_soft_serve_cup_chocolate.png"
+	  "texture": "res://assets/items/item_ice_cream_cup_chocolate.png"
 	},
 	{
-	  "id": "soft_serve_cup_blueberry",
+	  "id": "item_ice_cream_cup_blueberry",
 	  "category": "snack",
-	  "texture": "res://assets/items/item_soft_serve_cup_blueberry.png"
-	},
-	{
-	  "id": "yogurt_cup_orange",
-	  "category": "snack",
-	  "texture": "res://assets/items/item_yogurt_cup_orange.png"
+	  "texture": "res://assets/items/item_ice_cream_cup_blueberry.png"
 	},
 	{
 	  "id": "yogurt_cup_strawberry",

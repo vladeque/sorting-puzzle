@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cbrlkucxo5yxv"
-path="res://.godot/imported/item_smoothie_cup_blueberry.png-c6e81d4dcdc8af3f28ea52b10ce7c880.ctex"
+uid="uid://bbny66nn16sai"
+path="res://.godot/imported/item_ice_cream_cup_chocolate.png-e0c9faa54c3c8bb6dd8483f07d8ae110.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/items/item_smoothie_cup_blueberry.png"
-dest_files=["res://.godot/imported/item_smoothie_cup_blueberry.png-c6e81d4dcdc8af3f28ea52b10ce7c880.ctex"]
+source_file="res://assets/items/item_ice_cream_cup_chocolate.png"
+dest_files=["res://.godot/imported/item_ice_cream_cup_chocolate.png-e0c9faa54c3c8bb6dd8483f07d8ae110.ctex"]
 
 [params]
 
