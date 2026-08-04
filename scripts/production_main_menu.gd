@@ -22,6 +22,7 @@ const BOTTOM_BAR_HEIGHT := 245.0
 const BOTTOM_MARGIN := 112.0
 const SIDE_MARGIN := 48.0
 const LEVEL_BUTTON_MAX_WIDTH := 420.0
+const CHAPTER_BUTTON_MAX_WIDTH := 344.0
 const BOTTOM_NAVIGATION_HEIGHT := 96.0
 const LIFE_STATUS_REFRESH_SECONDS := 1.0
 
@@ -122,7 +123,7 @@ func _apply_responsive_layout() -> void:
 	button_minimum_size.x = minf(LEVEL_BUTTON_MAX_WIDTH, available_width)
 	_level_button.custom_minimum_size = button_minimum_size
 	var chapter_minimum_size := _chapter_button.custom_minimum_size
-	chapter_minimum_size.x = minf(LEVEL_BUTTON_MAX_WIDTH, available_width)
+	chapter_minimum_size.x = minf(CHAPTER_BUTTON_MAX_WIDTH, available_width)
 	_chapter_button.custom_minimum_size = chapter_minimum_size
 
 

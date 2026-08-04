@@ -32,7 +32,8 @@ Key constants:
 - `LIFE_STATUS_REFRESH_SECONDS`: cadence for refreshing the lives countdown while the menu is visible.
 - `TOP_MARGIN`: preferred distance from the physical top edge for the status row.
 - `CAMERA_CUTOUT_PADDING`: empty space reserved around each reported display cutout.
-- `BOTTOM_BAR_*`, `SIDE_MARGIN`, and `LEVEL_BUTTON_MAX_WIDTH`: responsive bottom-button layout values.
+- `BOTTOM_BAR_*`, `SIDE_MARGIN`, `LEVEL_BUTTON_MAX_WIDTH`, and `CHAPTER_BUTTON_MAX_WIDTH`:
+  responsive bottom-button layout values.
 
 Important nodes:
 - `%TopStatusBar`: top-anchored container positioned inside the display's top inset region while avoiding exact camera cutout rectangles.
@@ -47,7 +48,8 @@ Important nodes:
 - `MainMenuTopStatus/LivesWidget/LifeStatus`: shows `Full` or the `MM:SS` countdown until the next restored life.
 - `%BottomBar`: bottom-anchored container positioned at runtime with safe-area padding.
 - `%LevelButton`: `scenes/ui/level_button.tscn` instance that starts the saved campaign level.
-- `%ChapterButton`: compact selected-chapter text link that opens `chapter_selection_screen.tscn`.
+- `%ChapterButton`: compact light-blue selected-chapter button that opens
+  `chapter_selection_screen.tscn`.
 - `%BottomNavigation`: full-width `scenes/ui/main_menu_bottom_navigation.tscn` instance aligned to the viewport bottom and extended through the device safe area.
 
 Key methods:
@@ -83,7 +85,7 @@ Purpose:
 - `chapter_selection_screen.gd` builds one `chapter_cover_card.gd` page per chapter into a shared
   `scripts/horizontal_pager.gd` pager, opens on the currently selected chapter, and persists a new
   pick through `PlayerProgress`.
-- `main_menu_chapter_button.gd` labels the compact main-menu chapter link and exposes the full
+- `main_menu_chapter_button.gd` labels the compact main-menu chapter button and exposes the full
   chapter title in its tooltip. `chapter_cover_card.gd` owns full-screen art plus a bottom
   information panel with completion counts, selected state, exact lock progress, a labeled linear
   progress bar, contextual status, and CTA.

@@ -46,16 +46,21 @@ func _run() -> void:
 	)
 	_check(
 		chapter_button.tooltip_text.contains("Grocery Town"),
-		"The compact chapter link does not expose the selected chapter title."
+		"The compact chapter button does not expose the selected chapter title."
 	)
 	_check(
-		chapter_button.get_theme_stylebox("normal") is StyleBoxEmpty,
-		"The main menu chapter link should not render the old chapter card background."
+		chapter_button.custom_minimum_size == Vector2(344.0, 90.0),
+		"The main menu chapter button does not use its compact secondary-CTA size."
 	)
-	_check(
-		chapter_button.get_node_or_null("Underline") != null,
-		"The main menu chapter link is missing its visual underline."
-	)
+	var chapter_button_style := chapter_button.get_theme_stylebox("normal") as StyleBoxTexture
+	_check(chapter_button_style != null, "The main menu chapter button is missing its artwork.")
+	if chapter_button_style != null:
+		_check(
+			chapter_button_style.texture != null
+				and chapter_button_style.texture.resource_path
+					== "res://assets/ui/level_button_blank_light_blue_new.png",
+			"The main menu chapter button is not using the light-blue level-button artwork."
+		)
 
 	chapter_button.emit_signal("pressed")
 	await process_frame
