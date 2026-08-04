@@ -41,8 +41,20 @@ func _run() -> void:
 	var chapter_button := menu.get_node("%ChapterButton") as Button
 	_check(level_button.text == "LEVEL 1", "The default chapter does not offer its first level.")
 	_check(
-		str(chapter_button.get_node("%ChapterLabel").text).contains("GROCERY TOWN"),
-		"The main menu does not identify the selected chapter."
+		chapter_button.text == "CHAPTER 1",
+		"The main menu chapter link does not identify the selected chapter."
+	)
+	_check(
+		chapter_button.tooltip_text.contains("Grocery Town"),
+		"The compact chapter link does not expose the selected chapter title."
+	)
+	_check(
+		chapter_button.get_theme_stylebox("normal") is StyleBoxEmpty,
+		"The main menu chapter link should not render the old chapter card background."
+	)
+	_check(
+		chapter_button.get_node_or_null("Underline") != null,
+		"The main menu chapter link is missing its visual underline."
 	)
 
 	chapter_button.emit_signal("pressed")

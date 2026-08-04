@@ -47,7 +47,7 @@ Important nodes:
 - `MainMenuTopStatus/LivesWidget/LifeStatus`: shows `Full` or the `MM:SS` countdown until the next restored life.
 - `%BottomBar`: bottom-anchored container positioned at runtime with safe-area padding.
 - `%LevelButton`: `scenes/ui/level_button.tscn` instance that starts the saved campaign level.
-- `%ChapterButton`: selected-chapter summary that opens `chapter_selection_screen.tscn`.
+- `%ChapterButton`: compact selected-chapter text link that opens `chapter_selection_screen.tscn`.
 - `%BottomNavigation`: full-width `scenes/ui/main_menu_bottom_navigation.tscn` instance aligned to the viewport bottom and extended through the device safe area.
 
 Key methods:
@@ -83,9 +83,10 @@ Purpose:
 - `chapter_selection_screen.gd` builds one `chapter_cover_card.gd` page per chapter into a shared
   `scripts/horizontal_pager.gd` pager, opens on the currently selected chapter, and persists a new
   pick through `PlayerProgress`.
-- `chapter_cover_card.gd` and `main_menu_chapter_button.gd` render chapter art, completion counts,
-  selected state, and exact lock progress; `chapter_cover_card.gd` owns full-screen art plus a
-  bottom information panel with a labeled linear progress bar, contextual status, and CTA.
+- `main_menu_chapter_button.gd` labels the compact main-menu chapter link and exposes the full
+  chapter title in its tooltip. `chapter_cover_card.gd` owns full-screen art plus a bottom
+  information panel with completion counts, selected state, exact lock progress, a labeled linear
+  progress bar, contextual status, and CTA.
 - `chapter_level_background.gd` loads the selected level's configured chapter artwork.
 
 Depends on:
