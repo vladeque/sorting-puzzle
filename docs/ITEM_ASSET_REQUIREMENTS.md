@@ -65,9 +65,13 @@ direction, review candidates, and select an asset before implementation.
 
 ## Naming And Catalog Registration
 
-- Use a stable lowercase snake-case item ID, such as `blueberry_jam_jar`.
+- Use a stable lowercase snake-case item ID, such as `jam_jar_blueberry`.
+- Put the shared product family first and the distinguishing flavor, color, or form afterward:
+  `soda_can_lime`, `soda_can_strawberry`, and `juice_box_grape_tall`. Prefer meaningful suffixes
+  over numbers; use a numeric suffix only when the artwork has no durable descriptive distinction.
 - Name the texture `assets/items/item_<item_id>.png`.
-- Do not rename or reuse an ID after it has appeared in a level or save/protocol data.
+- Do not rename or reuse an ID after it has appeared in a level or save/protocol data unless an
+  explicit migration updates every authored/runtime reference in the same change.
 - Add exactly one matching entry to `configs/item_sprites.json`.
 - Set `texture` to `res://assets/items/item_<item_id>.png`.
 - Use an existing category where appropriate: `drink`, `snack`, `everyday`, `toy`, or `figurine`.

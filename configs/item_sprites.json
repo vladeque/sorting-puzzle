@@ -18,9 +18,49 @@
 	  "texture": "res://assets/items/item_soda_bottle.png"
 	},
 	{
-	  "id": "orange_juice_box",
+	  "id": "soda_bottle_orange",
 	  "category": "drink",
-	  "texture": "res://assets/items/item_orange_juice_box.png"
+	  "texture": "res://assets/items/item_soda_bottle_orange.png"
+	},
+	{
+	  "id": "soda_can_lime",
+	  "category": "drink",
+	  "texture": "res://assets/items/item_soda_can_lime.png"
+	},
+	{
+	  "id": "soda_can_grape",
+	  "category": "drink",
+	  "texture": "res://assets/items/item_soda_can_grape.png"
+	},
+	{
+	  "id": "soda_can_strawberry",
+	  "category": "drink",
+	  "texture": "res://assets/items/item_soda_can_strawberry.png"
+	},
+	{
+	  "id": "juice_box_orange",
+	  "category": "drink",
+	  "texture": "res://assets/items/item_juice_box_orange.png"
+	},
+	{
+	  "id": "juice_box_grape_compact",
+	  "category": "drink",
+	  "texture": "res://assets/items/item_juice_box_grape_compact.png"
+	},
+	{
+	  "id": "juice_box_grape_tall",
+	  "category": "drink",
+	  "texture": "res://assets/items/item_juice_box_grape_tall.png"
+	},
+	{
+	  "id": "juice_box_apple",
+	  "category": "drink",
+	  "texture": "res://assets/items/item_juice_box_apple.png"
+	},
+	{
+	  "id": "juice_box_mixed_berry",
+	  "category": "drink",
+	  "texture": "res://assets/items/item_juice_box_mixed_berry.png"
 	},
 	{
 	  "id": "water_bottle",
@@ -28,14 +68,69 @@
 	  "texture": "res://assets/items/item_water_bottle.png"
 	},
 	{
-	  "id": "chips_can",
-	  "category": "snack",
-	  "texture": "res://assets/items/item_chips_can.png"
+	  "id": "smoothie_cup_green",
+	  "category": "drink",
+	  "texture": "res://assets/items/item_smoothie_cup_green.png"
 	},
 	{
-	  "id": "cookie_box",
+	  "id": "smoothie_cup_strawberry",
+	  "category": "drink",
+	  "texture": "res://assets/items/item_smoothie_cup_strawberry.png"
+	},
+	{
+	  "id": "smoothie_cup_blueberry",
+	  "category": "drink",
+	  "texture": "res://assets/items/item_smoothie_cup_blueberry.png"
+	},
+	{
+	  "id": "smoothie_cup_strawberry_banana",
+	  "category": "drink",
+	  "texture": "res://assets/items/item_smoothie_cup_strawberry_banana.png"
+	},
+	{
+	  "id": "smoothie_cup_mango",
+	  "category": "drink",
+	  "texture": "res://assets/items/item_smoothie_cup_mango.png"
+	},
+	{
+	  "id": "coffee_cup",
+	  "category": "drink",
+	  "texture": "res://assets/items/item_coffee_cup.png"
+	},
+	{
+	  "id": "chips_can_classic",
 	  "category": "snack",
-	  "texture": "res://assets/items/item_cookie_box.png"
+	  "texture": "res://assets/items/item_chips_can_classic.png"
+	},
+	{
+	  "id": "chips_can_cheese",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_chips_can_cheese.png"
+	},
+	{
+	  "id": "chips_can_tomato",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_chips_can_tomato.png"
+	},
+	{
+	  "id": "cookie_box_blue",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_cookie_box_blue.png"
+	},
+	{
+	  "id": "cookie_box_blue_carton",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_cookie_box_blue_carton.png"
+	},
+	{
+	  "id": "cookie_box_chocolate",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_cookie_box_chocolate.png"
+	},
+	{
+	  "id": "cookie_box_berry",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_cookie_box_berry.png"
 	},
 	{
 	  "id": "candy_bag",
@@ -43,9 +138,24 @@
 	  "texture": "res://assets/items/item_candy_bag.png"
 	},
 	{
-	  "id": "chocolate_bar",
+	  "id": "chocolate_bar_classic",
 	  "category": "snack",
-	  "texture": "res://assets/items/item_chocolate_bar.png"
+	  "texture": "res://assets/items/item_chocolate_bar_classic.png"
+	},
+	{
+	  "id": "chocolate_bar_rainbow",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_chocolate_bar_rainbow.png"
+	},
+	{
+	  "id": "chocolate_bar_hazelnut",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_chocolate_bar_hazelnut.png"
+	},
+	{
+	  "id": "chocolate_bar_white_vanilla",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_chocolate_bar_white_vanilla.png"
 	},
 	{
 	  "id": "cupcake",
@@ -53,9 +163,109 @@
 	  "texture": "res://assets/items/item_cupcake.png"
 	},
 	{
+	  "id": "cupcake_lemon",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_cupcake_lemon.png"
+	},
+	{
+	  "id": "cupcake_strawberry",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_cupcake_strawberry.png"
+	},
+	{
 	  "id": "ice_cream_cup",
 	  "category": "snack",
 	  "texture": "res://assets/items/item_ice_cream_cup.png"
+	},
+	{
+	  "id": "ice_cream_tub_pink",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_ice_cream_tub_pink.png"
+	},
+	{
+	  "id": "frozen_yogurt_cup_blue",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_frozen_yogurt_cup_blue.png"
+	},
+	{
+	  "id": "frozen_yogurt_cup_chocolate",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_frozen_yogurt_cup_chocolate.png"
+	},
+	{
+	  "id": "frozen_yogurt_cup_strawberry",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_frozen_yogurt_cup_strawberry.png"
+	},
+	{
+	  "id": "frozen_yogurt_cup_vanilla",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_frozen_yogurt_cup_vanilla.png"
+	},
+	{
+	  "id": "soft_serve_cup_chocolate",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_soft_serve_cup_chocolate.png"
+	},
+	{
+	  "id": "soft_serve_cup_blueberry",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_soft_serve_cup_blueberry.png"
+	},
+	{
+	  "id": "yogurt_cup_orange",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_yogurt_cup_orange.png"
+	},
+	{
+	  "id": "yogurt_cup_strawberry",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_yogurt_cup_strawberry.png"
+	},
+	{
+	  "id": "yogurt_cup_blueberry",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_yogurt_cup_blueberry.png"
+	},
+	{
+	  "id": "yogurt_cup_peach",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_yogurt_cup_peach.png"
+	},
+	{
+	  "id": "yogurt_tub_strawberry",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_yogurt_tub_strawberry.png"
+	},
+	{
+	  "id": "yogurt_tub_blueberry",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_yogurt_tub_blueberry.png"
+	},
+	{
+	  "id": "yogurt_tub_vanilla",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_yogurt_tub_vanilla.png"
+	},
+	{
+	  "id": "lollipop_rainbow",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_lollipop_rainbow.png"
+	},
+	{
+	  "id": "lollipop_wrapped_rainbow",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_lollipop_wrapped_rainbow.png"
+	},
+	{
+	  "id": "gummy_bears_bag",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_gummy_bears_bag.png"
+	},
+	{
+	  "id": "popcorn_box",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_popcorn_box.png"
 	},
 	{
 	  "id": "ketchup_bottle",
@@ -68,19 +278,9 @@
 	  "texture": "res://assets/items/item_cereal_box.png"
 	},
 	{
-	  "id": "toy_unicorn",
-	  "category": "toy",
-	  "texture": "res://assets/items/item_toy_unicorn.png"
-	},
-	{
-	  "id": "teddy_bear",
-	  "category": "toy",
-	  "texture": "res://assets/items/item_teddy_bear.png"
-	},
-	{
-	  "id": "toy_robot",
-	  "category": "toy",
-	  "texture": "res://assets/items/item_toy_robot.png"
+	  "id": "cereal_box_rainbow",
+	  "category": "everyday",
+	  "texture": "res://assets/items/item_cereal_box_rainbow.png"
 	},
 	{
 	  "id": "plant_pot",
@@ -103,104 +303,59 @@
 	  "texture": "res://assets/items/item_shampoo_bottle.png"
 	},
 	{
-	  "id": "canned_food",
+	  "id": "vegetable_can_tomato",
 	  "category": "everyday",
-	  "texture": "res://assets/items/item_canned_food.png"
+	  "texture": "res://assets/items/item_vegetable_can_tomato.png"
 	},
 	{
-	  "id": "jam_jar",
+	  "id": "vegetable_can_corn",
 	  "category": "everyday",
-	  "texture": "res://assets/items/item_jam_jar.png"
+	  "texture": "res://assets/items/item_vegetable_can_corn.png"
+	},
+	{
+	  "id": "vegetable_can_peas",
+	  "category": "everyday",
+	  "texture": "res://assets/items/item_vegetable_can_peas.png"
+	},
+	{
+	  "id": "jam_jar_strawberry",
+	  "category": "everyday",
+	  "texture": "res://assets/items/item_jam_jar_strawberry.png"
+	},
+	{
+	  "id": "jam_jar_blueberry",
+	  "category": "everyday",
+	  "texture": "res://assets/items/item_jam_jar_blueberry.png"
+	},
+	{
+	  "id": "jam_jar_raspberry",
+	  "category": "everyday",
+	  "texture": "res://assets/items/item_jam_jar_raspberry.png"
+	},
+	{
+	  "id": "jam_jar_orange",
+	  "category": "everyday",
+	  "texture": "res://assets/items/item_jam_jar_orange.png"
+	},
+	{
+	  "id": "toy_unicorn",
+	  "category": "toy",
+	  "texture": "res://assets/items/item_toy_unicorn.png"
+	},
+	{
+	  "id": "teddy_bear",
+	  "category": "toy",
+	  "texture": "res://assets/items/item_teddy_bear.png"
+	},
+	{
+	  "id": "toy_robot",
+	  "category": "toy",
+	  "texture": "res://assets/items/item_toy_robot.png"
 	},
 	{
 	  "id": "gift_box",
 	  "category": "toy",
 	  "texture": "res://assets/items/item_gift_box.png"
-	},
-	{
-	  "id": "orange_soda_bottle",
-	  "category": "drink",
-	  "texture": "res://assets/items/item_orange_soda_bottle.png"
-	},
-	{
-	  "id": "wrapped_rainbow_lollipop",
-	  "category": "snack",
-	  "texture": "res://assets/items/item_wrapped_rainbow_lollipop.png"
-	},
-	{
-	  "id": "gummy_bears_bag",
-	  "category": "snack",
-	  "texture": "res://assets/items/item_gummy_bears_bag.png"
-	},
-	{
-	  "id": "blue_cookie_box",
-	  "category": "snack",
-	  "texture": "res://assets/items/item_blue_cookie_box.png"
-	},
-	{
-	  "id": "rainbow_chocolate_bar",
-	  "category": "snack",
-	  "texture": "res://assets/items/item_rainbow_chocolate_bar.png"
-	},
-	{
-	  "id": "orange_yogurt_cup",
-	  "category": "snack",
-	  "texture": "res://assets/items/item_orange_yogurt_cup.png"
-	},
-	{
-	  "id": "grape_juice_box",
-	  "category": "drink",
-	  "texture": "res://assets/items/item_grape_juice_box.png"
-	},
-	{
-	  "id": "rainbow_lollipop",
-	  "category": "snack",
-	  "texture": "res://assets/items/item_rainbow_lollipop.png"
-	},
-	{
-	  "id": "green_smoothie_cup",
-	  "category": "drink",
-	  "texture": "res://assets/items/item_green_smoothie_cup.png"
-	},
-	{
-	  "id": "blue_frozen_yogurt_cup",
-	  "category": "snack",
-	  "texture": "res://assets/items/item_blue_frozen_yogurt_cup.png"
-	},
-	{
-	  "id": "blueberry_jam_jar",
-	  "category": "everyday",
-	  "texture": "res://assets/items/item_blueberry_jam_jar.png"
-	},
-	{
-	  "id": "rainbow_cereal_box",
-	  "category": "everyday",
-	  "texture": "res://assets/items/item_rainbow_cereal_box.png"
-	},
-	{
-	  "id": "coffee_cup",
-	  "category": "drink",
-	  "texture": "res://assets/items/item_coffee_cup.png"
-	},
-	{
-	  "id": "pink_ice_cream_tub",
-	  "category": "snack",
-	  "texture": "res://assets/items/item_pink_ice_cream_tub.png"
-	},
-	{
-	  "id": "popcorn_box",
-	  "category": "snack",
-	  "texture": "res://assets/items/item_popcorn_box.png"
-	},
-	{
-	  "id": "strawberry_yogurt_cup",
-	  "category": "snack",
-	  "texture": "res://assets/items/item_strawberry_yogurt_cup.png"
-	},
-	{
-	  "id": "lime_soda_can",
-	  "category": "drink",
-	  "texture": "res://assets/items/item_lime_soda_can.png"
 	}
   ]
 }

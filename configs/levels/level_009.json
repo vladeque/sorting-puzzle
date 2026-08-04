@@ -5,49 +5,49 @@
   "shelves": [
 	{
 	  "layers": [
-		["milk_carton", "chips_can", null],
-		["milk_carton", "chips_can", "toy_robot"]
+		["milk_carton", "chips_can_classic", null],
+		["milk_carton", "chips_can_classic", "toy_robot"]
 	  ]
 	},
 	{
 	  "layers": [
 		["toy_robot", "soda_bottle", null],
-		["soda_bottle", "plant_pot", "cookie_box"]
+		["soda_bottle", "plant_pot", "cookie_box_blue"]
 	  ]
 	},
 	{
 	  "layers": [
-		["plant_pot", "cookie_box", "ketchup_bottle"],
-		["ketchup_bottle", "milk_carton", "chips_can"]
+		["plant_pot", "cookie_box_blue", "ketchup_bottle"],
+		["ketchup_bottle", "milk_carton", "chips_can_classic"]
 	  ]
 	},
 	{
 	  "layers": [
-		["chips_can", "toy_robot", "milk_carton"],
+		["chips_can_classic", "toy_robot", "milk_carton"],
 		["toy_robot", "soda_bottle", "plant_pot"]
 	  ]
 	},
 	{
 	  "layers": [
 		[null, null, "soda_bottle"],
-		["cookie_box", "ketchup_bottle", "milk_carton"]
+		["cookie_box_blue", "ketchup_bottle", "milk_carton"]
 	  ]
 	},
 	{
 	  "layers": [
-		["cookie_box", "plant_pot", "ketchup_bottle"],
-		["chips_can", "toy_robot", "soda_bottle"]
+		["cookie_box_blue", "plant_pot", "ketchup_bottle"],
+		["chips_can_classic", "toy_robot", "soda_bottle"]
 	  ]
 	},
 	{
 	  "layers": [
-		["toy_robot", "chips_can", null],
-		["plant_pot", "cookie_box", "ketchup_bottle"]
+		["toy_robot", "chips_can_classic", null],
+		["plant_pot", "cookie_box_blue", "ketchup_bottle"]
 	  ]
 	},
 	{
 	  "layers": [
-		["soda_bottle", null, "cookie_box"],
+		["soda_bottle", null, "cookie_box_blue"],
 		[null, null, null]
 	  ]
 	},

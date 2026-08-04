@@ -23,6 +23,41 @@ from level_item_progression import (  # noqa: E402
 from generate_level_shelves import generate_shelves  # noqa: E402
 
 
+NEW_LEVEL_ONE_ITEM_IDS = {
+    "chips_can_cheese",
+    "chips_can_tomato",
+    "chocolate_bar_hazelnut",
+    "chocolate_bar_white_vanilla",
+    "cookie_box_berry",
+    "cookie_box_chocolate",
+    "cupcake_lemon",
+    "cupcake_strawberry",
+    "frozen_yogurt_cup_chocolate",
+    "frozen_yogurt_cup_strawberry",
+    "frozen_yogurt_cup_vanilla",
+    "jam_jar_orange",
+    "jam_jar_raspberry",
+    "juice_box_apple",
+    "juice_box_grape_tall",
+    "juice_box_mixed_berry",
+    "smoothie_cup_blueberry",
+    "smoothie_cup_mango",
+    "smoothie_cup_strawberry",
+    "smoothie_cup_strawberry_banana",
+    "soda_can_grape",
+    "soda_can_strawberry",
+    "soft_serve_cup_blueberry",
+    "soft_serve_cup_chocolate",
+    "vegetable_can_corn",
+    "vegetable_can_peas",
+    "yogurt_cup_blueberry",
+    "yogurt_cup_peach",
+    "yogurt_cup_strawberry",
+    "yogurt_tub_blueberry",
+    "yogurt_tub_vanilla",
+}
+
+
 class LevelItemProgressionTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
@@ -34,9 +69,10 @@ class LevelItemProgressionTests(unittest.TestCase):
     def test_chapter_one_levels_share_one_exclusive_item_pool(self) -> None:
         chapter_one_items = set(self.progression.chapter_item_ids("chapter_01"))
         chapter_two_items = set(self.progression.chapter_item_ids("chapter_02"))
-        self.assertEqual(len(chapter_one_items), 20)
+        self.assertEqual(len(chapter_one_items), 51)
         self.assertEqual(len(chapter_two_items), 19)
         self.assertFalse(chapter_one_items & chapter_two_items)
+        self.assertLessEqual(NEW_LEVEL_ONE_ITEM_IDS, chapter_one_items)
         for level_number in range(1, 11):
             self.assertEqual(set(self.progression.available_items(level_number)), chapter_one_items)
 
@@ -99,8 +135,8 @@ class LevelItemProgressionTests(unittest.TestCase):
         )
 
     def test_materialization_rejects_more_types_than_the_level_pool(self) -> None:
-        logical_ids_for_level = tuple(logical_item_ids(21))
-        with self.assertRaisesRegex(ValueError, "only 20"):
+        logical_ids_for_level = tuple(logical_item_ids(52))
+        with self.assertRaisesRegex(ValueError, "only 51"):
             build_item_mapping(logical_ids_for_level, 5, self.progression)
 
     def test_templates_reject_concrete_or_malformed_item_ids(self) -> None:

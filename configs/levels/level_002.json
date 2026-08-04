@@ -7,42 +7,42 @@
     {
       "layers": [
         [
-          "ketchup_bottle",
-          "soap_pump",
-          "cereal_box"
+          "frozen_yogurt_cup_chocolate",
+          "juice_box_orange",
+          "cookie_box_berry"
         ],
         [
           "water_bottle",
+          "cookie_box_berry",
+          "cookie_box_berry"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
           "cereal_box",
-          "cereal_box"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "canned_food",
           null,
-          "ketchup_bottle"
+          "frozen_yogurt_cup_chocolate"
         ],
         [
           "water_bottle",
           null,
-          "toy_unicorn"
+          "soda_can_grape"
         ]
       ]
     },
     {
       "layers": [
         [
-          "toy_unicorn",
-          "plant_pot",
+          "soda_can_grape",
+          "juice_box_grape_tall",
           null
         ],
         [
           null,
-          "plant_pot",
-          "toy_unicorn"
+          "juice_box_grape_tall",
+          "soda_can_grape"
         ]
       ]
     },
@@ -50,27 +50,27 @@
       "layers": [
         [
           null,
+          "cookie_box_berry",
+          "juice_box_grape_tall"
+        ],
+        [
+          "water_bottle",
+          "frozen_yogurt_cup_chocolate",
+          "soda_can_grape"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "juice_box_orange",
+          null,
+          "soda_can_grape"
+        ],
+        [
+          "juice_box_grape_tall",
           "cereal_box",
-          "plant_pot"
-        ],
-        [
-          "water_bottle",
-          "ketchup_bottle",
-          "toy_unicorn"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "soap_pump",
-          null,
-          "toy_unicorn"
-        ],
-        [
-          "plant_pot",
-          "canned_food",
-          "plant_pot"
+          "juice_box_grape_tall"
         ]
       ]
     },
@@ -78,13 +78,13 @@
       "layers": [
         [
           "water_bottle",
-          "plant_pot",
+          "juice_box_grape_tall",
           "water_bottle"
         ],
         [
           null,
           null,
-          "ketchup_bottle"
+          "frozen_yogurt_cup_chocolate"
         ]
       ]
     },
@@ -92,26 +92,26 @@
       "layers": [
         [
           null,
-          "ketchup_bottle",
+          "frozen_yogurt_cup_chocolate",
           null
         ],
         [
-          "soap_pump",
-          "soap_pump",
-          "cereal_box"
+          "juice_box_orange",
+          "juice_box_orange",
+          "cookie_box_berry"
         ]
       ]
     },
     {
       "layers": [
         [
-          "toy_unicorn",
-          "soap_pump",
-          "cereal_box"
+          "soda_can_grape",
+          "juice_box_orange",
+          "cookie_box_berry"
         ],
         [
-          "ketchup_bottle",
-          "canned_food",
+          "frozen_yogurt_cup_chocolate",
+          "cereal_box",
           null
         ]
       ]
@@ -119,14 +119,14 @@
     {
       "layers": [
         [
-          "canned_food",
+          "cereal_box",
           "water_bottle",
-          "canned_food"
+          "cereal_box"
         ],
         [
-          "canned_food",
+          "cereal_box",
           null,
-          "soap_pump"
+          "juice_box_orange"
         ]
       ]
     }

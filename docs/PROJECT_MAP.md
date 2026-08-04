@@ -547,6 +547,7 @@ Change here when:
 Add a new item type:
 - Add the item image under `assets/items/`.
 - Follow `docs/ITEM_ASSET_REQUIREMENTS.md`.
+- Name variants family-first, such as `item_soda_can_lime.png`.
 - Add an entry to `configs/item_sprites.json`.
 - Schedule the item exactly once in `configs/item_progression.json`.
 - Rematerialize runtime levels if the item should affect an existing milestone.

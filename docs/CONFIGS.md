@@ -42,6 +42,8 @@ Item fields:
 Contract:
 - Every non-null item ID in `configs/levels/level_*.json` should exist here.
 - IDs should remain stable once used by levels.
+- Variant families use family-first IDs followed by a distinguishing suffix, such as
+  `soda_can_lime`, `soda_can_strawberry`, and `juice_box_grape_tall`.
 - Texture paths should point to imported Godot image assets.
 
 ## `configs/item_progression.json`
@@ -64,8 +66,8 @@ Contract:
 - Every catalog item is scheduled exactly once across all chapters, so chapter pools never overlap.
 - A level's available pool is the cumulative union of its chapter milestones whose
   `from_chapter_level` is not greater than that level's chapter-local number.
-- Chapter 1 owns the 20 item types used by levels 1-10; Chapter 2 owns the remaining 19 catalog
-  types.
+- Chapter 1 owns 51 item types available from local level 1; Chapter 2 owns the remaining 19
+  catalog types.
 - Materialization selects a deterministic subset and maps logical item tokens one-to-one. Different
   logical identities never collapse into the same concrete item.
 - The mapping follows the global level's catalog location and chapter-local number, not the
@@ -155,8 +157,8 @@ Shelf shape:
 {
   "unlock_after_triples": 3,
   "layers": [
-    ["milk_carton", "chips_can", null],
-    ["milk_carton", "chips_can", "toy_robot"]
+    ["milk_carton", "chips_can_classic", null],
+    ["milk_carton", "chips_can_classic", "toy_robot"]
   ]
 }
 ```
