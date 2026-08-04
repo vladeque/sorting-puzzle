@@ -4,16 +4,31 @@
 [ext_resource type="Script" path="res://scripts/press_scale_button.gd" id="2_press_scale_button"]
 
 [sub_resource type="StyleBoxFlat" id="Style_arrow"]
-bg_color = Color(0, 0, 0, 0.32)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(1, 1, 1, 0.35)
-corner_radius_top_left = 17
-corner_radius_top_right = 17
-corner_radius_bottom_right = 17
-corner_radius_bottom_left = 17
+bg_color = Color(1, 0.88, 0.56, 0.96)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.4, 0.18, 0.07, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0.19, 0.07, 0.02, 0.46)
+shadow_size = 5
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="Style_arrow_pressed"]
+bg_color = Color(0.9, 0.72, 0.34, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.32, 0.12, 0.04, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
 
 [node name="HorizontalPager" type="Control"]
 layout_mode = 3
@@ -47,16 +62,16 @@ anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
 offset_left = 2.0
-offset_top = -17.0
-offset_right = 36.0
-offset_bottom = 17.0
+offset_top = -42.0
+offset_right = 62.0
+offset_bottom = 42.0
 grow_vertical = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 17
+theme_override_colors/font_color = Color(0.3, 0.12, 0.04, 1)
+theme_override_font_sizes/font_size = 38
 theme_override_styles/normal = SubResource("Style_arrow")
 theme_override_styles/hover = SubResource("Style_arrow")
-theme_override_styles/pressed = SubResource("Style_arrow")
-text = "‹"
+theme_override_styles/pressed = SubResource("Style_arrow_pressed")
+text = "<"
 script = ExtResource("2_press_scale_button")
 
 [node name="NextArrow" type="Button" parent="."]
@@ -67,18 +82,18 @@ anchor_left = 1.0
 anchor_top = 0.5
 anchor_right = 1.0
 anchor_bottom = 0.5
-offset_left = -36.0
-offset_top = -17.0
+offset_left = -62.0
+offset_top = -42.0
 offset_right = -2.0
-offset_bottom = 17.0
+offset_bottom = 42.0
 grow_horizontal = 0
 grow_vertical = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 17
+theme_override_colors/font_color = Color(0.3, 0.12, 0.04, 1)
+theme_override_font_sizes/font_size = 38
 theme_override_styles/normal = SubResource("Style_arrow")
 theme_override_styles/hover = SubResource("Style_arrow")
-theme_override_styles/pressed = SubResource("Style_arrow")
-text = "›"
+theme_override_styles/pressed = SubResource("Style_arrow_pressed")
+text = ">"
 script = ExtResource("2_press_scale_button")
 
 [node name="Dots" type="HBoxContainer" parent="."]
@@ -90,9 +105,9 @@ anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -60.0
-offset_top = -14.0
+offset_top = -18.0
 offset_right = 60.0
-offset_bottom = -2.0
+offset_bottom = -10.0
 grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 2

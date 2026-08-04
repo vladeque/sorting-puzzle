@@ -31,6 +31,11 @@ func _run() -> void:
 			ResourceLoader.exists(catalog.get_background_texture_path("chapter_01")),
 			"Chapter 1 background texture exists"
 		)
+		_check(
+			catalog.get_selection_preview_path("chapter_01")
+			== "res://assets/backgrounds/main_menu.jpeg",
+			"Chapter 1 selection reuses the main-menu background"
+		)
 
 	if _failures.is_empty():
 		print("Chapter catalog tests passed.")

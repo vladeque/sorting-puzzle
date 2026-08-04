@@ -84,8 +84,8 @@ Purpose:
   `scripts/horizontal_pager.gd` pager, opens on the currently selected chapter, and persists a new
   pick through `PlayerProgress`.
 - `chapter_cover_card.gd` and `main_menu_chapter_button.gd` render chapter art, completion counts,
-  selected state, and exact lock progress; `chapter_cover_card.gd` shows a `scripts/progress_ring.gd`
-  readout (or the lock icon) instead of `main_menu_chapter_button.gd`'s plain text.
+  selected state, and exact lock progress; `chapter_cover_card.gd` owns full-screen art plus a
+  bottom information panel with a labeled linear progress bar, contextual status, and CTA.
 - `chapter_level_background.gd` loads the selected level's configured chapter artwork.
 
 Depends on:
@@ -94,7 +94,7 @@ Depends on:
 - `scripts/level.gd` export `selected_level`
 - `scripts/level.gd` export `launched_from_dev_mode`
 - `scripts/level.gd` export `return_menu_scene_path`
-- `scripts/horizontal_pager.gd`, `scripts/progress_ring.gd`
+- `scripts/horizontal_pager.gd`
 - `PlayerProgress` autoload
 
 Do not use for:
@@ -117,6 +117,8 @@ Purpose:
   them, snapping to the nearest page on release. Not chapter-specific.
 - Input handling mirrors `scripts/level.gd`'s press/motion/release drag idiom (a slop distance before
   a press becomes a drag, `accept_event()` on every handled branch) adapted to `Control._gui_input`.
+- First/last-page dragging is limited to a small overscroll allowance so edge swipes remain tactile
+  without exposing an unbounded empty track.
 
 Exports:
 - `peek_width`: how much of the neighboring page is visible at the pager's edges.
@@ -127,6 +129,7 @@ Exports:
 API:
 - `add_page(page: Control)`: appends a page.
 - `go_to_page(index: int, animate: bool = true)`: jumps to a page, optionally animated.
+- `get_current_page()`: returns the active zero-based page index.
 - `page_changed(index: int)` signal.
 
 Use when:
@@ -142,7 +145,8 @@ Class:
 - `ProgressRing`
 
 Attached to:
-- `scenes/ui/chapter_cover_card.tscn` `%Ring`.
+- No current production scene. Kept as a reusable circular progress utility; chapter covers use a
+  linear `ProgressBar` so exact current and total values remain legible in the bottom panel.
 
 Purpose:
 - Draws a circular progress readout with `Control._draw()`/`draw_arc()`: a full track circle plus a

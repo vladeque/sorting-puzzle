@@ -1,54 +1,85 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/chapters/chapter_cover_card.gd" id="1_script"]
-[ext_resource type="Script" path="res://scripts/progress_ring.gd" id="2_progress_ring"]
-[ext_resource type="Texture2D" path="res://assets/ui/lock_shelf_cutout.png" id="3_lock_icon"]
-[ext_resource type="Script" path="res://scripts/press_scale_button.gd" id="4_press_scale_button"]
+[ext_resource type="Texture2D" path="res://assets/ui/lock_shelf_cutout.png" id="2_lock_icon"]
+[ext_resource type="Script" path="res://scripts/press_scale_button.gd" id="3_press_scale_button"]
 
-[sub_resource type="Gradient" id="Gradient_scrim"]
-offsets = PackedFloat32Array(0, 0.55, 1)
-colors = PackedColorArray(0.078, 0.039, 0.012, 0.15, 0.059, 0.031, 0.012, 0.55, 0.047, 0.024, 0.008, 0.94)
+[sub_resource type="Gradient" id="Gradient_atmosphere"]
+offsets = PackedFloat32Array(0, 0.56, 0.78, 1)
+colors = PackedColorArray(0.08, 0.03, 0.01, 0.08, 0.08, 0.03, 0.01, 0, 0.08, 0.03, 0.01, 0.08, 0.08, 0.03, 0.01, 0.3)
 
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_scrim"]
-gradient = SubResource("Gradient_scrim")
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_atmosphere"]
+gradient = SubResource("Gradient_atmosphere")
 fill_from = Vector2(0.5, 0)
 fill_to = Vector2(0.5, 1)
 
+[sub_resource type="StyleBoxFlat" id="Style_info_panel"]
+bg_color = Color(1, 0.965, 0.86, 0.96)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.5, 0.25, 0.1, 1)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+shadow_color = Color(0.17, 0.06, 0.02, 0.4)
+shadow_size = 8
+shadow_offset = Vector2(0, 6)
+
+[sub_resource type="StyleBoxFlat" id="Style_progress_background"]
+bg_color = Color(0.79, 0.68, 0.48, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="Style_progress_fill"]
+bg_color = Color(0.35, 0.7, 0.27, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
 [sub_resource type="StyleBoxFlat" id="Style_cta_normal"]
-bg_color = Color(1, 0.86, 0.35, 1)
+bg_color = Color(0.93, 0.36, 0.18, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.65, 0.41, 0.04, 1)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
+border_color = Color(0.56, 0.18, 0.08, 1)
+corner_radius_top_left = 17
+corner_radius_top_right = 17
+corner_radius_bottom_right = 17
+corner_radius_bottom_left = 17
+shadow_color = Color(0.32, 0.1, 0.04, 0.44)
+shadow_size = 4
+shadow_offset = Vector2(0, 4)
 
 [sub_resource type="StyleBoxFlat" id="Style_cta_pressed"]
-bg_color = Color(0.89, 0.75, 0.28, 1)
+bg_color = Color(0.79, 0.27, 0.12, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.54, 0.33, 0.03, 1)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
+border_color = Color(0.46, 0.13, 0.05, 1)
+corner_radius_top_left = 17
+corner_radius_top_right = 17
+corner_radius_bottom_right = 17
+corner_radius_bottom_left = 17
 
 [sub_resource type="StyleBoxFlat" id="Style_cta_disabled"]
-bg_color = Color(0.73, 0.68, 0.61, 1)
+bg_color = Color(0.55, 0.47, 0.43, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.34, 0.3, 0.27, 1)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
+border_color = Color(0.35, 0.28, 0.25, 1)
+corner_radius_top_left = 17
+corner_radius_top_right = 17
+corner_radius_bottom_right = 17
+corner_radius_bottom_left = 17
 
 [node name="ChapterCoverCard" type="Control"]
 layout_mode = 3
@@ -57,6 +88,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
 clip_contents = true
 script = ExtResource("1_script")
 
@@ -72,7 +104,7 @@ mouse_filter = 2
 expand_mode = 1
 stretch_mode = 6
 
-[node name="Scrim" type="TextureRect" parent="."]
+[node name="Atmosphere" type="TextureRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -80,112 +112,139 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-texture = SubResource("GradientTexture2D_scrim")
+texture = SubResource("GradientTexture2D_atmosphere")
 expand_mode = 1
 stretch_mode = 0
 
-[node name="Ring" type="Control" parent="."]
+[node name="InfoMargins" type="MarginContainer" parent="."]
 unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -70.0
-offset_top = 16.0
-offset_right = -16.0
-offset_bottom = 70.0
-grow_horizontal = 0
-mouse_filter = 2
-script = ExtResource("2_progress_ring")
-ring_width = 6.0
-track_color = Color(0.4, 0.17, 0.22, 1)
-fill_color = Color(0.22, 0.77, 0.22, 1)
-
-[node name="LockIcon" type="TextureRect" parent="."]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -70.0
-offset_top = 16.0
-offset_right = -16.0
-offset_bottom = 70.0
-grow_horizontal = 0
-mouse_filter = 2
-texture = ExtResource("3_lock_icon")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Content" type="MarginContainer" parent="."]
-layout_mode = 1
-anchors_preset = 15
+anchors_preset = 12
+anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 30.0
+offset_top = -274.0
+offset_right = -30.0
+offset_bottom = -30.0
 grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-theme_override_constants/margin_left = 22
-theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 22
-theme_override_constants/margin_bottom = 20
+grow_vertical = 0
+mouse_filter = 1
 
-[node name="Layout" type="VBoxContainer" parent="Content"]
-layout_mode = 2
-mouse_filter = 2
-theme_override_constants/separation = 8
-
-[node name="Spacer" type="Control" parent="Content/Layout"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="EyebrowLabel" type="Label" parent="Content/Layout"]
+[node name="InfoPanel" type="PanelContainer" parent="InfoMargins"]
 unique_name_in_owner = true
 layout_mode = 2
+mouse_filter = 1
+theme_override_styles/panel = SubResource("Style_info_panel")
+
+[node name="PanelContent" type="MarginContainer" parent="InfoMargins/InfoPanel"]
+layout_mode = 2
+mouse_filter = 1
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 18
+
+[node name="Layout" type="VBoxContainer" parent="InfoMargins/InfoPanel/PanelContent"]
+layout_mode = 2
+mouse_filter = 1
+theme_override_constants/separation = 6
+
+[node name="EyebrowLabel" type="Label" parent="InfoMargins/InfoPanel/PanelContent/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
 theme_type_variation = &"GameSectionLabel"
-theme_override_colors/font_color = Color(1, 0.86, 0.35, 1)
-theme_override_colors/font_shadow_color = Color(0.08, 0.02, 0, 0.9)
-theme_override_constants/shadow_offset_x = 0
-theme_override_constants/shadow_offset_y = 2
-theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.66, 0.25, 0.09, 1)
+theme_override_font_sizes/font_size = 18
 text = "CHAPTER 1"
 
-[node name="TitleLabel" type="Label" parent="Content/Layout"]
+[node name="TitleLabel" type="Label" parent="InfoMargins/InfoPanel/PanelContent/Layout"]
 unique_name_in_owner = true
 layout_mode = 2
+mouse_filter = 2
 theme_type_variation = &"GameTitleLabel"
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_shadow_color = Color(0.08, 0.02, 0, 0.9)
-theme_override_constants/shadow_offset_x = 0
-theme_override_constants/shadow_offset_y = 4
-theme_override_font_sizes/font_size = 46
+theme_override_colors/font_color = Color(0.27, 0.11, 0.035, 1)
+theme_override_font_sizes/font_size = 42
 text = "Grocery Town"
 autowrap_mode = 2
 
-[node name="CaptionLabel" type="Label" parent="Content/Layout"]
+[node name="StatusRow" type="HBoxContainer" parent="InfoMargins/InfoPanel/PanelContent/Layout"]
 unique_name_in_owner = true
 layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="LockIcon" type="TextureRect" parent="InfoMargins/InfoPanel/PanelContent/Layout/StatusRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(34, 34)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("2_lock_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="StatusLabel" type="Label" parent="InfoMargins/InfoPanel/PanelContent/Layout/StatusRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
 theme_type_variation = &"GameBodyLabel"
-theme_override_colors/font_color = Color(1, 0.96, 0.87, 1)
-theme_override_colors/font_shadow_color = Color(0.08, 0.02, 0, 0.9)
-theme_override_constants/shadow_offset_x = 0
-theme_override_constants/shadow_offset_y = 2
-theme_override_font_sizes/font_size = 20
-text = "0 of 10 levels complete"
+theme_override_colors/font_color = Color(0.43, 0.2, 0.12, 1)
+theme_override_font_sizes/font_size = 17
+text = "Complete previous chapter levels to unlock"
+vertical_alignment = 1
 autowrap_mode = 2
 
-[node name="CtaButton" type="Button" parent="Content/Layout"]
+[node name="ProgressHeader" type="HBoxContainer" parent="InfoMargins/InfoPanel/PanelContent/Layout"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 62)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="ProgressLabel" type="Label" parent="InfoMargins/InfoPanel/PanelContent/Layout/ProgressHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_type_variation = &"GameBodyLabel"
+theme_override_colors/font_color = Color(0.4, 0.23, 0.13, 1)
+theme_override_font_sizes/font_size = 17
+text = "Current progress"
+
+[node name="ProgressSpacer" type="Control" parent="InfoMargins/InfoPanel/PanelContent/Layout/ProgressHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="ProgressValueLabel" type="Label" parent="InfoMargins/InfoPanel/PanelContent/Layout/ProgressHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_type_variation = &"GameNumberLabel"
+theme_override_colors/font_color = Color(0.3, 0.14, 0.06, 1)
+theme_override_font_sizes/font_size = 18
+text = "0 / 10"
+
+[node name="ProgressBar" type="ProgressBar" parent="InfoMargins/InfoPanel/PanelContent/Layout"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/background = SubResource("Style_progress_background")
+theme_override_styles/fill = SubResource("Style_progress_fill")
+show_percentage = false
+
+[node name="CtaButton" type="Button" parent="InfoMargins/InfoPanel/PanelContent/Layout"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 58)
 layout_mode = 2
 size_flags_horizontal = 3
 focus_mode = 1
-theme_override_colors/font_color = Color(0.29, 0.15, 0, 1)
-theme_override_colors/font_disabled_color = Color(0.34, 0.3, 0.27, 1)
-theme_override_font_sizes/font_size = 26
+theme_override_colors/font_color = Color(1, 0.985, 0.94, 1)
+theme_override_colors/font_disabled_color = Color(0.88, 0.82, 0.78, 1)
+theme_override_font_sizes/font_size = 25
 theme_override_styles/normal = SubResource("Style_cta_normal")
 theme_override_styles/hover = SubResource("Style_cta_normal")
 theme_override_styles/pressed = SubResource("Style_cta_pressed")
 theme_override_styles/disabled = SubResource("Style_cta_disabled")
 text = "PLAY"
-script = ExtResource("4_press_scale_button")
+script = ExtResource("3_press_scale_button")

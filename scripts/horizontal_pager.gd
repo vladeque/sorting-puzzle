@@ -4,6 +4,7 @@ extends Control
 signal page_changed(index: int)
 
 const SNAP_DURATION := 0.32
+const MAX_OVERSCROLL_FRACTION := 0.08
 const DOT_SIZE_OFF := 6.0
 const DOT_SIZE_ON := 18.0
 const DOT_COLOR_OFF := Color(1.0, 1.0, 1.0, 0.35)
@@ -58,6 +59,10 @@ func go_to_page(index: int, animate: bool = true) -> void:
 	page_changed.emit(_current_index)
 
 
+func get_current_page() -> int:
+	return _current_index
+
+
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		var mouse_event := event as InputEventMouseButton
@@ -102,7 +107,10 @@ func _update_pointer_motion(position: Vector2) -> void:
 			return
 		_drag_active = true
 	var delta := position.x - _press_position.x
-	_track.position.x = _track_start_x + delta
+	var overscroll := _page_width * MAX_OVERSCROLL_FRACTION
+	var maximum_x := peek_width + overscroll
+	var minimum_x := peek_width - float(maxi(_pages.size() - 1, 0)) * _page_width - overscroll
+	_track.position.x = clampf(_track_start_x + delta, minimum_x, maximum_x)
 
 
 func _end_press(position: Vector2) -> void:

@@ -86,15 +86,18 @@ Purpose:
 - Full-screen chapter picker opened from the main menu's `%ChapterButton`.
 - Builds one `scenes/ui/chapter_cover_card.tscn` instance per `configs/chapters.json` entry and
   hands each to a `scenes/ui/horizontal_pager.tscn` instance as a page.
+- Lets every cover own the entire viewport so swiping or pressing an arrow replaces its background
+  artwork and chapter information together. Chapter 1 intentionally reuses
+  `assets/backgrounds/main_menu.jpeg` as its selection artwork.
 - Opens directly on the currently selected chapter's cover.
 - Emits `chapter_selected(chapter_id)` and persists the pick through `PlayerProgress.select_chapter()`
   when a cover's CTA button is pressed.
 - Closes on the back button, `ui_cancel`, or a successful selection, emitting `closed`.
 
 Important nodes:
-- `%BackButton`.
+- `%BackButton`: safe-margin overlay above the full-screen covers.
 - `%Pager`: the `scenes/ui/horizontal_pager.tscn` instance holding one `chapter_cover_card` per
-  chapter.
+  chapter; this screen sets `peek_width` to zero so every background fills the viewport.
 
 Depends on:
 - `ChapterCatalog` autoload for chapter order and metadata.
@@ -115,6 +118,8 @@ Purpose:
   the player drag/swipe or tap the arrow buttons to move between them, snapping to the nearest page
   on release. Not chapter-specific — reusable anywhere a one-item-at-a-time browsing UI is needed
   (e.g. Shop or Rewards).
+- Applies a small bounded overscroll at the first and last page rather than allowing the track to
+  drift beyond the available content.
 
 Important nodes:
 - `%Clip`: clips `%Track` to the pager's bounds.
@@ -126,6 +131,7 @@ Important nodes:
 Public API:
 - `add_page(control: Control)`: appends a page.
 - `go_to_page(index: int, animate: bool = true)`: jumps to a page, optionally animated.
+- `get_current_page()`: returns the active zero-based page index.
 - `page_changed(index: int)` signal.
 
 Depends on:
@@ -140,19 +146,22 @@ Script:
 - `scripts/chapters/chapter_cover_card.gd`
 
 Purpose:
-- One full-bleed chapter "cover": chapter art, a bottom gradient scrim, a circular
-  `scripts/progress_ring.gd` progress readout (or `assets/ui/lock_shelf_cutout.png` when locked),
-  title/eyebrow/caption labels, and a single CTA button that confirms the pick.
+- One full-screen chapter "cover": chapter art, a light atmosphere gradient, and a warm bottom
+  information panel containing chapter number, title, labeled progress bar, availability status,
+  and a single CTA button.
 - `configure(chapter, progress, is_selected)` mirrors the three states the retired `chapter_card.gd`
   used: locked, unlocked-with-no-levels-yet ("coming soon"), and unlocked-with-levels.
 - Emits `selected(chapter_id)` when its CTA is pressed; the CTA stays disabled while locked.
+- Uses pass-through mouse filtering in its non-interactive hierarchy so swipes begun over the art
+  or information panel reach the pager while the CTA remains independently clickable.
 
 Important nodes:
-- `%Art`, `%Ring`, `%LockIcon`, `%EyebrowLabel`, `%TitleLabel`, `%CaptionLabel`, `%CtaButton`.
+- `%Art`, `%InfoPanel`, `%LockIcon`, `%StatusLabel`, `%EyebrowLabel`, `%TitleLabel`,
+  `%ProgressLabel`, `%ProgressValueLabel`, `%ProgressBar`, `%CtaButton`.
 
 Depends on:
 - `ChapterCatalog.get_selection_preview_path()` for the cover art.
-- `scripts/progress_ring.gd`, `assets/ui/lock_shelf_cutout.png`, `scripts/press_scale_button.gd`.
+- `assets/ui/lock_shelf_cutout.png`, `scripts/press_scale_button.gd`.
 
 ## `scenes/ui/leaderboard_screen.tscn`
 

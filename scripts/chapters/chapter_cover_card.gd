@@ -3,14 +3,21 @@ extends Control
 
 signal selected(chapter_id: String)
 
-const LOCKED_ART_TINT := Color(0.75, 0.7, 0.62, 1.0)
+const LOCKED_ART_TINT := Color(0.82, 0.78, 0.72, 1.0)
+const DEFAULT_PANEL_HEIGHT := 244.0
+const LOCKED_PANEL_HEIGHT := 290.0
 
 @onready var _art: TextureRect = %Art
-@onready var _lock_icon: TextureRect = %LockIcon
-@onready var _ring: ProgressRing = %Ring
+@onready var _info_margins: MarginContainer = %InfoMargins
 @onready var _eyebrow_label: Label = %EyebrowLabel
 @onready var _title_label: Label = %TitleLabel
-@onready var _caption_label: Label = %CaptionLabel
+@onready var _status_row: HBoxContainer = %StatusRow
+@onready var _lock_icon: TextureRect = %LockIcon
+@onready var _status_label: Label = %StatusLabel
+@onready var _progress_header: HBoxContainer = %ProgressHeader
+@onready var _progress_label: Label = %ProgressLabel
+@onready var _progress_value_label: Label = %ProgressValueLabel
+@onready var _progress_bar: ProgressBar = %ProgressBar
 @onready var _cta_button: Button = %CtaButton
 
 var _chapter_id := ""
@@ -28,37 +35,55 @@ func configure(chapter: Dictionary, progress: Dictionary, is_selected: bool) -> 
 	_art.texture = load(preview_path) as Texture2D if not preview_path.is_empty() else null
 
 	var unlocked := bool(progress.get("unlocked", false))
-	_cta_button.disabled = not unlocked
 	_art.self_modulate = Color.WHITE if unlocked else LOCKED_ART_TINT
+	_set_panel_height(LOCKED_PANEL_HEIGHT if not unlocked else DEFAULT_PANEL_HEIGHT)
+	_status_row.visible = not unlocked
 	_lock_icon.visible = not unlocked
-	_ring.visible = unlocked
+	_progress_header.visible = true
+	_progress_bar.visible = true
+	_cta_button.disabled = not unlocked
 
 	if not unlocked:
-		_ring.set_progress(
-			int(progress.get("previous_completed_levels", 0)),
-			int(progress.get("required_completed_levels", 0))
-		)
-		_caption_label.text = "Complete %d levels in the previous chapter" % int(
-			progress.get("required_completed_levels", 0)
-		)
+		var completed_required_levels := int(progress.get("previous_completed_levels", 0))
+		var required_levels := int(progress.get("required_completed_levels", 0))
+		var remaining_levels := maxi(required_levels - completed_required_levels, 0)
+		var previous_chapter_id := ChapterCatalog.get_previous_chapter_id(_chapter_id)
+		var previous_chapter := ChapterCatalog.get_chapter(previous_chapter_id)
+		var previous_title := str(previous_chapter.get("title", "the previous chapter"))
+		_status_label.text = "Complete %d more %s levels to unlock" % [remaining_levels, previous_title]
+		_progress_label.text = "Unlock progress"
+		_set_progress(completed_required_levels, required_levels)
 		_cta_button.text = "LOCKED"
 		return
 
 	if not bool(progress.get("has_levels", false)):
-		_ring.visible = false
-		_caption_label.text = "New levels are coming soon"
-		_cta_button.text = "SELECTED" if is_selected else "COMING SOON"
+		_status_row.visible = true
+		_lock_icon.visible = false
+		_status_label.text = "New levels are coming soon"
+		_progress_header.visible = false
+		_progress_bar.visible = false
+		_cta_button.disabled = true
+		_cta_button.text = "COMING SOON"
 		return
 
-	_ring.set_progress(int(progress.get("completed_levels", 0)), int(progress.get("total_levels", 0)))
-	_caption_label.text = "%d of %d levels complete" % [
-		int(progress.get("completed_levels", 0)),
-		int(progress.get("total_levels", 0)),
-	]
+	var completed_levels := int(progress.get("completed_levels", 0))
+	var total_levels := int(progress.get("total_levels", 0))
+	_progress_label.text = "Current progress"
+	_set_progress(completed_levels, total_levels)
 	if is_selected:
-		_cta_button.text = "CONTINUE" if int(progress.get("completed_levels", 0)) > 0 else "PLAY"
+		_cta_button.text = "CONTINUE" if completed_levels > 0 else "PLAY"
 	else:
 		_cta_button.text = "PLAY"
+
+
+func _set_progress(current: int, total: int) -> void:
+	_progress_bar.max_value = maxf(float(total), 1.0)
+	_progress_bar.value = clampf(float(current), 0.0, _progress_bar.max_value)
+	_progress_value_label.text = "%d / %d" % [current, total]
+
+
+func _set_panel_height(height: float) -> void:
+	_info_margins.offset_top = _info_margins.offset_bottom - height
 
 
 func _emit_selected() -> void:

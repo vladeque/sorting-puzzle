@@ -13,7 +13,7 @@
       },
       "gameplay_background_mode": "legacy",
       "background_texture": "res://assets/backgrounds/level_bg_option_02_warm_grocery.png",
-      "selection_preview": "res://assets/backgrounds/level_bg_option_02_warm_grocery.png"
+      "selection_preview": "res://assets/backgrounds/main_menu.jpeg"
     },
     {
       "id": "chapter_02",

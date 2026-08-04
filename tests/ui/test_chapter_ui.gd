@@ -58,8 +58,24 @@ func _run() -> void:
 			var current_cta := current_card.get_node("%CtaButton") as Button
 			_check(not current_cta.disabled, "Chapter 1 should be playable for a new player.")
 			_check(
-				current_card.size.x > 100.0 and current_card.size.x <= pager.size.x,
-				"The current chapter cover was not sized by the pager (got %s)." % current_card.size
+				is_equal_approx(current_card.size.x, pager.size.x),
+				"The current chapter background should fill the pager width (got %s)." % current_card.size
+			)
+			var current_art := current_card.get_node("%Art") as TextureRect
+			_check(
+				current_art.texture != null
+				and current_art.texture.resource_path == "res://assets/backgrounds/main_menu.jpeg",
+				"Chapter 1 should reuse the main-menu background."
+			)
+			var current_progress := current_card.get_node("%ProgressBar") as ProgressBar
+			_check(
+				is_equal_approx(current_progress.value, 0.0)
+				and is_equal_approx(current_progress.max_value, 10.0),
+				"Chapter 1 should expose its exact current progress in the bottom panel."
+			)
+			_check(
+				str(current_card.get_node("%ProgressValueLabel").text) == "0 / 10",
+				"Chapter 1's progress value should be readable beside the bar."
 			)
 
 			var locked_card := track.get_child(1)
@@ -69,14 +85,25 @@ func _run() -> void:
 				str(locked_cta.text) == "LOCKED",
 				"Chapter 2's CTA should read LOCKED while it is locked."
 			)
-			var locked_ring := locked_card.get_node("%Ring") as ProgressRing
+			var locked_progress := locked_card.get_node("%ProgressBar") as ProgressBar
 			_check(
-				locked_ring.get_progress_current() == 0 and locked_ring.get_progress_total() == 25,
+				is_equal_approx(locked_progress.value, 0.0)
+				and is_equal_approx(locked_progress.max_value, 25.0),
 				"Chapter 2 does not show its exact unlock progress."
 			)
 			_check(
-				str(locked_card.get_node("%CaptionLabel").text) == "Complete 25 levels in the previous chapter",
+				str(locked_card.get_node("%ProgressValueLabel").text) == "0 / 25",
+				"Chapter 2 does not label its exact unlock progress."
+			)
+			_check(
+				str(locked_card.get_node("%StatusLabel").text)
+				== "Complete 25 more Grocery Town levels to unlock",
 				"Chapter 2 does not show its exact unlock requirement."
+			)
+			_check(
+				(pager.get_node("%NextArrow") as Button).visible
+				and not (pager.get_node("%PrevArrow") as Button).visible,
+				"The first chapter should advertise the next page with only the right arrow."
 			)
 
 	for resolution in TEST_RESOLUTIONS:
@@ -104,6 +131,20 @@ func _run() -> void:
 			_check(
 				pager.global_position.x + pager.size.x <= logical_size.x + 1.0,
 				"The chapter pager escaped the right edge at %s." % resolution
+			)
+			_check(
+				pager.global_position.y >= 0.0
+				and pager.global_position.y + pager.size.y <= logical_size.y + 1.0,
+				"The chapter pager should remain a full-screen background at %s." % resolution
+			)
+			var current_card := (pager.get_node("%Track") as Control).get_child(0) as Control
+			var info_panel := current_card.get_node("%InfoPanel") as Control
+			_check(
+				info_panel.global_position.x >= 0.0
+				and info_panel.global_position.x + info_panel.size.x <= logical_size.x + 1.0
+				and info_panel.global_position.y >= 0.0
+				and info_panel.global_position.y + info_panel.size.y <= logical_size.y + 1.0,
+				"The chapter information panel escaped the viewport at %s." % resolution
 			)
 
 	var background_scene := load("res://scenes/backgrounds/chapter_level_background.tscn") as PackedScene
