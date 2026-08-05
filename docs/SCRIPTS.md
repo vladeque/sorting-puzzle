@@ -108,7 +108,8 @@ Key methods:
   scene through `_begin_navigation()`.
 - `_begin_navigation(scene_path)`: guarded `change_scene_to_file()` wrapper -- ignores a duplicate
   call while `_is_navigating` is already true, so a rapid double-tap (including via the top-status
-  coin shortcut) can never call it twice.
+  coin shortcut) can never call it twice, and disables this screen's own `process_mode` so no
+  descendant can react to further input before the deferred scene swap resolves.
 - `_on_profile_avatar_saved(avatar_id)`: refreshes the top status avatar after the profile menu saves.
 - `_launch_campaign_level()`: resolves the selected chapter's next incomplete global level,
   instantiates it, sets campaign launch metadata, swaps current scene, and queues the menu.

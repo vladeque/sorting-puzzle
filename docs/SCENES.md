@@ -113,7 +113,10 @@ explicit status-panel Retry action, never through a hidden tab-retap convention.
 navigation (tapping a *different* bottom-navigation tab, or the Main Menu coin shortcut that also
 opens Shop) is guarded by an `_is_navigating` flag on each of `production_main_menu.gd`,
 `shop_screen.gd`, and `leaderboard_screen.gd`, so a duplicate press while `change_scene_to_file()`
-is still in flight is ignored instead of calling it twice.
+is still in flight is ignored instead of calling it twice. The same guard also sets
+`process_mode = PROCESS_MODE_DISABLED` on the outgoing screen, so none of its descendants (not
+just the navigation buttons) can react to further mouse/touch/keyboard input during the brief
+window before the deferred scene swap resolves.
 
 **Back/`ui_cancel` behavior** -- `ui_cancel` closes the topmost open scoped overlay before it can
 navigate a screen away:

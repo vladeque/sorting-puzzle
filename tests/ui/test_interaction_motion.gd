@@ -486,10 +486,18 @@ func _test_final_navigation_phase() -> void:
 	await _wait_frames(6)
 
 	_check(not bool(shop.get("_is_navigating")), "Shop should not be mid-navigation before ui_cancel.")
+	_check(
+		shop.process_mode != Node.PROCESS_MODE_DISABLED,
+		"Shop should still accept input before ui_cancel starts a navigation."
+	)
 	shop.call("_unhandled_input", _make_ui_cancel_event())
 	_check(
 		bool(shop.get("_is_navigating")),
 		"ui_cancel with no overlay open should start returning Shop to Main Menu."
+	)
+	_check(
+		shop.process_mode == Node.PROCESS_MODE_DISABLED,
+		"Shop should stop accepting input once a navigation starts, so the outgoing screen never accepts input while the new one becomes visible."
 	)
 	# A duplicate press arriving before the deferred scene swap resolves must be ignored rather
 	# than calling change_scene_to_file() a second time.

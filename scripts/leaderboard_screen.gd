@@ -279,10 +279,13 @@ func _open_shop() -> void:
 
 
 ## Ignores a duplicate cross-destination press while a scene transition is already underway, so a
-## rapid double-tap on Home/Shop can never call change_scene_to_file() twice.
+## rapid double-tap on Home/Shop can never call change_scene_to_file() twice, and stops this whole
+## screen (every descendant's mouse/touch/keyboard input, not just navigation) from accepting
+## further input for the brief window before the deferred scene swap resolves.
 func _begin_navigation(scene_path: String) -> void:
 	if _is_navigating:
 		return
 
 	_is_navigating = true
+	process_mode = Node.PROCESS_MODE_DISABLED
 	get_tree().change_scene_to_file(scene_path)
