@@ -53,11 +53,6 @@
 	  "texture": "res://assets/items/item_juice_box_orange.png"
 	},
 	{
-	  "id": "juice_box_grape_compact",
-	  "category": "drink",
-	  "texture": "res://assets/items/item_juice_box_grape_compact.png"
-	},
-	{
 	  "id": "juice_box_grape_tall",
 	  "category": "drink",
 	  "texture": "res://assets/items/item_juice_box_grape_tall.png"
@@ -121,11 +116,6 @@
 	  "id": "cookie_box_blue",
 	  "category": "snack",
 	  "texture": "res://assets/items/item_cookie_box_blue.png"
-	},
-	{
-	  "id": "cookie_box_blue_carton",
-	  "category": "snack",
-	  "texture": "res://assets/items/item_cookie_box_blue_carton.png"
 	},
 	{
 	  "id": "cookie_box_chocolate",
@@ -203,12 +193,12 @@
 	  "texture": "res://assets/items/item_frozen_yogurt_cup_vanilla.png"
 	},
 	{
-	  "id": "item_ice_cream_cup_chocolate",
+	  "id": "ice_cream_cup_chocolate",
 	  "category": "snack",
 	  "texture": "res://assets/items/item_ice_cream_cup_chocolate.png"
 	},
 	{
-	  "id": "item_ice_cream_cup_blueberry",
+	  "id": "ice_cream_cup_blueberry",
 	  "category": "snack",
 	  "texture": "res://assets/items/item_ice_cream_cup_blueberry.png"
 	},

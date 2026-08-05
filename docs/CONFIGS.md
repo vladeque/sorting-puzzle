@@ -67,7 +67,7 @@ Contract:
 - Every catalog item is scheduled exactly once across all chapters, so chapter pools never overlap.
 - A level's available pool is the cumulative union of its chapter milestones whose
   `from_chapter_level` is not greater than that level's chapter-local number.
-- Chapter 1 owns 51 item types available from local level 1; Chapter 2 owns the remaining 19
+- Chapter 1 owns 53 item types available from local level 1; Chapter 2 owns the remaining 15
   catalog types.
 - Materialization selects a deterministic subset and maps logical item tokens one-to-one. Different
   logical identities never collapse into the same concrete item.

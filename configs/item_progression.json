@@ -26,6 +26,8 @@
 			"frozen_yogurt_cup_strawberry",
 			"frozen_yogurt_cup_vanilla",
 			"ice_cream_cup",
+			"ice_cream_cup_blueberry",
+			"ice_cream_cup_chocolate",
 			"jam_jar_orange",
 			"jam_jar_raspberry",
 			"juice_box_apple",
@@ -38,14 +40,13 @@
 			"shampoo_bottle",
 			"smoothie_cup_blueberry",
 			"smoothie_cup_mango",
-			"smoothie_cup_strawberry",
 			"smoothie_cup_strawberry_banana",
 			"soap_pump",
 			"soda_bottle",
+			"soda_bottle_grape",
 			"soda_can_grape",
+			"soda_can_orange",
 			"soda_can_strawberry",
-			"soft_serve_cup_blueberry",
-			"soft_serve_cup_chocolate",
 			"teddy_bear",
 			"toothpaste_box",
 			"toy_robot",
@@ -58,6 +59,7 @@
 			"yogurt_cup_peach",
 			"yogurt_cup_strawberry",
 			"yogurt_tub_blueberry",
+			"yogurt_tub_peach",
             "yogurt_tub_vanilla"
 		  ]
 		}
@@ -70,23 +72,19 @@
 		  "from_chapter_level": 1,
 		  "unlock": [
 			"cereal_box_rainbow",
-			"chocolate_bar_rainbow",
 			"coffee_cup",
-			"cookie_box_blue_carton",
 			"frozen_yogurt_cup_blue",
 			"gift_box",
 			"gummy_bears_bag",
 			"ice_cream_tub_pink",
 			"jam_jar_blueberry",
 			"jam_jar_strawberry",
-			"juice_box_grape_compact",
 			"lollipop_rainbow",
 			"lollipop_wrapped_rainbow",
 			"popcorn_box",
 			"smoothie_cup_green",
 			"soda_bottle_orange",
 			"soda_can_lime",
-			"yogurt_cup_orange",
             "yogurt_tub_strawberry"
 		  ]
 		}
