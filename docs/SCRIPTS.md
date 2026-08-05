@@ -17,6 +17,8 @@ Purpose:
 - Consumes completed-level reward payloads, displays the pre-reward chest value, and advances it once for each clover coin that reaches the chest.
 - Opens the reward chest detail modal when the reward chest widget emits `chest_pressed`.
 - Opens the main-menu settings popup from the top status bar.
+- Adds every main-menu modal through a shared overlay helper so no menu action can render or receive
+  input above an open modal.
 - Launches the first incomplete level in the selected unlocked chapter.
 - Opens the chapter selection screen and refreshes the level/chapter actions and fullscreen
   background after selection.
@@ -31,6 +33,8 @@ Key constants:
 - `PRODUCTION_MENU_SCENE`: return path assigned to campaign level instances.
 - `LEADERBOARD_SCENE`: destination path for the trophy tab.
 - `LIFE_STATUS_REFRESH_SECONDS`: cadence for refreshing the lives countdown while the menu is visible.
+- `MAIN_MENU_OVERLAY_Z_INDEX`: shared layer for runtime modals and the embedded leaderboard reward
+  dialog, above every production-menu action.
 - `TOP_MARGIN`: preferred distance from the physical top edge for the status row.
 - `CAMERA_CUTOUT_PADDING`: empty space reserved around each reported display cutout.
 - `BOTTOM_BAR_*`, `SIDE_MARGIN`, `LEVEL_BUTTON_MAX_WIDTH`, and `CHAPTER_BUTTON_MAX_WIDTH`:
@@ -74,6 +78,8 @@ Key methods:
 - `_open_settings_menu()`: creates the centered settings popup and wires its close button.
 - `_close_settings_menu()`: dismisses the settings popup.
 - `_open_reward_chest_menu()`: creates the centered reward chest detail modal; the modal reads its own progress and wires its own close button.
+- `_add_main_menu_overlay(overlay)`: places a runtime modal on the shared overlay z-index before
+  adding it to the production menu.
 - `_open_leaderboard()`: replaces the production menu with the dedicated leaderboard scene.
 - `_open_shop()`: replaces the production menu with the dedicated Shop scene.
 - `_on_profile_avatar_saved(avatar_id)`: refreshes the top status avatar after the profile menu saves.

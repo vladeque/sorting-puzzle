@@ -20,6 +20,8 @@ Purpose:
 - Main project entry scene.
 - Displays the selected chapter's configured `selection_preview` as a fullscreen production menu
   background; Chapter 1 defaults to `assets/backgrounds/main_menu.jpeg`.
+- Places all runtime modal windows and the embedded leaderboard reward dialog on a shared overlay
+  z-index above the complete main-menu action stack.
 - Provides a top status row for profile, saved gold coins, saved campaign lives, and settings.
 - Shows a left-side reward chest widget under the profile icon with saved star progress toward the active configured chest goal.
 - After a completed level returns here, launches one clover coin per earned star from the background house into the reward chest and advances the visible chest count on impact.

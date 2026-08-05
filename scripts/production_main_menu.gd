@@ -25,6 +25,7 @@ const LEVEL_BUTTON_MAX_WIDTH := 420.0
 const CHAPTER_BUTTON_MAX_WIDTH := 280.0
 const BOTTOM_NAVIGATION_HEIGHT := 96.0
 const LIFE_STATUS_REFRESH_SECONDS := 1.0
+const MAIN_MENU_OVERLAY_Z_INDEX := 100
 
 @onready var _background := %Background as TextureRect
 @onready var _top_status_bar := %TopStatusBar as MarginContainer
@@ -79,6 +80,7 @@ func _ready() -> void:
 	_update_level_button()
 	_update_chapter_button()
 	_update_chapter_background(PlayerProgress.get_selected_chapter_id())
+	_leaderboard_reward_dialog.z_index = MAIN_MENU_OVERLAY_Z_INDEX
 	_apply_responsive_layout()
 	if not pending_reward_animation.is_empty():
 		_play_pending_reward_animation.call_deferred(pending_reward_animation)
@@ -399,7 +401,7 @@ func _open_profile_menu() -> void:
 		return
 
 	_profile_menu = PROFILE_MENU_SCENE.instantiate() as Control
-	add_child(_profile_menu)
+	_add_main_menu_overlay(_profile_menu)
 	_profile_menu.connect("avatar_saved", Callable(self, "_on_profile_avatar_saved"))
 	_profile_menu.tree_exited.connect(_clear_profile_menu_reference)
 
@@ -409,7 +411,7 @@ func _open_settings_menu() -> void:
 		return
 
 	_settings_menu = SETTINGS_MENU_SCENE.instantiate() as Control
-	add_child(_settings_menu)
+	_add_main_menu_overlay(_settings_menu)
 
 	var close_button := _settings_menu.get_node_or_null("PauseMenuPanel/CloseButton") as Button
 	if close_button != null:
@@ -428,7 +430,7 @@ func _open_reward_chest_menu() -> void:
 		return
 
 	_reward_chest_menu = REWARD_CHEST_MENU_SCENE.instantiate() as Control
-	add_child(_reward_chest_menu)
+	_add_main_menu_overlay(_reward_chest_menu)
 	_reward_chest_menu.tree_exited.connect(_clear_reward_chest_menu_reference)
 
 
@@ -436,7 +438,7 @@ func _open_chapter_selection() -> void:
 	if is_instance_valid(_chapter_selection_screen):
 		return
 	_chapter_selection_screen = CHAPTER_SELECTION_SCENE.instantiate() as Control
-	add_child(_chapter_selection_screen)
+	_add_main_menu_overlay(_chapter_selection_screen)
 	_chapter_selection_screen.connect("chapter_selected", Callable(self, "_on_chapter_selected"))
 	_chapter_selection_screen.tree_exited.connect(_clear_chapter_selection_reference)
 
@@ -456,6 +458,11 @@ func _update_chapter_background(chapter_id: String) -> void:
 	var background_texture := load(background_path) as Texture2D
 	if background_texture != null:
 		_background.texture = background_texture
+
+
+func _add_main_menu_overlay(overlay: Control) -> void:
+	overlay.z_index = MAIN_MENU_OVERLAY_Z_INDEX
+	add_child(overlay)
 
 
 func _clear_chapter_selection_reference() -> void:
