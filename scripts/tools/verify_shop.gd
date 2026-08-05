@@ -61,6 +61,29 @@ func _run() -> void:
 	for _frame in range(5):
 		await get_tree().process_frame
 
+	var destination_shell := shop.get_node("%DestinationShell") as Control
+	_check(
+		_get_shell_background_path(destination_shell) == "res://assets/backgrounds/main_menu.jpeg",
+		"Shop should start on the selected Chapter 1 background."
+	)
+	destination_shell.call("set_background_for_chapter", "chapter_02")
+	_check(
+		_get_shell_background_path(destination_shell)
+			== ChapterCatalog.get_selection_preview_path("chapter_02"),
+		"Shop's shared background shell did not follow the selected chapter."
+	)
+	destination_shell.call("set_background_for_chapter", "chapter_01")
+
+	var status_panel := shop.get_node("%StatusPanel") as Control
+	var status_retry_button := status_panel.get_node(
+		"StatusPanelBackground/StatusStack/StatusRetryButton"
+	) as Button
+	_check(
+		status_retry_button.get_theme_stylebox("normal")
+			== load("res://assets/themes/style_box_orange_utility_normal.tres"),
+		"Shop's status Retry button is not using the shared orange utility style resource."
+	)
+
 	var bundles := shop.get_node("%BundlesContainer") as VBoxContainer
 	var coin_offers := shop.get_node("%CoinOffersContainer") as VBoxContainer
 	_check(bundles.get_child_count() == 2, "Expected two configured bundle cards.")
@@ -304,6 +327,13 @@ func _find_offer(offers: Array, offer_id: String) -> Dictionary:
 		if raw_offer is Dictionary and str((raw_offer as Dictionary).get("id", "")) == offer_id:
 			return raw_offer as Dictionary
 	return {}
+
+
+func _get_shell_background_path(shell: Control) -> String:
+	var background := shell.get_node("Background") as TextureRect
+	if background == null or background.texture == null:
+		return ""
+	return background.texture.resource_path
 
 
 func _check(condition: bool, message: String) -> void:

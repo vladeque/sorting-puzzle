@@ -190,6 +190,63 @@ func _run() -> void:
 				"The chapter information panel escaped the viewport at %s." % resolution
 			)
 
+	if selection != null:
+		root.size = Vector2i(720, 1280)
+		for _frame in range(3):
+			await process_frame
+
+		## The real safe-area lookup always yields Vector4.ZERO outside Android/iOS, so this
+		## directly exercises _apply_safe_margins() with a fabricated inset -- the only way to
+		## prove the back button, title, page arrows/indicators, and each card's information
+		## panel actually respect a non-zero inset while the full-bleed art underneath does not.
+		var simulated_margins := Vector4(40.0, 60.0, 50.0, 80.0)
+		selection.call("_apply_safe_margins", simulated_margins)
+		await process_frame
+
+		var header_margins := selection.get_node("%HeaderMargins") as Control
+		_check(
+			is_equal_approx(header_margins.offset_left, simulated_margins.x)
+				and is_equal_approx(header_margins.offset_top, simulated_margins.y)
+				and is_equal_approx(header_margins.offset_right, -simulated_margins.z),
+			"Chapter Selection's header did not respect the simulated safe-area inset."
+		)
+
+		var pager := selection.get_node("%Pager") as Control
+		var prev_arrow := pager.get_node("%PrevArrow") as Control
+		var next_arrow := pager.get_node("%NextArrow") as Control
+		var dots := pager.get_node("%Dots") as Control
+		_check(
+			is_equal_approx(prev_arrow.offset_left, 2.0 + simulated_margins.x),
+			"The pager's previous arrow did not shift inward for the simulated left inset."
+		)
+		_check(
+			is_equal_approx(next_arrow.offset_right, -2.0 - simulated_margins.z),
+			"The pager's next arrow did not shift inward for the simulated right inset."
+		)
+		_check(
+			is_equal_approx(dots.offset_bottom, -10.0 - simulated_margins.w),
+			"The pager's page indicators did not clear the simulated bottom inset."
+		)
+
+		var track := pager.get_node("%Track") as Control
+		var current_card := track.get_child(0) as Control
+		var current_art := current_card.get_node("%Art") as Control
+		_check(
+			is_equal_approx(current_art.offset_left, 0.0) and is_equal_approx(current_art.offset_right, 0.0),
+			"Chapter cover art should stay full-bleed under a simulated safe-area inset."
+		)
+		var info_margins := current_card.get_node("%InfoMargins") as Control
+		_check(
+			is_equal_approx(info_margins.offset_left, 30.0 + simulated_margins.x)
+				and is_equal_approx(info_margins.offset_right, -(30.0 + simulated_margins.z))
+				and is_equal_approx(info_margins.offset_bottom, -(30.0 + simulated_margins.w)),
+			"The chapter information panel did not respect the simulated safe-area inset."
+		)
+
+		# Restore a zero inset so later checks and cleanup see the normal, unshifted layout.
+		selection.call("_apply_safe_margins", Vector4.ZERO)
+		await process_frame
+
 	var background_scene := load("res://scenes/backgrounds/chapter_level_background.tscn") as PackedScene
 	var chapter_background := background_scene.instantiate() as TextureRect
 	root.add_child(chapter_background)
