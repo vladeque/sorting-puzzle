@@ -80,7 +80,9 @@ Files:
 - `scenes/ui/chapter_selection_screen.tscn`
 - `scenes/ui/chapter_cover_card.tscn`
 - `scenes/ui/horizontal_pager.tscn`
-- `assets/ui/main_menu_coin.png`
+- `scenes/ui/coin_balance_widget.tscn`
+- `scenes/ui/main_menu_coin_shortcut.tscn`
+- `assets/ui/clover_coin_transparent_96x96.png`
 - `assets/ui/main_menu_lives.png`
 - `assets/ui/main_menu_reward_chest.png`
 - `assets/ui/reward_chest_menu_illustration.png`
@@ -90,10 +92,16 @@ Files:
 - `assets/ui/avatar_circle_clip.gdshader`
 - `assets/ui/avatars/*.png`
 - `assets/ui/level_button_blank*.png`
+- `assets/themes/style_box_green_primary_button.tres`
+- `assets/themes/style_box_disabled_action_button.tres`
+- `assets/themes/style_box_pager_dot_inactive.tres`, `style_box_pager_dot_active.tres`
 - `scripts/press_scale_button.gd`
 - `scripts/horizontal_pager.gd`
 - `scripts/progress_ring.gd`
+- `scripts/destination_screen_layout.gd`
 - `scripts/production_main_menu.gd`
+- `scripts/main_menu_coin_shortcut.gd`
+- `scripts/coin_balance_widget.gd`
 - `scripts/chapters/*.gd`
 - `scripts/main_menu_reward_chest.gd`
 - `scripts/reward_chest_menu.gd`
@@ -104,16 +112,23 @@ Files:
 Responsibility:
 - Shows the selected chapter's next chapter-local level and a chapter summary button directly below.
 - Uses each catalog entry's `selection_preview` for both its full-screen chapter cover and the
-  production main-menu background after that chapter is selected.
+  production main-menu background after that chapter is selected, through the shared
+  `scripts/chapters/menu_background_resolver.gd` policy (also used by Shop/Leaderboard).
 - Keeps the chapter picker on a dedicated overlay z-index above all production menu actions.
-- Shows all configured chapters on a dedicated screen; locked cards expose exact previous-chapter
-  progress toward the default 25-level requirement.
-- Shows production top-row icons for the saved circular-clipped profile avatar, saved gold coins, saved lives, and a warm rounded settings button styled like the chapter selection back button.
+- Shows all configured chapters on a dedicated screen with a centered `CHAPTERS` title; locked
+  cards expose exact previous-chapter progress toward the default 25-level requirement, and every
+  overlay (back button, title, pager arrows/indicators, each card's information panel) respects
+  device safe-area insets through the shared `scripts/destination_screen_layout.gd` helper while
+  the full-bleed cover art itself stays uninset.
+- Shows production top-row icons for the saved circular-clipped profile avatar, a tappable
+  compact/regular-shared gold coin balance (`scenes/ui/coin_balance_widget.tscn` through
+  `scenes/ui/main_menu_coin_shortcut.tscn`, which also opens the Shop when pressed), saved lives,
+  and a warm rounded settings button styled like the chapter selection back button.
 - Shows a separate side reward chest widget under the profile icon with saved stars versus the active configured goal; tapping it opens `scenes/ui/reward_chest_menu.tscn`, a read-only centered modal showing the same progress at a larger size, the dedicated `assets/ui/reward_chest_menu_illustration.png` artwork, and the coin payout waiting at the next goal.
 - Opens `scenes/ui/profile_menu.tscn` from the profile widget, shows an editable player-name field above all 18 avatars in a centered pause-style window with a 3-column grid, and saves the name plus selected avatar through `PlayerProgress`.
 - Opens `scenes/ui/settings_menu.tscn` from the settings widget, with pause-menu-style music, sound-effects, and vibration toggle visuals plus no-op `Support` and `Language` buttons.
 - Disables campaign launch when saved lives are zero; the lives widget shows current lives and the `MM:SS` countdown until the next hourly restore.
-- Uses `scenes/ui/level_button.tscn` and `assets/ui/level_button_blank_new.png` for the reusable glossy green level button visuals while keeping the label dynamic; red, light-blue, and yellow-orange variants are available beside the source texture for alternate states or future UI variants.
+- Uses `scenes/ui/level_button.tscn` and `assets/ui/level_button_blank_new.png` for the reusable glossy green level button visuals while keeping the label dynamic (also the shared `assets/themes/style_box_green_primary_button.tres` "regular" tier used by Shop purchase buttons and the Chapter cover CTA); red, light-blue, and yellow-orange variants remain available beside the source texture for alternate states or future UI variants -- yellow-orange is the intentional Main Menu Chapter-button and in-level `Watch ad` secondary/alternative-action role (see `docs/SCENES.md` "Shared UI Style Tokens"), while light-blue is currently unused by any scene.
 - Uses `scripts/press_scale_button.gd` as the default held-press behavior for visible game UI buttons so they shrink slightly while a click or touch is held.
 - Keeps free level selection out of the production menu.
 - Preserves the old testing menu in `scenes/main_menu_testing.tscn`.
@@ -294,6 +309,38 @@ Change here when:
 - Adding a new authenticated backend read, changing read retry/refresh policy, or building the
   catalog (`GAME-008`) or leaderboard (`GAME-009`) providers that consume this transport.
 
+### Shared Destination-Screen UI
+
+Files:
+- `scenes/ui/destination_screen_shell.tscn`
+- `scenes/ui/destination_status_panel.tscn`
+- `scripts/destination_screen_shell.gd`
+- `scripts/destination_status_panel.gd`
+- `scripts/destination_screen_layout.gd`
+- `scripts/chapters/menu_background_resolver.gd`
+- `assets/themes/style_box_status_panel.tres`
+- `assets/themes/style_box_orange_utility_normal.tres`, `style_box_orange_utility_pressed.tres`
+
+Responsibility:
+- Owns the visual structure Shop and Leaderboard share: a fullscreen selected-chapter background
+  with a secondary-screen shade (`%DestinationShell`), safe-area-aware content margins capped to a
+  720px maximum logical width with 48/40 regular/compact title sizing and bottom-navigation
+  placement (`scripts/destination_screen_layout.gd`), and a bordered loading/empty/error/Retry
+  presentation (`%StatusPanel`).
+- `%ContentMargin`, `%TitleLabel`, and `%BottomNavigation` stay directly authored in each owning
+  screen's own scene rather than inside the shell, because Godot's `%unique_name` lookup cannot
+  cross into a child instanced scene and the headless verifiers (`scripts/tools/verify_shop.gd`/
+  `verify_leaderboard.gd`) reach those nodes directly.
+- Does not own catalog, purchase, leaderboard, ranking, or progression logic; that stays in
+  `shop_screen.gd`/`leaderboard_screen.gd`.
+- Chapter Selection reuses only `DestinationScreenLayout.get_safe_area_margins()`/
+  `get_title_font_size()` -- its full-bleed per-chapter layout is not a fixed-content-rect screen,
+  so it does not use the shell or status panel.
+
+Change here when:
+- Changing the shared background policy, secondary-screen shade, content-rect/title-size/
+  bottom-navigation math, or loading/empty/error presentation used by Shop and Leaderboard.
+
 ### Leaderboards
 
 Files:
@@ -324,6 +371,9 @@ Responsibility:
 - Uses a provider selected by `application/config/leaderboard_provider` (`mock` default, or `backend`) while preserving a provider boundary for later backend integration.
 - Uses Monday 00:00 UTC through the following Monday as the mock weekly scoring period; Country and World use lifetime stars.
 - GAME-009: `backend` sources Weekly/Country/World pages from the authenticated backend development leaderboard (`GET /v1/leaderboards/{scope}`, via the shared `BackendTransport`/`BackendReadOperations` from GAME-007) through `scripts/leaderboards/backend_leaderboard_provider.gd`, passing entries/rank/score/tie order through unchanged and never inferring country locally for the no-country response. `scripts/leaderboards/backend_leaderboard_cache.gd` persists the last successful page per scope to `user://leaderboard_backend_cache.json` so an unavailable, unauthorized, expired-cursor, or malformed later read falls back to an offline cached view instead of failing outright.
+- Uses the "Shared Destination-Screen UI" system above for its background, content-rect/title
+  sizing, bottom-navigation placement, and loading/empty/error presentation; the title now reads
+  the same 48/40 regular/compact size as Shop instead of its own previous 44/36.
 
 Change here when:
 - Replacing mock data, adding backend requests or pagination, changing leaderboard scopes, or changing ranking-row presentation.
@@ -355,6 +405,9 @@ Responsibility:
   processed transaction ids so callbacks are idempotent, and persists offer ids so local/mock
   lifetime offers disappear after their first account purchase.
 - GAME-008: `application/config/shop_catalog_source` independently selects where the *offer list* comes from. `local` (default) reads `configs/shop_catalog.json` unchanged. `backend` sources eligibility, rewards, and product IDs from the authenticated backend development catalog (`GET /v1/catalog`, via the shared `BackendTransport`/`BackendReadOperations` from GAME-007) through `scripts/store/backend_catalog_source.gd`, joins each eligible offer to `configs/backend/shop_catalog_prices.json` by `platform_product_id` for its display title and mock regional price, and still prices/purchases through the local `mock` provider. `scripts/store/backend_catalog_cache.gd` persists the last successful backend catalog to `user://shop_catalog_backend_cache.json` so an unavailable, unauthorized, or malformed later read falls back to an offline cached view instead of failing outright.
+- Uses the "Shared Destination-Screen UI" system above for its background, content-rect/title
+  sizing, bottom-navigation placement, and loading/error presentation; bundle/coin-offer purchase
+  buttons and the Chapter cover CTA share one "regular" (58px) green-button style and height.
 
 Change here when:
 - Adding offers, changing bundle presentation, integrating a real platform store, or moving purchase grants to a verified backend.
@@ -612,6 +665,23 @@ Change fonts or text hierarchy:
 - Apply an existing theme type variation in the owning scene instead of attaching font files directly.
 - Keep uppercase title rules and the `×` multiplier convention synchronized with dynamic strings in the owning scripts.
 - Follow `docs/TYPOGRAPHY.md` and recheck the representative mobile and tablet resolutions.
+
+Change shared button/panel/scrollbar styling:
+- Edit the relevant `assets/themes/style_box_*.tres` resource (see `docs/SCENES.md` "Shared UI
+  Style Tokens") rather than a scene-local `StyleBoxFlat`/`StyleBoxTexture` copy, so every consuming
+  scene updates together.
+- Edit `assets/themes/game_typography.tres`'s `VScrollBar`/`HScrollBar` entries for scrollbar
+  changes; it is the project's global `theme/custom`, so this affects every `ScrollContainer`.
+- Keep the 16/20/24 px corner-radius roles (buttons/rows/large panels) and the green-positive
+  vs. orange-utility vs. neutral-disabled action-color roles consistent with `docs/SCENES.md`.
+
+Change the shared destination-screen shell, status panel, or layout math:
+- Update `scripts/destination_screen_shell.gd`/`scripts/destination_status_panel.gd` for the
+  shared background/shade or loading/empty/error presentation, or
+  `scripts/destination_screen_layout.gd` for safe-area/content-rect/title-size/bottom-navigation
+  math. See "Shared Destination-Screen UI" above.
+- `%ContentMargin`, `%TitleLabel`, and `%BottomNavigation` must stay directly authored in each
+  owning screen's own scene, not relocated into the shell -- see that section for why.
 
 ## Related Docs
 

@@ -23,6 +23,8 @@ Purpose:
 - Opens the chapter selection screen and refreshes the level/chapter actions and fullscreen
   background after selection.
 - Opens the dedicated leaderboard scene from the bottom navigation trophy signal.
+- Opens the dedicated Shop scene when the top-status coin balance shortcut is pressed (in addition
+  to the bottom navigation cart).
 - Consumes `PlayerProgress.consume_pending_leaderboard_reward()` and shows `%LeaderboardRewardDialog` when a weekly leaderboard rollover granted a coin reward since the last launch.
 
 Key constants:
@@ -30,6 +32,8 @@ Key constants:
 - `PROFILE_MENU_SCENE`: preloads `res://scenes/ui/profile_menu.tscn`.
 - `SETTINGS_MENU_SCENE`: preloads `res://scenes/ui/settings_menu.tscn`.
 - `REWARD_CHEST_MENU_SCENE`: preloads `res://scenes/ui/reward_chest_menu.tscn`.
+- `MenuBackgroundResolverScript`: preloads `res://scripts/chapters/menu_background_resolver.gd`,
+  the same chapter-background policy Shop/Leaderboard use through their shared destination shell.
 - `PRODUCTION_MENU_SCENE`: return path assigned to campaign level instances.
 - `LEADERBOARD_SCENE`: destination path for the trophy tab.
 - `LIFE_STATUS_REFRESH_SECONDS`: cadence for refreshing the lives countdown while the menu is visible.
@@ -47,27 +51,30 @@ Important nodes:
 - `%RewardCoinFlyer`: dedicated fullscreen completed-level coin effect.
 - `MainMenuTopStatus/ProfileWidget`: opens the profile menu.
 - `MainMenuTopStatus/ProfileWidget/AvatarTexture`: displays the saved avatar texture.
-- `MainMenuTopStatus/CoinsWidget/CoinAmount`: shows the saved gold coin balance.
+- `MainMenuTopStatus/CoinsWidget`: `scenes/ui/main_menu_coin_shortcut.tscn` instance; shows the
+  saved gold coin balance and opens the Shop when pressed.
 - `MainMenuTopStatus/SettingsWidget/SettingsButton`: opens the main-menu settings popup.
 - `MainMenuTopStatus/LivesWidget/LifeCount`: shows current campaign lives.
 - `MainMenuTopStatus/LivesWidget/LifeStatus`: shows `Full` or the `MM:SS` countdown until the next restored life.
 - `%BottomBar`: bottom-anchored container positioned at runtime with safe-area padding.
 - `%LevelButton`: `scenes/ui/level_button.tscn` instance that starts the saved campaign level.
-- `%ChapterButton`: compact light-blue selected-chapter button that opens
-  `chapter_selection_screen.tscn`.
+- `%ChapterButton`: compact yellow-orange selected-chapter button that opens
+  `chapter_selection_screen.tscn`; see `docs/SCENES.md` "Shared UI Style Tokens" for why
+  yellow-orange is the intentional secondary/alternative-action role here.
 - `%BottomNavigation`: full-width `scenes/ui/main_menu_bottom_navigation.tscn` instance aligned to the viewport bottom and extended through the device safe area.
 
 Key methods:
-- `_ready()`: loads progress, wires level and bottom-navigation buttons, refreshes the saved coin label, selects Home, and applies responsive layout.
+- `_ready()`: loads progress, wires level, bottom-navigation, and coin-shortcut buttons, refreshes the saved coin balance, selects Home, and applies responsive layout.
 - `_process(delta)`: refreshes the lives display and play button state once per elapsed real-time second while the menu is open.
 - `_apply_responsive_layout()`: keeps the top status row cutout-aware and the bottom button inside the viewport safe area.
 - `_layout_top_status_bar()`: places the status row at `TOP_MARGIN`, expands its center exclusion gap around camera cutouts, and falls below a cutout only when the row cannot fit around it.
 - `_layout_reward_chest()`: positions the side reward chest under the profile icon without putting it in the top status scene.
 - `_layout_bottom_navigation()`: sizes the full-width navigation bar and passes its safe-bottom inset to the scene-owned layout.
 - `_update_level_button()`: displays the saved current level, no-lives state, or complete state.
-- `_update_chapter_background(chapter_id)`: loads the chapter's `selection_preview` into the
-  fullscreen `%Background`, preserving the scene fallback when the configured texture is invalid.
-- `_update_coin_status()`: writes the saved gold coin balance into the top status label.
+- `_update_chapter_background(chapter_id)`: thin wrapper around
+  `MenuBackgroundResolverScript.apply_background()`, the same policy Shop/Leaderboard use through
+  their shared destination shell.
+- `_update_coin_balance()`: forwards the saved gold coin balance to the coin shortcut's `set_amount()`.
 - `_update_lives_status()`: writes current lives and the next-life `MM:SS` countdown into the top status labels.
 - `_update_reward_chest_status()`: writes `PlayerProgress` reward chest progress into the side widget.
 - `_play_pending_reward_animation()`: flies earned clover coins from the house to the chest after scene entry.
@@ -93,12 +100,27 @@ Purpose:
   lookup; it is registered as the `ChapterCatalog` autoload before `PlayerProgress`.
 - `chapter_selection_screen.gd` builds one `chapter_cover_card.gd` page per chapter into a shared
   `scripts/horizontal_pager.gd` pager, opens on the currently selected chapter, and persists a new
-  pick through `PlayerProgress`.
+  pick through `PlayerProgress`. `_apply_responsive_layout()`/`_apply_safe_margins(margins)` reuse
+  `DestinationScreenLayout.get_safe_area_margins()`/`get_title_font_size()` to keep `%HeaderMargins`,
+  the centered `%ChaptersTitleLabel`, and every page's pager/card overlays inside the device safe
+  area; `_apply_safe_margins()` is split out so tests can exercise a fabricated inset directly,
+  since the real safe-area lookup is always zero on desktop/headless.
 - `main_menu_chapter_button.gd` labels the compact main-menu chapter button and exposes the full
   chapter title in its tooltip. `chapter_cover_card.gd` owns full-screen art plus a bottom
   information panel with completion counts, selected state, exact lock progress, a labeled linear
-  progress bar, contextual status, and CTA.
+  progress bar, contextual status (`Play`/`Continue`/`Locked`/`Coming Soon`, title case per
+  `docs/TYPOGRAPHY.md`), and CTA. Its `%CtaButton` reuses the shared green primary-action style
+  when actionable and a shared neutral disabled style for `Locked`/`Coming Soon` (see
+  `docs/SCENES.md` "Shared UI Style Tokens"). `set_safe_margins(margins)` insets `%InfoMargins`
+  without touching the full-bleed `%Art`.
 - `chapter_level_background.gd` loads the selected level's configured chapter artwork.
+- `menu_background_resolver.gd` (`class_name MenuBackgroundResolver`) is the shared "selected
+  chapter -> menu background texture" policy: `apply_background(background, chapter_id)`, silently
+  keeping the caller's current texture when the chapter has no valid configured
+  `selection_preview`. Used by Main Menu directly and by Shop/Leaderboard through
+  `scenes/ui/destination_screen_shell.tscn`, so the three screens can never drift out of sync
+  again. Consumers `preload` it and call it by the preloaded constant, matching the convention in
+  `scripts/backend/backend_read_operations.gd`, rather than relying on the bare global class name.
 
 Depends on:
 - `level.tscn`
@@ -107,6 +129,7 @@ Depends on:
 - `scripts/level.gd` export `launched_from_dev_mode`
 - `scripts/level.gd` export `return_menu_scene_path`
 - `scripts/horizontal_pager.gd`
+- `scripts/destination_screen_layout.gd`
 - `PlayerProgress` autoload
 
 Do not use for:
@@ -131,6 +154,8 @@ Purpose:
   a press becomes a drag, `accept_event()` on every handled branch) adapted to `Control._gui_input`.
 - First/last-page dragging is limited to a small overscroll allowance so edge swipes remain tactile
   without exposing an unbounded empty track.
+- `%Dots` are `Panel`s styled from `style_box_pager_dot_inactive/active.tres` (a circle at rest, a
+  rounded capsule for the active page) instead of a literally-square `ColorRect`.
 
 Exports:
 - `peek_width`: how much of the neighboring page is visible at the pager's edges.
@@ -142,6 +167,9 @@ API:
 - `add_page(page: Control)`: appends a page.
 - `go_to_page(index: int, animate: bool = true)`: jumps to a page, optionally animated.
 - `get_current_page()`: returns the active zero-based page index.
+- `set_safe_margins(margins: Vector4)`: insets `%PrevArrow`/`%NextArrow`/`%Dots` from their
+  authored offsets, leaving `%Clip`/`%Track`/pages untouched. Defaults to `Vector4.ZERO` (no-op),
+  so this stays a no-behavior-change opt-in for every other consumer of this generic pager.
 - `page_changed(index: int)` signal.
 
 Use when:
@@ -202,6 +230,53 @@ Purpose:
 Do not use for:
 - Loading destination scenes or owning menu progression.
 
+## `scripts/destination_screen_layout.gd`
+
+Class:
+- `DestinationScreenLayout` (`RefCounted`, all `static func`, no instance needed)
+
+Purpose:
+- Shared responsive-layout math for Shop/Leaderboard-style destination screens: safe-area-aware
+  content margins capped to a 720px maximum logical width, compact/regular title sizing (40/48
+  below/at-or-above 1100 logical viewport height), and bottom-navigation placement. Replaces what
+  used to be two near-identical ~60-line copies in `shop_screen.gd` and `leaderboard_screen.gd`.
+- `get_safe_area_margins()` is also reused by `chapter_selection_screen.gd` on its own (Chapter
+  Selection's full-bleed layout is not a fixed-content-rect screen, so the rest of this helper does
+  not apply there).
+- Consumers `preload` this script and call its static funcs by the preloaded constant, matching the
+  convention in `scripts/backend/backend_read_operations.gd` and `scripts/save/local_save_codec.gd`,
+  rather than relying on the bare global class name.
+
+API:
+- `get_safe_area_margins(viewport_size)`: `Vector4` (left/top/right/bottom), zero outside
+  Android/iOS.
+- `get_bottom_reserved(safe_margins)`, `apply_content_rect(content_margin, viewport_size,
+  safe_margins, bottom_reserved)`: positions a full-rect `MarginContainer` inside the safe area.
+- `is_compact_viewport(viewport_size)`, `get_title_font_size(viewport_size)`.
+- `layout_bottom_navigation(nav, safe_margins)`: positions a `main_menu_bottom_navigation.tscn`
+  instance and forwards its safe-bottom margin.
+
+## `scripts/destination_screen_shell.gd`
+
+Attached to:
+- `scenes/ui/destination_screen_shell.tscn` root `DestinationScreenShell`.
+
+Purpose:
+- Owns the shared fullscreen background + secondary-screen shade for Shop/Leaderboard's
+  `%DestinationShell` instance. `set_background_for_chapter(chapter_id)` delegates to
+  `menu_background_resolver.gd`.
+
+## `scripts/destination_status_panel.gd`
+
+Attached to:
+- `scenes/ui/destination_status_panel.tscn` root `DestinationStatusPanel`.
+
+Purpose:
+- Shared loading/empty/error/Retry presentation for Shop/Leaderboard's `%StatusPanel` instance.
+  `show_loading(message)`/`show_empty(message)` hide Retry (an in-progress load or a legitimately
+  empty result is not a failure); `show_error(message)` shows it; `hide_status()` hides the panel.
+  Emits `retry_pressed`; the owning screen decides what retrying actually does.
+
 ## `scripts/leaderboard_screen.gd`
 
 Attached to:
@@ -212,28 +287,44 @@ Purpose:
 - Builds ranking rows from provider dictionaries and pins the local player via `%PinnedPlayerRow`
   when absent from the returned entries or ranked beyond `PINNED_ROW_RANK_THRESHOLD` (10) -- being
   technically present on a 50-row page doesn't mean the player is visible without scrolling.
-- Updates the weekly reset countdown and loading, empty, and retry states.
+- Updates the weekly reset countdown and loading, empty, and retry states through `%StatusPanel`,
+  hiding `%ListBackground` while the status panel is showing so error/loading never nests two
+  bordered panels.
 - Reports the player's Weekly rank to `PlayerProgress.record_weekly_leaderboard_rank()` after every
   successful Weekly fetch. For Weekly ranks 1-3 it binds the configured reward amount and the
   requested rank-specific Shop coin-pile art to each row; Country/World remain reward-free because
   those all-time boards have no reset/payout moment.
-- Applies responsive content width, compact row sizing, bottom-navigation placement, and mobile safe-area margins.
+- Applies responsive content width, compact row sizing, bottom-navigation placement, and mobile
+  safe-area margins through `scripts/destination_screen_layout.gd` (shared with Shop); the title
+  now uses the same 48/40 regular/compact size as Shop instead of its previous local 44/36.
+- Follows the selected chapter's background through `%DestinationShell` in `_ready()` instead of a
+  fixed Chapter 1 image.
 - Routes the shared Home tab back to `scenes/main_menu.tscn`.
 - Routes the shared Shop tab to `scenes/ui/shop_screen.tscn`.
 
 Depends on:
 - `scripts/leaderboards/leaderboard_service.gd`.
-- `scenes/ui/leaderboard_row.tscn`.
-- `PlayerProgress` leaderboard and profile getters.
+- `scripts/destination_screen_layout.gd`.
+- `scenes/ui/leaderboard_row.tscn`, `scenes/ui/destination_screen_shell.tscn`,
+  `scenes/ui/destination_status_panel.tscn`.
+- `PlayerProgress` leaderboard, profile, and selected-chapter getters.
 
 ## `scripts/shop_screen.gd`
 
 - Owns Shop loading/error states, creates reusable offer scenes, coordinates one purchase at a time, and routes the shared navigation.
 - Passes purchase results and their offer ids to `PlayerProgress.apply_shop_purchase()`, refreshes
   the visible balance after a grant, and reloads the catalog so a claimed one-time offer disappears.
-- Applies maximum content width, compact offer sizing, fixed bottom navigation, and mobile safe-area margins.
+- Applies maximum content width, compact offer sizing, fixed bottom navigation, and mobile
+  safe-area margins through `scripts/destination_screen_layout.gd` (shared with Leaderboard); loading/error states go through `%StatusPanel`.
+- Follows the selected chapter's background through `%DestinationShell` in `_ready()` instead of a
+  fixed Chapter 1 image.
 - Owns the `ABILITY_INFO` display copy (name + one-line description) for Hammer/Shuffle/Lantern/
   Freezer and shows it through `%PurchaseDialog` when a bundle card's `info_requested` signal fires.
+
+Depends on:
+- `scripts/destination_screen_layout.gd`.
+- `scenes/ui/destination_screen_shell.tscn`, `scenes/ui/destination_status_panel.tscn`.
+- `PlayerProgress` for the selected chapter id.
 
 ## Shop component scripts
 
@@ -242,15 +333,32 @@ Depends on:
   discount starburst badge/compare-at price from
   `offer.discount_percent`/`offer.store.compare_at_formatted_price` and widens `%TitleSpacer` while
   the badge is visible so it never overlaps the title, and emits `info_requested(ability_id)` when a
-  reward cell's transparent info button is tapped.
+  reward cell's transparent info button is tapped. Its purchase button uses the shared
+  `style_box_green_primary_button.tres` at the "regular" 58px height, matching the Chapter CTA.
 - `scripts/shop_coin_offer_row.gd`: binds a coin quantity, its amount-scaled seven-tier clover-coin
   pile texture, formatted price, and purchase signal. The texture ladder uses 100, 300, 750, 1,600,
   3,500, and 13,000 as upper bounds before the largest overflowing-pouch fallback. Also binds an
-  optional `tag` banner (for example "BEST VALUE").
-- `scripts/coin_balance_widget.gd`: formats and displays a non-negative coin balance.
+  optional `tag` banner (for example "BEST VALUE"). Purchase button height matches the shared
+  "regular" 58px tier (previously a locally-different 64px).
+- `scripts/coin_balance_widget.gd` (`class_name CoinBalanceWidget`): formats and displays a
+  non-negative coin balance. `set_compact(bool)` selects between the Shop header's regular size
+  (158x68) and the Main Menu coin shortcut's compact size (142x60); both variants reuse the exact
+  same `%Pill` stylebox, `%CoinIcon` texture, and `GameNumberLabel` styling, so only geometry
+  differs between the two screens.
 - `scripts/shop_purchase_dialog.gd`: shows and dismisses a focused result modal; `show_result()`
   takes an optional `button_text` (defaults to "Continue") so the same dialog reads correctly for
-  both purchase results and ability info lookups ("Got it").
+  both purchase results and ability info lookups ("Got it"). `%CloseButton` uses the shared orange
+  utility style.
+
+## `scripts/main_menu_coin_shortcut.gd`
+
+Attached to:
+- `scenes/ui/main_menu_coin_shortcut.tscn` root `MainMenuCoinShortcut` (extends `PressScaleButton`).
+
+Purpose:
+- Wraps a compact `coin_balance_widget.tscn` instance with the Main Menu's "+" badge inside a real
+  tap target. `set_amount(amount)` forwards to the wrapped widget;
+  `scripts/production_main_menu.gd` connects the native `pressed` signal to open the Shop.
 
 ## Store scripts
 
@@ -290,6 +398,10 @@ Examples:
   tapped; coin and bundle purchases including the 2,500-coin New Player Bundle; lifetime
   one-time visibility across a reload; three Freezers per bundle; and duplicate transaction
   protection.
+- Also verifies the shared `%DestinationShell`'s background actually changes when the selected
+  chapter id changes (proving Shop no longer silently stays on the Chapter 1 image), and that
+  `%StatusPanel`'s Retry button resolves to the same `style_box_orange_utility_normal.tres`
+  resource instance as the shared token, not just a visually similar local copy.
 
 Run:
 
@@ -335,6 +447,11 @@ Purpose:
 - Verifies that the old reward summary label is gone, Weekly ranks 1-3 show 500/300/300 with tier
   04/03/02 artwork respectively, rank 4 has no preview, Country rows hide Weekly rewards, and the
   leaderboard remains within bounds at five representative portrait resolutions.
+- Also verifies the shared `%DestinationShell`'s background follows a chapter-id change,
+  `%StatusPanel`'s Retry button resolves to the shared orange utility style resource, the title
+  reads the shared regular size (48) at all five required resolutions, and -- directly against
+  `DestinationScreenLayout.get_title_font_size()`, since no required resolution produces a
+  sub-1100 logical height under this project's `keep_width` stretch mode -- the compact size (40).
 
 Run:
 

@@ -8,6 +8,42 @@ such as `GameTitleLabel`, `GameNumberLabel`, and `GameBodyLabel`; see
 `docs/TYPOGRAPHY.md`. Scene-owned color, size, outline, and shadow overrides
 remain responsible for contrast against each component's art.
 
+## Shared UI Style Tokens
+
+`assets/themes/` also holds standalone style resources shared by Main Menu, Shop, Leaderboard,
+and Chapter Selection instead of near-duplicate scene-local `StyleBoxFlat`/`StyleBoxTexture`
+copies:
+
+- `style_box_green_primary_button.tres`: glossy textured positive-action style
+  (`assets/ui/level_button_blank_new.png`) for the **regular** (58 px tall) button tier. Used by
+  Shop's bundle/coin-offer purchase buttons and the Chapter cover card's `%CtaButton`. The
+  **hero** tier is `scenes/ui/level_button.tscn` itself (153 px tall; Main Menu Play and Level
+  Completion `Next`), which keeps its own outlined font treatment for legibility over
+  photographic backgrounds.
+- `style_box_disabled_action_button.tres`: neutral gray "unavailable" style for a disabled action
+  that is not retryable, such as a Chapter cover card's `Locked`/`Coming Soon` state. Deliberately
+  not green: a shiny positive-looking button that is actually inert is a worse affordance than a
+  neutral one.
+- `style_box_orange_utility_normal.tres` / `style_box_orange_utility_pressed.tres`: shared orange
+  for retry/dismiss/secondary actions -- the Shop/Leaderboard status Retry button
+  (`scenes/ui/destination_status_panel.tscn`) and the Shop purchase-result dialog's Close button.
+  The Main Menu Chapter button (`scenes/ui/main_menu_chapter_button.tscn`) fills a related but
+  visually distinct **glossy textured** secondary/alternative-CTA role
+  (`assets/ui/level_button_blank_yellow_orange_new.png`) -- the same role and art the in-level
+  `Watch ad` button already uses (`scenes/ability_purchase_menu.tscn`'s `WatchAdButton`), so this
+  is a documented shared role, not a fresh exception.
+- `style_box_status_panel.tres`: shared burgundy/gold bordered panel for the loading/empty/error
+  presentation in `scenes/ui/destination_status_panel.tscn`.
+- `style_box_pager_dot_inactive.tres` / `style_box_pager_dot_active.tres`: circular inactive dot /
+  rounded active capsule for `scenes/ui/horizontal_pager.tscn`'s `%Dots`.
+
+Corner-radius roles: 16 px for buttons, 20 px for rows/cells, 24 px for large panels.
+
+`assets/themes/game_typography.tres` (the project's global `theme/custom`) also defines
+`VScrollBar`/`HScrollBar` styles -- a slim rounded semi-transparent grabber over a near-invisible
+track -- so `ScrollContainer`s such as `%ShopScroll` and `%LeaderboardScroll` never show the
+engine-default gray scrollbar.
+
 ## `scenes/main_menu.tscn`
 
 Root:
@@ -27,7 +63,7 @@ Purpose:
 - After a completed level returns here, launches one clover coin per earned star from the background house into the reward chest and advances the visible chest count on impact.
 - Provides a bottom `%LevelButton` labeled with the selected chapter's next local level, such as
   `Level 1`, or disabled as `No Lives`, `Chapter Complete`, or `Coming Soon`.
-- Places a small light-blue `%ChapterButton` directly against the level button and opens the
+- Places a small yellow-orange `%ChapterButton` directly against the level button and opens the
   dedicated chapter selection screen.
 - Opens the player profile menu when the profile widget is pressed.
 - Opens the main settings menu when the settings widget is pressed.
@@ -50,8 +86,9 @@ Important nodes:
   painted edges sit together without a visible gap.
 - `BottomBar/ActionColumn/LevelButton`: launches the selected chapter's first incomplete level.
 - `BottomBar/ActionColumn/ChapterButton`: selected-chapter button using
-  `assets/ui/level_button_blank_light_blue_new.png` through
-  `scenes/ui/main_menu_chapter_button.tscn`.
+  `assets/ui/level_button_blank_yellow_orange_new.png` through
+  `scenes/ui/main_menu_chapter_button.tscn`; see "Shared UI Style Tokens" above for why
+  yellow-orange is the intentional secondary/alternative-action role here, not drift.
 - `LeaderboardRewardDialog`: `scenes/ui/leaderboard_reward_dialog.tscn` instance, hidden until a
   weekly reward is pending.
 - Runtime child `scenes/ui/profile_menu.tscn`: centered pause-style profile editor window created when `ProfileWidget` is pressed.
@@ -102,17 +139,25 @@ Purpose:
 - Emits `chapter_selected(chapter_id)` and persists the pick through `PlayerProgress.select_chapter()`
   when a cover's CTA button is pressed.
 - Closes on the back button, `ui_cancel`, or a successful selection, emitting `closed`.
+- Reuses `DestinationScreenLayout.get_safe_area_margins()`/`get_title_font_size()` (the same helper
+  Shop and Leaderboard use) so the header/title/pager overlays respect device safe-area insets and
+  the 48/40 regular/compact title size, while the full-bleed chapter art itself is never inset.
 
 Important nodes:
 - `%BackButton`: safe-margin overlay above the full-screen covers.
+- `%ChaptersTitleLabel`: centered `CHAPTERS` title between the back button and a same-width
+  trailing spacer, so it stays centered on the viewport over the full-bleed art.
+- `%HeaderMargins`: repositioned by `_apply_safe_margins()` on top of its authored padding.
 - `%Pager`: the `scenes/ui/horizontal_pager.tscn` instance holding one `chapter_cover_card` per
-  chapter; this screen sets `peek_width` to zero so every background fills the viewport.
+  chapter; this screen sets `peek_width` to zero so every background fills the viewport, and calls
+  `set_safe_margins()` on it and on every card.
 
 Depends on:
 - `ChapterCatalog` autoload for chapter order and metadata.
 - `PlayerProgress` autoload for selection state and per-chapter progress (`get_chapter_progress()`,
   `get_selected_chapter_id()`, `select_chapter()`).
 - `scenes/ui/chapter_cover_card.tscn`, `scenes/ui/horizontal_pager.tscn`.
+- `scripts/destination_screen_layout.gd` for safe-area margins and title sizing.
 
 ## `scenes/ui/horizontal_pager.tscn`
 
@@ -135,12 +180,17 @@ Important nodes:
 - `%Track`: absolutely positions each added page edge to edge; its `position.x` is tweened to snap
   between pages.
 - `%PrevArrow`, `%NextArrow`: `press_scale_button.gd` buttons, hidden at the first/last page.
-- `%Dots`: paging indicator with one dot per page.
+- `%Dots`: paging indicator with one circular inactive dot per page and a rounded capsule for the
+  active page, styled from `style_box_pager_dot_inactive/active.tres` (see "Shared UI Style
+  Tokens").
 
 Public API:
 - `add_page(control: Control)`: appends a page.
 - `go_to_page(index: int, animate: bool = true)`: jumps to a page, optionally animated.
 - `get_current_page()`: returns the active zero-based page index.
+- `set_safe_margins(margins: Vector4)`: insets `%PrevArrow`/`%NextArrow`/`%Dots` only, leaving
+  `%Clip`/`%Track`/pages full-bleed. Defaults to zero (no-op) so other consumers of this generic
+  pager are unaffected unless they opt in.
 - `page_changed(index: int)` signal.
 
 Depends on:
@@ -159,18 +209,79 @@ Purpose:
   information panel containing chapter number, title, labeled progress bar, availability status,
   and a single CTA button.
 - `configure(chapter, progress, is_selected)` mirrors the three states the retired `chapter_card.gd`
-  used: locked, unlocked-with-no-levels-yet ("coming soon"), and unlocked-with-levels.
+  used: locked, unlocked-with-no-levels-yet ("coming soon"), and unlocked-with-levels. CTA text is
+  `Play`, `Continue`, `Locked`, or `Coming Soon` (title case, per `docs/TYPOGRAPHY.md`).
 - Emits `selected(chapter_id)` when its CTA is pressed; the CTA stays disabled while locked.
 - Uses pass-through mouse filtering in its non-interactive hierarchy so swipes begun over the art
   or information panel reach the pager while the CTA remains independently clickable.
+- `%CtaButton` reuses the shared `style_box_green_primary_button.tres` when actionable and
+  `style_box_disabled_action_button.tres` while `Locked`/`Coming Soon` (see "Shared UI Style
+  Tokens"), matching Main Menu Play and Shop Purchase instead of its previous local flat-orange
+  style.
+- `set_safe_margins(margins: Vector4)` insets `%InfoMargins`' left/right/bottom by a device
+  safe-area margin on top of its authored padding; `%Art`/`%Atmosphere` are never inset, so cover
+  art stays full-bleed under notches and display cutouts.
 
 Important nodes:
-- `%Art`, `%InfoPanel`, `%LockIcon`, `%StatusLabel`, `%EyebrowLabel`, `%TitleLabel`,
+- `%Art`, `%InfoPanel`, `%InfoMargins`, `%LockIcon`, `%StatusLabel`, `%EyebrowLabel`, `%TitleLabel`,
   `%ProgressLabel`, `%ProgressValueLabel`, `%ProgressBar`, `%CtaButton`.
 
 Depends on:
 - `ChapterCatalog.get_selection_preview_path()` for the cover art.
 - `assets/ui/lock_shelf_cutout.png`, `scripts/press_scale_button.gd`.
+- `assets/themes/style_box_green_primary_button.tres`,
+  `assets/themes/style_box_disabled_action_button.tres`.
+
+## `scenes/ui/destination_screen_shell.tscn`
+
+Root:
+- `DestinationScreenShell` (`Control`)
+
+Script:
+- `scripts/destination_screen_shell.gd`
+
+Purpose:
+- Shared fullscreen background + secondary-screen shade for Shop and Leaderboard, instanced as
+  `%DestinationShell` (first child) in each. Owns only the background policy; catalog, purchase,
+  leaderboard, ranking, and progression logic all stay in the owning screen's own script.
+- `set_background_for_chapter(chapter_id)` follows the selected chapter's configured background
+  through `MenuBackgroundResolver`, the same policy Main Menu uses -- fixes Shop/Leaderboard
+  previously always showing the Chapter 1 background regardless of the player's selection.
+
+Important nodes:
+- `Background`: fullscreen `TextureRect`, default `assets/backgrounds/main_menu.jpeg`.
+- `BackgroundShade`: fullscreen `ColorRect`, the canonical secondary-screen shade
+  `Color(0.13, 0.025, 0.045, 0.66)`.
+
+Depends on:
+- `scripts/chapters/menu_background_resolver.gd`.
+
+Do not use for:
+- `%ContentMargin`, `%TitleLabel`, or `%BottomNavigation`. Those stay directly authored in each
+  owning screen's own scene (`shop_screen.tscn`/`leaderboard_screen.tscn`) because Godot's
+  `%unique_name` lookup cannot cross into a child instanced scene, and both headless verifiers
+  (`scripts/tools/verify_shop.gd`/`verify_leaderboard.gd`) reach those nodes directly.
+
+## `scenes/ui/destination_status_panel.tscn`
+
+Root:
+- `DestinationStatusPanel` (`CenterContainer`)
+
+Script:
+- `scripts/destination_status_panel.gd`
+
+Purpose:
+- Shared loading/empty/error/Retry presentation for Shop and Leaderboard, instanced as
+  `%StatusPanel`. Leaderboard's previous plain, unbordered status text now matches Shop's
+  bordered-panel treatment, and gains a genuine empty state ("No scores yet", no Retry) distinct
+  from a retryable load error.
+- Purely presentational: `show_loading(message)`, `show_empty(message)`, `show_error(message)`
+  (shows Retry), `hide_status()`; emits `retry_pressed` for the owning screen to handle.
+
+Important nodes:
+- `%StatusPanelBackground`: bordered panel using `style_box_status_panel.tres`.
+- `%StatusMessageLabel`, `%StatusRetryButton`: styled from the shared orange utility styleboxes
+  (see "Shared UI Style Tokens").
 
 ## `scenes/ui/leaderboard_screen.tscn`
 
@@ -185,23 +296,28 @@ Purpose:
 - Shows the required `Leaderboard` title and Weekly, Country, and World segmented buttons.
 - Gives the central `LeaderboardScroll` the remaining vertical space between the tabs and the reusable bottom navigation.
 - Builds up to 50 mock ranking rows in `RowsContainer` and keeps the local player visible through `PinnedPlayerRow` whenever their rank is absent or beyond the "visible without scrolling" threshold.
-- Shows a weekly reset countdown, all-time scope descriptions, loading state, empty state, and retryable error state.
-- Centers content to a 720-pixel maximum logical width, compacts rows on short viewports, and applies Android/iOS safe-area padding.
+- Shows a weekly reset countdown, all-time scope descriptions, loading state, empty state, and retryable error state through `%StatusPanel` (`scenes/ui/destination_status_panel.tscn`).
+- Centers content to a 720-pixel maximum logical width, compacts rows on short viewports, and applies Android/iOS safe-area padding through `scripts/destination_screen_layout.gd` (shared with Shop); the title now uses the same 48/40 regular/compact size as Shop instead of its previous 44/36.
+- Follows the selected chapter's background through `%DestinationShell` (`scenes/ui/destination_screen_shell.tscn`) instead of a fixed Chapter 1 image.
 
 Important nodes:
+- `%DestinationShell`: shared fullscreen background + shade.
 - `%WeeklyButton`, `%CountryButton`, `%WorldButton`: leaderboard scope controls.
 - `%PeriodLabel`: weekly countdown or all-time scope description.
+- `%ListBackground`: gold-bordered backdrop panel behind the rows; hidden while `%StatusPanel` is showing so error/loading never nests two bordered panels.
 - `%LeaderboardScroll`: vertical-only ranking list.
 - `%RowsContainer`: runtime parent for reusable row instances.
-- `%StatusContainer`, `%StatusLabel`, `%RetryButton`: loading, empty, and error presentation.
+- `%StatusPanel`: shared loading/empty/error/Retry presentation (`scenes/ui/destination_status_panel.tscn`).
 - `%PinnedPlayerRow`: highlighted local-player entry outside the scroll view.
 - `%BottomNavigation`: shared navigation instance with Leaderboard selected.
 
 Depends on:
 - `scenes/ui/leaderboard_row.tscn`.
 - `scenes/ui/main_menu_bottom_navigation.tscn`.
+- `scenes/ui/destination_screen_shell.tscn`, `scenes/ui/destination_status_panel.tscn`.
+- `scripts/destination_screen_layout.gd`.
 - `scripts/leaderboards/leaderboard_service.gd`.
-- `PlayerProgress` for the local player's name, avatar, lifetime stars, and weekly stars.
+- `PlayerProgress` for the local player's name, avatar, lifetime stars, and weekly stars, and for the selected chapter id.
 
 ## `scenes/ui/leaderboard_row.tscn`
 
@@ -269,7 +385,13 @@ Script:
 Purpose:
 - Owns the dedicated Shop destination with the `Shop` title, live coin balance, scrollable bundle and coin-offer sections, loading/error states, purchase result dialog, and shared bottom navigation.
 - Builds offer views from `StoreService.load_catalog()`, which sources offers from `configs/shop_catalog.json` by default or from the authenticated backend development catalog when `application/config/shop_catalog_source` is `backend` (GAME-008), and always attaches the mock provider's formatted regional prices.
-- Centers content to a 720-pixel maximum logical width, compacts offers below 1100 logical pixels high, and applies mobile safe-area margins.
+- Centers content to a 720-pixel maximum logical width, compacts offers below 1100 logical pixels high, and applies mobile safe-area margins through `scripts/destination_screen_layout.gd` (shared with Leaderboard).
+- Follows the selected chapter's background through `%DestinationShell` (`scenes/ui/destination_screen_shell.tscn`) instead of a fixed Chapter 1 image.
+
+Important nodes:
+- `%DestinationShell`: shared fullscreen background + shade.
+- `%StatusPanel`: shared loading/error presentation (`scenes/ui/destination_status_panel.tscn`);
+  the former "no offers for this region" case still resolves to the Retry-bearing error state.
 
 Runtime children:
 - `shop_bundle_card.tscn` for each bundle.
@@ -309,13 +431,39 @@ Runtime children:
 
 ## `scenes/ui/coin_balance_widget.tscn`
 
-- Reusable clover-coin pill used by the Shop header and updated from `PlayerProgress.get_coins()`.
+- Reusable clover-coin pill used by the Shop header (regular, 158x68) and, through
+  `scenes/ui/main_menu_coin_shortcut.tscn`, the Main Menu top status row (compact, 142x60).
+  `set_compact(bool)` selects the variant; both reuse the exact same `%Pill` stylebox, `%CoinIcon`
+  texture, and `GameNumberLabel` styling, so the two screens show the same palette/border/shape/
+  icon and only differ in size. Updated from `PlayerProgress.get_coins()` via `set_amount()`.
+
+## `scenes/ui/main_menu_coin_shortcut.tscn`
+
+Root:
+- `MainMenuCoinShortcut` (`Button`, extends `PressScaleButton`)
+
+Script:
+- `scripts/main_menu_coin_shortcut.gd`
+
+Purpose:
+- Wraps a compact `coin_balance_widget.tscn` instance with the Main Menu's green "+" badge inside
+  a real tap target (`flat = true`, art-only hit target like `MainMenuTopStatus/ProfileWidget`).
+- `production_main_menu.gd` connects the native `pressed` signal to `_open_shop()`, so tapping the
+  coin balance opens the Shop (the same destination as the bottom-navigation Shop tab).
+- Instanced as `main_menu_top_status.tscn`'s `CoinsWidget` node (name preserved so
+  `main_menu_top_status.gd`'s `$CoinsWidget` center-exclusion-width lookup is unaffected).
+
+Depends on:
+- `scenes/ui/coin_balance_widget.tscn`.
+- `scripts/press_scale_button.gd`.
 
 ## `scenes/ui/shop_purchase_dialog.tscn`
 
 - Dedicated modal overlay for mock purchase success/error results and ability info lookups (a
   titled message with a configurable close-button label).
 - Keeps dialog hierarchy and button wiring out of `shop_screen.gd`.
+- `%CloseButton` uses the shared `style_box_orange_utility_normal/pressed.tres` (see "Shared UI
+  Style Tokens").
 
 ## `scenes/shop_verification.tscn`
 
@@ -323,6 +471,9 @@ Runtime children:
   starter reward layout, offer counts, amount-based coin-pile icon selection, the starter bundle's
   discount ribbon/compare-at price, the best-value coin tag, the ability info dialog, mock grants
   (including three Freezers), purchase dialog display, and duplicate-transaction handling.
+- Also verifies the shared destination shell's background actually follows a chapter-id change
+  (not just visually similar to Chapter 1) and that the status panel's Retry button resolves to
+  the shared `style_box_orange_utility_normal.tres` resource instance.
 - Must be launched with `scripts/tools/run_isolated_godot_test.ps1`; its verifier refuses the live
   `SortingPuzzle` project identity so mock purchases cannot mutate development player data.
 
@@ -331,6 +482,11 @@ Runtime children:
 - Automated verification entry scene for Weekly top-three reward images and configured amounts,
   Country reward hiding, removal of the former tier-summary label, and required portrait viewport
   bounds.
+- Also verifies the shared destination shell's background follows a chapter-id change, the status
+  panel's Retry button resolves to the shared orange utility style resource, the title label reads
+  the shared regular size (48) at all five required resolutions, and (directly against
+  `DestinationScreenLayout.get_title_font_size()`, since no required resolution produces a
+  sub-1100 logical height under this project's `keep_width` stretch mode) the compact size (40).
 - Must be launched with `scripts/tools/run_isolated_godot_test.ps1`; its verifier refuses the live
   `SortingPuzzle` project identity because it resets progress while preparing leaderboard data.
 
@@ -473,7 +629,9 @@ Purpose:
 Important nodes:
 - `ProfileWidget`: circular avatar button.
 - `ProfileWidget/AvatarTexture`: saved player avatar texture, clipped to a circle at runtime.
-- `CoinsWidget`: generated gold coin icon, saved coin amount label, and plus badge.
+- `CoinsWidget`: `scenes/ui/main_menu_coin_shortcut.tscn` instance (compact coin balance + "+"
+  badge, tappable to open the Shop). Kept named `CoinsWidget` so `scripts/main_menu_top_status.gd`'s
+  `$CoinsWidget` center-exclusion-width lookup is unchanged.
 - `Spacer02`: non-expanding center exclusion corridor resized around camera cutouts.
 - `LivesWidget`: generated heart icon, current life count label, and `Full` or `MM:SS` countdown status label.
 - `SettingsWidget`: warm rounded settings button matching the chapter selection screen's `BackButton` styling and held-press behavior.
@@ -481,7 +639,7 @@ Important nodes:
 Depends on:
 - `assets/ui/avatars/avatar_cat.png` for the default editor/display texture. The owning menu script replaces it with the saved avatar at runtime.
 - `assets/ui/avatar_circle_clip.gdshader` as a defensive runtime clip around the alpha-cleaned avatar PNGs.
-- `assets/ui/main_menu_coin.png`.
+- `scenes/ui/main_menu_coin_shortcut.tscn`.
 - `assets/ui/main_menu_lives.png`.
 - Owning menu scene for placement and safe-area layout.
 
