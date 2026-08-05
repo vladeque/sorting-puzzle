@@ -5,6 +5,7 @@ const PROFILE_MENU_SCENE := preload("res://scenes/ui/profile_menu.tscn")
 const SETTINGS_MENU_SCENE := preload("res://scenes/ui/settings_menu.tscn")
 const REWARD_CHEST_MENU_SCENE := preload("res://scenes/ui/reward_chest_menu.tscn")
 const CHAPTER_SELECTION_SCENE := preload("res://scenes/ui/chapter_selection_screen.tscn")
+const MenuBackgroundResolverScript := preload("res://scripts/chapters/menu_background_resolver.gd")
 const AVATAR_CLIP_SHADER := preload("res://assets/ui/avatar_circle_clip.gdshader")
 const PRODUCTION_MENU_SCENE := "res://scenes/main_menu.tscn"
 const SHOP_SCENE := "res://scenes/ui/shop_screen.tscn"
@@ -450,14 +451,7 @@ func _on_chapter_selected(chapter_id: String) -> void:
 
 
 func _update_chapter_background(chapter_id: String) -> void:
-	if _background == null:
-		return
-	var background_path := ChapterCatalog.get_selection_preview_path(chapter_id)
-	if background_path.is_empty() or not ResourceLoader.exists(background_path):
-		return
-	var background_texture := load(background_path) as Texture2D
-	if background_texture != null:
-		_background.texture = background_texture
+	MenuBackgroundResolverScript.apply_background(_background, chapter_id)
 
 
 func _add_main_menu_overlay(overlay: Control) -> void:

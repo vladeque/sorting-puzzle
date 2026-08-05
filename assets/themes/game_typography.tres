@@ -63,6 +63,53 @@ variation_opentype = {
 2003265652: 500.0
 }
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_scrollbar_track"]
+bg_color = Color(1, 0.9, 0.72, 0.12)
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_scrollbar_grabber"]
+bg_color = Color(1, 0.85, 0.55, 0.55)
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_scrollbar_grabber_highlight"]
+bg_color = Color(1, 0.85, 0.55, 0.75)
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_scrollbar_grabber_pressed"]
+bg_color = Color(1, 0.72, 0.32, 0.9)
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_scrollbar_icon"]
+size = Vector2(1, 1)
+
 [resource]
 default_font = SubResource("FontVariation_dynapuff_medium")
 Button/fonts/font = SubResource("FontVariation_dynapuff_bold")
@@ -78,5 +125,27 @@ GameSmallLabel/base_type = &"Label"
 GameSmallLabel/fonts/font = SubResource("FontVariation_nunito_bold")
 GameTitleLabel/base_type = &"Label"
 GameTitleLabel/fonts/font = SubResource("FontVariation_dynapuff_title")
+HScrollBar/icons/decrement = SubResource("PlaceholderTexture2D_scrollbar_icon")
+HScrollBar/icons/decrement_highlight = SubResource("PlaceholderTexture2D_scrollbar_icon")
+HScrollBar/icons/decrement_pressed = SubResource("PlaceholderTexture2D_scrollbar_icon")
+HScrollBar/icons/increment = SubResource("PlaceholderTexture2D_scrollbar_icon")
+HScrollBar/icons/increment_highlight = SubResource("PlaceholderTexture2D_scrollbar_icon")
+HScrollBar/icons/increment_pressed = SubResource("PlaceholderTexture2D_scrollbar_icon")
+HScrollBar/styles/grabber = SubResource("StyleBoxFlat_scrollbar_grabber")
+HScrollBar/styles/grabber_highlight = SubResource("StyleBoxFlat_scrollbar_grabber_highlight")
+HScrollBar/styles/grabber_pressed = SubResource("StyleBoxFlat_scrollbar_grabber_pressed")
+HScrollBar/styles/scroll = SubResource("StyleBoxFlat_scrollbar_track")
+HScrollBar/styles/scroll_focus = SubResource("StyleBoxFlat_scrollbar_track")
 LineEdit/fonts/font = SubResource("FontVariation_nunito_semibold")
 TextEdit/fonts/font = SubResource("FontVariation_nunito_semibold")
+VScrollBar/icons/decrement = SubResource("PlaceholderTexture2D_scrollbar_icon")
+VScrollBar/icons/decrement_highlight = SubResource("PlaceholderTexture2D_scrollbar_icon")
+VScrollBar/icons/decrement_pressed = SubResource("PlaceholderTexture2D_scrollbar_icon")
+VScrollBar/icons/increment = SubResource("PlaceholderTexture2D_scrollbar_icon")
+VScrollBar/icons/increment_highlight = SubResource("PlaceholderTexture2D_scrollbar_icon")
+VScrollBar/icons/increment_pressed = SubResource("PlaceholderTexture2D_scrollbar_icon")
+VScrollBar/styles/grabber = SubResource("StyleBoxFlat_scrollbar_grabber")
+VScrollBar/styles/grabber_highlight = SubResource("StyleBoxFlat_scrollbar_grabber_highlight")
+VScrollBar/styles/grabber_pressed = SubResource("StyleBoxFlat_scrollbar_grabber_pressed")
+VScrollBar/styles/scroll = SubResource("StyleBoxFlat_scrollbar_track")
+VScrollBar/styles/scroll_focus = SubResource("StyleBoxFlat_scrollbar_track")

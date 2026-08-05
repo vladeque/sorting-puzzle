@@ -1,16 +1,11 @@
 extends Control
 
 const StoreServiceScript := preload("res://scripts/store/store_service.gd")
+const DestinationScreenLayoutScript := preload("res://scripts/destination_screen_layout.gd")
 const BUNDLE_CARD_SCENE := preload("res://scenes/ui/shop_bundle_card.tscn")
 const COIN_OFFER_ROW_SCENE := preload("res://scenes/ui/shop_coin_offer_row.tscn")
 const MAIN_MENU_SCENE := "res://scenes/main_menu.tscn"
 const LEADERBOARD_SCENE := "res://scenes/ui/leaderboard_screen.tscn"
-const CONTENT_MAX_WIDTH := 720.0
-const CONTENT_SIDE_MARGIN := 16.0
-const CONTENT_TOP_MARGIN := 18.0
-const CONTENT_BOTTOM_GAP := 12.0
-const BOTTOM_NAVIGATION_HEIGHT := 96.0
-const COMPACT_VIEWPORT_HEIGHT := 1100.0
 const ABILITY_INFO := {
 	&"hammer": {
 		"name": "Hammer",
@@ -227,56 +222,26 @@ func _apply_responsive_layout() -> void:
 	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
 		return
 
-	var safe_margins := _get_safe_area_margins(viewport_size)
-	var available_width := maxf(
-		viewport_size.x - safe_margins.x - safe_margins.z - CONTENT_SIDE_MARGIN * 2.0,
-		1.0
+	var safe_margins := DestinationScreenLayoutScript.get_safe_area_margins(viewport_size)
+	DestinationScreenLayoutScript.apply_content_rect(
+		_content_margin,
+		viewport_size,
+		safe_margins,
+		DestinationScreenLayoutScript.get_bottom_reserved(safe_margins)
 	)
-	var content_width := minf(CONTENT_MAX_WIDTH, available_width)
-	var content_left := safe_margins.x + (viewport_size.x - safe_margins.x - safe_margins.z - content_width) * 0.5
-	_content_margin.offset_left = content_left
-	_content_margin.offset_top = safe_margins.y + CONTENT_TOP_MARGIN
-	_content_margin.offset_right = -(viewport_size.x - content_left - content_width)
-	_content_margin.offset_bottom = -(BOTTOM_NAVIGATION_HEIGHT + safe_margins.w + CONTENT_BOTTOM_GAP)
-	_layout_bottom_navigation(safe_margins)
+	DestinationScreenLayoutScript.layout_bottom_navigation(_bottom_navigation, safe_margins)
 
-	var is_compact := viewport_size.y < COMPACT_VIEWPORT_HEIGHT
-	_title_label.add_theme_font_size_override("font_size", 40 if is_compact else 48)
+	_title_label.add_theme_font_size_override(
+		"font_size", DestinationScreenLayoutScript.get_title_font_size(viewport_size)
+	)
 	_apply_offer_sizes()
 
 
 func _apply_offer_sizes() -> void:
-	var is_compact := get_viewport_rect().size.y < COMPACT_VIEWPORT_HEIGHT
+	var is_compact := DestinationScreenLayoutScript.is_compact_viewport(get_viewport_rect().size)
 	for view in _offer_views:
 		if is_instance_valid(view):
 			view.call("set_compact", is_compact)
-
-
-func _layout_bottom_navigation(safe_margins: Vector4) -> void:
-	var safe_bottom := maxf(safe_margins.w, 0.0)
-	_bottom_navigation.offset_top = -(BOTTOM_NAVIGATION_HEIGHT + safe_bottom)
-	_bottom_navigation.offset_bottom = 0.0
-	if _bottom_navigation.has_method("set_safe_bottom_margin"):
-		_bottom_navigation.call("set_safe_bottom_margin", safe_bottom)
-
-
-func _get_safe_area_margins(viewport_size: Vector2) -> Vector4:
-	if OS.get_name() not in ["Android", "iOS"]:
-		return Vector4.ZERO
-
-	var window_size := Vector2(DisplayServer.window_get_size())
-	var safe_area := DisplayServer.get_display_safe_area()
-	if window_size.x <= 0.0 or window_size.y <= 0.0 or safe_area.size.x <= 0 or safe_area.size.y <= 0:
-		return Vector4.ZERO
-
-	var scale := Vector2(viewport_size.x / window_size.x, viewport_size.y / window_size.y)
-	var safe_end := safe_area.position + safe_area.size
-	return Vector4(
-		maxf(float(safe_area.position.x) * scale.x, 0.0),
-		maxf(float(safe_area.position.y) * scale.y, 0.0),
-		maxf(float(window_size.x - safe_end.x) * scale.x, 0.0),
-		maxf(float(window_size.y - safe_end.y) * scale.y, 0.0)
-	)
 
 
 func _format_count(value: int) -> String:
