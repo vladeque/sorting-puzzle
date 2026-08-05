@@ -33,7 +33,7 @@ const MAIN_MENU_OVERLAY_Z_INDEX := 100
 @onready var _top_status_bar := %TopStatusBar as MarginContainer
 @onready var _reward_chest := %RewardChest as Control
 @onready var _house_reward_origin := %HouseRewardOrigin as Control
-@onready var _reward_coin_flyer := %RewardCoinFlyer as Control
+@onready var _reward_star_flyer := %RewardStarFlyer as Control
 @onready var _bottom_bar := %BottomBar as MarginContainer
 @onready var _level_button := %LevelButton as Button
 @onready var _chapter_button := %ChapterButton as Button
@@ -342,23 +342,23 @@ func _prepare_pending_reward_animation(pending: Dictionary) -> void:
 
 func _play_pending_reward_animation(pending: Dictionary) -> void:
 	var amount := maxi(int(pending.get("amount", 0)), 0)
-	if amount <= 0 or _reward_coin_flyer == null or _house_reward_origin == null:
+	if amount <= 0 or _reward_star_flyer == null or _house_reward_origin == null:
 		_update_reward_chest_status()
 		return
 
-	if not _reward_coin_flyer.coin_arrived.is_connected(_on_reward_coin_arrived):
-		_reward_coin_flyer.coin_arrived.connect(_on_reward_coin_arrived)
-	if not _reward_coin_flyer.animation_finished.is_connected(_on_reward_coin_animation_finished):
-		_reward_coin_flyer.animation_finished.connect(_on_reward_coin_animation_finished)
+	if not _reward_star_flyer.star_arrived.is_connected(_on_reward_star_arrived):
+		_reward_star_flyer.star_arrived.connect(_on_reward_star_arrived)
+	if not _reward_star_flyer.animation_finished.is_connected(_on_reward_star_animation_finished):
+		_reward_star_flyer.animation_finished.connect(_on_reward_star_animation_finished)
 
 	var start_position := _house_reward_origin.get_global_rect().get_center()
 	var target_position := _reward_chest.get_global_rect().get_center()
-	if _reward_chest.has_method("get_coin_target_global_position"):
-		target_position = _reward_chest.call("get_coin_target_global_position") as Vector2
-	_reward_coin_flyer.call("play", amount, start_position, target_position)
+	if _reward_chest.has_method("get_reward_target_global_position"):
+		target_position = _reward_chest.call("get_reward_target_global_position") as Vector2
+	_reward_star_flyer.call("play", amount, start_position, target_position)
 
 
-func _on_reward_coin_arrived() -> void:
+func _on_reward_star_arrived() -> void:
 	_animated_reward_stars += 1
 	var goal := PlayerProgress.get_reward_chest_goal_at_index(_animated_reward_goal_index)
 	if _animated_reward_stars >= goal:
@@ -373,7 +373,7 @@ func _on_reward_coin_arrived() -> void:
 		_reward_chest.call("play_receive_pulse")
 
 
-func _on_reward_coin_animation_finished() -> void:
+func _on_reward_star_animation_finished() -> void:
 	_update_reward_chest_status()
 
 

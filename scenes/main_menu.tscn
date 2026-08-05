@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://cfpyljokiei7h" path="res://scenes/ui/level_button.tscn" id="3_level_button"]
 [ext_resource type="PackedScene" uid="uid://76jf8ug6hwj5" path="res://scenes/ui/main_menu_top_status.tscn" id="4_top_status"]
 [ext_resource type="PackedScene" uid="uid://c6xhf1gyqk2tr" path="res://scenes/ui/main_menu_reward_chest.tscn" id="5_reward_chest"]
-[ext_resource type="PackedScene" path="res://scenes/ui/main_menu_reward_coin_flyer.tscn" id="6_reward_coin_flyer"]
+[ext_resource type="PackedScene" path="res://scenes/ui/main_menu_reward_star_flyer.tscn" id="6_reward_star_flyer"]
 [ext_resource type="PackedScene" uid="uid://cuq4oceh2x5if" path="res://scenes/ui/main_menu_bottom_navigation.tscn" id="7_bottom_navigation"]
 [ext_resource type="PackedScene" path="res://scenes/ui/leaderboard_reward_dialog.tscn" id="8_leaderboard_reward_dialog"]
 [ext_resource type="PackedScene" path="res://scenes/ui/main_menu_chapter_button.tscn" id="9_chapter_button"]
@@ -98,7 +98,7 @@ anchor_right = 0.5
 anchor_bottom = 0.59
 mouse_filter = 2
 
-[node name="RewardCoinFlyer" parent="." unique_id=188070023 instance=ExtResource("6_reward_coin_flyer")]
+[node name="RewardStarFlyer" parent="." unique_id=188070023 instance=ExtResource("6_reward_star_flyer")]
 unique_name_in_owner = true
 layout_mode = 1
 offset_left = -1.0

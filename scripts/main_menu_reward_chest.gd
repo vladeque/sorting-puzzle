@@ -44,7 +44,7 @@ func set_reward_progress(current_stars: int, goal_stars: int) -> void:
 	_amount_label.text = amount_text
 
 
-func get_coin_target_global_position() -> Vector2:
+func get_reward_target_global_position() -> Vector2:
 	var chest_icon := get_node_or_null("Visual/ChestIcon") as Control
 	if chest_icon == null:
 		return get_global_rect().get_center()
