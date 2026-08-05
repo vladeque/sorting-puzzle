@@ -7,8 +7,8 @@ const SNAP_DURATION := 0.32
 const MAX_OVERSCROLL_FRACTION := 0.08
 const DOT_SIZE_OFF := 6.0
 const DOT_SIZE_ON := 18.0
-const DOT_COLOR_OFF := Color(1.0, 1.0, 1.0, 0.35)
-const DOT_COLOR_ON := Color(1.0, 0.86, 0.35, 1.0)
+const DOT_STYLE_INACTIVE := preload("res://assets/themes/style_box_pager_dot_inactive.tres")
+const DOT_STYLE_ACTIVE := preload("res://assets/themes/style_box_pager_dot_active.tres")
 ## Authored offsets for %PrevArrow, %NextArrow, and %Dots before any additional device safe-area
 ## inset is applied through set_safe_margins().
 const PREV_ARROW_BASE_OFFSET_LEFT := 2.0
@@ -29,7 +29,7 @@ const DOTS_BASE_OFFSET_BOTTOM := -10.0
 @onready var _dots: HBoxContainer = %Dots
 
 var _pages: Array[Control] = []
-var _dot_rects: Array[ColorRect] = []
+var _dot_rects: Array[Panel] = []
 var _current_index := 0
 var _page_width := 1.0
 var _pressed := false
@@ -187,9 +187,9 @@ func _update_arrows() -> void:
 
 
 func _add_dot() -> void:
-	var dot := ColorRect.new()
+	var dot := Panel.new()
 	dot.custom_minimum_size = Vector2(DOT_SIZE_OFF, DOT_SIZE_OFF)
-	dot.color = DOT_COLOR_OFF
+	dot.add_theme_stylebox_override("panel", DOT_STYLE_INACTIVE)
 	_dots.add_child(dot)
 	_dot_rects.append(dot)
 
@@ -199,4 +199,4 @@ func _update_dots() -> void:
 		var dot := _dot_rects[dot_index]
 		var is_current := dot_index == _current_index
 		dot.custom_minimum_size = Vector2(DOT_SIZE_ON if is_current else DOT_SIZE_OFF, DOT_SIZE_OFF)
-		dot.color = DOT_COLOR_ON if is_current else DOT_COLOR_OFF
+		dot.add_theme_stylebox_override("panel", DOT_STYLE_ACTIVE if is_current else DOT_STYLE_INACTIVE)

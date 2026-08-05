@@ -42,7 +42,7 @@ const MAIN_MENU_OVERLAY_Z_INDEX := 100
 @onready var _profile_button := %TopStatusBar.get_node("MainMenuTopStatus/ProfileWidget") as Button
 @onready var _settings_button := %TopStatusBar.get_node("MainMenuTopStatus/SettingsWidget/SettingsButton") as Button
 @onready var _profile_avatar_texture := %TopStatusBar.get_node("MainMenuTopStatus/ProfileWidget/AvatarTexture") as TextureRect
-@onready var _coin_amount_label := %TopStatusBar.get_node("MainMenuTopStatus/CoinsWidget/CoinAmount") as Label
+@onready var _coin_shortcut := %TopStatusBar.get_node("MainMenuTopStatus/CoinsWidget") as Button
 @onready var _life_count_label := %TopStatusBar.get_node("MainMenuTopStatus/LivesWidget/LifeCount") as Label
 @onready var _life_status_label := %TopStatusBar.get_node("MainMenuTopStatus/LivesWidget/LifeStatus") as Label
 
@@ -64,6 +64,7 @@ func _ready() -> void:
 	_chapter_button.pressed.connect(_open_chapter_selection)
 	_profile_button.pressed.connect(_open_profile_menu)
 	_settings_button.pressed.connect(_open_settings_menu)
+	_coin_shortcut.pressed.connect(_open_shop)
 	if _reward_chest.has_signal("chest_pressed"):
 		_reward_chest.connect("chest_pressed", Callable(self, "_open_reward_chest_menu"))
 	_bottom_navigation.connect("shop_pressed", Callable(self, "_open_shop"))
@@ -364,15 +365,6 @@ func _format_life_restore_time(seconds_remaining: int) -> String:
 	return "%02d:%02d" % [minutes_remaining, remaining_seconds]
 
 
-func _format_count(value: int) -> String:
-	var value_text := str(maxi(value, 0))
-	var formatted := ""
-	while value_text.length() > 3:
-		formatted = ",%s%s" % [value_text.right(3), formatted]
-		value_text = value_text.substr(0, value_text.length() - 3)
-	return value_text + formatted
-
-
 func _update_profile_avatar() -> void:
 	if _profile_avatar_texture == null:
 		return
@@ -386,15 +378,8 @@ func _update_profile_avatar() -> void:
 
 
 func _update_coin_balance() -> void:
-	if _coin_amount_label != null:
-		var amount_text := _format_count(PlayerProgress.get_coins())
-		_coin_amount_label.text = amount_text
-		var font_size := 27
-		if amount_text.length() > 5:
-			font_size = 18
-		elif amount_text.length() > 3:
-			font_size = 22
-		_coin_amount_label.add_theme_font_size_override("font_size", font_size)
+	if _coin_shortcut != null:
+		_coin_shortcut.call("set_amount", PlayerProgress.get_coins())
 
 
 func _open_profile_menu() -> void:

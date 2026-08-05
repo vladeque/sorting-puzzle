@@ -1,0 +1,62 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/coin_balance_widget.tscn" id="1_coin_widget"]
+[ext_resource type="Script" path="res://scripts/main_menu_coin_shortcut.gd" id="2_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_plus_badge"]
+bg_color = Color(0.25, 0.82, 0.24, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 0.86)
+corner_radius_top_left = 9
+corner_radius_top_right = 9
+corner_radius_bottom_right = 9
+corner_radius_bottom_left = 9
+
+[node name="MainMenuCoinShortcut" type="Button"]
+custom_minimum_size = Vector2(142, 60)
+layout_mode = 3
+anchors_preset = 0
+focus_mode = 0
+mouse_default_cursor_shape = 2
+flat = true
+script = ExtResource("2_script")
+
+[node name="CoinBalanceWidget" parent="." instance=ExtResource("1_coin_widget")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PlusBadge" type="Panel" parent="."]
+layout_mode = 1
+offset_left = 39.0
+offset_top = 39.0
+offset_right = 57.0
+offset_bottom = 57.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_plus_badge")
+
+[node name="PlusLabel" type="Label" parent="PlusBadge"]
+theme_type_variation = &"GameNumberLabel"
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.04, 0.27, 0.03, 0.72)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 14
+text = "+"
+horizontal_alignment = 1
+vertical_alignment = 1
+mouse_filter = 2

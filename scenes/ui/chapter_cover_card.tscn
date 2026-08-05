@@ -3,6 +3,8 @@
 [ext_resource type="Script" path="res://scripts/chapters/chapter_cover_card.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://assets/ui/lock_shelf_cutout.png" id="2_lock_icon"]
 [ext_resource type="Script" path="res://scripts/press_scale_button.gd" id="3_press_scale_button"]
+[ext_resource type="StyleBoxTexture" path="res://assets/themes/style_box_green_primary_button.tres" id="4_green_button"]
+[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_disabled_action_button.tres" id="5_disabled_button"]
 
 [sub_resource type="Gradient" id="Gradient_atmosphere"]
 offsets = PackedFloat32Array(0, 0.56, 0.78, 1)
@@ -41,45 +43,6 @@ corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
-
-[sub_resource type="StyleBoxFlat" id="Style_cta_normal"]
-bg_color = Color(0.93, 0.36, 0.18, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.56, 0.18, 0.08, 1)
-corner_radius_top_left = 17
-corner_radius_top_right = 17
-corner_radius_bottom_right = 17
-corner_radius_bottom_left = 17
-shadow_color = Color(0.32, 0.1, 0.04, 0.44)
-shadow_size = 4
-shadow_offset = Vector2(0, 4)
-
-[sub_resource type="StyleBoxFlat" id="Style_cta_pressed"]
-bg_color = Color(0.79, 0.27, 0.12, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.46, 0.13, 0.05, 1)
-corner_radius_top_left = 17
-corner_radius_top_right = 17
-corner_radius_bottom_right = 17
-corner_radius_bottom_left = 17
-
-[sub_resource type="StyleBoxFlat" id="Style_cta_disabled"]
-bg_color = Color(0.55, 0.47, 0.43, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.35, 0.28, 0.25, 1)
-corner_radius_top_left = 17
-corner_radius_top_right = 17
-corner_radius_bottom_right = 17
-corner_radius_bottom_left = 17
 
 [node name="ChapterCoverCard" type="Control"]
 layout_mode = 3
@@ -239,12 +202,14 @@ custom_minimum_size = Vector2(0, 58)
 layout_mode = 2
 size_flags_horizontal = 3
 focus_mode = 1
-theme_override_colors/font_color = Color(1, 0.985, 0.94, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_colors/font_disabled_color = Color(0.88, 0.82, 0.78, 1)
 theme_override_font_sizes/font_size = 25
-theme_override_styles/normal = SubResource("Style_cta_normal")
-theme_override_styles/hover = SubResource("Style_cta_normal")
-theme_override_styles/pressed = SubResource("Style_cta_pressed")
-theme_override_styles/disabled = SubResource("Style_cta_disabled")
+theme_override_styles/normal = ExtResource("4_green_button")
+theme_override_styles/hover = ExtResource("4_green_button")
+theme_override_styles/pressed = ExtResource("4_green_button")
+theme_override_styles/disabled = ExtResource("5_disabled_button")
 text = "PLAY"
 script = ExtResource("3_press_scale_button")
