@@ -10,6 +10,7 @@ texture = ExtResource("1_0pgek")
 custom_minimum_size = Vector2(420, 153)
 size_flags_horizontal = 4
 size_flags_vertical = 4
+focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.92, 1, 0.9, 1)
