@@ -1,54 +1,13 @@
 [gd_scene format=3 uid="uid://b68mutsmn2nae"]
 
 [ext_resource type="Script" uid="uid://dn2jgb7ar364x" path="res://scripts/shop_screen.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://dwm7nk7sd3tou" path="res://assets/backgrounds/main_menu.jpeg" id="2_background"]
+[ext_resource type="PackedScene" path="res://scenes/ui/destination_screen_shell.tscn" id="2_shell"]
 [ext_resource type="PackedScene" path="res://scenes/ui/coin_balance_widget.tscn" id="3_coin_balance"]
 [ext_resource type="PackedScene" uid="uid://cuq4oceh2x5if" path="res://scenes/ui/main_menu_bottom_navigation.tscn" id="4_navigation"]
 [ext_resource type="PackedScene" path="res://scenes/ui/shop_purchase_dialog.tscn" id="5_dialog"]
+[ext_resource type="PackedScene" path="res://scenes/ui/destination_status_panel.tscn" id="6_status_panel"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_scroll"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_status"]
-content_margin_left = 24.0
-content_margin_top = 24.0
-content_margin_right = 24.0
-content_margin_bottom = 24.0
-bg_color = Color(0.25, 0.065, 0.1, 0.9)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 4
-border_color = Color(1, 0.69, 0.29, 0.72)
-corner_radius_top_left = 22
-corner_radius_top_right = 22
-corner_radius_bottom_right = 22
-corner_radius_bottom_left = 22
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_retry"]
-bg_color = Color(0.94, 0.44, 0.19, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 5
-border_color = Color(1, 0.79, 0.39, 1)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_retry_pressed"]
-bg_color = Color(0.68, 0.23, 0.12, 1)
-border_width_left = 3
-border_width_top = 5
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(1, 0.68, 0.3, 1)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_focus"]
 
 [node name="ShopScreen" type="Control" unique_id=1007849924]
 layout_mode = 3
@@ -59,27 +18,14 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_script")
 
-[node name="Background" type="TextureRect" parent="." unique_id=1669006478]
+[node name="DestinationShell" parent="." instance=ExtResource("2_shell")]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
-texture = ExtResource("2_background")
-expand_mode = 1
-stretch_mode = 6
-
-[node name="BackgroundShade" type="ColorRect" parent="." unique_id=1067617113]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-color = Color(0.13, 0.025, 0.045, 0.66)
 
 [node name="ContentMargin" type="MarginContainer" parent="." unique_id=1281134873]
 unique_name_in_owner = true
@@ -191,47 +137,10 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="StatusContainer" type="CenterContainer" parent="ContentMargin/ContentStack" unique_id=1356942832]
+[node name="StatusPanel" parent="ContentMargin/ContentStack" instance=ExtResource("6_status_panel")]
 unique_name_in_owner = true
-visible = false
 layout_mode = 2
 size_flags_vertical = 3
-
-[node name="StatusPanel" type="PanelContainer" parent="ContentMargin/ContentStack/StatusContainer" unique_id=1091682858]
-custom_minimum_size = Vector2(420, 0)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_status")
-
-[node name="StatusStack" type="VBoxContainer" parent="ContentMargin/ContentStack/StatusContainer/StatusPanel" unique_id=2146619088]
-layout_mode = 2
-theme_override_constants/separation = 18
-
-[node name="StatusLabel" type="Label" parent="ContentMargin/ContentStack/StatusContainer/StatusPanel/StatusStack" unique_id=633853284]
-unique_name_in_owner = true
-layout_mode = 2
-theme_type_variation = &"GameBodyLabel"
-theme_override_colors/font_color = Color(1, 0.92, 0.77, 1)
-theme_override_font_sizes/font_size = 24
-text = "Loading regional prices..."
-horizontal_alignment = 1
-autowrap_mode = 2
-
-[node name="RetryButton" type="Button" parent="ContentMargin/ContentStack/StatusContainer/StatusPanel/StatusStack" unique_id=322060682]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(0, 62)
-layout_mode = 2
-focus_mode = 0
-mouse_default_cursor_shape = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 25
-theme_override_styles/normal = SubResource("StyleBoxFlat_retry")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_retry_pressed")
-theme_override_styles/hover = SubResource("StyleBoxFlat_retry")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
-text = "Retry"
 
 [node name="BottomNavigation" parent="." unique_id=1931831526 instance=ExtResource("4_navigation")]
 unique_name_in_owner = true

@@ -25,6 +25,7 @@ const ABILITY_INFO := {
 	},
 }
 
+@onready var _destination_shell := %DestinationShell as Control
 @onready var _content_margin := %ContentMargin as MarginContainer
 @onready var _title_label := %TitleLabel as Label
 @onready var _coin_balance := %CoinBalance as Control
@@ -33,9 +34,7 @@ const ABILITY_INFO := {
 @onready var _bundles_container := %BundlesContainer as VBoxContainer
 @onready var _coin_offers_section := %CoinOffersSection as VBoxContainer
 @onready var _coin_offers_container := %CoinOffersContainer as VBoxContainer
-@onready var _status_container := %StatusContainer as CenterContainer
-@onready var _status_label := %StatusLabel as Label
-@onready var _retry_button := %RetryButton as Button
+@onready var _status_panel := %StatusPanel as Control
 @onready var _purchase_dialog := %PurchaseDialog as Control
 @onready var _bottom_navigation := %BottomNavigation as MarginContainer
 
@@ -47,13 +46,14 @@ var _load_request_serial := 0
 
 func _ready() -> void:
 	PlayerProgress.load_progress()
-	_retry_button.pressed.connect(_load_shop)
+	_status_panel.connect("retry_pressed", Callable(self, "_load_shop"))
 	_bottom_navigation.connect("shop_pressed", Callable(self, "_load_shop"))
 	_bottom_navigation.connect("home_pressed", Callable(self, "_return_to_main_menu"))
 	_bottom_navigation.connect("leaderboard_pressed", Callable(self, "_open_leaderboard"))
 	if _bottom_navigation.has_method("set_active_tab"):
 		_bottom_navigation.call("set_active_tab", &"shop")
 	get_viewport().size_changed.connect(_apply_responsive_layout)
+	_destination_shell.call("set_background_for_chapter", PlayerProgress.get_selected_chapter_id())
 	_update_coin_balance()
 	_apply_responsive_layout()
 	_load_shop.call_deferred()
@@ -87,7 +87,7 @@ func _load_shop() -> void:
 		_set_error_state("No shop offers are available for this region.")
 		return
 
-	_status_container.visible = false
+	_status_panel.call("hide_status")
 	_shop_scroll.visible = true
 	_bundles_section.visible = _bundles_container.get_child_count() > 0
 	_coin_offers_section.visible = _coin_offers_container.get_child_count() > 0
@@ -201,16 +201,12 @@ func _clear_offers() -> void:
 
 func _set_loading_state() -> void:
 	_shop_scroll.visible = false
-	_status_container.visible = true
-	_status_label.text = "Loading regional prices..."
-	_retry_button.visible = false
+	_status_panel.call("show_loading", "Loading regional prices…")
 
 
 func _set_error_state(message: String) -> void:
 	_shop_scroll.visible = false
-	_status_container.visible = true
-	_status_label.text = message
-	_retry_button.visible = true
+	_status_panel.call("show_error", message)
 
 
 func _update_coin_balance() -> void:

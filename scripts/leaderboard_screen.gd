@@ -19,17 +19,17 @@ const RANK_REWARD_TEXTURES := {
 ## standing visible without requiring a scroll.
 const PINNED_ROW_RANK_THRESHOLD := 10
 
+@onready var _destination_shell := %DestinationShell as Control
 @onready var _content_margin := %ContentMargin as MarginContainer
 @onready var _title_label := %TitleLabel as Label
 @onready var _weekly_button := %WeeklyButton as Button
 @onready var _country_button := %CountryButton as Button
 @onready var _world_button := %WorldButton as Button
 @onready var _period_label := %PeriodLabel as Label
+@onready var _list_background := %ListBackground as Panel
 @onready var _leaderboard_scroll := %LeaderboardScroll as ScrollContainer
 @onready var _rows_container := %RowsContainer as VBoxContainer
-@onready var _status_container := %StatusContainer as CenterContainer
-@onready var _status_label := %StatusLabel as Label
-@onready var _retry_button := %RetryButton as Button
+@onready var _status_panel := %StatusPanel as Control
 @onready var _pinned_player_row := %PinnedPlayerRow as Control
 @onready var _bottom_navigation := %BottomNavigation as MarginContainer
 
@@ -46,13 +46,14 @@ func _ready() -> void:
 	_weekly_button.pressed.connect(_select_scope.bind(SCOPE_WEEKLY))
 	_country_button.pressed.connect(_select_scope.bind(SCOPE_COUNTRY))
 	_world_button.pressed.connect(_select_scope.bind(SCOPE_WORLD))
-	_retry_button.pressed.connect(_load_selected_scope)
+	_status_panel.connect("retry_pressed", Callable(self, "_load_selected_scope"))
 	_bottom_navigation.connect("shop_pressed", Callable(self, "_open_shop"))
 	_bottom_navigation.connect("home_pressed", Callable(self, "_return_to_main_menu"))
 	_bottom_navigation.connect("leaderboard_pressed", Callable(self, "_load_selected_scope"))
 	if _bottom_navigation.has_method("set_active_tab"):
 		_bottom_navigation.call("set_active_tab", &"leaderboard")
 	get_viewport().size_changed.connect(_apply_responsive_layout)
+	_destination_shell.call("set_background_for_chapter", PlayerProgress.get_selected_chapter_id())
 	_apply_responsive_layout()
 	_select_scope(SCOPE_WEEKLY)
 
@@ -132,10 +133,12 @@ func _populate_entries(entries: Array, player_entry: Dictionary) -> void:
 		contains_current_player = contains_current_player or bool(entry.get("is_current_player", false))
 
 	var has_entries := not _rows.is_empty()
+	_list_background.visible = has_entries
 	_leaderboard_scroll.visible = has_entries
-	_status_container.visible = not has_entries
-	_status_label.text = "No scores yet" if not has_entries else ""
-	_retry_button.visible = false
+	if has_entries:
+		_status_panel.call("hide_status")
+	else:
+		_status_panel.call("show_empty", "No scores yet")
 
 	var player_rank := int(player_entry.get("rank", 0))
 	var should_pin_player := not player_entry.is_empty() and (
@@ -160,19 +163,17 @@ func _clear_rows() -> void:
 
 func _set_loading_state() -> void:
 	_clear_rows()
+	_list_background.visible = false
 	_leaderboard_scroll.visible = false
 	_pinned_player_row.visible = false
-	_status_container.visible = true
-	_status_label.text = "Loading leaderboard…"
-	_retry_button.visible = false
+	_status_panel.call("show_loading", "Loading leaderboard…")
 
 
 func _set_error_state(message: String) -> void:
+	_list_background.visible = false
 	_leaderboard_scroll.visible = false
 	_pinned_player_row.visible = false
-	_status_container.visible = true
-	_status_label.text = message
-	_retry_button.visible = true
+	_status_panel.call("show_error", message)
 
 
 func _update_period_label() -> void:
