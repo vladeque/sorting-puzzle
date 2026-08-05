@@ -69,7 +69,7 @@ func get_offer_id() -> StringName:
 
 func set_shop_locked(is_locked: bool, is_active_purchase: bool = false) -> void:
 	_purchase_button.disabled = is_locked
-	_purchase_button.text = "Purchasing..." if is_locked and is_active_purchase else _formatted_price
+	_purchase_button.text = "Purchasing…" if is_locked and is_active_purchase else _formatted_price
 	modulate = Color(1, 1, 1, 0.78) if is_locked and not is_active_purchase else Color.WHITE
 
 

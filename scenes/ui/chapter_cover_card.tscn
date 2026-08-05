@@ -211,5 +211,5 @@ theme_override_styles/normal = ExtResource("4_green_button")
 theme_override_styles/hover = ExtResource("4_green_button")
 theme_override_styles/pressed = ExtResource("4_green_button")
 theme_override_styles/disabled = ExtResource("5_disabled_button")
-text = "PLAY"
+text = "Play"
 script = ExtResource("3_press_scale_button")

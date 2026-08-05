@@ -69,8 +69,8 @@ func _run() -> void:
 		_check(
 			chapter_button_style.texture != null
 				and chapter_button_style.texture.resource_path
-					== "res://assets/ui/level_button_blank_light_blue_new.png",
-			"The main menu chapter button is not using the light-blue level-button artwork."
+					== "res://assets/ui/level_button_blank_yellow_orange_new.png",
+			"The main menu chapter button is not using the yellow-orange level-button artwork."
 		)
 
 	chapter_button.emit_signal("pressed")
@@ -117,8 +117,8 @@ func _run() -> void:
 			var locked_cta := locked_card.get_node("%CtaButton") as Button
 			_check(locked_cta.disabled, "Chapter 2 should be locked for a new player.")
 			_check(
-				str(locked_cta.text) == "LOCKED",
-				"Chapter 2's CTA should read LOCKED while it is locked."
+				str(locked_cta.text) == "Locked",
+				"Chapter 2's CTA should read Locked while it is locked."
 			)
 			var locked_progress := locked_card.get_node("%ProgressBar") as ProgressBar
 			_check(

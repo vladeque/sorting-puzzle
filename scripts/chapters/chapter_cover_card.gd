@@ -58,7 +58,7 @@ func configure(chapter: Dictionary, progress: Dictionary, is_selected: bool) -> 
 		_status_label.text = "Complete %d more %s levels to unlock" % [remaining_levels, previous_title]
 		_progress_label.text = "Unlock progress"
 		_set_progress(completed_required_levels, required_levels)
-		_cta_button.text = "LOCKED"
+		_cta_button.text = "Locked"
 		return
 
 	if not bool(progress.get("has_levels", false)):
@@ -68,7 +68,7 @@ func configure(chapter: Dictionary, progress: Dictionary, is_selected: bool) -> 
 		_progress_header.visible = false
 		_progress_bar.visible = false
 		_cta_button.disabled = true
-		_cta_button.text = "COMING SOON"
+		_cta_button.text = "Coming Soon"
 		return
 
 	var completed_levels := int(progress.get("completed_levels", 0))
@@ -76,9 +76,9 @@ func configure(chapter: Dictionary, progress: Dictionary, is_selected: bool) -> 
 	_progress_label.text = "Current progress"
 	_set_progress(completed_levels, total_levels)
 	if is_selected:
-		_cta_button.text = "CONTINUE" if completed_levels > 0 else "PLAY"
+		_cta_button.text = "Continue" if completed_levels > 0 else "Play"
 	else:
-		_cta_button.text = "PLAY"
+		_cta_button.text = "Play"
 
 
 func _set_progress(current: int, total: int) -> void:
