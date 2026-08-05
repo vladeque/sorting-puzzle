@@ -1,8 +1,8 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://do81cihimtc5e"]
 
-[ext_resource type="Script" path="res://scripts/chapters/chapter_selection_screen.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://pn10w67fpvih" path="res://scripts/chapters/chapter_selection_screen.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/ui/horizontal_pager.tscn" id="2_pager"]
-[ext_resource type="Script" path="res://scripts/press_scale_button.gd" id="3_press_scale_button"]
+[ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="3_press_scale_button"]
 
 [sub_resource type="StyleBoxFlat" id="Style_back_normal"]
 bg_color = Color(1, 0.9, 0.58, 0.96)
@@ -31,7 +31,7 @@ corner_radius_top_right = 20
 corner_radius_bottom_right = 20
 corner_radius_bottom_left = 20
 
-[node name="ChapterSelectionScreen" type="Control"]
+[node name="ChapterSelectionScreen" type="Control" unique_id=2125256543]
 z_index = 100
 layout_mode = 3
 anchors_preset = 15
@@ -41,44 +41,37 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_script")
 
-[node name="Pager" parent="." instance=ExtResource("2_pager")]
+[node name="Pager" parent="." unique_id=1017701611 instance=ExtResource("2_pager")]
 unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
 peek_width = 0.0
 
-[node name="HeaderMargins" type="MarginContainer" parent="."]
+[node name="HeaderMargins" type="MarginContainer" parent="." unique_id=1490486213]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
 offset_bottom = 112.0
 grow_horizontal = 2
-mouse_filter = 1
 theme_override_constants/margin_left = 30
 theme_override_constants/margin_top = 32
 theme_override_constants/margin_right = 30
 
-[node name="Header" type="HBoxContainer" parent="HeaderMargins"]
+[node name="Header" type="HBoxContainer" parent="HeaderMargins" unique_id=1224785783]
 layout_mode = 2
-mouse_filter = 1
 
-[node name="BackButton" type="Button" parent="HeaderMargins/Header"]
+[node name="BackButton" type="Button" parent="HeaderMargins/Header" unique_id=418571471]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(72, 64)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.29, 0.11, 0.04, 1)
 theme_override_font_sizes/font_size = 34
 theme_override_styles/normal = SubResource("Style_back_normal")
-theme_override_styles/hover = SubResource("Style_back_normal")
 theme_override_styles/pressed = SubResource("Style_back_pressed")
+theme_override_styles/hover = SubResource("Style_back_normal")
 text = "<"
 script = ExtResource("3_press_scale_button")
 
-[node name="HeaderSpacer" type="Control" parent="HeaderMargins/Header"]
+[node name="HeaderSpacer" type="Control" parent="HeaderMargins/Header" unique_id=2036187935]
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bmsxjlxl6l6qf"
-path="res://.godot/imported/item_juice_box_grape_compact.png-041f28547d747455b06e07efd258e29b.ctex"
+uid="uid://c1ede0tdi2pwu"
+path="res://.godot/imported/item_soda_bottle_grape.png-420ea14d053a38d6ff807a1b0116f1c4.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/items/item_juice_box_grape_compact.png"
-dest_files=["res://.godot/imported/item_juice_box_grape_compact.png-041f28547d747455b06e07efd258e29b.ctex"]
+source_file="res://assets/items/item_soda_bottle_grape.png"
+dest_files=["res://.godot/imported/item_soda_bottle_grape.png-420ea14d053a38d6ff807a1b0116f1c4.ctex"]
 
 [params]
 

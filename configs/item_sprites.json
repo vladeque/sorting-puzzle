@@ -23,6 +23,11 @@
 	  "texture": "res://assets/items/item_soda_bottle_orange.png"
 	},
 	{
+	  "id": "soda_bottle_grape",
+	  "category": "drink",
+	  "texture": "res://assets/items/item_soda_bottle_grape.png"
+	},
+	{
 	  "id": "soda_can_lime",
 	  "category": "drink",
 	  "texture": "res://assets/items/item_soda_can_lime.png"
@@ -36,6 +41,11 @@
 	  "id": "soda_can_strawberry",
 	  "category": "drink",
 	  "texture": "res://assets/items/item_soda_can_strawberry.png"
+	},
+	{
+	  "id": "soda_can_orange",
+	  "category": "drink",
+	  "texture": "res://assets/items/item_soda_can_orange.png"
 	},
 	{
 	  "id": "juice_box_orange",
@@ -76,6 +86,11 @@
 	  "id": "smoothie_cup_strawberry_banana",
 	  "category": "drink",
 	  "texture": "res://assets/items/item_smoothie_cup_strawberry_banana.png"
+	},
+	{
+	  "id": "smoothie_cup_blueberry",
+	  "category": "drink",
+	  "texture": "res://assets/items/item_smoothie_cup_blueberry.png"
 	},
 	{
 	  "id": "smoothie_cup_mango",
@@ -226,6 +241,11 @@
 	  "id": "yogurt_tub_vanilla",
 	  "category": "snack",
 	  "texture": "res://assets/items/item_yogurt_tub_vanilla.png"
+	},
+	{
+	  "id": "yogurt_tub_peach",
+	  "category": "snack",
+	  "texture": "res://assets/items/item_yogurt_tub_peach.png"
 	},
 	{
 	  "id": "lollipop_rainbow",

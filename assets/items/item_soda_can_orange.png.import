@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://y1r4outdr3ic"
-path="res://.godot/imported/item_cookie_box_blue_carton.png-f007d01219ea9f76cd4cef50afebba37.ctex"
+uid="uid://c8hv0m1qu6kfs"
+path="res://.godot/imported/item_soda_can_orange.png-e5f88e1dd0677299f2fe584a0c6799c6.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/items/item_cookie_box_blue_carton.png"
-dest_files=["res://.godot/imported/item_cookie_box_blue_carton.png-f007d01219ea9f76cd4cef50afebba37.ctex"]
+source_file="res://assets/items/item_soda_can_orange.png"
+dest_files=["res://.godot/imported/item_soda_can_orange.png-e5f88e1dd0677299f2fe584a0c6799c6.ctex"]
 
 [params]
 
