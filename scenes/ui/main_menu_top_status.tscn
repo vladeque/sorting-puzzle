@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://kvmueps1ax4n" path="res://assets/ui/main_menu_lives.png" id="2_lives"]
 [ext_resource type="Texture2D" uid="uid://ce5g86tlfcvli" path="res://assets/ui/clover_coin_transparent_96x96.png" id="2_xud8k"]
 [ext_resource type="Texture2D" uid="uid://d2pn1p1r8alak" path="res://assets/ui/avatars/avatar_cat.png" id="3_avatar_cat"]
+[ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="4_press_scale_button"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_counter_pill"]
 bg_color = Color(1, 0.78, 0.75, 1)
@@ -32,50 +33,32 @@ corner_radius_top_right = 9
 corner_radius_bottom_right = 9
 corner_radius_bottom_left = 9
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pause_button_normal"]
-bg_color = Color(0.12, 0.17, 0.22, 0.96)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.86, 0.92, 0.82, 0.86)
-corner_radius_top_left = 27
-corner_radius_top_right = 27
-corner_radius_bottom_right = 27
-corner_radius_bottom_left = 27
-shadow_color = Color(0, 0, 0, 0.36)
-shadow_size = 6
-shadow_offset = Vector2(0, 3)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_settings_button_normal"]
+bg_color = Color(1, 0.9, 0.58, 0.96)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.4, 0.18, 0.07, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0.19, 0.07, 0.02, 0.42)
+shadow_size = 5
+shadow_offset = Vector2(0, 4)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pause_button_pressed"]
-bg_color = Color(0.08, 0.12, 0.16, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.99, 0.75, 0.36, 1)
-corner_radius_top_left = 27
-corner_radius_top_right = 27
-corner_radius_bottom_right = 27
-corner_radius_bottom_left = 27
-shadow_color = Color(0, 0, 0, 0.26)
-shadow_size = 4
-shadow_offset = Vector2(0, 2)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pause_button_hover"]
-bg_color = Color(0.18, 0.25, 0.31, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.99, 0.88, 0.48, 1)
-corner_radius_top_left = 27
-corner_radius_top_right = 27
-corner_radius_bottom_right = 27
-corner_radius_bottom_left = 27
-shadow_color = Color(0, 0, 0, 0.4)
-shadow_size = 7
-shadow_offset = Vector2(0, 3)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_settings_button_pressed"]
+bg_color = Color(0.91, 0.76, 0.39, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.32, 0.12, 0.04, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
 
 [node name="MainMenuTopStatus" type="HBoxContainer" unique_id=1663924301]
 custom_minimum_size = Vector2(452, 78)
@@ -247,22 +230,24 @@ size_flags_horizontal = 3
 mouse_filter = 2
 
 [node name="SettingsWidget" type="Control" parent="." unique_id=1288611896]
-custom_minimum_size = Vector2(66, 66)
+custom_minimum_size = Vector2(72, 64)
 layout_mode = 2
 size_flags_vertical = 4
 mouse_filter = 2
 
 [node name="SettingsButton" type="Button" parent="SettingsWidget" unique_id=132950199]
 layout_mode = 1
-offset_left = 7.0
-offset_top = 7.0
-offset_right = 61.0
-offset_bottom = 61.0
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 24
-theme_override_styles/normal = SubResource("StyleBoxFlat_pause_button_normal")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_pause_button_pressed")
-theme_override_styles/hover = SubResource("StyleBoxFlat_pause_button_hover")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.29, 0.11, 0.04, 1)
+theme_override_colors/font_pressed_color = Color(0.29, 0.11, 0.04, 1)
+theme_override_colors/font_hover_color = Color(0.29, 0.11, 0.04, 1)
+theme_override_font_sizes/font_size = 26
+theme_override_styles/normal = SubResource("StyleBoxFlat_settings_button_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_settings_button_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_settings_button_normal")
 text = "II"
+script = ExtResource("4_press_scale_button")

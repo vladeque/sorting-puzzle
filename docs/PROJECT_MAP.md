@@ -108,7 +108,7 @@ Responsibility:
 - Keeps the chapter picker on a dedicated overlay z-index above all production menu actions.
 - Shows all configured chapters on a dedicated screen; locked cards expose exact previous-chapter
   progress toward the default 25-level requirement.
-- Shows production top-row icons for the saved circular-clipped profile avatar, saved gold coins, saved lives, and a smaller pause-style settings button.
+- Shows production top-row icons for the saved circular-clipped profile avatar, saved gold coins, saved lives, and a warm rounded settings button styled like the chapter selection back button.
 - Shows a separate side reward chest widget under the profile icon with saved stars versus the active configured goal; tapping it opens `scenes/ui/reward_chest_menu.tscn`, a read-only centered modal showing the same progress at a larger size, the dedicated `assets/ui/reward_chest_menu_illustration.png` artwork, and the coin payout waiting at the next goal.
 - Opens `scenes/ui/profile_menu.tscn` from the profile widget, shows an editable player-name field above all 18 avatars in a centered pause-style window with a 3-column grid, and saves the name plus selected avatar through `PlayerProgress`.
 - Opens `scenes/ui/settings_menu.tscn` from the settings widget, with pause-menu-style music, sound-effects, and vibration toggle visuals plus no-op `Support` and `Language` buttons.

@@ -474,7 +474,7 @@ Important nodes:
 - `CoinsWidget`: generated gold coin icon, saved coin amount label, and plus badge.
 - `Spacer02`: non-expanding center exclusion corridor resized around camera cutouts.
 - `LivesWidget`: generated heart icon, current life count label, and `Full` or `MM:SS` countdown status label.
-- `SettingsWidget`: smaller `PauseMenuButton`-style button with a small alert badge.
+- `SettingsWidget`: warm rounded settings button matching the chapter selection screen's `BackButton` styling and held-press behavior.
 
 Depends on:
 - `assets/ui/avatars/avatar_cat.png` for the default editor/display texture. The owning menu script replaces it with the saved avatar at runtime.
