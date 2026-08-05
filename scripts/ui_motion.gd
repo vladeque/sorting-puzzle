@@ -62,11 +62,21 @@ static func close_with_fade(node: CanvasItem, on_finished: Callable, duration: f
 ## ...). Use a distinct `meta_key` per independent concern when a single node needs more than one
 ## concurrently-running animation (for example a fade and a move).
 static func retween(node: Node, meta_key: StringName) -> Tween:
-	if node.has_meta(meta_key):
-		var previous_tween: Tween = node.get_meta(meta_key)
-		if previous_tween != null and previous_tween.is_valid():
-			previous_tween.kill()
-
+	stop_tween(node, meta_key)
 	var tween := node.create_tween()
 	node.set_meta(meta_key, tween)
 	return tween
+
+
+## Kills whichever tween this exact (node, meta_key) pair last started, if it is still running, and
+## clears the tracking meta, without starting a replacement. Use to explicitly stop a looping or
+## in-flight animation created via retween() -- for example the shared status panel's loading pulse
+## when the status becomes hidden or leaves the tree.
+static func stop_tween(node: Node, meta_key: StringName) -> void:
+	if not node.has_meta(meta_key):
+		return
+
+	var tracked_tween: Tween = node.get_meta(meta_key)
+	if tracked_tween != null and tracked_tween.is_valid():
+		tracked_tween.kill()
+	node.remove_meta(meta_key)
