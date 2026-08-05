@@ -197,6 +197,9 @@ theme_override_styles/pressed = SubResource("StyleBoxEmpty_focus")
 theme_override_styles/hover = SubResource("StyleBoxEmpty_focus")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
 flat = true
+script = ExtResource("8_press_scale_button")
+visual_target_path = NodePath("../Stack")
+held_scale = 0.97
 
 [node name="ShuffleReward" type="PanelContainer" parent="CardBody/CardStack/Rewards" unique_id=1847635692]
 unique_name_in_owner = true
@@ -238,6 +241,9 @@ theme_override_styles/pressed = SubResource("StyleBoxEmpty_focus")
 theme_override_styles/hover = SubResource("StyleBoxEmpty_focus")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
 flat = true
+script = ExtResource("8_press_scale_button")
+visual_target_path = NodePath("../Stack")
+held_scale = 0.97
 
 [node name="LanternReward" type="PanelContainer" parent="CardBody/CardStack/Rewards" unique_id=86008521]
 unique_name_in_owner = true
@@ -279,6 +285,9 @@ theme_override_styles/pressed = SubResource("StyleBoxEmpty_focus")
 theme_override_styles/hover = SubResource("StyleBoxEmpty_focus")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
 flat = true
+script = ExtResource("8_press_scale_button")
+visual_target_path = NodePath("../Stack")
+held_scale = 0.97
 
 [node name="FreezerReward" type="PanelContainer" parent="CardBody/CardStack/Rewards" unique_id=1041077588]
 unique_name_in_owner = true
@@ -320,6 +329,9 @@ theme_override_styles/pressed = SubResource("StyleBoxEmpty_focus")
 theme_override_styles/hover = SubResource("StyleBoxEmpty_focus")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
 flat = true
+script = ExtResource("8_press_scale_button")
+visual_target_path = NodePath("../Stack")
+held_scale = 0.97
 
 [node name="InfoHint" type="Label" parent="CardBody/CardStack" unique_id=408873947]
 layout_mode = 2

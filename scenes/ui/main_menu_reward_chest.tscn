@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dvm1bhdav30ec" path="res://scripts/main_menu_reward_chest.gd" id="1_reward_chest_script"]
 [ext_resource type="Texture2D" uid="uid://brf3b72bksb8e" path="res://assets/ui/main_menu_reward_chest.png" id="2_reward_chest_icon"]
+[ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="3_press_scale_button"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_icon_shadow"]
 bg_color = Color(0.08, 0.05, 0.05, 0.18)
@@ -46,7 +47,17 @@ anchors_preset = 0
 mouse_filter = 2
 script = ExtResource("1_reward_chest_script")
 
-[node name="IconShadow" type="Panel" parent="." unique_id=1245366181]
+[node name="Visual" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="IconShadow" type="Panel" parent="Visual" unique_id=1245366181]
 layout_mode = 1
 offset_left = 12.0
 offset_top = 12.0
@@ -55,7 +66,7 @@ offset_bottom = 108.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_icon_shadow")
 
-[node name="ChestIcon" type="TextureRect" parent="." unique_id=1371355349]
+[node name="ChestIcon" type="TextureRect" parent="Visual" unique_id=1371355349]
 layout_mode = 1
 offset_left = 0.0
 offset_top = -2.0
@@ -66,7 +77,7 @@ texture = ExtResource("2_reward_chest_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="ProgressTrack" type="Panel" parent="." unique_id=2049666495]
+[node name="ProgressTrack" type="Panel" parent="Visual" unique_id=2049666495]
 layout_mode = 1
 offset_left = 2.0
 offset_top = 106.0
@@ -75,7 +86,7 @@ offset_bottom = 136.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_progress_track")
 
-[node name="ProgressBar" type="ProgressBar" parent="ProgressTrack" unique_id=269161698]
+[node name="ProgressBar" type="ProgressBar" parent="Visual/ProgressTrack" unique_id=269161698]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -93,7 +104,7 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_bar_fill")
 max_value = 500.0
 show_percentage = false
 
-[node name="AmountLabel" type="Label" parent="ProgressTrack" unique_id=1003013178]
+[node name="AmountLabel" type="Label" parent="Visual/ProgressTrack" unique_id=1003013178]
 theme_type_variation = &"GameNumberLabel"
 unique_name_in_owner = true
 layout_mode = 1
@@ -123,3 +134,6 @@ grow_vertical = 2
 focus_mode = 0
 mouse_default_cursor_shape = 2
 flat = true
+script = ExtResource("3_press_scale_button")
+visual_target_path = NodePath("../Visual")
+held_scale = 0.97

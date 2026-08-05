@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://yltncpgta1v1" path="res://assets/ui/shopping_cart_icon_128x128.png" id="2_xh1q6"]
 [ext_resource type="Texture2D" uid="uid://bybvh3f425vvb" path="res://assets/ui/home_navigation_icon_1_128x128.png" id="3_xh1q6"]
 [ext_resource type="Texture2D" uid="uid://dqhhque5vqwqv" path="res://assets/ui/trophy_icon_128x128.png" id="4_4cxw6"]
+[ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="5_press_scale_button"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar"]
 bg_color = Color(0.9490196, 0.47843137, 0.2901961, 1)
@@ -62,6 +63,9 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_shop")
 theme_override_styles/hover = SubResource("StyleBoxFlat_shop")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_shop")
 theme_override_styles/focus = SubResource("StyleBoxFlat_shop")
+script = ExtResource("5_press_scale_button")
+visual_target_path = NodePath("Icon")
+held_scale = 0.97
 
 [node name="Icon" type="TextureRect" parent="Buttons/ShopButton" unique_id=1629281181]
 layout_mode = 1
@@ -114,6 +118,9 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_home")
 theme_override_styles/hover = SubResource("StyleBoxFlat_home")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_home")
 theme_override_styles/focus = SubResource("StyleBoxFlat_home")
+script = ExtResource("5_press_scale_button")
+visual_target_path = NodePath("Icon")
+held_scale = 0.97
 
 [node name="Icon" type="TextureRect" parent="Buttons/HomeButton" unique_id=991485767]
 layout_mode = 1
@@ -166,6 +173,9 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_leaderboard")
 theme_override_styles/hover = SubResource("StyleBoxFlat_leaderboard")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_leaderboard")
 theme_override_styles/focus = SubResource("StyleBoxFlat_leaderboard")
+script = ExtResource("5_press_scale_button")
+visual_target_path = NodePath("Icon")
+held_scale = 0.97
 
 [node name="Icon" type="TextureRect" parent="Buttons/LeaderboardButton" unique_id=1880946225]
 layout_mode = 1

@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/leaderboard_row.tscn" id="3_row"]
 [ext_resource type="PackedScene" path="res://scenes/ui/main_menu_bottom_navigation.tscn" id="4_navigation"]
 [ext_resource type="PackedScene" path="res://scenes/ui/destination_status_panel.tscn" id="5_status_panel"]
+[ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="6_press_scale_button"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_normal"]
 bg_color = Color(0.39, 0.17, 0.2, 0.96)
@@ -13,18 +14,6 @@ border_width_top = 3
 border_width_right = 3
 border_width_bottom = 4
 border_color = Color(0.18, 0.055, 0.075, 0.95)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_hover"]
-bg_color = Color(0.52, 0.24, 0.24, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 4
-border_color = Color(1, 0.74, 0.38, 0.9)
 corner_radius_top_left = 16
 corner_radius_top_right = 16
 corner_radius_bottom_right = 16
@@ -128,10 +117,12 @@ theme_override_colors/font_hover_color = Color(1, 0.97, 0.82, 1)
 theme_override_colors/font_pressed_color = Color(0.29, 0.08, 0.04, 1)
 theme_override_font_sizes/font_size = 24
 theme_override_styles/normal = SubResource("StyleBoxFlat_tab_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_tab_hover")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab_normal")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_tab_pressed")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
 text = "Weekly"
+script = ExtResource("6_press_scale_button")
+held_scale = 0.97
 
 [node name="CountryButton" type="Button" parent="ContentMargin/ContentStack/Tabs"]
 unique_name_in_owner = true
@@ -146,10 +137,12 @@ theme_override_colors/font_hover_color = Color(1, 0.97, 0.82, 1)
 theme_override_colors/font_pressed_color = Color(0.29, 0.08, 0.04, 1)
 theme_override_font_sizes/font_size = 24
 theme_override_styles/normal = SubResource("StyleBoxFlat_tab_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_tab_hover")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab_normal")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_tab_pressed")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
 text = "Country"
+script = ExtResource("6_press_scale_button")
+held_scale = 0.97
 
 [node name="WorldButton" type="Button" parent="ContentMargin/ContentStack/Tabs"]
 unique_name_in_owner = true
@@ -164,10 +157,12 @@ theme_override_colors/font_hover_color = Color(1, 0.97, 0.82, 1)
 theme_override_colors/font_pressed_color = Color(0.29, 0.08, 0.04, 1)
 theme_override_font_sizes/font_size = 24
 theme_override_styles/normal = SubResource("StyleBoxFlat_tab_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_tab_hover")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab_normal")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_tab_pressed")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
 text = "World"
+script = ExtResource("6_press_scale_button")
+held_scale = 0.97
 
 [node name="PeriodLabel" type="Label" parent="ContentMargin/ContentStack"]
 theme_type_variation = &"GameBodyLabel"

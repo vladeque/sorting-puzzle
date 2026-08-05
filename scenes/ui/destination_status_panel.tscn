@@ -4,6 +4,7 @@
 [ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_orange_utility_normal.tres" id="2_retry_normal"]
 [ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_orange_utility_pressed.tres" id="3_retry_pressed"]
 [ext_resource type="Script" path="res://scripts/destination_status_panel.gd" id="4_script"]
+[ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="5_press_scale_button"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_focus"]
 
@@ -47,3 +48,4 @@ theme_override_styles/pressed = ExtResource("3_retry_pressed")
 theme_override_styles/hover = ExtResource("2_retry_normal")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
 text = "Retry"
+script = ExtResource("5_press_scale_button")
