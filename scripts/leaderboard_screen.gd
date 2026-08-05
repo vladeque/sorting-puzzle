@@ -39,6 +39,7 @@ var _request_serial := 0
 var _period_end_unix := 0
 var _timer_refresh_accumulator := 0.0
 var _rows: Array[Control] = []
+var _is_navigating := false
 
 
 func _ready() -> void:
@@ -49,7 +50,7 @@ func _ready() -> void:
 	_status_panel.connect("retry_pressed", Callable(self, "_load_selected_scope"))
 	_bottom_navigation.connect("shop_pressed", Callable(self, "_open_shop"))
 	_bottom_navigation.connect("home_pressed", Callable(self, "_return_to_main_menu"))
-	_bottom_navigation.connect("leaderboard_pressed", Callable(self, "_load_selected_scope"))
+	_bottom_navigation.connect("leaderboard_pressed", Callable(self, "_on_leaderboard_tab_reselected"))
 	if _bottom_navigation.has_method("set_active_tab"):
 		_bottom_navigation.call("set_active_tab", &"leaderboard")
 	get_viewport().size_changed.connect(_apply_responsive_layout)
@@ -223,6 +224,16 @@ func _format_duration(seconds: int) -> String:
 	return "%dm" % minutes
 
 
+## Leaderboard has no scoped overlay of its own, so `ui_cancel` always returns to Main Menu,
+## matching Shop (see docs/SCENES.md's "Back/ui_cancel Behavior").
+func _unhandled_input(event: InputEvent) -> void:
+	if not event.is_action_pressed("ui_cancel"):
+		return
+
+	get_viewport().set_input_as_handled()
+	_return_to_main_menu()
+
+
 func _apply_responsive_layout() -> void:
 	var viewport_size := get_viewport_rect().size
 	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
@@ -250,9 +261,26 @@ func _apply_responsive_layout() -> void:
 	_pinned_player_row.call("set_compact", is_compact)
 
 
+## Retapping the already-active Leaderboard tab is a no-op (see docs/SCENES.md's "Active-Tab
+## Reselection Rule"); ranking refresh stays available only through the status panel's explicit
+## Retry action, not a hidden tab-retap convention.
+func _on_leaderboard_tab_reselected() -> void:
+	pass
+
+
 func _return_to_main_menu() -> void:
-	get_tree().change_scene_to_file(MAIN_MENU_SCENE)
+	_begin_navigation(MAIN_MENU_SCENE)
 
 
 func _open_shop() -> void:
-	get_tree().change_scene_to_file(SHOP_SCENE)
+	_begin_navigation(SHOP_SCENE)
+
+
+## Ignores a duplicate cross-destination press while a scene transition is already underway, so a
+## rapid double-tap on Home/Shop can never call change_scene_to_file() twice.
+func _begin_navigation(scene_path: String) -> void:
+	if _is_navigating:
+		return
+
+	_is_navigating = true
+	get_tree().change_scene_to_file(scene_path)

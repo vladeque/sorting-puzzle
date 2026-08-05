@@ -16,17 +16,16 @@ const RELEASE_DURATION := 0.12
 const NAV_ACTIVE_CHANGE_DURATION := 0.165
 const OVERLAY_DURATION := 0.2
 
+const _FADE_TWEEN_META := &"_ui_motion_fade_tween"
+
 
 ## Fades `node` in from fully transparent to `target_alpha` (default opaque) over OVERLAY_DURATION,
-## showing it first if it was hidden. Kills any tween already animating `node`'s modulate so rapid
-## open/close never accumulates competing tweens. Returns the tween so callers can
-## `await tween.finished` to sequence work after the fade, or ignore it.
+## showing it first if it was hidden. Returns the tween so callers can `await tween.finished` to
+## sequence work after the fade, or ignore it.
 static func fade_in(node: CanvasItem, duration: float = OVERLAY_DURATION, target_alpha: float = 1.0) -> Tween:
-	_kill_modulate_tween(node)
 	node.modulate.a = 0.0
 	node.show()
-	var tween := node.create_tween()
-	node.set_meta(&"_ui_motion_tween", tween)
+	var tween := retween(node, _FADE_TWEEN_META)
 	tween.tween_property(node, "modulate:a", target_alpha, duration) \
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	return tween
@@ -35,18 +34,23 @@ static func fade_in(node: CanvasItem, duration: float = OVERLAY_DURATION, target
 ## Fades `node` out to fully transparent over OVERLAY_DURATION. Does not hide/free `node` --
 ## callers should `await tween.finished` and then hide()/queue_free() it themselves.
 static func fade_out(node: CanvasItem, duration: float = OVERLAY_DURATION) -> Tween:
-	_kill_modulate_tween(node)
-	var tween := node.create_tween()
-	node.set_meta(&"_ui_motion_tween", tween)
+	var tween := retween(node, _FADE_TWEEN_META)
 	tween.tween_property(node, "modulate:a", 0.0, duration) \
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 	return tween
 
 
-static func _kill_modulate_tween(node: CanvasItem) -> void:
-	if not node.has_meta(&"_ui_motion_tween"):
-		return
-	var previous_tween: Tween = node.get_meta(&"_ui_motion_tween")
-	if previous_tween != null and previous_tween.is_valid():
-		previous_tween.kill()
-	node.remove_meta(&"_ui_motion_tween")
+## Kills whichever tween this exact (node, meta_key) pair last started, if it is still running, and
+## returns a freshly created tween tagged the same way -- so callers never accumulate competing
+## tweens on the same property across rapid repeated triggers (nav icon moves, status pulses, fades,
+## ...). Use a distinct `meta_key` per independent concern when a single node needs more than one
+## concurrently-running animation (for example a fade and a move).
+static func retween(node: Node, meta_key: StringName) -> Tween:
+	if node.has_meta(meta_key):
+		var previous_tween: Tween = node.get_meta(meta_key)
+		if previous_tween != null and previous_tween.is_valid():
+			previous_tween.kill()
+
+	var tween := node.create_tween()
+	node.set_meta(meta_key, tween)
+	return tween

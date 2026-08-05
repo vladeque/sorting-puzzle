@@ -42,12 +42,13 @@ var _store_service = StoreServiceScript.new()
 var _offer_views: Array[Control] = []
 var _purchase_in_progress := false
 var _load_request_serial := 0
+var _is_navigating := false
 
 
 func _ready() -> void:
 	PlayerProgress.load_progress()
 	_status_panel.connect("retry_pressed", Callable(self, "_load_shop"))
-	_bottom_navigation.connect("shop_pressed", Callable(self, "_load_shop"))
+	_bottom_navigation.connect("shop_pressed", Callable(self, "_on_shop_tab_reselected"))
 	_bottom_navigation.connect("home_pressed", Callable(self, "_return_to_main_menu"))
 	_bottom_navigation.connect("leaderboard_pressed", Callable(self, "_open_leaderboard"))
 	if _bottom_navigation.has_method("set_active_tab"):
@@ -213,6 +214,21 @@ func _update_coin_balance() -> void:
 	_coin_balance.call("set_amount", PlayerProgress.get_coins())
 
 
+## With no overlay open, `ui_cancel` returns to Main Menu, matching Leaderboard (see
+## docs/SCENES.md's "Back/ui_cancel Behavior"). The purchase-result dialog counts as a scoped
+## overlay and is closed first if it is showing, rather than also leaving the screen.
+func _unhandled_input(event: InputEvent) -> void:
+	if not event.is_action_pressed("ui_cancel"):
+		return
+
+	get_viewport().set_input_as_handled()
+	if _purchase_dialog.visible:
+		_purchase_dialog.hide()
+		return
+
+	_return_to_main_menu()
+
+
 func _apply_responsive_layout() -> void:
 	var viewport_size := get_viewport_rect().size
 	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
@@ -249,9 +265,26 @@ func _format_count(value: int) -> String:
 	return value_text + formatted
 
 
+## Retapping the already-active Shop tab is a no-op (see docs/SCENES.md's "Active-Tab Reselection
+## Rule"); catalog refresh stays available only through the status panel's explicit Retry action,
+## not a hidden tab-retap convention.
+func _on_shop_tab_reselected() -> void:
+	pass
+
+
 func _return_to_main_menu() -> void:
-	get_tree().change_scene_to_file(MAIN_MENU_SCENE)
+	_begin_navigation(MAIN_MENU_SCENE)
 
 
 func _open_leaderboard() -> void:
-	get_tree().change_scene_to_file(LEADERBOARD_SCENE)
+	_begin_navigation(LEADERBOARD_SCENE)
+
+
+## Ignores a duplicate cross-destination press while a scene transition is already underway, so a
+## rapid double-tap on Home/Leaderboard can never call change_scene_to_file() twice.
+func _begin_navigation(scene_path: String) -> void:
+	if _is_navigating:
+		return
+
+	_is_navigating = true
+	get_tree().change_scene_to_file(scene_path)

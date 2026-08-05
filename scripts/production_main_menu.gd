@@ -53,6 +53,7 @@ var _reward_chest_menu: Control
 var _chapter_selection_screen: Control
 var _animated_reward_stars := 0
 var _animated_reward_goal_index := 0
+var _is_navigating := false
 
 
 func _ready() -> void:
@@ -69,6 +70,7 @@ func _ready() -> void:
 		_reward_chest.connect("chest_pressed", Callable(self, "_open_reward_chest_menu"))
 	_bottom_navigation.connect("shop_pressed", Callable(self, "_open_shop"))
 	_bottom_navigation.connect("leaderboard_pressed", Callable(self, "_open_leaderboard"))
+	_bottom_navigation.connect("home_pressed", Callable(self, "_on_home_tab_reselected"))
 	if _bottom_navigation.has_method("set_active_tab"):
 		_bottom_navigation.call("set_active_tab", &"home")
 	get_viewport().size_changed.connect(_apply_responsive_layout)
@@ -103,6 +105,32 @@ func _process(delta: float) -> void:
 	_update_lives_status()
 	_update_level_button()
 	_update_chapter_button()
+
+
+## Closes whichever scoped overlay is currently open (Chapter Selection first, then the profile,
+## settings, or reward-chest modal, then the leaderboard reward dialog), one per press. With no
+## overlay open, `ui_cancel` intentionally does nothing -- Main Menu must not quit or navigate
+## unexpectedly without a separately approved exit flow (see docs/SCENES.md's "Back/ui_cancel
+## Behavior"). Chapter Selection owns its own `ui_cancel` handling (scripts/chapters/
+## chapter_selection_screen.gd), so this only skips past it rather than also closing it here.
+func _unhandled_input(event: InputEvent) -> void:
+	if not event.is_action_pressed("ui_cancel"):
+		return
+	if is_instance_valid(_chapter_selection_screen):
+		return
+
+	if is_instance_valid(_profile_menu):
+		get_viewport().set_input_as_handled()
+		_profile_menu.queue_free()
+	elif is_instance_valid(_settings_menu):
+		get_viewport().set_input_as_handled()
+		_close_settings_menu()
+	elif is_instance_valid(_reward_chest_menu):
+		get_viewport().set_input_as_handled()
+		_reward_chest_menu.queue_free()
+	elif _leaderboard_reward_dialog.visible:
+		get_viewport().set_input_as_handled()
+		_leaderboard_reward_dialog.hide()
 
 
 func _apply_responsive_layout() -> void:
@@ -464,12 +492,29 @@ func _clear_settings_menu_reference() -> void:
 	_settings_menu = null
 
 
+## Retapping the already-active Home tab is a no-op (see docs/SCENES.md's "Active-Tab Reselection
+## Rule"); Main Menu has no separate reload/refresh action tied to its own bottom-navigation tab.
+func _on_home_tab_reselected() -> void:
+	pass
+
+
 func _open_leaderboard() -> void:
-	get_tree().change_scene_to_file(LEADERBOARD_SCENE)
+	_begin_navigation(LEADERBOARD_SCENE)
 
 
 func _open_shop() -> void:
-	get_tree().change_scene_to_file(SHOP_SCENE)
+	_begin_navigation(SHOP_SCENE)
+
+
+## Ignores a duplicate cross-destination press while a scene transition is already underway, so a
+## rapid double-tap on Shop/Leaderboard (including via the top-status coin shortcut) can never call
+## change_scene_to_file() twice.
+func _begin_navigation(scene_path: String) -> void:
+	if _is_navigating:
+		return
+
+	_is_navigating = true
+	get_tree().change_scene_to_file(scene_path)
 
 
 func _launch_campaign_level() -> void:

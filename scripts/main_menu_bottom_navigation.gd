@@ -1,8 +1,15 @@
 extends MarginContainer
 
+## Retapping the already-active tab is intentionally a no-op here too: `pressed` is a native Button
+## signal that fires on every press regardless of prior state, so it always forwards. The owning
+## screen (production_main_menu.gd/shop_screen.gd/leaderboard_screen.gd) is the one that decides
+## whether its own matching signal actually does anything -- see docs/SCENES.md's "Active-Tab
+## Reselection Rule".
 signal shop_pressed
 signal home_pressed
 signal leaderboard_pressed
+
+const UIMotionScript := preload("res://scripts/ui_motion.gd")
 
 const TAB_SHOP := "shop"
 const TAB_HOME := "home"
@@ -11,6 +18,8 @@ const INACTIVE_ICON_TOP := -50.0
 const INACTIVE_ICON_BOTTOM := 50.0
 const ACTIVE_ICON_TOP := -76.0
 const ACTIVE_ICON_BOTTOM := 24.0
+const ICON_TWEEN_META := &"_nav_icon_tween"
+const LABEL_TWEEN_META := &"_nav_label_tween"
 
 @export_enum("shop", "home", "leaderboard") var active_tab := "home"
 
@@ -53,7 +62,27 @@ func _apply_active_tab() -> void:
 	_set_tab_active(_leaderboard_icon, _leaderboard_label, active_tab == TAB_LEADERBOARD)
 
 
+## Animates the active-tab icon raise/lower and label fade over
+## UIMotion.NAV_ACTIVE_CHANGE_DURATION instead of jumping, including the very first call each time
+## a destination scene loads (screens never live-switch their own bottom nav's active tab -- Home,
+## Shop, and Leaderboard are separate scenes -- so scene entry is the only moment this is visible).
+## Kills any tween already in flight per icon/label so rapid re-entry never accumulates offsets or
+## opacity.
 func _set_tab_active(icon: TextureRect, label: Label, is_active: bool) -> void:
-	icon.offset_top = ACTIVE_ICON_TOP if is_active else INACTIVE_ICON_TOP
-	icon.offset_bottom = ACTIVE_ICON_BOTTOM if is_active else INACTIVE_ICON_BOTTOM
-	label.visible = is_active
+	var target_top := ACTIVE_ICON_TOP if is_active else INACTIVE_ICON_TOP
+	var target_bottom := ACTIVE_ICON_BOTTOM if is_active else INACTIVE_ICON_BOTTOM
+	var icon_tween := UIMotionScript.retween(icon, ICON_TWEEN_META)
+	icon_tween.set_parallel(true)
+	icon_tween.tween_property(icon, "offset_top", target_top, UIMotionScript.NAV_ACTIVE_CHANGE_DURATION) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	icon_tween.tween_property(icon, "offset_bottom", target_bottom, UIMotionScript.NAV_ACTIVE_CHANGE_DURATION) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+
+	var label_tween := UIMotionScript.retween(label, LABEL_TWEEN_META)
+	if is_active:
+		label.modulate.a = 0.0
+		label.visible = true
+		label_tween.tween_property(label, "modulate:a", 1.0, UIMotionScript.NAV_ACTIVE_CHANGE_DURATION)
+	else:
+		label_tween.tween_property(label, "modulate:a", 0.0, UIMotionScript.NAV_ACTIVE_CHANGE_DURATION)
+		label_tween.tween_callback(label.hide)
