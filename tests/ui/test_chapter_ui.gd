@@ -49,8 +49,13 @@ func _run() -> void:
 		"The compact chapter button does not expose the selected chapter title."
 	)
 	_check(
-		chapter_button.custom_minimum_size == Vector2(344.0, 90.0),
+		chapter_button.custom_minimum_size == Vector2(280.0, 74.0),
 		"The main menu chapter button does not use its compact secondary-CTA size."
+	)
+	var action_column := menu.get_node("BottomBar/ActionColumn") as VBoxContainer
+	_check(
+		action_column.get_theme_constant("separation") == -12,
+		"The chapter button's transparent edge is not tucked against the level button."
 	)
 	var chapter_button_style := chapter_button.get_theme_stylebox("normal") as StyleBoxTexture
 	_check(chapter_button_style != null, "The main menu chapter button is missing its artwork.")

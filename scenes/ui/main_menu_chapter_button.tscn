@@ -7,7 +7,7 @@
 texture = ExtResource("1_button_texture")
 
 [node name="ChapterButton" type="Button"]
-custom_minimum_size = Vector2(344, 90)
+custom_minimum_size = Vector2(280, 74)
 size_flags_horizontal = 4
 size_flags_vertical = 4
 focus_mode = 1
@@ -18,7 +18,7 @@ theme_override_colors/font_pressed_color = Color(0.88, 0.97, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.015, 0.25, 0.45, 0.95)
 theme_override_constants/outline_size = 3
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 29
 theme_override_styles/normal = SubResource("Style_button")
 theme_override_styles/hover = SubResource("Style_button")
 theme_override_styles/pressed = SubResource("Style_button")

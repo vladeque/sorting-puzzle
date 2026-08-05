@@ -24,7 +24,7 @@ Purpose:
 - After a completed level returns here, launches one clover coin per earned star from the background house into the reward chest and advances the visible chest count on impact.
 - Provides a bottom `%LevelButton` labeled with the selected chapter's next local level, such as
   `Level 1`, or disabled as `No Lives`, `Chapter Complete`, or `Coming Soon`.
-- Places a compact light-blue `%ChapterButton` immediately below the level button and opens the
+- Places a small light-blue `%ChapterButton` directly against the level button and opens the
   dedicated chapter selection screen.
 - Opens the player profile menu when the profile widget is pressed.
 - Opens the main settings menu when the settings widget is pressed.
@@ -41,7 +41,9 @@ Important nodes:
 - `RewardChest`: left-side `scenes/ui/main_menu_reward_chest.tscn` instance positioned by `scripts/production_main_menu.gd`.
 - `HouseRewardOrigin`: responsive marker over the background house used as the reward animation origin.
 - `RewardCoinFlyer`: fullscreen `scenes/ui/main_menu_reward_coin_flyer.tscn` effect layer.
-- `BottomBar/ActionColumn`: bottom-anchored responsive stack for campaign actions.
+- `BottomBar/ActionColumn`: bottom-anchored responsive stack for campaign actions. Its small
+  negative separation cancels the transparent edge padding in the two button textures so their
+  painted edges sit together without a visible gap.
 - `BottomBar/ActionColumn/LevelButton`: launches the selected chapter's first incomplete level.
 - `BottomBar/ActionColumn/ChapterButton`: selected-chapter button using
   `assets/ui/level_button_blank_light_blue_new.png` through
