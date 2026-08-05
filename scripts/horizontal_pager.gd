@@ -9,6 +9,14 @@ const DOT_SIZE_OFF := 6.0
 const DOT_SIZE_ON := 18.0
 const DOT_COLOR_OFF := Color(1.0, 1.0, 1.0, 0.35)
 const DOT_COLOR_ON := Color(1.0, 0.86, 0.35, 1.0)
+## Authored offsets for %PrevArrow, %NextArrow, and %Dots before any additional device safe-area
+## inset is applied through set_safe_margins().
+const PREV_ARROW_BASE_OFFSET_LEFT := 2.0
+const PREV_ARROW_BASE_OFFSET_RIGHT := 62.0
+const NEXT_ARROW_BASE_OFFSET_LEFT := -62.0
+const NEXT_ARROW_BASE_OFFSET_RIGHT := -2.0
+const DOTS_BASE_OFFSET_TOP := -18.0
+const DOTS_BASE_OFFSET_BOTTOM := -10.0
 
 @export var peek_width := 16.0
 @export var drag_start_distance := 12.0
@@ -61,6 +69,20 @@ func go_to_page(index: int, animate: bool = true) -> void:
 
 func get_current_page() -> int:
 	return _current_index
+
+
+## Insets %PrevArrow/%NextArrow/%Dots by the given device safe-area margin (left/top/right/bottom)
+## on top of their authored offsets. %Clip/%Track and the pages themselves are left untouched, so
+## full-bleed page content (such as a chapter cover's background art) is unaffected. Defaults to
+## Vector4.ZERO, a no-op, so every other consumer of this generic pager is unaffected unless it
+## opts in.
+func set_safe_margins(margins: Vector4) -> void:
+	_prev_arrow.offset_left = PREV_ARROW_BASE_OFFSET_LEFT + margins.x
+	_prev_arrow.offset_right = PREV_ARROW_BASE_OFFSET_RIGHT + margins.x
+	_next_arrow.offset_left = NEXT_ARROW_BASE_OFFSET_LEFT - margins.z
+	_next_arrow.offset_right = NEXT_ARROW_BASE_OFFSET_RIGHT - margins.z
+	_dots.offset_top = DOTS_BASE_OFFSET_TOP - margins.w
+	_dots.offset_bottom = DOTS_BASE_OFFSET_BOTTOM - margins.w
 
 
 func _gui_input(event: InputEvent) -> void:

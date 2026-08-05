@@ -6,6 +6,9 @@ signal selected(chapter_id: String)
 const LOCKED_ART_TINT := Color(0.82, 0.78, 0.72, 1.0)
 const DEFAULT_PANEL_HEIGHT := 244.0
 const LOCKED_PANEL_HEIGHT := 290.0
+## Authored left/right/bottom inset of %InfoMargins from the card's own edges, before any
+## additional device safe-area inset is applied.
+const INFO_MARGIN_BASE := 30.0
 
 @onready var _art: TextureRect = %Art
 @onready var _info_margins: MarginContainer = %InfoMargins
@@ -21,6 +24,8 @@ const LOCKED_PANEL_HEIGHT := 290.0
 @onready var _cta_button: Button = %CtaButton
 
 var _chapter_id := ""
+var _panel_height := DEFAULT_PANEL_HEIGHT
+var _safe_margins := Vector4.ZERO
 
 
 func _ready() -> void:
@@ -82,8 +87,25 @@ func _set_progress(current: int, total: int) -> void:
 	_progress_value_label.text = "%d / %d" % [current, total]
 
 
+## Insets %InfoMargins by the given device safe-area margin (left/top/right/bottom) on top of its
+## authored padding, leaving %Art/%Atmosphere untouched so the cover art stays full-bleed under
+## notches and display cutouts. Only left/right/bottom are relevant -- the info panel is bottom
+## anchored and never approaches the top safe area.
+func set_safe_margins(margins: Vector4) -> void:
+	_safe_margins = margins
+	_apply_info_margins()
+
+
 func _set_panel_height(height: float) -> void:
-	_info_margins.offset_top = _info_margins.offset_bottom - height
+	_panel_height = height
+	_apply_info_margins()
+
+
+func _apply_info_margins() -> void:
+	_info_margins.offset_left = INFO_MARGIN_BASE + _safe_margins.x
+	_info_margins.offset_right = -(INFO_MARGIN_BASE + _safe_margins.z)
+	_info_margins.offset_bottom = -(INFO_MARGIN_BASE + _safe_margins.w)
+	_info_margins.offset_top = _info_margins.offset_bottom - _panel_height
 
 
 func _emit_selected() -> void:
