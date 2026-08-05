@@ -17,13 +17,19 @@ const NAV_ACTIVE_CHANGE_DURATION := 0.165
 const OVERLAY_DURATION := 0.2
 
 const _FADE_TWEEN_META := &"_ui_motion_fade_tween"
-const _CLOSING_META := &"_ui_motion_closing"
+## Presence of this key means "a close_with_fade() is in flight"; its value is a generation token
+## that lets a stale, superseded close notice it was superseded (see close_with_fade()).
+const _CLOSE_GENERATION_META := &"_ui_motion_close_generation"
 
 
 ## Fades `node` in from fully transparent to `target_alpha` (default opaque) over OVERLAY_DURATION,
-## showing it first if it was hidden. Returns the tween so callers can `await tween.finished` to
-## sequence work after the fade, or ignore it.
+## showing it first if it was hidden. Cancels any close_with_fade() still in flight for `node` (a
+## reusable dialog can legitimately be re-shown before its previous close finished fading out), so
+## that stale close never fires its finish callback against the freshly-reopened node. Returns the
+## tween so callers can `await tween.finished` to sequence work after the fade, or ignore it.
 static func fade_in(node: CanvasItem, duration: float = OVERLAY_DURATION, target_alpha: float = 1.0) -> Tween:
+	if node.has_meta(_CLOSE_GENERATION_META):
+		node.remove_meta(_CLOSE_GENERATION_META)
 	node.modulate.a = 0.0
 	node.show()
 	var tween := retween(node, _FADE_TWEEN_META)
@@ -44,15 +50,26 @@ static func fade_out(node: CanvasItem, duration: float = OVERLAY_DURATION) -> Tw
 ## Fades `node` out and then calls `on_finished` (typically `node.queue_free` or `node.hide`) once.
 ## Safe to call more than once while already closing -- a repeat call (the Close button pressed
 ## twice, or `ui_cancel` arriving while a press already started closing it) is ignored rather than
-## restarting the fade or running `on_finished` twice. The guard clears once the fade completes, so
-## a reusable node (a dialog shown/hidden repeatedly rather than freed) closes normally next time.
+## restarting the fade or running `on_finished` twice.
+##
+## Waits out the fade on a plain timer rather than the fade tween's own `finished` signal, because
+## fade_in() is allowed to kill that tween mid-flight (see above) -- a killed tween never emits
+## `finished`, which would otherwise strand this coroutine (and its "closing" guard) forever. A
+## generation token detects that supersession on the way out: if `node` was re-shown (or asked to
+## close again) while this call was waiting, its token no longer matches and this stale call quietly
+## does nothing instead of hiding/freeing a node someone else already reopened.
 static func close_with_fade(node: CanvasItem, on_finished: Callable, duration: float = OVERLAY_DURATION) -> void:
-	if node.has_meta(_CLOSING_META) and bool(node.get_meta(_CLOSING_META)):
+	if node.has_meta(_CLOSE_GENERATION_META):
 		return
 
-	node.set_meta(_CLOSING_META, true)
-	await fade_out(node, duration).finished
-	node.remove_meta(_CLOSING_META)
+	var my_generation := int(node.get_meta(_CLOSE_GENERATION_META, 0)) + 1
+	node.set_meta(_CLOSE_GENERATION_META, my_generation)
+	fade_out(node, duration)
+	await node.get_tree().create_timer(duration).timeout
+	if int(node.get_meta(_CLOSE_GENERATION_META, -1)) != my_generation:
+		return
+
+	node.remove_meta(_CLOSE_GENERATION_META)
 	on_finished.call()
 
 
