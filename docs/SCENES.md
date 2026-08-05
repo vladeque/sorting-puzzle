@@ -18,7 +18,8 @@ Script:
 
 Purpose:
 - Main project entry scene.
-- Displays `assets/backgrounds/main_menu.jpeg` as a fullscreen production menu background.
+- Displays the selected chapter's configured `selection_preview` as a fullscreen production menu
+  background; Chapter 1 defaults to `assets/backgrounds/main_menu.jpeg`.
 - Provides a top status row for profile, saved gold coins, saved campaign lives, and settings.
 - Shows a left-side reward chest widget under the profile icon with saved star progress toward the active configured chest goal.
 - After a completed level returns here, launches one clover coin per earned star from the background house into the reward chest and advances the visible chest count on impact.
@@ -36,7 +37,8 @@ Purpose:
   since the app was last opened.
 
 Important nodes:
-- `Background`: fullscreen `TextureRect` using `assets/backgrounds/main_menu.jpeg`.
+- `%Background`: fullscreen `TextureRect` updated from the selected chapter's
+  `ChapterCatalog.get_selection_preview_path()` value on scene entry and after chapter selection.
 - `TopStatusBar`: top-anchored container that places `scenes/ui/main_menu_top_status.tscn` inside the display's top inset region while avoiding exact camera cutouts.
 - `RewardChest`: left-side `scenes/ui/main_menu_reward_chest.tscn` instance positioned by `scripts/production_main_menu.gd`.
 - `HouseRewardOrigin`: responsive marker over the background house used as the reward animation origin.
@@ -60,7 +62,7 @@ Important nodes:
 Depends on:
 - `level.tscn` through `scripts/production_main_menu.gd`.
 - `PlayerProgress` autoload for the saved campaign level, gold coins, lives count, life restore countdown, and reward chest progress.
-- `assets/backgrounds/main_menu.jpeg`.
+- `configs/chapters.json` and `ChapterCatalog` for the selected chapter's menu background.
 - `scenes/ui/main_menu_top_status.tscn` for top status icons and labels.
 - `scenes/ui/main_menu_reward_chest.tscn` for the side reward chest icon and progress bar.
 - `scenes/ui/main_menu_reward_coin_flyer.tscn` for the clover-coin flight effect.

@@ -36,6 +36,11 @@ func _run() -> void:
 			== "res://assets/backgrounds/main_menu.jpeg",
 			"Chapter 1 selection reuses the main-menu background"
 		)
+		_check(
+			catalog.get_selection_preview_path("chapter_02")
+			== "res://assets/backgrounds/chapter_02_witch_apothecary.png",
+			"Chapter 2 uses the witch apothecary menu background"
+		)
 
 	if _failures.is_empty():
 		print("Chapter catalog tests passed.")

@@ -8,8 +8,9 @@ Main scene:
 - `scenes/main_menu.tscn`
 - Configured in `project.godot` as `run/main_scene`.
 - `project.godot` keeps the 720x1280 design viewport and uses `canvas_items` stretch with `keep_width` so portrait devices share a stable logical width while gaining or losing vertical play space.
-- Owns the production campaign entry point over `assets/backgrounds/main_menu.jpeg`, launches the
-  selected chapter's next level, and opens the chapter picker from the action beneath the level button.
+- Owns the production campaign entry point over the selected chapter's `selection_preview`,
+  launches that chapter's next level, and opens the chapter picker from the action beneath the level
+  button. Chapter selection updates the menu background immediately.
 - Shows a separate left-side reward chest progress widget under the profile icon.
 
 Testing menu:
@@ -102,6 +103,8 @@ Files:
 
 Responsibility:
 - Shows the selected chapter's next chapter-local level and a chapter summary button directly below.
+- Uses each catalog entry's `selection_preview` for both its full-screen chapter cover and the
+  production main-menu background after that chapter is selected.
 - Shows all configured chapters on a dedicated screen; locked cards expose exact previous-chapter
   progress toward the default 25-level requirement.
 - Shows production top-row icons for the saved circular-clipped profile avatar, saved gold coins, saved lives, and a smaller pause-style settings button.

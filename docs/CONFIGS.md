@@ -19,8 +19,9 @@ Contract:
   ships.
 - `gameplay_background_mode` is `legacy` for the original procedural wall/floor presentation or
   `artwork` for the chapter's full-screen gameplay texture. Chapter 1 uses `legacy`.
-- `background_texture` and `selection_preview` must reference existing Godot textures; the preview
-  remains available in chapter-selection UI even for a legacy gameplay background.
+- `background_texture` and `selection_preview` must reference existing Godot textures.
+  `background_texture` owns gameplay presentation, while `selection_preview` supplies both the
+  chapter-selection cover and the production main-menu background for the selected chapter.
 
 ## `configs/item_sprites.json`
 

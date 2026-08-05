@@ -39,6 +39,12 @@ func _run() -> void:
 
 	var level_button := menu.get_node("%LevelButton") as Button
 	var chapter_button := menu.get_node("%ChapterButton") as Button
+	var menu_background := menu.get_node("%Background") as TextureRect
+	_check(
+		menu_background.texture != null
+			and menu_background.texture.resource_path == "res://assets/backgrounds/main_menu.jpeg",
+		"The production menu should start with the selected Chapter 1 background."
+	)
 	_check(level_button.text == "LEVEL 1", "The default chapter does not offer its first level.")
 	_check(
 		chapter_button.text == "CHAPTER 1",
@@ -101,6 +107,13 @@ func _run() -> void:
 			)
 
 			var locked_card := track.get_child(1)
+			var locked_art := locked_card.get_node("%Art") as TextureRect
+			_check(
+				locked_art.texture != null
+					and locked_art.texture.resource_path
+						== "res://assets/backgrounds/chapter_02_witch_apothecary.png",
+				"Chapter 2 should show the witch apothecary cover art."
+			)
 			var locked_cta := locked_card.get_node("%CtaButton") as Button
 			_check(locked_cta.disabled, "Chapter 2 should be locked for a new player.")
 			_check(
@@ -126,6 +139,14 @@ func _run() -> void:
 				(pager.get_node("%NextArrow") as Button).visible
 				and not (pager.get_node("%PrevArrow") as Button).visible,
 				"The first chapter should advertise the next page with only the right arrow."
+			)
+			selection.emit_signal("chapter_selected", "chapter_02")
+			await process_frame
+			_check(
+				menu_background.texture != null
+					and menu_background.texture.resource_path
+						== "res://assets/backgrounds/chapter_02_witch_apothecary.png",
+				"The production menu background should change with the selected chapter."
 			)
 
 	for resolution in TEST_RESOLUTIONS:

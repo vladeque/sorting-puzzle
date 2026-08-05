@@ -8,7 +8,7 @@ Attached to:
 - `scenes/main_menu.tscn` root `ProductionMainMenu`.
 
 Purpose:
-- Shows the production campaign entry point over the production menu background.
+- Shows the production campaign entry point over the selected chapter's configured menu background.
 - Labels the bottom button with the saved current level.
 - Displays saved campaign lives in the top status bar and disables campaign play at zero lives.
 - Displays saved gold coins in the top status bar.
@@ -18,7 +18,8 @@ Purpose:
 - Opens the reward chest detail modal when the reward chest widget emits `chest_pressed`.
 - Opens the main-menu settings popup from the top status bar.
 - Launches the first incomplete level in the selected unlocked chapter.
-- Opens the chapter selection screen and refreshes the level/chapter actions after selection.
+- Opens the chapter selection screen and refreshes the level/chapter actions and fullscreen
+  background after selection.
 - Opens the dedicated leaderboard scene from the bottom navigation trophy signal.
 - Consumes `PlayerProgress.consume_pending_leaderboard_reward()` and shows `%LeaderboardRewardDialog` when a weekly leaderboard rollover granted a coin reward since the last launch.
 
@@ -60,6 +61,8 @@ Key methods:
 - `_layout_reward_chest()`: positions the side reward chest under the profile icon without putting it in the top status scene.
 - `_layout_bottom_navigation()`: sizes the full-width navigation bar and passes its safe-bottom inset to the scene-owned layout.
 - `_update_level_button()`: displays the saved current level, no-lives state, or complete state.
+- `_update_chapter_background(chapter_id)`: loads the chapter's `selection_preview` into the
+  fullscreen `%Background`, preserving the scene fallback when the configured texture is invalid.
 - `_update_coin_status()`: writes the saved gold coin balance into the top status label.
 - `_update_lives_status()`: writes current lives and the next-life `MM:SS` countdown into the top status labels.
 - `_update_reward_chest_status()`: writes `PlayerProgress` reward chest progress into the side widget.

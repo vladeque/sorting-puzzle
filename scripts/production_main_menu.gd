@@ -26,6 +26,7 @@ const CHAPTER_BUTTON_MAX_WIDTH := 280.0
 const BOTTOM_NAVIGATION_HEIGHT := 96.0
 const LIFE_STATUS_REFRESH_SECONDS := 1.0
 
+@onready var _background := %Background as TextureRect
 @onready var _top_status_bar := %TopStatusBar as MarginContainer
 @onready var _reward_chest := %RewardChest as Control
 @onready var _house_reward_origin := %HouseRewardOrigin as Control
@@ -77,6 +78,7 @@ func _ready() -> void:
 		_prepare_pending_reward_animation(pending_reward_animation)
 	_update_level_button()
 	_update_chapter_button()
+	_update_chapter_background(PlayerProgress.get_selected_chapter_id())
 	_apply_responsive_layout()
 	if not pending_reward_animation.is_empty():
 		_play_pending_reward_animation.call_deferred(pending_reward_animation)
@@ -439,9 +441,21 @@ func _open_chapter_selection() -> void:
 	_chapter_selection_screen.tree_exited.connect(_clear_chapter_selection_reference)
 
 
-func _on_chapter_selected(_chapter_id: String) -> void:
+func _on_chapter_selected(chapter_id: String) -> void:
 	_update_level_button()
 	_update_chapter_button()
+	_update_chapter_background(chapter_id)
+
+
+func _update_chapter_background(chapter_id: String) -> void:
+	if _background == null:
+		return
+	var background_path := ChapterCatalog.get_selection_preview_path(chapter_id)
+	if background_path.is_empty() or not ResourceLoader.exists(background_path):
+		return
+	var background_texture := load(background_path) as Texture2D
+	if background_texture != null:
+		_background.texture = background_texture
 
 
 func _clear_chapter_selection_reference() -> void:

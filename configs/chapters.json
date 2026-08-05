@@ -26,7 +26,7 @@
       },
       "gameplay_background_mode": "artwork",
       "background_texture": "res://assets/backgrounds/level_bg_option_04_cozy_candy.png",
-      "selection_preview": "res://assets/backgrounds/level_bg_option_04_cozy_candy.png"
+      "selection_preview": "res://assets/backgrounds/chapter_02_witch_apothecary.png"
     }
   ]
 }
