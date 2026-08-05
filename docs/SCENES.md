@@ -89,6 +89,8 @@ Script:
 
 Purpose:
 - Full-screen chapter picker opened from the main menu's `%ChapterButton`.
+- Uses a dedicated overlay z-index above the production menu actions so the level and chapter
+  buttons cannot render through the full-screen picker.
 - Builds one `scenes/ui/chapter_cover_card.tscn` instance per `configs/chapters.json` entry and
   hands each to a `scenes/ui/horizontal_pager.tscn` instance as a page.
 - Lets every cover own the entire viewport so swiping or pressing an arrow replaces its background

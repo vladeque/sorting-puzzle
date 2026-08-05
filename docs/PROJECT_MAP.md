@@ -105,6 +105,7 @@ Responsibility:
 - Shows the selected chapter's next chapter-local level and a chapter summary button directly below.
 - Uses each catalog entry's `selection_preview` for both its full-screen chapter cover and the
   production main-menu background after that chapter is selected.
+- Keeps the chapter picker on a dedicated overlay z-index above all production menu actions.
 - Shows all configured chapters on a dedicated screen; locked cards expose exact previous-chapter
   progress toward the default 25-level requirement.
 - Shows production top-row icons for the saved circular-clipped profile avatar, saved gold coins, saved lives, and a smaller pause-style settings button.
