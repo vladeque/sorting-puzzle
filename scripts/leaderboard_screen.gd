@@ -2,6 +2,7 @@ extends Control
 
 const LeaderboardServiceScript := preload("res://scripts/leaderboards/leaderboard_service.gd")
 const DestinationScreenLayoutScript := preload("res://scripts/destination_screen_layout.gd")
+const UIMotionScript := preload("res://scripts/ui_motion.gd")
 const ROW_SCENE := preload("res://scenes/ui/leaderboard_row.tscn")
 const MAIN_MENU_SCENE := "res://scenes/main_menu.tscn"
 const SHOP_SCENE := "res://scenes/ui/shop_screen.tscn"
@@ -43,6 +44,7 @@ var _is_navigating := false
 
 
 func _ready() -> void:
+	UIMotionScript.fade_in(self)
 	_service = LeaderboardServiceScript.new()
 	_weekly_button.pressed.connect(_select_scope.bind(SCOPE_WEEKLY))
 	_country_button.pressed.connect(_select_scope.bind(SCOPE_COUNTRY))

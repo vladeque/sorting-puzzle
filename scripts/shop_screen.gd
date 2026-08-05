@@ -2,6 +2,7 @@ extends Control
 
 const StoreServiceScript := preload("res://scripts/store/store_service.gd")
 const DestinationScreenLayoutScript := preload("res://scripts/destination_screen_layout.gd")
+const UIMotionScript := preload("res://scripts/ui_motion.gd")
 const BUNDLE_CARD_SCENE := preload("res://scenes/ui/shop_bundle_card.tscn")
 const COIN_OFFER_ROW_SCENE := preload("res://scenes/ui/shop_coin_offer_row.tscn")
 const MAIN_MENU_SCENE := "res://scenes/main_menu.tscn"
@@ -46,6 +47,7 @@ var _is_navigating := false
 
 
 func _ready() -> void:
+	UIMotionScript.fade_in(self)
 	PlayerProgress.load_progress()
 	_status_panel.connect("retry_pressed", Callable(self, "_load_shop"))
 	_bottom_navigation.connect("shop_pressed", Callable(self, "_on_shop_tab_reselected"))
@@ -223,7 +225,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	get_viewport().set_input_as_handled()
 	if _purchase_dialog.visible:
-		_purchase_dialog.hide()
+		_purchase_dialog.call("close")
 		return
 
 	_return_to_main_menu()

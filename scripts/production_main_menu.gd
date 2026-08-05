@@ -6,6 +6,7 @@ const SETTINGS_MENU_SCENE := preload("res://scenes/ui/settings_menu.tscn")
 const REWARD_CHEST_MENU_SCENE := preload("res://scenes/ui/reward_chest_menu.tscn")
 const CHAPTER_SELECTION_SCENE := preload("res://scenes/ui/chapter_selection_screen.tscn")
 const MenuBackgroundResolverScript := preload("res://scripts/chapters/menu_background_resolver.gd")
+const UIMotionScript := preload("res://scripts/ui_motion.gd")
 const AVATAR_CLIP_SHADER := preload("res://assets/ui/avatar_circle_clip.gdshader")
 const PRODUCTION_MENU_SCENE := "res://scenes/main_menu.tscn"
 const SHOP_SCENE := "res://scenes/ui/shop_screen.tscn"
@@ -57,6 +58,7 @@ var _is_navigating := false
 
 
 func _ready() -> void:
+	UIMotionScript.fade_in(self)
 	PlayerProgress.load_progress()
 	PlayerProgress.refresh_lives()
 	var pending_reward_animation := PlayerProgress.consume_pending_reward_chest_animation()
@@ -121,16 +123,16 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	if is_instance_valid(_profile_menu):
 		get_viewport().set_input_as_handled()
-		_profile_menu.queue_free()
+		_profile_menu.call("close")
 	elif is_instance_valid(_settings_menu):
 		get_viewport().set_input_as_handled()
 		_close_settings_menu()
 	elif is_instance_valid(_reward_chest_menu):
 		get_viewport().set_input_as_handled()
-		_reward_chest_menu.queue_free()
+		_reward_chest_menu.call("close")
 	elif _leaderboard_reward_dialog.visible:
 		get_viewport().set_input_as_handled()
-		_leaderboard_reward_dialog.hide()
+		_leaderboard_reward_dialog.call("close")
 
 
 func _apply_responsive_layout() -> void:
@@ -436,7 +438,7 @@ func _open_settings_menu() -> void:
 
 func _close_settings_menu() -> void:
 	if is_instance_valid(_settings_menu):
-		_settings_menu.queue_free()
+		UIMotionScript.close_with_fade(_settings_menu, _settings_menu.queue_free)
 
 
 func _open_reward_chest_menu() -> void:
@@ -470,6 +472,7 @@ func _update_chapter_background(chapter_id: String) -> void:
 func _add_main_menu_overlay(overlay: Control) -> void:
 	overlay.z_index = MAIN_MENU_OVERLAY_Z_INDEX
 	add_child(overlay)
+	UIMotionScript.fade_in(overlay)
 
 
 func _clear_chapter_selection_reference() -> void:

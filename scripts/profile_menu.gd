@@ -2,6 +2,7 @@ extends Control
 
 signal avatar_saved(avatar_id: String)
 
+const UIMotionScript := preload("res://scripts/ui_motion.gd")
 const AVATAR_CLIP_SHADER := preload("res://assets/ui/avatar_circle_clip.gdshader")
 const GRID_COLUMNS := 3
 const PANEL_MAX_WIDTH := 520.0
@@ -33,7 +34,7 @@ func _ready() -> void:
 	_avatar_grid.add_theme_constant_override("v_separation", GRID_V_SEPARATION)
 	_save_button.text = "Save"
 	_save_button.pressed.connect(_save_selection)
-	_close_button.pressed.connect(queue_free)
+	_close_button.pressed.connect(close)
 	_name_line_edit.text_submitted.connect(_save_from_name_submit)
 	resized.connect(_apply_responsive_layout)
 	get_viewport().size_changed.connect(_apply_responsive_layout)
@@ -80,7 +81,14 @@ func _select_avatar(avatar_id: String) -> void:
 func _save_selection() -> void:
 	if PlayerProgress.set_profile(_selected_avatar_id, _name_line_edit.text):
 		avatar_saved.emit(_selected_avatar_id)
-		queue_free()
+		close()
+
+
+## Fades out and frees this modal. Safe to call more than once (Close pressed, Save pressed, and
+## the owning menu's `ui_cancel` handling can all reach here) -- a repeat call while already
+## closing is ignored.
+func close() -> void:
+	UIMotionScript.close_with_fade(self, queue_free)
 
 
 func _save_from_name_submit(_new_text: String) -> void:

@@ -5,6 +5,7 @@ signal closed
 
 const CHAPTER_COVER_CARD_SCENE := preload("res://scenes/ui/chapter_cover_card.tscn")
 const DestinationScreenLayoutScript := preload("res://scripts/destination_screen_layout.gd")
+const UIMotionScript := preload("res://scripts/ui_motion.gd")
 ## Authored pixel height of %HeaderMargins before any additional top safe-area inset is applied.
 const HEADER_HEIGHT := 112.0
 
@@ -53,7 +54,13 @@ func _select_chapter(chapter_id: String) -> void:
 	_close()
 
 
+## Fades out and frees this screen. Safe to call more than once (the back button, `ui_cancel`, and
+## a successful selection can all reach here) -- a repeat call while already closing is ignored.
 func _close() -> void:
+	UIMotionScript.close_with_fade(self, _finish_close)
+
+
+func _finish_close() -> void:
 	closed.emit()
 	queue_free()
 

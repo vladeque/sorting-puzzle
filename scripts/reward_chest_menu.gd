@@ -1,5 +1,6 @@
 extends Control
 
+const UIMotionScript := preload("res://scripts/ui_motion.gd")
 const ILLUSTRATION_CORNER_RADIUS := 16.0
 
 @onready var _close_button := %CloseButton as Button
@@ -10,11 +11,18 @@ const ILLUSTRATION_CORNER_RADIUS := 16.0
 
 
 func _ready() -> void:
-	_close_button.pressed.connect(queue_free)
-	_continue_button.pressed.connect(queue_free)
+	_close_button.pressed.connect(close)
+	_continue_button.pressed.connect(close)
 	_illustration.resized.connect(_sync_illustration_corner_mask)
 	_sync_illustration_corner_mask()
 	_apply_reward_progress(PlayerProgress.get_reward_chest_progress())
+
+
+## Fades out and frees this modal. Safe to call more than once (Close pressed, Continue pressed,
+## and the owning menu's `ui_cancel` handling can all reach here) -- a repeat call while already
+## closing is ignored.
+func close() -> void:
+	UIMotionScript.close_with_fade(self, queue_free)
 
 
 func _apply_reward_progress(progress: Dictionary) -> void:

@@ -17,6 +17,7 @@ const NAV_ACTIVE_CHANGE_DURATION := 0.165
 const OVERLAY_DURATION := 0.2
 
 const _FADE_TWEEN_META := &"_ui_motion_fade_tween"
+const _CLOSING_META := &"_ui_motion_closing"
 
 
 ## Fades `node` in from fully transparent to `target_alpha` (default opaque) over OVERLAY_DURATION,
@@ -38,6 +39,21 @@ static func fade_out(node: CanvasItem, duration: float = OVERLAY_DURATION) -> Tw
 	tween.tween_property(node, "modulate:a", 0.0, duration) \
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 	return tween
+
+
+## Fades `node` out and then calls `on_finished` (typically `node.queue_free` or `node.hide`) once.
+## Safe to call more than once while already closing -- a repeat call (the Close button pressed
+## twice, or `ui_cancel` arriving while a press already started closing it) is ignored rather than
+## restarting the fade or running `on_finished` twice. The guard clears once the fade completes, so
+## a reusable node (a dialog shown/hidden repeatedly rather than freed) closes normally next time.
+static func close_with_fade(node: CanvasItem, on_finished: Callable, duration: float = OVERLAY_DURATION) -> void:
+	if node.has_meta(_CLOSING_META) and bool(node.get_meta(_CLOSING_META)):
+		return
+
+	node.set_meta(_CLOSING_META, true)
+	await fade_out(node, duration).finished
+	node.remove_meta(_CLOSING_META)
+	on_finished.call()
 
 
 ## Kills whichever tween this exact (node, meta_key) pair last started, if it is still running, and
