@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://dwm7nk7sd3tou" path="res://assets/backgrounds/main_menu.jpeg" id="1_background"]
 [ext_resource type="Script" uid="uid://cb4p4uex1kp4j" path="res://scripts/production_main_menu.gd" id="2_menu_script"]
-[ext_resource type="PackedScene" path="res://scenes/ui/level_button.tscn" id="3_level_button"]
+[ext_resource type="PackedScene" uid="uid://cfpyljokiei7h" path="res://scenes/ui/level_button.tscn" id="3_level_button"]
 [ext_resource type="PackedScene" uid="uid://76jf8ug6hwj5" path="res://scenes/ui/main_menu_top_status.tscn" id="4_top_status"]
 [ext_resource type="PackedScene" uid="uid://c6xhf1gyqk2tr" path="res://scenes/ui/main_menu_reward_chest.tscn" id="5_reward_chest"]
 [ext_resource type="PackedScene" path="res://scenes/ui/main_menu_reward_coin_flyer.tscn" id="6_reward_coin_flyer"]
@@ -68,15 +68,16 @@ offset_bottom = -112.0
 grow_horizontal = 2
 grow_vertical = 0
 
-[node name="ActionColumn" type="VBoxContainer" parent="BottomBar"]
+[node name="ActionColumn" type="VBoxContainer" parent="BottomBar" unique_id=1872994259]
 layout_mode = 2
-theme_override_constants/separation = -12
+theme_override_constants/separation = -20
 
 [node name="LevelButton" parent="BottomBar/ActionColumn" unique_id=1123251713 instance=ExtResource("3_level_button")]
 unique_name_in_owner = true
+z_index = 1
 layout_mode = 2
 
-[node name="ChapterButton" parent="BottomBar/ActionColumn" instance=ExtResource("9_chapter_button")]
+[node name="ChapterButton" parent="BottomBar/ActionColumn" unique_id=348848065 instance=ExtResource("9_chapter_button")]
 unique_name_in_owner = true
 layout_mode = 2
 
@@ -105,6 +106,6 @@ offset_top = -25.0
 offset_right = -1.0
 offset_bottom = -25.0
 
-[node name="LeaderboardRewardDialog" parent="." instance=ExtResource("8_leaderboard_reward_dialog")]
+[node name="LeaderboardRewardDialog" parent="." unique_id=2007464570 instance=ExtResource("8_leaderboard_reward_dialog")]
 unique_name_in_owner = true
 layout_mode = 1
