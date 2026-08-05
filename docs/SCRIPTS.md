@@ -14,11 +14,11 @@ Purpose:
 - Displays saved gold coins in the top status bar.
 - Displays the saved profile avatar and opens the profile editor from the top status bar.
 - Displays the saved reward chest star progress in a separate left-side widget under the profile icon.
-- Consumes completed-level reward payloads, displays the pre-reward chest value, and advances it once for each clover coin that reaches the chest.
+- Consumes completed-level reward payloads, displays the pre-reward chest value, and advances it once for each reward star that reaches the chest.
 - Opens the reward chest detail modal when the reward chest widget emits `chest_pressed`.
 - Opens the main-menu settings popup from the top status bar.
 - Adds every main-menu modal through a shared overlay helper so no menu action can render or receive
-  input above an open modal.
+  input above an open modal; each overlay fades in on open and out before it closes.
 - Launches the first incomplete level in the selected unlocked chapter.
 - Opens the chapter selection screen and refreshes the level/chapter actions and fullscreen
   background after selection.
@@ -26,6 +26,11 @@ Purpose:
 - Opens the dedicated Shop scene when the top-status coin balance shortcut is pressed (in addition
   to the bottom navigation cart).
 - Consumes `PlayerProgress.consume_pending_leaderboard_reward()` and shows `%LeaderboardRewardDialog` when a weekly leaderboard rollover granted a coin reward since the last launch.
+- Fades the whole screen in on `_ready()`; retapping the already-active Home bottom-navigation tab
+  is a documented no-op; `ui_cancel` closes the topmost open overlay (skipping its own handling
+  entirely while Chapter Selection is open, since that screen owns its own `ui_cancel`) or does
+  nothing with none open; a duplicate cross-destination navigation press while a scene transition is
+  in flight is ignored (see `docs/SCENES.md`'s "Shared Interaction Roles").
 
 Key constants:
 - `LEVEL_SCENE`: preloads `res://level.tscn`.
@@ -34,6 +39,7 @@ Key constants:
 - `REWARD_CHEST_MENU_SCENE`: preloads `res://scenes/ui/reward_chest_menu.tscn`.
 - `MenuBackgroundResolverScript`: preloads `res://scripts/chapters/menu_background_resolver.gd`,
   the same chapter-background policy Shop/Leaderboard use through their shared destination shell.
+- `UIMotionScript`: preloads `res://scripts/ui_motion.gd` for the destination/overlay fades.
 - `PRODUCTION_MENU_SCENE`: return path assigned to campaign level instances.
 - `LEADERBOARD_SCENE`: destination path for the trophy tab.
 - `LIFE_STATUS_REFRESH_SECONDS`: cadence for refreshing the lives countdown while the menu is visible.
@@ -48,7 +54,8 @@ Important nodes:
 - `%TopStatusBar`: top-anchored container positioned inside the display's top inset region while avoiding exact camera cutout rectangles.
 - `%RewardChest`: side-screen `scenes/ui/main_menu_reward_chest.tscn` instance positioned under the profile icon.
 - `%HouseRewardOrigin`: normalized marker over the background house.
-- `%RewardCoinFlyer`: dedicated fullscreen completed-level coin effect.
+- `%RewardStarFlyer`: dedicated fullscreen completed-level reward-star effect (renamed from
+  `%RewardCoinFlyer` in UI-002; see `docs/SCENES.md`'s "Reward-Progress Semantics").
 - `MainMenuTopStatus/ProfileWidget`: opens the profile menu.
 - `MainMenuTopStatus/ProfileWidget/AvatarTexture`: displays the saved avatar texture.
 - `MainMenuTopStatus/CoinsWidget`: `scenes/ui/main_menu_coin_shortcut.tscn` instance; shows the
@@ -64,8 +71,14 @@ Important nodes:
 - `%BottomNavigation`: full-width `scenes/ui/main_menu_bottom_navigation.tscn` instance aligned to the viewport bottom and extended through the device safe area.
 
 Key methods:
-- `_ready()`: loads progress, wires level, bottom-navigation, and coin-shortcut buttons, refreshes the saved coin balance, selects Home, and applies responsive layout.
+- `_ready()`: fades the screen in, loads progress, wires level, bottom-navigation, and
+  coin-shortcut buttons, refreshes the saved coin balance, selects Home, and applies responsive
+  layout.
 - `_process(delta)`: refreshes the lives display and play button state once per elapsed real-time second while the menu is open.
+- `_unhandled_input(event)`: closes the topmost open scoped overlay on `ui_cancel` (profile,
+  settings, or reward-chest modal, then the leaderboard reward dialog), one per press; explicitly
+  skips entirely while Chapter Selection is open (it owns its own `ui_cancel` handling); does
+  nothing with no overlay open.
 - `_apply_responsive_layout()`: keeps the top status row cutout-aware and the bottom button inside the viewport safe area.
 - `_layout_top_status_bar()`: places the status row at `TOP_MARGIN`, expands its center exclusion gap around camera cutouts, and falls below a cutout only when the row cannot fit around it.
 - `_layout_reward_chest()`: positions the side reward chest under the profile icon without putting it in the top status scene.
@@ -77,18 +90,25 @@ Key methods:
 - `_update_coin_balance()`: forwards the saved gold coin balance to the coin shortcut's `set_amount()`.
 - `_update_lives_status()`: writes current lives and the next-life `MM:SS` countdown into the top status labels.
 - `_update_reward_chest_status()`: writes `PlayerProgress` reward chest progress into the side widget.
-- `_play_pending_reward_animation()`: flies earned clover coins from the house to the chest after scene entry.
-- `_on_reward_coin_arrived()`: advances the displayed chest count and handles configured goal rollover on impact.
+- `_play_pending_reward_animation()`: flies earned reward stars from the house to the chest after
+  scene entry (UI-002 corrected this from flying clover-coin art; see `docs/SCENES.md`'s
+  "Reward-Progress Semantics").
+- `_on_reward_star_arrived()`: advances the displayed chest count and handles configured goal rollover on impact (renamed from `_on_reward_coin_arrived`).
+- `_on_reward_star_animation_finished()`: reconciles the displayed chest value with saved progress once the flight finishes (renamed from `_on_reward_coin_animation_finished`).
+- `_on_home_tab_reselected()`: documented no-op for retapping the already-active Home tab.
 - `_format_life_restore_time(seconds_remaining)`: formats the next-life restore timer as zero-padded minutes and seconds.
 - `_update_profile_avatar()`: loads the saved avatar texture into the top status profile widget.
 - `_open_profile_menu()`: creates the centered profile menu window and listens for saved avatar changes.
 - `_open_settings_menu()`: creates the centered settings popup and wires its close button.
-- `_close_settings_menu()`: dismisses the settings popup.
+- `_close_settings_menu()`: fades the settings popup out, then frees it.
 - `_open_reward_chest_menu()`: creates the centered reward chest detail modal; the modal reads its own progress and wires its own close button.
-- `_add_main_menu_overlay(overlay)`: places a runtime modal on the shared overlay z-index before
-  adding it to the production menu.
-- `_open_leaderboard()`: replaces the production menu with the dedicated leaderboard scene.
-- `_open_shop()`: replaces the production menu with the dedicated Shop scene.
+- `_add_main_menu_overlay(overlay)`: places a runtime modal on the shared overlay z-index, adds it
+  to the production menu, and fades it in.
+- `_open_leaderboard()` / `_open_shop()`: request navigation to the dedicated leaderboard/Shop
+  scene through `_begin_navigation()`.
+- `_begin_navigation(scene_path)`: guarded `change_scene_to_file()` wrapper -- ignores a duplicate
+  call while `_is_navigating` is already true, so a rapid double-tap (including via the top-status
+  coin shortcut) can never call it twice.
 - `_on_profile_avatar_saved(avatar_id)`: refreshes the top status avatar after the profile menu saves.
 - `_launch_campaign_level()`: resolves the selected chapter's next incomplete global level,
   instantiates it, sets campaign launch metadata, swaps current scene, and queues the menu.
@@ -104,7 +124,10 @@ Purpose:
   `DestinationScreenLayout.get_safe_area_margins()`/`get_title_font_size()` to keep `%HeaderMargins`,
   the centered `%ChaptersTitleLabel`, and every page's pager/card overlays inside the device safe
   area; `_apply_safe_margins()` is split out so tests can exercise a fabricated inset directly,
-  since the real safe-area lookup is always zero on desktop/headless.
+  since the real safe-area lookup is always zero on desktop/headless. `_close()` (the back button,
+  `ui_cancel`, or a successful selection) fades the screen out via `scripts/ui_motion.gd` before
+  freeing it; owns its own `ui_cancel` handling independently of Main Menu's, which explicitly
+  skips acting while this screen is open instead of risking a double-handling race.
 - `main_menu_chapter_button.gd` labels the compact main-menu chapter button and exposes the full
   chapter title in its tooltip. `chapter_cover_card.gd` owns full-screen art plus a bottom
   information panel with completion counts, selected state, exact lock progress, a labeled linear
@@ -130,6 +153,7 @@ Depends on:
 - `scripts/level.gd` export `return_menu_scene_path`
 - `scripts/horizontal_pager.gd`
 - `scripts/destination_screen_layout.gd`
+- `scripts/ui_motion.gd`
 - `PlayerProgress` autoload
 
 Do not use for:
@@ -223,9 +247,22 @@ Attached to:
 - `scenes/ui/main_menu_bottom_navigation.tscn` root `MainMenuBottomNavigation`.
 
 Purpose:
-- Wires the three scene-owned icon buttons to `shop_pressed`, `home_pressed`, and `leaderboard_pressed` signals.
+- Wires the three scene-owned icon buttons to `shop_pressed`, `home_pressed`, and
+  `leaderboard_pressed` signals. `pressed` is a native Button signal and always forwards regardless
+  of prior state; the owning screen decides whether its own matching signal actually does anything
+  (a documented no-op when it matches the screen's own destination -- see `docs/SCENES.md`'s
+  "Active-Tab Reselection Rule").
 - Applies runtime bottom safe-area padding while preserving three equal-width button segments.
-- Owns the reusable active-tab presentation: `set_active_tab(tab_name)` raises the selected icon beyond the bar height, shows its label, and restores the other icons to centered unlabeled states.
+- Owns the reusable active-tab presentation: `set_active_tab(tab_name)` raises the selected icon
+  beyond the bar height, shows its label, and restores the other icons to centered unlabeled
+  states, animating the icon raise/lower and label fade over
+  `UIMotion.NAV_ACTIVE_CHANGE_DURATION` (via `_set_tab_active()`) instead of jumping. Kills any
+  tween already in flight per icon/label first, so rapid re-entry never accumulates offsets or
+  opacity. Screens never live-switch their own bottom nav's active tab -- Home, Shop, and
+  Leaderboard are separate scenes -- so scene entry is the only moment this animation is visible.
+
+Depends on:
+- `scripts/ui_motion.gd`.
 
 Do not use for:
 - Loading destination scenes or owning menu progression.
@@ -276,6 +313,13 @@ Purpose:
   `show_loading(message)`/`show_empty(message)` hide Retry (an in-progress load or a legitimately
   empty result is not a failure); `show_error(message)` shows it; `hide_status()` hides the panel.
   Emits `retry_pressed`; the owning screen decides what retrying actually does.
+- `show_loading()` starts a looping opacity pulse on `%StatusMessageLabel` (`UIMotion` tokens, via
+  `retween()`) so an in-progress load reads as active rather than frozen; every other state and
+  leaving the tree stop it (`stop_tween()`), so reloads never accumulate loop tweens. Purely
+  visual -- never blocks `ui_cancel` or bottom navigation.
+
+Depends on:
+- `scripts/ui_motion.gd`.
 
 ## `scripts/leaderboard_screen.gd`
 
@@ -301,10 +345,14 @@ Purpose:
   fixed Chapter 1 image.
 - Routes the shared Home tab back to `scenes/main_menu.tscn`.
 - Routes the shared Shop tab to `scenes/ui/shop_screen.tscn`.
+- Fades the whole screen in on `_ready()`; retapping the already-active Leaderboard
+  bottom-navigation tab is a documented no-op (`_on_leaderboard_tab_reselected()`; ranking refresh
+  stays available only through `%StatusPanel`'s Retry); `ui_cancel` always returns to Main Menu,
+  since Leaderboard has no scoped overlay of its own; `_begin_navigation()` guards `_return_to_main_menu()`/`_open_shop()` against a duplicate press while a transition is already in flight.
 
 Depends on:
 - `scripts/leaderboards/leaderboard_service.gd`.
-- `scripts/destination_screen_layout.gd`.
+- `scripts/destination_screen_layout.gd`, `scripts/ui_motion.gd`.
 - `scenes/ui/leaderboard_row.tscn`, `scenes/ui/destination_screen_shell.tscn`,
   `scenes/ui/destination_status_panel.tscn`.
 - `PlayerProgress` leaderboard, profile, and selected-chapter getters.
@@ -320,9 +368,15 @@ Depends on:
   fixed Chapter 1 image.
 - Owns the `ABILITY_INFO` display copy (name + one-line description) for Hammer/Shuffle/Lantern/
   Freezer and shows it through `%PurchaseDialog` when a bundle card's `info_requested` signal fires.
+- Fades the whole screen in on `_ready()`; retapping the already-active Shop bottom-navigation tab
+  is a documented no-op (`_on_shop_tab_reselected()`; catalog refresh stays available only through
+  `%StatusPanel`'s Retry); `ui_cancel` closes an open `%PurchaseDialog` first via its `close()`
+  method if one is showing, otherwise returns to Main Menu; `_begin_navigation()` guards
+  `_return_to_main_menu()`/`_open_leaderboard()` against a duplicate press while a transition is
+  already in flight.
 
 Depends on:
-- `scripts/destination_screen_layout.gd`.
+- `scripts/destination_screen_layout.gd`, `scripts/ui_motion.gd`.
 - `scenes/ui/destination_screen_shell.tscn`, `scenes/ui/destination_status_panel.tscn`.
 - `PlayerProgress` for the selected chapter id.
 
@@ -334,7 +388,10 @@ Depends on:
   `offer.discount_percent`/`offer.store.compare_at_formatted_price` and widens `%TitleSpacer` while
   the badge is visible so it never overlaps the title, and emits `info_requested(ability_id)` when a
   reward cell's transparent info button is tapped. Its purchase button uses the shared
-  `style_box_green_primary_button.tres` at the "regular" 58px height, matching the Chapter CTA.
+  `style_box_green_primary_button.tres` at the "regular" 58px height, matching the Chapter CTA. Each
+  reward cell's info button uses `press_scale_button.gd` with `visual_target_path` set to its
+  sibling `Stack` (0.97 held scale), so it visibly presses without shrinking the full-cell tap
+  target -- these had no press feedback at all before UI-002.
 - `scripts/shop_coin_offer_row.gd`: binds a coin quantity, its amount-scaled seven-tier clover-coin
   pile texture, formatted price, and purchase signal. The texture ladder uses 100, 300, 750, 1,600,
   3,500, and 13,000 as upper bounds before the largest overflowing-pouch fallback. Also binds an
@@ -348,7 +405,9 @@ Depends on:
 - `scripts/shop_purchase_dialog.gd`: shows and dismisses a focused result modal; `show_result()`
   takes an optional `button_text` (defaults to "Continue") so the same dialog reads correctly for
   both purchase results and ability info lookups ("Got it"). `%CloseButton` uses the shared orange
-  utility style.
+  utility style plus `press_scale_button.gd` for press feedback (it had none before UI-002).
+  `show_result()` fades in; `close()` fades out then hides (never frees -- the same instance is
+  reused for every purchase result).
 
 ## `scripts/main_menu_coin_shortcut.gd`
 
@@ -474,6 +533,11 @@ Purpose:
 - Generic titled-message modal shown once per granted weekly reward, mirroring
   `shop_purchase_dialog.gd`'s structure. `show_reward(rank, coin_reward)` builds the message from
   the actual granted values; `scripts/production_main_menu.gd` is the only caller.
+- `%CloseButton` uses `press_scale_button.gd` for press feedback (it had none before UI-002).
+  `show_reward()` fades in; `close()` fades out then hides.
+
+Depends on:
+- `scripts/ui_motion.gd`, `scripts/press_scale_button.gd`.
 
 ## `scripts/leaderboards/leaderboard_provider.gd`
 
@@ -524,18 +588,22 @@ Purpose:
 - GAME-009: `application/config/leaderboard_provider=backend` selects `BackendLeaderboardProvider`, looking up the shared `BackendTransport` through the `PlayerProgress` autoload by name (mirrors `scripts/store/store_service.gd`'s `_find_backend_transport()`).
 - Is the replacement point for a later HTTP or platform-backed provider.
 
-## `scripts/main_menu_reward_coin_flyer.gd`
+## `scripts/main_menu_reward_star_flyer.gd`
 
 Attached to:
-- `scenes/ui/main_menu_reward_coin_flyer.tscn` root `MainMenuRewardCoinFlyer`.
+- `scenes/ui/main_menu_reward_star_flyer.tscn` root `MainMenuRewardStarFlyer`.
 
 Purpose:
-- Creates and animates one clover coin for every star earned in the just-completed level.
-- Staggers arcing coin tweens between menu-provided global positions.
-- Emits `coin_arrived` for count updates and `animation_finished` for final saved-state reconciliation.
+- Creates and animates one reward star for every star earned in the just-completed level.
+- Staggers arcing star tweens between menu-provided global positions.
+- Emits `star_arrived` for count updates and `animation_finished` for final saved-state
+  reconciliation.
+- Renamed from `main_menu_reward_coin_flyer.gd`/`MainMenuRewardCoinFlyer` and its `coin_arrived`
+  signal (UI-002): this always represents earned stars, never spendable coins, and previously flew
+  clover-coin art -- see `docs/SCENES.md`'s "Reward-Progress Semantics".
 
 Depends on:
-- `assets/ui/clover_coin_transparent_96x96.png`.
+- `assets/ui/reward_star_84x84.png`.
 - The production menu for start and target positions.
 
 ## `scripts/main_menu_reward_chest.gd`
@@ -547,16 +615,23 @@ Purpose:
 - Owns the visual state of the main-menu reward chest progress widget.
 - Updates the progress bar value and centered `current/goal` label.
 - Shrinks the label font for longer progress text so it stays inside the bar.
-- Emits `chest_pressed` when the widget's full-rect `%ChestButton` overlay is tapped; the icon and
-  progress bar underneath stay `mouse_filter = Ignore` and never receive input directly.
+- Emits `chest_pressed` when the widget's full-rect `%ChestButton` overlay is tapped; `%ChestButton`
+  uses `press_scale_button.gd` with `visual_target_path` set to the `Visual` wrapper around the
+  chest icon and progress track (0.97 held scale, UI-002 -- it had no press feedback at all
+  before), which along with the icon and progress bar stays `mouse_filter = Ignore` and never
+  receives input directly.
 
 Key methods:
 - `set_reward_progress(current_stars, goal_stars)`: clamps the displayed value to the active goal and updates the bar and label.
-- `get_coin_target_global_position()`: returns the center of the chest art for reward flights.
-- `play_receive_pulse()`: briefly pulses the chest when a reward coin arrives.
+- `get_reward_target_global_position()`: returns the center of the chest art for reward flights
+  (renamed from `get_coin_target_global_position()` in UI-002 -- this is the chest's landing point
+  for any reward flight, not specifically a coin concept).
+- `play_receive_pulse()`: briefly pulses the whole widget when a reward star arrives (independent
+  of, and composes fine with, `%ChestButton`'s own press-scale animation on `Visual`).
 
 Depends on:
-- `scenes/ui/main_menu_reward_chest.tscn` node names `%ProgressBar`, `%AmountLabel`, and `%ChestButton`.
+- `scenes/ui/main_menu_reward_chest.tscn` node names `Visual`, `%ProgressBar`, `%AmountLabel`, and `%ChestButton`.
+- `scripts/press_scale_button.gd`.
 
 Do not use for:
 - Saving stars, loading goal config, or awarding completion stars. Those stay in `PlayerProgress`.
@@ -573,9 +648,12 @@ Purpose:
   pattern as `scripts/profile_menu.gd`, rather than having the opening menu push data in.
 - Read-only: there is no claim/collect action, since `scripts/player_progress.gd` already grants the
   configured coin reward automatically when a goal is reached. Both the close and `Continue`
-  buttons only dismiss the modal.
+  buttons call the shared `close()` method, which fades the modal out before freeing it (a repeat
+  call while already closing -- both buttons pressed, or Main Menu's `ui_cancel` handling arriving
+  mid-close -- is ignored; see `docs/SCENES.md`'s "Shared Interaction Roles").
 
 Key methods:
+- `close()`: fades this modal out via `scripts/ui_motion.gd`, then frees it.
 - `_apply_reward_progress(progress)`: writes the clamped `current/goal` values into the progress bar
   and label, the remaining-stars caption, and the hero image's reward badge.
 - `_sync_illustration_corner_mask()`: updates the image shader with the illustration's actual
@@ -585,6 +663,7 @@ Depends on:
 - `scenes/ui/reward_chest_menu.tscn` node names `%CloseButton`, `%ContinueButton`, `%ProgressBar`,
   `%Illustration`, `%AmountLabel`, `%GoalCaptionLabel`, and `%NextRewardLabel`.
 - `PlayerProgress.get_reward_chest_progress()`.
+- `scripts/ui_motion.gd`.
 
 Do not use for:
 - Persisting reward stars, loading goal config, or awarding completion stars. Those stay in
@@ -615,18 +694,22 @@ Important nodes:
 - `%NameLineEdit`: editable player-name field populated from `PlayerProgress.get_player_name()`.
 - `%AvatarGrid`: `GridContainer` populated with generated avatar buttons.
 - `%SaveButton`: `scenes/ui/level_button.tscn` instance labeled `Save`.
-- `%CloseButton`: dismisses the picker without saving.
+- `%CloseButton`: dismisses the picker without saving, through the shared `close()` method.
 
 Key methods:
+- `close()`: fades this modal out via `scripts/ui_motion.gd`, then frees it. Safe to call more than
+  once (Close pressed, Save pressed, or Main Menu's `ui_cancel` handling can all reach here) -- a
+  repeat call while already closing is ignored.
 - `_build_avatar_buttons()`: creates the 18 avatar buttons and loads their textures.
 - `_select_avatar(avatar_id)`: updates the pending avatar selection.
-- `_save_selection()`: writes the entered player name and selected avatar through `PlayerProgress.set_profile()` and closes the menu.
+- `_save_selection()`: writes the entered player name and selected avatar through `PlayerProgress.set_profile()` and calls `close()`.
 - `_save_from_name_submit(new_text)`: saves the full profile when the name field is submitted.
 - `_apply_responsive_layout()`: updates panel bounds, avatar button sizes, and save button width.
 - `_apply_avatar_clip_material(avatar_texture)`: applies circular clipping to an avatar `TextureRect`.
 
 Depends on:
 - `PlayerProgress`
+- `scripts/ui_motion.gd`.
 - `assets/ui/avatars/*.png`
 - `assets/ui/avatar_circle_clip.gdshader`
 - `scenes/ui/level_button.tscn`
@@ -679,7 +762,7 @@ Do not use for:
 Class:
 - `PressScaleButton`
 
-Attached to:
+Attached to (self-scaling, no `visual_target_path` -- the whole button is the visual):
 - `scenes/ui/level_button.tscn` root `LevelButton`.
 - `scenes/ui/level_completion_screen.tscn` `NextButton`.
 - `scenes/pause_menu.tscn` `PauseMenuPanel/InnerPanel/IconRow/*/*Button` settings icon buttons.
@@ -688,19 +771,94 @@ Attached to:
 - `scenes/leave_confirmation_menu.tscn` `ConfirmationPanel/ButtonRow/ConfirmLeaveButton` and `ContinueButton`.
 - `scenes/ui/horizontal_pager.tscn` `%PrevArrow` and `%NextArrow`.
 - `scenes/ui/chapter_cover_card.tscn` `%CtaButton`.
+- `scenes/ui/chapter_selection_screen.tscn` `%BackButton`.
+- `scenes/ui/main_menu_chapter_button.tscn` root `ChapterButton`.
+- `scenes/ui/shop_bundle_card.tscn`/`shop_coin_offer_row.tscn` `%PurchaseButton`.
+- `scenes/ui/destination_status_panel.tscn` `%StatusRetryButton` (UI-002).
+- `scenes/ui/shop_purchase_dialog.tscn`/`leaderboard_reward_dialog.tscn` `%CloseButton` (UI-002).
+- `scenes/ui/leaderboard_screen.tscn` `%WeeklyButton`/`%CountryButton`/`%WorldButton` (UI-002).
+
+Attached to (`visual_target_path` set -- an invisible or full-rect hit target animates a sibling/
+child visual instead of itself, so its own touch rectangle never shrinks; all added in UI-002):
+- `scenes/ui/main_menu_top_status.tscn` `ProfileWidget` (target `AvatarTexture`).
+- `scenes/ui/main_menu_reward_chest.tscn` `%ChestButton` (target `Visual`).
+- `scenes/ui/main_menu_bottom_navigation.tscn` `%ShopButton`/`%HomeButton`/`%LeaderboardButton`
+  (each targets its own `Icon`).
+- `scenes/ui/shop_bundle_card.tscn` `%HammerInfoButton`/`%ShuffleInfoButton`/`%LanternInfoButton`/
+  `%FreezerInfoButton` (each targets its sibling `Stack`).
 
 Purpose:
-- Provides the default held-press visual behavior for game UI buttons.
-- Scales the button slightly smaller from its center on `button_down`, then restores its original scale on `button_up`, visibility changes, or exit from the scene tree.
+- Shared press-feedback owner for every interactive role in the UI-002 interaction system (see
+  `docs/SCENES.md`'s "Shared Interaction Roles"). Animates press-in/release through a killable
+  tween using `scripts/ui_motion.gd`'s `PRESS_IN_DURATION`/`RELEASE_DURATION` (previously an instant
+  snap) instead of `button_down`/`button_up` directly setting `scale`.
+- Restores the released scale -- with no animation -- on: disabling mid-press (polled every frame
+  only while held, since `Button.disabled` emits no signal of its own), hiding, exiting the scene
+  tree, and the application losing focus (backgrounded mid-press). A normal release, including
+  release outside the button (Godot reports `button_up` the same either way), animates back instead
+  of snapping. Any in-flight tween is always killed before a new one starts, so rapid repeated
+  presses never accumulate scale.
 
 Exports:
-- `held_scale`: visual scale multiplier while the pointer or touch is held down, defaulting to `0.94`.
+- `held_scale`: visual scale multiplier while the pointer or touch is held down, defaulting to
+  `0.94` (the primary/secondary CTA and Retry/dialog-dismiss role). Compact tabs, bottom
+  navigation, icon buttons, and clickable cells set `0.97` explicitly in their scene.
+- `visual_target_path`: optional `NodePath`, relative to the button, of the `Control` to animate
+  instead of the button itself. Empty (the default) animates the button's own scale.
 
 Use when:
 - Adding future visible game UI buttons, including image buttons, icon toggles, and generated scene buttons that should visually press inward while held.
+- Wrapping an art-only or full-cell tap target: set `visual_target_path` to the sibling/child that
+  should visibly react, so the touch rectangle and responsive layout never shrink.
 
 Do not use for:
-- Text input controls, non-button puzzle item input, or invisible hit areas where scaling would move the perceived target without a visible button.
+- Text input controls or non-button puzzle item input.
+
+## `scripts/ui_motion.gd`
+
+Class:
+- `UIMotion` (`RefCounted`, all `static func`, no instance needed)
+
+Purpose:
+- Shared motion tokens and small tween helpers for UI-002's interaction system (Main Menu, Shop,
+  Leaderboard, Chapter Selection). Consumers `preload` this script and call its static consts/funcs
+  by the preloaded constant, matching the convention in `scripts/destination_screen_layout.gd` and
+  `scripts/chapters/menu_background_resolver.gd`, rather than relying on the bare global class name.
+
+Constants:
+- `PRESS_IN_DURATION` (0.09s), `RELEASE_DURATION` (0.12s): `scripts/press_scale_button.gd`'s
+  press/release tween durations.
+- `NAV_ACTIVE_CHANGE_DURATION` (0.165s): the bottom-navigation active icon/label transition.
+- `OVERLAY_DURATION` (0.2s): destination-screen and modal-overlay fade in/out.
+
+API:
+- `fade_in(node, duration = OVERLAY_DURATION, target_alpha = 1.0)` / `fade_out(node, duration =
+  OVERLAY_DURATION)`: tween a `CanvasItem`'s `modulate.a` via `retween()`. `fade_in()` also cancels
+  any `close_with_fade()` still in flight for `node` (see below) and calls `show()`.
+- `retween(node, meta_key)`: kills whichever tween the same `(node, meta_key)` pair last started (if
+  still running, tracked via node metadata) and returns a freshly created, identically-tagged tween.
+  The shared primitive behind every per-node animation in this system, so rapid repeated triggers
+  never accumulate competing tweens on the same property. Use a distinct `meta_key` per independent
+  concern when one node needs more than one concurrently-running animation.
+- `stop_tween(node, meta_key)`: kills and clears a `retween()`-tracked tween without starting a
+  replacement -- used to explicitly stop a looping animation (the status panel's loading pulse).
+- `close_with_fade(node, on_finished, duration = OVERLAY_DURATION)`: fades `node` out, then calls
+  `on_finished` (`queue_free` for a one-shot modal, `hide` for a reusable dialog) exactly once. A
+  repeat call while already closing is ignored. Waits on a plain timer rather than the fade tween's
+  own `finished` signal, because `fade_in()` is allowed to kill that tween mid-flight if `node` is
+  legitimately re-shown before its previous close finished, and a killed tween never emits
+  `finished` -- which would otherwise strand this coroutine (and its "closing" guard) forever. A
+  generation token detects that supersession: a stale close whose token no longer matches quietly
+  does nothing instead of hiding/freeing a node someone already reopened.
+
+Used by:
+- `scripts/press_scale_button.gd` (press/release timing).
+- `scripts/main_menu_bottom_navigation.gd` (active icon/label transition).
+- `scripts/destination_status_panel.gd` (loading pulse).
+- `scripts/production_main_menu.gd`, `scripts/chapters/chapter_selection_screen.gd`,
+  `scripts/profile_menu.gd`, `scripts/reward_chest_menu.gd`, `scripts/shop_purchase_dialog.gd`,
+  `scripts/leaderboard_reward_dialog.gd`, `scripts/shop_screen.gd`, `scripts/leaderboard_screen.gd`
+  (overlay/destination fade in/out).
 
 ## `scripts/level_completion_screen.gd`
 

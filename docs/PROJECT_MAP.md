@@ -83,6 +83,7 @@ Files:
 - `scenes/ui/coin_balance_widget.tscn`
 - `scenes/ui/main_menu_coin_shortcut.tscn`
 - `assets/ui/clover_coin_transparent_96x96.png`
+- `assets/ui/reward_star_84x84.png`
 - `assets/ui/main_menu_lives.png`
 - `assets/ui/main_menu_reward_chest.png`
 - `assets/ui/reward_chest_menu_illustration.png`
@@ -96,6 +97,7 @@ Files:
 - `assets/themes/style_box_disabled_action_button.tres`
 - `assets/themes/style_box_pager_dot_inactive.tres`, `style_box_pager_dot_active.tres`
 - `scripts/press_scale_button.gd`
+- `scripts/ui_motion.gd`
 - `scripts/horizontal_pager.gd`
 - `scripts/progress_ring.gd`
 - `scripts/destination_screen_layout.gd`
@@ -104,6 +106,7 @@ Files:
 - `scripts/coin_balance_widget.gd`
 - `scripts/chapters/*.gd`
 - `scripts/main_menu_reward_chest.gd`
+- `scripts/main_menu_reward_star_flyer.gd`
 - `scripts/reward_chest_menu.gd`
 - `scripts/profile_menu.gd`
 - `scripts/main_menu.gd`
@@ -125,6 +128,13 @@ Responsibility:
   `scenes/ui/main_menu_coin_shortcut.tscn`, which also opens the Shop when pressed), saved lives,
   and a warm rounded settings button styled like the chapter selection back button.
 - Shows a separate side reward chest widget under the profile icon with saved stars versus the active configured goal; tapping it opens `scenes/ui/reward_chest_menu.tscn`, a read-only centered modal showing the same progress at a larger size, the dedicated `assets/ui/reward_chest_menu_illustration.png` artwork, and the coin payout waiting at the next goal.
+- Uses one shared interaction/motion system across Main Menu, Shop, Leaderboard, and Chapter
+  Selection (UI-002): `scripts/press_scale_button.gd` (now tween-based, with an optional
+  `visual_target_path` so art-only/full-cell hit targets can animate without shrinking their touch
+  rect) and `scripts/ui_motion.gd` (shared durations plus fade/retween/close-with-fade helpers) for
+  press feedback and overlay/destination fades; retapping an already-active bottom-navigation tab is
+  a no-op; `ui_cancel` closes the topmost overlay or returns to Main Menu; every control is
+  `FOCUS_NONE` (documented touch-only policy). See `docs/SCENES.md`'s "Shared Interaction Roles".
 - Opens `scenes/ui/profile_menu.tscn` from the profile widget, shows an editable player-name field above all 18 avatars in a centered pause-style window with a 3-column grid, and saves the name plus selected avatar through `PlayerProgress`.
 - Opens `scenes/ui/settings_menu.tscn` from the settings widget, with pause-menu-style music, sound-effects, and vibration toggle visuals plus no-op `Support` and `Language` buttons.
 - Disables campaign launch when saved lives are zero; the lives widget shows current lives and the `MM:SS` countdown until the next hourly restore.
@@ -317,6 +327,8 @@ Files:
 - `scripts/destination_screen_shell.gd`
 - `scripts/destination_status_panel.gd`
 - `scripts/destination_screen_layout.gd`
+- `scripts/ui_motion.gd`
+- `scripts/press_scale_button.gd`
 - `scripts/chapters/menu_background_resolver.gd`
 - `assets/themes/style_box_status_panel.tres`
 - `assets/themes/style_box_orange_utility_normal.tres`, `style_box_orange_utility_pressed.tres`
@@ -326,7 +338,8 @@ Responsibility:
   with a secondary-screen shade (`%DestinationShell`), safe-area-aware content margins capped to a
   720px maximum logical width with 48/40 regular/compact title sizing and bottom-navigation
   placement (`scripts/destination_screen_layout.gd`), and a bordered loading/empty/error/Retry
-  presentation (`%StatusPanel`).
+  presentation (`%StatusPanel`) that pulses its message while loading (UI-002,
+  `scripts/ui_motion.gd`) and whose Retry button uses `scripts/press_scale_button.gd`.
 - `%ContentMargin`, `%TitleLabel`, and `%BottomNavigation` stay directly authored in each owning
   screen's own scene rather than inside the shell, because Godot's `%unique_name` lookup cannot
   cross into a child instanced scene and the headless verifiers (`scripts/tools/verify_shop.gd`/
@@ -374,6 +387,9 @@ Responsibility:
 - Uses the "Shared Destination-Screen UI" system above for its background, content-rect/title
   sizing, bottom-navigation placement, and loading/empty/error presentation; the title now reads
   the same 48/40 regular/compact size as Shop instead of its own previous 44/36.
+- Retapping the already-active Leaderboard bottom-navigation tab is a no-op; `ui_cancel` always
+  returns to Main Menu; the screen fades in on `_ready()` (UI-002, see `docs/SCENES.md`'s "Shared
+  Interaction Roles").
 
 Change here when:
 - Replacing mock data, adding backend requests or pagination, changing leaderboard scopes, or changing ranking-row presentation.
@@ -408,6 +424,9 @@ Responsibility:
 - Uses the "Shared Destination-Screen UI" system above for its background, content-rect/title
   sizing, bottom-navigation placement, and loading/error presentation; bundle/coin-offer purchase
   buttons and the Chapter cover CTA share one "regular" (58px) green-button style and height.
+- Retapping the already-active Shop bottom-navigation tab is a no-op; `ui_cancel` closes an open
+  purchase-result dialog first, otherwise returns to Main Menu; the screen and dialog fade rather
+  than snap (UI-002, see `docs/SCENES.md`'s "Shared Interaction Roles").
 
 Change here when:
 - Adding offers, changing bundle presentation, integrating a real platform store, or moving purchase grants to a verified backend.
@@ -447,7 +466,7 @@ Responsibility:
 - Shows the current run's star total in `UI/StarCounterLabel` with a small `assets/ui/reward_star.png` icon; triple clears add stars equal to the combo value reached by each clear and play small `assets/ui/reward_star_34_glossy_b.png` stars that drop from the cleared triple, fly into the counter, and pulse it.
 - Shows short praise words near the clear location for 2x+ combos, with unique wording through 20x and stronger colored outlines as the combo rises.
 - Shows the completed-level reward overlay through the `UI/CompletionScreen` instance of `scenes/ui/level_completion_screen.tscn`, using `assets/ui/reward_star.png`, `assets/ui/level_button_blank_new.png`, and the final run star count for the earned amount label.
-- Sends completed campaign stars to `PlayerProgress`; completion `Next` returns to the main menu, where one clover coin per earned star flies from the house to the reward chest and advances its visible count.
+- Sends completed campaign stars to `PlayerProgress`; completion `Next` returns to the main menu, where one reward star per earned star flies from the house to the reward chest and advances its visible count.
 - Uses `scripts/press_scale_button.gd` on the completion `Next` button so the green blank-image button shrinks while held.
 - Tracks cleared triples and unlocks shelves whose configs require progress before becoming accessible.
 - Plays item placement and triple-clear sound effects.
