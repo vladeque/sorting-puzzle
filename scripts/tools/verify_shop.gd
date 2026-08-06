@@ -3,6 +3,7 @@ extends Node
 const StoreServiceScript := preload("res://scripts/store/store_service.gd")
 const SHOP_SCENE := preload("res://scenes/ui/shop_screen.tscn")
 const COIN_OFFER_ROW_SCENE := preload("res://scenes/ui/shop_coin_offer_row.tscn")
+const GREEN_PRIMARY_STYLE := preload("res://assets/themes/style_box_green_primary_button.tres")
 const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
 const TEST_REGIONS := {
 	"US": "$0.99",
@@ -105,6 +106,23 @@ func _run() -> void:
 	var new_player_bundle_card := _find_bundle_card(bundles, &"new_player_bundle")
 	_check(bundle_card != null, "Could not find the starter bundle card.")
 	_check(new_player_bundle_card != null, "Could not find the new-player bundle card.")
+	if bundle_card != null:
+		var bundle_purchase := bundle_card.get_node("%PurchaseButton") as Button
+		_check(
+			bundle_purchase.get_theme_stylebox("normal") == GREEN_PRIMARY_STYLE,
+			"Bundle purchases should use the shared green primary-button resource."
+		)
+		var reward_cell := bundle_card.get_node(
+			"CardBody/CardStack/Rewards/CoinReward"
+		) as PanelContainer
+		var reward_style := reward_cell.get_theme_stylebox("panel") as StyleBoxFlat
+		_check(
+			reward_style.corner_radius_top_left == 20
+				and reward_style.corner_radius_top_right == 20
+				and reward_style.corner_radius_bottom_right == 20
+				and reward_style.corner_radius_bottom_left == 20,
+			"Shop reward cells should use the shared 20 px cell-radius role."
+		)
 	if new_player_bundle_card != null:
 		_check(
 			(new_player_bundle_card.get_node("%CoinCount") as Label).text == "2,500",
@@ -158,6 +176,11 @@ func _run() -> void:
 	var other_row := _find_coin_offer_row(coin_offers, &"coins_100")
 	_check(other_row != null, "Could not find the coins_100 row to check its tag.")
 	if other_row != null:
+		_check(
+			(other_row.get_node("%PurchaseButton") as Button).get_theme_stylebox("normal")
+				== GREEN_PRIMARY_STYLE,
+			"Coin-offer purchases should use the shared green primary-button resource."
+		)
 		_check(
 			not (other_row.get_node("%TagBanner") as Control).visible,
 			"coins_100 should not show a value tag."

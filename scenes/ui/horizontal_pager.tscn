@@ -2,33 +2,8 @@
 
 [ext_resource type="Script" path="res://scripts/horizontal_pager.gd" id="1_script"]
 [ext_resource type="Script" path="res://scripts/press_scale_button.gd" id="2_press_scale_button"]
-
-[sub_resource type="StyleBoxFlat" id="Style_arrow"]
-bg_color = Color(1, 0.88, 0.56, 0.96)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.4, 0.18, 0.07, 1)
-corner_radius_top_left = 20
-corner_radius_top_right = 20
-corner_radius_bottom_right = 20
-corner_radius_bottom_left = 20
-shadow_color = Color(0.19, 0.07, 0.02, 0.46)
-shadow_size = 5
-shadow_offset = Vector2(0, 4)
-
-[sub_resource type="StyleBoxFlat" id="Style_arrow_pressed"]
-bg_color = Color(0.9, 0.72, 0.34, 0.98)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.32, 0.12, 0.04, 1)
-corner_radius_top_left = 20
-corner_radius_top_right = 20
-corner_radius_bottom_right = 20
-corner_radius_bottom_left = 20
+[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_warm_icon_normal.tres" id="3_warm_normal"]
+[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_warm_icon_pressed.tres" id="4_warm_pressed"]
 
 [node name="HorizontalPager" type="Control"]
 layout_mode = 3
@@ -70,9 +45,9 @@ focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(0.3, 0.12, 0.04, 1)
 theme_override_font_sizes/font_size = 38
-theme_override_styles/normal = SubResource("Style_arrow")
-theme_override_styles/hover = SubResource("Style_arrow")
-theme_override_styles/pressed = SubResource("Style_arrow_pressed")
+theme_override_styles/normal = ExtResource("3_warm_normal")
+theme_override_styles/hover = ExtResource("3_warm_normal")
+theme_override_styles/pressed = ExtResource("4_warm_pressed")
 text = "<"
 script = ExtResource("2_press_scale_button")
 
@@ -94,9 +69,9 @@ focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(0.3, 0.12, 0.04, 1)
 theme_override_font_sizes/font_size = 38
-theme_override_styles/normal = SubResource("Style_arrow")
-theme_override_styles/hover = SubResource("Style_arrow")
-theme_override_styles/pressed = SubResource("Style_arrow_pressed")
+theme_override_styles/normal = ExtResource("3_warm_normal")
+theme_override_styles/hover = ExtResource("3_warm_normal")
+theme_override_styles/pressed = ExtResource("4_warm_pressed")
 text = ">"
 script = ExtResource("2_press_scale_button")
 

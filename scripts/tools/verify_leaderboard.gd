@@ -84,6 +84,16 @@ func _run() -> void:
 			== load("res://assets/themes/style_box_orange_utility_normal.tres"),
 		"Leaderboard's status Retry button is not using the shared orange utility style resource."
 	)
+	var list_style := (leaderboard.get_node("%ListBackground") as Panel).get_theme_stylebox(
+		"panel"
+	) as StyleBoxFlat
+	_check(
+		list_style.corner_radius_top_left == 24
+			and list_style.corner_radius_top_right == 24
+			and list_style.corner_radius_bottom_right == 24
+			and list_style.corner_radius_bottom_left == 24,
+		"Leaderboard's large list panel should use the shared 24 px panel-radius role."
+	)
 
 	_check(
 		leaderboard.get_node_or_null("%RewardTiersLabel") == null,

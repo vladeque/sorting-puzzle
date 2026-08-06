@@ -90,14 +90,14 @@ func _test_press_scale_button_self_target() -> void:
 	_check(is_equal_approx(button.scale.x, 1.0), "A fresh PressScaleButton should start at the released scale.")
 
 	button.emit_signal("button_down")
-	await _wait_seconds(UIMotionScript.PRESS_IN_DURATION + 0.05)
+	await _wait_for_scale(button, button.held_scale)
 	_check(
 		is_equal_approx(button.scale.x, button.held_scale),
 		"Holding the button should animate to exactly held_scale."
 	)
 
 	button.emit_signal("button_up")
-	await _wait_seconds(UIMotionScript.RELEASE_DURATION + 0.05)
+	await _wait_for_scale(button, 1.0)
 	_check(
 		is_equal_approx(button.scale.x, 1.0),
 		"Releasing should animate back to the released scale."
@@ -108,7 +108,7 @@ func _test_press_scale_button_self_target() -> void:
 	button.emit_signal("button_down")
 	await process_frame
 	button.emit_signal("button_up")
-	await _wait_seconds(UIMotionScript.RELEASE_DURATION + 0.05)
+	await _wait_for_scale(button, 1.0)
 	_check(
 		is_equal_approx(button.scale.x, 1.0),
 		"Release outside the button should restore the released scale the same as a release inside."
@@ -139,13 +139,13 @@ func _test_press_scale_button_self_target() -> void:
 	button.emit_signal("button_down")
 	await process_frame
 	button.emit_signal("button_down")
-	await _wait_seconds(UIMotionScript.PRESS_IN_DURATION + 0.05)
+	await _wait_for_scale(button, button.held_scale)
 	_check(
 		is_equal_approx(button.scale.x, button.held_scale),
 		"A redundant button_down while already held must not compound the held scale."
 	)
 	button.emit_signal("button_up")
-	await _wait_seconds(UIMotionScript.RELEASE_DURATION + 0.05)
+	await _wait_for_scale(button, 1.0)
 
 	# Scene exit mid-press restores the released scale (checked just before the node is gone).
 	button.emit_signal("button_down")
@@ -172,7 +172,7 @@ func _test_press_scale_button_visual_target() -> void:
 
 	var button_size_before := button.size
 	button.emit_signal("button_down")
-	await _wait_seconds(UIMotionScript.PRESS_IN_DURATION + 0.05)
+	await _wait_for_scale(visual, 0.9)
 	_check(
 		is_equal_approx(visual.scale.x, 0.9),
 		"The designated visual child should animate to held_scale while pressed."
@@ -187,7 +187,7 @@ func _test_press_scale_button_visual_target() -> void:
 	)
 
 	button.emit_signal("button_up")
-	await _wait_seconds(UIMotionScript.RELEASE_DURATION + 0.05)
+	await _wait_for_scale(visual, 1.0)
 	_check(is_equal_approx(visual.scale.x, 1.0), "The visual child should restore its released scale.")
 
 	button.queue_free()
@@ -528,6 +528,17 @@ func _wait_frames(count: int) -> void:
 
 func _wait_seconds(duration: float) -> void:
 	await create_timer(duration).timeout
+
+
+## Tween completion and SceneTreeTimer timeouts can land on opposite sides of the same rendered
+## frame under load. Polling the observable scale with a generous bounded timeout verifies the
+## behavior itself without making this timing-sensitive test intermittently sample one frame early.
+func _wait_for_scale(control: Control, target_scale: float, timeout_seconds: float = 0.5) -> void:
+	var deadline_msec := Time.get_ticks_msec() + ceili(timeout_seconds * 1000.0)
+	while Time.get_ticks_msec() < deadline_msec:
+		if is_equal_approx(control.scale.x, target_scale):
+			return
+		await process_frame
 
 
 func _make_ui_cancel_event() -> InputEventAction:

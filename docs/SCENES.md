@@ -26,12 +26,15 @@ copies:
   neutral one.
 - `style_box_orange_utility_normal.tres` / `style_box_orange_utility_pressed.tres`: shared orange
   for retry/dismiss/secondary actions -- the Shop/Leaderboard status Retry button
-  (`scenes/ui/destination_status_panel.tscn`) and the Shop purchase-result dialog's Close button.
+  (`scenes/ui/destination_status_panel.tscn`) and both purchase/reward dialog Close buttons.
   The Main Menu Chapter button (`scenes/ui/main_menu_chapter_button.tscn`) fills a related but
   visually distinct **glossy textured** secondary/alternative-CTA role
   (`assets/ui/level_button_blank_yellow_orange_new.png`) -- the same role and art the in-level
   `Watch ad` button already uses (`scenes/ability_purchase_menu.tscn`'s `WatchAdButton`), so this
-  is a documented shared role, not a fresh exception.
+  is a documented shared role, not a fresh exception. Both use white text with the same warm-brown
+  outline and do not shift to a cool text color while pressed.
+- `style_box_warm_icon_normal.tres` / `style_box_warm_icon_pressed.tres`: shared cream/gold 16 px
+  icon-button pair used by Main Menu Settings, Chapter Selection Back, and both pager arrows.
 - `style_box_status_panel.tres`: shared burgundy/gold bordered panel for the loading/empty/error
   presentation in `scenes/ui/destination_status_panel.tscn`.
 - `style_box_pager_dot_inactive.tres` / `style_box_pager_dot_active.tres`: circular inactive dot /
@@ -209,7 +212,8 @@ Important nodes:
 - `BottomBar/ActionColumn/ChapterButton`: selected-chapter button using
   `assets/ui/level_button_blank_yellow_orange_new.png` through
   `scenes/ui/main_menu_chapter_button.tscn`; see "Shared UI Style Tokens" above for why
-  yellow-orange is the intentional secondary/alternative-action role here, not drift. `FOCUS_NONE`
+  yellow-orange is the intentional secondary/alternative-action role here, with the same
+  white/warm-brown text treatment as the in-level `Watch ad` button, not drift. `FOCUS_NONE`
   (was `FOCUS_CLICK` before UI-002's focus-policy normalization; see "Focus Policy" above).
 - `LeaderboardRewardDialog`: `scenes/ui/leaderboard_reward_dialog.tscn` instance, hidden until a
   weekly reward is pending.
@@ -522,7 +526,8 @@ Purpose:
 - Instantiated once as `main_menu.tscn`'s `%LeaderboardRewardDialog`.
 - `show_reward()` fades in; `close()` (the Close button, or Main Menu's `ui_cancel` handling) fades
   out then hides, like `shop_purchase_dialog.tscn`. `%CloseButton` uses `press_scale_button.gd`
-  (0.94 held scale) for press feedback.
+  (0.94 held scale) for press feedback and the same shared orange utility normal/pressed resources
+  as the Shop purchase-result dialog and destination Retry action.
 
 Depends on:
 - `scripts/ui_motion.gd`, `scripts/press_scale_button.gd`.

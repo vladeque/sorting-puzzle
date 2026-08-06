@@ -96,6 +96,7 @@ Files:
 - `assets/themes/style_box_green_primary_button.tres`
 - `assets/themes/style_box_disabled_action_button.tres`
 - `assets/themes/style_box_pager_dot_inactive.tres`, `style_box_pager_dot_active.tres`
+- `assets/themes/style_box_warm_icon_normal.tres`, `style_box_warm_icon_pressed.tres`
 - `scripts/press_scale_button.gd`
 - `scripts/ui_motion.gd`
 - `scripts/horizontal_pager.gd`

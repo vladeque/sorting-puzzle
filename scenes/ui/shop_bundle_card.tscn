@@ -7,7 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://dwmyah5l2r82d" path="res://assets/abilities/ability_lantern.png" id="4_lantern"]
 [ext_resource type="Texture2D" uid="uid://x6rx0xrv78dw" path="res://assets/abilities/ice_clock_icon_256x256.png" id="5_d3y3u"]
 [ext_resource type="Texture2D" uid="uid://nm6j8p75d3hn" path="res://assets/ui/discount_badge_pinned.png" id="6_discount_badge"]
-[ext_resource type="Texture2D" uid="uid://borxe8m7bwoqf" path="res://assets/ui/level_button_blank_new.png" id="7_purchase_button"]
+[ext_resource type="StyleBoxTexture" path="res://assets/themes/style_box_green_primary_button.tres" id="7_purchase_button"]
 [ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="8_press_scale_button"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
@@ -29,9 +29,6 @@ shadow_color = Color(0.08, 0.01, 0.02, 0.48)
 shadow_size = 7
 shadow_offset = Vector2(0, 5)
 
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_purchase_button"]
-texture = ExtResource("7_purchase_button")
-
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_focus"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_reward"]
@@ -45,10 +42,10 @@ border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
 border_color = Color(1, 0.83, 0.48, 0.5)
-corner_radius_top_left = 15
-corner_radius_top_right = 15
-corner_radius_bottom_right = 15
-corner_radius_bottom_left = 15
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
 
 [node name="ShopBundleCard" type="PanelContainer" unique_id=1914459394]
 custom_minimum_size = Vector2(0, 246)
@@ -116,10 +113,10 @@ theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_colors/font_disabled_color = Color(1, 1, 1, 0.72)
 theme_override_font_sizes/font_size = 25
-theme_override_styles/normal = SubResource("StyleBoxTexture_purchase_button")
-theme_override_styles/pressed = SubResource("StyleBoxTexture_purchase_button")
-theme_override_styles/hover = SubResource("StyleBoxTexture_purchase_button")
-theme_override_styles/disabled = SubResource("StyleBoxTexture_purchase_button")
+theme_override_styles/normal = ExtResource("7_purchase_button")
+theme_override_styles/pressed = ExtResource("7_purchase_button")
+theme_override_styles/hover = ExtResource("7_purchase_button")
+theme_override_styles/disabled = ExtResource("7_purchase_button")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
 text = "$4.99"
 script = ExtResource("8_press_scale_button")

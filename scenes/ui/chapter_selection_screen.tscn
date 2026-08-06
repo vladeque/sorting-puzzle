@@ -3,33 +3,8 @@
 [ext_resource type="Script" uid="uid://pn10w67fpvih" path="res://scripts/chapters/chapter_selection_screen.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/ui/horizontal_pager.tscn" id="2_pager"]
 [ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="3_press_scale_button"]
-
-[sub_resource type="StyleBoxFlat" id="Style_back_normal"]
-bg_color = Color(1, 0.9, 0.58, 0.96)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.4, 0.18, 0.07, 1)
-corner_radius_top_left = 20
-corner_radius_top_right = 20
-corner_radius_bottom_right = 20
-corner_radius_bottom_left = 20
-shadow_color = Color(0.19, 0.07, 0.02, 0.42)
-shadow_size = 5
-shadow_offset = Vector2(0, 4)
-
-[sub_resource type="StyleBoxFlat" id="Style_back_pressed"]
-bg_color = Color(0.91, 0.76, 0.39, 0.98)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.32, 0.12, 0.04, 1)
-corner_radius_top_left = 20
-corner_radius_top_right = 20
-corner_radius_bottom_right = 20
-corner_radius_bottom_left = 20
+[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_warm_icon_normal.tres" id="4_warm_normal"]
+[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_warm_icon_pressed.tres" id="5_warm_pressed"]
 
 [node name="ChapterSelectionScreen" type="Control" unique_id=2125256543]
 z_index = 100
@@ -68,9 +43,9 @@ focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(0.29, 0.11, 0.04, 1)
 theme_override_font_sizes/font_size = 34
-theme_override_styles/normal = SubResource("Style_back_normal")
-theme_override_styles/pressed = SubResource("Style_back_pressed")
-theme_override_styles/hover = SubResource("Style_back_normal")
+theme_override_styles/normal = ExtResource("4_warm_normal")
+theme_override_styles/pressed = ExtResource("5_warm_pressed")
+theme_override_styles/hover = ExtResource("4_warm_normal")
 text = "<"
 script = ExtResource("3_press_scale_button")
 

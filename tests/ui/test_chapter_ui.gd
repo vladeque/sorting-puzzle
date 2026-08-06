@@ -40,6 +40,11 @@ func _run() -> void:
 	var level_button := menu.get_node("%LevelButton") as Button
 	var chapter_button := menu.get_node("%ChapterButton") as Button
 	var menu_background := menu.get_node("%Background") as TextureRect
+	var warm_normal := load("res://assets/themes/style_box_warm_icon_normal.tres") as StyleBoxFlat
+	var warm_pressed := load("res://assets/themes/style_box_warm_icon_pressed.tres") as StyleBoxFlat
+	var orange_normal := load(
+		"res://assets/themes/style_box_orange_utility_normal.tres"
+	) as StyleBoxFlat
 	_check(
 		menu_background.texture != null
 			and menu_background.texture.resource_path == "res://assets/backgrounds/main_menu.jpeg",
@@ -72,6 +77,28 @@ func _run() -> void:
 					== "res://assets/ui/level_button_blank_yellow_orange_new.png",
 			"The main menu chapter button is not using the yellow-orange level-button artwork."
 		)
+	_check(
+		chapter_button.get_theme_color("font_color") == Color.WHITE
+			and chapter_button.get_theme_color("font_pressed_color") == Color.WHITE
+			and chapter_button.get_theme_color("font_outline_color")
+				== Color(0.46, 0.16, 0.02, 0.95),
+		"The yellow-orange Chapter button does not use its shared white/brown text treatment."
+	)
+	var settings_button := menu.get_node(
+		"TopStatusBar/MainMenuTopStatus/SettingsWidget/SettingsButton"
+	) as Button
+	_check(
+		settings_button.get_theme_stylebox("normal") == warm_normal
+			and settings_button.get_theme_stylebox("pressed") == warm_pressed,
+		"The Main Menu Settings button is not using the shared warm icon-button styles."
+	)
+	var reward_dialog_close := menu.get_node(
+		"LeaderboardRewardDialog/Center/Panel/Stack/CloseButton"
+	) as Button
+	_check(
+		reward_dialog_close.get_theme_stylebox("normal") == orange_normal,
+		"The Leaderboard reward dialog is not using the shared orange utility style."
+	)
 
 	chapter_button.emit_signal("pressed")
 	await process_frame
@@ -79,6 +106,25 @@ func _run() -> void:
 	_check(selection != null, "The chapter button did not open the selection screen.")
 	if selection != null:
 		var pager := selection.get_node("%Pager") as Control
+		var back_button := selection.get_node("%BackButton") as Button
+		var previous_button := pager.get_node("%PrevArrow") as Button
+		var next_button := pager.get_node("%NextArrow") as Button
+		_check(
+			back_button.get_theme_stylebox("normal") == warm_normal
+				and back_button.get_theme_stylebox("pressed") == warm_pressed
+				and previous_button.get_theme_stylebox("normal") == warm_normal
+				and previous_button.get_theme_stylebox("pressed") == warm_pressed
+				and next_button.get_theme_stylebox("normal") == warm_normal
+				and next_button.get_theme_stylebox("pressed") == warm_pressed,
+			"Chapter Back and pager arrows should share one warm icon-button style pair."
+		)
+		_check(
+			warm_normal.corner_radius_top_left == 16
+				and warm_normal.corner_radius_top_right == 16
+				and warm_normal.corner_radius_bottom_right == 16
+				and warm_normal.corner_radius_bottom_left == 16,
+			"Warm icon buttons should use the shared 16 px button-radius role."
+		)
 		var track := pager.get_node("%Track") as Control
 		_check(track.get_child_count() == 2, "Expected two configured chapter covers.")
 		if track.get_child_count() == 2:
