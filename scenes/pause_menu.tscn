@@ -1,83 +1,15 @@
 [gd_scene format=3 uid="uid://g1xsr7chqeg7"]
 
-[ext_resource type="Texture2D" uid="uid://sli6yinfrmk5" path="res://assets/ui/icon_music.png" id="1_music_icon"]
-[ext_resource type="Texture2D" uid="uid://cqs8ijno3xqrc" path="res://assets/ui/icon_sound_effects.png" id="2_sound_effects_icon"]
-[ext_resource type="Texture2D" uid="uid://dhu182ygjcxh2" path="res://assets/ui/icon_vibration.png" id="3_vibration_icon"]
-[ext_resource type="Script" uid="uid://djayncoacexvl" path="res://scripts/pause_menu.gd" id="4_pause_menu_script"]
-[ext_resource type="Texture2D" uid="uid://cgebkwbjfmtsd" path="res://assets/ui/level_button_blank_red_new.png" id="5_leave_button"]
-[ext_resource type="Texture2D" uid="uid://borxe8m7bwoqf" path="res://assets/ui/level_button_blank_new.png" id="6_continue_button"]
-[ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="7_press_scale_button"]
+[ext_resource type="PackedScene" path="res://scenes/ui/gameplay_modal_shell.tscn" id="1_shell"]
+[ext_resource type="Texture2D" uid="uid://sli6yinfrmk5" path="res://assets/ui/icon_music.png" id="2_music_icon"]
+[ext_resource type="Texture2D" uid="uid://cqs8ijno3xqrc" path="res://assets/ui/icon_sound_effects.png" id="3_sound_effects_icon"]
+[ext_resource type="Texture2D" uid="uid://dhu182ygjcxh2" path="res://assets/ui/icon_vibration.png" id="4_vibration_icon"]
+[ext_resource type="Script" uid="uid://djayncoacexvl" path="res://scripts/pause_menu.gd" id="5_pause_menu_script"]
+[ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="6_press_scale_button"]
+[ext_resource type="StyleBoxTexture" path="res://assets/themes/style_box_gameplay_destructive_action.tres" id="7_leave_button"]
+[ext_resource type="StyleBoxTexture" path="res://assets/themes/style_box_green_primary_button.tres" id="8_continue_button"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_outer_panel"]
-bg_color = Color(0.67, 0.32, 0.22, 1)
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 6
-border_color = Color(0.43, 0.17, 0.11, 1)
-corner_radius_top_left = 30
-corner_radius_top_right = 30
-corner_radius_bottom_right = 30
-corner_radius_bottom_left = 30
-shadow_color = Color(0, 0, 0, 0.42)
-shadow_size = 18
-shadow_offset = Vector2(0, 8)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_normal"]
-bg_color = Color(0.86, 0.08, 0.06, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 4
-border_color = Color(1, 0.58, 0.5, 1)
-corner_radius_top_left = 32
-corner_radius_top_right = 32
-corner_radius_bottom_right = 32
-corner_radius_bottom_left = 32
-shadow_color = Color(0, 0, 0, 0.36)
-shadow_size = 6
-shadow_offset = Vector2(0, 3)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_pressed"]
-bg_color = Color(0.58, 0.04, 0.04, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 4
-border_color = Color(1, 0.76, 0.68, 1)
-corner_radius_top_left = 32
-corner_radius_top_right = 32
-corner_radius_bottom_right = 32
-corner_radius_bottom_left = 32
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_hover"]
-bg_color = Color(0.98, 0.2, 0.16, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 4
-border_color = Color(1, 0.82, 0.72, 1)
-corner_radius_top_left = 32
-corner_radius_top_right = 32
-corner_radius_bottom_right = 32
-corner_radius_bottom_left = 32
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inner_panel"]
-bg_color = Color(0.96, 0.9, 0.78, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 4
-border_color = Color(0.45, 0.19, 0.13, 0.52)
-corner_radius_top_left = 24
-corner_radius_top_right = 24
-corner_radius_bottom_right = 24
-corner_radius_bottom_left = 24
-shadow_color = Color(0.24, 0.08, 0.04, 0.22)
-shadow_size = 8
-shadow_offset = Vector2(0, 3)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1s2dm"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_icon_shadow_normal"]
 bg_color = Color(1, 1, 1, 0)
 border_color = Color(1, 1, 1, 0)
 corner_radius_top_left = 20
@@ -88,7 +20,7 @@ shadow_color = Color(0.3, 0.12, 0.07, 0.22)
 shadow_size = 6
 shadow_offset = Vector2(0, 3)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_88e76"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_icon_shadow_pressed"]
 bg_color = Color(1, 1, 1, 0)
 border_color = Color(1, 1, 1, 0)
 corner_radius_top_left = 20
@@ -99,7 +31,7 @@ shadow_color = Color(0.3, 0.12, 0.07, 0.18)
 shadow_size = 4
 shadow_offset = Vector2(0, 2)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_knqa7"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_icon_shadow_hover"]
 bg_color = Color(1, 1, 1, 0)
 border_color = Color(1, 1, 1, 0)
 corner_radius_top_left = 20
@@ -110,99 +42,35 @@ shadow_color = Color(0.3, 0.12, 0.07, 0.3)
 shadow_size = 7
 shadow_offset = Vector2(0, 3)
 
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_leave_button"]
-texture = ExtResource("5_leave_button")
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_continue_button"]
-texture = ExtResource("6_continue_button")
-
-[node name="PauseMenuOverlay" type="ColorRect" unique_id=636763679]
+[node name="PauseMenuOverlay" type="Control"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.02, 0.025, 0.03, 0.66)
-script = ExtResource("4_pause_menu_script")
+script = ExtResource("5_pause_menu_script")
 
-[node name="PauseMenuPanel" type="Panel" parent="." unique_id=1355035433]
+[node name="Shell" parent="." instance=ExtResource("1_shell")]
+unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -260.0
-offset_top = -250.0
-offset_right = 260.0
-offset_bottom = 250.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_outer_panel")
 
-[node name="TitleLabel" type="Label" parent="PauseMenuPanel" unique_id=1806017559]
-theme_type_variation = &"GameTitleLabel"
+[node name="SettingsContent" type="Control" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_left = 46.0
-offset_top = 25.0
-offset_right = -46.0
-offset_bottom = 86.0
-grow_horizontal = 2
-theme_override_colors/font_color = Color(1, 0.95, 0.78, 1)
-theme_override_colors/font_shadow_color = Color(0.16, 0.04, 0.02, 0.92)
-theme_override_constants/shadow_offset_x = 0
-theme_override_constants/shadow_offset_y = 3
-theme_override_font_sizes/font_size = 44
-text = "PAUSE"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="CloseButton" type="Button" parent="PauseMenuPanel" unique_id=975190343]
-layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -54.0
-offset_top = -518.0
-offset_right = 18.0
-offset_bottom = -446.0
-grow_horizontal = 0
-grow_vertical = 0
-focus_mode = 0
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_colors/font_outline_color = Color(0.32, 0.02, 0.02, 1)
-theme_override_constants/outline_size = 4
-theme_override_font_sizes/font_size = 36
-theme_override_styles/normal = SubResource("StyleBoxFlat_close_normal")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_close_pressed")
-theme_override_styles/hover = SubResource("StyleBoxFlat_close_hover")
-text = "X"
-
-[node name="InnerPanel" type="Panel" parent="PauseMenuPanel" unique_id=1357716807]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_left = 46.0
-offset_top = 116.0
-offset_right = -46.0
-offset_bottom = 370.0
 grow_horizontal = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_inner_panel")
+grow_vertical = 2
 
-[node name="InnerTitleLabel" type="Label" parent="PauseMenuPanel/InnerPanel" unique_id=1478165782]
+[node name="InnerTitleLabel" type="Label" parent="SettingsContent"]
 theme_type_variation = &"GameSectionLabel"
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_left = 24.0
+offset_left = -22.0
 offset_top = 22.0
-offset_right = -24.0
+offset_right = 22.0
 offset_bottom = 60.0
 grow_horizontal = 2
 theme_override_colors/font_color = Color(0.36, 0.16, 0.1, 1)
@@ -211,35 +79,36 @@ text = "SETTINGS"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="IconRow" type="HBoxContainer" parent="PauseMenuPanel/InnerPanel" unique_id=1999098372]
+[node name="IconRow" type="HBoxContainer" parent="SettingsContent"]
 layout_mode = 1
-anchors_preset = 10
+anchors_preset = 15
 anchor_right = 1.0
-offset_left = 31.0
-offset_top = 94.0
-offset_right = -29.0
-offset_bottom = 221.0
+anchor_bottom = 1.0
+offset_top = 72.0
 grow_horizontal = 2
+grow_vertical = 2
 theme_override_constants/separation = 28
 alignment = 1
 
-[node name="MusicOption" type="VBoxContainer" parent="PauseMenuPanel/InnerPanel/IconRow" unique_id=922438013]
+[node name="MusicOption" type="VBoxContainer" parent="SettingsContent/IconRow"]
 custom_minimum_size = Vector2(104, 124)
 layout_mode = 2
 theme_override_constants/separation = 5
 alignment = 1
 
-[node name="MusicButton" type="Button" parent="PauseMenuPanel/InnerPanel/IconRow/MusicOption" unique_id=29253899]
+[node name="MusicButton" type="Button" parent="SettingsContent/IconRow/MusicOption"]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 size_flags_horizontal = 4
 focus_mode = 0
-theme_override_styles/normal = SubResource("StyleBoxFlat_1s2dm")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_88e76")
-theme_override_styles/hover = SubResource("StyleBoxFlat_knqa7")
-script = ExtResource("7_press_scale_button")
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_icon_shadow_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_icon_shadow_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_icon_shadow_hover")
+script = ExtResource("6_press_scale_button")
+held_scale = 0.97
 
-[node name="Icon" type="TextureRect" parent="PauseMenuPanel/InnerPanel/IconRow/MusicOption/MusicButton" unique_id=839423075]
+[node name="Icon" type="TextureRect" parent="SettingsContent/IconRow/MusicOption/MusicButton"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -251,11 +120,33 @@ offset_bottom = 18.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-texture = ExtResource("1_music_icon")
+texture = ExtResource("2_music_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="PauseMenuPanel/InnerPanel/IconRow/MusicOption" unique_id=1169088267]
+[node name="CrossOut" type="Control" parent="SettingsContent/IconRow/MusicOption/MusicButton"]
+visible = false
+mouse_filter = 2
+position = Vector2(2, 42)
+size = Vector2(96, 14)
+pivot_offset = Vector2(48, 7)
+rotation_degrees = -45.0
+
+[node name="Border" type="ColorRect" parent="SettingsContent/IconRow/MusicOption/MusicButton/CrossOut"]
+mouse_filter = 2
+color = Color(1, 0.82, 0.26, 1)
+offset_right = 96.0
+offset_bottom = 14.0
+
+[node name="Slash" type="ColorRect" parent="SettingsContent/IconRow/MusicOption/MusicButton/CrossOut"]
+mouse_filter = 2
+color = Color(0.86, 0.08, 0.06, 1)
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 90.0
+offset_bottom = 8.0
+
+[node name="Label" type="Label" parent="SettingsContent/IconRow/MusicOption"]
 theme_type_variation = &"GameSmallLabel"
 layout_mode = 2
 theme_override_colors/font_color = Color(0.36, 0.16, 0.1, 1)
@@ -263,23 +154,25 @@ theme_override_font_sizes/font_size = 18
 text = "Music"
 horizontal_alignment = 1
 
-[node name="SoundEffectsOption" type="VBoxContainer" parent="PauseMenuPanel/InnerPanel/IconRow" unique_id=664863032]
+[node name="SoundEffectsOption" type="VBoxContainer" parent="SettingsContent/IconRow"]
 custom_minimum_size = Vector2(104, 124)
 layout_mode = 2
 theme_override_constants/separation = 5
 alignment = 1
 
-[node name="SoundEffectsButton" type="Button" parent="PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption" unique_id=466445782]
+[node name="SoundEffectsButton" type="Button" parent="SettingsContent/IconRow/SoundEffectsOption"]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 size_flags_horizontal = 4
 focus_mode = 0
-theme_override_styles/normal = SubResource("StyleBoxFlat_1s2dm")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_88e76")
-theme_override_styles/hover = SubResource("StyleBoxFlat_knqa7")
-script = ExtResource("7_press_scale_button")
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_icon_shadow_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_icon_shadow_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_icon_shadow_hover")
+script = ExtResource("6_press_scale_button")
+held_scale = 0.97
 
-[node name="Icon" type="TextureRect" parent="PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption/SoundEffectsButton" unique_id=1247065992]
+[node name="Icon" type="TextureRect" parent="SettingsContent/IconRow/SoundEffectsOption/SoundEffectsButton"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -291,11 +184,33 @@ offset_bottom = 18.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-texture = ExtResource("2_sound_effects_icon")
+texture = ExtResource("3_sound_effects_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption" unique_id=1886069866]
+[node name="CrossOut" type="Control" parent="SettingsContent/IconRow/SoundEffectsOption/SoundEffectsButton"]
+visible = false
+mouse_filter = 2
+position = Vector2(2, 42)
+size = Vector2(96, 14)
+pivot_offset = Vector2(48, 7)
+rotation_degrees = -45.0
+
+[node name="Border" type="ColorRect" parent="SettingsContent/IconRow/SoundEffectsOption/SoundEffectsButton/CrossOut"]
+mouse_filter = 2
+color = Color(1, 0.82, 0.26, 1)
+offset_right = 96.0
+offset_bottom = 14.0
+
+[node name="Slash" type="ColorRect" parent="SettingsContent/IconRow/SoundEffectsOption/SoundEffectsButton/CrossOut"]
+mouse_filter = 2
+color = Color(0.86, 0.08, 0.06, 1)
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 90.0
+offset_bottom = 8.0
+
+[node name="Label" type="Label" parent="SettingsContent/IconRow/SoundEffectsOption"]
 theme_type_variation = &"GameSmallLabel"
 layout_mode = 2
 theme_override_colors/font_color = Color(0.36, 0.16, 0.1, 1)
@@ -303,23 +218,25 @@ theme_override_font_sizes/font_size = 18
 text = "SFX"
 horizontal_alignment = 1
 
-[node name="VibrationOption" type="VBoxContainer" parent="PauseMenuPanel/InnerPanel/IconRow" unique_id=815507441]
+[node name="VibrationOption" type="VBoxContainer" parent="SettingsContent/IconRow"]
 custom_minimum_size = Vector2(104, 124)
 layout_mode = 2
 theme_override_constants/separation = 5
 alignment = 1
 
-[node name="VibrationButton" type="Button" parent="PauseMenuPanel/InnerPanel/IconRow/VibrationOption" unique_id=1948336907]
+[node name="VibrationButton" type="Button" parent="SettingsContent/IconRow/VibrationOption"]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 size_flags_horizontal = 4
 focus_mode = 0
-theme_override_styles/normal = SubResource("StyleBoxFlat_1s2dm")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_88e76")
-theme_override_styles/hover = SubResource("StyleBoxFlat_knqa7")
-script = ExtResource("7_press_scale_button")
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_icon_shadow_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_icon_shadow_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_icon_shadow_hover")
+script = ExtResource("6_press_scale_button")
+held_scale = 0.97
 
-[node name="Icon" type="TextureRect" parent="PauseMenuPanel/InnerPanel/IconRow/VibrationOption/VibrationButton" unique_id=620864544]
+[node name="Icon" type="TextureRect" parent="SettingsContent/IconRow/VibrationOption/VibrationButton"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -331,11 +248,33 @@ offset_bottom = 18.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-texture = ExtResource("3_vibration_icon")
+texture = ExtResource("4_vibration_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="PauseMenuPanel/InnerPanel/IconRow/VibrationOption" unique_id=505956906]
+[node name="CrossOut" type="Control" parent="SettingsContent/IconRow/VibrationOption/VibrationButton"]
+visible = false
+mouse_filter = 2
+position = Vector2(2, 42)
+size = Vector2(96, 14)
+pivot_offset = Vector2(48, 7)
+rotation_degrees = -45.0
+
+[node name="Border" type="ColorRect" parent="SettingsContent/IconRow/VibrationOption/VibrationButton/CrossOut"]
+mouse_filter = 2
+color = Color(1, 0.82, 0.26, 1)
+offset_right = 96.0
+offset_bottom = 14.0
+
+[node name="Slash" type="ColorRect" parent="SettingsContent/IconRow/VibrationOption/VibrationButton/CrossOut"]
+mouse_filter = 2
+color = Color(0.86, 0.08, 0.06, 1)
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 90.0
+offset_bottom = 8.0
+
+[node name="Label" type="Label" parent="SettingsContent/IconRow/VibrationOption"]
 theme_type_variation = &"GameSmallLabel"
 layout_mode = 2
 theme_override_colors/font_color = Color(0.36, 0.16, 0.1, 1)
@@ -343,47 +282,40 @@ theme_override_font_sizes/font_size = 18
 text = "Vibrate"
 horizontal_alignment = 1
 
-[node name="ButtonRow" type="HBoxContainer" parent="PauseMenuPanel" unique_id=400633957]
-layout_mode = 1
-anchors_preset = 12
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 56.0
-offset_top = -108.0
-offset_right = -56.0
-offset_bottom = -32.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_override_constants/separation = 18
-alignment = 1
-
-[node name="LeaveButton" type="Button" parent="PauseMenuPanel/ButtonRow" unique_id=2050016554]
+[node name="LeaveButton" type="Button" parent="."]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(194, 76)
 layout_mode = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.34, 0.02, 0.02, 0.95)
 theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 30
-theme_override_styles/normal = SubResource("StyleBoxTexture_leave_button")
-theme_override_styles/pressed = SubResource("StyleBoxTexture_leave_button")
-theme_override_styles/hover = SubResource("StyleBoxTexture_leave_button")
+theme_override_styles/normal = ExtResource("7_leave_button")
+theme_override_styles/pressed = ExtResource("7_leave_button")
+theme_override_styles/hover = ExtResource("7_leave_button")
 text = "Leave"
-script = ExtResource("7_press_scale_button")
+script = ExtResource("6_press_scale_button")
+held_scale = 0.94
 
-[node name="ContinueButton" type="Button" parent="PauseMenuPanel/ButtonRow" unique_id=179584193]
+[node name="ContinueButton" type="Button" parent="."]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(214, 76)
 layout_mode = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.92, 1, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.03, 0.25, 0.04, 0.95)
 theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 30
-theme_override_styles/normal = SubResource("StyleBoxTexture_continue_button")
-theme_override_styles/pressed = SubResource("StyleBoxTexture_continue_button")
-theme_override_styles/hover = SubResource("StyleBoxTexture_continue_button")
+theme_override_styles/normal = ExtResource("8_continue_button")
+theme_override_styles/pressed = ExtResource("8_continue_button")
+theme_override_styles/hover = ExtResource("8_continue_button")
 text = "Continue"
-script = ExtResource("7_press_scale_button")
+script = ExtResource("6_press_scale_button")
+held_scale = 0.94
