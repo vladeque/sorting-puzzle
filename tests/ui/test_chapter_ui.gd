@@ -101,6 +101,9 @@ func _run() -> void:
 	var lives_pill := menu.get_node(
 		"TopStatusBar/MainMenuTopStatus/LivesWidget/LivesPill"
 	) as Panel
+	var life_status := menu.get_node(
+		"TopStatusBar/MainMenuTopStatus/LivesWidget/LifeStatus"
+	) as Label
 	_check(
 		coin_pill.get_theme_stylebox("panel") == status_counter_pill
 			and lives_pill.get_theme_stylebox("panel") == status_counter_pill,
@@ -109,6 +112,13 @@ func _run() -> void:
 	_check(
 		coin_pill.size == lives_pill.size,
 		"The Main Menu coin and lives pill backgrounds should use the same compact size."
+	)
+	_check(
+		is_equal_approx(
+			life_status.position.y + life_status.size.y * 0.5,
+			lives_pill.position.y + lives_pill.size.y * 0.5
+		),
+		"The life status text should be vertically centered in its pill background."
 	)
 	var reward_dialog_close := menu.get_node(
 		"LeaderboardRewardDialog/Center/Panel/Stack/CloseButton"

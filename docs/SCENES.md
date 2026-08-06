@@ -823,7 +823,7 @@ Important nodes:
   `$CoinsWidget` center-exclusion-width lookup is unchanged.
 - `Spacer02`: non-expanding center exclusion corridor resized around camera cutouts.
 - `LivesWidget`: generated heart icon, current life count label, and `Full` or `MM:SS` countdown
-  status label. Its compact pill background matches `CoinsWidget` through the shared
+  status label, vertically centered within the pill. Its compact pill background matches `CoinsWidget` through the shared
   `assets/themes/style_box_status_counter_pill.tres` resource and matching 118x44 geometry.
 - `SettingsWidget`: warm rounded settings button matching the chapter selection screen's `BackButton` styling and held-press behavior; `FOCUS_NONE` with the pointing-hand cursor.
 
