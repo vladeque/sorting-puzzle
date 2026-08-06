@@ -602,7 +602,9 @@ Runtime children:
   `scenes/ui/main_menu_coin_shortcut.tscn`, the Main Menu top status row (compact, 142x60).
   `set_compact(bool)` selects the variant; both reuse the exact same `%Pill` stylebox, `%CoinIcon`
   texture, and `GameNumberLabel` styling, so the two screens show the same palette/border/shape/
-  icon and only differ in size. Updated from `PlayerProgress.get_coins()` via `set_amount()`.
+  icon and only differ in size. The pill uses the shared
+  `assets/themes/style_box_status_counter_pill.tres` resource also consumed by the Main Menu lives
+  counter. Updated from `PlayerProgress.get_coins()` via `set_amount()`.
 
 ## `scenes/ui/main_menu_coin_shortcut.tscn`
 
@@ -820,7 +822,9 @@ Important nodes:
   badge, tappable to open the Shop). Kept named `CoinsWidget` so `scripts/main_menu_top_status.gd`'s
   `$CoinsWidget` center-exclusion-width lookup is unchanged.
 - `Spacer02`: non-expanding center exclusion corridor resized around camera cutouts.
-- `LivesWidget`: generated heart icon, current life count label, and `Full` or `MM:SS` countdown status label.
+- `LivesWidget`: generated heart icon, current life count label, and `Full` or `MM:SS` countdown
+  status label. Its compact pill background matches `CoinsWidget` through the shared
+  `assets/themes/style_box_status_counter_pill.tres` resource and matching 118x44 geometry.
 - `SettingsWidget`: warm rounded settings button matching the chapter selection screen's `BackButton` styling and held-press behavior; `FOCUS_NONE` with the pointing-hand cursor.
 
 Depends on:

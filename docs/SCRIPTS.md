@@ -61,7 +61,9 @@ Important nodes:
 - `MainMenuTopStatus/CoinsWidget`: `scenes/ui/main_menu_coin_shortcut.tscn` instance; shows the
   saved gold coin balance and opens the Shop when pressed.
 - `MainMenuTopStatus/SettingsWidget/SettingsButton`: opens the main-menu settings popup.
-- `MainMenuTopStatus/LivesWidget/LifeCount`: shows current campaign lives.
+- `MainMenuTopStatus/LivesWidget/LifeCount`: shows current campaign lives; the owning scene's
+  `LivesPill` shares `assets/themes/style_box_status_counter_pill.tres` and compact 118x44 geometry
+  with the coin balance background.
 - `MainMenuTopStatus/LivesWidget/LifeStatus`: shows `Full` or the `MM:SS` countdown until the next restored life.
 - `%BottomBar`: bottom-anchored container positioned at runtime with safe-area padding.
 - `%LevelButton`: `scenes/ui/level_button.tscn` instance that starts the saved campaign level.

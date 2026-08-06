@@ -42,6 +42,9 @@ func _run() -> void:
 	var menu_background := menu.get_node("%Background") as TextureRect
 	var warm_normal := load("res://assets/themes/style_box_warm_icon_normal.tres") as StyleBoxFlat
 	var warm_pressed := load("res://assets/themes/style_box_warm_icon_pressed.tres") as StyleBoxFlat
+	var status_counter_pill := load(
+		"res://assets/themes/style_box_status_counter_pill.tres"
+	) as StyleBoxFlat
 	var orange_normal := load(
 		"res://assets/themes/style_box_orange_utility_normal.tres"
 	) as StyleBoxFlat
@@ -91,6 +94,21 @@ func _run() -> void:
 		settings_button.get_theme_stylebox("normal") == warm_normal
 			and settings_button.get_theme_stylebox("pressed") == warm_pressed,
 		"The Main Menu Settings button is not using the shared warm icon-button styles."
+	)
+	var coin_pill := menu.get_node(
+		"TopStatusBar/MainMenuTopStatus/CoinsWidget/CoinBalanceWidget/Pill"
+	) as Panel
+	var lives_pill := menu.get_node(
+		"TopStatusBar/MainMenuTopStatus/LivesWidget/LivesPill"
+	) as Panel
+	_check(
+		coin_pill.get_theme_stylebox("panel") == status_counter_pill
+			and lives_pill.get_theme_stylebox("panel") == status_counter_pill,
+		"The Main Menu coin and lives counters should use the shared status-pill background."
+	)
+	_check(
+		coin_pill.size == lives_pill.size,
+		"The Main Menu coin and lives pill backgrounds should use the same compact size."
 	)
 	var reward_dialog_close := menu.get_node(
 		"LeaderboardRewardDialog/Center/Panel/Stack/CloseButton"
