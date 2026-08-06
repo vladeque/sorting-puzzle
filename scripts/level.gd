@@ -48,16 +48,6 @@ const SHELF_VISUAL_VARIANT_FLOOR_ONLY := "floor_only"
 const LAYOUT_ROW_VERTICAL_EPSILON := 8.0
 const SHELF_TOP_STACK_VERTICAL_EPSILON := 4.0
 const SHELF_TOP_STACK_MIN_HORIZONTAL_OVERLAP := 0.35
-const HUD_TOP_MARGIN := 28.0
-const HUD_SIDE_MARGIN := 24.0
-const COMBO_FILL_INSET := 3.0
-const LEVEL_LABEL_MARGIN_LEFT := 32.0
-const LEVEL_LABEL_TOP := 42.0
-const LEVEL_LABEL_SIZE := Vector2(194, 40)
-const TIMER_LABEL_HEIGHT := 64.0
-const PAUSE_BUTTON_SIZE := Vector2(64, 64)
-const STAR_COUNTER_SIZE := Vector2(112, 52)
-const STAR_COUNTER_GAP := 40.0
 const ABILITY_BAR_HEIGHT := 126.0
 const ABILITY_BAR_DESIGN_BOTTOM_MARGIN := 96.0
 const ABILITY_BAR_SAFE_BOTTOM_PADDING := 24.0
@@ -70,7 +60,6 @@ const STAR_REWARD_SIZE := Vector2(28, 28)
 const STAR_REWARD_DROP_DURATION_SECONDS := 0.2
 const STAR_REWARD_FLY_DURATION_SECONDS := 0.62
 const STAR_REWARD_STAGGER_SECONDS := 0.035
-const STAR_REWARD_COUNTER_PULSE_SCALE := Vector2(1.12, 1.12)
 const COMBO_PRAISE_WORDS := [
 	"",
 	"",
@@ -147,17 +136,10 @@ var _drag_layer: Node2D
 var _background: Control
 var _chapter_artwork: TextureRect
 var _shelves_root: Node2D
-var _timer_label: Label
-var _level_label: Label
-var _star_counter_panel: Control
-var _star_counter_label: Label
+var _top_hud: LevelTopHud
 var _star_reward_effect_layer: Control
-var _star_counter_pulse_tween: Tween
-var _combo_fill: Control
-var _combo_label: Label
 var _failure_screen: LevelFailureScreen
 var _completion_screen: LevelCompletionScreen
-var _pause_menu_button: Button
 var _pause_menu_overlay: PauseMenu
 var _leave_confirmation_overlay: LeaveConfirmationMenu
 var _ability_purchase_overlay: AbilityPurchaseMenu
@@ -211,15 +193,9 @@ func _ready() -> void:
 	_chapter_artwork = get_node("Background/ChapterArtwork") as TextureRect
 	_shelves_root = get_node("Shelves") as Node2D
 	_drag_layer = get_node("DragLayer") as Node2D
-	_timer_label = get_node("UI/TimerLabel") as Label
-	_level_label = get_node("UI/LevelLabel") as Label
-	_star_counter_panel = get_node("UI/StarCounterLabel") as Control
-	_star_counter_label = get_node("UI/StarCounterLabel/CountLabel") as Label
-	_combo_fill = get_node("Background/HudCenterSlot/ComboFill") as Control
-	_combo_label = get_node("Background/HudCenterSlot/ComboLabel") as Label
+	_top_hud = get_node("UI/TopHud") as LevelTopHud
 	_failure_screen = get_node("UI/FailureScreen") as LevelFailureScreen
 	_completion_screen = get_node("UI/CompletionScreen") as LevelCompletionScreen
-	_pause_menu_button = get_node("UI/PauseMenuButton") as Button
 	_pause_menu_overlay = get_node("UI/PauseMenuOverlay") as PauseMenu
 	_leave_confirmation_overlay = get_node("UI/LeaveConfirmationOverlay") as LeaveConfirmationMenu
 	_ability_purchase_overlay = get_node("UI/AbilityPurchaseOverlay") as AbilityPurchaseMenu
@@ -276,7 +252,7 @@ func _apply_responsive_layout() -> void:
 		_background.position = Vector2.ZERO
 		_background.size = viewport_size
 
-	_layout_top_hud(safe_margins)
+	_top_hud.apply_safe_layout(safe_margins, viewport_size)
 	_layout_ability_bar(safe_margins)
 	_failure_screen.apply_safe_layout(safe_margins, viewport_size)
 	_completion_screen.apply_safe_layout(safe_margins, viewport_size)
@@ -331,48 +307,6 @@ func _get_safe_area_margins(viewport_size: Vector2) -> Vector4:
 	)
 
 
-func _layout_top_hud(safe_margins: Vector4) -> void:
-	if _timer_label != null:
-		_timer_label.anchor_left = 0.0
-		_timer_label.anchor_top = 0.0
-		_timer_label.anchor_right = 1.0
-		_timer_label.anchor_bottom = 0.0
-		_timer_label.offset_left = safe_margins.x
-		_timer_label.offset_top = safe_margins.y + HUD_TOP_MARGIN
-		_timer_label.offset_right = -safe_margins.z
-		_timer_label.offset_bottom = safe_margins.y + HUD_TOP_MARGIN + TIMER_LABEL_HEIGHT
-
-	if _level_label != null:
-		_level_label.anchor_left = 0.0
-		_level_label.anchor_top = 0.0
-		_level_label.anchor_right = 0.0
-		_level_label.anchor_bottom = 0.0
-		_level_label.offset_left = safe_margins.x + LEVEL_LABEL_MARGIN_LEFT
-		_level_label.offset_top = safe_margins.y + LEVEL_LABEL_TOP
-		_level_label.offset_right = _level_label.offset_left + LEVEL_LABEL_SIZE.x
-		_level_label.offset_bottom = _level_label.offset_top + LEVEL_LABEL_SIZE.y
-
-	if _star_counter_panel != null:
-		_star_counter_panel.anchor_left = 1.0
-		_star_counter_panel.anchor_top = 0.0
-		_star_counter_panel.anchor_right = 1.0
-		_star_counter_panel.anchor_bottom = 0.0
-		_star_counter_panel.offset_right = -(safe_margins.z + HUD_SIDE_MARGIN + PAUSE_BUTTON_SIZE.x + STAR_COUNTER_GAP)
-		_star_counter_panel.offset_left = _star_counter_panel.offset_right - STAR_COUNTER_SIZE.x
-		_star_counter_panel.offset_top = safe_margins.y + HUD_TOP_MARGIN + ((PAUSE_BUTTON_SIZE.y - STAR_COUNTER_SIZE.y) * 0.5)
-		_star_counter_panel.offset_bottom = _star_counter_panel.offset_top + STAR_COUNTER_SIZE.y
-
-	if _pause_menu_button != null:
-		_pause_menu_button.anchor_left = 1.0
-		_pause_menu_button.anchor_top = 0.0
-		_pause_menu_button.anchor_right = 1.0
-		_pause_menu_button.anchor_bottom = 0.0
-		_pause_menu_button.offset_right = -(safe_margins.z + HUD_SIDE_MARGIN)
-		_pause_menu_button.offset_left = _pause_menu_button.offset_right - PAUSE_BUTTON_SIZE.x
-		_pause_menu_button.offset_top = safe_margins.y + HUD_TOP_MARGIN
-		_pause_menu_button.offset_bottom = _pause_menu_button.offset_top + PAUSE_BUTTON_SIZE.y
-
-
 func _layout_ability_bar(safe_margins: Vector4) -> void:
 	if _ability_bar == null:
 		return
@@ -386,7 +320,9 @@ func _layout_ability_bar(safe_margins: Vector4) -> void:
 	_ability_bar.offset_top = -(bottom_margin + ABILITY_BAR_HEIGHT)
 	_ability_bar.offset_right = -safe_margins.z
 	_ability_bar.offset_bottom = -bottom_margin
-	_ability_bar.apply_responsive_layout(get_viewport_rect().size.x)
+	# Usable width after safe-area side insets, not raw viewport width, so the compact/regular
+	# breakpoint is based on the space actually available to the bar.
+	_ability_bar.apply_responsive_layout(get_viewport_rect().size.x - safe_margins.x - safe_margins.z)
 
 
 func _get_ability_bar_bottom_margin(safe_margins: Vector4) -> float:
@@ -1429,29 +1365,16 @@ func _update_timer_label() -> void:
 	var remaining_seconds := ceili(_time_remaining)
 	var minutes := floori(float(remaining_seconds) / 60.0)
 	var seconds := remaining_seconds % 60
-	_timer_label.text = "%02d:%02d" % [minutes, seconds]
+	_top_hud.set_timer_text("%02d:%02d" % [minutes, seconds])
 
 
 func _update_level_label() -> void:
 	var local_level := ChapterCatalog.get_local_level_number(selected_level)
-	_level_label.text = "LEVEL %d" % (local_level if local_level > 0 else selected_level)
+	_top_hud.set_level_text("LEVEL %d" % (local_level if local_level > 0 else selected_level))
 
 
 func _update_star_counter_label() -> void:
-	if _star_counter_label == null:
-		return
-
-	var star_text := "%d" % _stars
-	var font_size := 26
-	if star_text.length() >= 7:
-		font_size = 18
-	elif star_text.length() >= 6:
-		font_size = 20
-	elif star_text.length() >= 5:
-		font_size = 22
-
-	_star_counter_label.add_theme_font_size_override("font_size", font_size)
-	_star_counter_label.text = star_text
+	_top_hud.set_star_count(_stars)
 
 
 func _add_stars(star_count: int) -> void:
@@ -1501,18 +1424,7 @@ func _reset_combo() -> void:
 
 func _update_combo_hud() -> void:
 	var should_show := _combo_count > 0 and not _level_failed and not _level_completed
-	if _combo_fill != null:
-		_combo_fill.visible = should_show
-		_combo_fill.anchor_right = _get_combo_time_ratio() if should_show else 0.0
-		_combo_fill.offset_left = COMBO_FILL_INSET
-		_combo_fill.offset_top = COMBO_FILL_INSET
-		_combo_fill.offset_right = -COMBO_FILL_INSET
-		_combo_fill.offset_bottom = -COMBO_FILL_INSET
-
-	if _combo_label != null:
-		_combo_label.visible = should_show
-	if _combo_label != null and should_show:
-		_combo_label.text = "COMBO ×%d" % _combo_count
+	_top_hud.set_combo(should_show, _combo_count, _get_combo_time_ratio())
 
 
 func _get_combo_time_ratio() -> float:
@@ -1615,7 +1527,7 @@ func _spend_campaign_life_for_run(outcome: String = "left") -> void:
 
 
 func _setup_pause_menu_buttons() -> void:
-	_pause_menu_button.pressed.connect(_on_pause_menu_button_pressed)
+	_top_hud.pause_pressed.connect(_on_pause_menu_button_pressed)
 	_pause_menu_overlay.leave_pressed.connect(_on_pause_menu_leave_pressed)
 	_pause_menu_overlay.continue_pressed.connect(_on_pause_menu_continue_pressed)
 	_pause_menu_overlay.setting_toggled.connect(_on_pause_menu_setting_toggled)
@@ -1819,10 +1731,7 @@ func _close_pause_menu() -> void:
 
 
 func _update_pause_menu_button() -> void:
-	if _pause_menu_button == null:
-		return
-
-	_pause_menu_button.disabled = _level_failed or _level_completed or _level_paused
+	_top_hud.set_pause_enabled(not (_level_failed or _level_completed or _level_paused))
 
 
 func _handle_press_at(pointer_global_position: Vector2) -> void:
@@ -2311,10 +2220,10 @@ func _play_match_clear_animation(shelf_items: Array[ShelfItem]) -> void:
 
 
 func _play_combo_star_reward_animation(origin_global_position: Vector2, star_count: int) -> void:
-	if star_count <= 0 or _star_reward_effect_layer == null or _star_counter_panel == null:
+	if star_count <= 0 or _star_reward_effect_layer == null or _top_hud == null:
 		return
 
-	var target_global_position := _star_counter_panel.get_global_rect().get_center()
+	var target_global_position := _top_hud.get_star_counter_global_center()
 	for star_index in range(star_count):
 		_spawn_combo_reward_star(origin_global_position, target_global_position, star_index, star_count)
 
@@ -2324,7 +2233,7 @@ func _play_combo_star_reward_animation(origin_global_position: Vector2, star_cou
 		+ STAR_REWARD_STAGGER_SECONDS * maxf(float(star_count - 1), 0.0)
 	)
 	await get_tree().create_timer(total_duration).timeout
-	_pulse_star_counter()
+	_top_hud.play_star_receive_pulse()
 
 
 func _show_combo_praise(origin_global_position: Vector2, combo_count: int) -> void:
@@ -2574,37 +2483,9 @@ func _get_star_effect_layer_position(global_position: Vector2) -> Vector2:
 	return global_position - _star_reward_effect_layer.global_position
 
 
-func _pulse_star_counter() -> void:
-	if _star_counter_panel == null or not is_instance_valid(_star_counter_panel):
-		return
-
-	if _star_counter_pulse_tween != null and _star_counter_pulse_tween.is_valid():
-		_star_counter_pulse_tween.kill()
-
-	_star_counter_panel.pivot_offset = _star_counter_panel.size * 0.5
-	_star_counter_panel.scale = Vector2.ONE
-	_star_counter_pulse_tween = _star_counter_panel.create_tween()
-	_star_counter_pulse_tween.tween_property(
-		_star_counter_panel,
-		"scale",
-		STAR_REWARD_COUNTER_PULSE_SCALE,
-		0.08
-	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	_star_counter_pulse_tween.tween_property(
-		_star_counter_panel,
-		"scale",
-		Vector2.ONE,
-		0.12
-	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
-
-
 func _clear_star_reward_effects() -> void:
-	if _star_counter_pulse_tween != null and _star_counter_pulse_tween.is_valid():
-		_star_counter_pulse_tween.kill()
-	_star_counter_pulse_tween = null
-
-	if _star_counter_panel != null:
-		_star_counter_panel.scale = Vector2.ONE
+	if _top_hud != null:
+		_top_hud.reset_star_pulse()
 
 	if _star_reward_effect_layer == null:
 		return
@@ -3704,16 +3585,8 @@ func _update_freezer_visuals() -> void:
 			ABILITY_FREEZER,
 			_freezer_time_remaining if is_active else 0.0
 		)
-	if _timer_label == null or not is_instance_valid(_timer_label):
-		return
-	if is_active:
-		_timer_label.add_theme_color_override("font_color", Color(0.68, 0.96, 1.0, 1.0))
-		_timer_label.add_theme_color_override("font_outline_color", Color(0.08, 0.34, 0.52, 0.95))
-		_timer_label.add_theme_constant_override("outline_size", 5)
-	else:
-		_timer_label.remove_theme_color_override("font_color")
-		_timer_label.remove_theme_color_override("font_outline_color")
-		_timer_label.remove_theme_constant_override("outline_size")
+	if _top_hud != null:
+		_top_hud.set_timer_frozen_visual(is_active)
 
 
 func _update_ability_buttons() -> void:

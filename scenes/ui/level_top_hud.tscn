@@ -1,0 +1,234 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/level_top_hud.gd" id="1_hud_script"]
+[ext_resource type="Texture2D" uid="uid://xbjatvx3natv" path="res://assets/ui/reward_star_34_glossy_b.png" id="2_star_icon"]
+[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_gameplay_status_pill.tres" id="3_status_pill"]
+[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_gameplay_hud_icon_normal.tres" id="4_hud_icon_normal"]
+[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_gameplay_hud_icon_pressed.tres" id="5_hud_icon_pressed"]
+[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_gameplay_hud_icon_hover.tres" id="6_hud_icon_hover"]
+[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_gameplay_hud_icon_disabled.tres" id="7_hud_icon_disabled"]
+[ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="8_press_scale_button"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_top_hud_strip"]
+bg_color = Color(0.7, 0.34, 0.24, 1)
+border_width_bottom = 4
+border_color = Color(0.45, 0.19, 0.13, 1)
+shadow_color = Color(0.25, 0.1, 0.06, 0.32)
+shadow_size = 8
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hud_center_slot"]
+bg_color = Color(0.36, 0.08, 0.06, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.84, 0.48, 0.34, 0.72)
+corner_radius_top_left = 13
+corner_radius_top_right = 13
+corner_radius_bottom_right = 13
+corner_radius_bottom_left = 13
+shadow_color = Color(0.2, 0.05, 0.04, 0.36)
+shadow_size = 5
+shadow_offset = Vector2(0, 2)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_combo_fill"]
+bg_color = Color(0.27, 0.8, 0.25, 0.82)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="LevelTopHud" type="Control"]
+layout_mode = 3
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 112.0
+grow_horizontal = 2
+mouse_filter = 2
+script = ExtResource("1_hud_script")
+
+[node name="Strip" type="Panel" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_top_hud_strip")
+
+[node name="HudCenterSlot" type="Panel" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -85.0
+offset_top = 92.0
+offset_right = 85.0
+offset_bottom = 121.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hud_center_slot")
+
+[node name="ComboFill" type="Panel" parent="HudCenterSlot"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 3.0
+offset_top = 3.0
+offset_right = -3.0
+offset_bottom = -3.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_combo_fill")
+
+[node name="ComboLabel" type="Label" parent="HudCenterSlot"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_type_variation = &"GameNumberLabel"
+theme_override_colors/font_color = Color(1, 0.92, 0.62, 1)
+theme_override_colors/font_shadow_color = Color(0.08, 0.02, 0.01, 0.82)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 22
+text = "COMBO ×1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TimerLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 28.0
+offset_bottom = 92.0
+grow_horizontal = 2
+theme_type_variation = &"GameNumberLabel"
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.72)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 4
+theme_override_font_sizes/font_size = 46
+text = "05:00"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LevelLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+offset_left = 32.0
+offset_top = 42.0
+offset_right = 226.0
+offset_bottom = 82.0
+theme_type_variation = &"GameNumberLabel"
+theme_override_colors/font_color = Color(1, 1, 1, 0.9)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.72)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 3
+theme_override_font_sizes/font_size = 28
+text = "LEVEL 1"
+vertical_alignment = 1
+
+[node name="StarCounter" type="Panel" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -212.0
+offset_top = 34.0
+offset_right = -100.0
+offset_bottom = 86.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_styles/panel = ExtResource("3_status_pill")
+
+[node name="Icon" type="TextureRect" parent="StarCounter"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 10.0
+offset_top = -17.0
+offset_right = 44.0
+offset_bottom = 17.0
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_star_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="StarCountLabel" type="Label" parent="StarCounter"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 42.0
+offset_right = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_type_variation = &"GameNumberLabel"
+theme_override_colors/font_color = Color(1, 0.92, 0.5, 1)
+theme_override_colors/font_shadow_color = Color(0.08, 0.03, 0.01, 0.82)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 26
+text = "0"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="PauseButton" type="Button" parent="."]
+unique_name_in_owner = true
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -96.0
+offset_top = 28.0
+offset_right = -24.0
+offset_bottom = 124.0
+grow_horizontal = 0
+grow_vertical = 0
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = ExtResource("4_hud_icon_normal")
+theme_override_styles/pressed = ExtResource("5_hud_icon_pressed")
+theme_override_styles/hover = ExtResource("6_hud_icon_hover")
+theme_override_styles/disabled = ExtResource("7_hud_icon_disabled")
+script = ExtResource("8_press_scale_button")
+held_scale = 0.97
+
+[node name="PauseBar1" type="ColorRect" parent="PauseButton"]
+unique_name_in_owner = true
+mouse_filter = 2
+color = Color(1, 1, 1, 1)
+offset_left = 32.0
+offset_top = 28.0
+offset_right = 43.0
+offset_bottom = 68.0
+
+[node name="PauseBar2" type="ColorRect" parent="PauseButton"]
+unique_name_in_owner = true
+mouse_filter = 2
+color = Color(1, 1, 1, 1)
+offset_left = 53.0
+offset_top = 28.0
+offset_right = 64.0
+offset_bottom = 68.0

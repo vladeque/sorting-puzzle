@@ -1,6 +1,5 @@
 [gd_scene format=3 uid="uid://bx74wdn60xop5"]
 
-[ext_resource type="Texture2D" uid="uid://xbjatvx3natv" path="res://assets/ui/reward_star_34_glossy_b.png" id="2_n6hdu"]
 [ext_resource type="PackedScene" uid="uid://g1xsr7chqeg7" path="res://scenes/pause_menu.tscn" id="5_pause_menu"]
 [ext_resource type="PackedScene" uid="uid://dlopvf5glhqiu" path="res://scenes/ui/level_completion_screen.tscn" id="7_completion_screen"]
 [ext_resource type="PackedScene" uid="uid://cblpm4vbgjmfu" path="res://scenes/leave_confirmation_menu.tscn" id="8_leave_confirmation"]
@@ -9,36 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://db6gp1qpotd1l" path="res://scenes/ui/ability_bar.tscn" id="11_ability_bar"]
 [ext_resource type="PackedScene" path="res://scenes/backgrounds/chapter_level_background.tscn" id="12_chapter_background"]
 [ext_resource type="PackedScene" path="res://scenes/ui/level_failure_screen.tscn" id="13_failure_screen"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_top_hud_strip"]
-bg_color = Color(0.7, 0.34, 0.24, 1)
-border_width_bottom = 4
-border_color = Color(0.45, 0.19, 0.13, 1)
-shadow_color = Color(0.25, 0.1, 0.06, 0.32)
-shadow_size = 8
-shadow_offset = Vector2(0, 4)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hud_center_slot"]
-bg_color = Color(0.36, 0.08, 0.06, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.84, 0.48, 0.34, 0.72)
-corner_radius_top_left = 13
-corner_radius_top_right = 13
-corner_radius_bottom_right = 13
-corner_radius_bottom_left = 13
-shadow_color = Color(0.2, 0.05, 0.04, 0.36)
-shadow_size = 5
-shadow_offset = Vector2(0, 2)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_combo_fill"]
-bg_color = Color(0.27, 0.8, 0.25, 0.82)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
+[ext_resource type="PackedScene" path="res://scenes/ui/level_top_hud.tscn" id="14_top_hud"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_baseboard"]
 bg_color = Color(0.83, 0.66, 0.47, 1)
@@ -48,66 +18,6 @@ border_color = Color(0.98, 0.87, 0.66, 0.82)
 shadow_color = Color(0.45, 0.22, 0.13, 0.24)
 shadow_size = 7
 shadow_offset = Vector2(0, -2)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_star_counter"]
-bg_color = Color(0.18, 0.12, 0.08, 0.86)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(1, 0.84, 0.32, 0.88)
-corner_radius_top_left = 22
-corner_radius_top_right = 22
-corner_radius_bottom_right = 22
-corner_radius_bottom_left = 22
-shadow_color = Color(0, 0, 0, 0.3)
-shadow_size = 6
-shadow_offset = Vector2(0, 3)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pause_button_normal"]
-bg_color = Color(0.12, 0.17, 0.22, 0.96)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.86, 0.92, 0.82, 0.86)
-corner_radius_top_left = 34
-corner_radius_top_right = 34
-corner_radius_bottom_right = 34
-corner_radius_bottom_left = 34
-shadow_color = Color(0, 0, 0, 0.36)
-shadow_size = 8
-shadow_offset = Vector2(0, 4)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pause_button_pressed"]
-bg_color = Color(0.08, 0.12, 0.16, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.99, 0.75, 0.36, 1)
-corner_radius_top_left = 34
-corner_radius_top_right = 34
-corner_radius_bottom_right = 34
-corner_radius_bottom_left = 34
-shadow_color = Color(0, 0, 0, 0.26)
-shadow_size = 5
-shadow_offset = Vector2(0, 3)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pause_button_hover"]
-bg_color = Color(0.18, 0.25, 0.31, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.99, 0.88, 0.48, 1)
-corner_radius_top_left = 34
-corner_radius_top_right = 34
-corner_radius_bottom_right = 34
-corner_radius_bottom_left = 34
-shadow_color = Color(0, 0, 0, 0.4)
-shadow_size = 10
-shadow_offset = Vector2(0, 4)
 
 [node name="Level" type="Node2D" unique_id=949256860]
 script = ExtResource("10_level_script")
@@ -146,61 +56,6 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 color = Color(0.86, 0.77, 0.65, 1)
-
-[node name="TopHudStrip" type="Panel" parent="Background" unique_id=1074493098]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_bottom = 112.0
-grow_horizontal = 2
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_top_hud_strip")
-
-[node name="HudCenterSlot" type="Panel" parent="Background" unique_id=884675723]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -85.0
-offset_top = 92.0
-offset_right = 85.0
-offset_bottom = 121.0
-grow_horizontal = 2
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_hud_center_slot")
-
-[node name="ComboFill" type="Panel" parent="Background/HudCenterSlot" unique_id=1795234617]
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 3.0
-offset_top = 3.0
-offset_right = -3.0
-offset_bottom = -3.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_combo_fill")
-
-[node name="ComboLabel" type="Label" parent="Background/HudCenterSlot" unique_id=449182547]
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_type_variation = &"GameNumberLabel"
-theme_override_colors/font_color = Color(1, 0.92, 0.62, 1)
-theme_override_colors/font_shadow_color = Color(0.08, 0.02, 0.01, 0.82)
-theme_override_constants/shadow_offset_x = 0
-theme_override_constants/shadow_offset_y = 2
-theme_override_font_sizes/font_size = 22
-text = "COMBO ×1"
-horizontal_alignment = 1
-vertical_alignment = 1
 
 [node name="Baseboard" type="Panel" parent="Background" unique_id=616197814]
 visible = false
@@ -322,104 +177,7 @@ z_index = 100
 [node name="UI" type="CanvasLayer" parent="." unique_id=1854925290]
 layer = 10
 
-[node name="TimerLabel" type="Label" parent="UI" unique_id=272348979]
-anchors_preset = 10
-anchor_right = 1.0
-offset_top = 28.0
-offset_bottom = 92.0
-grow_horizontal = 2
-theme_type_variation = &"GameNumberLabel"
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.72)
-theme_override_constants/shadow_offset_x = 0
-theme_override_constants/shadow_offset_y = 4
-theme_override_font_sizes/font_size = 46
-text = "05:00"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="LevelLabel" type="Label" parent="UI" unique_id=1053243000]
-offset_left = 32.0
-offset_top = 42.0
-offset_right = 226.0
-offset_bottom = 82.0
-theme_type_variation = &"GameNumberLabel"
-theme_override_colors/font_color = Color(1, 1, 1, 0.9)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.72)
-theme_override_constants/shadow_offset_x = 0
-theme_override_constants/shadow_offset_y = 3
-theme_override_font_sizes/font_size = 28
-text = "LEVEL 1"
-vertical_alignment = 1
-
-[node name="StarCounterLabel" type="Panel" parent="UI" unique_id=1248988476]
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -212.0
-offset_top = 34.0
-offset_right = -100.0
-offset_bottom = 86.0
-grow_horizontal = 0
-grow_vertical = 0
-theme_override_styles/panel = SubResource("StyleBoxFlat_star_counter")
-
-[node name="Icon" type="TextureRect" parent="UI/StarCounterLabel" unique_id=2131150893]
-layout_mode = 1
-anchors_preset = 4
-anchor_top = 0.5
-anchor_bottom = 0.5
-offset_left = 10.0
-offset_top = -17.0
-offset_right = 44.0
-offset_bottom = 17.0
-grow_vertical = 2
-mouse_filter = 2
-texture = ExtResource("2_n6hdu")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="CountLabel" type="Label" parent="UI/StarCounterLabel" unique_id=1332287251]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 42.0
-offset_right = -12.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_type_variation = &"GameNumberLabel"
-theme_override_colors/font_color = Color(1, 0.92, 0.5, 1)
-theme_override_colors/font_shadow_color = Color(0.08, 0.03, 0.01, 0.82)
-theme_override_constants/shadow_offset_x = 0
-theme_override_constants/shadow_offset_y = 2
-theme_override_font_sizes/font_size = 26
-text = "0"
-horizontal_alignment = 2
-vertical_alignment = 1
-
-[node name="PauseMenuButton" type="Button" parent="UI" unique_id=406101987]
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -88.0
-offset_top = 28.0
-offset_right = -24.0
-offset_bottom = 92.0
-grow_horizontal = 0
-grow_vertical = 0
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 28
-theme_override_styles/normal = SubResource("StyleBoxFlat_pause_button_normal")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_pause_button_pressed")
-theme_override_styles/hover = SubResource("StyleBoxFlat_pause_button_hover")
-text = "II"
+[node name="TopHud" parent="UI" unique_id=272348979 instance=ExtResource("14_top_hud")]
 
 [node name="AbilityBar" parent="UI" unique_id=135995489 instance=ExtResource("11_ability_bar")]
 offset_top = -222.0

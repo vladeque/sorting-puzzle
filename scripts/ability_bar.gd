@@ -3,6 +3,8 @@ class_name AbilityBar
 
 signal ability_pressed(ability_id: StringName)
 
+const GameplayUIThemeScript := preload("res://scripts/gameplay_ui_theme.gd")
+
 const ABILITY_HAMMER := &"hammer"
 const ABILITY_SHUFFLE := &"shuffle"
 const ABILITY_HIGHLIGHT := &"highlight"
@@ -13,9 +15,6 @@ const ABILITY_IDS := [
 	ABILITY_HIGHLIGHT,
 	ABILITY_FREEZER,
 ]
-const COMPACT_VIEWPORT_WIDTH := 620.0
-const COMPACT_BUTTON_SIZE := Vector2(82.0, 82.0)
-const REGULAR_BUTTON_SIZE := Vector2(96.0, 96.0)
 
 @onready var _button_row := %ButtonRow as HBoxContainer
 @onready var _buttons := {
@@ -25,12 +24,19 @@ const REGULAR_BUTTON_SIZE := Vector2(96.0, 96.0)
 	ABILITY_FREEZER: %FreezerButton as Button,
 }
 
+## Each button's Icon/UsesLabel/TimerLabel rects as authored in the scene (calibrated for
+## GameplayUITheme.HUD_ICON_REGULAR_SIZE). apply_responsive_layout() scales these proportionally
+## for the compact size instead of only resizing the parent button -- previously the icon and both
+## badge types stayed at their 96px-authored offsets and overflowed an 82px compact button.
+var _reference_child_rects: Dictionary = {}
+
 
 func _ready() -> void:
 	for ability_id in ABILITY_IDS:
 		var button := _buttons.get(ability_id) as Button
 		if button != null:
 			button.pressed.connect(ability_pressed.emit.bind(ability_id))
+			_reference_child_rects[ability_id] = _capture_reference_rects(button)
 
 
 func set_uses(ability_uses: Dictionary) -> void:
@@ -74,11 +80,51 @@ func get_ability_button(ability_id: StringName) -> Button:
 	return _buttons.get(ability_id) as Button
 
 
-func apply_responsive_layout(viewport_width: float) -> void:
-	var is_compact := viewport_width <= COMPACT_VIEWPORT_WIDTH
-	var button_size := COMPACT_BUTTON_SIZE if is_compact else REGULAR_BUTTON_SIZE
+func apply_responsive_layout(usable_width: float) -> void:
+	var is_compact := usable_width <= GameplayUIThemeScript.HUD_ICON_COMPACT_VIEWPORT_WIDTH
+	var button_size := GameplayUIThemeScript.HUD_ICON_COMPACT_SIZE if is_compact else GameplayUIThemeScript.HUD_ICON_REGULAR_SIZE
+	var reference_size := GameplayUIThemeScript.HUD_ICON_REGULAR_SIZE
+	var scale := button_size.x / reference_size.x if reference_size.x > 0.0 else 1.0
+
 	_button_row.add_theme_constant_override("separation", 18 if is_compact else 34)
 	for ability_id in ABILITY_IDS:
 		var button := _buttons.get(ability_id) as Button
-		if button != null:
-			button.custom_minimum_size = button_size
+		if button == null:
+			continue
+
+		button.custom_minimum_size = button_size
+		var rects: Dictionary = _reference_child_rects.get(ability_id, {})
+		_apply_scaled_rect(button.get_node_or_null("Icon") as Control, rects.get("icon"), scale)
+		_apply_scaled_rect(button.get_node_or_null("UsesLabel") as Control, rects.get("uses_label"), scale)
+		_apply_scaled_rect(button.get_node_or_null("TimerLabel") as Control, rects.get("timer_label"), scale)
+
+
+func _capture_reference_rects(button: Button) -> Dictionary:
+	var child_names_by_key := {
+		"icon": "Icon",
+		"uses_label": "UsesLabel",
+		"timer_label": "TimerLabel",
+	}
+	var rects := {}
+	for key in child_names_by_key.keys():
+		var child := button.get_node_or_null(child_names_by_key[key]) as Control
+		if child == null:
+			continue
+		rects[key] = Rect2(
+			child.offset_left,
+			child.offset_top,
+			child.offset_right - child.offset_left,
+			child.offset_bottom - child.offset_top
+		)
+	return rects
+
+
+func _apply_scaled_rect(control: Control, reference: Variant, scale: float) -> void:
+	if control == null or reference == null:
+		return
+
+	var rect := reference as Rect2
+	control.offset_left = rect.position.x * scale
+	control.offset_top = rect.position.y * scale
+	control.offset_right = (rect.position.x + rect.size.x) * scale
+	control.offset_bottom = (rect.position.y + rect.size.y) * scale

@@ -5,93 +5,13 @@
 [ext_resource type="Texture2D" uid="uid://x0qk7pd87bfv" path="res://assets/abilities/ability_shuffle.png" id="3_shuffle"]
 [ext_resource type="Texture2D" uid="uid://dwmyah5l2r82d" path="res://assets/abilities/ability_lantern.png" id="4_lantern"]
 [ext_resource type="Texture2D" uid="uid://x6rx0xrv78dw" path="res://assets/abilities/ice_clock_icon_256x256.png" id="5_bymt5"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ability_normal"]
-bg_color = Color(0.16, 0.21, 0.27, 0.94)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.55, 0.77, 0.86, 0.82)
-corner_radius_top_left = 48
-corner_radius_top_right = 48
-corner_radius_bottom_right = 48
-corner_radius_bottom_left = 48
-shadow_color = Color(0, 0, 0, 0.28)
-shadow_size = 8
-shadow_offset = Vector2(0, 5)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ability_pressed"]
-bg_color = Color(0.1, 0.15, 0.2, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.94, 0.76, 0.38, 1)
-corner_radius_top_left = 48
-corner_radius_top_right = 48
-corner_radius_bottom_right = 48
-corner_radius_bottom_left = 48
-shadow_color = Color(0, 0, 0, 0.22)
-shadow_size = 5
-shadow_offset = Vector2(0, 3)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ability_hover"]
-bg_color = Color(0.21, 0.29, 0.36, 0.98)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.89, 0.94, 0.72, 0.95)
-corner_radius_top_left = 48
-corner_radius_top_right = 48
-corner_radius_bottom_right = 48
-corner_radius_bottom_left = 48
-shadow_color = Color(0, 0, 0, 0.32)
-shadow_size = 10
-shadow_offset = Vector2(0, 5)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ability_disabled"]
-bg_color = Color(0.11, 0.12, 0.14, 0.68)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.35, 0.39, 0.44, 0.58)
-corner_radius_top_left = 48
-corner_radius_top_right = 48
-corner_radius_bottom_right = 48
-corner_radius_bottom_left = 48
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ability_count_badge"]
-bg_color = Color(0.93, 0.32, 0.18, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(1, 0.92, 0.62, 1)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-shadow_color = Color(0, 0, 0, 0.34)
-shadow_size = 5
-shadow_offset = Vector2(0, 2)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_timer_badge"]
-bg_color = Color(0.1, 0.15, 0.2, 0.96)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.62, 0.94, 1, 1)
-corner_radius_top_left = 22
-corner_radius_top_right = 22
-corner_radius_bottom_right = 22
-corner_radius_bottom_left = 22
-shadow_color = Color(0, 0, 0, 0.34)
-shadow_size = 5
-shadow_offset = Vector2(0, 2)
+[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_gameplay_hud_icon_normal.tres" id="6_hud_icon_normal"]
+[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_gameplay_hud_icon_pressed.tres" id="7_hud_icon_pressed"]
+[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_gameplay_hud_icon_hover.tres" id="8_hud_icon_hover"]
+[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_gameplay_hud_icon_disabled.tres" id="9_hud_icon_disabled"]
+[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_gameplay_count_badge.tres" id="10_count_badge"]
+[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_gameplay_timer_badge.tres" id="11_timer_badge"]
+[ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="12_press_scale_button"]
 
 [node name="AbilityBar" type="Control" unique_id=2085968]
 layout_mode = 3
@@ -124,10 +44,14 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 focus_mode = 0
-theme_override_styles/normal = SubResource("StyleBoxFlat_ability_normal")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_ability_pressed")
-theme_override_styles/hover = SubResource("StyleBoxFlat_ability_hover")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_ability_disabled")
+mouse_default_cursor_shape = 2
+tooltip_text = "Hammer -- clears a matching triple"
+theme_override_styles/normal = ExtResource("6_hud_icon_normal")
+theme_override_styles/pressed = ExtResource("7_hud_icon_pressed")
+theme_override_styles/hover = ExtResource("8_hud_icon_hover")
+theme_override_styles/disabled = ExtResource("9_hud_icon_disabled")
+script = ExtResource("12_press_scale_button")
+held_scale = 0.97
 
 [node name="Icon" type="TextureRect" parent="ButtonRow/HammerButton" unique_id=1532768853]
 layout_mode = 0
@@ -152,7 +76,7 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.86)
 theme_override_constants/shadow_offset_y = 1
 theme_override_font_sizes/font_size = 20
-theme_override_styles/normal = SubResource("StyleBoxFlat_ability_count_badge")
+theme_override_styles/normal = ExtResource("10_count_badge")
 text = "3"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -162,10 +86,14 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 focus_mode = 0
-theme_override_styles/normal = SubResource("StyleBoxFlat_ability_normal")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_ability_pressed")
-theme_override_styles/hover = SubResource("StyleBoxFlat_ability_hover")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_ability_disabled")
+mouse_default_cursor_shape = 2
+tooltip_text = "Shuffle -- reshuffles unlocked items"
+theme_override_styles/normal = ExtResource("6_hud_icon_normal")
+theme_override_styles/pressed = ExtResource("7_hud_icon_pressed")
+theme_override_styles/hover = ExtResource("8_hud_icon_hover")
+theme_override_styles/disabled = ExtResource("9_hud_icon_disabled")
+script = ExtResource("12_press_scale_button")
+held_scale = 0.97
 
 [node name="Icon" type="TextureRect" parent="ButtonRow/ShuffleButton" unique_id=1787090029]
 layout_mode = 0
@@ -190,7 +118,7 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.86)
 theme_override_constants/shadow_offset_y = 1
 theme_override_font_sizes/font_size = 20
-theme_override_styles/normal = SubResource("StyleBoxFlat_ability_count_badge")
+theme_override_styles/normal = ExtResource("10_count_badge")
 text = "3"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -200,10 +128,14 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 focus_mode = 0
-theme_override_styles/normal = SubResource("StyleBoxFlat_ability_normal")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_ability_pressed")
-theme_override_styles/hover = SubResource("StyleBoxFlat_ability_hover")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_ability_disabled")
+mouse_default_cursor_shape = 2
+tooltip_text = "Lantern -- highlights a matchable triple"
+theme_override_styles/normal = ExtResource("6_hud_icon_normal")
+theme_override_styles/pressed = ExtResource("7_hud_icon_pressed")
+theme_override_styles/hover = ExtResource("8_hud_icon_hover")
+theme_override_styles/disabled = ExtResource("9_hud_icon_disabled")
+script = ExtResource("12_press_scale_button")
+held_scale = 0.97
 
 [node name="Icon" type="TextureRect" parent="ButtonRow/HighlightButton" unique_id=185698927]
 layout_mode = 0
@@ -228,7 +160,7 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.86)
 theme_override_constants/shadow_offset_y = 1
 theme_override_font_sizes/font_size = 20
-theme_override_styles/normal = SubResource("StyleBoxFlat_ability_count_badge")
+theme_override_styles/normal = ExtResource("10_count_badge")
 text = "3"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -246,7 +178,7 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.86)
 theme_override_constants/shadow_offset_y = 1
 theme_override_font_sizes/font_size = 16
-theme_override_styles/normal = SubResource("StyleBoxFlat_timer_badge")
+theme_override_styles/normal = ExtResource("11_timer_badge")
 text = "15s"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -256,14 +188,14 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 focus_mode = 0
-theme_override_colors/font_color = Color(0.78, 0.96, 1, 1)
-theme_override_colors/font_disabled_color = Color(0.78, 0.96, 1, 0.42)
-theme_override_font_sizes/font_size = 16
-theme_override_styles/normal = SubResource("StyleBoxFlat_ability_normal")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_ability_pressed")
-theme_override_styles/hover = SubResource("StyleBoxFlat_ability_hover")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_ability_disabled")
-text = "Freeze"
+mouse_default_cursor_shape = 2
+tooltip_text = "Freezer -- pauses the countdown timer"
+theme_override_styles/normal = ExtResource("6_hud_icon_normal")
+theme_override_styles/pressed = ExtResource("7_hud_icon_pressed")
+theme_override_styles/hover = ExtResource("8_hud_icon_hover")
+theme_override_styles/disabled = ExtResource("9_hud_icon_disabled")
+script = ExtResource("12_press_scale_button")
+held_scale = 0.97
 
 [node name="Icon" type="TextureRect" parent="ButtonRow/FreezerButton" unique_id=956361512]
 layout_mode = 0
@@ -288,7 +220,7 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.86)
 theme_override_constants/shadow_offset_y = 1
 theme_override_font_sizes/font_size = 20
-theme_override_styles/normal = SubResource("StyleBoxFlat_ability_count_badge")
+theme_override_styles/normal = ExtResource("10_count_badge")
 text = "3"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -306,7 +238,7 @@ theme_override_colors/font_color = Color(0.82, 0.98, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.86)
 theme_override_constants/shadow_offset_y = 1
 theme_override_font_sizes/font_size = 16
-theme_override_styles/normal = SubResource("StyleBoxFlat_timer_badge")
+theme_override_styles/normal = ExtResource("11_timer_badge")
 text = "30s"
 horizontal_alignment = 1
 vertical_alignment = 1
