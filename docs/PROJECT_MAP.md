@@ -23,9 +23,9 @@ Playable level scene:
 - Owns shelf layout, timer, drag and tap movement, triple matching, abilities, pause-menu wiring, failure, and completion flow.
 - Uses the original procedural gameplay background for Chapter 1 and chapter artwork for chapters
   whose catalog entry selects `artwork` mode.
-- The proposed gameplay-UI consistency refactor for the HUD, ability bar, Pause/Leave/Purchase
-  modals, Completion/Failure results, and locked-shelf feedback is tracked in
-  `docs/UI_003_LEVEL_UI_CONSISTENCY_TICKET.md`.
+- Uses one shared gameplay UI system for its HUD, ability bar, Pause/Leave Confirmation/Ability
+  Purchase modals, and Completion/Failure terminal results (UI-003, implemented and validated --
+  see `docs/UI_003_LEVEL_UI_CONSISTENCY_TICKET.md` and "Shared Gameplay UI" below).
 
 Player progression:
 - `scripts/player_progress.gd`
@@ -358,6 +358,43 @@ Change here when:
 - Changing the shared background policy, secondary-screen shade, content-rect/title-size/
   bottom-navigation math, or loading/empty/error presentation used by Shop and Leaderboard.
 
+### Shared Gameplay UI
+
+Files:
+- `scenes/ui/gameplay_modal_shell.tscn`, `scripts/gameplay_modal_shell.gd`
+- `scenes/ui/gameplay_result_shell.tscn`, `scripts/gameplay_result_shell.gd`
+- `scenes/ui/level_top_hud.tscn`, `scripts/level_top_hud.gd`
+- `scripts/gameplay_ui_theme.gd`
+- `scripts/ui_motion.gd`, `scripts/press_scale_button.gd`
+- `assets/themes/style_box_gameplay_*.tres`
+
+Responsibility:
+- UI-003's gameplay-scope equivalent of "Shared Destination-Screen UI" above, kept separate because
+  the level intentionally keeps its own denser, higher-contrast palette rather than the menu
+  system's brighter one (see `docs/UI_003_LEVEL_UI_CONSISTENCY_TICKET.md`'s Objective).
+- `gameplay_modal_shell.tscn` owns the shared shade, safe-area-fitted outer panel, regular/long
+  title role, true-circular close action, cream content region, and action row for Pause, Leave
+  Confirmation, and Ability Purchase -- each composes it and keeps only its own content and signals.
+- `gameplay_result_shell.tscn` owns the shared terminal shade, hero title role, action placement,
+  and safe-area layout for Completion and Failure -- each keeps its own state-specific content
+  (star/earned-count, body copy) without merging it into the shell.
+- `level_top_hud.tscn` owns the top strip background, combo slot, timer, level label, star pill,
+  and Pause button as one safe-area-aware component (the strip background and combo slot now
+  grow/shift with the safe-top inset; the timer stays clear of the level label and star/pause
+  cluster at any value length).
+- `gameplay_ui_theme.gd` holds the shared HUD icon compact/regular sizes and breakpoint, modal
+  safe-fit geometry, modal-title regular/long sizes, and the result-hero title role + responsive
+  scale -- the gameplay-scope equivalent of `destination_screen_layout.gd`.
+- Every shell exposes `apply_safe_layout(safe_margins, viewport_size)`, `open()`/`close()` (fading
+  via `scripts/ui_motion.gd` instead of snapping `visible`), and `is_transitioning()` so
+  `scripts/level.gd`'s button handlers and `ui_cancel` chain never double-navigate mid-fade.
+- Does not own puzzle rules, ability effects, economy, or progression logic; that stays in
+  `scripts/level.gd` and `PlayerProgress`.
+
+Change here when:
+- Changing the shared gameplay shade, modal/result panel geometry, HUD icon-button/badge/pill
+  roles, or the top HUD's safe-area/responsive math.
+
 ### Leaderboards
 
 Files:
@@ -444,11 +481,14 @@ Files:
 - `scenes/shelf.tscn`
 - `scenes/moving_shelf_row.tscn`
 - `scenes/layouts/layout_*.tscn`
+- `scenes/ui/level_top_hud.tscn`, `scenes/ui/gameplay_modal_shell.tscn`, `scenes/ui/gameplay_result_shell.tscn`
 - `scenes/pause_menu.tscn`
 - `scenes/leave_confirmation_menu.tscn`
+- `scenes/ui/level_failure_screen.tscn`
 - `assets/ui/*.png`
 - Settings icon assets use square textures with warm rectangular tile art, and the main-menu and pause-menu settings buttons are square to avoid clipping or stretching.
 - `scripts/level.gd`
+- `scripts/level_top_hud.gd`, `scripts/gameplay_modal_shell.gd`, `scripts/gameplay_result_shell.gd`, `scripts/gameplay_ui_theme.gd`
 - `scripts/moving_shelf_row.gd`
 - `scripts/shelf_layout_row.gd`
 - `assets/audio/*.wav`
@@ -461,30 +501,38 @@ Files:
 
 Responsibility:
 - Loads level JSON and item sprite config.
-- Applies responsive layout for the top HUD, ability bar over the floor/baseboard transition strip, overlays, pause menu panel, and scaled shelf root when the viewport size changes.
+- Applies responsive layout by delegating to each component's own
+  `apply_safe_layout(safe_margins, viewport_size)` (UI-003): the top HUD
+  (`scenes/ui/level_top_hud.tscn`), the ability bar over the floor/baseboard transition strip,
+  Pause/Leave Confirmation/Ability Purchase (each composing `scenes/ui/gameplay_modal_shell.tscn`),
+  Completion/Failure (each composing `scenes/ui/gameplay_result_shell.tscn`), and the scaled/
+  centered shelf root. `scripts/level.gd` no longer owns fixed panel sizes or reaches into overlay
+  children by path -- see "Shared Gameplay UI" below.
 - Instantiates `scenes/shelf.tscn` for each configured shelf and places shelf cells from `scenes/layouts/layout_*.tscn` preset templates.
 - Builds optional `row_layouts` or template-authored moving rows, including moving rows that clip and wrap more shelves than are visible at once.
 - Spawns `ShelfItem` instances from config layers.
 - Handles mouse and touch interaction.
 - Resolves matches of three identical visible items on the same shelf, including the gather-and-shrink clear animation.
-- Shows and expires the active combo count and shrinking green time strip in `Background/HudCenterSlot` when triple clears happen within the configured combo window.
-- Shows the current run's star total in `UI/StarCounterLabel` with a small `assets/ui/reward_star_34_glossy_b.png` icon; triple clears add stars equal to the combo value reached by each clear and play the same compact stars as they drop from the cleared triple, fly into the counter, and pulse it.
+- Shows and expires the active combo count and shrinking green time strip in the top HUD's combo slot when triple clears happen within the configured combo window.
+- Shows the current run's star total in the top HUD's star pill (a true pill, UI-003) with a small `assets/ui/reward_star_34_glossy_b.png` icon; triple clears add stars equal to the combo value reached by each clear and play the same compact stars as they drop from the cleared triple, fly into the counter, and pulse it.
 - Shows short praise words near the clear location for 2x+ combos, with unique wording through 20x and stronger colored outlines as the combo rises.
-- Shows the completed-level reward overlay through the `UI/CompletionScreen` instance of `scenes/ui/level_completion_screen.tscn`, using `assets/ui/reward_star.png`, `assets/ui/level_button_blank_new.png`, and the final run star count for the earned amount label.
-- Sends completed campaign stars to `PlayerProgress`; completion `Next` returns to the main menu, where one reward star per earned star flies from the house to the reward chest and advances its visible count.
-- Uses `scripts/press_scale_button.gd` on the completion `Next` button so the green blank-image button shrinks while held.
-- Tracks cleared triples and unlocks shelves whose configs require progress before becoming accessible.
+- Shows the completed-level reward overlay through the `UI/CompletionScreen` instance of `scenes/ui/level_completion_screen.tscn` (composing the shared result shell), using `assets/ui/reward_star.png`, the shared green CTA style, and the final run star count for the earned amount label. Its action reads `Continue`.
+- Shows a working failure exit through the `UI/FailureScreen` instance of `scenes/ui/level_failure_screen.tscn` (new, UI-003 P0 -- Failure was previously a dead-end embedded label with no action), composing the same shared result shell as Completion.
+- Sends completed campaign stars to `PlayerProgress`; Completion's `Continue` and Failure's `Main Menu` both return to the main menu, where one reward star per earned star flies from the house to the reward chest and advances its visible count.
+- Uses `scripts/press_scale_button.gd` on every gameplay action (Pause, all four ability buttons, every modal close button, and both result screens' actions -- UI-003 extended this to controls that previously had no press feedback at all).
+- Tracks cleared triples and unlocks shelves whose configs require progress before becoming accessible, pulsing the remaining count on decrease and playing a one-shot fade/scale on unlock (UI-003 P3) without delaying the shelf's actual input availability.
 - Plays item placement and triple-clear sound effects.
 - Keeps non-clearing items interactive while match animations run, resolves different shelves concurrently, and queues only repeated work for a shelf that is already resolving.
 - Promotes back layers as soon as their own visible shelf layer clears, without waiting for match or reward animations on other shelves.
 - Tracks the countdown timer, starting it only after the first meaningful player action, and win/loss overlays.
 - Plays the hammer ability by gathering the targeted items into one center-screen item, striking it with the fullscreen hammer, then dropping combo reward stars from the impact point.
 - Plays the shuffle ability by showing a center-screen delivery box, flying visible unlocked items into it, swapping item identities while hidden, flying them back to their slots, then resolving shelf matches.
-- Wires the in-level pause menu, including the top-right circular menu button, modal overlay, Leave action, Continue action, leave confirmation overlay, and campaign life spend for confirmed Leave.
-- Displays a responsive Godot-authored level backdrop with a top HUD strip, monotone shop wall, baseboard, and bottom floor band behind generated shelves.
+- Wires the in-level pause menu, including the shared circular Pause button (`scenes/ui/level_top_hud.tscn`), modal overlay, Leave action, Continue action, leave confirmation overlay, and campaign life spend for confirmed Leave. Implements the `ui_cancel` back stack (Leave Confirmation -> Pause -> resume; Ability Purchase restores its prior state; Completion/Failure invoke their routes; otherwise opens Pause) -- there was no back-button handling at all during gameplay before UI-003.
+- Displays a responsive Godot-authored level backdrop with a top HUD strip (now owned by `scenes/ui/level_top_hud.tscn`), monotone shop wall, baseboard, and bottom floor band behind generated shelves.
 
 Change here when:
 - Editing puzzle rules, input behavior, runtime shelf construction, procedural level background styling, level timing, completion conditions, or ability behavior.
+- Changing the shared gameplay HUD/modal/result shell system: see "Shared Gameplay UI" below.
 
 ### Moving Shelf Rows
 
@@ -517,7 +565,7 @@ Responsibility:
 - Defines the reusable shelf cell visuals, front slots, and item snap markers.
 - Owns generated back-layer slot layout and preview styling defaults.
 - Contains the visible back wall, opaque non-compounding interior/cast shadows, wood floor, frame, floor lip, floor grain nodes, and hidden top edge details shown by `scripts/level.gd` for shelves with no stacked neighbor above. Shelf cast shadows draw below generated back-layer item previews and remain enabled for full shelves so neighboring shelf bodies and items cover them.
-- Contains the hidden lock overlay used by triple-gated shelves; `scripts/level.gd` toggles it and fits the remaining count onto the lock center panel.
+- Contains the hidden lock overlay used by triple-gated shelves; `scripts/level.gd` toggles it, fits the remaining count onto the lock center panel, pulses that count on a decrease, and plays a one-shot fade/scale when the shelf unlocks (UI-003 P3) without delaying the shelf's actual input availability.
 - Keeps the shelf width, height, and slot positions aligned with the level grid constants so a three-shelf row fills most of the gameplay viewport.
 
 Change here when:
@@ -546,7 +594,9 @@ Change here when:
 
 Files:
 - `level.tscn`
+- `scenes/ui/ability_bar.tscn`, `scripts/ability_bar.gd`
 - `scripts/level.gd`
+- `scripts/gameplay_ui_theme.gd`
 - `scripts/player_progress.gd`
 - `scenes/ability_purchase_menu.tscn`
 - `scripts/ability_purchase_menu.gd`
@@ -556,12 +606,16 @@ Files:
 - `assets/abilities/*.png`
 
 Responsibility:
-- Provides hammer, shuffle, and highlight buttons.
+- Provides hammer, shuffle, highlight, and Freezer buttons, sharing the gameplay HUD icon-button
+  role (compact 82px/regular 96px, an explicit disabled style) with the top HUD's Pause button
+  (UI-003); all four are icon-only with a tooltip, use `press_scale_button.gd` (0.97), and rescale
+  their icon/badge children proportionally to the actual button size instead of overflowing a
+  compact button.
 - Reads campaign ability uses from `PlayerProgress`, spends campaign uses immediately, and uses temporary three-use counts for isolated dev/test levels.
 - Lets hammer clear matching visible/front items first, or supplement visible/front items with first-back-layer copies of the same type if no visible item type can make a triple.
 - Gathers hammer targets to the center of the screen, spawns a fullscreen hammer strike effect there, swaps through four pseudo-3D hammer angle textures in the scene-authored `AnimationPlayer`, and waits for the `impact` callback before destroying the merged item and dropping combo reward stars.
 - Shows the shuffle delivery box sprite from `assets/abilities/ability_shuffle_box.png` and pauses moving shelf rows while shuffle items fly through the center-screen box.
-- Disables abilities after failure, completion, pause, or active ability animations. A zero-use ability button stays pressable during gameplay so `scenes/ability_purchase_menu.tscn` can offer a paid immediate use.
+- Disables abilities after failure, completion, pause, or active ability animations. A zero-use ability button stays pressable during gameplay so `scenes/ability_purchase_menu.tscn` can offer a paid immediate use, presented as "USE ABILITY"/"USE NOW" (UI-003, not an inventory acquisition) with the canonical clover coin art and a genuine unavailable style (not alpha dimming) when unaffordable.
 - Loads per-ability paid-use prices from `configs/ability_purchase_prices.json`, spends coins through `PlayerProgress.spend_coins()`, and applies the selected paid ability immediately without adding saved inventory.
 - Starts the highlight timer even when no current shelf state can be highlighted.
 - Uses `ShelfItem` outline state for border-only highlight ability visuals.
@@ -569,31 +623,35 @@ Responsibility:
 
 Change here when:
 - Adding, removing, rebalancing, or restyling player abilities.
+- Changing the shared HUD icon-button/badge roles: see "Shared Gameplay UI" below.
 
 ### Pause Menu
 
 Files:
 - `level.tscn`
-- `scenes/pause_menu.tscn`
-- `scenes/leave_confirmation_menu.tscn`
-- `scenes/ability_purchase_menu.tscn`
+- `scenes/ui/gameplay_modal_shell.tscn`, `scripts/gameplay_modal_shell.gd`
+- `scenes/pause_menu.tscn`, `scripts/pause_menu.gd`
+- `scenes/leave_confirmation_menu.tscn`, `scripts/leave_confirmation_menu.gd`
+- `scenes/ability_purchase_menu.tscn`, `scripts/ability_purchase_menu.gd`
 - `assets/ui/*.png`
 - Settings icon assets use square textures with warm rectangular tile art, and the pause/settings buttons are square to avoid clipping or stretching.
-- `scripts/pause_menu.gd`
 - `scripts/press_scale_button.gd`
+- `scripts/gameplay_ui_theme.gd`
 - `scripts/level.gd`
 
 Responsibility:
-- `level.tscn` provides the top-right circular pause button and instances the pause menu scene.
-- `scenes/pause_menu.tscn` owns the popup layout, warm outer area, cream inner settings area, `Pause` title, protruding top-right red close button, music / sound-effects / vibration square icon buttons with shadow-only button styling, and Leave/Continue image buttons.
-- `scenes/leave_confirmation_menu.tscn` owns the second-step confirmation popup shown after Leave, including warm outer area, cream inner loss area, protruding top-right red close button, crossed-out rectangular lost life/star slots, and red Leave / green Continue image buttons.
-- `scenes/ability_purchase_menu.tscn` owns the zero-ability purchase popup, including warm outer area, cream inner item slot, selected ability icon, `x1` badge, coin-price button, and inactive `Watch ad` button.
-- `scripts/press_scale_button.gd` provides the default held-press shrink behavior for visible game UI buttons, including the pause/settings icon buttons and red/green bottom image buttons.
-- `scripts/pause_menu.gd` toggles crossed-out visuals on the three settings icon buttons, keeps their saved disabled states synchronized between the main-menu settings popup and in-level pause menu, and emits setting state changes.
-- `scripts/level.gd` opens and closes the menu, pauses the timer and gameplay input, treats red close buttons like Continue, opens the leave confirmation before routing confirmed Leave back to the main menu, writes the current run star count into that confirmation, initializes gameplay sound effects from the shared setting, and mutes them when the sound-effects button is crossed out.
+- `level.tscn` provides the top HUD's shared circular Pause button (`scenes/ui/level_top_hud.tscn`) and instances the pause menu scene.
+- `scenes/pause_menu.tscn`, `scenes/leave_confirmation_menu.tscn`, and `scenes/ability_purchase_menu.tscn` each compose `scenes/ui/gameplay_modal_shell.tscn` for the shared shade, warm outer panel, cream inner content region, title, protruding true-circular red close button, and bottom action row (UI-003) instead of each owning local copies of that styling. Each keeps only its own content and action buttons:
+  - Pause: `Pause` title, music / sound-effects / vibration square icon buttons with shadow-only button styling and a scene-authored crossed-out marker, and Leave/Continue actions.
+  - Leave Confirmation: `Leaving the Level` title (the long-title role), crossed-out rectangular lost life/star slots, and red Leave / green Continue actions. Close/system-back returns to Pause; the explicit Continue action resumes gameplay directly -- these used to collapse into the same outcome.
+  - Ability Purchase: `Use Ability` title, selected ability icon, a `Use Now` badge (not a `×1` inventory count -- this purchase applies one ability immediately), a coin-price button using the canonical clover coin art, and the rewarded-ad placeholder hidden in production (visible-but-disabled with `Coming Soon` copy in a debug build only).
+- `scripts/press_scale_button.gd` provides the default held-press shrink behavior for every gameplay action, including the pause/settings icon buttons, all four ability buttons, every modal's close button, and the red/green bottom image buttons -- several of these had no press feedback at all before UI-003.
+- `scripts/pause_menu.gd` toggles crossed-out visuals on the three settings icon buttons (located by name, working for both this scene's shell-composed layout and the Main Menu settings popup's own unrelated layout), keeps their saved disabled states synchronized between the main-menu settings popup and in-level pause menu, and emits setting state changes.
+- `scripts/level.gd` opens and closes the menu, pauses the timer and gameplay input, and implements the `ui_cancel` back stack (Leave Confirmation returns to Pause; Ability Purchase restores the state it opened from; Pause resumes) by listening to each overlay's `leave_pressed`/`continue_pressed`/`close_requested` signals instead of reaching into their buttons by child path. Also writes the current run star count into the leave confirmation, initializes gameplay sound effects from the shared setting, and mutes them when the sound-effects button is crossed out.
 
 Change here when:
 - Restyling the in-level pause popup, adding pause menu actions, or changing pause/resume behavior.
+- Changing the shared modal shell itself: see "Shared Gameplay UI" below.
 
 ### Level Data And Tooling
 
@@ -655,6 +713,9 @@ Change matching rules:
 Change shelf unlock rules:
 - Update `scripts/level.gd` shelf lock helpers, ability item collection, and match/promotion filters.
 - Update `scenes/shelf.tscn` when changing the locked shelf overlay art, placement, or count label.
+- Keep the unlock/count-pulse feedback animation (`_update_shelf_lock_overlay()`,
+  `_play_shelf_unlock_animation()`, `_pulse_lock_remaining_label()`) from delaying
+  `_update_shelf_input_pickable()`'s immediate effect if you change this further.
 - Update `scripts/tools/validate_level_solvable.py` when unlock timing or counting semantics change.
 - Keep `docs/CONFIGS.md` and generator `--locked-shelves` behavior aligned with the level JSON field.
 
@@ -678,16 +739,22 @@ Change level win or loss flow:
 - Keep `assets/ui/reward_star.png` aligned with both `UI/StarCounterLabel/Icon` and `scenes/ui/level_completion_screen.tscn` `StarImage`, and keep `assets/ui/level_button_blank_new.png` aligned with `NextButton` when changing completion reward art.
 
 Change pause menu layout:
-- Update `scenes/pause_menu.tscn`.
-- Update `scenes/leave_confirmation_menu.tscn` when changing the leave-confirmation popup.
+- Update `scenes/pause_menu.tscn`, `scenes/leave_confirmation_menu.tscn`, or
+  `scenes/ability_purchase_menu.tscn` for their own content/action-row nodes; update
+  `scenes/ui/gameplay_modal_shell.tscn` for shade/panel/title/close-button changes shared by all three.
 - Update `assets/ui/*.png` when changing pause menu icon art.
 - `assets/ui/pause_menu_option_a_sheet.png` and `assets/ui/pause_menu_option_b_sheet.png` are kept as alternate generated style sheets.
-- Keep node paths used by `scripts/level.gd` stable unless the script is updated in the same change.
+- `scripts/level.gd` only listens to each overlay's own signals
+  (`leave_pressed`/`continue_pressed`/`close_requested`/`buy_pressed`/etc.) and calls
+  `set_star_count()`/`set_offer()`/`open()`/`close()` -- it does not reach into these scenes'
+  children by path, so their internal node structure can change without touching `level.gd`.
 
 Change fonts or text hierarchy:
 - Update `assets/themes/game_typography.tres` for shared font families, weights, and semantic type variations.
 - Apply an existing theme type variation in the owning scene instead of attaching font files directly.
 - Keep uppercase title rules and the `×` multiplier convention synchronized with dynamic strings in the owning scripts.
+- Gameplay modal-title regular/long and terminal-result hero sizes live in
+  `scripts/gameplay_ui_theme.gd`, not `game_typography.tres` -- see `docs/TYPOGRAPHY.md`.
 - Follow `docs/TYPOGRAPHY.md` and recheck the representative mobile and tablet resolutions.
 
 Change shared button/panel/scrollbar styling:
@@ -698,6 +765,12 @@ Change shared button/panel/scrollbar styling:
   changes; it is the project's global `theme/custom`, so this affects every `ScrollContainer`.
 - Keep the 16/20/24 px corner-radius roles (buttons/rows/large panels) and the green-positive
   vs. orange-utility vs. neutral-disabled action-color roles consistent with `docs/SCENES.md`.
+- Gameplay-scoped roles (Pause/ability HUD icon buttons, gameplay modal shell, terminal result
+  shell, badges, the star pill) live in `assets/themes/style_box_gameplay_*.tres` -- see
+  `docs/SCENES.md` "Shared Gameplay UI Roles" and "Shared Gameplay UI" above. Edit those instead of
+  a scene-local copy, and keep the 16/20/24 geometry roles consistent there too (true-circular
+  controls use a deliberately oversized `corner_radius`, which Godot clamps to a true circle at any
+  size, rather than a size-specific exact value).
 
 Change the shared destination-screen shell, status panel, or layout math:
 - Update `scripts/destination_screen_shell.gd`/`scripts/destination_status_panel.gd` for the

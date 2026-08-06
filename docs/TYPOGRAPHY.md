@@ -48,6 +48,35 @@ labels inherit medium DynaPuff with the playful contextual alternates intact.
 Existing scene-owned font sizes, colors, outlines, and shadows remain local to
 the component because they depend on the background and control art.
 
+## Gameplay Modal And Result Title Roles (UI-003)
+
+The playable level defines its own title-size roles in `scripts/gameplay_ui_theme.gd`
+(`GameplayUITheme`), separate from the menu system's 48/40 screen-title sizing, because gameplay
+modals and terminal results use a denser layout at a different scale:
+
+- Modal-title regular (44px): the default role for gameplay modal titles, such as `PAUSE`.
+- Modal-title long (40px): for titles needing to fit more text at the same panel width, such as
+  `LEAVING THE LEVEL`. `scenes/ui/gameplay_modal_shell.tscn`'s `configure(title, is_long_title)`
+  selects between the two.
+- Terminal-result hero (58px): the single role shared by Completion's `GREAT JOB!` and Failure's
+  `LEVEL FAILED`, unifying what were previously two unrelated sizes (58/70). Scales responsively
+  with `GameplayUITheme.get_result_title_scale()` (the same formula Completion already used, so its
+  on-screen size is unchanged).
+
+All three still use `GameTitleLabel` and remain uppercase per the casing rule below.
+
+## Reward-Star Variants
+
+Three reward-star raster sizes are used across the project, each a documented named role -- do not
+introduce a fourth asset for a new reward-star use; reuse the variant whose role matches:
+
+- **Compact** -- `assets/ui/reward_star_34_glossy_b.png` (34px): the level HUD's star-total pill
+  icon (`scenes/ui/level_top_hud.tscn`) and Leaderboard row reward icons.
+- **Regular** -- `assets/ui/reward_star_84x84.png` (84px): the reward-chest flight
+  (`scenes/ui/main_menu_reward_star_flyer.tscn`), the Main Menu reward chest widgets, and the
+  in-level Leave Confirmation's lost-star slot.
+- **Hero** -- `assets/ui/reward_star.png` (large): the Level Completion screen's centerpiece art.
+
 ## Casing And Numeric Style
 
 - Screen titles, popup titles, result titles, section headings, and special
