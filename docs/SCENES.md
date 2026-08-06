@@ -348,9 +348,10 @@ Purpose:
   or information panel reach the pager while the CTA remains independently clickable.
 - `%InfoPanel` uses a 294 px unlocked height and a 340 px locked height, each 50 px taller than
   before; expanded vertical padding and spacing keep its content balanced within the extra room.
-- `%CtaButton` uses scene-local flat green normal/hover/pressed styles with the same border and
-  16 px corner geometry as `style_box_disabled_action_button.tres`; it switches to that shared
-  neutral style while `Locked`/`Coming Soon`.
+- `%CtaButton` uses scene-local flat green normal/hover/pressed styles sampled from
+  `level_button_blank_new.png`, with the same border and 16 px corner geometry as
+  `style_box_disabled_action_button.tres`; it switches to that shared neutral style while
+  `Locked`/`Coming Soon`.
 - `set_safe_margins(margins: Vector4)` insets `%InfoMargins`' left/right/bottom by a device
   safe-area margin on top of its authored padding; `%Art`/`%Atmosphere` are never inset, so cover
   art stays full-bleed under notches and display cutouts.

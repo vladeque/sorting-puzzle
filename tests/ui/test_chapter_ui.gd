@@ -146,6 +146,12 @@ func _run() -> void:
 					"The actionable Chapter CTA's %s state should use a flat green style."
 						% style_state
 				)
+			var current_cta_normal := current_cta.get_theme_stylebox("normal") as StyleBoxFlat
+			_check(
+				current_cta_normal != null
+					and current_cta_normal.bg_color == Color(0.21, 0.81, 0.11, 1),
+				"The Chapter CTA should use the sampled glossy level-button green palette."
+			)
 			_check(
 				is_equal_approx(current_card.size.x, pager.size.x),
 				"The current chapter background should fill the pager width (got %s)." % current_card.size
