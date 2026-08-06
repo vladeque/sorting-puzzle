@@ -19,10 +19,13 @@ Testing menu:
 
 Playable level scene:
 - `level.tscn`
-- Instantiated by `scripts/main_menu.gd` and by `scripts/level.gd` when the completion reward overlay's `Next` button loads the next normal campaign level.
+- Instantiated by `scripts/main_menu.gd`; the current completion action returns to the Main Menu.
 - Owns shelf layout, timer, drag and tap movement, triple matching, abilities, pause-menu wiring, failure, and completion flow.
 - Uses the original procedural gameplay background for Chapter 1 and chapter artwork for chapters
   whose catalog entry selects `artwork` mode.
+- The proposed gameplay-UI consistency refactor for the HUD, ability bar, Pause/Leave/Purchase
+  modals, Completion/Failure results, and locked-shelf feedback is tracked in
+  `docs/UI_003_LEVEL_UI_CONSISTENCY_TICKET.md`.
 
 Player progression:
 - `scripts/player_progress.gd`
@@ -465,7 +468,7 @@ Responsibility:
 - Handles mouse and touch interaction.
 - Resolves matches of three identical visible items on the same shelf, including the gather-and-shrink clear animation.
 - Shows and expires the active combo count and shrinking green time strip in `Background/HudCenterSlot` when triple clears happen within the configured combo window.
-- Shows the current run's star total in `UI/StarCounterLabel` with a small `assets/ui/reward_star.png` icon; triple clears add stars equal to the combo value reached by each clear and play small `assets/ui/reward_star_34_glossy_b.png` stars that drop from the cleared triple, fly into the counter, and pulse it.
+- Shows the current run's star total in `UI/StarCounterLabel` with a small `assets/ui/reward_star_34_glossy_b.png` icon; triple clears add stars equal to the combo value reached by each clear and play the same compact stars as they drop from the cleared triple, fly into the counter, and pulse it.
 - Shows short praise words near the clear location for 2x+ combos, with unique wording through 20x and stronger colored outlines as the combo rises.
 - Shows the completed-level reward overlay through the `UI/CompletionScreen` instance of `scenes/ui/level_completion_screen.tscn`, using `assets/ui/reward_star.png`, `assets/ui/level_button_blank_new.png`, and the final run star count for the earned amount label.
 - Sends completed campaign stars to `PlayerProgress`; completion `Next` returns to the main menu, where one reward star per earned star flies from the house to the reward chest and advances its visible count.
