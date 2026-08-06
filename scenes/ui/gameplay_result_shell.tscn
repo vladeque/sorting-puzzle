@@ -1,0 +1,68 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/gameplay_result_shell.gd" id="1_shell_script"]
+[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_gameplay_result_shade.tres" id="2_shade"]
+
+[node name="GameplayResultShell" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_shell_script")
+
+[node name="ResultShade" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("2_shade")
+
+[node name="TitleLabel" type="Label" parent="."]
+unique_name_in_owner = true
+theme_type_variation = &"GameTitleLabel"
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = 60.0
+offset_bottom = 156.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 4
+theme_override_font_sizes/font_size = 58
+text = "TITLE"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ContentRegion" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ActionRegion" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -170.0
+offset_top = -62.0
+offset_right = 170.0
+offset_bottom = 62.0
+grow_horizontal = 2
+grow_vertical = 2

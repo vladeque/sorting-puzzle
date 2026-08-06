@@ -66,7 +66,6 @@ const SHELVES_BOTTOM_CLEARANCE := 52.0
 const SHELVES_SIDE_MARGIN := 16.0
 const SHELVES_MIN_LAYOUT_SCALE := 0.45
 const SHELVES_MAX_LAYOUT_SCALE := 1.5
-const RESULT_LABEL_HEIGHT := 96.0
 const STAR_REWARD_SIZE := Vector2(28, 28)
 const STAR_REWARD_DROP_DURATION_SECONDS := 0.2
 const STAR_REWARD_FLY_DURATION_SECONDS := 0.62
@@ -156,7 +155,7 @@ var _star_reward_effect_layer: Control
 var _star_counter_pulse_tween: Tween
 var _combo_fill: Control
 var _combo_label: Label
-var _failure_panel: Control
+var _failure_screen: LevelFailureScreen
 var _completion_screen: LevelCompletionScreen
 var _pause_menu_button: Button
 var _pause_menu_overlay: PauseMenu
@@ -218,14 +217,14 @@ func _ready() -> void:
 	_star_counter_label = get_node("UI/StarCounterLabel/CountLabel") as Label
 	_combo_fill = get_node("Background/HudCenterSlot/ComboFill") as Control
 	_combo_label = get_node("Background/HudCenterSlot/ComboLabel") as Label
-	_failure_panel = get_node("UI/FailurePanel") as Control
+	_failure_screen = get_node("UI/FailureScreen") as LevelFailureScreen
 	_completion_screen = get_node("UI/CompletionScreen") as LevelCompletionScreen
 	_pause_menu_button = get_node("UI/PauseMenuButton") as Button
 	_pause_menu_overlay = get_node("UI/PauseMenuOverlay") as PauseMenu
 	_leave_confirmation_overlay = get_node("UI/LeaveConfirmationOverlay") as LeaveConfirmationMenu
 	_ability_purchase_overlay = get_node("UI/AbilityPurchaseOverlay") as AbilityPurchaseMenu
 	_ability_bar = get_node("UI/AbilityBar") as AbilityBar
-	_failure_panel.visible = false
+	_failure_screen.visible = false
 	_completion_screen.visible = false
 	_pause_menu_overlay.visible = false
 	_leave_confirmation_overlay.visible = false
@@ -236,6 +235,7 @@ func _ready() -> void:
 	_setup_audio_players()
 	_setup_pause_menu_buttons()
 	_setup_completion_buttons()
+	_setup_failure_screen()
 	_setup_ability_purchase_menu()
 	_setup_ability_buttons()
 	_load_ability_purchase_prices()
@@ -278,8 +278,8 @@ func _apply_responsive_layout() -> void:
 
 	_layout_top_hud(safe_margins)
 	_layout_ability_bar(safe_margins)
-	_layout_result_panel(_failure_panel, safe_margins)
-	_completion_screen.apply_responsive_layout(safe_margins)
+	_failure_screen.apply_safe_layout(safe_margins, viewport_size)
+	_completion_screen.apply_safe_layout(safe_margins, viewport_size)
 	_pause_menu_overlay.apply_safe_layout(safe_margins, viewport_size)
 	_leave_confirmation_overlay.apply_safe_layout(safe_margins, viewport_size)
 	if _ability_purchase_overlay != null:
@@ -297,8 +297,8 @@ func _setup_star_reward_effect_layer() -> void:
 	_star_reward_effect_layer.name = "StarRewardEffectLayer"
 	_star_reward_effect_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	ui_layer.add_child(_star_reward_effect_layer)
-	if _failure_panel != null:
-		ui_layer.move_child(_star_reward_effect_layer, _failure_panel.get_index())
+	if _failure_screen != null:
+		ui_layer.move_child(_star_reward_effect_layer, _failure_screen.get_index())
 
 
 func _layout_star_reward_effect_layer(viewport_size: Vector2) -> void:
@@ -391,34 +391,6 @@ func _layout_ability_bar(safe_margins: Vector4) -> void:
 
 func _get_ability_bar_bottom_margin(safe_margins: Vector4) -> float:
 	return maxf(ABILITY_BAR_DESIGN_BOTTOM_MARGIN, safe_margins.w + ABILITY_BAR_SAFE_BOTTOM_PADDING)
-
-
-func _layout_result_panel(panel: Control, safe_margins: Vector4) -> void:
-	if panel == null:
-		return
-
-	panel.anchor_left = 0.0
-	panel.anchor_top = 0.0
-	panel.anchor_right = 1.0
-	panel.anchor_bottom = 1.0
-	panel.offset_left = 0.0
-	panel.offset_top = 0.0
-	panel.offset_right = 0.0
-	panel.offset_bottom = 0.0
-
-	for child in panel.get_children():
-		var label := child as Label
-		if label == null:
-			continue
-
-		label.anchor_left = 0.0
-		label.anchor_top = 0.5
-		label.anchor_right = 1.0
-		label.anchor_bottom = 0.5
-		label.offset_left = safe_margins.x
-		label.offset_top = -RESULT_LABEL_HEIGHT * 0.5
-		label.offset_right = -safe_margins.z
-		label.offset_bottom = RESULT_LABEL_HEIGHT * 0.5
 
 
 func _layout_shelves(viewport_size: Vector2, safe_margins: Vector4) -> void:
@@ -701,7 +673,7 @@ func _apply_level_config(config: Dictionary) -> void:
 	_reset_combo()
 	_update_star_counter_label()
 	_returning_to_menu = false
-	_failure_panel.visible = false
+	_failure_screen.visible = false
 	_completion_screen.visible = false
 	if _pause_menu_overlay != null:
 		_pause_menu_overlay.visible = false
@@ -1577,7 +1549,7 @@ func _fail_level() -> void:
 	_drag_offset = Vector2.ZERO
 	_pressed_item = null
 	_pressed_origin_slot = null
-	_failure_panel.visible = true
+	_failure_screen.open()
 	_pause_menu_overlay.visible = false
 	_leave_confirmation_overlay.visible = false
 	if _ability_purchase_overlay != null:
@@ -1606,7 +1578,7 @@ func _complete_level() -> void:
 	_update_ability_buttons()
 	_update_pause_menu_button()
 	_completion_screen.set_earned_stars(_stars)
-	_completion_screen.visible = true
+	_completion_screen.open()
 	_pause_menu_overlay.visible = false
 	_leave_confirmation_overlay.visible = false
 	if _ability_purchase_overlay != null:
@@ -1657,6 +1629,10 @@ func _setup_completion_buttons() -> void:
 	_completion_screen.next_pressed.connect(_on_completion_next_pressed)
 
 
+func _setup_failure_screen() -> void:
+	_failure_screen.main_menu_pressed.connect(_on_failure_main_menu_pressed)
+
+
 func _setup_ability_purchase_menu() -> void:
 	if _ability_purchase_overlay == null:
 		return
@@ -1668,6 +1644,13 @@ func _setup_ability_purchase_menu() -> void:
 
 func _on_completion_next_pressed() -> void:
 	if not _level_completed or _returning_to_menu:
+		return
+
+	_return_to_main_menu()
+
+
+func _on_failure_main_menu_pressed() -> void:
+	if not _level_failed or _returning_to_menu:
 		return
 
 	_return_to_main_menu()

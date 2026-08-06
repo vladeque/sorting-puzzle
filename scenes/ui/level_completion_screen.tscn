@@ -1,40 +1,28 @@
 [gd_scene format=3 uid="uid://dlopvf5glhqiu"]
 
-[ext_resource type="Texture2D" uid="uid://3vi3qpy12q0w" path="res://assets/ui/reward_star.png" id="1_reward_star"]
-[ext_resource type="Texture2D" uid="uid://borxe8m7bwoqf" path="res://assets/ui/level_button_blank_new.png" id="2_level_button_blank"]
-[ext_resource type="Script" uid="uid://cp7jmwiig6qtc" path="res://scripts/level_completion_screen.gd" id="3_completion_screen_script"]
-[ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="4_press_scale_button"]
+[ext_resource type="PackedScene" path="res://scenes/ui/gameplay_result_shell.tscn" id="1_shell"]
+[ext_resource type="Texture2D" uid="uid://3vi3qpy12q0w" path="res://assets/ui/reward_star.png" id="2_reward_star"]
+[ext_resource type="Texture2D" uid="uid://borxe8m7bwoqf" path="res://assets/ui/level_button_blank_new.png" id="3_level_button_blank"]
+[ext_resource type="Script" uid="uid://cp7jmwiig6qtc" path="res://scripts/level_completion_screen.gd" id="4_completion_screen_script"]
+[ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="5_press_scale_button"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_completion_next"]
-texture = ExtResource("2_level_button_blank")
+texture = ExtResource("3_level_button_blank")
 
-[node name="LevelCompletionScreen" type="ColorRect" unique_id=39553239]
+[node name="LevelCompletionScreen" type="Control"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.04, 0.035, 0.045, 0.76)
-script = ExtResource("3_completion_screen_script")
+script = ExtResource("4_completion_screen_script")
 
-[node name="TitleLabel" type="Label" parent="." unique_id=878357026]
-theme_type_variation = &"GameTitleLabel"
+[node name="Shell" parent="." instance=ExtResource("1_shell")]
+unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_top = 112.0
-offset_bottom = 208.0
-grow_horizontal = 2
-theme_override_colors/font_color = Color(1, 0.87, 0.12, 1)
-theme_override_colors/font_shadow_color = Color(0.32, 0.1, 0.02, 0.95)
-theme_override_constants/shadow_offset_x = 0
-theme_override_constants/shadow_offset_y = 5
-theme_override_font_sizes/font_size = 70
-text = "GREAT JOB!"
-horizontal_alignment = 1
-vertical_alignment = 1
 
-[node name="StarImage" type="TextureRect" parent="." unique_id=1376141176]
+[node name="StarImage" type="TextureRect" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -48,11 +36,12 @@ offset_bottom = 160.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-texture = ExtResource("1_reward_star")
+texture = ExtResource("2_reward_star")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="EarnedStarsLabel" type="Label" parent="." unique_id=1762046095]
+[node name="EarnedStarsLabel" type="Label" parent="."]
+unique_name_in_owner = true
 theme_type_variation = &"GameNumberLabel"
 z_index = 1
 layout_mode = 1
@@ -78,7 +67,8 @@ text = "×0"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="NextButton" type="Button" parent="." unique_id=50723726]
+[node name="NextButton" type="Button" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -91,6 +81,8 @@ offset_right = 150.0
 offset_bottom = 410.0
 grow_horizontal = 2
 grow_vertical = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.92, 1, 0.9, 1)
@@ -101,5 +93,6 @@ theme_override_font_sizes/font_size = 42
 theme_override_styles/normal = SubResource("StyleBoxTexture_completion_next")
 theme_override_styles/pressed = SubResource("StyleBoxTexture_completion_next")
 theme_override_styles/hover = SubResource("StyleBoxTexture_completion_next")
-text = "Next"
-script = ExtResource("4_press_scale_button")
+text = "Continue"
+script = ExtResource("5_press_scale_button")
+held_scale = 0.94
