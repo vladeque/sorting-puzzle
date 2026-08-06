@@ -1767,14 +1767,21 @@ func _refresh_ability_purchase_offer() -> void:
 	)
 
 
+## should_resume=true (the close/X button and ui_cancel) restores whatever state Ability Purchase was
+## opened from: Pause if it was opened from Pause, or active gameplay otherwise. should_resume=false
+## (a successful paid purchase) deliberately leaves gameplay running regardless of where it was
+## opened from -- the caller already resumed gameplay itself before applying the paid ability.
 func _close_ability_purchase_menu(should_resume: bool = true) -> void:
 	if _ability_purchase_overlay != null:
 		_ability_purchase_overlay.close()
 
 	_ability_purchase_pending_id = StringName()
-	if should_resume and not _ability_purchase_was_paused and not _level_failed and not _level_completed:
-		_level_paused = false
-		_set_moving_shelf_rows_paused(false)
+	if should_resume and not _level_failed and not _level_completed:
+		if _ability_purchase_was_paused:
+			_pause_menu_overlay.open()
+		else:
+			_level_paused = false
+			_set_moving_shelf_rows_paused(false)
 
 	_update_ability_buttons()
 	_update_pause_menu_button()

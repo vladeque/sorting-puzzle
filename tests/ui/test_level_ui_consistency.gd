@@ -1,0 +1,537 @@
+extends SceneTree
+
+## UI-003 level UI consistency verification: shared gameplay resource identity, explicit disabled
+## styles (no engine-default fallback), the Completion/Failure signal routing and copy, the
+## ui_cancel back-stack precedence, safe-area layout at fabricated insets, responsive ability-bar
+## icon/badge bounds, long-value formatting, the hidden rewarded-ad placeholder, and locked-shelf
+## count/unlock feedback. See docs/UI_003_LEVEL_UI_CONSISTENCY_TICKET.md and docs/SCENES.md's
+## "Shared Gameplay UI Roles" section.
+
+const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
+
+var _failures: Array[String] = []
+
+## Loaded at runtime inside _run() rather than preloaded at the class level (matching
+## tests/ui/test_interaction_motion.gd): level.tscn and its sub-scenes transitively compile scripts
+## that reference the PlayerProgress/ChapterCatalog autoload globals, which do not exist yet while
+## this main-loop script itself is still being compiled.
+var _level_scene: PackedScene
+var _pause_menu_scene: PackedScene
+var _leave_confirmation_scene: PackedScene
+var _ability_purchase_scene: PackedScene
+
+
+func _init() -> void:
+	if not str(ProjectSettings.get_setting("application/config/name", "")).begins_with(
+		ISOLATED_TEST_PROJECT_PREFIX
+	):
+		push_error("Level UI consistency verification must run through run_isolated_godot_test.ps1.")
+		quit(1)
+		return
+	call_deferred("_run")
+
+
+func _run() -> void:
+	await process_frame
+	_level_scene = load("res://level.tscn") as PackedScene
+	_pause_menu_scene = load("res://scenes/pause_menu.tscn") as PackedScene
+	_leave_confirmation_scene = load("res://scenes/leave_confirmation_menu.tscn") as PackedScene
+	_ability_purchase_scene = load("res://scenes/ability_purchase_menu.tscn") as PackedScene
+
+	await _test_shared_resource_identity()
+	await _test_explicit_disabled_styles()
+	await _test_focus_and_cursor_policy()
+	await _test_rewarded_ad_placeholder()
+	await _test_completion_and_failure_routing()
+	await _test_ui_cancel_chain()
+	await _test_safe_area_layout()
+	await _test_ability_bar_responsive_bounds()
+	await _test_long_value_formatting()
+	await _test_locked_shelf_feedback()
+
+	# Let any still-in-flight tween/timer from the phases above drain naturally before quitting.
+	await _wait_frames(60)
+
+	if _failures.is_empty():
+		print("Level UI consistency verification passed.")
+		quit(0)
+	else:
+		for failure in _failures:
+			push_error(failure)
+		quit(1)
+
+
+## Pause, Leave Confirmation, and Ability Purchase must consume the same modal shell/resources
+## rather than local copies -- checked as literal Resource identity (===), the same pattern
+## scripts/tools/verify_shop.gd already uses for the Shop/Leaderboard Retry style.
+func _test_shared_resource_identity() -> void:
+	var pause := _pause_menu_scene.instantiate()
+	var leave := _leave_confirmation_scene.instantiate()
+	var purchase := _ability_purchase_scene.instantiate()
+	root.add_child(pause)
+	root.add_child(leave)
+	root.add_child(purchase)
+	await process_frame
+
+	var pause_outer := pause.find_child("OuterPanel", true, false) as Panel
+	var leave_outer := leave.find_child("OuterPanel", true, false) as Panel
+	var purchase_outer := purchase.find_child("OuterPanel", true, false) as Panel
+	_check(
+		pause_outer.get_theme_stylebox("panel") == leave_outer.get_theme_stylebox("panel")
+			and leave_outer.get_theme_stylebox("panel") == purchase_outer.get_theme_stylebox("panel"),
+		"Pause/Leave Confirmation/Ability Purchase should share one modal outer-panel StyleBox instance."
+	)
+
+	var pause_close := pause.find_child("CloseButton", true, false) as Button
+	var leave_close := leave.find_child("CloseButton", true, false) as Button
+	var purchase_close := purchase.find_child("CloseButton", true, false) as Button
+	_check(
+		pause_close.get_theme_stylebox("normal") == leave_close.get_theme_stylebox("normal")
+			and leave_close.get_theme_stylebox("normal") == purchase_close.get_theme_stylebox("normal"),
+		"Pause/Leave Confirmation/Ability Purchase should share one close-button StyleBox instance."
+	)
+
+	var pause_shade := pause.find_child("Shade", true, false) as Panel
+	var leave_shade := leave.find_child("Shade", true, false) as Panel
+	_check(
+		pause_shade.get_theme_stylebox("panel") == leave_shade.get_theme_stylebox("panel"),
+		"Pause/Leave Confirmation should share one modal-shade StyleBox instance."
+	)
+
+	pause.queue_free()
+	leave.queue_free()
+	purchase.queue_free()
+	await process_frame
+
+	var level := await _make_level()
+	var top_hud = level.get("_top_hud")
+	var ability_bar = level.get("_ability_bar")
+	var pause_button := top_hud.find_child("PauseButton", true, false) as Button
+	var hammer_button := ability_bar.find_child("HammerButton", true, false) as Button
+	_check(
+		pause_button.get_theme_stylebox("normal") == hammer_button.get_theme_stylebox("normal"),
+		"The Pause button and ability buttons should share one HUD icon-button StyleBox instance."
+	)
+	_check(
+		pause_button.get_theme_stylebox("disabled") == hammer_button.get_theme_stylebox("disabled"),
+		"The Pause button and ability buttons should share one disabled HUD icon-button StyleBox instance."
+	)
+
+	var hammer_badge := hammer_button.find_child("UsesLabel", true, false) as Label
+	var purchase2 := _ability_purchase_scene.instantiate()
+	root.add_child(purchase2)
+	await process_frame
+	var use_now_label := purchase2.find_child("UseNowLabel", true, false) as Label
+	_check(
+		hammer_badge.get_theme_stylebox("normal") == use_now_label.get_parent().get_theme_stylebox("panel"),
+		"The ability-bar count badge and the purchase menu's USE NOW badge should share one StyleBox instance."
+	)
+	purchase2.queue_free()
+
+	var completion_shade_panel := level.get("_completion_screen").find_child("ResultShade", true, false) as Panel
+	# Read the shared StyleBox resource itself (not the node) before freeing -- the resource is an
+	# independent external object and stays valid after its consuming node is gone, but the node
+	# reference itself would dangle.
+	var completion_shade_style := completion_shade_panel.get_theme_stylebox("panel")
+	level.free()
+
+	var failure_level := await _make_level()
+	var failure_shade_panel := failure_level.get("_failure_screen").find_child("ResultShade", true, false) as Panel
+	_check(
+		completion_shade_style == failure_shade_panel.get_theme_stylebox("panel"),
+		"Completion and Failure should share one terminal-result shade StyleBox instance."
+	)
+	failure_level.free()
+
+
+## No level-owned button may fall back to Godot's engine-default square style when disabled --
+## opening any overlay used to visibly turn the circular Pause button into a square because it had
+## no disabled StyleBox at all.
+func _test_explicit_disabled_styles() -> void:
+	var level := await _make_level()
+	var top_hud = level.get("_top_hud")
+	var ability_bar = level.get("_ability_bar")
+
+	var pause_button := top_hud.find_child("PauseButton", true, false) as Button
+	_check(pause_button.get_theme_stylebox("disabled") != null, "Pause button must have an explicit disabled style.")
+
+	for button_name in ["HammerButton", "ShuffleButton", "HighlightButton", "FreezerButton"]:
+		var button := ability_bar.find_child(button_name, true, false) as Button
+		_check(button.get_theme_stylebox("disabled") != null, "%s must have an explicit disabled style." % button_name)
+
+	level.free()
+
+
+## Every level-owned button stays FOCUS_NONE (documented touch-only policy, matching the rest of the
+## project) with the pointing-hand cursor while enabled.
+func _test_focus_and_cursor_policy() -> void:
+	var level := await _make_level()
+	var top_hud = level.get("_top_hud")
+	var ability_bar = level.get("_ability_bar")
+	var pause_overlay = level.get("_pause_menu_overlay")
+
+	var pause_button := top_hud.find_child("PauseButton", true, false) as Button
+	_check(pause_button.focus_mode == Control.FOCUS_NONE, "Pause button should be FOCUS_NONE.")
+	_check(
+		pause_button.mouse_default_cursor_shape == Control.CURSOR_POINTING_HAND,
+		"Pause button should use the pointing-hand cursor."
+	)
+
+	for button_name in ["HammerButton", "ShuffleButton", "HighlightButton", "FreezerButton"]:
+		var button := ability_bar.find_child(button_name, true, false) as Button
+		_check(button.focus_mode == Control.FOCUS_NONE, "%s should be FOCUS_NONE." % button_name)
+		_check(
+			button.mouse_default_cursor_shape == Control.CURSOR_POINTING_HAND,
+			"%s should use the pointing-hand cursor." % button_name
+		)
+
+	var close_button := pause_overlay.find_child("CloseButton", true, false) as Button
+	_check(close_button.focus_mode == Control.FOCUS_NONE, "Modal close button should be FOCUS_NONE.")
+	_check(
+		close_button.get_script() != null,
+		"Modal close button should use PressScaleButton for held feedback."
+	)
+
+	level.free()
+
+
+## The rewarded-ad placeholder must never be an enabled no-op, in any build. It hides entirely
+## outside a debug build and stays disabled with "Coming Soon" copy inside one.
+func _test_rewarded_ad_placeholder() -> void:
+	var purchase := _ability_purchase_scene.instantiate()
+	root.add_child(purchase)
+	await process_frame
+
+	var watch_ad_button := purchase.find_child("WatchAdButton", true, false) as Button
+	_check(watch_ad_button.disabled, "WatchAdButton must never be enabled -- no enabled no-op in any build.")
+	_check(
+		watch_ad_button.visible == OS.is_debug_build(),
+		"WatchAdButton visibility should exactly follow OS.is_debug_build() (hidden in production)."
+	)
+	if watch_ad_button.visible:
+		_check(watch_ad_button.text == "Coming Soon", "A visible dev-preview WatchAdButton should read Coming Soon.")
+
+	purchase.queue_free()
+	await process_frame
+
+
+## Completion's action reads "Continue" (same return-to-menu behavior); Failure has a working exit
+## instead of being a terminal dead end. Both route through their documented signal.
+func _test_completion_and_failure_routing() -> void:
+	var level := await _make_level()
+	var completion = level.get("_completion_screen")
+	var next_button := completion.find_child("NextButton", true, false) as Button
+	_check(next_button.text == "Continue", "Completion's action should read Continue, not Next.")
+
+	# A single-element Array, not a raw bool, because GDScript lambda captures snapshot primitive
+	# locals by value -- mutating a captured bool inside the lambda would not be observable here.
+	var completion_signal_fired := [false]
+	completion.next_pressed.connect(func() -> void: completion_signal_fired[0] = true)
+	next_button.pressed.emit()
+	_check(completion_signal_fired[0], "Pressing Completion's action should emit next_pressed.")
+	level.free()
+
+	var failure_level := await _make_level()
+	var failure = failure_level.get("_failure_screen")
+	var main_menu_button := failure.find_child("MainMenuButton", true, false) as Button
+	_check(main_menu_button.text == "Main Menu", "Failure should expose a working Main Menu action.")
+
+	var failure_signal_fired := [false]
+	failure.main_menu_pressed.connect(func() -> void: failure_signal_fired[0] = true)
+	main_menu_button.pressed.emit()
+	_check(failure_signal_fired[0], "Pressing Failure's action should emit main_menu_pressed.")
+	failure_level.free()
+
+
+## The full ui_cancel precedence chain: Leave Confirmation -> Pause -> resume; Ability Purchase
+## restores its prior state; Completion/Failure invoke their routes; an in-flight transition drops
+## the press instead of double-navigating.
+func _test_ui_cancel_chain() -> void:
+	var gameplay_level := await _make_level()
+	gameplay_level.call("_unhandled_input", _make_ui_cancel_event())
+	await _wait_seconds(0.35)
+	_check(
+		bool(gameplay_level.get("_pause_menu_overlay").visible),
+		"ui_cancel during active gameplay should open Pause."
+	)
+
+	gameplay_level.call("_unhandled_input", _make_ui_cancel_event())
+	await _wait_seconds(0.35)
+	_check(
+		not bool(gameplay_level.get("_pause_menu_overlay").visible)
+			and not bool(gameplay_level.get("_level_paused")),
+		"ui_cancel on Pause should resume gameplay."
+	)
+	gameplay_level.free()
+
+	var stack_level := await _make_level()
+	stack_level.call("_open_pause_menu")
+	await _wait_seconds(0.35)
+	stack_level.call("_on_pause_menu_leave_pressed")
+	await _wait_seconds(0.35)
+	stack_level.call("_unhandled_input", _make_ui_cancel_event())
+	await _wait_seconds(0.35)
+	_check(
+		not bool(stack_level.get("_leave_confirmation_overlay").visible)
+			and bool(stack_level.get("_pause_menu_overlay").visible),
+		"ui_cancel on Leave Confirmation should return to Pause, not resume gameplay directly."
+	)
+
+	stack_level.call("_open_ability_purchase_menu", &"hammer")
+	await _wait_seconds(0.35)
+	stack_level.call("_unhandled_input", _make_ui_cancel_event())
+	await _wait_seconds(0.35)
+	_check(
+		not bool(stack_level.get("_ability_purchase_overlay").visible)
+			and bool(stack_level.get("_pause_menu_overlay").visible),
+		"ui_cancel on Ability Purchase opened from Pause should restore Pause, not resume gameplay."
+	)
+
+	# In-flight transition: a second ui_cancel arriving before open() finishes must be dropped.
+	stack_level.call("_close_pause_menu")
+	await _wait_seconds(0.35)
+	stack_level.call("_open_pause_menu")
+	stack_level.call("_unhandled_input", _make_ui_cancel_event())
+	await _wait_seconds(0.35)
+	_check(
+		bool(stack_level.get("_pause_menu_overlay").visible),
+		"ui_cancel during an in-flight open() transition must be dropped, not double-toggle."
+	)
+	stack_level.free()
+
+	var completion_level := await _make_level()
+	completion_level.call("_complete_level")
+	await _wait_seconds(0.35)
+	var completion_tree := completion_level.get_tree()
+	completion_level.call("_unhandled_input", _make_ui_cancel_event())
+	await _wait_seconds(0.2)
+	_check(
+		completion_tree.current_scene != completion_level,
+		"ui_cancel on Completion should invoke its Continue route."
+	)
+
+	var failure_level := await _make_level()
+	failure_level.call("_fail_level")
+	await _wait_seconds(0.35)
+	var failure_tree := failure_level.get_tree()
+	failure_level.call("_unhandled_input", _make_ui_cancel_event())
+	await _wait_seconds(0.2)
+	_check(
+		failure_tree.current_scene != failure_level,
+		"ui_cancel on Failure should invoke its Main Menu route."
+	)
+
+
+## Safe-area insets (top/side/bottom) must keep the HUD strip, timer/level/star/pause cluster, and
+## modal outer panel within bounds instead of sliding under a notch or overflowing a tight viewport.
+func _test_safe_area_layout() -> void:
+	var level := await _make_level()
+	var top_hud = level.get("_top_hud")
+	var pause_overlay = level.get("_pause_menu_overlay")
+
+	var safe_margins := Vector4(60.0, 90.0, 60.0, 70.0)
+	var viewport_size := Vector2(1080.0, 2400.0)
+	top_hud.call("apply_safe_layout", safe_margins, viewport_size)
+	await process_frame
+
+	_check(
+		top_hud.offset_bottom >= safe_margins.y,
+		"The HUD strip background should grow with the safe-top inset instead of staying a fixed height."
+	)
+
+	var pause_button := top_hud.find_child("PauseButton", true, false) as Control
+	_check(pause_button.offset_top >= safe_margins.y, "Pause button should sit clear of the safe-top inset.")
+	_check(
+		pause_button.offset_right <= viewport_size.x - safe_margins.z + 0.5,
+		"Pause button should stay clear of the safe-right inset."
+	)
+
+	var timer_label := top_hud.find_child("TimerLabel", true, false) as Control
+	var level_label := top_hud.find_child("LevelLabel", true, false) as Control
+	var star_counter := top_hud.find_child("StarCounter", true, false) as Control
+	_check(
+		timer_label.offset_left + 0.5 >= level_label.offset_right,
+		"Timer should stay clear of the level label (left exclusion zone)."
+	)
+	_check(
+		timer_label.offset_right <= star_counter.offset_left + 0.5,
+		"Timer should stay clear of the star/pause cluster (right exclusion zone)."
+	)
+
+	# A viewport far too narrow for the modal's preferred 520px width must clamp, not overflow.
+	var tight_margins := Vector4(200.0, 100.0, 200.0, 100.0)
+	var tight_viewport := Vector2(540.0, 960.0)
+	pause_overlay.call("apply_safe_layout", tight_margins, tight_viewport)
+	await process_frame
+	var outer_panel := pause_overlay.find_child("OuterPanel", true, false) as Control
+	var fitted_width := outer_panel.offset_right - outer_panel.offset_left
+	var fitted_height := outer_panel.offset_bottom - outer_panel.offset_top
+	_check(
+		fitted_width <= tight_viewport.x - tight_margins.x - tight_margins.z + 1.0,
+		"Modal outer panel width must fit within the safe content rect at a tight viewport."
+	)
+	_check(
+		fitted_height <= tight_viewport.y - tight_margins.y - tight_margins.w + 1.0,
+		"Modal outer panel height must fit within the safe content rect at a tight viewport."
+	)
+
+	level.free()
+
+
+## Compact ability layout must resize/reposition the icon and both badge types, not only the parent
+## button -- previously the icon and badges stayed at their 96px-authored offsets and overflowed an
+## 82px compact button.
+func _test_ability_bar_responsive_bounds() -> void:
+	var level := await _make_level()
+	var ability_bar = level.get("_ability_bar")
+	var hammer_button := ability_bar.find_child("HammerButton", true, false) as Control
+	var hammer_icon := hammer_button.find_child("Icon", true, false) as Control
+	var hammer_badge := hammer_button.find_child("UsesLabel", true, false) as Control
+
+	ability_bar.call("apply_responsive_layout", 900.0)
+	await process_frame
+	var regular_size: Vector2 = hammer_button.custom_minimum_size
+	var regular_badge_right: float = hammer_badge.offset_right
+
+	ability_bar.call("apply_responsive_layout", 400.0)
+	await process_frame
+	var compact_size: Vector2 = hammer_button.custom_minimum_size
+	var compact_icon_right: float = hammer_icon.offset_right
+	var compact_badge_right: float = hammer_badge.offset_right
+
+	_check(compact_size.x < regular_size.x, "Compact ability button should be smaller than regular.")
+	_check(
+		compact_icon_right <= compact_size.x + 0.5,
+		"Compact icon must stay within the compact button bounds, not overflow it."
+	)
+	_check(
+		compact_badge_right < regular_badge_right,
+		"Compact badge offset should shrink relative to the regular one, not stay at the 96px value."
+	)
+
+	level.free()
+
+
+## LEVEL 99, 59:59, a large star total, a large ability-use count, and an active ability timer must
+## all remain legible rather than truncated or silently unhandled.
+func _test_long_value_formatting() -> void:
+	var level := await _make_level()
+	var top_hud = level.get("_top_hud")
+	var ability_bar = level.get("_ability_bar")
+
+	level.set("selected_level", 99)
+	level.call("_update_level_label")
+	var level_label := top_hud.find_child("LevelLabel", true, false) as Label
+	_check(level_label.text == "LEVEL 99", "Level label should handle a two-digit level number.")
+
+	level.set("_time_remaining", 3599.0)
+	level.call("_update_timer_label")
+	var timer_label := top_hud.find_child("TimerLabel", true, false) as Label
+	_check(timer_label.text == "59:59", "Timer label should format the maximum MM:SS value correctly.")
+
+	level.set("_stars", 123456)
+	level.call("_update_star_counter_label")
+	var star_label := top_hud.find_child("StarCountLabel", true, false) as Label
+	_check(star_label.text == "123456", "Star count label should display a large total in full.")
+	_check(
+		int(star_label.get_theme_font_size("font_size")) < 26,
+		"Star count label should shrink its font for a large total instead of overflowing the pill."
+	)
+
+	ability_bar.call("set_uses", {"hammer": 999, "shuffle": 3, "highlight": 3, "freezer": 3})
+	var hammer_uses := ability_bar.find_child("HammerButton", true, false).find_child("UsesLabel", true, false) as Label
+	_check(hammer_uses.text == "999", "A large ability-use count should display in full.")
+
+	ability_bar.call("set_active_seconds", &"highlight", 15.0)
+	var highlight_timer := ability_bar.find_child("HighlightButton", true, false).find_child("TimerLabel", true, false) as Label
+	_check(
+		highlight_timer.visible and highlight_timer.text == "15s",
+		"An active ability timer should show its remaining seconds."
+	)
+
+	level.free()
+
+
+## The remaining-count label pulses on a decrease and the overlay plays a one-shot unlock animation
+## without delaying actual unlock availability.
+func _test_locked_shelf_feedback() -> void:
+	var level := _level_scene.instantiate()
+	level.set("launched_from_dev_mode", true)
+	level.set("selected_level", 7)
+	root.add_child(level)
+	await process_frame
+
+	var shelf: Node2D = null
+	for candidate in level.call("_get_all_shelves"):
+		if int(level.call("_get_shelf_unlock_requirement", candidate)) > 0:
+			shelf = candidate
+			break
+
+	if shelf == null:
+		_failures.append("Level 7 should have at least one locked shelf to exercise this test.")
+		level.free()
+		return
+
+	var overlay := shelf.get_node_or_null("LockedOverlay") as Node2D
+	var count_label := overlay.get_node_or_null("RemainingLabel") as Label
+	var requirement := int(level.call("_get_shelf_unlock_requirement", shelf))
+
+	level.set("_triples_cleared", requirement - 1)
+	level.call("_update_locked_shelves")
+	await process_frame
+	_check(overlay.visible, "Shelf should stay locked before the requirement is met.")
+	_check(
+		not count_label.scale.is_equal_approx(Vector2.ONE),
+		"Remaining label should be mid-pulse right after a count decrease."
+	)
+	await _wait_seconds(0.3)
+	_check(
+		count_label.scale.is_equal_approx(Vector2.ONE),
+		"Remaining label pulse should settle back to normal scale."
+	)
+
+	level.set("_triples_cleared", requirement)
+	level.call("_update_locked_shelves")
+	await process_frame
+	_check(
+		overlay.visible,
+		"Overlay should still be visible/fading right after unlocking, not disappear on the same frame."
+	)
+	await _wait_seconds(0.4)
+	_check(not overlay.visible, "Overlay should be fully hidden once the unlock animation finishes.")
+	_check(
+		overlay.modulate.a == 1.0 and overlay.scale.is_equal_approx(Vector2.ONE),
+		"Overlay should reset to identity modulate/scale after finishing, not retain the animated values."
+	)
+
+	level.free()
+
+
+func _make_level() -> Node:
+	var level := _level_scene.instantiate()
+	level.set("launched_from_dev_mode", true)
+	level.set("selected_level", 1)
+	root.add_child(level)
+	await process_frame
+	return level
+
+
+func _wait_frames(count: int) -> void:
+	for _frame in range(count):
+		await process_frame
+
+
+func _wait_seconds(duration: float) -> void:
+	await create_timer(duration).timeout
+
+
+func _make_ui_cancel_event() -> InputEventAction:
+	var event := InputEventAction.new()
+	event.action = &"ui_cancel"
+	event.pressed = true
+	return event
+
+
+func _check(condition: bool, message: String) -> void:
+	if not condition:
+		_failures.append(message)

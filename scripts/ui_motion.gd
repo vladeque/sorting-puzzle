@@ -66,7 +66,10 @@ static func close_with_fade(node: CanvasItem, on_finished: Callable, duration: f
 	node.set_meta(_CLOSE_GENERATION_META, my_generation)
 	fade_out(node, duration)
 	await node.get_tree().create_timer(duration).timeout
-	if int(node.get_meta(_CLOSE_GENERATION_META, -1)) != my_generation:
+	# node can be freed out from under this suspended coroutine (a queue_free() elsewhere, or the
+	# owning scene tearing down) while the timer above is still counting down; touching a freed
+	# CanvasItem here would error instead of quietly no-oping like every other stale-close case.
+	if not is_instance_valid(node) or int(node.get_meta(_CLOSE_GENERATION_META, -1)) != my_generation:
 		return
 
 	node.remove_meta(_CLOSE_GENERATION_META)
