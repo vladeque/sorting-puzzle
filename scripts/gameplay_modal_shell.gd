@@ -1,0 +1,117 @@
+extends Control
+class_name GameplayModalShell
+
+## Shared gameplay modal shell (UI-003): fullscreen shade + input blocker, safe-area-fitted
+## centered outer panel, title region (regular/long variant), true-circular close action, cream
+## content region, and a bottom action row. Pause, Leave Confirmation, and Ability Purchase each
+## instance this as their first child and compose their own content/actions into the slots below
+## instead of repeating shade/panel/close-button styling locally. See docs/SCENES.md's "Shared
+## Gameplay UI Roles" section.
+##
+## Ownership split (matches the project's destination_screen_shell.tscn precedent): this shell owns
+## presentation, safe-area fitting, and open/close motion. The owning scene's own script owns its
+## content, signals, and gameplay data -- `scripts/level.gd` only sets data, shows/hides through
+## open()/close(), and listens for signals.
+
+signal close_requested
+signal opened
+signal closed
+
+const UIMotionScript := preload("res://scripts/ui_motion.gd")
+const GameplayUIThemeScript := preload("res://scripts/gameplay_ui_theme.gd")
+
+@onready var _outer_panel := %OuterPanel as Control
+@onready var _title_label := %TitleLabel as Label
+@onready var _close_button := %CloseButton as Button
+@onready var _content_region := %ContentRegion as Control
+@onready var _action_row := %ActionRow as Control
+
+var _preferred_size := Vector2(GameplayUIThemeScript.MODAL_MAX_WIDTH, 500.0)
+var _is_transitioning := false
+
+
+func _ready() -> void:
+	_close_button.pressed.connect(func() -> void: close_requested.emit())
+
+
+## Sets the title text and selects the regular/long modal-title typography role.
+func configure(title: String, is_long_title: bool = false) -> void:
+	_title_label.text = title
+	_title_label.add_theme_font_size_override(
+		"font_size",
+		GameplayUIThemeScript.MODAL_TITLE_LONG_SIZE if is_long_title else GameplayUIThemeScript.MODAL_TITLE_REGULAR_SIZE
+	)
+
+
+## Sets the panel's preferred (unclamped) size; apply_safe_layout() fits it within safe bounds.
+func set_preferred_size(size: Vector2) -> void:
+	_preferred_size = size
+
+
+func get_content_region() -> Control:
+	return _content_region
+
+
+func get_action_row() -> Control:
+	return _action_row
+
+
+## Hides the cream content region for modals that only need a title and action row.
+func hide_content_region() -> void:
+	_content_region.visible = false
+
+
+## True while an open()/close() fade is in flight. Callers (scripts/level.gd's button handlers and
+## its ui_cancel chain) should ignore duplicate navigation input until this clears.
+func is_transitioning() -> bool:
+	return _is_transitioning
+
+
+## Fits and centers the outer panel within the safe content rect. Safe to call every time the
+## viewport changes size, matching every other responsive-layout owner in this project.
+func apply_safe_layout(safe_margins: Vector4, viewport_size: Vector2) -> void:
+	anchor_left = 0.0
+	anchor_top = 0.0
+	anchor_right = 1.0
+	anchor_bottom = 1.0
+	offset_left = 0.0
+	offset_top = 0.0
+	offset_right = 0.0
+	offset_bottom = 0.0
+
+	var fitted_size := GameplayUIThemeScript.fit_outer_panel_size(_preferred_size, safe_margins, viewport_size)
+	_outer_panel.anchor_left = 0.5
+	_outer_panel.anchor_top = 0.5
+	_outer_panel.anchor_right = 0.5
+	_outer_panel.anchor_bottom = 0.5
+	_outer_panel.offset_left = -fitted_size.x * 0.5
+	_outer_panel.offset_top = -fitted_size.y * 0.5
+	_outer_panel.offset_right = fitted_size.x * 0.5
+	_outer_panel.offset_bottom = fitted_size.y * 0.5
+
+
+## Fades the shell in. Cancels an in-flight close() first (UIMotion.fade_in() cancels any
+## close_with_fade() already in progress for this node), so re-opening mid-close never strands the
+## old close coroutine.
+func open() -> void:
+	_is_transitioning = true
+	var tween := UIMotionScript.fade_in(self)
+	await tween.finished
+	_is_transitioning = false
+	opened.emit()
+
+
+## Fades the shell out, then hides it. A no-op if already hidden. A repeat call while already
+## closing is ignored by UIMotion.close_with_fade()'s own generation-token guard.
+func close() -> void:
+	if not visible:
+		return
+
+	_is_transitioning = true
+	await UIMotionScript.close_with_fade(self, _finish_close)
+
+
+func _finish_close() -> void:
+	hide()
+	_is_transitioning = false
+	closed.emit()
