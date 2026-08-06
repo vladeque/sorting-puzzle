@@ -120,8 +120,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="ChapterArtwork" parent="Background" instance=ExtResource("12_chapter_background")]
-layout_mode = 1
+[node name="ChapterArtwork" parent="Background" unique_id=494626438 instance=ExtResource("12_chapter_background")]
 
 [node name="Wall" type="ColorRect" parent="Background" unique_id=1791137621]
 visible = false
@@ -185,7 +184,6 @@ mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_combo_fill")
 
 [node name="ComboLabel" type="Label" parent="Background/HudCenterSlot" unique_id=449182547]
-theme_type_variation = &"GameNumberLabel"
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -193,6 +191,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_type_variation = &"GameNumberLabel"
 theme_override_colors/font_color = Color(1, 0.92, 0.62, 1)
 theme_override_colors/font_shadow_color = Color(0.08, 0.02, 0.01, 0.82)
 theme_override_constants/shadow_offset_x = 0
@@ -323,12 +322,12 @@ z_index = 100
 layer = 10
 
 [node name="TimerLabel" type="Label" parent="UI" unique_id=272348979]
-theme_type_variation = &"GameNumberLabel"
 anchors_preset = 10
 anchor_right = 1.0
 offset_top = 28.0
 offset_bottom = 92.0
 grow_horizontal = 2
+theme_type_variation = &"GameNumberLabel"
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.72)
 theme_override_constants/shadow_offset_x = 0
@@ -339,11 +338,11 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="LevelLabel" type="Label" parent="UI" unique_id=1053243000]
-theme_type_variation = &"GameNumberLabel"
 offset_left = 32.0
 offset_top = 42.0
 offset_right = 226.0
 offset_bottom = 82.0
+theme_type_variation = &"GameNumberLabel"
 theme_override_colors/font_color = Color(1, 1, 1, 0.9)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.72)
 theme_override_constants/shadow_offset_x = 0
@@ -382,7 +381,6 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="CountLabel" type="Label" parent="UI/StarCounterLabel" unique_id=1332287251]
-theme_type_variation = &"GameNumberLabel"
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -391,6 +389,7 @@ offset_left = 42.0
 offset_right = -12.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_type_variation = &"GameNumberLabel"
 theme_override_colors/font_color = Color(1, 0.92, 0.5, 1)
 theme_override_colors/font_shadow_color = Color(0.08, 0.03, 0.01, 0.82)
 theme_override_constants/shadow_offset_x = 0
@@ -435,7 +434,6 @@ grow_vertical = 2
 color = Color(0.04, 0.04, 0.05, 0.68)
 
 [node name="FailureLabel" type="Label" parent="UI/FailurePanel" unique_id=1144242749]
-theme_type_variation = &"GameTitleLabel"
 layout_mode = 1
 anchors_preset = 14
 anchor_top = 0.5
@@ -445,6 +443,7 @@ offset_top = -48.0
 offset_bottom = 48.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_type_variation = &"GameTitleLabel"
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
 theme_override_constants/shadow_offset_x = 0

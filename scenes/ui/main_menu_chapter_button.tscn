@@ -8,6 +8,8 @@ texture = ExtResource("1_tvm12")
 
 [node name="ChapterButton" type="Button" unique_id=1739465394]
 custom_minimum_size = Vector2(280, 74)
+offset_right = 280.0
+offset_bottom = 74.0
 size_flags_horizontal = 4
 size_flags_vertical = 4
 focus_mode = 0

@@ -41,7 +41,7 @@ resource_local_to_scene = true
 shader = SubResource("Shader_item_outline")
 shader_parameter/outline_color = Color(1, 0.86, 0.18, 1)
 shader_parameter/alpha_threshold = 0.1
-shader_parameter/outline_radius_px = 4.0
+shader_parameter/outline_radius_px = 0.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_item_hitbox"]
 size = Vector2(74, 112)
@@ -51,10 +51,10 @@ z_index = 10
 script = ExtResource("1_item_script")
 
 [node name="Shadow" type="Polygon2D" parent="." unique_id=1649807921]
-visible = false
 z_index = -4
 position = Vector2(6, 42)
 color = Color(0.5, 0.31, 0.15, 1)
+offset = Vector2(0, 5)
 polygon = PackedVector2Array(-10, 6, -15, -2, 1, -14, 28.2789, -13.574501, 13, 0, 2, 5)
 
 [node name="OutlineSprite" type="Sprite2D" parent="." unique_id=515204852]
