@@ -16,7 +16,7 @@ copies:
 
 - `style_box_green_primary_button.tres`: glossy textured positive-action style
   (`assets/ui/level_button_blank_new.png`) for the **regular** (58 px tall) button tier. Used by
-  Shop's bundle/coin-offer purchase buttons and the Chapter cover card's `%CtaButton`. The
+  Shop's bundle/coin-offer purchase buttons. The
   **hero** tier is `scenes/ui/level_button.tscn` itself (153 px tall; Main Menu Play and Level
   Completion `Next`), which keeps its own outlined font treatment for legibility over
   photographic backgrounds.
@@ -346,10 +346,11 @@ Purpose:
 - Emits `selected(chapter_id)` when its CTA is pressed; the CTA stays disabled while locked.
 - Uses pass-through mouse filtering in its non-interactive hierarchy so swipes begun over the art
   or information panel reach the pager while the CTA remains independently clickable.
-- `%CtaButton` reuses the shared `style_box_green_primary_button.tres` when actionable and
-  `style_box_disabled_action_button.tres` while `Locked`/`Coming Soon` (see "Shared UI Style
-  Tokens"), matching Main Menu Play and Shop Purchase instead of its previous local flat-orange
-  style.
+- `%InfoPanel` uses a 294 px unlocked height and a 340 px locked height, each 50 px taller than
+  before; expanded vertical padding and spacing keep its content balanced within the extra room.
+- `%CtaButton` uses scene-local flat green normal/hover/pressed styles with the same border and
+  16 px corner geometry as `style_box_disabled_action_button.tres`; it switches to that shared
+  neutral style while `Locked`/`Coming Soon`.
 - `set_safe_margins(margins: Vector4)` insets `%InfoMargins`' left/right/bottom by a device
   safe-area margin on top of its authored padding; `%Art`/`%Atmosphere` are never inset, so cover
   art stays full-bleed under notches and display cutouts.
@@ -363,8 +364,7 @@ Important nodes:
 Depends on:
 - `ChapterCatalog.get_selection_preview_path()` for the cover art.
 - `assets/ui/lock_shelf_cutout.png`, `scripts/press_scale_button.gd`.
-- `assets/themes/style_box_green_primary_button.tres`,
-  `assets/themes/style_box_disabled_action_button.tres`.
+- `assets/themes/style_box_disabled_action_button.tres`.
 
 ## `scenes/ui/destination_screen_shell.tscn`
 

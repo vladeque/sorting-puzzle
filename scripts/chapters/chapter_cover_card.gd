@@ -4,8 +4,8 @@ extends Control
 signal selected(chapter_id: String)
 
 const LOCKED_ART_TINT := Color(0.82, 0.78, 0.72, 1.0)
-const DEFAULT_PANEL_HEIGHT := 244.0
-const LOCKED_PANEL_HEIGHT := 290.0
+const DEFAULT_PANEL_HEIGHT := 294.0
+const LOCKED_PANEL_HEIGHT := 340.0
 ## Authored left/right/bottom inset of %InfoMargins from the card's own edges, before any
 ## additional device safe-area inset is applied.
 const INFO_MARGIN_BASE := 30.0

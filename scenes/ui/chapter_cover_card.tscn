@@ -3,7 +3,6 @@
 [ext_resource type="Script" path="res://scripts/chapters/chapter_cover_card.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://assets/ui/lock_shelf_cutout.png" id="2_lock_icon"]
 [ext_resource type="Script" path="res://scripts/press_scale_button.gd" id="3_press_scale_button"]
-[ext_resource type="StyleBoxTexture" path="res://assets/themes/style_box_green_primary_button.tres" id="4_green_button"]
 [ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_disabled_action_button.tres" id="5_disabled_button"]
 
 [sub_resource type="Gradient" id="Gradient_atmosphere"]
@@ -43,6 +42,42 @@ corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="Style_cta_normal"]
+bg_color = Color(0.25, 0.67, 0.22, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.14, 0.44, 0.12, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="Style_cta_hover"]
+bg_color = Color(0.3, 0.74, 0.26, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.14, 0.44, 0.12, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="Style_cta_pressed"]
+bg_color = Color(0.2, 0.57, 0.18, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.1, 0.36, 0.09, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
 
 [node name="ChapterCoverCard" type="Control"]
 layout_mode = 3
@@ -87,7 +122,7 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 30.0
-offset_top = -274.0
+offset_top = -324.0
 offset_right = -30.0
 offset_bottom = -30.0
 grow_horizontal = 2
@@ -104,14 +139,14 @@ theme_override_styles/panel = SubResource("Style_info_panel")
 layout_mode = 2
 mouse_filter = 1
 theme_override_constants/margin_left = 24
-theme_override_constants/margin_top = 18
+theme_override_constants/margin_top = 23
 theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 18
+theme_override_constants/margin_bottom = 23
 
 [node name="Layout" type="VBoxContainer" parent="InfoMargins/InfoPanel/PanelContent"]
 layout_mode = 2
 mouse_filter = 1
-theme_override_constants/separation = 6
+theme_override_constants/separation = 14
 
 [node name="EyebrowLabel" type="Label" parent="InfoMargins/InfoPanel/PanelContent/Layout"]
 unique_name_in_owner = true
@@ -208,9 +243,9 @@ theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_colors/font_disabled_color = Color(0.88, 0.82, 0.78, 1)
 theme_override_font_sizes/font_size = 25
-theme_override_styles/normal = ExtResource("4_green_button")
-theme_override_styles/hover = ExtResource("4_green_button")
-theme_override_styles/pressed = ExtResource("4_green_button")
+theme_override_styles/normal = SubResource("Style_cta_normal")
+theme_override_styles/hover = SubResource("Style_cta_hover")
+theme_override_styles/pressed = SubResource("Style_cta_pressed")
 theme_override_styles/disabled = ExtResource("5_disabled_button")
 text = "Play"
 script = ExtResource("3_press_scale_button")

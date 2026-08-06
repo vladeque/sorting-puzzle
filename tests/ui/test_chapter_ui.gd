@@ -131,6 +131,21 @@ func _run() -> void:
 			var current_card := track.get_child(0) as Control
 			var current_cta := current_card.get_node("%CtaButton") as Button
 			_check(not current_cta.disabled, "Chapter 1 should be playable for a new player.")
+			var info_margins := current_card.get_node("%InfoMargins") as MarginContainer
+			_check(
+				is_equal_approx(info_margins.offset_top, -324.0)
+					and is_equal_approx(info_margins.offset_bottom, -30.0),
+				"The chapter information panel should use its expanded 294 px authored height (offsets: %s / %s; size: %s)."
+					% [info_margins.offset_top, info_margins.offset_bottom, info_margins.size]
+			)
+			for style_state in [&"normal", &"hover", &"pressed"]:
+				var current_cta_style := current_cta.get_theme_stylebox(style_state) as StyleBoxFlat
+				_check(
+					current_cta_style != null
+						and current_cta_style.bg_color.g > current_cta_style.bg_color.r,
+					"The actionable Chapter CTA's %s state should use a flat green style."
+						% style_state
+				)
 			_check(
 				is_equal_approx(current_card.size.x, pager.size.x),
 				"The current chapter background should fill the pager width (got %s)." % current_card.size
@@ -162,6 +177,12 @@ func _run() -> void:
 			)
 			var locked_cta := locked_card.get_node("%CtaButton") as Button
 			_check(locked_cta.disabled, "Chapter 2 should be locked for a new player.")
+			var locked_info_margins := locked_card.get_node("%InfoMargins") as MarginContainer
+			_check(
+				is_equal_approx(locked_info_margins.offset_top, -370.0)
+					and is_equal_approx(locked_info_margins.offset_bottom, -30.0),
+				"The locked chapter information panel should use its expanded 340 px height."
+			)
 			_check(
 				str(locked_cta.text) == "Locked",
 				"Chapter 2's CTA should read Locked while it is locked."

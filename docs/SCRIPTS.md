@@ -133,9 +133,11 @@ Purpose:
   chapter title in its tooltip. `chapter_cover_card.gd` owns full-screen art plus a bottom
   information panel with completion counts, selected state, exact lock progress, a labeled linear
   progress bar, contextual status (`Play`/`Continue`/`Locked`/`Coming Soon`, title case per
-  `docs/TYPOGRAPHY.md`), and CTA. Its `%CtaButton` reuses the shared green primary-action style
-  when actionable and a shared neutral disabled style for `Locked`/`Coming Soon` (see
-  `docs/SCENES.md` "Shared UI Style Tokens"). `set_safe_margins(margins)` insets `%InfoMargins`
+  `docs/TYPOGRAPHY.md`), and CTA. Its 294 px unlocked and 340 px locked `%InfoPanel` heights give
+  the content more vertical breathing room, and `%CtaButton` uses scene-local flat green active
+  styles with the shared
+  neutral disabled style for `Locked`/`Coming Soon` (see `docs/SCENES.md`).
+  `set_safe_margins(margins)` insets `%InfoMargins`
   without touching the full-bleed `%Art`.
 - `chapter_level_background.gd` loads the selected level's configured chapter artwork.
 - `menu_background_resolver.gd` (`class_name MenuBackgroundResolver`) is the shared "selected
@@ -389,7 +391,8 @@ Depends on:
   `offer.discount_percent`/`offer.store.compare_at_formatted_price` and widens `%TitleSpacer` while
   the badge is visible so it never overlaps the title, and emits `info_requested(ability_id)` when a
   reward cell's transparent info button is tapped. Its purchase button uses the shared
-  `style_box_green_primary_button.tres` at the "regular" 58px height, matching the Chapter CTA. Each
+  `style_box_green_primary_button.tres` at the "regular" 58px height, also used by the flat-styled
+  Chapter CTA. Each
   reward cell's info button uses `press_scale_button.gd` with `visual_target_path` set to its
   sibling `Stack` (0.97 held scale), so it visibly presses without shrinking the full-cell tap
   target -- these had no press feedback at all before UI-002.
