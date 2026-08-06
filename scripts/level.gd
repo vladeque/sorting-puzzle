@@ -533,6 +533,48 @@ func _input(event: InputEvent) -> void:
 		_handle_motion_at(_screen_position_to_global(drag_event.position))
 
 
+## System back / Android back / Escape (UI-003). Unlike _input() above, this always runs regardless
+## of pause/failed/completed state, implementing one topmost-state-first back stack:
+##   1. Leave Confirmation returns to Pause.
+##   2. Ability Purchase closes and restores the state it opened from.
+##   3. Pause closes and resumes active gameplay.
+##   4. Completion invokes its Continue route; Failure invokes its Main Menu route.
+##   5. Otherwise (active gameplay) opens Pause.
+## Every branch reuses the exact handler its equivalent button already calls, so this can never
+## spend a life, coin, or star by itself, and behaves identically to tapping that button. If any
+## overlay/result screen is mid open()/close() transition, the press is dropped rather than acted
+## on, so a rapid double-press can never race two transitions or double-navigate.
+func _unhandled_input(event: InputEvent) -> void:
+	if not event.is_action_pressed(&"ui_cancel"):
+		return
+
+	if _is_any_overlay_transitioning():
+		get_viewport().set_input_as_handled()
+		return
+
+	get_viewport().set_input_as_handled()
+	if _leave_confirmation_overlay.visible:
+		_on_leave_confirmation_close_pressed()
+	elif _ability_purchase_overlay != null and _ability_purchase_overlay.visible:
+		_on_ability_purchase_close_pressed()
+	elif _pause_menu_overlay.visible:
+		_on_pause_menu_continue_pressed()
+	elif _level_completed:
+		_on_completion_next_pressed()
+	elif _level_failed:
+		_on_failure_main_menu_pressed()
+	else:
+		_on_pause_menu_button_pressed()
+
+
+func _is_any_overlay_transitioning() -> bool:
+	if _leave_confirmation_overlay.is_transitioning() or _pause_menu_overlay.is_transitioning():
+		return true
+	if _ability_purchase_overlay != null and _ability_purchase_overlay.is_transitioning():
+		return true
+	return _completion_screen.is_transitioning() or _failure_screen.is_transitioning()
+
+
 func _load_item_textures() -> void:
 	_item_textures.clear()
 
