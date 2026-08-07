@@ -1575,7 +1575,11 @@ Key responsibilities:
   regardless of where it was opened from, since the caller already resumed gameplay before applying
   the ability.
 - Hammer targets visible/front triples first, then can supplement visible/front matches with first-back-layer copies of the same item type when no visible item type has three available copies.
-- Hammer now gathers the chosen three targets into one item at the screen center, plays a fullscreen impact animation there, destroys the merged item on the effect's `impact` signal, and then drops combo reward stars from the impact point.
+- Hammer computes the average position of its chosen three targets, starts the fullscreen hammer
+  wind-up there immediately, and gathers the items into that same board-local impact point while
+  the hammer travels from its lower-left launch pose to the upper-right anticipation pose. The
+  merged item is destroyed on the effect's 480 ms `impact` signal; combo reward stars start while
+  the 1.12 second recoil/burst tail is still fading instead of waiting for the effect to finish.
 - Shuffle now pauses moving shelf rows, shows the center-screen delivery box, flies visible unlocked items into the box, changes unlocked item identity assignments while they are hidden, flies them back to their original slots, and resolves shelves only after the return animation completes.
 - Count hammer destroys as cleared triples for shelf unlocking.
 - Let highlight uses start their timed window even when no immediate triple can currently be highlighted.
@@ -1637,7 +1641,9 @@ Attached to:
 
 Purpose:
 - Thin runtime controller for the hammer ability's fullscreen visual strike.
-- Positions and scales the scene over a provided screen-space target point, plays the scene-owned `AnimationPlayer` `strike` timeline, and draws a short procedural burst based on the animated burst amount.
+- Positions and scales the scene over a provided screen-space target point, plays the scene-owned
+  1.12 second `AnimationPlayer` `strike` animatic, and draws the placeholder magenta/white flash,
+  expanding rings, glow, and alternating impact rays from animated burst/flash amounts.
 - Emits `impact` on the visual hit frame and `finished` after the hammer fades out.
 
 Exports:
@@ -1647,6 +1653,12 @@ Depends on:
 - `assets/abilities/ability_hammer_swing_*.png` for the four pseudo-3D angle frames.
 - `scenes/abilities/hammer_impact_effect.tscn` `AnimationPlayer` keyframes for hammer motion, opacity, texture swaps, burst amount, and signal callbacks.
 - `scripts/level.gd` for runtime instancing and gameplay response to `impact`.
+
+Verification:
+- `tests/gameplay/test_hammer_animation.gd` checks immediate launch, lower-left start,
+  upper-right anticipation, the 480 ms impact marker, the full recoil duration, and cleanup. It can
+  also render an in-level timing preview when launched with `--write-movie` and the
+  `--hammer-animation-preview` user argument.
 
 Do not use for:
 - Ability inventory, target selection, item deletion, score/star rules, or shelf resolution.

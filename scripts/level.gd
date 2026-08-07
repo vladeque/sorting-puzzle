@@ -2985,13 +2985,13 @@ func _play_hammer_ability(items_to_destroy: Array[ShelfItem]) -> void:
 
 	var shelves_to_check := _get_hammer_shelves_to_check(items_to_destroy)
 	var destroyed_triples := floori(float(_get_valid_item_count(items_to_destroy)) / float(SLOT_COUNT))
-	var impact_screen_position := get_viewport_rect().size * 0.5
-	var impact_global_position := _screen_position_to_global(impact_screen_position)
-	var merged_item := await _play_hammer_gather_animation(items_to_destroy, impact_global_position)
+	var impact_global_position := _get_hammer_target_center(items_to_destroy)
+	var impact_screen_position := get_canvas_transform() * impact_global_position
 	var ui_layer := get_node("UI") as CanvasLayer
 	var effect := HAMMER_IMPACT_EFFECT_SCENE.instantiate() as HammerImpactEffect
 	ui_layer.add_child(effect)
 	effect.play(impact_screen_position)
+	var merged_item := await _play_hammer_gather_animation(items_to_destroy, impact_global_position)
 
 	await effect.impact
 	_play_hammer_screen_shake()
@@ -2999,12 +2999,23 @@ func _play_hammer_ability(items_to_destroy: Array[ShelfItem]) -> void:
 	var earned_stars := _record_triples_cleared(destroyed_triples)
 	_show_combo_praise(impact_global_position, _combo_count)
 	_resolve_shelves(shelves_to_check)
+	_play_combo_star_reward_animation(impact_global_position, earned_stars)
 	await effect.finished
 	effect.queue_free()
-	await _play_combo_star_reward_animation(impact_global_position, earned_stars)
 
 	_hammer_effect_active = false
 	_update_ability_buttons()
+
+
+func _get_hammer_target_center(items_to_destroy: Array[ShelfItem]) -> Vector2:
+	var valid_items := _get_valid_items(items_to_destroy)
+	if valid_items.is_empty():
+		return _screen_position_to_global(get_viewport_rect().size * 0.5)
+
+	var target_center := Vector2.ZERO
+	for item in valid_items:
+		target_center += item.global_position
+	return target_center / float(valid_items.size())
 
 
 func _get_hammer_shelves_to_check(items_to_destroy: Array[ShelfItem]) -> Array[Node]:
@@ -3110,10 +3121,11 @@ func _play_hammer_screen_shake() -> void:
 		return
 
 	var original_position := _shelves_root.position
-	var shake_offset := Vector2(8.0, -5.0) * clampf(_shelves_layout_scale, 0.75, 1.35)
+	var shake_offset := Vector2(12.0, -7.0) * clampf(_shelves_layout_scale, 0.75, 1.35)
 	var tween := create_tween()
-	tween.tween_property(_shelves_root, "position", original_position + shake_offset, 0.035)
-	tween.tween_property(_shelves_root, "position", original_position - shake_offset * 0.6, 0.045)
+	tween.tween_property(_shelves_root, "position", original_position + shake_offset, 0.028)
+	tween.tween_property(_shelves_root, "position", original_position - shake_offset * 0.72, 0.04)
+	tween.tween_property(_shelves_root, "position", original_position + shake_offset * 0.32, 0.045)
 	tween.tween_property(_shelves_root, "position", original_position, 0.055)
 
 

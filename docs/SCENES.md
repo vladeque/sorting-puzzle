@@ -1282,11 +1282,14 @@ Script:
 Purpose:
 - Reusable fullscreen hammer strike effect spawned by `scripts/level.gd` when the hammer ability is used.
 - Displays the selected high-resolution transparent hammer sprite over gameplay using four pseudo-3D angle frames.
-- Owns the editable `AnimationPlayer` `strike` timeline for wind-up, fast strike, rebound, fade-out, texture swaps, impact signal timing, and burst amount.
-- Emits `impact` exactly when the hammer visually lands so gameplay can destroy the center-screen merged item on the hit frame.
+- Owns the editable 1.12 second `AnimationPlayer` `strike` animatic: lower-left launch,
+  upper-right anticipation during item gathering, fast downstroke, front-facing impact, recoil,
+  fade-out, texture swaps, impact signal timing, burst amount, and flash amount.
+- Emits `impact` at 480 ms so gameplay destroys the merged item at the selected targets' averaged
+  board position on the visual hit frame. Reward stars begin during the remaining recoil/burst tail.
 
 Important nodes:
-- `ImpactAnchor`: runtime-positioned target point that scales the full hammer for the current viewport.
+- `ImpactAnchor`: runtime-positioned target point averaged from the three selected items; scales the full hammer for the current viewport.
 - `ImpactAnchor/HammerPivot`: keyframed by `AnimationPlayer` for wind-up, strike, rebound, and exit motion.
 - `ImpactAnchor/HammerPivot/HammerSprite`: transparent hammer sprite whose position and texture are value-keyframed by the `strike` animation.
 - `AnimationPlayer`: owns the `strike` animation; edit this timeline for most hammer motion and timing adjustments.
@@ -1297,6 +1300,7 @@ Depends on:
 - `assets/abilities/ability_hammer_swing_impact.png`.
 - `assets/abilities/ability_hammer_swing_rebound.png`.
 - Runtime instancing and target positioning from `scripts/level.gd`.
+- `tests/gameplay/test_hammer_animation.gd` for deterministic timing/integration verification and optional movie capture.
 
 Do not use for:
 - Choosing hammer targets, spending ability inventory, destroying items, or resolving shelves. Those stay in `scripts/level.gd`.
