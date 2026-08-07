@@ -2,12 +2,9 @@
 
 [ext_resource type="PackedScene" path="res://scenes/ui/gameplay_result_shell.tscn" id="1_shell"]
 [ext_resource type="Texture2D" uid="uid://3vi3qpy12q0w" path="res://assets/ui/reward_star.png" id="2_reward_star"]
-[ext_resource type="Texture2D" uid="uid://borxe8m7bwoqf" path="res://assets/ui/level_button_blank_new.png" id="3_level_button_blank"]
+[ext_resource type="StyleBoxTexture" path="res://assets/themes/style_box_green_primary_button.tres" id="3_positive_action"]
 [ext_resource type="Script" uid="uid://cp7jmwiig6qtc" path="res://scripts/level_completion_screen.gd" id="4_completion_screen_script"]
 [ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="5_press_scale_button"]
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_completion_next"]
-texture = ExtResource("3_level_button_blank")
 
 [node name="LevelCompletionScreen" type="Control"]
 anchors_preset = 15
@@ -90,9 +87,9 @@ theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.03, 0.25, 0.04, 0.95)
 theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 42
-theme_override_styles/normal = SubResource("StyleBoxTexture_completion_next")
-theme_override_styles/pressed = SubResource("StyleBoxTexture_completion_next")
-theme_override_styles/hover = SubResource("StyleBoxTexture_completion_next")
+theme_override_styles/normal = ExtResource("3_positive_action")
+theme_override_styles/pressed = ExtResource("3_positive_action")
+theme_override_styles/hover = ExtResource("3_positive_action")
 text = "Continue"
 script = ExtResource("5_press_scale_button")
 held_scale = 0.94

@@ -100,10 +100,16 @@ func open() -> void:
 func close() -> void:
 	if _shell != null:
 		await _shell.close()
+		# A new open() can supersede this close while it awaits the fade. In that case the shell is
+		# visible again and this stale owner coroutine must not hide the freshly reopened overlay.
+		if _shell.visible:
+			return
 	hide()
 
 
 func _on_setting_button_pressed(cross_out: Control, setting_id: StringName) -> void:
+	if _shell != null and _shell.is_transitioning():
+		return
 	var is_disabled := not is_setting_disabled(setting_id)
 	_disabled_settings[String(setting_id)] = is_disabled
 	if not PlayerProgress.set_setting_disabled(setting_id, is_disabled):

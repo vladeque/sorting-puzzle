@@ -19,6 +19,7 @@ extends RefCounted
 ## these sizes; Pause now matches instead of keeping its own bespoke 64px size.
 const HUD_ICON_COMPACT_SIZE := Vector2(82.0, 82.0)
 const HUD_ICON_REGULAR_SIZE := Vector2(96.0, 96.0)
+const HUD_ICON_COMPACT_REFERENCE_WIDTH := 540.0
 ## Usable-width breakpoint below which HUD icon buttons (and the ability bar) switch to compact.
 ## Matches the ability bar's pre-existing threshold so Pause and abilities always agree.
 const HUD_ICON_COMPACT_VIEWPORT_WIDTH := 620.0
@@ -51,7 +52,10 @@ const ICON_HELD_SCALE := 0.97
 ## callers should already have subtracted safe-area side insets, matching
 ## AbilityBar.apply_responsive_layout()'s contract.
 static func get_hud_icon_size(usable_width: float) -> Vector2:
-	return HUD_ICON_COMPACT_SIZE if usable_width <= HUD_ICON_COMPACT_VIEWPORT_WIDTH else HUD_ICON_REGULAR_SIZE
+	if usable_width > HUD_ICON_COMPACT_VIEWPORT_WIDTH:
+		return HUD_ICON_REGULAR_SIZE
+	var safe_scale := clampf(usable_width / HUD_ICON_COMPACT_REFERENCE_WIDTH, 0.0, 1.0)
+	return HUD_ICON_COMPACT_SIZE * safe_scale
 
 
 ## Clamps a modal's preferred outer-panel size so it never exceeds the safe content rect minus
@@ -69,3 +73,31 @@ static func fit_outer_panel_size(preferred_size: Vector2, safe_margins: Vector4,
 ## level_completion_screen.gd already used so Completion's on-screen size is unchanged.
 static func get_result_title_scale(viewport_size: Vector2) -> float:
 	return clampf(minf(viewport_size.x / 720.0, viewport_size.y / 1280.0), RESULT_TITLE_SCALE_MIN, RESULT_TITLE_SCALE_MAX)
+
+
+## Returns the largest font size in [minimum_size, maximum_size] whose rendered text fits within
+## available_width. Numeric HUD labels use this after their responsive rect changes so assigning a
+## longer value cannot silently overflow an otherwise correctly positioned badge/pill.
+static func fit_label_font_size(
+	label: Label,
+	available_width: float,
+	maximum_size: int,
+	minimum_size: int = 10
+) -> int:
+	var font := label.get_theme_font("font")
+	if font == null:
+		return maximum_size
+
+	var fitted_size := maximum_size
+	var safe_width := maxf(available_width, 1.0)
+	while fitted_size > minimum_size:
+		var rendered_width := font.get_string_size(
+			label.text,
+			HORIZONTAL_ALIGNMENT_LEFT,
+			-1,
+			fitted_size
+		).x
+		if rendered_width <= safe_width:
+			break
+		fitted_size -= 1
+	return fitted_size

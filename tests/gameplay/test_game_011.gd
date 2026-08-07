@@ -143,8 +143,13 @@ func _test_paid_use_and_persistence() -> void:
 	)
 
 	var level = await _make_level(false, 1)
+	# This test normally disables Level processing for deterministic ability assertions. Re-enable it
+	# while exercising the real modal fade so the production input gate can reach its stable state.
+	level.process_mode = Node.PROCESS_MODE_INHERIT
 	level.call("_open_ability_purchase_menu", ABILITY_FREEZER)
+	await create_timer(0.35).timeout
 	level.call("_on_ability_purchase_buy_pressed")
+	await create_timer(0.35).timeout
 	_check(bool(level.call("_is_freezer_active")), "zero-use coin purchase activates Freezer")
 	_check(progress.get_coins() == 200, "zero-use Freezer costs exactly 100 coins")
 	_check(
@@ -153,12 +158,14 @@ func _test_paid_use_and_persistence() -> void:
 	)
 
 	level.call("_open_ability_purchase_menu", ABILITY_FREEZER)
+	await create_timer(0.35).timeout
 	level.call("_on_ability_purchase_buy_pressed")
 	_check(progress.get_coins() == 200, "active Freezer rejects a paid refresh without spending")
 
 	level.call("_clear_freezer")
 	_check(progress.spend_coins(150), "fixture reduces balance below the Freezer price")
 	level.call("_open_ability_purchase_menu", ABILITY_FREEZER)
+	await create_timer(0.35).timeout
 	level.call("_on_ability_purchase_buy_pressed")
 	_check(progress.get_coins() == 50, "insufficient-coins attempt spends nothing")
 	_check(not bool(level.call("_is_freezer_active")), "insufficient coins do not activate Freezer")

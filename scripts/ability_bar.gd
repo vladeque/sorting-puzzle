@@ -15,6 +15,9 @@ const ABILITY_IDS := [
 	ABILITY_HIGHLIGHT,
 	ABILITY_FREEZER,
 ]
+const USES_BADGE_MAX_FONT_SIZE := 20
+const USES_BADGE_MIN_FONT_SIZE := 8
+const USES_BADGE_HORIZONTAL_PADDING := 4.0
 
 @onready var _button_row := %ButtonRow as HBoxContainer
 @onready var _buttons := {
@@ -47,6 +50,7 @@ func set_uses(ability_uses: Dictionary) -> void:
 		var uses_label := button.get_node_or_null("UsesLabel") as Label
 		if uses_label != null:
 			uses_label.text = str(maxi(int(ability_uses.get(ability_id, 0)), 0))
+			_fit_uses_label(uses_label)
 
 
 func set_interaction_blocked(is_blocked: bool, freezer_active: bool) -> void:
@@ -54,6 +58,9 @@ func set_interaction_blocked(is_blocked: bool, freezer_active: bool) -> void:
 		var button := _buttons.get(ability_id) as Button
 		if button != null:
 			button.disabled = is_blocked or (ability_id == ABILITY_FREEZER and freezer_active)
+			button.mouse_default_cursor_shape = (
+				Control.CURSOR_ARROW if button.disabled else Control.CURSOR_POINTING_HAND
+			)
 
 
 func set_active_seconds(ability_id: StringName, seconds_remaining: float) -> void:
@@ -82,11 +89,17 @@ func get_ability_button(ability_id: StringName) -> Button:
 
 func apply_responsive_layout(usable_width: float) -> void:
 	var is_compact := usable_width <= GameplayUIThemeScript.HUD_ICON_COMPACT_VIEWPORT_WIDTH
-	var button_size := GameplayUIThemeScript.HUD_ICON_COMPACT_SIZE if is_compact else GameplayUIThemeScript.HUD_ICON_REGULAR_SIZE
+	var button_size := GameplayUIThemeScript.get_hud_icon_size(usable_width)
 	var reference_size := GameplayUIThemeScript.HUD_ICON_REGULAR_SIZE
 	var scale := button_size.x / reference_size.x if reference_size.x > 0.0 else 1.0
+	var compact_scale := (
+		button_size.x / GameplayUIThemeScript.HUD_ICON_COMPACT_SIZE.x if is_compact else 1.0
+	)
 
-	_button_row.add_theme_constant_override("separation", 18 if is_compact else 34)
+	_button_row.add_theme_constant_override(
+		"separation",
+		maxi(roundi(18.0 * compact_scale), 1) if is_compact else 34
+	)
 	for ability_id in ABILITY_IDS:
 		var button := _buttons.get(ability_id) as Button
 		if button == null:
@@ -95,8 +108,10 @@ func apply_responsive_layout(usable_width: float) -> void:
 		button.custom_minimum_size = button_size
 		var rects: Dictionary = _reference_child_rects.get(ability_id, {})
 		_apply_scaled_rect(button.get_node_or_null("Icon") as Control, rects.get("icon"), scale)
-		_apply_scaled_rect(button.get_node_or_null("UsesLabel") as Control, rects.get("uses_label"), scale)
+		var uses_label := button.get_node_or_null("UsesLabel") as Label
+		_apply_scaled_rect(uses_label, rects.get("uses_label"), scale)
 		_apply_scaled_rect(button.get_node_or_null("TimerLabel") as Control, rects.get("timer_label"), scale)
+		_fit_uses_label(uses_label)
 
 
 func _capture_reference_rects(button: Button) -> Dictionary:
@@ -128,3 +143,20 @@ func _apply_scaled_rect(control: Control, reference: Variant, scale: float) -> v
 	control.offset_top = rect.position.y * scale
 	control.offset_right = (rect.position.x + rect.size.x) * scale
 	control.offset_bottom = (rect.position.y + rect.size.y) * scale
+
+
+func _fit_uses_label(uses_label: Label) -> void:
+	if uses_label == null:
+		return
+	var available_width := (
+		uses_label.offset_right - uses_label.offset_left - USES_BADGE_HORIZONTAL_PADDING
+	)
+	uses_label.add_theme_font_size_override(
+		"font_size",
+		GameplayUIThemeScript.fit_label_font_size(
+			uses_label,
+			available_width,
+			USES_BADGE_MAX_FONT_SIZE,
+			USES_BADGE_MIN_FONT_SIZE
+		)
+	)

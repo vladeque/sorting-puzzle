@@ -222,16 +222,21 @@ role + responsive scale. See `docs/SCRIPTS.md` for its full API.
 **`scenes/ui/gameplay_result_shell.tscn`** (`scripts/gameplay_result_shell.gd`) are the two shared
 shells -- see their own entries below and in `docs/SCRIPTS.md` for the full ownership split (shell
 owns shade/panel/title/close/safe-area/motion; the owning scene keeps its own content and signals).
+The modal shell preserves the authored 520px composition and uniformly scales the complete panel
+subtree when safe insets leave less room; this keeps title, close cutout, content, and action-row
+minimum sizes inside the same fitted rect instead of shrinking only the outer panel.
 
 **Interaction/motion** -- every gameplay button now uses `press_scale_button.gd`: `0.94` for CTAs
 (Leave/Continue/Buy/Watch-Ad/Completion's Continue/Failure's Main Menu action), `0.97` for icon/
 close buttons (Pause, the four ability buttons, and every gameplay modal's shared close action --
 this ticket's own text calls out close buttons as the icon role here, unlike the menu system's 0.94
 dialog-dismiss role). Every gameplay-owned control is `FOCUS_NONE` with the pointing-hand cursor
-while enabled, matching the menu system's touch-only policy. Modal/result open and close fade via
+while enabled and the arrow cursor while disabled, matching the menu system's touch-only policy.
+Modal/result open and close fade via
 `scripts/ui_motion.gd` (`OVERLAY_DURATION`) instead of snapping between `visible` states, and every
 shell exposes `is_transitioning()` so `scripts/level.gd`'s button handlers and `ui_cancel` chain can
-ignore duplicate input until a fade settles.
+ignore duplicate input until a fade settles. Owner wrappers also verify that their shell remained
+closed before hiding their root, so an interrupted close cannot hide a freshly reopened modal.
 
 **`ui_cancel` back stack** -- `scripts/level.gd::_unhandled_input()` (there was no back-button
 handling at all during gameplay before this ticket) implements one topmost-state-first order: Leave
@@ -252,10 +257,12 @@ disabled with `"Coming Soon"` copy and the shared unavailable style, mirroring
 disabled styles (no engine-default fallback), the `FOCUS_NONE`/pointing-hand-cursor sweep, the
 rewarded-ad placeholder never being an enabled no-op, Completion/Failure copy and signal routing,
 the full `ui_cancel` chain including a dropped in-flight-transition press, safe-area layout at
-fabricated insets (including a tight viewport that must clamp a modal instead of overflowing it),
+fabricated insets using post-layout rendered rectangles (including a tight viewport that must fit
+the modal's action and close controls instead of only shrinking its outer panel),
 regular/compact ability icon+badge bounds, long-value formatting (`LEVEL 99`, `59:59`, a six-digit
-star total, a three-digit ability count, an active ability timer), and locked-shelf count-pulse/
-unlock-animation feedback.
+star total, a six-digit ability count, an active ability timer), disabled cursor restoration,
+interrupted modal close/reopen behavior, shared Completion/Failure CTA identity, and locked-shelf
+count-pulse/unlock-animation feedback.
 
 ## `scenes/main_menu.tscn`
 

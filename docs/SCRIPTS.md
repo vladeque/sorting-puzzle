@@ -1420,13 +1420,15 @@ Purpose:
   `style_box_gameplay_count_badge.tres`/`style_box_gameplay_timer_badge.tres` resources.
 
 Key methods:
-- `set_uses(ability_uses)`.
-- `set_interaction_blocked(is_blocked, freezer_active)`.
+- `set_uses(ability_uses)`: fits longer numeric values down to the shared badge minimum font size
+  after both regular and compact layout changes.
+- `set_interaction_blocked(is_blocked, freezer_active)`: updates disabled state and restores the
+  arrow cursor for blocked actions.
 - `set_active_seconds(ability_id, seconds_remaining)`.
 - `get_icon_texture(ability_id)`.
 - `get_ability_button(ability_id)`.
 - `apply_responsive_layout(usable_width)`: switches between `GameplayUITheme`'s shared compact
-  (82px) and regular (96px) HUD icon sizes at its shared width breakpoint, matching the Pause
+  (82px), safe-inset-scaled compact, and regular (96px) HUD icon sizes, matching the Pause
   button. Also captures each button's authored (96px) Icon/UsesLabel/TimerLabel rects once at
   `_ready()` and rescales them proportionally to the actual button size (UI-003) -- previously only
   the parent button resized, so the icon and both badge types stayed at their 96px offsets and
@@ -1810,8 +1812,10 @@ Purpose:
 
 Constants:
 - `HUD_ICON_COMPACT_SIZE` (82x82) / `HUD_ICON_REGULAR_SIZE` (96x96) /
+  `HUD_ICON_COMPACT_REFERENCE_WIDTH` (540) /
   `HUD_ICON_COMPACT_VIEWPORT_WIDTH` (620): the shared circular HUD icon-button role's two sizes and
-  breakpoint, shared by the top HUD's Pause button and the four ability buttons.
+  breakpoint, shared by the top HUD's Pause button and the four ability buttons. Below the compact
+  reference width, both consumers scale the compact role proportionally to the safe usable width.
 - `MODAL_MAX_WIDTH` (520) / `MODAL_MIN_EDGE_GAP` (20) / `CLOSE_BUTTON_SIZE` (72x72): gameplay modal
   shell geometry.
 - `MODAL_TITLE_REGULAR_SIZE` (44) / `MODAL_TITLE_LONG_SIZE` (40): modal-title typography roles
@@ -1825,12 +1829,14 @@ Constants:
   held-scale roles.
 
 API:
-- `get_hud_icon_size(usable_width)`: compact or regular size for the given *usable* width (callers
-  subtract safe-area side insets first).
+- `get_hud_icon_size(usable_width)`: regular, compact, or safe-inset-scaled compact size for the
+  given *usable* width (callers subtract safe-area side insets first).
 - `fit_outer_panel_size(preferred_size, safe_margins, viewport_size)`: clamps a modal's preferred
   outer-panel size so it never exceeds the safe content rect minus `MODAL_MIN_EDGE_GAP` on every
   side, at any supported viewport.
 - `get_result_title_scale(viewport_size)`: the shared responsive scale for the terminal-result shell.
+- `fit_label_font_size(label, available_width, maximum_size, minimum_size)`: finds the largest
+  rendered font size that fits a numeric HUD label's current responsive bounds.
 
 ## `scripts/gameplay_modal_shell.gd`
 
@@ -1861,10 +1867,13 @@ Key methods:
 - `hide_content_region()`: for modals that only need a title and action row.
 - `is_transitioning()`: true while an `open()`/`close()` fade is in flight -- callers (button
   handlers, the `ui_cancel` chain) should ignore duplicate input until this clears.
-- `apply_safe_layout(safe_margins, viewport_size)`: fits and centers the outer panel within the safe
-  content rect via `GameplayUITheme.fit_outer_panel_size()`.
+- `apply_safe_layout(safe_margins, viewport_size)`: centers the panel in the safe content rect and
+  uniformly scales its full composed subtree to `GameplayUITheme.fit_outer_panel_size()`; fixed
+  child/container minimum sizes therefore cannot overflow a shrunken outer panel.
 - `open()` / `close()`: fade via `scripts/ui_motion.gd`. `close()` is a no-op if already hidden; a
-  repeat call while already closing is absorbed by `UIMotion.close_with_fade()`'s own generation-token guard.
+  repeat call while already closing is absorbed by `UIMotion.close_with_fade()`'s own generation-token
+  guard. Each owning wrapper hides its root only if the shell is still closed after the await, so a
+  stale close superseded by `open()` cannot hide the reopened modal.
 
 Depends on:
 - `scripts/ui_motion.gd`, `scripts/gameplay_ui_theme.gd`, `scripts/press_scale_button.gd`.
@@ -1916,9 +1925,9 @@ Purpose:
   supplies data, calls `apply_safe_layout()` on resize, and listens for `pause_pressed`.
 - The background strip height and the combo slot both grow/shift with the safe-top inset (before,
   only the timer/level/star/pause row did, so a top inset could push that row below the strip's own
-  background). The timer stays centered on the viewport but is kept clear of the level label and
-  star/pause cluster -- sized to whichever exclusion zone is tighter -- so long values (`LEVEL 99`,
-  `59:59`, large star totals) can never overlap either side.
+  background). The timer stays centered in a real font-sized center region. At compact widths the
+  level, timer, star pill, Pause control, fonts, and gaps scale as one row using safe usable width,
+  so Label minimum-size resolution cannot expand the timer into either side after layout.
 - The Pause button shares the gameplay HUD icon-button role with the four ability buttons (compact
   82px/regular 96px, an explicit disabled style -- previously a bespoke 64px button with no disabled
   style, so opening any overlay fell back to Godot's square default). Its `"II"` text is replaced
@@ -1931,7 +1940,8 @@ Purpose:
 Key methods:
 - `set_level_text(text)` / `set_timer_text(text)` / `set_star_count(stars)`.
 - `set_combo(is_combo_active, combo_count, time_ratio)`.
-- `set_pause_enabled(is_enabled)`.
+- `set_pause_enabled(is_enabled)`: also switches between pointing-hand and arrow cursors so a
+  disabled Pause action does not retain an enabled affordance.
 - `get_star_counter_global_center()`: the reward-star flight's landing point.
 - `play_star_receive_pulse()`: briefly pulses the star pill when a reward star arrives, matching
   `scripts/main_menu_reward_chest.gd`'s `play_receive_pulse()` convention; kills any prior pulse first.

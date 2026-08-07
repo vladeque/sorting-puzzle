@@ -230,6 +230,25 @@ Update `docs/SCENES.md`, `docs/SCRIPTS.md`, `docs/PROJECT_MAP.md`, and `docs/TYP
 - Responsive variants and safe-area behavior.
 - Immediate paid-ability copy and the hidden rewarded-ad placeholder policy.
 
+## Follow-up Validation Fixes (2026-08-07)
+
+A post-implementation runtime review found and fixed six gaps that the first structural suite did
+not exercise:
+
+- Modal button handlers now reject navigation during fades, and owner close coroutines cannot hide
+  a shell that was reopened while the close was waiting.
+- The safe-area HUD uses a real compact center allocation and scales all top-row roles together;
+  tests compare resolved rectangles rather than pre-layout offsets.
+- Gameplay modal safe fitting uniformly scales the complete composed panel, including action and
+  close controls, rather than shrinking only the outer panel around fixed-size children.
+- Six-digit ability counts and large star totals fit their rendered badge/pill bounds.
+- Disabled Pause and ability controls restore the arrow cursor.
+- Completion and Failure now reference the same positive CTA `StyleBox` resource by identity.
+
+`tests/ui/test_level_ui_consistency.gd` contains direct regressions for each case, including the
+rapid Pause -> Leave -> Close transition sequence that previously could leave gameplay paused with
+no visible overlay.
+
 ## Out of Scope
 
 - Puzzle rules, shelf layout algorithms, item art, drag/drop, matching, ability effects, or level

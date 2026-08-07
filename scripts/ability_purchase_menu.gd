@@ -83,4 +83,6 @@ func open() -> void:
 ## shell's own modulate/visible state.
 func close() -> void:
 	await _shell.close()
+	if _shell.visible:
+		return
 	hide()

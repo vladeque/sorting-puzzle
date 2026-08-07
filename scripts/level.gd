@@ -1655,14 +1655,14 @@ func _setup_ability_purchase_menu() -> void:
 
 
 func _on_completion_next_pressed() -> void:
-	if not _level_completed or _returning_to_menu:
+	if not _level_completed or _is_ui_action_blocked():
 		return
 
 	_return_to_main_menu()
 
 
 func _on_failure_main_menu_pressed() -> void:
-	if not _level_failed or _returning_to_menu:
+	if not _level_failed or _is_ui_action_blocked():
 		return
 
 	_return_to_main_menu()
@@ -1678,7 +1678,7 @@ func _on_pause_menu_setting_toggled(setting_id: StringName, is_disabled: bool) -
 
 
 func _on_pause_menu_button_pressed() -> void:
-	if _level_failed or _level_completed:
+	if _level_failed or _level_completed or _is_ui_action_blocked():
 		return
 
 	_open_pause_menu()
@@ -1696,6 +1696,8 @@ func _open_pause_menu() -> void:
 
 
 func _on_pause_menu_leave_pressed() -> void:
+	if _is_ui_action_blocked():
+		return
 	_open_leave_confirmation()
 
 
@@ -1713,7 +1715,7 @@ func _open_leave_confirmation() -> void:
 
 
 func _on_leave_confirmation_leave_pressed() -> void:
-	if _returning_to_menu:
+	if _is_ui_action_blocked():
 		return
 
 	_spend_campaign_life_for_run()
@@ -1725,6 +1727,8 @@ func _on_leave_confirmation_leave_pressed() -> void:
 ## one that resumes gameplay. These used to collapse into the same outcome; UI-003 distinguishes
 ## "pop this confirmation" from "resume."
 func _on_leave_confirmation_close_pressed() -> void:
+	if _is_ui_action_blocked():
+		return
 	_leave_confirmation_overlay.close()
 	_pause_menu_overlay.open()
 	_update_ability_buttons()
@@ -1732,10 +1736,14 @@ func _on_leave_confirmation_close_pressed() -> void:
 
 
 func _on_leave_confirmation_continue_pressed() -> void:
+	if _is_ui_action_blocked():
+		return
 	_close_pause_menu()
 
 
 func _on_pause_menu_continue_pressed() -> void:
+	if _is_ui_action_blocked():
+		return
 	_close_pause_menu()
 
 
@@ -1788,11 +1796,13 @@ func _close_ability_purchase_menu(should_resume: bool = true) -> void:
 
 
 func _on_ability_purchase_close_pressed() -> void:
+	if _is_ui_action_blocked():
+		return
 	_close_ability_purchase_menu()
 
 
 func _on_ability_purchase_buy_pressed() -> void:
-	if _ability_purchase_pending_id == StringName():
+	if _ability_purchase_pending_id == StringName() or _is_ui_action_blocked():
 		return
 
 	var ability_id := _ability_purchase_pending_id
@@ -1823,6 +1833,10 @@ func _on_ability_purchase_buy_pressed() -> void:
 
 func _on_ability_purchase_ad_pressed() -> void:
 	pass
+
+
+func _is_ui_action_blocked() -> bool:
+	return _returning_to_menu or _is_any_overlay_transitioning()
 
 
 func _close_pause_menu() -> void:

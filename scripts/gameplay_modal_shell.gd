@@ -79,15 +79,38 @@ func apply_safe_layout(safe_margins: Vector4, viewport_size: Vector2) -> void:
 	offset_right = 0.0
 	offset_bottom = 0.0
 
-	var fitted_size := GameplayUIThemeScript.fit_outer_panel_size(_preferred_size, safe_margins, viewport_size)
-	_outer_panel.anchor_left = 0.5
-	_outer_panel.anchor_top = 0.5
-	_outer_panel.anchor_right = 0.5
-	_outer_panel.anchor_bottom = 0.5
-	_outer_panel.offset_left = -fitted_size.x * 0.5
-	_outer_panel.offset_top = -fitted_size.y * 0.5
-	_outer_panel.offset_right = fitted_size.x * 0.5
-	_outer_panel.offset_bottom = fitted_size.y * 0.5
+	var fitted_size := GameplayUIThemeScript.fit_outer_panel_size(
+		_preferred_size,
+		safe_margins,
+		viewport_size
+	)
+	# Keep the authored panel/content/action geometry intact and uniformly scale the whole subtree.
+	# Resizing only OuterPanel lets Container minimum sizes spill fixed children back outside the safe
+	# rect. Scaling the composed panel makes the shell, title, close cutout, content, and actions obey
+	# the same fit while preserving their relative shapes.
+	var fit_scale := minf(
+		fitted_size.x / maxf(_preferred_size.x, 1.0),
+		fitted_size.y / maxf(_preferred_size.y, 1.0)
+	)
+	fit_scale = minf(fit_scale, 1.0)
+	var safe_size := Vector2(
+		maxf(viewport_size.x - safe_margins.x - safe_margins.z, 1.0),
+		maxf(viewport_size.y - safe_margins.y - safe_margins.w, 1.0)
+	)
+	var safe_center := Vector2(
+		safe_margins.x + safe_size.x * 0.5,
+		safe_margins.y + safe_size.y * 0.5
+	)
+	_outer_panel.anchor_left = 0.0
+	_outer_panel.anchor_top = 0.0
+	_outer_panel.anchor_right = 0.0
+	_outer_panel.anchor_bottom = 0.0
+	_outer_panel.offset_left = safe_center.x - _preferred_size.x * 0.5
+	_outer_panel.offset_top = safe_center.y - _preferred_size.y * 0.5
+	_outer_panel.offset_right = safe_center.x + _preferred_size.x * 0.5
+	_outer_panel.offset_bottom = safe_center.y + _preferred_size.y * 0.5
+	_outer_panel.pivot_offset = _preferred_size * 0.5
+	_outer_panel.scale = Vector2.ONE * fit_scale
 
 
 ## Fades the shell in. Cancels an in-flight close() first (UIMotion.fade_in() cancels any

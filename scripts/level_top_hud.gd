@@ -22,6 +22,17 @@ const HUD_SIDE_MARGIN := 24.0
 const LEVEL_LABEL_MARGIN_LEFT := 32.0
 const LEVEL_LABEL_TOP := 42.0
 const LEVEL_LABEL_SIZE := Vector2(194.0, 40.0)
+const COMPACT_HUD_SIDE_MARGIN := 16.0
+const COMPACT_LEVEL_LABEL_MARGIN_LEFT := 20.0
+const COMPACT_LEVEL_LABEL_SIZE := Vector2(160.0, 40.0)
+const COMPACT_STAR_COUNTER_SIZE := Vector2(88.0, 46.0)
+const COMPACT_STAR_COUNTER_GAP := 18.0
+const COMPACT_TIMER_WIDTH := 120.0
+const REGULAR_TIMER_WIDTH := 140.0
+const COMPACT_TIMER_FONT_SIZE := 40
+const REGULAR_TIMER_FONT_SIZE := 46
+const COMPACT_LEVEL_FONT_SIZE := 24
+const REGULAR_LEVEL_FONT_SIZE := 28
 const TIMER_LABEL_HEIGHT := 64.0
 const STAR_COUNTER_SIZE := Vector2(112.0, 52.0)
 const STAR_COUNTER_GAP := 40.0
@@ -45,6 +56,7 @@ const TIMER_FROZEN_OUTLINE_SIZE := 5
 @onready var _timer_label := %TimerLabel as Label
 @onready var _level_label := %LevelLabel as Label
 @onready var _star_counter := %StarCounter as Control
+@onready var _star_icon := %StarCounter.get_node("Icon") as TextureRect
 @onready var _star_count_label := %StarCountLabel as Label
 @onready var _pause_button := %PauseButton as Button
 @onready var _pause_bar_1 := %PauseBar1 as Control
@@ -66,17 +78,8 @@ func set_timer_text(text: String) -> void:
 
 
 func set_star_count(stars: int) -> void:
-	var star_text := "%d" % stars
-	var font_size := 26
-	if star_text.length() >= 7:
-		font_size = 18
-	elif star_text.length() >= 6:
-		font_size = 20
-	elif star_text.length() >= 5:
-		font_size = 22
-
-	_star_count_label.add_theme_font_size_override("font_size", font_size)
-	_star_count_label.text = star_text
+	_star_count_label.text = "%d" % stars
+	_fit_star_count_font()
 
 
 ## The reward-star flight's landing point (scripts/level.gd flies earned stars from a clear
@@ -136,6 +139,9 @@ func set_combo(is_combo_active: bool, combo_count: int, time_ratio: float) -> vo
 
 func set_pause_enabled(is_enabled: bool) -> void:
 	_pause_button.disabled = not is_enabled
+	_pause_button.mouse_default_cursor_shape = (
+		Control.CURSOR_POINTING_HAND if is_enabled else Control.CURSOR_ARROW
+	)
 
 
 func apply_safe_layout(safe_margins: Vector4, viewport_size: Vector2) -> void:
@@ -149,29 +155,59 @@ func apply_safe_layout(safe_margins: Vector4, viewport_size: Vector2) -> void:
 	offset_bottom = safe_margins.y + STRIP_BASE_HEIGHT
 
 	var usable_width := maxf(viewport_size.x - safe_margins.x - safe_margins.z, 1.0)
+	var is_compact := usable_width <= GameplayUIThemeScript.HUD_ICON_COMPACT_VIEWPORT_WIDTH
+	# Below the 540px compact reference width, scale every top-row role together. This preserves the
+	# same non-overlapping regions when side cutouts reduce usable width instead of merely assigning
+	# a tiny timer rect that its font minimum immediately overrides.
 	var icon_size := GameplayUIThemeScript.get_hud_icon_size(usable_width)
+	var compact_scale := (
+		icon_size.x / GameplayUIThemeScript.HUD_ICON_COMPACT_SIZE.x if is_compact else 1.0
+	)
+	var side_margin := COMPACT_HUD_SIDE_MARGIN * compact_scale if is_compact else HUD_SIDE_MARGIN
+	var star_gap := COMPACT_STAR_COUNTER_GAP * compact_scale if is_compact else STAR_COUNTER_GAP
+	var star_size := COMPACT_STAR_COUNTER_SIZE * compact_scale if is_compact else STAR_COUNTER_SIZE
+	var level_margin_left := (
+		COMPACT_LEVEL_LABEL_MARGIN_LEFT * compact_scale if is_compact else LEVEL_LABEL_MARGIN_LEFT
+	)
+	var level_size := COMPACT_LEVEL_LABEL_SIZE * compact_scale if is_compact else LEVEL_LABEL_SIZE
+	var timer_width := COMPACT_TIMER_WIDTH * compact_scale if is_compact else REGULAR_TIMER_WIDTH
+	_timer_label.add_theme_font_size_override(
+		"font_size",
+		maxi(roundi(COMPACT_TIMER_FONT_SIZE * compact_scale), 10) if is_compact else REGULAR_TIMER_FONT_SIZE
+	)
+	_level_label.add_theme_font_size_override(
+		"font_size",
+		maxi(roundi(COMPACT_LEVEL_FONT_SIZE * compact_scale), 10) if is_compact else REGULAR_LEVEL_FONT_SIZE
+	)
 
-	var pause_right_x := viewport_size.x - (safe_margins.z + HUD_SIDE_MARGIN)
+	var pause_right_x := viewport_size.x - (safe_margins.z + side_margin)
 	var pause_left_x := pause_right_x - icon_size.x
 	var pause_top_y := safe_margins.y + HUD_TOP_MARGIN
 	_layout_absolute(_pause_button, pause_left_x, pause_top_y, pause_right_x, pause_top_y + icon_size.y)
 	_layout_pause_bars(icon_size)
 
-	var star_right_x := pause_left_x - STAR_COUNTER_GAP
-	var star_left_x := star_right_x - STAR_COUNTER_SIZE.x
-	var star_top_y := pause_top_y + (icon_size.y - STAR_COUNTER_SIZE.y) * 0.5
-	_layout_absolute(_star_counter, star_left_x, star_top_y, star_right_x, star_top_y + STAR_COUNTER_SIZE.y)
+	var star_right_x := pause_left_x - star_gap
+	var star_left_x := star_right_x - star_size.x
+	var star_top_y := pause_top_y + (icon_size.y - star_size.y) * 0.5
+	_layout_absolute(_star_counter, star_left_x, star_top_y, star_right_x, star_top_y + star_size.y)
+	_layout_star_counter_children(star_size, compact_scale if is_compact else 1.0)
 
-	var level_left_x := safe_margins.x + LEVEL_LABEL_MARGIN_LEFT
+	var level_left_x := safe_margins.x + level_margin_left
 	var level_top_y := safe_margins.y + LEVEL_LABEL_TOP
-	_layout_absolute(_level_label, level_left_x, level_top_y, level_left_x + LEVEL_LABEL_SIZE.x, level_top_y + LEVEL_LABEL_SIZE.y)
+	_layout_absolute(_level_label, level_left_x, level_top_y, level_left_x + level_size.x, level_top_y + level_size.y)
 
-	# Keep the timer centered on the viewport, but only as wide as the tighter of the two side
-	# exclusion zones allows, so it can never overlap the level label or the star/pause cluster.
+	# The compact side roles above reserve a real, font-sized center region. Giving the timer a known
+	# width prevents Label minimum-size resolution from expanding a nominal 1-2px allocation into
+	# the star pill after the layout pass.
 	var timer_top_y := safe_margins.y + HUD_TOP_MARGIN
 	var timer_center_x := viewport_size.x * 0.5
-	var half_width := maxf(minf(timer_center_x - (level_left_x + LEVEL_LABEL_SIZE.x + HUD_SIDE_MARGIN), (star_left_x - HUD_SIDE_MARGIN) - timer_center_x), 1.0)
-	_layout_absolute(_timer_label, timer_center_x - half_width, timer_top_y, timer_center_x + half_width, timer_top_y + TIMER_LABEL_HEIGHT)
+	_layout_absolute(
+		_timer_label,
+		timer_center_x - timer_width * 0.5,
+		timer_top_y,
+		timer_center_x + timer_width * 0.5,
+		timer_top_y + TIMER_LABEL_HEIGHT * compact_scale
+	)
 
 	_hud_center_slot.anchor_left = 0.5
 	_hud_center_slot.anchor_right = 0.5
@@ -180,6 +216,38 @@ func apply_safe_layout(safe_margins: Vector4, viewport_size: Vector2) -> void:
 	_hud_center_slot.offset_right = COMBO_SLOT_SIZE.x * 0.5
 	_hud_center_slot.offset_top = safe_margins.y + COMBO_SLOT_TOP
 	_hud_center_slot.offset_bottom = safe_margins.y + COMBO_SLOT_TOP + COMBO_SLOT_SIZE.y
+
+
+func _layout_star_counter_children(star_size: Vector2, layout_scale: float) -> void:
+	var icon_margin := 8.0 * layout_scale
+	var icon_size := minf(34.0 * layout_scale, star_size.y - icon_margin * 2.0)
+	var label_left := icon_margin + icon_size + 2.0 * layout_scale
+	var label_right_margin := 8.0 * layout_scale
+	_layout_absolute(
+		_star_icon,
+		icon_margin,
+		(star_size.y - icon_size) * 0.5,
+		icon_margin + icon_size,
+		(star_size.y + icon_size) * 0.5
+	)
+	_layout_absolute(_star_count_label, label_left, 0.0, star_size.x - label_right_margin, star_size.y)
+	_fit_star_count_font()
+
+
+func _fit_star_count_font() -> void:
+	if _star_count_label == null:
+		return
+	var available_width := _star_count_label.offset_right - _star_count_label.offset_left - 4.0
+	var maximum_size := 26
+	_star_count_label.add_theme_font_size_override(
+		"font_size",
+		GameplayUIThemeScript.fit_label_font_size(
+			_star_count_label,
+			available_width,
+			maximum_size,
+			10
+		)
+	)
 
 
 func _layout_pause_bars(icon_size: Vector2) -> void:

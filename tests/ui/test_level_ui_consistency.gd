@@ -44,6 +44,7 @@ func _run() -> void:
 	await _test_rewarded_ad_placeholder()
 	await _test_completion_and_failure_routing()
 	await _test_ui_cancel_chain()
+	await _test_modal_transition_interruption()
 	await _test_safe_area_layout()
 	await _test_ability_bar_responsive_bounds()
 	await _test_long_value_formatting()
@@ -128,11 +129,14 @@ func _test_shared_resource_identity() -> void:
 	)
 	purchase2.queue_free()
 
-	var completion_shade_panel := level.get("_completion_screen").find_child("ResultShade", true, false) as Panel
+	var completion_screen = level.get("_completion_screen")
+	var completion_shade_panel := completion_screen.find_child("ResultShade", true, false) as Panel
+	var completion_button := completion_screen.find_child("NextButton", true, false) as Button
 	# Read the shared StyleBox resource itself (not the node) before freeing -- the resource is an
 	# independent external object and stays valid after its consuming node is gone, but the node
 	# reference itself would dangle.
 	var completion_shade_style := completion_shade_panel.get_theme_stylebox("panel")
+	var completion_action_style := completion_button.get_theme_stylebox("normal")
 	level.free()
 
 	var failure_level := await _make_level()
@@ -140,6 +144,11 @@ func _test_shared_resource_identity() -> void:
 	_check(
 		completion_shade_style == failure_shade_panel.get_theme_stylebox("panel"),
 		"Completion and Failure should share one terminal-result shade StyleBox instance."
+	)
+	var failure_button := failure_level.get("_failure_screen").find_child("MainMenuButton", true, false) as Button
+	_check(
+		completion_action_style == failure_button.get_theme_stylebox("normal"),
+		"Completion and Failure should consume the same positive-action StyleBox instance."
 	)
 	failure_level.free()
 
@@ -176,6 +185,12 @@ func _test_focus_and_cursor_policy() -> void:
 		pause_button.mouse_default_cursor_shape == Control.CURSOR_POINTING_HAND,
 		"Pause button should use the pointing-hand cursor."
 	)
+	top_hud.call("set_pause_enabled", false)
+	_check(
+		pause_button.mouse_default_cursor_shape == Control.CURSOR_ARROW,
+		"A disabled Pause button should restore the arrow cursor."
+	)
+	top_hud.call("set_pause_enabled", true)
 
 	for button_name in ["HammerButton", "ShuffleButton", "HighlightButton", "FreezerButton"]:
 		var button := ability_bar.find_child(button_name, true, false) as Button
@@ -184,6 +199,15 @@ func _test_focus_and_cursor_policy() -> void:
 			button.mouse_default_cursor_shape == Control.CURSOR_POINTING_HAND,
 			"%s should use the pointing-hand cursor." % button_name
 		)
+
+	ability_bar.call("set_interaction_blocked", true, false)
+	for button_name in ["HammerButton", "ShuffleButton", "HighlightButton", "FreezerButton"]:
+		var disabled_button := ability_bar.find_child(button_name, true, false) as Button
+		_check(
+			disabled_button.mouse_default_cursor_shape == Control.CURSOR_ARROW,
+			"A disabled %s should restore the arrow cursor." % button_name
+		)
+	ability_bar.call("set_interaction_blocked", false, false)
 
 	var close_button := pause_overlay.find_child("CloseButton", true, false) as Button
 	_check(close_button.focus_mode == Control.FOCUS_NONE, "Modal close button should be FOCUS_NONE.")
@@ -322,6 +346,42 @@ func _test_ui_cancel_chain() -> void:
 	)
 
 
+## Visible modal controls must be inert during an open/close fade, and a stale owner close must not
+## hide a root that has been reopened before that close's timer finishes.
+func _test_modal_transition_interruption() -> void:
+	var level := await _make_level()
+	var pause_overlay = level.get("_pause_menu_overlay")
+	var leave_overlay = level.get("_leave_confirmation_overlay")
+
+	level.call("_open_pause_menu")
+	await _wait_seconds(0.3)
+	level.call("_on_pause_menu_leave_pressed")
+	await _wait_seconds(0.05)
+	level.call("_on_leave_confirmation_close_pressed")
+	await _wait_seconds(0.3)
+	_check(
+		leave_overlay.visible and not pause_overlay.visible and bool(level.get("_level_paused")),
+		"A close tap during Leave Confirmation's opening fade should be dropped without losing the modal."
+	)
+
+	level.call("_on_leave_confirmation_close_pressed")
+	await _wait_seconds(0.3)
+	_check(
+		pause_overlay.visible and not leave_overlay.visible and bool(level.get("_level_paused")),
+		"Closing a stable Leave Confirmation should return to a visible Pause overlay."
+	)
+
+	pause_overlay.close()
+	await _wait_seconds(0.05)
+	pause_overlay.open()
+	await _wait_seconds(0.3)
+	_check(
+		pause_overlay.visible and pause_overlay.find_child("Shell", true, false).visible,
+		"A superseded Pause close coroutine must not hide the freshly reopened owner root."
+	)
+	level.free()
+
+
 ## Safe-area insets (top/side/bottom) must keep the HUD strip, timer/level/star/pause cluster, and
 ## modal outer panel within bounds instead of sliding under a notch or overflowing a tight viewport.
 func _test_safe_area_layout() -> void:
@@ -330,7 +390,7 @@ func _test_safe_area_layout() -> void:
 	var pause_overlay = level.get("_pause_menu_overlay")
 
 	var safe_margins := Vector4(60.0, 90.0, 60.0, 70.0)
-	var viewport_size := Vector2(1080.0, 2400.0)
+	var viewport_size := Vector2(720.0, 1280.0)
 	top_hud.call("apply_safe_layout", safe_margins, viewport_size)
 	await process_frame
 
@@ -350,11 +410,11 @@ func _test_safe_area_layout() -> void:
 	var level_label := top_hud.find_child("LevelLabel", true, false) as Control
 	var star_counter := top_hud.find_child("StarCounter", true, false) as Control
 	_check(
-		timer_label.offset_left + 0.5 >= level_label.offset_right,
+		timer_label.get_rect().position.x + 0.5 >= level_label.get_rect().end.x,
 		"Timer should stay clear of the level label (left exclusion zone)."
 	)
 	_check(
-		timer_label.offset_right <= star_counter.offset_left + 0.5,
+		timer_label.get_rect().end.x <= star_counter.get_rect().position.x + 0.5,
 		"Timer should stay clear of the star/pause cluster (right exclusion zone)."
 	)
 
@@ -364,16 +424,30 @@ func _test_safe_area_layout() -> void:
 	pause_overlay.call("apply_safe_layout", tight_margins, tight_viewport)
 	await process_frame
 	var outer_panel := pause_overlay.find_child("OuterPanel", true, false) as Control
-	var fitted_width := outer_panel.offset_right - outer_panel.offset_left
-	var fitted_height := outer_panel.offset_bottom - outer_panel.offset_top
+	var fitted_width := outer_panel.size.x * outer_panel.scale.x
+	var fitted_height := outer_panel.size.y * outer_panel.scale.y
 	_check(
-		fitted_width <= tight_viewport.x - tight_margins.x - tight_margins.z + 1.0,
+		fitted_width <= tight_viewport.x - tight_margins.x - tight_margins.z - 39.0,
 		"Modal outer panel width must fit within the safe content rect at a tight viewport."
 	)
 	_check(
-		fitted_height <= tight_viewport.y - tight_margins.y - tight_margins.w + 1.0,
+		fitted_height <= tight_viewport.y - tight_margins.y - tight_margins.w - 39.0,
 		"Modal outer panel height must fit within the safe content rect at a tight viewport."
 	)
+	var safe_rect := Rect2(
+		Vector2(tight_margins.x, tight_margins.y),
+		Vector2(
+			tight_viewport.x - tight_margins.x - tight_margins.z,
+			tight_viewport.y - tight_margins.y - tight_margins.w
+		)
+	)
+	for button_name in ["LeaveButton", "ContinueButton", "CloseButton"]:
+		var modal_button := pause_overlay.find_child(button_name, true, false) as Control
+		var button_rect := modal_button.get_global_rect()
+		_check(
+			safe_rect.encloses(button_rect),
+			"%s must stay inside the modal's safe rect after fitting." % button_name
+		)
 
 	level.free()
 
@@ -383,6 +457,7 @@ func _test_safe_area_layout() -> void:
 ## 82px compact button.
 func _test_ability_bar_responsive_bounds() -> void:
 	var level := await _make_level()
+	var top_hud = level.get("_top_hud")
 	var ability_bar = level.get("_ability_bar")
 	var hammer_button := ability_bar.find_child("HammerButton", true, false) as Control
 	var hammer_icon := hammer_button.find_child("Icon", true, false) as Control
@@ -394,12 +469,22 @@ func _test_ability_bar_responsive_bounds() -> void:
 	var regular_badge_right: float = hammer_badge.offset_right
 
 	ability_bar.call("apply_responsive_layout", 400.0)
+	top_hud.call(
+		"apply_safe_layout",
+		Vector4(70.0, 0.0, 70.0, 0.0),
+		Vector2(540.0, 960.0)
+	)
 	await process_frame
 	var compact_size: Vector2 = hammer_button.custom_minimum_size
 	var compact_icon_right: float = hammer_icon.offset_right
 	var compact_badge_right: float = hammer_badge.offset_right
 
 	_check(compact_size.x < regular_size.x, "Compact ability button should be smaller than regular.")
+	var pause_button := top_hud.find_child("PauseButton", true, false) as Control
+	_check(
+		pause_button.size.is_equal_approx(compact_size),
+		"Pause and ability buttons should share the same safe-inset-scaled compact size."
+	)
 	_check(
 		compact_icon_right <= compact_size.x + 0.5,
 		"Compact icon must stay within the compact button bounds, not overflow it."
@@ -438,9 +523,18 @@ func _test_long_value_formatting() -> void:
 		"Star count label should shrink its font for a large total instead of overflowing the pill."
 	)
 
-	ability_bar.call("set_uses", {"hammer": 999, "shuffle": 3, "highlight": 3, "freezer": 3})
+	ability_bar.call("apply_responsive_layout", 400.0)
+	ability_bar.call("set_uses", {"hammer": 123456, "shuffle": 3, "highlight": 3, "freezer": 3})
 	var hammer_uses := ability_bar.find_child("HammerButton", true, false).find_child("UsesLabel", true, false) as Label
-	_check(hammer_uses.text == "999", "A large ability-use count should display in full.")
+	_check(hammer_uses.text == "123456", "A long ability-use count should display in full.")
+	_check(
+		_get_rendered_text_width(hammer_uses) <= hammer_uses.size.x - 3.5,
+		"A long ability-use count should shrink to fit the compact badge's rendered bounds."
+	)
+	_check(
+		_get_rendered_text_width(star_label) <= star_label.size.x - 3.5,
+		"A large star total should fit the rendered star-pill label bounds."
+	)
 
 	ability_bar.call("set_active_seconds", &"highlight", 15.0)
 	var highlight_timer := ability_bar.find_child("HighlightButton", true, false).find_child("TimerLabel", true, false) as Label
@@ -530,6 +624,15 @@ func _make_ui_cancel_event() -> InputEventAction:
 	event.action = &"ui_cancel"
 	event.pressed = true
 	return event
+
+
+func _get_rendered_text_width(label: Label) -> float:
+	return label.get_theme_font("font").get_string_size(
+		label.text,
+		HORIZONTAL_ALIGNMENT_LEFT,
+		-1,
+		label.get_theme_font_size("font_size")
+	).x
 
 
 func _check(condition: bool, message: String) -> void:
