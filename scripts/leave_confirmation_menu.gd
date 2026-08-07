@@ -17,6 +17,7 @@ signal leave_pressed
 signal continue_pressed
 
 const GameplayUIThemeScript := preload("res://scripts/gameplay_ui_theme.gd")
+const CONTENT_REGION_HEIGHT := 240.0
 
 @onready var _shell := %Shell as GameplayModalShell
 @onready var _loss_content := %LossContent as Control
@@ -27,7 +28,11 @@ const GameplayUIThemeScript := preload("res://scripts/gameplay_ui_theme.gd")
 
 func _ready() -> void:
 	_shell.configure("LEAVING THE LEVEL", true)
-	_shell.set_preferred_size(Vector2(GameplayUIThemeScript.MODAL_MAX_WIDTH, 560.0))
+	_shell.set_preferred_size(Vector2(
+		GameplayUIThemeScript.MODAL_MAX_WIDTH,
+		GameplayUIThemeScript.MODAL_COMPACT_HEIGHT
+	))
+	_shell.set_content_region_height(CONTENT_REGION_HEIGHT)
 	_shell.close_requested.connect(func() -> void: close_requested.emit())
 	_loss_content.reparent(_shell.get_content_region(), false)
 	_confirm_leave_button.reparent(_shell.get_action_row(), false)

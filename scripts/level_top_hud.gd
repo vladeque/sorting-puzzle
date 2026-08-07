@@ -40,6 +40,9 @@ const STAR_COUNTER_GAP := 12.0
 const COMBO_SLOT_SIZE := Vector2(170.0, 29.0)
 const COMBO_SLOT_TOP := 92.0
 const COMBO_FILL_INSET := 3.0
+## Matches MainMenuTopStatus/SettingsWidget at supported widths. On exceptionally narrow usable
+## widths it follows the row's existing compact scale so safe-area fitting still wins.
+const PAUSE_BUTTON_SIZE := Vector2(72.0, 64.0)
 const PAUSE_BAR_WIDTH_RATIO := 0.12
 const PAUSE_BAR_HEIGHT_RATIO := 0.42
 const PAUSE_BAR_GAP_RATIO := 0.10
@@ -181,15 +184,15 @@ func apply_safe_layout(safe_margins: Vector4, viewport_size: Vector2) -> void:
 		maxi(roundi(COMPACT_LEVEL_FONT_SIZE * compact_scale), 10) if is_compact else REGULAR_LEVEL_FONT_SIZE
 	)
 
+	var pause_size := PAUSE_BUTTON_SIZE * (compact_scale if is_compact else 1.0)
 	var pause_right_x := viewport_size.x - (safe_margins.z + side_margin)
-	var pause_left_x := pause_right_x - icon_size.x
-	# Keep every status control on the authored y=60 row center. Pause used to be 64px tall at
-	# y=28; anchoring the shared 96px role to that old top edge pushed its center (and the star pill
-	# centered from it) down to y=76 while Level/Timer remained centered around y=60.
+	var pause_left_x := pause_right_x - pause_size.x
+	# Keep every status control on the authored y=60 row center even though Pause intentionally uses
+	# the smaller warm Main Menu settings-button role instead of the larger circular ability role.
 	var row_center_y := safe_margins.y + HUD_ROW_CENTER_Y
-	var pause_top_y := row_center_y - icon_size.y * 0.5
-	_layout_absolute(_pause_button, pause_left_x, pause_top_y, pause_right_x, pause_top_y + icon_size.y)
-	_layout_pause_bars(icon_size)
+	var pause_top_y := row_center_y - pause_size.y * 0.5
+	_layout_absolute(_pause_button, pause_left_x, pause_top_y, pause_right_x, pause_top_y + pause_size.y)
+	_layout_pause_bars(pause_size)
 
 	var star_right_x := pause_left_x - star_gap
 	var star_left_x := star_right_x - star_size.x

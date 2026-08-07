@@ -19,6 +19,7 @@ signal closed
 
 const UIMotionScript := preload("res://scripts/ui_motion.gd")
 const GameplayUIThemeScript := preload("res://scripts/gameplay_ui_theme.gd")
+const CONTENT_REGION_TOP := 116.0
 
 @onready var _outer_panel := %OuterPanel as Control
 @onready var _title_label := %TitleLabel as Label
@@ -26,7 +27,10 @@ const GameplayUIThemeScript := preload("res://scripts/gameplay_ui_theme.gd")
 @onready var _content_region := %ContentRegion as Control
 @onready var _action_row := %ActionRow as Control
 
-var _preferred_size := Vector2(GameplayUIThemeScript.MODAL_MAX_WIDTH, 500.0)
+var _preferred_size := Vector2(
+	GameplayUIThemeScript.MODAL_MAX_WIDTH,
+	GameplayUIThemeScript.MODAL_COMPACT_HEIGHT
+)
 var _is_transitioning := false
 
 
@@ -46,6 +50,16 @@ func configure(title: String, is_long_title: bool = false) -> void:
 ## Sets the panel's preferred (unclamped) size; apply_safe_layout() fits it within safe bounds.
 func set_preferred_size(size: Vector2) -> void:
 	_preferred_size = size
+
+
+## Gives each modal a compact authored content height without stretching the cream panel when an
+## owner needs a different outer-panel height. The whole shell is still uniformly safe-area scaled.
+func set_content_region_height(height: float) -> void:
+	_content_region.anchor_top = 0.0
+	_content_region.anchor_bottom = 0.0
+	_content_region.offset_top = CONTENT_REGION_TOP
+	_content_region.offset_bottom = CONTENT_REGION_TOP + maxf(height, 1.0)
+	_content_region.grow_vertical = Control.GROW_DIRECTION_END
 
 
 func get_content_region() -> Control:

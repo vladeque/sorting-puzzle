@@ -10,23 +10,22 @@ extends RefCounted
 ## this script and call its static consts/funcs by the preloaded constant, matching the project
 ## convention, rather than relying on the bare global class name.
 ##
-## The level intentionally keeps its own denser, higher-contrast palette rather than reusing the
-## menu system's resources (see docs/SCENES.md "Shared UI Style Tokens"), so these roles are
-## separate from -- not merged into -- scripts/destination_screen_layout.gd.
+## Most level UI keeps its own denser, higher-contrast palette. Pause is the deliberate exception:
+## it mirrors the Main Menu settings-button role because both controls open settings/navigation UI.
 
-## Compact/regular size variants shared by the Pause button and all four ability buttons (the "one
-## gameplay HUD icon-button role" the ticket asks for). Ability bar compact/regular were already
-## these sizes; Pause now matches instead of keeping its own bespoke 64px size.
+## Compact/regular size variants for the four ability buttons. The top HUD also uses their compact
+## scale factor to keep its independently-sized Pause/settings control inside extreme side insets.
 const HUD_ICON_COMPACT_SIZE := Vector2(82.0, 82.0)
 const HUD_ICON_REGULAR_SIZE := Vector2(96.0, 96.0)
 const HUD_ICON_COMPACT_REFERENCE_WIDTH := 540.0
 ## Usable-width breakpoint below which HUD icon buttons (and the ability bar) switch to compact.
-## Matches the ability bar's pre-existing threshold so Pause and abilities always agree.
+## Matches the ability bar's pre-existing threshold.
 const HUD_ICON_COMPACT_VIEWPORT_WIDTH := 620.0
 
 ## Gameplay modal shell geometry: a preferred/maximum outer-panel width, and the minimum gap kept
 ## clear beyond safe-area insets on every edge at every supported viewport.
 const MODAL_MAX_WIDTH := 520.0
+const MODAL_COMPACT_HEIGHT := 500.0
 const MODAL_MIN_EDGE_GAP := 20.0
 const CLOSE_BUTTON_SIZE := Vector2(72.0, 72.0)
 
@@ -48,7 +47,7 @@ const CTA_HELD_SCALE := 0.94
 const ICON_HELD_SCALE := 0.97
 
 
-## Returns the HUD icon-button size (Pause or an ability button) for the given *usable* width --
+## Returns the ability icon-button size for the given *usable* width --
 ## callers should already have subtracted safe-area side insets, matching
 ## AbilityBar.apply_responsive_layout()'s contract.
 static func get_hud_icon_size(usable_width: float) -> Vector2:

@@ -19,6 +19,7 @@ var _level_scene: PackedScene
 var _pause_menu_scene: PackedScene
 var _leave_confirmation_scene: PackedScene
 var _ability_purchase_scene: PackedScene
+var _main_menu_top_status_scene: PackedScene
 
 
 func _init() -> void:
@@ -37,6 +38,7 @@ func _run() -> void:
 	_pause_menu_scene = load("res://scenes/pause_menu.tscn") as PackedScene
 	_leave_confirmation_scene = load("res://scenes/leave_confirmation_menu.tscn") as PackedScene
 	_ability_purchase_scene = load("res://scenes/ability_purchase_menu.tscn") as PackedScene
+	_main_menu_top_status_scene = load("res://scenes/ui/main_menu_top_status.tscn") as PackedScene
 
 	await _test_shared_resource_identity()
 	await _test_explicit_disabled_styles()
@@ -98,36 +100,60 @@ func _test_shared_resource_identity() -> void:
 		pause_shade.get_theme_stylebox("panel") == leave_shade.get_theme_stylebox("panel"),
 		"Pause/Leave Confirmation should share one modal-shade StyleBox instance."
 	)
+	var pause_content := pause.find_child("ContentRegion", true, false) as Control
+	var leave_content := leave.find_child("ContentRegion", true, false) as Control
+	var purchase_content := purchase.find_child("ContentRegion", true, false) as Control
+	_check(
+		pause_outer.size.is_equal_approx(Vector2(520.0, 500.0))
+			and leave_outer.size.is_equal_approx(pause_outer.size)
+			and purchase_outer.size.is_equal_approx(pause_outer.size),
+		"All gameplay modals should use the same compact 520x500 outer-panel size."
+	)
+	_check(
+		is_equal_approx(pause_content.size.y, 224.0)
+			and is_equal_approx(leave_content.size.y, 240.0)
+			and is_equal_approx(purchase_content.size.y, 224.0),
+		"Gameplay modal cream panels should use compact content-specific heights, not stretch with the shell."
+	)
+	_check(
+		purchase.find_child("UseNowLabel", true, false) == null,
+		"Ability Purchase should not show the redundant USE NOW badge."
+	)
 
 	pause.queue_free()
 	leave.queue_free()
 	purchase.queue_free()
 	await process_frame
 
+	var main_menu_top_status := _main_menu_top_status_scene.instantiate()
+	root.add_child(main_menu_top_status)
+	await process_frame
+	var settings_button := main_menu_top_status.find_child("SettingsButton", true, false) as Button
+
 	var level := await _make_level()
 	var top_hud = level.get("_top_hud")
-	var ability_bar = level.get("_ability_bar")
 	var pause_button := top_hud.find_child("PauseButton", true, false) as Button
-	var hammer_button := ability_bar.find_child("HammerButton", true, false) as Button
 	_check(
-		pause_button.get_theme_stylebox("normal") == hammer_button.get_theme_stylebox("normal"),
-		"The Pause button and ability buttons should share one HUD icon-button StyleBox instance."
+		pause_button.get_theme_stylebox("normal") == settings_button.get_theme_stylebox("normal")
+			and pause_button.get_theme_stylebox("pressed") == settings_button.get_theme_stylebox("pressed")
+			and pause_button.get_theme_stylebox("hover") == settings_button.get_theme_stylebox("hover"),
+		"The Pause button should consume the Main Menu settings button's warm style resources."
 	)
 	_check(
-		pause_button.get_theme_stylebox("disabled") == hammer_button.get_theme_stylebox("disabled"),
-		"The Pause button and ability buttons should share one disabled HUD icon-button StyleBox instance."
+		pause_button.get_theme_stylebox("disabled") == settings_button.get_theme_stylebox("normal"),
+		"Disabled Pause should retain the warm settings-button shape instead of falling back to a default."
 	)
-
-	var hammer_badge := hammer_button.find_child("UsesLabel", true, false) as Label
-	var purchase2 := _ability_purchase_scene.instantiate()
-	root.add_child(purchase2)
-	await process_frame
-	var use_now_label := purchase2.find_child("UseNowLabel", true, false) as Label
 	_check(
-		hammer_badge.get_theme_stylebox("normal") == use_now_label.get_parent().get_theme_stylebox("panel"),
-		"The ability-bar count badge and the purchase menu's USE NOW badge should share one StyleBox instance."
+		pause_button.size.is_equal_approx(Vector2(72.0, 64.0)),
+		"The Pause button should match the Main Menu settings button's 72x64 size."
 	)
-	purchase2.queue_free()
+	var pause_bar := pause_button.find_child("PauseBar1", true, false) as ColorRect
+	_check(
+		is_equal_approx(float(pause_button.get("held_scale")), float(settings_button.get("held_scale")))
+			and pause_bar.color == settings_button.get_theme_color("font_color"),
+		"Pause should match the Main Menu settings button's held behavior and dark glyph color."
+	)
+	main_menu_top_status.queue_free()
 
 	var completion_screen = level.get("_completion_screen")
 	var completion_shade_panel := completion_screen.find_child("ResultShade", true, false) as Panel
@@ -500,9 +526,10 @@ func _test_ability_bar_responsive_bounds() -> void:
 
 	_check(compact_size.x < regular_size.x, "Compact ability button should be smaller than regular.")
 	var pause_button := top_hud.find_child("PauseButton", true, false) as Control
+	var expected_pause_size := Vector2(72.0, 64.0) * (400.0 / 540.0)
 	_check(
-		pause_button.size.is_equal_approx(compact_size),
-		"Pause and ability buttons should share the same safe-inset-scaled compact size."
+		pause_button.size.is_equal_approx(expected_pause_size),
+		"Pause should preserve its smaller settings-button proportions when safe-inset scaled."
 	)
 	_check(
 		compact_icon_right <= compact_size.x + 0.5,

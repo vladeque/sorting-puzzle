@@ -369,12 +369,14 @@ Files:
 - `assets/themes/style_box_gameplay_*.tres`
 
 Responsibility:
-- UI-003's gameplay-scope equivalent of "Shared Destination-Screen UI" above, kept separate because
-  the level intentionally keeps its own denser, higher-contrast palette rather than the menu
-  system's brighter one (see `docs/UI_003_LEVEL_UI_CONSISTENCY_TICKET.md`'s Objective).
+- UI-003's gameplay-scope equivalent of "Shared Destination-Screen UI" above. Most level controls
+  keep the denser gameplay palette; Pause deliberately reuses the warm Main Menu settings-button
+  role because both controls open settings/navigation UI.
 - `gameplay_modal_shell.tscn` owns the shared shade, safe-area-fitted outer panel, regular/long
   title role, true-circular close action, cream content region, and action row for Pause, Leave
   Confirmation, and Ability Purchase -- each composes it and keeps only its own content and signals.
+  All three use a 520x500 authored shell; owners set compact cream-panel heights (224px Pause/
+  Purchase, 240px Leave Confirmation) before safe-area scaling.
 - `gameplay_result_shell.tscn` owns the shared terminal shade, hero title role, action placement,
   and safe-area layout for Completion and Failure -- each keeps its own state-specific content
   (star/earned-count, body copy) without merging it into the shell.
@@ -382,7 +384,7 @@ Responsibility:
   and Pause button as one safe-area-aware component (the strip background and combo slot now
   grow/shift with the safe-top inset; the timer stays clear of the level label and star/pause
   cluster at any value length).
-- `gameplay_ui_theme.gd` holds the shared HUD icon compact/regular sizes and breakpoint, modal
+- `gameplay_ui_theme.gd` holds the ability-icon compact/regular sizes and breakpoint, modal
   safe-fit geometry, modal-title regular/long sizes, and the result-hero title role + responsive
   scale -- the gameplay-scope equivalent of `destination_screen_layout.gd`.
 - Every shell exposes `apply_safe_layout(safe_margins, viewport_size)`, `open()`/`close()` (fading
@@ -606,16 +608,16 @@ Files:
 - `assets/abilities/*.png`
 
 Responsibility:
-- Provides hammer, shuffle, highlight, and Freezer buttons, sharing the gameplay HUD icon-button
-  role (compact 82px/regular 96px, an explicit disabled style) with the top HUD's Pause button
-  (UI-003); all four are icon-only with a tooltip, use `press_scale_button.gd` (0.97), and rescale
+- Provides hammer, shuffle, highlight, and Freezer buttons using the circular ability icon-button
+  role (compact 82px/regular 96px, with an explicit disabled style); all four are icon-only with a
+  tooltip, use `press_scale_button.gd` (0.97), and rescale
   their icon/badge children proportionally to the actual button size instead of overflowing a
   compact button.
 - Reads campaign ability uses from `PlayerProgress`, spends campaign uses immediately, and uses temporary three-use counts for isolated dev/test levels.
 - Lets hammer clear matching visible/front items first, or supplement visible/front items with first-back-layer copies of the same type if no visible item type can make a triple.
 - Gathers hammer targets to the center of the screen, spawns a fullscreen hammer strike effect there, swaps through four pseudo-3D hammer angle textures in the scene-authored `AnimationPlayer`, and waits for the `impact` callback before destroying the merged item and dropping combo reward stars.
 - Shows the shuffle delivery box sprite from `assets/abilities/ability_shuffle_box.png` and pauses moving shelf rows while shuffle items fly through the center-screen box.
-- Disables abilities after failure, completion, pause, or active ability animations. A zero-use ability button stays pressable during gameplay so `scenes/ability_purchase_menu.tscn` can offer a paid immediate use, presented as "USE ABILITY"/"USE NOW" (UI-003, not an inventory acquisition) with the canonical clover coin art and a genuine unavailable style (not alpha dimming) when unaffordable.
+- Disables abilities after failure, completion, pause, or active ability animations. A zero-use ability button stays pressable during gameplay so `scenes/ability_purchase_menu.tscn` can offer a paid immediate use, presented as "USE ABILITY" (UI-003, not an inventory acquisition) with the canonical clover coin art and a genuine unavailable style (not alpha dimming) when unaffordable.
 - Loads per-ability paid-use prices from `configs/ability_purchase_prices.json`, spends coins through `PlayerProgress.spend_coins()`, and applies the selected paid ability immediately without adding saved inventory.
 - Starts the highlight timer even when no current shelf state can be highlighted.
 - Uses `ShelfItem` outline state for border-only highlight ability visuals.
@@ -640,11 +642,13 @@ Files:
 - `scripts/level.gd`
 
 Responsibility:
-- `level.tscn` provides the top HUD's shared circular Pause button (`scenes/ui/level_top_hud.tscn`) and instances the pause menu scene.
+- `level.tscn` provides the top HUD's 72x64 warm Pause/settings-role button (`scenes/ui/level_top_hud.tscn`) and instances the pause menu scene.
 - `scenes/pause_menu.tscn`, `scenes/leave_confirmation_menu.tscn`, and `scenes/ability_purchase_menu.tscn` each compose `scenes/ui/gameplay_modal_shell.tscn` for the shared shade, warm outer panel, cream inner content region, title, protruding true-circular red close button, and bottom action row (UI-003) instead of each owning local copies of that styling. Each keeps only its own content and action buttons:
   - Pause: `Pause` title, music / sound-effects / vibration square icon buttons with shadow-only button styling and a scene-authored crossed-out marker, and Leave/Continue actions.
   - Leave Confirmation: `Leaving the Level` title (the long-title role), crossed-out rectangular lost life/star slots, and red Leave / green Continue actions. Close/system-back returns to Pause; the explicit Continue action resumes gameplay directly -- these used to collapse into the same outcome.
-  - Ability Purchase: `Use Ability` title, selected ability icon, a `Use Now` badge (not a `×1` inventory count -- this purchase applies one ability immediately), a coin-price button using the canonical clover coin art, and the rewarded-ad placeholder hidden in production (visible-but-disabled with `Coming Soon` copy in a debug build only).
+  - Ability Purchase: `Use Ability` title, selected ability icon without a redundant secondary badge, a coin-price button using the canonical clover coin art, and the rewarded-ad placeholder hidden in production (visible-but-disabled with `Coming Soon` copy in a debug build only).
+- All three modal owners use the same 520x500 outer shell and compact content-specific cream-panel
+  heights, preventing taller inner panels from returning when one modal's content changes.
 - `scripts/press_scale_button.gd` provides the default held-press shrink behavior for every gameplay action, including the pause/settings icon buttons, all four ability buttons, every modal's close button, and the red/green bottom image buttons -- several of these had no press feedback at all before UI-003.
 - `scripts/pause_menu.gd` toggles crossed-out visuals on the three settings icon buttons (located by name, working for both this scene's shell-composed layout and the Main Menu settings popup's own unrelated layout), keeps their saved disabled states synchronized between the main-menu settings popup and in-level pause menu, and emits setting state changes.
 - `scripts/level.gd` opens and closes the menu, pauses the timer and gameplay input, and implements the `ui_cancel` back stack (Leave Confirmation returns to Pause; Ability Purchase restores the state it opened from; Pause resumes) by listening to each overlay's `leave_pressed`/`continue_pressed`/`close_requested` signals instead of reaching into their buttons by child path. Also writes the current run star count into the leave confirmation, initializes gameplay sound effects from the shared setting, and mutes them when the sound-effects button is crossed out.
@@ -765,10 +769,11 @@ Change shared button/panel/scrollbar styling:
   changes; it is the project's global `theme/custom`, so this affects every `ScrollContainer`.
 - Keep the 16/20/24 px corner-radius roles (buttons/rows/large panels) and the green-positive
   vs. orange-utility vs. neutral-disabled action-color roles consistent with `docs/SCENES.md`.
-- Gameplay-scoped roles (Pause/ability HUD icon buttons, gameplay modal shell, terminal result
-  shell, badges, the star pill) live in `assets/themes/style_box_gameplay_*.tres` -- see
-  `docs/SCENES.md` "Shared Gameplay UI Roles" and "Shared Gameplay UI" above. Edit those instead of
-  a scene-local copy, and keep the 16/20/24 geometry roles consistent there too (true-circular
+- Gameplay-scoped roles (ability HUD icon buttons, gameplay modal shell, terminal result shell,
+  badges, and the star pill) live in `assets/themes/style_box_gameplay_*.tres`; the warm Pause/
+  settings role lives in `style_box_warm_icon_{normal,pressed}.tres`. See `docs/SCENES.md` "Shared
+  Gameplay UI Roles" and "Shared Gameplay UI" above. Edit those instead of a scene-local copy, and
+  keep the 16/20/24 geometry roles consistent there too (true-circular
   controls use a deliberately oversized `corner_radius`, which Godot clamps to a true circle at any
   size, rather than a size-specific exact value).
 

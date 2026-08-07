@@ -5,7 +5,7 @@ class_name AbilityPurchaseMenu
 ## remaining uses. Composes scenes/ui/gameplay_modal_shell.tscn for shade, outer panel, title,
 ## close button, content region, and action row (UI-003; see docs/SCENES.md "Shared Gameplay UI
 ## Roles"). Buying applies one ability immediately -- it is not an inventory purchase, hence "USE
-## ABILITY"/"USE NOW" rather than "GET MORE ITEMS"/"×1" (see
+## ABILITY" rather than "GET MORE ITEMS"/"×1" (see
 ## docs/UI_003_LEVEL_UI_CONSISTENCY_TICKET.md). scripts/level.gd only calls set_offer()/open()/
 ## close() and listens for close_pressed/buy_pressed/ad_pressed.
 
@@ -16,6 +16,7 @@ signal ad_pressed
 const GameplayUIThemeScript := preload("res://scripts/gameplay_ui_theme.gd")
 const AFFORDABLE_BUY_STYLE := preload("res://assets/themes/style_box_green_primary_button.tres")
 const UNAFFORDABLE_BUY_STYLE := preload("res://assets/themes/style_box_disabled_action_button.tres")
+const CONTENT_REGION_HEIGHT := 224.0
 
 @onready var _shell := %Shell as GameplayModalShell
 @onready var _purchase_content := %PurchaseContent as Control
@@ -27,7 +28,11 @@ const UNAFFORDABLE_BUY_STYLE := preload("res://assets/themes/style_box_disabled_
 
 func _ready() -> void:
 	_shell.configure("USE ABILITY")
-	_shell.set_preferred_size(Vector2(GameplayUIThemeScript.MODAL_MAX_WIDTH, 560.0))
+	_shell.set_preferred_size(Vector2(
+		GameplayUIThemeScript.MODAL_MAX_WIDTH,
+		GameplayUIThemeScript.MODAL_COMPACT_HEIGHT
+	))
+	_shell.set_content_region_height(CONTENT_REGION_HEIGHT)
 	_shell.close_requested.connect(func() -> void: close_pressed.emit())
 	_purchase_content.reparent(_shell.get_content_region(), false)
 	_buy_button.reparent(_shell.get_action_row(), false)

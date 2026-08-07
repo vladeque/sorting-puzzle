@@ -822,10 +822,9 @@ Exports:
 - `held_scale`: visual scale multiplier while the pointer or touch is held down, defaulting to
   `0.94` (the primary/secondary CTA and Retry/dialog-dismiss role). Compact tabs, bottom
   navigation, icon buttons, and clickable cells set `0.97` explicitly in their scene. The gameplay
-  scope (UI-003) follows the same two roles: `0.94` for CTAs (Leave/Continue/Buy/WatchAd/completion
-  and failure actions), `0.97` for icon/close buttons (Pause, the four ability buttons, and every
-  gameplay modal's close action) -- this ticket's own text calls out close buttons as the icon role
-  rather than the menu system's 0.94 dialog-dismiss role.
+  scope (UI-003) follows the same two roles: `0.94` for CTAs and the warm Pause/settings control
+  (Leave/Continue/Buy/WatchAd/completion and failure actions), `0.97` for ability and gameplay-modal
+  close icon buttons.
 - `visual_target_path`: optional `NodePath`, relative to the button, of the `Control` to animate
   instead of the button itself. Empty (the default) animates the button's own scale.
 
@@ -1412,7 +1411,7 @@ Purpose:
   countdown badges, button enablement, icon lookup, responsive touch-target sizing, and the
   `ability_pressed(ability_id)` signal.
 - Keeps gameplay preflight, persistence, purchase, and effect execution out of the UI component.
-- All four buttons share the gameplay HUD icon-button role with the top HUD's Pause button
+- All four buttons share the circular ability icon-button role
   (`style_box_gameplay_hud_icon_*.tres`, including an explicit disabled state), use
   `press_scale_button.gd` (0.97 held scale -- these had no press feedback at all before UI-003),
   and carry a `tooltip_text` (Freezer no longer has unique visible button text; all four are
@@ -1427,9 +1426,9 @@ Key methods:
 - `set_active_seconds(ability_id, seconds_remaining)`.
 - `get_icon_texture(ability_id)`.
 - `get_ability_button(ability_id)`.
-- `apply_responsive_layout(usable_width)`: switches between `GameplayUITheme`'s shared compact
-  (82px), safe-inset-scaled compact, and regular (96px) HUD icon sizes, matching the Pause
-  button. Also captures each button's authored (96px) Icon/UsesLabel/TimerLabel rects once at
+- `apply_responsive_layout(usable_width)`: switches between `GameplayUITheme`'s compact (82px),
+  safe-inset-scaled compact, and regular (96px) ability icon sizes. Also captures each button's
+  authored (96px) Icon/UsesLabel/TimerLabel rects once at
   `_ready()` and rescales them proportionally to the actual button size (UI-003) -- previously only
   the parent button resized, so the icon and both badge types stayed at their 96px offsets and
   overflowed the smaller compact button. `scripts/level.gd` passes the safe-inset-adjusted usable
@@ -1566,7 +1565,7 @@ Key responsibilities:
 - Apply paid ability uses through `_can_apply_ability()`, `PlayerProgress.spend_coins()`, and
   `_apply_paid_ability()`: the local spend commits after successful preflight and before the
   gameplay effect starts, without adding saved ability inventory. The purchase menu presents this
-  as "USE ABILITY"/"USE NOW" (UI-003), not an inventory acquisition.
+  as "USE ABILITY" (UI-003), not an inventory acquisition.
 - `_close_ability_purchase_menu(should_resume)`: `should_resume=true` (the close button and
   `ui_cancel`) restores whatever state Ability Purchase was opened from -- re-opens Pause if it was
   opened from Pause, otherwise resumes gameplay (fixed a real bug: this used to leave `_level_paused`
@@ -1806,18 +1805,18 @@ Purpose:
 - The gameplay-scope equivalent of `scripts/destination_screen_layout.gd`: shared geometry/
   typography constants and small pure layout helpers for the in-level HUD, ability bar, gameplay
   modals, and terminal result screens (UI-003; see docs/SCENES.md "Shared Gameplay UI Roles"). The
-  level intentionally keeps its own denser, higher-contrast palette rather than reusing the menu
-  system's resources, so these roles are separate from `destination_screen_layout.gd`. Consumers
+  level generally keeps its own denser, higher-contrast palette; Pause deliberately reuses the
+  warm Main Menu settings-button role because both controls open settings/navigation UI. Consumers
   `preload` this script and call its static consts/funcs by the preloaded constant.
 
 Constants:
 - `HUD_ICON_COMPACT_SIZE` (82x82) / `HUD_ICON_REGULAR_SIZE` (96x96) /
   `HUD_ICON_COMPACT_REFERENCE_WIDTH` (540) /
-  `HUD_ICON_COMPACT_VIEWPORT_WIDTH` (620): the shared circular HUD icon-button role's two sizes and
-  breakpoint, shared by the top HUD's Pause button and the four ability buttons. Below the compact
-  reference width, both consumers scale the compact role proportionally to the safe usable width.
-- `MODAL_MAX_WIDTH` (520) / `MODAL_MIN_EDGE_GAP` (20) / `CLOSE_BUTTON_SIZE` (72x72): gameplay modal
-  shell geometry.
+  `HUD_ICON_COMPACT_VIEWPORT_WIDTH` (620): the circular ability icon-button role's two sizes and
+  breakpoint. The top HUD reuses the same compact scale factor for its independently-sized 72x64
+  Pause/settings control when unusually narrow safe-area insets require scaling.
+- `MODAL_MAX_WIDTH` (520) / `MODAL_COMPACT_HEIGHT` (500) / `MODAL_MIN_EDGE_GAP` (20) /
+  `CLOSE_BUTTON_SIZE` (72x72): gameplay modal shell geometry.
 - `MODAL_TITLE_REGULAR_SIZE` (44) / `MODAL_TITLE_LONG_SIZE` (40): modal-title typography roles
   (regular for short titles like "PAUSE", long for titles needing to fit more text in the same
   width, like "LEAVING THE LEVEL").
@@ -1863,6 +1862,8 @@ Key methods:
 - `configure(title, is_long_title = false)`: sets the title text and selects the regular/long
   modal-title typography role.
 - `set_preferred_size(size)`: the panel's preferred (unclamped) size; `apply_safe_layout()` fits it.
+- `set_content_region_height(height)`: fixes the cream panel to a content-specific authored height
+  rather than stretching it with the outer shell; safe fitting still uniformly scales both.
 - `get_content_region()` / `get_action_row()`: the slots owning scenes reparent their own nodes into.
 - `hide_content_region()`: for modals that only need a title and action row.
 - `is_transitioning()`: true while an `open()`/`close()` fade is in flight -- callers (button
@@ -1928,13 +1929,12 @@ Purpose:
   background). The timer stays centered in a real font-sized center region. At compact widths the
   level, timer, star pill, Pause control, fonts, and gaps scale as one row using safe usable width,
   so Label minimum-size resolution cannot expand the timer into either side after layout. The
-  timer, star pill, and Pause control share the authored 60px row center; growing Pause from its old
-  64px size therefore expands around the row instead of shifting the whole right cluster downward.
-- The Pause button shares the gameplay HUD icon-button role with the four ability buttons (compact
-  82px/regular 96px, an explicit disabled style -- previously a bespoke 64px button with no disabled
-  style, so opening any overlay fell back to Godot's square default). Its `"II"` text is replaced
-  with two scene-authored `ColorRect` bars (`PauseBar1`/`PauseBar2`, not font-glyph-dependent),
-  scaled/repositioned proportionally to the button's actual size.
+  timer, star pill, and Pause control share the authored 60px row center.
+- The Pause button matches the Main Menu settings-button role at 72x64, consuming the same warm
+  normal/pressed resources and 0.94 held scale. Its explicit disabled override preserves that shape
+  while overlays are open. Its `"II"` text is replaced with two dark-brown scene-authored
+  `ColorRect` bars (`PauseBar1`/`PauseBar2`, not font-glyph-dependent), scaled/repositioned
+  proportionally if extreme side insets require compacting the row.
 - Also owns the reward-star flight's landing point and receive pulse, and the Freezer countdown's
   frozen timer-color visual (moved here from `scripts/level.gd` so it does not reach into this
   scene's `TimerLabel` directly).
@@ -1953,9 +1953,9 @@ Key methods:
 - `apply_safe_layout(safe_margins, viewport_size)`.
 
 Depends on:
-- `scripts/gameplay_ui_theme.gd` for the shared HUD icon size/breakpoint.
+- `scripts/gameplay_ui_theme.gd` for responsive row scaling.
 - `assets/themes/style_box_gameplay_status_pill.tres`,
-  `style_box_gameplay_hud_icon_{normal,pressed,hover,disabled}.tres`.
+  `style_box_warm_icon_{normal,pressed}.tres`.
 - `scripts/press_scale_button.gd` on `%PauseButton`.
 
 ## `scripts/level_failure_screen.gd`
@@ -2029,8 +2029,9 @@ Purpose:
 - Reusable in-level ability-purchase overlay shown when the player taps an ability with zero
   remaining uses. Composes `scenes/ui/gameplay_modal_shell.tscn` for shade, outer panel, title
   (`"USE ABILITY"`), close button, content region, and action row. Buying applies one ability
-  immediately -- it is not an inventory purchase, hence `"USE ABILITY"`/`"USE NOW"` rather than the
-  previous `"GET MORE ITEMS"`/`"×1"`, which read like acquiring inventory.
+  immediately -- it is not an inventory purchase, hence `"USE ABILITY"` rather than the previous
+  `"GET MORE ITEMS"`/`"×1"`, which read like acquiring inventory. The redundant `"USE NOW"` badge
+  was removed from the icon slot.
 - `scripts/level.gd` only calls `set_offer()`/`open()`/`close()` and listens for
   `close_pressed`/`buy_pressed`/`ad_pressed`.
 
@@ -2053,8 +2054,8 @@ Behavior notes:
 Depends on:
 - `scenes/ui/gameplay_modal_shell.tscn`, `scripts/gameplay_ui_theme.gd`, `scripts/press_scale_button.gd`.
 - `assets/ui/clover_coin_transparent_96x96.png`.
-- `assets/themes/style_box_gameplay_item_slot.tres`, `style_box_gameplay_count_badge.tres`
-  (the `"USE NOW"` badge), `style_box_green_primary_button.tres`, `style_box_disabled_action_button.tres`.
+- `assets/themes/style_box_gameplay_item_slot.tres`, `style_box_green_primary_button.tres`,
+  `style_box_disabled_action_button.tres`.
 
 ## `scripts/item.gd`
 

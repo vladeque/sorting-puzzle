@@ -26,6 +26,7 @@ const SETTINGS_BUTTONS: Array[Dictionary] = [
 	{"name": "VibrationButton", "setting_id": SETTING_VIBRATION},
 ]
 const CROSS_OUT_NAME := "CrossOut"
+const CONTENT_REGION_HEIGHT := 224.0
 const GameplayUIThemeScript := preload("res://scripts/gameplay_ui_theme.gd")
 
 static var _disabled_settings: Dictionary = {}
@@ -52,7 +53,11 @@ func _ready() -> void:
 
 	if _shell != null:
 		_shell.configure("PAUSE")
-		_shell.set_preferred_size(Vector2(GameplayUIThemeScript.MODAL_MAX_WIDTH, 500.0))
+		_shell.set_preferred_size(Vector2(
+			GameplayUIThemeScript.MODAL_MAX_WIDTH,
+			GameplayUIThemeScript.MODAL_COMPACT_HEIGHT
+		))
+		_shell.set_content_region_height(CONTENT_REGION_HEIGHT)
 		_shell.close_requested.connect(func() -> void: continue_pressed.emit())
 		if _settings_content != null:
 			_settings_content.reparent(_shell.get_content_region(), false)

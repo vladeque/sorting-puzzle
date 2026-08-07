@@ -189,16 +189,18 @@ inside gameplay `.tscn` files):
 - `style_box_gameplay_close_button_{normal,pressed,hover}.tres`: the true-circular red close action
   (72px control, radius 36 -- was 32, i.e. not actually a true circle before) shared by every
   gameplay modal's close button.
-- `style_box_gameplay_hud_icon_{normal,pressed,hover,disabled}.tres`: the shared circular gameplay
-  HUD icon-button role -- Pause and all four ability buttons. One set of four styles (not one set
-  per size) covers both the compact (82px) and regular (96px) sizes: each uses a deliberately
+- `style_box_gameplay_hud_icon_{normal,pressed,hover,disabled}.tres`: the circular ability-button
+  role used by all four abilities. One set of four styles (not one set per size) covers both the
+  compact (82px) and regular (96px) sizes: each uses a deliberately
   oversized `corner_radius`, which Godot clamps to half the control's smaller dimension, so it
   renders as a true circle at either size without needing size-specific resources. Includes an
-  explicit `disabled` style -- opening any overlay used to disable the Pause button and fall back to
-  Godot's engine-default square style because it had normal/hover/pressed but no disabled StyleBox.
-- `style_box_gameplay_count_badge.tres`: the shared inventory-count badge (ability-bar remaining-use
-  counts and the Ability Purchase menu's `"USE NOW"` badge), replacing the previous orange-red-vs-
-  burgundy mismatch. Same oversized-radius trick for a true pill/circle at any authored size.
+  explicit `disabled` style so blocked abilities never fall back to Godot's default square style.
+- `style_box_warm_icon_{normal,pressed}.tres`: the top-HUD Pause control deliberately reuses the
+  Main Menu settings-button role at 72x64, including its dark-brown scene-authored pause bars. Its
+  explicit disabled override points at the warm normal resource, preventing default-style fallback.
+- `style_box_gameplay_count_badge.tres`: the shared inventory/count badge used by ability-bar
+  remaining-use counts and Leave Confirmation's loss counts. Same oversized-radius trick for a
+  true pill/circle at any authored size.
 - `style_box_gameplay_timer_badge.tres`: the documented navy/cyan timed-status badge exception
   (Lantern/Freezer countdown badges on the ability bar), extracted from a previously-duplicated
   local sub-resource with no visual change.
@@ -222,15 +224,16 @@ role + responsive scale. See `docs/SCRIPTS.md` for its full API.
 **`scenes/ui/gameplay_result_shell.tscn`** (`scripts/gameplay_result_shell.gd`) are the two shared
 shells -- see their own entries below and in `docs/SCRIPTS.md` for the full ownership split (shell
 owns shade/panel/title/close/safe-area/motion; the owning scene keeps its own content and signals).
-The modal shell preserves the authored 520px composition and uniformly scales the complete panel
+The modal shell preserves the authored 520x500 composition and uniformly scales the complete panel
 subtree when safe insets leave less room; this keeps title, close cutout, content, and action-row
-minimum sizes inside the same fitted rect instead of shrinking only the outer panel.
+minimum sizes inside the same fitted rect instead of shrinking only the outer panel. Owners set a
+compact content-region height (224px for Pause/Purchase, 240px for Leave Confirmation) so the cream
+panel fits its content instead of stretching to fill the outer shell.
 
 **Interaction/motion** -- every gameplay button now uses `press_scale_button.gd`: `0.94` for CTAs
-(Leave/Continue/Buy/Watch-Ad/Completion's Continue/Failure's Main Menu action), `0.97` for icon/
-close buttons (Pause, the four ability buttons, and every gameplay modal's shared close action --
-this ticket's own text calls out close buttons as the icon role here, unlike the menu system's 0.94
-dialog-dismiss role). Every gameplay-owned control is `FOCUS_NONE` with the pointing-hand cursor
+(including Pause's warm settings-role control, Leave/Continue/Buy/Watch-Ad/Completion's Continue/
+Failure's Main Menu action), `0.97` for ability and modal-close icon buttons. Every gameplay-owned
+control is `FOCUS_NONE` with the pointing-hand cursor
 while enabled and the arrow cursor while disabled, matching the menu system's touch-only policy.
 Modal/result open and close fade via
 `scripts/ui_motion.gd` (`OVERLAY_DURATION`) instead of snapping between `visible` states, and every
@@ -1130,8 +1133,8 @@ Script:
 Purpose:
 - Reusable four-ability gameplay control extracted from `level.tscn`.
 - Owns Hammer, Shuffle, Lantern/highlight, and Freezer buttons; each has a minimum 82x82 compact
-  touch target and a 96x96 regular target -- the shared gameplay HUD icon-button role (UI-003, see
-  "Shared Gameplay UI Roles" above), also used by the top HUD's Pause button.
+  touch target and a 96x96 regular target -- the circular ability icon-button role (UI-003, see
+  "Shared Gameplay UI Roles" above).
 - Owns remaining-use badges (`style_box_gameplay_count_badge.tres`) plus independent Lantern and
   Freezer active countdown badges (`style_box_gameplay_timer_badge.tres`).
 - Emits `ability_pressed(ability_id)` and exposes focused state/layout methods; `scripts/level.gd`
@@ -1173,15 +1176,13 @@ Purpose:
   close button, content region, and action row (UI-003; see "Shared Gameplay UI Roles" above),
   instead of locally repeating the leave-confirmation modal's styling.
 - Shows the `USE ABILITY` title (was `GET MORE ITEMS`), the selected ability icon in a centered
-  slot, a bottom-right `USE NOW` badge (was a `×1` count -- this purchase applies one ability
-  immediately, not inventory), a green coin-price image button, and the hidden-in-production
-  `Watch ad` action.
+  slot, a green coin-price image button, and the hidden-in-production `Watch ad` action. The
+  redundant `USE NOW` badge was removed; the title and price action already communicate the flow.
 
 Important nodes:
 - `Shell`: the shared modal shell instance.
-- `PurchaseContent`: reparented into `Shell`'s content region at `_ready()`; holds `AbilitySlot`
-  (`style_box_gameplay_item_slot.tres`), `%AbilityIcon`, and the `UseNowBadge`
-  (`style_box_gameplay_count_badge.tres`) with its `%UseNowLabel`.
+- `PurchaseContent`: reparented into `Shell`'s compact 224px content region at `_ready()`; holds
+  `AbilitySlot` (`style_box_gameplay_item_slot.tres`) and `%AbilityIcon`.
 - `%BuyButton`: reparented into `Shell`'s action row; its child `PriceRow` shows the canonical
   `assets/ui/clover_coin_transparent_96x96.png` and the configured price. `set_offer()` switches its
   style between the shared affordable (green) and unaffordable (neutral disabled) resources rather
@@ -1193,8 +1194,8 @@ Important nodes:
 Depends on:
 - `scenes/ui/gameplay_modal_shell.tscn`.
 - `assets/ui/clover_coin_transparent_96x96.png`.
-- `assets/themes/style_box_gameplay_item_slot.tres`, `style_box_gameplay_count_badge.tres`,
-  `style_box_green_primary_button.tres`, `style_box_disabled_action_button.tres`.
+- `assets/themes/style_box_gameplay_item_slot.tres`, `style_box_green_primary_button.tres`,
+  `style_box_disabled_action_button.tres`.
 - `scripts/press_scale_button.gd`.
 - Runtime offer setup, coin spending, and ability execution from `scripts/level.gd`.
 
@@ -1445,9 +1446,10 @@ Purpose:
   label and star/pause cluster so long values (`LEVEL 99`, `59:59`, large star totals) can never
   overlap either side. Timer, star pill, and Pause share the authored 60px row center, and the star
   pill keeps its original 12px regular-width gap from Pause.
-- `%PauseButton` shares the gameplay HUD icon-button role with the four ability buttons (compact
-  82px/regular 96px, an explicit disabled style) instead of its own bespoke 64px button with no
-  disabled style. Its `"II"` text is replaced by two scene-authored `ColorRect` bars.
+- `%PauseButton` matches the Main Menu settings-button role: 72x64 with the shared warm normal/
+  pressed resources, a matching 0.94 held scale, and an explicit warm disabled override. Its `"II"`
+  text is replaced by two dark-brown scene-authored `ColorRect` bars. At extreme safe-inset widths
+  the control scales proportionally while preserving those settings-button proportions.
 
 Important nodes:
 - `%Strip`: full-rect `Panel`, the top strip background.
@@ -1456,12 +1458,12 @@ Important nodes:
 - `%StarCounter` (`style_box_gameplay_status_pill.tres`, a true pill), `%StarCountLabel`: the run's
   star total; `get_star_counter_global_center()` is the reward-star flight's landing point and
   `play_star_receive_pulse()`/`reset_star_pulse()` own its receive-pulse animation.
-- `%PauseButton`, `%PauseBar1`, `%PauseBar2`: the shared HUD icon-button role with a scene-authored
-  two-bar pause glyph; `press_scale_button.gd` (0.97 held scale).
+- `%PauseButton`, `%PauseBar1`, `%PauseBar2`: the warm Main Menu settings-button role with a
+  scene-authored two-bar pause glyph; `press_scale_button.gd` (0.94 held scale).
 
 Depends on:
 - `assets/themes/style_box_gameplay_status_pill.tres`,
-  `style_box_gameplay_hud_icon_{normal,pressed,hover,disabled}.tres`.
+  `style_box_warm_icon_{normal,pressed}.tres`.
 - `scripts/gameplay_ui_theme.gd`, `scripts/press_scale_button.gd`, `scripts/ui_motion.gd`.
 
 Do not use for:
@@ -1488,7 +1490,7 @@ Purpose:
 
 Important nodes:
 - `Shell`: the shared modal shell instance.
-- `SettingsContent`: reparented into `Shell`'s content region at `_ready()`; holds
+- `SettingsContent`: reparented into `Shell`'s compact 224px content region at `_ready()`; holds
   `InnerTitleLabel` (`SETTINGS`) and `IconRow`.
 - `IconRow/MusicOption/MusicButton`, `SoundEffectsOption/SoundEffectsButton`,
   `VibrationOption/VibrationButton`: square toggle buttons with shadow-only button styling,
@@ -1533,7 +1535,7 @@ Purpose:
 
 Important nodes:
 - `Shell`: the shared modal shell instance.
-- `LossContent`: reparented into `Shell`'s content region at `_ready()`; holds `MessageLabel` and
+- `LossContent`: reparented into `Shell`'s compact 240px content region at `_ready()`; holds `MessageLabel` and
   `LossRow`.
 - `LossRow/LifeLoss`, `LossRow/StarLoss`: `style_box_gameplay_item_slot.tres` cells with a
   `style_box_gameplay_count_badge.tres` count badge each; `StarLoss`'s `%CountLabel` is the current

@@ -41,16 +41,16 @@ Ability Purchase, Completion, and Failure at the 720×1280 design viewport.
 | Priority | Area | Current inconsistency | Required unification |
 | --- | --- | --- | --- |
 | P0 | Failure flow | `level.tscn` embeds a shade and `LEVEL FAILED` label with no action. `_fail_level()` only makes it visible, leaving the player in a terminal screen with no route forward. This also violates the project rule that multi-node result screens own separate scenes. | Extract `scenes/ui/level_failure_screen.tscn` with a focused owner script and a working `Main Menu` action. Keep retry/life-policy changes out of this ticket. |
-| P1 | Disabled pause button | `PauseMenuButton` has normal, hover, and pressed styles but no disabled style. Opening any overlay disables it and Godot falls back to a square default control, visibly changing a circular HUD button into a square. | Give the shared circular HUD-button role an explicit disabled style and use it for Pause and every ability button. |
+| P1 | Disabled pause button | `PauseMenuButton` has normal, hover, and pressed styles but no disabled style. Opening any overlay disables it and Godot falls back to a square default control, visibly changing the control. | Give Pause an explicit disabled override using the same warm resource as its normal Main Menu settings-button role; keep explicit disabled resources on every ability button. |
 | P1 | Rewarded-ad placeholder | `WatchAdButton` looks enabled, scales when pressed, and emits a signal, while `_on_ability_purchase_ad_pressed()` is empty. The authoritative backend requirement says the placeholder grants nothing until a separate rewarded-ad feature is approved. | Do not expose an enabled no-op. Hide it in production until approved; any developer preview must be disabled, use the shared unavailable style, and say `Coming Soon`. |
 | P1 | Back behavior | `scripts/level.gd::_input()` has no `ui_cancel` handling and returns immediately while paused. System back therefore does nothing during gameplay and overlays. Close/Continue also collapse the Leave Confirmation directly into gameplay instead of distinguishing “pop this confirmation” from “resume.” | Implement one topmost-overlay back stack: gameplay opens Pause; Pause resumes; Leave Confirmation returns to Pause; Ability Purchase restores its prior state; terminal results use their visible navigation action. |
 | P1 | Completion copy | Completion says `Next`, but `_on_completion_next_pressed()` returns to the Main Menu rather than starting the next level. | Use the minimal-risk contract: rename the action to `Continue` and preserve return-to-menu behavior. Starting another authoritative run is not part of this UI ticket. |
-| P1 | Ability-purchase copy | `GET MORE ITEMS` and `×1` read like inventory acquisition, but the implementation purchases and applies one ability immediately without adding inventory. | Rename the presentation to `USE ABILITY`/`USE NOW` and document that the purchase is one immediate use. Do not alter the transaction behavior. |
-| P1 | Interaction feedback | Pause, all four ability buttons, and all three red modal close buttons omit `PressScaleButton`. Several CTAs retain default focus, and scoped controls do not consistently set the desktop pointing-hand cursor. | Apply UI-002 to every action: 0.97 held scale for icon/close buttons, 0.94 for CTAs, `FOCUS_NONE` under the documented touch-only policy, and pointing-hand cursor only while enabled. |
+| P1 | Ability-purchase copy | `GET MORE ITEMS` and `×1` read like inventory acquisition, but the implementation purchases and applies one ability immediately without adding inventory. | Rename the presentation to `USE ABILITY` and document that the purchase is one immediate use. Do not alter the transaction behavior; avoid a redundant secondary badge. |
+| P1 | Interaction feedback | Pause, all four ability buttons, and all three red modal close buttons omit `PressScaleButton`. Several CTAs retain default focus, and scoped controls do not consistently set the desktop pointing-hand cursor. | Apply UI-002 to every action: 0.97 held scale for ability/close icons, 0.94 for the warm Pause/settings role and CTAs, `FOCUS_NONE` under the documented touch-only policy, and pointing-hand cursor only while enabled. |
 | P1 | Overlay motion | Pause, Leave Confirmation, Ability Purchase, Completion, and Failure snap between `visible` states. Their scripts do not use the shared motion helper, block repeated transitions, or protect against tween accumulation. | Use the shared 180–220 ms overlay/result transition tokens, replace active tweens safely, and prevent input-through/double navigation during transitions. |
 | P2 | Modal duplication | Pause, Leave Confirmation, and Ability Purchase repeat the same shade, terracotta outer panel, cream inner panel, red close-button styles, shadow values, margins, and bottom action-row layout as local subresources. | Extract one gameplay modal shell or inherited base scene with named content/action slots, plus shared `.tres` styles. Individual scenes should own only their content and signals. |
 | P2 | Geometry roles | Gameplay modal outer panels use radius 30 while the established large-panel role is 24. Their 72×72 close controls use radius 32 instead of a true circular radius 36. Count badges and item slots use unrelated 18/20/24/30 radii for equivalent concepts. | Reuse the 16/20/24 geometry system; make circular controls/badges mathematically circular. Expose compact/regular/hero sizes as named variants rather than new corner values. |
-| P2 | HUD icon-button role | The 68 px Pause button and 82/96 px ability buttons are the same circular gameplay action concept but use near-matching navy backgrounds, unrelated border colors, shadows, and held states. Pause also uses the font text `II`, while abilities use scene-authored icons. | Create one gameplay HUD icon-button role with compact and regular size variants. Build the pause mark from two scene-authored bars so it is not dependent on font glyph metrics. |
+| P2 | HUD icon-button role | The Pause button and 82/96 px ability buttons used near-matching navy backgrounds despite different semantic roles. Pause also used the font text `II`. | Keep the circular navy role for abilities; make Pause match the Main Menu's 72x64 warm settings control because both open settings/navigation UI. Build the pause mark from two scene-authored bars so it is not dependent on font glyph metrics. |
 | P2 | Count/status badges | Ability-use counts use orange-red/gold, modal counts use burgundy/gold, the star counter is not a true pill, and equivalent badge sizes are recreated locally. Timer badges add another local shape without a named semantic role. | Share inventory-count badge resources with named compact/regular sizes, make the star total a true pill, and keep timed-status badges as a documented navy/cyan semantic exception. |
 | P2 | Currency asset | Ability Purchase uses `assets/ui/main_menu_coin.png`; Main Menu and Shop now use the canonical spendable-currency art `assets/ui/clover_coin_transparent_96x96.png`. | Use the canonical clover coin anywhere a spendable coin balance or price is shown. |
 | P2 | Disabled purchase state | An unaffordable Buy button reuses its enabled green texture and adds `modulate.a = 0.62`, unlike the shared neutral unavailable-action role. | Use a deliberate disabled resource, clear pointer/press feedback, and restore full modulation when enabled. Do not rely on opacity alone. |
@@ -161,7 +161,8 @@ scripts own their data and signals. Remove fixed modal sizes and internal child-
 - Failure is a separate scene with an actionable exit; no terminal level state can trap the player.
 - Opening Pause, Leave Confirmation, Ability Purchase, Completion, or Failure never turns the top
   Pause control into a square or exposes an engine-default style.
-- Pause and ability buttons share one color/state system through named compact/regular variants.
+- Pause matches the Main Menu settings-button size/color/state system; the four ability buttons
+  share their own named compact/regular circular role.
 - Pause, ability, close, and CTA controls all have consistent held feedback, focus policy, and enabled
   pointer cursor.
 - No enabled button performs a no-op. The unimplemented rewarded-ad action is absent from production.
@@ -191,7 +192,8 @@ scripts own their data and signals. Remove fixed modal sizes and internal child-
 Add an isolated structural/behavior suite, recommended as
 `tests/ui/test_level_ui_consistency.gd`, covering:
 
-- Shared resource identity for modal shell, shade, close, HUD-button, badge, and CTA roles.
+- Shared resource identity for modal shell, shade, close, Main Menu/Pause warm-button, ability,
+  badge, and CTA roles.
 - Explicit Pause and ability disabled styles; no engine-default fallback.
 - Held-scale restoration after release outside, disable while held, visibility change, and scene exit.
 - Focus and cursor policy for every level-owned button.
@@ -248,6 +250,22 @@ not exercise:
 `tests/ui/test_level_ui_consistency.gd` contains direct regressions for each case, including the
 rapid Pause -> Leave -> Close transition sequence that previously could leave gameplay paused with
 no visible overlay.
+
+## Visual Regression Follow-up (2026-08-07)
+
+A second visual review corrected three regressions introduced by over-unifying different roles:
+
+- Pause now matches the Main Menu settings control exactly in normal sizing and style: 72x64, warm
+  normal/pressed resources, dark-brown scene-authored bars, and 0.94 held scale. It retains an
+  explicit warm disabled override and scales only when extreme side insets require it.
+- Pause, Leave Confirmation, and Ability Purchase now share the compact 520x500 outer-shell size.
+  Their cream content regions are content-sized rather than stretched: 224px for Pause/Purchase and
+  240px for Leave Confirmation, with the existing whole-shell safe-area scale left intact.
+- Ability Purchase no longer shows the redundant `USE NOW` badge. `USE ABILITY`, the selected icon,
+  and the coin-price action communicate the immediate-use flow without duplicate copy.
+
+The isolated UI suite now checks all three decisions directly so the role coupling and stretched
+inner panels cannot silently return.
 
 ## Out of Scope
 
