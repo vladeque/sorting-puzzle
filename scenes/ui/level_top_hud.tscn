@@ -145,17 +145,14 @@ vertical_alignment = 1
 [node name="StarCounter" type="Panel" parent="."]
 unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 3
+anchors_preset = 1
 anchor_left = 1.0
-anchor_top = 1.0
 anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -212.0
+offset_left = -244.0
 offset_top = 34.0
-offset_right = -100.0
+offset_right = -132.0
 offset_bottom = 86.0
 grow_horizontal = 0
-grow_vertical = 0
 theme_override_styles/panel = ExtResource("3_status_pill")
 
 [node name="Icon" type="TextureRect" parent="StarCounter"]
@@ -195,17 +192,15 @@ vertical_alignment = 1
 
 [node name="PauseButton" type="Button" parent="."]
 unique_name_in_owner = true
-anchors_preset = 3
+layout_mode = 1
+anchors_preset = 1
 anchor_left = 1.0
-anchor_top = 1.0
 anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -96.0
-offset_top = 28.0
+offset_left = -120.0
+offset_top = 12.0
 offset_right = -24.0
-offset_bottom = 124.0
+offset_bottom = 108.0
 grow_horizontal = 0
-grow_vertical = 0
 focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_styles/normal = ExtResource("4_hud_icon_normal")

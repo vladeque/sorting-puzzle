@@ -388,9 +388,28 @@ func _test_safe_area_layout() -> void:
 	var level := await _make_level()
 	var top_hud = level.get("_top_hud")
 	var pause_overlay = level.get("_pause_menu_overlay")
+	var pause_button := top_hud.find_child("PauseButton", true, false) as Control
+	var timer_label := top_hud.find_child("TimerLabel", true, false) as Control
+	var level_label := top_hud.find_child("LevelLabel", true, false) as Control
+	var star_counter := top_hud.find_child("StarCounter", true, false) as Control
 
 	var safe_margins := Vector4(60.0, 90.0, 60.0, 70.0)
 	var viewport_size := Vector2(720.0, 1280.0)
+	top_hud.call("apply_safe_layout", Vector4.ZERO, viewport_size)
+	await process_frame
+	_check(
+		is_equal_approx(pause_button.get_rect().get_center().y, timer_label.get_rect().get_center().y),
+		"Pause button and timer should share the same top-HUD row center."
+	)
+	_check(
+		is_equal_approx(star_counter.get_rect().get_center().y, timer_label.get_rect().get_center().y),
+		"Star counter and timer should share the same top-HUD row center."
+	)
+	_check(
+		is_equal_approx(pause_button.get_rect().position.x - star_counter.get_rect().end.x, 12.0),
+		"Regular star and Pause controls should keep their authored 12px gap."
+	)
+
 	top_hud.call("apply_safe_layout", safe_margins, viewport_size)
 	await process_frame
 
@@ -399,16 +418,16 @@ func _test_safe_area_layout() -> void:
 		"The HUD strip background should grow with the safe-top inset instead of staying a fixed height."
 	)
 
-	var pause_button := top_hud.find_child("PauseButton", true, false) as Control
 	_check(pause_button.offset_top >= safe_margins.y, "Pause button should sit clear of the safe-top inset.")
 	_check(
 		pause_button.offset_right <= viewport_size.x - safe_margins.z + 0.5,
 		"Pause button should stay clear of the safe-right inset."
 	)
 
-	var timer_label := top_hud.find_child("TimerLabel", true, false) as Control
-	var level_label := top_hud.find_child("LevelLabel", true, false) as Control
-	var star_counter := top_hud.find_child("StarCounter", true, false) as Control
+	_check(
+		is_equal_approx(pause_button.get_rect().position.x - star_counter.get_rect().end.x, 10.0),
+		"Compact star and Pause controls should keep their authored 10px gap."
+	)
 	_check(
 		timer_label.get_rect().position.x + 0.5 >= level_label.get_rect().end.x,
 		"Timer should stay clear of the level label (left exclusion zone)."

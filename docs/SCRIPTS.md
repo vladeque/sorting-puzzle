@@ -1927,7 +1927,9 @@ Purpose:
   only the timer/level/star/pause row did, so a top inset could push that row below the strip's own
   background). The timer stays centered in a real font-sized center region. At compact widths the
   level, timer, star pill, Pause control, fonts, and gaps scale as one row using safe usable width,
-  so Label minimum-size resolution cannot expand the timer into either side after layout.
+  so Label minimum-size resolution cannot expand the timer into either side after layout. The
+  timer, star pill, and Pause control share the authored 60px row center; growing Pause from its old
+  64px size therefore expands around the row instead of shifting the whole right cluster downward.
 - The Pause button shares the gameplay HUD icon-button role with the four ability buttons (compact
   82px/regular 96px, an explicit disabled style -- previously a bespoke 64px button with no disabled
   style, so opening any overlay fell back to Godot's square default). Its `"II"` text is replaced

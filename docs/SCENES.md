@@ -1443,7 +1443,8 @@ Purpose:
 - The background strip height and the combo slot both grow/shift with the safe-top inset (before,
   only the timer/level/star/pause row did). The timer stays centered but is kept clear of the level
   label and star/pause cluster so long values (`LEVEL 99`, `59:59`, large star totals) can never
-  overlap either side.
+  overlap either side. Timer, star pill, and Pause share the authored 60px row center, and the star
+  pill keeps its original 12px regular-width gap from Pause.
 - `%PauseButton` shares the gameplay HUD icon-button role with the four ability buttons (compact
   82px/regular 96px, an explicit disabled style) instead of its own bespoke 64px button with no
   disabled style. Its `"II"` text is replaced by two scene-authored `ColorRect` bars.

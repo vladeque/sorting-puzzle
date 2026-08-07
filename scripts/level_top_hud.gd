@@ -18,6 +18,7 @@ const GameplayUIThemeScript := preload("res://scripts/gameplay_ui_theme.gd")
 
 const STRIP_BASE_HEIGHT := 112.0
 const HUD_TOP_MARGIN := 28.0
+const HUD_ROW_CENTER_Y := 60.0
 const HUD_SIDE_MARGIN := 24.0
 const LEVEL_LABEL_MARGIN_LEFT := 32.0
 const LEVEL_LABEL_TOP := 42.0
@@ -26,7 +27,7 @@ const COMPACT_HUD_SIDE_MARGIN := 16.0
 const COMPACT_LEVEL_LABEL_MARGIN_LEFT := 20.0
 const COMPACT_LEVEL_LABEL_SIZE := Vector2(160.0, 40.0)
 const COMPACT_STAR_COUNTER_SIZE := Vector2(88.0, 46.0)
-const COMPACT_STAR_COUNTER_GAP := 18.0
+const COMPACT_STAR_COUNTER_GAP := 10.0
 const COMPACT_TIMER_WIDTH := 120.0
 const REGULAR_TIMER_WIDTH := 140.0
 const COMPACT_TIMER_FONT_SIZE := 40
@@ -35,7 +36,7 @@ const COMPACT_LEVEL_FONT_SIZE := 24
 const REGULAR_LEVEL_FONT_SIZE := 28
 const TIMER_LABEL_HEIGHT := 64.0
 const STAR_COUNTER_SIZE := Vector2(112.0, 52.0)
-const STAR_COUNTER_GAP := 40.0
+const STAR_COUNTER_GAP := 12.0
 const COMBO_SLOT_SIZE := Vector2(170.0, 29.0)
 const COMBO_SLOT_TOP := 92.0
 const COMBO_FILL_INSET := 3.0
@@ -182,13 +183,17 @@ func apply_safe_layout(safe_margins: Vector4, viewport_size: Vector2) -> void:
 
 	var pause_right_x := viewport_size.x - (safe_margins.z + side_margin)
 	var pause_left_x := pause_right_x - icon_size.x
-	var pause_top_y := safe_margins.y + HUD_TOP_MARGIN
+	# Keep every status control on the authored y=60 row center. Pause used to be 64px tall at
+	# y=28; anchoring the shared 96px role to that old top edge pushed its center (and the star pill
+	# centered from it) down to y=76 while Level/Timer remained centered around y=60.
+	var row_center_y := safe_margins.y + HUD_ROW_CENTER_Y
+	var pause_top_y := row_center_y - icon_size.y * 0.5
 	_layout_absolute(_pause_button, pause_left_x, pause_top_y, pause_right_x, pause_top_y + icon_size.y)
 	_layout_pause_bars(icon_size)
 
 	var star_right_x := pause_left_x - star_gap
 	var star_left_x := star_right_x - star_size.x
-	var star_top_y := pause_top_y + (icon_size.y - star_size.y) * 0.5
+	var star_top_y := row_center_y - star_size.y * 0.5
 	_layout_absolute(_star_counter, star_left_x, star_top_y, star_right_x, star_top_y + star_size.y)
 	_layout_star_counter_children(star_size, compact_scale if is_compact else 1.0)
 
