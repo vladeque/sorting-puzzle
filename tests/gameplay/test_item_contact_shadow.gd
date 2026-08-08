@@ -78,8 +78,7 @@ func _verify_shadow_follows_item_form(item: ShelfItem, shadow: Sprite2D) -> void
 
 
 func _verify_cast_projection(item: ShelfItem, shadow: Sprite2D) -> void:
-	ShelfItem.shadow_style = ShelfItem.ShadowStyle.CAST_PROJECTION
-	item.refresh_shadow_style()
+	item.shadow_style = ShelfItem.ShadowStyle.CAST_PROJECTION
 
 	_check(
 		_get_ground_fade(shadow) == 0.0,
@@ -99,8 +98,7 @@ func _verify_contact_pool(item: ShelfItem, shadow: Sprite2D) -> void:
 	var cast_height := shadow.scale.y
 	var ground_y := ShelfItem.SHADOW_GROUND_TEXELS * item.visual_scale
 
-	ShelfItem.shadow_style = ShelfItem.ShadowStyle.CONTACT_POOL
-	item.refresh_shadow_style()
+	item.shadow_style = ShelfItem.ShadowStyle.CONTACT_POOL
 
 	_check(
 		is_equal_approx(_get_ground_fade(shadow), ShelfItem.SHADOW_POOL_FADE_TEXELS),
@@ -119,8 +117,7 @@ func _verify_contact_pool(item: ShelfItem, shadow: Sprite2D) -> void:
 		"Contact pool straddles the contact line instead of sitting entirely above it."
 	)
 
-	ShelfItem.shadow_style = ShelfItem.ShadowStyle.CAST_PROJECTION
-	item.refresh_shadow_style()
+	item.shadow_style = ShelfItem.ShadowStyle.CAST_PROJECTION
 
 
 func _verify_drag_lift(level: Node, item: ShelfItem, shadow: Sprite2D) -> void:
@@ -176,7 +173,6 @@ func _get_shadow_alpha(shadow: Sprite2D) -> float:
 
 
 func _finish(level: Node) -> void:
-	ShelfItem.shadow_style = ShelfItem.ShadowStyle.CAST_PROJECTION
 	if level != null and is_instance_valid(level):
 		level.queue_free()
 	await process_frame

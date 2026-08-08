@@ -1523,7 +1523,7 @@ Key responsibilities:
 - Finish every player-visible drop with `ShelfItem.play_land_impact()`, the landing squash-and-stretch owned by `scripts/item.gd`. It fires from `_play_item_move_animation()` after the eased travel settles and from `_place_item_in_slot()` when `should_play_landing` is set. The call is never awaited, so a landing does not delay `_resolve_shelves()` and its match clears. Silent forced restores (level failure, ability interrupt) pass `should_play_landing = false` and stay unanimated. Back-layer promotion is deliberately excluded: `_play_layer_promotion_animation()` already lands with its own `TRANS_BACK` overshoot on `visual_scale`.
 - Cancel a pending bounce with `ShelfItem.reset_land_impact()` before re-grabbing an item in `_begin_drag()` and before the gather in `_play_match_clear_animation()`, so the next animation never starts from a deformed pose.
 - Lift the active item's ground shadow with `ShelfItem.set_drag_lifted(true)` while the player is dragging it, and settle it again when the drag releases, cancels, fails, or completes. The shadow stays parented to the item so it travels with the finger; the lift (further along the light direction, spread wider, washed out) is what reads as "held above the board". `_place_item_in_slot()` also clears the lift as a safety net for paths that land an item without going through `_finish_active_drag()`.
-- Cycle the prototype ground-shadow style with F9 in a debug build (`_unhandled_key_input()` / `_cycle_item_shadow_style()`), which flips the shared `ShelfItem.shadow_style` and refreshes every item in the `shelf_items` group. This is temporary scaffolding for choosing between the two styles and should be removed with the losing style.
+- The level does not switch ground-shadow styles at runtime. Items take `ShelfItem.default_shadow_style`; compare the two prototypes in `scenes/shadow_style_preview.tscn`, which renders both at once.
 - Redirect moves aimed at an occupied destination slot on another shelf to the nearest free front slot on that destination shelf; same-shelf occupied targets leave the item in its original slot.
 - Clear triples with `_clear_matching_shelves()` and `_play_match_clear_animation()`.
 - Track the active triple-clear combo with `_extend_combo()`, `_update_combo_timer()`, `_reset_combo()`, and `_update_combo_hud()`, including the shrinking center-slot fill (now rendered by `scripts/level_top_hud.gd::set_combo()`). Combo value increases by 1 per cleared triple, and each cleared triple adds stars equal to the combo value reached by that triple; `_update_star_counter_label()` forwards that number to `LevelTopHud.set_star_count()`, which owns the star pill (now a true pill, `style_box_gameplay_status_pill.tres`).
@@ -2146,12 +2146,20 @@ Runtime properties:
 - `shadow_style` (static): the prototype ground-shadow style shared by every item, `CAST_PROJECTION` or `CONTACT_POOL`. Typed as `int` rather than the enum because cross-script assignment to an enum-typed static is rejected at runtime.
 
 Key methods:
-- `_ready()`: joins the `shelf_items` group, then applies current texture and scale.
+- `_ready()`: applies current texture and scale.
 - `_apply_texture()`: updates `Sprite2D.texture` and refreshes the ground shadow, which hides itself when the item has no texture.
 - `_apply_visual_scale()`: updates `Sprite2D` and `OutlineSprite` scale from `visual_scale * highlight scale multiplier * land_squash`, applies the contact pivot offset, then refreshes the shadow and outline.
 - `_apply_shadow()`: projects the item's own silhouette onto the floor. Anchors the shadow sprite on the art's ground line (`SHADOW_GROUND_TEXELS`, the 240-128 texel drop every item texture shares per `docs/ITEM_ASSET_REQUIREMENTS.md`), then flattens it -- sheared up-right for `CAST_PROJECTION`, straddling the contact line without shear for `CONTACT_POOL` -- and folds in the landing squash's width and the drag lift's offset, spread and fade. Only the shadow's width follows the squash: an impact spreads the contact patch sideways, it does not push the shadow further along the shelf.
 - `set_drag_lifted(lifted)`: tweens `shadow_lift`, lifting the shadow off a carried item instead of hiding it. Node-bound through `UIMotion.retween`, so it dies with the item.
-- `refresh_shadow_style()`: re-reads the shared `shadow_style`; only the prototype style switcher in `scripts/level.gd` needs it, since item creation picks the current style up through `_ready()`.
+
+## `scripts/shadow_style_preview.gd`
+
+Purpose:
+- Throwaway harness for choosing between the two prototype item ground-shadow styles. Lays the same contrasting silhouettes out twice, once per style, on real shelves over the real level background, and cycles the drag lift so the carried-item read can be judged too.
+- Owns `scenes/shadow_style_preview.tscn`; run that scene directly to compare.
+
+Do not use for:
+- Anything shipped. Delete this script, its scene, and the losing half of `ShelfItem.ShadowStyle` once a style is chosen.
 - `play_land_impact(strength)`: plays the landing squash-and-stretch (compress ~70 ms, rebound past rest ~70 ms, settle ~90 ms, roughly volume-conserving). Fire-and-forget and node-bound via `UIMotion.retween`, so it dies with the item if a landing immediately completes a triple. Called by `scripts/level.gd` from `_play_item_move_animation()` and from `_place_item_in_slot()` when `should_play_landing` is set.
 - `reset_land_impact()`: cancels an in-flight bounce and restores the resting shape; called before re-grabbing a dragged item and before the match-clear gather.
 - `_get_sprite_scale()` / `_get_contact_pivot_offset_y()`: compose the squash with the uniform scale and keep the art's ground contact planted so the item does not lift off the shelf while deforming. `CONTACT_ANCHOR_Y` is the landing bounce's pivot and is tuned by eye; it is deliberately not the same value as the shadow's `SHADOW_GROUND_TEXELS` anchor, which is measured from the texture contract.

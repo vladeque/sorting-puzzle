@@ -550,39 +550,6 @@ func _input(event: InputEvent) -> void:
 		_handle_motion_at(_screen_position_to_global(drag_event.position))
 
 
-## Prototype scaffolding: cycles every item's ground-shadow style (cast projection <-> contact pool)
-## with F9 in a debug build, so both can be compared on the same board without a rebuild. Delete
-## this together with ShelfItem.ShadowStyle once one style is chosen. On device, where there is no
-## keyboard, set ShelfItem.shadow_style's default in scripts/item.gd before building instead.
-func _unhandled_key_input(event: InputEvent) -> void:
-	if not OS.is_debug_build():
-		return
-
-	var key_event := event as InputEventKey
-	if key_event == null or not key_event.pressed or key_event.echo:
-		return
-
-	if key_event.keycode != KEY_F9:
-		return
-
-	_cycle_item_shadow_style()
-	get_viewport().set_input_as_handled()
-
-
-func _cycle_item_shadow_style() -> void:
-	var is_cast := ShelfItem.shadow_style == ShelfItem.ShadowStyle.CAST_PROJECTION
-	ShelfItem.shadow_style = (
-		ShelfItem.ShadowStyle.CONTACT_POOL if is_cast else ShelfItem.ShadowStyle.CAST_PROJECTION
-	)
-
-	for node in get_tree().get_nodes_in_group(ShelfItem.ITEM_GROUP):
-		var item := node as ShelfItem
-		if item != null:
-			item.refresh_shadow_style()
-
-	print("Item shadow style: %s" % ("contact pool" if is_cast else "cast projection"))
-
-
 ## System back / Android back / Escape (UI-003). Unlike _input() above, this always runs regardless
 ## of pause/failed/completed state, implementing one topmost-state-first back stack:
 ##   1. Leave Confirmation returns to Pause.

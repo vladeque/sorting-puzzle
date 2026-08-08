@@ -6,10 +6,6 @@ const UIMotionScript := preload("res://scripts/ui_motion.gd")
 
 const DEFAULT_VISUAL_SCALE := 0.46
 
-## Group every ShelfItem joins, so prototype-wide shadow restyling can reach items on shelves,
-## in back layers and mid-drag alike.
-const ITEM_GROUP := &"shelf_items"
-
 const SHADOW_NODE_NAME := ^"Shadow"
 
 ## Two competing ground-shadow prototypes, both derived from the item's own alpha silhouette:
@@ -20,11 +16,10 @@ enum ShadowStyle {
 	CONTACT_POOL,
 }
 
-## Prototype selector shared by every item; holds a ShadowStyle value. Change this default for a
-## device build, or cycle it at runtime in a debug build with F9 (scripts/level.gd) to compare the
-## two styles side by side. Typed as int rather than ShadowStyle because cross-script assignment to
-## an enum-typed static is rejected at runtime.
-static var shadow_style: int = ShadowStyle.CAST_PROJECTION
+## Prototype selector every new item is created with; holds a ShadowStyle value. Change this one
+## line to try the other style everywhere, including on device. Typed as int rather than ShadowStyle
+## because cross-script assignment to an enum-typed static is rejected at runtime.
+static var default_shadow_style: int = ShadowStyle.CAST_PROJECTION
 
 ## Distance from the sprite's texture center down to the art's ground line, in source texels. Item
 ## textures are a 256x256 canvas whose visible artwork ends at y=240 (docs/ITEM_ASSET_REQUIREMENTS),
@@ -114,6 +109,14 @@ var land_squash := Vector2.ONE:
 		land_squash = value
 		_apply_visual_scale()
 
+## This item's ground-shadow style, seeded at construction from default_shadow_style. Per item
+## rather than global so scenes/shadow_style_preview.tscn can show both prototypes at once; in the
+## level every item simply takes the default.
+var shadow_style: int = default_shadow_style:
+	set(value):
+		shadow_style = value
+		_apply_shadow()
+
 ## 0 while the item rests on a shelf, 1 while the player holds it above the board. Animated as its
 ## own channel (like land_squash) so a lift arriving mid-landing does not fight the bounce.
 var shadow_lift := 0.0:
@@ -130,8 +133,6 @@ var _contact_shadow_enabled := true
 var _highlight_scale_multiplier := 1.0
 
 func _ready() -> void:
-	if not is_in_group(ITEM_GROUP):
-		add_to_group(ITEM_GROUP)
 	_prepare_outline_material()
 	_apply_texture()
 	_apply_visual_scale()
@@ -174,12 +175,6 @@ func set_drag_lifted(lifted: bool) -> void:
 	tween.tween_property(self, "shadow_lift", target, SHADOW_LIFT_SECONDS).set_trans(
 		Tween.TRANS_QUAD
 	).set_ease(Tween.EASE_OUT)
-
-
-## Re-reads the shared ShelfItem.shadow_style. Only the prototype style switcher needs this; item
-## creation picks the current style up through _ready()'s normal shadow application.
-func refresh_shadow_style() -> void:
-	_apply_shadow()
 
 
 ## Plays the landing squash-and-stretch, restarting cleanly if one is already running. Fire and

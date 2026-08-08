@@ -1648,6 +1648,24 @@ Depends on:
 Do not use for:
 - Level timing, matching, input handling, lock progression, item identity assignment, or back-layer promotion timing. Those stay in `scripts/level.gd`.
 
+## `scenes/shadow_style_preview.tscn`
+
+Root:
+- `ShadowStylePreview` (`Node2D`)
+
+Script:
+- `scripts/shadow_style_preview.gd`
+
+Purpose:
+- Throwaway side-by-side harness for choosing between the two prototype item ground-shadow styles.
+  Run the scene directly: it lays the same contrasting silhouettes (tall bottle, squat tub,
+  irregular cupcake) out twice, once per style, on real `scenes/shelf.tscn` shelves over the real
+  chapter level background, and cycles the drag lift on an off-shelf copy of each.
+
+Do not use for:
+- Anything shipped. Delete this scene, its script, and the losing half of `ShelfItem.ShadowStyle`
+  once a style is chosen.
+
 ## `scenes/item.tscn`
 
 Root:
@@ -1671,11 +1689,13 @@ Important nodes:
   the sprite on the art's ground line (canvas y=240, see `docs/ITEM_ASSET_REQUIREMENTS.md`) and
   projects it onto the floor. Generated back-layer previews and clearing items disable it; an
   actively dragged item keeps it and lifts it instead.
-- Two prototype shadow styles are wired up for comparison, selected by `ShelfItem.shadow_style` and
-  configured by the `shadow_cast_material` / `shadow_pool_material` shader materials exported on the
-  root: `CAST_PROJECTION` skews the whole flattened silhouette up-right along the light direction,
-  and `CONTACT_POOL` drops the shear and keeps only the contact region so it spreads into a soft
-  pool under the item. Once one is chosen, delete the other along with the style switcher.
+- Two prototype shadow styles are wired up for comparison, selected per item by
+  `ShelfItem.shadow_style` (seeded from the `ShelfItem.default_shadow_style` static) and configured
+  by the `shadow_cast_material` / `shadow_pool_material` shader materials exported on the root:
+  `CAST_PROJECTION` skews the whole flattened silhouette up-right along the light direction, and
+  `CONTACT_POOL` drops the shear and keeps only the contact region so it spreads into a soft pool
+  under the item. Compare them in `scenes/shadow_style_preview.tscn`; change
+  `default_shadow_style` to try one in real levels, then delete the loser.
 - `OutlineSprite`: hidden sprite used by `ShelfItem` to draw alpha-based highlight borders.
 - `Sprite2D`: main item sprite; texture and visual scale are controlled by `ShelfItem`.
 - `CollisionShape2D`: rectangular item hitbox used by runtime interaction.

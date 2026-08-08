@@ -120,7 +120,7 @@ shader_parameter/ground_line_v = 0.9375
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_item_hitbox"]
 size = Vector2(74, 112)
 
-[node name="Item" type="Area2D" groups=["shelf_items"] unique_id=757671973]
+[node name="Item" type="Area2D" unique_id=757671973]
 z_index = 10
 script = ExtResource("1_item_script")
 shadow_cast_material = SubResource("ShaderMaterial_shadow_cast")
