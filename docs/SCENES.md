@@ -1484,9 +1484,12 @@ Purpose:
   overlap either side. Timer, star pill, and Pause share the authored 60px row center, and the star
   pill keeps its original 12px regular-width gap from Pause.
 - `%PauseButton` matches the Main Menu settings-button role: 72x64 with the shared warm normal/
-  pressed resources, a matching 0.94 held scale, and an explicit warm disabled override. Its `"II"`
-  text is replaced by two dark-brown scene-authored `ColorRect` bars. At extreme safe-inset widths
-  the control scales proportionally while preserving those settings-button proportions.
+  pressed resources, a matching 0.94 held scale, and an explicit warm disabled override. Its pause
+  mark is the `"II"` text glyph, authored in the same dark brown as the settings button for every
+  state -- including `font_disabled_color`, because Pause is disabled for the whole completion
+  celebration, where the frozen board leaves it in plain sight instead of behind an overlay. At
+  extreme safe-inset widths the control scales proportionally while preserving those
+  settings-button proportions.
 
 Important nodes:
 - `%Strip`: full-rect `Panel`, the top strip background.
@@ -1494,9 +1497,11 @@ Important nodes:
 - `%TimerLabel`, `%LevelLabel`: the countdown and chapter-local level number.
 - `%StarCounter` (`style_box_gameplay_status_pill.tres`, a true pill), `%StarCountLabel`: the run's
   star total; `get_star_counter_global_center()` is the reward-star flight's landing point and
-  `play_star_receive_pulse()`/`reset_star_pulse()` own its receive-pulse animation.
-- `%PauseButton`, `%PauseBar1`, `%PauseBar2`: the warm Main Menu settings-button role with a
-  scene-authored two-bar pause glyph; `press_scale_button.gd` (0.94 held scale).
+  `play_star_receive_pulse()`/`reset_star_pulse()` own its receive-pulse animation. The pulse
+  scales the pill's star `Icon`, never the pill: the pill's 2px gold border and 6px drop shadow
+  thicken and its rasterized count blurs when the panel itself is scaled.
+- `%PauseButton`: the warm Main Menu settings-button role with the `"II"` pause glyph;
+  `press_scale_button.gd` (0.94 held scale).
 
 Depends on:
 - `assets/themes/style_box_gameplay_status_pill.tres`,

@@ -90,28 +90,36 @@ func get_star_counter_global_center() -> Vector2:
 	return _star_counter.get_global_rect().get_center()
 
 
-## Briefly pulses the star pill when a reward star arrives, matching
+## Briefly pulses the star icon when a reward star arrives, matching
 ## scripts/main_menu_reward_chest.gd's play_receive_pulse() convention. Kills any prior pulse first
 ## so rapid repeated arrivals never accumulate competing tweens.
+##
+## The pulse scales the icon rather than the whole pill on purpose. Scaling the pill runs its
+## StyleBoxFlat and its glyphs through the scaled transform: the 2px gold border and the 6px drop
+## shadow visibly thicken and the rasterized count blurs, so the counter stops matching the Pause
+## button beside it for the length of the pulse. That was most obvious during the completion
+## celebration, where the level-clearing combo's stars land while the frozen board is on screen.
+## The icon is a texture drawn straight from its source, so it stays crisp at any scale.
 func play_star_receive_pulse() -> void:
 	if _star_pulse_tween != null and _star_pulse_tween.is_valid():
 		_star_pulse_tween.kill()
 
-	_star_counter.pivot_offset = _star_counter.size * 0.5
-	_star_counter.scale = Vector2.ONE
-	_star_pulse_tween = _star_counter.create_tween()
-	_star_pulse_tween.tween_property(_star_counter, "scale", STAR_PULSE_SCALE, STAR_PULSE_IN_SECONDS) \
+	_star_icon.pivot_offset = _star_icon.size * 0.5
+	_star_icon.scale = Vector2.ONE
+	_star_pulse_tween = _star_icon.create_tween()
+	_star_pulse_tween.tween_property(_star_icon, "scale", STAR_PULSE_SCALE, STAR_PULSE_IN_SECONDS) \
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	_star_pulse_tween.tween_property(_star_counter, "scale", Vector2.ONE, STAR_PULSE_OUT_SECONDS) \
+	_star_pulse_tween.tween_property(_star_icon, "scale", Vector2.ONE, STAR_PULSE_OUT_SECONDS) \
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
 
 
-## Kills any in-flight pulse and resets the star pill's scale -- used when a level (re)starts so a
+## Kills any in-flight pulse and resets the star icon's scale -- used when a level (re)starts so a
 ## pulse from the previous run is never retained.
 func reset_star_pulse() -> void:
 	if _star_pulse_tween != null and _star_pulse_tween.is_valid():
 		_star_pulse_tween.kill()
 	_star_pulse_tween = null
+	_star_icon.scale = Vector2.ONE
 	_star_counter.scale = Vector2.ONE
 
 
@@ -191,7 +199,7 @@ func apply_safe_layout(safe_margins: Vector4, viewport_size: Vector2) -> void:
 	var pause_top_y := row_center_y - pause_size.y * 0.5
 	_layout_absolute(_pause_button, pause_left_x, pause_top_y, pause_right_x, pause_top_y + pause_size.y)
 
-	var star_right_x := pause_left_x - 3 * star_gap
+	var star_right_x := pause_left_x - star_gap
 	var star_left_x := star_right_x - star_size.x
 	var star_top_y := row_center_y - star_size.y * 0.5
 	_layout_absolute(_star_counter, star_left_x, star_top_y, star_right_x, star_top_y + star_size.y)

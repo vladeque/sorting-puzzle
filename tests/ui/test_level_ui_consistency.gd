@@ -1,7 +1,8 @@
 extends SceneTree
 
 ## UI-003 level UI consistency verification: shared gameplay resource identity, explicit disabled
-## styles (no engine-default fallback), the Completion/Failure signal routing and copy, the
+## styles (no engine-default fallback), the star pill's receive pulse leaving its chrome alone, the
+## Completion/Failure signal routing and copy, the
 ## ui_cancel back-stack precedence, safe-area layout at fabricated insets, responsive ability-bar
 ## icon/badge bounds, long-value formatting, the hidden rewarded-ad placeholder, and locked-shelf
 ## count/unlock feedback. See docs/UI_003_LEVEL_UI_CONSISTENCY_TICKET.md and docs/SCENES.md's
@@ -42,6 +43,7 @@ func _run() -> void:
 
 	await _test_shared_resource_identity()
 	await _test_explicit_disabled_styles()
+	await _test_star_receive_pulse_keeps_pill_chrome()
 	await _test_focus_and_cursor_policy()
 	await _test_rewarded_ad_placeholder()
 	await _test_completion_and_failure_routing()
@@ -147,10 +149,9 @@ func _test_shared_resource_identity() -> void:
 		pause_button.size.is_equal_approx(Vector2(72.0, 64.0)),
 		"The Pause button should match the Main Menu settings button's 72x64 size."
 	)
-	var pause_bar := pause_button.find_child("PauseBar1", true, false) as ColorRect
 	_check(
 		is_equal_approx(float(pause_button.get("held_scale")), float(settings_button.get("held_scale")))
-			and pause_bar.color == settings_button.get_theme_color("font_color"),
+			and pause_button.get_theme_color("font_color") == settings_button.get_theme_color("font_color"),
 		"Pause should match the Main Menu settings button's held behavior and dark glyph color."
 	)
 	main_menu_top_status.queue_free()
@@ -179,9 +180,10 @@ func _test_shared_resource_identity() -> void:
 	failure_level.free()
 
 
-## No level-owned button may fall back to Godot's engine-default square style when disabled --
-## opening any overlay used to visibly turn the circular Pause button into a square because it had
-## no disabled StyleBox at all.
+## No level-owned button may fall back to a Godot engine-default when disabled -- opening any overlay
+## used to visibly turn the circular Pause button into a square because it had no disabled StyleBox
+## at all, and Pause's "II" glyph later washed out to the engine's pale default because only the
+## normal/pressed/hover font colors were authored.
 func _test_explicit_disabled_styles() -> void:
 	var level := await _make_level()
 	var top_hud = level.get("_top_hud")
@@ -189,10 +191,63 @@ func _test_explicit_disabled_styles() -> void:
 
 	var pause_button := top_hud.find_child("PauseButton", true, false) as Button
 	_check(pause_button.get_theme_stylebox("disabled") != null, "Pause button must have an explicit disabled style.")
+	# Pause is disabled for the whole completion celebration, where the frozen board leaves it in
+	# plain sight rather than behind an overlay.
+	_check(
+		pause_button.get_theme_color("font_disabled_color")
+			== pause_button.get_theme_color("font_color"),
+		"A disabled Pause button must keep its dark glyph instead of the engine's pale default."
+	)
 
 	for button_name in ["HammerButton", "ShuffleButton", "HighlightButton", "FreezerButton"]:
 		var button := ability_bar.find_child(button_name, true, false) as Button
 		_check(button.get_theme_stylebox("disabled") != null, "%s must have an explicit disabled style." % button_name)
+
+	level.free()
+
+
+## The star pill's receive pulse must never scale the pill itself. Its StyleBoxFlat carries a 2px
+## gold border and a 6px drop shadow, and the count is rasterized text, so a scaled pill visibly
+## thickens its own chrome and blurs its number -- most obviously during the completion celebration,
+## when the level-clearing combo's stars land over the frozen board. Only the star icon, which is
+## drawn straight from its texture, may scale.
+func _test_star_receive_pulse_keeps_pill_chrome() -> void:
+	var level := await _make_level()
+	var top_hud = level.get("_top_hud")
+	var star_counter := top_hud.find_child("StarCounter", true, false) as Control
+	var star_icon := star_counter.get_node("Icon") as Control
+
+	# Stepped by hand rather than sampled against the clock: a single slow frame in a headless run
+	# can swallow the whole 0.2s pulse, which would make a timed sample flaky.
+	top_hud.call("play_star_receive_pulse")
+	var pulse_tween: Tween = top_hud.get("_star_pulse_tween")
+	pulse_tween.pause()
+	pulse_tween.custom_step(0.05)
+	_check(
+		star_counter.scale.is_equal_approx(Vector2.ONE),
+		"The star pill must not scale during its receive pulse."
+	)
+	_check(
+		star_icon.scale.x > 1.0 and star_icon.scale.y > 1.0,
+		"The star icon should carry the receive pulse instead."
+	)
+
+	pulse_tween.custom_step(1.0)
+	_check(
+		star_icon.scale.is_equal_approx(Vector2.ONE),
+		"The receive pulse should settle the star icon back to its authored scale."
+	)
+
+	top_hud.call("play_star_receive_pulse")
+	var interrupted_tween: Tween = top_hud.get("_star_pulse_tween")
+	interrupted_tween.pause()
+	interrupted_tween.custom_step(0.05)
+	top_hud.call("reset_star_pulse")
+	_check(
+		star_icon.scale.is_equal_approx(Vector2.ONE)
+			and star_counter.scale.is_equal_approx(Vector2.ONE),
+		"Resetting the pulse on level restart should clear a mid-flight icon scale."
+	)
 
 	level.free()
 

@@ -1987,10 +1987,11 @@ Purpose:
   so Label minimum-size resolution cannot expand the timer into either side after layout. The
   timer, star pill, and Pause control share the authored 60px row center.
 - The Pause button matches the Main Menu settings-button role at 72x64, consuming the same warm
-  normal/pressed resources and 0.94 held scale. Its explicit disabled override preserves that shape
-  while overlays are open. Its `"II"` text is replaced with two dark-brown scene-authored
-  `ColorRect` bars (`PauseBar1`/`PauseBar2`, not font-glyph-dependent), scaled/repositioned
-  proportionally if extreme side insets require compacting the row.
+  normal/pressed resources and 0.94 held scale. Its explicit disabled StyleBox override preserves
+  that shape while overlays are open, and its `font_disabled_color` override keeps the `"II"` glyph
+  the settings button's dark brown rather than the engine's pale default -- Pause is disabled for
+  the whole completion celebration, where the frozen board leaves it visible instead of covered.
+  The whole control scales proportionally if extreme side insets require compacting the row.
 - Also owns the reward-star flight's landing point and receive pulse, and the Freezer countdown's
   frozen timer-color visual (moved here from `scripts/level.gd` so it does not reach into this
   scene's `TimerLabel` directly).
@@ -2001,8 +2002,12 @@ Key methods:
 - `set_pause_enabled(is_enabled)`: also switches between pointing-hand and arrow cursors so a
   disabled Pause action does not retain an enabled affordance.
 - `get_star_counter_global_center()`: the reward-star flight's landing point.
-- `play_star_receive_pulse()`: briefly pulses the star pill when a reward star arrives, matching
-  `scripts/main_menu_reward_chest.gd`'s `play_receive_pulse()` convention; kills any prior pulse first.
+- `play_star_receive_pulse()`: briefly pulses the star pill's `Icon` when a reward star arrives,
+  matching `scripts/main_menu_reward_chest.gd`'s `play_receive_pulse()` convention; kills any prior
+  pulse first. It scales the icon rather than the pill on purpose -- scaling the pill runs its
+  StyleBoxFlat and glyphs through the scaled transform, visibly thickening the 2px gold border and
+  6px drop shadow and blurring the count, which was most obvious during the completion celebration
+  where the level-clearing combo's stars land over the frozen board.
 - `reset_star_pulse()`: kills any in-flight pulse and resets scale -- used on level (re)start.
 - `set_timer_frozen_visual(is_frozen)`: recolors the countdown timer to the frozen cyan treatment
   while Freezer is active.
