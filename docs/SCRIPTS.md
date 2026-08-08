@@ -1519,6 +1519,8 @@ Key responsibilities:
 - Spawn configured items with `_add_configured_item()`.
 - Handle mouse and touch input through `_input()` and the press/motion/release helpers.
 - Move items with `_move_item_to_slot()`, `_resolve_move_target_slot()`, `_play_item_move_animation()`, and `_place_item_in_slot()`.
+- Finish every player-visible drop with `ShelfItem.play_land_impact()`, the landing squash-and-stretch owned by `scripts/item.gd`. It fires from `_play_item_move_animation()` after the eased travel settles and from `_place_item_in_slot()` when `should_play_landing` is set. The call is never awaited, so a landing does not delay `_resolve_shelves()` and its match clears. Silent forced restores (level failure, ability interrupt) pass `should_play_landing = false` and stay unanimated. Back-layer promotion is deliberately excluded: `_play_layer_promotion_animation()` already lands with its own `TRANS_BACK` overshoot on `visual_scale`.
+- Cancel a pending bounce with `ShelfItem.reset_land_impact()` before re-grabbing an item in `_begin_drag()` and before the gather in `_play_match_clear_animation()`, so the next animation never starts from a deformed pose.
 - Hide the active item's contact shadow while the player is dragging it, then restore the shadow when the drag releases, cancels, fails, or completes.
 - Redirect moves aimed at an occupied destination slot on another shelf to the nearest free front slot on that destination shelf; same-shelf occupied targets leave the item in its original slot.
 - Clear triples with `_clear_matching_shelves()` and `_play_match_clear_animation()`.
@@ -2078,7 +2080,7 @@ Attached to:
 - `scenes/item.tscn` root `Item`.
 
 Purpose:
-- Stores the item ID and applies sprite visuals for one sortable item.
+- Stores the item ID and applies sprite visuals for one sortable item, and owns the item's landing squash-and-stretch.
 
 Exports:
 - `item_id`: item identity used by matching and config loading.
@@ -2088,10 +2090,16 @@ Exports:
 - `outline_width`: desired on-screen outline thickness in pixels; converted to a source-texture texel radius for the outline shader so thickness stays constant regardless of the item's current scale.
 - `outline_alpha_threshold`: alpha cutoff used to detect the item silhouette.
 
+Runtime properties:
+- `land_squash`: non-uniform `Vector2` multiplier layered on top of `visual_scale` and the highlight scale, tweened by `play_land_impact()`. It is a separate channel precisely so `set_highlight_scale()` and `set_outline()` can keep writing their own uniform scale without flattening an in-flight bounce; anything that writes sprite scale must go through `_get_sprite_scale()` rather than assigning a uniform scale directly.
+
 Key methods:
 - `_ready()`: applies current texture and scale.
 - `_apply_texture()`: updates `Sprite2D.texture` and hides the soft contact shadow when the item has no texture.
-- `_apply_visual_scale()`: updates `Sprite2D`, `OutlineSprite`, and contact-shadow scale from `visual_scale * highlight scale multiplier`, then refreshes the outline.
+- `_apply_visual_scale()`: updates `Sprite2D`, `OutlineSprite`, and contact-shadow scale from `visual_scale * highlight scale multiplier * land_squash`, applies the contact pivot offset, then refreshes the outline.
+- `play_land_impact(strength)`: plays the landing squash-and-stretch (compress ~70 ms, rebound past rest ~70 ms, settle ~90 ms, roughly volume-conserving). Fire-and-forget and node-bound via `UIMotion.retween`, so it dies with the item if a landing immediately completes a triple. Called by `scripts/level.gd` from `_play_item_move_animation()` and from `_place_item_in_slot()` when `should_play_landing` is set.
+- `reset_land_impact()`: cancels an in-flight bounce and restores the resting shape; called before re-grabbing a dragged item and before the match-clear gather.
+- `_get_sprite_scale()` / `_get_contact_pivot_offset_y()`: compose the squash with the uniform scale and keep the art's ground contact planted (`CONTACT_ANCHOR_Y` mirrors the `Shadow` node's authored y in `scenes/item.tscn`) so the item does not lift off the shelf while deforming.
 - `set_outline(enabled, color, width)`: enables or disables the sprite border highlight.
 - `set_highlight_scale(multiplier)`: scales the sprite and outline up (without changing the persistent `visual_scale`) while an item is highlighted by the Lantern ability.
 - `set_contact_shadow_enabled(enabled)`: toggles the item contact shadow while still respecting texture availability; used by back-layer previews and active player dragging.
@@ -2102,9 +2110,14 @@ Depends on:
 - Child node `OutlineSprite`.
 - Child node `Shadow`.
 - `scenes/item.tscn` outline `ShaderMaterial`.
+- `scripts/ui_motion.gd` for `retween`/`stop_tween` landing-impact tween ownership.
 
 Do not use for:
 - Input ownership, matching rules, abilities, or shelf promotion.
+- Node-level `scale` animation. `scripts/level.gd` already tweens the item node's own `scale` for the match gather, Hammer, and Shuffle effects; the landing bounce deliberately stays on the child sprites so the two compose instead of fighting.
+
+Verified by:
+- `tests/gameplay/test_item_landing_impact.gd` (run through `scripts/tools/run_isolated_godot_test.ps1`).
 
 ## `scripts/tools/generate_level_shelves.py`
 

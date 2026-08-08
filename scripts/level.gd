@@ -1928,6 +1928,9 @@ func _begin_drag(item: ShelfItem, pointer_global_position: Vector2) -> void:
 	_dragged_item = item
 	_origin_slot = origin_slot
 	_drag_offset = item.global_position - pointer_global_position
+	# An item grabbed again before its previous landing finished must follow the finger at its
+	# resting shape rather than mid-squash.
+	item.reset_land_impact()
 	item.reparent(_drag_layer, true)
 	item.z_index = 100
 	item.set_contact_shadow_enabled(false)
@@ -2118,12 +2121,15 @@ func _get_slot_item(slot: Node2D) -> ShelfItem:
 	return null
 
 
-func _place_item_in_slot(item: ShelfItem, slot: Node2D, should_play_sound := false) -> void:
+## `should_play_landing` distinguishes a player-visible drop, which gets the full landing feedback,
+## from a silent forced restore (level failure, ability interrupt) that should not read as a move.
+func _place_item_in_slot(item: ShelfItem, slot: Node2D, should_play_landing := false) -> void:
 	item.reparent(slot, true)
 	item.position = SLOT_ITEM_POSITION
 	item.z_index = 10
 	_apply_item_visual_state(item)
-	if should_play_sound:
+	if should_play_landing:
+		item.play_land_impact()
 		_play_item_place_sound()
 
 
@@ -2173,6 +2179,9 @@ func _play_item_move_animation(item: ShelfItem, target_slot: Node2D) -> void:
 		collision.disabled = false
 
 	_apply_item_visual_state(item)
+	# Deliberately not awaited: the bounce is presentation only, and blocking here would delay
+	# _resolve_shelves() (and therefore every match clear) by the length of the impact.
+	item.play_land_impact()
 	_play_item_place_sound()
 
 
@@ -2280,6 +2289,9 @@ func _play_match_clear_animation(shelf_items: Array[ShelfItem]) -> void:
 		var item_instance_id := item.get_instance_id()
 		clearing_item_ids.append(item_instance_id)
 		_mark_item_clearing_by_id(item_instance_id)
+		# The landing that completed this triple is very likely still bouncing; clear it so the
+		# gather and shrink tweens start from the resting shape.
+		item.reset_land_impact()
 		item.input_pickable = false
 		item.z_index = 20
 
