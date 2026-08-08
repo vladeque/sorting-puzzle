@@ -27,7 +27,7 @@ const COMPACT_HUD_SIDE_MARGIN := 16.0
 const COMPACT_LEVEL_LABEL_MARGIN_LEFT := 20.0
 const COMPACT_LEVEL_LABEL_SIZE := Vector2(160.0, 40.0)
 const COMPACT_STAR_COUNTER_SIZE := Vector2(88.0, 46.0)
-const COMPACT_STAR_COUNTER_GAP := 10.0
+const COMPACT_STAR_COUNTER_GAP := 30.0
 const COMPACT_TIMER_WIDTH := 120.0
 const REGULAR_TIMER_WIDTH := 140.0
 const COMPACT_TIMER_FONT_SIZE := 40
@@ -36,7 +36,9 @@ const COMPACT_LEVEL_FONT_SIZE := 24
 const REGULAR_LEVEL_FONT_SIZE := 28
 const TIMER_LABEL_HEIGHT := 64.0
 const STAR_COUNTER_SIZE := Vector2(112.0, 52.0)
-const STAR_COUNTER_GAP := 12.0
+## Deliberately wider than the row's other gaps: the star pill and Pause are separate roles (a
+## status readout and a control), so they read as two things rather than one cluster.
+const STAR_COUNTER_GAP := 36.0
 const COMBO_SLOT_SIZE := Vector2(170.0, 29.0)
 const COMBO_SLOT_TOP := 92.0
 const COMBO_FILL_INSET := 3.0

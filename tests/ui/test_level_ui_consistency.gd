@@ -487,8 +487,8 @@ func _test_safe_area_layout() -> void:
 		"Star counter and timer should share the same top-HUD row center."
 	)
 	_check(
-		is_equal_approx(pause_button.get_rect().position.x - star_counter.get_rect().end.x, 12.0),
-		"Regular star and Pause controls should keep their authored 12px gap."
+		is_equal_approx(pause_button.get_rect().position.x - star_counter.get_rect().end.x, 36.0),
+		"Regular star and Pause controls should keep their authored 36px gap."
 	)
 
 	top_hud.call("apply_safe_layout", safe_margins, viewport_size)
@@ -506,8 +506,8 @@ func _test_safe_area_layout() -> void:
 	)
 
 	_check(
-		is_equal_approx(pause_button.get_rect().position.x - star_counter.get_rect().end.x, 10.0),
-		"Compact star and Pause controls should keep their authored 10px gap."
+		is_equal_approx(pause_button.get_rect().position.x - star_counter.get_rect().end.x, 30.0),
+		"Compact star and Pause controls should keep their authored 30px gap."
 	)
 	_check(
 		timer_label.get_rect().position.x + 0.5 >= level_label.get_rect().end.x,

@@ -1482,7 +1482,8 @@ Purpose:
   only the timer/level/star/pause row did). The timer stays centered but is kept clear of the level
   label and star/pause cluster so long values (`LEVEL 99`, `59:59`, large star totals) can never
   overlap either side. Timer, star pill, and Pause share the authored 60px row center, and the star
-  pill keeps its original 12px regular-width gap from Pause.
+  pill keeps a deliberately wide 36px regular-width gap from Pause (30px compact) so the status
+  readout and the control read as two roles rather than one cluster.
 - `%PauseButton` matches the Main Menu settings-button role: 72x64 with the shared warm normal/
   pressed resources, a matching 0.94 held scale, and an explicit warm disabled override. Its pause
   mark is the `"II"` text glyph, authored in the same dark brown as the settings button for every
