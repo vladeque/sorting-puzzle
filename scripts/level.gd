@@ -550,6 +550,39 @@ func _input(event: InputEvent) -> void:
 		_handle_motion_at(_screen_position_to_global(drag_event.position))
 
 
+## Prototype scaffolding: cycles every item's ground-shadow style (cast projection <-> contact pool)
+## with F9 in a debug build, so both can be compared on the same board without a rebuild. Delete
+## this together with ShelfItem.ShadowStyle once one style is chosen. On device, where there is no
+## keyboard, set ShelfItem.shadow_style's default in scripts/item.gd before building instead.
+func _unhandled_key_input(event: InputEvent) -> void:
+	if not OS.is_debug_build():
+		return
+
+	var key_event := event as InputEventKey
+	if key_event == null or not key_event.pressed or key_event.echo:
+		return
+
+	if key_event.keycode != KEY_F9:
+		return
+
+	_cycle_item_shadow_style()
+	get_viewport().set_input_as_handled()
+
+
+func _cycle_item_shadow_style() -> void:
+	var is_cast := ShelfItem.shadow_style == ShelfItem.ShadowStyle.CAST_PROJECTION
+	ShelfItem.shadow_style = (
+		ShelfItem.ShadowStyle.CONTACT_POOL if is_cast else ShelfItem.ShadowStyle.CAST_PROJECTION
+	)
+
+	for node in get_tree().get_nodes_in_group(ShelfItem.ITEM_GROUP):
+		var item := node as ShelfItem
+		if item != null:
+			item.refresh_shadow_style()
+
+	print("Item shadow style: %s" % ("contact pool" if is_cast else "cast projection"))
+
+
 ## System back / Android back / Escape (UI-003). Unlike _input() above, this always runs regardless
 ## of pause/failed/completed state, implementing one topmost-state-first back stack:
 ##   1. Leave Confirmation returns to Pause.
@@ -1564,7 +1597,7 @@ func _fail_level() -> void:
 	_update_pause_menu_button()
 
 	if _dragged_item != null and _origin_slot != null:
-		_dragged_item.set_contact_shadow_enabled(true)
+		_dragged_item.set_drag_lifted(false)
 		_place_item_in_slot(_dragged_item, _origin_slot)
 
 	_dragged_item = null
@@ -1596,7 +1629,7 @@ func _complete_level() -> void:
 	_clear_selected_item()
 	_set_moving_shelf_rows_paused(true)
 	if _dragged_item != null:
-		_dragged_item.set_contact_shadow_enabled(true)
+		_dragged_item.set_drag_lifted(false)
 	_dragged_item = null
 	_origin_slot = null
 	_drag_offset = Vector2.ZERO
@@ -1967,7 +2000,9 @@ func _begin_drag(item: ShelfItem, pointer_global_position: Vector2) -> void:
 	item.reset_land_impact()
 	item.reparent(_drag_layer, true)
 	item.z_index = 100
-	item.set_contact_shadow_enabled(false)
+	# The shadow stays on and stays parented to the item, so it travels with the finger; lifting it
+	# is what separates "held above the board" from "resting in a slot".
+	item.set_drag_lifted(true)
 	item.global_position = pointer_global_position + _drag_offset
 
 
@@ -1986,7 +2021,7 @@ func _finish_active_drag(pointer_global_position: Vector2) -> void:
 	var item := _dragged_item
 	var origin_slot := _origin_slot
 	var target_slot := _find_nearest_slot(pointer_global_position)
-	item.set_contact_shadow_enabled(true)
+	item.set_drag_lifted(false)
 	if target_slot == null:
 		_return_item_to_origin_after_animation(item, origin_slot)
 	elif target_slot == origin_slot:
@@ -2161,6 +2196,9 @@ func _place_item_in_slot(item: ShelfItem, slot: Node2D, should_play_landing := f
 	item.reparent(slot, true)
 	item.position = SLOT_ITEM_POSITION
 	item.z_index = 10
+	# Safety net for every path that lands an item without going through _finish_active_drag: an
+	# item back in a slot must never keep a carried item's lifted shadow.
+	item.set_drag_lifted(false)
 	_apply_item_visual_state(item)
 	if should_play_landing:
 		item.play_land_impact()
@@ -3002,7 +3040,7 @@ func _cancel_active_interaction() -> void:
 	_clear_selected_item()
 
 	if _dragged_item != null and _origin_slot != null:
-		_dragged_item.set_contact_shadow_enabled(true)
+		_dragged_item.set_drag_lifted(false)
 		_place_item_in_slot(_dragged_item, _origin_slot)
 
 	_dragged_item = null

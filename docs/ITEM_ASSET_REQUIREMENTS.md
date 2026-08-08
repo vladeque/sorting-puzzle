@@ -14,7 +14,8 @@ Every item texture must:
   checkerboard, shelf, or chroma-key color.
 - Contain one complete item silhouette with no cropping at the canvas edges.
 - Avoid a baked contact or cast shadow outside the item silhouette. `scenes/item.tscn` owns the
-  shared runtime contact shadow.
+  runtime ground shadow, and it is generated from this texture's own alpha, so any baked shadow
+  would be projected a second time as part of the silhouette.
 - Prefer source art generated or authored at `256x256` or larger. A `128x128` source can be
   upscaled when no better source exists, but upscaling does not restore lost detail.
 
@@ -35,7 +36,8 @@ The visible artwork must:
 - Preserve its original aspect ratio. Never stretch width and height independently.
 - Be centered horizontally around canvas X=`128`, with a tolerance of about `2` pixels.
 - End at canvas Y=`240`, with a tolerance of about `1` pixel. With the top-left coordinate system,
-  this means `visible_y + visible_height = 240`.
+  this means `visible_y + visible_height = 240`. The runtime ground shadow anchors on this line
+  (`ShelfItem.SHADOW_GROUND_TEXELS`), so art that ends short of it will appear to hover.
 - Leave approximately `16` transparent pixels below the visible item.
 - Remain bottom-aligned when it is shorter than `220` pixels. Do not vertically center short jars,
   tubs, boxes, or other squat items, because they will appear to float above the shelf.

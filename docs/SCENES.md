@@ -1662,7 +1662,19 @@ Purpose:
 - In generated shelves, the owning shelf cell scale enlarges the item sprite, shadow, and hit area together with the shelf visuals.
 
 Important nodes:
-- `Shadow`: solid-color up-right cast shadow behind front-layer item sprites; generated back-layer previews and active player drags disable it.
+- `Shadow`: translucent ground shadow drawn from the item's own texture, so each item's silhouette
+  shapes its own shadow. A shared shader low-pass filters the alpha (a ring average, unlike
+  `OutlineSprite`'s max-dilation) so straws, handles and label detail dissolve while the overall
+  bottle/box/tub form stays recognizable, then flattens the result to one translucent color that
+  reads on both the wooden shelf floor and the lighter level background. `scripts/item.gd` anchors
+  the sprite on the art's ground line (canvas y=240, see `docs/ITEM_ASSET_REQUIREMENTS.md`) and
+  projects it onto the floor. Generated back-layer previews and clearing items disable it; an
+  actively dragged item keeps it and lifts it instead.
+- Two prototype shadow styles are wired up for comparison, selected by `ShelfItem.shadow_style` and
+  configured by the `shadow_cast_material` / `shadow_pool_material` shader materials exported on the
+  root: `CAST_PROJECTION` skews the whole flattened silhouette up-right along the light direction,
+  and `CONTACT_POOL` drops the shear and keeps only the contact region so it spreads into a soft
+  pool under the item. Once one is chosen, delete the other along with the style switcher.
 - `OutlineSprite`: hidden sprite used by `ShelfItem` to draw alpha-based highlight borders.
 - `Sprite2D`: main item sprite; texture and visual scale are controlled by `ShelfItem`.
 - `CollisionShape2D`: rectangular item hitbox used by runtime interaction.

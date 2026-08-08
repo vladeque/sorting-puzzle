@@ -43,19 +43,93 @@ shader_parameter/outline_color = Color(1, 0.86, 0.18, 1)
 shader_parameter/alpha_threshold = 0.1
 shader_parameter/outline_radius_px = 0.0
 
+[sub_resource type="Shader" id="Shader_item_shadow"]
+code = "shader_type canvas_item;
+render_mode unshaded;
+
+// Ground shadow derived from the item's own sprite alpha, so every catalog item casts its own
+// form without per-asset shadow authoring. The silhouette is low-pass filtered (a ring average,
+// unlike the outline shader's max-dilation) so straws, handles, lids and label details dissolve
+// while the overall bottle/box/tub shape survives -- the shadow stays recognizable without being
+// a literal copy of the item.
+//
+// The projection itself lives outside this shader: scenes/item.tscn anchors the sprite on the
+// art's ground line (canvas y=240, per docs/ITEM_ASSET_REQUIREMENTS.md) and scripts/item.gd
+// squashes, skews and lifts it onto the floor.
+uniform vec4 shadow_color : source_color = vec4(0.1, 0.05, 0.02, 0.34);
+uniform float blur_radius_px : hint_range(0.0, 64.0, 0.5) = 10.0;
+uniform float mask_low : hint_range(0.0, 1.0, 0.01) = 0.3;
+uniform float mask_high : hint_range(0.0, 1.0, 0.01) = 0.62;
+// Height above the art's ground line, in source texels, over which the mask fades out. 0 keeps
+// the whole silhouette (cast projection); a small value keeps only the contact region so the
+// shadow reads as a pool whose width still comes from the item (contact pool).
+uniform float ground_fade_texels : hint_range(0.0, 256.0, 1.0) = 0.0;
+uniform float ground_line_v : hint_range(0.0, 1.0, 0.001) = 0.9375;
+
+const int SHADOW_RING_STEPS = 8;
+const float SHADOW_TAU = 6.283185307179586;
+const float SHADOW_INNER_RING = 0.55;
+
+void fragment() {
+	float coverage = texture(TEXTURE, UV).a;
+	float sample_count = 1.0;
+
+	if (blur_radius_px > 0.0) {
+		for (int i = 0; i < SHADOW_RING_STEPS; i++) {
+			float angle = float(i) / float(SHADOW_RING_STEPS) * SHADOW_TAU;
+			vec2 ring = vec2(cos(angle), sin(angle)) * blur_radius_px * TEXTURE_PIXEL_SIZE;
+			coverage += texture(TEXTURE, UV + ring * SHADOW_INNER_RING).a;
+			coverage += texture(TEXTURE, UV + ring).a;
+			sample_count += 2.0;
+		}
+	}
+
+	float mask = smoothstep(mask_low, mask_high, coverage / sample_count);
+
+	if (ground_fade_texels > 0.0) {
+		float height_above_ground =
+			(ground_line_v - UV.y) / (ground_fade_texels * TEXTURE_PIXEL_SIZE.y);
+		mask *= 1.0 - smoothstep(0.0, 1.0, clamp(height_above_ground, 0.0, 1.0));
+	}
+
+	// The fragment color is generated from the alpha mask rather than from the texture's own color,
+	// so the incoming COLOR (and with it the item's modulate) is deliberately discarded. Per-item
+	// opacity -- the drag lift -- rides on shadow_color's alpha in a per-item material copy instead.
+	COLOR = vec4(shadow_color.rgb, shadow_color.a * mask);
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_shadow_cast"]
+shader = SubResource("Shader_item_shadow")
+shader_parameter/shadow_color = Color(0.1, 0.05, 0.02, 0.34)
+shader_parameter/blur_radius_px = 10.0
+shader_parameter/mask_low = 0.3
+shader_parameter/mask_high = 0.62
+shader_parameter/ground_fade_texels = 0.0
+shader_parameter/ground_line_v = 0.9375
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_shadow_pool"]
+shader = SubResource("Shader_item_shadow")
+shader_parameter/shadow_color = Color(0.1, 0.05, 0.02, 0.4)
+shader_parameter/blur_radius_px = 26.0
+shader_parameter/mask_low = 0.12
+shader_parameter/mask_high = 0.5
+shader_parameter/ground_fade_texels = 90.0
+shader_parameter/ground_line_v = 0.9375
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_item_hitbox"]
 size = Vector2(74, 112)
 
-[node name="Item" type="Area2D" unique_id=757671973]
+[node name="Item" type="Area2D" groups=["shelf_items"] unique_id=757671973]
 z_index = 10
 script = ExtResource("1_item_script")
+shadow_cast_material = SubResource("ShaderMaterial_shadow_cast")
+shadow_pool_material = SubResource("ShaderMaterial_shadow_pool")
 
-[node name="Shadow" type="Polygon2D" parent="." unique_id=1649807921]
+[node name="Shadow" type="Sprite2D" parent="." unique_id=1649807921]
 z_index = -4
-position = Vector2(6, 42)
-color = Color(0.5, 0.31, 0.15, 1)
-offset = Vector2(0, 5)
-polygon = PackedVector2Array(-10, 6, -15, -2, 1, -14, 28.2789, -13.574501, 13, 0, 2, 5)
+material = SubResource("ShaderMaterial_shadow_cast")
+offset = Vector2(0, -112)
 
 [node name="OutlineSprite" type="Sprite2D" parent="." unique_id=515204852]
 visible = false

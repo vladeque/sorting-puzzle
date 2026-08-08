@@ -1522,7 +1522,8 @@ Key responsibilities:
 - Move items with `_move_item_to_slot()`, `_resolve_move_target_slot()`, `_play_item_move_animation()`, and `_place_item_in_slot()`.
 - Finish every player-visible drop with `ShelfItem.play_land_impact()`, the landing squash-and-stretch owned by `scripts/item.gd`. It fires from `_play_item_move_animation()` after the eased travel settles and from `_place_item_in_slot()` when `should_play_landing` is set. The call is never awaited, so a landing does not delay `_resolve_shelves()` and its match clears. Silent forced restores (level failure, ability interrupt) pass `should_play_landing = false` and stay unanimated. Back-layer promotion is deliberately excluded: `_play_layer_promotion_animation()` already lands with its own `TRANS_BACK` overshoot on `visual_scale`.
 - Cancel a pending bounce with `ShelfItem.reset_land_impact()` before re-grabbing an item in `_begin_drag()` and before the gather in `_play_match_clear_animation()`, so the next animation never starts from a deformed pose.
-- Hide the active item's contact shadow while the player is dragging it, then restore the shadow when the drag releases, cancels, fails, or completes.
+- Lift the active item's ground shadow with `ShelfItem.set_drag_lifted(true)` while the player is dragging it, and settle it again when the drag releases, cancels, fails, or completes. The shadow stays parented to the item so it travels with the finger; the lift (further along the light direction, spread wider, washed out) is what reads as "held above the board". `_place_item_in_slot()` also clears the lift as a safety net for paths that land an item without going through `_finish_active_drag()`.
+- Cycle the prototype ground-shadow style with F9 in a debug build (`_unhandled_key_input()` / `_cycle_item_shadow_style()`), which flips the shared `ShelfItem.shadow_style` and refreshes every item in the `shelf_items` group. This is temporary scaffolding for choosing between the two styles and should be removed with the losing style.
 - Redirect moves aimed at an occupied destination slot on another shelf to the nearest free front slot on that destination shelf; same-shelf occupied targets leave the item in its original slot.
 - Clear triples with `_clear_matching_shelves()` and `_play_match_clear_animation()`.
 - Track the active triple-clear combo with `_extend_combo()`, `_update_combo_timer()`, `_reset_combo()`, and `_update_combo_hud()`, including the shrinking center-slot fill (now rendered by `scripts/level_top_hud.gd::set_combo()`). Combo value increases by 1 per cleared triple, and each cleared triple adds stars equal to the combo value reached by that triple; `_update_star_counter_label()` forwards that number to `LevelTopHud.set_star_count()`, which owns the star pill (now a true pill, `style_box_gameplay_status_pill.tres`).
@@ -2137,19 +2138,26 @@ Exports:
 - `outline_width`: desired on-screen outline thickness in pixels; converted to a source-texture texel radius for the outline shader so thickness stays constant regardless of the item's current scale.
 - `outline_alpha_threshold`: alpha cutoff used to detect the item silhouette.
 
+- `shadow_cast_material` / `shadow_pool_material`: shared shader materials for the two prototype ground-shadow styles, assigned in `scenes/item.tscn`. Each item renders through a duplicate of the active one, because the shadow shader generates its color from the alpha mask and therefore ignores the node's modulate, leaving the shader's `shadow_color` alpha as the only per-item opacity channel.
+
 Runtime properties:
 - `land_squash`: non-uniform `Vector2` multiplier layered on top of `visual_scale` and the highlight scale, tweened by `play_land_impact()`. It is a separate channel precisely so `set_highlight_scale()` and `set_outline()` can keep writing their own uniform scale without flattening an in-flight bounce; anything that writes sprite scale must go through `_get_sprite_scale()` rather than assigning a uniform scale directly.
+- `shadow_lift`: 0 while the item rests in a slot, 1 while the player carries it, tweened by `set_drag_lifted()`. Its own channel for the same reason `land_squash` is: a lift arriving mid-landing must not fight the bounce.
+- `shadow_style` (static): the prototype ground-shadow style shared by every item, `CAST_PROJECTION` or `CONTACT_POOL`. Typed as `int` rather than the enum because cross-script assignment to an enum-typed static is rejected at runtime.
 
 Key methods:
-- `_ready()`: applies current texture and scale.
-- `_apply_texture()`: updates `Sprite2D.texture` and hides the soft contact shadow when the item has no texture.
-- `_apply_visual_scale()`: updates `Sprite2D`, `OutlineSprite`, and contact-shadow scale from `visual_scale * highlight scale multiplier * land_squash`, applies the contact pivot offset, then refreshes the outline.
+- `_ready()`: joins the `shelf_items` group, then applies current texture and scale.
+- `_apply_texture()`: updates `Sprite2D.texture` and refreshes the ground shadow, which hides itself when the item has no texture.
+- `_apply_visual_scale()`: updates `Sprite2D` and `OutlineSprite` scale from `visual_scale * highlight scale multiplier * land_squash`, applies the contact pivot offset, then refreshes the shadow and outline.
+- `_apply_shadow()`: projects the item's own silhouette onto the floor. Anchors the shadow sprite on the art's ground line (`SHADOW_GROUND_TEXELS`, the 240-128 texel drop every item texture shares per `docs/ITEM_ASSET_REQUIREMENTS.md`), then flattens it -- sheared up-right for `CAST_PROJECTION`, straddling the contact line without shear for `CONTACT_POOL` -- and folds in the landing squash's width and the drag lift's offset, spread and fade. Only the shadow's width follows the squash: an impact spreads the contact patch sideways, it does not push the shadow further along the shelf.
+- `set_drag_lifted(lifted)`: tweens `shadow_lift`, lifting the shadow off a carried item instead of hiding it. Node-bound through `UIMotion.retween`, so it dies with the item.
+- `refresh_shadow_style()`: re-reads the shared `shadow_style`; only the prototype style switcher in `scripts/level.gd` needs it, since item creation picks the current style up through `_ready()`.
 - `play_land_impact(strength)`: plays the landing squash-and-stretch (compress ~70 ms, rebound past rest ~70 ms, settle ~90 ms, roughly volume-conserving). Fire-and-forget and node-bound via `UIMotion.retween`, so it dies with the item if a landing immediately completes a triple. Called by `scripts/level.gd` from `_play_item_move_animation()` and from `_place_item_in_slot()` when `should_play_landing` is set.
 - `reset_land_impact()`: cancels an in-flight bounce and restores the resting shape; called before re-grabbing a dragged item and before the match-clear gather.
-- `_get_sprite_scale()` / `_get_contact_pivot_offset_y()`: compose the squash with the uniform scale and keep the art's ground contact planted (`CONTACT_ANCHOR_Y` mirrors the `Shadow` node's authored y in `scenes/item.tscn`) so the item does not lift off the shelf while deforming.
+- `_get_sprite_scale()` / `_get_contact_pivot_offset_y()`: compose the squash with the uniform scale and keep the art's ground contact planted so the item does not lift off the shelf while deforming. `CONTACT_ANCHOR_Y` is the landing bounce's pivot and is tuned by eye; it is deliberately not the same value as the shadow's `SHADOW_GROUND_TEXELS` anchor, which is measured from the texture contract.
 - `set_outline(enabled, color, width)`: enables or disables the sprite border highlight.
 - `set_highlight_scale(multiplier)`: scales the sprite and outline up (without changing the persistent `visual_scale`) while an item is highlighted by the Lantern ability.
-- `set_contact_shadow_enabled(enabled)`: toggles the item contact shadow while still respecting texture availability; used by back-layer previews and active player dragging.
+- `set_contact_shadow_enabled(enabled)`: hard on/off switch for the ground shadow, still respecting texture availability; used by back-layer previews, clearing items, and the shuffle fly-in. Dragging no longer uses it -- see `set_drag_lifted()`.
 - `_apply_outline()`: sends outline color/threshold and the computed dilation radius to the `OutlineSprite` shader material, and keeps the outline node visible only while enabled. The `OutlineSprite` shader dilates the alpha mask by sampling a ring of points around each pixel (in source-texture texels) rather than scaling the whole sprite up, so the border thickness stays even around irregular silhouettes.
 
 Depends on:
@@ -2165,6 +2173,7 @@ Do not use for:
 
 Verified by:
 - `tests/gameplay/test_item_landing_impact.gd` (run through `scripts/tools/run_isolated_godot_test.ps1`).
+- `tests/gameplay/test_item_contact_shadow.gd` for the silhouette-derived ground shadow: both prototype styles, the ground-line anchor, and the drag lift travelling with the item.
 
 ## `scripts/tools/generate_level_shelves.py`
 
