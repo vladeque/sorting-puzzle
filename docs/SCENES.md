@@ -1090,8 +1090,10 @@ Important nodes:
 - `UI/AbilityBar`: `scenes/ui/ability_bar.tscn` instance; its focused owner script owns all four
   buttons, use badges, timed badges, touch-target sizing, and the `ability_pressed` signal.
 - `UI/FailurePanel`: shown when time runs out.
-- `UI/CompletionScreen`: `scenes/ui/level_completion_screen.tscn` instance shown after all items clear, once the completion celebration window has elapsed.
-- `UI/CompletionConfetti`: `scenes/effects/level_completion_confetti.tscn` instance, kept last in the `UI` layer so its pieces fall in front of the reward overlay.
+- `UI/CompletionScreen`: `scenes/ui/level_completion_screen.tscn` instance whose reveal begins 1.35
+  seconds after all items clear, while the longer confetti fall continues.
+- `UI/CompletionConfetti`: `scenes/effects/level_completion_confetti.tscn` instance, kept last in the
+  `UI` layer so its foreground paper pieces bridge the cleared board and reward overlay.
 - `UI/PauseMenuOverlay`: `scenes/pause_menu.tscn` instance used for the modal pause menu.
 - `UI/LeaveConfirmationOverlay`: `scenes/leave_confirmation_menu.tscn` instance shown after the pause menu's Leave button, before spending a campaign life and returning to the menu.
 - `UI/AbilityPurchaseOverlay`: `scenes/ability_purchase_menu.tscn` instance shown when the player taps an ability with zero saved uses remaining.
@@ -1218,6 +1220,8 @@ Purpose:
   title (`Great job!`), action placement, safe-area layout, and open/close fade (UI-003; see
   "Shared Gameplay UI Roles" above). Keeps its own star image/earned-count placement, which stays
   local since it is state-specific (not shared with `scenes/ui/level_failure_screen.tscn`).
+- Pops in the title/reward star, then bounces in the earned count and action; five small tinted
+  paper-star nodes flash around the reward and continue a restrained twinkle while the screen waits.
 - Displays the reward star image and earned-star count label, and emits `next_pressed` (unchanged
   signal name) so `scripts/level.gd` can advance campaign levels or return dev/test launches to
   their menu. The action button now reads `Continue` (was `Next`) -- same return-to-menu behavior.
@@ -1225,6 +1229,8 @@ Purpose:
 Important nodes:
 - `Shell`: the shared result shell instance.
 - `StarImage`: large `assets/ui/reward_star.png` reward art, reparented into `Shell`'s content region.
+- `SparkleLayer` / `Sparkle*`: responsive, input-transparent tinted paper-star glints positioned
+  around `StarImage`; their intro and idle twinkle are owned by the screen script.
 - `EarnedStarsLabel`: final run star count formatted as `×N`; its responsive center sits 150 design
   pixels below the reward star center. Reparented into `Shell`'s content region.
 - `NextButton`: green blank-image button reading `Continue`, reparented into `Shell`'s action row,
@@ -1232,7 +1238,8 @@ Important nodes:
 
 Depends on:
 - `scenes/ui/gameplay_result_shell.tscn`.
-- `assets/ui/reward_star.png`, the shared `style_box_green_primary_button.tres`.
+- `assets/ui/reward_star.png`, `assets/effects/confetti_paper_star.png`, and the shared
+  `style_box_green_primary_button.tres`.
 - `scripts/press_scale_button.gd`, `scripts/gameplay_ui_theme.gd`.
 
 Do not use for:
@@ -1281,20 +1288,21 @@ Script:
 - `scripts/level_completion_confetti.gd`
 
 Purpose:
-- Confetti celebration played by `scripts/level.gd` while a cleared level stays on screen, before
-  `scenes/ui/level_completion_screen.tscn` opens. Instanced in `level.tscn` as `UI/CompletionConfetti`
-  and kept last in the `UI` layer so pieces keep falling in front of the reward overlay's shade.
+- Layered paper-confetti celebration played by `scripts/level.gd` while the cleared board stays on
+  screen. The reward overlay begins opening 1.35 seconds into the longer fall, and the effect is kept
+  last in the `UI` layer so its foreground pieces visibly bridge both states.
 - Extracted rather than assembled in `scripts/level.gd` (see AGENTS.md's Scene Extraction Rule): the
   piece look is scene-authored and tunable without touching gameplay code.
 
 Important nodes:
-- `LeftCannon` / `RightCannon`: the two `CPUParticles2D` emitters. They own the confetti look --
-  ribbon shape (`split_scale` with a flip curve on X and a constant thickness curve on Y), the
-  six-color discrete `color_initial_ramp`, the end-of-life alpha `color_ramp`, tumble
-  (`angular_velocity`), air drag (`damping_max`), and the one-shot burst timing
-  (`amount`, `lifetime`, `explosiveness`). Their muzzle positions, direction, launch speed, gravity,
-  and piece size are recomputed for the live viewport by the script on every `play()`, so the
-  scene's values are design-resolution defaults.
+- `LeftBackCurl` / `RightBackCurl`, `LeftCannon` / `RightCannon`, `LeftFold` / `RightFold`,
+  `LeftStars` / `RightStars`, and `LeftFrontCurl` / `RightFrontCurl`: five depth/shape layers per
+  corner. They use the four transparent Paper A textures in `assets/effects/`, varied arc heights,
+  piece sizes, color ramps, tumble, opacity, and z-indices while keeping side-emitter count at 248.
+- `CentralFlash`: short radial gradient flash at the arc intersection.
+- `CenterBurst`: delayed 18-piece textured paper-star pop on the same center beat.
+- Muzzle positions, direction, launch speed, gravity, and responsive sprite scale are recomputed for
+  the live viewport on every `play()`; the scene values are design-resolution defaults.
 
 Depends on:
 - `scripts/level.gd` for playback on completion.

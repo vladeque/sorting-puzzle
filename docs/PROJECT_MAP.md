@@ -520,8 +520,11 @@ Responsibility:
 - Shows and expires the active combo count and shrinking green time strip in the top HUD's combo slot when triple clears happen within the configured combo window.
 - Shows the current run's star total in the top HUD's star pill (a true pill, UI-003) with a small `assets/ui/reward_star_34_glossy_b.png` icon; triple clears add stars equal to the combo value reached by each clear and play the same compact stars as they drop from the cleared triple, fly into the counter, and pulse it.
 - Shows short praise words near the clear location for 2x+ combos, with unique wording through 20x and stronger colored outlines as the combo rises.
-- Keeps the cleared board on screen for `COMPLETION_CELEBRATION_SECONDS` (2s) and plays the `UI/CompletionConfetti` instance of `scenes/effects/level_completion_confetti.tscn` over it before the reward overlay opens. Progress is committed at the moment of the clear, not at the end of the celebration; a back press during the window skips straight to the reward overlay.
-- Shows the completed-level reward overlay through the `UI/CompletionScreen` instance of `scenes/ui/level_completion_screen.tscn` (composing the shared result shell), using `assets/ui/reward_star.png`, the shared green CTA style, and the final run star count for the earned amount label. Its action reads `Continue`.
+- Starts the layered Paper A `UI/CompletionConfetti` effect immediately, keeps the cleared board
+  exposed for `COMPLETION_REVEAL_SECONDS` (1.35s), then opens the reward overlay while foreground
+  curls continue falling. Progress commits at clear time; Back during the lead-in skips the wait.
+- Shows the completed-level reward overlay through `UI/CompletionScreen`, with a title pop, reward
+  star overshoot, earned-count bounce, rising `Continue` action, and small tinted paper-star glints.
 - Shows a working failure exit through the `UI/FailureScreen` instance of `scenes/ui/level_failure_screen.tscn` (new, UI-003 P0 -- Failure was previously a dead-end embedded label with no action), composing the same shared result shell as Completion.
 - Sends completed campaign stars to `PlayerProgress`; Completion's `Continue` and Failure's `Main Menu` both return to the main menu, where one reward star per earned star flies from the house to the reward chest and advances its visible count.
 - Uses `scripts/press_scale_button.gd` on every gameplay action (Pause, all four ability buttons, every modal close button, and both result screens' actions -- UI-003 extended this to controls that previously had no press feedback at all).

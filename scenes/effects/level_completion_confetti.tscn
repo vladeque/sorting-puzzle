@@ -1,23 +1,53 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://scripts/level_completion_confetti.gd" id="1_confetti_script"]
+[ext_resource type="Texture2D" path="res://assets/effects/confetti_paper_curl.png" id="2_paper_curl"]
+[ext_resource type="Texture2D" path="res://assets/effects/confetti_paper_tile.png" id="3_paper_tile"]
+[ext_resource type="Texture2D" path="res://assets/effects/confetti_paper_star.png" id="4_paper_star"]
+[ext_resource type="Texture2D" path="res://assets/effects/confetti_paper_fold.png" id="5_paper_fold"]
 
 [sub_resource type="Gradient" id="Gradient_confetti_colors"]
 interpolation_mode = 1
 offsets = PackedFloat32Array(0, 0.167, 0.334, 0.5, 0.667, 0.834)
 colors = PackedColorArray(1, 0.31, 0.64, 1, 1, 0.82, 0.25, 1, 0.31, 0.85, 1, 1, 0.43, 0.91, 0.43, 1, 1, 0.54, 0.24, 1, 0.71, 0.48, 1, 1)
 
+[sub_resource type="Gradient" id="Gradient_confetti_back_colors"]
+interpolation_mode = 1
+offsets = PackedFloat32Array(0, 0.25, 0.5, 0.75)
+colors = PackedColorArray(0.98, 0.48, 0.73, 0.72, 0.37, 0.82, 0.96, 0.72, 0.98, 0.78, 0.3, 0.72, 0.46, 0.9, 0.66, 0.72)
+
+[sub_resource type="Gradient" id="Gradient_confetti_star_colors"]
+interpolation_mode = 1
+offsets = PackedFloat32Array(0, 0.34, 0.67)
+colors = PackedColorArray(1, 0.94, 0.3, 1, 1, 0.63, 0.2, 1, 1, 0.4, 0.64, 1)
+
 [sub_resource type="Gradient" id="Gradient_confetti_fade"]
-offsets = PackedFloat32Array(0, 0.8, 1)
+offsets = PackedFloat32Array(0, 0.78, 1)
 colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)
 
+[sub_resource type="Gradient" id="Gradient_confetti_back_fade"]
+offsets = PackedFloat32Array(0, 0.72, 1)
+colors = PackedColorArray(1, 1, 1, 0.82, 1, 1, 1, 0.72, 1, 1, 1, 0)
+
 [sub_resource type="Curve" id="Curve_confetti_flip"]
-_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.2, 0.32), 0.0, 0.0, 0, 0, Vector2(0.4, 0.96), 0.0, 0.0, 0, 0, Vector2(0.62, 0.34), 0.0, 0.0, 0, 0, Vector2(0.82, 0.94), 0.0, 0.0, 0, 0, Vector2(1, 0.4), 0.0, 0.0, 0, 0]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.18, 0.24), 0.0, 0.0, 0, 0, Vector2(0.38, 0.96), 0.0, 0.0, 0, 0, Vector2(0.6, 0.3), 0.0, 0.0, 0, 0, Vector2(0.81, 0.92), 0.0, 0.0, 0, 0, Vector2(1, 0.38), 0.0, 0.0, 0, 0]
 point_count = 6
 
 [sub_resource type="Curve" id="Curve_confetti_thickness"]
-_data = [Vector2(0, 0.5), 0.0, 0.0, 0, 0, Vector2(1, 0.5), 0.0, 0.0, 0, 0]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
 point_count = 2
+
+[sub_resource type="Gradient" id="Gradient_center_flash"]
+offsets = PackedFloat32Array(0, 0.32, 1)
+colors = PackedColorArray(1, 0.98, 0.72, 0.72, 1, 0.8, 0.28, 0.28, 1, 0.7, 0.2, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture_center_flash"]
+gradient = SubResource("Gradient_center_flash")
+width = 256
+height = 256
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
 
 [node name="LevelCompletionConfetti" type="Control"]
 layout_mode = 3
@@ -29,58 +59,276 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_confetti_script")
 
+[node name="CentralFlash" type="Sprite2D" parent="."]
+unique_name_in_owner = true
+z_index = -2
+modulate = Color(1, 1, 1, 0)
+position = Vector2(360, 550)
+texture = SubResource("GradientTexture_center_flash")
+
+[node name="CenterBurst" type="CPUParticles2D" parent="."]
+unique_name_in_owner = true
+z_index = -1
+position = Vector2(360, 550)
+emitting = false
+amount = 18
+lifetime = 0.95
+one_shot = true
+explosiveness = 0.98
+randomness = 0.18
+direction = Vector2(0, -1)
+spread = 180.0
+gravity = Vector2(0, 140)
+initial_velocity_min = 220.0
+initial_velocity_max = 430.0
+angular_velocity_min = -300.0
+angular_velocity_max = 300.0
+scale_amount_min = 0.12
+scale_amount_max = 0.22
+color_ramp = SubResource("Gradient_confetti_fade")
+color_initial_ramp = SubResource("Gradient_confetti_star_colors")
+texture = ExtResource("4_paper_star")
+
+[node name="LeftBackCurl" type="CPUParticles2D" parent="."]
+unique_name_in_owner = true
+z_index = -2
+position = Vector2(28, 1270)
+emitting = false
+amount = 24
+lifetime = 3.6
+one_shot = true
+explosiveness = 0.91
+randomness = 0.28
+lifetime_randomness = 0.28
+spread = 32.0
+angular_velocity_min = -170.0
+angular_velocity_max = 170.0
+damping_max = 24.0
+angle_min = -180.0
+angle_max = 180.0
+scale_amount_min = 0.14
+scale_amount_max = 0.22
+split_scale = true
+scale_curve_x = SubResource("Curve_confetti_flip")
+scale_curve_y = SubResource("Curve_confetti_thickness")
+color_ramp = SubResource("Gradient_confetti_back_fade")
+color_initial_ramp = SubResource("Gradient_confetti_back_colors")
+texture = ExtResource("2_paper_curl")
+
+[node name="RightBackCurl" type="CPUParticles2D" parent="."]
+unique_name_in_owner = true
+z_index = -2
+position = Vector2(692, 1270)
+emitting = false
+amount = 24
+lifetime = 3.6
+one_shot = true
+explosiveness = 0.91
+randomness = 0.28
+lifetime_randomness = 0.28
+spread = 32.0
+angular_velocity_min = -170.0
+angular_velocity_max = 170.0
+damping_max = 24.0
+angle_min = -180.0
+angle_max = 180.0
+scale_amount_min = 0.14
+scale_amount_max = 0.22
+split_scale = true
+scale_curve_x = SubResource("Curve_confetti_flip")
+scale_curve_y = SubResource("Curve_confetti_thickness")
+color_ramp = SubResource("Gradient_confetti_back_fade")
+color_initial_ramp = SubResource("Gradient_confetti_back_colors")
+texture = ExtResource("2_paper_curl")
+
 [node name="LeftCannon" type="CPUParticles2D" parent="."]
 unique_name_in_owner = true
 position = Vector2(28, 1270)
 emitting = false
-amount = 130
+amount = 45
 lifetime = 3.4
 one_shot = true
 explosiveness = 0.94
 randomness = 0.2
 lifetime_randomness = 0.25
-direction = Vector2(0.225, -0.974)
 spread = 26.0
-gravity = Vector2(0, 1250)
-initial_velocity_min = 1360.0
-initial_velocity_max = 1800.0
-angular_velocity_min = -260.0
-angular_velocity_max = 260.0
+angular_velocity_min = -250.0
+angular_velocity_max = 250.0
 damping_max = 30.0
 angle_min = -180.0
 angle_max = 180.0
-scale_amount_min = 22.0
-scale_amount_max = 34.0
+scale_amount_min = 0.2
+scale_amount_max = 0.32
 split_scale = true
 scale_curve_x = SubResource("Curve_confetti_flip")
 scale_curve_y = SubResource("Curve_confetti_thickness")
 color_ramp = SubResource("Gradient_confetti_fade")
 color_initial_ramp = SubResource("Gradient_confetti_colors")
+texture = ExtResource("3_paper_tile")
 
 [node name="RightCannon" type="CPUParticles2D" parent="."]
 unique_name_in_owner = true
 position = Vector2(692, 1270)
 emitting = false
-amount = 130
+amount = 45
 lifetime = 3.4
 one_shot = true
 explosiveness = 0.94
 randomness = 0.2
 lifetime_randomness = 0.25
-direction = Vector2(-0.225, -0.974)
 spread = 26.0
-gravity = Vector2(0, 1250)
-initial_velocity_min = 1360.0
-initial_velocity_max = 1800.0
-angular_velocity_min = -260.0
-angular_velocity_max = 260.0
+angular_velocity_min = -250.0
+angular_velocity_max = 250.0
 damping_max = 30.0
 angle_min = -180.0
 angle_max = 180.0
-scale_amount_min = 22.0
-scale_amount_max = 34.0
+scale_amount_min = 0.2
+scale_amount_max = 0.32
 split_scale = true
 scale_curve_x = SubResource("Curve_confetti_flip")
 scale_curve_y = SubResource("Curve_confetti_thickness")
 color_ramp = SubResource("Gradient_confetti_fade")
 color_initial_ramp = SubResource("Gradient_confetti_colors")
+texture = ExtResource("3_paper_tile")
+
+[node name="LeftFold" type="CPUParticles2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(28, 1270)
+emitting = false
+amount = 35
+lifetime = 3.5
+one_shot = true
+explosiveness = 0.93
+randomness = 0.24
+lifetime_randomness = 0.24
+spread = 29.0
+angular_velocity_min = -310.0
+angular_velocity_max = 310.0
+damping_max = 27.0
+angle_min = -180.0
+angle_max = 180.0
+scale_amount_min = 0.24
+scale_amount_max = 0.36
+split_scale = true
+scale_curve_x = SubResource("Curve_confetti_flip")
+scale_curve_y = SubResource("Curve_confetti_thickness")
+color_ramp = SubResource("Gradient_confetti_fade")
+color_initial_ramp = SubResource("Gradient_confetti_colors")
+texture = ExtResource("5_paper_fold")
+
+[node name="RightFold" type="CPUParticles2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(692, 1270)
+emitting = false
+amount = 35
+lifetime = 3.5
+one_shot = true
+explosiveness = 0.93
+randomness = 0.24
+lifetime_randomness = 0.24
+spread = 29.0
+angular_velocity_min = -310.0
+angular_velocity_max = 310.0
+damping_max = 27.0
+angle_min = -180.0
+angle_max = 180.0
+scale_amount_min = 0.24
+scale_amount_max = 0.36
+split_scale = true
+scale_curve_x = SubResource("Curve_confetti_flip")
+scale_curve_y = SubResource("Curve_confetti_thickness")
+color_ramp = SubResource("Gradient_confetti_fade")
+color_initial_ramp = SubResource("Gradient_confetti_colors")
+texture = ExtResource("5_paper_fold")
+
+[node name="LeftStars" type="CPUParticles2D" parent="."]
+unique_name_in_owner = true
+z_index = 1
+position = Vector2(28, 1270)
+emitting = false
+amount = 12
+lifetime = 3.15
+one_shot = true
+explosiveness = 0.96
+randomness = 0.18
+lifetime_randomness = 0.2
+spread = 24.0
+angular_velocity_min = -220.0
+angular_velocity_max = 220.0
+damping_max = 34.0
+angle_min = -180.0
+angle_max = 180.0
+scale_amount_min = 0.16
+scale_amount_max = 0.24
+color_ramp = SubResource("Gradient_confetti_fade")
+color_initial_ramp = SubResource("Gradient_confetti_star_colors")
+texture = ExtResource("4_paper_star")
+
+[node name="RightStars" type="CPUParticles2D" parent="."]
+unique_name_in_owner = true
+z_index = 1
+position = Vector2(692, 1270)
+emitting = false
+amount = 12
+lifetime = 3.15
+one_shot = true
+explosiveness = 0.96
+randomness = 0.18
+lifetime_randomness = 0.2
+spread = 24.0
+angular_velocity_min = -220.0
+angular_velocity_max = 220.0
+damping_max = 34.0
+angle_min = -180.0
+angle_max = 180.0
+scale_amount_min = 0.16
+scale_amount_max = 0.24
+color_ramp = SubResource("Gradient_confetti_fade")
+color_initial_ramp = SubResource("Gradient_confetti_star_colors")
+texture = ExtResource("4_paper_star")
+
+[node name="LeftFrontCurl" type="CPUParticles2D" parent="."]
+unique_name_in_owner = true
+z_index = 2
+position = Vector2(28, 1270)
+emitting = false
+amount = 8
+lifetime = 2.85
+one_shot = true
+explosiveness = 0.96
+randomness = 0.2
+lifetime_randomness = 0.18
+spread = 22.0
+angular_velocity_min = -120.0
+angular_velocity_max = 120.0
+damping_max = 40.0
+angle_min = -180.0
+angle_max = 180.0
+scale_amount_min = 0.4
+scale_amount_max = 0.58
+color_ramp = SubResource("Gradient_confetti_back_fade")
+color_initial_ramp = SubResource("Gradient_confetti_colors")
+texture = ExtResource("2_paper_curl")
+
+[node name="RightFrontCurl" type="CPUParticles2D" parent="."]
+unique_name_in_owner = true
+z_index = 2
+position = Vector2(692, 1270)
+emitting = false
+amount = 8
+lifetime = 2.85
+one_shot = true
+explosiveness = 0.96
+randomness = 0.2
+lifetime_randomness = 0.18
+spread = 22.0
+angular_velocity_min = -120.0
+angular_velocity_max = 120.0
+damping_max = 40.0
+angle_min = -180.0
+angle_max = 180.0
+scale_amount_min = 0.4
+scale_amount_max = 0.58
+color_ramp = SubResource("Gradient_confetti_back_fade")
+color_initial_ramp = SubResource("Gradient_confetti_colors")
+texture = ExtResource("2_paper_curl")

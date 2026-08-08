@@ -39,6 +39,12 @@ func get_content_region() -> Control:
 	return _content_region
 
 
+## Exposes the shared title node so a state-specific owner can add presentation motion without
+## duplicating the shell's title hierarchy or changing the Failure screen's behavior.
+func get_title_label() -> Label:
+	return _title_label
+
+
 ## The single CTA slot (Completion's Continue, Failure's Main Menu). The owning scene reparents its
 ## own button here and anchors it full-rect so it fills whatever size apply_safe_layout() computes.
 func get_action_region() -> Control:

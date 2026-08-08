@@ -907,6 +907,9 @@ Purpose:
 - Sizes the earned-star label for longer totals and emits `next_pressed` when the player taps the
   action button, which now reads `Continue` (same return-to-menu behavior as before -- signal name
   unchanged to minimize churn in `scripts/level.gd`).
+- Plays the Completion-specific motion sequence: title pop, reward-star overshoot/rotation, earned
+  count bounce, action rise, and five responsive colored paper-star glints. The action stays disabled
+  until the 0.92-second intro settles, then the glints enter a restrained idle twinkle.
 
 Key methods:
 - `apply_safe_layout(safe_margins, viewport_size)`: delegates shade/title/action placement to the
@@ -915,15 +918,16 @@ Key methods:
   `apply_responsive_layout(safe_margins)` for a consistent signature across every level
   overlay/result screen).
 - `set_earned_stars(stars)`: updates the `×N` reward label and reduces font size when the value is long.
-- `is_transitioning()` / `open()` / `close()`: delegate to the shell; `open()`/`close()` show/hide
-  this screen's own root immediately around the shell's fade (an always-visible root would either
-  skip the fade or become a permanent screen-covering input blocker).
+- `is_transitioning()` / `open()` / `close()`: combine the shell fade and Completion intro state;
+  opening resets/restarts all focused tweens, while closing kills intro/idle glint tweens before the
+  shell fade.
 
 Depends on:
 - `scenes/ui/gameplay_result_shell.tscn` (`scripts/gameplay_result_shell.gd`).
 - `scripts/gameplay_ui_theme.gd` for the shared responsive scale.
 - `scripts/press_scale_button.gd` on `NextButton`.
-- `assets/ui/reward_star.png` and the shared `style_box_green_primary_button.tres`.
+- `assets/ui/reward_star.png`, `assets/effects/confetti_paper_star.png`, and the shared
+  `style_box_green_primary_button.tres`.
 
 Do not use for:
 - Level progression or save data. Keep that in `scripts/level.gd` and `scripts/player_progress.gd`.
@@ -1498,7 +1502,8 @@ Important constants:
 - `ITEM_PLACE_SOUND`: short sound played when the player drops or moves an item into a shelf slot.
 - `TRIPLE_CLEAR_SOUND`: sound played when a matched triple gathers and disappears.
 - `HAMMER_IMPACT_EFFECT_SCENE`: `res://scenes/abilities/hammer_impact_effect.tscn`, spawned when the hammer ability is used.
-- `COMPLETION_CELEBRATION_SECONDS`: how long the cleared board stays on screen with confetti flying before the completion screen opens.
+- `COMPLETION_REVEAL_SECONDS`: 1.35-second cleared-board lead-in before the reward overlay begins;
+  the longer confetti effect continues independently across that reveal.
 - `SHUFFLE_BOX_TEXTURE`: `res://assets/abilities/ability_shuffle_box.png`, shown at screen center while the shuffle ability gathers and redistributes items.
 
 Key responsibilities:
@@ -1545,8 +1550,9 @@ Key responsibilities:
   Both call `open()` on their result screen (a shared fade, UI-003) instead of snapping
   `.visible = true`. `_fail_level()` opens `UI/FailureScreen` (`scripts/level_failure_screen.gd`,
   new -- Failure was previously a bare embedded shade + label with no action, trapping the player);
-  `_complete_level()` still shows `UI/CompletionScreen` with the run's earned star count, whose
-  action now reads `Continue` (same return-to-menu behavior, `next_pressed` signal unchanged).
+  `_complete_level()` starts the layered paper-confetti effect, then shows `UI/CompletionScreen`
+  after `COMPLETION_REVEAL_SECONDS` while pieces continue falling. The screen receives the run's
+  earned star count and its action reads `Continue` (`next_pressed` signal unchanged).
 - Spend one campaign life on campaign failure and on confirmed pause-menu Leave through `_spend_campaign_life_for_run()`, guarded so one level run cannot spend twice.
 - Return to the configured menu scene when leaving a level, when Completion's `Continue` is pressed, or when Failure's `Main Menu` is pressed.
 - Keep the level countdown idle until the first meaningful player action, then format the active timer as zero-padded `MM:SS` text with `_update_timer_label()`, forwarded to `LevelTopHud.set_timer_text()`.
@@ -1644,33 +1650,31 @@ Attached to:
 - `scenes/effects/level_completion_confetti.tscn` root `LevelCompletionConfetti`.
 
 Purpose:
-- Two-cannon confetti burst played by `scripts/level.gd` while a cleared level stays on screen,
-  before `scenes/ui/level_completion_screen.tscn` opens. Instanced in `level.tscn` as the last child
-  of the `UI` canvas layer so pieces keep falling in front of the reward overlay's shade.
-- Owns only what depends on the live viewport: muzzle placement in the two bottom corners and the
-  launch aim. Piece shape, color mix, spin, and fade are scene-configured on the two
-  `CPUParticles2D` cannons (`LeftCannon`, `RightCannon`) rather than written in script.
-- Solves the launch vector from projectile motion (`APEX_HEIGHT_RATIO`, `HORIZONTAL_REACH_RATIO`,
-  `GRAVITY_AT_DESIGN_HEIGHT`) instead of baking velocities into the scene, so both streams converge
-  near the middle of the screen at every supported resolution, not only at 720x1280.
+- Layered two-corner paper-confetti burst played across the cleared-board lead-in and reward-overlay
+  reveal. Five emitter pairs divide back curls, main tiles, folds, stars, and sparse large foreground
+  curls; the scene keeps these at 248 side pieces, near the previous 260-piece budget.
+- Owns live-viewport muzzle placement, responsive sprite scale, and a distinct solved trajectory for
+  every layer. Their arcs still converge near screen center at every supported portrait resolution.
+- Starts a delayed radial flash and 18-piece paper-star center pop 0.22 seconds after launch, giving
+  the two streams a shared visual impact beat.
 - Uses `CPUParticles2D` rather than `GPUParticles2D`: the piece counts are small and CPU particles
   avoid GPU-particle behavior differences on low-end Android devices.
 
 Exports:
 - `muzzle_inset`: where each cannon sits relative to its bottom corner, at the design resolution.
+- `center_height_ratio`: responsive vertical position for the flash/star intersection beat.
 
 API:
-- `play()`: aims and fires both cannons; awaitable, and emits `finished` once the last piece can no
-  longer be on screen.
-- `get_burst_duration()`: how long the burst can stay visible (emission tail plus one lifetime plus
-  a settle margin).
+- `play()`: aims/fires every layer and center beat; awaitable, generation-safe across restarts, and
+  emits `finished` once the last piece can no longer be on screen.
+- `get_burst_duration()`: maximum emission tail/lifetime across every side layer plus settle margin.
 
 Depends on:
 - `scripts/level.gd` for playback on completion.
 
 Verification:
-- `tests/gameplay/test_level_completion_confetti.gd` checks the corner muzzles, the inward/upward
-  aim, the celebration delay before the reward screen opens, and the back-press skip.
+- `tests/gameplay/test_level_completion_confetti.gd` checks textured/emitting layers, the 260-piece
+  side budget, center beat, responsive aim, shortened reveal, falling-piece overlap, and back skip.
 
 Do not use for:
 - Completion rules, star awards, or the reward screen itself. Those stay in `scripts/level.gd` and
@@ -1956,6 +1960,8 @@ Purpose:
 
 Key methods:
 - `configure(title)`.
+- `get_title_label()`: exposes the shared title to state-specific presentation motion without
+  duplicating its hierarchy or changing Failure behavior.
 - `get_content_region()`: full-viewport-sized passthrough; the owning scene positions its own
   content within it using the same absolute-viewport-relative math it used before this shell
   existed, since the region's rect matches the old root's rect.

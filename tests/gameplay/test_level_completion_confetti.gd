@@ -2,16 +2,16 @@ extends SceneTree
 
 ## Focused verification for the post-clear celebration window (scripts/level.gd's _complete_level and
 ## scenes/effects/level_completion_confetti.tscn). Covers the delay before the completion screen
-## opens, the two cannons firing from the bottom corners toward the middle, and the back-press skip
-## that jumps straight to the reward screen without letting the timer re-open it.
+## opens, layered textured cannons firing from the bottom corners toward the middle, the center beat,
+## the overlap between falling pieces and the reward overlay, and the back-press skip.
 
 const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
 const LEVEL_SCENE_PATH := "res://level.tscn"
 
 ## Sampled inside the celebration window rather than at its edge, so the assertions do not depend on
 ## landing exactly on a frame boundary.
-const MID_CELEBRATION_SECONDS := 1.0
-const POST_CELEBRATION_SECONDS := 1.4
+const PRE_REVEAL_SECONDS := 0.75
+const POST_REVEAL_SECONDS := 0.8
 
 ## The representative portrait resolutions from AGENTS.md's "Responsive UI", plus a squarer
 ## tablet-like viewport.
@@ -73,11 +73,46 @@ func _verify_celebration_window() -> void:
 	var viewport_size := confetti.get_viewport_rect().size
 	var left_cannon := confetti.get_node("LeftCannon") as CPUParticles2D
 	var right_cannon := confetti.get_node("RightCannon") as CPUParticles2D
+	var center_burst := confetti.get_node("CenterBurst") as CPUParticles2D
+	var textured_emitters: Array[CPUParticles2D] = []
+	for node_name in [
+		"LeftBackCurl",
+		"RightBackCurl",
+		"LeftCannon",
+		"RightCannon",
+		"LeftFold",
+		"RightFold",
+		"LeftStars",
+		"RightStars",
+		"LeftFrontCurl",
+		"RightFrontCurl",
+	]:
+		textured_emitters.append(confetti.get_node(node_name) as CPUParticles2D)
+	var all_layers_textured_and_emitting := true
+	var side_particle_count := 0
+	for emitter: CPUParticles2D in textured_emitters:
+		all_layers_textured_and_emitting = (
+			all_layers_textured_and_emitting and emitter.texture != null and emitter.emitting
+		)
+		side_particle_count += emitter.amount
 
 	_check(confetti.visible, "Clearing the board starts the confetti burst.")
 	_check(
 		left_cannon.emitting and right_cannon.emitting,
-		"Both cannons fire on completion."
+		"Both main cannons fire on completion."
+	)
+	_check(
+		all_layers_textured_and_emitting,
+		"Every depth and shape layer uses a texture and fires with the main burst."
+	)
+	_check(
+		side_particle_count <= 260,
+		"Layered side emitters stay within the previous 260-piece particle budget."
+	)
+	_check(
+		center_burst.texture != null
+		and center_burst.position.distance_to(viewport_size * Vector2(0.5, 0.43)) < 1.0,
+		"The delayed textured star burst is centered where the two arcs meet."
 	)
 	_check(
 		left_cannon.position.x < viewport_size.x * 0.1
@@ -102,7 +137,7 @@ func _verify_celebration_window() -> void:
 		"Pieces are launched with real speed and fall back down."
 	)
 
-	await create_timer(MID_CELEBRATION_SECONDS).timeout
+	await create_timer(PRE_REVEAL_SECONDS).timeout
 	_check(
 		not completion_screen.visible,
 		"The cleared level stays on screen for the celebration before the reward screen opens."
@@ -112,10 +147,14 @@ func _verify_celebration_window() -> void:
 		"Completion is committed up front, not deferred until the celebration ends."
 	)
 
-	await create_timer(POST_CELEBRATION_SECONDS).timeout
+	await create_timer(POST_REVEAL_SECONDS).timeout
 	_check(
 		completion_screen.visible,
-		"The reward screen opens once the celebration window elapses."
+		"The reward screen starts opening after the shorter reveal delay."
+	)
+	_check(
+		confetti.visible,
+		"Confetti keeps falling in front of the reward screen instead of ending at the transition."
 	)
 	_check(
 		not bool(level.get("_completion_celebration_active")),
@@ -131,7 +170,7 @@ func _verify_back_press_skip() -> void:
 	var completion_screen := level.get_node("UI/CompletionScreen") as Control
 
 	level.call("_complete_level")
-	await create_timer(MID_CELEBRATION_SECONDS).timeout
+	await create_timer(PRE_REVEAL_SECONDS).timeout
 
 	# The back-press branch of _unhandled_input routes here rather than exiting to the main menu.
 	level.call("_open_completion_screen")
@@ -142,7 +181,7 @@ func _verify_back_press_skip() -> void:
 
 	# The celebration timer is still counting down; it must not re-open the screen behind the skip.
 	completion_screen.hide()
-	await create_timer(POST_CELEBRATION_SECONDS).timeout
+	await create_timer(POST_REVEAL_SECONDS).timeout
 	_check(
 		not completion_screen.visible,
 		"The celebration timer no-ops after a skip instead of opening the screen twice."

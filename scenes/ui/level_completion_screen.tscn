@@ -5,6 +5,7 @@
 [ext_resource type="StyleBoxTexture" path="res://assets/themes/style_box_green_primary_button.tres" id="3_positive_action"]
 [ext_resource type="Script" uid="uid://cp7jmwiig6qtc" path="res://scripts/level_completion_screen.gd" id="4_completion_screen_script"]
 [ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="5_press_scale_button"]
+[ext_resource type="Texture2D" path="res://assets/effects/confetti_paper_star.png" id="6_paper_star"]
 
 [node name="LevelCompletionScreen" type="Control"]
 anchors_preset = 15
@@ -63,6 +64,57 @@ theme_override_font_sizes/font_size = 58
 text = "×0"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="SparkleLayer" type="Control" parent="."]
+unique_name_in_owner = true
+z_index = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="SparkleTopLeft" type="TextureRect" parent="SparkleLayer"]
+unique_name_in_owner = true
+layout_mode = 0
+mouse_filter = 2
+texture = ExtResource("6_paper_star")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SparkleTopRight" type="TextureRect" parent="SparkleLayer"]
+unique_name_in_owner = true
+layout_mode = 0
+mouse_filter = 2
+texture = ExtResource("6_paper_star")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SparkleMiddleLeft" type="TextureRect" parent="SparkleLayer"]
+unique_name_in_owner = true
+layout_mode = 0
+mouse_filter = 2
+texture = ExtResource("6_paper_star")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SparkleMiddleRight" type="TextureRect" parent="SparkleLayer"]
+unique_name_in_owner = true
+layout_mode = 0
+mouse_filter = 2
+texture = ExtResource("6_paper_star")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SparkleBottomRight" type="TextureRect" parent="SparkleLayer"]
+unique_name_in_owner = true
+layout_mode = 0
+mouse_filter = 2
+texture = ExtResource("6_paper_star")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="NextButton" type="Button" parent="."]
 unique_name_in_owner = true
