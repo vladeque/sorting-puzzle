@@ -2138,28 +2138,27 @@ Exports:
 - `outline_width`: desired on-screen outline thickness in pixels; converted to a source-texture texel radius for the outline shader so thickness stays constant regardless of the item's current scale.
 - `outline_alpha_threshold`: alpha cutoff used to detect the item silhouette.
 
-- `shadow_cast_material` / `shadow_pool_material`: shared shader materials for the two prototype ground-shadow styles, assigned in `scenes/item.tscn`. Each item renders through a duplicate of the active one, because the shadow shader generates its color from the alpha mask and therefore ignores the node's modulate, leaving the shader's `shadow_color` alpha as the only per-item opacity channel.
+- `shadow_material`: shared ground-shadow shader material, assigned in `scenes/item.tscn`. Each item renders through its own duplicate, because the shadow shader generates its color from the alpha mask and therefore ignores the node's modulate, leaving the shader uniforms as the only per-item channel for the resting/carried blend.
 
 Runtime properties:
 - `land_squash`: non-uniform `Vector2` multiplier layered on top of `visual_scale` and the highlight scale, tweened by `play_land_impact()`. It is a separate channel precisely so `set_highlight_scale()` and `set_outline()` can keep writing their own uniform scale without flattening an in-flight bounce; anything that writes sprite scale must go through `_get_sprite_scale()` rather than assigning a uniform scale directly.
-- `shadow_lift`: 0 while the item rests in a slot, 1 while the player carries it, tweened by `set_drag_lifted()`. Its own channel for the same reason `land_squash` is: a lift arriving mid-landing must not fight the bounce.
-- `shadow_style` (static): the prototype ground-shadow style shared by every item, `CAST_PROJECTION` or `CONTACT_POOL`. Typed as `int` rather than the enum because cross-script assignment to an enum-typed static is rejected at runtime.
+- `shadow_lift`: 0 while the item rests in a slot, 1 while the player carries it, tweened by `set_drag_lifted()`. Blends the shadow between its resting and carried shapes. Its own channel for the same reason `land_squash` is: a lift arriving mid-landing must not fight the bounce.
 
 Key methods:
 - `_ready()`: applies current texture and scale.
 - `_apply_texture()`: updates `Sprite2D.texture` and refreshes the ground shadow, which hides itself when the item has no texture.
 - `_apply_visual_scale()`: updates `Sprite2D` and `OutlineSprite` scale from `visual_scale * highlight scale multiplier * land_squash`, applies the contact pivot offset, then refreshes the shadow and outline.
-- `_apply_shadow()`: projects the item's own silhouette onto the floor. Anchors the shadow sprite on the art's ground line (`SHADOW_GROUND_TEXELS`, the 240-128 texel drop every item texture shares per `docs/ITEM_ASSET_REQUIREMENTS.md`), then flattens it -- sheared up-right for `CAST_PROJECTION`, straddling the contact line without shear for `CONTACT_POOL` -- and folds in the landing squash's width and the drag lift's offset, spread and fade. Only the shadow's width follows the squash: an impact spreads the contact patch sideways, it does not push the shadow further along the shelf.
-- `set_drag_lifted(lifted)`: tweens `shadow_lift`, lifting the shadow off a carried item instead of hiding it. Node-bound through `UIMotion.retween`, so it dies with the item.
+- `_apply_shadow()`: draws the item's own silhouette as its shadow. Anchors the shadow sprite on the art's ground line (`SHADOW_GROUND_TEXELS`, the 240-128 texel drop every item texture shares per `docs/ITEM_ASSET_REQUIREMENTS.md`), then blends by `shadow_lift` between two readings: **resting**, the silhouette squashed onto the shelf with a negative flatten and mirrored shear so it folds down-right toward the viewer instead of hiding behind the item's own body; and **carried**, the silhouette standing back up to full height, unsheared, displaced down-right by `SHADOW_CARRY_OFFSET`, softer (`blur_radius_px`) and slightly lighter. The flatten crosses zero early in that blend, which reads as the shadow snapping upright. Only the shadow's width follows the landing squash: an impact spreads the contact patch sideways, it does not push the shadow further along the shelf.
+- `set_drag_lifted(lifted)`: tweens `shadow_lift`, moving the shadow between its resting and carried shapes instead of hiding it while carried. Node-bound through `UIMotion.retween`, so it dies with the item.
 
 ## `scripts/shadow_style_preview.gd`
 
 Purpose:
-- Throwaway harness for choosing between the two prototype item ground-shadow styles. Lays the same contrasting silhouettes out twice, once per style, on real shelves over the real level background, and cycles the drag lift so the carried-item read can be judged too.
-- Owns `scenes/shadow_style_preview.tscn`; run that scene directly to compare.
+- Throwaway harness for tuning the item ground shadow. Lays the same contrasting silhouettes out on real shelves at three lift values (resting, mid-grab, carried) over chapter_01's legacy background colors, plus copies that animate between them so the grab and drop transitions can be judged as motion.
+- Owns `scenes/shadow_style_preview.tscn`; run that scene directly. `-- --capture <path>` saves a screenshot and quits.
 
 Do not use for:
-- Anything shipped. Delete this script, its scene, and the losing half of `ShelfItem.ShadowStyle` once a style is chosen.
+- Anything shipped. Delete this script and its scene once the shadow is signed off.
 - `play_land_impact(strength)`: plays the landing squash-and-stretch (compress ~70 ms, rebound past rest ~70 ms, settle ~90 ms, roughly volume-conserving). Fire-and-forget and node-bound via `UIMotion.retween`, so it dies with the item if a landing immediately completes a triple. Called by `scripts/level.gd` from `_play_item_move_animation()` and from `_place_item_in_slot()` when `should_play_landing` is set.
 - `reset_land_impact()`: cancels an in-flight bounce and restores the resting shape; called before re-grabbing a dragged item and before the match-clear gather.
 - `_get_sprite_scale()` / `_get_contact_pivot_offset_y()`: compose the squash with the uniform scale and keep the art's ground contact planted so the item does not lift off the shelf while deforming. `CONTACT_ANCHOR_Y` is the landing bounce's pivot and is tuned by eye; it is deliberately not the same value as the shadow's `SHADOW_GROUND_TEXELS` anchor, which is measured from the texture contract.

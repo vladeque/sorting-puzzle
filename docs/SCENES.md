@@ -1657,14 +1657,17 @@ Script:
 - `scripts/shadow_style_preview.gd`
 
 Purpose:
-- Throwaway side-by-side harness for choosing between the two prototype item ground-shadow styles.
-  Run the scene directly: it lays the same contrasting silhouettes (tall bottle, squat tub,
-  irregular cupcake) out twice, once per style, on real `scenes/shelf.tscn` shelves over the real
-  chapter level background, and cycles the drag lift on an off-shelf copy of each.
+- Throwaway harness for tuning the item ground shadow. Run the scene directly: it lays the same
+  contrasting silhouettes (tall bottle, squat tub, irregular cupcake) out on real `scenes/shelf.tscn`
+  shelves at three lift values -- resting, mid-grab, and carried -- plus an off-shelf copy of each
+  that animates continuously between them, so the grab and drop transitions can be judged as motion.
+- Reproduces chapter_01's `legacy` flat wall/floor background colors from `level.tscn`, since that
+  is what every currently playable level renders behind its shelves.
+- Accepts `-- --capture <path>` on the command line to save a screenshot and quit, for reviewing the
+  shadow without watching the window.
 
 Do not use for:
-- Anything shipped. Delete this scene, its script, and the losing half of `ShelfItem.ShadowStyle`
-  once a style is chosen.
+- Anything shipped. Delete this scene and its script once the shadow is signed off.
 
 ## `scenes/item.tscn`
 
@@ -1682,20 +1685,19 @@ Purpose:
 
 Important nodes:
 - `Shadow`: translucent ground shadow drawn from the item's own texture, so each item's silhouette
-  shapes its own shadow. A shared shader low-pass filters the alpha (a ring average, unlike
-  `OutlineSprite`'s max-dilation) so straws, handles and label detail dissolve while the overall
-  bottle/box/tub form stays recognizable, then flattens the result to one translucent color that
-  reads on both the wooden shelf floor and the lighter level background. `scripts/item.gd` anchors
-  the sprite on the art's ground line (canvas y=240, see `docs/ITEM_ASSET_REQUIREMENTS.md`) and
-  projects it onto the floor. Generated back-layer previews and clearing items disable it; an
-  actively dragged item keeps it and lifts it instead.
-- Two prototype shadow styles are wired up for comparison, selected per item by
-  `ShelfItem.shadow_style` (seeded from the `ShelfItem.default_shadow_style` static) and configured
-  by the `shadow_cast_material` / `shadow_pool_material` shader materials exported on the root:
-  `CAST_PROJECTION` skews the whole flattened silhouette up-right along the light direction, and
-  `CONTACT_POOL` drops the shear and keeps only the contact region so it spreads into a soft pool
-  under the item. Compare them in `scenes/shadow_style_preview.tscn`; change
-  `default_shadow_style` to try one in real levels, then delete the loser.
+  shapes its own shadow. The `shadow_material` shader (exported on the root) low-pass filters the
+  alpha (a ring average, unlike `OutlineSprite`'s max-dilation) so straws, handles and label detail
+  dissolve while the overall bottle/box/tub form stays recognizable, then flattens the result to one
+  translucent color that reads on both the wooden shelf floor and the lighter level background.
+  `scripts/item.gd` anchors the sprite on the art's ground line (canvas y=240, see
+  `docs/ITEM_ASSET_REQUIREMENTS.md`). Generated back-layer previews and clearing items disable it.
+- The shadow has two readings, blended by `ShelfItem.shadow_lift`. **Resting**: the silhouette
+  squashed onto the shelf and folded down-right toward the viewer, following the same light
+  direction as the shelf's own cast shadow -- folding it away from the viewer instead would be
+  hidden behind the item's own opaque body. **Carried**: while the player drags the item, the
+  silhouette stands back up to full height and separates down-right of the item, softer and slightly
+  larger, reading as a shadow cast far below rather than one lying under the item's feet. Compare
+  and tune both in `scenes/shadow_style_preview.tscn`.
 - `OutlineSprite`: hidden sprite used by `ShelfItem` to draw alpha-based highlight borders.
 - `Sprite2D`: main item sprite; texture and visual scale are controlled by `ShelfItem`.
 - `CollisionShape2D`: rectangular item hitbox used by runtime interaction.

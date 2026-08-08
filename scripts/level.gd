@@ -16,8 +16,9 @@ const ABILITY_HIGHLIGHT := &"highlight"
 const ABILITY_FREEZER := &"freezer"
 const HIGHLIGHT_DURATION_SECONDS := 15.0
 const FREEZER_DURATION_SECONDS := 30.0
-## How long the cleared board stays on screen, celebrating, before the completion screen opens.
-const COMPLETION_CELEBRATION_SECONDS := 2.0
+## The reward overlay begins before the longer confetti fall ends, bridging the cleared board and
+## completion states instead of leaving the player on a static board for the whole particle burst.
+const COMPLETION_REVEAL_SECONDS := 1.35
 const SHELF_SCENE := preload("res://scenes/shelf.tscn")
 const MOVING_SHELF_ROW_SCENE := preload("res://scenes/moving_shelf_row.tscn")
 const ITEM_SCENE := preload("res://scenes/item.tscn")
@@ -1579,8 +1580,8 @@ func _fail_level() -> void:
 		_ability_purchase_overlay.visible = false
 
 
-## Freezes the cleared board, plays the confetti celebration over it for
-## COMPLETION_CELEBRATION_SECONDS, and only then opens the completion screen. Progress is committed
+## Freezes the cleared board, starts the confetti celebration, and opens the completion screen after
+## COMPLETION_REVEAL_SECONDS while foreground paper pieces continue falling. Progress is committed
 ## and `_level_completed` is set before that wait, so the reward is banked even if the run is
 ## interrupted mid-celebration, and the existing `_level_completed` guards already stop input,
 ## `_process`, the timer, and the pause button for the whole window.
@@ -1613,7 +1614,7 @@ func _complete_level() -> void:
 	_completion_celebration_active = true
 	if _completion_confetti != null:
 		_completion_confetti.play()
-	await get_tree().create_timer(COMPLETION_CELEBRATION_SECONDS).timeout
+	await get_tree().create_timer(COMPLETION_REVEAL_SECONDS).timeout
 	# The celebration can end before its timer does -- the level can be torn down (returning to the
 	# menu, the scene being freed), or a back press can skip straight to the screen -- so re-check
 	# instead of opening a screen that is already open or already gone.

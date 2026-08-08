@@ -55,16 +55,12 @@ render_mode unshaded;
 //
 // The projection itself lives outside this shader: scenes/item.tscn anchors the sprite on the
 // art's ground line (canvas y=240, per docs/ITEM_ASSET_REQUIREMENTS.md) and scripts/item.gd
-// squashes, skews and lifts it onto the floor.
+// blends between the resting and carried shapes, driving blur_radius_px and shadow_color's alpha
+// along with them (a resting shadow is tight and dark, a carried one softer and lighter).
 uniform vec4 shadow_color : source_color = vec4(0.1, 0.05, 0.02, 0.34);
 uniform float blur_radius_px : hint_range(0.0, 64.0, 0.5) = 10.0;
 uniform float mask_low : hint_range(0.0, 1.0, 0.01) = 0.3;
 uniform float mask_high : hint_range(0.0, 1.0, 0.01) = 0.62;
-// Height above the art's ground line, in source texels, over which the mask fades out. 0 keeps
-// the whole silhouette (cast projection); a small value keeps only the contact region so the
-// shadow reads as a pool whose width still comes from the item (contact pool).
-uniform float ground_fade_texels : hint_range(0.0, 256.0, 1.0) = 0.0;
-uniform float ground_line_v : hint_range(0.0, 1.0, 0.001) = 0.9375;
 
 const int SHADOW_RING_STEPS = 8;
 const float SHADOW_TAU = 6.283185307179586;
@@ -86,12 +82,6 @@ void fragment() {
 
 	float mask = smoothstep(mask_low, mask_high, coverage / sample_count);
 
-	if (ground_fade_texels > 0.0) {
-		float height_above_ground =
-			(ground_line_v - UV.y) / (ground_fade_texels * TEXTURE_PIXEL_SIZE.y);
-		mask *= 1.0 - smoothstep(0.0, 1.0, clamp(height_above_ground, 0.0, 1.0));
-	}
-
 	// The fragment color is generated from the alpha mask rather than from the texture's own color,
 	// so the incoming COLOR (and with it the item's modulate) is deliberately discarded. Per-item
 	// opacity -- the drag lift -- rides on shadow_color's alpha in a per-item material copy instead.
@@ -99,23 +89,12 @@ void fragment() {
 }
 "
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_shadow_cast"]
-shader = SubResource("Shader_item_shadow")
-shader_parameter/shadow_color = Color(0.1, 0.05, 0.02, 0.34)
-shader_parameter/blur_radius_px = 10.0
-shader_parameter/mask_low = 0.3
-shader_parameter/mask_high = 0.62
-shader_parameter/ground_fade_texels = 0.0
-shader_parameter/ground_line_v = 0.9375
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_shadow_pool"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_shadow"]
 shader = SubResource("Shader_item_shadow")
 shader_parameter/shadow_color = Color(0.1, 0.05, 0.02, 0.4)
-shader_parameter/blur_radius_px = 26.0
-shader_parameter/mask_low = 0.12
-shader_parameter/mask_high = 0.5
-shader_parameter/ground_fade_texels = 90.0
-shader_parameter/ground_line_v = 0.9375
+shader_parameter/blur_radius_px = 12.0
+shader_parameter/mask_low = 0.3
+shader_parameter/mask_high = 0.62
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_item_hitbox"]
 size = Vector2(74, 112)
@@ -123,12 +102,11 @@ size = Vector2(74, 112)
 [node name="Item" type="Area2D" unique_id=757671973]
 z_index = 10
 script = ExtResource("1_item_script")
-shadow_cast_material = SubResource("ShaderMaterial_shadow_cast")
-shadow_pool_material = SubResource("ShaderMaterial_shadow_pool")
+shadow_material = SubResource("ShaderMaterial_shadow")
 
 [node name="Shadow" type="Sprite2D" parent="." unique_id=1649807921]
 z_index = -4
-material = SubResource("ShaderMaterial_shadow_cast")
+material = SubResource("ShaderMaterial_shadow")
 offset = Vector2(0, -112)
 
 [node name="OutlineSprite" type="Sprite2D" parent="." unique_id=515204852]

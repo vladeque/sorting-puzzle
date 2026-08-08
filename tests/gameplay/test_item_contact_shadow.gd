@@ -1,9 +1,10 @@
 extends SceneTree
 
 ## Focused verification for the ShelfItem ground shadow (scripts/item.gd's _apply_shadow). Covers the
-## three properties the shadow rework had to deliver: the shadow is derived from the item's own
-## texture instead of one shared authored blob, both prototype styles anchor on the art's ground
-## line, and a dragged item keeps a lifted shadow that travels with it rather than losing it.
+## properties the shadow rework had to deliver: the shadow is derived from the item's own texture
+## instead of one shared authored blob, it anchors on the art's ground line, and it has two distinct
+## readings -- flattened onto the shelf at rest, standing upright and displaced while carried -- with
+## the carried one travelling with the dragged item instead of being dropped.
 
 const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
 const LEVEL_SCENE_PATH := "res://level.tscn"
@@ -51,8 +52,8 @@ func _run() -> void:
 		return
 
 	_verify_shadow_follows_item_form(item, shadow)
-	_verify_cast_projection(item, shadow)
-	_verify_contact_pool(item, shadow)
+	_verify_resting_shape(item, shadow)
+	_verify_carried_shape(item, shadow)
 	await _verify_drag_lift(level, item, shadow)
 
 	_finish(level)
@@ -73,57 +74,55 @@ func _verify_shadow_follows_item_form(item: ShelfItem, shadow: Sprite2D) -> void
 	)
 	_check(
 		is_equal_approx(shadow.position.y, ShelfItem.SHADOW_GROUND_TEXELS * item.visual_scale),
-		"The shadow is anchored on the item's contact point rather than the texture centre."
+		"A resting shadow is anchored on the item's contact point, undisplaced."
 	)
 
 
-func _verify_cast_projection(item: ShelfItem, shadow: Sprite2D) -> void:
-	item.shadow_style = ShelfItem.ShadowStyle.CAST_PROJECTION
+func _verify_resting_shape(item: ShelfItem, shadow: Sprite2D) -> void:
+	item.shadow_lift = 0.0
 
 	_check(
-		_get_ground_fade(shadow) == 0.0,
-		"Cast projection keeps the whole silhouette instead of fading it above the contact line."
+		shadow.scale.y < 0.0,
+		"A resting shadow folds toward the viewer, so it is not hidden behind the item's own body."
 	)
 	_check(
-		shadow.skew > 0.0,
-		"Cast projection shears the silhouette along the light direction."
+		absf(shadow.scale.y) < absf(shadow.scale.x) * 0.5,
+		"A resting shadow is flattened onto the shelf rather than standing up."
 	)
 	_check(
-		shadow.scale.y > 0.0 and shadow.scale.y < shadow.scale.x,
-		"Cast projection flattens the silhouette onto the floor without mirroring it."
+		not is_zero_approx(shadow.skew),
+		"A resting shadow is sheared along the light direction."
 	)
 
 
-func _verify_contact_pool(item: ShelfItem, shadow: Sprite2D) -> void:
-	var cast_height := shadow.scale.y
+func _verify_carried_shape(item: ShelfItem, shadow: Sprite2D) -> void:
+	var resting_blur := _get_blur(shadow)
 	var ground_y := ShelfItem.SHADOW_GROUND_TEXELS * item.visual_scale
 
-	item.shadow_style = ShelfItem.ShadowStyle.CONTACT_POOL
+	item.shadow_lift = 1.0
 
 	_check(
-		is_equal_approx(_get_ground_fade(shadow), ShelfItem.SHADOW_POOL_FADE_TEXELS),
-		"Contact pool keeps only the contact region, matching the pool geometry in item.gd."
+		shadow.scale.y > 0.0 and shadow.scale.y > shadow.scale.x * 0.8,
+		"A carried shadow stands back up to the item's own height instead of lying on the floor."
 	)
 	_check(
 		is_zero_approx(shadow.skew),
-		"Contact pool spreads straight under the item instead of shearing."
+		"A carried shadow drops straight, without the resting shear."
 	)
 	_check(
-		shadow.scale.y < cast_height,
-		"Contact pool flattens harder than the cast projection."
+		shadow.position.x > 0.0 and shadow.position.y > ground_y,
+		"A carried shadow separates down-right of the item it belongs to."
 	)
 	_check(
-		shadow.position.y > ground_y,
-		"Contact pool straddles the contact line instead of sitting entirely above it."
+		_get_blur(shadow) > resting_blur,
+		"A carried shadow is softer than a resting one, its casting surface being further away."
 	)
 
-	item.shadow_style = ShelfItem.ShadowStyle.CAST_PROJECTION
+	item.shadow_lift = 0.0
 
 
 func _verify_drag_lift(level: Node, item: ShelfItem, shadow: Sprite2D) -> void:
-	var resting_offset := shadow.position
-	var resting_scale := shadow.scale
-	var resting_alpha := _get_shadow_alpha(shadow)
+	var resting_position := shadow.position
 	var grab_position := item.global_position
 
 	level.call("_begin_drag", item, grab_position)
@@ -131,12 +130,12 @@ func _verify_drag_lift(level: Node, item: ShelfItem, shadow: Sprite2D) -> void:
 
 	_check(shadow.visible, "A dragged item keeps its shadow instead of dropping it.")
 	_check(
-		shadow.position.x > resting_offset.x and shadow.position.y < resting_offset.y,
-		"Lifting pushes the shadow further along the light direction."
+		is_equal_approx(item.shadow_lift, 1.0),
+		"Grabbing an item drives its shadow all the way to the carried shape."
 	)
 	_check(
-		shadow.scale.x > resting_scale.x and _get_shadow_alpha(shadow) < resting_alpha,
-		"A lifted shadow spreads and washes out."
+		shadow.position.x > resting_position.x and shadow.position.y > resting_position.y,
+		"Carrying displaces the shadow down-right of where it rested."
 	)
 
 	var shadow_before_move := shadow.global_position
@@ -151,25 +150,16 @@ func _verify_drag_lift(level: Node, item: ShelfItem, shadow: Sprite2D) -> void:
 	await create_timer(LIFT_SETTLE_SECONDS).timeout
 
 	_check(
-		is_zero_approx(item.shadow_lift)
-		and is_equal_approx(_get_shadow_alpha(shadow), resting_alpha),
-		"Dropping the item settles its shadow back onto the shelf."
+		is_zero_approx(item.shadow_lift) and shadow.scale.y < 0.0,
+		"Dropping the item lays its shadow back down onto the shelf."
 	)
 
 
-func _get_ground_fade(shadow: Sprite2D) -> float:
+func _get_blur(shadow: Sprite2D) -> float:
 	var material := shadow.material as ShaderMaterial
 	if material == null:
 		return -1.0
-	return float(material.get_shader_parameter("ground_fade_texels"))
-
-
-func _get_shadow_alpha(shadow: Sprite2D) -> float:
-	var material := shadow.material as ShaderMaterial
-	if material == null:
-		return -1.0
-	var color = material.get_shader_parameter("shadow_color")
-	return color.a if color is Color else -1.0
+	return float(material.get_shader_parameter("blur_radius_px"))
 
 
 func _finish(level: Node) -> void:
