@@ -63,8 +63,6 @@ const TIMER_FROZEN_OUTLINE_SIZE := 5
 @onready var _star_icon := %StarCounter.get_node("Icon") as TextureRect
 @onready var _star_count_label := %StarCountLabel as Label
 @onready var _pause_button := %PauseButton as Button
-@onready var _pause_bar_1 := %PauseBar1 as Control
-@onready var _pause_bar_2 := %PauseBar2 as Control
 
 var _star_pulse_tween: Tween
 
@@ -192,9 +190,8 @@ func apply_safe_layout(safe_margins: Vector4, viewport_size: Vector2) -> void:
 	var row_center_y := safe_margins.y + HUD_ROW_CENTER_Y
 	var pause_top_y := row_center_y - pause_size.y * 0.5
 	_layout_absolute(_pause_button, pause_left_x, pause_top_y, pause_right_x, pause_top_y + pause_size.y)
-	_layout_pause_bars(pause_size)
 
-	var star_right_x := pause_left_x - star_gap
+	var star_right_x := pause_left_x - 3 * star_gap
 	var star_left_x := star_right_x - star_size.x
 	var star_top_y := row_center_y - star_size.y * 0.5
 	_layout_absolute(_star_counter, star_left_x, star_top_y, star_right_x, star_top_y + star_size.y)
@@ -230,7 +227,7 @@ func _layout_star_counter_children(star_size: Vector2, layout_scale: float) -> v
 	var icon_margin := 8.0 * layout_scale
 	var icon_size := minf(34.0 * layout_scale, star_size.y - icon_margin * 2.0)
 	var label_left := icon_margin + icon_size + 2.0 * layout_scale
-	var label_right_margin := 8.0 * layout_scale
+	var label_right_margin := 12.0 * layout_scale
 	_layout_absolute(
 		_star_icon,
 		icon_margin,
@@ -256,19 +253,6 @@ func _fit_star_count_font() -> void:
 			10
 		)
 	)
-
-
-func _layout_pause_bars(icon_size: Vector2) -> void:
-	var bar_width := icon_size.x * PAUSE_BAR_WIDTH_RATIO
-	var bar_height := icon_size.y * PAUSE_BAR_HEIGHT_RATIO
-	var gap := icon_size.x * PAUSE_BAR_GAP_RATIO
-	var total_width := bar_width * 2.0 + gap
-	var left_x := (icon_size.x - total_width) * 0.5
-	var top_y := (icon_size.y - bar_height) * 0.5
-
-	_layout_absolute(_pause_bar_1, left_x, top_y, left_x + bar_width, top_y + bar_height)
-	_layout_absolute(_pause_bar_2, left_x + bar_width + gap, top_y, left_x + total_width, top_y + bar_height)
-
 
 func _layout_absolute(control: Control, left: float, top: float, right: float, bottom: float) -> void:
 	control.anchor_left = 0.0
