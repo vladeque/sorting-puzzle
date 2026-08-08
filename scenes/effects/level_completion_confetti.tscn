@@ -1,0 +1,86 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/level_completion_confetti.gd" id="1_confetti_script"]
+
+[sub_resource type="Gradient" id="Gradient_confetti_colors"]
+interpolation_mode = 1
+offsets = PackedFloat32Array(0, 0.167, 0.334, 0.5, 0.667, 0.834)
+colors = PackedColorArray(1, 0.31, 0.64, 1, 1, 0.82, 0.25, 1, 0.31, 0.85, 1, 1, 0.43, 0.91, 0.43, 1, 1, 0.54, 0.24, 1, 0.71, 0.48, 1, 1)
+
+[sub_resource type="Gradient" id="Gradient_confetti_fade"]
+offsets = PackedFloat32Array(0, 0.8, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="Curve" id="Curve_confetti_flip"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.2, 0.32), 0.0, 0.0, 0, 0, Vector2(0.4, 0.96), 0.0, 0.0, 0, 0, Vector2(0.62, 0.34), 0.0, 0.0, 0, 0, Vector2(0.82, 0.94), 0.0, 0.0, 0, 0, Vector2(1, 0.4), 0.0, 0.0, 0, 0]
+point_count = 6
+
+[sub_resource type="Curve" id="Curve_confetti_thickness"]
+_data = [Vector2(0, 0.5), 0.0, 0.0, 0, 0, Vector2(1, 0.5), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[node name="LevelCompletionConfetti" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_confetti_script")
+
+[node name="LeftCannon" type="CPUParticles2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(28, 1270)
+emitting = false
+amount = 130
+lifetime = 3.4
+one_shot = true
+explosiveness = 0.94
+randomness = 0.2
+lifetime_randomness = 0.25
+direction = Vector2(0.225, -0.974)
+spread = 26.0
+gravity = Vector2(0, 1250)
+initial_velocity_min = 1360.0
+initial_velocity_max = 1800.0
+angular_velocity_min = -260.0
+angular_velocity_max = 260.0
+damping_max = 30.0
+angle_min = -180.0
+angle_max = 180.0
+scale_amount_min = 22.0
+scale_amount_max = 34.0
+split_scale = true
+scale_curve_x = SubResource("Curve_confetti_flip")
+scale_curve_y = SubResource("Curve_confetti_thickness")
+color_ramp = SubResource("Gradient_confetti_fade")
+color_initial_ramp = SubResource("Gradient_confetti_colors")
+
+[node name="RightCannon" type="CPUParticles2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(692, 1270)
+emitting = false
+amount = 130
+lifetime = 3.4
+one_shot = true
+explosiveness = 0.94
+randomness = 0.2
+lifetime_randomness = 0.25
+direction = Vector2(-0.225, -0.974)
+spread = 26.0
+gravity = Vector2(0, 1250)
+initial_velocity_min = 1360.0
+initial_velocity_max = 1800.0
+angular_velocity_min = -260.0
+angular_velocity_max = 260.0
+damping_max = 30.0
+angle_min = -180.0
+angle_max = 180.0
+scale_amount_min = 22.0
+scale_amount_max = 34.0
+split_scale = true
+scale_curve_x = SubResource("Curve_confetti_flip")
+scale_curve_y = SubResource("Curve_confetti_thickness")
+color_ramp = SubResource("Gradient_confetti_fade")
+color_initial_ramp = SubResource("Gradient_confetti_colors")

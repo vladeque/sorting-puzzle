@@ -16,6 +16,8 @@ const ABILITY_HIGHLIGHT := &"highlight"
 const ABILITY_FREEZER := &"freezer"
 const HIGHLIGHT_DURATION_SECONDS := 15.0
 const FREEZER_DURATION_SECONDS := 30.0
+## How long the cleared board stays on screen, celebrating, before the completion screen opens.
+const COMPLETION_CELEBRATION_SECONDS := 2.0
 const SHELF_SCENE := preload("res://scenes/shelf.tscn")
 const MOVING_SHELF_ROW_SCENE := preload("res://scenes/moving_shelf_row.tscn")
 const ITEM_SCENE := preload("res://scenes/item.tscn")
@@ -149,6 +151,7 @@ var _top_hud: LevelTopHud
 var _star_reward_effect_layer: Control
 var _failure_screen: LevelFailureScreen
 var _completion_screen: LevelCompletionScreen
+var _completion_confetti: LevelCompletionConfetti
 var _pause_menu_overlay: PauseMenu
 var _leave_confirmation_overlay: LeaveConfirmationMenu
 var _ability_purchase_overlay: AbilityPurchaseMenu
@@ -195,6 +198,8 @@ var _triples_cleared := 0
 var _shelves_layout_scale := 1.0
 var _hammer_effect_active := false
 var _shuffle_effect_active := false
+## True from the moment the board is cleared until the completion screen opens (see _complete_level).
+var _completion_celebration_active := false
 
 
 func _ready() -> void:
@@ -205,6 +210,7 @@ func _ready() -> void:
 	_top_hud = get_node("UI/TopHud") as LevelTopHud
 	_failure_screen = get_node("UI/FailureScreen") as LevelFailureScreen
 	_completion_screen = get_node("UI/CompletionScreen") as LevelCompletionScreen
+	_completion_confetti = get_node("UI/CompletionConfetti") as LevelCompletionConfetti
 	_pause_menu_overlay = get_node("UI/PauseMenuOverlay") as PauseMenu
 	_leave_confirmation_overlay = get_node("UI/LeaveConfirmationOverlay") as LeaveConfirmationMenu
 	_ability_purchase_overlay = get_node("UI/AbilityPurchaseOverlay") as AbilityPurchaseMenu
@@ -265,6 +271,8 @@ func _apply_responsive_layout() -> void:
 	_layout_ability_bar(safe_margins)
 	_failure_screen.apply_safe_layout(safe_margins, viewport_size)
 	_completion_screen.apply_safe_layout(safe_margins, viewport_size)
+	if _completion_confetti != null:
+		_completion_confetti.apply_safe_layout(safe_margins, viewport_size)
 	_pause_menu_overlay.apply_safe_layout(safe_margins, viewport_size)
 	_leave_confirmation_overlay.apply_safe_layout(safe_margins, viewport_size)
 	if _ability_purchase_overlay != null:
@@ -547,8 +555,9 @@ func _input(event: InputEvent) -> void:
 ##   1. Leave Confirmation returns to Pause.
 ##   2. Ability Purchase closes and restores the state it opened from.
 ##   3. Pause closes and resumes active gameplay.
-##   4. Completion invokes its Continue route; Failure invokes its Main Menu route.
-##   5. Otherwise (active gameplay) opens Pause.
+##   4. The post-clear confetti celebration skips ahead to the Completion screen.
+##   5. Completion invokes its Continue route; Failure invokes its Main Menu route.
+##   6. Otherwise (active gameplay) opens Pause.
 ## Every branch reuses the exact handler its equivalent button already calls, so this can never
 ## spend a life, coin, or star by itself, and behaves identically to tapping that button. If any
 ## overlay/result screen is mid open()/close() transition, the press is dropped rather than acted
@@ -568,6 +577,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		_on_ability_purchase_close_pressed()
 	elif _pause_menu_overlay.visible:
 		_on_pause_menu_continue_pressed()
+	elif _completion_celebration_active:
+		_open_completion_screen()
 	elif _level_completed:
 		_on_completion_next_pressed()
 	elif _level_failed:
@@ -1568,6 +1579,11 @@ func _fail_level() -> void:
 		_ability_purchase_overlay.visible = false
 
 
+## Freezes the cleared board, plays the confetti celebration over it for
+## COMPLETION_CELEBRATION_SECONDS, and only then opens the completion screen. Progress is committed
+## and `_level_completed` is set before that wait, so the reward is banked even if the run is
+## interrupted mid-celebration, and the existing `_level_completed` guards already stop input,
+## `_process`, the timer, and the pause button for the whole window.
 func _complete_level() -> void:
 	if not launched_from_dev_mode and not PlayerProgress.complete_level(selected_level, _stars):
 		push_error("Level completion could not be committed; keeping the level active.")
@@ -1589,12 +1605,30 @@ func _complete_level() -> void:
 	_clear_ability_highlights()
 	_update_ability_buttons()
 	_update_pause_menu_button()
-	_completion_screen.set_earned_stars(_stars)
-	_completion_screen.open()
 	_pause_menu_overlay.visible = false
 	_leave_confirmation_overlay.visible = false
 	if _ability_purchase_overlay != null:
 		_ability_purchase_overlay.visible = false
+
+	_completion_celebration_active = true
+	if _completion_confetti != null:
+		_completion_confetti.play()
+	await get_tree().create_timer(COMPLETION_CELEBRATION_SECONDS).timeout
+	# The celebration can end before its timer does -- the level can be torn down (returning to the
+	# menu, the scene being freed), or a back press can skip straight to the screen -- so re-check
+	# instead of opening a screen that is already open or already gone.
+	if not is_inside_tree() or _returning_to_menu or not _completion_celebration_active:
+		return
+
+	_open_completion_screen()
+
+
+## Ends the celebration window and shows the reward screen. Safe to call once; the celebration timer
+## and the back-press skip both route through here and the flag keeps the second one a no-op.
+func _open_completion_screen() -> void:
+	_completion_celebration_active = false
+	_completion_screen.set_earned_stars(_stars)
+	_completion_screen.open()
 
 
 func _check_level_completed() -> void:

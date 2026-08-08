@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" path="res://scenes/backgrounds/chapter_level_background.tscn" id="12_chapter_background"]
 [ext_resource type="PackedScene" path="res://scenes/ui/level_failure_screen.tscn" id="13_failure_screen"]
 [ext_resource type="PackedScene" path="res://scenes/ui/level_top_hud.tscn" id="14_top_hud"]
+[ext_resource type="PackedScene" path="res://scenes/effects/level_completion_confetti.tscn" id="15_completion_confetti"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_baseboard"]
 bg_color = Color(0.83, 0.66, 0.47, 1)
@@ -193,3 +194,6 @@ visible = false
 [node name="LeaveConfirmationOverlay" parent="UI" unique_id=840119744 instance=ExtResource("8_leave_confirmation")]
 
 [node name="AbilityPurchaseOverlay" parent="UI" unique_id=38239463 instance=ExtResource("9_ability_purchase")]
+
+[node name="CompletionConfetti" parent="UI" instance=ExtResource("15_completion_confetti")]
+visible = false

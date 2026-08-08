@@ -1090,7 +1090,8 @@ Important nodes:
 - `UI/AbilityBar`: `scenes/ui/ability_bar.tscn` instance; its focused owner script owns all four
   buttons, use badges, timed badges, touch-target sizing, and the `ability_pressed` signal.
 - `UI/FailurePanel`: shown when time runs out.
-- `UI/CompletionScreen`: `scenes/ui/level_completion_screen.tscn` instance shown after all items clear.
+- `UI/CompletionScreen`: `scenes/ui/level_completion_screen.tscn` instance shown after all items clear, once the completion celebration window has elapsed.
+- `UI/CompletionConfetti`: `scenes/effects/level_completion_confetti.tscn` instance, kept last in the `UI` layer so its pieces fall in front of the reward overlay.
 - `UI/PauseMenuOverlay`: `scenes/pause_menu.tscn` instance used for the modal pause menu.
 - `UI/LeaveConfirmationOverlay`: `scenes/leave_confirmation_menu.tscn` instance shown after the pause menu's Leave button, before spending a campaign life and returning to the menu.
 - `UI/AbilityPurchaseOverlay`: `scenes/ability_purchase_menu.tscn` instance shown when the player taps an ability with zero saved uses remaining.
@@ -1270,6 +1271,38 @@ Depends on:
 Do not use for:
 - Retry/run-lifecycle behavior (out of this ticket's scope -- Failure exits to Main Menu only).
   Puzzle failure conditions and life spending stay in `scripts/level.gd`.
+
+## `scenes/effects/level_completion_confetti.tscn`
+
+Root:
+- `LevelCompletionConfetti` (`Control`, full-rect and input-transparent)
+
+Script:
+- `scripts/level_completion_confetti.gd`
+
+Purpose:
+- Confetti celebration played by `scripts/level.gd` while a cleared level stays on screen, before
+  `scenes/ui/level_completion_screen.tscn` opens. Instanced in `level.tscn` as `UI/CompletionConfetti`
+  and kept last in the `UI` layer so pieces keep falling in front of the reward overlay's shade.
+- Extracted rather than assembled in `scripts/level.gd` (see AGENTS.md's Scene Extraction Rule): the
+  piece look is scene-authored and tunable without touching gameplay code.
+
+Important nodes:
+- `LeftCannon` / `RightCannon`: the two `CPUParticles2D` emitters. They own the confetti look --
+  ribbon shape (`split_scale` with a flip curve on X and a constant thickness curve on Y), the
+  six-color discrete `color_initial_ramp`, the end-of-life alpha `color_ramp`, tumble
+  (`angular_velocity`), air drag (`damping_max`), and the one-shot burst timing
+  (`amount`, `lifetime`, `explosiveness`). Their muzzle positions, direction, launch speed, gravity,
+  and piece size are recomputed for the live viewport by the script on every `play()`, so the
+  scene's values are design-resolution defaults.
+
+Depends on:
+- `scripts/level.gd` for playback on completion.
+- `tests/gameplay/test_level_completion_confetti.gd` for celebration-window and aim verification.
+
+Do not use for:
+- Star awards, completion rules, or the reward screen. Those stay in `scripts/level.gd` and
+  `scenes/ui/level_completion_screen.tscn`.
 
 ## `scenes/abilities/hammer_impact_effect.tscn`
 

@@ -1498,6 +1498,7 @@ Important constants:
 - `ITEM_PLACE_SOUND`: short sound played when the player drops or moves an item into a shelf slot.
 - `TRIPLE_CLEAR_SOUND`: sound played when a matched triple gathers and disappears.
 - `HAMMER_IMPACT_EFFECT_SCENE`: `res://scenes/abilities/hammer_impact_effect.tscn`, spawned when the hammer ability is used.
+- `COMPLETION_CELEBRATION_SECONDS`: how long the cleared board stays on screen with confetti flying before the completion screen opens.
 - `SHUFFLE_BOX_TEXTURE`: `res://assets/abilities/ability_shuffle_box.png`, shown at screen center while the shuffle ability gathers and redistributes items.
 
 Key responsibilities:
@@ -1632,6 +1633,47 @@ Do not use for:
 - Offline level generation or solvability search. Keep that in `scripts/tools/`.
 - Save data ownership. Keep that in `scripts/save/local_save_store.gd`; route gameplay access
   through `PlayerProgress`.
+
+## `scripts/level_completion_confetti.gd`
+
+Class:
+- `LevelCompletionConfetti`
+
+Attached to:
+- `scenes/effects/level_completion_confetti.tscn` root `LevelCompletionConfetti`.
+
+Purpose:
+- Two-cannon confetti burst played by `scripts/level.gd` while a cleared level stays on screen,
+  before `scenes/ui/level_completion_screen.tscn` opens. Instanced in `level.tscn` as the last child
+  of the `UI` canvas layer so pieces keep falling in front of the reward overlay's shade.
+- Owns only what depends on the live viewport: muzzle placement in the two bottom corners and the
+  launch aim. Piece shape, color mix, spin, and fade are scene-configured on the two
+  `CPUParticles2D` cannons (`LeftCannon`, `RightCannon`) rather than written in script.
+- Solves the launch vector from projectile motion (`APEX_HEIGHT_RATIO`, `HORIZONTAL_REACH_RATIO`,
+  `GRAVITY_AT_DESIGN_HEIGHT`) instead of baking velocities into the scene, so both streams converge
+  near the middle of the screen at every supported resolution, not only at 720x1280.
+- Uses `CPUParticles2D` rather than `GPUParticles2D`: the piece counts are small and CPU particles
+  avoid GPU-particle behavior differences on low-end Android devices.
+
+Exports:
+- `muzzle_inset`: where each cannon sits relative to its bottom corner, at the design resolution.
+
+API:
+- `play()`: aims and fires both cannons; awaitable, and emits `finished` once the last piece can no
+  longer be on screen.
+- `get_burst_duration()`: how long the burst can stay visible (emission tail plus one lifetime plus
+  a settle margin).
+
+Depends on:
+- `scripts/level.gd` for playback on completion.
+
+Verification:
+- `tests/gameplay/test_level_completion_confetti.gd` checks the corner muzzles, the inward/upward
+  aim, the celebration delay before the reward screen opens, and the back-press skip.
+
+Do not use for:
+- Completion rules, star awards, or the reward screen itself. Those stay in `scripts/level.gd` and
+  `scripts/level_completion_screen.gd`.
 
 ## `scripts/hammer_impact_effect.gd`
 
