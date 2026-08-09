@@ -54,11 +54,11 @@ render_mode unshaded;
 // a literal copy of the item.
 //
 // The projection itself lives outside this shader: scenes/item.tscn anchors the sprite on the
-// art's ground line (canvas y=240, per docs/ITEM_ASSET_REQUIREMENTS.md) and scripts/item.gd
+// art's ground line (canvas y=120, per docs/ITEM_ASSET_REQUIREMENTS.md) and scripts/item.gd
 // blends between the resting and carried shapes, driving blur_radius_px and shadow_color's alpha
 // along with them (a resting shadow is tight and dark, a carried one softer and lighter).
 uniform vec4 shadow_color : source_color = vec4(0.1, 0.05, 0.02, 0.34);
-uniform float blur_radius_px : hint_range(0.0, 64.0, 0.5) = 10.0;
+uniform float blur_radius_px : hint_range(0.0, 32.0, 0.5) = 5.0;
 uniform float mask_low : hint_range(0.0, 1.0, 0.01) = 0.3;
 uniform float mask_high : hint_range(0.0, 1.0, 0.01) = 0.62;
 
@@ -92,7 +92,7 @@ void fragment() {
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_shadow"]
 shader = SubResource("Shader_item_shadow")
 shader_parameter/shadow_color = Color(0.1, 0.05, 0.02, 0.4)
-shader_parameter/blur_radius_px = 12.0
+shader_parameter/blur_radius_px = 6.0
 shader_parameter/mask_low = 0.3
 shader_parameter/mask_high = 0.62
 
@@ -107,15 +107,15 @@ shadow_material = SubResource("ShaderMaterial_shadow")
 [node name="Shadow" type="Sprite2D" parent="." unique_id=1649807921]
 z_index = -4
 material = SubResource("ShaderMaterial_shadow")
-offset = Vector2(0, -112)
+offset = Vector2(0, -56)
 
 [node name="OutlineSprite" type="Sprite2D" parent="." unique_id=515204852]
 visible = false
 material = SubResource("ShaderMaterial_4gq7n")
-scale = Vector2(0.46, 0.46)
+scale = Vector2(0.92, 0.92)
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=800087730]
-scale = Vector2(0.46, 0.46)
+scale = Vector2(0.92, 0.92)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=518417999]
 shape = SubResource("RectangleShape2D_item_hitbox")

@@ -81,8 +81,8 @@ func _verify_shadow_follows_item_form(item: ShelfItem, shadow: Sprite2D) -> void
 ## Widest and tallest visible artwork any item texture may contain, per
 ## docs/ITEM_ASSET_REQUIREMENTS.md. Used to check that the resting shadow reaches past the item's own
 ## silhouette instead of hiding underneath it.
-const MAX_ART_HEIGHT_TEXELS := 220.0
-const MAX_ART_HALF_WIDTH_TEXELS := 66.0
+const MAX_ART_HEIGHT_TEXELS := 110.0
+const MAX_ART_HALF_WIDTH_TEXELS := 33.0
 
 
 func _verify_resting_shape(item: ShelfItem, shadow: Sprite2D) -> void:
@@ -98,7 +98,7 @@ func _verify_resting_shape(item: ShelfItem, shadow: Sprite2D) -> void:
 	)
 
 	# The regression that made the first resting shadow useless: it pointed the right way but only
-	# reached ~29 texels, well inside the item's own half-width, so the item's opaque body covered
+	# reached ~15 texels, well inside the item's own half-width, so the item's opaque body covered
 	# every pixel of it. Direction alone is not enough -- the far end has to clear the silhouette.
 	var reach := MAX_ART_HEIGHT_TEXELS * ShelfItem.SHADOW_REST_FLATTEN * sin(ShelfItem.SHADOW_REST_SKEW)
 	_check(

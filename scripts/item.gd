@@ -4,27 +4,27 @@ extends Area2D
 
 const UIMotionScript := preload("res://scripts/ui_motion.gd")
 
-const DEFAULT_VISUAL_SCALE := 0.46
+const DEFAULT_VISUAL_SCALE := 0.92
 
 const SHADOW_NODE_NAME := ^"Shadow"
 
 ## Distance from the sprite's texture center down to the art's ground line, in source texels. Item
-## textures are a 256x256 canvas whose visible artwork ends at y=240 (docs/ITEM_ASSET_REQUIREMENTS),
-## so the contact point is 240 - 128 texels below the center for every catalog item.
-const SHADOW_GROUND_TEXELS := 112.0
+## textures are a 128x128 canvas whose visible artwork ends at y=120 (docs/ITEM_ASSET_REQUIREMENTS),
+## so the contact point is 120 - 64 texels below the center for every catalog item.
+const SHADOW_GROUND_TEXELS := 56.0
 
 ## Resting shadow: the item sits on the shelf, so its silhouette is squashed onto the floor and
 ## sheared up-right, running away from the viewer across the shelf floor and continuing up the back
 ## wall behind the item -- the light sits low and to the front-left.
 ##
 ## The reach matters as much as the direction. The shear displaces the silhouette's far end by
-## roughly `art_height * flatten * sin(skew)` texels, and anything under the item's own ~66-texel
+## roughly `art_height * flatten * sin(skew)` texels, and anything under the item's own ~33-texel
 ## half-width stays hidden behind its opaque body no matter how dark the shadow is. These values put
-## a tall item's far end about 95 texels out, so the silhouette clears itself and reads.
+## a tall item's far end about 47 texels out, so the silhouette clears itself and reads.
 const SHADOW_REST_WIDTH := 1.05
 const SHADOW_REST_FLATTEN := 0.52
 const SHADOW_REST_SKEW := 0.88
-const SHADOW_REST_BLUR_PX := 12.0
+const SHADOW_REST_BLUR_PX := 6.0
 
 ## Carried shadow: the item is held well above the board, so a ground projection is the wrong read.
 ## The silhouette stands back up to full height and is dropped down-right of the item -- the same
@@ -33,12 +33,12 @@ const SHADOW_REST_BLUR_PX := 12.0
 const SHADOW_CARRY_WIDTH := 1.06
 const SHADOW_CARRY_FLATTEN := 1.06
 const SHADOW_CARRY_SKEW := 0.0
-const SHADOW_CARRY_BLUR_PX := 18.0
+const SHADOW_CARRY_BLUR_PX := 9.0
 const SHADOW_CARRY_ALPHA_SCALE := 0.88
 
 ## How far the carried shadow separates from the item, in source texels (scaled with the sprite).
 ## Down and to the right, so the item reads as lifted toward the player and off to the light's side.
-const SHADOW_CARRY_OFFSET := Vector2(78.0, 30.0)
+const SHADOW_CARRY_OFFSET := Vector2(39.0, 15.0)
 
 const SHADOW_LIFT_SECONDS := 0.12
 const SHADOW_LIFT_TWEEN_META := &"_shelf_item_shadow_lift_tween"
@@ -70,7 +70,7 @@ const LAND_IMPACT_TWEEN_META := &"_shelf_item_land_impact_tween"
 		texture = value
 		_apply_texture()
 
-@export_range(0.1, 2.0, 0.01) var visual_scale: float = 0.46:
+@export_range(0.2, 4.0, 0.01) var visual_scale: float = 0.92:
 	set(value):
 		visual_scale = value
 		_apply_visual_scale()

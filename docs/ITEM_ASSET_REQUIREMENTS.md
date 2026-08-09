@@ -8,7 +8,7 @@ reworked.
 
 Every item texture must:
 
-- Be a PNG with an exact physical canvas size of `256x256` pixels.
+- Be a PNG with an exact physical canvas size of `128x128` pixels.
 - Use sRGB/RGBA color with a real alpha channel.
 - Have a fully transparent background outside the item. Do not bake in a solid background,
   checkerboard, shelf, or chroma-key color.
@@ -16,15 +16,15 @@ Every item texture must:
 - Avoid a baked contact or cast shadow outside the item silhouette. `scenes/item.tscn` owns the
   runtime ground shadow, and it is generated from this texture's own alpha, so any baked shadow
   would be projected a second time as part of the silhouette.
-- Prefer source art generated or authored at `256x256` or larger. A `128x128` source can be
-  upscaled when no better source exists, but upscaling does not restore lost detail.
+- Prefer source art generated or authored at `256x256` or larger and downsampled to the final
+  `128x128` canvas. Never upscale a smaller source; upscaling does not restore lost detail.
 
 When art must be resized or its alpha cleaned up, use ImageMagick as required by `AGENTS.md`.
 Do not use Pillow unless one of the documented exceptions applies.
 
 ## Visible Artwork Bounds
 
-Canvas size and visible item size are separate requirements. A `256x256` file whose item fills
+Canvas size and visible item size are separate requirements. A `128x128` file whose item fills
 the entire canvas will be too large for the shelf slots.
 
 Measure the visible artwork using the bounding box of pixels whose alpha is greater than
@@ -32,21 +32,22 @@ approximately `5%`. Low-alpha antialiasing fringe outside this box is acceptable
 
 The visible artwork must:
 
-- Fit within a maximum box of approximately `132x220` pixels.
+- Fit within a maximum box of approximately `66x110` pixels.
 - Preserve its original aspect ratio. Never stretch width and height independently.
-- Be centered horizontally around canvas X=`128`, with a tolerance of about `2` pixels.
-- End at canvas Y=`240`, with a tolerance of about `1` pixel. With the top-left coordinate system,
-  this means `visible_y + visible_height = 240`. The runtime ground shadow anchors on this line
+- Be centered horizontally around canvas X=`64`, with a tolerance of about `1` pixel.
+- End at canvas Y=`120`, with a tolerance of about `1` pixel. With the top-left coordinate system,
+  this means `visible_y + visible_height = 120`. The runtime ground shadow anchors on this line
   (`ShelfItem.SHADOW_GROUND_TEXELS`), so art that ends short of it will appear to hover.
-- Leave approximately `16` transparent pixels below the visible item.
-- Remain bottom-aligned when it is shorter than `220` pixels. Do not vertically center short jars,
+- Leave approximately `8` transparent pixels below the visible item.
+- Remain bottom-aligned when it is shorter than `110` pixels. Do not vertically center short jars,
   tubs, boxes, or other squat items, because they will appear to float above the shelf.
 - Use less than the maximum width or height when the item's natural silhouette calls for it.
   Narrow bottles should remain narrower than jars or cereal boxes.
 
-At the default `ShelfItem` visual scale of `0.46`, the maximum visible bounds render at roughly
+At the default `ShelfItem` visual scale of `0.92`, the maximum visible bounds render at roughly
 `61x101` logical pixels. This fits inside the shared `74x112` item hit area while leaving enough
-horizontal separation for three shelf slots.
+horizontal separation for three shelf slots. The scale is twice the source canvas' halving from
+`256x256`, so on-screen item size is unchanged from the earlier art generation.
 
 ## Visual Style
 
@@ -88,7 +89,8 @@ texture.
 
 Item texture imports should:
 
-- Keep `process/size_limit=0`; Godot must not reduce the texture to `128x128`.
+- Keep `process/size_limit=0`; the PNG is already authored at its final `128x128` size and Godot
+  must not reduce it further.
 - Keep mipmap generation disabled for these 2D shelf sprites.
 - Preserve the alpha channel.
 - Keep alpha-border fixing enabled to avoid dark or bright fringes during filtering.
@@ -103,18 +105,18 @@ godot --headless --path . --import
 
 ## ImageMagick Normalization
 
-The normalization operation must keep the final canvas at `256x256`; trimming is only an
+The normalization operation must keep the final canvas at `128x128`; trimming is only an
 intermediate measurement/processing step.
 
 Use this sequence:
 
 1. Ensure the source has a clean alpha channel.
 2. Trim temporary transparent padding around the silhouette.
-3. Resize the trimmed silhouette proportionally to fit within `132x220`.
+3. Resize the trimmed silhouette proportionally to fit within `66x110`.
 4. Measure the resized width and height.
-5. Place it on a new transparent `256x256` canvas at:
-   - `x = floor((256 - visible_width) / 2)`
-   - `y = 240 - visible_height`
+5. Place it on a new transparent `128x128` canvas at:
+   - `x = floor((128 - visible_width) / 2)`
+   - `y = 120 - visible_height`
 6. Recheck the final alpha bounds after resampling.
 
 Use the verified ImageMagick executable when `magick` is not on `PATH`:
@@ -126,7 +128,7 @@ $magick = 'C:\Program Files\ImageMagick-7.1.2-Q16-HDRI\magick.exe'
 Lanczos is the preferred filter for proportional resizing of these raster assets:
 
 ```powershell
-& $magick input.png -alpha on -trim +repage -filter Lanczos -resize '132x220>' trimmed.png
+& $magick input.png -alpha on -trim +repage -filter Lanczos -resize '66x110>' trimmed.png
 ```
 
 Compose the processed silhouette onto a new transparent canvas using the calculated `x` and `y`
@@ -142,7 +144,7 @@ Check canvas size, channels, and alpha with ImageMagick:
 
 Expected:
 
-- `canvas=256x256`
+- `canvas=128x128`
 - RGBA/sRGBA channels
 - `opaque=False`
 
@@ -155,10 +157,10 @@ Check the meaningful alpha bounds:
 
 Confirm that:
 
-- Visible width is at most about `132`.
-- Visible height is at most about `220`.
-- The horizontal center is approximately X=`128`.
-- `offset_y + visible_height` is approximately `240`.
+- Visible width is at most about `66`.
+- Visible height is at most about `110`.
+- The horizontal center is approximately X=`64`.
+- `offset_y + visible_height` is approximately `120`.
 
 Then:
 

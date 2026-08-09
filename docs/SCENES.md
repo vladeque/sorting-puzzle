@@ -1706,7 +1706,7 @@ Important nodes:
   alpha (a ring average, unlike `OutlineSprite`'s max-dilation) so straws, handles and label detail
   dissolve while the overall bottle/box/tub form stays recognizable, then flattens the result to one
   translucent color that reads on both the wooden shelf floor and the lighter level background.
-  `scripts/item.gd` anchors the sprite on the art's ground line (canvas y=240, see
+  `scripts/item.gd` anchors the sprite on the art's ground line (canvas y=120, see
   `docs/ITEM_ASSET_REQUIREMENTS.md`). Generated back-layer previews and clearing items disable it.
 - The shadow has two readings, blended by `ShelfItem.shadow_lift`. **Resting**: the silhouette
   squashed onto the shelf and sheared up-right, running away from the viewer across the shelf floor
