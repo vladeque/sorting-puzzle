@@ -78,20 +78,32 @@ func _verify_shadow_follows_item_form(item: ShelfItem, shadow: Sprite2D) -> void
 	)
 
 
+## Widest and tallest visible artwork any item texture may contain, per
+## docs/ITEM_ASSET_REQUIREMENTS.md. Used to check that the resting shadow reaches past the item's own
+## silhouette instead of hiding underneath it.
+const MAX_ART_HEIGHT_TEXELS := 220.0
+const MAX_ART_HALF_WIDTH_TEXELS := 66.0
+
+
 func _verify_resting_shape(item: ShelfItem, shadow: Sprite2D) -> void:
 	item.shadow_lift = 0.0
 
 	_check(
-		shadow.scale.y < 0.0,
-		"A resting shadow folds toward the viewer, so it is not hidden behind the item's own body."
-	)
-	_check(
-		absf(shadow.scale.y) < absf(shadow.scale.x) * 0.5,
+		shadow.scale.y > 0.0 and shadow.scale.y < shadow.scale.x * 0.7,
 		"A resting shadow is flattened onto the shelf rather than standing up."
 	)
 	_check(
-		not is_zero_approx(shadow.skew),
-		"A resting shadow is sheared along the light direction."
+		shadow.skew > 0.0,
+		"A resting shadow shears up-right, away from the viewer, along the light direction."
+	)
+
+	# The regression that made the first resting shadow useless: it pointed the right way but only
+	# reached ~29 texels, well inside the item's own half-width, so the item's opaque body covered
+	# every pixel of it. Direction alone is not enough -- the far end has to clear the silhouette.
+	var reach := MAX_ART_HEIGHT_TEXELS * ShelfItem.SHADOW_REST_FLATTEN * sin(ShelfItem.SHADOW_REST_SKEW)
+	_check(
+		reach > MAX_ART_HALF_WIDTH_TEXELS,
+		"A resting shadow reaches past the item's own silhouette instead of hiding behind it."
 	)
 
 
@@ -150,7 +162,7 @@ func _verify_drag_lift(level: Node, item: ShelfItem, shadow: Sprite2D) -> void:
 	await create_timer(LIFT_SETTLE_SECONDS).timeout
 
 	_check(
-		is_zero_approx(item.shadow_lift) and shadow.scale.y < 0.0,
+		is_zero_approx(item.shadow_lift) and shadow.scale.y < shadow.scale.x * 0.7,
 		"Dropping the item lays its shadow back down onto the shelf."
 	)
 

@@ -1700,9 +1700,10 @@ Important nodes:
   `scripts/item.gd` anchors the sprite on the art's ground line (canvas y=240, see
   `docs/ITEM_ASSET_REQUIREMENTS.md`). Generated back-layer previews and clearing items disable it.
 - The shadow has two readings, blended by `ShelfItem.shadow_lift`. **Resting**: the silhouette
-  squashed onto the shelf and folded down-right toward the viewer, following the same light
-  direction as the shelf's own cast shadow -- folding it away from the viewer instead would be
-  hidden behind the item's own opaque body. **Carried**: while the player drags the item, the
+  squashed onto the shelf and sheared up-right, running away from the viewer across the shelf floor
+  and continuing up the back wall behind the item. Its reach is what makes it visible -- the shear
+  has to displace the silhouette's far end past the item's own half-width, or the item's opaque body
+  covers the whole shadow. **Carried**: while the player drags the item, the
   silhouette stands back up to full height and separates down-right of the item, softer and slightly
   larger, reading as a shadow cast far below rather than one lying under the item's feet. Compare
   and tune both in `scenes/shadow_style_preview.tscn`.

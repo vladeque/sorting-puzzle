@@ -13,15 +13,17 @@ const SHADOW_NODE_NAME := ^"Shadow"
 ## so the contact point is 240 - 128 texels below the center for every catalog item.
 const SHADOW_GROUND_TEXELS := 112.0
 
-## Resting shadow: the item sits on the shelf, so its silhouette is squashed onto the floor. The
-## flatten is negative and the skew mirrors it, folding the silhouette down-right toward the viewer
-## the way the shelf's own cast shadow falls -- the item's top becomes the far end of the shadow.
-## Folding it up-right instead would be geometrically defensible but invisible, since the item's own
-## opaque body stands in front of exactly that area. Kept short because there is only a shallow band
-## of shelf floor in front of the item before the front lip.
+## Resting shadow: the item sits on the shelf, so its silhouette is squashed onto the floor and
+## sheared up-right, running away from the viewer across the shelf floor and continuing up the back
+## wall behind the item -- the light sits low and to the front-left.
+##
+## The reach matters as much as the direction. The shear displaces the silhouette's far end by
+## roughly `art_height * flatten * sin(skew)` texels, and anything under the item's own ~66-texel
+## half-width stays hidden behind its opaque body no matter how dark the shadow is. These values put
+## a tall item's far end about 95 texels out, so the silhouette clears itself and reads.
 const SHADOW_REST_WIDTH := 1.05
-const SHADOW_REST_FLATTEN := -0.14
-const SHADOW_REST_SKEW := -0.5
+const SHADOW_REST_FLATTEN := 0.52
+const SHADOW_REST_SKEW := 0.88
 const SHADOW_REST_BLUR_PX := 12.0
 
 ## Carried shadow: the item is held well above the board, so a ground projection is the wrong read.
@@ -226,8 +228,8 @@ func _apply_visual_scale() -> void:
 
 ## Draws the item's own silhouette as its shadow, in one of two readings blended by `shadow_lift`:
 ##
-##   resting (0) -- the item is touching the shelf, so the silhouette is squashed flat onto the floor
-##                  and sheared up-right: a shadow lying on the surface the item stands on.
+##   resting (0) -- the item is touching the shelf, so the silhouette is squashed onto the floor and
+##                  sheared up-right, running back across the shelf and up the wall behind it.
 ##   carried (1) -- the item is held above the board, so the silhouette stands back up to full height
 ##                  and separates down-right of the item, the way a lifted object's shadow detaches.
 ##
@@ -249,9 +251,6 @@ func _apply_shadow() -> void:
 
 	var sprite_scale := _get_effective_scale()
 	var lift := clampf(shadow_lift, 0.0, 1.0)
-	# Crosses zero early in the blend, where the folded-down resting shadow passes through flat on
-	# its way to standing upright. That is one frame of the 0.12s grab, and it reads as the shadow
-	# snapping up rather than as a gap.
 	var flatten := lerpf(SHADOW_REST_FLATTEN, SHADOW_CARRY_FLATTEN, lift)
 	var spread := lerpf(SHADOW_REST_WIDTH, SHADOW_CARRY_WIDTH, lift)
 
