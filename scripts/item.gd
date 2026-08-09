@@ -28,17 +28,18 @@ const SHADOW_REST_BLUR_PX := 6.0
 
 ## Carried shadow: the item is held well above the board, so a ground projection is the wrong read.
 ## The silhouette stands back up to full height and is dropped down-right of the item -- the same
-## shape, displaced, the way a lifted object's shadow separates from it. Softer and slightly larger
-## than the resting shadow because the casting surface is now far below.
+## shape, displaced, the way a lifted object's shadow separates from it. A source-alpha core keeps
+## narrow necks, handles and irregular edges recognizable while a smaller filtered halo softens it.
 const SHADOW_CARRY_WIDTH := 1.06
 const SHADOW_CARRY_FLATTEN := 1.06
 const SHADOW_CARRY_SKEW := 0.0
-const SHADOW_CARRY_BLUR_PX := 9.0
-const SHADOW_CARRY_ALPHA_SCALE := 0.88
+const SHADOW_CARRY_BLUR_PX := 4.5
+const SHADOW_CARRY_SILHOUETTE_WEIGHT := 0.7
+const SHADOW_CARRY_ALPHA_SCALE := 0.78
 
 ## How far the carried shadow separates from the item, in source texels (scaled with the sprite).
 ## Down and to the right, so the item reads as lifted toward the player and off to the light's side.
-const SHADOW_CARRY_OFFSET := Vector2(39.0, 15.0)
+const SHADOW_CARRY_OFFSET := Vector2(30.0, 12.0)
 
 const SHADOW_LIFT_SECONDS := 0.12
 const SHADOW_LIFT_TWEEN_META := &"_shelf_item_shadow_lift_tween"
@@ -271,6 +272,10 @@ func _apply_shadow() -> void:
 		_shadow_material.set_shader_parameter(
 			"blur_radius_px",
 			lerpf(SHADOW_REST_BLUR_PX, SHADOW_CARRY_BLUR_PX, lift)
+		)
+		_shadow_material.set_shader_parameter(
+			"silhouette_weight",
+			SHADOW_CARRY_SILHOUETTE_WEIGHT * lift
 		)
 
 

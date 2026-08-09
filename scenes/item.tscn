@@ -48,26 +48,27 @@ code = "shader_type canvas_item;
 render_mode unshaded;
 
 // Ground shadow derived from the item's own sprite alpha, so every catalog item casts its own
-// form without per-asset shadow authoring. The silhouette is low-pass filtered (a ring average,
-// unlike the outline shader's max-dilation) so straws, handles, lids and label details dissolve
-// while the overall bottle/box/tub shape survives -- the shadow stays recognizable without being
-// a literal copy of the item.
+// form without per-asset shadow authoring. A ring-average mask supplies the soft projection. While
+// carried, silhouette_weight also retains a lighter source-alpha core so narrow necks, handles and
+// irregular edges remain recognizable instead of dissolving into the filtered mask.
 //
 // The projection itself lives outside this shader: scenes/item.tscn anchors the sprite on the
 // art's ground line (canvas y=120, per docs/ITEM_ASSET_REQUIREMENTS.md) and scripts/item.gd
-// blends between the resting and carried shapes, driving blur_radius_px and shadow_color's alpha
-// along with them (a resting shadow is tight and dark, a carried one softer and lighter).
+// blends between the resting and carried shapes, driving blur_radius_px, silhouette_weight and
+// shadow_color's alpha along with them.
 uniform vec4 shadow_color : source_color = vec4(0.1, 0.05, 0.02, 0.34);
 uniform float blur_radius_px : hint_range(0.0, 32.0, 0.5) = 5.0;
 uniform float mask_low : hint_range(0.0, 1.0, 0.01) = 0.3;
 uniform float mask_high : hint_range(0.0, 1.0, 0.01) = 0.62;
+uniform float silhouette_weight : hint_range(0.0, 1.0, 0.01) = 0.0;
 
 const int SHADOW_RING_STEPS = 8;
 const float SHADOW_TAU = 6.283185307179586;
 const float SHADOW_INNER_RING = 0.55;
 
 void fragment() {
-	float coverage = texture(TEXTURE, UV).a;
+	float source_alpha = texture(TEXTURE, UV).a;
+	float coverage = source_alpha;
 	float sample_count = 1.0;
 
 	if (blur_radius_px > 0.0) {
@@ -80,7 +81,9 @@ void fragment() {
 		}
 	}
 
-	float mask = smoothstep(mask_low, mask_high, coverage / sample_count);
+	float soft_mask = smoothstep(mask_low, mask_high, coverage / sample_count);
+	float silhouette_mask = smoothstep(0.08, 0.45, source_alpha);
+	float mask = max(soft_mask, silhouette_mask * silhouette_weight);
 
 	// The fragment color is generated from the alpha mask rather than from the texture's own color,
 	// so the incoming COLOR (and with it the item's modulate) is deliberately discarded. Per-item
@@ -95,6 +98,7 @@ shader_parameter/shadow_color = Color(0.1, 0.05, 0.02, 0.4)
 shader_parameter/blur_radius_px = 6.0
 shader_parameter/mask_low = 0.3
 shader_parameter/mask_high = 0.62
+shader_parameter/silhouette_weight = 0.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_item_hitbox"]
 size = Vector2(74, 112)

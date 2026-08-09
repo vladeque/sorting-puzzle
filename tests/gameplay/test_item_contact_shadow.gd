@@ -96,6 +96,10 @@ func _verify_resting_shape(item: ShelfItem, shadow: Sprite2D) -> void:
 		shadow.skew > 0.0,
 		"A resting shadow shears up-right, away from the viewer, along the light direction."
 	)
+	_check(
+		is_zero_approx(_get_silhouette_weight(shadow)),
+		"A resting shadow uses only the filtered projection, without the carried silhouette core."
+	)
 
 	# The regression that made the first resting shadow useless: it pointed the right way but only
 	# reached ~15 texels, well inside the item's own half-width, so the item's opaque body covered
@@ -108,7 +112,6 @@ func _verify_resting_shape(item: ShelfItem, shadow: Sprite2D) -> void:
 
 
 func _verify_carried_shape(item: ShelfItem, shadow: Sprite2D) -> void:
-	var resting_blur := _get_blur(shadow)
 	var ground_y := ShelfItem.SHADOW_GROUND_TEXELS * item.visual_scale
 
 	item.shadow_lift = 1.0
@@ -126,8 +129,15 @@ func _verify_carried_shape(item: ShelfItem, shadow: Sprite2D) -> void:
 		"A carried shadow separates down-right of the item it belongs to."
 	)
 	_check(
-		_get_blur(shadow) > resting_blur,
-		"A carried shadow is softer than a resting one, its casting surface being further away."
+		is_equal_approx(_get_blur(shadow), ShelfItem.SHADOW_CARRY_BLUR_PX),
+		"A carried shadow uses the compact halo radius that preserves recognizable edges."
+	)
+	_check(
+		is_equal_approx(
+			_get_silhouette_weight(shadow),
+			ShelfItem.SHADOW_CARRY_SILHOUETTE_WEIGHT
+		),
+		"A carried shadow retains a source-alpha core for narrow and irregular silhouette details."
 	)
 
 	item.shadow_lift = 0.0
@@ -172,6 +182,13 @@ func _get_blur(shadow: Sprite2D) -> float:
 	if material == null:
 		return -1.0
 	return float(material.get_shader_parameter("blur_radius_px"))
+
+
+func _get_silhouette_weight(shadow: Sprite2D) -> float:
+	var material := shadow.material as ShaderMaterial
+	if material == null:
+		return -1.0
+	return float(material.get_shader_parameter("silhouette_weight"))
 
 
 func _finish(level: Node) -> void:
