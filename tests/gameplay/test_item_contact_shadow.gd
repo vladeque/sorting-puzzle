@@ -3,8 +3,8 @@ extends SceneTree
 ## Focused verification for the ShelfItem ground shadow (scripts/item.gd's _apply_shadow). Covers the
 ## properties the shadow rework had to deliver: the shadow is derived from the item's own texture
 ## instead of one shared authored blob, it anchors on the art's ground line, and it has two distinct
-## readings -- flattened onto the shelf at rest, standing upright and displaced while carried -- with
-## the carried one travelling with the dragged item instead of being dropped.
+## readings -- a nearby soft silhouette at rest and a more separated, shape-preserving silhouette
+## while carried -- with the carried one travelling with the dragged item instead of being dropped.
 
 const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
 const LEVEL_SCENE_PATH := "res://level.tscn"
@@ -73,41 +73,43 @@ func _verify_shadow_follows_item_form(item: ShelfItem, shadow: Sprite2D) -> void
 		"The shadow sprite is offset so the art's ground line sits on its own origin."
 	)
 	_check(
-		is_equal_approx(shadow.position.y, ShelfItem.SHADOW_GROUND_TEXELS * item.visual_scale),
-		"A resting shadow is anchored on the item's contact point, undisplaced."
+		shadow.position.is_equal_approx(
+			Vector2(0.0, ShelfItem.SHADOW_GROUND_TEXELS * item.visual_scale)
+				+ ShelfItem.SHADOW_REST_OFFSET * item.visual_scale
+		),
+		"A resting shadow is anchored on the ground line and offset slightly down-right."
 	)
-
-
-## Widest and tallest visible artwork any item texture may contain, per
-## docs/ITEM_ASSET_REQUIREMENTS.md. Used to check that the resting shadow reaches past the item's own
-## silhouette instead of hiding underneath it.
-const MAX_ART_HEIGHT_TEXELS := 110.0
-const MAX_ART_HALF_WIDTH_TEXELS := 33.0
 
 
 func _verify_resting_shape(item: ShelfItem, shadow: Sprite2D) -> void:
 	item.shadow_lift = 0.0
 
 	_check(
-		shadow.scale.y > 0.0 and shadow.scale.y < shadow.scale.x * 0.7,
-		"A resting shadow is flattened onto the shelf rather than standing up."
+		shadow.scale.y > 0.0 and is_equal_approx(shadow.scale.y, shadow.scale.x),
+		"A resting shadow keeps the item's full-height silhouette instead of flattening it."
 	)
 	_check(
-		shadow.skew > 0.0,
-		"A resting shadow shears up-right, away from the viewer, along the light direction."
+		is_zero_approx(shadow.skew),
+		"A resting shadow stays upright without shearing the recognizable silhouette."
 	)
 	_check(
 		is_zero_approx(_get_silhouette_weight(shadow)),
 		"A resting shadow uses only the filtered projection, without the carried silhouette core."
 	)
-
-	# The regression that made the first resting shadow useless: it pointed the right way but only
-	# reached ~15 texels, well inside the item's own half-width, so the item's opaque body covered
-	# every pixel of it. Direction alone is not enough -- the far end has to clear the silhouette.
-	var reach := MAX_ART_HEIGHT_TEXELS * ShelfItem.SHADOW_REST_FLATTEN * sin(ShelfItem.SHADOW_REST_SKEW)
 	_check(
-		reach > MAX_ART_HALF_WIDTH_TEXELS,
-		"A resting shadow reaches past the item's own silhouette instead of hiding behind it."
+		is_equal_approx(_get_blur(shadow), ShelfItem.SHADOW_REST_BLUR_PX),
+		"A resting shadow uses the broad blur radius of the soft wall silhouette."
+	)
+	_check(
+		is_equal_approx(_get_mask_low(shadow), ShelfItem.SHADOW_REST_MASK_LOW),
+		"A resting shadow uses the broad mask transition that softens its penumbra."
+	)
+	_check(
+		is_equal_approx(
+			_get_shadow_alpha(shadow),
+			_get_base_shadow_alpha(item) * ShelfItem.SHADOW_REST_ALPHA_SCALE
+		),
+		"A resting shadow is faint enough not to crowd adjacent shelf items."
 	)
 
 
@@ -118,7 +120,7 @@ func _verify_carried_shape(item: ShelfItem, shadow: Sprite2D) -> void:
 
 	_check(
 		shadow.scale.y > 0.0 and shadow.scale.y > shadow.scale.x * 0.8,
-		"A carried shadow stands back up to the item's own height instead of lying on the floor."
+		"A carried shadow retains the item's full-height silhouette."
 	)
 	_check(
 		is_zero_approx(shadow.skew),
@@ -131,6 +133,10 @@ func _verify_carried_shape(item: ShelfItem, shadow: Sprite2D) -> void:
 	_check(
 		is_equal_approx(_get_blur(shadow), ShelfItem.SHADOW_CARRY_BLUR_PX),
 		"A carried shadow uses the compact halo radius that preserves recognizable edges."
+	)
+	_check(
+		is_equal_approx(_get_mask_low(shadow), ShelfItem.SHADOW_CARRY_MASK_LOW),
+		"A carried shadow restores the tighter halo threshold."
 	)
 	_check(
 		is_equal_approx(
@@ -172,8 +178,8 @@ func _verify_drag_lift(level: Node, item: ShelfItem, shadow: Sprite2D) -> void:
 	await create_timer(LIFT_SETTLE_SECONDS).timeout
 
 	_check(
-		is_zero_approx(item.shadow_lift) and shadow.scale.y < shadow.scale.x * 0.7,
-		"Dropping the item lays its shadow back down onto the shelf."
+		is_zero_approx(item.shadow_lift) and shadow.scale.y > shadow.scale.x * 0.8,
+		"Dropping the item returns its shadow to the soft upright resting silhouette."
 	)
 
 
@@ -189,6 +195,28 @@ func _get_silhouette_weight(shadow: Sprite2D) -> float:
 	if material == null:
 		return -1.0
 	return float(material.get_shader_parameter("silhouette_weight"))
+
+
+func _get_mask_low(shadow: Sprite2D) -> float:
+	var material := shadow.material as ShaderMaterial
+	if material == null:
+		return -1.0
+	return float(material.get_shader_parameter("mask_low"))
+
+
+func _get_shadow_alpha(shadow: Sprite2D) -> float:
+	var material := shadow.material as ShaderMaterial
+	if material == null:
+		return -1.0
+	var color = material.get_shader_parameter("shadow_color")
+	return color.a if color is Color else -1.0
+
+
+func _get_base_shadow_alpha(item: ShelfItem) -> float:
+	if item.shadow_material == null:
+		return -1.0
+	var color = item.shadow_material.get_shader_parameter("shadow_color")
+	return color.a if color is Color else -1.0
 
 
 func _finish(level: Node) -> void:

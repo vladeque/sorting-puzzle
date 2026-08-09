@@ -1709,15 +1709,14 @@ Important nodes:
   requiring per-item shadow art.
   `scripts/item.gd` anchors the sprite on the art's ground line (canvas y=120, see
   `docs/ITEM_ASSET_REQUIREMENTS.md`). Generated back-layer previews and clearing items disable it.
-- The shadow has two readings, blended by `ShelfItem.shadow_lift`. **Resting**: the silhouette
-  squashed onto the shelf and sheared up-right, running away from the viewer across the shelf floor
-  and continuing up the back wall behind the item. Its reach is what makes it visible -- the shear
-  has to displace the silhouette's far end past the item's own half-width, or the item's opaque body
-  covers the whole shadow. **Carried**: while the player drags the item, the
-  silhouette stands back up to full height and separates down-right of the item. Its smaller filtered
-  halo and weighted source-alpha core keep the carried shadow close to the item's recognizable shape,
-  while reduced opacity prevents it from reading as a dark duplicate. Compare and tune both in
-  `scenes/shadow_style_preview.tscn`.
+- The shadow has two readings, blended by `ShelfItem.shadow_lift`. **Resting**: a broad alpha-mask
+  transition produces a soft, low-opacity, full-height silhouette just down-right of the item, as if
+  it were cast onto the shelf's nearby back wall. The offset exposes enough of the shadow to remain
+  recognizable without crowding adjacent items, and the shadow follows both axes of the landing
+  squash. **Carried**: while the player drags the item, the silhouette separates farther down-right.
+  Its smaller filtered halo and weighted source-alpha core keep the carried shadow close to the
+  item's recognizable shape, while reduced opacity prevents it from reading as a dark duplicate.
+  Compare and tune both in `scenes/shadow_style_preview.tscn`.
 - `OutlineSprite`: hidden sprite used by `ShelfItem` to draw alpha-based highlight borders.
 - `Sprite2D`: main item sprite; texture and visual scale are controlled by `ShelfItem`.
 - `CollisionShape2D`: rectangular item hitbox used by runtime interaction.

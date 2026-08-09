@@ -13,27 +13,27 @@ const SHADOW_NODE_NAME := ^"Shadow"
 ## so the contact point is 120 - 64 texels below the center for every catalog item.
 const SHADOW_GROUND_TEXELS := 56.0
 
-## Resting shadow: the item sits on the shelf, so its silhouette is squashed onto the floor and
-## sheared up-right, running away from the viewer across the shelf floor and continuing up the back
-## wall behind the item -- the light sits low and to the front-left.
-##
-## The reach matters as much as the direction. The shear displaces the silhouette's far end by
-## roughly `art_height * flatten * sin(skew)` texels, and anything under the item's own ~33-texel
-## half-width stays hidden behind its opaque body no matter how dark the shadow is. These values put
-## a tall item's far end about 47 texels out, so the silhouette clears itself and reads.
-const SHADOW_REST_WIDTH := 1.05
-const SHADOW_REST_FLATTEN := 0.52
-const SHADOW_REST_SKEW := 0.88
-const SHADOW_REST_BLUR_PX := 6.0
+## Resting shadow: a soft, nearly full-height copy of the item silhouette displaced slightly
+## down-right, as if the item stands close to the shelf's back wall. It has no crisp silhouette core:
+## the broad mask transition and low opacity keep neighboring shelf items from becoming visually
+## crowded while the bottle/box/tub form remains legible behind its owner.
+const SHADOW_REST_WIDTH := 1.0
+const SHADOW_REST_FLATTEN := 1.0
+const SHADOW_REST_SKEW := 0.0
+const SHADOW_REST_BLUR_PX := 7.5
+const SHADOW_REST_MASK_LOW := 0.12
+const SHADOW_REST_ALPHA_SCALE := 0.56
+const SHADOW_REST_OFFSET := Vector2(16.0, 2.0)
 
 ## Carried shadow: the item is held well above the board, so a ground projection is the wrong read.
-## The silhouette stands back up to full height and is dropped down-right of the item -- the same
-## shape, displaced, the way a lifted object's shadow separates from it. A source-alpha core keeps
+## The silhouette moves farther down-right of the item -- the same shape, displaced, the way a
+## lifted object's shadow separates from it. A source-alpha core keeps
 ## narrow necks, handles and irregular edges recognizable while a smaller filtered halo softens it.
 const SHADOW_CARRY_WIDTH := 1.06
 const SHADOW_CARRY_FLATTEN := 1.06
 const SHADOW_CARRY_SKEW := 0.0
 const SHADOW_CARRY_BLUR_PX := 4.5
+const SHADOW_CARRY_MASK_LOW := 0.3
 const SHADOW_CARRY_SILHOUETTE_WEIGHT := 0.7
 const SHADOW_CARRY_ALPHA_SCALE := 0.78
 
@@ -229,13 +229,13 @@ func _apply_visual_scale() -> void:
 
 ## Draws the item's own silhouette as its shadow, in one of two readings blended by `shadow_lift`:
 ##
-##   resting (0) -- the item is touching the shelf, so the silhouette is squashed onto the floor and
-##                  sheared up-right, running back across the shelf and up the wall behind it.
-##   carried (1) -- the item is held above the board, so the silhouette stands back up to full height
-##                  and separates down-right of the item, the way a lifted object's shadow detaches.
+##   resting (0) -- the item is touching the shelf, so a soft, low-opacity copy of its silhouette
+##                  sits just down-right on the shelf's back wall.
+##   carried (1) -- the item is held above the board, so the silhouette separates farther down-right
+##                  and gains a recognizable source-alpha core.
 ##
-## Blending rather than switching means grabbing an item visibly stands its shadow up and slides it
-## out, and dropping it lays the shadow back down, instead of the two shapes popping.
+## Blending rather than switching means grabbing an item slides and sharpens its shadow, while
+## dropping it returns to the nearby soft silhouette instead of either shape popping.
 func _apply_shadow() -> void:
 	var shadow := get_node_or_null(SHADOW_NODE_NAME) as Sprite2D
 	if shadow == null:
@@ -256,18 +256,18 @@ func _apply_shadow() -> void:
 	var spread := lerpf(SHADOW_REST_WIDTH, SHADOW_CARRY_WIDTH, lift)
 
 	shadow.skew = lerpf(SHADOW_REST_SKEW, SHADOW_CARRY_SKEW, lift)
-	# Only the shadow's width follows the landing squash: an impact spreads the contact patch
-	# sideways, it does not push the shadow further from the item along the shelf.
+	# The upright shadow follows both axes of the landing squash so its silhouette continues to match
+	# the item during impact instead of briefly retaining the pre-impact height.
 	shadow.scale = Vector2(
 		sprite_scale * spread * land_squash.x,
-		sprite_scale * flatten
+		sprite_scale * flatten * land_squash.y
 	)
 	shadow.position = Vector2(0.0, SHADOW_GROUND_TEXELS * sprite_scale)
-	shadow.position += SHADOW_CARRY_OFFSET * sprite_scale * lift
+	shadow.position += SHADOW_REST_OFFSET.lerp(SHADOW_CARRY_OFFSET, lift) * sprite_scale
 
 	if _shadow_material != null:
 		var shadow_color := _shadow_base_color
-		shadow_color.a *= lerpf(1.0, SHADOW_CARRY_ALPHA_SCALE, lift)
+		shadow_color.a *= lerpf(SHADOW_REST_ALPHA_SCALE, SHADOW_CARRY_ALPHA_SCALE, lift)
 		_shadow_material.set_shader_parameter("shadow_color", shadow_color)
 		_shadow_material.set_shader_parameter(
 			"blur_radius_px",
@@ -276,6 +276,10 @@ func _apply_shadow() -> void:
 		_shadow_material.set_shader_parameter(
 			"silhouette_weight",
 			SHADOW_CARRY_SILHOUETTE_WEIGHT * lift
+		)
+		_shadow_material.set_shader_parameter(
+			"mask_low",
+			lerpf(SHADOW_REST_MASK_LOW, SHADOW_CARRY_MASK_LOW, lift)
 		)
 
 

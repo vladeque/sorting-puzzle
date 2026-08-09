@@ -151,7 +151,7 @@ func _process(_delta: float) -> void:
 	if _animated_items.is_empty():
 		return
 
-	# 0 -> 1 -> 0, so the shadow repeatedly stands up off the floor and lies back down.
+	# 0 -> 1 -> 0, so the shadow repeatedly moves between its nearby soft and separated carried forms.
 	var phase := fmod(Time.get_ticks_msec() / 1000.0, LIFT_CYCLE_SECONDS) / LIFT_CYCLE_SECONDS
 	var eased := smoothstep(0.0, 1.0, 1.0 - absf(phase * 2.0 - 1.0))
 
