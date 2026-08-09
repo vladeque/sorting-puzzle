@@ -1339,7 +1339,7 @@ Important nodes:
 - `ImpactAnchor/HammerPivot`: keyframed by `AnimationPlayer` for wind-up, strike, rebound, and exit motion.
 - `ImpactAnchor/HammerPivot/HammerSprite`: transparent hammer sprite whose position and texture are value-keyframed by the `strike` animation.
 - `ImpactAnchor/HammerPivot/AfterimageEarly` / `AfterimageLate`: low-alpha tinted copies of the two
-  smear poses behind the live hammer during the downstroke.
+  smear poses behind the live hammer during the downstroke, sharing one additive canvas material.
 - `WindupAudio`, `DownstrokeAudio`, `ImpactLowAudio`, `ImpactMagicAudio`, and `SparkleTailAudio`:
   scene-owned layered cues built from the project's existing short SFX palette.
 - `AnimationPlayer`: owns the `strike` animation; edit this timeline for most hammer motion and timing adjustments.

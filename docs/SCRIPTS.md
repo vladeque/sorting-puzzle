@@ -1697,7 +1697,8 @@ Purpose:
 - Positions and scales the scene over a provided screen-space target point, plays the scene-owned
   1.12 second `AnimationPlayer` `strike` animatic, and draws mobile-capped swing trails, radial
   glow, two shockwave rings, pink/teal/white starburst rays, a 2-3-frame screen flash, and
-  deterministic sparks/debris from five animated scalar amounts.
+  deterministic sparks/debris from five animated scalar amounts. The two smear afterimages share
+  one additive canvas material; the effect does not allocate runtime particle emitters.
 - Coordinates the scene's entrance/downstroke, layered impact, and sparkle-tail audio players,
   plus the optional mobile impact vibration.
 - Emits `pre_impact` at 400 ms, `impact` on the 480 ms visual hit frame, and `finished` after the

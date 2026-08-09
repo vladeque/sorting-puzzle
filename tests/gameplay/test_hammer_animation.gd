@@ -91,8 +91,17 @@ func _run() -> void:
 	_check(effect.get_node_or_null("ImpactLowAudio") != null, "Hammer owns a dedicated impact-thump cue.")
 	_check(effect.get_node_or_null("DownstrokeAudio") != null, "Hammer owns a dedicated downstroke cue.")
 	_check(effect.get_node_or_null("SparkleTailAudio") != null, "Hammer owns a dedicated sparkle-tail cue.")
-	_check(effect.get_node_or_null("ImpactAnchor/HammerPivot/AfterimageEarly") != null, "Hammer owns an early downstroke afterimage.")
-	_check(effect.get_node_or_null("ImpactAnchor/HammerPivot/AfterimageLate") != null, "Hammer owns a late downstroke afterimage.")
+	var early_afterimage := effect.get_node_or_null("ImpactAnchor/HammerPivot/AfterimageEarly") as Sprite2D
+	var late_afterimage := effect.get_node_or_null("ImpactAnchor/HammerPivot/AfterimageLate") as Sprite2D
+	_check(early_afterimage != null, "Hammer owns an early downstroke afterimage.")
+	_check(late_afterimage != null, "Hammer owns a late downstroke afterimage.")
+	_check(
+		early_afterimage != null
+			and early_afterimage.material is CanvasItemMaterial
+			and (early_afterimage.material as CanvasItemMaterial).blend_mode
+				== CanvasItemMaterial.BLEND_MODE_ADD,
+		"Hammer smear afterimages use a shared additive mobile canvas material."
+	)
 	var script_constants: Dictionary = effect.get_script().get_script_constant_map()
 	_check(
 		int(script_constants.get("BURST_RAY_COUNT", 999)) <= 20

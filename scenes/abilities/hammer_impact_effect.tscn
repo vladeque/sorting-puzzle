@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://bwejmpw6brl73"]
+[gd_scene load_steps=18 format=3 uid="uid://bwejmpw6brl73"]
 
 [ext_resource type="Script" uid="uid://djqf15hllksrw" path="res://scripts/hammer_impact_effect.gd" id="1_hammer_script"]
 [ext_resource type="Texture2D" uid="uid://bb7dkgc56jya1" path="res://assets/abilities/ability_hammer_swing_windup.png" id="2_hammer_windup"]
@@ -14,6 +14,9 @@
 [ext_resource type="AudioStream" uid="uid://cwd8pbvkx38bh" path="res://assets/audio/item_place.wav" id="12_item_place"]
 [ext_resource type="AudioStream" uid="uid://dp5wrl310xgo" path="res://assets/audio/triple_clear.wav" id="13_triple_clear"]
 [ext_resource type="AudioStream" uid="uid://6la25ugplv7c" path="res://assets/audio/A_short_satisfying_i_#3-1782529645197.wav" id="14_magic"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_additive_smear"]
+blend_mode = 1
 
 [sub_resource type="Animation" id="Animation_hammer_strike"]
 resource_name = "strike"
@@ -249,6 +252,7 @@ texture = ExtResource("2_hammer_windup")
 [node name="AfterimageEarly" type="Sprite2D" parent="ImpactAnchor/HammerPivot"]
 unique_name_in_owner = true
 show_behind_parent = true
+material = SubResource("CanvasItemMaterial_additive_smear")
 modulate = Color(0.75, 1, 0.96, 0)
 position = Vector2(-18, 55)
 texture = ExtResource("6_hammer_smear_early")
@@ -256,6 +260,7 @@ texture = ExtResource("6_hammer_smear_early")
 [node name="AfterimageLate" type="Sprite2D" parent="ImpactAnchor/HammerPivot"]
 unique_name_in_owner = true
 show_behind_parent = true
+material = SubResource("CanvasItemMaterial_additive_smear")
 modulate = Color(1, 0.72, 0.94, 0)
 position = Vector2(-8, 5)
 texture = ExtResource("7_hammer_smear_late")
