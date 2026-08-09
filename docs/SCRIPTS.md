@@ -1588,8 +1588,12 @@ Key responsibilities:
 - Hammer computes the average position of its chosen three targets, starts the fullscreen hammer
   wind-up there immediately, and gathers the items into that same board-local impact point while
   the hammer travels from its lower-left launch pose to the upper-right anticipation pose. The
-  merged item is destroyed on the effect's 480 ms `impact` signal; combo reward stars start while
-  the 1.12 second recoil/burst tail is still fading instead of waiting for the effect to finish.
+  merged item compresses on the 400 ms `pre_impact` signal, becomes invisible and is freed on the
+  480 ms `impact` signal, and the combo reward starts 140 ms later while the 1.12 second recoil/VFX
+  tail is still fading. Gameplay scoring, shelf resolution, and ability input lock rules are unchanged.
+- Hammer passes the live sound-effects setting and exported `hammer_haptics_enabled` flag into the
+  effect scene. Disabling sound while the strike is active stops every scene-owned hammer cue;
+  supported mobile builds receive a short 65 ms impact vibration when haptics are enabled.
 - Shuffle now pauses moving shelf rows, shows the center-screen delivery box, flies visible unlocked items into the box, changes unlocked item identity assignments while they are hidden, flies them back to their original slots, and resolves shelves only after the return animation completes.
 - Count hammer destroys as cleared triples for shelf unlocking.
 - Let highlight uses start their timed window even when no immediate triple can currently be highlighted.
@@ -1689,25 +1693,34 @@ Attached to:
 - `scenes/abilities/hammer_impact_effect.tscn` root `HammerImpactEffect`.
 
 Purpose:
-- Thin runtime controller for the hammer ability's fullscreen visual strike.
+- Runtime controller and procedural VFX renderer for the hammer ability's fullscreen strike.
 - Positions and scales the scene over a provided screen-space target point, plays the scene-owned
-  1.12 second `AnimationPlayer` `strike` animatic, and draws the placeholder magenta/white flash,
-  expanding rings, glow, and alternating impact rays from animated burst/flash amounts.
-- Emits `impact` on the visual hit frame and `finished` after the hammer fades out.
+  1.12 second `AnimationPlayer` `strike` animatic, and draws mobile-capped swing trails, radial
+  glow, two shockwave rings, pink/teal/white starburst rays, a 2-3-frame screen flash, and
+  deterministic sparks/debris from five animated scalar amounts.
+- Coordinates the scene's entrance/downstroke, layered impact, and sparkle-tail audio players,
+  plus the optional mobile impact vibration.
+- Emits `pre_impact` at 400 ms, `impact` on the 480 ms visual hit frame, and `finished` after the
+  hammer and VFX fade out.
 
 Exports:
 - `base_hammer_scale`: base visual size before responsive viewport scaling.
 
 Depends on:
-- `assets/abilities/ability_hammer_swing_*.png` for the four pseudo-3D angle frames.
-- `scenes/abilities/hammer_impact_effect.tscn` `AnimationPlayer` keyframes for hammer motion, opacity, texture swaps, burst amount, and signal callbacks.
+- `assets/abilities/ability_hammer_swing_*.png` for the ten pseudo-3D poses.
+- The existing item-place, triple-clear, and short satisfying SFX for layered hammer cues; no new
+  audio asset is required.
+- `scenes/abilities/hammer_impact_effect.tscn` `AnimationPlayer` keyframes for hammer motion,
+  opacity, texture swaps, afterimages, VFX layer amounts, cue callbacks, and gameplay signals.
 - `scripts/level.gd` for runtime instancing and gameplay response to `impact`.
 
 Verification:
-- `tests/gameplay/test_hammer_animation.gd` checks immediate launch, lower-left start,
-  upper-right anticipation, the 480 ms impact marker, the full recoil duration, and cleanup. It can
-  also render an in-level timing preview when launched with `--write-movie` and the
-  `--hammer-animation-preview` user argument.
+- `tests/gameplay/test_hammer_animation.gd` checks all ten poses, all five procedural VFX tracks,
+  two afterimages, audio ownership/muting, lower-left launch, upper-right anticipation, pre-impact
+  compression, exact-frame target disappearance, delayed reward overlap, 480 ms impact timing,
+  the full recoil duration, cleanup, and responsive layout at 540x960, 720x1280, 1080x1920,
+  1080x2400, and 900x1200. It can also render an in-level timing preview with `--write-movie` and
+  the `--hammer-animation-preview` user argument.
 
 Do not use for:
 - Ability inventory, target selection, item deletion, score/star rules, or shelf resolution.

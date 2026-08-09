@@ -19,6 +19,8 @@ const FREEZER_DURATION_SECONDS := 30.0
 ## The reward overlay begins before the longer confetti fall ends, bridging the cleared board and
 ## completion states instead of leaving the player on a static board for the whole particle burst.
 const COMPLETION_REVEAL_SECONDS := 1.35
+const HAMMER_ITEM_COMPRESSION_SECONDS := 0.08
+const HAMMER_REWARD_DELAY_SECONDS := 0.14
 const SHELF_SCENE := preload("res://scenes/shelf.tscn")
 const MOVING_SHELF_ROW_SCENE := preload("res://scenes/moving_shelf_row.tscn")
 const ITEM_SCENE := preload("res://scenes/item.tscn")
@@ -134,6 +136,7 @@ const DEFAULT_ABILITY_PURCHASE_PRICES := {
 @export var level_duration_seconds := 300.0
 @export_range(-40.0, 6.0, 0.5) var item_place_volume_db := -5.0
 @export_range(-40.0, 6.0, 0.5) var triple_clear_volume_db := -5.0
+@export var hammer_haptics_enabled := true
 @export var selected_level := 1
 @export var launched_from_dev_mode := false
 @export_file("*.tscn") var return_menu_scene_path := MAIN_MENU_SCENE
@@ -472,6 +475,10 @@ func _stop_sound_effects() -> void:
 
 	if _triple_clear_audio_player != null:
 		_triple_clear_audio_player.stop()
+
+	for effect in get_tree().get_nodes_in_group(&"hammer_impact_effect"):
+		if effect is HammerImpactEffect:
+			effect.set_sound_enabled(false)
 
 
 func _process(delta: float) -> void:
@@ -3042,16 +3049,19 @@ func _play_hammer_ability(items_to_destroy: Array[ShelfItem]) -> void:
 	var ui_layer := get_node("UI") as CanvasLayer
 	var effect := HAMMER_IMPACT_EFFECT_SCENE.instantiate() as HammerImpactEffect
 	ui_layer.add_child(effect)
-	effect.play(impact_screen_position)
+	effect.play(impact_screen_position, _sound_effects_enabled, hammer_haptics_enabled)
 	var merged_item := await _play_hammer_gather_animation(items_to_destroy, impact_global_position)
 
-	await effect.impact
+	if not effect.has_reached_pre_impact():
+		await effect.pre_impact
+	_play_hammer_item_compression(merged_item)
+	if not effect.has_impacted():
+		await effect.impact
 	_play_hammer_screen_shake()
-	await _play_hammer_destroy_animation(merged_item, items_to_destroy)
+	_play_hammer_destroy_animation(merged_item, items_to_destroy)
 	var earned_stars := _record_triples_cleared(destroyed_triples)
-	_show_combo_praise(impact_global_position, _combo_count)
 	_resolve_shelves(shelves_to_check)
-	_play_combo_star_reward_animation(impact_global_position, earned_stars)
+	_play_delayed_hammer_reward(impact_global_position, earned_stars, _combo_count)
 	await effect.finished
 	effect.queue_free()
 
@@ -3125,24 +3135,27 @@ func _play_hammer_gather_animation(items_to_destroy: Array[ShelfItem], target_gl
 	return merged_item if merged_item != null and is_instance_valid(merged_item) else null
 
 
-func _play_hammer_destroy_animation(merged_item: ShelfItem, items_to_destroy: Array[ShelfItem]) -> void:
-	_play_triple_clear_sound()
+func _play_hammer_item_compression(merged_item: ShelfItem) -> void:
 	if merged_item != null and is_instance_valid(merged_item):
-		var shrink_tween := create_tween()
-		shrink_tween.set_parallel(true)
-		shrink_tween.tween_property(
+		var compression_tween := create_tween()
+		compression_tween.set_parallel(true)
+		compression_tween.tween_property(
 			merged_item,
 			"scale",
-			Vector2.ZERO,
-			match_shrink_duration_seconds
-		).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
-		shrink_tween.tween_property(
+			Vector2(0.98, 0.68),
+			HAMMER_ITEM_COMPRESSION_SECONDS
+		).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		compression_tween.tween_property(
 			merged_item,
 			"modulate",
-			Color(1, 1, 1, 0),
-			match_shrink_duration_seconds
+			Color(1.3, 1.15, 1.25, 1.0),
+			HAMMER_ITEM_COMPRESSION_SECONDS
 		).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-		await shrink_tween.finished
+
+
+func _play_hammer_destroy_animation(merged_item: ShelfItem, items_to_destroy: Array[ShelfItem]) -> void:
+	if merged_item != null and is_instance_valid(merged_item):
+		merged_item.visible = false
 
 	for item in items_to_destroy:
 		if item == null or not is_instance_valid(item):
@@ -3153,6 +3166,18 @@ func _play_hammer_destroy_animation(merged_item: ShelfItem, items_to_destroy: Ar
 
 		_unmark_item_clearing_by_id(item.get_instance_id())
 		item.queue_free()
+
+
+func _play_delayed_hammer_reward(
+	impact_global_position: Vector2,
+	earned_stars: int,
+	combo_count: int
+) -> void:
+	await get_tree().create_timer(HAMMER_REWARD_DELAY_SECONDS).timeout
+	if not is_inside_tree():
+		return
+	_show_combo_praise(impact_global_position, combo_count)
+	_play_combo_star_reward_animation(impact_global_position, earned_stars)
 
 
 func _get_valid_items(items: Array[ShelfItem]) -> Array[ShelfItem]:

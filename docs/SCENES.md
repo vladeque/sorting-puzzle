@@ -1322,24 +1322,33 @@ Script:
 
 Purpose:
 - Reusable fullscreen hammer strike effect spawned by `scripts/level.gd` when the hammer ability is used.
-- Displays the selected high-resolution transparent hammer sprite over gameplay using four pseudo-3D angle frames.
+- Displays the high-resolution transparent hammer over gameplay as a ten-pose pseudo-3D swing,
+  including two short smear poses, impact overshoot, and a two-pose rebound.
 - Owns the editable 1.12 second `AnimationPlayer` `strike` animatic: lower-left launch,
   upper-right anticipation during item gathering, fast downstroke, front-facing impact, recoil,
-  fade-out, texture swaps, impact signal timing, burst amount, and flash amount.
-- Emits `impact` at 480 ms so gameplay destroys the merged item at the selected targets' averaged
-  board position on the visual hit frame. Reward stars begin during the remaining recoil/burst tail.
+  fade-out, texture swaps, afterimages, layered impact amounts, audio cue callbacks, and signal timing.
+- Emits `pre_impact` at 400 ms for item compression and `impact` at 480 ms so gameplay hides and
+  frees the merged item on the visual hit frame. Reward stars begin 140 ms later, during the
+  remaining recoil/VFX tail.
+- Owns the entrance/downstroke, impact-thump/magic, and sparkle-tail `AudioStreamPlayer` nodes. The
+  level passes the current sound setting into `play()` and can mute an active effect through the
+  `hammer_impact_effect` group.
 
 Important nodes:
 - `ImpactAnchor`: runtime-positioned target point averaged from the three selected items; scales the full hammer for the current viewport.
 - `ImpactAnchor/HammerPivot`: keyframed by `AnimationPlayer` for wind-up, strike, rebound, and exit motion.
 - `ImpactAnchor/HammerPivot/HammerSprite`: transparent hammer sprite whose position and texture are value-keyframed by the `strike` animation.
+- `ImpactAnchor/HammerPivot/AfterimageEarly` / `AfterimageLate`: low-alpha tinted copies of the two
+  smear poses behind the live hammer during the downstroke.
+- `WindupAudio`, `DownstrokeAudio`, `ImpactLowAudio`, `ImpactMagicAudio`, and `SparkleTailAudio`:
+  scene-owned layered cues built from the project's existing short SFX palette.
 - `AnimationPlayer`: owns the `strike` animation; edit this timeline for most hammer motion and timing adjustments.
 
 Depends on:
-- `assets/abilities/ability_hammer_swing_windup.png`.
-- `assets/abilities/ability_hammer_swing_mid.png`.
-- `assets/abilities/ability_hammer_swing_impact.png`.
-- `assets/abilities/ability_hammer_swing_rebound.png`.
+- `assets/abilities/ability_hammer_swing_*.png` for all ten poses from windup through rebound.
+- `assets/audio/item_place.wav`, `assets/audio/triple_clear.wav`, and
+  `assets/audio/A_short_satisfying_i_#3-1782529645197.wav`, layered with scene-specific pitch and
+  volume settings.
 - Runtime instancing and target positioning from `scripts/level.gd`.
 - `tests/gameplay/test_hammer_animation.gd` for deterministic timing/integration verification and optional movie capture.
 

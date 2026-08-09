@@ -1,10 +1,19 @@
-[gd_scene load_steps=8 format=3 uid="uid://bwejmpw6brl73"]
+[gd_scene load_steps=17 format=3 uid="uid://bwejmpw6brl73"]
 
 [ext_resource type="Script" uid="uid://djqf15hllksrw" path="res://scripts/hammer_impact_effect.gd" id="1_hammer_script"]
 [ext_resource type="Texture2D" uid="uid://bb7dkgc56jya1" path="res://assets/abilities/ability_hammer_swing_windup.png" id="2_hammer_windup"]
-[ext_resource type="Texture2D" uid="uid://c3qkvcq4ep7is" path="res://assets/abilities/ability_hammer_swing_mid.png" id="3_hammer_mid"]
-[ext_resource type="Texture2D" uid="uid://cwb17jmdvuslq" path="res://assets/abilities/ability_hammer_swing_impact.png" id="4_hammer_impact"]
-[ext_resource type="Texture2D" uid="uid://doolhkvwy6hlh" path="res://assets/abilities/ability_hammer_swing_rebound.png" id="5_hammer_rebound"]
+[ext_resource type="Texture2D" uid="uid://un6fd3c7ivmn" path="res://assets/abilities/ability_hammer_swing_rise.png" id="3_hammer_rise"]
+[ext_resource type="Texture2D" uid="uid://bgr2uo6w1k1gl" path="res://assets/abilities/ability_hammer_swing_anticipation.png" id="4_hammer_anticipation"]
+[ext_resource type="Texture2D" uid="uid://c3qkvcq4ep7is" path="res://assets/abilities/ability_hammer_swing_mid.png" id="5_hammer_mid"]
+[ext_resource type="Texture2D" uid="uid://c172qvhn7gk2f" path="res://assets/abilities/ability_hammer_swing_smear_early.png" id="6_hammer_smear_early"]
+[ext_resource type="Texture2D" uid="uid://5y041y34p0sm" path="res://assets/abilities/ability_hammer_swing_smear_late.png" id="7_hammer_smear_late"]
+[ext_resource type="Texture2D" uid="uid://cwb17jmdvuslq" path="res://assets/abilities/ability_hammer_swing_impact.png" id="8_hammer_impact"]
+[ext_resource type="Texture2D" uid="uid://ddiwsg1yjvsut" path="res://assets/abilities/ability_hammer_swing_impact_overshoot.png" id="9_hammer_impact_overshoot"]
+[ext_resource type="Texture2D" uid="uid://dauscnolvgdmp" path="res://assets/abilities/ability_hammer_swing_rebound_transition.png" id="10_hammer_rebound_transition"]
+[ext_resource type="Texture2D" uid="uid://doolhkvwy6hlh" path="res://assets/abilities/ability_hammer_swing_rebound.png" id="11_hammer_rebound"]
+[ext_resource type="AudioStream" uid="uid://cwd8pbvkx38bh" path="res://assets/audio/item_place.wav" id="12_item_place"]
+[ext_resource type="AudioStream" uid="uid://dp5wrl310xgo" path="res://assets/audio/triple_clear.wav" id="13_triple_clear"]
+[ext_resource type="AudioStream" uid="uid://6la25ugplv7c" path="res://assets/audio/A_short_satisfying_i_#3-1782529645197.wav" id="14_magic"]
 
 [sub_resource type="Animation" id="Animation_hammer_strike"]
 resource_name = "strike"
@@ -16,7 +25,7 @@ tracks/0/path = NodePath(".:modulate")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.05, 0.98, 1.12),
+"times": PackedFloat32Array(0, 0.035, 1.04, 1.12),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
 "values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
@@ -28,10 +37,10 @@ tracks/1/path = NodePath("ImpactAnchor/HammerPivot:position")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.07, 0.22, 0.32, 0.4, 0.48, 0.54, 0.64, 0.78),
-"transitions": PackedFloat32Array(1, 1, 0.75, 1.4, 0.75, 1, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.07, 0.18, 0.23, 0.32, 0.385, 0.425, 0.48, 0.525, 0.59, 0.67, 0.82),
+"transitions": PackedFloat32Array(1, 1, 0.75, 1, 1.35, 1.55, 1.7, 1, 1, 1, 1, 1),
 "update": 0,
-"values": [Vector2(-245, 400), Vector2(-195, 315), Vector2(120, -205), Vector2(145, -235), Vector2(68, -142), Vector2(0, 0), Vector2(0, 10), Vector2(-18, 28), Vector2(62, -120)]
+"values": [Vector2(-245, 400), Vector2(-195, 315), Vector2(80, -150), Vector2(145, -235), Vector2(132, -224), Vector2(104, -190), Vector2(58, -116), Vector2(0, 0), Vector2(0, 0), Vector2(-14, 25), Vector2(16, 56), Vector2(70, -105)]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
@@ -40,10 +49,10 @@ tracks/2/path = NodePath("ImpactAnchor/HammerPivot:rotation")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0, 0.07, 0.22, 0.32, 0.4, 0.48, 0.54, 0.64, 0.78),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.07, 0.18, 0.23, 0.32, 0.385, 0.425, 0.48, 0.525, 0.59, 0.67, 0.82),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
 "update": 0,
-"values": [-1.0472, -0.925025, -0.418879, -0.349066, -0.174533, 0.122173, 0.0872665, -0.0872665, 0.244346]
+"values": [-1.0472, -0.925025, -0.506145, -0.401426, -0.331613, -0.226893, -0.0872665, 0.122173, 0.122173, 0.0523599, -0.10472, 0.226893]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
@@ -52,10 +61,10 @@ tracks/3/path = NodePath("ImpactAnchor/HammerPivot:scale")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(0, 0.07, 0.22, 0.32, 0.4, 0.48, 0.54, 0.64, 0.78),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.07, 0.18, 0.23, 0.32, 0.385, 0.425, 0.48, 0.525, 0.59, 0.67, 0.82),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
 "update": 0,
-"values": [Vector2(0.56, 0.56), Vector2(0.72, 0.72), Vector2(0.96, 0.96), Vector2(1.08, 1.08), Vector2(1.14, 1.14), Vector2(1.22, 1.22), Vector2(1.17, 1.17), Vector2(1.05, 1.05), Vector2(0.92, 0.92)]
+"values": [Vector2(0.56, 0.56), Vector2(0.72, 0.72), Vector2(0.92, 0.92), Vector2(1.02, 1.02), Vector2(1.08, 1.08), Vector2(1.13, 1.13), Vector2(1.18, 1.18), Vector2(1.23, 1.23), Vector2(1.23, 1.23), Vector2(1.14, 1.14), Vector2(1.04, 1.04), Vector2(0.9, 0.9)]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
@@ -64,10 +73,10 @@ tracks/4/path = NodePath(".:_burst_amount")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
-"times": PackedFloat32Array(0, 0.47, 0.48, 0.55, 0.8, 1.05),
+"times": PackedFloat32Array(0, 0.47, 0.48, 0.55, 0.82, 1.02),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
 "update": 0,
-"values": [0.0, 0.0, 1.0, 0.86, 0.26, 0.0]
+"values": [0.0, 0.0, 1.0, 0.9, 0.28, 0.0]
 }
 tracks/5/type = "value"
 tracks/5/imported = false
@@ -76,59 +85,131 @@ tracks/5/path = NodePath(".:_flash_amount")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
-"times": PackedFloat32Array(0, 0.47, 0.48, 0.54, 0.66),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.472, 0.48, 0.515, 0.55, 0.62),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
 "update": 0,
-"values": [0.0, 0.0, 1.0, 0.24, 0.0]
+"values": [0.0, 0.0, 1.0, 0.72, 0.22, 0.0]
 }
 tracks/6/type = "value"
 tracks/6/imported = false
 tracks/6/enabled = true
-tracks/6/path = NodePath("ImpactAnchor/HammerPivot/HammerSprite:position")
+tracks/6/path = NodePath(".:_glow_amount")
 tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
-"times": PackedFloat32Array(0, 0.22, 0.32, 0.4, 0.48, 0.54, 0.64, 0.78),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.34, 0.46, 0.48, 0.7, 0.98),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
 "update": 0,
-"values": [Vector2(-15, 130), Vector2(-15, 130), Vector2(-31, 103), Vector2(-31, 103), Vector2(-3, -35), Vector2(-3, -35), Vector2(10, 85), Vector2(10, 85)]
+"values": [0.0, 0.0, 0.38, 1.0, 0.42, 0.0]
 }
 tracks/7/type = "value"
 tracks/7/imported = false
 tracks/7/enabled = true
-tracks/7/path = NodePath("ImpactAnchor/HammerPivot/HammerSprite:texture")
+tracks/7/path = NodePath(".:_trail_amount")
 tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
-"times": PackedFloat32Array(0, 0.32, 0.45, 0.58),
-"transitions": PackedFloat32Array(1, 1, 1, 1),
-"update": 1,
-"values": [ExtResource("2_hammer_windup"), ExtResource("3_hammer_mid"), ExtResource("4_hammer_impact"), ExtResource("5_hammer_rebound")]
+"times": PackedFloat32Array(0, 0.3, 0.385, 0.44, 0.49, 0.54),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [0.0, 0.0, 0.28, 0.62, 0.9, 1.0]
 }
 tracks/8/type = "value"
 tracks/8/imported = false
 tracks/8/enabled = true
-tracks/8/path = NodePath("ImpactAnchor/HammerPivot:modulate")
+tracks/8/path = NodePath(".:_debris_amount")
 tracks/8/interp = 1
 tracks/8/loop_wrap = true
 tracks/8/keys = {
-"times": PackedFloat32Array(0, 0.05, 0.54, 0.7),
+"times": PackedFloat32Array(0, 0.47, 0.48, 0.62, 0.9, 1.04),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [0.0, 0.0, 1.0, 0.78, 0.2, 0.0]
+}
+tracks/9/type = "value"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("ImpactAnchor/HammerPivot/HammerSprite:position")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
+"times": PackedFloat32Array(0, 0.11, 0.23, 0.32, 0.385, 0.425, 0.48, 0.525, 0.59, 0.67),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Vector2(-15, 130), Vector2(-12, 120), Vector2(-20, 112), Vector2(-31, 103), Vector2(-18, 55), Vector2(-8, 5), Vector2(-3, -35), Vector2(-6, -30), Vector2(4, 35), Vector2(10, 85)]
+}
+tracks/10/type = "value"
+tracks/10/imported = false
+tracks/10/enabled = true
+tracks/10/path = NodePath("ImpactAnchor/HammerPivot/HammerSprite:texture")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/keys = {
+"times": PackedFloat32Array(0, 0.11, 0.23, 0.32, 0.385, 0.425, 0.48, 0.525, 0.59, 0.67),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [ExtResource("2_hammer_windup"), ExtResource("3_hammer_rise"), ExtResource("4_hammer_anticipation"), ExtResource("5_hammer_mid"), ExtResource("6_hammer_smear_early"), ExtResource("7_hammer_smear_late"), ExtResource("8_hammer_impact"), ExtResource("9_hammer_impact_overshoot"), ExtResource("10_hammer_rebound_transition"), ExtResource("11_hammer_rebound")]
+}
+tracks/11/type = "value"
+tracks/11/imported = false
+tracks/11/enabled = true
+tracks/11/path = NodePath("ImpactAnchor/HammerPivot:modulate")
+tracks/11/interp = 1
+tracks/11/loop_wrap = true
+tracks/11/keys = {
+"times": PackedFloat32Array(0, 0.035, 0.82, 1.02),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
 "values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
 }
-tracks/9/type = "method"
-tracks/9/imported = false
-tracks/9/enabled = true
-tracks/9/path = NodePath(".")
-tracks/9/interp = 1
-tracks/9/loop_wrap = true
-tracks/9/keys = {
-"times": PackedFloat32Array(0.48, 1.12),
-"transitions": PackedFloat32Array(1, 1),
+tracks/12/type = "value"
+tracks/12/imported = false
+tracks/12/enabled = true
+tracks/12/path = NodePath("ImpactAnchor/HammerPivot/AfterimageEarly:modulate")
+tracks/12/interp = 1
+tracks/12/loop_wrap = true
+tracks/12/keys = {
+"times": PackedFloat32Array(0, 0.34, 0.385, 0.455),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Color(0.75, 1, 0.96, 0), Color(0.75, 1, 0.96, 0), Color(0.75, 1, 0.96, 0.2), Color(0.75, 1, 0.96, 0)]
+}
+tracks/13/type = "value"
+tracks/13/imported = false
+tracks/13/enabled = true
+tracks/13/path = NodePath("ImpactAnchor/HammerPivot/AfterimageLate:modulate")
+tracks/13/interp = 1
+tracks/13/loop_wrap = true
+tracks/13/keys = {
+"times": PackedFloat32Array(0, 0.38, 0.425, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Color(1, 0.72, 0.94, 0), Color(1, 0.72, 0.94, 0), Color(1, 0.72, 0.94, 0.18), Color(1, 0.72, 0.94, 0)]
+}
+tracks/14/type = "method"
+tracks/14/imported = false
+tracks/14/enabled = true
+tracks/14/path = NodePath(".")
+tracks/14/interp = 1
+tracks/14/loop_wrap = true
+tracks/14/keys = {
+"times": PackedFloat32Array(0.025, 0.36, 0.4, 0.48, 0.64, 1.12),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
 "values": [{
 "args": [],
+"method": &"_play_windup_audio"
+}, {
+"args": [],
+"method": &"_play_downstroke_audio"
+}, {
+"args": [],
+"method": &"_emit_pre_impact"
+}, {
+"args": [],
 "method": &"_emit_impact"
+}, {
+"args": [],
+"method": &"_play_sparkle_tail_audio"
 }, {
 "args": [],
 "method": &"_emit_finished"
@@ -164,6 +245,50 @@ scale = Vector2(0.56, 0.56)
 unique_name_in_owner = true
 position = Vector2(-15, 130)
 texture = ExtResource("2_hammer_windup")
+
+[node name="AfterimageEarly" type="Sprite2D" parent="ImpactAnchor/HammerPivot"]
+unique_name_in_owner = true
+show_behind_parent = true
+modulate = Color(0.75, 1, 0.96, 0)
+position = Vector2(-18, 55)
+texture = ExtResource("6_hammer_smear_early")
+
+[node name="AfterimageLate" type="Sprite2D" parent="ImpactAnchor/HammerPivot"]
+unique_name_in_owner = true
+show_behind_parent = true
+modulate = Color(1, 0.72, 0.94, 0)
+position = Vector2(-8, 5)
+texture = ExtResource("7_hammer_smear_late")
+
+[node name="WindupAudio" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+stream = ExtResource("12_item_place")
+volume_db = -13.0
+pitch_scale = 0.72
+
+[node name="DownstrokeAudio" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+stream = ExtResource("14_magic")
+volume_db = -11.0
+pitch_scale = 0.82
+
+[node name="ImpactLowAudio" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+stream = ExtResource("13_triple_clear")
+volume_db = -2.0
+pitch_scale = 0.74
+
+[node name="ImpactMagicAudio" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+stream = ExtResource("12_item_place")
+volume_db = -5.0
+pitch_scale = 1.16
+
+[node name="SparkleTailAudio" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+stream = ExtResource("14_magic")
+volume_db = -13.0
+pitch_scale = 1.42
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 unique_name_in_owner = true
