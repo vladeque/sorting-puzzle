@@ -45,21 +45,30 @@ func _run() -> void:
 
 	var item := visible_items[0] as ShelfItem
 	var shadow := item.get_node_or_null("Shadow") as Sprite2D
+	var shelf_floor_shadow := item.get_node_or_null("ShelfFloorShadow") as Sprite2D
 
 	_check(shadow != null, "The item shadow is a Sprite2D that can carry the item's silhouette.")
-	if shadow == null:
+	_check(
+		shelf_floor_shadow != null,
+		"The item has a second Sprite2D for the shelf-floor segment of its resting shadow."
+	)
+	if shadow == null or shelf_floor_shadow == null:
 		_finish(level)
 		return
 
-	_verify_shadow_follows_item_form(item, shadow)
-	_verify_resting_shape(item, shadow)
-	_verify_carried_shape(item, shadow)
-	await _verify_drag_lift(level, item, shadow)
+	_verify_shadow_follows_item_form(item, shadow, shelf_floor_shadow)
+	_verify_resting_shape(item, shadow, shelf_floor_shadow)
+	_verify_carried_shape(item, shadow, shelf_floor_shadow)
+	await _verify_drag_lift(level, item, shadow, shelf_floor_shadow)
 
 	_finish(level)
 
 
-func _verify_shadow_follows_item_form(item: ShelfItem, shadow: Sprite2D) -> void:
+func _verify_shadow_follows_item_form(
+	item: ShelfItem,
+	shadow: Sprite2D,
+	shelf_floor_shadow: Sprite2D
+) -> void:
 	_check(
 		item.texture != null and shadow.texture == item.texture,
 		"The shadow is derived from the item's own texture, not a shared authored shape."
@@ -67,6 +76,11 @@ func _verify_shadow_follows_item_form(item: ShelfItem, shadow: Sprite2D) -> void
 	_check(
 		shadow.material is ShaderMaterial,
 		"The shadow renders through the silhouette shader."
+	)
+	_check(
+		shelf_floor_shadow.texture == item.texture
+			and shelf_floor_shadow.material is ShaderMaterial,
+		"The shelf-floor segment derives from the same item silhouette and shader."
 	)
 	_check(
 		is_equal_approx(shadow.offset.y, -ShelfItem.SHADOW_GROUND_TEXELS),
@@ -81,7 +95,11 @@ func _verify_shadow_follows_item_form(item: ShelfItem, shadow: Sprite2D) -> void
 	)
 
 
-func _verify_resting_shape(item: ShelfItem, shadow: Sprite2D) -> void:
+func _verify_resting_shape(
+	item: ShelfItem,
+	shadow: Sprite2D,
+	shelf_floor_shadow: Sprite2D
+) -> void:
 	item.shadow_lift = 0.0
 
 	_check(
@@ -111,9 +129,39 @@ func _verify_resting_shape(item: ShelfItem, shadow: Sprite2D) -> void:
 		),
 		"A resting shadow is faint enough not to crowd adjacent shelf items."
 	)
+	_check(shelf_floor_shadow.visible, "A resting item casts a visible segment across the shelf floor.")
+	_check(
+		shelf_floor_shadow.position.is_equal_approx(
+			Vector2(0.0, ShelfItem.SHADOW_GROUND_TEXELS * item.visual_scale)
+		),
+		"The shelf-floor segment begins at the item's ground contact."
+	)
+	_check(
+		shelf_floor_shadow.scale.y < shelf_floor_shadow.scale.x * 0.5
+			and shelf_floor_shadow.skew > PI * 0.25,
+		"The shelf-floor segment is flattened and cast up-right along the annotated shelf plane."
+	)
+	var projected_slope := absf(
+		cos(shelf_floor_shadow.skew) / sin(shelf_floor_shadow.skew)
+	)
+	_check(
+		projected_slope > 0.45 and projected_slope < 0.7,
+		"The shelf-floor segment follows the annotated rise-to-run slope."
+	)
+	_check(
+		is_equal_approx(
+			_get_shadow_alpha(shelf_floor_shadow),
+			_get_base_shadow_alpha(item) * ShelfItem.SHELF_FLOOR_SHADOW_ALPHA_SCALE
+		),
+		"The shelf-floor segment stays subtler than the wall silhouette."
+	)
 
 
-func _verify_carried_shape(item: ShelfItem, shadow: Sprite2D) -> void:
+func _verify_carried_shape(
+	item: ShelfItem,
+	shadow: Sprite2D,
+	shelf_floor_shadow: Sprite2D
+) -> void:
 	var ground_y := ShelfItem.SHADOW_GROUND_TEXELS * item.visual_scale
 
 	item.shadow_lift = 1.0
@@ -145,11 +193,20 @@ func _verify_carried_shape(item: ShelfItem, shadow: Sprite2D) -> void:
 		),
 		"A carried shadow retains a source-alpha core for narrow and irregular silhouette details."
 	)
+	_check(
+		not shelf_floor_shadow.visible,
+		"The shelf-floor segment disappears once the item is fully carried."
+	)
 
 	item.shadow_lift = 0.0
 
 
-func _verify_drag_lift(level: Node, item: ShelfItem, shadow: Sprite2D) -> void:
+func _verify_drag_lift(
+	level: Node,
+	item: ShelfItem,
+	shadow: Sprite2D,
+	shelf_floor_shadow: Sprite2D
+) -> void:
 	var resting_position := shadow.position
 	var grab_position := item.global_position
 
@@ -157,6 +214,7 @@ func _verify_drag_lift(level: Node, item: ShelfItem, shadow: Sprite2D) -> void:
 	await create_timer(LIFT_SETTLE_SECONDS).timeout
 
 	_check(shadow.visible, "A dragged item keeps its shadow instead of dropping it.")
+	_check(not shelf_floor_shadow.visible, "A dragged item no longer casts onto its original shelf plane.")
 	_check(
 		is_equal_approx(item.shadow_lift, 1.0),
 		"Grabbing an item drives its shadow all the way to the carried shape."
@@ -181,6 +239,7 @@ func _verify_drag_lift(level: Node, item: ShelfItem, shadow: Sprite2D) -> void:
 		is_zero_approx(item.shadow_lift) and shadow.scale.y > shadow.scale.x * 0.8,
 		"Dropping the item returns its shadow to the soft upright resting silhouette."
 	)
+	_check(shelf_floor_shadow.visible, "Dropping the item restores its shelf-floor shadow segment.")
 
 
 func _get_blur(shadow: Sprite2D) -> float:
