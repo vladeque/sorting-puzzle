@@ -54,6 +54,12 @@ func get_base_cell_size() -> Vector2:
 	return BASE_CELL_SIZE
 
 
+## Everything this shelf draws, relative to its own origin and before `SHELF_CELL_VISUAL_SCALE`.
+## Usually the cell itself, but a shelf type may draw outside the footprint it occupies in the grid.
+func get_visual_bounds() -> Rect2:
+	return Rect2(-BASE_CELL_SIZE * 0.5, BASE_CELL_SIZE)
+
+
 ## Number of front slots, and therefore the width of every layer in this shelf's level config.
 func get_slot_count() -> int:
 	return SLOT_COUNT

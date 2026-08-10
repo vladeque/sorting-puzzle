@@ -24,6 +24,9 @@ const COMPLETION_REVEAL_SECONDS := 1.35
 const HAMMER_ITEM_COMPRESSION_SECONDS := 0.08
 const HAMMER_REWARD_DELAY_SECONDS := 0.14
 const SHELF_SCENE := preload("res://scenes/shelf.tscn")
+const DISPENSER_SHELF_SCENE := preload("res://scenes/dispenser_shelf.tscn")
+const SHELF_TYPE_STANDARD := "standard"
+const SHELF_TYPE_DISPENSER := "dispenser"
 const MOVING_SHELF_ROW_SCENE := preload("res://scenes/moving_shelf_row.tscn")
 const ITEM_SCENE := preload("res://scenes/item.tscn")
 const HAMMER_IMPACT_EFFECT_SCENE := preload("res://scenes/abilities/hammer_impact_effect.tscn")
@@ -437,9 +440,15 @@ func _get_shelves_root_child_bounds(child: Node) -> Rect2:
 	if moving_row != null:
 		return Rect2(moving_row.position, moving_row.size)
 
-	var shelf_node := child as Node2D
-	if shelf_node != null and _is_shelf_node(shelf_node):
-		return Rect2(shelf_node.position - SHELF_CELL_SIZE * 0.5, SHELF_CELL_SIZE)
+	# Visual bounds, not the grid cell: a dispenser's indicator hangs below its shelf body, and the
+	# responsive fit has to keep that on screen even though row packing ignores it.
+	var shelf_cell := child as Shelf
+	if shelf_cell != null:
+		var visual_bounds := shelf_cell.get_visual_bounds()
+		return Rect2(
+			shelf_cell.position + visual_bounds.position * SHELF_CELL_VISUAL_SCALE,
+			visual_bounds.size * SHELF_CELL_VISUAL_SCALE
+		)
 
 	return Rect2()
 
@@ -743,7 +752,12 @@ func _add_preset_layout_shelves(shelves: Node2D, shelves_config: Array) -> void:
 		if shelf_config == null:
 			continue
 
-		var shelf := _add_shelf(shelves, shelf_index + 1, shelf_positions[shelf_index])
+		var shelf := _add_shelf(
+			shelves,
+			shelf_index + 1,
+			shelf_positions[shelf_index],
+			_get_shelf_type(shelf_config)
+		)
 		_apply_shelf_row_placement(shelf, _get_grid_row_shelf_placement(shelf_index, shelves_config.size(), 3))
 		_configure_shelf_from_config(shelf, shelf_config)
 
@@ -843,15 +857,35 @@ func _add_static_shelf_row(
 	row_center_y: float,
 	visual_variant: String
 ) -> void:
-	var row_origin_x := -float(row_shelf_count - 1) * SHELF_GRID_STEP.x * 0.5
+	# Rows pack by each cell's own width instead of one uniform grid step, so a narrow shelf sits
+	# flush against its neighbours rather than floating inside a standard-width gap. An all-standard
+	# row lands on exactly the positions the uniform step used to produce.
+	var shelf_types: Array[String] = []
+	var shelf_widths: Array[float] = []
+	var row_width := 0.0
 	for row_shelf_index in range(row_shelf_count):
+		var row_shelf_config := shelves_config[start_shelf_index + row_shelf_index] as Dictionary
+		var row_shelf_type := SHELF_TYPE_STANDARD if row_shelf_config == null else _get_shelf_type(row_shelf_config)
+		var row_shelf_width := _get_shelf_cell_size(row_shelf_type).x
+		shelf_types.append(row_shelf_type)
+		shelf_widths.append(row_shelf_width)
+		row_width += row_shelf_width
+
+	row_width -= SHELF_SHARED_EDGE_THICKNESS * float(maxi(row_shelf_count - 1, 0))
+
+	var cursor_x := -row_width * 0.5
+	for row_shelf_index in range(row_shelf_count):
+		var shelf_width: float = shelf_widths[row_shelf_index]
+		var shelf_center_x := cursor_x + shelf_width * 0.5
+		cursor_x += shelf_width - SHELF_SHARED_EDGE_THICKNESS
+
 		var shelf_config := shelves_config[start_shelf_index + row_shelf_index] as Dictionary
 		if shelf_config == null:
 			continue
 
 		var shelf_number := start_shelf_index + row_shelf_index + 1
-		var shelf_position := Vector2(row_origin_x + float(row_shelf_index) * SHELF_GRID_STEP.x, row_center_y)
-		var shelf := _add_shelf(shelves, shelf_number, shelf_position)
+		var shelf_position := Vector2(shelf_center_x, row_center_y)
+		var shelf := _add_shelf(shelves, shelf_number, shelf_position, shelf_types[row_shelf_index])
 		_apply_shelf_visual_variant(shelf, visual_variant)
 		_apply_shelf_row_placement(shelf, _get_row_shelf_placement(row_shelf_index, row_shelf_count))
 		_configure_shelf_from_config(shelf, shelf_config)
@@ -887,7 +921,18 @@ func _add_moving_shelf_row(
 			continue
 
 		var shelf_number := start_shelf_index + row_shelf_index + 1
-		var shelf := _add_shelf(row, shelf_number, Vector2.ZERO)
+		# Moving rows step by one uniform cell width and wrap on it, so they cannot carry a shelf
+		# type of a different width. Same restriction, and same degrade-with-a-warning handling, as
+		# locked shelves in moving rows.
+		var shelf_type := _get_shelf_type(shelf_config)
+		if shelf_type == SHELF_TYPE_DISPENSER:
+			push_warning(
+				"Shelf%02d is in a moving row. Dispenser shelves in moving rows are not supported."
+				% shelf_number
+			)
+			shelf_type = SHELF_TYPE_STANDARD
+
+		var shelf := _add_shelf(row, shelf_number, Vector2.ZERO, shelf_type)
 		row.add_shelf(shelf)
 		_apply_shelf_visual_variant(shelf, visual_variant)
 		_apply_shelf_row_placement(shelf, Shelf.ROW_PLACEMENT_MIDDLE)
@@ -899,6 +944,53 @@ func _configure_shelf_from_config(shelf: Shelf, shelf_config: Dictionary, allow_
 	_max_layer_count = maxi(_max_layer_count, layers.size())
 	_add_configured_layers(shelf, layers)
 	_configure_shelf_unlock(shelf, shelf_config, allow_locked)
+	_configure_dispenser_capacity(shelf, layers)
+
+
+func _get_shelf_type(shelf_config: Dictionary) -> String:
+	var shelf_type := str(shelf_config.get("type", SHELF_TYPE_STANDARD)).to_lower()
+	if shelf_type == SHELF_TYPE_STANDARD or shelf_type == SHELF_TYPE_DISPENSER:
+		return shelf_type
+
+	push_warning("Unknown shelf type '%s'. Using %s." % [shelf_type, SHELF_TYPE_STANDARD])
+	return SHELF_TYPE_STANDARD
+
+
+func _get_shelf_cell_size(shelf_type: String) -> Vector2:
+	var base_cell_size := (
+		DispenserShelf.DISPENSER_BASE_CELL_SIZE
+		if shelf_type == SHELF_TYPE_DISPENSER
+		else Shelf.BASE_CELL_SIZE
+	)
+	return base_cell_size * SHELF_CELL_VISUAL_SCALE
+
+
+## The indicator counts items rather than live nodes, so its capacity comes from the config the shelf
+## was built from. Counting configured items instead of layers keeps a malformed config (a null in a
+## dispenser layer, which the validator rejects) from lighting a socket that holds nothing.
+func _configure_dispenser_capacity(shelf: Shelf, layers: Array) -> void:
+	var dispenser := shelf as DispenserShelf
+	if dispenser == null:
+		return
+
+	var layer_count := layers.size()
+	if layer_count < DispenserShelf.MIN_LAYER_COUNT or layer_count > DispenserShelf.MAX_LAYER_COUNT:
+		push_warning(
+			"%s is a dispenser with %s layers; expected %s to %s."
+			% [shelf.name, layer_count, DispenserShelf.MIN_LAYER_COUNT, DispenserShelf.MAX_LAYER_COUNT]
+		)
+
+	var item_count := 0
+	for layer in layers:
+		var layer_items := layer as Array
+		if layer_items == null:
+			continue
+
+		for item_value in layer_items:
+			if item_value != null and not str(item_value).is_empty():
+				item_count += 1
+
+	dispenser.set_capacity(item_count)
 
 
 func _is_row_layout_moving(row_config: Dictionary) -> bool:
@@ -1013,7 +1105,12 @@ func _add_layout_template_shelves(shelves: Node2D, shelves_config: Array, layout
 			var shelf_config := shelves_config[shelf_config_index] as Dictionary
 			if shelf_config != null:
 				var shelf_marker := layout_node as Node2D
-				var shelf := _add_shelf(shelves, shelf_config_index + 1, shelf_marker.global_position)
+				var shelf := _add_shelf(
+						shelves,
+						shelf_config_index + 1,
+						shelf_marker.global_position,
+						_get_shelf_type(shelf_config)
+					)
 				_apply_shelf_row_placement(
 					shelf,
 					str(marker_placements.get(shelf_marker.get_instance_id(), Shelf.ROW_PLACEMENT_MIDDLE))
@@ -1172,15 +1269,41 @@ func _has_stacked_shelf_above(shelf: Node2D, shelves: Array[Node]) -> bool:
 		if other_position.y >= shelf_position.y - SHELF_TOP_STACK_VERTICAL_EPSILON:
 			continue
 
-		if _shelf_cells_stack_horizontally(shelf_position.x, other_position.x):
+		if _shelf_cells_stack_horizontally(
+			shelf_position.x,
+			_get_shelf_cell_width(shelf),
+			other_position.x,
+			_get_shelf_cell_width(other_shelf)
+		):
 			return true
 
 	return false
 
 
-func _shelf_cells_stack_horizontally(first_x: float, second_x: float) -> bool:
-	var overlap_width := maxf(SHELF_CELL_SIZE.x - absf(first_x - second_x), 0.0)
-	return overlap_width / SHELF_CELL_SIZE.x >= SHELF_TOP_STACK_MIN_HORIZONTAL_OVERLAP
+## Overlap is measured against the narrower of the two cells, so a wide shelf only counts as covered
+## when the shelf above genuinely sits over it. With two equal widths this is the same test as the
+## single-width version it replaced.
+func _shelf_cells_stack_horizontally(
+	first_x: float,
+	first_width: float,
+	second_x: float,
+	second_width: float
+) -> bool:
+	var reference_width := minf(first_width, second_width)
+	if reference_width <= 0.0:
+		return false
+
+	var touching_distance := (first_width + second_width) * 0.5
+	var overlap_width := maxf(touching_distance - absf(first_x - second_x), 0.0)
+	return overlap_width / reference_width >= SHELF_TOP_STACK_MIN_HORIZONTAL_OVERLAP
+
+
+func _get_shelf_cell_width(shelf: Node2D) -> float:
+	var shelf_cell := shelf as Shelf
+	if shelf_cell == null:
+		return SHELF_CELL_SIZE.x
+
+	return shelf_cell.get_base_cell_size().x * SHELF_CELL_VISUAL_SCALE
 
 
 func _get_shelf_root_local_position(shelf: Node2D) -> Vector2:
@@ -1239,8 +1362,14 @@ func _get_grid_layout_positions(columns: int, shelf_count: int) -> Array[Vector2
 	return positions
 
 
-func _add_shelf(parent: Node, shelf_number: int, shelf_position: Vector2) -> Shelf:
-	var shelf := SHELF_SCENE.instantiate() as Shelf
+func _add_shelf(
+	parent: Node,
+	shelf_number: int,
+	shelf_position: Vector2,
+	shelf_type := SHELF_TYPE_STANDARD
+) -> Shelf:
+	var shelf_scene := DISPENSER_SHELF_SCENE if shelf_type == SHELF_TYPE_DISPENSER else SHELF_SCENE
+	var shelf := shelf_scene.instantiate() as Shelf
 	shelf.name = "Shelf%02d" % shelf_number
 	shelf.position = shelf_position
 	shelf.scale = Vector2.ONE * SHELF_CELL_VISUAL_SCALE
@@ -1252,17 +1381,18 @@ func _add_shelf(parent: Node, shelf_number: int, shelf_position: Vector2) -> She
 
 
 func _add_configured_layers(shelf: Shelf, layers: Array) -> void:
+	var slot_count := shelf.get_slot_count()
 	for layer_index in range(layers.size()):
 		var item_ids := layers[layer_index] as Array
 		if item_ids == null:
 			push_warning("%s layer %s is not an array." % [shelf.name, layer_index + 1])
 			continue
 
-		if item_ids.size() != SLOT_COUNT:
-			push_warning("%s layer %s expected %s slots, found %s." % [shelf.name, layer_index + 1, SLOT_COUNT, item_ids.size()])
+		if item_ids.size() != slot_count:
+			push_warning("%s layer %s expected %s slots, found %s." % [shelf.name, layer_index + 1, slot_count, item_ids.size()])
 
 		var layer_slots := _get_front_slots(shelf) if layer_index == 0 else shelf.add_back_layer(layer_index, _get_front_slots(shelf))
-		var fill_count = mini(SLOT_COUNT, item_ids.size())
+		var fill_count = mini(slot_count, item_ids.size())
 		for slot_index in range(fill_count):
 			_add_configured_item(layer_slots[slot_index], item_ids[slot_index], layer_index, slot_index)
 
@@ -1320,6 +1450,13 @@ func _get_shelf_unlock_requirement(shelf: Node) -> int:
 
 func _is_shelf_locked(shelf: Node) -> bool:
 	return shelf != null and bool(shelf.get_meta(SHELF_LOCKED_META, false))
+
+
+## A one-slot shelf could never hold three items anyway, but saying so explicitly keeps the rule from
+## silently depending on the slot-count coincidence.
+func _shelf_forms_triples(shelf: Node) -> bool:
+	var shelf_cell := shelf as Shelf
+	return shelf_cell == null or shelf_cell.forms_triples()
 
 
 func _is_slot_locked(slot: Node) -> bool:
@@ -2089,8 +2226,23 @@ func _move_item_to_slot(item: ShelfItem, origin_slot: Node2D, target_slot: Node2
 	_add_shelf_to_check(shelves_to_check, origin_slot)
 	_add_shelf_to_check(shelves_to_check, target_slot)
 
+	_record_dispenser_item_taken(origin_slot, target_slot)
 	_move_item_to_slot_after_animation(item, target_slot, shelves_to_check)
 	return true
+
+
+## The one place a dispenser's count goes down: an item has just committed to a slot on a different
+## shelf and is never coming back. Every other path that empties the front slot -- picking the item
+## up, dropping it somewhere invalid, returning it to its own shelf -- leaves the item on the
+## dispenser, which is why the count is not derived from the shelf's live children.
+func _record_dispenser_item_taken(origin_slot: Node2D, target_slot: Node2D) -> void:
+	var origin_shelf := _get_owning_shelf(origin_slot)
+	if origin_shelf == null or origin_shelf == _get_owning_shelf(target_slot):
+		return
+
+	var dispenser := origin_shelf as DispenserShelf
+	if dispenser != null:
+		dispenser.take_one()
 
 
 func _find_item_at_position(pointer_global_position: Vector2) -> ShelfItem:
@@ -2346,11 +2498,11 @@ func _clear_matching_shelves(shelves_to_check: Array[Node]) -> bool:
 	var cleared_any := false
 
 	for shelf in shelves_to_check:
-		if _is_shelf_locked(shelf):
+		if _is_shelf_locked(shelf) or not _shelf_forms_triples(shelf):
 			continue
 
 		var shelf_items := _get_shelf_items(shelf)
-		if shelf_items.size() != 3:
+		if shelf_items.size() != SLOT_COUNT:
 			continue
 
 		var item_id := shelf_items[0].item_id
@@ -3085,10 +3237,14 @@ func _cancel_active_interaction() -> void:
 
 
 func _use_hammer() -> bool:
-	var visible_items := _get_visible_items()
+	# A dispenser's queue is authored to be taken by hand in order, so hammer never eats out of one.
+	var visible_items := _get_visible_items(true)
 	var items_to_destroy := _find_hammer_targets(visible_items)
 	if items_to_destroy.is_empty():
-		items_to_destroy = _find_hammer_supplemented_targets(visible_items, _get_first_back_layer_items())
+		items_to_destroy = _find_hammer_supplemented_targets(
+			visible_items,
+			_get_first_back_layer_items(true)
+		)
 
 	if items_to_destroy.is_empty():
 		return false
@@ -3356,7 +3512,9 @@ func _use_shuffle() -> bool:
 
 func _get_shuffle_eligible_items() -> Array[ShelfItem]:
 	var items: Array[ShelfItem] = []
-	for item in _get_unlocked_items():
+	# Shuffle reassigns hidden back-layer identities as well as visible ones, so including a
+	# dispenser would rewrite the queue the level was authored (and validated) around.
+	for item in _get_unlocked_items(true):
 		if item == null or not is_instance_valid(item) or item.is_queued_for_deletion():
 			continue
 
@@ -3952,10 +4110,16 @@ func _get_all_items() -> Array[ShelfItem]:
 	return items
 
 
-func _get_unlocked_items() -> Array[ShelfItem]:
+## `only_ability_modifiable` drops shelves whose items abilities must not destroy or rewrite. It is
+## off by default because read-only abilities -- highlight -- treat every shelf alike; only hammer
+## and shuffle pass it. See `Shelf.allows_ability_modification()`.
+func _get_unlocked_items(only_ability_modifiable := false) -> Array[ShelfItem]:
 	var items: Array[ShelfItem] = []
 	for shelf in _get_all_shelves():
 		if _is_shelf_locked(shelf):
+			continue
+
+		if only_ability_modifiable and not _shelf_allows_ability_modification(shelf):
 			continue
 
 		_collect_items_recursive(shelf, items)
@@ -3963,10 +4127,18 @@ func _get_unlocked_items() -> Array[ShelfItem]:
 	return items
 
 
-func _get_visible_items() -> Array[ShelfItem]:
+func _shelf_allows_ability_modification(shelf: Node) -> bool:
+	var shelf_cell := shelf as Shelf
+	return shelf_cell == null or shelf_cell.allows_ability_modification()
+
+
+func _get_visible_items(only_ability_modifiable := false) -> Array[ShelfItem]:
 	var items: Array[ShelfItem] = []
 	for shelf in _get_all_shelves():
 		if _is_shelf_locked(shelf):
+			continue
+
+		if only_ability_modifiable and not _shelf_allows_ability_modification(shelf):
 			continue
 
 		for item in _get_shelf_items(shelf):
@@ -3976,10 +4148,13 @@ func _get_visible_items() -> Array[ShelfItem]:
 	return items
 
 
-func _get_first_back_layer_items() -> Array[ShelfItem]:
+func _get_first_back_layer_items(only_ability_modifiable := false) -> Array[ShelfItem]:
 	var items: Array[ShelfItem] = []
 	for shelf in _get_all_shelves():
 		if _is_shelf_locked(shelf):
+			continue
+
+		if only_ability_modifiable and not _shelf_allows_ability_modification(shelf):
 			continue
 
 		var shelf_node := shelf as Shelf

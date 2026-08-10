@@ -1,0 +1,124 @@
+class_name DispenserShelf
+extends Shelf
+
+## A source-only shelf: one item slot, 2-4 stacked layers, and a segmented indicator underneath
+## counting how many items are still on it, the one on display included. The player can take from it
+## but never place onto it, so its authored queue is the only route its items take to the board.
+##
+## The queue is not a new system. `Shelf`'s back-layer machinery already models "one hidden item per
+## layer, promoted when the front layer empties", and with a single front slot that is exactly a
+## dispenser. This type only narrows the cell and refuses the interactions that would rewrite the
+## queue -- see `scripts/level.gd` for how those refusals are read.
+
+## Named apart from `Shelf`'s own `BASE_CELL_SIZE`/`SLOT_COUNT` because GDScript does not let a
+## subclass reuse a parent constant's name.
+const DISPENSER_BASE_CELL_SIZE := Vector2(96, 135)
+const DISPENSER_SLOT_COUNT := 1
+const MIN_LAYER_COUNT := 2
+const MAX_LAYER_COUNT := 4
+
+## Taller than the cell because the indicator hangs below the shelf body. The extra height is
+## deliberately kept out of `get_base_cell_size()`: row packing must line a dispenser's shelf floor
+## up with its neighbours', while the responsive fit has to keep the indicator on screen.
+const VISUAL_BOUNDS := Rect2(-48.0, -89.0, 96.0, 163.0)
+
+const LAYER_INDICATOR_NODE := "LayerIndicator"
+
+var _capacity := 0
+var _remaining := 0
+
+
+func _ready() -> void:
+	super._ready()
+	# The frame is self-contained rather than shared with neighbours, so its cap is simply part of
+	# the shelf instead of something that appears only when nothing is stacked above.
+	set_top_ceiling_cap_visible(true)
+	_refresh_indicator(false)
+
+
+func get_base_cell_size() -> Vector2:
+	return DISPENSER_BASE_CELL_SIZE
+
+
+func get_visual_bounds() -> Rect2:
+	return VISUAL_BOUNDS
+
+
+func get_slot_count() -> int:
+	return DISPENSER_SLOT_COUNT
+
+
+func accepts_dropped_items() -> bool:
+	return false
+
+
+func forms_triples() -> bool:
+	return false
+
+
+func allows_ability_modification() -> bool:
+	return false
+
+
+## Row placement paints the shared left/middle/right edges that let neighbouring cells butt against
+## each other. A dispenser carries its own complete frame, so it stays neutral wherever it sits.
+func set_row_placement(_placement: String) -> void:
+	super.set_row_placement(ROW_PLACEMENT_MIDDLE)
+
+
+func set_top_ceiling_cap_visible(_should_show: bool) -> void:
+	super.set_top_ceiling_cap_visible(true)
+
+
+func set_visual_variant(visual_variant: String) -> void:
+	if visual_variant == VISUAL_VARIANT_FLOOR_ONLY:
+		push_warning("%s is a dispenser and has no floor_only variant. Using full shelf." % name)
+
+	super.set_visual_variant(VISUAL_VARIANT_FULL)
+
+
+## Sets both how many sockets the indicator shows and how many are lit. Called once per shelf from
+## the level config, where capacity is the authored item count.
+func set_capacity(capacity: int) -> void:
+	_capacity = maxi(capacity, 0)
+	_remaining = _capacity
+	_refresh_indicator(false)
+
+
+func get_capacity() -> int:
+	return _capacity
+
+
+func get_remaining_count() -> int:
+	return _remaining
+
+
+## Records that one item left this shelf for good.
+##
+## The count is authoritative state rather than something recomputed from live nodes, because a
+## carried item is reparented out of its slot for the length of the drag: a shelf that counted its
+## own children would read as already emptied the moment the player picked the item up, and would
+## have to count back up again if they dropped it somewhere invalid. `scripts/level.gd` calls this
+## exactly once per committed move off the shelf instead.
+func take_one() -> void:
+	set_remaining_count(_remaining - 1)
+
+
+func set_remaining_count(remaining: int) -> void:
+	var next_remaining := clampi(remaining, 0, _capacity)
+	if next_remaining == _remaining:
+		return
+
+	_remaining = next_remaining
+	_refresh_indicator(true)
+
+
+func _refresh_indicator(should_animate: bool) -> void:
+	var indicator := get_node_or_null(LAYER_INDICATOR_NODE) as ShelfLayerIndicator
+	if indicator == null:
+		return
+
+	if should_animate:
+		indicator.set_remaining(_remaining)
+	else:
+		indicator.configure(_capacity, _remaining)
