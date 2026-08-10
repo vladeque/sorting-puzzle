@@ -8,10 +8,6 @@ const DEFAULT_VISUAL_SCALE := 0.92
 
 const SHADOW_NODE_NAME := ^"Shadow"
 
-## Opaque pre-blend of the original resting item shadow over Shelf/BackWall. Shelf shadow polygons
-## use this same color, so item/shelf and shelf/shelf intersections cannot compound darker.
-const SHELF_SHADOW_COLOR := Color(0.68884707, 0.6076549, 0.5096408, 1.0)
-
 ## Distance from the sprite's texture center down to the art's ground line, in source texels. Item
 ## textures are a 128x128 canvas whose visible artwork ends at y=120 (docs/ITEM_ASSET_REQUIREMENTS),
 ## so the contact point is 120 - 64 texels below the center for every catalog item.
@@ -19,14 +15,14 @@ const SHADOW_GROUND_TEXELS := 56.0
 
 ## Resting shadow: a soft, full-size copy of the item silhouette displaced slightly
 ## up-right, as if the item stands close to the shelf's back wall. It has no crisp silhouette core:
-## the broad mask transition keeps neighboring shelf items from becoming visually crowded while the
-## bottle/box/tub form remains legible behind its owner.
+## the broad mask transition and low opacity keep neighboring shelf items from becoming visually
+## crowded while the bottle/box/tub form remains legible behind its owner.
 const SHADOW_REST_WIDTH := 1.0
 const SHADOW_REST_FLATTEN := 1.0
 const SHADOW_REST_SKEW := 0.0
 const SHADOW_REST_BLUR_PX := 7.5
 const SHADOW_REST_MASK_LOW := 0.12
-const SHADOW_REST_ALPHA_SCALE := 1.0
+const SHADOW_REST_ALPHA_SCALE := 0.56
 const SHADOW_REST_OFFSET := Vector2(12.0, -4.0)
 
 ## Carried shadow: the item is held well above the board, so a ground projection is the wrong read.
@@ -39,7 +35,7 @@ const SHADOW_CARRY_SKEW := 0.0
 const SHADOW_CARRY_BLUR_PX := 4.5
 const SHADOW_CARRY_MASK_LOW := 0.3
 const SHADOW_CARRY_SILHOUETTE_WEIGHT := 0.7
-const SHADOW_CARRY_ALPHA_SCALE := 1.0
+const SHADOW_CARRY_ALPHA_SCALE := 0.78
 
 ## How far the carried shadow separates from the item, in source texels (scaled with the sprite).
 ## Down and to the right, so the item reads as lifted toward the player and off to the light's side.
@@ -114,7 +110,7 @@ var shadow_lift := 0.0:
 var _outline_enabled := false
 var _outline_material: ShaderMaterial
 var _shadow_material: ShaderMaterial
-var _shadow_base_color := SHELF_SHADOW_COLOR
+var _shadow_base_color := Color(0.1, 0.05, 0.02, 0.34)
 var _contact_shadow_enabled := true
 var _highlight_scale_multiplier := 1.0
 
@@ -145,7 +141,7 @@ func set_contact_shadow_enabled(enabled: bool) -> void:
 
 ## Lifts the shadow off the item while the player carries it, instead of hiding the shadow the way
 ## earlier drags did: the shadow stays a child of the item, so it follows the finger for free, but it
-## slides further along the light direction and refines its mask so the item reads as held above the
+## slides further along the light direction and changes opacity so the item reads as held above the
 ## board. Fire and forget -- the tween is bound to this node, so it dies with the item.
 func set_drag_lifted(lifted: bool) -> void:
 	var target := 1.0 if lifted else 0.0
@@ -233,7 +229,7 @@ func _apply_visual_scale() -> void:
 
 ## Draws the item's own silhouette as its shadow, in one of two readings blended by `shadow_lift`:
 ##
-##   resting (0) -- the item is touching the shelf, so a soft copy of its silhouette
+##   resting (0) -- the item is touching the shelf, so a soft, low-opacity copy of its silhouette
 ##                  sits just up-right on the shelf's back wall.
 ##   carried (1) -- the item is held above the board, so the silhouette separates farther down-right
 ##                  and gains a recognizable source-alpha core.

@@ -1640,9 +1640,7 @@ Purpose:
 - Owns the visible shelf back wall, floor, frame, front slot positions, and item snap markers.
 - Owns generated back-layer slot layout and preview styling defaults through `scripts/shelf.gd`.
 - Owns soft internal left/top wall shadows, the diagonal bottom cast shadow, the hidden top ceiling cap, and the right-column cast shadow toggled by `scripts/level.gd`.
-- Uses one opaque shadow color pre-blended from the original resting item shadow over `BackWall`.
-  Every physical shelf shadow and the item-shadow shader share it, so intersections behave like a
-  union and do not compound into darker patches.
+- Uses opaque pre-blended shadow colors so overlapping shadow polygons do not compound into darker patches.
 - Owns the hidden locked-shelf overlay visuals shown by `scripts/level.gd` when a level config gates the shelf behind cleared triples.
 - Uses wide, slightly shorter cell bounds so three generated shelves span most of the 720 px gameplay viewport with compact row spacing.
 - Runtime shelf instances are scaled slightly by `scripts/level.gd`, with layout template markers and moving-row windows authored to match the scaled cell footprint.
@@ -1651,13 +1649,13 @@ Purpose:
 
 Important nodes:
 - `BackWall`: muted panel behind shelf items.
-- `BackWallTopShade`: interior wall shadow using the canonical item-derived shelf-shadow color.
+- `BackWallTopShade`: soft interior wall shadow layer behind items.
 - `PlacementVisuals`: editable role-specific shelf art groups toggled by `scripts/shelf.gd`.
 - `PlacementVisuals/Left`: left shelf role visuals. Contains `BackWallLeftShade`, `LeftWall`, `RightWall`, and the left-specific `TopCeilingCap`.
 - `PlacementVisuals/Middle`: middle shelf role visuals. Contains row divider art and the middle-specific `TopCeilingCap`.
 - `PlacementVisuals/Right`: right shelf role visuals. Contains right edge art and the right-specific `TopCeilingCap`.
 - `Ceiling`: shared wooden top frame. Placement-specific `TopCeilingCap` nodes are shown at runtime only for top shelves.
-- `Shadow` and `RightColumnShadow`: perspective cast shadows using the canonical item-derived shelf-shadow color, shown at runtime for full shelf visuals and drawn below shelf bodies, items, and generated back-layer item previews so they remain visible only on exposed wall/background areas.
+- `Shadow` and `RightColumnShadow`: solid-color perspective cast shadows, shown at runtime for full shelf visuals and drawn below shelf bodies, items, and generated back-layer item previews so they remain visible only on exposed wall/background areas.
 - `FloorSurface` and `FloorFrontLip`: wooden floor where items visually rest.
 - `FloorGrain*`: subtle line details on the floor; generated back-layer item previews draw above the floor and grain, while active front items draw above back-layer previews.
 - `LockedOverlay`: hidden lock overlay used for triple-gated shelves. `scripts/level.gd`
@@ -1717,21 +1715,19 @@ Important nodes:
 - `Shadow`: translucent ground shadow drawn from the item's own texture, so each item's silhouette
   shapes its own shadow. The `shadow_material` shader (exported on the root) builds a soft mask from
   a ring average of the texture alpha, clips it to the source-alpha envelope so the shadow does not
-  exceed the item's size, then applies the canonical opaque shelf-shadow color. That color is the
-  original resting item-shadow appearance pre-blended over `Shelf/BackWall`, so the resting item
-  keeps its prior appearance while all physical shelf shadows now match it. Shared RGB prevents
-  item/shelf and shelf/shelf intersections from becoming darker. The carried state adds a weighted
+  exceed the item's size, then flattens the result to one translucent color that reads on both the
+  wooden shelf floor and the lighter level background. The carried state adds a weighted
   source-alpha core to that mask, preserving narrow necks, handles and irregular edges without
   requiring per-item shadow art.
   `scripts/item.gd` anchors the sprite on the art's ground line (canvas y=120, see
   `docs/ITEM_ASSET_REQUIREMENTS.md`). Generated back-layer previews and clearing items disable it.
 - The shadow has two readings, blended by `ShelfItem.shadow_lift`. **Resting**: a broad alpha-mask
-  transition produces a soft, item-sized silhouette just up-right of the item, as if
+  transition produces a soft, low-opacity, item-sized silhouette just up-right of the item, as if
   it were cast onto the shelf's nearby back wall. The offset exposes enough of the shadow to remain
   recognizable without crowding adjacent items, and the shadow follows both axes of the landing
   squash. **Carried**: while the player drags the item, the silhouette separates farther down-right.
   Its smaller filtered fill and weighted source-alpha core keep the carried shadow close to the
-  item's recognizable shape while retaining the shared non-compounding color.
+  item's recognizable shape, while reduced opacity prevents it from reading as a dark duplicate.
   Compare and tune both in `scenes/shadow_style_preview.tscn`.
 - `OutlineSprite`: hidden sprite used by `ShelfItem` to draw alpha-based highlight borders.
 - `Sprite2D`: main item sprite; texture and visual scale are controlled by `ShelfItem`.
