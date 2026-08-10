@@ -1709,17 +1709,11 @@ Important nodes:
   requiring per-item shadow art.
   `scripts/item.gd` anchors the sprite on the art's ground line (canvas y=120, see
   `docs/ITEM_ASSET_REQUIREMENTS.md`). Generated back-layer previews and clearing items disable it.
-- `ShelfFloorShadow`: a second silhouette-derived sprite used only while the item rests. It begins
-  at the same ground-line anchor and compresses/shears the item alpha up-right across the horizontal
-  shelf plane, joining the nearby wall silhouette into one two-surface cast shadow. It fades to zero
-  during pickup and is hidden at full carry height.
 - The shadow has two readings, blended by `ShelfItem.shadow_lift`. **Resting**: a broad alpha-mask
-  transition produces a soft, low-opacity, full-height silhouette just down-right of the item on the
-  nearby back wall, while `ShelfFloorShadow` runs from the item's feet up-right across the shelf at
-  the authored floor-plane slope. The offset exposes enough of the wall shadow to remain recognizable
-  without crowding adjacent items, and both pieces follow the landing squash. **Carried**: while the
-  player drags the item, the floor piece fades away and the wall silhouette separates farther
-  down-right.
+  transition produces a soft, low-opacity, full-height silhouette just down-right of the item, as if
+  it were cast onto the shelf's nearby back wall. The offset exposes enough of the shadow to remain
+  recognizable without crowding adjacent items, and the shadow follows both axes of the landing
+  squash. **Carried**: while the player drags the item, the silhouette separates farther down-right.
   Its smaller filtered halo and weighted source-alpha core keep the carried shadow close to the
   item's recognizable shape, while reduced opacity prevents it from reading as a dark duplicate.
   Compare and tune both in `scenes/shadow_style_preview.tscn`.

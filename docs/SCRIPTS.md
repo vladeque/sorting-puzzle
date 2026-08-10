@@ -1527,7 +1527,7 @@ Key responsibilities:
 - Move items with `_move_item_to_slot()`, `_resolve_move_target_slot()`, `_play_item_move_animation()`, and `_place_item_in_slot()`.
 - Finish every player-visible drop with `ShelfItem.play_land_impact()`, the landing squash-and-stretch owned by `scripts/item.gd`. It fires from `_play_item_move_animation()` after the eased travel settles and from `_place_item_in_slot()` when `should_play_landing` is set. The call is never awaited, so a landing does not delay `_resolve_shelves()` and its match clears. Silent forced restores (level failure, ability interrupt) pass `should_play_landing = false` and stay unanimated. Back-layer promotion is deliberately excluded: `_play_layer_promotion_animation()` already lands with its own `TRANS_BACK` overshoot on `visual_scale`.
 - Cancel a pending bounce with `ShelfItem.reset_land_impact()` before re-grabbing an item in `_begin_drag()` and before the gather in `_play_match_clear_animation()`, so the next animation never starts from a deformed pose.
-- Lift the active item's ground shadow with `ShelfItem.set_drag_lifted(true)` while the player is dragging it, and settle it again when the drag releases, cancels, fails, or completes. Both shadow nodes stay parented to the item; the lift fades out the shelf-floor segment, separates the remaining silhouette farther down-right, and blends in a source-alpha core so the carried shadow keeps the item's recognizable outline. `_place_item_in_slot()` also clears the lift as a safety net for paths that land an item without going through `_finish_active_drag()`.
+- Lift the active item's ground shadow with `ShelfItem.set_drag_lifted(true)` while the player is dragging it, and settle it again when the drag releases, cancels, fails, or completes. The shadow stays parented to the item so it travels with the finger; the lift separates the silhouette farther down-right and blends in a source-alpha core so the carried shadow keeps the item's recognizable outline. `_place_item_in_slot()` also clears the lift as a safety net for paths that land an item without going through `_finish_active_drag()`.
 - The level only switches an item's shadow between its resting and carried readings through
   `ShelfItem.shadow_lift`; compare the resting, mid-grab, and carried states together in
   `scenes/shadow_style_preview.tscn`.
@@ -2164,14 +2164,14 @@ Exports:
 
 Runtime properties:
 - `land_squash`: non-uniform `Vector2` multiplier layered on top of `visual_scale` and the highlight scale, tweened by `play_land_impact()`. It is a separate channel precisely so `set_highlight_scale()` and `set_outline()` can keep writing their own uniform scale without flattening an in-flight bounce; anything that writes sprite scale must go through `_get_sprite_scale()` rather than assigning a uniform scale directly.
-- `shadow_lift`: 0 while the item rests in a slot, 1 while the player carries it, tweened by `set_drag_lifted()`. Blends the wall shadow between its resting and carried forms while fading out `ShelfFloorShadow`. Its own channel for the same reason `land_squash` is: a lift arriving mid-landing must not fight the bounce.
+- `shadow_lift`: 0 while the item rests in a slot, 1 while the player carries it, tweened by `set_drag_lifted()`. Blends the shadow between its resting and carried shapes. Its own channel for the same reason `land_squash` is: a lift arriving mid-landing must not fight the bounce.
 
 Key methods:
 - `_ready()`: applies current texture and scale.
 - `_apply_texture()`: updates `Sprite2D.texture` and refreshes the ground shadow, which hides itself when the item has no texture.
 - `_apply_visual_scale()`: updates `Sprite2D` and `OutlineSprite` scale from `visual_scale * highlight scale multiplier * land_squash`, applies the contact pivot offset, then refreshes the shadow and outline.
-- `_apply_shadow()`: draws the item's own silhouette as two coordinated pieces sharing the art's ground-line anchor (`SHADOW_GROUND_TEXELS`, the 120-64 texel drop every texture follows per `docs/ITEM_ASSET_REQUIREMENTS.md`). `Shadow` is the full-height wall/carried form: at rest it is displaced slightly down-right by `SHADOW_REST_OFFSET`, softened by `SHADOW_REST_BLUR_PX` and the broad `SHADOW_REST_MASK_LOW` transition, and reduced to `SHADOW_REST_ALPHA_SCALE` opacity; while carried it moves to `SHADOW_CARRY_OFFSET` and gains a compact filtered halo plus `SHADOW_CARRY_SILHOUETTE_WEIGHT` of the source alpha. `ShelfFloorShadow` is the resting-only second piece: `_apply_shelf_floor_shadow()` flattens and shears the silhouette up-right from the item's feet using `SHELF_FLOOR_SHADOW_FLATTEN` and `SHELF_FLOOR_SHADOW_SKEW`, matching the shelf-plane slope, then fades it out across `shadow_lift`. Both pieces follow the landing squash.
-- `set_drag_lifted(lifted)`: tweens `shadow_lift`, fading the shelf-floor projection while moving the wall shadow between its resting and carried forms. Node-bound through `UIMotion.retween`, so it dies with the item.
+- `_apply_shadow()`: draws the item's own silhouette as its shadow. Anchors the shadow sprite on the art's ground line (`SHADOW_GROUND_TEXELS`, the 120-64 texel drop every item texture shares per `docs/ITEM_ASSET_REQUIREMENTS.md`), then blends by `shadow_lift` between two readings: **resting**, a full-height, unsheared silhouette displaced slightly down-right by `SHADOW_REST_OFFSET`, softened by `SHADOW_REST_BLUR_PX` and the broad `SHADOW_REST_MASK_LOW` transition, and reduced to `SHADOW_REST_ALPHA_SCALE` opacity so neighboring shelf items remain readable; and **carried**, the silhouette displaced farther down-right by `SHADOW_CARRY_OFFSET` and rendered with a compact filtered halo plus `SHADOW_CARRY_SILHOUETTE_WEIGHT` of the original alpha mask. The source-alpha core preserves narrow and irregular carried-item features. Both shadow axes follow the landing squash so the upright resting silhouette continues to match the item during impact.
+- `set_drag_lifted(lifted)`: tweens `shadow_lift`, moving the shadow between its resting and carried shapes instead of hiding it while carried. Node-bound through `UIMotion.retween`, so it dies with the item.
 
 ## `scripts/shadow_style_preview.gd`
 
@@ -2186,7 +2186,7 @@ Do not use for:
 - `_get_sprite_scale()` / `_get_contact_pivot_offset_y()`: compose the squash with the uniform scale and keep the art's ground contact planted so the item does not lift off the shelf while deforming. `CONTACT_ANCHOR_Y` is the landing bounce's pivot and is tuned by eye; it is deliberately not the same value as the shadow's `SHADOW_GROUND_TEXELS` anchor, which is measured from the texture contract.
 - `set_outline(enabled, color, width)`: enables or disables the sprite border highlight.
 - `set_highlight_scale(multiplier)`: scales the sprite and outline up (without changing the persistent `visual_scale`) while an item is highlighted by the Lantern ability.
-- `set_contact_shadow_enabled(enabled)`: hard on/off switch for both shadow pieces, still respecting texture availability; used by back-layer previews, clearing items, and the shuffle fly-in. Dragging no longer uses it -- see `set_drag_lifted()`.
+- `set_contact_shadow_enabled(enabled)`: hard on/off switch for the ground shadow, still respecting texture availability; used by back-layer previews, clearing items, and the shuffle fly-in. Dragging no longer uses it -- see `set_drag_lifted()`.
 - `_apply_outline()`: sends outline color/threshold and the computed dilation radius to the `OutlineSprite` shader material, and keeps the outline node visible only while enabled. The `OutlineSprite` shader dilates the alpha mask by sampling a ring of points around each pixel (in source-texture texels) rather than scaling the whole sprite up, so the border thickness stays even around irregular silhouettes.
 
 Depends on:
@@ -2202,7 +2202,7 @@ Do not use for:
 
 Verified by:
 - `tests/gameplay/test_item_landing_impact.gd` (run through `scripts/tools/run_isolated_godot_test.ps1`).
-- `tests/gameplay/test_item_contact_shadow.gd` for the silhouette-derived shadow: the soft upright wall form, shelf-floor projection and annotated slope, carried source-alpha core and compact halo, shared ground-line anchor, and drag lift travelling with the item.
+- `tests/gameplay/test_item_contact_shadow.gd` for the silhouette-derived ground shadow: the soft upright resting silhouette, carried source-alpha core and compact halo, ground-line anchor, and drag lift travelling with the item.
 
 ## `scripts/tools/generate_level_shelves.py`
 

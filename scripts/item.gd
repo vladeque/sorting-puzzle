@@ -7,7 +7,6 @@ const UIMotionScript := preload("res://scripts/ui_motion.gd")
 const DEFAULT_VISUAL_SCALE := 0.92
 
 const SHADOW_NODE_NAME := ^"Shadow"
-const SHELF_FLOOR_SHADOW_NODE_NAME := ^"ShelfFloorShadow"
 
 ## Distance from the sprite's texture center down to the art's ground line, in source texels. Item
 ## textures are a 128x128 canvas whose visible artwork ends at y=120 (docs/ITEM_ASSET_REQUIREMENTS),
@@ -25,17 +24,6 @@ const SHADOW_REST_BLUR_PX := 7.5
 const SHADOW_REST_MASK_LOW := 0.12
 const SHADOW_REST_ALPHA_SCALE := 0.56
 const SHADOW_REST_OFFSET := Vector2(16.0, 2.0)
-
-## Shelf-floor segment of the resting shadow. The full-height Shadow lands on the nearby back wall;
-## this second copy folds the same alpha silhouette down onto the shelf plane, starting at the
-## item's contact point and running up-right until it meets that wall. The skew sets the annotated
-## shelf-plane slope while the flatten controls its reach.
-const SHELF_FLOOR_SHADOW_WIDTH := 1.0
-const SHELF_FLOOR_SHADOW_FLATTEN := 0.42
-const SHELF_FLOOR_SHADOW_SKEW := 1.05
-const SHELF_FLOOR_SHADOW_BLUR_PX := 5.0
-const SHELF_FLOOR_SHADOW_MASK_LOW := 0.12
-const SHELF_FLOOR_SHADOW_ALPHA_SCALE := 0.5
 
 ## Carried shadow: the item is held well above the board, so a ground projection is the wrong read.
 ## The silhouette moves farther down-right of the item -- the same shape, displaced, the way a
@@ -74,8 +62,8 @@ const LAND_IMPACT_TWEEN_META := &"_shelf_item_land_impact_tween"
 
 @export var item_id: StringName = &""
 
-## Shared shadow material, assigned in scenes/item.tscn. The wall/carried and shelf-floor shadow
-## nodes each render through their own copy because their shader uniforms differ per item.
+## Shared shadow material, assigned in scenes/item.tscn. Each item renders through its own copy,
+## because the resting/carried blend writes per-item shader uniforms.
 @export var shadow_material: ShaderMaterial
 
 @export var texture: Texture2D:
@@ -122,7 +110,6 @@ var shadow_lift := 0.0:
 var _outline_enabled := false
 var _outline_material: ShaderMaterial
 var _shadow_material: ShaderMaterial
-var _shelf_floor_shadow_material: ShaderMaterial
 var _shadow_base_color := Color(0.1, 0.05, 0.02, 0.34)
 var _contact_shadow_enabled := true
 var _highlight_scale_multiplier := 1.0
@@ -154,9 +141,8 @@ func set_contact_shadow_enabled(enabled: bool) -> void:
 
 ## Lifts the shadow off the item while the player carries it, instead of hiding the shadow the way
 ## earlier drags did: the shadow stays a child of the item, so it follows the finger for free, but it
-## slides further along the light direction while the shelf-floor segment fades away, so the item
-## reads as held above the board. Fire and forget -- the tween is bound to this node, so it dies with
-## the item.
+## slides further along the light direction, spreads and fades so the item reads as held above the
+## board. Fire and forget -- the tween is bound to this node, so it dies with the item.
 func set_drag_lifted(lifted: bool) -> void:
 	var target := 1.0 if lifted else 0.0
 	if not is_inside_tree():
@@ -241,104 +227,60 @@ func _apply_visual_scale() -> void:
 	_apply_outline()
 
 
-## Draws the item's own silhouette as two coordinated shadow pieces:
-##
-##   ShelfFloorShadow -- the resting-only projection running from the item's feet up-right across
-##                       the horizontal shelf plane.
-##   Shadow           -- the soft nearby wall silhouette at rest, blended into the separated
-##                       shape-preserving shadow while carried.
+## Draws the item's own silhouette as its shadow, in one of two readings blended by `shadow_lift`:
 ##
 ##   resting (0) -- the item is touching the shelf, so a soft, low-opacity copy of its silhouette
-##                  sits just down-right on the shelf's back wall and the floor projection is shown.
+##                  sits just down-right on the shelf's back wall.
 ##   carried (1) -- the item is held above the board, so the silhouette separates farther down-right
-##                  and gains a recognizable source-alpha core while the floor projection vanishes.
+##                  and gains a recognizable source-alpha core.
 ##
 ## Blending rather than switching means grabbing an item slides and sharpens its shadow, while
 ## dropping it returns to the nearby soft silhouette instead of either shape popping.
 func _apply_shadow() -> void:
 	var shadow := get_node_or_null(SHADOW_NODE_NAME) as Sprite2D
-	var shelf_floor_shadow := get_node_or_null(SHELF_FLOOR_SHADOW_NODE_NAME) as Sprite2D
-	if shadow == null and shelf_floor_shadow == null:
+	if shadow == null:
 		return
+
+	shadow.texture = texture
+	shadow.visible = _contact_shadow_enabled and texture != null
+	# Puts the art's ground line (texture y=240) on the node's origin, so both readings pivot on the
+	# item's contact point rather than on the middle of the texture canvas. At full carry height this
+	# also makes the shadow line up exactly with the item sprite before it is displaced.
+	shadow.offset = Vector2(0.0, -SHADOW_GROUND_TEXELS)
+
+	_prepare_shadow_material(shadow)
 
 	var sprite_scale := _get_effective_scale()
 	var lift := clampf(shadow_lift, 0.0, 1.0)
-	var has_texture := texture != null
+	var flatten := lerpf(SHADOW_REST_FLATTEN, SHADOW_CARRY_FLATTEN, lift)
+	var spread := lerpf(SHADOW_REST_WIDTH, SHADOW_CARRY_WIDTH, lift)
 
-	if shadow != null:
-		shadow.texture = texture
-		shadow.visible = _contact_shadow_enabled and has_texture
-		# Puts the art's ground line (texture y=120) on the node's origin, so both readings pivot on
-		# the item's contact point rather than on the middle of the texture canvas.
-		shadow.offset = Vector2(0.0, -SHADOW_GROUND_TEXELS)
-
-		_prepare_shadow_material(shadow)
-
-		var flatten := lerpf(SHADOW_REST_FLATTEN, SHADOW_CARRY_FLATTEN, lift)
-		var spread := lerpf(SHADOW_REST_WIDTH, SHADOW_CARRY_WIDTH, lift)
-
-		shadow.skew = lerpf(SHADOW_REST_SKEW, SHADOW_CARRY_SKEW, lift)
-		# The upright shadow follows both axes of the landing squash so its silhouette continues to
-		# match the item during impact instead of briefly retaining the pre-impact height.
-		shadow.scale = Vector2(
-			sprite_scale * spread * land_squash.x,
-			sprite_scale * flatten * land_squash.y
-		)
-		shadow.position = Vector2(0.0, SHADOW_GROUND_TEXELS * sprite_scale)
-		shadow.position += SHADOW_REST_OFFSET.lerp(SHADOW_CARRY_OFFSET, lift) * sprite_scale
-
-		if _shadow_material != null:
-			var shadow_color := _shadow_base_color
-			shadow_color.a *= lerpf(SHADOW_REST_ALPHA_SCALE, SHADOW_CARRY_ALPHA_SCALE, lift)
-			_shadow_material.set_shader_parameter("shadow_color", shadow_color)
-			_shadow_material.set_shader_parameter(
-				"blur_radius_px",
-				lerpf(SHADOW_REST_BLUR_PX, SHADOW_CARRY_BLUR_PX, lift)
-			)
-			_shadow_material.set_shader_parameter(
-				"silhouette_weight",
-				SHADOW_CARRY_SILHOUETTE_WEIGHT * lift
-			)
-			_shadow_material.set_shader_parameter(
-				"mask_low",
-				lerpf(SHADOW_REST_MASK_LOW, SHADOW_CARRY_MASK_LOW, lift)
-			)
-
-	if shelf_floor_shadow != null:
-		_apply_shelf_floor_shadow(shelf_floor_shadow, sprite_scale, lift, has_texture)
-
-
-## Draws the part of a resting item's shadow that lies across the horizontal shelf plane. It uses a
-## separate material copy because its projection and fade are independent of the wall/carried form.
-func _apply_shelf_floor_shadow(
-	shadow: Sprite2D,
-	sprite_scale: float,
-	lift: float,
-	has_texture: bool
-) -> void:
-	shadow.texture = texture
-	shadow.visible = _contact_shadow_enabled and has_texture and lift < 1.0
-	shadow.offset = Vector2(0.0, -SHADOW_GROUND_TEXELS)
-	shadow.skew = SHELF_FLOOR_SHADOW_SKEW
+	shadow.skew = lerpf(SHADOW_REST_SKEW, SHADOW_CARRY_SKEW, lift)
+	# The upright shadow follows both axes of the landing squash so its silhouette continues to match
+	# the item during impact instead of briefly retaining the pre-impact height.
 	shadow.scale = Vector2(
-		sprite_scale * SHELF_FLOOR_SHADOW_WIDTH * land_squash.x,
-		sprite_scale * SHELF_FLOOR_SHADOW_FLATTEN * land_squash.y
+		sprite_scale * spread * land_squash.x,
+		sprite_scale * flatten * land_squash.y
 	)
 	shadow.position = Vector2(0.0, SHADOW_GROUND_TEXELS * sprite_scale)
+	shadow.position += SHADOW_REST_OFFSET.lerp(SHADOW_CARRY_OFFSET, lift) * sprite_scale
 
-	_prepare_shelf_floor_shadow_material(shadow)
-	if _shelf_floor_shadow_material == null:
-		return
-
-	var shadow_color := _shadow_base_color
-	shadow_color.a *= SHELF_FLOOR_SHADOW_ALPHA_SCALE * (1.0 - lift)
-	_shelf_floor_shadow_material.set_shader_parameter("shadow_color", shadow_color)
-	_shelf_floor_shadow_material.set_shader_parameter(
-		"blur_radius_px",
-		SHELF_FLOOR_SHADOW_BLUR_PX
-	)
-	_shelf_floor_shadow_material.set_shader_parameter("silhouette_weight", 0.0)
-	_shelf_floor_shadow_material.set_shader_parameter("mask_low", SHELF_FLOOR_SHADOW_MASK_LOW)
+	if _shadow_material != null:
+		var shadow_color := _shadow_base_color
+		shadow_color.a *= lerpf(SHADOW_REST_ALPHA_SCALE, SHADOW_CARRY_ALPHA_SCALE, lift)
+		_shadow_material.set_shader_parameter("shadow_color", shadow_color)
+		_shadow_material.set_shader_parameter(
+			"blur_radius_px",
+			lerpf(SHADOW_REST_BLUR_PX, SHADOW_CARRY_BLUR_PX, lift)
+		)
+		_shadow_material.set_shader_parameter(
+			"silhouette_weight",
+			SHADOW_CARRY_SILHOUETTE_WEIGHT * lift
+		)
+		_shadow_material.set_shader_parameter(
+			"mask_low",
+			lerpf(SHADOW_REST_MASK_LOW, SHADOW_CARRY_MASK_LOW, lift)
+		)
 
 
 ## Gives this item its own copy of the shared shadow material. The shader writes a flat color
@@ -358,18 +300,6 @@ func _prepare_shadow_material(shadow: Sprite2D) -> void:
 	if base_color is Color:
 		_shadow_base_color = base_color
 	shadow.material = _shadow_material
-
-
-func _prepare_shelf_floor_shadow_material(shadow: Sprite2D) -> void:
-	if _shelf_floor_shadow_material != null:
-		shadow.material = _shelf_floor_shadow_material
-		return
-
-	if shadow_material == null:
-		return
-
-	_shelf_floor_shadow_material = shadow_material.duplicate() as ShaderMaterial
-	shadow.material = _shelf_floor_shadow_material
 
 
 func _prepare_outline_material() -> void:

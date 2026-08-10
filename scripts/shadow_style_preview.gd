@@ -18,7 +18,7 @@ const SHELF_SCENE := preload("res://scenes/shelf.tscn")
 ## Deliberately contrasting silhouettes: a tall narrow bottle, a squat wide tub, and an irregular
 ## shape with detail that a good shadow should simplify rather than copy.
 const PREVIEW_ITEM_TEXTURES := [
-	"res://assets/items/item_water_bottle.png",
+	"res://assets/items/item_soda_bottle.png",
 	"res://assets/items/item_ice_cream_tub_pink.png",
 	"res://assets/items/item_cupcake.png",
 ]
