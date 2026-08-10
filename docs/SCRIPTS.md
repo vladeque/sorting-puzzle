@@ -291,8 +291,10 @@ Purpose:
 API:
 - `get_safe_area_margins(viewport_size)`: `Vector4` (left/top/right/bottom), zero outside
   Android/iOS.
-- `get_bottom_reserved(safe_margins)`, `apply_content_rect(content_margin, viewport_size,
-  safe_margins, bottom_reserved)`: positions a full-rect `MarginContainer` inside the safe area.
+- `get_bottom_reserved(safe_margins)` / `get_overlay_bottom_reserved(safe_margins)`: reserve the
+  bottom-navigation footprint or only the safe-bottom gap respectively.
+- `apply_content_rect(content_margin, viewport_size, safe_margins, bottom_reserved)`: positions a
+  full-rect `MarginContainer` inside the safe area.
 - `is_compact_viewport(viewport_size)`, `get_title_font_size(viewport_size)`.
 - `layout_bottom_navigation(nav, safe_margins)`: positions a `main_menu_bottom_navigation.tscn`
   instance and forwards its safe-bottom margin.
@@ -363,6 +365,8 @@ Depends on:
 
 ## `scripts/shop_screen.gd`
 
+- `ShopScreen` supports destination and in-level-overlay presentation modes without duplicating
+  catalog or purchase logic.
 - Owns Shop loading/error states, creates reusable offer scenes, coordinates one purchase at a time, and routes the shared navigation.
 - Passes purchase results and their offer ids to `PlayerProgress.apply_shop_purchase()`, refreshes
   the visible balance after a grant, and reloads the catalog so a claimed one-time offer disappears.
@@ -378,6 +382,11 @@ Depends on:
   method if one is showing, otherwise returns to Main Menu; `_begin_navigation()` guards
   `_return_to_main_menu()`/`_open_leaderboard()` against a duplicate press while a transition is
   already in flight.
+- In overlay mode it hides `%BottomNavigation`, shows `%OverlayCloseButton`, uses the extra vertical
+  content space, and exposes `open()`/`close()`/`is_transitioning()` plus
+  `close_requested`/`closed`. `handle_back()` closes `%PurchaseDialog` first, then requests return
+  to Ability Purchase through `scripts/level.gd`, regardless of which embedded node receives
+  `ui_cancel` first.
 
 Depends on:
 - `scripts/destination_screen_layout.gd`, `scripts/ui_motion.gd`.
@@ -1511,6 +1520,9 @@ Key responsibilities:
   own `apply_safe_layout(safe_margins, viewport_size)` (UI-003 -- each owns its own safe-area
   fitting instead of `level.gd` reaching into fixed panel sizes and child paths), then scales and
   centers the generated shelf root between them.
+- Keep the insufficient-coins stack paused: Ability Purchase stays beneath
+  `InLevelShopOverlay`; closing the Shop refreshes coins and saved ability inventory, while opening
+  it never spends coins or applies the pending ability.
 - Resize the scene-owned `Background` control. Chapter 1 restores the original procedural wall,
   play wall, baseboard, and floor; chapters configured for `artwork` use
   `Background/ChapterArtwork`. The HUD strip remains scene-owned above either presentation.
@@ -2131,10 +2143,9 @@ Purpose:
   `close_pressed`/`buy_pressed`/`ad_pressed`.
 
 Key methods:
-- `set_offer(ability_texture, price, available_coins)`: sets the icon and price, and switches the
-  Buy button between the shared affordable (`style_box_green_primary_button.tres`) and unaffordable
-  (`style_box_disabled_action_button.tres`) styles -- a deliberate neutral "unavailable" resource,
-  not `modulate.a` dimming as before -- plus the matching pointing-hand/arrow cursor and full/no modulation.
+- `set_offer(ability_texture, price, available_coins)`: sets the icon and price and keeps the green
+  Buy action enabled. When coins are insufficient, its `buy_pressed` signal opens the in-level Shop
+  instead of spending or applying the ability.
 - `is_transitioning()` / `apply_safe_layout(safe_margins, viewport_size)` / `open()` / `close()`.
 
 Behavior notes:

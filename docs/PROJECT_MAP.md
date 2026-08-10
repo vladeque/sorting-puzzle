@@ -344,6 +344,9 @@ Responsibility:
   placement (`scripts/destination_screen_layout.gd`), and a bordered loading/empty/error/Retry
   presentation (`%StatusPanel`) that pulses its message while loading (UI-002,
   `scripts/ui_motion.gd`) and whose Retry button uses `scripts/press_scale_button.gd`.
+- `scenes/ui/in_level_shop_screen.tscn` inherits the Shop presentation in overlay mode: the same
+  catalog/purchase UI without Bottom Navigation, with a safe-area X that returns to Ability
+  Purchase.
 - `%ContentMargin`, `%TitleLabel`, and `%BottomNavigation` stay directly authored in each owning
   screen's own scene rather than inside the shell, because Godot's `%unique_name` lookup cannot
   cross into a child instanced scene and the headless verifiers (`scripts/tools/verify_shop.gd`/
@@ -657,7 +660,14 @@ Responsibility:
   heights, preventing taller inner panels from returning when one modal's content changes.
 - `scripts/press_scale_button.gd` provides the default held-press shrink behavior for every gameplay action, including the pause/settings icon buttons, all four ability buttons, every modal's close button, and the red/green bottom image buttons -- several of these had no press feedback at all before UI-003.
 - `scripts/pause_menu.gd` toggles crossed-out visuals on the three settings icon buttons (located by name, working for both this scene's shell-composed layout and the Main Menu settings popup's own unrelated layout), keeps their saved disabled states synchronized between the main-menu settings popup and in-level pause menu, and emits setting state changes.
-- `scripts/level.gd` opens and closes the menu, pauses the timer and gameplay input, and implements the `ui_cancel` back stack (Leave Confirmation returns to Pause; Ability Purchase restores the state it opened from; Pause resumes) by listening to each overlay's `leave_pressed`/`continue_pressed`/`close_requested` signals instead of reaching into their buttons by child path. Also writes the current run star count into the leave confirmation, initializes gameplay sound effects from the shared setting, and mutes them when the sound-effects button is crossed out.
+- `scripts/level.gd` opens and closes the menu, pauses the timer and gameplay input, and implements
+  the `ui_cancel` back stack (in-level Shop returns to Ability Purchase; Leave Confirmation returns
+  to Pause; Ability Purchase restores the state it opened from; Pause resumes) by listening to each
+  overlay's signals instead of reaching into their buttons by child path. An unaffordable Ability
+  Purchase action opens the inherited Shop overlay without spending coins or applying the ability.
+  The script also writes the current run star count into the leave confirmation, initializes
+  gameplay sound effects from the shared setting, and mutes them when the sound-effects button is
+  crossed out.
 
 Change here when:
 - Restyling the in-level pause popup, adding pause menu actions, or changing pause/resume behavior.

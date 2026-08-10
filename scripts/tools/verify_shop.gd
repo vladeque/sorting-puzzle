@@ -2,6 +2,7 @@ extends Node
 
 const StoreServiceScript := preload("res://scripts/store/store_service.gd")
 const SHOP_SCENE := preload("res://scenes/ui/shop_screen.tscn")
+const IN_LEVEL_SHOP_SCENE := preload("res://scenes/ui/in_level_shop_screen.tscn")
 const COIN_OFFER_ROW_SCENE := preload("res://scenes/ui/shop_coin_offer_row.tscn")
 const GREEN_PRIMARY_STYLE := preload("res://assets/themes/style_box_green_primary_button.tres")
 const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
@@ -84,6 +85,8 @@ func _run() -> void:
 			== load("res://assets/themes/style_box_orange_utility_normal.tres"),
 		"Shop's status Retry button is not using the shared orange utility style resource."
 	)
+
+	await _verify_in_level_shop_variant()
 
 	var bundles := shop.get_node("%BundlesContainer") as VBoxContainer
 	var coin_offers := shop.get_node("%CoinOffersContainer") as VBoxContainer
@@ -306,6 +309,57 @@ func _verify_regional_prices() -> void:
 			str(store.get("formatted_price", "")) == TEST_REGIONS[country_code],
 			"Unexpected mock price for %s." % country_code
 		)
+
+
+func _verify_in_level_shop_variant() -> void:
+	var overlay := IN_LEVEL_SHOP_SCENE.instantiate() as ShopScreen
+	get_tree().root.add_child(overlay)
+	await get_tree().process_frame
+	var navigation := overlay.get_node("%BottomNavigation") as Control
+	var close_button := overlay.get_node("%OverlayCloseButton") as Button
+	_check(not navigation.visible, "In-level Shop should hide BottomNavigation.")
+	_check(close_button.visible, "In-level Shop should show its X close button.")
+
+	var close_requested := [false]
+	overlay.close_requested.connect(func() -> void:
+		close_requested[0] = true
+		overlay.close()
+	)
+	overlay.open()
+	await get_tree().create_timer(0.35).timeout
+	_check(overlay.visible, "In-level Shop did not open.")
+	_check(
+		(overlay.get_node("%BundlesContainer") as VBoxContainer).get_child_count() == 2,
+		"In-level Shop should reuse the destination Shop bundle catalog."
+	)
+	_check(
+		(overlay.get_node("%CoinOffersContainer") as VBoxContainer).get_child_count() == 5,
+		"In-level Shop should reuse the destination Shop coin catalog."
+	)
+	for resolution in TEST_RESOLUTIONS:
+		get_tree().root.size = resolution
+		for _frame in range(3):
+			await get_tree().process_frame
+		var logical_size := overlay.get_viewport_rect().size
+		var content := overlay.get_node("%ContentMargin") as Control
+		_check(content.position.x >= 0.0, "In-level Shop content escaped left at %s." % resolution)
+		_check(
+			content.position.x + content.size.x <= logical_size.x + 1.0,
+			"In-level Shop content escaped right at %s." % resolution
+		)
+		_check(
+			content.position.y + content.size.y <= logical_size.y + 1.0,
+			"In-level Shop content escaped bottom at %s." % resolution
+		)
+	get_tree().root.size = Vector2i(720, 1280)
+	await get_tree().process_frame
+
+	close_button.pressed.emit()
+	await get_tree().create_timer(0.35).timeout
+	_check(bool(close_requested[0]), "In-level Shop X should request close.")
+	_check(not overlay.visible, "In-level Shop X should close the overlay through its owner.")
+	overlay.queue_free()
+	await get_tree().process_frame
 
 
 func _verify_high_tier_coin_offer_icons() -> void:

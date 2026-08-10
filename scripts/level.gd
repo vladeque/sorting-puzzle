@@ -586,7 +586,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	get_viewport().set_input_as_handled()
 	if _in_level_shop_overlay != null and _in_level_shop_overlay.visible:
-		_on_in_level_shop_close_requested()
+		_in_level_shop_overlay.handle_back()
 	elif _leave_confirmation_overlay.visible:
 		_on_leave_confirmation_close_pressed()
 	elif _ability_purchase_overlay != null and _ability_purchase_overlay.visible:

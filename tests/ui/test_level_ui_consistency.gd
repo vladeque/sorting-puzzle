@@ -348,9 +348,9 @@ func _test_completion_and_failure_routing() -> void:
 	failure_level.free()
 
 
-## The full ui_cancel precedence chain: Leave Confirmation -> Pause -> resume; Ability Purchase
-## restores its prior state; Completion/Failure invoke their routes; an in-flight transition drops
-## the press instead of double-navigating.
+## The full ui_cancel precedence chain: in-level Shop -> Ability Purchase, Leave Confirmation ->
+## Pause -> resume; Ability Purchase restores its prior state; Completion/Failure invoke their
+## routes; an in-flight transition drops the press instead of double-navigating.
 func _test_ui_cancel_chain() -> void:
 	var gameplay_level := await _make_level()
 	gameplay_level.call("_unhandled_input", _make_ui_cancel_event())
@@ -384,6 +384,17 @@ func _test_ui_cancel_chain() -> void:
 
 	stack_level.call("_open_ability_purchase_menu", &"hammer")
 	await _wait_seconds(0.35)
+	stack_level.call("_open_in_level_shop")
+	await _wait_seconds(0.35)
+	stack_level.call("_unhandled_input", _make_ui_cancel_event())
+	await _wait_seconds(0.35)
+	_check(
+		not bool(stack_level.get("_in_level_shop_overlay").visible)
+			and bool(stack_level.get("_ability_purchase_overlay").visible)
+			and not bool(stack_level.get("_pause_menu_overlay").visible),
+		"ui_cancel on the in-level Shop should return to Ability Purchase first."
+	)
+
 	stack_level.call("_unhandled_input", _make_ui_cancel_event())
 	await _wait_seconds(0.35)
 	_check(

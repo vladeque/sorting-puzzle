@@ -14,8 +14,7 @@ signal buy_pressed
 signal ad_pressed
 
 const GameplayUIThemeScript := preload("res://scripts/gameplay_ui_theme.gd")
-const AFFORDABLE_BUY_STYLE := preload("res://assets/themes/style_box_green_primary_button.tres")
-const UNAFFORDABLE_BUY_STYLE := preload("res://assets/themes/style_box_disabled_action_button.tres")
+const BUY_STYLE := preload("res://assets/themes/style_box_green_primary_button.tres")
 const CONTENT_REGION_HEIGHT := 224.0
 
 @onready var _shell := %Shell as GameplayModalShell
@@ -47,24 +46,19 @@ func _ready() -> void:
 	_watch_ad_button.visible = OS.is_debug_build()
 
 
-func set_offer(ability_texture: Texture2D, price: int, available_coins: int) -> void:
+func set_offer(ability_texture: Texture2D, price: int, _available_coins: int) -> void:
 	_ability_icon.texture = ability_texture
 	_price_label.text = str(maxi(price, 0))
 
-	var can_afford := available_coins >= price
-	_buy_button.disabled = not can_afford
+	# This remains an actionable price button when the player is short on coins: Level routes that
+	# press to the in-level Shop instead of treating it as an inert unavailable action.
+	_buy_button.disabled = false
 	_buy_button.modulate = Color.WHITE
-	_buy_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND if can_afford else Control.CURSOR_ARROW
-
-	# A deliberate neutral "unavailable" resource, not alpha-only styling, so an unaffordable Buy
-	# reads and behaves as inert rather than a dimmed version of the positive action. Explicitly
-	# typed StyleBox: the two branches are different concrete StyleBox subclasses (StyleBoxTexture
-	# vs StyleBoxFlat), and this project's strict GDScript warnings reject an inferred Variant.
-	var style: StyleBox = AFFORDABLE_BUY_STYLE if can_afford else UNAFFORDABLE_BUY_STYLE
-	_buy_button.add_theme_stylebox_override("normal", style)
-	_buy_button.add_theme_stylebox_override("pressed", style)
-	_buy_button.add_theme_stylebox_override("hover", style)
-	_buy_button.add_theme_stylebox_override("disabled", style)
+	_buy_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	_buy_button.add_theme_stylebox_override("normal", BUY_STYLE)
+	_buy_button.add_theme_stylebox_override("pressed", BUY_STYLE)
+	_buy_button.add_theme_stylebox_override("hover", BUY_STYLE)
+	_buy_button.add_theme_stylebox_override("disabled", BUY_STYLE)
 
 
 func is_transitioning() -> bool:

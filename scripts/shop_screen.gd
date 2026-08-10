@@ -1,4 +1,13 @@
 extends Control
+class_name ShopScreen
+
+signal close_requested
+signal closed
+
+enum PresentationMode {
+	DESTINATION,
+	IN_LEVEL_OVERLAY,
+}
 
 const StoreServiceScript := preload("res://scripts/store/store_service.gd")
 const DestinationScreenLayoutScript := preload("res://scripts/destination_screen_layout.gd")
@@ -26,6 +35,8 @@ const ABILITY_INFO := {
 	},
 }
 
+@export var presentation_mode := PresentationMode.DESTINATION
+
 @onready var _destination_shell := %DestinationShell as Control
 @onready var _content_margin := %ContentMargin as MarginContainer
 @onready var _title_label := %TitleLabel as Label
@@ -38,28 +49,95 @@ const ABILITY_INFO := {
 @onready var _status_panel := %StatusPanel as Control
 @onready var _purchase_dialog := %PurchaseDialog as Control
 @onready var _bottom_navigation := %BottomNavigation as MarginContainer
+@onready var _overlay_close_button := %OverlayCloseButton as Button
 
 var _store_service = StoreServiceScript.new()
 var _offer_views: Array[Control] = []
 var _purchase_in_progress := false
 var _load_request_serial := 0
 var _is_navigating := false
+var _is_overlay_transitioning := false
 
 
 func _ready() -> void:
-	UIMotionScript.fade_in(self)
 	PlayerProgress.load_progress()
 	_status_panel.connect("retry_pressed", Callable(self, "_load_shop"))
-	_bottom_navigation.connect("shop_pressed", Callable(self, "_on_shop_tab_reselected"))
-	_bottom_navigation.connect("home_pressed", Callable(self, "_return_to_main_menu"))
-	_bottom_navigation.connect("leaderboard_pressed", Callable(self, "_open_leaderboard"))
-	if _bottom_navigation.has_method("set_active_tab"):
-		_bottom_navigation.call("set_active_tab", &"shop")
+	_overlay_close_button.pressed.connect(_request_overlay_close)
+	var is_overlay := presentation_mode == PresentationMode.IN_LEVEL_OVERLAY
+	_bottom_navigation.visible = not is_overlay
+	_overlay_close_button.visible = is_overlay
+	if is_overlay:
+		hide()
+		modulate = Color.WHITE
+	else:
+		UIMotionScript.fade_in(self)
+		_bottom_navigation.connect("shop_pressed", Callable(self, "_on_shop_tab_reselected"))
+		_bottom_navigation.connect("home_pressed", Callable(self, "_return_to_main_menu"))
+		_bottom_navigation.connect("leaderboard_pressed", Callable(self, "_open_leaderboard"))
+		if _bottom_navigation.has_method("set_active_tab"):
+			_bottom_navigation.call("set_active_tab", &"shop")
 	get_viewport().size_changed.connect(_apply_responsive_layout)
 	_destination_shell.call("set_background_for_chapter", PlayerProgress.get_selected_chapter_id())
 	_update_coin_balance()
 	_apply_responsive_layout()
+	if not is_overlay:
+		_load_shop.call_deferred()
+
+
+func open() -> void:
+	if presentation_mode != PresentationMode.IN_LEVEL_OVERLAY or visible or _is_overlay_transitioning:
+		return
+
+	_is_overlay_transitioning = true
+	_purchase_dialog.hide()
+	_purchase_dialog.modulate = Color.WHITE
+	_update_coin_balance()
+	_apply_responsive_layout()
+	show()
 	_load_shop.call_deferred()
+	var tween := UIMotionScript.fade_in(self)
+	await tween.finished
+	if is_instance_valid(self):
+		_is_overlay_transitioning = false
+
+
+func close() -> void:
+	if presentation_mode != PresentationMode.IN_LEVEL_OVERLAY or not visible or _is_overlay_transitioning:
+		return
+
+	_is_overlay_transitioning = true
+	var tween := UIMotionScript.fade_out(self)
+	await tween.finished
+	if not is_instance_valid(self):
+		return
+	hide()
+	modulate = Color.WHITE
+	_is_overlay_transitioning = false
+	closed.emit()
+
+
+func is_transitioning() -> bool:
+	return _is_overlay_transitioning
+
+
+func _request_overlay_close() -> void:
+	if (
+		presentation_mode != PresentationMode.IN_LEVEL_OVERLAY
+		or _is_overlay_transitioning
+		or _purchase_in_progress
+	):
+		return
+	close_requested.emit()
+
+
+func handle_back() -> void:
+	if _purchase_dialog.visible:
+		_purchase_dialog.call("close")
+		return
+	if presentation_mode == PresentationMode.IN_LEVEL_OVERLAY:
+		_request_overlay_close()
+		return
+	_return_to_main_menu()
 
 
 func _load_shop() -> void:
@@ -128,6 +206,7 @@ func _purchase_offer(offer_id: StringName) -> void:
 		return
 
 	_purchase_in_progress = true
+	_set_overlay_close_locked(true)
 	_set_offers_locked(true, offer_id)
 	var purchase_result: Dictionary = await _store_service.purchase_offer(offer_id)
 	if not bool(purchase_result.get("ok", false)):
@@ -137,6 +216,7 @@ func _purchase_offer(offer_id: StringName) -> void:
 			str(purchase_result.get("error", "The mock purchase could not be completed."))
 		)
 		_purchase_in_progress = false
+		_set_overlay_close_locked(false)
 		_set_offers_locked(false)
 		return
 
@@ -160,6 +240,7 @@ func _purchase_offer(offer_id: StringName) -> void:
 		)
 
 	_purchase_in_progress = false
+	_set_overlay_close_locked(false)
 	if bool(grant_result.get("ok", false)):
 		await _load_shop()
 	else:
@@ -195,6 +276,15 @@ func _set_offers_locked(is_locked: bool, active_offer_id: StringName = &"") -> v
 		view.call("set_shop_locked", is_locked, is_active)
 
 
+func _set_overlay_close_locked(is_locked: bool) -> void:
+	if presentation_mode != PresentationMode.IN_LEVEL_OVERLAY:
+		return
+	_overlay_close_button.disabled = is_locked
+	_overlay_close_button.mouse_default_cursor_shape = (
+		Control.CURSOR_ARROW if is_locked else Control.CURSOR_POINTING_HAND
+	)
+
+
 func _clear_offers() -> void:
 	for view in _offer_views:
 		if is_instance_valid(view):
@@ -224,11 +314,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 
 	get_viewport().set_input_as_handled()
-	if _purchase_dialog.visible:
-		_purchase_dialog.call("close")
-		return
-
-	_return_to_main_menu()
+	handle_back()
 
 
 func _apply_responsive_layout() -> void:
@@ -237,13 +323,19 @@ func _apply_responsive_layout() -> void:
 		return
 
 	var safe_margins := DestinationScreenLayoutScript.get_safe_area_margins(viewport_size)
+	var bottom_reserved := (
+		DestinationScreenLayoutScript.get_overlay_bottom_reserved(safe_margins)
+		if presentation_mode == PresentationMode.IN_LEVEL_OVERLAY
+		else DestinationScreenLayoutScript.get_bottom_reserved(safe_margins)
+	)
 	DestinationScreenLayoutScript.apply_content_rect(
 		_content_margin,
 		viewport_size,
 		safe_margins,
-		DestinationScreenLayoutScript.get_bottom_reserved(safe_margins)
+		bottom_reserved
 	)
-	DestinationScreenLayoutScript.layout_bottom_navigation(_bottom_navigation, safe_margins)
+	if presentation_mode == PresentationMode.DESTINATION:
+		DestinationScreenLayoutScript.layout_bottom_navigation(_bottom_navigation, safe_margins)
 
 	_title_label.add_theme_font_size_override(
 		"font_size", DestinationScreenLayoutScript.get_title_font_size(viewport_size)

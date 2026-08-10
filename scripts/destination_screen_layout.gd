@@ -48,6 +48,12 @@ static func get_bottom_reserved(safe_margins: Vector4) -> float:
 	return BOTTOM_NAVIGATION_HEIGHT + maxf(safe_margins.w, 0.0) + CONTENT_BOTTOM_GAP
 
 
+## Logical pixels reserved below content when a destination-style screen is presented without the
+## shared bottom navigation, such as the in-level Shop overlay.
+static func get_overlay_bottom_reserved(safe_margins: Vector4) -> float:
+	return maxf(safe_margins.w, 0.0) + CONTENT_BOTTOM_GAP
+
+
 ## Positions `content_margin` (a full-rect MarginContainer) inside the safe area, centered up to
 ## CONTENT_MAX_WIDTH, leaving `bottom_reserved` logical pixels clear at the bottom.
 static func apply_content_rect(

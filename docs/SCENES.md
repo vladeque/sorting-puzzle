@@ -126,7 +126,8 @@ navigate a screen away:
 - Chapter Selection (`scripts/chapters/chapter_selection_screen.gd`) closes itself; this is
   unchanged from before UI-002.
 - Shop (`scripts/shop_screen.gd`) closes an open purchase-result dialog first if one is showing;
-  otherwise it returns to Main Menu.
+  otherwise the destination Shop returns to Main Menu and the in-level Shop variant returns to
+  Ability Purchase.
 - Leaderboard (`scripts/leaderboard_screen.gd`) has no overlay of its own, so `ui_cancel` always
   returns to Main Menu.
 - Main Menu (`scripts/production_main_menu.gd`) closes whichever of the profile modal, settings
@@ -242,10 +243,11 @@ ignore duplicate input until a fade settles. Owner wrappers also verify that the
 closed before hiding their root, so an interrupted close cannot hide a freshly reopened modal.
 
 **`ui_cancel` back stack** -- `scripts/level.gd::_unhandled_input()` (there was no back-button
-handling at all during gameplay before this ticket) implements one topmost-state-first order: Leave
-Confirmation returns to Pause; Ability Purchase closes and restores the state it opened from (Pause
-if opened from Pause, otherwise resumes gameplay); Pause resumes; Completion invokes its `Continue`
-route and Failure its `Main Menu` route; otherwise (active gameplay) opens Pause. Every branch
+handling at all during gameplay before this ticket) implements one topmost-state-first order: the
+in-level Shop returns to Ability Purchase; Leave Confirmation returns to Pause; Ability Purchase
+closes and restores the state it opened from (Pause if opened from Pause, otherwise resumes
+gameplay); Pause resumes; Completion invokes its `Continue` route and Failure its `Main Menu`
+route; otherwise (active gameplay) opens Pause. Every branch
 reuses the exact handler its equivalent button already calls, so it can never spend a life, coin, or
 star by itself, and a press during any overlay/result screen's in-flight transition is dropped
 rather than acted on.
@@ -648,7 +650,9 @@ Script:
 - `scripts/shop_screen.gd`
 
 Purpose:
-- Owns the dedicated Shop destination with the `Shop` title, live coin balance, scrollable bundle and coin-offer sections, loading/error states, purchase result dialog, and shared bottom navigation.
+- Owns the reusable Shop presentation with the `Shop` title, live coin balance, scrollable bundle
+  and coin-offer sections, loading/error states, and purchase result dialog. Destination mode shows
+  shared bottom navigation; in-level overlay mode hides it and shows `%OverlayCloseButton`.
 - Builds offer views from `StoreService.load_catalog()`, which sources offers from `configs/shop_catalog.json` by default or from the authenticated backend development catalog when `application/config/shop_catalog_source` is `backend` (GAME-008), and always attaches the mock provider's formatted regional prices.
 - Centers content to a 720-pixel maximum logical width, compacts offers below 1100 logical pixels high, and applies mobile safe-area margins through `scripts/destination_screen_layout.gd` (shared with Leaderboard).
 - Follows the selected chapter's background through `%DestinationShell` (`scenes/ui/destination_screen_shell.tscn`) instead of a fixed Chapter 1 image.
@@ -657,15 +661,30 @@ Purpose:
   `%PurchaseDialog` first if one is showing, otherwise returns to Main Menu; a duplicate
   cross-destination press while a scene transition is in flight is ignored (see "Shared Interaction
   Roles" above).
+- In-level overlay mode exposes `open()`/`close()`/`is_transitioning()`, emits
+  `close_requested`/`closed`, and reserves only the safe-bottom inset instead of the absent bottom
+  navigation. Its X and `ui_cancel` both return through the Level-owned overlay stack.
 
 Important nodes:
 - `%DestinationShell`: shared fullscreen background + shade.
+- `%OverlayCloseButton`: safe-area-contained red circular X, hidden in destination mode and shown
+  in in-level overlay mode.
 - `%StatusPanel`: shared loading/error presentation (`scenes/ui/destination_status_panel.tscn`);
   the former "no offers for this region" case still resolves to the Retry-bearing error state.
 
 Runtime children:
 - `shop_bundle_card.tscn` for each bundle.
 - `shop_coin_offer_row.tscn` for each coin-only offer.
+
+## `scenes/ui/in_level_shop_screen.tscn`
+
+- Dedicated inherited Shop variant configured with `ShopScreen.IN_LEVEL_OVERLAY`.
+- Instanced by `level.tscn` above Ability Purchase when the player presses its coin-price action
+  without enough coins.
+- Reuses the exact destination Shop catalog, StoreService purchase flow, balance widget, offer
+  scenes, selected-chapter background, loading/error state, and purchase-result dialog.
+- Has no Bottom Navigation; X/system back closes it and restores Ability Purchase without spending
+  coins or applying the pending ability.
 
 ## `scenes/ui/shop_bundle_card.tscn`
 
@@ -1097,6 +1116,8 @@ Important nodes:
 - `UI/PauseMenuOverlay`: `scenes/pause_menu.tscn` instance used for the modal pause menu.
 - `UI/LeaveConfirmationOverlay`: `scenes/leave_confirmation_menu.tscn` instance shown after the pause menu's Leave button, before spending a campaign life and returning to the menu.
 - `UI/AbilityPurchaseOverlay`: `scenes/ability_purchase_menu.tscn` instance shown when the player taps an ability with zero saved uses remaining.
+- `UI/InLevelShopOverlay`: `scenes/ui/in_level_shop_screen.tscn` instance shown above Ability
+  Purchase when its configured coin price is unaffordable.
 
 Runtime-created nodes:
 - `ShelfXX`: `scenes/shelf.tscn` instances generated under `Shelves`.
@@ -1114,6 +1135,7 @@ Depends on:
 - `scenes/pause_menu.tscn`
 - `scenes/leave_confirmation_menu.tscn`
 - `scenes/ability_purchase_menu.tscn`
+- `scenes/ui/in_level_shop_screen.tscn`
 - `scenes/ui/ability_bar.tscn`
 - `assets/audio/*.wav`
 - `configs/item_sprites.json`
@@ -1187,9 +1209,9 @@ Important nodes:
 - `PurchaseContent`: reparented into `Shell`'s compact 224px content region at `_ready()`; holds
   `AbilitySlot` (`style_box_gameplay_item_slot.tres`) and `%AbilityIcon`.
 - `%BuyButton`: reparented into `Shell`'s action row; its child `PriceRow` shows the canonical
-  `assets/ui/clover_coin_transparent_96x96.png` and the configured price. `set_offer()` switches its
-  style between the shared affordable (green) and unaffordable (neutral disabled) resources rather
-  than dimming with `modulate.a`.
+  `assets/ui/clover_coin_transparent_96x96.png` and the configured price. It remains an enabled
+  green action when unaffordable so `scripts/level.gd` can open the in-level Shop; only a successful
+  paid-use preflight spends coins or applies the ability.
 - `%WatchAdButton`: reparented into `Shell`'s action row; always `disabled = true` with `"Coming
   Soon"` text and the shared disabled style, `visible` set to `OS.is_debug_build()` at `_ready()` --
   hidden in production, visible-but-inert in a debug build. Never an enabled no-op.

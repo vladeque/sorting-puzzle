@@ -122,6 +122,10 @@ scripts own their data and signals. Remove fixed modal sizes and internal child-
   resumes gameplay; `Leave` keeps the existing life-spend and return behavior.
 - Move the settings cross-out presentation into the scene/shared component.
 
+Later economy-flow note: the in-level Shop follow-up supersedes the unaffordable Buy action above.
+The coin-price action now remains enabled so a press can open the Shop overlay; insufficient coins
+still never spend currency or apply the ability.
+
 ### 5. Unify Terminal Result Screens
 
 - Extract `scenes/ui/level_failure_screen.tscn` and a focused script.

@@ -166,9 +166,44 @@ func _test_paid_use_and_persistence() -> void:
 	_check(progress.spend_coins(150), "fixture reduces balance below the Freezer price")
 	level.call("_open_ability_purchase_menu", ABILITY_FREEZER)
 	await create_timer(0.35).timeout
+	var buy_button := level.get("_ability_purchase_overlay").find_child("BuyButton", true, false) as Button
+	_check(not buy_button.disabled, "unaffordable ability price remains actionable")
 	level.call("_on_ability_purchase_buy_pressed")
+	await create_timer(0.35).timeout
 	_check(progress.get_coins() == 50, "insufficient-coins attempt spends nothing")
 	_check(not bool(level.call("_is_freezer_active")), "insufficient coins do not activate Freezer")
+	var in_level_shop = level.get("_in_level_shop_overlay")
+	_check(bool(in_level_shop.visible), "insufficient coins open the in-level Shop")
+	_check(
+		not bool((in_level_shop.get_node("%BottomNavigation") as Control).visible),
+		"in-level Shop hides BottomNavigation"
+	)
+	_check(
+		bool((in_level_shop.get_node("%OverlayCloseButton") as Control).visible),
+		"in-level Shop shows its X close button"
+	)
+	_check(
+		bool(level.get("_ability_purchase_overlay").visible),
+		"Ability Purchase remains beneath the in-level Shop"
+	)
+	in_level_shop.call("_purchase_offer", &"coins_100")
+	await create_timer(0.35).timeout
+	_check(progress.get_coins() == 150, "in-level Shop coin purchase updates the saved balance")
+	var purchase_dialog := in_level_shop.get_node("%PurchaseDialog") as Control
+	_check(purchase_dialog.visible, "in-level Shop shows the shared purchase result dialog")
+	purchase_dialog.call("close")
+	await create_timer(0.25).timeout
+	level.call("_on_in_level_shop_close_requested")
+	await create_timer(0.35).timeout
+	_check(not bool(in_level_shop.visible), "closing the in-level Shop hides it")
+	_check(
+		bool(level.get("_ability_purchase_overlay").visible),
+		"closing the in-level Shop returns to Ability Purchase"
+	)
+	level.call("_on_ability_purchase_buy_pressed")
+	await create_timer(0.35).timeout
+	_check(bool(level.call("_is_freezer_active")), "refilled coins allow the pending paid ability")
+	_check(progress.get_coins() == 50, "refilled paid ability spends its configured price exactly once")
 
 	progress.load_progress()
 	_check(progress.get_coins() == 50, "paid-use coin spend survives restart")
