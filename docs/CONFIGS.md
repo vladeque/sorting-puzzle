@@ -165,17 +165,45 @@ Shelf shape:
 ```
 
 Layer rules:
+- `type` is optional and defaults to `standard`. The only other value is `dispenser`.
 - `unlock_after_triples` is optional. Omit it or set `0` for shelves that are accessible at level start.
 - A positive `unlock_after_triples` keeps the shelf inaccessible until the player has cleared that many triples.
 - Each shelf must contain a non-empty `layers` array.
-- Each layer must contain exactly three slots.
+- Each layer must contain exactly as many slots as the shelf type has: three for `standard`, one for `dispenser`.
 - Slot values must be item ID strings or `null`.
 - Layer `0` is the visible front layer.
 - Later layers are hidden or previewed back layers that promote when the front layer clears.
 
+Dispenser shelf shape:
+
+```json
+{
+  "type": "dispenser",
+  "layers": [["milk_carton"], ["chips_can_classic"], ["toy_robot"]]
+}
+```
+
+Dispenser rules:
+- A dispenser is a narrow, source-only shelf: the player can take the item on display but can never
+  place onto it, so its authored queue is the only route its items take to the board.
+- Between `2` and `4` layers, each exactly one slot wide.
+- No `null` slots. A hole in a queue has nothing to hand out and nothing can move into it.
+- The green indicator underneath shows one socket per authored item and counts the items still on the
+  shelf, the one on display included. Taking an item darkens one socket; promoting the next item does
+  not, because that item is still on the shelf.
+- `unlock_after_triples` works the same as on a standard shelf.
+- Not supported inside moving rows, which step and wrap on a single uniform cell width. The runtime
+  warns and falls back to a standard shelf, the same way it handles locked shelves in moving rows.
+- Hammer and shuffle skip dispensers so the authored queue survives; highlight still outlines the
+  item on display.
+- In `row_layouts`, a row holding a dispenser reserves extra height so the indicator clears the row
+  below, and the row packs by each cell's own width so the narrow shelf sits flush against its
+  neighbours. Under `layout_preset` marker placement the markers are authored, so the preset author
+  is responsible for leaving room.
+
 Item count rules:
-- Each item ID should appear in a multiple of three across the level.
-- The runtime clears three identical visible items on one shelf.
+- Each item ID should appear in a multiple of three across the level, dispenser items included.
+- The runtime clears three identical visible items on one standard shelf; dispensers never match.
 
 Runtime behavior:
 - `scripts/level.gd` instantiates one `scenes/shelf.tscn` cell for each configured shelf.
@@ -195,6 +223,12 @@ py scripts\tools\validate_level_solvable.py configs\levels\level_001.json --max-
 ```
 
 The validator checks `row_layouts` totals, moving-row motion fields, supported visual variants, rejects locked shelves inside moving rows, and rejects levels that mix horizontal and vertical moving shelves. For preset-defined moving rows, the validator mirrors the moving-row metadata from the matching layout template.
+
+Shelf kind is part of the search state: layer width comes from the kind, dispensers are validated as
+2-4 single-item layers with no holes, and the search treats them as move sources but never as move
+targets. Matching is gated on the kind for a reason worth keeping -- a dispenser layer is one slot
+wide, so "every slot holds the same item" is trivially true for it, and an ungated settle step would
+clear every dispenser on sight, hand out free triples, and report unsolvable boards as solvable.
 Solvability search treats moving rows as eventually accessible and does not model shelf positions over time.
 
 Generation:
@@ -233,6 +267,18 @@ Use `--locked-shelves` to add unlock requirements to generated shelves. Entries 
 ```powershell
 py scripts\tools\generate_level_shelves.py --shelf-count 9 --layer-count 2 --difficulty medium --locked-shelves 7:3,8:5 --validate
 ```
+
+Use `--dispenser-shelves` to add source-only dispenser shelves. Entries are 1-based positions and
+layer counts (`2` to `4`), and they count against `--shelf-count`:
+
+```powershell
+py scripts\tools\generate_level_shelves.py --shelf-count 11 --layer-count 2 --item-type-count 7 --difficulty medium --dispenser-shelves 10:3,11:2 --require-solvable
+```
+
+The distribution engine is untouched: it lays out only the standard shelves, and the queues are then
+stocked by relocating items out of the deepest layers, so every item ID keeps the multiple-of-three
+count it was given. Because relocation can change whether a board is winnable, pair the flag with
+`--require-solvable` so the search re-runs afterwards instead of assuming a solution survived.
 
 ## `configs/reward_chest_goals.json`
 

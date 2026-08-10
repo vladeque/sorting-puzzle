@@ -1773,6 +1773,19 @@ Important exports:
 - `back_layer_item_scale`: scale multiplier for back-layer item previews.
 - `back_layer_item_modulate`: color used for visible back-layer previews.
 
+Shelf-type capabilities (all permissive here; `scripts/dispenser_shelf.gd` is the first type to
+override any of them). `scripts/level.gd` branches on these rather than on the shelf's class, so a
+new shelf type only overrides what actually differs:
+- `get_base_cell_size()`: cell footprint before `SHELF_CELL_VISUAL_SCALE`; drives row packing.
+- `get_visual_bounds()`: everything the shelf draws, for the responsive board fit. May exceed the cell.
+- `get_slot_count()`: front slots, and therefore the width of every layer in this shelf's config.
+- `accepts_dropped_items()`: whether a carried item may be placed here. Separate from being a valid
+  pick-up source -- see `_is_slot_move_source_eligible()`/`_is_slot_drop_target_eligible()` in `scripts/level.gd`.
+- `forms_triples()`: whether a full front layer of identical items clears.
+- `allows_ability_modification()`: whether hammer may destroy or shuffle may rewrite these items.
+  Read-only abilities such as highlight ignore it.
+- `shows_back_layer_preview()`: whether the first back layer is previewed as dimmed art.
+
 Key methods:
 - `set_visual_variant(visual_variant)`: applies `full` or `floor_only` shelf presentation and records the active variant as metadata for `scripts/level.gd` shelf edge and cast-shadow visibility checks.
 - `get_visual_variant()`: returns the active shelf visual variant.
@@ -1791,6 +1804,70 @@ Depends on:
 
 Do not use for:
 - Level JSON parsing, item identity assignment, matching, abilities, lock progression, or promotion timing. Those stay in `scripts/level.gd`.
+
+## `scripts/dispenser_shelf.gd`
+
+Class:
+- `DispenserShelf` (extends `Shelf`)
+
+Attached to:
+- `scenes/dispenser_shelf.tscn` root `DispenserShelf`.
+
+Purpose:
+- A source-only shelf: one item slot, 2-4 stacked layers, and a segmented indicator underneath
+  counting the items still on it, the one on display included.
+- Reuses `Shelf`'s back-layer machinery for the queue -- with a single front slot, "one hidden item
+  per layer, promoted when the front layer empties" already is a dispenser, so there is no separate
+  stacking system.
+- Owns the authoritative remaining count and forwards it to `LayerIndicator`.
+
+Capability overrides:
+- `get_base_cell_size()` -> `DISPENSER_BASE_CELL_SIZE` (96x135, about 43% of a standard cell -- the
+  narrowest that fits the canonical item silhouette without clipping).
+- `get_visual_bounds()` -> `VISUAL_BOUNDS`, taller than the cell because the indicator hangs below.
+- `get_slot_count()` -> `1`; `accepts_dropped_items()`, `forms_triples()`,
+  `allows_ability_modification()`, and `shows_back_layer_preview()` all return `false`.
+- `set_row_placement()` and `set_top_ceiling_cap_visible()` are pinned: the frame is self-contained
+  rather than sharing edges with neighbours.
+- Constants are named `DISPENSER_BASE_CELL_SIZE`/`DISPENSER_SLOT_COUNT` because GDScript does not
+  let a subclass reuse a parent constant's name.
+
+Key methods:
+- `set_capacity(capacity)`: sets socket count and lights them all; called once from the level config.
+- `take_one()` / `set_remaining_count(remaining)`: records that an item left for good.
+- `get_capacity()` / `get_remaining_count()`.
+
+Why the count is state rather than derived: a carried item is reparented out of its slot for the
+length of a drag, so a shelf counting its own children would read as emptied the moment the player
+picked the item up, and would have to count back up if they dropped it somewhere invalid.
+`scripts/level.gd` calls `take_one()` exactly once per committed move onto a different shelf.
+
+Do not use for:
+- Level JSON parsing, move validation, or ability targeting. Those stay in `scripts/level.gd`.
+
+## `scripts/shelf_layer_indicator.gd`
+
+Class:
+- `ShelfLayerIndicator`
+
+Attached to:
+- `scenes/shelf_layer_indicator.tscn` root `ShelfLayerIndicator`.
+
+Purpose:
+- Segmented readout of how many items a dispenser still holds. Knows nothing about matching, moves,
+  or the level -- `scripts/level.gd` talks to the shelf, never to the indicator.
+- Generates the socket row rather than authoring it, because the socket count comes from the level
+  config (2-4) and the sockets share a fixed track width, so their size depends on how many there
+  are. Only the count badge's label is authored in the scene.
+
+Key methods:
+- `configure(capacity, remaining)`: rebuilds the sockets and snaps to a state.
+- `set_remaining(remaining)`: a decrease animates the socket that just emptied and pulses the badge;
+  anything else snaps, since nothing in the game grows a dispenser back.
+- `get_capacity()` / `get_remaining()`.
+
+Depends on:
+- `scripts/ui_motion.gd` for the deplete and badge-pulse tweens.
 
 ## `scripts/shelf_layout_row.gd`
 

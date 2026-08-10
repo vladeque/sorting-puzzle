@@ -60,6 +60,13 @@ func allows_ability_modification() -> bool:
 	return false
 
 
+## One item on display at a time. The indicator already says how many are left, and a dimmed preview
+## of the next item reads as a second item sitting on a shelf that only has one slot -- on a cell
+## this narrow it also spills past the frame onto the neighbouring shelf.
+func shows_back_layer_preview() -> bool:
+	return false
+
+
 ## Row placement paints the shared left/middle/right edges that let neighbouring cells butt against
 ## each other. A dispenser carries its own complete frame, so it stays neutral wherever it sits.
 func set_row_placement(_placement: String) -> void:

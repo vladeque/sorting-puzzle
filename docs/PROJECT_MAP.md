@@ -573,7 +573,9 @@ Files:
 - `scripts/shelf.gd`
 
 Responsibility:
-- Defines the reusable shelf cell visuals, front slots, and item snap markers.
+- Defines the reusable *standard* shelf cell visuals, front slots, and item snap markers. The narrow
+  source-only variant lives in `scenes/dispenser_shelf.tscn` -- see "Dispenser Shelf" below.
+- `scripts/shelf.gd` owns the shelf-type capability surface every shelf type answers.
 - Owns generated back-layer slot layout and preview styling defaults.
 - Contains the visible back wall, opaque non-compounding interior/cast shadows, wood floor, frame, floor lip, floor grain nodes, and hidden top edge details shown by `scripts/level.gd` for shelves with no stacked neighbor above. Shelf cast shadows draw below generated back-layer item previews and remain enabled for full shelves so neighboring shelf bodies and items cover them.
 - Contains the hidden lock overlay used by triple-gated shelves; `scripts/level.gd` toggles it, fits the remaining count onto the lock center panel, pulses that count on a decrease, and plays a one-shot fade/scale when the shelf unlocks (UI-003 P3) without delaying the shelf's actual input availability.
@@ -581,6 +583,44 @@ Responsibility:
 
 Change here when:
 - Editing shelf visual details, back-layer preview presentation, locked shelf overlay visuals, front slot positions, item snap marker positions, or cell art node names.
+
+### Dispenser Shelf
+
+Files:
+- `scenes/dispenser_shelf.tscn`, `scripts/dispenser_shelf.gd`
+- `scenes/shelf_layer_indicator.tscn`, `scripts/shelf_layer_indicator.gd`
+- `scripts/shelf.gd`
+- `scripts/level.gd`
+- `scripts/tools/validate_level_solvable.py`, `scripts/tools/generate_level_shelves.py`
+- `tests/gameplay/test_dispenser_shelf.gd`, `tests/tools/test_validate_level_solvable.py`
+
+Responsibility:
+- A second shelf type: a narrow one-slot cell holding 2-4 stacked layers that the player can take
+  from but never place onto, with a segmented indicator underneath counting the items still on it,
+  the one on display included.
+- The queue is not a separate stacking system. `Shelf`'s back-layer machinery already models "one
+  hidden item per layer, promoted when the front layer empties", and with a single front slot that
+  is exactly a dispenser.
+- `scripts/shelf.gd` exposes the shelf-type capability surface (`get_base_cell_size()`,
+  `get_visual_bounds()`, `get_slot_count()`, `accepts_dropped_items()`, `forms_triples()`,
+  `allows_ability_modification()`, `shows_back_layer_preview()`), so `scripts/level.gd` branches on
+  what a shelf can do rather than on its class. Shelf identity is `node is Shelf`, not a slot count.
+- Taking and placing are separate permissions in `scripts/level.gd`
+  (`_is_slot_move_source_eligible()` vs `_is_slot_drop_target_eligible()`): a dispenser passes the
+  first and fails the second.
+- The remaining count is authoritative state decremented once per committed move onto another shelf,
+  never derived from live nodes -- a carried item is reparented out of its slot for the length of a
+  drag. See `_record_dispenser_item_taken()`.
+- Hammer and shuffle skip dispensers so the authored queue survives; highlight still reads them.
+- Static `row_layouts` rows pack by each cell's own width, and a row holding a dispenser reserves
+  `DISPENSER_ROW_EXTRA_HEIGHT` so the indicator clears the row below. Not supported inside moving
+  rows, which step and wrap on one uniform cell width.
+- No campaign level uses dispensers yet; the mechanic is reachable only through a level config that
+  opts in with `"type": "dispenser"`.
+
+Change here when:
+- Adding shelf types, changing dispenser capacity/indicator presentation, changing which abilities
+  may touch which shelf types, or changing mixed-width row packing.
 
 ### Item Runtime
 

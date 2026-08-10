@@ -1700,6 +1700,54 @@ Depends on:
 Do not use for:
 - Level timing, matching, input handling, lock progression, item identity assignment, or back-layer promotion timing. Those stay in `scripts/level.gd`.
 
+## `scenes/dispenser_shelf.tscn`
+
+Root:
+- `DispenserShelf` (`Node2D`)
+
+Script:
+- `scripts/dispenser_shelf.gd`
+
+Purpose:
+- The narrow, source-only shelf type: one item slot, 2-4 stacked layers, and a `LayerIndicator`
+  underneath showing how many items are left. Instantiated by `scripts/level.gd` for any level-config
+  shelf with `"type": "dispenser"`.
+- Carries a complete self-contained frame (both side walls plus its own ceiling cap) instead of the
+  `PlacementVisuals` left/middle/right variants standard cells share with their neighbours, so it
+  reads as a standalone unit wherever it sits in a row.
+
+Important nodes:
+- `BackWall`, `BackWallTopShade`, `BackWallLeftShade`, `LeftWall`, `RightWall`, `Ceiling`,
+  `TopCeilingCap`, `FloorSurface`, `FloorFrontLip`, `FloorGrain*`: the same art vocabulary as
+  `scenes/shelf.tscn`, narrowed to the 96-wide cell.
+- `LayerIndicator`: `scenes/shelf_layer_indicator.tscn` instance positioned below the floor lip.
+- `LockedOverlay`: same role as the standard shelf's, re-proportioned for the narrow cell.
+- `Slot01`/`Slot01/ItemSlot01`: the single front slot and its snap marker, at the same vertical
+  position as a standard shelf's so items rest identically.
+
+Depends on:
+- `assets/ui/lock_shelf_cutout.png`, `scenes/shelf_layer_indicator.tscn`.
+
+Do not use for:
+- Move validation, ability targeting, or queue promotion timing. Those stay in `scripts/level.gd`.
+
+## `scenes/shelf_layer_indicator.tscn`
+
+Root:
+- `ShelfLayerIndicator` (`Node2D`)
+
+Script:
+- `scripts/shelf_layer_indicator.gd`
+
+Purpose:
+- The green segmented bar and round count badge under a dispenser shelf.
+- Only `CountLabel` is authored. The track backing, badge art, and one socket per authored item are
+  generated at runtime, because the socket count comes from the level config and the sockets share a
+  fixed track width.
+
+Do not use for:
+- Anything that owns the count. The number lives on `DispenserShelf`; this scene only renders it.
+
 ## `scenes/shadow_style_preview.tscn`
 
 Root:

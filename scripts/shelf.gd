@@ -82,6 +82,12 @@ func allows_ability_modification() -> bool:
 	return true
 
 
+## Whether the first back layer is previewed behind the front items as dimmed art. A shelf type that
+## says no keeps its queue hidden until each item is actually promoted.
+func shows_back_layer_preview() -> bool:
+	return true
+
+
 func set_visual_variant(visual_variant: String) -> void:
 	match visual_variant:
 		VISUAL_VARIANT_FULL, VISUAL_VARIANT_FLOOR_ONLY:
@@ -126,7 +132,7 @@ func add_back_layer(layer_index: int, front_slots: Array[Node2D]) -> Array[Node2
 	var layer := Node2D.new()
 	layer.name = get_back_layer_name(layer_index)
 	layer.z_index = back_layer_z_index
-	layer.visible = layer_index == FIRST_BACK_LAYER_INDEX
+	layer.visible = _is_previewed_back_layer(layer_index)
 	add_child(layer)
 
 	var layer_slots: Array[Node2D] = []
@@ -145,7 +151,7 @@ func get_back_layer_name(layer_index: int) -> String:
 
 
 func configure_back_layer(layer: Node2D, layer_index: int) -> void:
-	var should_show := layer_index == FIRST_BACK_LAYER_INDEX
+	var should_show := _is_previewed_back_layer(layer_index)
 	layer.visible = should_show
 
 	for layer_slot in layer.get_children():
@@ -159,8 +165,9 @@ func configure_back_layer(layer: Node2D, layer_index: int) -> void:
 
 
 func configure_back_layer_item(item: ShelfItem, should_show: bool) -> void:
+	var is_previewed := should_show and shows_back_layer_preview()
 	item.z_index = back_layer_item_z_index
-	item.modulate = back_layer_item_modulate if should_show else Color.TRANSPARENT
+	item.modulate = back_layer_item_modulate if is_previewed else Color.TRANSPARENT
 	item.input_pickable = false
 	item.set_contact_shadow_enabled(false)
 	item.visual_scale *= back_layer_item_scale
@@ -168,6 +175,10 @@ func configure_back_layer_item(item: ShelfItem, should_show: bool) -> void:
 	var collision := item.get_node_or_null("CollisionShape2D") as CollisionShape2D
 	if collision != null:
 		collision.disabled = true
+
+
+func _is_previewed_back_layer(layer_index: int) -> bool:
+	return layer_index == FIRST_BACK_LAYER_INDEX and shows_back_layer_preview()
 
 
 func _add_layer_slot(layer: Node2D, front_slot: Node2D) -> Node2D:
