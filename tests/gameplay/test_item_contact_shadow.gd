@@ -83,10 +83,11 @@ func _verify_shadow_follows_item_form(item: ShelfItem, shadow: Sprite2D) -> void
 
 func _verify_resting_shape(item: ShelfItem, shadow: Sprite2D) -> void:
 	item.shadow_lift = 0.0
+	var item_sprite := item.get_node_or_null("Sprite2D") as Sprite2D
 
 	_check(
-		shadow.scale.y > 0.0 and is_equal_approx(shadow.scale.y, shadow.scale.x),
-		"A resting shadow keeps the item's full-height silhouette instead of flattening it."
+		item_sprite != null and shadow.scale.is_equal_approx(item_sprite.scale),
+		"A resting shadow has the same size as the item sprite."
 	)
 	_check(
 		is_zero_approx(shadow.skew),
@@ -117,10 +118,11 @@ func _verify_carried_shape(item: ShelfItem, shadow: Sprite2D) -> void:
 	var ground_y := ShelfItem.SHADOW_GROUND_TEXELS * item.visual_scale
 
 	item.shadow_lift = 1.0
+	var item_sprite := item.get_node_or_null("Sprite2D") as Sprite2D
 
 	_check(
-		shadow.scale.y > 0.0 and shadow.scale.y > shadow.scale.x * 0.8,
-		"A carried shadow retains the item's full-height silhouette."
+		item_sprite != null and shadow.scale.is_equal_approx(item_sprite.scale),
+		"A carried shadow has the same size as the item sprite."
 	)
 	_check(
 		is_zero_approx(shadow.skew),
@@ -132,11 +134,11 @@ func _verify_carried_shape(item: ShelfItem, shadow: Sprite2D) -> void:
 	)
 	_check(
 		is_equal_approx(_get_blur(shadow), ShelfItem.SHADOW_CARRY_BLUR_PX),
-		"A carried shadow uses the compact halo radius that preserves recognizable edges."
+		"A carried shadow uses the compact blur radius that preserves recognizable edges."
 	)
 	_check(
 		is_equal_approx(_get_mask_low(shadow), ShelfItem.SHADOW_CARRY_MASK_LOW),
-		"A carried shadow restores the tighter halo threshold."
+		"A carried shadow restores the tighter soft-edge threshold."
 	)
 	_check(
 		is_equal_approx(
@@ -178,8 +180,9 @@ func _verify_drag_lift(level: Node, item: ShelfItem, shadow: Sprite2D) -> void:
 	await create_timer(LIFT_SETTLE_SECONDS).timeout
 
 	_check(
-		is_zero_approx(item.shadow_lift) and shadow.scale.y > shadow.scale.x * 0.8,
-		"Dropping the item returns its shadow to the soft upright resting silhouette."
+		is_zero_approx(item.shadow_lift)
+			and shadow.scale.is_equal_approx((item.get_node("Sprite2D") as Sprite2D).scale),
+		"Dropping the item returns its shadow to the item-sized resting silhouette."
 	)
 
 

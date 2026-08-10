@@ -13,7 +13,7 @@ const SHADOW_NODE_NAME := ^"Shadow"
 ## so the contact point is 120 - 64 texels below the center for every catalog item.
 const SHADOW_GROUND_TEXELS := 56.0
 
-## Resting shadow: a soft, nearly full-height copy of the item silhouette displaced slightly
+## Resting shadow: a soft, full-size copy of the item silhouette displaced slightly
 ## down-right, as if the item stands close to the shelf's back wall. It has no crisp silhouette core:
 ## the broad mask transition and low opacity keep neighboring shelf items from becoming visually
 ## crowded while the bottle/box/tub form remains legible behind its owner.
@@ -28,9 +28,9 @@ const SHADOW_REST_OFFSET := Vector2(16.0, 2.0)
 ## Carried shadow: the item is held well above the board, so a ground projection is the wrong read.
 ## The silhouette moves farther down-right of the item -- the same shape, displaced, the way a
 ## lifted object's shadow separates from it. A source-alpha core keeps
-## narrow necks, handles and irregular edges recognizable while a smaller filtered halo softens it.
-const SHADOW_CARRY_WIDTH := 1.06
-const SHADOW_CARRY_FLATTEN := 1.06
+## narrow necks, handles and irregular edges recognizable while a smaller filtered fill softens it.
+const SHADOW_CARRY_WIDTH := 1.0
+const SHADOW_CARRY_FLATTEN := 1.0
 const SHADOW_CARRY_SKEW := 0.0
 const SHADOW_CARRY_BLUR_PX := 4.5
 const SHADOW_CARRY_MASK_LOW := 0.3
@@ -141,7 +141,7 @@ func set_contact_shadow_enabled(enabled: bool) -> void:
 
 ## Lifts the shadow off the item while the player carries it, instead of hiding the shadow the way
 ## earlier drags did: the shadow stays a child of the item, so it follows the finger for free, but it
-## slides further along the light direction, spreads and fades so the item reads as held above the
+## slides further along the light direction and changes opacity so the item reads as held above the
 ## board. Fire and forget -- the tween is bound to this node, so it dies with the item.
 func set_drag_lifted(lifted: bool) -> void:
 	var target := 1.0 if lifted else 0.0

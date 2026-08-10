@@ -2170,7 +2170,7 @@ Key methods:
 - `_ready()`: applies current texture and scale.
 - `_apply_texture()`: updates `Sprite2D.texture` and refreshes the ground shadow, which hides itself when the item has no texture.
 - `_apply_visual_scale()`: updates `Sprite2D` and `OutlineSprite` scale from `visual_scale * highlight scale multiplier * land_squash`, applies the contact pivot offset, then refreshes the shadow and outline.
-- `_apply_shadow()`: draws the item's own silhouette as its shadow. Anchors the shadow sprite on the art's ground line (`SHADOW_GROUND_TEXELS`, the 120-64 texel drop every item texture shares per `docs/ITEM_ASSET_REQUIREMENTS.md`), then blends by `shadow_lift` between two readings: **resting**, a full-height, unsheared silhouette displaced slightly down-right by `SHADOW_REST_OFFSET`, softened by `SHADOW_REST_BLUR_PX` and the broad `SHADOW_REST_MASK_LOW` transition, and reduced to `SHADOW_REST_ALPHA_SCALE` opacity so neighboring shelf items remain readable; and **carried**, the silhouette displaced farther down-right by `SHADOW_CARRY_OFFSET` and rendered with a compact filtered halo plus `SHADOW_CARRY_SILHOUETTE_WEIGHT` of the original alpha mask. The source-alpha core preserves narrow and irregular carried-item features. Both shadow axes follow the landing squash so the upright resting silhouette continues to match the item during impact.
+- `_apply_shadow()`: draws the item's own silhouette as its shadow. Anchors the shadow sprite on the art's ground line (`SHADOW_GROUND_TEXELS`, the 120-64 texel drop every item texture shares per `docs/ITEM_ASSET_REQUIREMENTS.md`), then blends by `shadow_lift` between two readings: **resting**, a full-size, unsheared silhouette displaced slightly down-right by `SHADOW_REST_OFFSET`, softened inside the source-alpha envelope by `SHADOW_REST_BLUR_PX` and the broad `SHADOW_REST_MASK_LOW` transition, and reduced to `SHADOW_REST_ALPHA_SCALE` opacity so neighboring shelf items remain readable; and **carried**, the same-size silhouette displaced farther down-right by `SHADOW_CARRY_OFFSET` and rendered with a compact filtered fill plus `SHADOW_CARRY_SILHOUETTE_WEIGHT` of the original alpha mask. Clipping the filtered mask to the source envelope prevents either state from rendering larger than the item. Both shadow axes follow the landing squash so the silhouette continues to match the item during impact.
 - `set_drag_lifted(lifted)`: tweens `shadow_lift`, moving the shadow between its resting and carried shapes instead of hiding it while carried. Node-bound through `UIMotion.retween`, so it dies with the item.
 
 ## `scripts/shadow_style_preview.gd`
@@ -2202,7 +2202,7 @@ Do not use for:
 
 Verified by:
 - `tests/gameplay/test_item_landing_impact.gd` (run through `scripts/tools/run_isolated_godot_test.ps1`).
-- `tests/gameplay/test_item_contact_shadow.gd` for the silhouette-derived ground shadow: the soft upright resting silhouette, carried source-alpha core and compact halo, ground-line anchor, and drag lift travelling with the item.
+- `tests/gameplay/test_item_contact_shadow.gd` for the item-sized silhouette-derived ground shadow: the soft upright resting silhouette, carried source-alpha core and compact filtered fill, ground-line anchor, and drag lift travelling with the item.
 
 ## `scripts/tools/generate_level_shelves.py`
 

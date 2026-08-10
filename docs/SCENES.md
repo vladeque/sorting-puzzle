@@ -1703,18 +1703,19 @@ Purpose:
 Important nodes:
 - `Shadow`: translucent ground shadow drawn from the item's own texture, so each item's silhouette
   shapes its own shadow. The `shadow_material` shader (exported on the root) builds a soft mask from
-  a ring average of the texture alpha, then flattens the result to one translucent color that reads
-  on both the wooden shelf floor and the lighter level background. The carried state adds a weighted
+  a ring average of the texture alpha, clips it to the source-alpha envelope so the shadow does not
+  exceed the item's size, then flattens the result to one translucent color that reads on both the
+  wooden shelf floor and the lighter level background. The carried state adds a weighted
   source-alpha core to that mask, preserving narrow necks, handles and irregular edges without
   requiring per-item shadow art.
   `scripts/item.gd` anchors the sprite on the art's ground line (canvas y=120, see
   `docs/ITEM_ASSET_REQUIREMENTS.md`). Generated back-layer previews and clearing items disable it.
 - The shadow has two readings, blended by `ShelfItem.shadow_lift`. **Resting**: a broad alpha-mask
-  transition produces a soft, low-opacity, full-height silhouette just down-right of the item, as if
+  transition produces a soft, low-opacity, item-sized silhouette just down-right of the item, as if
   it were cast onto the shelf's nearby back wall. The offset exposes enough of the shadow to remain
   recognizable without crowding adjacent items, and the shadow follows both axes of the landing
   squash. **Carried**: while the player drags the item, the silhouette separates farther down-right.
-  Its smaller filtered halo and weighted source-alpha core keep the carried shadow close to the
+  Its smaller filtered fill and weighted source-alpha core keep the carried shadow close to the
   item's recognizable shape, while reduced opacity prevents it from reading as a dark duplicate.
   Compare and tune both in `scenes/shadow_style_preview.tscn`.
 - `OutlineSprite`: hidden sprite used by `ShelfItem` to draw alpha-based highlight borders.

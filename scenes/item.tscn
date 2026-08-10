@@ -48,7 +48,8 @@ code = "shader_type canvas_item;
 render_mode unshaded;
 
 // Ground shadow derived from the item's own sprite alpha, so every catalog item casts its own
-// form without per-asset shadow authoring. A ring-average mask supplies the soft projection. While
+// form without per-asset shadow authoring. A ring-average mask supplies the soft projection inside
+// the source silhouette, keeping the visible shadow footprint the same size as the item. While
 // carried, silhouette_weight also retains a lighter source-alpha core so narrow necks, handles and
 // irregular edges remain recognizable instead of dissolving into the filtered mask.
 //
@@ -83,7 +84,8 @@ void fragment() {
 
 	float soft_mask = smoothstep(mask_low, mask_high, coverage / sample_count);
 	float silhouette_mask = smoothstep(0.08, 0.45, source_alpha);
-	float mask = max(soft_mask, silhouette_mask * silhouette_weight);
+	float source_envelope = smoothstep(0.0, 0.08, source_alpha);
+	float mask = min(max(soft_mask, silhouette_mask * silhouette_weight), source_envelope);
 
 	// The fragment color is generated from the alpha mask rather than from the texture's own color,
 	// so the incoming COLOR (and with it the item's modulate) is deliberately discarded. Per-item
