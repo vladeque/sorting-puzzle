@@ -1,9 +1,11 @@
 extends Node2D
 
+## The size of a triple. Standard shelves happen to be exactly this wide, but shelf width now comes
+## from `Shelf.get_slot_count()`; this constant only ever means "how many items make a match".
 const SLOT_COUNT := 3
 const SLOT_ITEM_POSITION := Vector2(0, -32)
 const SHELF_CELL_VISUAL_SCALE := 1.06
-const SHELF_BASE_CELL_SIZE := Vector2(224, 135)
+const SHELF_BASE_CELL_SIZE := Shelf.BASE_CELL_SIZE
 const SHELF_CELL_SIZE := SHELF_BASE_CELL_SIZE * SHELF_CELL_VISUAL_SCALE
 const SHELF_BASE_SHARED_EDGE_THICKNESS := 8.0
 const SHELF_SHARED_EDGE_THICKNESS := SHELF_BASE_SHARED_EDGE_THICKNESS * SHELF_CELL_VISUAL_SCALE
@@ -159,6 +161,7 @@ var _completion_confetti: LevelCompletionConfetti
 var _pause_menu_overlay: PauseMenu
 var _leave_confirmation_overlay: LeaveConfirmationMenu
 var _ability_purchase_overlay: AbilityPurchaseMenu
+var _in_level_shop_overlay: ShopScreen
 var _ability_bar: AbilityBar
 var _ability_uses: Dictionary = {
 	ABILITY_HAMMER: 3,
@@ -218,12 +221,14 @@ func _ready() -> void:
 	_pause_menu_overlay = get_node("UI/PauseMenuOverlay") as PauseMenu
 	_leave_confirmation_overlay = get_node("UI/LeaveConfirmationOverlay") as LeaveConfirmationMenu
 	_ability_purchase_overlay = get_node("UI/AbilityPurchaseOverlay") as AbilityPurchaseMenu
+	_in_level_shop_overlay = get_node("UI/InLevelShopOverlay") as ShopScreen
 	_ability_bar = get_node("UI/AbilityBar") as AbilityBar
 	_failure_screen.visible = false
 	_completion_screen.visible = false
 	_pause_menu_overlay.visible = false
 	_leave_confirmation_overlay.visible = false
 	_ability_purchase_overlay.visible = false
+	_in_level_shop_overlay.visible = false
 	_setup_star_reward_effect_layer()
 	get_viewport().size_changed.connect(_apply_responsive_layout)
 	_rng.randomize()
@@ -560,12 +565,13 @@ func _input(event: InputEvent) -> void:
 
 ## System back / Android back / Escape (UI-003). Unlike _input() above, this always runs regardless
 ## of pause/failed/completed state, implementing one topmost-state-first back stack:
-##   1. Leave Confirmation returns to Pause.
-##   2. Ability Purchase closes and restores the state it opened from.
-##   3. Pause closes and resumes active gameplay.
-##   4. The post-clear confetti celebration skips ahead to the Completion screen.
-##   5. Completion invokes its Continue route; Failure invokes its Main Menu route.
-##   6. Otherwise (active gameplay) opens Pause.
+##   1. The in-level Shop returns to Ability Purchase.
+##   2. Leave Confirmation returns to Pause.
+##   3. Ability Purchase closes and restores the state it opened from.
+##   4. Pause closes and resumes active gameplay.
+##   5. The post-clear confetti celebration skips ahead to the Completion screen.
+##   6. Completion invokes its Continue route; Failure invokes its Main Menu route.
+##   7. Otherwise (active gameplay) opens Pause.
 ## Every branch reuses the exact handler its equivalent button already calls, so this can never
 ## spend a life, coin, or star by itself, and behaves identically to tapping that button. If any
 ## overlay/result screen is mid open()/close() transition, the press is dropped rather than acted
@@ -579,7 +585,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 
 	get_viewport().set_input_as_handled()
-	if _leave_confirmation_overlay.visible:
+	if _in_level_shop_overlay != null and _in_level_shop_overlay.visible:
+		_on_in_level_shop_close_requested()
+	elif _leave_confirmation_overlay.visible:
 		_on_leave_confirmation_close_pressed()
 	elif _ability_purchase_overlay != null and _ability_purchase_overlay.visible:
 		_on_ability_purchase_close_pressed()
@@ -599,6 +607,8 @@ func _is_any_overlay_transitioning() -> bool:
 	if _leave_confirmation_overlay.is_transitioning() or _pause_menu_overlay.is_transitioning():
 		return true
 	if _ability_purchase_overlay != null and _ability_purchase_overlay.is_transitioning():
+		return true
+	if _in_level_shop_overlay != null and _in_level_shop_overlay.is_transitioning():
 		return true
 	return _completion_screen.is_transitioning() or _failure_screen.is_transitioning()
 
@@ -1316,11 +1326,16 @@ func _is_slot_locked(slot: Node) -> bool:
 	return _is_shelf_locked(_get_owning_shelf(slot))
 
 
-func _is_slot_drag_drop_targetable(slot: Node) -> bool:
-	return slot != null and _is_shelf_drag_drop_targetable(_get_owning_shelf(slot))
+## Taking an item and placing an item are separate permissions. Reachability (unlocked, and inside a
+## moving row's visible window) gates both, but a source-only shelf type such as
+## `scenes/dispenser_shelf.tscn` passes the source check and fails the drop-target check.
 
 
-func _is_shelf_drag_drop_targetable(shelf: Node) -> bool:
+func _is_slot_move_source_eligible(slot: Node) -> bool:
+	return slot != null and _is_shelf_move_source_eligible(_get_owning_shelf(slot))
+
+
+func _is_shelf_move_source_eligible(shelf: Node) -> bool:
 	var shelf_node := shelf as Node2D
 	if shelf_node == null:
 		return false
@@ -1330,6 +1345,18 @@ func _is_shelf_drag_drop_targetable(shelf: Node) -> bool:
 
 	var moving_row := _get_moving_shelf_row(shelf_node)
 	return moving_row == null or moving_row.is_shelf_inside_visible_window(shelf_node)
+
+
+func _is_slot_drop_target_eligible(slot: Node) -> bool:
+	return slot != null and _is_shelf_drop_target_eligible(_get_owning_shelf(slot))
+
+
+func _is_shelf_drop_target_eligible(shelf: Node) -> bool:
+	if not _is_shelf_move_source_eligible(shelf):
+		return false
+
+	var shelf_cell := shelf as Shelf
+	return shelf_cell == null or shelf_cell.accepts_dropped_items()
 
 
 func _get_moving_shelf_row(node: Node) -> MovingShelfRow:
@@ -1345,10 +1372,10 @@ func _get_moving_shelf_row(node: Node) -> MovingShelfRow:
 
 
 func _clear_drag_drop_selection_if_unavailable() -> void:
-	if _selected_slot != null and not _is_slot_drag_drop_targetable(_selected_slot):
+	if _selected_slot != null and not _is_slot_move_source_eligible(_selected_slot):
 		_clear_selected_item()
 
-	if _pressed_origin_slot != null and not _is_slot_drag_drop_targetable(_pressed_origin_slot):
+	if _pressed_origin_slot != null and not _is_slot_move_source_eligible(_pressed_origin_slot):
 		_pressed_item = null
 		_pressed_origin_slot = null
 
@@ -1694,6 +1721,9 @@ func _setup_ability_purchase_menu() -> void:
 	_ability_purchase_overlay.close_pressed.connect(_on_ability_purchase_close_pressed)
 	_ability_purchase_overlay.buy_pressed.connect(_on_ability_purchase_buy_pressed)
 	_ability_purchase_overlay.ad_pressed.connect(_on_ability_purchase_ad_pressed)
+	if _in_level_shop_overlay != null:
+		_in_level_shop_overlay.close_requested.connect(_on_in_level_shop_close_requested)
+		_in_level_shop_overlay.closed.connect(_on_in_level_shop_closed)
 
 
 func _on_completion_next_pressed() -> void:
@@ -1733,6 +1763,8 @@ func _open_pause_menu() -> void:
 	_pause_menu_overlay.open()
 	if _ability_purchase_overlay != null:
 		_ability_purchase_overlay.close()
+	if _in_level_shop_overlay != null:
+		_in_level_shop_overlay.close()
 	_update_ability_buttons()
 	_update_pause_menu_button()
 
@@ -1850,7 +1882,7 @@ func _on_ability_purchase_buy_pressed() -> void:
 	var ability_id := _ability_purchase_pending_id
 	var price := _get_ability_purchase_price(ability_id)
 	if PlayerProgress.get_coins() < price:
-		_refresh_ability_purchase_offer()
+		_open_in_level_shop()
 		return
 	if not _can_apply_ability(ability_id):
 		_refresh_ability_purchase_offer()
@@ -1871,6 +1903,33 @@ func _on_ability_purchase_buy_pressed() -> void:
 		return
 
 	_close_ability_purchase_menu(false)
+
+
+func _open_in_level_shop() -> void:
+	if _in_level_shop_overlay == null or _in_level_shop_overlay.visible:
+		return
+	_in_level_shop_overlay.open()
+
+
+func _on_in_level_shop_close_requested() -> void:
+	if _in_level_shop_overlay == null or _is_ui_action_blocked():
+		return
+	_in_level_shop_overlay.close()
+
+
+func _on_in_level_shop_closed() -> void:
+	# The Shop can sell bundles as well as coins, so both economy values must be synchronized before
+	# restoring the screen that opened it. Never consume a newly purchased ability automatically.
+	if not launched_from_dev_mode:
+		_load_ability_uses()
+		if (
+			_ability_purchase_pending_id != StringName()
+			and int(_ability_uses.get(_ability_purchase_pending_id, 0)) > 0
+		):
+			_close_ability_purchase_menu()
+			return
+	_refresh_ability_purchase_offer()
+	_update_ability_buttons()
 
 
 func _on_ability_purchase_ad_pressed() -> void:
@@ -1931,7 +1990,7 @@ func _handle_motion_at(pointer_global_position: Vector2) -> void:
 	if _pressed_item == null:
 		return
 
-	if not _is_slot_drag_drop_targetable(_pressed_origin_slot):
+	if not _is_slot_move_source_eligible(_pressed_origin_slot):
 		_pressed_item = null
 		_pressed_origin_slot = null
 		return
@@ -1954,7 +2013,7 @@ func _handle_release_at(pointer_global_position: Vector2) -> void:
 	if _pressed_item == null:
 		return
 
-	if _pressed_item.get_parent() == _pressed_origin_slot and _is_slot_drag_drop_targetable(_pressed_origin_slot):
+	if _pressed_item.get_parent() == _pressed_origin_slot and _is_slot_move_source_eligible(_pressed_origin_slot):
 		_set_selected_item(_pressed_item, _pressed_origin_slot)
 
 	_pressed_item = null
@@ -1964,7 +2023,7 @@ func _handle_release_at(pointer_global_position: Vector2) -> void:
 
 func _begin_drag(item: ShelfItem, pointer_global_position: Vector2) -> void:
 	var origin_slot := item.get_parent() as Node2D
-	if not _is_slot_drag_drop_targetable(origin_slot):
+	if not _is_slot_move_source_eligible(origin_slot):
 		return
 
 	_dragged_item = item
@@ -2015,7 +2074,7 @@ func _move_item_to_slot(item: ShelfItem, origin_slot: Node2D, target_slot: Node2
 	if item == null or origin_slot == null or target_slot == null:
 		return false
 
-	if _is_slot_locked(origin_slot) or not _is_slot_drag_drop_targetable(target_slot):
+	if _is_slot_locked(origin_slot) or not _is_slot_drop_target_eligible(target_slot):
 		return false
 
 	target_slot = _resolve_move_target_slot(origin_slot, target_slot)
@@ -2037,7 +2096,7 @@ func _move_item_to_slot(item: ShelfItem, origin_slot: Node2D, target_slot: Node2
 func _find_item_at_position(pointer_global_position: Vector2) -> ShelfItem:
 	for i in range(_slots.size() - 1, -1, -1):
 		var slot := _slots[i]
-		if not _is_slot_drag_drop_targetable(slot):
+		if not _is_slot_move_source_eligible(slot):
 			continue
 
 		var item := _get_slot_item(slot)
@@ -2064,7 +2123,7 @@ func _find_nearest_slot(pointer_global_position: Vector2) -> Node2D:
 	var nearest_distance := _get_scaled_slot_snap_distance()
 
 	for slot in _slots:
-		if not _is_slot_drag_drop_targetable(slot):
+		if not _is_slot_drop_target_eligible(slot):
 			continue
 
 		var marker := _get_slot_marker(slot)
@@ -2084,7 +2143,7 @@ func _find_nearest_empty_slot(pointer_global_position: Vector2) -> Node2D:
 	var nearest_distance := _get_scaled_slot_snap_distance()
 
 	for slot in _slots:
-		if not _is_slot_drag_drop_targetable(slot):
+		if not _is_slot_drop_target_eligible(slot):
 			continue
 
 		if _get_slot_item(slot) != null:
@@ -2107,7 +2166,7 @@ func _get_scaled_slot_snap_distance() -> float:
 
 
 func _resolve_move_target_slot(origin_slot: Node2D, target_slot: Node2D) -> Node2D:
-	if _is_slot_locked(origin_slot) or not _is_slot_drag_drop_targetable(target_slot):
+	if _is_slot_locked(origin_slot) or not _is_slot_drop_target_eligible(target_slot):
 		return null
 
 	if target_slot == origin_slot:
@@ -2127,7 +2186,7 @@ func _find_free_slot_on_target_shelf(target_slot: Node2D, excluded_slot: Node2D)
 	if target_shelf == null:
 		return null
 
-	if not _is_shelf_drag_drop_targetable(target_shelf):
+	if not _is_shelf_drop_target_eligible(target_shelf):
 		return null
 
 	var target_marker := _get_slot_marker(target_slot)
@@ -3879,8 +3938,10 @@ func _collect_shelves_recursive(node: Node, shelves: Array[Node]) -> void:
 		_collect_shelves_recursive(child, shelves)
 
 
+## Shelf identity is the node's type, not its slot count: shelf types have different widths, so
+## counting `Slot*` children would hide any shelf that is not exactly three slots wide.
 func _is_shelf_node(node: Node) -> bool:
-	return node is Node2D and _get_front_slots(node).size() == SLOT_COUNT
+	return node is Shelf
 
 
 func _get_all_items() -> Array[ShelfItem]:

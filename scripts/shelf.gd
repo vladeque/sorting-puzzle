@@ -1,6 +1,10 @@
 class_name Shelf
 extends Node2D
 
+## Cell footprint one shelf occupies in the level grid, before `SHELF_CELL_VISUAL_SCALE`.
+## `scripts/level.gd` reads this as the authority for `SHELF_BASE_CELL_SIZE`.
+const BASE_CELL_SIZE := Vector2(224, 135)
+const SLOT_COUNT := 3
 const BACK_LAYER_PREFIX := "ShelfLayer"
 const FIRST_BACK_LAYER_INDEX := 1
 const VISUAL_VARIANT_META := &"visual_variant"
@@ -37,6 +41,39 @@ var _should_show_top_ceiling_cap := false
 func _ready() -> void:
 	_apply_visual_variant()
 	_apply_row_placement()
+
+
+## Shelf-type capabilities. `scripts/level.gd` branches on these instead of on the shelf's class, so
+## a new shelf type only has to override what actually differs. `scenes/dispenser_shelf.tscn` is the
+## first type that says no to any of them.
+
+
+## Cell footprint this shelf type occupies, before `SHELF_CELL_VISUAL_SCALE`. Drives both row packing
+## and the board bounds the responsive layout scales to fit.
+func get_base_cell_size() -> Vector2:
+	return BASE_CELL_SIZE
+
+
+## Number of front slots, and therefore the width of every layer in this shelf's level config.
+func get_slot_count() -> int:
+	return SLOT_COUNT
+
+
+## Whether the player may drop a carried item onto this shelf. A shelf that says no is still a valid
+## place to pick items up from -- taking and placing are separate permissions.
+func accepts_dropped_items() -> bool:
+	return true
+
+
+## Whether a full front layer of identical items clears as a triple.
+func forms_triples() -> bool:
+	return true
+
+
+## Whether abilities may destroy this shelf's items (hammer) or rewrite their identities (shuffle).
+## Read-only abilities such as highlight ignore this and treat every shelf alike.
+func allows_ability_modification() -> bool:
+	return true
 
 
 func set_visual_variant(visual_variant: String) -> void:
