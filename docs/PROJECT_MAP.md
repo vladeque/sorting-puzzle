@@ -590,7 +590,7 @@ Files:
 Responsibility:
 - Represents one sortable item as an `Area2D`.
 - Stores `item_id`.
-- Applies texture and visual scale to its `Sprite2D` and to an equally sized translucent shadow drawn inside the item's own alpha silhouette. The shadow is disabled for generated back-layer item previews and blends from a nearby resting offset to a farther down-right carried offset while preserving the item's size.
+- Applies texture and visual scale to its `Sprite2D` and to an equally sized translucent shadow drawn inside the item's own alpha silhouette. The shadow is disabled for generated back-layer item previews and blends from a nearby up-right resting offset to a farther down-right carried offset while preserving the item's size.
 - Draws reusable alpha-based sprite outlines for item highlight states.
 - Defines the canonical texture size, visible bounds, shelf baseline, alpha, naming, import, and
   validation requirements for item art.

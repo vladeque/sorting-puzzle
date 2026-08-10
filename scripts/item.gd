@@ -14,7 +14,7 @@ const SHADOW_NODE_NAME := ^"Shadow"
 const SHADOW_GROUND_TEXELS := 56.0
 
 ## Resting shadow: a soft, full-size copy of the item silhouette displaced slightly
-## down-right, as if the item stands close to the shelf's back wall. It has no crisp silhouette core:
+## up-right, as if the item stands close to the shelf's back wall. It has no crisp silhouette core:
 ## the broad mask transition and low opacity keep neighboring shelf items from becoming visually
 ## crowded while the bottle/box/tub form remains legible behind its owner.
 const SHADOW_REST_WIDTH := 1.0
@@ -23,7 +23,7 @@ const SHADOW_REST_SKEW := 0.0
 const SHADOW_REST_BLUR_PX := 7.5
 const SHADOW_REST_MASK_LOW := 0.12
 const SHADOW_REST_ALPHA_SCALE := 0.56
-const SHADOW_REST_OFFSET := Vector2(16.0, 2.0)
+const SHADOW_REST_OFFSET := Vector2(16.0, -2.0)
 
 ## Carried shadow: the item is held well above the board, so a ground projection is the wrong read.
 ## The silhouette moves farther down-right of the item -- the same shape, displaced, the way a
@@ -230,7 +230,7 @@ func _apply_visual_scale() -> void:
 ## Draws the item's own silhouette as its shadow, in one of two readings blended by `shadow_lift`:
 ##
 ##   resting (0) -- the item is touching the shelf, so a soft, low-opacity copy of its silhouette
-##                  sits just down-right on the shelf's back wall.
+##                  sits just up-right on the shelf's back wall.
 ##   carried (1) -- the item is held above the board, so the silhouette separates farther down-right
 ##                  and gains a recognizable source-alpha core.
 ##

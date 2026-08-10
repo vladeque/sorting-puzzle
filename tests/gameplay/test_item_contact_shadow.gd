@@ -77,7 +77,11 @@ func _verify_shadow_follows_item_form(item: ShelfItem, shadow: Sprite2D) -> void
 			Vector2(0.0, ShelfItem.SHADOW_GROUND_TEXELS * item.visual_scale)
 				+ ShelfItem.SHADOW_REST_OFFSET * item.visual_scale
 		),
-		"A resting shadow is anchored on the ground line and offset slightly down-right."
+		"A resting shadow is anchored on the ground line and uses its configured offset."
+	)
+	_check(
+		ShelfItem.SHADOW_REST_OFFSET.x > 0.0 and ShelfItem.SHADOW_REST_OFFSET.y < 0.0,
+		"A resting shadow falls slightly up-right of the item."
 	)
 
 
