@@ -23,7 +23,7 @@ const SHADOW_REST_SKEW := 0.0
 const SHADOW_REST_BLUR_PX := 7.5
 const SHADOW_REST_MASK_LOW := 0.12
 const SHADOW_REST_ALPHA_SCALE := 0.56
-const SHADOW_REST_OFFSET := Vector2(16.0, -2.0)
+const SHADOW_REST_OFFSET := Vector2(12.0, -4.0)
 
 ## Carried shadow: the item is held well above the board, so a ground projection is the wrong read.
 ## The silhouette moves farther down-right of the item -- the same shape, displaced, the way a
