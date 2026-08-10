@@ -8,6 +8,20 @@ extends SceneTree
 
 const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
 const LEVEL_SCENE_PATH := "res://level.tscn"
+const SHELF_SCENE_PATH := "res://scenes/shelf.tscn"
+
+const SHELF_SHADOW_PATHS := [
+	"Shadow",
+	"RightColumnShadow",
+	"BackWallTopShade",
+	"PlacementVisuals/Left/BackWallLeftShade",
+	"PlacementVisuals/Left/LeftShadowEdge",
+	"PlacementVisuals/Middle/BackWallLeftShade",
+	"PlacementVisuals/Middle/LeftShadowEdge",
+	"PlacementVisuals/Middle/RightShadowEdge",
+	"PlacementVisuals/Right/BackWallLeftShade",
+	"PlacementVisuals/Right/RightShadowEdge",
+]
 
 ## The lift tween runs for SHADOW_LIFT_SECONDS (0.12); sample well clear of both ends.
 const LIFT_SETTLE_SECONDS := 0.2
@@ -52,6 +66,7 @@ func _run() -> void:
 		return
 
 	_verify_shadow_follows_item_form(item, shadow)
+	_verify_shadow_color_and_overlap(item, shadow)
 	_verify_resting_shape(item, shadow)
 	_verify_carried_shape(item, shadow)
 	await _verify_drag_lift(level, item, shadow)
@@ -83,6 +98,54 @@ func _verify_shadow_follows_item_form(item: ShelfItem, shadow: Sprite2D) -> void
 		ShelfItem.SHADOW_REST_OFFSET.x > 0.0 and ShelfItem.SHADOW_REST_OFFSET.y < 0.0,
 		"A resting shadow falls slightly up-right of the item."
 	)
+
+
+func _verify_shadow_color_and_overlap(item: ShelfItem, shadow: Sprite2D) -> void:
+	var shelf_scene := load(SHELF_SCENE_PATH) as PackedScene
+	var shelf: Node = shelf_scene.instantiate() if shelf_scene != null else null
+	_check(shelf != null, "The shelf scene is available for item-shadow color verification.")
+	if shelf == null:
+		return
+
+	var left_shade := shelf.get_node_or_null(
+		"PlacementVisuals/Left/BackWallLeftShade"
+	) as Polygon2D
+	_check(left_shade != null, "The shelf exposes its canonical BackWallLeftShade.")
+	if left_shade == null:
+		shelf.free()
+		return
+
+	item.shadow_lift = 0.0
+	var resting_color := _get_shadow_color(shadow)
+	_check(
+		_colors_match_rgb(resting_color, left_shade.color),
+		"The resting item shadow uses the BackWallLeftShade RGB color."
+	)
+
+	item.shadow_lift = 1.0
+	var carried_color := _get_shadow_color(shadow)
+	_check(
+		_colors_match_rgb(carried_color, left_shade.color),
+		"The carried item shadow keeps the BackWallLeftShade RGB color."
+	)
+
+	for item_shadow_color in [resting_color, carried_color]:
+		for shadow_path in SHELF_SHADOW_PATHS:
+			var shelf_shadow := shelf.get_node_or_null(shadow_path) as Polygon2D
+			_check(shelf_shadow != null, "Shelf shadow '%s' exists." % shadow_path)
+			if shelf_shadow == null:
+				continue
+
+			var composite := _source_over(item_shadow_color, shelf_shadow.color)
+			_check(
+				composite.r + 0.000001 >= shelf_shadow.color.r
+					and composite.g + 0.000001 >= shelf_shadow.color.g
+					and composite.b + 0.000001 >= shelf_shadow.color.b,
+				"Item-shadow overlap does not darken shelf shadow '%s'." % shadow_path
+			)
+
+	item.shadow_lift = 0.0
+	shelf.free()
 
 
 func _verify_resting_shape(item: ShelfItem, shadow: Sprite2D) -> void:
@@ -212,11 +275,31 @@ func _get_mask_low(shadow: Sprite2D) -> float:
 
 
 func _get_shadow_alpha(shadow: Sprite2D) -> float:
+	return _get_shadow_color(shadow).a
+
+
+func _get_shadow_color(shadow: Sprite2D) -> Color:
 	var material := shadow.material as ShaderMaterial
 	if material == null:
-		return -1.0
+		return Color.TRANSPARENT
 	var color = material.get_shader_parameter("shadow_color")
-	return color.a if color is Color else -1.0
+	return color if color is Color else Color.TRANSPARENT
+
+
+func _colors_match_rgb(first: Color, second: Color) -> bool:
+	return is_equal_approx(first.r, second.r) \
+		and is_equal_approx(first.g, second.g) \
+		and is_equal_approx(first.b, second.b)
+
+
+func _source_over(source: Color, destination: Color) -> Color:
+	var source_alpha := clampf(source.a, 0.0, 1.0)
+	return Color(
+		lerpf(destination.r, source.r, source_alpha),
+		lerpf(destination.g, source.g, source_alpha),
+		lerpf(destination.b, source.b, source_alpha),
+		1.0
+	)
 
 
 func _get_base_shadow_alpha(item: ShelfItem) -> float:

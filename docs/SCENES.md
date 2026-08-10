@@ -1655,7 +1655,7 @@ Important nodes:
 - `PlacementVisuals/Middle`: middle shelf role visuals. Contains row divider art and the middle-specific `TopCeilingCap`.
 - `PlacementVisuals/Right`: right shelf role visuals. Contains right edge art and the right-specific `TopCeilingCap`.
 - `Ceiling`: shared wooden top frame. Placement-specific `TopCeilingCap` nodes are shown at runtime only for top shelves.
-- `Shadow` and `RightColumnShadow`: solid-color perspective cast shadows, shown at runtime for full shelf visuals and drawn below shelf bodies, items, and generated back-layer item previews so they remain visible only on exposed wall/background areas.
+- `Shadow` and `RightColumnShadow`: solid-color perspective cast shadows using the same canonical RGB as `BackWallLeftShade`, shown at runtime for full shelf visuals and drawn below shelf bodies, items, and generated back-layer item previews so they remain visible only on exposed wall/background areas. The item silhouette shadow uses this RGB too; intersections with these shadows remain the same color instead of compounding darker.
 - `FloorSurface` and `FloorFrontLip`: wooden floor where items visually rest.
 - `FloorGrain*`: subtle line details on the floor; generated back-layer item previews draw above the floor and grain, while active front items draw above back-layer previews.
 - `LockedOverlay`: hidden lock overlay used for triple-gated shelves. `scripts/level.gd`
@@ -1715,8 +1715,9 @@ Important nodes:
 - `Shadow`: translucent ground shadow drawn from the item's own texture, so each item's silhouette
   shapes its own shadow. The `shadow_material` shader (exported on the root) builds a soft mask from
   a ring average of the texture alpha, clips it to the source-alpha envelope so the shadow does not
-  exceed the item's size, then flattens the result to one translucent color that reads on both the
-  wooden shelf floor and the lighter level background. The carried state adds a weighted
+  exceed the item's size, then flattens the result to the exact RGB used by the shelf's
+  `BackWallLeftShade`. Shelf shadows use that RGB or a darker one, so overlap cannot create a darker
+  intersection. The carried state adds a weighted
   source-alpha core to that mask, preserving narrow necks, handles and irregular edges without
   requiring per-item shadow art.
   `scripts/item.gd` anchors the sprite on the art's ground line (canvas y=120, see

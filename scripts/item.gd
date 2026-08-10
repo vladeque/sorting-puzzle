@@ -8,6 +8,10 @@ const DEFAULT_VISUAL_SCALE := 0.92
 
 const SHADOW_NODE_NAME := ^"Shadow"
 
+## Matches Shelf/PlacementVisuals/*/BackWallLeftShade. Keeping the item shadow at least as bright
+## as every shelf-authored shadow prevents source-over blending from creating darker intersections.
+const SHELF_SHADOW_COLOR := Color(0.7490196, 0.65882355, 0.54901963, 1.0)
+
 ## Distance from the sprite's texture center down to the art's ground line, in source texels. Item
 ## textures are a 128x128 canvas whose visible artwork ends at y=120 (docs/ITEM_ASSET_REQUIREMENTS),
 ## so the contact point is 120 - 64 texels below the center for every catalog item.
@@ -22,7 +26,7 @@ const SHADOW_REST_FLATTEN := 1.0
 const SHADOW_REST_SKEW := 0.0
 const SHADOW_REST_BLUR_PX := 7.5
 const SHADOW_REST_MASK_LOW := 0.12
-const SHADOW_REST_ALPHA_SCALE := 0.56
+const SHADOW_REST_ALPHA_SCALE := 0.224
 const SHADOW_REST_OFFSET := Vector2(12.0, -4.0)
 
 ## Carried shadow: the item is held well above the board, so a ground projection is the wrong read.
@@ -35,7 +39,7 @@ const SHADOW_CARRY_SKEW := 0.0
 const SHADOW_CARRY_BLUR_PX := 4.5
 const SHADOW_CARRY_MASK_LOW := 0.3
 const SHADOW_CARRY_SILHOUETTE_WEIGHT := 0.7
-const SHADOW_CARRY_ALPHA_SCALE := 0.78
+const SHADOW_CARRY_ALPHA_SCALE := 0.312
 
 ## How far the carried shadow separates from the item, in source texels (scaled with the sprite).
 ## Down and to the right, so the item reads as lifted toward the player and off to the light's side.
@@ -110,7 +114,7 @@ var shadow_lift := 0.0:
 var _outline_enabled := false
 var _outline_material: ShaderMaterial
 var _shadow_material: ShaderMaterial
-var _shadow_base_color := Color(0.1, 0.05, 0.02, 0.34)
+var _shadow_base_color := SHELF_SHADOW_COLOR
 var _contact_shadow_enabled := true
 var _highlight_scale_multiplier := 1.0
 
