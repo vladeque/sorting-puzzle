@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import copy
+import random
 import sys
 import unittest
 from collections import Counter
@@ -10,7 +12,12 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 TOOLS_PATH = REPOSITORY_ROOT / "scripts" / "tools"
 sys.path.insert(0, str(TOOLS_PATH))
 
-from generate_level_shelves import generate_shelves, infer_item_type_count  # noqa: E402
+from generate_level_shelves import (  # noqa: E402
+    apply_dispenser_shelves,
+    generate_shelves,
+    infer_item_type_count,
+    parse_dispenser_shelves,
+)
 from level_item_progression import logical_item_ids  # noqa: E402
 
 
@@ -166,6 +173,85 @@ class GenerateLevelShelvesTests(unittest.TestCase):
         self.assertEqual(stats["preferred_layer_triple_ratio"], 0.30)
         self.assertTrue(any(abs(ratio - 0.30) > 0.10 for ratio in ratios))
         self.assertEqual(stats["non_adjacent_item_spreads"], {})
+
+
+class DispenserShelfGenerationTests(unittest.TestCase):
+    @staticmethod
+    def _board() -> list[dict[str, object]]:
+        return [
+            {"layers": [["item_01", "item_01", "item_02"], ["item_02", "item_02", "item_01"]]},
+            {"layers": [["item_03", "item_03", None], ["item_03", "item_04", "item_04"]]},
+            {"layers": [["item_04", None, None], [None, None, None]]},
+        ]
+
+    def test_parses_dispenser_entries(self) -> None:
+        self.assertEqual(parse_dispenser_shelves("10:3,11:4"), {10: 3, 11: 4})
+        self.assertEqual(parse_dispenser_shelves(None), {})
+        self.assertEqual(parse_dispenser_shelves(""), {})
+
+    def test_rejects_malformed_dispenser_entries(self) -> None:
+        for raw in ["10", "10:3:4", "x:3", "0:3"]:
+            with self.subTest(raw=raw):
+                with self.assertRaises(ValueError):
+                    parse_dispenser_shelves(raw)
+
+    def test_rejects_layer_counts_outside_the_supported_range(self) -> None:
+        for raw in ["10:1", "10:5"]:
+            with self.subTest(raw=raw):
+                with self.assertRaises(ValueError):
+                    parse_dispenser_shelves(raw)
+
+    ## Queue items are relocated out of the generated board, never minted, so the multiple-of-three
+    ## counts the distribution engine produced have to survive the pass untouched.
+    def test_relocating_items_preserves_every_item_count(self) -> None:
+        shelves = self._board()
+        before = Counter(
+            item_id
+            for shelf in shelves
+            for layer in shelf["layers"]
+            for item_id in layer
+            if item_id is not None
+        )
+
+        apply_dispenser_shelves(shelves, {2: 3}, random.Random(7))
+
+        after = Counter(
+            item_id
+            for shelf in shelves
+            for layer in shelf["layers"]
+            for item_id in layer
+            if item_id is not None
+        )
+        self.assertEqual(before, after)
+
+    def test_inserts_dispensers_at_their_requested_positions(self) -> None:
+        shelves = self._board()
+        apply_dispenser_shelves(shelves, {1: 2, 4: 3}, random.Random(11))
+
+        self.assertEqual(len(shelves), 5)
+        self.assertEqual(shelves[0].get("type"), "dispenser")
+        self.assertEqual(shelves[3].get("type"), "dispenser")
+        self.assertEqual(len(shelves[0]["layers"]), 2)
+        self.assertEqual(len(shelves[3]["layers"]), 3)
+        for shelf in [shelves[0], shelves[3]]:
+            for layer in shelf["layers"]:
+                self.assertEqual(len(layer), 1)
+                self.assertIsNotNone(layer[0])
+
+    def test_rejects_a_position_beyond_the_resulting_shelf_count(self) -> None:
+        with self.assertRaises(ValueError):
+            apply_dispenser_shelves(self._board(), {9: 2}, random.Random(1))
+
+    def test_rejects_a_board_without_enough_items_to_stock_the_queues(self) -> None:
+        sparse = [{"layers": [["item_01", None, None]]}]
+        with self.assertRaises(ValueError):
+            apply_dispenser_shelves(sparse, {1: 4}, random.Random(1))
+
+    def test_leaves_a_board_without_dispensers_untouched(self) -> None:
+        shelves = self._board()
+        expected = copy.deepcopy(shelves)
+        apply_dispenser_shelves(shelves, {}, random.Random(1))
+        self.assertEqual(shelves, expected)
 
 
 if __name__ == "__main__":

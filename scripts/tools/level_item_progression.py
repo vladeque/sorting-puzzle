@@ -19,6 +19,9 @@ DEFAULT_ITEM_CONFIG = Path("configs/item_sprites.json")
 DEFAULT_CHAPTERS_CONFIG = Path("configs/chapters.json")
 LOGICAL_ITEM_PATTERN = re.compile(r"^item_(\d{2,})$")
 SLOTS_PER_SHELF = 3
+TRIPLE_SIZE = 3
+SHELF_KIND_DISPENSER = "dispenser"
+DISPENSER_SLOTS_PER_SHELF = 1
 
 
 @dataclass(frozen=True)
@@ -308,15 +311,20 @@ def collect_logical_item_ids(level: dict[str, Any]) -> tuple[str, ...]:
         layers = shelf.get("layers")
         if not isinstance(layers, list) or not layers:
             raise ValueError(f"shelf {shelf_index + 1} must contain layers")
+        slot_count = (
+            DISPENSER_SLOTS_PER_SHELF
+            if shelf.get("type") == SHELF_KIND_DISPENSER
+            else SLOTS_PER_SHELF
+        )
         for layer_index, layer in enumerate(layers):
             if not isinstance(layer, list):
                 raise ValueError(
                     f"shelf {shelf_index + 1} layer {layer_index + 1} must be an array"
                 )
-            if len(layer) != SLOTS_PER_SHELF:
+            if len(layer) != slot_count:
                 raise ValueError(
                     f"shelf {shelf_index + 1} layer {layer_index + 1} "
-                    f"must contain {SLOTS_PER_SHELF} slots"
+                    f"must contain {slot_count} slots"
                 )
             for slot_index, item_id in enumerate(layer):
                 if item_id is None:
@@ -337,7 +345,7 @@ def collect_logical_item_ids(level: dict[str, Any]) -> tuple[str, ...]:
             "logical item IDs must be contiguous canonical tokens starting at item_01"
         )
     for item_id, count in item_counts.items():
-        if count % SLOTS_PER_SHELF != 0:
+        if count % TRIPLE_SIZE != 0:
             raise ValueError(
                 f"logical item '{item_id}' appears {count} times; expected a multiple of 3"
             )

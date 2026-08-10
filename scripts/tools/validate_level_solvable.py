@@ -12,6 +12,13 @@ from typing import Any, NamedTuple
 
 
 SLOTS_PER_SHELF = 3
+TRIPLE_SIZE = 3
+SHELF_KIND_STANDARD = "standard"
+SHELF_KIND_DISPENSER = "dispenser"
+SHELF_KINDS = {SHELF_KIND_STANDARD, SHELF_KIND_DISPENSER}
+DISPENSER_SLOTS_PER_SHELF = 1
+DISPENSER_MIN_LAYERS = 2
+DISPENSER_MAX_LAYERS = 4
 DEFAULT_ITEM_CONFIG = Path("configs/item_sprites.json")
 ROW_MOTION_HORIZONTAL_WRAP = "horizontal_wrap"
 ROW_MOTION_VERTICAL_WRAP = "vertical_wrap"
@@ -37,12 +44,34 @@ LAYOUT_PRESET_ROW_LAYOUTS: dict[str, list[dict[str, Any]]] = {
 }
 
 Item = str | None
-Layer = tuple[Item, Item, Item]
+Layer = tuple[Item, ...]
 
 
 class ShelfState(NamedTuple):
     unlock_after_triples: int
     layers: tuple[Layer, ...]
+    kind: str = SHELF_KIND_STANDARD
+
+    @property
+    def slot_count(self) -> int:
+        return slots_for_kind(self.kind)
+
+    @property
+    def accepts_dropped_items(self) -> bool:
+        return self.kind != SHELF_KIND_DISPENSER
+
+    @property
+    def forms_triples(self) -> bool:
+        return self.kind != SHELF_KIND_DISPENSER
+
+
+def shelf_kind(shelf: dict[str, Any]) -> str:
+    kind = shelf.get("type", SHELF_KIND_STANDARD)
+    return kind if kind in SHELF_KINDS else SHELF_KIND_STANDARD
+
+
+def slots_for_kind(kind: str) -> int:
+    return DISPENSER_SLOTS_PER_SHELF if kind == SHELF_KIND_DISPENSER else SLOTS_PER_SHELF
 
 
 State = tuple[int, tuple[ShelfState, ...]]
@@ -252,23 +281,47 @@ def validate_shelves_shape(
         if type(unlock_after_triples) is not int or unlock_after_triples < 0:
             errors.append(f"shelf {shelf_index + 1} unlock_after_triples must be a non-negative integer")
 
+        raw_kind = shelf.get("type", SHELF_KIND_STANDARD)
+        if raw_kind not in SHELF_KINDS:
+            errors.append(
+                f"shelf {shelf_index + 1} type must be one of {sorted(SHELF_KINDS)}"
+            )
+        kind = shelf_kind(shelf)
+        slot_count = slots_for_kind(kind)
+        is_dispenser = kind == SHELF_KIND_DISPENSER
+
         layers = shelf.get("layers")
         if not isinstance(layers, list) or not layers:
             errors.append(f"shelf {shelf_index + 1} must contain a non-empty layers array")
             continue
 
+        # A dispenser holds one item per layer and the player can only take from it, so its layer
+        # count is exactly how many items it will ever hand out.
+        if is_dispenser and not DISPENSER_MIN_LAYERS <= len(layers) <= DISPENSER_MAX_LAYERS:
+            errors.append(
+                f"shelf {shelf_index + 1} is a dispenser with {len(layers)} layers, expected "
+                f"{DISPENSER_MIN_LAYERS} to {DISPENSER_MAX_LAYERS}"
+            )
+
         for layer_index, layer in enumerate(layers):
             if not isinstance(layer, list):
                 errors.append(f"shelf {shelf_index + 1} layer {layer_index + 1} must be an array")
                 continue
-            if len(layer) != SLOTS_PER_SHELF:
+            if len(layer) != slot_count:
                 errors.append(
-                    f"shelf {shelf_index + 1} layer {layer_index + 1} must contain {SLOTS_PER_SHELF} slots"
+                    f"shelf {shelf_index + 1} layer {layer_index + 1} must contain {slot_count} slots"
                 )
                 continue
 
             for slot_index, item_id in enumerate(layer):
                 if item_id is None:
+                    # A hole in a dispenser's queue has no meaning: there is nothing to move into
+                    # it and nothing for it to hand out.
+                    if is_dispenser:
+                        errors.append(
+                            f"shelf {shelf_index + 1} layer {layer_index + 1} is a dispenser layer "
+                            "and must contain an item ID, not null"
+                        )
                     continue
                 if not isinstance(item_id, str) or not item_id:
                     errors.append(
@@ -282,8 +335,8 @@ def validate_shelves_shape(
                 item_counts[item_id] += 1
 
     for item_id, count in sorted(item_counts.items()):
-        if count % SLOTS_PER_SHELF != 0:
-            errors.append(f"item '{item_id}' appears {count} times, expected a multiple of {SLOTS_PER_SHELF}")
+        if count % TRIPLE_SIZE != 0:
+            errors.append(f"item '{item_id}' appears {count} times, expected a multiple of {TRIPLE_SIZE}")
 
     return errors, item_counts
 
@@ -298,6 +351,7 @@ def shelves_to_state(shelves: list[dict[str, Any]]) -> State:
             ShelfState(
                 unlock_after_triples=max(0, int(shelf.get("unlock_after_triples", 0))),
                 layers=tuple(layers),
+                kind=shelf_kind(shelf),
             )
         )
 
@@ -308,8 +362,9 @@ def slot_sort_key(item: Item) -> tuple[int, str]:
     return (1, "") if item is None else (0, item)
 
 
-def shelf_sort_key(shelf: ShelfState) -> tuple[int, tuple[tuple[tuple[int, str], ...], ...]]:
+def shelf_sort_key(shelf: ShelfState) -> tuple[str, int, tuple[tuple[tuple[int, str], ...], ...]]:
     return (
+        shelf.kind,
         shelf.unlock_after_triples,
         tuple(tuple(slot_sort_key(item) for item in layer) for layer in shelf.layers),
     )
@@ -326,6 +381,7 @@ def canonicalize_state(state: State) -> State:
             ShelfState(
                 unlock_after_triples=shelf.unlock_after_triples,
                 layers=tuple(canonical_layers),
+                kind=shelf.kind,
             )
         )
 
@@ -336,7 +392,13 @@ def is_empty_layer(layer: Layer) -> bool:
     return all(item is None for item in layer)
 
 
-def is_matching_layer(layer: Layer) -> bool:
+## A dispenser's layer is one slot wide, so the "every slot holds the same item" test is trivially
+## true for it. Without the shelf-kind gate every dispenser would clear itself on sight and hand out
+## free triples, and the search would call unsolvable levels solvable.
+def is_matching_layer(shelf: ShelfState, layer: Layer) -> bool:
+    if not shelf.forms_triples or len(layer) != TRIPLE_SIZE:
+        return False
+
     first = layer[0]
     return first is not None and all(item == first for item in layer)
 
@@ -355,9 +417,9 @@ def settle_state(state: State) -> State:
         for shelf_index, shelf in enumerate(shelves):
             shelf_state = state_shelves[shelf_index]
             while shelf and is_shelf_unlocked(shelf_state, triples_cleared) and (
-                is_empty_layer(shelf[0]) or is_matching_layer(shelf[0])
+                is_empty_layer(shelf[0]) or is_matching_layer(shelf_state, shelf[0])
             ):
-                if is_matching_layer(shelf[0]):
+                if is_matching_layer(shelf_state, shelf[0]):
                     triples_cleared += 1
                 shelf.pop(0)
                 changed = True
@@ -370,6 +432,7 @@ def settle_state(state: State) -> State:
             ShelfState(
                 unlock_after_triples=state_shelves[shelf_index].unlock_after_triples,
                 layers=tuple(layers),
+                kind=state_shelves[shelf_index].kind,
             )
         )
 
@@ -386,7 +449,7 @@ def is_cleared(state: State) -> bool:
 
 def visible_layer(shelf: ShelfState) -> Layer:
     if not shelf.layers:
-        return (None, None, None)
+        return (None,) * shelf.slot_count
 
     return shelf.layers[0]
 
@@ -403,7 +466,9 @@ def legal_moves(state: State) -> list[Move]:
         front = visible_layer(shelf)
         for slot_index, item_id in enumerate(front):
             if item_id is None:
-                targets.append((shelf_index, slot_index))
+                # A source-only shelf never offers its empty slot as somewhere to put an item.
+                if shelf.accepts_dropped_items:
+                    targets.append((shelf_index, slot_index))
             else:
                 sources.append((shelf_index, slot_index, item_id))
 
@@ -440,7 +505,7 @@ def apply_move(state: State, move: Move) -> State:
     shelves = [[list(layer) for layer in shelf.layers] for shelf in state_shelves]
 
     if not shelves[move.to_shelf]:
-        shelves[move.to_shelf].append([None, None, None])
+        shelves[move.to_shelf].append([None] * state_shelves[move.to_shelf].slot_count)
 
     shelves[move.from_shelf][0][move.from_slot] = None
     shelves[move.to_shelf][0][move.to_slot] = move.item_id
@@ -451,6 +516,7 @@ def apply_move(state: State, move: Move) -> State:
             ShelfState(
                 unlock_after_triples=state_shelves[shelf_index].unlock_after_triples,
                 layers=tuple(tuple(layer) for layer in shelf),
+                kind=state_shelves[shelf_index].kind,
             )
         )
 

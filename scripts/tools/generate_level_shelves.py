@@ -18,6 +18,9 @@ from validate_level_solvable import solve_level, shelves_to_state, validate_shel
 
 
 SLOTS_PER_SHELF = 3
+SHELF_KIND_DISPENSER = "dispenser"
+DISPENSER_MIN_LAYERS = 2
+DISPENSER_MAX_LAYERS = 4
 DEFAULT_PREFERRED_COPIES_PER_TYPE = 6.0
 LAYER_TRIPLE_RATIO_TOLERANCE = 0.05
 LAYOUT_PRESETS = (
@@ -111,6 +114,111 @@ def parse_locked_shelves(raw_locked_shelves: str | None) -> dict[int, int]:
         locked_shelves[shelf_number] = unlock_after_triples
 
     return locked_shelves
+
+
+def parse_dispenser_shelves(raw_dispenser_shelves: str | None) -> dict[int, int]:
+    if not raw_dispenser_shelves:
+        return {}
+
+    dispenser_shelves: dict[int, int] = {}
+    for raw_entry in raw_dispenser_shelves.split(","):
+        entry = raw_entry.strip()
+        if not entry:
+            continue
+
+        parts = entry.split(":")
+        if len(parts) != 2:
+            raise ValueError("--dispenser-shelves entries must use SHELF:LAYERS")
+
+        try:
+            shelf_number = int(parts[0])
+            layer_count = int(parts[1])
+        except ValueError as error:
+            raise ValueError("--dispenser-shelves entries must contain integers") from error
+
+        if shelf_number <= 0:
+            raise ValueError("--dispenser-shelves shelf numbers are 1-based and must be positive")
+        if not DISPENSER_MIN_LAYERS <= layer_count <= DISPENSER_MAX_LAYERS:
+            raise ValueError(
+                f"--dispenser-shelves layer counts must be {DISPENSER_MIN_LAYERS} "
+                f"to {DISPENSER_MAX_LAYERS}"
+            )
+
+        dispenser_shelves[shelf_number] = layer_count
+
+    return dispenser_shelves
+
+
+def collect_dispenser_donor_slots(
+    shelves: list[dict[str, Any]],
+    rng: random.Random,
+) -> list[tuple[int, int, int]]:
+    """Filled slot coordinates, deepest layer first, shuffled within each layer."""
+    donors: list[tuple[int, int, int]] = []
+    max_layer_count = max((len(shelf["layers"]) for shelf in shelves), default=0)
+    for layer_index in range(max_layer_count - 1, -1, -1):
+        layer_donors: list[tuple[int, int, int]] = []
+        for shelf_index, shelf in enumerate(shelves):
+            layers = shelf["layers"]
+            if layer_index >= len(layers):
+                continue
+
+            for slot_index, item_id in enumerate(layers[layer_index]):
+                if item_id is not None:
+                    layer_donors.append((shelf_index, layer_index, slot_index))
+
+        rng.shuffle(layer_donors)
+        donors.extend(layer_donors)
+
+    return donors
+
+
+def apply_dispenser_shelves(
+    shelves: list[dict[str, Any]],
+    dispenser_shelves: dict[int, int],
+    rng: random.Random,
+) -> None:
+    """Insert source-only dispenser shelves, stocking them from the generated board.
+
+    Queue items are relocated rather than newly minted, so every item ID keeps the multiple-of-three
+    count the distribution engine gave it. They come out of the deepest layers first, which disturbs
+    the opening board least. Whether the result is still winnable is not assumed here --
+    --require-solvable re-runs the search after this pass.
+    """
+    if not dispenser_shelves:
+        return
+
+    total_shelf_count = len(shelves) + len(dispenser_shelves)
+    for shelf_number in sorted(dispenser_shelves):
+        if shelf_number > total_shelf_count:
+            raise ValueError(
+                f"--dispenser-shelves references shelf {shelf_number}, "
+                f"but only {total_shelf_count} shelves exist"
+            )
+
+    required_item_count = sum(dispenser_shelves.values())
+    donors = collect_dispenser_donor_slots(shelves, rng)
+    if len(donors) < required_item_count:
+        raise ValueError(
+            f"--dispenser-shelves needs {required_item_count} items, but the generated board "
+            f"only holds {len(donors)}"
+        )
+
+    queue_items: list[str] = []
+    for shelf_index, layer_index, slot_index in donors[:required_item_count]:
+        queue_items.append(shelves[shelf_index]["layers"][layer_index][slot_index])
+        shelves[shelf_index]["layers"][layer_index][slot_index] = None
+
+    # Ascending order so an earlier insertion never shifts a later target position.
+    item_cursor = 0
+    for shelf_number in sorted(dispenser_shelves):
+        layer_count = dispenser_shelves[shelf_number]
+        items = queue_items[item_cursor : item_cursor + layer_count]
+        item_cursor += layer_count
+        shelves.insert(
+            shelf_number - 1,
+            {"type": SHELF_KIND_DISPENSER, "layers": [[item_id] for item_id in items]},
+        )
 
 
 def apply_locked_shelves(shelves: list[dict[str, Any]], locked_shelves: dict[int, int]) -> None:
@@ -404,16 +512,24 @@ def generate_with_optional_validation(
     max_depth: int,
     preferred_copies_per_type: float = DEFAULT_PREFERRED_COPIES_PER_TYPE,
     locked_shelves: dict[int, int] | None = None,
+    dispenser_shelves: dict[int, int] | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any], dict[str, Any] | None, int | None]:
     attempts = max(1, max_attempts if require_solvable else 1)
     random_seed_source = random.SystemRandom()
     last_result = None
     locked_shelves = locked_shelves or {}
+    dispenser_shelves = dispenser_shelves or {}
+
+    # Dispensers are inserted after generation, so the distribution engine lays out only the
+    # standard shelves and the requested total still comes out right.
+    standard_shelf_count = shelf_count - len(dispenser_shelves)
+    if standard_shelf_count < 1:
+        raise ValueError("--dispenser-shelves must leave at least one standard shelf")
 
     for attempt_index in range(attempts):
         attempt_seed = seed + attempt_index if seed is not None else random_seed_source.randrange(1, 2**31)
         shelves, stats = generate_shelves(
-            shelf_count=shelf_count,
+            shelf_count=standard_shelf_count,
             layer_count=layer_count,
             filled_layer_count=filled_layer_count,
             item_types=item_types,
@@ -423,7 +539,12 @@ def generate_with_optional_validation(
             min_front_visible_triples=min_front_visible_triples,
             preferred_copies_per_type=preferred_copies_per_type,
         )
+        apply_dispenser_shelves(shelves, dispenser_shelves, random.Random(attempt_seed))
         apply_locked_shelves(shelves, locked_shelves)
+        stats["dispenser_shelves"] = {
+            str(shelf_number): layer_count
+            for shelf_number, layer_count in sorted(dispenser_shelves.items())
+        }
         stats["attempt"] = attempt_index + 1
         stats["max_attempts"] = attempts
         stats["locked_shelves"] = {
@@ -1552,6 +1673,13 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     parser.add_argument(
+        "--dispenser-shelves",
+        help=(
+            "Comma-separated 1-based dispenser shelf positions and layer counts, such as 10:3,11:4. "
+            "Each becomes a source-only shelf holding that many items, counted against --shelf-count."
+        ),
+    )
+    parser.add_argument(
         "--locked-shelves",
         help=(
             "Comma-separated 1-based shelf unlock requirements, such as 7:3,8:5. "
@@ -1572,6 +1700,7 @@ def main() -> int:
         if args.item_type_count is not None:
             item_types = logical_item_ids(args.item_type_count)
         locked_shelves = parse_locked_shelves(args.locked_shelves)
+        dispenser_shelves = parse_dispenser_shelves(args.dispenser_shelves)
         shelves, stats, validation, used_seed = generate_with_optional_validation(
             shelf_count=args.shelf_count,
             layer_count=args.layer_count,
@@ -1588,6 +1717,7 @@ def main() -> int:
             max_depth=args.validator_max_depth,
             preferred_copies_per_type=args.preferred_copies_per_type,
             locked_shelves=locked_shelves,
+            dispenser_shelves=dispenser_shelves,
         )
     except (OSError, ValueError, KeyError) as error:
         print(f"error: {error}", file=sys.stderr)
