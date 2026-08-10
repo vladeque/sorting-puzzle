@@ -118,15 +118,15 @@ func _verify_shadow_color_and_overlap(item: ShelfItem, shadow: Sprite2D) -> void
 	item.shadow_lift = 0.0
 	var resting_color := _get_shadow_color(shadow)
 	_check(
-		resting_color.is_equal_approx(left_shade.color),
-		"The resting item shadow uses the complete BackWallLeftShade color."
+		_colors_match_rgb(resting_color, left_shade.color),
+		"The resting item shadow uses the BackWallLeftShade RGB color."
 	)
 
 	item.shadow_lift = 1.0
 	var carried_color := _get_shadow_color(shadow)
 	_check(
-		carried_color.is_equal_approx(left_shade.color),
-		"The carried item shadow keeps the complete BackWallLeftShade color."
+		_colors_match_rgb(carried_color, left_shade.color),
+		"The carried item shadow keeps the BackWallLeftShade RGB color."
 	)
 
 	for item_shadow_color in [resting_color, carried_color]:
@@ -177,7 +177,7 @@ func _verify_resting_shape(item: ShelfItem, shadow: Sprite2D) -> void:
 			_get_shadow_alpha(shadow),
 			_get_base_shadow_alpha(item) * ShelfItem.SHADOW_REST_ALPHA_SCALE
 		),
-		"A resting shadow keeps the canonical shelf-shadow opacity."
+		"A resting shadow is faint enough not to crowd adjacent shelf items."
 	)
 
 
@@ -284,6 +284,12 @@ func _get_shadow_color(shadow: Sprite2D) -> Color:
 		return Color.TRANSPARENT
 	var color = material.get_shader_parameter("shadow_color")
 	return color if color is Color else Color.TRANSPARENT
+
+
+func _colors_match_rgb(first: Color, second: Color) -> bool:
+	return is_equal_approx(first.r, second.r) \
+		and is_equal_approx(first.g, second.g) \
+		and is_equal_approx(first.b, second.b)
 
 
 func _source_over(source: Color, destination: Color) -> Color:
