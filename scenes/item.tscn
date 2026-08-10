@@ -56,7 +56,7 @@ render_mode unshaded;
 // The projection itself lives outside this shader: scenes/item.tscn anchors the sprite on the
 // art's ground line (canvas y=120, per docs/ITEM_ASSET_REQUIREMENTS.md) and scripts/item.gd
 // blends between the resting and carried shapes, driving blur_radius_px, silhouette_weight and
-// shadow_color's alpha along with them. Its RGB matches the shelf's opaque BackWallLeftShade;
+// shadow_color's alpha along with them. Its complete opaque color matches BackWallLeftShade;
 // source-over intersections with equal or darker shelf shadows therefore cannot become darker.
 uniform vec4 shadow_color : source_color = vec4(0.7490196, 0.65882355, 0.54901963, 1.0);
 uniform float blur_radius_px : hint_range(0.0, 32.0, 0.5) = 5.0;
