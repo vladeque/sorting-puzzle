@@ -1562,7 +1562,8 @@ Purpose:
 Important nodes:
 - `Shell`: the shared modal shell instance.
 - `SettingsContent`: reparented into `Shell`'s compact 224px content region at `_ready()`; holds
-  `InnerTitleLabel` (`SETTINGS`) and `IconRow`.
+  `InnerTitleLabel` (`SETTINGS`) and `IconRow`; the row starts at y=64 to keep the icons close to
+  the inner title.
 - `IconRow/MusicOption/MusicButton`, `SoundEffectsOption/SoundEffectsButton`,
   `VibrationOption/VibrationButton`: square toggle buttons with shadow-only button styling,
   held-press scaling, and a scene-authored hidden `CrossOut` child (`Border` + `Slash` ColorRects)
@@ -1606,8 +1607,9 @@ Purpose:
 
 Important nodes:
 - `Shell`: the shared modal shell instance.
-- `LossContent`: reparented into `Shell`'s compact 240px content region at `_ready()`; holds `MessageLabel` and
-  `LossRow`.
+- `LossContent`: reparented into `Shell`'s compact 240px content region at `_ready()`; holds
+  `MessageLabel` and `LossRow`; the centered row uses a -40px top offset to keep the loss icons
+  close to the message.
 - `LossRow/LifeLoss`, `LossRow/StarLoss`: `style_box_gameplay_item_slot.tres` cells with a
   `style_box_gameplay_count_badge.tres` count badge each; `StarLoss`'s `%CountLabel` is the current
   run star count written by `scripts/leave_confirmation_menu.gd::set_star_count()`.
