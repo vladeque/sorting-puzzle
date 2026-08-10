@@ -219,9 +219,8 @@ Attached to:
 
 Purpose:
 - Draws a circular progress readout with `Control._draw()`/`draw_arc()`: a full track circle plus a
-  partial fill arc starting at the top. The first percentage-driven `_draw()` component in the
-  project (the only prior `draw_arc()` usage, `scripts/hammer_impact_effect.gd`, is a decorative
-  full-sweep burst, not progress-driven).
+  partial fill arc starting at the top. The only percentage-driven `_draw()` component in the
+  project, and now the only `draw_arc()` usage.
 - Recomputes its radius from `size` on `NOTIFICATION_RESIZED`, so it stays correct across the five
   responsive test resolutions without a hardcoded pixel radius.
 
@@ -1589,9 +1588,9 @@ Key responsibilities:
 - Hammer targets visible/front triples first, then can supplement visible/front matches with first-back-layer copies of the same item type when no visible item type has three available copies.
 - Hammer computes the average position of its chosen three targets, starts the fullscreen hammer
   wind-up there immediately, and gathers the items into that same board-local impact point while
-  the hammer travels from its lower-left launch pose to the upper-right anticipation pose. The
+  the hammer travels from its lower-left launch pose to the raised anticipation pose. The
   merged item compresses on the 400 ms `pre_impact` signal, becomes invisible and is freed on the
-  480 ms `impact` signal, and the combo reward starts 140 ms later while the 1.12 second recoil/VFX
+  480 ms `impact` signal, and the combo reward starts 140 ms later while the 1.12 second VFX
   tail is still fading. Gameplay scoring, shelf resolution, and ability input lock rules are unchanged.
 - Hammer passes the live sound-effects setting and exported `hammer_haptics_enabled` flag into the
   effect scene. Disabling sound while the strike is active stops every scene-owned hammer cue;
@@ -1697,20 +1696,30 @@ Attached to:
 Purpose:
 - Runtime controller and procedural VFX renderer for the hammer ability's fullscreen strike.
 - Positions and scales the scene over a provided screen-space target point, plays the scene-owned
-  1.12 second `AnimationPlayer` `strike` animatic, and draws mobile-capped swing trails, radial
-  glow, two shockwave rings, pink/teal/white starburst rays, a 2-3-frame screen flash, and
-  deterministic sparks/debris from five animated scalar amounts. The two smear afterimages share
-  one additive canvas material; the effect does not allocate runtime particle emitters.
+  1.12 second `AnimationPlayer` `strike` animatic, and draws mobile-capped swing trails, a radial
+  magenta glow, tapered white/warm starburst spikes, a localised hot core, and deterministic
+  sparks/debris from five animated scalar amounts. All `_draw()` output uses the root's additive
+  canvas material so the burst brightens the board instead of staining the warm background; a
+  full-screen flash rect was removed for the same reason. The effect does not allocate runtime
+  particle emitters.
+- Keeps each pose's striking face on the pivot via `POSE_HEAD_OFFSETS`, applied every frame in
+  `_process()` (which runs at `process_priority = 1`, after the child `AnimationPlayer`). The hammer
+  art is not centred on its striking face, so without this the head lands beside the burst it causes.
+- Mirrors the whole approach through `ImpactAnchor.scale.x` for targets past
+  `MIRROR_THRESHOLD_RATIO`, keeping the raised pose inside the viewport on right-column strikes.
+- Samples the head's real path into a short ring buffer so the swing trail follows the swing
+  instead of a fixed screen-space arc.
 - Coordinates the scene's entrance/downstroke, layered impact, and sparkle-tail audio players,
   plus the optional mobile impact vibration.
 - Emits `pre_impact` at 400 ms, `impact` on the 480 ms visual hit frame, and `finished` after the
   hammer and VFX fade out.
 
 Exports:
-- `base_hammer_scale`: base visual size before responsive viewport scaling.
+- `base_hammer_scale`: base visual size before responsive viewport scaling. Tuned so the head covers
+  roughly one shelf cell at impact; larger values bury the cell being cleared.
 
 Depends on:
-- `assets/abilities/ability_hammer_swing_*.png` for the ten pseudo-3D poses.
+- `assets/abilities/ability_hammer_swing_*.png` for the eight pseudo-3D poses.
 - The existing item-place, triple-clear, and short satisfying SFX for layered hammer cues; no new
   audio asset is required.
 - `scenes/abilities/hammer_impact_effect.tscn` `AnimationPlayer` keyframes for hammer motion,
@@ -1718,12 +1727,14 @@ Depends on:
 - `scripts/level.gd` for runtime instancing and gameplay response to `impact`.
 
 Verification:
-- `tests/gameplay/test_hammer_animation.gd` checks all ten poses, all five procedural VFX tracks,
-  two afterimages, audio ownership/muting, lower-left launch, upper-right anticipation, pre-impact
-  compression, exact-frame target disappearance, delayed reward overlap, 480 ms impact timing,
-  the full recoil duration, cleanup, and responsive layout at 540x960, 720x1280, 1080x1920,
-  1080x2400, and 900x1200. It can also render an in-level timing preview with `--write-movie` and
-  the `--hammer-animation-preview` user argument.
+- `tests/gameplay/test_hammer_animation.gd` checks all eight poses, the impact-pose hold through the
+  dissolve, all five procedural VFX tracks, two afterimages, audio ownership/muting, lower-left
+  launch, raised anticipation, pre-impact compression, exact-frame target disappearance, delayed
+  reward overlap, 480 ms impact timing, the full tail duration, cleanup, and responsive layout at
+  540x960, 720x1280, 1080x1920, 1080x2400, and 900x1200. It also seeks the paused animation to
+  verify head-on-pivot alignment and on-screen framing for left, centre, and right targets. It can
+  render an in-level timing preview with `--write-movie` and the `--hammer-animation-preview` user
+  argument; use a `.png` movie path, since the `.avi` output is not readable by common ffmpeg builds.
 
 Do not use for:
 - Ability inventory, target selection, item deletion, score/star rules, or shelf resolution.

@@ -76,7 +76,14 @@ func _run() -> void:
 	)
 	_check(texture_track >= 0, "Hammer strike owns a texture-swap track.")
 	if texture_track >= 0:
-		_check(strike.track_get_key_count(texture_track) == 10, "Hammer strike uses all ten pose assets.")
+		_check(
+			strike.track_get_key_count(texture_track) == 8,
+			"Hammer strike swaps through the eight swing poses."
+		)
+		_check(
+			strike.track_get_key_time(texture_track, 7) <= 0.53,
+			"Hammer holds its impact pose through the dissolve instead of playing a rebound."
+		)
 	for property_path in [
 		NodePath(".:_trail_amount"),
 		NodePath(".:_glow_amount"),
@@ -150,6 +157,11 @@ func _run() -> void:
 		"Hammer impact signal is aligned to the 480 ms strike frame."
 	)
 	await process_frame
+	_check(
+		(effect.call("_get_head_position") as Vector2).distance_to(expected_impact_screen_position)
+			< 24.0,
+		"Hammer head lands on the impact point instead of beside it."
+	)
 	for item in hammer_targets:
 		_check(
 			item == null
@@ -207,8 +219,66 @@ func _verify_responsive_effect_layout() -> void:
 			"Hammer keeps its board-relative target at %s." % viewport_size
 		)
 		_check(
-			sprite.scale.x >= 0.5 and sprite.scale.x <= 0.92,
+			sprite.scale.x >= 0.28 and sprite.scale.x <= 0.56,
 			"Hammer scale remains capped for mobile/tablet viewport %s." % viewport_size
+		)
+		effect.queue_free()
+		await process_frame
+
+	await _verify_edge_target_framing()
+
+
+## Targets near the right edge must mirror their approach, otherwise the raised pose hangs off the
+## viewport and the player never sees the wind-up.
+func _verify_edge_target_framing() -> void:
+	var effect_scene := load("res://scenes/abilities/hammer_impact_effect.tscn") as PackedScene
+	var viewport_size := Vector2i(720, 1280)
+	get_root().content_scale_size = viewport_size
+	get_root().size = viewport_size
+	await process_frame
+
+	for target_ratio in [0.18, 0.5, 0.86]:
+		var effect := effect_scene.instantiate() as HammerImpactEffect
+		root.add_child(effect)
+		await process_frame
+		var target := Vector2(viewport_size) * Vector2(target_ratio, 0.5)
+		effect.play(target, false, false)
+		await process_frame
+		var anchor := effect.get_node("ImpactAnchor") as Node2D
+		var mirrored := anchor.scale.x < 0.0
+		_check(
+			mirrored == (target_ratio > 0.55),
+			"Hammer mirrors its approach only for right-side targets (ratio %s)." % target_ratio
+		)
+
+		var animation_player := effect.get_node("AnimationPlayer") as AnimationPlayer
+		# Pausing keeps the pose fixed while the effect's own _process aligns the sprite, so these
+		# assertions do not depend on how far a frame advances the strike.
+		animation_player.seek(0.3, true)
+		animation_player.pause()
+		await process_frame
+		var raised_head: Vector2 = effect.call("_get_head_position")
+		_check(
+			raised_head.x >= 0.0 and raised_head.x <= float(viewport_size.x),
+			"Hammer keeps its raised pose on screen for target ratio %s." % target_ratio
+		)
+
+		animation_player.seek(0.48, true)
+		animation_player.pause()
+		await process_frame
+		var pose_offsets: Dictionary = effect.get_script().get_script_constant_map().get(
+			"POSE_HEAD_OFFSETS", {}
+		)
+		var sprite := effect.get_node("ImpactAnchor/HammerPivot/HammerSprite") as Sprite2D
+		var head_offset: Vector2 = pose_offsets.get(sprite.texture, Vector2.INF)
+		_check(
+			head_offset.is_finite()
+				and (sprite.position + head_offset * sprite.scale).length() < 0.01,
+			"Impact pose keeps its striking face on the pivot the burst is drawn around."
+		)
+		_check(
+			(effect.call("_get_head_position") as Vector2).distance_to(target) < 0.01,
+			"Hammer head lands exactly on the impact point for target ratio %s." % target_ratio
 		)
 		effect.queue_free()
 		await process_frame

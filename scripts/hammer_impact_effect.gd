@@ -9,11 +9,39 @@ const DESIGN_WIDTH := 720.0
 const BURST_RAY_COUNT := 18
 const SPARK_COUNT := 20
 const TRAIL_LINE_COUNT := 4
+const TRAIL_SAMPLE_COUNT := 7
 const PINK := Color(1.0, 0.18, 0.72, 1.0)
 const LIGHT_PINK := Color(1.0, 0.76, 0.94, 1.0)
-const TEAL := Color(0.2, 1.0, 0.92, 1.0)
+const WARM := Color(1.0, 0.86, 0.42, 1.0)
 
-@export_range(0.1, 2.0, 0.01) var base_hammer_scale := 0.68
+## Strikes landing right of this fraction of the overlay mirror their approach so the raised pose
+## stays inside the viewport instead of hanging off the right edge.
+const MIRROR_THRESHOLD_RATIO := 0.55
+
+const WINDUP_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_windup.png")
+const RISE_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_rise.png")
+const ANTICIPATION_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_anticipation.png")
+const MID_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_mid.png")
+const SMEAR_EARLY_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_smear_early.png")
+const SMEAR_LATE_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_smear_late.png")
+const IMPACT_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_impact.png")
+const IMPACT_OVERSHOOT_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_impact_overshoot.png")
+
+## Offset of each pose's striking face from its texture centre, in texture pixels. The sprite is
+## shifted by the negation of this so the face always lands on the pivot, which is what the impact
+## VFX are drawn around. Without it the hammer visually lands beside the burst it causes.
+const POSE_HEAD_OFFSETS := {
+	WINDUP_TEXTURE: Vector2(-20.0, -126.0),
+	RISE_TEXTURE: Vector2(0.0, -140.0),
+	ANTICIPATION_TEXTURE: Vector2(60.0, -145.0),
+	MID_TEXTURE: Vector2(36.0, -98.0),
+	SMEAR_EARLY_TEXTURE: Vector2(-38.0, 110.0),
+	SMEAR_LATE_TEXTURE: Vector2(-20.0, 60.0),
+	IMPACT_TEXTURE: Vector2(8.0, 110.0),
+	IMPACT_OVERSHOOT_TEXTURE: Vector2(24.0, 110.0),
+}
+
+@export_range(0.1, 2.0, 0.01) var base_hammer_scale := 0.4
 
 @onready var _impact_anchor: Node2D = %ImpactAnchor
 @onready var _hammer_pivot: Node2D = %HammerPivot
@@ -33,6 +61,7 @@ var _sound_enabled := true
 var _haptics_enabled := true
 var _pre_impact_reached := false
 var _has_impacted := false
+var _trail_points: PackedVector2Array = PackedVector2Array()
 var _burst_amount := 0.0:
 	set(value):
 		_burst_amount = value
@@ -58,6 +87,8 @@ var _debris_amount := 0.0:
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	visible = false
+	# Runs after the child AnimationPlayer so pose alignment reads the current frame's texture.
+	process_priority = 1
 	add_to_group(&"hammer_impact_effect")
 	_apply_full_rect()
 
@@ -76,12 +107,16 @@ func play(target_screen_position: Vector2, sound_enabled := true, haptics_enable
 	_glow_amount = 0.0
 	_trail_amount = 0.0
 	_debris_amount = 0.0
+	_trail_points.clear()
 
 	_impact_anchor.position = _impact_position
-	_impact_anchor.scale = Vector2.ONE
+	_impact_anchor.scale = Vector2(-1.0, 1.0) if _should_mirror_approach() else Vector2.ONE
 	_hammer_sprite.scale = Vector2.ONE * base_hammer_scale * _layout_scale
 	_afterimage_early.scale = _hammer_sprite.scale
 	_afterimage_late.scale = _hammer_sprite.scale
+	_align_sprite_to_pivot(_hammer_sprite)
+	_align_sprite_to_pivot(_afterimage_early)
+	_align_sprite_to_pivot(_afterimage_late)
 	_animation_player.stop()
 	_animation_player.play(&"strike")
 
@@ -103,94 +138,119 @@ func set_sound_enabled(enabled: bool) -> void:
 			player.stop()
 
 
+func _process(_delta: float) -> void:
+	if not visible:
+		return
+
+	_align_sprite_to_pivot(_hammer_sprite)
+	_sample_trail_point()
+
+
+## Keeps the striking face of whichever pose is on screen pinned to the pivot origin.
+func _align_sprite_to_pivot(sprite: Sprite2D) -> void:
+	if sprite == null or sprite.texture == null:
+		return
+	var head_offset: Vector2 = POSE_HEAD_OFFSETS.get(sprite.texture, Vector2.ZERO)
+	sprite.position = -head_offset * sprite.scale
+
+
+func _get_head_position() -> Vector2:
+	# The sprite alignment above places the striking face exactly on the pivot origin, so the head
+	# position collapses to the pivot's own transform.
+	return _impact_anchor.position + _impact_anchor.scale * _hammer_pivot.position
+
+
+func _sample_trail_point() -> void:
+	if _trail_amount <= 0.0:
+		if not _trail_points.is_empty():
+			_trail_points.clear()
+		return
+
+	_trail_points.append(_get_head_position())
+	if _trail_points.size() > TRAIL_SAMPLE_COUNT:
+		_trail_points.remove_at(0)
+	queue_redraw()
+
+
 func _draw() -> void:
 	if _trail_amount > 0.0:
 		_draw_swing_trails()
-
-	if _flash_amount > 0.0:
-		draw_rect(Rect2(Vector2.ZERO, size), Color(1.0, 0.82, 0.95, 0.24 * _flash_amount))
-		draw_rect(Rect2(Vector2.ZERO, size), Color(0.72, 1.0, 0.98, 0.08 * _flash_amount))
 
 	if _glow_amount > 0.0:
 		_draw_radial_glow()
 
 	if _burst_amount > 0.0:
-		_draw_shockwave_and_starburst()
+		_draw_starburst()
+
+	if _flash_amount > 0.0:
+		_draw_flash_core()
 
 	if _debris_amount > 0.0:
 		_draw_sparks_and_debris()
 
 
+## Traces the path the head actually travelled this swing rather than a fixed screen-space arc.
 func _draw_swing_trails() -> void:
-	var alpha := sin(_trail_amount * PI)
-	if alpha <= 0.0:
+	if _trail_points.size() < 2:
 		return
-	for trail_index in range(TRAIL_LINE_COUNT):
-		var spacing := float(trail_index) * 18.0 * _layout_scale
-		var points := PackedVector2Array([
-			_impact_position + Vector2(248.0, -330.0) * _layout_scale + Vector2(spacing, -spacing * 0.25),
-			_impact_position + Vector2(202.0, -258.0) * _layout_scale + Vector2(spacing * 0.5, 0.0),
-			_impact_position + Vector2(130.0, -166.0) * _layout_scale,
-			_impact_position + Vector2(50.0, -62.0) * _layout_scale,
-		])
-		var color := TEAL if trail_index % 2 == 0 else LIGHT_PINK
-		color.a = alpha * (0.5 - float(trail_index) * 0.07)
-		draw_polyline(points, color, (8.0 - float(trail_index)) * _layout_scale, true)
+
+	var travel := _trail_points[_trail_points.size() - 1] - _trail_points[0]
+	if travel.length() < 1.0:
+		return
+
+	var perpendicular := travel.normalized().orthogonal()
+	for strand_index in range(TRAIL_LINE_COUNT):
+		var spread := (float(strand_index) - float(TRAIL_LINE_COUNT - 1) * 0.5) * 15.0 * _layout_scale
+		var strand := PackedVector2Array()
+		for point in _trail_points:
+			strand.append(point + perpendicular * spread)
+		var color := WARM if strand_index % 2 == 0 else LIGHT_PINK
+		color.a = _trail_amount * (0.3 - absf(spread) * 0.005)
+		draw_polyline(strand, color, (6.0 - float(strand_index)) * _layout_scale, true)
 
 
+## Drawn additively (see the overlay's canvas material), so the glow brightens the board instead of
+## staining it. Sized to roughly the target cell plus its neighbours rather than the whole shelf.
 func _draw_radial_glow() -> void:
 	var alpha := _glow_amount
 	var expansion := 1.0 - alpha
-	for glow_index in range(4, 0, -1):
-		var radius := lerpf(96.0, 284.0, expansion) * float(glow_index) / 4.0 * _layout_scale
-		var glow_color := PINK if glow_index % 2 == 0 else TEAL
-		glow_color.a = alpha * (0.035 + float(5 - glow_index) * 0.016)
+	for glow_index in range(6, 0, -1):
+		var radius := lerpf(150.0, 218.0, expansion) * float(glow_index) / 6.0 * _layout_scale
+		var glow_color := PINK if glow_index % 2 == 0 else LIGHT_PINK
+		glow_color.a = alpha * (0.035 + float(7 - glow_index) * 0.024)
 		draw_circle(_impact_position, radius, glow_color)
 
 
-func _draw_shockwave_and_starburst() -> void:
+func _draw_starburst() -> void:
 	var alpha := _burst_amount
 	var expansion := 1.0 - alpha
-	var radius := lerpf(72.0, 224.0, expansion) * _layout_scale
-	draw_arc(
-		_impact_position,
-		radius,
-		0.0,
-		TAU,
-		64,
-		Color(PINK, 0.9 * alpha),
-		lerpf(10.0, 3.0, expansion) * _layout_scale,
-		true
-	)
-	draw_arc(
-		_impact_position,
-		radius * 0.72,
-		0.0,
-		TAU,
-		48,
-		Color(TEAL, 0.75 * alpha),
-		lerpf(7.0, 2.0, expansion) * _layout_scale,
-		true
-	)
-
 	for ray_index in range(BURST_RAY_COUNT):
 		var direction := Vector2.RIGHT.rotated(TAU * float(ray_index) / float(BURST_RAY_COUNT))
+		var tangent := direction.orthogonal()
 		var long_ray := ray_index % 3 == 0
-		var start := _impact_position + direction * (34.0 * _layout_scale)
-		var initial_distance := 230.0 if long_ray else 190.0
-		var final_distance := 334.0 if long_ray else 272.0
-		var end_distance := lerpf(initial_distance, final_distance, expansion)
-		var end := _impact_position + direction * (end_distance * _layout_scale)
-		var ray_color := Color.WHITE if long_ray else (TEAL if ray_index % 2 == 0 else LIGHT_PINK)
-		ray_color.a = (0.96 if long_ray else 0.72) * alpha
-		var ray_width := (7.0 if long_ray else 3.5) * _layout_scale
-		draw_line(start, end, ray_color, ray_width, true)
+		var base_distance := 30.0 * _layout_scale
+		var initial_distance := 168.0 if long_ray else 126.0
+		var final_distance := 258.0 if long_ray else 190.0
+		var tip_distance := lerpf(initial_distance, final_distance, expansion) * _layout_scale
+		var half_width := (13.0 if long_ray else 7.5) * _layout_scale * alpha
+		var spike := PackedVector2Array([
+			_impact_position + direction * tip_distance,
+			_impact_position + direction * base_distance + tangent * half_width,
+			_impact_position + direction * base_distance - tangent * half_width,
+		])
+		var ray_color := Color.WHITE if long_ray else WARM
+		ray_color.a = (0.95 if long_ray else 0.7) * alpha
+		draw_colored_polygon(spike, ray_color)
 
-	draw_circle(
-		_impact_position,
-		lerpf(38.0, 5.0, expansion) * _layout_scale,
-		Color(1.0, 1.0, 1.0, 0.96 * alpha)
-	)
+
+## Localised hot core. A full-screen flash washed out the board and hid what was being cleared.
+func _draw_flash_core() -> void:
+	var alpha := _flash_amount
+	var expansion := 1.0 - alpha
+	for core_index in range(4, 0, -1):
+		var radius := lerpf(46.0, 112.0, expansion) * float(core_index) / 4.0 * _layout_scale
+		var core_color := Color(1.0, 0.94, 0.99, alpha * (0.1 + float(5 - core_index) * 0.11))
+		draw_circle(_impact_position, radius, core_color)
 
 
 func _draw_sparks_and_debris() -> void:
@@ -203,7 +263,7 @@ func _draw_sparks_and_debris() -> void:
 		var distance := lerpf(72.0, 248.0 * distance_scale, travel) * _layout_scale
 		var position := _impact_position + direction * distance
 		var size := (7.0 if spark_index % 3 == 0 else 4.5) * _layout_scale * maxf(alpha, 0.35)
-		var color := TEAL if spark_index % 2 == 0 else LIGHT_PINK
+		var color := WARM if spark_index % 2 == 0 else LIGHT_PINK
 		color.a = 0.88 * alpha
 		if spark_index % 3 == 0:
 			var tangent := direction.rotated(PI * 0.5)
@@ -216,6 +276,10 @@ func _draw_sparks_and_debris() -> void:
 			draw_colored_polygon(points, color)
 		else:
 			draw_circle(position, size, color)
+
+
+func _should_mirror_approach() -> bool:
+	return size.x > 0.0 and _impact_position.x > size.x * MIRROR_THRESHOLD_RATIO
 
 
 func _play_windup_audio() -> void:
