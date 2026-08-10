@@ -291,7 +291,8 @@ Purpose:
   background house into the reward chest and advances the visible chest count on impact (see
   "Reward-Progress Semantics" above -- this used to fly clover-coin art).
 - Provides a bottom `%LevelButton` labeled with the selected chapter's next local level, such as
-  `Level 1`, or disabled as `No Lives`, `Chapter Complete`, or `Coming Soon`.
+  `Level 1`; zero lives keeps it enabled and opens Out of Lives, while completed/unavailable
+  chapters remain disabled as `Chapter Complete` or `Coming Soon`.
 - Places a small yellow-orange `%ChapterButton` directly against the level button and opens the
   dedicated chapter selection screen.
 - Opens the player profile menu when the profile widget is pressed.
@@ -325,6 +326,7 @@ Important nodes:
   (was `FOCUS_CLICK` before UI-002's focus-policy normalization; see "Focus Policy" above).
 - `LeaderboardRewardDialog`: `scenes/ui/leaderboard_reward_dialog.tscn` instance, hidden until a
   weekly reward is pending.
+- `%OutOfLivesMenu`: hidden `scenes/ui/out_of_lives_menu.tscn` instance on the shared modal z-index.
 - Runtime child `scenes/ui/profile_menu.tscn`: centered pause-style profile editor window created when `ProfileWidget` is pressed.
 - Runtime child `scenes/ui/settings_menu.tscn`: centered pause-style settings window created when `SettingsWidget/SettingsButton` is pressed.
 - Runtime child `scenes/ui/reward_chest_menu.tscn`: centered pause-style reward chest detail modal created when the `RewardChest` widget emits `chest_pressed`.
@@ -750,6 +752,33 @@ Purpose:
 Depends on:
 - `scenes/ui/coin_balance_widget.tscn`.
 - `scripts/press_scale_button.gd`.
+
+## `scenes/ui/out_of_lives_menu.tscn`
+
+Root:
+- `OutOfLivesMenu` (`Control`)
+
+Script:
+- `scripts/out_of_lives_menu.gd`
+
+Purpose:
+- Main-menu modal shown after the player requests a campaign level with zero lives.
+- Composes `scenes/ui/gameplay_modal_shell.tscn` for the shared shade, cream content region, title,
+  close action, responsive safe-area fitting, and fade motion.
+- Shows `OUT OF LIVES`, `assets/ui/main_menu_lives.png` with a zero count, the live `MM:SS`
+  restoration countdown, a green clover-coin price action, and a production-visible disabled
+  `Coming Soon` action.
+- Emits purchase/close intent only; `production_main_menu.gd` owns navigation while
+  `PlayerProgress` owns the atomic offline economy mutation.
+
+Important nodes:
+- `%LifeCountLabel`, `%CountdownLabel`, and `%PriceLabel`: state supplied by the Main Menu.
+- `%PurchaseButton`: green 194x76 coin-price action using the shared primary style.
+- `%ComingSoonButton`: always-visible, always-disabled neutral placeholder.
+
+Depends on:
+- `scenes/ui/gameplay_modal_shell.tscn`, `assets/ui/main_menu_lives.png`, the canonical clover coin
+  art, and the shared green/disabled action styles.
 
 ## `scenes/ui/shop_purchase_dialog.tscn`
 
@@ -1182,8 +1211,9 @@ Depends on:
 - `scripts/press_scale_button.gd`.
 
 Do not use for:
-- Spending inventory, opening purchase UI, or applying effects. Those remain in
-  `scripts/level.gd` and `PlayerProgress`.
+- Mutating inventory/economy state or applying gameplay effects. Main Menu may route its own
+  Out-of-Lives purchase intent, but persistence remains in `PlayerProgress`; in-level ability
+  purchasing/effects remain in `scripts/level.gd`.
 
 ## `scenes/ability_purchase_menu.tscn`
 

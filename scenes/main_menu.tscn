@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://cuq4oceh2x5if" path="res://scenes/ui/main_menu_bottom_navigation.tscn" id="7_bottom_navigation"]
 [ext_resource type="PackedScene" path="res://scenes/ui/leaderboard_reward_dialog.tscn" id="8_leaderboard_reward_dialog"]
 [ext_resource type="PackedScene" path="res://scenes/ui/main_menu_chapter_button.tscn" id="9_chapter_button"]
+[ext_resource type="PackedScene" path="res://scenes/ui/out_of_lives_menu.tscn" id="10_out_of_lives"]
 
 [node name="ProductionMainMenu" type="Control" unique_id=1235428546]
 layout_mode = 3
@@ -108,4 +109,9 @@ offset_bottom = -25.0
 
 [node name="LeaderboardRewardDialog" parent="." unique_id=2007464570 instance=ExtResource("8_leaderboard_reward_dialog")]
 unique_name_in_owner = true
+layout_mode = 1
+
+[node name="OutOfLivesMenu" parent="." instance=ExtResource("10_out_of_lives")]
+unique_name_in_owner = true
+visible = false
 layout_mode = 1

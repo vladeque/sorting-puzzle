@@ -361,6 +361,30 @@ Rules:
 - Missing entries use the built-in default price for that ability.
 - Buying from the modal spends coins only when the selected ability can actually start, then uses that one paid ability immediately without adding saved inventory.
 
+## `configs/life_purchase.json`
+
+Purpose:
+- Defines the offline-capable coin price for buying exactly one life from the Main Menu's Out of
+  Lives modal.
+- Owned by `scripts/player_progress.gd`, which uses a built-in 500-coin fallback if the file is
+  missing or invalid.
+
+Shape:
+
+```json
+{
+  "coin_price": 500
+}
+```
+
+Rules:
+- `coin_price` must be a positive integer.
+- The grant is always exactly one life and never exceeds the five-life cap.
+- A purchase keeps the existing next-restore deadline while lives remain below the cap; reaching
+  the cap clears the deadline.
+- The coin spend and resulting life state are persisted together as one signed `life_purchase`
+  operation so the feature works offline and reconciles later.
+
 ## `configs/shop_catalog.json`
 
 Purpose:
@@ -423,7 +447,9 @@ The gameplay snapshot schema is version 6. It retains the former schema-5 fields
 
 Runtime behavior:
 - Fresh saves start at level 1 with five lives, 300 gold coins, three uses for each ability, `avatar_cat` selected as the profile avatar, a generated `player_` name with a five-character random suffix, and all settings buttons enabled.
-- The main menu blocks campaign level launch at zero lives.
+- The main menu keeps campaign launch pressable at zero lives and opens the Out of Lives modal.
+- Buying one life costs the configured `configs/life_purchase.json` price (500 by default), works
+  offline, and resumes the level launch that opened the modal.
 - The production profile menu can save the player name and any avatar id from `assets/ui/avatars/*.png`; invalid avatar ids are sanitized back to `avatar_cat`.
 - Campaign level failure and pause-menu Leave spend one life. Completed levels do not spend lives.
 - Missing lives restore at one life per real-time hour until the five-life cap is reached.

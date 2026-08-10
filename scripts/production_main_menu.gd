@@ -39,6 +39,7 @@ const MAIN_MENU_OVERLAY_Z_INDEX := 100
 @onready var _chapter_button := %ChapterButton as Button
 @onready var _bottom_navigation := %BottomNavigation as MarginContainer
 @onready var _leaderboard_reward_dialog := %LeaderboardRewardDialog as Control
+@onready var _out_of_lives_menu := %OutOfLivesMenu as OutOfLivesMenu
 @onready var _top_status := %TopStatusBar.get_node("MainMenuTopStatus") as HBoxContainer
 @onready var _profile_button := %TopStatusBar.get_node("MainMenuTopStatus/ProfileWidget") as Button
 @onready var _settings_button := %TopStatusBar.get_node("MainMenuTopStatus/SettingsWidget/SettingsButton") as Button
@@ -55,6 +56,7 @@ var _chapter_selection_screen: Control
 var _animated_reward_stars := 0
 var _animated_reward_goal_index := 0
 var _is_navigating := false
+var _life_purchase_in_progress := false
 
 
 func _ready() -> void:
@@ -68,6 +70,8 @@ func _ready() -> void:
 	_profile_button.pressed.connect(_open_profile_menu)
 	_settings_button.pressed.connect(_open_settings_menu)
 	_coin_shortcut.pressed.connect(_open_shop)
+	_out_of_lives_menu.close_requested.connect(_on_out_of_lives_close_requested)
+	_out_of_lives_menu.purchase_requested.connect(_on_out_of_lives_purchase_requested)
 	if _reward_chest.has_signal("chest_pressed"):
 		_reward_chest.connect("chest_pressed", Callable(self, "_open_reward_chest_menu"))
 	_bottom_navigation.connect("shop_pressed", Callable(self, "_open_shop"))
@@ -87,6 +91,7 @@ func _ready() -> void:
 	_update_chapter_button()
 	_update_chapter_background(PlayerProgress.get_selected_chapter_id())
 	_leaderboard_reward_dialog.z_index = MAIN_MENU_OVERLAY_Z_INDEX
+	_out_of_lives_menu.z_index = MAIN_MENU_OVERLAY_Z_INDEX
 	_apply_responsive_layout()
 	if not pending_reward_animation.is_empty():
 		_play_pending_reward_animation.call_deferred(pending_reward_animation)
@@ -105,6 +110,7 @@ func _process(delta: float) -> void:
 
 	_life_status_refresh_time = fmod(_life_status_refresh_time, LIFE_STATUS_REFRESH_SECONDS)
 	_update_lives_status()
+	_refresh_out_of_lives_offer()
 	_update_level_button()
 	_update_chapter_button()
 
@@ -121,7 +127,11 @@ func _unhandled_input(event: InputEvent) -> void:
 	if is_instance_valid(_chapter_selection_screen):
 		return
 
-	if is_instance_valid(_profile_menu):
+	if _out_of_lives_menu.visible:
+		get_viewport().set_input_as_handled()
+		if not _out_of_lives_menu.is_transitioning():
+			_out_of_lives_menu.close()
+	elif is_instance_valid(_profile_menu):
 		get_viewport().set_input_as_handled()
 		_profile_menu.call("close")
 	elif is_instance_valid(_settings_menu):
@@ -145,6 +155,7 @@ func _apply_responsive_layout() -> void:
 	_layout_top_status_bar(safe_margins, viewport_size, display_cutouts)
 	_layout_reward_chest(safe_margins)
 	_layout_bottom_navigation(safe_margins)
+	_out_of_lives_menu.apply_safe_layout(safe_margins, viewport_size)
 	_bottom_bar.anchor_left = 0.0
 	_bottom_bar.anchor_top = 1.0
 	_bottom_bar.anchor_right = 1.0
@@ -285,12 +296,8 @@ func _update_level_button() -> void:
 	var chapter_id := PlayerProgress.get_selected_chapter_id()
 	var next_level := PlayerProgress.get_next_level_for_chapter(chapter_id)
 	if next_level > 0:
-		if PlayerProgress.get_lives() <= 0:
-			_level_button.text = "NO LIVES"
-			_level_button.disabled = true
-		else:
-			_level_button.text = "LEVEL %d" % ChapterCatalog.get_local_level_number(next_level)
-			_level_button.disabled = false
+		_level_button.text = "LEVEL %d" % ChapterCatalog.get_local_level_number(next_level)
+		_level_button.disabled = false
 	else:
 		var progress := PlayerProgress.get_chapter_progress(chapter_id)
 		_level_button.text = "CHAPTER COMPLETE" if bool(progress.get("complete", false)) else "COMING SOON"
@@ -320,6 +327,20 @@ func _update_lives_status() -> void:
 
 	var seconds_remaining := PlayerProgress.get_next_life_restore_seconds_remaining()
 	_life_status_label.text = _format_life_restore_time(seconds_remaining)
+
+
+func _refresh_out_of_lives_offer() -> void:
+	if _out_of_lives_menu == null:
+		return
+	var lives := PlayerProgress.get_lives()
+	_out_of_lives_menu.set_offer(
+		lives,
+		PlayerProgress.get_next_life_restore_seconds_remaining(),
+		PlayerProgress.get_life_purchase_coin_price()
+	)
+	_out_of_lives_menu.set_purchase_enabled(not _life_purchase_in_progress)
+	if lives > 0 and _out_of_lives_menu.visible and not _out_of_lives_menu.is_transitioning():
+		_out_of_lives_menu.close()
 
 
 func _update_reward_chest_status() -> void:
@@ -528,6 +549,7 @@ func _launch_campaign_level() -> void:
 	if PlayerProgress.get_lives() <= 0:
 		_update_lives_status()
 		_update_level_button()
+		_open_out_of_lives_menu()
 		return
 
 	var chapter_id := PlayerProgress.get_selected_chapter_id()
@@ -547,3 +569,45 @@ func _launch_campaign_level() -> void:
 
 	if current_scene != null:
 		current_scene.queue_free()
+
+
+func _open_out_of_lives_menu() -> void:
+	if _out_of_lives_menu.visible or _is_navigating:
+		return
+	_refresh_out_of_lives_offer()
+	_out_of_lives_menu.open()
+
+
+func _on_out_of_lives_close_requested() -> void:
+	if _life_purchase_in_progress or _out_of_lives_menu.is_transitioning():
+		return
+	_out_of_lives_menu.close()
+
+
+func _on_out_of_lives_purchase_requested() -> void:
+	if _life_purchase_in_progress or _out_of_lives_menu.is_transitioning():
+		return
+
+	PlayerProgress.refresh_lives()
+	if PlayerProgress.get_lives() > 0:
+		await _out_of_lives_menu.close()
+		_launch_campaign_level()
+		return
+
+	if PlayerProgress.get_coins() < PlayerProgress.get_life_purchase_coin_price():
+		_open_shop()
+		return
+
+	_life_purchase_in_progress = true
+	_out_of_lives_menu.set_purchase_enabled(false)
+	if not PlayerProgress.purchase_life():
+		_life_purchase_in_progress = false
+		_refresh_out_of_lives_offer()
+		return
+
+	_update_coin_balance()
+	_update_lives_status()
+	_update_level_button()
+	await _out_of_lives_menu.close()
+	_life_purchase_in_progress = false
+	_launch_campaign_level()

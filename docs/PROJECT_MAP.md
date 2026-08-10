@@ -106,6 +106,8 @@ Files:
 - `scripts/progress_ring.gd`
 - `scripts/destination_screen_layout.gd`
 - `scripts/production_main_menu.gd`
+- `scenes/ui/out_of_lives_menu.tscn`
+- `scripts/out_of_lives_menu.gd`
 - `scripts/main_menu_coin_shortcut.gd`
 - `scripts/coin_balance_widget.gd`
 - `scripts/chapters/*.gd`
@@ -183,6 +185,8 @@ Responsibility:
   economy, abilities, reward chest, leaderboard totals, and profile state.
 - Defaults fresh and legacy profile saves to `avatar_cat` and a generated `player_` name with a five-character random suffix.
 - Restores one missing life per elapsed real-time hour until the five-life cap is reached.
+- Keeps the campaign level action enabled at zero lives, shows the responsive Out of Lives modal,
+  and buys one offline-capable life for the configured 500-coin default before launching.
 - Spends one campaign life when a campaign level fails or the player leaves from the pause menu.
 - Commits ability/coin spends after effect preflight and before starting the gameplay effect.
 - Accepts only the selected chapter's first incomplete level, prevents replay after completion, and

@@ -14,6 +14,7 @@ const VALID_OPERATION_TYPES := [
 	"campaign_completion",
 	"campaign_attempt",
 	"resource_spend",
+	"life_purchase",
 	"life_state",
 	"profile_edit",
 ]
@@ -512,6 +513,36 @@ func _validate_operation_payload(operation_type: String, payload: Dictionary) ->
 				or not ["ability_use", "gameplay", "shop"].has(str(payload.get("reason", "")))
 			):
 				return _error("Resource-spend payload values are invalid.")
+		"life_purchase":
+			if not _has_exact_keys(payload, [
+				"configuration_version",
+				"coin_price",
+				"lives_granted",
+				"available_lives",
+				"maximum_lives",
+				"restore_interval_seconds",
+				"next_restore_at",
+				"observed_at",
+			]):
+				return _error("Life-purchase payload fields are invalid.")
+			var purchased_available := int(payload.get("available_lives", -1))
+			var purchased_maximum := int(payload.get("maximum_lives", 0))
+			var purchased_next_restore = payload.get("next_restore_at")
+			if (
+				not LocalSaveCodecScript.is_opaque_id(payload.get("configuration_version"))
+				or int(payload.get("coin_price", 0)) <= 0
+				or int(payload.get("lives_granted", 0)) != 1
+				or purchased_available < 1
+				or purchased_maximum <= 0
+				or purchased_available > purchased_maximum
+				or int(payload.get("restore_interval_seconds", 0)) <= 0
+				or not (
+					purchased_next_restore == null
+					or LocalSaveCodecScript.is_timestamp(purchased_next_restore)
+				)
+				or not LocalSaveCodecScript.is_timestamp(payload.get("observed_at"))
+			):
+				return _error("Life-purchase payload values are invalid.")
 		"life_state":
 			if not _has_exact_keys(payload, [
 				"available_lives",

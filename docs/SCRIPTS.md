@@ -10,7 +10,8 @@ Attached to:
 Purpose:
 - Shows the production campaign entry point over the selected chapter's configured menu background.
 - Labels the bottom button with the saved current level.
-- Displays saved campaign lives in the top status bar and disables campaign play at zero lives.
+- Displays saved campaign lives in the top status bar and keeps campaign play pressable at zero
+  lives so the dedicated Out of Lives modal can explain recovery and purchase options.
 - Displays saved gold coins in the top status bar.
 - Displays the saved profile avatar and opens the profile editor from the top status bar.
 - Displays the saved reward chest star progress in a separate left-side widget under the profile icon.
@@ -67,6 +68,8 @@ Important nodes:
 - `MainMenuTopStatus/LivesWidget/LifeStatus`: shows `Full` or the `MM:SS` countdown until the next restored life.
 - `%BottomBar`: bottom-anchored container positioned at runtime with safe-area padding.
 - `%LevelButton`: `scenes/ui/level_button.tscn` instance that starts the saved campaign level.
+- `%OutOfLivesMenu`: persistent hidden `scenes/ui/out_of_lives_menu.tscn` instance shown when a
+  launch request finds zero lives.
 - `%ChapterButton`: compact yellow-orange selected-chapter button that opens
   `chapter_selection_screen.tscn`; see `docs/SCENES.md` "Shared UI Style Tokens" for why
   yellow-orange is the intentional secondary/alternative-action role here.
@@ -85,7 +88,8 @@ Key methods:
 - `_layout_top_status_bar()`: places the status row at `TOP_MARGIN`, expands its center exclusion gap around camera cutouts, and falls below a cutout only when the row cannot fit around it.
 - `_layout_reward_chest()`: positions the side reward chest under the profile icon without putting it in the top status scene.
 - `_layout_bottom_navigation()`: sizes the full-width navigation bar and passes its safe-bottom inset to the scene-owned layout.
-- `_update_level_button()`: displays the saved current level, no-lives state, or complete state.
+- `_update_level_button()`: displays the saved current level or complete/unavailable state; zero
+  lives no longer disables or relabels a playable campaign action.
 - `_update_chapter_background(chapter_id)`: thin wrapper around
   `MenuBackgroundResolverScript.apply_background()`, the same policy Shop/Leaderboard use through
   their shared destination shell.
@@ -114,7 +118,13 @@ Key methods:
   descendant can react to further input before the deferred scene swap resolves.
 - `_on_profile_avatar_saved(avatar_id)`: refreshes the top status avatar after the profile menu saves.
 - `_launch_campaign_level()`: resolves the selected chapter's next incomplete global level,
-  instantiates it, sets campaign launch metadata, swaps current scene, and queues the menu.
+  opens Out of Lives when needed, and resumes the same launch after a successful life purchase;
+  otherwise instantiates the level, sets campaign launch metadata, swaps current scene, and queues
+  the menu.
+- `_refresh_out_of_lives_offer()`: keeps the modal's zero count, configured price, and next-life
+  countdown current; closes it without auto-launch if time restores a life.
+- `_on_out_of_lives_purchase_requested()`: opens Shop when unaffordable, otherwise persists one
+  atomic offline life purchase, closes the modal, and launches the originally requested level.
 
 ## `scripts/chapters/*.gd`
 
@@ -1022,6 +1032,10 @@ Key methods:
 - `set_profile(avatar_id, player_name)`: validates and saves the avatar and player name together.
 - `get_lives()`: refreshes and returns current campaign lives.
 - `get_max_lives()`: returns the lives cap.
+- `get_life_purchase_coin_price()`: returns the positive bundled value from
+  `configs/life_purchase.json` (500 by default).
+- `purchase_life()`: atomically spends the configured coins, grants exactly one life, preserves the
+  active restore deadline unless the cap is reached, and appends one `life_purchase` journal entry.
 - `get_next_life_restore_seconds_remaining()`: returns seconds until the next life restore, or `0` when full.
 - `refresh_lives()`: restores one life per elapsed real-time hour while lives are not full.
 - `spend_life(level_number, outcome)`: atomically appends the attempt and resulting life state.
@@ -1043,6 +1057,7 @@ Depends on:
 - `scripts/save/*.gd`
 - `scripts/backend/backend_transport.gd`
 - `configs/reward_chest_goals.json`
+- `configs/life_purchase.json`
 - `ChapterCatalog` autoload and `configs/chapters.json`
 
 Do not use for:

@@ -22,7 +22,9 @@ const PLAYER_NAME_RANDOM_ALPHABET := "abcdefghijklmnopqrstuvwxyz0123456789"
 const PLAYER_NAME_RANDOM_LENGTH := 5
 const REWARD_CHEST_GOALS_CONFIG := "res://configs/reward_chest_goals.json"
 const LEADERBOARD_REWARD_TIERS_CONFIG := "res://configs/leaderboard_reward_tiers.json"
+const LIFE_PURCHASE_CONFIG := "res://configs/life_purchase.json"
 const DEFAULT_COINS := 300
+const DEFAULT_LIFE_PURCHASE_COIN_PRICE := 500
 const LEADERBOARD_WEEK_SECONDS := 7 * 24 * 60 * 60
 const UNIX_EPOCH_MONDAY_OFFSET_DAYS := 3
 const DEFAULT_REWARD_CHEST_GOALS := [
@@ -81,6 +83,7 @@ var _reward_chest_goals := []
 var _pending_reward_chest_animation := {}
 var _pending_leaderboard_reward := {}
 var _leaderboard_reward_tiers: Array = []
+var _life_purchase_coin_price := DEFAULT_LIFE_PURCHASE_COIN_PRICE
 var _session_store
 var _account_coordinator
 var _local_store
@@ -97,6 +100,7 @@ func _ready() -> void:
 
 func load_progress() -> void:
 	_load_content_provenance()
+	_load_life_purchase_configuration()
 	if _session_store == null:
 		_session_store = SecureSessionStoreScript.new()
 		var identity_result: Dictionary = _session_store.initialize()
@@ -557,6 +561,32 @@ func get_lives() -> int:
 
 func get_max_lives() -> int:
 	return MAX_LIVES
+
+
+func get_life_purchase_coin_price() -> int:
+	return _life_purchase_coin_price
+
+
+## Buys exactly one life using the bundled, configurable coin price. The updated snapshot and
+## single life_purchase journal operation are written in one crash-safe local save generation, so
+## offline play never persists the coin spend without the matching life state (or vice versa).
+func purchase_life() -> bool:
+	refresh_lives()
+	var lives := int(_data.get("lives", MAX_LIVES))
+	if lives >= MAX_LIVES or get_coins() < _life_purchase_coin_price:
+		return false
+
+	var previous_data := _data.duplicate(true)
+	_data["coins"] = get_coins() - _life_purchase_coin_price
+	_data["lives"] = lives + 1
+	if int(_data.get("lives", 0)) >= MAX_LIVES:
+		_data["next_life_restore_unix"] = 0
+	elif int(_data.get("next_life_restore_unix", 0)) <= 0:
+		_data["next_life_restore_unix"] = (
+			int(Time.get_unix_time_from_system()) + LIFE_RESTORE_SECONDS
+		)
+
+	return _commit_or_restore(previous_data, [_life_purchase_operation()])
 
 
 func get_next_life_restore_seconds_remaining() -> int:
@@ -1326,6 +1356,24 @@ func _load_content_provenance() -> void:
 		)
 
 
+func _load_life_purchase_configuration() -> void:
+	_life_purchase_coin_price = DEFAULT_LIFE_PURCHASE_COIN_PRICE
+	if not FileAccess.file_exists(LIFE_PURCHASE_CONFIG):
+		return
+	var file := FileAccess.open(LIFE_PURCHASE_CONFIG, FileAccess.READ)
+	if file == null:
+		return
+	var parsed = JSON.parse_string(file.get_as_text())
+	if not (parsed is Dictionary):
+		return
+	var configured_price := int((parsed as Dictionary).get(
+		"coin_price",
+		DEFAULT_LIFE_PURCHASE_COIN_PRICE
+	))
+	if configured_price > 0:
+		_life_purchase_coin_price = configured_price
+
+
 func _campaign_provenance(level_number: int) -> Dictionary:
 	if _content_provenance == null or not _content_provenance.is_valid():
 		return {}
@@ -1349,6 +1397,28 @@ func _life_state_operation() -> Dictionary:
 	return {
 		"operation_type": "life_state",
 		"payload": {
+			"available_lives": clampi(int(_data.get("lives", MAX_LIVES)), 0, MAX_LIVES),
+			"maximum_lives": MAX_LIVES,
+			"restore_interval_seconds": LIFE_RESTORE_SECONDS,
+			"next_restore_at": (
+				LocalSaveCodecScript.iso_timestamp(next_restore_unix)
+				if next_restore_unix > 0
+				else null
+			),
+			"observed_at": LocalSaveCodecScript.iso_timestamp(),
+		},
+	}
+
+
+func _life_purchase_operation() -> Dictionary:
+	var next_restore_unix := int(_data.get("next_life_restore_unix", 0))
+	var provenance := _campaign_provenance(MIN_LEVEL)
+	return {
+		"operation_type": "life_purchase",
+		"payload": {
+			"configuration_version": provenance.get("configuration_version", "local"),
+			"coin_price": _life_purchase_coin_price,
+			"lives_granted": 1,
 			"available_lives": clampi(int(_data.get("lives", MAX_LIVES)), 0, MAX_LIVES),
 			"maximum_lives": MAX_LIVES,
 			"restore_interval_seconds": LIFE_RESTORE_SECONDS,
@@ -1457,6 +1527,15 @@ func _apply_unacknowledged_operation(snapshot: Dictionary, operation: Dictionary
 				var uses := result.get("ability_uses", {}) as Dictionary
 				uses[asset] = maxi(int(uses.get(asset, 0)) - amount, 0)
 				result["ability_uses"] = uses
+		"life_purchase":
+			result["coins"] = maxi(
+				int(result.get("coins", 0)) - maxi(int(payload.get("coin_price", 0)), 0),
+				0
+			)
+			result["lives"] = int(payload.get("available_lives", MAX_LIVES))
+			result["next_life_restore_unix"] = LocalSaveCodecScript.unix_from_timestamp(
+				payload.get("next_restore_at")
+			)
 		"life_state":
 			result["lives"] = int(payload.get("available_lives", MAX_LIVES))
 			result["next_life_restore_unix"] = LocalSaveCodecScript.unix_from_timestamp(
