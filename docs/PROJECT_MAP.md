@@ -572,7 +572,7 @@ Files:
 Responsibility:
 - Defines the reusable shelf cell visuals, front slots, and item snap markers.
 - Owns generated back-layer slot layout and preview styling defaults.
-- Contains the visible back wall, opaque non-compounding interior/cast shadows, wood floor, frame, floor lip, floor grain nodes, and hidden top edge details shown by `scripts/level.gd` for shelves with no stacked neighbor above. Shelf cast shadows draw below generated back-layer item previews and remain enabled for full shelves so neighboring shelf bodies and items cover them.
+- Contains the visible back wall, opaque non-compounding interior/cast shadows using the original resting item-shadow appearance as their canonical color, wood floor, frame, floor lip, floor grain nodes, and hidden top edge details shown by `scripts/level.gd` for shelves with no stacked neighbor above. Shelf cast shadows draw below generated back-layer item previews and remain enabled for full shelves so neighboring shelf bodies and items cover them.
 - Contains the hidden lock overlay used by triple-gated shelves; `scripts/level.gd` toggles it, fits the remaining count onto the lock center panel, pulses that count on a decrease, and plays a one-shot fade/scale when the shelf unlocks (UI-003 P3) without delaying the shelf's actual input availability.
 - Keeps the shelf width, height, and slot positions aligned with the level grid constants so a three-shelf row fills most of the gameplay viewport.
 
@@ -590,7 +590,7 @@ Files:
 Responsibility:
 - Represents one sortable item as an `Area2D`.
 - Stores `item_id`.
-- Applies texture and visual scale to its `Sprite2D` and to an equally sized translucent shadow drawn inside the item's own alpha silhouette. The shadow is disabled for generated back-layer item previews and blends from a nearby up-right resting offset to a farther down-right carried offset while preserving the item's size.
+- Applies texture and visual scale to its `Sprite2D` and to an equally sized shadow drawn inside the item's own alpha silhouette. The shader and every physical shelf shadow share one opaque pre-blended color so their intersections cannot darken. The shadow is disabled for generated back-layer item previews and blends from a nearby up-right resting offset to a farther down-right carried offset while preserving the item's size.
 - Draws reusable alpha-based sprite outlines for item highlight states.
 - Defines the canonical texture size, visible bounds, shelf baseline, alpha, naming, import, and
   validation requirements for item art.

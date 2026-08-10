@@ -56,8 +56,9 @@ render_mode unshaded;
 // The projection itself lives outside this shader: scenes/item.tscn anchors the sprite on the
 // art's ground line (canvas y=120, per docs/ITEM_ASSET_REQUIREMENTS.md) and scripts/item.gd
 // blends between the resting and carried shapes, driving blur_radius_px, silhouette_weight and
-// shadow_color's alpha along with them.
-uniform vec4 shadow_color : source_color = vec4(0.1, 0.05, 0.02, 0.34);
+// shadow_color's alpha along with them. The opaque shadow color is the original resting item shadow
+// pre-blended over Shelf/BackWall, and shelf shadows use the same color to avoid darker overlaps.
+uniform vec4 shadow_color : source_color = vec4(0.68884707, 0.6076549, 0.5096408, 1.0);
 uniform float blur_radius_px : hint_range(0.0, 32.0, 0.5) = 5.0;
 uniform float mask_low : hint_range(0.0, 1.0, 0.01) = 0.3;
 uniform float mask_high : hint_range(0.0, 1.0, 0.01) = 0.62;
@@ -89,14 +90,14 @@ void fragment() {
 
 	// The fragment color is generated from the alpha mask rather than from the texture's own color,
 	// so the incoming COLOR (and with it the item's modulate) is deliberately discarded. Per-item
-	// opacity -- the drag lift -- rides on shadow_color's alpha in a per-item material copy instead.
+	// opacity comes from the shared opaque shadow color multiplied by this per-pixel silhouette mask.
 	COLOR = vec4(shadow_color.rgb, shadow_color.a * mask);
 }
 "
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_shadow"]
 shader = SubResource("Shader_item_shadow")
-shader_parameter/shadow_color = Color(0.1, 0.05, 0.02, 0.4)
+shader_parameter/shadow_color = Color(0.68884707, 0.6076549, 0.5096408, 1)
 shader_parameter/blur_radius_px = 6.0
 shader_parameter/mask_low = 0.3
 shader_parameter/mask_high = 0.62

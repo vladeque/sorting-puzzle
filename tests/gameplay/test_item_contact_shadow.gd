@@ -8,6 +8,23 @@ extends SceneTree
 
 const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
 const LEVEL_SCENE_PATH := "res://level.tscn"
+const SHELF_SCENE_PATH := "res://scenes/shelf.tscn"
+
+const SHELF_SHADOW_PATHS := [
+	"Shadow",
+	"RightColumnShadow",
+	"BackWallTopShade",
+	"PlacementVisuals/Left/BackWallLeftShade",
+	"PlacementVisuals/Left/LeftShadowEdge",
+	"PlacementVisuals/Middle/BackWallLeftShade",
+	"PlacementVisuals/Middle/LeftShadowEdge",
+	"PlacementVisuals/Middle/RightShadowEdge",
+	"PlacementVisuals/Right/BackWallLeftShade",
+	"PlacementVisuals/Right/RightShadowEdge",
+]
+
+const ORIGINAL_REST_SHADOW_SOURCE := Color(0.1, 0.05, 0.02, 0.4 * 0.56)
+const SHELF_BACK_WALL_COLOR := Color(0.85882354, 0.76862746, 0.6509804, 1.0)
 
 ## The lift tween runs for SHADOW_LIFT_SECONDS (0.12); sample well clear of both ends.
 const LIFT_SETTLE_SECONDS := 0.2
@@ -52,6 +69,7 @@ func _run() -> void:
 		return
 
 	_verify_shadow_follows_item_form(item, shadow)
+	_verify_shared_shelf_shadow_color(item, shadow)
 	_verify_resting_shape(item, shadow)
 	_verify_carried_shape(item, shadow)
 	await _verify_drag_lift(level, item, shadow)
@@ -85,6 +103,61 @@ func _verify_shadow_follows_item_form(item: ShelfItem, shadow: Sprite2D) -> void
 	)
 
 
+func _verify_shared_shelf_shadow_color(item: ShelfItem, shadow: Sprite2D) -> void:
+	var expected_original_rest := _source_over(
+		ORIGINAL_REST_SHADOW_SOURCE,
+		SHELF_BACK_WALL_COLOR
+	)
+	_check(
+		ShelfItem.SHELF_SHADOW_COLOR.is_equal_approx(expected_original_rest),
+		"The canonical shelf color preserves the original resting item-shadow appearance."
+	)
+
+	item.shadow_lift = 0.0
+	var resting_color := _get_shadow_color(shadow)
+	_check(
+		resting_color.is_equal_approx(ShelfItem.SHELF_SHADOW_COLOR),
+		"The resting item shadow uses the canonical shelf-shadow color."
+	)
+
+	item.shadow_lift = 1.0
+	var carried_color := _get_shadow_color(shadow)
+	_check(
+		carried_color.is_equal_approx(ShelfItem.SHELF_SHADOW_COLOR),
+		"The carried item shadow uses the canonical shelf-shadow color."
+	)
+
+	var shelf_scene := load(SHELF_SCENE_PATH) as PackedScene
+	var shelf: Node = shelf_scene.instantiate() if shelf_scene != null else null
+	_check(shelf != null, "The shelf scene is available for shadow color verification.")
+	if shelf == null:
+		item.shadow_lift = 0.0
+		return
+
+	for shadow_path in SHELF_SHADOW_PATHS:
+		var shelf_shadow := shelf.get_node_or_null(shadow_path) as Polygon2D
+		_check(shelf_shadow != null, "Shelf shadow '%s' exists." % shadow_path)
+		if shelf_shadow == null:
+			continue
+
+		_check(
+			shelf_shadow.color.is_equal_approx(ShelfItem.SHELF_SHADOW_COLOR),
+			"Shelf shadow '%s' uses the item-shadow color." % shadow_path
+		)
+
+		var soft_item_color := ShelfItem.SHELF_SHADOW_COLOR
+		soft_item_color.a = 0.5
+		_check(
+			_source_over(soft_item_color, shelf_shadow.color).is_equal_approx(
+				shelf_shadow.color
+			),
+			"A soft item-shadow edge does not darken shelf shadow '%s'." % shadow_path
+		)
+
+	shelf.free()
+	item.shadow_lift = 0.0
+
+
 func _verify_resting_shape(item: ShelfItem, shadow: Sprite2D) -> void:
 	item.shadow_lift = 0.0
 	var item_sprite := item.get_node_or_null("Sprite2D") as Sprite2D
@@ -114,7 +187,7 @@ func _verify_resting_shape(item: ShelfItem, shadow: Sprite2D) -> void:
 			_get_shadow_alpha(shadow),
 			_get_base_shadow_alpha(item) * ShelfItem.SHADOW_REST_ALPHA_SCALE
 		),
-		"A resting shadow is faint enough not to crowd adjacent shelf items."
+		"A resting shadow keeps the canonical shelf-shadow opacity."
 	)
 
 
@@ -212,11 +285,25 @@ func _get_mask_low(shadow: Sprite2D) -> float:
 
 
 func _get_shadow_alpha(shadow: Sprite2D) -> float:
+	return _get_shadow_color(shadow).a
+
+
+func _get_shadow_color(shadow: Sprite2D) -> Color:
 	var material := shadow.material as ShaderMaterial
 	if material == null:
-		return -1.0
+		return Color.TRANSPARENT
 	var color = material.get_shader_parameter("shadow_color")
-	return color.a if color is Color else -1.0
+	return color if color is Color else Color.TRANSPARENT
+
+
+func _source_over(source: Color, destination: Color) -> Color:
+	var source_alpha := clampf(source.a, 0.0, 1.0)
+	return Color(
+		lerpf(destination.r, source.r, source_alpha),
+		lerpf(destination.g, source.g, source_alpha),
+		lerpf(destination.b, source.b, source_alpha),
+		1.0
+	)
 
 
 func _get_base_shadow_alpha(item: ShelfItem) -> float:
