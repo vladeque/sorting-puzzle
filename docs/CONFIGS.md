@@ -168,6 +168,8 @@ Layer rules:
 - `type` is optional and defaults to `standard`. The only other value is `dispenser`.
 - `unlock_after_triples` is optional. Omit it or set `0` for shelves that are accessible at level start.
 - A positive `unlock_after_triples` keeps the shelf inaccessible until the player has cleared that many triples.
+- The value counts cleared triples rather than pointer moves. Hammer-destroyed triples use the same
+  runtime counter and continue to advance locked-shelf progress.
 - Each shelf must contain a non-empty `layers` array.
 - Each layer must contain exactly as many slots as the shelf type has: three for `standard`, one for `dispenser`.
 - Slot values must be item ID strings or `null`.

@@ -65,6 +65,19 @@ modals and terminal results use a denser layout at a different scale:
 
 All three still use `GameTitleLabel` and remain uppercase per the casing rule below.
 
+## Locked-Shelf Label Roles
+
+`scenes/ui/shelf_lock_overlay.tscn` keeps both pieces of lock copy as live labels so they remain
+crisp over the raster chains and lock:
+
+- `AdLabel` uses `GameNumberLabel` for the decorative uppercase `AD` plate. It does not represent an
+  ad action and has no input or gameplay behavior.
+- `RemainingLabel` uses `GameNumberLabel` for the cleared-triples countdown. Its local font size
+  steps down for two- and three-digit values while retaining the shared numeric face and outline.
+
+The overlay owns the local colors, outlines, and shadows because they are tuned specifically for the
+orange lock and green circular badge.
+
 ## Reward-Star Variants
 
 Three reward-star raster sizes are used across the project, each a documented named role -- do not

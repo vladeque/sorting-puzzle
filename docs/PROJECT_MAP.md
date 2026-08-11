@@ -535,7 +535,10 @@ Responsibility:
 - Shows a working failure exit through the `UI/FailureScreen` instance of `scenes/ui/level_failure_screen.tscn` (new, UI-003 P0 -- Failure was previously a dead-end embedded label with no action), composing the same shared result shell as Completion.
 - Sends completed campaign stars to `PlayerProgress`; Completion's `Continue` and Failure's `Main Menu` both return to the main menu, where one reward star per earned star flies from the house to the reward chest and advances its visible count.
 - Uses `scripts/press_scale_button.gd` on every gameplay action (Pause, all four ability buttons, every modal close button, and both result screens' actions -- UI-003 extended this to controls that previously had no press feedback at all).
-- Tracks cleared triples and unlocks shelves whose configs require progress before becoming accessible, pulsing the remaining count on decrease and playing a one-shot fade/scale on unlock (UI-003 P3) without delaying the shelf's actual input availability.
+- Tracks cleared triples and unlocks shelves whose configs require progress before becoming
+  accessible. It passes remaining counts/state to `ShelfLockOverlay`; that component pops the badge,
+  shakes the chains, swings the hanging lock, and releases the chains without delaying actual input
+  availability. Hammer-cleared triples continue through the same `_record_triples_cleared()` path.
 - Plays item placement and triple-clear sound effects.
 - Keeps non-clearing items interactive while match animations run, resolves different shelves concurrently, and queues only repeated work for a shelf that is already resolving.
 - Promotes back layers as soon as their own visible shelf layer clears, without waiting for match or reward animations on other shelves.
@@ -575,6 +578,7 @@ Change here when:
 Files:
 - `scenes/shelf.tscn`
 - `scripts/shelf.gd`
+- `scenes/ui/shelf_lock_overlay.tscn`
 
 Responsibility:
 - Defines the reusable *standard* shelf cell visuals, front slots, and item snap markers. The narrow
@@ -582,11 +586,38 @@ Responsibility:
 - `scripts/shelf.gd` owns the shelf-type capability surface every shelf type answers.
 - Owns generated back-layer slot layout and preview styling defaults.
 - Contains the visible back wall, opaque non-compounding interior/cast shadows, wood floor, frame, floor lip, floor grain nodes, and hidden top edge details shown by `scripts/level.gd` for shelves with no stacked neighbor above. Shelf cast shadows draw below generated back-layer item previews and remain enabled for full shelves so neighboring shelf bodies and items cover them.
-- Contains the hidden lock overlay used by triple-gated shelves; `scripts/level.gd` toggles it, fits the remaining count onto the lock center panel, pulses that count on a decrease, and plays a one-shot fade/scale when the shelf unlocks (UI-003 P3) without delaying the shelf's actual input availability.
+- Instances the reusable hidden lock overlay used by triple-gated shelves; the shelf owns only its
+  placement, while `ShelfLockOverlay` owns chains, lock, badge, labels, and motion.
 - Keeps the shelf width, height, and slot positions aligned with the level grid constants so a three-shelf row fills most of the gameplay viewport.
 
 Change here when:
-- Editing shelf visual details, back-layer preview presentation, locked shelf overlay visuals, front slot positions, item snap marker positions, or cell art node names.
+- Editing shelf visual details, back-layer preview presentation, lock-overlay placement, front slot
+  positions, item snap marker positions, or cell art node names. Edit the extracted component below
+  for the lock overlay's internal visuals or motion.
+
+### Locked Shelf Overlay
+
+Files:
+- `scenes/ui/shelf_lock_overlay.tscn`
+- `scripts/shelf_lock_overlay.gd`
+- `assets/ui/shelf_lock_chain_c2.png`
+- `assets/ui/lock_shelf_cutout.png`
+- `tests/ui/test_shelf_lock_overlay.gd`
+
+Responsibility:
+- Reusable standard/compact visual component for every triple-gated shelf.
+- Crosses two instances of the transparent C2 chain texture over shelf contents, hangs the existing
+  orange lock at their intersection, renders decorative `AD`, and shows remaining clears in a green
+  circle above the lock.
+- On a recorded triple clear, pops the count, shakes the chain rig, and swings the lock. On zero,
+  recoils/fades both chains and drops/fades the lock while the level enables the shelf immediately.
+- Replaces interrupted feedback tweens and restores authored transforms after both normal and rapid
+  state changes.
+- Uses a compact layout when instanced by `scenes/dispenser_shelf.tscn`.
+
+Change here when:
+- Editing chain/lock/badge art, `AD` styling, count fitting, decrement shake/swing timing, final chain
+  release motion, or the compact dispenser proportions.
 
 ### Dispenser Shelf
 
@@ -778,10 +809,11 @@ Change matching rules:
 
 Change shelf unlock rules:
 - Update `scripts/level.gd` shelf lock helpers, ability item collection, and match/promotion filters.
-- Update `scenes/shelf.tscn` when changing the locked shelf overlay art, placement, or count label.
-- Keep the unlock/count-pulse feedback animation (`_update_shelf_lock_overlay()`,
-  `_play_shelf_unlock_animation()`, `_pulse_lock_remaining_label()`) from delaying
-  `_update_shelf_input_pickable()`'s immediate effect if you change this further.
+- Update `scenes/ui/shelf_lock_overlay.tscn` and `scripts/shelf_lock_overlay.gd` when changing locked
+  shelf art, count presentation, or feedback motion; update the shelf scenes only for instance-level
+  standard/compact placement.
+- Keep `ShelfLockOverlay.play_unlock()` fire-and-forget and independent from
+  `_update_shelf_input_pickable()`'s immediate effect.
 - Update `scripts/tools/validate_level_solvable.py` when unlock timing or counting semantics change.
 - Keep `docs/CONFIGS.md` and generator `--locked-shelves` behavior aligned with the level JSON field.
 

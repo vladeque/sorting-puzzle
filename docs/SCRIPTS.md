@@ -862,8 +862,8 @@ Class:
 Purpose:
 - Shared motion tokens and small tween helpers for UI-002's interaction system (Main Menu, Shop,
   Leaderboard, Chapter Selection) and UI-003's gameplay overlay/result/locked-shelf motion
-  (`scripts/gameplay_modal_shell.gd`, `scripts/gameplay_result_shell.gd`, and `scripts/level.gd`'s
-  locked-shelf feedback). Consumers `preload` this script and call its static consts/funcs
+  (`scripts/gameplay_modal_shell.gd`, `scripts/gameplay_result_shell.gd`, and
+  `scripts/shelf_lock_overlay.gd`). Consumers `preload` this script and call its static consts/funcs
   by the preloaded constant, matching the convention in `scripts/destination_screen_layout.gd` and
   `scripts/chapters/menu_background_resolver.gd`, rather than relying on the bare global class name.
 
@@ -902,7 +902,7 @@ Used by:
 - `scripts/main_menu_bottom_navigation.gd` (active icon/label transition).
 - `scripts/destination_status_panel.gd` (loading pulse).
 - `scripts/gameplay_modal_shell.gd`, `scripts/gameplay_result_shell.gd`, and
-  `scripts/level.gd`'s locked-shelf pulse/unlock-fade (UI-003).
+  `scripts/shelf_lock_overlay.gd`'s chain/count/lock feedback.
 - `scripts/production_main_menu.gd`, `scripts/chapters/chapter_selection_screen.gd`,
   `scripts/profile_menu.gd`, `scripts/reward_chest_menu.gd`, `scripts/shop_purchase_dialog.gd`,
   `scripts/leaderboard_reward_dialog.gd`, `scripts/shop_screen.gd`, `scripts/leaderboard_screen.gd`
@@ -1509,8 +1509,6 @@ Important constants:
   layout (UI-003) -- see `scripts/level_top_hud.gd`, `scripts/gameplay_modal_shell.gd`, and
   `scripts/gameplay_result_shell.gd` below; `level.gd` only calls each one's
   `apply_safe_layout(safe_margins, viewport_size)`.
-- `LOCK_OVERLAY_TWEEN_META`, `LOCK_LABEL_PULSE_TWEEN_META`, `LOCK_UNLOCK_FADE_SECONDS`,
-  `LOCK_UNLOCK_SCALE`, `LOCK_LABEL_PULSE_SCALE`: locked-shelf feedback animation tokens (UI-003 P3).
 - `SHELF_SCENE`: `res://scenes/shelf.tscn`.
 - `MOVING_SHELF_ROW_SCENE`: `res://scenes/moving_shelf_row.tscn`.
 - `ITEM_SCENE`: `res://scenes/item.tscn`.
@@ -1563,12 +1561,10 @@ Key responsibilities:
 - Show combo praise words with `_show_combo_praise()` starting at 2x combo, using unique wording through 20x. Labels appear near the cleared triple or hammer impact for two seconds, then fade out; lower combos use thinner calmer outlines, while 10x+ combos use larger gold, violet, and red outlines.
 - Play combo reward feedback with `_play_combo_star_reward_animation()`: after the matched items finish `_play_match_clear_animation()`, small `reward_star_34_glossy_b.png` stars drop from the cleared triple, fly into `UI/StarCounterLabel`, and pulse the counter. The number of visual stars matches the combo-earned star amount returned by `_record_triples_cleared()`.
 - Track cleared triples and locked shelf accessibility with `_record_triples_cleared()`, `_update_locked_shelves()`, and shelf metadata from `unlock_after_triples`.
-- Toggle each shelf scene's lock overlay with the remaining triple count, fit that count to the lock art's center panel, and keep locked shelves out of move, match, promotion, and ability targeting.
-  `_update_shelf_lock_overlay()` (UI-003 P3) pulses the remaining-count label when it decreases and
-  plays a one-shot fade/scale via `UIMotionScript.retween()` when a shelf unlocks, instead of both
-  changing instantly; `_update_shelf_input_pickable()` is always called independently of that
-  animation, so a shelf becomes interactable immediately regardless of how long the unlock fade
-  takes.
+- Keep locked shelves out of move, match, promotion, and ability targeting, and pass remaining triple
+  counts/state to their extracted `ShelfLockOverlay`. `_update_shelf_input_pickable()` remains
+  independent from `play_unlock()`, so chain release never delays interaction. Hammer destruction
+  continues to call `_record_triples_cleared()` and therefore decrements the same counters.
 - Play placement and triple-clear sound effects with runtime `AudioStreamPlayer` nodes.
 - Track clearing items so only disappearing items ignore input and abilities during the animation.
 - Track transitioning items so newly promoted back-layer items ignore input and abilities until their forward slide finishes.
@@ -1640,7 +1636,8 @@ Depends on:
 - `level.tscn` node names and paths.
 - `scenes/shelf.tscn` slot names and item snap marker names.
 - `scripts/shelf.gd` for generated back-layer preview setup.
-- `scenes/shelf.tscn` `LockedOverlay/RemainingLabel` for locked shelf progress display on the lock image.
+- `scenes/ui/shelf_lock_overlay.tscn` (`scripts/shelf_lock_overlay.gd`) for locked shelf visuals and
+  feedback motion.
 - `scenes/moving_shelf_row.tscn` for optional row-layout movement and clipping.
 - `scenes/layouts/layout_*.tscn` for named layout preset placement.
 - `scenes/ui/level_top_hud.tscn` (`scripts/level_top_hud.gd`) for the top HUD strip, combo slot,
@@ -1658,7 +1655,6 @@ Depends on:
   reward UI, its `next_pressed` signal, and `set_earned_stars()`/`open()`/`close()`/`apply_safe_layout()`.
 - `scenes/ui/level_failure_screen.tscn` (`scripts/level_failure_screen.gd`) for the failure result
   UI, its `main_menu_pressed` signal, and `open()`/`close()`/`apply_safe_layout()`.
-- `scripts/ui_motion.gd` for the locked-shelf pulse/unlock-fade tweens.
 - `scenes/item.tscn` and `ShelfItem`.
 - `assets/audio/item_place.wav` and `assets/audio/triple_clear.wav`.
 - `configs/item_sprites.json` item IDs and texture paths.
@@ -1672,6 +1668,47 @@ Do not use for:
 - Offline level generation or solvability search. Keep that in `scripts/tools/`.
 - Save data ownership. Keep that in `scripts/save/local_save_store.gd`; route gameplay access
   through `PlayerProgress`.
+
+## `scripts/shelf_lock_overlay.gd`
+
+Class:
+- `ShelfLockOverlay`
+
+Attached to:
+- `scenes/ui/shelf_lock_overlay.tscn` root `ShelfLockOverlay`.
+
+Purpose:
+- Owns the visual hierarchy and replacement-safe feedback tweens for standard and compact locked
+  shelves, keeping those details out of `scripts/level.gd`.
+- Applies `overlay_half_width` to the shade and `compact_layout` to the chain, lock, and badge rig at
+  `_ready()`.
+- Preserves the selected C2 chain art as two crossed `Sprite2D` instances; keeps `AD` and the
+  remaining count scene-native.
+
+API:
+- `show_locked(remaining)`: shows a clean locked state, fits 1-, 2-, or 3+-digit copy in the circular
+  badge, and plays a badge pop + chain shake + hanging-lock swing only when the value decreased.
+- `play_unlock()`: visibly sets the badge to zero, plays the same impact beat, then recoils/fades the
+  chains, drops/fades the lock, fades the shade, hides the component, and restores every authored
+  transform. Gameplay eligibility is intentionally owned and updated by `scripts/level.gd` before
+  this fire-and-forget method runs.
+- `reset_visual_state()`: stops tracked tweens and restores authored transforms for safe reuse.
+
+Motion ownership:
+- Uses independent `UIMotion.retween()` metadata keys for the chain shake, lock swing, badge pop, and
+  final unlock release. A rapid decrement replaces the same concern's prior tween instead of
+  accumulating transforms.
+- Standard motion settles in roughly 0.3 seconds; the final release completes in roughly 0.38
+  seconds.
+
+Depends on:
+- `scenes/ui/shelf_lock_overlay.tscn` node paths.
+- `scripts/ui_motion.gd` for `retween()` / `stop_tween()`.
+- `assets/ui/shelf_lock_chain_c2.png` and `assets/ui/lock_shelf_cutout.png`.
+
+Do not use for:
+- Unlock requirements, cleared-triple ownership, Hammer counting, item eligibility, or shelf
+  resolution. Those remain in `scripts/level.gd`.
 
 ## `scripts/level_completion_confetti.gd`
 

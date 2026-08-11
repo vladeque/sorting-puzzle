@@ -271,6 +271,24 @@ A second visual review corrected three regressions introduced by over-unifying d
 The isolated UI suite now checks all three decisions directly so the role coupling and stretched
 inner panels cannot silently return.
 
+## Locked-Shelf Chain Refresh (2026-08-11)
+
+The later locked-shelf visual refresh supersedes this ticket's original "no new raster artwork"
+constraint for that component only:
+
+- `scenes/ui/shelf_lock_overlay.tscn` / `scripts/shelf_lock_overlay.gd` now own the extracted standard
+  and compact lock overlay instead of duplicating nodes in both shelf scenes or keeping animation
+  internals in `scripts/level.gd`.
+- The selected C2 chain art is stored as `assets/ui/shelf_lock_chain_c2.png` and reused twice in a
+  crossed layout. The existing orange lock remains, with decorative `AD` and a separate green
+  remaining-clears circle.
+- Decrements pop the count, shake the chains, and swing the hanging lock. Reaching zero recoils the
+  chains and drops the lock while shelf eligibility still changes immediately.
+- Hammer-cleared triples retain the existing `_record_triples_cleared()` path and therefore continue
+  to decrement the overlay.
+- `tests/ui/test_shelf_lock_overlay.gd` is the focused regression; the locked-shelf phase in
+  `tests/ui/test_level_ui_consistency.gd` also covers the extracted hierarchy.
+
 ## Out of Scope
 
 - Puzzle rules, shelf layout algorithms, item art, drag/drop, matching, ability effects, or level

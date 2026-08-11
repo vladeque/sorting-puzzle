@@ -1,0 +1,100 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/ui/shelf_lock_chain_c2.png" id="1_chain"]
+[ext_resource type="Texture2D" uid="uid://7lmfd8og03cd" path="res://assets/ui/lock_shelf_cutout.png" id="2_lock"]
+[ext_resource type="Script" path="res://scripts/shelf_lock_overlay.gd" id="3_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_countdown_badge"]
+bg_color = Color(0.245, 0.735, 0.18, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.075, 0.31, 0.08, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+shadow_color = Color(0, 0, 0, 0.36)
+shadow_size = 3
+shadow_offset = Vector2(0, 2)
+
+[node name="ShelfLockOverlay" type="Node2D"]
+visible = false
+z_index = 40
+script = ExtResource("3_script")
+
+[node name="Shade" type="Polygon2D" parent="."]
+color = Color(0.04, 0.05, 0.06, 0.46)
+polygon = PackedVector2Array(-104, -81, 104, -81, 104, 46, -104, 46)
+
+[node name="VisualRig" type="Node2D" parent="."]
+z_index = 1
+
+[node name="ChainRig" type="Node2D" parent="VisualRig"]
+position = Vector2(0, -17)
+
+[node name="ChainBack" type="Sprite2D" parent="VisualRig/ChainRig"]
+texture_filter = 2
+rotation = -0.34
+scale = Vector2(0.45, 0.45)
+texture = ExtResource("1_chain")
+
+[node name="ChainFront" type="Sprite2D" parent="VisualRig/ChainRig"]
+texture_filter = 2
+rotation = 0.34
+scale = Vector2(0.45, 0.45)
+texture = ExtResource("1_chain")
+
+[node name="LockRig" type="Node2D" parent="VisualRig"]
+z_index = 2
+position = Vector2(0, -30)
+
+[node name="LockSprite" type="Sprite2D" parent="VisualRig/LockRig"]
+position = Vector2(0, 31)
+scale = Vector2(0.31, 0.31)
+texture = ExtResource("2_lock")
+
+[node name="AdLabel" type="Label" parent="VisualRig/LockRig"]
+offset_left = -27.0
+offset_top = 32.0
+offset_right = 27.0
+offset_bottom = 57.0
+mouse_filter = 2
+theme_type_variation = &"GameNumberLabel"
+theme_override_colors/font_color = Color(0.63, 0.255, 0.055, 1)
+theme_override_colors/font_outline_color = Color(1, 0.78, 0.25, 0.82)
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 20
+text = "AD"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CountdownBadge" type="Node2D" parent="VisualRig"]
+z_index = 3
+position = Vector2(0, -54)
+
+[node name="BadgePanel" type="Panel" parent="VisualRig/CountdownBadge"]
+offset_left = -22.0
+offset_top = -22.0
+offset_right = 22.0
+offset_bottom = 22.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBox_countdown_badge")
+
+[node name="RemainingLabel" type="Label" parent="VisualRig/CountdownBadge"]
+offset_left = -21.0
+offset_top = -22.0
+offset_right = 21.0
+offset_bottom = 22.0
+mouse_filter = 2
+theme_type_variation = &"GameNumberLabel"
+theme_override_colors/font_color = Color(1, 1, 0.95, 1)
+theme_override_colors/font_outline_color = Color(0.05, 0.19, 0.055, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.5)
+theme_override_constants/outline_size = 2
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 26
+horizontal_alignment = 1
+vertical_alignment = 1

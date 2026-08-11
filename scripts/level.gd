@@ -34,7 +34,6 @@ const DISPENSER_ROW_EXTRA_HEIGHT := 58.0
 const MOVING_SHELF_ROW_SCENE := preload("res://scenes/moving_shelf_row.tscn")
 const ITEM_SCENE := preload("res://scenes/item.tscn")
 const HAMMER_IMPACT_EFFECT_SCENE := preload("res://scenes/abilities/hammer_impact_effect.tscn")
-const UIMotionScript := preload("res://scripts/ui_motion.gd")
 const ITEM_SPRITES_CONFIG := "res://configs/item_sprites.json"
 const ABILITY_PURCHASE_PRICES_CONFIG := "res://configs/ability_purchase_prices.json"
 const LEVEL_CONFIG_TEMPLATE := "res://configs/levels/level_%03d.json"
@@ -50,15 +49,6 @@ const PAUSE_SETTING_SOUND_EFFECTS := &"sound_effects"
 const SHELF_UNLOCK_REQUIREMENT_META := &"unlock_after_triples"
 const SHELF_LOCKED_META := &"is_locked"
 const LOCKED_OVERLAY_NAME := "LockedOverlay"
-const LOCK_REMAINING_LABEL_NAME := "RemainingLabel"
-const LOCK_OVERLAY_TWEEN_META := &"lock_overlay_unlock_tween"
-const LOCK_LABEL_PULSE_TWEEN_META := &"lock_label_pulse_tween"
-const LOCK_LABEL_PREVIOUS_REMAINING_META := &"lock_label_previous_remaining"
-const LOCK_UNLOCK_FADE_SECONDS := 0.22
-const LOCK_UNLOCK_SCALE := 1.18
-const LOCK_LABEL_PULSE_SCALE := Vector2(1.35, 1.35)
-const LOCK_LABEL_PULSE_IN_SECONDS := 0.1
-const LOCK_LABEL_PULSE_OUT_SECONDS := 0.14
 const SHELF_VISUAL_VARIANT_META := &"visual_variant"
 const SHELF_TOP_CEILING_CAP_NAME := "TopCeilingCap"
 const SHELF_BOTTOM_SHADOW_NAME := "Shadow"
@@ -1558,81 +1548,22 @@ func _clear_drag_drop_selection_if_unavailable() -> void:
 		_pressed_origin_slot = null
 
 
-## Locked-shelf feedback (UI-003 P3): pulses the remaining-count label when it decreases and plays a
-## one-shot fade/scale when the shelf unlocks, instead of the count and overlay changing instantly.
+## Locked-shelf feedback: the extracted overlay owns its count pop, chain shake, hanging-lock swing,
+## and chain-release animation instead of level orchestration reaching into its visual hierarchy.
 ## _update_shelf_input_pickable() (called separately by every caller of this function) is never
 ## gated on this animation, so the shelf becomes interactable immediately regardless of how long the
 ## unlock animation takes to finish.
 func _update_shelf_lock_overlay(shelf: Node2D, should_lock: bool) -> void:
-	var overlay := shelf.get_node_or_null(LOCKED_OVERLAY_NAME) as Node2D
+	var overlay := shelf.get_node_or_null(LOCKED_OVERLAY_NAME) as ShelfLockOverlay
 	if overlay == null:
 		return
 
 	if should_lock:
-		# A freshly (re)locked shelf always starts from a clean visual state -- never retains a
-		# scale/modulate change from a prior unlock animation on this same overlay instance.
-		UIMotionScript.stop_tween(overlay, LOCK_OVERLAY_TWEEN_META)
-		overlay.visible = true
-		overlay.modulate = Color.WHITE
-		overlay.scale = Vector2.ONE
-
 		var remaining := maxi(_get_shelf_unlock_requirement(shelf) - _triples_cleared, 0)
-		var count_label := overlay.get_node_or_null(LOCK_REMAINING_LABEL_NAME) as Label
-		if count_label != null:
-			_update_lock_remaining_label(count_label, remaining)
+		overlay.show_locked(remaining)
 		return
 
-	if not overlay.visible:
-		return
-
-	_play_shelf_unlock_animation(overlay)
-
-
-func _play_shelf_unlock_animation(overlay: Node2D) -> void:
-	overlay.modulate = Color.WHITE
-	overlay.scale = Vector2.ONE
-
-	var tween := UIMotionScript.retween(overlay, LOCK_OVERLAY_TWEEN_META)
-	tween.set_parallel(true)
-	tween.tween_property(overlay, "modulate:a", 0.0, LOCK_UNLOCK_FADE_SECONDS) \
-		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
-	tween.tween_property(overlay, "scale", Vector2.ONE * LOCK_UNLOCK_SCALE, LOCK_UNLOCK_FADE_SECONDS) \
-		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
-	tween.set_parallel(false)
-	tween.tween_callback(func() -> void:
-		overlay.visible = false
-		overlay.modulate = Color.WHITE
-		overlay.scale = Vector2.ONE
-	)
-
-
-func _update_lock_remaining_label(count_label: Label, remaining: int) -> void:
-	var remaining_text := str(remaining)
-	count_label.text = remaining_text
-
-	var font_size := 34
-	if remaining_text.length() >= 3:
-		font_size = 24
-	elif remaining_text.length() == 2:
-		font_size = 30
-
-	count_label.add_theme_font_size_override("font_size", font_size)
-
-	var previous_remaining := int(count_label.get_meta(LOCK_LABEL_PREVIOUS_REMAINING_META, remaining))
-	count_label.set_meta(LOCK_LABEL_PREVIOUS_REMAINING_META, remaining)
-	if remaining < previous_remaining:
-		_pulse_lock_remaining_label(count_label)
-
-
-func _pulse_lock_remaining_label(count_label: Label) -> void:
-	count_label.pivot_offset = count_label.size * 0.5
-	count_label.scale = Vector2.ONE
-
-	var tween := UIMotionScript.retween(count_label, LOCK_LABEL_PULSE_TWEEN_META)
-	tween.tween_property(count_label, "scale", LOCK_LABEL_PULSE_SCALE, LOCK_LABEL_PULSE_IN_SECONDS) \
-		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tween.tween_property(count_label, "scale", Vector2.ONE, LOCK_LABEL_PULSE_OUT_SECONDS) \
-		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	overlay.play_unlock()
 
 
 func _update_shelf_input_pickable(shelf: Node, should_enable: bool) -> void:

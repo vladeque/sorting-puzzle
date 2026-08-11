@@ -5,7 +5,7 @@ extends SceneTree
 ## Completion/Failure signal routing and copy, the
 ## ui_cancel back-stack precedence, safe-area layout at fabricated insets, responsive ability-bar
 ## icon/badge bounds, long-value formatting, the hidden rewarded-ad placeholder, and locked-shelf
-## count/unlock feedback. See docs/UI_003_LEVEL_UI_CONSISTENCY_TICKET.md and docs/SCENES.md's
+## chain/count/unlock feedback. See docs/UI_003_LEVEL_UI_CONSISTENCY_TICKET.md and docs/SCENES.md's
 ## "Shared Gameplay UI Roles" section.
 
 const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
@@ -658,8 +658,8 @@ func _test_long_value_formatting() -> void:
 	level.free()
 
 
-## The remaining-count label pulses on a decrease and the overlay plays a one-shot unlock animation
-## without delaying actual unlock availability.
+## The extracted overlay keeps its decorative AD label and countdown readable, shakes its chains,
+## swings the hanging lock on a decrease, and releases cleanly without delaying unlock availability.
 func _test_locked_shelf_feedback() -> void:
 	var level := _level_scene.instantiate()
 	level.set("launched_from_dev_mode", true)
@@ -678,22 +678,50 @@ func _test_locked_shelf_feedback() -> void:
 		level.free()
 		return
 
-	var overlay := shelf.get_node_or_null("LockedOverlay") as Node2D
-	var count_label := overlay.get_node_or_null("RemainingLabel") as Label
+	var overlay := shelf.get_node_or_null("LockedOverlay") as ShelfLockOverlay
+	var chain_rig := overlay.get_node("VisualRig/ChainRig") as Node2D
+	var chain_back := overlay.get_node("VisualRig/ChainRig/ChainBack") as Sprite2D
+	var chain_front := overlay.get_node("VisualRig/ChainRig/ChainFront") as Sprite2D
+	var lock_rig := overlay.get_node("VisualRig/LockRig") as Node2D
+	var ad_label := overlay.get_node("VisualRig/LockRig/AdLabel") as Label
+	var countdown_badge := overlay.get_node("VisualRig/CountdownBadge") as Node2D
+	var count_label := overlay.get_node("VisualRig/CountdownBadge/RemainingLabel") as Label
 	var requirement := int(level.call("_get_shelf_unlock_requirement", shelf))
+	var chain_rest_position := chain_rig.position
+	var lock_rest_position := lock_rig.position
+	var badge_rest_position := countdown_badge.position
+	var badge_rest_scale := countdown_badge.scale
+	var standard_chain_scale := chain_back.scale
+
+	_check(ad_label.text == "AD", "Locked shelf should show the decorative AD label on its lock.")
+	_check(
+		chain_back.texture != null and is_same(chain_front.texture, chain_back.texture),
+		"Both crossed chains should reuse the selected C2 chain texture."
+	)
 
 	level.set("_triples_cleared", requirement - 1)
 	level.call("_update_locked_shelves")
 	await process_frame
 	_check(overlay.visible, "Shelf should stay locked before the requirement is met.")
+	_check(count_label.text == "1", "Countdown badge should show one remaining clear.")
 	_check(
-		not count_label.scale.is_equal_approx(Vector2.ONE),
-		"Remaining label should be mid-pulse right after a count decrease."
+		not countdown_badge.scale.is_equal_approx(badge_rest_scale),
+		"Countdown badge should be mid-pop right after a count decrease."
 	)
-	await _wait_seconds(0.3)
 	_check(
-		count_label.scale.is_equal_approx(Vector2.ONE),
-		"Remaining label pulse should settle back to normal scale."
+		not chain_rig.position.is_equal_approx(chain_rest_position),
+		"Crossed chains should be mid-shake right after a count decrease."
+	)
+	_check(
+		not is_zero_approx(lock_rig.rotation),
+		"Hanging lock should be mid-swing right after a count decrease."
+	)
+	await _wait_seconds(0.35)
+	_check(
+		countdown_badge.scale.is_equal_approx(badge_rest_scale)
+		and chain_rig.position.is_equal_approx(chain_rest_position)
+		and is_zero_approx(lock_rig.rotation),
+		"Badge, chains, and hanging lock should settle back to their authored transforms."
 	)
 
 	level.set("_triples_cleared", requirement)
@@ -703,14 +731,50 @@ func _test_locked_shelf_feedback() -> void:
 		overlay.visible,
 		"Overlay should still be visible/fading right after unlocking, not disappear on the same frame."
 	)
-	await _wait_seconds(0.4)
+	_check(count_label.text == "0", "Final clear should visibly decrement the badge to zero.")
+	_check(
+		bool(level.call("_is_shelf_move_source_eligible", shelf)),
+		"Shelf should become gameplay-eligible immediately while its chains are still releasing."
+	)
+	await _wait_seconds(0.5)
 	_check(not overlay.visible, "Overlay should be fully hidden once the unlock animation finishes.")
 	_check(
-		overlay.modulate.a == 1.0 and overlay.scale.is_equal_approx(Vector2.ONE),
-		"Overlay should reset to identity modulate/scale after finishing, not retain the animated values."
+		overlay.modulate.a == 1.0
+		and overlay.scale.is_equal_approx(Vector2.ONE)
+		and chain_rig.position.is_equal_approx(chain_rest_position)
+		and chain_back.position.is_equal_approx(Vector2.ZERO)
+		and chain_front.position.is_equal_approx(Vector2.ZERO)
+		and lock_rig.position.is_equal_approx(lock_rest_position)
+		and is_zero_approx(lock_rig.rotation)
+		and countdown_badge.position.is_equal_approx(badge_rest_position)
+		and countdown_badge.scale.is_equal_approx(badge_rest_scale),
+		"Unlock should hide and fully reset every animated overlay transform."
 	)
 
 	level.free()
+
+	var dispenser := (load("res://scenes/dispenser_shelf.tscn") as PackedScene).instantiate()
+	root.add_child(dispenser)
+	await process_frame
+	var compact_overlay := dispenser.get_node("LockedOverlay") as ShelfLockOverlay
+	var compact_shade := compact_overlay.get_node("Shade") as Polygon2D
+	var compact_chain := compact_overlay.get_node("VisualRig/ChainRig/ChainBack") as Sprite2D
+	var compact_label := compact_overlay.get_node(
+		"VisualRig/CountdownBadge/RemainingLabel"
+	) as Label
+	compact_overlay.show_locked(123)
+	_check(compact_overlay.compact_layout, "Dispenser should use the compact locked-shelf layout.")
+	_check(
+		is_equal_approx(compact_shade.polygon[0].x, -40.0)
+		and is_equal_approx(compact_shade.polygon[1].x, 40.0),
+		"Compact shade should fit the dispenser's narrow shelf bounds."
+	)
+	_check(
+		compact_chain.scale.x < standard_chain_scale.x,
+		"Compact chain treatment should be narrower than the standard shelf treatment."
+	)
+	_check(compact_label.text == "123", "Compact countdown should retain a three-digit value.")
+	dispenser.free()
 
 
 func _make_level() -> Node:

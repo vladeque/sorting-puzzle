@@ -1682,6 +1682,45 @@ Depends on:
 Do not use for:
 - Spending lives, scene navigation, or pause state ownership. Those stay in `scripts/level.gd`.
 
+## `scenes/ui/shelf_lock_overlay.tscn`
+
+Root:
+- `ShelfLockOverlay` (`Node2D`)
+
+Script:
+- `scripts/shelf_lock_overlay.gd`
+
+Purpose:
+- Reusable visual owner instanced as `LockedOverlay` by both standard and dispenser shelves.
+- Draws two crossed instances of the selected C2 chain texture over a softened shelf shade, with the
+  existing orange padlock hanging at their intersection.
+- Keeps the decorative `AD` copy and the green circular remaining-clears badge as live Godot labels,
+  so text stays crisp and 1-, 2-, and 3+-digit counts can resize independently from the raster art.
+- Owns decrement feedback (badge pop, chain shake, hanging-lock swing) and the final release (chains
+  recoil/fade, lock drops, shade fades). The owning level changes gameplay eligibility immediately;
+  none of these visuals can delay an unlocked shelf.
+- Exposes standard and compact layouts through `overlay_half_width` and `compact_layout`, letting the
+  dispenser reuse the exact component without duplicating its hierarchy or animation logic.
+
+Important nodes:
+- `Shade`: shelf-local darkening layer whose horizontal bounds follow `overlay_half_width`.
+- `VisualRig/ChainRig/ChainBack` and `ChainFront`: crossed, rotated instances of
+  `assets/ui/shelf_lock_chain_c2.png`.
+- `VisualRig/LockRig`: pivot at the shackle attachment point; contains the existing lock sprite and
+  decorative `AdLabel`.
+- `VisualRig/CountdownBadge`: true circular green panel and `RemainingLabel`, positioned above the
+  chain intersection.
+
+Depends on:
+- `assets/ui/shelf_lock_chain_c2.png`, prepared from the selected ImageGen C2 candidate with an alpha
+  background.
+- `assets/ui/lock_shelf_cutout.png` for the hanging orange padlock.
+- `scripts/ui_motion.gd` for replacement-safe tweens.
+
+Do not use for:
+- Counting cleared triples, deciding whether a shelf is locked, or changing item input. Those remain
+  authoritative in `scripts/level.gd`.
+
 ## `scenes/shelf.tscn`
 
 Root:
@@ -1696,7 +1735,8 @@ Purpose:
 - Owns generated back-layer slot layout and preview styling defaults through `scripts/shelf.gd`.
 - Owns soft internal left/top wall shadows, the diagonal bottom cast shadow, the hidden top ceiling cap, and the right-column cast shadow toggled by `scripts/level.gd`.
 - Uses opaque pre-blended shadow colors so overlapping shadow polygons do not compound into darker patches.
-- Owns the hidden locked-shelf overlay visuals shown by `scripts/level.gd` when a level config gates the shelf behind cleared triples.
+- Instances the reusable hidden `scenes/ui/shelf_lock_overlay.tscn` when a level config gates the
+  shelf behind cleared triples.
 - Uses wide, slightly shorter cell bounds so three generated shelves span most of the 720 px gameplay viewport with compact row spacing.
 - Runtime shelf instances are scaled slightly by `scripts/level.gd`, with layout template markers and moving-row windows authored to match the scaled cell footprint.
 - Can be switched by `scripts/level.gd` to a `floor_only` visual variant for moving rows by hiding wall and ceiling nodes at runtime.
@@ -1713,19 +1753,14 @@ Important nodes:
 - `Shadow` and `RightColumnShadow`: solid-color perspective cast shadows, shown at runtime for full shelf visuals and drawn below shelf bodies, items, and generated back-layer item previews so they remain visible only on exposed wall/background areas.
 - `FloorSurface` and `FloorFrontLip`: wooden floor where items visually rest.
 - `FloorGrain*`: subtle line details on the floor; generated back-layer item previews draw above the floor and grain, while active front items draw above back-layer previews.
-- `LockedOverlay`: hidden lock overlay used for triple-gated shelves. `scripts/level.gd`
-  (UI-003 P3) pulses `RemainingLabel` when its count decreases and plays a one-shot fade/scale via
-  `UIMotionScript.retween()` when the shelf unlocks, instead of the count and overlay changing
-  instantly; the shelf's items become interactable immediately regardless of how long that
-  animation takes.
-- `LockedOverlay/LockSprite`: transparent lock image from `assets/ui/lock_shelf_cutout.png`, scaled to fit the shelf overlay.
-- `LockedOverlay/RemainingLabel`: runtime-updated count of triples still needed to unlock the shelf, optically centered over the lock's clear center panel.
+- `LockedOverlay`: standard-layout instance of `scenes/ui/shelf_lock_overlay.tscn`; the component owns
+  its crossed chains, hanging lock, decorative `AD`, remaining-clears badge, and feedback motion.
 - `Slot01`, `Slot02`, `Slot03`: front slots used by runtime movement and matching logic, positioned so default item silhouettes sit next to each other.
 - `SlotXX/ItemSlotXX`: marker positions used by `scripts/level.gd` for snap targeting.
 
 Depends on:
 - `scripts/shelf.gd` for generated back-layer preview setup.
-- `assets/ui/lock_shelf_cutout.png` for locked shelf overlay art with a clear center panel for the count label.
+- `scenes/ui/shelf_lock_overlay.tscn` for triple-gate presentation.
 - Runtime item spawning from `scripts/level.gd`.
 
 Do not use for:
@@ -1752,12 +1787,13 @@ Important nodes:
   `TopCeilingCap`, `FloorSurface`, `FloorFrontLip`, `FloorGrain*`: the same art vocabulary as
   `scenes/shelf.tscn`, narrowed to the 96-wide cell.
 - `LayerIndicator`: `scenes/shelf_layer_indicator.tscn` instance positioned below the floor lip.
-- `LockedOverlay`: same role as the standard shelf's, re-proportioned for the narrow cell.
+- `LockedOverlay`: compact-layout instance of `scenes/ui/shelf_lock_overlay.tscn`, with a narrower
+  shade and scaled chain/lock/badge rig for the one-slot cell.
 - `Slot01`/`Slot01/ItemSlot01`: the single front slot and its snap marker, at the same vertical
   position as a standard shelf's so items rest identically.
 
 Depends on:
-- `assets/ui/lock_shelf_cutout.png`, `scenes/shelf_layer_indicator.tscn`.
+- `scenes/ui/shelf_lock_overlay.tscn`, `scenes/shelf_layer_indicator.tscn`.
 
 Do not use for:
 - Move validation, ability targeting, or queue promotion timing. Those stay in `scripts/level.gd`.
