@@ -668,7 +668,9 @@ Responsibility:
   compact button.
 - Reads campaign ability uses from `PlayerProgress`, spends campaign uses immediately, and uses temporary three-use counts for isolated dev/test levels.
 - Lets hammer clear matching visible/front items first, or supplement visible/front items with first-back-layer copies of the same type if no visible item type can make a triple.
-- Gathers hammer targets to the center of the screen, spawns a fullscreen hammer strike effect there, swaps through four pseudo-3D hammer angle textures in the scene-authored `AnimationPlayer`, and waits for the `impact` callback before destroying the merged item and dropping combo reward stars.
+- Gathers hammer targets to the exact viewport center, merges them into one item with a short settle
+  pop, then spawns the fullscreen strike and swaps through the supplied eight-frame hammer sequence
+  before destroying the merged item and dropping combo reward stars from the center impact point.
 - Shows the shuffle delivery box sprite from `assets/abilities/ability_shuffle_box.png` and pauses moving shelf rows while shuffle items fly through the center-screen box.
 - Disables abilities after failure, completion, pause, or active ability animations. A zero-use ability button stays pressable during gameplay so `scenes/ability_purchase_menu.tscn` can offer a paid immediate use, presented as "USE ABILITY" (UI-003, not an inventory acquisition) with the canonical clover coin art and a genuine unavailable style (not alpha dimming) when unaffordable.
 - Loads per-ability paid-use prices from `configs/ability_purchase_prices.json`, spends coins through `PlayerProgress.spend_coins()`, and applies the selected paid ability immediately without adding saved inventory.

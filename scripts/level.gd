@@ -22,6 +22,7 @@ const FREEZER_DURATION_SECONDS := 30.0
 ## completion states instead of leaving the player on a static board for the whole particle burst.
 const COMPLETION_REVEAL_SECONDS := 1.35
 const HAMMER_ITEM_COMPRESSION_SECONDS := 0.08
+const HAMMER_MERGE_POP_SECONDS := 0.12
 const HAMMER_REWARD_DELAY_SECONDS := 0.14
 const SHELF_SCENE := preload("res://scenes/shelf.tscn")
 const DISPENSER_SHELF_SCENE := preload("res://scenes/dispenser_shelf.tscn")
@@ -3299,13 +3300,13 @@ func _play_hammer_ability(items_to_destroy: Array[ShelfItem]) -> void:
 
 	var shelves_to_check := _get_hammer_shelves_to_check(items_to_destroy)
 	var destroyed_triples := floori(float(_get_valid_item_count(items_to_destroy)) / float(SLOT_COUNT))
-	var impact_global_position := _get_hammer_target_center(items_to_destroy)
-	var impact_screen_position := get_canvas_transform() * impact_global_position
+	var impact_screen_position := get_viewport_rect().size * 0.5
+	var impact_global_position := _screen_position_to_global(impact_screen_position)
+	var merged_item := await _play_hammer_gather_animation(items_to_destroy, impact_global_position)
 	var ui_layer := get_node("UI") as CanvasLayer
 	var effect := HAMMER_IMPACT_EFFECT_SCENE.instantiate() as HammerImpactEffect
 	ui_layer.add_child(effect)
 	effect.play(impact_screen_position, _sound_effects_enabled, hammer_haptics_enabled)
-	var merged_item := await _play_hammer_gather_animation(items_to_destroy, impact_global_position)
 
 	if not effect.has_reached_pre_impact():
 		await effect.pre_impact
@@ -3322,18 +3323,6 @@ func _play_hammer_ability(items_to_destroy: Array[ShelfItem]) -> void:
 
 	_hammer_effect_active = false
 	_update_ability_buttons()
-
-
-func _get_hammer_target_center(items_to_destroy: Array[ShelfItem]) -> Vector2:
-	var valid_items := _get_valid_items(items_to_destroy)
-	if valid_items.is_empty():
-		return _screen_position_to_global(get_viewport_rect().size * 0.5)
-
-	var target_center := Vector2.ZERO
-	for item in valid_items:
-		target_center += item.global_position
-	return target_center / float(valid_items.size())
-
 
 func _get_hammer_shelves_to_check(items_to_destroy: Array[ShelfItem]) -> Array[Node]:
 	var shelves_to_check: Array[Node] = []
@@ -3384,8 +3373,25 @@ func _play_hammer_gather_animation(items_to_destroy: Array[ShelfItem], target_gl
 
 	for item in valid_items:
 		if item != merged_item and item != null and is_instance_valid(item):
+			item.visible = false
 			_unmark_item_clearing_by_id(item.get_instance_id())
 			item.queue_free()
+
+	if merged_item != null and is_instance_valid(merged_item):
+		var merge_tween := create_tween()
+		merge_tween.tween_property(
+			merged_item,
+			"scale",
+			Vector2.ONE * 1.06,
+			HAMMER_MERGE_POP_SECONDS * 0.55
+		).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		merge_tween.tween_property(
+			merged_item,
+			"scale",
+			Vector2.ONE * 0.92,
+			HAMMER_MERGE_POP_SECONDS * 0.45
+		).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+		await merge_tween.finished
 
 	return merged_item if merged_item != null and is_instance_valid(merged_item) else null
 

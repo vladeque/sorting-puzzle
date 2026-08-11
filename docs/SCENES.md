@@ -1374,16 +1374,16 @@ Script:
 
 Purpose:
 - Reusable fullscreen hammer strike effect spawned by `scripts/level.gd` when the hammer ability is used.
-- Displays the high-resolution transparent hammer over gameplay as an eight-pose pseudo-3D swing,
-  including two short smear poses and an impact overshoot.
-- Owns the editable 1.12 second `AnimationPlayer` `strike` animatic: lower-left launch,
-  upper-right anticipation during item gathering, a 260 ms near-still hold, a 60 ms downstroke,
-  front-facing impact, dissolve, texture swaps, afterimages, layered impact amounts, audio cue
-  callbacks, and signal timing. The long hold against the short downstroke is what makes the hit
-  read as a snap; shortening it flattens the strike.
+- Displays the normalized transparent versions of the supplied numbered hammer frames in exact
+  1-through-8 order. Frames 1-6 share a 680x680 canvas; the portrait source canvases for frames 7-8
+  become 453x680 so their intended closer head framing is retained.
+- Owns the editable 1.26 second `AnimationPlayer` `strike` animatic: raised upper-right approach,
+  eight evenly readable texture swaps, accelerating center descent, final-frame impact, short
+  recoil/dissolve, subtle frame-derived afterimages, layered impact amounts, audio callbacks, and
+  gameplay signal timing.
 - Ends the hammer with a fade-and-flare dissolve rather than a rebound, so the head does not sit
   over the cell it just cleared while the burst plays.
-- Emits `pre_impact` at 400 ms for item compression and `impact` at 480 ms so gameplay hides and
+- Emits `pre_impact` at 400 ms for item compression and `impact` at 580 ms so gameplay hides and
   frees the merged item on the visual hit frame. Reward stars begin 140 ms later, during the
   remaining recoil/VFX tail.
 - Owns the entrance/downstroke, impact-thump/magic, and sparkle-tail `AudioStreamPlayer` nodes. The
@@ -1391,24 +1391,25 @@ Purpose:
   `hammer_impact_effect` group.
 
 Important nodes:
-- `ImpactAnchor`: runtime-positioned target point averaged from the three selected items; scales the
-  full hammer for the current viewport. Its `scale.x` flips to `-1` for targets past
+- `ImpactAnchor`: runtime-positioned at the exact viewport center after the three selected items
+  finish converging and settle as one visible item; scales the full hammer for the current
+  viewport. Its `scale.x` flips to `-1` for reusable targets past
   `MIRROR_THRESHOLD_RATIO` so right-side strikes approach from the left instead of hanging the
   raised pose off the viewport edge.
 - `ImpactAnchor/HammerPivot`: keyframed by `AnimationPlayer` for wind-up, strike, and dissolve motion.
 - `ImpactAnchor/HammerPivot/HammerSprite`: transparent hammer sprite whose texture is value-keyframed
   by the `strike` animation. Its position is not keyframed — the script derives it each frame from
-  `POSE_HEAD_OFFSETS` so every pose's striking face stays on the pivot the impact VFX are drawn
+  `POSE_HEAD_OFFSETS` so every frame's head centre stays on the pivot the impact VFX are drawn
   around.
-- `ImpactAnchor/HammerPivot/AfterimageEarly` / `AfterimageLate`: low-alpha tinted copies of the two
-  smear poses behind the live hammer during the downstroke, sharing one additive canvas material.
+- `ImpactAnchor/HammerPivot/AfterimageEarly` / `AfterimageLate`: subtle low-alpha tinted copies of
+  frames 5 and 6 behind the live hammer during the descent, sharing one additive canvas material.
 - `WindupAudio`, `DownstrokeAudio`, `ImpactLowAudio`, `ImpactMagicAudio`, and `SparkleTailAudio`:
   scene-owned layered cues built from the project's existing short SFX palette.
 - `AnimationPlayer`: owns the `strike` animation; edit this timeline for most hammer motion and timing adjustments.
 
 Depends on:
-- `assets/abilities/ability_hammer_swing_*.png` for the eight poses from windup through impact
-  overshoot. The `rebound` and `rebound_transition` art is no longer referenced.
+- `assets/abilities/ability_hammer_swing_*.png` for the normalized supplied frames 1 through 8. The
+  `rebound` and `rebound_transition` art is no longer referenced.
 - `assets/audio/item_place.wav`, `assets/audio/triple_clear.wav`, and
   `assets/audio/A_short_satisfying_i_#3-1782529645197.wav`, layered with scene-specific pitch and
   volume settings.

@@ -56,15 +56,47 @@ func _run() -> void:
 		_finish(level)
 		return
 
-	var expected_impact_global_position: Vector2 = level.call("_get_hammer_target_center", hammer_targets)
-	var expected_impact_screen_position: Vector2 = level.get_canvas_transform() * expected_impact_global_position
+	var expected_impact_screen_position: Vector2 = level.get_viewport_rect().size * 0.5
+	var expected_impact_global_position: Vector2 = level.call(
+		"_screen_position_to_global", expected_impact_screen_position
+	)
+	var starting_distances: Array[float] = []
+	for item in hammer_targets:
+		starting_distances.append(
+			(item as ShelfItem).global_position.distance_to(expected_impact_global_position)
+		)
 	level.set("_has_player_started_timer", true)
 	level.call("_play_hammer_ability", hammer_targets)
 	var effect := level.get_node_or_null("UI/HammerImpactEffect") as HammerImpactEffect
-	_check(effect != null, "Hammer effect starts immediately instead of waiting for item gathering.")
+	_check(effect == null, "Hammer stays hidden until the three targets have merged.")
+	await create_timer(0.1).timeout
+	for item_index in range(hammer_targets.size()):
+		var gathering_item := hammer_targets[item_index] as ShelfItem
+		_check(
+			gathering_item != null
+				and is_instance_valid(gathering_item)
+				and gathering_item.global_position.distance_to(expected_impact_global_position)
+					< starting_distances[item_index],
+			"Every Hammer target flies toward the viewport center before the strike."
+		)
+	await create_timer(0.25).timeout
+	effect = level.get_node_or_null("UI/HammerImpactEffect") as HammerImpactEffect
+	_check(effect != null, "Hammer starts after the center merge pop completes.")
 	if effect == null:
 		_finish(level)
 		return
+	var visible_merged_items := 0
+	for item in hammer_targets:
+		if item != null and is_instance_valid(item) and item.visible and not item.is_queued_for_deletion():
+			visible_merged_items += 1
+	_check(visible_merged_items == 1, "The three gathered targets merge into one visible item.")
+	var merged_item := hammer_targets[0] as ShelfItem
+	_check(
+		merged_item != null
+			and is_instance_valid(merged_item)
+			and merged_item.global_position.distance_to(expected_impact_global_position) < 1.0,
+		"The merged item settles at the exact viewport center."
+	)
 
 	var pivot := effect.get_node("ImpactAnchor/HammerPivot") as Node2D
 	var impact_anchor := effect.get_node("ImpactAnchor") as Node2D
@@ -81,8 +113,8 @@ func _run() -> void:
 			"Hammer strike swaps through the eight swing poses."
 		)
 		_check(
-			strike.track_get_key_time(texture_track, 7) <= 0.53,
-			"Hammer holds its impact pose through the dissolve instead of playing a rebound."
+			strike.track_get_key_time(texture_track, 7) <= 0.59,
+			"Hammer reaches supplied frame 8 on the impact beat."
 		)
 	for property_path in [
 		NodePath(".:_trail_amount"),
@@ -127,22 +159,21 @@ func _run() -> void:
 	)
 	_check(
 		impact_anchor.position.is_equal_approx(expected_impact_screen_position),
-		"Hammer gathers and strikes at the selected targets' averaged board position."
+		"Hammer strikes at the exact viewport center."
 	)
 	_check(
-		pivot.position.x < 0.0 and pivot.position.y > 0.0,
-		"Hammer begins in the lower-left launch pose."
+		pivot.position.x > 0.0 and pivot.position.y < 0.0,
+		"Hammer begins in its raised upper-right approach pose."
 	)
 
 	await create_timer(0.24).timeout
 	_check(
 		pivot.position.x > 0.0 and pivot.position.y < 0.0,
-		"Hammer reaches the upper-right anticipation pose while the gather completes."
+		"Hammer circles above the already-merged center item before descending."
 	)
 
 	await effect.pre_impact
 	await create_timer(0.04).timeout
-	var merged_item := hammer_targets[0] as ShelfItem
 	_check(
 		merged_item != null
 			and is_instance_valid(merged_item)
@@ -153,8 +184,8 @@ func _run() -> void:
 	await effect.impact
 	var impact_animation_position := animation_player.current_animation_position
 	_check(
-		impact_animation_position >= 0.47 and impact_animation_position <= 0.52,
-		"Hammer impact signal is aligned to the 480 ms strike frame."
+		impact_animation_position >= 0.57 and impact_animation_position <= 0.62,
+		"Hammer impact signal is aligned to the 580 ms final supplied frame."
 	)
 	await process_frame
 	_check(
@@ -183,8 +214,8 @@ func _run() -> void:
 
 	await effect.finished
 	_check(
-		animation_player.current_animation_position >= 1.1,
-		"Hammer recoil and layered VFX remain visible for the full 1.12 second strike."
+		animation_player.current_animation_position >= 1.24,
+		"Hammer recoil and layered VFX remain visible for the full 1.26 second strike."
 	)
 	await create_timer(0.45).timeout
 	_check(not bool(level.get("_hammer_effect_active")), "Hammer input lock clears after the effect finishes.")
@@ -263,7 +294,7 @@ func _verify_edge_target_framing() -> void:
 			"Hammer keeps its raised pose on screen for target ratio %s." % target_ratio
 		)
 
-		animation_player.seek(0.48, true)
+		animation_player.seek(0.58, true)
 		animation_player.pause()
 		await process_frame
 		var pose_offsets: Dictionary = effect.get_script().get_script_constant_map().get(
@@ -274,7 +305,7 @@ func _verify_edge_target_framing() -> void:
 		_check(
 			head_offset.is_finite()
 				and (sprite.position + head_offset * sprite.scale).length() < 0.01,
-			"Impact pose keeps its striking face on the pivot the burst is drawn around."
+			"Impact pose keeps its head centre on the pivot the burst is drawn around."
 		)
 		_check(
 			(effect.call("_get_head_position") as Vector2).distance_to(target) < 0.01,

@@ -14,7 +14,7 @@ const PINK := Color(1.0, 0.18, 0.72, 1.0)
 const LIGHT_PINK := Color(1.0, 0.76, 0.94, 1.0)
 const WARM := Color(1.0, 0.86, 0.42, 1.0)
 
-## Strikes landing right of this fraction of the overlay mirror their approach so the raised pose
+## Strikes landing right of this fraction of the overlay mirror their approach so the opening pose
 ## stays inside the viewport instead of hanging off the right edge.
 const MIRROR_THRESHOLD_RATIO := 0.55
 
@@ -27,18 +27,18 @@ const SMEAR_LATE_TEXTURE := preload("res://assets/abilities/ability_hammer_swing
 const IMPACT_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_impact.png")
 const IMPACT_OVERSHOOT_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_impact_overshoot.png")
 
-## Offset of each pose's striking face from its texture centre, in texture pixels. The sprite is
-## shifted by the negation of this so the face always lands on the pivot, which is what the impact
-## VFX are drawn around. Without it the hammer visually lands beside the burst it causes.
+## Offset of each supplied frame's head centre from its texture centre, in texture pixels. The
+## sprite is shifted by the negation of this so the head follows one continuous arc and the final
+## frame lands on the pivot where the impact VFX are drawn.
 const POSE_HEAD_OFFSETS := {
-	WINDUP_TEXTURE: Vector2(-20.0, -126.0),
-	RISE_TEXTURE: Vector2(0.0, -140.0),
-	ANTICIPATION_TEXTURE: Vector2(60.0, -145.0),
-	MID_TEXTURE: Vector2(36.0, -98.0),
-	SMEAR_EARLY_TEXTURE: Vector2(-38.0, 110.0),
-	SMEAR_LATE_TEXTURE: Vector2(-20.0, 60.0),
-	IMPACT_TEXTURE: Vector2(8.0, 110.0),
-	IMPACT_OVERSHOOT_TEXTURE: Vector2(24.0, 110.0),
+	WINDUP_TEXTURE: Vector2(-8.0, -145.0),
+	RISE_TEXTURE: Vector2(4.0, -148.0),
+	ANTICIPATION_TEXTURE: Vector2(0.0, 0.0),
+	MID_TEXTURE: Vector2(2.0, -140.0),
+	SMEAR_EARLY_TEXTURE: Vector2(0.0, -158.0),
+	SMEAR_LATE_TEXTURE: Vector2(-3.0, -170.0),
+	IMPACT_TEXTURE: Vector2(34.0, -205.0),
+	IMPACT_OVERSHOOT_TEXTURE: Vector2(46.0, -195.0),
 }
 
 @export_range(0.1, 2.0, 0.01) var base_hammer_scale := 0.4
@@ -146,7 +146,7 @@ func _process(_delta: float) -> void:
 	_sample_trail_point()
 
 
-## Keeps the striking face of whichever pose is on screen pinned to the pivot origin.
+## Keeps the head centre of whichever supplied frame is on screen pinned to the pivot origin.
 func _align_sprite_to_pivot(sprite: Sprite2D) -> void:
 	if sprite == null or sprite.texture == null:
 		return
@@ -155,7 +155,7 @@ func _align_sprite_to_pivot(sprite: Sprite2D) -> void:
 
 
 func _get_head_position() -> Vector2:
-	# The sprite alignment above places the striking face exactly on the pivot origin, so the head
+	# The sprite alignment above places the head centre exactly on the pivot origin, so the head
 	# position collapses to the pivot's own transform.
 	return _impact_anchor.position + _impact_anchor.scale * _hammer_pivot.position
 
