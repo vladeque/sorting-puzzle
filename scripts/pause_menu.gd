@@ -26,7 +26,7 @@ const SETTINGS_BUTTONS: Array[Dictionary] = [
 	{"name": "VibrationButton", "setting_id": SETTING_VIBRATION},
 ]
 const CROSS_OUT_NAME := "CrossOut"
-const CONTENT_REGION_HEIGHT := 224.0
+const CONTENT_REGION_HEIGHT := 234.0
 const GameplayUIThemeScript := preload("res://scripts/gameplay_ui_theme.gd")
 
 static var _disabled_settings: Dictionary = {}
