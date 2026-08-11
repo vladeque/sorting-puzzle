@@ -1548,7 +1548,7 @@ func _clear_drag_drop_selection_if_unavailable() -> void:
 		_pressed_origin_slot = null
 
 
-## Locked-shelf feedback: the extracted overlay owns its count pop, chain shake, hanging-lock swing,
+## Locked-shelf feedback: the extracted overlay owns its count pop, chain tension, hanging-lock swing,
 ## and chain-release animation instead of level orchestration reaching into its visual hierarchy.
 ## _update_shelf_input_pickable() (called separately by every caller of this function) is never
 ## gated on this animation, so the shelf becomes interactable immediately regardless of how long the

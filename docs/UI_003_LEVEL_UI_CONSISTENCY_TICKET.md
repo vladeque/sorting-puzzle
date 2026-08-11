@@ -279,11 +279,12 @@ constraint for that component only:
 - `scenes/ui/shelf_lock_overlay.tscn` / `scripts/shelf_lock_overlay.gd` now own the extracted standard
   and compact lock overlay instead of duplicating nodes in both shelf scenes or keeping animation
   internals in `scripts/level.gd`.
-- The selected C2 chain art is stored as `assets/ui/shelf_lock_chain_c2.png` and reused twice in a
-  crossed layout. The existing orange lock remains, with decorative `AD` and a separate green
-  remaining-clears circle.
-- Decrements pop the count, shake the chains, and swing the hanging lock. Reaching zero recoils the
-  chains and drops the lock while shelf eligibility still changes immediately.
+- The follow-up selected three-link candidate A, stored as `assets/ui/shelf_lock_chain_arm_a.png`,
+  replaces the heavier C2 strip. Four independent arms meet beneath the existing orange lock, with
+  decorative `AD` and a separate green remaining-clears circle.
+- Decrements pop the count, tension each arm toward the lock, and swing the hanging lock. Reaching
+  zero retracts the arms toward their corners and drops the lock while shelf eligibility still
+  changes immediately.
 - Hammer-cleared triples retain the existing `_record_triples_cleared()` path and therefore continue
   to decrement the overlay.
 - `tests/ui/test_shelf_lock_overlay.gd` is the focused regression; the locked-shelf phase in

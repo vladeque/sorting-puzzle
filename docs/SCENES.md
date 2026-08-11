@@ -1692,28 +1692,27 @@ Script:
 
 Purpose:
 - Reusable visual owner instanced as `LockedOverlay` by both standard and dispenser shelves.
-- Draws two crossed instances of the selected C2 chain texture over a softened shelf shade, with the
-  existing orange padlock hanging at their intersection.
+- Draws four slim three-link arms from selected candidate A over a softened shelf shade, with the
+  existing orange padlock hanging at their clean central intersection.
 - Keeps the decorative `AD` copy and the green circular remaining-clears badge as live Godot labels,
   so text stays crisp and 1-, 2-, and 3+-digit counts can resize independently from the raster art.
-- Owns decrement feedback (badge pop, chain shake, hanging-lock swing) and the final release (chains
-  recoil/fade, lock drops, shade fades). The owning level changes gameplay eligibility immediately;
-  none of these visuals can delay an unlocked shelf.
+- Owns decrement feedback (badge pop, inward chain tension, hanging-lock swing) and the final release
+  (each arm retracts/fades toward its shelf corner, the lock drops, and the shade fades). The owning
+  level changes gameplay eligibility immediately; none of these visuals can delay an unlocked shelf.
 - Exposes standard and compact layouts through `overlay_half_width` and `compact_layout`, letting the
   dispenser reuse the exact component without duplicating its hierarchy or animation logic.
 
 Important nodes:
 - `Shade`: shelf-local darkening layer whose horizontal bounds follow `overlay_half_width`.
-- `VisualRig/ChainRig/ChainBack` and `ChainFront`: crossed, rotated instances of
-  `assets/ui/shelf_lock_chain_c2.png`.
+- `VisualRig/ChainRig/TopLeftArm`, `TopRightArm`, `BottomLeftArm`, and `BottomRightArm`: independently
+  positioned instances of `assets/ui/shelf_lock_chain_arm_a.png` that meet beneath the lock.
 - `VisualRig/LockRig`: pivot at the shackle attachment point; contains the existing lock sprite and
   decorative `AdLabel`.
 - `VisualRig/CountdownBadge`: true circular green panel and `RemainingLabel`, positioned above the
   chain intersection.
 
 Depends on:
-- `assets/ui/shelf_lock_chain_c2.png`, prepared from the selected ImageGen C2 candidate with an alpha
-  background.
+- `assets/ui/shelf_lock_chain_arm_a.png`, prepared from selected ImageGen candidate A with alpha.
 - `assets/ui/lock_shelf_cutout.png` for the hanging orange padlock.
 - `scripts/ui_motion.gd` for replacement-safe tweens.
 
@@ -1754,7 +1753,7 @@ Important nodes:
 - `FloorSurface` and `FloorFrontLip`: wooden floor where items visually rest.
 - `FloorGrain*`: subtle line details on the floor; generated back-layer item previews draw above the floor and grain, while active front items draw above back-layer previews.
 - `LockedOverlay`: standard-layout instance of `scenes/ui/shelf_lock_overlay.tscn`; the component owns
-  its crossed chains, hanging lock, decorative `AD`, remaining-clears badge, and feedback motion.
+  its four chain arms, hanging lock, decorative `AD`, remaining-clears badge, and feedback motion.
 - `Slot01`, `Slot02`, `Slot03`: front slots used by runtime movement and matching logic, positioned so default item silhouettes sit next to each other.
 - `SlotXX/ItemSlotXX`: marker positions used by `scripts/level.gd` for snap targeting.
 

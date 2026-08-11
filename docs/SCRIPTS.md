@@ -1682,12 +1682,12 @@ Purpose:
   shelves, keeping those details out of `scripts/level.gd`.
 - Applies `overlay_half_width` to the shade and `compact_layout` to the chain, lock, and badge rig at
   `_ready()`.
-- Preserves the selected C2 chain art as two crossed `Sprite2D` instances; keeps `AD` and the
+- Reuses selected candidate A as four independent three-link `Sprite2D` arms; keeps `AD` and the
   remaining count scene-native.
 
 API:
 - `show_locked(remaining)`: shows a clean locked state, fits 1-, 2-, or 3+-digit copy in the circular
-  badge, and plays a badge pop + chain shake + hanging-lock swing only when the value decreased.
+  badge, and plays a badge pop + inward arm tension + hanging-lock swing only when the value decreased.
 - `play_unlock()`: visibly sets the badge to zero, plays the same impact beat, then recoils/fades the
   chains, drops/fades the lock, fades the shade, hides the component, and restores every authored
   transform. Gameplay eligibility is intentionally owned and updated by `scripts/level.gd` before
@@ -1695,7 +1695,7 @@ API:
 - `reset_visual_state()`: stops tracked tweens and restores authored transforms for safe reuse.
 
 Motion ownership:
-- Uses independent `UIMotion.retween()` metadata keys for the chain shake, lock swing, badge pop, and
+- Uses independent `UIMotion.retween()` metadata keys for chain tension, lock swing, badge pop, and
   final unlock release. A rapid decrement replaces the same concern's prior tween instead of
   accumulating transforms.
 - Standard motion settles in roughly 0.3 seconds; the final release completes in roughly 0.38
@@ -1704,7 +1704,7 @@ Motion ownership:
 Depends on:
 - `scenes/ui/shelf_lock_overlay.tscn` node paths.
 - `scripts/ui_motion.gd` for `retween()` / `stop_tween()`.
-- `assets/ui/shelf_lock_chain_c2.png` and `assets/ui/lock_shelf_cutout.png`.
+- `assets/ui/shelf_lock_chain_arm_a.png` and `assets/ui/lock_shelf_cutout.png`.
 
 Do not use for:
 - Unlock requirements, cleared-triple ownership, Hammer counting, item eligibility, or shelf

@@ -54,12 +54,12 @@ func _test_level_progression_feedback() -> void:
 
 	var requirement := int(level.call("_get_shelf_unlock_requirement", shelf))
 	var overlay := shelf.get_node("LockedOverlay") as ShelfLockOverlay
-	var chain_rig := overlay.get_node("VisualRig/ChainRig") as Node2D
+	var chain_arm := overlay.get_node("VisualRig/ChainRig/TopLeftArm") as Sprite2D
 	var lock_rig := overlay.get_node("VisualRig/LockRig") as Node2D
 	var badge := overlay.get_node("VisualRig/CountdownBadge") as Node2D
 	var label := overlay.get_node("VisualRig/CountdownBadge/RemainingLabel") as Label
 	var ad_label := overlay.get_node("VisualRig/LockRig/AdLabel") as Label
-	var chain_rest_position := chain_rig.position
+	var chain_rest_position := chain_arm.position
 	var badge_rest_scale := badge.scale
 
 	_check(ad_label.text == "AD", "Lock should retain the selected decorative AD copy.")
@@ -73,8 +73,8 @@ func _test_level_progression_feedback() -> void:
 	await process_frame
 	_check(label.text == "1", "A recorded triple should decrement the visible countdown.")
 	_check(
-		not chain_rig.position.is_equal_approx(chain_rest_position),
-		"A countdown decrement should shake the crossed chains."
+		not chain_arm.position.is_equal_approx(chain_rest_position),
+		"A countdown decrement should tension the chain arms toward the lock."
 	)
 	_check(not is_zero_approx(lock_rig.rotation), "A countdown decrement should swing the lock.")
 	_check(
@@ -83,7 +83,7 @@ func _test_level_progression_feedback() -> void:
 	)
 	await _wait_seconds(0.35)
 	_check(
-		chain_rig.position.is_equal_approx(chain_rest_position)
+		chain_arm.position.is_equal_approx(chain_rest_position)
 		and is_zero_approx(lock_rig.rotation)
 		and badge.scale.is_equal_approx(badge_rest_scale),
 		"Decrement feedback should settle completely."
@@ -112,12 +112,11 @@ func _test_compact_layout_and_restart_safe_motion() -> void:
 
 	var overlay := dispenser.get_node("LockedOverlay") as ShelfLockOverlay
 	var shade := overlay.get_node("Shade") as Polygon2D
-	var chain := overlay.get_node("VisualRig/ChainRig/ChainBack") as Sprite2D
-	var chain_rig := overlay.get_node("VisualRig/ChainRig") as Node2D
+	var chain := overlay.get_node("VisualRig/ChainRig/TopLeftArm") as Sprite2D
 	var lock_rig := overlay.get_node("VisualRig/LockRig") as Node2D
 	var badge := overlay.get_node("VisualRig/CountdownBadge") as Node2D
 	var label := overlay.get_node("VisualRig/CountdownBadge/RemainingLabel") as Label
-	var chain_rest_position := chain_rig.position
+	var chain_rest_position := chain.position
 	var lock_rest_position := lock_rig.position
 	var badge_rest_scale := badge.scale
 
@@ -129,7 +128,7 @@ func _test_compact_layout_and_restart_safe_motion() -> void:
 		and is_equal_approx(shade.polygon[1].x, 40.0),
 		"Compact shade should fit the dispenser aperture."
 	)
-	_check(chain.scale.x <= 0.201, "Compact crossed chains should fit the narrow shelf.")
+	_check(chain.scale.x <= 0.086, "Compact chain arms should fit the narrow shelf.")
 
 	# A second update before the first feedback settles must replace its tweens rather than stack
 	# conflicting transforms.
@@ -139,7 +138,7 @@ func _test_compact_layout_and_restart_safe_motion() -> void:
 	await _wait_seconds(0.4)
 	_check(label.text == "121", "Rapid updates should keep the newest countdown value.")
 	_check(
-		chain_rig.position.is_equal_approx(chain_rest_position)
+		chain.position.is_equal_approx(chain_rest_position)
 		and lock_rig.position.is_equal_approx(lock_rest_position)
 		and is_zero_approx(lock_rig.rotation)
 		and badge.scale.is_equal_approx(badge_rest_scale),

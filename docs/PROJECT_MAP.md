@@ -537,7 +537,7 @@ Responsibility:
 - Uses `scripts/press_scale_button.gd` on every gameplay action (Pause, all four ability buttons, every modal close button, and both result screens' actions -- UI-003 extended this to controls that previously had no press feedback at all).
 - Tracks cleared triples and unlocks shelves whose configs require progress before becoming
   accessible. It passes remaining counts/state to `ShelfLockOverlay`; that component pops the badge,
-  shakes the chains, swings the hanging lock, and releases the chains without delaying actual input
+  tensions the chain arms, swings the hanging lock, and releases the arms without delaying actual input
   availability. Hammer-cleared triples continue through the same `_record_triples_cleared()` path.
 - Plays item placement and triple-clear sound effects.
 - Keeps non-clearing items interactive while match animations run, resolves different shelves concurrently, and queues only repeated work for a shelf that is already resolving.
@@ -600,23 +600,24 @@ Change here when:
 Files:
 - `scenes/ui/shelf_lock_overlay.tscn`
 - `scripts/shelf_lock_overlay.gd`
-- `assets/ui/shelf_lock_chain_c2.png`
+- `assets/ui/shelf_lock_chain_arm_a.png`
 - `assets/ui/lock_shelf_cutout.png`
 - `tests/ui/test_shelf_lock_overlay.gd`
 
 Responsibility:
 - Reusable standard/compact visual component for every triple-gated shelf.
-- Crosses two instances of the transparent C2 chain texture over shelf contents, hangs the existing
-  orange lock at their intersection, renders decorative `AD`, and shows remaining clears in a green
-  circle above the lock.
-- On a recorded triple clear, pops the count, shakes the chain rig, and swings the lock. On zero,
-  recoils/fades both chains and drops/fades the lock while the level enables the shelf immediately.
+- Places four independent instances of selected three-link candidate A from the shelf edges toward
+  the center, hangs the existing orange lock at their intersection, renders decorative `AD`, and
+  shows remaining clears in a green circle above the lock.
+- On a recorded triple clear, pops the count, pulls each arm toward the lock, and swings the lock. On
+  zero, retracts/fades the arms toward their corners and drops/fades the lock while the level enables
+  the shelf immediately.
 - Replaces interrupted feedback tweens and restores authored transforms after both normal and rapid
   state changes.
 - Uses a compact layout when instanced by `scenes/dispenser_shelf.tscn`.
 
 Change here when:
-- Editing chain/lock/badge art, `AD` styling, count fitting, decrement shake/swing timing, final chain
+- Editing chain/lock/badge art, `AD` styling, count fitting, decrement tension/swing timing, final chain
   release motion, or the compact dispenser proportions.
 
 ### Dispenser Shelf

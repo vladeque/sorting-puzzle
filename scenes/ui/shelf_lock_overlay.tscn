@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3]
 
-[ext_resource type="Texture2D" path="res://assets/ui/shelf_lock_chain_c2.png" id="1_chain"]
+[ext_resource type="Texture2D" path="res://assets/ui/shelf_lock_chain_arm_a.png" id="1_chain"]
 [ext_resource type="Texture2D" uid="uid://7lmfd8og03cd" path="res://assets/ui/lock_shelf_cutout.png" id="2_lock"]
 [ext_resource type="Script" path="res://scripts/shelf_lock_overlay.gd" id="3_script"]
 
@@ -25,7 +25,7 @@ z_index = 40
 script = ExtResource("3_script")
 
 [node name="Shade" type="Polygon2D" parent="."]
-color = Color(0.04, 0.05, 0.06, 0.46)
+color = Color(0.04, 0.05, 0.06, 0.3)
 polygon = PackedVector2Array(-104, -81, 104, -81, 104, 46, -104, 46)
 
 [node name="VisualRig" type="Node2D" parent="."]
@@ -34,17 +34,37 @@ z_index = 1
 [node name="ChainRig" type="Node2D" parent="VisualRig"]
 position = Vector2(0, -17)
 
-[node name="ChainBack" type="Sprite2D" parent="VisualRig/ChainRig"]
+[node name="TopLeftArm" type="Sprite2D" parent="VisualRig/ChainRig"]
 texture_filter = 2
-rotation = -0.34
-scale = Vector2(0.45, 0.45)
+position = Vector2(-49, -17)
+rotation = 0.32
+scale = Vector2(0.21, 0.21)
 texture = ExtResource("1_chain")
+self_modulate = Color(0.86, 0.9, 0.96, 1)
 
-[node name="ChainFront" type="Sprite2D" parent="VisualRig/ChainRig"]
+[node name="TopRightArm" type="Sprite2D" parent="VisualRig/ChainRig"]
 texture_filter = 2
-rotation = 0.34
-scale = Vector2(0.45, 0.45)
+position = Vector2(49, -17)
+rotation = -0.32
+scale = Vector2(0.21, 0.21)
 texture = ExtResource("1_chain")
+self_modulate = Color(0.86, 0.9, 0.96, 1)
+
+[node name="BottomLeftArm" type="Sprite2D" parent="VisualRig/ChainRig"]
+texture_filter = 2
+position = Vector2(-49, 17)
+rotation = -0.32
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("1_chain")
+self_modulate = Color(0.86, 0.9, 0.96, 1)
+
+[node name="BottomRightArm" type="Sprite2D" parent="VisualRig/ChainRig"]
+texture_filter = 2
+position = Vector2(49, 17)
+rotation = 0.32
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("1_chain")
+self_modulate = Color(0.86, 0.9, 0.96, 1)
 
 [node name="LockRig" type="Node2D" parent="VisualRig"]
 z_index = 2

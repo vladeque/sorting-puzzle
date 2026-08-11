@@ -658,7 +658,7 @@ func _test_long_value_formatting() -> void:
 	level.free()
 
 
-## The extracted overlay keeps its decorative AD label and countdown readable, shakes its chains,
+## The extracted overlay keeps its decorative AD label and countdown readable, tensions its chains,
 ## swings the hanging lock on a decrease, and releases cleanly without delaying unlock availability.
 func _test_locked_shelf_feedback() -> void:
 	var level := _level_scene.instantiate()
@@ -679,25 +679,38 @@ func _test_locked_shelf_feedback() -> void:
 		return
 
 	var overlay := shelf.get_node_or_null("LockedOverlay") as ShelfLockOverlay
-	var chain_rig := overlay.get_node("VisualRig/ChainRig") as Node2D
-	var chain_back := overlay.get_node("VisualRig/ChainRig/ChainBack") as Sprite2D
-	var chain_front := overlay.get_node("VisualRig/ChainRig/ChainFront") as Sprite2D
+	var chain_top_left := overlay.get_node("VisualRig/ChainRig/TopLeftArm") as Sprite2D
+	var chain_top_right := overlay.get_node("VisualRig/ChainRig/TopRightArm") as Sprite2D
+	var chain_bottom_left := overlay.get_node("VisualRig/ChainRig/BottomLeftArm") as Sprite2D
+	var chain_bottom_right := overlay.get_node("VisualRig/ChainRig/BottomRightArm") as Sprite2D
+	var chain_arms: Array[Sprite2D] = [
+		chain_top_left,
+		chain_top_right,
+		chain_bottom_left,
+		chain_bottom_right,
+	]
 	var lock_rig := overlay.get_node("VisualRig/LockRig") as Node2D
 	var ad_label := overlay.get_node("VisualRig/LockRig/AdLabel") as Label
 	var countdown_badge := overlay.get_node("VisualRig/CountdownBadge") as Node2D
 	var count_label := overlay.get_node("VisualRig/CountdownBadge/RemainingLabel") as Label
 	var requirement := int(level.call("_get_shelf_unlock_requirement", shelf))
-	var chain_rest_position := chain_rig.position
+	var chain_rest_positions: Array[Vector2] = []
+	for chain_arm in chain_arms:
+		chain_rest_positions.append(chain_arm.position)
 	var lock_rest_position := lock_rig.position
 	var badge_rest_position := countdown_badge.position
 	var badge_rest_scale := countdown_badge.scale
-	var standard_chain_scale := chain_back.scale
+	var standard_chain_scale := chain_top_left.scale
 
 	_check(ad_label.text == "AD", "Locked shelf should show the decorative AD label on its lock.")
-	_check(
-		chain_back.texture != null and is_same(chain_front.texture, chain_back.texture),
-		"Both crossed chains should reuse the selected C2 chain texture."
-	)
+	var shared_chain_texture := chain_top_left.texture
+	var all_arms_share_texture := shared_chain_texture != null
+	for chain_arm in chain_arms:
+		all_arms_share_texture = all_arms_share_texture and is_same(
+			chain_arm.texture,
+			shared_chain_texture
+		)
+	_check(all_arms_share_texture, "All four arms should reuse selected chain candidate A.")
 
 	level.set("_triples_cleared", requirement - 1)
 	level.call("_update_locked_shelves")
@@ -709,8 +722,8 @@ func _test_locked_shelf_feedback() -> void:
 		"Countdown badge should be mid-pop right after a count decrease."
 	)
 	_check(
-		not chain_rig.position.is_equal_approx(chain_rest_position),
-		"Crossed chains should be mid-shake right after a count decrease."
+		not chain_top_left.position.is_equal_approx(chain_rest_positions[0]),
+		"Chain arms should be pulling toward the lock right after a count decrease."
 	)
 	_check(
 		not is_zero_approx(lock_rig.rotation),
@@ -719,7 +732,7 @@ func _test_locked_shelf_feedback() -> void:
 	await _wait_seconds(0.35)
 	_check(
 		countdown_badge.scale.is_equal_approx(badge_rest_scale)
-		and chain_rig.position.is_equal_approx(chain_rest_position)
+		and chain_top_left.position.is_equal_approx(chain_rest_positions[0])
 		and is_zero_approx(lock_rig.rotation),
 		"Badge, chains, and hanging lock should settle back to their authored transforms."
 	)
@@ -738,12 +751,15 @@ func _test_locked_shelf_feedback() -> void:
 	)
 	await _wait_seconds(0.5)
 	_check(not overlay.visible, "Overlay should be fully hidden once the unlock animation finishes.")
+	var all_arms_reset := true
+	for index in range(chain_arms.size()):
+		all_arms_reset = all_arms_reset and chain_arms[index].position.is_equal_approx(
+			chain_rest_positions[index]
+		)
 	_check(
 		overlay.modulate.a == 1.0
 		and overlay.scale.is_equal_approx(Vector2.ONE)
-		and chain_rig.position.is_equal_approx(chain_rest_position)
-		and chain_back.position.is_equal_approx(Vector2.ZERO)
-		and chain_front.position.is_equal_approx(Vector2.ZERO)
+		and all_arms_reset
 		and lock_rig.position.is_equal_approx(lock_rest_position)
 		and is_zero_approx(lock_rig.rotation)
 		and countdown_badge.position.is_equal_approx(badge_rest_position)
@@ -758,7 +774,7 @@ func _test_locked_shelf_feedback() -> void:
 	await process_frame
 	var compact_overlay := dispenser.get_node("LockedOverlay") as ShelfLockOverlay
 	var compact_shade := compact_overlay.get_node("Shade") as Polygon2D
-	var compact_chain := compact_overlay.get_node("VisualRig/ChainRig/ChainBack") as Sprite2D
+	var compact_chain := compact_overlay.get_node("VisualRig/ChainRig/TopLeftArm") as Sprite2D
 	var compact_label := compact_overlay.get_node(
 		"VisualRig/CountdownBadge/RemainingLabel"
 	) as Label
