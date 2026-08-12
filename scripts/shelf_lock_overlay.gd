@@ -19,17 +19,27 @@ const CHAIN_ARM_VISIBLE_WIDTH := 500.0
 const WALL_COVER_DEPTH := 8.0
 const WALL_COVER_TOP := -89.0
 const WALL_COVER_BOTTOM := 46.0
-const STANDARD_WALL_EMBED_DEPTH := 5.0
-const COMPACT_WALL_EMBED_DEPTH := 4.0
 const STANDARD_CHAIN_THICKNESS_SCALE := 0.34
 const COMPACT_CHAIN_THICKNESS_SCALE := 0.145
-const STANDARD_WALL_ANCHOR_Y := [-52.0, -48.0, 14.0, 18.0]
-const COMPACT_WALL_ANCHOR_Y := [-42.0, -39.0, 4.0, 7.0]
+## X is a signed offset from the matching shelf side; Y is local to the overlay. These endpoints
+## reproduce the authored standard-arm transforms while keeping the wall side responsive.
+const STANDARD_WALL_ANCHORS_FROM_EDGE := [
+	Vector2(-1.208509, -66.285566),
+	Vector2(1.016543, -62.897603),
+	Vector2(-4.908108, 25.033825),
+	Vector2(3.035202, 33.254229),
+]
+const COMPACT_WALL_ANCHORS_FROM_EDGE := [
+	Vector2(-4, -42),
+	Vector2(4, -39),
+	Vector2(-4, 4),
+	Vector2(4, 7),
+]
 const STANDARD_LOCK_ANCHORS := [
-	Vector2(-4, -20),
-	Vector2(4, -18),
-	Vector2(-4, -14),
-	Vector2(4, -16),
+	Vector2(-6.791499, -17.714434),
+	Vector2(4.983449, -19.102397),
+	Vector2(-7.091884, -13.033829),
+	Vector2(6.964798, -13.254231),
 ]
 const COMPACT_LOCK_ANCHORS := [
 	Vector2(-2, -19),
@@ -40,7 +50,7 @@ const COMPACT_LOCK_ANCHORS := [
 
 const STANDARD_LOCK_POSITION := Vector2(0, -30)
 const COMPACT_LOCK_POSITION := Vector2(0, -28)
-const STANDARD_BADGE_POSITION := Vector2(0, -54)
+const STANDARD_BADGE_POSITION := Vector2(0, -44)
 const COMPACT_BADGE_POSITION := Vector2(0, -51)
 const STANDARD_LOCK_SCALE := Vector2(1.08, 1.08)
 const COMPACT_LOCK_SCALE := Vector2(0.76, 0.76)
@@ -203,18 +213,20 @@ func _apply_wall_attachment_covers() -> void:
 
 
 func _configure_chain_anchors() -> void:
-	var wall_anchor_y := COMPACT_WALL_ANCHOR_Y if compact_layout else STANDARD_WALL_ANCHOR_Y
+	var wall_anchors_from_edge := (
+		COMPACT_WALL_ANCHORS_FROM_EDGE
+		if compact_layout
+		else STANDARD_WALL_ANCHORS_FROM_EDGE
+	)
 	var lock_anchors := COMPACT_LOCK_ANCHORS if compact_layout else STANDARD_LOCK_ANCHORS
-	var embed_depth := COMPACT_WALL_EMBED_DEPTH if compact_layout else STANDARD_WALL_EMBED_DEPTH
 	_chain_thickness_scale = (
 		COMPACT_CHAIN_THICKNESS_SCALE if compact_layout else STANDARD_CHAIN_THICKNESS_SCALE
 	)
 
 	_chain_wall_anchors.clear()
-	_chain_wall_anchors.append(Vector2(-overlay_half_width - embed_depth, wall_anchor_y[0]))
-	_chain_wall_anchors.append(Vector2(overlay_half_width + embed_depth, wall_anchor_y[1]))
-	_chain_wall_anchors.append(Vector2(-overlay_half_width - embed_depth, wall_anchor_y[2]))
-	_chain_wall_anchors.append(Vector2(overlay_half_width + embed_depth, wall_anchor_y[3]))
+	for anchor_from_edge in wall_anchors_from_edge:
+		var side_x := -overlay_half_width if anchor_from_edge.x < 0.0 else overlay_half_width
+		_chain_wall_anchors.append(Vector2(side_x + anchor_from_edge.x, anchor_from_edge.y))
 
 	_chain_lock_anchors.clear()
 	_chain_attachment_center = Vector2.ZERO

@@ -726,7 +726,7 @@ func _test_locked_shelf_feedback() -> void:
 	)
 	_check(
 		wall_endpoint_at_rest.x <= -overlay.overlay_half_width
-		and absf(lock_endpoint_at_rest.x) <= 6.0,
+		and absf(lock_endpoint_at_rest.x) <= 8.0,
 		"A chain arm should span from beneath the shelf wall to the lock shackle."
 	)
 	var hammer_button := level.get_node("UI/AbilityBar").find_child(

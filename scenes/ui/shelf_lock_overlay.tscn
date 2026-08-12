@@ -23,16 +23,16 @@ z_index = 2
 [node name="TopLeftArm" type="Sprite2D" parent="VisualRig/ChainRig" unique_id=67435052]
 self_modulate = Color(0.86, 0.9, 0.96, 1)
 texture_filter = 2
-position = Vector2(-56.5, -36)
-rotation = 0.296
+position = Vector2(-56.000004, -42)
+rotation = 0.4584532
 scale = Vector2(0.2195, 0.34)
 texture = ExtResource("1_chain")
 
 [node name="TopRightArm" type="Sprite2D" parent="VisualRig/ChainRig" unique_id=708479932]
 self_modulate = Color(0.86, 0.9, 0.96, 1)
 texture_filter = 2
-position = Vector2(56.5, -33)
-rotation = -0.278
+position = Vector2(54.999996, -41)
+rotation = -0.41266823
 scale = Vector2(0.2184, 0.34)
 texture = ExtResource("1_chain")
 
@@ -40,8 +40,8 @@ texture = ExtResource("1_chain")
 self_modulate = Color(0.86, 0.9, 0.96, 1)
 texture_filter = 2
 z_index = -2
-position = Vector2(-56.5, 0)
-rotation = -0.261
+position = Vector2(-57.999996, 5.999998)
+rotation = -0.3577936
 scale = Vector2(0.2174, 0.34)
 texture = ExtResource("1_chain")
 
@@ -49,8 +49,8 @@ texture = ExtResource("1_chain")
 self_modulate = Color(0.86, 0.9, 0.96, 1)
 texture_filter = 2
 z_index = -2
-position = Vector2(56.5, 1)
-rotation = 0.313
+position = Vector2(57, 9.999999)
+rotation = 0.43505818
 scale = Vector2(0.2207, 0.34)
 texture = ExtResource("1_chain")
 
@@ -90,7 +90,7 @@ vertical_alignment = 1
 
 [node name="CountdownBadge" type="Node2D" parent="VisualRig" unique_id=1854519460]
 z_index = 4
-position = Vector2(0, -54)
+position = Vector2(0, -44)
 
 [node name="RemainingLabel" type="Label" parent="VisualRig/CountdownBadge" unique_id=337056043]
 offset_left = -20.0

@@ -56,6 +56,7 @@ func _test_level_progression_feedback() -> void:
 	var overlay := shelf.get_node("LockedOverlay") as ShelfLockOverlay
 	var chain_rig := overlay.get_node("VisualRig/ChainRig") as Node2D
 	var chain_arm := overlay.get_node("VisualRig/ChainRig/TopLeftArm") as Sprite2D
+	var top_right_arm := overlay.get_node("VisualRig/ChainRig/TopRightArm") as Sprite2D
 	var bottom_left_arm := overlay.get_node("VisualRig/ChainRig/BottomLeftArm") as Sprite2D
 	var bottom_right_arm := overlay.get_node("VisualRig/ChainRig/BottomRightArm") as Sprite2D
 	var wall_covers := overlay.get_node("VisualRig/WallAttachmentCovers") as Node2D
@@ -70,6 +71,29 @@ func _test_level_progression_feedback() -> void:
 	var badge_rest_scale := badge.scale
 
 	_check(ad_label.text == "AD", "Lock should retain the selected decorative AD copy.")
+	var authored_arms: Array[Sprite2D] = [
+		chain_arm,
+		top_right_arm,
+		bottom_left_arm,
+		bottom_right_arm,
+	]
+	var authored_positions := [
+		Vector2(-56.000004, -42),
+		Vector2(54.999996, -41),
+		Vector2(-57.999996, 5.999998),
+		Vector2(57, 9.999999),
+	]
+	var authored_rotations := [0.4584532, -0.41266823, -0.3577936, 0.43505818]
+	for index in range(authored_arms.size()):
+		_check(
+			authored_arms[index].position.distance_to(authored_positions[index]) < 0.001
+			and absf(authored_arms[index].rotation - authored_rotations[index]) < 0.0001,
+			"Runtime chain arm %d should reproduce its authored standard transform." % index
+		)
+	_check(
+		badge.position.is_equal_approx(Vector2(0, -44)),
+		"Runtime counter should preserve the authored standard position."
+	)
 	_check(
 		chain_rig.z_index + chain_arm.z_index > lock_rig.z_index,
 		"Top chain arms should render in front of the lock and its shackle."
@@ -88,7 +112,7 @@ func _test_level_progression_feedback() -> void:
 		"The top-left chain should terminate beneath the shelf's left wall."
 	)
 	_check(
-		absf(lock_endpoint_at_rest.x) <= 6.0
+		absf(lock_endpoint_at_rest.x) <= 8.0
 		and lock_endpoint_at_rest.y >= -22.0
 		and lock_endpoint_at_rest.y <= -12.0,
 		"The top-left chain should terminate over the lock shackle."

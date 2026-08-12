@@ -1710,7 +1710,8 @@ Important nodes:
 - `Shade`: shelf-local darkening layer whose horizontal bounds follow `overlay_half_width`.
 - `VisualRig/ChainRig/TopLeftArm`, `TopRightArm`, `BottomLeftArm`, and `BottomRightArm`: independently
   fitted instances of C2-7A at legacy path `assets/ui/shelf_lock_chain_arm_a.png`, running from wall
-  anchors to the lock.
+  anchors to the lock. Their scene transforms are the standard-layout authoring preview; runtime
+  derives the same transforms from the endpoint constants in `scripts/shelf_lock_overlay.gd`.
 - `VisualRig/WallAttachmentCovers`: reusable left/right wood strips drawn above chain endpoints so
   terminal links disappear beneath the actual shelf frame.
 - `VisualRig/LockRig`: drawn between the bottom and top arm depth layers; contains the lock sprite

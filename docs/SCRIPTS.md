@@ -1688,6 +1688,9 @@ Purpose:
   from a fixed wall endpoint and a lock-shackle endpoint, adds small per-arm slope differences,
   configures overlay-owned wall covers from `overlay_half_width`, and layers the bottom pair behind
   the lock while the top pair crosses in front.
+- `STANDARD_WALL_ANCHORS_FROM_EDGE` and `STANDARD_LOCK_ANCHORS` are the authoritative standard-layout
+  endpoints. Runtime intentionally derives every arm's position, rotation, and horizontal scale from
+  them; direct `.tscn` transform edits must be transferred to these constants to appear in a level.
 - Keeps `AD` and the remaining count scene-native; the count uses the shared ability/inventory badge
   resource and `GameplayUITheme.COUNT_BADGE_*` fitting contract.
 
