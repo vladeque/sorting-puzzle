@@ -10,6 +10,10 @@ param(
 
     [string[]]$GodotArguments = @(),
 
+    [string[]]$UserArguments = @(),
+
+    [switch]$Windowed,
+
     [switch]$KeepArtifacts
 )
 
@@ -23,6 +27,8 @@ $userDataParent = Join-Path $env:APPDATA 'Godot\app_userdata'
 $userDataPath = Join-Path $userDataParent $testProjectName
 $exitCode = 1
 $junctionPaths = @()
+$stdoutPath = $null
+$stderrPath = $null
 
 function Assert-SafeCleanupPath {
     param(
@@ -93,14 +99,25 @@ try {
     }
 
     $godotTarget = "res://$($relativeTarget.Replace('\', '/'))"
-    $arguments = @('--headless', '--path', $scratchRoot) + $GodotArguments
+    # Screenshot capture needs a real display server: a headless run resolves
+    # get_viewport().get_texture() to a null texture and silently produces no image.
+    $arguments = @()
+    if (-not $Windowed) {
+        $arguments += '--headless'
+    }
+    $arguments += @('--path', $scratchRoot) + $GodotArguments
     if ($PSCmdlet.ParameterSetName -eq 'Script') {
         $arguments += @('--script', $godotTarget)
     } else {
         $arguments += $godotTarget
     }
+    # Everything after the separator reaches the target through OS.get_cmdline_user_args().
+    if ($UserArguments.Count -gt 0) {
+        $arguments += @('--') + $UserArguments
+    }
 
-    Write-Output "Running isolated Godot test in $scratchRoot"
+    $modeLabel = if ($Windowed) { 'windowed' } else { 'headless' }
+    Write-Output "Running isolated Godot test ($modeLabel) in $scratchRoot"
     $processArguments = @{
         FilePath = $GodotPath
         ArgumentList = $arguments
@@ -108,8 +125,23 @@ try {
         Wait = $true
         PassThru = $true
     }
+    # A windowed run normally uses Godot's GUI binary, which never attaches to this console. Without
+    # redirection its engine errors -- script parse failures above all -- would be lost entirely.
+    # Headless runs keep writing straight to the console so existing tests stream output unchanged.
+    if ($Windowed) {
+        $stdoutPath = Join-Path $scratchParent "sorting-puzzle-godot-$testId-stdout.txt"
+        $stderrPath = Join-Path $scratchParent "sorting-puzzle-godot-$testId-stderr.txt"
+        $processArguments['RedirectStandardOutput'] = $stdoutPath
+        $processArguments['RedirectStandardError'] = $stderrPath
+    }
     $process = Start-Process @processArguments
     $exitCode = $process.ExitCode
+    foreach ($outputPath in @($stdoutPath, $stderrPath)) {
+        if ($outputPath -and (Test-Path -LiteralPath $outputPath -PathType Leaf)) {
+            Get-Content -LiteralPath $outputPath | ForEach-Object { Write-Output $_ }
+            Remove-Item -LiteralPath $outputPath -Force
+        }
+    }
 }
 finally {
     if ($KeepArtifacts) {

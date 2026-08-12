@@ -218,6 +218,31 @@ Change here when:
 - Adding a headless test that writes `user://`, changing the project name, or changing which project
   resource directories tests require.
 
+### UI Visual Capture
+
+Files:
+- `scripts/tools/capture_ui.ps1`
+- `scripts/tools/capture_scene.gd`
+- `scripts/tools/captures/shelf_lock_overlay_setup.gd`
+
+Responsibility:
+- Renders any scene at the responsive resolutions from AGENTS.md and writes one PNG per resolution to
+  the git-ignored `tmp/ui_capture/`, plus an ImageMagick contact sheet for a single review pass.
+- Runs through the isolated test project with `run_isolated_godot_test.ps1 -Windowed`, because a
+  headless display server resolves the viewport texture to null and produces no image.
+- Reports results through `<name>_manifest.json` rather than stdout, since the windowed Godot binary
+  on Windows is a GUI executable whose prints never reach the calling shell. The runner redirects
+  engine output to the console for windowed runs so script parse errors stay visible.
+- Measures each capture from the saved image, so a window clamped by the desktop or a render target
+  letterboxed by the project's stretch aspect is reported instead of being passed off as the
+  requested resolution.
+- Prepares scenes that render nothing on their own through a setup script in `scripts/tools/captures/`
+  exposing `setup(scene_root: Node, tree: SceneTree) -> void`.
+
+Change here when:
+- Adding a capture setup script for a scene that needs runtime state, changing the reviewed
+  resolution set, or changing how capture artifacts are named or stored.
+
 ### Android Local Backend Debug Export (GAME-003)
 
 Files:

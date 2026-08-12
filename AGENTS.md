@@ -122,6 +122,39 @@ Use anchors, containers, stretch settings, safe-area padding, and runtime scalin
 
 When changing UI or gameplay layout, test representative resolutions such as 540x960, 720x1280, 1080x1920, 1080x2400, and a squarer tablet-like viewport.
 
+### Visual Verification
+
+Visual changes must be verified from a rendered screenshot. Reading a `.tscn` file, a style resource,
+or layout code does not establish what the screen actually looks like, and reasoning about intended
+appearance is not a substitute for looking at the pixels.
+
+After changing a scene, a theme or `StyleBox` resource, art placement, or layout code, capture the
+affected screen and look at the result before reporting the change as done:
+
+```powershell
+& .\scripts\tools\capture_ui.ps1 -Scene scenes/ui/shop_screen.tscn -Name shop
+```
+
+Captures render at the responsive resolutions listed above and are written to `tmp/ui_capture/`,
+together with a `<name>_contact_sheet.png` that places every resolution side by side for a single
+review pass. The directory is git-ignored and carries a `.gdignore` so review images never enter the
+project as importable assets.
+
+Useful options:
+
+- `-Resolutions '720x1280'` narrows the run while iterating on one layout.
+- `-Setup scripts/tools/captures/<name>_setup.gd` prepares runtime state for scenes that render
+  nothing on their own, such as overlays a level normally drives.
+- `-Zoom 3` and `-Background '#2b2f3a'` make small components legible against a neutral field.
+
+Capture requires a windowed Godot run. A headless run resolves the viewport texture to null and
+silently produces no image at all, which is why `run_isolated_godot_test.ps1` grew a `-Windowed`
+switch and why `capture_ui.ps1` always passes it. A windowed run briefly opens a real Godot window.
+
+Report what the capture shows, including the resolutions where a layout looks wrong. A capture whose
+rendered size differs from the requested size is reported as a warning and must not be read as a
+faithful view of that resolution.
+
 ### Image Conversion
 
 For generated project assets that need transparency, prefer ImageMagick for chroma-key removal and PNG alpha cleanup.
