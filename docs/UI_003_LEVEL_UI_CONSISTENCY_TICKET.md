@@ -294,8 +294,8 @@ constraint for that component only:
 
 - Each chain arm is now fitted between an endpoint embedded beneath a shelf side wall and an
   endpoint over the lock shackle. Small per-arm endpoint variations avoid a mechanically mirrored X.
-- Overlay-owned wood covers mask the outer links, while the lock draws behind the chains and the
-  count draws above them.
+- Overlay-owned wood covers mask the outer links. The bottom chain arms draw behind the lock, the
+  top arms cross in front, and the count draws above the complete assembly.
 - Decrement tension keeps wall endpoints fixed and moves only shackle endpoints; unlock collapses
   each arm back into its wall without delaying shelf eligibility.
 - `RemainingLabel` now reuses `style_box_gameplay_count_badge.tres` and the same shared font-fitting

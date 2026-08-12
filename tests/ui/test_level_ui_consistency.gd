@@ -710,8 +710,14 @@ func _test_locked_shelf_feedback() -> void:
 
 	_check(ad_label.text == "AD", "Locked shelf should show the decorative AD label on its lock.")
 	_check(
-		chain_rig.z_index > lock_rig.z_index,
-		"Locked-shelf chains should render in front of the lock."
+		chain_rig.z_index + chain_top_left.z_index > lock_rig.z_index
+		and chain_rig.z_index + chain_top_right.z_index > lock_rig.z_index,
+		"Locked-shelf top chain arms should render in front of the lock."
+	)
+	_check(
+		chain_rig.z_index + chain_bottom_left.z_index < lock_rig.z_index
+		and chain_rig.z_index + chain_bottom_right.z_index < lock_rig.z_index,
+		"Locked-shelf bottom chain arms should render behind the lock."
 	)
 	_check(
 		wall_covers.z_index > chain_rig.z_index

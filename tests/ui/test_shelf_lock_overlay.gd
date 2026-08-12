@@ -56,6 +56,8 @@ func _test_level_progression_feedback() -> void:
 	var overlay := shelf.get_node("LockedOverlay") as ShelfLockOverlay
 	var chain_rig := overlay.get_node("VisualRig/ChainRig") as Node2D
 	var chain_arm := overlay.get_node("VisualRig/ChainRig/TopLeftArm") as Sprite2D
+	var bottom_left_arm := overlay.get_node("VisualRig/ChainRig/BottomLeftArm") as Sprite2D
+	var bottom_right_arm := overlay.get_node("VisualRig/ChainRig/BottomRightArm") as Sprite2D
 	var wall_covers := overlay.get_node("VisualRig/WallAttachmentCovers") as Node2D
 	var lock_rig := overlay.get_node("VisualRig/LockRig") as Node2D
 	var badge := overlay.get_node("VisualRig/CountdownBadge") as Node2D
@@ -69,8 +71,13 @@ func _test_level_progression_feedback() -> void:
 
 	_check(ad_label.text == "AD", "Lock should retain the selected decorative AD copy.")
 	_check(
-		chain_rig.z_index > lock_rig.z_index,
-		"Chains should render in front of the lock and its shackle."
+		chain_rig.z_index + chain_arm.z_index > lock_rig.z_index,
+		"Top chain arms should render in front of the lock and its shackle."
+	)
+	_check(
+		chain_rig.z_index + bottom_left_arm.z_index < lock_rig.z_index
+		and chain_rig.z_index + bottom_right_arm.z_index < lock_rig.z_index,
+		"Bottom chain arms should render behind the lock."
 	)
 	_check(
 		wall_covers.z_index > chain_rig.z_index and badge.z_index > wall_covers.z_index,

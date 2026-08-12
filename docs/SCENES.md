@@ -1695,8 +1695,9 @@ Purpose:
 - Draws four slim three-link arms from selected candidate A over a softened shelf shade. Every arm
   is fitted between an endpoint embedded beneath a side wall and an endpoint over the padlock
   shackle, with small authored per-arm slope differences instead of a perfectly mirrored X.
-- Draws the lock behind the chains and the shared orange-red/gold gameplay count badge above them;
-  decorative `AD` and the remaining-clear count stay as crisp live Godot labels.
+- Layers the lock between the chain pairs: `BottomLeftArm` and `BottomRightArm` draw behind it while
+  the top pair crosses in front. The shared orange-red/gold gameplay count badge stays above the
+  whole assembly; decorative `AD` and the remaining-clear count remain crisp live Godot labels.
 - Owns decrement feedback (badge pop, fixed-wall inward chain tension, hanging-lock swing) and the
   final release (each arm collapses/fades into its wall, the lock drops, and the shade fades). The
   owning level changes gameplay eligibility immediately; none of these visuals can delay an
@@ -1710,7 +1711,8 @@ Important nodes:
   fitted instances of `assets/ui/shelf_lock_chain_arm_a.png` running from wall anchors to the lock.
 - `VisualRig/WallAttachmentCovers`: reusable left/right wood strips drawn above chain endpoints so
   terminal links disappear beneath the actual shelf frame.
-- `VisualRig/LockRig`: drawn behind `ChainRig`; contains the lock sprite and decorative `AdLabel`.
+- `VisualRig/LockRig`: drawn between the bottom and top arm depth layers; contains the lock sprite
+  and decorative `AdLabel`.
 - `VisualRig/CountdownBadge/RemainingLabel`: uses the same shared 40px count-badge style and numeric
   fitting contract as `AbilityBar/UsesLabel`, positioned above the chain intersection.
 

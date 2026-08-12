@@ -608,7 +608,8 @@ Responsibility:
 - Reusable standard/compact visual component for every triple-gated shelf.
 - Fits four instances of selected three-link candidate A between slightly varied wall anchors and
   lock-shackle anchors. Overlay-owned wall covers hide the terminal links beneath the shelf frame;
-  chains draw in front of the orange `AD` lock and behind the shared gameplay count badge.
+  the bottom arms draw behind the orange `AD` lock, the top arms draw in front, and every arm stays
+  behind the shared gameplay count badge.
 - On a recorded triple clear, pops the count, keeps every wall endpoint fixed while pulling the
   shackle endpoints inward, and swings the lock. On zero, collapses/fades each arm into its wall and
   drops/fades the lock while the level enables the shelf immediately.

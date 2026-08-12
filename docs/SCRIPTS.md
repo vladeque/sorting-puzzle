@@ -1685,7 +1685,8 @@ Purpose:
   `_ready()`.
 - Reuses selected candidate A as four independent three-link `Sprite2D` arms. It computes each
   transform from a fixed wall endpoint and a lock-shackle endpoint, adds small per-arm slope
-  differences, and configures overlay-owned wall covers from `overlay_half_width`.
+  differences, configures overlay-owned wall covers from `overlay_half_width`, and layers the bottom
+  pair behind the lock while the top pair crosses in front.
 - Keeps `AD` and the remaining count scene-native; the count uses the shared ability/inventory badge
   resource and `GameplayUITheme.COUNT_BADGE_*` fitting contract.
 
