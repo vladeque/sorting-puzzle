@@ -1681,8 +1681,9 @@ Attached to:
 Purpose:
 - Owns the visual hierarchy and replacement-safe feedback tweens for standard and compact locked
   shelves, keeping those details out of `scripts/level.gd`.
-- Applies `overlay_half_width` to the shade and `compact_layout` to the chain, lock, and badge rig at
-  `_ready()`.
+- Applies exported horizontal/vertical shade bounds and wall-cover bounds at `_ready()`, plus
+  `compact_layout` to the chain, lock, and badge rig. This lets the open dispenser cradle reuse the
+  overlay without inheriting the standard closed shelf's height.
 - Reuses selected seven-link C2-7A art as four independent `Sprite2D` arms. The texture alternates
   crosswise/front-facing links and includes a shallow baked sag. The script computes each transform
   from a fixed wall endpoint and a lock-shackle endpoint, adds small per-arm slope differences,
@@ -1877,7 +1878,7 @@ Attached to:
 - `scenes/dispenser_shelf.tscn` root `DispenserShelf`.
 
 Purpose:
-- A source-only shelf: one item slot, 2-4 stacked layers, and a segmented indicator underneath
+- A source-only shelf: one item slot, 2-4 stacked layers, and an integrated count/fill readout
   counting the items still on it, the one on display included.
 - Reuses `Shelf`'s back-layer machinery for the queue -- with a single front slot, "one hidden item
   per layer, promoted when the front layer empties" already is a dispenser, so there is no separate
@@ -1887,16 +1888,17 @@ Purpose:
 Capability overrides:
 - `get_base_cell_size()` -> `DISPENSER_BASE_CELL_SIZE` (96x135, about 43% of a standard cell -- the
   narrowest that fits the canonical item silhouette without clipping).
-- `get_visual_bounds()` -> `VISUAL_BOUNDS`, taller than the cell because the indicator hangs below.
+- `get_visual_bounds()` -> `VISUAL_BOUNDS`, spanning the shorter open cradle and attached meter.
 - `get_slot_count()` -> `1`; `accepts_dropped_items()`, `forms_triples()`,
   `allows_ability_modification()`, and `shows_back_layer_preview()` all return `false`.
 - `set_row_placement()` and `set_top_ceiling_cap_visible()` are pinned: the frame is self-contained
-  rather than sharing edges with neighbours.
+  rather than sharing edges with neighbours, and the open cradle never grows a ceiling cap.
 - Constants are named `DISPENSER_BASE_CELL_SIZE`/`DISPENSER_SLOT_COUNT` because GDScript does not
   let a subclass reuse a parent constant's name.
 
 Key methods:
-- `set_capacity(capacity)`: sets socket count and lights them all; called once from the level config.
+- `set_capacity(capacity)`: sets the continuous meter denominator and fills it; called once from the
+  level config.
 - `take_one()` / `set_remaining_count(remaining)`: records that an item left for good.
 - `get_capacity()` / `get_remaining_count()`.
 
@@ -1917,20 +1919,19 @@ Attached to:
 - `scenes/shelf_layer_indicator.tscn` root `ShelfLayerIndicator`.
 
 Purpose:
-- Segmented readout of how many items a dispenser still holds. Knows nothing about matching, moves,
+- Integrated readout of how many items a dispenser still holds. Knows nothing about matching, moves,
   or the level -- `scripts/level.gd` talks to the shelf, never to the indicator.
-- Generates the socket row rather than authoring it, because the socket count comes from the level
-  config (2-4) and the sockets share a fixed track width, so their size depends on how many there
-  are. Only the count badge's label is authored in the scene.
+- Generates one stable dark track and a green fill whose width is `remaining / capacity`. Only the
+  fascia count label is authored in the scene.
 
 Key methods:
-- `configure(capacity, remaining)`: rebuilds the sockets and snaps to a state.
-- `set_remaining(remaining)`: a decrease animates the socket that just emptied and pulses the badge;
+- `configure(capacity, remaining)`: snaps the fill fraction and count to a state.
+- `set_remaining(remaining)`: a decrease contracts the fill's right edge and pulses the count;
   anything else snaps, since nothing in the game grows a dispenser back.
-- `get_capacity()` / `get_remaining()`.
+- `get_capacity()` / `get_remaining()` / `get_fill_fraction()`.
 
 Depends on:
-- `scripts/ui_motion.gd` for the deplete and badge-pulse tweens.
+- `scripts/ui_motion.gd` for the fill-contraction and count-pulse tweens.
 
 ## `scripts/shelf_layout_row.gd`
 

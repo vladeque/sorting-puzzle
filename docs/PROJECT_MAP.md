@@ -658,9 +658,9 @@ Files:
 - `tests/gameplay/test_dispenser_shelf.gd`, `tests/tools/test_validate_level_solvable.py`
 
 Responsibility:
-- A second shelf type: a narrow one-slot cell holding 2-4 stacked layers that the player can take
-  from but never place onto, with a segmented indicator underneath counting the items still on it,
-  the one on display included.
+- A second shelf type: a narrow one-slot open wooden cradle holding 2-4 stacked layers that the
+  player can take from but never place onto. Its dark fascia shows the exact remaining count and an
+  attached continuous green track visualizes `remaining / capacity`.
 - The queue is not a separate stacking system. `Shelf`'s back-layer machinery already models "one
   hidden item per layer, promoted when the front layer empties", and with a single front slot that
   is exactly a dispenser.
@@ -676,10 +676,10 @@ Responsibility:
   drag. See `_record_dispenser_item_taken()`.
 - Hammer and shuffle skip dispensers so the authored queue survives; highlight still reads them.
 - Static `row_layouts` rows pack by each cell's own width, and a row holding a dispenser reserves
-  `DISPENSER_ROW_EXTRA_HEIGHT` so the indicator clears the row below. Not supported inside moving
-  rows, which step and wrap on one uniform cell width.
-- No campaign level uses dispensers yet; the mechanic is reachable only through a level config that
-  opts in with `"type": "dispenser"`.
+  `DISPENSER_ROW_EXTRA_HEIGHT` so the indicator clears the row below. Authored `layout_preset`
+  marker rows receive the same clearance and are recentered at runtime. Dispensers are not supported
+  inside moving rows, which step and wrap on one uniform cell width.
+- The mechanic is opt-in through a level-config shelf with `"type": "dispenser"`.
 
 Change here when:
 - Adding shelf types, changing dispenser capacity/indicator presentation, changing which abilities

@@ -1,8 +1,8 @@
 class_name DispenserShelf
 extends Shelf
 
-## A source-only shelf: one item slot, 2-4 stacked layers, and a segmented indicator underneath
-## counting how many items are still on it, the one on display included. The player can take from it
+## A source-only shelf: one item slot, 2-4 stacked layers, and an integrated count/fill readout
+## showing how many items are still on it, the one on display included. The player can take from it
 ## but never place onto it, so its authored queue is the only route its items take to the board.
 ##
 ## The queue is not a new system. `Shelf`'s back-layer machinery already models "one hidden item per
@@ -17,10 +17,10 @@ const DISPENSER_SLOT_COUNT := 1
 const MIN_LAYER_COUNT := 2
 const MAX_LAYER_COUNT := 4
 
-## Taller than the cell because the indicator hangs below the shelf body. The extra height is
-## deliberately kept out of `get_base_cell_size()`: row packing must line a dispenser's shelf floor
-## up with its neighbours', while the responsive fit has to keep the indicator on screen.
-const VISUAL_BOUNDS := Rect2(-48.0, -89.0, 96.0, 163.0)
+## The open cradle is shorter than a standard closed cubby, while its attached fill track extends a
+## little below the fascia. The extra height stays out of `get_base_cell_size()`: row packing must
+## still line the floor up with neighbouring shelves.
+const VISUAL_BOUNDS := Rect2(-48.0, -70.0, 96.0, 144.0)
 
 const LAYER_INDICATOR_NODE := "LayerIndicator"
 
@@ -30,9 +30,6 @@ var _remaining := 0
 
 func _ready() -> void:
 	super._ready()
-	# The frame is self-contained rather than shared with neighbours, so its cap is simply part of
-	# the shelf instead of something that appears only when nothing is stacked above.
-	set_top_ceiling_cap_visible(true)
 	_refresh_indicator(false)
 
 
@@ -74,7 +71,8 @@ func set_row_placement(_placement: String) -> void:
 
 
 func set_top_ceiling_cap_visible(_should_show: bool) -> void:
-	super.set_top_ceiling_cap_visible(true)
+	# The dispenser is intentionally an open cradle, so it never grows the standard shelf's top cap.
+	super.set_top_ceiling_cap_visible(false)
 
 
 func set_visual_variant(visual_variant: String) -> void:
@@ -84,8 +82,8 @@ func set_visual_variant(visual_variant: String) -> void:
 	super.set_visual_variant(VISUAL_VARIANT_FULL)
 
 
-## Sets both how many sockets the indicator shows and how many are lit. Called once per shelf from
-## the level config, where capacity is the authored item count.
+## Sets the readout's total capacity and fills it completely. Called once per shelf from the level
+## config, where capacity is the authored item count.
 func set_capacity(capacity: int) -> void:
 	_capacity = maxi(capacity, 0)
 	_remaining = _capacity

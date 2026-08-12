@@ -30,7 +30,7 @@ const SHELF_TYPE_STANDARD := "standard"
 const SHELF_TYPE_DISPENSER := "dispenser"
 ## Extra height a `row_layouts` row reserves when it holds a dispenser: how far the indicator reaches
 ## past the shelf floor, plus the shared edge by which rows overlap, plus a small breathing gap.
-const DISPENSER_ROW_EXTRA_HEIGHT := 58.0
+const DISPENSER_ROW_EXTRA_HEIGHT := 44.0
 const MOVING_SHELF_ROW_SCENE := preload("res://scenes/moving_shelf_row.tscn")
 const ITEM_SCENE := preload("res://scenes/item.tscn")
 const HAMMER_IMPACT_EFFECT_SCENE := preload("res://scenes/abilities/hammer_impact_effect.tscn")
@@ -1103,10 +1103,15 @@ func _add_layout_template_shelves(shelves: Node2D, shelves_config: Array, layout
 
 	var shelf_config_index := 0
 	var marker_placements := _get_layout_template_marker_placements(layout_template)
+	var layout_positions := _get_layout_template_node_positions(layout_template, shelves_config)
 	var moving_motion_type := ""
 	for layout_node in layout_template.get_children():
 		if layout_node is ShelfLayoutRow:
 			var layout_row := layout_node as ShelfLayoutRow
+			var layout_row_position: Vector2 = layout_positions.get(
+				layout_row.get_instance_id(),
+				layout_row.global_position
+			)
 			var row_shelf_count := layout_row.shelf_count
 			var visible_count := clampi(layout_row.visible_count, 1, row_shelf_count)
 			var row_config := layout_row.to_row_config()
@@ -1127,7 +1132,7 @@ func _add_layout_template_shelves(shelves: Node2D, shelves_config: Array, layout
 				shelf_config_index,
 				row_shelf_count,
 				visible_count,
-				layout_row.global_position,
+				layout_row_position,
 				row_config,
 				visual_variant
 			)
@@ -1136,10 +1141,14 @@ func _add_layout_template_shelves(shelves: Node2D, shelves_config: Array, layout
 			var shelf_config := shelves_config[shelf_config_index] as Dictionary
 			if shelf_config != null:
 				var shelf_marker := layout_node as Node2D
+				var shelf_position: Vector2 = layout_positions.get(
+					shelf_marker.get_instance_id(),
+					shelf_marker.global_position
+				)
 				var shelf := _add_shelf(
 						shelves,
 						shelf_config_index + 1,
-						shelf_marker.global_position,
+						shelf_position,
 						_get_shelf_type(shelf_config)
 					)
 				_apply_shelf_row_placement(
@@ -1152,6 +1161,90 @@ func _add_layout_template_shelves(shelves: Node2D, shelves_config: Array, layout
 
 	layout_template.queue_free()
 	return true
+
+
+## Layout-template markers author the normal interlocked shelf spacing. If one row contains a
+## dispenser, insert only the compact readout clearance after that row and recenter the complete
+## template. This is the preset-layout equivalent of `_get_row_layout_extra_heights()`; without it,
+## the attached green track would land inside the shelf aperture directly below it.
+func _get_layout_template_node_positions(
+	layout_template: Node2D,
+	shelves_config: Array
+) -> Dictionary:
+	var rows: Array[Dictionary] = []
+	var shelf_config_index := 0
+	for layout_node in layout_template.get_children():
+		var row_position := Vector2.ZERO
+		var row_has_dispenser := false
+		if layout_node is ShelfLayoutRow:
+			var layout_row := layout_node as ShelfLayoutRow
+			row_position = layout_row.global_position
+			for row_shelf_index in range(layout_row.shelf_count):
+				var config_index := shelf_config_index + row_shelf_index
+				if config_index >= shelves_config.size():
+					break
+				var shelf_config := shelves_config[config_index] as Dictionary
+				if (
+					shelf_config != null
+					and _get_shelf_type(shelf_config) == SHELF_TYPE_DISPENSER
+				):
+					row_has_dispenser = true
+					break
+			shelf_config_index += layout_row.shelf_count
+		elif _is_layout_shelf_marker(layout_node):
+			var shelf_marker := layout_node as Node2D
+			row_position = shelf_marker.global_position
+			if shelf_config_index < shelves_config.size():
+				var shelf_config := shelves_config[shelf_config_index] as Dictionary
+				row_has_dispenser = (
+					shelf_config != null
+					and _get_shelf_type(shelf_config) == SHELF_TYPE_DISPENSER
+				)
+			shelf_config_index += 1
+		else:
+			continue
+
+		var matching_row: Dictionary = {}
+		for row in rows:
+			if is_equal_approx(float(row["y"]), row_position.y):
+				matching_row = row
+				break
+		if matching_row.is_empty():
+			matching_row = {
+				"y": row_position.y,
+				"has_dispenser": false,
+				"nodes": [],
+			}
+			rows.append(matching_row)
+
+		matching_row["has_dispenser"] = (
+			bool(matching_row["has_dispenser"])
+			or row_has_dispenser
+		)
+		(matching_row["nodes"] as Array).append(layout_node)
+
+	rows.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return float(a["y"]) < float(b["y"])
+	)
+	var total_extra_height := 0.0
+	for row in rows:
+		if bool(row["has_dispenser"]):
+			total_extra_height += DISPENSER_ROW_EXTRA_HEIGHT
+
+	var positions := {}
+	var accumulated_extra_height := 0.0
+	for row in rows:
+		var row_offset_y := accumulated_extra_height - total_extra_height * 0.5
+		for layout_node in row["nodes"] as Array:
+			var node_2d := layout_node as Node2D
+			positions[node_2d.get_instance_id()] = (
+				node_2d.global_position
+				+ Vector2(0.0, row_offset_y)
+			)
+		if bool(row["has_dispenser"]):
+			accumulated_extra_height += DISPENSER_ROW_EXTRA_HEIGHT
+
+	return positions
 
 
 func _get_layout_scene_path(layout_preset: String) -> String:

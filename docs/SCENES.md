@@ -1703,11 +1703,13 @@ Purpose:
   final release (each arm collapses/fades into its wall, the lock drops, and the shade fades). The
   owning level changes gameplay eligibility immediately; none of these visuals can delay an
   unlocked shelf.
-- Exposes standard and compact layouts through `overlay_half_width` and `compact_layout`, letting the
-  dispenser reuse the exact component without duplicating its hierarchy or animation logic.
+- Exposes standard and compact layouts through `overlay_half_width`, vertical shade/wall-cover
+  bounds, and `compact_layout`, letting the open dispenser cradle reuse the exact component without
+  duplicating its hierarchy or animation logic.
 
 Important nodes:
-- `Shade`: shelf-local darkening layer whose horizontal bounds follow `overlay_half_width`.
+- `Shade`: shelf-local darkening layer whose horizontal and vertical bounds follow the owning shelf's
+  exported overlay geometry.
 - `VisualRig/ChainRig/TopLeftArm`, `TopRightArm`, `BottomLeftArm`, and `BottomRightArm`: independently
   fitted instances of C2-7A at legacy path `assets/ui/shelf_lock_chain_arm_a.png`, running from wall
   anchors to the lock. Their scene transforms are the standard-layout authoring preview; runtime
@@ -1784,18 +1786,19 @@ Script:
 - `scripts/dispenser_shelf.gd`
 
 Purpose:
-- The narrow, source-only shelf type: one item slot, 2-4 stacked layers, and a `LayerIndicator`
-  underneath showing how many items are left. Instantiated by `scripts/level.gd` for any level-config
-  shelf with `"type": "dispenser"`.
-- Carries a complete self-contained frame (both side walls plus its own ceiling cap) instead of the
-  `PlacementVisuals` left/middle/right variants standard cells share with their neighbours, so it
-  reads as a standalone unit wherever it sits in a row.
+- The narrow, source-only shelf type: one item slot, 2-4 stacked layers, and an integrated
+  count/fill readout showing how many items are left. Instantiated by `scripts/level.gd` for any
+  level-config shelf with `"type": "dispenser"`.
+- Uses an open wooden cradle: short beveled side guards, a recessed back panel, and a dark stock
+  fascia instead of the standard shelf's ceiling beam/cap. The distinct silhouette identifies the
+  one-way source while keeping the standard shelf palette and item resting position.
 
 Important nodes:
-- `BackWall`, `BackWallTopShade`, `BackWallLeftShade`, `LeftWall`, `RightWall`, `Ceiling`,
-  `TopCeilingCap`, `FloorSurface`, `FloorFrontLip`, `FloorGrain*`: the same art vocabulary as
-  `scenes/shelf.tscn`, narrowed to the 96-wide cell.
-- `LayerIndicator`: `scenes/shelf_layer_indicator.tscn` instance positioned below the floor lip.
+- `BackWall`, `BackWallTopShade`, `LeftWall`, `RightWall`, wall highlight/shade nodes,
+  `FloorSurface`, dark `FloorFrontLip`, and `FloorGrain*`: the open-cradle art, narrowed to the
+  96-wide cell. There is intentionally no `Ceiling` or `TopCeilingCap`.
+- `LayerIndicator`: `scenes/shelf_layer_indicator.tscn` instance attached to the fascia; its number
+  sits on the fascia and its continuous green fill sits immediately underneath.
 - `LockedOverlay`: compact-layout instance of `scenes/ui/shelf_lock_overlay.tscn`, with a narrower
   shade and scaled chain/lock/badge rig for the one-slot cell.
 - `Slot01`/`Slot01/ItemSlot01`: the single front slot and its snap marker, at the same vertical
@@ -1816,10 +1819,9 @@ Script:
 - `scripts/shelf_layer_indicator.gd`
 
 Purpose:
-- The green segmented bar and round count badge under a dispenser shelf.
-- Only `CountLabel` is authored. The track backing, badge art, and one socket per authored item are
-  generated at runtime, because the socket count comes from the level config and the sockets share a
-  fixed track width.
+- The dispenser's exact white fascia count and attached continuous green stock meter.
+- Only `CountLabel` is authored. The dark track and green fill geometry are generated at runtime;
+  capacity provides the denominator and the fill width renders `remaining / capacity`.
 
 Do not use for:
 - Anything that owns the count. The number lives on `DispenserShelf`; this scene only renders it.

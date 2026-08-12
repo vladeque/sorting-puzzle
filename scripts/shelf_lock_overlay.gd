@@ -70,6 +70,10 @@ const UNLOCK_LOCK_DROP := Vector2(0, 34)
 const UNLOCK_BADGE_LIFT := Vector2(0, -8)
 
 @export var overlay_half_width := 104.0
+@export var overlay_top := -81.0
+@export var overlay_bottom := 46.0
+@export var wall_cover_top := WALL_COVER_TOP
+@export var wall_cover_bottom := WALL_COVER_BOTTOM
 @export var compact_layout := false
 
 @onready var _shade := $Shade as Polygon2D
@@ -177,10 +181,10 @@ func reset_visual_state() -> void:
 
 func _apply_layout() -> void:
 	_shade.polygon = PackedVector2Array([
-		Vector2(-overlay_half_width, -81),
-		Vector2(overlay_half_width, -81),
-		Vector2(overlay_half_width, 46),
-		Vector2(-overlay_half_width, 46),
+		Vector2(-overlay_half_width, overlay_top),
+		Vector2(overlay_half_width, overlay_top),
+		Vector2(overlay_half_width, overlay_bottom),
+		Vector2(-overlay_half_width, overlay_bottom),
 	])
 	_apply_wall_attachment_covers()
 	_configure_chain_anchors()
@@ -199,16 +203,16 @@ func _apply_layout() -> void:
 
 func _apply_wall_attachment_covers() -> void:
 	_left_wall_cover.polygon = PackedVector2Array([
-		Vector2(-overlay_half_width - WALL_COVER_DEPTH, WALL_COVER_TOP),
-		Vector2(-overlay_half_width, WALL_COVER_TOP),
-		Vector2(-overlay_half_width, WALL_COVER_BOTTOM),
-		Vector2(-overlay_half_width - WALL_COVER_DEPTH, WALL_COVER_BOTTOM),
+		Vector2(-overlay_half_width - WALL_COVER_DEPTH, wall_cover_top),
+		Vector2(-overlay_half_width, wall_cover_top),
+		Vector2(-overlay_half_width, wall_cover_bottom),
+		Vector2(-overlay_half_width - WALL_COVER_DEPTH, wall_cover_bottom),
 	])
 	_right_wall_cover.polygon = PackedVector2Array([
-		Vector2(overlay_half_width, WALL_COVER_TOP),
-		Vector2(overlay_half_width + WALL_COVER_DEPTH, WALL_COVER_TOP),
-		Vector2(overlay_half_width + WALL_COVER_DEPTH, WALL_COVER_BOTTOM),
-		Vector2(overlay_half_width, WALL_COVER_BOTTOM),
+		Vector2(overlay_half_width, wall_cover_top),
+		Vector2(overlay_half_width + WALL_COVER_DEPTH, wall_cover_top),
+		Vector2(overlay_half_width + WALL_COVER_DEPTH, wall_cover_bottom),
+		Vector2(overlay_half_width, wall_cover_bottom),
 	])
 
 

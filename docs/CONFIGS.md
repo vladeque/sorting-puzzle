@@ -190,9 +190,9 @@ Dispenser rules:
   place onto it, so its authored queue is the only route its items take to the board.
 - Between `2` and `4` layers, each exactly one slot wide.
 - No `null` slots. A hole in a queue has nothing to hand out and nothing can move into it.
-- The green indicator underneath shows one socket per authored item and counts the items still on the
-  shelf, the one on display included. Taking an item darkens one socket; promoting the next item does
-  not, because that item is still on the shelf.
+- The exact remaining count is integrated into the dispenser's dark front fascia. The attached green
+  track shows `remaining / capacity` as one continuous fill. Taking an item contracts the fill;
+  promoting the next item does not, because that item is still on the shelf.
 - `unlock_after_triples` works the same as on a standard shelf.
 - Not supported inside moving rows, which step and wrap on a single uniform cell width. The runtime
   warns and falls back to a standard shelf, the same way it handles locked shelves in moving rows.
@@ -200,8 +200,8 @@ Dispenser rules:
   item on display.
 - In `row_layouts`, a row holding a dispenser reserves extra height so the indicator clears the row
   below, and the row packs by each cell's own width so the narrow shelf sits flush against its
-  neighbours. Under `layout_preset` marker placement the markers are authored, so the preset author
-  is responsible for leaving room.
+  neighbours. `layout_preset` marker rows receive the same runtime clearance and are recentered, so
+  authored standard shelf spacing does not need a dispenser-specific template.
 
 Item count rules:
 - Each item ID should appear in a multiple of three across the level, dispenser items included.

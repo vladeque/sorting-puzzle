@@ -1,11 +1,11 @@
 extends SceneTree
 
-## Verification for the dispenser shelf: a one-slot, source-only shelf whose segmented indicator
-## counts the items it still holds, the one on display included.
+## Verification for the dispenser shelf: a one-slot, source-only shelf whose integrated count/fill
+## readout tracks the items it still holds, the one on display included.
 ##
-## The board is supplied inline rather than by loading a campaign level, because no campaign level
-## uses dispensers yet. `_apply_level_config()` rebuilds the shelves from a config dictionary exactly
-## the way `_ready()` does, so this exercises the real construction path.
+## The board is supplied inline so verification does not depend on mutable campaign content.
+## `_apply_level_config()` rebuilds the shelves from a config dictionary exactly the way `_ready()`
+## does, so this exercises the real construction path.
 ##
 ## This run reports two leaked `SceneTreeTimer` instances at exit. They belong to the completion
 ## reveal window, which this test reaches by force-freeing a level instead of letting it change
@@ -16,7 +16,7 @@ const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
 const LEVEL_SCENE_PATH := "res://level.tscn"
 
 ## Two standard shelves and one dispenser. The standard pair starts one candy_bag short of a triple
-## and the dispenser holds the third, so the first move both drains a socket and clears a match.
+## and the dispenser holds the third, so the first move both contracts the fill and clears a match.
 const DISPENSER_LEVEL_CONFIG := {
 	"level": 1,
 	"time_seconds": 300,
@@ -52,7 +52,8 @@ func _run() -> void:
 	await process_frame
 
 	await _test_construction_and_capabilities()
-	await _test_taking_an_item_drains_one_socket()
+	await _test_preset_layout_reserves_indicator_clearance()
+	await _test_taking_an_item_contracts_the_fill()
 	await _test_cancelled_move_leaves_the_count_alone()
 	await _test_ability_targeting()
 	await _test_completion_waits_for_the_queue()
@@ -93,18 +94,30 @@ func _test_construction_and_capabilities() -> void:
 	if indicator != null:
 		_check(
 			int(indicator.call("get_capacity")) == 3 and int(indicator.call("get_remaining")) == 3,
-			"Indicator should start with every socket lit."
+			"Indicator should start with the authored capacity and remaining count."
 		)
 		var count_label := indicator.get_node_or_null("CountLabel") as Label
 		_check(
 			count_label != null and count_label.text == "3",
-			"Count badge should read the number of items still on the shelf."
+			"The fascia count should read the number of items still on the shelf."
 		)
-		var sockets := indicator.get_node_or_null("Sockets")
 		_check(
-			sockets != null and sockets.get_child_count() == 3,
-			"Indicator should build one socket per authored item."
+			is_equal_approx(float(indicator.call("get_fill_fraction")), 1.0),
+			"A freshly stocked dispenser should start with a full continuous track."
 		)
+		var fill := indicator.get_node_or_null("Fill") as Node2D
+		var fill_body := fill.get_node_or_null("Body") as Polygon2D if fill != null else null
+		_check(fill_body != null and fill.visible, "The continuous fill should be visible at capacity.")
+		_check(
+			is_equal_approx(_get_polygon_width(fill_body), 80.0),
+			"A full dispenser should occupy the track's full authored width."
+		)
+
+	_check(
+		dispenser.get_node_or_null("Ceiling") == null
+		and dispenser.get_node_or_null("TopCeilingCap") == null,
+		"The dispenser should use an open-cradle silhouette without a top beam."
+	)
 
 	var dispenser_slot := front_slots[0] as Node2D
 	_check(
@@ -133,8 +146,46 @@ func _test_construction_and_capabilities() -> void:
 	await _teardown(level)
 
 
-## Taking the visible item drops the count by exactly one and promotes the next queued item.
-func _test_taking_an_item_drains_one_socket() -> void:
+## Authored layout-preset markers use the standard interlocked row step. A dispenser row inserts a
+## compact extra gap at runtime so its attached meter cannot overlap the next shelf aperture.
+func _test_preset_layout_reserves_indicator_clearance() -> void:
+	var shelves: Array = [
+		{
+			"type": "dispenser",
+			"layers": [["candy_bag"], ["milk_carton"], ["toy_unicorn"]],
+		},
+	]
+	for _index in range(11):
+		shelves.append({"layers": [[null, null, null]]})
+
+	var level_scene := load(LEVEL_SCENE_PATH) as PackedScene
+	var level := level_scene.instantiate()
+	level.set("launched_from_dev_mode", true)
+	level.set("selected_level", 1)
+	root.add_child(level)
+	await process_frame
+	level.call("_apply_level_config", {
+		"level": 1,
+		"time_seconds": 300,
+		"layout_preset": "grid_3x4",
+		"shelves": shelves,
+	})
+
+	var all_shelves := level.call("_get_all_shelves") as Array
+	_check(all_shelves.size() == 12, "The grid_3x4 preset should build all twelve shelves.")
+	if all_shelves.size() == 12:
+		var first_row_y := (all_shelves[0] as Node2D).position.y
+		var second_row_y := (all_shelves[3] as Node2D).position.y
+		_check(
+			is_equal_approx(second_row_y - first_row_y, 178.62),
+			"A preset row containing a dispenser should reserve 44px below its meter."
+		)
+
+	await _teardown(level)
+
+
+## Taking the visible item drops the count, contracts the fill, and promotes the next queued item.
+func _test_taking_an_item_contracts_the_fill() -> void:
 	var level := await _make_dispenser_level()
 	var dispenser := _find_dispenser(level)
 	var target_slot := _find_empty_standard_slot(level)
@@ -174,17 +225,17 @@ func _test_taking_an_item_drains_one_socket() -> void:
 		var count_label := indicator.get_node_or_null("CountLabel") as Label
 		_check(
 			count_label != null and count_label.text == "2",
-			"The count badge follows the remaining count."
+			"The fascia count follows the remaining count."
 		)
-		var sockets := indicator.get_node_or_null("Sockets")
 		_check(
-			sockets != null and sockets.get_child_count() == 3,
-			"Depleting a socket leaves the track width alone; the socket goes dark instead."
+			is_equal_approx(float(indicator.call("get_fill_fraction")), 2.0 / 3.0),
+			"Taking one of three items should contract the track to two-thirds."
 		)
-		var drained_fill := _get_socket_fill(indicator, 2)
+		var fill := indicator.get_node_or_null("Fill") as Node2D
+		var fill_body := fill.get_node_or_null("Body") as Polygon2D if fill != null else null
 		_check(
-			drained_fill != null and not drained_fill.visible,
-			"The drained socket's lit fill should be hidden once its animation finishes."
+			fill_body != null and is_equal_approx(_get_polygon_width(fill_body), 80.0 * 2.0 / 3.0),
+			"The rendered fill geometry should contract smoothly from its right edge."
 		)
 
 	await _teardown(level)
@@ -349,13 +400,15 @@ func _has_item_from(level: Node, items: Array, shelf: Node2D) -> bool:
 	return false
 
 
-func _get_socket_fill(indicator: Node, index: int) -> Node2D:
-	var sockets := indicator.get_node_or_null("Sockets")
-	if sockets == null or index >= sockets.get_child_count():
-		return null
-
-	var socket := sockets.get_child(index) as Node2D
-	return socket.get_node_or_null("Fill") as Node2D
+func _get_polygon_width(polygon: Polygon2D) -> float:
+	if polygon == null or polygon.polygon.is_empty():
+		return 0.0
+	var min_x := INF
+	var max_x := -INF
+	for point in polygon.polygon:
+		min_x = minf(min_x, point.x)
+		max_x = maxf(max_x, point.x)
+	return max_x - min_x
 
 
 func _check(condition: bool, message: String) -> void:

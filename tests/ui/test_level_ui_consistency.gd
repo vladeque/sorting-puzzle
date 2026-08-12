@@ -831,8 +831,10 @@ func _test_locked_shelf_feedback() -> void:
 	compact_overlay.show_locked(123)
 	_check(compact_overlay.compact_layout, "Dispenser should use the compact locked-shelf layout.")
 	_check(
-		is_equal_approx(compact_shade.polygon[0].x, -40.0)
-		and is_equal_approx(compact_shade.polygon[1].x, 40.0),
+		is_equal_approx(compact_shade.polygon[0].x, -38.0)
+		and is_equal_approx(compact_shade.polygon[1].x, 38.0)
+		and is_equal_approx(compact_shade.polygon[0].y, -70.0)
+		and is_equal_approx(compact_shade.polygon[2].y, 56.0),
 		"Compact shade should fit the dispenser's narrow shelf bounds."
 	)
 	_check(
@@ -841,8 +843,10 @@ func _test_locked_shelf_feedback() -> void:
 		"Compact chain treatment should scale down in both axes from the standard shelf treatment."
 	)
 	_check(
-		_get_chain_wall_endpoint(compact_chain, true).x <= -40.0
-		and is_equal_approx(compact_left_wall_cover.polygon[1].x, -40.0),
+		_get_chain_wall_endpoint(compact_chain, true).x <= -38.0
+		and is_equal_approx(compact_left_wall_cover.polygon[1].x, -38.0)
+		and is_equal_approx(compact_left_wall_cover.polygon[0].y, -50.0)
+		and is_equal_approx(compact_left_wall_cover.polygon[2].y, 56.0),
 		"Compact chain should disappear beneath the dispenser wall cover."
 	)
 	_check(compact_label.text == "123", "Compact countdown should retain a three-digit value.")
