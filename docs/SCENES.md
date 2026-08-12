@@ -200,8 +200,8 @@ inside gameplay `.tscn` files):
   Main Menu settings-button role at 72x64, including its dark-brown scene-authored pause bars. Its
   explicit disabled override points at the warm normal resource, preventing default-style fallback.
 - `style_box_gameplay_count_badge.tres`: the shared inventory/count badge used by ability-bar
-  remaining-use counts and Leave Confirmation's loss counts. Same oversized-radius trick for a
-  true pill/circle at any authored size.
+  remaining-use counts, locked-shelf remaining-clear counts, and Leave Confirmation's loss counts.
+  Same oversized-radius trick for a true pill/circle at any authored size.
 - `style_box_gameplay_timer_badge.tres`: the documented navy/cyan timed-status badge exception
   (Lantern/Freezer countdown badges on the ability bar), extracted from a previously-duplicated
   local sub-resource with no visual change.
@@ -1692,28 +1692,32 @@ Script:
 
 Purpose:
 - Reusable visual owner instanced as `LockedOverlay` by both standard and dispenser shelves.
-- Draws four slim three-link arms from selected candidate A over a softened shelf shade, with the
-  existing orange padlock hanging at their clean central intersection.
-- Keeps the decorative `AD` copy and the green circular remaining-clears badge as live Godot labels,
-  so text stays crisp and 1-, 2-, and 3+-digit counts can resize independently from the raster art.
-- Owns decrement feedback (badge pop, inward chain tension, hanging-lock swing) and the final release
-  (each arm retracts/fades toward its shelf corner, the lock drops, and the shade fades). The owning
-  level changes gameplay eligibility immediately; none of these visuals can delay an unlocked shelf.
+- Draws four slim three-link arms from selected candidate A over a softened shelf shade. Every arm
+  is fitted between an endpoint embedded beneath a side wall and an endpoint over the padlock
+  shackle, with small authored per-arm slope differences instead of a perfectly mirrored X.
+- Draws the lock behind the chains and the shared orange-red/gold gameplay count badge above them;
+  decorative `AD` and the remaining-clear count stay as crisp live Godot labels.
+- Owns decrement feedback (badge pop, fixed-wall inward chain tension, hanging-lock swing) and the
+  final release (each arm collapses/fades into its wall, the lock drops, and the shade fades). The
+  owning level changes gameplay eligibility immediately; none of these visuals can delay an
+  unlocked shelf.
 - Exposes standard and compact layouts through `overlay_half_width` and `compact_layout`, letting the
   dispenser reuse the exact component without duplicating its hierarchy or animation logic.
 
 Important nodes:
 - `Shade`: shelf-local darkening layer whose horizontal bounds follow `overlay_half_width`.
 - `VisualRig/ChainRig/TopLeftArm`, `TopRightArm`, `BottomLeftArm`, and `BottomRightArm`: independently
-  positioned instances of `assets/ui/shelf_lock_chain_arm_a.png` that meet beneath the lock.
-- `VisualRig/LockRig`: pivot at the shackle attachment point; contains the existing lock sprite and
-  decorative `AdLabel`.
-- `VisualRig/CountdownBadge`: true circular green panel and `RemainingLabel`, positioned above the
-  chain intersection.
+  fitted instances of `assets/ui/shelf_lock_chain_arm_a.png` running from wall anchors to the lock.
+- `VisualRig/WallAttachmentCovers`: reusable left/right wood strips drawn above chain endpoints so
+  terminal links disappear beneath the actual shelf frame.
+- `VisualRig/LockRig`: drawn behind `ChainRig`; contains the lock sprite and decorative `AdLabel`.
+- `VisualRig/CountdownBadge/RemainingLabel`: uses the same shared 40px count-badge style and numeric
+  fitting contract as `AbilityBar/UsesLabel`, positioned above the chain intersection.
 
 Depends on:
 - `assets/ui/shelf_lock_chain_arm_a.png`, prepared from selected ImageGen candidate A with alpha.
 - `assets/ui/lock_shelf_cutout.png` for the hanging orange padlock.
+- `assets/themes/style_box_gameplay_count_badge.tres` for the shared remaining-count presentation.
 - `scripts/ui_motion.gd` for replacement-safe tweens.
 
 Do not use for:

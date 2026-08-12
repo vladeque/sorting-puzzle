@@ -606,19 +606,19 @@ Files:
 
 Responsibility:
 - Reusable standard/compact visual component for every triple-gated shelf.
-- Places four independent instances of selected three-link candidate A from the shelf edges toward
-  the center, hangs the existing orange lock at their intersection, renders decorative `AD`, and
-  shows remaining clears in a green circle above the lock.
-- On a recorded triple clear, pops the count, pulls each arm toward the lock, and swings the lock. On
-  zero, retracts/fades the arms toward their corners and drops/fades the lock while the level enables
-  the shelf immediately.
+- Fits four instances of selected three-link candidate A between slightly varied wall anchors and
+  lock-shackle anchors. Overlay-owned wall covers hide the terminal links beneath the shelf frame;
+  chains draw in front of the orange `AD` lock and behind the shared gameplay count badge.
+- On a recorded triple clear, pops the count, keeps every wall endpoint fixed while pulling the
+  shackle endpoints inward, and swings the lock. On zero, collapses/fades each arm into its wall and
+  drops/fades the lock while the level enables the shelf immediately.
 - Replaces interrupted feedback tweens and restores authored transforms after both normal and rapid
   state changes.
 - Uses a compact layout when instanced by `scenes/dispenser_shelf.tscn`.
 
 Change here when:
-- Editing chain/lock/badge art, `AD` styling, count fitting, decrement tension/swing timing, final chain
-  release motion, or the compact dispenser proportions.
+- Editing wall/shackle endpoints, wall-cover depth/color, chain/lock/badge art, `AD` styling, shared
+  count fitting, decrement tension/swing timing, final chain release motion, or compact proportions.
 
 ### Dispenser Shelf
 

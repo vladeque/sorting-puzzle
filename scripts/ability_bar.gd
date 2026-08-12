@@ -15,10 +15,6 @@ const ABILITY_IDS := [
 	ABILITY_HIGHLIGHT,
 	ABILITY_FREEZER,
 ]
-const USES_BADGE_MAX_FONT_SIZE := 20
-const USES_BADGE_MIN_FONT_SIZE := 8
-const USES_BADGE_HORIZONTAL_PADDING := 4.0
-
 @onready var _button_row := %ButtonRow as HBoxContainer
 @onready var _buttons := {
 	ABILITY_HAMMER: %HammerButton as Button,
@@ -149,14 +145,16 @@ func _fit_uses_label(uses_label: Label) -> void:
 	if uses_label == null:
 		return
 	var available_width := (
-		uses_label.offset_right - uses_label.offset_left - USES_BADGE_HORIZONTAL_PADDING
+		uses_label.offset_right
+		- uses_label.offset_left
+		- GameplayUIThemeScript.COUNT_BADGE_HORIZONTAL_PADDING
 	)
 	uses_label.add_theme_font_size_override(
 		"font_size",
 		GameplayUIThemeScript.fit_label_font_size(
 			uses_label,
 			available_width,
-			USES_BADGE_MAX_FONT_SIZE,
-			USES_BADGE_MIN_FONT_SIZE
+			GameplayUIThemeScript.COUNT_BADGE_MAX_FONT_SIZE,
+			GameplayUIThemeScript.COUNT_BADGE_MIN_FONT_SIZE
 		)
 	)

@@ -1447,7 +1447,8 @@ Purpose:
 
 Key methods:
 - `set_uses(ability_uses)`: fits longer numeric values down to the shared badge minimum font size
-  after both regular and compact layout changes.
+  after both regular and compact layout changes, using `GameplayUITheme.COUNT_BADGE_*` constants
+  shared with locked-shelf counters.
 - `set_interaction_blocked(is_blocked, freezer_active)`: updates disabled state and restores the
   arrow cursor for blocked actions.
 - `set_active_seconds(ability_id, seconds_remaining)`.
@@ -1682,29 +1683,34 @@ Purpose:
   shelves, keeping those details out of `scripts/level.gd`.
 - Applies `overlay_half_width` to the shade and `compact_layout` to the chain, lock, and badge rig at
   `_ready()`.
-- Reuses selected candidate A as four independent three-link `Sprite2D` arms; keeps `AD` and the
-  remaining count scene-native.
+- Reuses selected candidate A as four independent three-link `Sprite2D` arms. It computes each
+  transform from a fixed wall endpoint and a lock-shackle endpoint, adds small per-arm slope
+  differences, and configures overlay-owned wall covers from `overlay_half_width`.
+- Keeps `AD` and the remaining count scene-native; the count uses the shared ability/inventory badge
+  resource and `GameplayUITheme.COUNT_BADGE_*` fitting contract.
 
 API:
 - `show_locked(remaining)`: shows a clean locked state, fits 1-, 2-, or 3+-digit copy in the circular
   badge, and plays a badge pop + inward arm tension + hanging-lock swing only when the value decreased.
-- `play_unlock()`: visibly sets the badge to zero, plays the same impact beat, then recoils/fades the
-  chains, drops/fades the lock, fades the shade, hides the component, and restores every authored
-  transform. Gameplay eligibility is intentionally owned and updated by `scripts/level.gd` before
-  this fire-and-forget method runs.
+- `play_unlock()`: visibly sets the badge to zero, plays the same impact beat, then collapses/fades
+  every chain arm into its fixed wall anchor, drops/fades the lock, fades the shade, hides the
+  component, and restores every authored transform. Gameplay eligibility is intentionally owned
+  and updated by `scripts/level.gd` before this fire-and-forget method runs.
 - `reset_visual_state()`: stops tracked tweens and restores authored transforms for safe reuse.
 
 Motion ownership:
 - Uses independent `UIMotion.retween()` metadata keys for chain tension, lock swing, badge pop, and
-  final unlock release. A rapid decrement replaces the same concern's prior tween instead of
-  accumulating transforms.
+  final unlock release. Tension modifies only shackle endpoints while wall endpoints remain fixed;
+  a rapid decrement replaces the same concern's prior tween instead of accumulating transforms.
 - Standard motion settles in roughly 0.3 seconds; the final release completes in roughly 0.38
   seconds.
 
 Depends on:
 - `scenes/ui/shelf_lock_overlay.tscn` node paths.
 - `scripts/ui_motion.gd` for `retween()` / `stop_tween()`.
+- `scripts/gameplay_ui_theme.gd` for the shared count-badge fitting contract.
 - `assets/ui/shelf_lock_chain_arm_a.png` and `assets/ui/lock_shelf_cutout.png`.
+- `assets/themes/style_box_gameplay_count_badge.tres`.
 
 Do not use for:
 - Unlock requirements, cleared-triple ownership, Hammer counting, item eligibility, or shelf
@@ -2044,6 +2050,9 @@ Constants:
   `HUD_ICON_COMPACT_VIEWPORT_WIDTH` (620): the circular ability icon-button role's two sizes and
   breakpoint. The top HUD reuses the same compact scale factor for its independently-sized 72x64
   Pause/settings control when unusually narrow safe-area insets require scaling.
+- `COUNT_BADGE_MAX_FONT_SIZE` (20) / `COUNT_BADGE_MIN_FONT_SIZE` (8) /
+  `COUNT_BADGE_HORIZONTAL_PADDING` (4): shared numeric-fit contract for ability-use and locked-shelf
+  remaining-clear badges using `style_box_gameplay_count_badge.tres`.
 - `MODAL_MAX_WIDTH` (520) / `MODAL_COMPACT_HEIGHT` (500) / `MODAL_MIN_EDGE_GAP` (20) /
   `CLOSE_BUTTON_SIZE` (72x72): gameplay modal shell geometry.
 - `MODAL_TITLE_REGULAR_SIZE` (44) / `MODAL_TITLE_LONG_SIZE` (40): modal-title typography roles

@@ -72,11 +72,12 @@ crisp over the raster chains and lock:
 
 - `AdLabel` uses `GameNumberLabel` for the decorative uppercase `AD` plate. It does not represent an
   ad action and has no input or gameplay behavior.
-- `RemainingLabel` uses `GameNumberLabel` for the cleared-triples countdown. Its local font size
-  steps down for two- and three-digit values while retaining the shared numeric face and outline.
+- `RemainingLabel` uses `GameNumberLabel` for the cleared-triples countdown. It reuses
+  `style_box_gameplay_count_badge.tres` and the same `GameplayUITheme.COUNT_BADGE_*` font-fitting
+  contract as `AbilityBar/UsesLabel`, including long numeric values.
 
-The overlay owns the local colors, outlines, and shadows because they are tuned specifically for the
-orange lock and green circular badge.
+The decorative `AD` keeps lock-specific colors and outline; the remaining-clear counter deliberately
+uses the project-wide orange-red/gold gameplay count role instead of lock-specific styling.
 
 ## Reward-Star Variants
 

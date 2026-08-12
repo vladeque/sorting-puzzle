@@ -280,15 +280,26 @@ constraint for that component only:
   and compact lock overlay instead of duplicating nodes in both shelf scenes or keeping animation
   internals in `scripts/level.gd`.
 - The follow-up selected three-link candidate A, stored as `assets/ui/shelf_lock_chain_arm_a.png`,
-  replaces the heavier C2 strip. Four independent arms meet beneath the existing orange lock, with
-  decorative `AD` and a separate green remaining-clears circle.
+  replaces the heavier C2 strip. Four independent arms cross over the existing orange `AD` lock,
+  with remaining clears shown in the shared gameplay count badge.
 - Decrements pop the count, tension each arm toward the lock, and swing the hanging lock. Reaching
-  zero retracts the arms toward their corners and drops the lock while shelf eligibility still
+  zero retracts the arms into their wall anchors and drops the lock while shelf eligibility still
   changes immediately.
 - Hammer-cleared triples retain the existing `_record_triples_cleared()` path and therefore continue
   to decrement the overlay.
 - `tests/ui/test_shelf_lock_overlay.gd` is the focused regression; the locked-shelf phase in
   `tests/ui/test_level_ui_consistency.gd` also covers the extracted hierarchy.
+
+### Wall-Attachment Follow-up (2026-08-12)
+
+- Each chain arm is now fitted between an endpoint embedded beneath a shelf side wall and an
+  endpoint over the lock shackle. Small per-arm endpoint variations avoid a mechanically mirrored X.
+- Overlay-owned wood covers mask the outer links, while the lock draws behind the chains and the
+  count draws above them.
+- Decrement tension keeps wall endpoints fixed and moves only shackle endpoints; unlock collapses
+  each arm back into its wall without delaying shelf eligibility.
+- `RemainingLabel` now reuses `style_box_gameplay_count_badge.tres` and the same shared font-fitting
+  constants as `AbilityBar/UsesLabel`.
 
 ## Out of Scope
 

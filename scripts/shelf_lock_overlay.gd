@@ -2,24 +2,42 @@ class_name ShelfLockOverlay
 extends Node2D
 
 ## Reusable visual owner for triple-gated shelves. `scripts/level.gd` supplies only the remaining
-## clear count and the locked/unlocked state; this component owns its chain, badge, lock, and all
-## feedback motion.
+## clear count and the locked/unlocked state; this component owns its wall-attached chains, badge,
+## lock, and all feedback motion.
 
 const UIMotionScript := preload("res://scripts/ui_motion.gd")
+const GameplayUIThemeScript := preload("res://scripts/gameplay_ui_theme.gd")
 
-const CHAIN_SHAKE_TWEEN_META := &"shelf_lock_chain_shake_tween"
+const CHAIN_TENSION_TWEEN_META := &"shelf_lock_chain_tension_tween"
 const LOCK_SWING_TWEEN_META := &"shelf_lock_swing_tween"
 const BADGE_POP_TWEEN_META := &"shelf_lock_badge_pop_tween"
 const UNLOCK_TWEEN_META := &"shelf_lock_unlock_tween"
 
-const STANDARD_CHAIN_ARM_SCALE := Vector2(0.21, 0.21)
-const COMPACT_CHAIN_ARM_SCALE := Vector2(0.085, 0.085)
-const STANDARD_CHAIN_ARM_POSITION := Vector2(49, 17)
-const COMPACT_CHAIN_ARM_POSITION := Vector2(19, 12)
-const STANDARD_CHAIN_ARM_ROTATION := 0.32
-const COMPACT_CHAIN_ARM_ROTATION := 0.52
-const STANDARD_CHAIN_POSITION := Vector2(0, -17)
-const COMPACT_CHAIN_POSITION := Vector2(0, -18)
+## Candidate A has 6px of transparent horizontal padding on each side of its 512px canvas.
+## Geometry uses the visible 500px span so authored endpoints meet walls and the lock shackle.
+const CHAIN_ARM_VISIBLE_WIDTH := 500.0
+const WALL_COVER_DEPTH := 8.0
+const WALL_COVER_TOP := -89.0
+const WALL_COVER_BOTTOM := 46.0
+const STANDARD_WALL_EMBED_DEPTH := 5.0
+const COMPACT_WALL_EMBED_DEPTH := 4.0
+const STANDARD_CHAIN_THICKNESS_SCALE := 0.20
+const COMPACT_CHAIN_THICKNESS_SCALE := 0.085
+const STANDARD_WALL_ANCHOR_Y := [-52.0, -48.0, 14.0, 18.0]
+const COMPACT_WALL_ANCHOR_Y := [-42.0, -39.0, 4.0, 7.0]
+const STANDARD_LOCK_ANCHORS := [
+	Vector2(-4, -20),
+	Vector2(4, -18),
+	Vector2(-4, -14),
+	Vector2(4, -16),
+]
+const COMPACT_LOCK_ANCHORS := [
+	Vector2(-2, -19),
+	Vector2(2, -18),
+	Vector2(-2, -15),
+	Vector2(2, -16),
+]
+
 const STANDARD_LOCK_POSITION := Vector2(0, -30)
 const COMPACT_LOCK_POSITION := Vector2(0, -28)
 const STANDARD_BADGE_POSITION := Vector2(0, -54)
@@ -36,10 +54,8 @@ const LOCK_SWING_DURATIONS := [0.07, 0.08, 0.07, 0.08]
 const BADGE_POP_SCALE := Vector2(1.22, 1.22)
 const BADGE_POP_IN_SECONDS := 0.09
 const BADGE_POP_OUT_SECONDS := 0.16
-const UNLOCK_SHAKE_SECONDS := 0.14
+const UNLOCK_IMPACT_SECONDS := 0.14
 const UNLOCK_RELEASE_SECONDS := 0.24
-const STANDARD_UNLOCK_CHAIN_RETRACT := 18.0
-const COMPACT_UNLOCK_CHAIN_RETRACT := 9.0
 const UNLOCK_LOCK_DROP := Vector2(0, 34)
 const UNLOCK_BADGE_LIFT := Vector2(0, -8)
 
@@ -52,17 +68,18 @@ const UNLOCK_BADGE_LIFT := Vector2(0, -8)
 @onready var _chain_top_right := $VisualRig/ChainRig/TopRightArm as Sprite2D
 @onready var _chain_bottom_left := $VisualRig/ChainRig/BottomLeftArm as Sprite2D
 @onready var _chain_bottom_right := $VisualRig/ChainRig/BottomRightArm as Sprite2D
+@onready var _left_wall_cover := $VisualRig/WallAttachmentCovers/Left as Polygon2D
+@onready var _right_wall_cover := $VisualRig/WallAttachmentCovers/Right as Polygon2D
 @onready var _lock_rig := $VisualRig/LockRig as Node2D
 @onready var _countdown_badge := $VisualRig/CountdownBadge as Node2D
 @onready var _remaining_label := $VisualRig/CountdownBadge/RemainingLabel as Label
 
 var _previous_remaining := -1
-var _chain_base_position := Vector2.ZERO
 var _chain_arms: Array[Sprite2D] = []
-var _chain_arm_base_positions: Array[Vector2] = []
-var _chain_arm_base_rotations: Array[float] = []
-var _chain_arm_base_scales: Array[Vector2] = []
-var _unlock_chain_retract_distance := STANDARD_UNLOCK_CHAIN_RETRACT
+var _chain_wall_anchors: Array[Vector2] = []
+var _chain_lock_anchors: Array[Vector2] = []
+var _chain_attachment_center := Vector2.ZERO
+var _chain_thickness_scale := STANDARD_CHAIN_THICKNESS_SCALE
 var _lock_base_position := Vector2.ZERO
 var _lock_base_scale := Vector2.ONE
 var _badge_base_position := Vector2.ZERO
@@ -108,21 +125,16 @@ func play_unlock() -> void:
 	_play_decrement_feedback()
 
 	var tween := UIMotionScript.retween(self, UNLOCK_TWEEN_META)
-	tween.tween_interval(UNLOCK_SHAKE_SECONDS)
+	tween.tween_interval(UNLOCK_IMPACT_SECONDS)
 	tween.tween_callback(_stop_feedback_tweens)
-	tween.tween_callback(_reset_chain_arm_positions)
+	tween.tween_callback(_reset_chain_geometry)
 	tween.set_parallel(true)
-	for index in range(_chain_arms.size()):
-		var chain_arm := _chain_arms[index]
-		var outward_direction := _chain_arm_base_positions[index].normalized()
-		tween.tween_property(
-			chain_arm,
-			"position",
-			_chain_arm_base_positions[index] + outward_direction * _unlock_chain_retract_distance,
-			UNLOCK_RELEASE_SECONDS
-		).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-		tween.tween_property(chain_arm, "modulate:a", 0.0, UNLOCK_RELEASE_SECONDS) \
-			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+	tween.tween_method(
+		_set_chain_release_progress,
+		0.0,
+		1.0,
+		UNLOCK_RELEASE_SECONDS
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	tween.tween_property(
 		_lock_rig,
 		"position",
@@ -160,62 +172,78 @@ func _apply_layout() -> void:
 		Vector2(overlay_half_width, 46),
 		Vector2(-overlay_half_width, 46),
 	])
-
-	var chain_scale := COMPACT_CHAIN_ARM_SCALE if compact_layout else STANDARD_CHAIN_ARM_SCALE
-	var chain_position := (
-		COMPACT_CHAIN_ARM_POSITION if compact_layout else STANDARD_CHAIN_ARM_POSITION
-	)
-	var chain_rotation := (
-		COMPACT_CHAIN_ARM_ROTATION if compact_layout else STANDARD_CHAIN_ARM_ROTATION
-	)
-	_chain_rig.position = COMPACT_CHAIN_POSITION if compact_layout else STANDARD_CHAIN_POSITION
-	_chain_top_left.position = Vector2(-chain_position.x, -chain_position.y)
-	_chain_top_left.rotation = chain_rotation
-	_chain_top_right.position = Vector2(chain_position.x, -chain_position.y)
-	_chain_top_right.rotation = -chain_rotation
-	_chain_bottom_left.position = Vector2(-chain_position.x, chain_position.y)
-	_chain_bottom_left.rotation = -chain_rotation
-	_chain_bottom_right.position = chain_position
-	_chain_bottom_right.rotation = chain_rotation
-	for chain_arm in _chain_arms:
-		chain_arm.scale = chain_scale
-	_unlock_chain_retract_distance = (
-		COMPACT_UNLOCK_CHAIN_RETRACT if compact_layout else STANDARD_UNLOCK_CHAIN_RETRACT
-	)
+	_apply_wall_attachment_covers()
+	_configure_chain_anchors()
+	_reset_chain_geometry()
 
 	_lock_rig.position = COMPACT_LOCK_POSITION if compact_layout else STANDARD_LOCK_POSITION
 	_lock_rig.scale = COMPACT_LOCK_SCALE if compact_layout else STANDARD_LOCK_SCALE
 	_countdown_badge.position = COMPACT_BADGE_POSITION if compact_layout else STANDARD_BADGE_POSITION
 	_countdown_badge.scale = COMPACT_BADGE_SCALE if compact_layout else STANDARD_BADGE_SCALE
 
-	_chain_base_position = _chain_rig.position
-	_chain_arm_base_positions.clear()
-	_chain_arm_base_rotations.clear()
-	_chain_arm_base_scales.clear()
-	for chain_arm in _chain_arms:
-		_chain_arm_base_positions.append(chain_arm.position)
-		_chain_arm_base_rotations.append(chain_arm.rotation)
-		_chain_arm_base_scales.append(chain_arm.scale)
 	_lock_base_position = _lock_rig.position
 	_lock_base_scale = _lock_rig.scale
 	_badge_base_position = _countdown_badge.position
 	_badge_base_scale = _countdown_badge.scale
 
 
-func _set_remaining_text(remaining: int) -> void:
-	var remaining_text := str(remaining)
-	_remaining_label.text = remaining_text
+func _apply_wall_attachment_covers() -> void:
+	_left_wall_cover.polygon = PackedVector2Array([
+		Vector2(-overlay_half_width - WALL_COVER_DEPTH, WALL_COVER_TOP),
+		Vector2(-overlay_half_width, WALL_COVER_TOP),
+		Vector2(-overlay_half_width, WALL_COVER_BOTTOM),
+		Vector2(-overlay_half_width - WALL_COVER_DEPTH, WALL_COVER_BOTTOM),
+	])
+	_right_wall_cover.polygon = PackedVector2Array([
+		Vector2(overlay_half_width, WALL_COVER_TOP),
+		Vector2(overlay_half_width + WALL_COVER_DEPTH, WALL_COVER_TOP),
+		Vector2(overlay_half_width + WALL_COVER_DEPTH, WALL_COVER_BOTTOM),
+		Vector2(overlay_half_width, WALL_COVER_BOTTOM),
+	])
 
-	var font_size := 26
-	if remaining_text.length() >= 3:
-		font_size = 17
-	elif remaining_text.length() == 2:
-		font_size = 22
-	_remaining_label.add_theme_font_size_override("font_size", font_size)
+
+func _configure_chain_anchors() -> void:
+	var wall_anchor_y := COMPACT_WALL_ANCHOR_Y if compact_layout else STANDARD_WALL_ANCHOR_Y
+	var lock_anchors := COMPACT_LOCK_ANCHORS if compact_layout else STANDARD_LOCK_ANCHORS
+	var embed_depth := COMPACT_WALL_EMBED_DEPTH if compact_layout else STANDARD_WALL_EMBED_DEPTH
+	_chain_thickness_scale = (
+		COMPACT_CHAIN_THICKNESS_SCALE if compact_layout else STANDARD_CHAIN_THICKNESS_SCALE
+	)
+
+	_chain_wall_anchors.clear()
+	_chain_wall_anchors.append(Vector2(-overlay_half_width - embed_depth, wall_anchor_y[0]))
+	_chain_wall_anchors.append(Vector2(overlay_half_width + embed_depth, wall_anchor_y[1]))
+	_chain_wall_anchors.append(Vector2(-overlay_half_width - embed_depth, wall_anchor_y[2]))
+	_chain_wall_anchors.append(Vector2(overlay_half_width + embed_depth, wall_anchor_y[3]))
+
+	_chain_lock_anchors.clear()
+	_chain_attachment_center = Vector2.ZERO
+	for lock_anchor in lock_anchors:
+		_chain_lock_anchors.append(lock_anchor)
+		_chain_attachment_center += lock_anchor
+	_chain_attachment_center /= float(_chain_lock_anchors.size())
+
+
+func _set_remaining_text(remaining: int) -> void:
+	_remaining_label.text = str(remaining)
+	var available_width := (
+		_remaining_label.offset_right
+		- _remaining_label.offset_left
+		- GameplayUIThemeScript.COUNT_BADGE_HORIZONTAL_PADDING
+	)
+	_remaining_label.add_theme_font_size_override(
+		"font_size",
+		GameplayUIThemeScript.fit_label_font_size(
+			_remaining_label,
+			available_width,
+			GameplayUIThemeScript.COUNT_BADGE_MAX_FONT_SIZE,
+			GameplayUIThemeScript.COUNT_BADGE_MIN_FONT_SIZE
+		)
+	)
 
 
 func _play_decrement_feedback() -> void:
-	var chain_tween := UIMotionScript.retween(_chain_rig, CHAIN_SHAKE_TWEEN_META)
+	var chain_tween := UIMotionScript.retween(_chain_rig, CHAIN_TENSION_TWEEN_META)
 	for index in range(CHAIN_TENSION_DISTANCES.size()):
 		chain_tween.tween_method(
 			_set_chain_tension,
@@ -254,34 +282,59 @@ func _stop_all_tweens() -> void:
 
 
 func _stop_feedback_tweens() -> void:
-	UIMotionScript.stop_tween(_chain_rig, CHAIN_SHAKE_TWEEN_META)
+	UIMotionScript.stop_tween(_chain_rig, CHAIN_TENSION_TWEEN_META)
 	UIMotionScript.stop_tween(_lock_rig, LOCK_SWING_TWEEN_META)
 	UIMotionScript.stop_tween(_countdown_badge, BADGE_POP_TWEEN_META)
 
 
 func _set_chain_tension(distance: float) -> void:
 	for index in range(_chain_arms.size()):
-		var inward_direction := -_chain_arm_base_positions[index].normalized()
-		_chain_arms[index].position = (
-			_chain_arm_base_positions[index] + inward_direction * distance
+		var base_lock_anchor := _chain_lock_anchors[index]
+		var pull_direction := base_lock_anchor.direction_to(_chain_attachment_center)
+		_apply_chain_arm_transform(
+			index,
+			base_lock_anchor + pull_direction * distance
 		)
 
 
-func _reset_chain_arm_positions() -> void:
+func _set_chain_release_progress(progress: float) -> void:
+	var safe_progress := clampf(progress, 0.0, 1.0)
 	for index in range(_chain_arms.size()):
-		_chain_arms[index].position = _chain_arm_base_positions[index]
+		var inner_anchor := _chain_lock_anchors[index].lerp(
+			_chain_wall_anchors[index],
+			safe_progress
+		)
+		_apply_chain_arm_transform(index, inner_anchor)
+		_chain_arms[index].modulate.a = 1.0 - safe_progress
+
+
+func _reset_chain_geometry() -> void:
+	for index in range(_chain_arms.size()):
+		_apply_chain_arm_transform(index, _chain_lock_anchors[index])
+		_chain_arms[index].modulate = Color.WHITE
+
+
+func _apply_chain_arm_transform(index: int, inner_anchor: Vector2) -> void:
+	var chain_arm := _chain_arms[index]
+	var wall_anchor := _chain_wall_anchors[index]
+	var first_endpoint := wall_anchor if wall_anchor.x < 0.0 else inner_anchor
+	var second_endpoint := inner_anchor if wall_anchor.x < 0.0 else wall_anchor
+	var direction := second_endpoint - first_endpoint
+	var visible_length := direction.length()
+
+	chain_arm.position = (wall_anchor + inner_anchor) * 0.5
+	if visible_length > 0.001:
+		chain_arm.rotation = direction.angle()
+	chain_arm.scale = Vector2(
+		visible_length / CHAIN_ARM_VISIBLE_WIDTH,
+		_chain_thickness_scale
+	)
 
 
 func _reset_animated_nodes() -> void:
 	modulate = Color.WHITE
 	scale = Vector2.ONE
-	_chain_rig.position = _chain_base_position
-	for index in range(_chain_arms.size()):
-		var chain_arm := _chain_arms[index]
-		chain_arm.position = _chain_arm_base_positions[index]
-		chain_arm.rotation = _chain_arm_base_rotations[index]
-		chain_arm.scale = _chain_arm_base_scales[index]
-		chain_arm.modulate = Color.WHITE
+	_reset_chain_geometry()
 	_lock_rig.position = _lock_base_position
 	_lock_rig.rotation = 0.0
 	_lock_rig.scale = _lock_base_scale

@@ -3,21 +3,7 @@
 [ext_resource type="Texture2D" path="res://assets/ui/shelf_lock_chain_arm_a.png" id="1_chain"]
 [ext_resource type="Texture2D" uid="uid://7lmfd8og03cd" path="res://assets/ui/lock_shelf_cutout.png" id="2_lock"]
 [ext_resource type="Script" path="res://scripts/shelf_lock_overlay.gd" id="3_script"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBox_countdown_badge"]
-bg_color = Color(0.245, 0.735, 0.18, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.075, 0.31, 0.08, 1)
-corner_radius_top_left = 22
-corner_radius_top_right = 22
-corner_radius_bottom_right = 22
-corner_radius_bottom_left = 22
-shadow_color = Color(0, 0, 0, 0.36)
-shadow_size = 3
-shadow_offset = Vector2(0, 2)
+[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_gameplay_count_badge.tres" id="4_count_badge"]
 
 [node name="ShelfLockOverlay" type="Node2D"]
 visible = false
@@ -32,42 +18,53 @@ polygon = PackedVector2Array(-104, -81, 104, -81, 104, 46, -104, 46)
 z_index = 1
 
 [node name="ChainRig" type="Node2D" parent="VisualRig"]
-position = Vector2(0, -17)
+z_index = 2
 
 [node name="TopLeftArm" type="Sprite2D" parent="VisualRig/ChainRig"]
 texture_filter = 2
-position = Vector2(-49, -17)
-rotation = 0.32
-scale = Vector2(0.21, 0.21)
+position = Vector2(-56.5, -36)
+rotation = 0.296
+scale = Vector2(0.2195, 0.2)
 texture = ExtResource("1_chain")
 self_modulate = Color(0.86, 0.9, 0.96, 1)
 
 [node name="TopRightArm" type="Sprite2D" parent="VisualRig/ChainRig"]
 texture_filter = 2
-position = Vector2(49, -17)
-rotation = -0.32
-scale = Vector2(0.21, 0.21)
+position = Vector2(56.5, -33)
+rotation = -0.278
+scale = Vector2(0.2184, 0.2)
 texture = ExtResource("1_chain")
 self_modulate = Color(0.86, 0.9, 0.96, 1)
 
 [node name="BottomLeftArm" type="Sprite2D" parent="VisualRig/ChainRig"]
 texture_filter = 2
-position = Vector2(-49, 17)
-rotation = -0.32
-scale = Vector2(0.21, 0.21)
+position = Vector2(-56.5, 0)
+rotation = -0.261
+scale = Vector2(0.2174, 0.2)
 texture = ExtResource("1_chain")
 self_modulate = Color(0.86, 0.9, 0.96, 1)
 
 [node name="BottomRightArm" type="Sprite2D" parent="VisualRig/ChainRig"]
 texture_filter = 2
-position = Vector2(49, 17)
-rotation = 0.32
-scale = Vector2(0.21, 0.21)
+position = Vector2(56.5, 1)
+rotation = 0.313
+scale = Vector2(0.2207, 0.2)
 texture = ExtResource("1_chain")
 self_modulate = Color(0.86, 0.9, 0.96, 1)
 
+[node name="WallAttachmentCovers" type="Node2D" parent="VisualRig"]
+z_index = 3
+
+[node name="Left" type="Polygon2D" parent="VisualRig/WallAttachmentCovers"]
+color = Color(0.78039217, 0.52156866, 0.2901961, 1)
+polygon = PackedVector2Array(-112, -89, -104, -89, -104, 46, -112, 46)
+
+[node name="Right" type="Polygon2D" parent="VisualRig/WallAttachmentCovers"]
+color = Color(0.78039217, 0.52156866, 0.2901961, 1)
+polygon = PackedVector2Array(104, -89, 112, -89, 112, 46, 104, 46)
+
 [node name="LockRig" type="Node2D" parent="VisualRig"]
-z_index = 2
+z_index = 1
 position = Vector2(0, -30)
 
 [node name="LockSprite" type="Sprite2D" parent="VisualRig/LockRig"]
@@ -91,30 +88,21 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="CountdownBadge" type="Node2D" parent="VisualRig"]
-z_index = 3
+z_index = 4
 position = Vector2(0, -54)
 
-[node name="BadgePanel" type="Panel" parent="VisualRig/CountdownBadge"]
-offset_left = -22.0
-offset_top = -22.0
-offset_right = 22.0
-offset_bottom = 22.0
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBox_countdown_badge")
-
 [node name="RemainingLabel" type="Label" parent="VisualRig/CountdownBadge"]
-offset_left = -21.0
-offset_top = -22.0
-offset_right = 21.0
-offset_bottom = 22.0
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
 mouse_filter = 2
 theme_type_variation = &"GameNumberLabel"
-theme_override_colors/font_color = Color(1, 1, 0.95, 1)
-theme_override_colors/font_outline_color = Color(0.05, 0.19, 0.055, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.5)
-theme_override_constants/outline_size = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.86)
 theme_override_constants/shadow_offset_x = 0
-theme_override_constants/shadow_offset_y = 2
-theme_override_font_sizes/font_size = 26
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = ExtResource("4_count_badge")
 horizontal_alignment = 1
 vertical_alignment = 1

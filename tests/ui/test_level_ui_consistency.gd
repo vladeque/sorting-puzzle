@@ -679,6 +679,7 @@ func _test_locked_shelf_feedback() -> void:
 		return
 
 	var overlay := shelf.get_node_or_null("LockedOverlay") as ShelfLockOverlay
+	var chain_rig := overlay.get_node("VisualRig/ChainRig") as Node2D
 	var chain_top_left := overlay.get_node("VisualRig/ChainRig/TopLeftArm") as Sprite2D
 	var chain_top_right := overlay.get_node("VisualRig/ChainRig/TopRightArm") as Sprite2D
 	var chain_bottom_left := overlay.get_node("VisualRig/ChainRig/BottomLeftArm") as Sprite2D
@@ -689,20 +690,52 @@ func _test_locked_shelf_feedback() -> void:
 		chain_bottom_left,
 		chain_bottom_right,
 	]
+	var wall_covers := overlay.get_node("VisualRig/WallAttachmentCovers") as Node2D
 	var lock_rig := overlay.get_node("VisualRig/LockRig") as Node2D
 	var ad_label := overlay.get_node("VisualRig/LockRig/AdLabel") as Label
 	var countdown_badge := overlay.get_node("VisualRig/CountdownBadge") as Node2D
 	var count_label := overlay.get_node("VisualRig/CountdownBadge/RemainingLabel") as Label
 	var requirement := int(level.call("_get_shelf_unlock_requirement", shelf))
 	var chain_rest_positions: Array[Vector2] = []
+	var chain_rest_scales: Array[Vector2] = []
 	for chain_arm in chain_arms:
 		chain_rest_positions.append(chain_arm.position)
+		chain_rest_scales.append(chain_arm.scale)
+	var wall_endpoint_at_rest := _get_chain_wall_endpoint(chain_top_left, true)
+	var lock_endpoint_at_rest := _get_chain_lock_endpoint(chain_top_left, true)
 	var lock_rest_position := lock_rig.position
 	var badge_rest_position := countdown_badge.position
 	var badge_rest_scale := countdown_badge.scale
 	var standard_chain_scale := chain_top_left.scale
 
 	_check(ad_label.text == "AD", "Locked shelf should show the decorative AD label on its lock.")
+	_check(
+		chain_rig.z_index > lock_rig.z_index,
+		"Locked-shelf chains should render in front of the lock."
+	)
+	_check(
+		wall_covers.z_index > chain_rig.z_index
+		and countdown_badge.z_index > wall_covers.z_index,
+		"Wall covers should mask chain ends while the count remains topmost."
+	)
+	_check(
+		wall_endpoint_at_rest.x <= -overlay.overlay_half_width
+		and absf(lock_endpoint_at_rest.x) <= 6.0,
+		"A chain arm should span from beneath the shelf wall to the lock shackle."
+	)
+	var hammer_button := level.get_node("UI/AbilityBar").find_child(
+		"HammerButton",
+		true,
+		false
+	) as Control
+	var ability_uses_label := hammer_button.find_child("UsesLabel", true, false) as Label
+	_check(
+		is_same(
+			count_label.get_theme_stylebox("normal"),
+			ability_uses_label.get_theme_stylebox("normal")
+		),
+		"Locked-shelf and ability-use counters should share the exact badge style resource."
+	)
 	var shared_chain_texture := chain_top_left.texture
 	var all_arms_share_texture := shared_chain_texture != null
 	for chain_arm in chain_arms:
@@ -726,6 +759,13 @@ func _test_locked_shelf_feedback() -> void:
 		"Chain arms should be pulling toward the lock right after a count decrease."
 	)
 	_check(
+		_get_chain_wall_endpoint(chain_top_left, true).is_equal_approx(wall_endpoint_at_rest)
+		and not _get_chain_lock_endpoint(chain_top_left, true).is_equal_approx(
+			lock_endpoint_at_rest
+		),
+		"Tension feedback should preserve the wall anchor and move the shackle endpoint."
+	)
+	_check(
 		not is_zero_approx(lock_rig.rotation),
 		"Hanging lock should be mid-swing right after a count decrease."
 	)
@@ -733,6 +773,7 @@ func _test_locked_shelf_feedback() -> void:
 	_check(
 		countdown_badge.scale.is_equal_approx(badge_rest_scale)
 		and chain_top_left.position.is_equal_approx(chain_rest_positions[0])
+		and chain_top_left.scale.is_equal_approx(chain_rest_scales[0])
 		and is_zero_approx(lock_rig.rotation),
 		"Badge, chains, and hanging lock should settle back to their authored transforms."
 	)
@@ -755,7 +796,7 @@ func _test_locked_shelf_feedback() -> void:
 	for index in range(chain_arms.size()):
 		all_arms_reset = all_arms_reset and chain_arms[index].position.is_equal_approx(
 			chain_rest_positions[index]
-		)
+		) and chain_arms[index].scale.is_equal_approx(chain_rest_scales[index])
 	_check(
 		overlay.modulate.a == 1.0
 		and overlay.scale.is_equal_approx(Vector2.ONE)
@@ -775,6 +816,9 @@ func _test_locked_shelf_feedback() -> void:
 	var compact_overlay := dispenser.get_node("LockedOverlay") as ShelfLockOverlay
 	var compact_shade := compact_overlay.get_node("Shade") as Polygon2D
 	var compact_chain := compact_overlay.get_node("VisualRig/ChainRig/TopLeftArm") as Sprite2D
+	var compact_left_wall_cover := compact_overlay.get_node(
+		"VisualRig/WallAttachmentCovers/Left"
+	) as Polygon2D
 	var compact_label := compact_overlay.get_node(
 		"VisualRig/CountdownBadge/RemainingLabel"
 	) as Label
@@ -789,8 +833,31 @@ func _test_locked_shelf_feedback() -> void:
 		compact_chain.scale.x < standard_chain_scale.x,
 		"Compact chain treatment should be narrower than the standard shelf treatment."
 	)
+	_check(
+		_get_chain_wall_endpoint(compact_chain, true).x <= -40.0
+		and is_equal_approx(compact_left_wall_cover.polygon[1].x, -40.0),
+		"Compact chain should disappear beneath the dispenser wall cover."
+	)
 	_check(compact_label.text == "123", "Compact countdown should retain a three-digit value.")
 	dispenser.free()
+
+
+func _get_chain_wall_endpoint(chain_arm: Sprite2D, is_left_arm: bool) -> Vector2:
+	var endpoints := _get_chain_endpoints(chain_arm)
+	return endpoints[0] if is_left_arm else endpoints[1]
+
+
+func _get_chain_lock_endpoint(chain_arm: Sprite2D, is_left_arm: bool) -> Vector2:
+	var endpoints := _get_chain_endpoints(chain_arm)
+	return endpoints[1] if is_left_arm else endpoints[0]
+
+
+func _get_chain_endpoints(chain_arm: Sprite2D) -> Array[Vector2]:
+	var half_span := Vector2(
+		ShelfLockOverlay.CHAIN_ARM_VISIBLE_WIDTH * chain_arm.scale.x * 0.5,
+		0.0
+	).rotated(chain_arm.rotation)
+	return [chain_arm.position - half_span, chain_arm.position + half_span]
 
 
 func _make_level() -> Node:

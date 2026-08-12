@@ -22,6 +22,12 @@ const HUD_ICON_COMPACT_REFERENCE_WIDTH := 540.0
 ## Matches the ability bar's pre-existing threshold.
 const HUD_ICON_COMPACT_VIEWPORT_WIDTH := 620.0
 
+## Shared inventory/count-badge typography contract. AbilityBar and locked shelves both use the
+## same 40px badge resource and these fit limits so equivalent counts never drift visually.
+const COUNT_BADGE_MAX_FONT_SIZE := 20
+const COUNT_BADGE_MIN_FONT_SIZE := 8
+const COUNT_BADGE_HORIZONTAL_PADDING := 4.0
+
 ## Gameplay modal shell geometry: a preferred/maximum outer-panel width, and the minimum gap kept
 ## clear beyond safe-area insets on every edge at every supported viewport.
 const MODAL_MAX_WIDTH := 520.0
