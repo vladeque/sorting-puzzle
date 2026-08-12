@@ -1683,10 +1683,11 @@ Purpose:
   shelves, keeping those details out of `scripts/level.gd`.
 - Applies `overlay_half_width` to the shade and `compact_layout` to the chain, lock, and badge rig at
   `_ready()`.
-- Reuses selected candidate A as four independent three-link `Sprite2D` arms. It computes each
-  transform from a fixed wall endpoint and a lock-shackle endpoint, adds small per-arm slope
-  differences, configures overlay-owned wall covers from `overlay_half_width`, and layers the bottom
-  pair behind the lock while the top pair crosses in front.
+- Reuses selected seven-link C2-7A art as four independent `Sprite2D` arms. The texture alternates
+  crosswise/front-facing links and includes a shallow baked sag. The script computes each transform
+  from a fixed wall endpoint and a lock-shackle endpoint, adds small per-arm slope differences,
+  configures overlay-owned wall covers from `overlay_half_width`, and layers the bottom pair behind
+  the lock while the top pair crosses in front.
 - Keeps `AD` and the remaining count scene-native; the count uses the shared ability/inventory badge
   resource and `GameplayUITheme.COUNT_BADGE_*` fitting contract.
 

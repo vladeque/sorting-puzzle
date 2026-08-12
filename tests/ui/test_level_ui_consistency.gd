@@ -749,7 +749,7 @@ func _test_locked_shelf_feedback() -> void:
 			chain_arm.texture,
 			shared_chain_texture
 		)
-	_check(all_arms_share_texture, "All four arms should reuse selected chain candidate A.")
+	_check(all_arms_share_texture, "All four arms should reuse the selected C2-7A chain texture.")
 
 	level.set("_triples_cleared", requirement - 1)
 	level.call("_update_locked_shelves")
@@ -836,8 +836,9 @@ func _test_locked_shelf_feedback() -> void:
 		"Compact shade should fit the dispenser's narrow shelf bounds."
 	)
 	_check(
-		compact_chain.scale.x < standard_chain_scale.x,
-		"Compact chain treatment should be narrower than the standard shelf treatment."
+		compact_chain.scale.x < standard_chain_scale.x
+		and compact_chain.scale.y < standard_chain_scale.y,
+		"Compact chain treatment should scale down in both axes from the standard shelf treatment."
 	)
 	_check(
 		_get_chain_wall_endpoint(compact_chain, true).x <= -40.0

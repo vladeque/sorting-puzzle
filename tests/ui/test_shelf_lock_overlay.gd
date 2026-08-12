@@ -183,7 +183,10 @@ func _test_compact_layout_and_restart_safe_motion() -> void:
 		and is_equal_approx(shade.polygon[1].x, 40.0),
 		"Compact shade should fit the dispenser aperture."
 	)
-	_check(chain.scale.x <= 0.1, "Compact chain arms should fit the narrow shelf.")
+	_check(
+		chain.scale.x <= 0.1 and chain.scale.y <= 0.15,
+		"Compact chain arms should fit the narrow shelf while retaining readable link weight."
+	)
 	_check(
 		_get_chain_wall_endpoint(chain, true).x <= -40.0
 		and is_equal_approx(left_wall_cover.polygon[1].x, -40.0),

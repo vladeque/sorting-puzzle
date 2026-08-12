@@ -600,14 +600,15 @@ Change here when:
 Files:
 - `scenes/ui/shelf_lock_overlay.tscn`
 - `scripts/shelf_lock_overlay.gd`
-- `assets/ui/shelf_lock_chain_arm_a.png`
+- `assets/ui/shelf_lock_chain_arm_a.png` (legacy path, selected C2-7A art)
 - `assets/ui/lock_shelf_cutout.png`
 - `tests/ui/test_shelf_lock_overlay.gd`
 
 Responsibility:
 - Reusable standard/compact visual component for every triple-gated shelf.
-- Fits four instances of selected three-link candidate A between slightly varied wall anchors and
-  lock-shackle anchors. Overlay-owned wall covers hide the terminal links beneath the shelf frame;
+- Fits four instances of the selected seven-link C2-7A chain between slightly varied wall anchors
+  and lock-shackle anchors. Its links alternate crosswise/front-facing and its baked shallow sag
+  keeps each arm from reading as a rigid line. Overlay-owned wall covers hide the terminal links;
   the bottom arms draw behind the orange `AD` lock, the top arms draw in front, and every arm stays
   behind the shared gameplay count badge.
 - On a recorded triple clear, pops the count, keeps every wall endpoint fixed while pulling the

@@ -13,7 +13,7 @@ const LOCK_SWING_TWEEN_META := &"shelf_lock_swing_tween"
 const BADGE_POP_TWEEN_META := &"shelf_lock_badge_pop_tween"
 const UNLOCK_TWEEN_META := &"shelf_lock_unlock_tween"
 
-## Candidate A has 6px of transparent horizontal padding on each side of its 512px canvas.
+## Selected C2-7A has 6px of transparent horizontal padding on each side of its 512px canvas.
 ## Geometry uses the visible 500px span so authored endpoints meet walls and the lock shackle.
 const CHAIN_ARM_VISIBLE_WIDTH := 500.0
 const WALL_COVER_DEPTH := 8.0
@@ -21,8 +21,8 @@ const WALL_COVER_TOP := -89.0
 const WALL_COVER_BOTTOM := 46.0
 const STANDARD_WALL_EMBED_DEPTH := 5.0
 const COMPACT_WALL_EMBED_DEPTH := 4.0
-const STANDARD_CHAIN_THICKNESS_SCALE := 0.20
-const COMPACT_CHAIN_THICKNESS_SCALE := 0.085
+const STANDARD_CHAIN_THICKNESS_SCALE := 0.34
+const COMPACT_CHAIN_THICKNESS_SCALE := 0.145
 const STANDARD_WALL_ANCHOR_Y := [-52.0, -48.0, 14.0, 18.0]
 const COMPACT_WALL_ANCHOR_Y := [-42.0, -39.0, 4.0, 7.0]
 const STANDARD_LOCK_ANCHORS := [

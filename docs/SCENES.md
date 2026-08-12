@@ -1692,7 +1692,8 @@ Script:
 
 Purpose:
 - Reusable visual owner instanced as `LockedOverlay` by both standard and dispenser shelves.
-- Draws four slim three-link arms from selected candidate A over a softened shelf shade. Every arm
+- Draws four instances of the selected seven-link C2-7A chain over a softened shelf shade. The art
+  alternates four crosswise and three front-facing links and includes a shallow baked sag. Every arm
   is fitted between an endpoint embedded beneath a side wall and an endpoint over the padlock
   shackle, with small authored per-arm slope differences instead of a perfectly mirrored X.
 - Layers the lock between the chain pairs: `BottomLeftArm` and `BottomRightArm` draw behind it while
@@ -1708,7 +1709,8 @@ Purpose:
 Important nodes:
 - `Shade`: shelf-local darkening layer whose horizontal bounds follow `overlay_half_width`.
 - `VisualRig/ChainRig/TopLeftArm`, `TopRightArm`, `BottomLeftArm`, and `BottomRightArm`: independently
-  fitted instances of `assets/ui/shelf_lock_chain_arm_a.png` running from wall anchors to the lock.
+  fitted instances of C2-7A at legacy path `assets/ui/shelf_lock_chain_arm_a.png`, running from wall
+  anchors to the lock.
 - `VisualRig/WallAttachmentCovers`: reusable left/right wood strips drawn above chain endpoints so
   terminal links disappear beneath the actual shelf frame.
 - `VisualRig/LockRig`: drawn between the bottom and top arm depth layers; contains the lock sprite
@@ -1717,7 +1719,8 @@ Important nodes:
   fitting contract as `AbilityBar/UsesLabel`, positioned above the chain intersection.
 
 Depends on:
-- `assets/ui/shelf_lock_chain_arm_a.png`, prepared from selected ImageGen candidate A with alpha.
+- `assets/ui/shelf_lock_chain_arm_a.png`, the legacy resource path containing selected ImageGen
+  C2-7A, prepared with the ImageGen skill's chroma-key helper and normalized to 512x112.
 - `assets/ui/lock_shelf_cutout.png` for the hanging orange padlock.
 - `assets/themes/style_box_gameplay_count_badge.tres` for the shared remaining-count presentation.
 - `scripts/ui_motion.gd` for replacement-safe tweens.

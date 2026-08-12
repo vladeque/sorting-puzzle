@@ -279,9 +279,10 @@ constraint for that component only:
 - `scenes/ui/shelf_lock_overlay.tscn` / `scripts/shelf_lock_overlay.gd` now own the extracted standard
   and compact lock overlay instead of duplicating nodes in both shelf scenes or keeping animation
   internals in `scripts/level.gd`.
-- The follow-up selected three-link candidate A, stored as `assets/ui/shelf_lock_chain_arm_a.png`,
-  replaces the heavier C2 strip. Four independent arms cross over the existing orange `AD` lock,
-  with remaining clears shown in the shared gameplay count badge.
+- The latest art pass stores selected seven-link C2-7A at the legacy
+  `assets/ui/shelf_lock_chain_arm_a.png` path. Each arm alternates four crosswise and three
+  front-facing links and carries a shallow baked sag; four independent arms layer around the
+  existing orange `AD` lock, with remaining clears in the shared gameplay count badge.
 - Decrements pop the count, tension each arm toward the lock, and swing the hanging lock. Reaching
   zero retracts the arms into their wall anchors and drops the lock while shelf eligibility still
   changes immediately.
