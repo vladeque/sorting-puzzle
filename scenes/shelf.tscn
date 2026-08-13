@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://snc20hx11yql"]
 
 [ext_resource type="Script" uid="uid://dxsnfvwv34noq" path="res://scripts/shelf.gd" id="1_shelf_script"]
-[ext_resource type="PackedScene" path="res://scenes/ui/shelf_lock_overlay.tscn" id="2_lock_overlay"]
+[ext_resource type="PackedScene" uid="uid://5oa3wa7li56n" path="res://scenes/ui/shelf_lock_overlay.tscn" id="2_lock_overlay"]
 
 [node name="Shelf" type="Node2D" unique_id=961540884]
 script = ExtResource("1_shelf_script")
@@ -68,12 +68,12 @@ uv = PackedVector2Array(-120.070244, -88.05257, -111.93141, -88.05257, -111.9410
 [node name="Middle" type="Node2D" parent="PlacementVisuals" unique_id=2091187359]
 
 [node name="RightWall" type="Polygon2D" parent="PlacementVisuals/Middle" unique_id=1980170564]
-z_index = 4
+z_index = 8
 color = Color(0.78039217, 0.52156866, 0.2901961, 1)
 polygon = PackedVector2Array(104, -89, 112, -89, 112, 46, 104, 46)
 
 [node name="LeftWall" type="Polygon2D" parent="PlacementVisuals/Middle" unique_id=1666305439]
-z_index = 4
+z_index = 8
 color = Color(0.78039217, 0.52156866, 0.2901961, 1)
 polygon = PackedVector2Array(-112, -89, -104, -89, -104, 46, -112, 46)
 
