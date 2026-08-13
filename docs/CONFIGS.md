@@ -192,9 +192,10 @@ Dispenser rules:
   place onto it, so its authored queue is the only route its items take to the board.
 - Between `2` and `4` layers, each exactly one slot wide.
 - No `null` slots. A hole in a queue has nothing to hand out and nothing can move into it.
-- A central dark badge shows the exact remaining count. The attached stock rail contains one cell
-  per authored layer (2-4); taking an item pops and extinguishes the rightmost lit cell, while
-  promoting the next item changes nothing because that item is still on the shelf.
+- A compact circular badge reuses the ability count-badge style and shows the exact remaining count.
+  The attached stock rail contains one cell per authored layer (2-4), drawn as one continuous strip
+  with a minimal outer outline and thin seams; taking an item pops and extinguishes the rightmost lit
+  cell, while promoting the next item changes nothing because that item is still on the shelf.
 - `unlock_after_triples` works the same as on a standard shelf.
 - Not supported inside moving rows, which step and wrap on a single uniform cell width. The runtime
   warns and falls back to a standard shelf, the same way it handles locked shelves in moving rows.

@@ -659,8 +659,8 @@ Files:
 
 Responsibility:
 - A second shelf type: a narrow one-slot open wooden cradle holding 2-4 stacked layers that the
-  player can take from but never place onto. Its central badge shows the exact remaining count and
-  its attached segmented stock rail shows both remaining items and total capacity at a glance.
+  player can take from but never place onto. Its circular badge reuses the ability count style, and
+  its thin-outlined segmented stock rail shows both remaining items and total capacity at a glance.
 - The queue is not a separate stacking system. `Shelf`'s back-layer machinery already models "one
   hidden item per layer, promoted when the front layer empties", and with a single front slot that
   is exactly a dispenser.

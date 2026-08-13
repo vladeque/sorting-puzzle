@@ -102,6 +102,18 @@ func _test_construction_and_capabilities() -> void:
 			count_label != null and count_label.text == "3",
 			"The central badge should read the number of items still on the shelf."
 		)
+		var ability_count_style := load(
+			"res://assets/themes/style_box_gameplay_count_badge.tres"
+		) as StyleBoxFlat
+		_check(
+			count_label != null
+			and is_same(count_label.get_theme_stylebox("normal"), ability_count_style),
+			"The dispenser count should reuse the exact ability count-badge style resource."
+		)
+		_check(
+			count_label != null and count_label.size.is_equal_approx(Vector2(32.0, 32.0)),
+			"The shared count style should render as a compact 32px circle on the dispenser."
+		)
 		_check(
 			is_equal_approx(float(indicator.call("get_fill_fraction")), 1.0),
 			"A freshly stocked dispenser should report a full stock fraction."
@@ -113,6 +125,34 @@ func _test_construction_and_capabilities() -> void:
 		)
 		var final_segment := indicator.get_node_or_null("Segments/Segment03/Light") as Node2D
 		_check(final_segment != null and final_segment.visible, "Every stock cell should start lit.")
+		var track_backing := indicator.get_node_or_null("TrackBacking") as Polygon2D
+		var track_inset := indicator.get_node_or_null("TrackInset") as Polygon2D
+		_check(
+			track_backing != null and track_inset != null
+			and is_equal_approx(
+				_get_polygon_bounds(track_backing).size.x - _get_polygon_bounds(track_inset).size.x,
+				2.0
+			),
+			"The stock rail should keep only a 1px outer border on each side."
+		)
+		var first_body := indicator.get_node_or_null("Segments/Segment01/Light/Body") as Polygon2D
+		var second_body := indicator.get_node_or_null("Segments/Segment02/Light/Body") as Polygon2D
+		var first_segment_root := (
+			first_body.get_parent().get_parent() as Node2D if first_body != null else null
+		)
+		var second_segment_root := (
+			second_body.get_parent().get_parent() as Node2D if second_body != null else null
+		)
+		_check(
+			first_body != null and second_body != null
+			and first_segment_root != null and second_segment_root != null
+			and is_equal_approx(
+				second_segment_root.position.x - first_segment_root.position.x
+				- _get_polygon_bounds(first_body).size.x,
+				1.5
+			),
+			"Adjacent stock cells should be separated by only a 1.5px seam."
+		)
 		indicator.call("configure", 4, 2)
 		_check(
 			int(indicator.call("get_segment_count")) == 4
@@ -511,6 +551,15 @@ func _has_item_from(level: Node, items: Array, shelf: Node2D) -> bool:
 			return true
 
 	return false
+
+
+func _get_polygon_bounds(polygon: Polygon2D) -> Rect2:
+	if polygon == null or polygon.polygon.is_empty():
+		return Rect2()
+	var bounds := Rect2(polygon.polygon[0], Vector2.ZERO)
+	for point in polygon.polygon:
+		bounds = bounds.expand(point)
+	return bounds
 
 
 func _check(condition: bool, message: String) -> void:

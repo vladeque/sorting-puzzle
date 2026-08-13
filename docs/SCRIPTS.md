@@ -1923,8 +1923,9 @@ Attached to:
 Purpose:
 - Integrated readout of how many items a dispenser still holds. Knows nothing about matching, moves,
   or the level -- `scripts/level.gd` talks to the shelf, never to the indicator.
-- Generates a central dark count badge and a wide rail with one bright cell per remaining item. Only
-  the badge's count label is authored in the scene.
+- Reuses the ability bar's circular count-badge style and generates a wide, minimally outlined rail
+  with one bright cell per remaining item. Only the badge's count label is authored in the scene;
+  cell ends share one outer curve and adjacent cells use narrow straight seams.
 
 Key methods:
 - `configure(capacity, remaining)`: rebuilds 2-4 capacity cells and snaps them and the count to state.

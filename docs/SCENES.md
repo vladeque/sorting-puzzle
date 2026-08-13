@@ -1792,15 +1792,17 @@ Purpose:
   count/segmented-stock readout showing how many items are left. Instantiated by `scripts/level.gd`
   for any level-config shelf with `"type": "dispenser"`.
 - Uses a short open wooden cradle whose item protrudes above its recessed back panel. Chunky beveled
-  guards, a frame-level cast shadow, a central count badge, and a wide segmented stock rail identify
-  the one-way source while keeping the standard shelf palette and item resting position.
+  guards, a frame-level cast shadow, an ability-style circular count badge, and a wide segmented
+  stock rail identify the one-way source while keeping the standard shelf palette and item resting
+  position.
 
 Important nodes:
 - `FrameShadow`, `BackWall`, `BackWallTopShade`, `LeftWall`, `RightWall`, wall highlight/shade nodes,
   `FloorSurface`, `FloorFrontLip`, and `FloorGrain*`: the compact open-cradle art inside the 96-wide
   packing cell. There is intentionally no `Ceiling` or `TopCeilingCap`.
 - `LayerIndicator`: `scenes/shelf_layer_indicator.tscn` instance overlapping the front lip; its
-  central badge shows the exact count and its wide rail shows one cell per authored item.
+  compact circular badge shows the exact count and its wide, thin-outlined rail shows one cell per
+  authored item with narrow straight seams like one continuous segmented strip.
 - `LockedOverlay`: compact-layout instance of `scenes/ui/shelf_lock_overlay.tscn`, with a narrower
   shade and scaled chain/lock/badge rig for the one-slot cell.
 - `Slot01`/`Slot01/ItemSlot01`: the single front slot and its snap marker, at the same vertical
@@ -1821,9 +1823,10 @@ Script:
 - `scripts/shelf_layer_indicator.gd`
 
 Purpose:
-- The dispenser's exact central count badge and attached segmented stock rail.
-- Only `CountLabel` is authored. The badge, dark track, empty cells, and bright cell geometry are
-  generated at runtime; capacity creates 2-4 cells and remaining count controls which stay lit.
+- The dispenser's exact circular count badge and attached segmented stock rail.
+- `CountLabel` is authored with `style_box_gameplay_count_badge.tres`, matching ability counters.
+  The minimal dark rail outline, empty cells, and bright cell geometry are generated at runtime;
+  capacity creates 2-4 cells and remaining count controls which stay lit.
 
 Do not use for:
 - Anything that owns the count. The number lives on `DispenserShelf`; this scene only renders it.
