@@ -14,6 +14,7 @@ extends SceneTree
 
 const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
 const LEVEL_SCENE_PATH := "res://level.tscn"
+const LAYER_INDICATOR_SCENE_PATH := "res://scenes/shelf_layer_indicator.tscn"
 
 ## Two standard shelves and one dispenser. The standard pair starts one candy_bag short of a triple
 ## and the dispenser holds the third, so the first move extinguishes one segment and clears a match.
@@ -51,6 +52,7 @@ func _init() -> void:
 func _run() -> void:
 	await process_frame
 
+	_test_indicator_visuals_are_scene_authored()
 	await _test_construction_and_capabilities()
 	await _test_preset_layout_offsets_only_dispensers()
 	await _test_row_layout_offsets_only_dispenser()
@@ -67,7 +69,35 @@ func _run() -> void:
 	else:
 		for failure in _failures:
 			push_error(failure)
-		quit(1)
+			quit(1)
+
+
+func _test_indicator_visuals_are_scene_authored() -> void:
+	var packed_scene := load(LAYER_INDICATOR_SCENE_PATH) as PackedScene
+	var indicator := packed_scene.instantiate() if packed_scene != null else null
+	_check(indicator != null, "The dispenser indicator scene should instantiate.")
+	if indicator == null:
+		return
+
+	_check(
+		indicator.get_node_or_null("TrackBacking") is Polygon2D
+		and indicator.get_node_or_null("TrackInset") is Polygon2D,
+		"The stock rail backing and inset should be authored directly in the scene."
+	)
+	var segments := indicator.get_node_or_null("Segments")
+	_check(
+		segments != null and segments.get_child_count() == 4,
+		"The indicator scene should author all four supported stock segments."
+	)
+	for index in range(4):
+		var segment_path := "Segments/Segment%02d" % (index + 1)
+		_check(
+			indicator.get_node_or_null(segment_path + "/Empty") is Polygon2D
+			and indicator.get_node_or_null(segment_path + "/Light/Body") is Polygon2D
+			and indicator.get_node_or_null(segment_path + "/Light/Gloss") is Polygon2D,
+			"%s should author its empty, filled, and gloss visuals in the scene." % segment_path
+		)
+	indicator.free()
 
 
 ## One slot, a full indicator, and a shelf that can be taken from but not placed onto.

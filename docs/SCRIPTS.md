@@ -1923,9 +1923,12 @@ Attached to:
 Purpose:
 - Integrated readout of how many items a dispenser still holds. Knows nothing about matching, moves,
   or the level -- `scripts/level.gd` talks to the shelf, never to the indicator.
-- Reuses the ability bar's circular count-badge style and generates a wide, minimally outlined rail
-  with one bright cell per remaining item. Only the badge's count label is authored in the scene;
-  cell ends share one outer curve and adjacent cells use narrow straight seams.
+- Reuses the ability bar's circular count-badge style and drives the wide, minimally outlined rail
+  authored in `scenes/shelf_layer_indicator.tscn`. The script caches the scene's four segment nodes,
+  fits the active 2-4 cells to the configured capacity, and animates their authored `Light` children;
+  it no longer constructs or deletes visual nodes at runtime.
+- Exposes the rail's sizing, border, gap, corner, and gloss measurements in the root node's
+  `Rail Layout` inspector group. Segment colors and visual layering live on the authored scene nodes.
 
 Key methods:
 - `configure(capacity, remaining)`: rebuilds 2-4 capacity cells and snaps them and the count to state.

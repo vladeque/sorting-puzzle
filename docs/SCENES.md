@@ -1825,8 +1825,12 @@ Script:
 Purpose:
 - The dispenser's exact circular count badge and attached segmented stock rail.
 - `CountLabel` is authored with `style_box_gameplay_count_badge.tres`, matching ability counters.
-  The minimal dark rail outline, empty cells, and bright cell geometry are generated at runtime;
-  capacity creates 2-4 cells and remaining count controls which stay lit.
+  `TrackBacking`, `TrackInset`, and all four supported `Segment##` node hierarchies are also authored
+  in the scene, so their colors, polygons, layering, and gloss are directly editable in Godot.
+- Each segment owns `Empty` plus `Light/Body` and `Light/Gloss`. At runtime the script only fits the
+  authored nodes to the configured 2-4 capacity and controls which `Light` nodes stay lit.
+- Rail size, border width, center, gap, corner radius, and gloss dimensions are exposed under the
+  root node's `Rail Layout` inspector group.
 
 Do not use for:
 - Anything that owns the count. The number lives on `DispenserShelf`; this scene only renders it.
