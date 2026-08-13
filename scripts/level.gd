@@ -28,9 +28,10 @@ const SHELF_SCENE := preload("res://scenes/shelf.tscn")
 const DISPENSER_SHELF_SCENE := preload("res://scenes/dispenser_shelf.tscn")
 const SHELF_TYPE_STANDARD := "standard"
 const SHELF_TYPE_DISPENSER := "dispenser"
-## Extra height a `row_layouts` row reserves when it holds a dispenser: how far the indicator reaches
-## past the shelf floor, plus the shared edge by which rows overlap, plus a small breathing gap.
-const DISPENSER_ROW_EXTRA_HEIGHT := 44.0
+## How far a dispenser with another row below moves upward so its attached stock meter clears that
+## row. The offset belongs to the dispenser itself: standard neighbours must keep the authored grid
+## position so they remain interlocked with standard shelves below.
+const DISPENSER_LOWER_CLEARANCE := 44.0
 const MOVING_SHELF_ROW_SCENE := preload("res://scenes/moving_shelf_row.tscn")
 const ITEM_SCENE := preload("res://scenes/item.tscn")
 const HAMMER_IMPACT_EFFECT_SCENE := preload("res://scenes/abilities/hammer_impact_effect.tscn")
@@ -774,13 +775,7 @@ func _add_row_layout_shelves(shelves: Node2D, shelves_config: Array, row_layouts
 		_add_preset_layout_shelves(shelves, shelves_config)
 		return
 
-	# Rows normally interlock by the shared edge, so anything drawn below a shelf floor lands on the
-	# row underneath. A row holding a dispenser therefore reserves extra height for its indicator.
-	var row_extra_heights := _get_row_layout_extra_heights(shelves_config, row_layouts)
 	var stacked_height := SHELF_GRID_STEP.y * float(maxi(row_layouts.size() - 1, 0))
-	for row_extra_height in row_extra_heights:
-		stacked_height += row_extra_height
-
 	var row_cursor_y := -stacked_height * 0.5
 	var shelf_config_index := 0
 	for row_index in range(row_layouts.size()):
@@ -790,7 +785,7 @@ func _add_row_layout_shelves(shelves: Node2D, shelves_config: Array, row_layouts
 
 		var row_shelf_count := int(row_config.get("shelf_count", 0))
 		var row_center_y := row_cursor_y
-		row_cursor_y += SHELF_GRID_STEP.y + row_extra_heights[row_index]
+		row_cursor_y += SHELF_GRID_STEP.y
 		var is_moving := _is_row_layout_moving(row_config)
 		var visible_count := _get_row_visible_count(row_config, row_shelf_count, is_moving)
 		var visual_variant := _get_row_visual_variant(row_config, is_moving)
@@ -813,41 +808,11 @@ func _add_row_layout_shelves(shelves: Node2D, shelves_config: Array, row_layouts
 				shelf_config_index,
 				row_shelf_count,
 				row_center_y,
-				visual_variant
+				visual_variant,
+				row_index < row_layouts.size() - 1
 			)
 
 		shelf_config_index += row_shelf_count
-
-
-## Per-row extra vertical room, indexed the same as `row_layouts`. Only a row holding a dispenser
-## asks for any, so an all-standard board keeps exactly the positions the uniform step produced.
-func _get_row_layout_extra_heights(shelves_config: Array, row_layouts: Array) -> Array[float]:
-	var extra_heights: Array[float] = []
-	var shelf_config_index := 0
-	for row_layout in row_layouts:
-		var row_config := row_layout as Dictionary
-		if row_config == null:
-			extra_heights.append(0.0)
-			continue
-
-		var row_shelf_count := int(row_config.get("shelf_count", 0))
-		var row_extra_height := 0.0
-		for row_shelf_index in range(row_shelf_count):
-			var shelf_config_position := shelf_config_index + row_shelf_index
-			if shelf_config_position >= shelves_config.size():
-				break
-
-			var shelf_config := shelves_config[shelf_config_position] as Dictionary
-			if shelf_config != null and _get_shelf_type(shelf_config) == SHELF_TYPE_DISPENSER:
-				row_extra_height = DISPENSER_ROW_EXTRA_HEIGHT
-				break
-
-		extra_heights.append(row_extra_height)
-		shelf_config_index += row_shelf_count
-
-	return extra_heights
-
-
 func _get_row_layout_shelf_count(row_layouts: Array) -> int:
 	var shelf_count := 0
 	for row_layout in row_layouts:
@@ -886,7 +851,8 @@ func _add_static_shelf_row(
 	start_shelf_index: int,
 	row_shelf_count: int,
 	row_center_y: float,
-	visual_variant: String
+	visual_variant: String,
+	has_row_below: bool
 ) -> void:
 	# Rows pack by each cell's own width instead of one uniform grid step, so a narrow shelf sits
 	# flush against its neighbours rather than floating inside a standard-width gap. An all-standard
@@ -915,7 +881,10 @@ func _add_static_shelf_row(
 			continue
 
 		var shelf_number := start_shelf_index + row_shelf_index + 1
-		var shelf_position := Vector2(shelf_center_x, row_center_y)
+		var shelf_y := row_center_y
+		if shelf_types[row_shelf_index] == SHELF_TYPE_DISPENSER and has_row_below:
+			shelf_y -= DISPENSER_LOWER_CLEARANCE
+		var shelf_position := Vector2(shelf_center_x, shelf_y)
 		var shelf := _add_shelf(shelves, shelf_number, shelf_position, shelf_types[row_shelf_index])
 		_apply_shelf_visual_variant(shelf, visual_variant)
 		_apply_shelf_row_placement(shelf, _get_row_shelf_placement(row_shelf_index, row_shelf_count))
@@ -1163,10 +1132,9 @@ func _add_layout_template_shelves(shelves: Node2D, shelves_config: Array, layout
 	return true
 
 
-## Layout-template markers author the normal interlocked shelf spacing. If one row contains a
-## dispenser, insert only the compact readout clearance after that row and recenter the complete
-## template. This is the preset-layout equivalent of `_get_row_layout_extra_heights()`; without it,
-## the attached green track would land inside the shelf aperture directly below it.
+## Layout-template markers author the normal interlocked shelf spacing. A dispenser with a row below
+## moves upward by its own readout clearance; standard shelves on the same authored row stay put so
+## they remain joined to standard shelves below.
 func _get_layout_template_node_positions(
 	layout_template: Node2D,
 	shelves_config: Array
@@ -1212,37 +1180,33 @@ func _get_layout_template_node_positions(
 		if matching_row.is_empty():
 			matching_row = {
 				"y": row_position.y,
-				"has_dispenser": false,
 				"nodes": [],
+				"dispenser_nodes": [],
 			}
 			rows.append(matching_row)
 
-		matching_row["has_dispenser"] = (
-			bool(matching_row["has_dispenser"])
-			or row_has_dispenser
-		)
 		(matching_row["nodes"] as Array).append(layout_node)
+		if row_has_dispenser and _is_layout_shelf_marker(layout_node):
+			(matching_row["dispenser_nodes"] as Array).append(layout_node)
 
 	rows.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		return float(a["y"]) < float(b["y"])
 	)
-	var total_extra_height := 0.0
-	for row in rows:
-		if bool(row["has_dispenser"]):
-			total_extra_height += DISPENSER_ROW_EXTRA_HEIGHT
-
 	var positions := {}
-	var accumulated_extra_height := 0.0
-	for row in rows:
-		var row_offset_y := accumulated_extra_height - total_extra_height * 0.5
+	for row_index in range(rows.size()):
+		var row := rows[row_index] as Dictionary
 		for layout_node in row["nodes"] as Array:
 			var node_2d := layout_node as Node2D
-			positions[node_2d.get_instance_id()] = (
-				node_2d.global_position
-				+ Vector2(0.0, row_offset_y)
+			positions[node_2d.get_instance_id()] = node_2d.global_position
+
+		if row_index >= rows.size() - 1:
+			continue
+		for dispenser_node in row["dispenser_nodes"] as Array:
+			var dispenser_marker := dispenser_node as Node2D
+			positions[dispenser_marker.get_instance_id()] = (
+				dispenser_marker.global_position
+				- Vector2(0.0, DISPENSER_LOWER_CLEARANCE)
 			)
-		if bool(row["has_dispenser"]):
-			accumulated_extra_height += DISPENSER_ROW_EXTRA_HEIGHT
 
 	return positions
 
@@ -1390,7 +1354,8 @@ func _has_stacked_shelf_above(shelf: Node2D, shelves: Array[Node]) -> bool:
 			continue
 
 		var other_position := _get_shelf_root_local_position(other_shelf)
-		if other_position.y >= shelf_position.y - SHELF_TOP_STACK_VERTICAL_EPSILON:
+		var vertical_distance := shelf_position.y - other_position.y
+		if absf(vertical_distance - SHELF_GRID_STEP.y) > SHELF_TOP_STACK_VERTICAL_EPSILON:
 			continue
 
 		if _shelf_cells_stack_horizontally(

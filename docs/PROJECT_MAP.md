@@ -675,10 +675,13 @@ Responsibility:
   never derived from live nodes -- a carried item is reparented out of its slot for the length of a
   drag. See `_record_dispenser_item_taken()`.
 - Hammer and shuffle skip dispensers so the authored queue survives; highlight still reads them.
-- Static `row_layouts` rows pack by each cell's own width, and a row holding a dispenser reserves
-  `DISPENSER_ROW_EXTRA_HEIGHT` so the indicator clears the row below. Authored `layout_preset`
-  marker rows receive the same clearance and are recentered at runtime. Dispensers are not supported
-  inside moving rows, which step and wrap on one uniform cell width.
+- Static `row_layouts` rows pack by each cell's own width. A dispenser with another row below moves
+  upward by `DISPENSER_LOWER_CLEARANCE` so its indicator clears that row; standard neighbours retain
+  their authored grid positions and stay interlocked with standard shelves below. Authored
+  `layout_preset` markers use the same per-dispenser offset. A shelf top cap is suppressed only by a
+  horizontally overlapping shelf exactly one grid step above, so a separated dispenser does not
+  hide the exposed ceiling below it. Dispensers are not supported inside moving rows, which step and
+  wrap on one uniform cell width.
 - The mechanic is opt-in through a level-config shelf with `"type": "dispenser"`.
 
 Change here when:

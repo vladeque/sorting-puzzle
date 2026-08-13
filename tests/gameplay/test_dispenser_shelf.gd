@@ -52,7 +52,8 @@ func _run() -> void:
 	await process_frame
 
 	await _test_construction_and_capabilities()
-	await _test_preset_layout_reserves_indicator_clearance()
+	await _test_preset_layout_offsets_only_dispensers()
+	await _test_row_layout_offsets_only_dispenser()
 	await _test_taking_an_item_contracts_the_fill()
 	await _test_cancelled_move_leaves_the_count_alone()
 	await _test_ability_targeting()
@@ -146,16 +147,22 @@ func _test_construction_and_capabilities() -> void:
 	await _teardown(level)
 
 
-## Authored layout-preset markers use the standard interlocked row step. A dispenser row inserts a
-## compact extra gap at runtime so its attached meter cannot overlap the next shelf aperture.
-func _test_preset_layout_reserves_indicator_clearance() -> void:
+## Reproduces level 5's dispenser-standard-dispenser top row. Only the two dispensers move upward for
+## meter clearance; the standard center stays interlocked, and separated dispensers do not suppress
+## the exposed top caps on the outer shelves below.
+func _test_preset_layout_offsets_only_dispensers() -> void:
 	var shelves: Array = [
 		{
 			"type": "dispenser",
 			"layers": [["candy_bag"], ["milk_carton"], ["toy_unicorn"]],
 		},
+		{"layers": [[null, null, null]]},
+		{
+			"type": "dispenser",
+			"layers": [["candy_bag"], ["milk_carton"], ["toy_unicorn"]],
+		},
 	]
-	for _index in range(11):
+	for _index in range(9):
 		shelves.append({"layers": [[null, null, null]]})
 
 	var level_scene := load(LEVEL_SCENE_PATH) as PackedScene
@@ -174,11 +181,101 @@ func _test_preset_layout_reserves_indicator_clearance() -> void:
 	var all_shelves := level.call("_get_all_shelves") as Array
 	_check(all_shelves.size() == 12, "The grid_3x4 preset should build all twelve shelves.")
 	if all_shelves.size() == 12:
-		var first_row_y := (all_shelves[0] as Node2D).position.y
-		var second_row_y := (all_shelves[3] as Node2D).position.y
+		var left_dispenser_y := (all_shelves[0] as Node2D).position.y
+		var center_standard_y := (all_shelves[1] as Node2D).position.y
+		var right_dispenser_y := (all_shelves[2] as Node2D).position.y
+		var second_row_left_y := (all_shelves[3] as Node2D).position.y
+		var second_row_center_y := (all_shelves[4] as Node2D).position.y
 		_check(
-			is_equal_approx(second_row_y - first_row_y, 178.62),
-			"A preset row containing a dispenser should reserve 44px below its meter."
+			is_equal_approx(center_standard_y - left_dispenser_y, 44.0)
+			and is_equal_approx(center_standard_y - right_dispenser_y, 44.0),
+			"Only dispensers should move upward by their 44px meter clearance."
+		)
+		_check(
+			is_equal_approx(second_row_center_y - center_standard_y, 134.62),
+			"The standard center shelf should keep the authored interlocked row step."
+		)
+		_check(
+			is_equal_approx(second_row_left_y - left_dispenser_y, 178.62),
+			"A dispenser should still leave 44px of meter clearance above the row below."
+		)
+
+		var second_row_left_cap := (
+			(all_shelves[3] as Node).get_node("PlacementVisuals/Left/TopCeilingCap")
+			as CanvasItem
+		)
+		var second_row_center_cap := (
+			(all_shelves[4] as Node).get_node("PlacementVisuals/Middle/TopCeilingCap")
+			as CanvasItem
+		)
+		var second_row_right_cap := (
+			(all_shelves[5] as Node).get_node("PlacementVisuals/Right/TopCeilingCap")
+			as CanvasItem
+		)
+		_check(
+			second_row_left_cap.visible and second_row_right_cap.visible,
+			"Separated dispensers should leave the outer second-row top caps exposed."
+		)
+		_check(
+			not second_row_center_cap.visible,
+			"The second-row center cap should stay hidden under the joined standard shelf."
+		)
+
+	await _teardown(level)
+
+
+## The explicit row_layouts construction path follows the same per-shelf rule as preset markers.
+func _test_row_layout_offsets_only_dispenser() -> void:
+	var level_scene := load(LEVEL_SCENE_PATH) as PackedScene
+	var level := level_scene.instantiate()
+	level.set("launched_from_dev_mode", true)
+	level.set("selected_level", 1)
+	root.add_child(level)
+	await process_frame
+	level.call("_apply_level_config", {
+		"level": 1,
+		"time_seconds": 300,
+		"row_layouts": [
+			{"shelf_count": 2},
+			{"shelf_count": 2},
+		],
+		"shelves": [
+			{
+				"type": "dispenser",
+				"layers": [["candy_bag"], ["milk_carton"], ["toy_unicorn"]],
+			},
+			{"layers": [[null, null, null]]},
+			{"layers": [[null, null, null]]},
+			{"layers": [[null, null, null]]},
+		],
+	})
+
+	var all_shelves := level.call("_get_all_shelves") as Array
+	_check(all_shelves.size() == 4, "The two explicit rows should build all four shelves.")
+	if all_shelves.size() == 4:
+		var dispenser_y := (all_shelves[0] as Node2D).position.y
+		var top_standard_y := (all_shelves[1] as Node2D).position.y
+		var bottom_standard_y := (all_shelves[3] as Node2D).position.y
+		_check(
+			is_equal_approx(top_standard_y - dispenser_y, 44.0),
+			"row_layouts should apply meter clearance only to the dispenser."
+		)
+		_check(
+			is_equal_approx(bottom_standard_y - top_standard_y, 134.62),
+			"A row_layouts standard neighbour should retain the interlocked row step."
+		)
+
+		var bottom_left_cap := (
+			(all_shelves[2] as Node).get_node("PlacementVisuals/Left/TopCeilingCap")
+			as CanvasItem
+		)
+		var bottom_right_cap := (
+			(all_shelves[3] as Node).get_node("PlacementVisuals/Right/TopCeilingCap")
+			as CanvasItem
+		)
+		_check(
+			bottom_left_cap.visible and not bottom_right_cap.visible,
+			"Only the bottom shelf joined to a standard shelf above should hide its top cap."
 		)
 
 	await _teardown(level)

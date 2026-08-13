@@ -1503,6 +1503,8 @@ Important constants:
 - `SHELF_CELL_SIZE`: scaled reusable shelf scene bounds; three cells in a row are packed to fill most of the 720 px gameplay viewport, with compact vertical row spacing.
 - `SHELF_SHARED_EDGE_THICKNESS`: shelf boundary thickness that neighboring cells overlap.
 - `SHELF_GRID_STEP`: packed layout spacing after overlapping shared shelf edges.
+- `DISPENSER_LOWER_CLEARANCE`: per-dispenser upward offset used when another row follows, leaving
+  room for the attached stock meter without moving standard neighbours out of the interlocked grid.
 - `LAYOUT_ROW_VERTICAL_EPSILON`: tolerance used to group authored layout-template shelf markers into horizontal rows before assigning left/middle/right shelf visuals.
 - `ABILITY_BAR_*`, `SHELVES_*`: responsive layout constants for positioning the ability bar and
   generated shelf root across portrait viewport sizes, including minimum and maximum shelf layout
