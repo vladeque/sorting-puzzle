@@ -1,7 +1,7 @@
 extends SceneTree
 
-## Verification for the dispenser shelf: a one-slot, source-only shelf whose integrated count/fill
-## readout tracks the items it still holds, the one on display included.
+## Verification for the dispenser shelf: a one-slot, source-only shelf whose central badge and
+## segmented stock rail track the items it still holds, the one on display included.
 ##
 ## The board is supplied inline so verification does not depend on mutable campaign content.
 ## `_apply_level_config()` rebuilds the shelves from a config dictionary exactly the way `_ready()`
@@ -16,7 +16,7 @@ const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
 const LEVEL_SCENE_PATH := "res://level.tscn"
 
 ## Two standard shelves and one dispenser. The standard pair starts one candy_bag short of a triple
-## and the dispenser holds the third, so the first move both contracts the fill and clears a match.
+## and the dispenser holds the third, so the first move extinguishes one segment and clears a match.
 const DISPENSER_LEVEL_CONFIG := {
 	"level": 1,
 	"time_seconds": 300,
@@ -54,7 +54,7 @@ func _run() -> void:
 	await _test_construction_and_capabilities()
 	await _test_preset_layout_offsets_only_dispensers()
 	await _test_row_layout_offsets_only_dispenser()
-	await _test_taking_an_item_contracts_the_fill()
+	await _test_taking_an_item_extinguishes_stock_segment()
 	await _test_cancelled_move_leaves_the_count_alone()
 	await _test_ability_targeting()
 	await _test_completion_waits_for_the_queue()
@@ -100,19 +100,28 @@ func _test_construction_and_capabilities() -> void:
 		var count_label := indicator.get_node_or_null("CountLabel") as Label
 		_check(
 			count_label != null and count_label.text == "3",
-			"The fascia count should read the number of items still on the shelf."
+			"The central badge should read the number of items still on the shelf."
 		)
 		_check(
 			is_equal_approx(float(indicator.call("get_fill_fraction")), 1.0),
-			"A freshly stocked dispenser should start with a full continuous track."
+			"A freshly stocked dispenser should report a full stock fraction."
 		)
-		var fill := indicator.get_node_or_null("Fill") as Node2D
-		var fill_body := fill.get_node_or_null("Body") as Polygon2D if fill != null else null
-		_check(fill_body != null and fill.visible, "The continuous fill should be visible at capacity.")
 		_check(
-			is_equal_approx(_get_polygon_width(fill_body), 80.0),
-			"A full dispenser should occupy the track's full authored width."
+			int(indicator.call("get_segment_count")) == 3
+			and int(indicator.call("get_lit_segment_count")) == 3,
+			"A three-item dispenser should render three lit stock segments."
 		)
+		var final_segment := indicator.get_node_or_null("Segments/Segment03/Light") as Node2D
+		_check(final_segment != null and final_segment.visible, "Every stock cell should start lit.")
+		indicator.call("configure", 4, 2)
+		_check(
+			int(indicator.call("get_segment_count")) == 4
+			and int(indicator.call("get_lit_segment_count")) == 2,
+			"The readout should rebuild four capacity cells while preserving an exact remaining count."
+		)
+		var fourth_segment := indicator.get_node_or_null("Segments/Segment04/Light") as Node2D
+		_check(fourth_segment != null and not fourth_segment.visible, "Unfilled capacity cells stay dark.")
+		indicator.call("configure", 3, 3)
 
 	_check(
 		dispenser.get_node_or_null("Ceiling") == null
@@ -187,17 +196,17 @@ func _test_preset_layout_offsets_only_dispensers() -> void:
 		var second_row_left_y := (all_shelves[3] as Node2D).position.y
 		var second_row_center_y := (all_shelves[4] as Node2D).position.y
 		_check(
-			is_equal_approx(center_standard_y - left_dispenser_y, 44.0)
-			and is_equal_approx(center_standard_y - right_dispenser_y, 44.0),
-			"Only dispensers should move upward by their 44px meter clearance."
+			is_equal_approx(center_standard_y - left_dispenser_y, 32.0)
+			and is_equal_approx(center_standard_y - right_dispenser_y, 32.0),
+			"Only dispensers should move upward by their compact 32px stock-rail clearance."
 		)
 		_check(
 			is_equal_approx(second_row_center_y - center_standard_y, 134.62),
 			"The standard center shelf should keep the authored interlocked row step."
 		)
 		_check(
-			is_equal_approx(second_row_left_y - left_dispenser_y, 178.62),
-			"A dispenser should still leave 44px of meter clearance above the row below."
+			is_equal_approx(second_row_left_y - left_dispenser_y, 166.62),
+			"A dispenser should leave 32px of stock-rail clearance above the row below."
 		)
 
 		var second_row_left_cap := (
@@ -257,8 +266,8 @@ func _test_row_layout_offsets_only_dispenser() -> void:
 		var top_standard_y := (all_shelves[1] as Node2D).position.y
 		var bottom_standard_y := (all_shelves[3] as Node2D).position.y
 		_check(
-			is_equal_approx(top_standard_y - dispenser_y, 44.0),
-			"row_layouts should apply meter clearance only to the dispenser."
+			is_equal_approx(top_standard_y - dispenser_y, 32.0),
+			"row_layouts should apply compact stock-rail clearance only to the dispenser."
 		)
 		_check(
 			is_equal_approx(bottom_standard_y - top_standard_y, 134.62),
@@ -281,8 +290,8 @@ func _test_row_layout_offsets_only_dispenser() -> void:
 	await _teardown(level)
 
 
-## Taking the visible item drops the count, contracts the fill, and promotes the next queued item.
-func _test_taking_an_item_contracts_the_fill() -> void:
+## Taking the visible item drops the count, extinguishes one cell, and promotes the next queued item.
+func _test_taking_an_item_extinguishes_stock_segment() -> void:
 	var level := await _make_dispenser_level()
 	var dispenser := _find_dispenser(level)
 	var target_slot := _find_empty_standard_slot(level)
@@ -322,17 +331,24 @@ func _test_taking_an_item_contracts_the_fill() -> void:
 		var count_label := indicator.get_node_or_null("CountLabel") as Label
 		_check(
 			count_label != null and count_label.text == "2",
-			"The fascia count follows the remaining count."
+			"The central badge follows the remaining count."
 		)
 		_check(
 			is_equal_approx(float(indicator.call("get_fill_fraction")), 2.0 / 3.0),
-			"Taking one of three items should contract the track to two-thirds."
+			"Taking one of three items should report two-thirds stock."
 		)
-		var fill := indicator.get_node_or_null("Fill") as Node2D
-		var fill_body := fill.get_node_or_null("Body") as Polygon2D if fill != null else null
 		_check(
-			fill_body != null and is_equal_approx(_get_polygon_width(fill_body), 80.0 * 2.0 / 3.0),
-			"The rendered fill geometry should contract smoothly from its right edge."
+			int(indicator.call("get_lit_segment_count")) == 2,
+			"Taking one item should leave exactly two lit stock cells."
+		)
+		var first_segment := indicator.get_node_or_null("Segments/Segment01/Light") as Node2D
+		var second_segment := indicator.get_node_or_null("Segments/Segment02/Light") as Node2D
+		var spent_segment := indicator.get_node_or_null("Segments/Segment03/Light") as Node2D
+		_check(
+			first_segment != null and first_segment.visible
+			and second_segment != null and second_segment.visible
+			and spent_segment != null and not spent_segment.visible,
+			"The rightmost stock cell should extinguish while the first two remain lit."
 		)
 
 	await _teardown(level)
@@ -495,17 +511,6 @@ func _has_item_from(level: Node, items: Array, shelf: Node2D) -> bool:
 			return true
 
 	return false
-
-
-func _get_polygon_width(polygon: Polygon2D) -> float:
-	if polygon == null or polygon.polygon.is_empty():
-		return 0.0
-	var min_x := INF
-	var max_x := -INF
-	for point in polygon.polygon:
-		min_x = minf(min_x, point.x)
-		max_x = maxf(max_x, point.x)
-	return max_x - min_x
 
 
 func _check(condition: bool, message: String) -> void:

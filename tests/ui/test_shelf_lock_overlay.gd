@@ -203,10 +203,10 @@ func _test_compact_layout_and_restart_safe_motion() -> void:
 	_check(overlay.compact_layout, "Dispenser should opt into the compact layout.")
 	_check(label.text == "123", "Compact badge should retain a three-digit count.")
 	_check(
-		is_equal_approx(shade.polygon[0].x, -38.0)
-		and is_equal_approx(shade.polygon[1].x, 38.0)
+		is_equal_approx(shade.polygon[0].x, -34.0)
+		and is_equal_approx(shade.polygon[1].x, 34.0)
 		and is_equal_approx(shade.polygon[0].y, -70.0)
-		and is_equal_approx(shade.polygon[2].y, 56.0),
+		and is_equal_approx(shade.polygon[2].y, 46.0),
 		"Compact shade should fit the dispenser aperture."
 	)
 	_check(
@@ -214,10 +214,10 @@ func _test_compact_layout_and_restart_safe_motion() -> void:
 		"Compact chain arms should fit the narrow shelf while retaining readable link weight."
 	)
 	_check(
-		_get_chain_wall_endpoint(chain, true).x <= -38.0
-		and is_equal_approx(left_wall_cover.polygon[1].x, -38.0)
-		and is_equal_approx(left_wall_cover.polygon[0].y, -50.0)
-		and is_equal_approx(left_wall_cover.polygon[2].y, 56.0),
+		_get_chain_wall_endpoint(chain, true).x <= -34.0
+		and is_equal_approx(left_wall_cover.polygon[1].x, -34.0)
+		and is_equal_approx(left_wall_cover.polygon[0].y, -40.0)
+		and is_equal_approx(left_wall_cover.polygon[2].y, 48.0),
 		"Compact chains should terminate beneath the dispenser wall cover."
 	)
 

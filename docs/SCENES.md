@@ -1789,18 +1789,18 @@ Script:
 
 Purpose:
 - The narrow, source-only shelf type: one item slot, 2-4 stacked layers, and an integrated
-  count/fill readout showing how many items are left. Instantiated by `scripts/level.gd` for any
-  level-config shelf with `"type": "dispenser"`.
-- Uses an open wooden cradle: short beveled side guards, a recessed back panel, and a dark stock
-  fascia instead of the standard shelf's ceiling beam/cap. The distinct silhouette identifies the
-  one-way source while keeping the standard shelf palette and item resting position.
+  count/segmented-stock readout showing how many items are left. Instantiated by `scripts/level.gd`
+  for any level-config shelf with `"type": "dispenser"`.
+- Uses a short open wooden cradle whose item protrudes above its recessed back panel. Chunky beveled
+  guards, a frame-level cast shadow, a central count badge, and a wide segmented stock rail identify
+  the one-way source while keeping the standard shelf palette and item resting position.
 
 Important nodes:
-- `BackWall`, `BackWallTopShade`, `LeftWall`, `RightWall`, wall highlight/shade nodes,
-  `FloorSurface`, dark `FloorFrontLip`, and `FloorGrain*`: the open-cradle art, narrowed to the
-  96-wide cell. There is intentionally no `Ceiling` or `TopCeilingCap`.
-- `LayerIndicator`: `scenes/shelf_layer_indicator.tscn` instance attached to the fascia; its number
-  sits on the fascia and its continuous green fill sits immediately underneath.
+- `FrameShadow`, `BackWall`, `BackWallTopShade`, `LeftWall`, `RightWall`, wall highlight/shade nodes,
+  `FloorSurface`, `FloorFrontLip`, and `FloorGrain*`: the compact open-cradle art inside the 96-wide
+  packing cell. There is intentionally no `Ceiling` or `TopCeilingCap`.
+- `LayerIndicator`: `scenes/shelf_layer_indicator.tscn` instance overlapping the front lip; its
+  central badge shows the exact count and its wide rail shows one cell per authored item.
 - `LockedOverlay`: compact-layout instance of `scenes/ui/shelf_lock_overlay.tscn`, with a narrower
   shade and scaled chain/lock/badge rig for the one-slot cell.
 - `Slot01`/`Slot01/ItemSlot01`: the single front slot and its snap marker, at the same vertical
@@ -1821,9 +1821,9 @@ Script:
 - `scripts/shelf_layer_indicator.gd`
 
 Purpose:
-- The dispenser's exact white fascia count and attached continuous green stock meter.
-- Only `CountLabel` is authored. The dark track and green fill geometry are generated at runtime;
-  capacity provides the denominator and the fill width renders `remaining / capacity`.
+- The dispenser's exact central count badge and attached segmented stock rail.
+- Only `CountLabel` is authored. The badge, dark track, empty cells, and bright cell geometry are
+  generated at runtime; capacity creates 2-4 cells and remaining count controls which stay lit.
 
 Do not use for:
 - Anything that owns the count. The number lives on `DispenserShelf`; this scene only renders it.

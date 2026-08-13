@@ -1,7 +1,7 @@
 class_name DispenserShelf
 extends Shelf
 
-## A source-only shelf: one item slot, 2-4 stacked layers, and an integrated count/fill readout
+## A source-only shelf: one item slot, 2-4 stacked layers, and an integrated segmented stock readout
 ## showing how many items are still on it, the one on display included. The player can take from it
 ## but never place onto it, so its authored queue is the only route its items take to the board.
 ##
@@ -17,10 +17,9 @@ const DISPENSER_SLOT_COUNT := 1
 const MIN_LAYER_COUNT := 2
 const MAX_LAYER_COUNT := 4
 
-## The open cradle is shorter than a standard closed cubby, while its attached fill track extends a
-## little below the fascia. The extra height stays out of `get_base_cell_size()`: row packing must
-## still line the floor up with neighbouring shelves.
-const VISUAL_BOUNDS := Rect2(-48.0, -70.0, 96.0, 144.0)
+## The item protrudes above the short cradle while the stock rail extends slightly beyond the wood.
+## These drawing bounds stay separate from the 96px packing cell so mixed rows do not become wider.
+const VISUAL_BOUNDS := Rect2(-52.0, -70.0, 104.0, 134.0)
 
 const LAYER_INDICATOR_NODE := "LayerIndicator"
 

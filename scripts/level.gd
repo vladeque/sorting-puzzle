@@ -28,10 +28,10 @@ const SHELF_SCENE := preload("res://scenes/shelf.tscn")
 const DISPENSER_SHELF_SCENE := preload("res://scenes/dispenser_shelf.tscn")
 const SHELF_TYPE_STANDARD := "standard"
 const SHELF_TYPE_DISPENSER := "dispenser"
-## How far a dispenser with another row below moves upward so its attached stock meter clears that
-## row. The offset belongs to the dispenser itself: standard neighbours must keep the authored grid
-## position so they remain interlocked with standard shelves below.
-const DISPENSER_LOWER_CLEARANCE := 44.0
+## How far a dispenser with another row below moves upward so its compact stock rail clears that row.
+## The offset belongs to the dispenser itself: standard neighbours keep the authored grid position
+## and remain interlocked with standard shelves below.
+const DISPENSER_LOWER_CLEARANCE := 32.0
 const MOVING_SHELF_ROW_SCENE := preload("res://scenes/moving_shelf_row.tscn")
 const ITEM_SCENE := preload("res://scenes/item.tscn")
 const HAMMER_IMPACT_EFFECT_SCENE := preload("res://scenes/abilities/hammer_impact_effect.tscn")

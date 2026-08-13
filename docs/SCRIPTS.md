@@ -1880,7 +1880,7 @@ Attached to:
 - `scenes/dispenser_shelf.tscn` root `DispenserShelf`.
 
 Purpose:
-- A source-only shelf: one item slot, 2-4 stacked layers, and an integrated count/fill readout
+- A source-only shelf: one item slot, 2-4 stacked layers, and an integrated segmented stock readout
   counting the items still on it, the one on display included.
 - Reuses `Shelf`'s back-layer machinery for the queue -- with a single front slot, "one hidden item
   per layer, promoted when the front layer empties" already is a dispenser, so there is no separate
@@ -1899,8 +1899,8 @@ Capability overrides:
   let a subclass reuse a parent constant's name.
 
 Key methods:
-- `set_capacity(capacity)`: sets the continuous meter denominator and fills it; called once from the
-  level config.
+- `set_capacity(capacity)`: creates one stock cell per authored item and lights them all; called once
+  from the level config.
 - `take_one()` / `set_remaining_count(remaining)`: records that an item left for good.
 - `get_capacity()` / `get_remaining_count()`.
 
@@ -1923,17 +1923,18 @@ Attached to:
 Purpose:
 - Integrated readout of how many items a dispenser still holds. Knows nothing about matching, moves,
   or the level -- `scripts/level.gd` talks to the shelf, never to the indicator.
-- Generates one stable dark track and a green fill whose width is `remaining / capacity`. Only the
-  fascia count label is authored in the scene.
+- Generates a central dark count badge and a wide rail with one bright cell per remaining item. Only
+  the badge's count label is authored in the scene.
 
 Key methods:
-- `configure(capacity, remaining)`: snaps the fill fraction and count to a state.
-- `set_remaining(remaining)`: a decrease contracts the fill's right edge and pulses the count;
-  anything else snaps, since nothing in the game grows a dispenser back.
-- `get_capacity()` / `get_remaining()` / `get_fill_fraction()`.
+- `configure(capacity, remaining)`: rebuilds 2-4 capacity cells and snaps them and the count to state.
+- `set_remaining(remaining)`: a decrease pops and extinguishes spent rightmost cells and pulses the
+  count; anything else snaps, since nothing in the game grows a dispenser back.
+- `get_capacity()` / `get_remaining()` / `get_fill_fraction()` / `get_segment_count()` /
+  `get_lit_segment_count()`.
 
 Depends on:
-- `scripts/ui_motion.gd` for the fill-contraction and count-pulse tweens.
+- `scripts/ui_motion.gd` for segment-depletion and count-pulse tweens.
 
 ## `scripts/shelf_layout_row.gd`
 

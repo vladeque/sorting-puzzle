@@ -39,6 +39,7 @@ texture = ExtResource("1_chain")
 [node name="BottomLeftArm" type="Sprite2D" parent="VisualRig/ChainRig" unique_id=1258695291]
 self_modulate = Color(0.86, 0.9, 0.96, 1)
 texture_filter = 2
+z_index = -2
 position = Vector2(-57.999996, 5.999998)
 rotation = -0.3577936
 scale = Vector2(0.2174, 0.34)
@@ -47,6 +48,7 @@ texture = ExtResource("1_chain")
 [node name="BottomRightArm" type="Sprite2D" parent="VisualRig/ChainRig" unique_id=1911489556]
 self_modulate = Color(0.86, 0.9, 0.96, 1)
 texture_filter = 2
+z_index = -2
 position = Vector2(57, 9.999999)
 rotation = 0.43505818
 scale = Vector2(0.2207, 0.34)
