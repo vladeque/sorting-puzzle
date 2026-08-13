@@ -25,11 +25,13 @@ DEFAULT_PREFERRED_COPIES_PER_TYPE = 6.0
 LAYER_TRIPLE_RATIO_TOLERANCE = 0.05
 LAYOUT_PRESETS = (
     "grid_2x3",
+    "grid_3x2",
     "grid_3x3",
     "grid_3x4",
     "grid_3x5",
     "grid_4x3",
     "grid_3x3_moving_5_bottom",
+    "staggered_2_3_3_2",
     "staggered_5_4_5",
     "staggered_4_5_4",
 )

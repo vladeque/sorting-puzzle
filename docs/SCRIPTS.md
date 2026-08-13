@@ -2384,7 +2384,7 @@ Key inputs:
 - When `--item-type-count` is omitted, the generator infers it as
   `ceil(target_filled_slots / preferred_copies_per_type)`. `--preferred-copies-per-type` accepts
   fractional values of at least `3` and defaults to `6`; an explicit type count takes precedence.
-- Layout preset values mirror the runtime layout template names in `scenes/layouts/`, including fixed-count staggered presets for 14-shelf `staggered_5_4_5`, 13-shelf `staggered_4_5_4`, and 14-shelf `grid_3x3_moving_5_bottom` layouts.
+- Layout preset values mirror the runtime layout template names in `scenes/layouts/`, including the 6-shelf `grid_3x2`, 10-shelf `staggered_2_3_3_2`, 14-shelf `staggered_5_4_5`, 13-shelf `staggered_4_5_4`, and 14-shelf `grid_3x3_moving_5_bottom` layouts.
 
 Generation constraints:
 - Difficulty presets cap how many copies of the same item can appear on one filled layer.

@@ -112,11 +112,13 @@ Top-level fields:
 
 Supported layout presets:
 - `grid_2x3`
+- `grid_3x2`: 6 shelves arranged as three columns across two rows.
 - `grid_3x3`
 - `grid_3x4`
 - `grid_3x5`
 - `grid_4x3`
 - `grid_3x3_moving_5_bottom`: 14 shelves arranged as a 3x3 static grid plus a bottom row of five moving shelves, with three moving shelves visible at once.
+- `staggered_2_3_3_2`: 10 shelves arranged as centered rows of two, three, three, and two shelves.
 - `staggered_5_4_5`: 14 shelves arranged as five left, four centered, five right.
 - `staggered_4_5_4`: 13 shelves arranged as four left, five centered, four right.
 

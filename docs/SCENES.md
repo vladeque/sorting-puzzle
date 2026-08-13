@@ -1436,11 +1436,13 @@ Important nodes:
 
 Existing presets:
 - `scenes/layouts/layout_grid_2x3.tscn`
+- `scenes/layouts/layout_grid_3x2.tscn`
 - `scenes/layouts/layout_grid_3x3.tscn`
 - `scenes/layouts/layout_grid_3x4.tscn`
 - `scenes/layouts/layout_grid_3x5.tscn`
 - `scenes/layouts/layout_grid_4x3.tscn`
 - `scenes/layouts/layout_grid_3x3_moving_5_bottom.tscn`
+- `scenes/layouts/layout_staggered_2_3_3_2.tscn`
 - `scenes/layouts/layout_staggered_5_4_5.tscn`
 - `scenes/layouts/layout_staggered_4_5_4.tscn`
 

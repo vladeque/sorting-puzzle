@@ -1,0 +1,33 @@
+[gd_scene format=3]
+
+[node name="LayoutStaggered2x3x3x2" type="Node2D"]
+
+[node name="Shelf01" type="Marker2D" parent="."]
+position = Vector2(-114.48, -201.93)
+
+[node name="Shelf02" type="Marker2D" parent="."]
+position = Vector2(114.48, -201.93)
+
+[node name="Shelf03" type="Marker2D" parent="."]
+position = Vector2(-228.96, -67.31)
+
+[node name="Shelf04" type="Marker2D" parent="."]
+position = Vector2(0, -67.31)
+
+[node name="Shelf05" type="Marker2D" parent="."]
+position = Vector2(228.96, -67.31)
+
+[node name="Shelf06" type="Marker2D" parent="."]
+position = Vector2(-228.96, 67.31)
+
+[node name="Shelf07" type="Marker2D" parent="."]
+position = Vector2(0, 67.31)
+
+[node name="Shelf08" type="Marker2D" parent="."]
+position = Vector2(228.96, 67.31)
+
+[node name="Shelf09" type="Marker2D" parent="."]
+position = Vector2(-114.48, 201.93)
+
+[node name="Shelf10" type="Marker2D" parent="."]
+position = Vector2(114.48, 201.93)

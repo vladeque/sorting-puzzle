@@ -13,12 +13,26 @@ TOOLS_PATH = REPOSITORY_ROOT / "scripts" / "tools"
 sys.path.insert(0, str(TOOLS_PATH))
 
 from generate_level_shelves import (  # noqa: E402
+    LAYOUT_PRESETS,
     apply_dispenser_shelves,
     generate_shelves,
     infer_item_type_count,
     parse_dispenser_shelves,
 )
 from level_item_progression import logical_item_ids  # noqa: E402
+
+
+class LayoutPresetTests(unittest.TestCase):
+    def test_every_generator_preset_has_a_runtime_scene(self) -> None:
+        for layout_preset in LAYOUT_PRESETS:
+            with self.subTest(layout_preset=layout_preset):
+                scene_path = (
+                    REPOSITORY_ROOT
+                    / "scenes"
+                    / "layouts"
+                    / f"layout_{layout_preset}.tscn"
+                )
+                self.assertTrue(scene_path.is_file(), msg=f"Missing {scene_path}")
 
 
 class GenerateLevelShelvesTests(unittest.TestCase):
