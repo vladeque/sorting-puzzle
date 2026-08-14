@@ -1,0 +1,36 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/shelf_layout_row.gd" id="1_layout_row"]
+
+[node name="LayoutStaggeredColumns4Moving6x4" type="Node2D"]
+
+[node name="Shelf01" type="Marker2D" parent="."]
+position = Vector2(-228.96, -201.93)
+
+[node name="Shelf02" type="Marker2D" parent="."]
+position = Vector2(-228.96, -67.31)
+
+[node name="Shelf03" type="Marker2D" parent="."]
+position = Vector2(-228.96, 67.31)
+
+[node name="Shelf04" type="Marker2D" parent="."]
+position = Vector2(-228.96, 201.93)
+
+[node name="MovingRow05" type="Node2D" parent="."]
+script = ExtResource("1_layout_row")
+shelf_count = 6
+motion_type = "vertical_wrap"
+speed_pixels_per_second = 55.0
+direction = "down"
+
+[node name="Shelf11" type="Marker2D" parent="."]
+position = Vector2(228.96, -201.93)
+
+[node name="Shelf12" type="Marker2D" parent="."]
+position = Vector2(228.96, -67.31)
+
+[node name="Shelf13" type="Marker2D" parent="."]
+position = Vector2(228.96, 67.31)
+
+[node name="Shelf14" type="Marker2D" parent="."]
+position = Vector2(228.96, 201.93)

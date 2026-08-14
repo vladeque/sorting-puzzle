@@ -25,21 +25,84 @@ ROW_MOTION_VERTICAL_WRAP = "vertical_wrap"
 ROW_MOTION_TYPES = {ROW_MOTION_HORIZONTAL_WRAP, ROW_MOTION_VERTICAL_WRAP}
 ROW_VISUAL_VARIANTS = {"full", "floor_only"}
 LAYOUT_GRID_3X3_MOVING_5_BOTTOM = "grid_3x3_moving_5_bottom"
+LAYOUT_GRID_3X2_MOVING_4_BOTTOM = "grid_3x2_moving_4_bottom"
+LAYOUT_GRID_3X3_MOVING_4_MIDDLE = "grid_3x3_moving_4_middle"
+LAYOUT_GRID_3X2_MOVING_4_4_CENTER = "grid_3x2_moving_4_4_center"
+LAYOUT_STAGGERED_COLUMNS_4_MOVING_6_4 = "staggered_columns_4_moving_6_4"
+LAYOUT_STAGGERED_COLUMNS_5_MOVING_6_5 = "staggered_columns_5_moving_6_5"
+LAYOUT_GRID_2X4_MOVING_6_LEFT = "grid_2x4_moving_6_left"
+LAYOUT_GRID_1X4_MOVING_6_6_SIDES = "grid_1x4_moving_6_6_sides"
+
+
+def moving_row(
+    shelf_count: int,
+    speed: float,
+    direction: str,
+    motion_type: str = ROW_MOTION_HORIZONTAL_WRAP,
+    visible_count: int = 3,
+) -> dict[str, Any]:
+    """Mirrors one `ShelfLayoutRow` node of a layout template scene."""
+    return {
+        "shelf_count": shelf_count,
+        "visible_count": visible_count,
+        "motion": {
+            "type": motion_type,
+            "speed": speed,
+            "direction": direction,
+        },
+        "visual_variant": "floor_only",
+    }
+
+
+# Preset-defined moving rows, mirrored from the `ShelfLayoutRow` nodes in
+# `scenes/layouts/layout_<preset>.tscn`. Entries are in shelf order, so a preset whose belt sits
+# between static rows lists the static rows before and after it. Presets without a moving row need no
+# entry: `get_effective_row_layouts` only uses this table to recover moving-row metadata.
 LAYOUT_PRESET_ROW_LAYOUTS: dict[str, list[dict[str, Any]]] = {
     LAYOUT_GRID_3X3_MOVING_5_BOTTOM: [
         {"shelf_count": 3},
         {"shelf_count": 3},
         {"shelf_count": 3},
-        {
-            "shelf_count": 5,
-            "visible_count": 3,
-            "motion": {
-                "type": ROW_MOTION_HORIZONTAL_WRAP,
-                "speed": 70,
-                "direction": "right",
-            },
-            "visual_variant": "floor_only",
-        },
+        moving_row(5, 70, "right"),
+    ],
+    LAYOUT_GRID_3X2_MOVING_4_BOTTOM: [
+        {"shelf_count": 3},
+        {"shelf_count": 3},
+        moving_row(4, 45, "right"),
+    ],
+    LAYOUT_GRID_3X3_MOVING_4_MIDDLE: [
+        {"shelf_count": 3},
+        moving_row(4, 60, "right"),
+        {"shelf_count": 3},
+        {"shelf_count": 3},
+    ],
+    LAYOUT_GRID_3X2_MOVING_4_4_CENTER: [
+        {"shelf_count": 3},
+        moving_row(4, 60, "right"),
+        moving_row(4, 60, "left"),
+        {"shelf_count": 3},
+    ],
+    # Columns, not rows: the two static entries are the left and right columns of four shelves and
+    # the moving entry is the vertical belt between them. Only the shelf-order grouping and the
+    # motion metadata matter here; the validator does not model shelf geometry.
+    LAYOUT_STAGGERED_COLUMNS_4_MOVING_6_4: [
+        {"shelf_count": 4},
+        moving_row(6, 55, "down", motion_type=ROW_MOTION_VERTICAL_WRAP),
+        {"shelf_count": 4},
+    ],
+    LAYOUT_STAGGERED_COLUMNS_5_MOVING_6_5: [
+        {"shelf_count": 5},
+        moving_row(6, 55, "down", motion_type=ROW_MOTION_VERTICAL_WRAP, visible_count=4),
+        {"shelf_count": 5},
+    ],
+    LAYOUT_GRID_2X4_MOVING_6_LEFT: [
+        moving_row(6, 55, "down", motion_type=ROW_MOTION_VERTICAL_WRAP, visible_count=4),
+        {"shelf_count": 8},
+    ],
+    LAYOUT_GRID_1X4_MOVING_6_6_SIDES: [
+        moving_row(6, 55, "down", motion_type=ROW_MOTION_VERTICAL_WRAP, visible_count=4),
+        moving_row(6, 55, "up", motion_type=ROW_MOTION_VERTICAL_WRAP, visible_count=4),
+        {"shelf_count": 4},
     ],
 }
 

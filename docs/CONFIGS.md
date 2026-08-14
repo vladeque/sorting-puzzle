@@ -110,17 +110,55 @@ Top-level fields:
 - `row_layouts`: optional row-by-row shelf placement and motion config. When present, its `shelf_count` total must equal the `shelves` length and it replaces `layout_preset` placement at runtime.
 - `shelves`: ordered shelf list.
 
-Supported layout presets:
-- `grid_2x3`
+Preset naming:
+- `grid_<columns>x<rows>` is a full rectangle; a suffix such as `_hollow` names the cells it omits.
+- `staggered_rows_<a>_<b>_...` counts shelves per row, top to bottom.
+- `staggered_columns_<a>_<b>_<c>` counts shelves per column, left to right.
+- `_moving_<count>_<placement>` marks moving rows.
+- A level must declare exactly as many shelves as its preset has markers; a mismatch warns and falls
+  back to `grid_3x3`.
+
+Supported static layout presets:
+- `grid_2x3`: 6 shelves arranged as two columns across three rows.
 - `grid_3x2`: 6 shelves arranged as three columns across two rows.
-- `grid_3x3`
-- `grid_3x4`
-- `grid_3x5`
-- `grid_4x3`
-- `grid_3x3_moving_5_bottom`: 14 shelves arranged as a 3x3 static grid plus a bottom row of five moving shelves, with three moving shelves visible at once.
-- `staggered_2_3_3_2`: 10 shelves arranged as centered rows of two, three, three, and two shelves.
-- `staggered_5_4_5`: 14 shelves arranged as five left, four centered, five right.
-- `staggered_4_5_4`: 13 shelves arranged as four left, five centered, four right.
+- `grid_3x3`: 9 shelves.
+- `grid_3x4`: 12 shelves.
+- `grid_3x5`: 15 shelves.
+- `grid_4x3`: 12 shelves arranged as four columns across three rows.
+- `grid_4x4_hollow`: 12 shelves arranged as a 4x4 field without its four inner cells.
+- `staggered_rows_2_3_2`: 7 shelves arranged as centered rows of two, three, and two shelves.
+- `staggered_rows_3_2_3`: 8 shelves arranged as centered rows of three, two, and three shelves.
+- `staggered_rows_2_3_3_2`: 10 shelves arranged as centered rows of two, three, three, and two shelves.
+- `staggered_rows_3_4_4_3`: 14 shelves arranged as rows of three, four, four, and three shelves in a
+  brick bond.
+- `staggered_columns_4_3_4`: 11 shelves arranged as four left, three centered, four right.
+- `staggered_columns_4_5_4`: 13 shelves arranged as four left, five centered, four right.
+- `staggered_columns_5_4_5`: 14 shelves arranged as five left, four centered, five right.
+
+Supported layout presets with moving rows:
+- `grid_3x2_moving_4_bottom`: 10 shelves arranged as two static rows of three plus a bottom row of
+  four moving shelves, three visible at 45 px/s to the right.
+- `grid_3x3_moving_4_middle`: 13 shelves arranged as a static row of three, a row of four moving
+  shelves, and two more static rows of three. Three moving shelves are visible at 60 px/s to the right.
+- `grid_3x2_moving_4_4_center`: 14 shelves arranged as a static row of three, two counter-running
+  rows of four moving shelves, and a static row of three. Three moving shelves per row are visible at
+  60 px/s, the upper row to the right and the lower row to the left.
+- `grid_3x3_moving_5_bottom`: 14 shelves arranged as a 3x3 static grid plus a bottom row of five
+  moving shelves, three visible at 70 px/s to the right.
+- `staggered_columns_4_moving_6_4`: 14 shelves arranged as a static column of four, a vertical belt
+  of six moving shelves, and a static column of four. Three moving shelves are visible at 55 px/s
+  downward.
+- `staggered_columns_5_moving_6_5`: 16 shelves arranged as a static column of five, a vertical belt
+  of six moving shelves, and a static column of five. Four moving shelves are visible at 55 px/s
+  downward. This is the tallest board that fits the play area.
+- `grid_2x4_moving_6_left`: 14 shelves arranged as a vertical belt of six moving shelves down the
+  left edge and a static 2x4 block beside it. Four moving shelves are visible at 55 px/s downward.
+- `grid_1x4_moving_6_6_sides`: 16 shelves arranged as two vertical belts of six moving shelves around
+  a static column of four. Four moving shelves per belt are visible at 55 px/s, the left belt
+  downward and the right belt upward.
+
+The four `vertical_wrap` presets above cannot be combined with horizontal moving rows in the same
+level.
 
 Row layout shape:
 
@@ -150,6 +188,9 @@ Row layout rules:
 - `motion.speed` is pixels per second. Use `0` for a row that is structured as a moving row but currently stopped.
 - `motion.direction` supports `right` and `left` for `horizontal_wrap`, and `down` and `up` for `vertical_wrap`. Vertical rows default to `down`, moving shelves from top to bottom.
 - A level may use horizontal moving shelves or vertical moving shelves, but not both at the same time.
+- A `vertical_wrap` row carries at least six shelves. Below that the off-window part of the belt is
+  shorter than the window itself, so a shelf leaving the bottom edge is still on screen when it
+  re-enters at the top.
 - `visual_variant` supports `full` and `floor_only`. Moving rows default to `floor_only`; static rows default to `full`.
 - Locked shelves are not allowed inside moving rows.
 - `grid_3x3_moving_5_bottom` is a shorthand preset for three static rows of three shelves plus the bottom moving row from the example above.

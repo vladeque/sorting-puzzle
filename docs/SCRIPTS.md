@@ -1504,7 +1504,8 @@ Important constants:
 - `SHELF_SHARED_EDGE_THICKNESS`: shelf boundary thickness that neighboring cells overlap.
 - `SHELF_GRID_STEP`: packed layout spacing after overlapping shared shelf edges.
 - `DISPENSER_LOWER_CLEARANCE`: per-dispenser upward offset used when another row follows, leaving
-  room for the attached stock meter without moving standard neighbours out of the interlocked grid.
+  room for the attached stock meter without moving standard neighbours out of the interlocked grid;
+  this 32px conditional clearance is additional to the dispenser scene's authored 10px root lift.
 - `LAYOUT_ROW_VERTICAL_EPSILON`: tolerance used to group authored layout-template shelf markers into horizontal rows before assigning left/middle/right shelf visuals.
 - `ABILITY_BAR_*`, `SHELVES_*`: responsive layout constants for positioning the ability bar and
   generated shelf root across portrait viewport sizes, including minimum and maximum shelf layout
@@ -1543,7 +1544,10 @@ Key responsibilities:
   play wall, baseboard, and floor; chapters configured for `artwork` use
   `Background/ChapterArtwork`. The HUD strip remains scene-owned above either presentation.
 - Load JSON configs with `_load_json_file()`.
-- Instantiate reusable shelf cells with `_add_shelf()`, apply the shared shelf visual scale, assign left/middle/right row placement visuals for static shelves, and ask `Shelf` to add generated back layers.
+- Instantiate reusable shelf cells with `_add_shelf()`, preserve each scene root's authored position
+  as a per-type offset from the generated grid position, apply the shared shelf visual scale, assign
+  left/middle/right row placement visuals for static shelves, and ask `Shelf` to add generated back
+  layers. `scenes/dispenser_shelf.tscn` uses this offset to sit 10px higher than standard shelves.
 - Ask each shelf scene to show or hide its placement-specific `TopCeilingCap` when it has no stacked neighbor above. Show each shelf scene's bottom `Shadow` and `RightColumnShadow` whenever the shelf uses full visuals so neighboring shelf bodies and items cover those low-layer cast shadows while exposed wall/background areas still receive them.
 - Load `layout_preset` scene templates from `scenes/layouts/`, group authored `ShelfXX` markers into rows by position, and place runtime shelves with derived row-placement visuals.
 - Build optional `row_layouts` rows with `_add_row_layout_shelves()`, including horizontal or vertical moving rows and static rows mixed in one level. Moving-row shelves currently use the neutral middle row-placement visual, and moving rows in a level must all use the same axis.
@@ -2389,7 +2393,7 @@ Key inputs:
 - When `--item-type-count` is omitted, the generator infers it as
   `ceil(target_filled_slots / preferred_copies_per_type)`. `--preferred-copies-per-type` accepts
   fractional values of at least `3` and defaults to `6`; an explicit type count takes precedence.
-- Layout preset values mirror the runtime layout template names in `scenes/layouts/`, including the 6-shelf `grid_3x2`, 10-shelf `staggered_2_3_3_2`, 14-shelf `staggered_5_4_5`, 13-shelf `staggered_4_5_4`, and 14-shelf `grid_3x3_moving_5_bottom` layouts.
+- Layout preset values mirror the runtime layout template names in `scenes/layouts/`; `LAYOUT_PRESETS` is the accepted set and `docs/SCENES.md` lists every preset with its shelf count. A preset only accepts a level whose shelf count matches its authored markers.
 
 Generation constraints:
 - Difficulty presets cap how many copies of the same item can appear on one filled layer.

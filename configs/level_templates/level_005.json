@@ -1,7 +1,7 @@
 {
   "level": 5,
   "time_seconds": 420,
-  "layout_preset": "staggered_5_4_5",
+  "layout_preset": "staggered_columns_5_4_5",
   "seed": 5005,
   "difficulty": "hard",
   "shelves": [

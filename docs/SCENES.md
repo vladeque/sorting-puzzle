@@ -1434,17 +1434,47 @@ Important nodes:
 - `ShelfXX`: `Marker2D` nodes consumed in scene order by `scripts/level.gd`; their positions become runtime `scenes/shelf.tscn` positions.
 - `MovingRowXX`: optional `Node2D` nodes with `scripts/shelf_layout_row.gd`; their positions become the visible moving-row center.
 
-Existing presets:
-- `scenes/layouts/layout_grid_2x3.tscn`
-- `scenes/layouts/layout_grid_3x2.tscn`
-- `scenes/layouts/layout_grid_3x3.tscn`
-- `scenes/layouts/layout_grid_3x4.tscn`
-- `scenes/layouts/layout_grid_3x5.tscn`
-- `scenes/layouts/layout_grid_4x3.tscn`
-- `scenes/layouts/layout_grid_3x3_moving_5_bottom.tscn`
-- `scenes/layouts/layout_staggered_2_3_3_2.tscn`
-- `scenes/layouts/layout_staggered_5_4_5.tscn`
-- `scenes/layouts/layout_staggered_4_5_4.tscn`
+Naming:
+- `grid_<columns>x<rows>` is a full rectangle of markers; a suffix such as `_hollow` names the cells it omits.
+- `staggered_rows_<a>_<b>_...` lists shelves per row, top to bottom, for layouts whose rows differ in width and interlock by half a column step.
+- `staggered_columns_<a>_<b>_<c>` lists shelves per column, left to right, for layouts whose columns differ in height and interlock by half a row step.
+- `_moving_<count>_<placement>` marks a preset's moving rows, as in `grid_3x3_moving_5_bottom`.
+- Row and column counts in a preset name always describe the authored markers, so a name plus the shelf count is enough to tell whether a level fits the preset.
+
+Authored geometry:
+- Markers sit on the runtime shelf grid: `228.96` between columns (`114.48` for a half-step stagger) and `134.62` between static rows.
+- A moving row is `50.88` taller than a static one (`MovingShelfRow.ROW_HEIGHT_PADDING`), so a static row and an adjacent moving row are placed `176.49` apart and two adjacent moving rows `185.50` apart. Both keep the same visual gap static rows have.
+
+Static presets:
+- `scenes/layouts/layout_grid_2x3.tscn` (6 shelves)
+- `scenes/layouts/layout_grid_3x2.tscn` (6)
+- `scenes/layouts/layout_grid_3x3.tscn` (9)
+- `scenes/layouts/layout_grid_3x4.tscn` (12)
+- `scenes/layouts/layout_grid_3x5.tscn` (15)
+- `scenes/layouts/layout_grid_4x3.tscn` (12)
+- `scenes/layouts/layout_grid_4x4_hollow.tscn` (12; a 4x4 field without its four inner cells)
+- `scenes/layouts/layout_staggered_rows_2_3_2.tscn` (7)
+- `scenes/layouts/layout_staggered_rows_3_2_3.tscn` (8)
+- `scenes/layouts/layout_staggered_rows_2_3_3_2.tscn` (10)
+- `scenes/layouts/layout_staggered_rows_3_4_4_3.tscn` (14; three-wide and four-wide rows in a brick bond)
+- `scenes/layouts/layout_staggered_columns_4_3_4.tscn` (11)
+- `scenes/layouts/layout_staggered_columns_4_5_4.tscn` (13)
+- `scenes/layouts/layout_staggered_columns_5_4_5.tscn` (14)
+
+Presets with moving rows:
+- `scenes/layouts/layout_grid_3x2_moving_4_bottom.tscn` (10; two static rows over one 4-shelf belt, 3 visible, 45 px/s right)
+- `scenes/layouts/layout_grid_3x3_moving_4_middle.tscn` (13; a 4-shelf belt between the top static row and the two below it, 3 visible, 60 px/s right)
+- `scenes/layouts/layout_grid_3x2_moving_4_4_center.tscn` (14; two counter-running 4-shelf belts between two static rows, 3 visible each, 60 px/s)
+- `scenes/layouts/layout_grid_3x3_moving_5_bottom.tscn` (14; a 3x3 static grid over one 5-shelf belt, 3 visible, 70 px/s right)
+- `scenes/layouts/layout_staggered_columns_4_moving_6_4.tscn` (14; a vertical 6-shelf belt between two static columns of four, 3 visible, 55 px/s down)
+- `scenes/layouts/layout_staggered_columns_5_moving_6_5.tscn` (16; a vertical 6-shelf belt between two static columns of five, 4 visible, 55 px/s down)
+- `scenes/layouts/layout_grid_2x4_moving_6_left.tscn` (14; a vertical 6-shelf belt down the left edge beside a static 2x4 block, 4 visible, 55 px/s down)
+- `scenes/layouts/layout_grid_1x4_moving_6_6_sides.tscn` (16; two vertical 6-shelf belts around a static column of four, 4 visible each, 55 px/s, left down and right up)
+
+Vertical belts:
+- A `vertical_wrap` row carries at least six shelves. Fewer makes the hidden part of the belt shorter
+  than the window it wraps around, so a shelf leaving the bottom is still on screen as it re-enters
+  at the top.
 
 Depends on:
 - Runtime shelf instantiation from `scripts/level.gd`.

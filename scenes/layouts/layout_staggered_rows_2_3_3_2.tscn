@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[node name="LayoutStaggered2x3x3x2" type="Node2D"]
+[node name="LayoutStaggeredRows2x3x3x2" type="Node2D"]
 
 [node name="Shelf01" type="Marker2D" parent="."]
 position = Vector2(-114.48, -201.93)
