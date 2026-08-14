@@ -1459,8 +1459,12 @@ func _add_shelf(
 ) -> Shelf:
 	var shelf_scene := DISPENSER_SHELF_SCENE if shelf_type == SHELF_TYPE_DISPENSER else SHELF_SCENE
 	var shelf := shelf_scene.instantiate() as Shelf
+	# A reusable shelf scene may author a small per-type layout offset on its root. Capture it before
+	# assigning the generated grid position; the dispenser uses this to keep its whole cradle 10px
+	# higher than a standard neighbour in every construction path.
+	var authored_position_offset := shelf.position
 	shelf.name = "Shelf%02d" % shelf_number
-	shelf.position = shelf_position
+	shelf.position = shelf_position + authored_position_offset
 	shelf.scale = Vector2.ONE * SHELF_CELL_VISUAL_SCALE
 	shelf.set_visual_variant(SHELF_VISUAL_VARIANT_FULL)
 	shelf.set_row_placement(Shelf.ROW_PLACEMENT_MIDDLE)

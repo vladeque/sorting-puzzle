@@ -297,17 +297,17 @@ func _test_preset_layout_offsets_only_dispensers() -> void:
 		var second_row_left_y := (all_shelves[3] as Node2D).position.y
 		var second_row_center_y := (all_shelves[4] as Node2D).position.y
 		_check(
-			is_equal_approx(center_standard_y - left_dispenser_y, 32.0)
-			and is_equal_approx(center_standard_y - right_dispenser_y, 32.0),
-			"Only dispensers should move upward by their compact 32px stock-rail clearance."
+			is_equal_approx(center_standard_y - left_dispenser_y, 42.0)
+			and is_equal_approx(center_standard_y - right_dispenser_y, 42.0),
+			"Only dispensers should combine their authored 10px lift with 32px rail clearance."
 		)
 		_check(
 			is_equal_approx(second_row_center_y - center_standard_y, 134.62),
 			"The standard center shelf should keep the authored interlocked row step."
 		)
 		_check(
-			is_equal_approx(second_row_left_y - left_dispenser_y, 166.62),
-			"A dispenser should leave 32px of stock-rail clearance above the row below."
+			is_equal_approx(second_row_left_y - left_dispenser_y, 176.62),
+			"A dispenser should keep its 10px lift plus 32px rail clearance above the row below."
 		)
 
 		var second_row_left_cap := (
@@ -367,8 +367,8 @@ func _test_row_layout_offsets_only_dispenser() -> void:
 		var top_standard_y := (all_shelves[1] as Node2D).position.y
 		var bottom_standard_y := (all_shelves[3] as Node2D).position.y
 		_check(
-			is_equal_approx(top_standard_y - dispenser_y, 32.0),
-			"row_layouts should apply compact stock-rail clearance only to the dispenser."
+			is_equal_approx(top_standard_y - dispenser_y, 42.0),
+			"row_layouts should retain the dispenser's 10px lift plus stock-rail clearance."
 		)
 		_check(
 			is_equal_approx(bottom_standard_y - top_standard_y, 134.62),
