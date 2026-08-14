@@ -26,7 +26,6 @@ const COUNT_PULSE_TWEEN_META := &"stock_count_pulse_tween"
 const COUNT_LABEL_NODE := "CountLabel"
 const SEGMENTS_NODE := "Segments"
 const TRACK_BACKING_NODE := "TrackBacking"
-const TRACK_INSET_NODE := "TrackInset"
 
 @export_group("Rail Layout")
 @export var track_size := Vector2(100.0, 13.0)
@@ -131,11 +130,6 @@ func _layout_track() -> void:
 			track_corner_radius
 		)
 
-	var inset := get_node_or_null(TRACK_INSET_NODE) as Polygon2D
-	if inset != null:
-		inset.position = track_center
-		inset.polygon = _rounded_rect_points(track_size, track_size.y * 0.5)
-
 	if _segments_root != null:
 		_segments_root.position = track_center
 
@@ -158,12 +152,9 @@ func _layout_segments() -> void:
 			first_x + float(index) * (segment_width + segment_gap),
 			0.0
 		)
-		var empty_cell := segment.get_node_or_null("Empty") as Polygon2D
 		var body := segment.get_node_or_null("Light/Body") as Polygon2D
 		var gloss := segment.get_node_or_null("Light/Gloss") as Polygon2D
 		var cell_polygon := _segment_rect_points(segment_size, index, _capacity)
-		if empty_cell != null:
-			empty_cell.polygon = cell_polygon
 		if body != null:
 			body.polygon = cell_polygon
 		if gloss != null:

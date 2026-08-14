@@ -24,7 +24,7 @@ z_index = 2
 color = Color(0.68884706, 0.6076549, 0.5096408, 1)
 polygon = PackedVector2Array(-34, -44, -31, -44, -31, 16, -34, 16)
 
-[node name="LeftWallHighlight" type="Polygon2D" parent="." unique_id=1698445851]
+[node name="LeftWallLowerFace" type="Polygon2D" parent="." unique_id=1698445851]
 z_index = 7
 position = Vector2(0, 33.971443)
 scale = Vector2(1, 0.29327783)
@@ -96,39 +96,39 @@ polygon = PackedVector2Array(-30, -89, 30, -89, 30, -12, -30, -12)
 [node name="ItemSlot01" type="Marker2D" parent="Slot01" unique_id=1750058201]
 position = Vector2(0, -32)
 
-[node name="LeftWallHighlight3" type="Polygon2D" parent="." unique_id=522642064]
+[node name="FloorFrontLip" type="Polygon2D" parent="." unique_id=522642064]
 z_index = 7
 position = Vector2(0, 76)
 color = Color(0.78039217, 0.52156866, 0.2901961, 1)
 polygon = PackedVector2Array(-44, -34, 44, -34, 44, -26, -44, -26)
 
-[node name="LeftWallHighlight5" type="Polygon2D" parent="." unique_id=570086919]
+[node name="LeftWallUpperFace" type="Polygon2D" parent="." unique_id=570086919]
 z_index = 9
 position = Vector2(1, -16.004166)
 scale = Vector2(1, 0.64693636)
 color = Color(0.78039217, 0.52156866, 0.2901961, 1)
 polygon = PackedVector2Array(-44, -34, -35, -34, -35, 48, -44, 48)
 
-[node name="LeftWallHighlight6" type="Polygon2D" parent="." unique_id=489395928]
+[node name="LeftWallLowerBevel" type="Polygon2D" parent="." unique_id=489395928]
 z_index = 9
 position = Vector2(4, -24)
 scale = Vector2(1.1, 1)
 color = Color(0.78039217, 0.52156866, 0.2901961, 1)
 polygon = PackedVector2Array(-42.727272, 39, -34.545452, 39, -35.454544, 48, -43.636364, 48)
 
-[node name="LeftWallHighlight7" type="Polygon2D" parent="LeftWallHighlight6" unique_id=959997199]
+[node name="Shade" type="Polygon2D" parent="LeftWallLowerBevel" unique_id=959997199]
 z_index = 9
 color = Color(0.6392157, 0.3882353, 0.1882353, 0.85882354)
 polygon = PackedVector2Array(-42.727272, 39, -34.545452, 39, -35.454544, 48, -43.636364, 48)
 
-[node name="LeftWallHighlight2" type="Polygon2D" parent="." unique_id=1547015844]
+[node name="RightWallLowerFace" type="Polygon2D" parent="." unique_id=1547015844]
 z_index = 7
 position = Vector2(79, 33.971443)
 scale = Vector2(1, 0.29327783)
 color = Color(0.78039217, 0.52156866, 0.2901961, 1)
 polygon = PackedVector2Array(-44, -34, -35, -34, -35, 48, -44, 48)
 
-[node name="LeftWallHighlight7" type="Polygon2D" parent="." unique_id=166648647]
+[node name="RightWallLowerBevel" type="Polygon2D" parent="." unique_id=166648647]
 z_index = 9
 position = Vector2(83, -24)
 rotation = -6.2831855
@@ -136,19 +136,19 @@ scale = Vector2(1.1, 1)
 color = Color(0.78039217, 0.52156866, 0.2901961, 1)
 polygon = PackedVector2Array(-44.545464, 38.999992, -36.363647, 38.999992, -35.454544, 48, -43.636364, 48)
 
-[node name="LeftWallHighlight7" type="Polygon2D" parent="LeftWallHighlight7" unique_id=1029582897]
+[node name="Shade" type="Polygon2D" parent="RightWallLowerBevel" unique_id=1029582897]
 z_index = 9
 color = Color(0.6392157, 0.3882353, 0.1882353, 0.85882354)
 polygon = PackedVector2Array(-44.545464, 38.999992, -36.363647, 38.999992, -35.454544, 48, -43.636364, 48)
 
-[node name="LeftWallHighlight9" type="Polygon2D" parent="." unique_id=1377447835]
+[node name="RightWallUpperFace" type="Polygon2D" parent="." unique_id=1377447835]
 z_index = 9
 position = Vector2(78, -15.830518)
 scale = Vector2(1, 0.65204364)
 color = Color(0.78039217, 0.52156866, 0.2901961, 1)
 polygon = PackedVector2Array(-44, -34, -35, -34, -35, 48, -44, 48)
 
-[node name="LeftWallHighlight8" type="Polygon2D" parent="." unique_id=1061717865]
+[node name="RightWallTopBevel" type="Polygon2D" parent="." unique_id=1061717865]
 z_index = 9
 position = Vector2(82, -86)
 rotation = -6.2831855
@@ -156,12 +156,12 @@ scale = Vector2(1.1, 1)
 color = Color(0.78039217, 0.52156866, 0.2901961, 1)
 polygon = PackedVector2Array(-48.18182, 39.99999, -41.818184, 39.999992, -35.454544, 48, -43.636364, 48)
 
-[node name="LeftWallHighlight7" type="Polygon2D" parent="LeftWallHighlight8" unique_id=477574238]
+[node name="Shade" type="Polygon2D" parent="RightWallTopBevel" unique_id=477574238]
 z_index = 9
 color = Color(0.6392157, 0.3882353, 0.1882353, 0.85882354)
 polygon = PackedVector2Array(-48.18182, 39.99999, -41.818184, 39.999992, -35.454544, 48, -43.636364, 48)
 
-[node name="LeftWallHighlight10" type="Polygon2D" parent="." unique_id=301018592]
+[node name="RightWallInnerFace" type="Polygon2D" parent="." unique_id=301018592]
 z_index = 4
 position = Vector2(82, -86)
 rotation = -6.2831855
@@ -169,13 +169,13 @@ scale = Vector2(1.1, 1)
 color = Color(0.78039217, 0.52156866, 0.2901961, 1)
 polygon = PackedVector2Array(-48.18182, 39.99999, -43.636368, 47.999992, -43.636383, 127.99999, -48.181835, 127.999985)
 
-[node name="LeftWallHighlight7" type="Polygon2D" parent="LeftWallHighlight10" unique_id=1603767559]
+[node name="Shade" type="Polygon2D" parent="RightWallInnerFace" unique_id=1603767559]
 z_index = 4
 z_as_relative = false
 color = Color(0.6392157, 0.3882353, 0.1882353, 0.85882354)
 polygon = PackedVector2Array(-48.18182, 39.99999, -43.636368, 47.999992, -43.636383, 127.99999, -48.181835, 127.999985)
 
-[node name="LeftWallHighlight11" type="Polygon2D" parent="." unique_id=589000422]
+[node name="LeftWallTopBevel" type="Polygon2D" parent="." unique_id=589000422]
 z_index = 9
 position = Vector2(6, -86)
 rotation = -6.2831855
@@ -183,12 +183,12 @@ scale = Vector2(1.1, 1)
 color = Color(0.78039217, 0.52156866, 0.2901961, 1)
 polygon = PackedVector2Array(-39.090916, 39.999992, -31.818188, 39.999996, -36.363644, 47.999992, -44.54546, 47.999992)
 
-[node name="LeftWallHighlight7" type="Polygon2D" parent="LeftWallHighlight11" unique_id=1349383390]
+[node name="Shade" type="Polygon2D" parent="LeftWallTopBevel" unique_id=1349383390]
 z_index = 9
 color = Color(0.6392157, 0.3882353, 0.1882353, 0.85882354)
 polygon = PackedVector2Array(-39.090916, 39.999992, -31.818188, 39.999996, -36.363644, 47.999992, -44.54546, 47.999992)
 
-[node name="LeftWallHighlight12" type="Polygon2D" parent="." unique_id=879516250]
+[node name="LeftWallInnerFace" type="Polygon2D" parent="." unique_id=879516250]
 z_index = 4
 position = Vector2(19, -86)
 rotation = -6.2831855
@@ -196,13 +196,13 @@ scale = Vector2(1.1, 1)
 color = Color(0.78039217, 0.52156866, 0.2901961, 1)
 polygon = PackedVector2Array(-48.181824, 47.999992, -43.636368, 39.999996, -43.636383, 127.99999, -48.181835, 127.999985)
 
-[node name="LeftWallHighlight7" type="Polygon2D" parent="LeftWallHighlight12" unique_id=1490050770]
+[node name="Shade" type="Polygon2D" parent="LeftWallInnerFace" unique_id=1490050770]
 z_index = 4
 z_as_relative = false
 color = Color(0.6392157, 0.3882353, 0.1882353, 0.85882354)
 polygon = PackedVector2Array(-48.181824, 47.999992, -43.636368, 39.999996, -43.636383, 127.99999, -48.181835, 127.999985)
 
-[node name="LeftWallHighlight4" type="Polygon2D" parent="." unique_id=827236665]
+[node name="BackWallLowerPanel" type="Polygon2D" parent="." unique_id=827236665]
 z_index = 9
 position = Vector2(15, 41)
 color = Color(0.78039217, 0.52156866, 0.2901961, 1)

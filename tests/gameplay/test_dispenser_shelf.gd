@@ -52,6 +52,7 @@ func _init() -> void:
 func _run() -> void:
 	await process_frame
 
+	_test_visual_nodes_have_semantic_names()
 	_test_indicator_visuals_are_scene_authored()
 	await _test_construction_and_capabilities()
 	await _test_preset_layout_offsets_only_dispensers()
@@ -72,6 +73,38 @@ func _run() -> void:
 			quit(1)
 
 
+func _test_visual_nodes_have_semantic_names() -> void:
+	var packed_scene := load("res://scenes/dispenser_shelf.tscn") as PackedScene
+	var dispenser := packed_scene.instantiate() if packed_scene != null else null
+	_check(dispenser != null, "The dispenser shelf scene should instantiate.")
+	if dispenser == null:
+		return
+
+	var expected_nodes := [
+		"FrameShadow",
+		"BackWall",
+		"BackWallLowerPanel",
+		"LeftWallUpperFace",
+		"LeftWallTopBevel",
+		"LeftWallInnerFace",
+		"LeftWallLowerBevel",
+		"LeftWallLowerFace",
+		"RightWallUpperFace",
+		"RightWallTopBevel",
+		"RightWallInnerFace",
+		"RightWallLowerBevel",
+		"RightWallLowerFace",
+		"FloorSurface",
+		"FloorFrontLip",
+	]
+	for node_name in expected_nodes:
+		_check(
+			dispenser.get_node_or_null(node_name) is Polygon2D,
+			"Dispenser visual node %s should be authored with a semantic name." % node_name
+		)
+	dispenser.free()
+
+
 func _test_indicator_visuals_are_scene_authored() -> void:
 	var packed_scene := load(LAYER_INDICATOR_SCENE_PATH) as PackedScene
 	var indicator := packed_scene.instantiate() if packed_scene != null else null
@@ -80,9 +113,8 @@ func _test_indicator_visuals_are_scene_authored() -> void:
 		return
 
 	_check(
-		indicator.get_node_or_null("TrackBacking") is Polygon2D
-		and indicator.get_node_or_null("TrackInset") is Polygon2D,
-		"The stock rail backing and inset should be authored directly in the scene."
+		indicator.get_node_or_null("TrackBacking") is Polygon2D,
+		"The stock rail backing should be authored directly in the scene."
 	)
 	var segments := indicator.get_node_or_null("Segments")
 	_check(
@@ -92,10 +124,9 @@ func _test_indicator_visuals_are_scene_authored() -> void:
 	for index in range(4):
 		var segment_path := "Segments/Segment%02d" % (index + 1)
 		_check(
-			indicator.get_node_or_null(segment_path + "/Empty") is Polygon2D
-			and indicator.get_node_or_null(segment_path + "/Light/Body") is Polygon2D
+			indicator.get_node_or_null(segment_path + "/Light/Body") is Polygon2D
 			and indicator.get_node_or_null(segment_path + "/Light/Gloss") is Polygon2D,
-			"%s should author its empty, filled, and gloss visuals in the scene." % segment_path
+			"%s should author its filled body and gloss visuals in the scene." % segment_path
 		)
 	indicator.free()
 
@@ -156,14 +187,14 @@ func _test_construction_and_capabilities() -> void:
 		var final_segment := indicator.get_node_or_null("Segments/Segment03/Light") as Node2D
 		_check(final_segment != null and final_segment.visible, "Every stock cell should start lit.")
 		var track_backing := indicator.get_node_or_null("TrackBacking") as Polygon2D
-		var track_inset := indicator.get_node_or_null("TrackInset") as Polygon2D
 		_check(
-			track_backing != null and track_inset != null
+			track_backing != null
 			and is_equal_approx(
-				_get_polygon_bounds(track_backing).size.x - _get_polygon_bounds(track_inset).size.x,
-				2.0
+				_get_polygon_bounds(track_backing).size.x,
+				float((indicator.get("track_size") as Vector2).x)
+					+ float(indicator.get("track_border_width")) * 2.0
 			),
-			"The stock rail should keep only a 1px outer border on each side."
+			"The stock rail backing should include its configured border width."
 		)
 		var first_body := indicator.get_node_or_null("Segments/Segment01/Light/Body") as Polygon2D
 		var second_body := indicator.get_node_or_null("Segments/Segment02/Light/Body") as Polygon2D
