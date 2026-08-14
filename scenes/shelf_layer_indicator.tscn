@@ -1,112 +1,91 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://drsqf13pi65oc"]
 
-[ext_resource type="Script" path="res://scripts/shelf_layer_indicator.gd" id="1_layer_indicator_script"]
-[ext_resource type="StyleBox" path="res://assets/themes/style_box_gameplay_count_badge.tres" id="2_count_badge"]
+[ext_resource type="Script" uid="uid://dte65csbjeo78" path="res://scripts/shelf_layer_indicator.gd" id="1_layer_indicator_script"]
+[ext_resource type="StyleBox" uid="uid://clkxu830fi8fm" path="res://assets/themes/style_box_gameplay_count_badge.tres" id="2_count_badge"]
 
-[node name="ShelfLayerIndicator" type="Node2D"]
+[node name="ShelfLayerIndicator" type="Node2D" unique_id=622891350]
 script = ExtResource("1_layer_indicator_script")
 
-[node name="TrackBacking" type="Polygon2D" parent="."]
-position = Vector2(0, 10)
-color = Color(0.18, 0.11, 0.07, 0.98)
+[node name="TrackBacking" type="Polygon2D" parent="." unique_id=1300500958]
+position = Vector2(4.9471855e-06, 10)
+scale = Vector2(1.0392158, 1.1999999)
+color = Color(0.18039216, 0.10980392, 0.07058824, 0.7058824)
 polygon = PackedVector2Array(43.5, -7.5, 46.3701, -6.9291, 48.8033, -5.3033, 50.4291, -2.87013, 51, 0, 50.4291, 2.87013, 48.8033, 5.3033, 46.3701, 6.9291, 43.5, 7.5, -43.5, 7.5, -46.3701, 6.9291, -48.8033, 5.3033, -50.4291, 2.87013, -51, 0, -50.4291, -2.87013, -48.8033, -5.3033, -46.3701, -6.9291, -43.5, -7.5)
 
-[node name="TrackInset" type="Polygon2D" parent="."]
-position = Vector2(0, 10)
-z_index = 1
-color = Color(0.25, 0.22, 0.18, 1)
-polygon = PackedVector2Array(43.5, -6.5, 45.9874, -6.00522, 48.0962, -4.59619, 49.5052, -2.48744, 50, 0, 49.5052, 2.48744, 48.0962, 4.59619, 45.9874, 6.00522, 43.5, 6.5, -43.5, 6.5, -45.9874, 6.00522, -48.0962, 4.59619, -49.5052, 2.48744, -50, 0, -49.5052, -2.48744, -48.0962, -4.59619, -45.9874, -6.00522, -43.5, -6.5)
-
-[node name="Segments" type="Node2D" parent="."]
-position = Vector2(0, 10)
+[node name="Segments" type="Node2D" parent="." unique_id=875838530]
 z_index = 2
+position = Vector2(0, 10)
 
-[node name="Segment01" type="Node2D" parent="Segments"]
+[node name="Segment01" type="Node2D" parent="Segments" unique_id=771083638]
 position = Vector2(-38.0625, 0)
 
-[node name="Empty" type="Polygon2D" parent="Segments/Segment01"]
-color = Color(0.34, 0.31, 0.25, 1)
-polygon = PackedVector2Array(11.9375, -6.5, 11.9375, 6.5, -5.4375, 6.5, -7.92494, 6.00522, -10.0337, 4.59619, -11.4427, 2.48744, -11.9375, 0, -11.4427, -2.48744, -10.0337, -4.59619, -7.92494, -6.00522, -5.4375, -6.5)
-
-[node name="Light" type="Node2D" parent="Segments/Segment01"]
+[node name="Light" type="Node2D" parent="Segments/Segment01" unique_id=1305397798]
 z_index = 1
 
-[node name="Body" type="Polygon2D" parent="Segments/Segment01/Light"]
+[node name="Body" type="Polygon2D" parent="Segments/Segment01/Light" unique_id=1910420667]
 color = Color(0.22, 0.88, 0.3, 1)
 polygon = PackedVector2Array(11.9375, -6.5, 11.9375, 6.5, -5.4375, 6.5, -7.92494, 6.00522, -10.0337, 4.59619, -11.4427, 2.48744, -11.9375, 0, -11.4427, -2.48744, -10.0337, -4.59619, -7.92494, -6.00522, -5.4375, -6.5)
 
-[node name="Gloss" type="Polygon2D" parent="Segments/Segment01/Light"]
-position = Vector2(0, -4.25)
+[node name="Gloss" type="Polygon2D" parent="Segments/Segment01/Light" unique_id=1966664115]
 z_index = 1
+position = Vector2(1, -4.25)
 color = Color(0.66, 1, 0.56, 0.92)
 polygon = PackedVector2Array(7.6875, -1.25, 8.16585, -1.15485, 8.57138, -0.883883, 8.84235, -0.478354, 8.9375, 0, 8.84235, 0.478354, 8.57138, 0.883883, 8.16585, 1.15485, 7.6875, 1.25, -7.6875, 1.25, -8.16585, 1.15485, -8.57138, 0.883883, -8.84235, 0.478354, -8.9375, 0, -8.84235, -0.478354, -8.57138, -0.883883, -8.16585, -1.15485, -7.6875, -1.25)
 
-[node name="Segment02" type="Node2D" parent="Segments"]
+[node name="Segment02" type="Node2D" parent="Segments" unique_id=1896383219]
 position = Vector2(-12.6875, 0)
 
-[node name="Empty" type="Polygon2D" parent="Segments/Segment02"]
-color = Color(0.34, 0.31, 0.25, 1)
-polygon = PackedVector2Array(11.9375, -6.5, 11.9375, 6.5, -11.9375, 6.5, -11.9375, -6.5)
-
-[node name="Light" type="Node2D" parent="Segments/Segment02"]
+[node name="Light" type="Node2D" parent="Segments/Segment02" unique_id=749660781]
 z_index = 1
 
-[node name="Body" type="Polygon2D" parent="Segments/Segment02/Light"]
+[node name="Body" type="Polygon2D" parent="Segments/Segment02/Light" unique_id=1580439363]
 color = Color(0.22, 0.88, 0.3, 1)
 polygon = PackedVector2Array(11.9375, -6.5, 11.9375, 6.5, -11.9375, 6.5, -11.9375, -6.5)
 
-[node name="Gloss" type="Polygon2D" parent="Segments/Segment02/Light"]
-position = Vector2(0, -4.25)
+[node name="Gloss" type="Polygon2D" parent="Segments/Segment02/Light" unique_id=880071903]
 z_index = 1
+position = Vector2(0, -4.25)
 color = Color(0.66, 1, 0.56, 0.92)
 polygon = PackedVector2Array(7.6875, -1.25, 8.16585, -1.15485, 8.57138, -0.883883, 8.84235, -0.478354, 8.9375, 0, 8.84235, 0.478354, 8.57138, 0.883883, 8.16585, 1.15485, 7.6875, 1.25, -7.6875, 1.25, -8.16585, 1.15485, -8.57138, 0.883883, -8.84235, 0.478354, -8.9375, 0, -8.84235, -0.478354, -8.57138, -0.883883, -8.16585, -1.15485, -7.6875, -1.25)
 
-[node name="Segment03" type="Node2D" parent="Segments"]
+[node name="Segment03" type="Node2D" parent="Segments" unique_id=563322073]
 position = Vector2(12.6875, 0)
 
-[node name="Empty" type="Polygon2D" parent="Segments/Segment03"]
-color = Color(0.34, 0.31, 0.25, 1)
-polygon = PackedVector2Array(11.9375, -6.5, 11.9375, 6.5, -11.9375, 6.5, -11.9375, -6.5)
-
-[node name="Light" type="Node2D" parent="Segments/Segment03"]
+[node name="Light" type="Node2D" parent="Segments/Segment03" unique_id=2062087257]
 z_index = 1
 
-[node name="Body" type="Polygon2D" parent="Segments/Segment03/Light"]
+[node name="Body" type="Polygon2D" parent="Segments/Segment03/Light" unique_id=2012960934]
 color = Color(0.22, 0.88, 0.3, 1)
 polygon = PackedVector2Array(11.9375, -6.5, 11.9375, 6.5, -11.9375, 6.5, -11.9375, -6.5)
 
-[node name="Gloss" type="Polygon2D" parent="Segments/Segment03/Light"]
-position = Vector2(0, -4.25)
+[node name="Gloss" type="Polygon2D" parent="Segments/Segment03/Light" unique_id=1373013153]
 z_index = 1
+position = Vector2(0, -4.25)
 color = Color(0.66, 1, 0.56, 0.92)
 polygon = PackedVector2Array(7.6875, -1.25, 8.16585, -1.15485, 8.57138, -0.883883, 8.84235, -0.478354, 8.9375, 0, 8.84235, 0.478354, 8.57138, 0.883883, 8.16585, 1.15485, 7.6875, 1.25, -7.6875, 1.25, -8.16585, 1.15485, -8.57138, 0.883883, -8.84235, 0.478354, -8.9375, 0, -8.84235, -0.478354, -8.57138, -0.883883, -8.16585, -1.15485, -7.6875, -1.25)
 
-[node name="Segment04" type="Node2D" parent="Segments"]
+[node name="Segment04" type="Node2D" parent="Segments" unique_id=1004024328]
 position = Vector2(38.0625, 0)
 
-[node name="Empty" type="Polygon2D" parent="Segments/Segment04"]
-color = Color(0.34, 0.31, 0.25, 1)
-polygon = PackedVector2Array(5.4375, -6.5, 7.92494, -6.00522, 10.0337, -4.59619, 11.4427, -2.48744, 11.9375, 0, 11.4427, 2.48744, 10.0337, 4.59619, 7.92494, 6.00522, 5.4375, 6.5, -11.9375, 6.5, -11.9375, -6.5)
-
-[node name="Light" type="Node2D" parent="Segments/Segment04"]
+[node name="Light" type="Node2D" parent="Segments/Segment04" unique_id=1148051614]
 z_index = 1
 
-[node name="Body" type="Polygon2D" parent="Segments/Segment04/Light"]
+[node name="Body" type="Polygon2D" parent="Segments/Segment04/Light" unique_id=868383139]
 color = Color(0.22, 0.88, 0.3, 1)
 polygon = PackedVector2Array(5.4375, -6.5, 7.92494, -6.00522, 10.0337, -4.59619, 11.4427, -2.48744, 11.9375, 0, 11.4427, 2.48744, 10.0337, 4.59619, 7.92494, 6.00522, 5.4375, 6.5, -11.9375, 6.5, -11.9375, -6.5)
 
-[node name="Gloss" type="Polygon2D" parent="Segments/Segment04/Light"]
-position = Vector2(0, -4.25)
+[node name="Gloss" type="Polygon2D" parent="Segments/Segment04/Light" unique_id=939816006]
 z_index = 1
+position = Vector2(-1, -4.25)
 color = Color(0.66, 1, 0.56, 0.92)
 polygon = PackedVector2Array(7.6875, -1.25, 8.16585, -1.15485, 8.57138, -0.883883, 8.84235, -0.478354, 8.9375, 0, 8.84235, 0.478354, 8.57138, 0.883883, 8.16585, 1.15485, 7.6875, 1.25, -7.6875, 1.25, -8.16585, 1.15485, -8.57138, 0.883883, -8.84235, 0.478354, -8.9375, 0, -8.84235, -0.478354, -8.57138, -0.883883, -8.16585, -1.15485, -7.6875, -1.25)
 
-[node name="CountLabel" type="Label" parent="."]
+[node name="CountLabel" type="Label" parent="." unique_id=1910619959]
 z_index = 12
 offset_left = -16.0
-offset_top = -16.0
+offset_top = -19.0
 offset_right = 16.0
-offset_bottom = 16.0
+offset_bottom = 13.0
 theme_type_variation = &"GameNumberLabel"
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.86)
