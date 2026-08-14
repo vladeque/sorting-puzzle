@@ -1635,6 +1635,9 @@ Key responsibilities:
   item interaction, combo expiry, Lantern expiry, moving shelf rows, animations, matching, and
   other abilities continue. Pause menus, the ability-purchase modal, and application interruption
   suspend only the Freezer window. A partial expiry delta suppresses only its frozen portion.
+- Mirror that active state into the reusable layer-5 `FreezerScreenEffect`: its transparent
+  perimeter cracks reveal once on activation, remain below the HUD without tinting chapter art,
+  and thaw on expiry/failure/completion. Level rebuild and teardown paths clear it immediately.
 - Treat Freezer activation before the first move as the first meaningful action, disable only its
   button while active, and clear runtime state/visuals on level load, completion, failure, leave,
   application scene teardown, or a new level configuration.
@@ -1766,6 +1769,39 @@ Verification:
 Do not use for:
 - Completion rules, star awards, or the reward screen itself. Those stay in `scripts/level.gd` and
   `scripts/level_completion_screen.gd`.
+
+## `scripts/freezer_screen_effect.gd`
+
+Class:
+- `FreezerScreenEffect`
+
+Attached to:
+- `scenes/abilities/freezer_screen_effect.tscn` root `FreezerScreenEffect`.
+
+Purpose:
+- Owns the Freezer ability's visual lifecycle independently from gameplay/economy state.
+- Drives the cracked-ice shader's edge-distance reveal and opacity with short activation and thaw
+  tweens. Repeated `set_active(true)` calls are idempotent because `scripts/level.gd` refreshes
+  Freezer visuals every active frame.
+- Keeps the effect hidden when inactive and provides an immediate reset path for board rebuild,
+  scene teardown, and deterministic verification.
+
+Key methods:
+- `set_active(should_be_active, immediate)`: starts one state transition or applies its final state.
+- `is_active()`, `get_reveal_amount()`, `get_effect_opacity()`: focused state/verification accessors.
+
+Depends on:
+- `assets/abilities/freezer_cracked_ice_overlay.png`: selected cracked-ice candidate converted to
+  an alpha PNG with no baked background color.
+- `assets/abilities/freezer_cracked_ice_reveal.gdshader`: one texture sample plus an edge-distance
+  reveal mask; it does not read the screen texture.
+
+Verification:
+- `tests/gameplay/test_freezer_screen_effect.gd`.
+- Responsive `level.tscn` capture through `scripts/tools/captures/freezer_effect_setup.gd`.
+
+Do not use for:
+- Freezer duration, timer suppression, inventory, purchase, or save behavior.
 
 ## `scripts/hammer_impact_effect.gd`
 

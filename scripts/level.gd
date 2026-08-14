@@ -161,6 +161,7 @@ var _leave_confirmation_overlay: LeaveConfirmationMenu
 var _ability_purchase_overlay: AbilityPurchaseMenu
 var _in_level_shop_overlay: ShopScreen
 var _ability_bar: AbilityBar
+var _freezer_screen_effect: FreezerScreenEffect
 var _ability_uses: Dictionary = {
 	ABILITY_HAMMER: 3,
 	ABILITY_SHUFFLE: 3,
@@ -221,6 +222,7 @@ func _ready() -> void:
 	_ability_purchase_overlay = get_node("UI/AbilityPurchaseOverlay") as AbilityPurchaseMenu
 	_in_level_shop_overlay = get_node("UI/InLevelShopOverlay") as ShopScreen
 	_ability_bar = get_node("UI/AbilityBar") as AbilityBar
+	_freezer_screen_effect = get_node("FreezerScreenEffect") as FreezerScreenEffect
 	_failure_screen.visible = false
 	_completion_screen.visible = false
 	_pause_menu_overlay.visible = false
@@ -530,7 +532,7 @@ func _notification(what: int) -> void:
 
 
 func _exit_tree() -> void:
-	_clear_freezer()
+	_clear_freezer(true)
 
 
 func _input(event: InputEvent) -> void:
@@ -707,7 +709,7 @@ func _apply_level_config(config: Dictionary) -> void:
 	_shelves_resolving_ids.clear()
 
 	_clear_ability_highlights()
-	_clear_freezer()
+	_clear_freezer(true)
 	_load_ability_uses()
 
 	var shelves_config := config.get("shelves", []) as Array
@@ -1848,7 +1850,7 @@ func _check_level_completed() -> void:
 func _return_to_main_menu() -> void:
 	_level_paused = false
 	_returning_to_menu = true
-	_clear_freezer()
+	_clear_freezer(true)
 	var menu_scene_path := return_menu_scene_path if return_menu_scene_path != "" else MAIN_MENU_SCENE
 	var error := get_tree().change_scene_to_file(menu_scene_path)
 	if error != OK:
@@ -4039,12 +4041,12 @@ func _is_freezer_active() -> bool:
 	return _freezer_time_remaining > 0.0
 
 
-func _clear_freezer() -> void:
+func _clear_freezer(immediate_visual := false) -> void:
 	_freezer_time_remaining = 0.0
-	_update_freezer_visuals()
+	_update_freezer_visuals(immediate_visual)
 
 
-func _update_freezer_visuals() -> void:
+func _update_freezer_visuals(immediate := false) -> void:
 	var is_active := _is_freezer_active() and not _level_failed and not _level_completed
 	if _ability_bar != null:
 		_ability_bar.set_active_seconds(
@@ -4053,6 +4055,8 @@ func _update_freezer_visuals() -> void:
 		)
 	if _top_hud != null:
 		_top_hud.set_timer_frozen_visual(is_active)
+	if _freezer_screen_effect != null:
+		_freezer_screen_effect.set_active(is_active, immediate)
 
 
 func _update_ability_buttons() -> void:

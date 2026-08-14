@@ -1129,6 +1129,9 @@ Important nodes:
 - `Background/HudCenterSlot/ComboLabel`: hidden until the player clears a triple, then shows the active combo count.
 - `Shelves`: parent for generated shelf nodes and optional moving shelf row containers; `scripts/level.gd` scales and centers it in the available play area for the current viewport size.
 - `DragLayer`: temporary parent for dragged items, drawn above shelves.
+- `FreezerScreenEffect`: `scenes/abilities/freezer_screen_effect.tscn` instance on canvas layer 5;
+  its transparent cracked-ice perimeter renders above gameplay without recoloring the level and
+  below the layer-10 HUD/modals.
 - `UI`: `CanvasLayer` for gameplay labels, the reusable ability bar, and overlays; top-level
   controls are anchored or positioned at runtime for non-720x1280 portrait screens.
 - `UI/TimerLabel`: countdown display.
@@ -1172,6 +1175,7 @@ Depends on:
 - `configs/levels/level_*.json`
 - `assets/abilities/*.png`
 - `scenes/abilities/hammer_impact_effect.tscn` for the hammer ability's fullscreen strike animation.
+- `scenes/abilities/freezer_screen_effect.tscn` for the Freezer ability's persistent perimeter ice.
 
 Do not use for:
 - Static shelf cell visuals. Put those in `scenes/shelf.tscn`.
@@ -1363,6 +1367,38 @@ Depends on:
 Do not use for:
 - Star awards, completion rules, or the reward screen. Those stay in `scripts/level.gd` and
   `scenes/ui/level_completion_screen.tscn`.
+
+## `scenes/abilities/freezer_screen_effect.tscn`
+
+Root:
+- `FreezerScreenEffect` (`CanvasLayer`, layer 5)
+
+Script:
+- `scripts/freezer_screen_effect.gd`
+
+Purpose:
+- Reusable fullscreen Freezer presentation owned by a separate scene instead of `scripts/level.gd`.
+- Composites only the transparent cyan-white crack artwork over gameplay; it does not sample,
+  tint, blur, or replace the current chapter background.
+- Reveals the cracks inward from the viewport edges when Freezer starts, holds them for the active
+  gameplay window, and retracts/fades them when Freezer ends.
+- Ignores mouse/touch input and stays below the HUD, ability buttons, purchase flow, pause menu,
+  and result screens.
+
+Important nodes:
+- `Overlay`: fullscreen, mouse-ignored control that follows the live viewport.
+- `Overlay/IceFrame`: stretches `assets/abilities/freezer_cracked_ice_overlay.png` to the viewport
+  and uses `freezer_cracked_ice_reveal.gdshader` for the edge-distance reveal.
+
+Verification:
+- `tests/gameplay/test_freezer_screen_effect.gd` checks layering, input pass-through, idempotent
+  active-state refresh, activation, thaw cleanup, and `level.tscn` integration.
+- `scripts/tools/captures/freezer_effect_setup.gd` activates Freezer for responsive rendered
+  captures of `level.tscn`.
+
+Do not use for:
+- Freezer timing, inventory spending, timer gating, or persistence. Those remain in
+  `scripts/level.gd` and `PlayerProgress`.
 
 ## `scenes/abilities/hammer_impact_effect.tscn`
 

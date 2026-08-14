@@ -530,10 +530,13 @@ Files:
 - `configs/item_sprites.json`
 - `scenes/abilities/hammer_impact_effect.tscn`
 - `scripts/hammer_impact_effect.gd`
+- `scenes/abilities/freezer_screen_effect.tscn`
+- `scripts/freezer_screen_effect.gd`
 - `scenes/effects/level_completion_confetti.tscn`
 - `scripts/level_completion_confetti.gd`
 - `assets/abilities/ability_hammer_swing_*.png`
 - `assets/abilities/ability_shuffle_box.png`
+- `assets/abilities/freezer_cracked_ice_overlay.png`
 
 Responsibility:
 - Loads level JSON and item sprite config.
@@ -570,6 +573,9 @@ Responsibility:
 - Tracks the countdown timer, starting it only after the first meaningful player action, and win/loss overlays.
 - Plays the hammer ability by gathering the targeted items into one center-screen item, striking it with the fullscreen hammer, then dropping combo reward stars from the impact point.
 - Plays the shuffle ability by showing a center-screen delivery box, flying visible unlocked items into it, swapping item identities while hidden, flying them back to their slots, then resolving shelf matches.
+- Shows Freezer as transparent cyan-white perimeter cracks on a dedicated layer between gameplay
+  and the HUD. The effect reveals inward once, holds without recoloring the configured level
+  background, and thaws when the 30-second active-gameplay window ends.
 - Wires the in-level pause menu, including the shared circular Pause button (`scenes/ui/level_top_hud.tscn`), modal overlay, Leave action, Continue action, leave confirmation overlay, and campaign life spend for confirmed Leave. Implements the `ui_cancel` back stack (Leave Confirmation -> Pause -> resume; Ability Purchase restores its prior state; Completion/Failure invoke their routes; otherwise opens Pause) -- there was no back-button handling at all during gameplay before UI-003.
 - Displays a responsive Godot-authored level backdrop with a top HUD strip (now owned by `scenes/ui/level_top_hud.tscn`), monotone shop wall, baseboard, and bottom floor band behind generated shelves.
 
@@ -720,6 +726,8 @@ Files:
 - `configs/ability_purchase_prices.json`
 - `scenes/abilities/hammer_impact_effect.tscn`
 - `scripts/hammer_impact_effect.gd`
+- `scenes/abilities/freezer_screen_effect.tscn`
+- `scripts/freezer_screen_effect.gd`
 - `assets/abilities/*.png`
 
 Responsibility:
@@ -739,6 +747,8 @@ Responsibility:
 - Starts the highlight timer even when no current shelf state can be highlighted.
 - Uses `ShelfItem` outline state for border-only highlight ability visuals.
 - Shows the active highlight countdown in a bottom-right badge on the highlight button.
+- Pauses only the level countdown for Freezer, shows its active badge and frozen timer treatment,
+  and mirrors that state into the transparent cracked-ice perimeter effect below the HUD.
 
 Change here when:
 - Adding, removing, rebalancing, or restyling player abilities.
