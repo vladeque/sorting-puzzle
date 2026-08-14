@@ -10,7 +10,9 @@ extends Node2D
 
 const UIMotionScript := preload("res://scripts/ui_motion.gd")
 
-const CORNER_SEGMENTS := 4
+## Eight subdivisions per quarter turn keep the 13-15px-high capsule ends visibly round after the
+## shelf and responsive board scales are composed. Four subdivisions still read faceted in-game.
+const CORNER_SEGMENTS := 8
 const MAX_SEGMENTS := 4
 
 const SEGMENT_POP_SCALE := Vector2(1.1, 1.1)

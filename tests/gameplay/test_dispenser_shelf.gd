@@ -196,8 +196,16 @@ func _test_construction_and_capabilities() -> void:
 			),
 			"The stock rail backing should include its configured border width."
 		)
+		_check(
+			track_backing != null and track_backing.polygon.size() >= 32,
+			"The stock rail backing should use enough arc points to render as a smooth capsule."
+		)
 		var first_body := indicator.get_node_or_null("Segments/Segment01/Light/Body") as Polygon2D
 		var second_body := indicator.get_node_or_null("Segments/Segment02/Light/Body") as Polygon2D
+		_check(
+			first_body != null and first_body.polygon.size() >= 20,
+			"An outer stock segment should use enough arc points to keep its end circular."
+		)
 		var first_segment_root := (
 			first_body.get_parent().get_parent() as Node2D if first_body != null else null
 		)
