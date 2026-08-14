@@ -7,7 +7,7 @@ Use this file as the first stop when you need to identify where a feature lives.
 Main scene:
 - `scenes/main_menu.tscn`
 - Configured in `project.godot` as `run/main_scene`.
-- `project.godot` keeps the 720x1280 design viewport and uses `canvas_items` stretch with `keep_width` so portrait devices share a stable logical width while gaining or losing vertical play space.
+- `project.godot` keeps the 720x1280 design viewport and uses `canvas_items` stretch with `keep_width` so portrait devices share a stable logical width while gaining or losing vertical play space. The Mobile renderer uses 2x 2D MSAA to smooth runtime `Polygon2D` edges, including the dispenser shelf's short bevels, without the larger bandwidth cost of 4x sampling.
 - Owns the production campaign entry point over the selected chapter's `selection_preview`,
   launches that chapter's next level, and opens the chapter picker from the action beneath the level
   button. Chapter selection updates the menu background immediately.
