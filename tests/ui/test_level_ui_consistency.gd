@@ -2,7 +2,7 @@ extends SceneTree
 
 ## UI-003 level UI consistency verification: shared gameplay resource identity, explicit disabled
 ## styles (no engine-default fallback), the star pill's receive pulse leaving its chrome alone, the
-## Completion/Failure signal routing and copy, the
+## Completion/Failure signal routing and copy, the failure modal composition, the
 ## ui_cancel back-stack precedence, safe-area layout at fabricated insets, responsive ability-bar
 ## icon/badge bounds, long-value formatting, the hidden rewarded-ad placeholder, and locked-shelf
 ## chain/count/unlock feedback. See docs/UI_003_LEVEL_UI_CONSISTENCY_TICKET.md and docs/SCENES.md's
@@ -102,6 +102,9 @@ func _test_shared_resource_identity() -> void:
 		pause_shade.get_theme_stylebox("panel") == leave_shade.get_theme_stylebox("panel"),
 		"Pause/Leave Confirmation should share one modal-shade StyleBox instance."
 	)
+	var pause_shade_style := pause_shade.get_theme_stylebox("panel")
+	var pause_outer_style := pause_outer.get_theme_stylebox("panel")
+	var pause_close_style := pause_close.get_theme_stylebox("normal")
 	var pause_content := pause.find_child("ContentRegion", true, false) as Control
 	var leave_content := leave.find_child("ContentRegion", true, false) as Control
 	var purchase_content := purchase.find_child("ContentRegion", true, false) as Control
@@ -112,10 +115,15 @@ func _test_shared_resource_identity() -> void:
 		"All gameplay modals should use the same compact 520x500 outer-panel size."
 	)
 	_check(
-		is_equal_approx(pause_content.size.y, 224.0)
+		is_equal_approx(pause_content.size.y, 234.0)
 			and is_equal_approx(leave_content.size.y, 240.0)
 			and is_equal_approx(purchase_content.size.y, 224.0),
-		"Gameplay modal cream panels should use compact content-specific heights, not stretch with the shell."
+		"Gameplay modal cream panels should use compact content-specific heights, not stretch with "
+			+ "the shell (Pause %.1f, Leave %.1f, Purchase %.1f)." % [
+				pause_content.size.y,
+				leave_content.size.y,
+				purchase_content.size.y,
+			]
 	)
 	_check(
 		purchase.find_child("UseNowLabel", true, false) == null,
@@ -156,26 +164,24 @@ func _test_shared_resource_identity() -> void:
 	)
 	main_menu_top_status.queue_free()
 
-	var completion_screen = level.get("_completion_screen")
-	var completion_shade_panel := completion_screen.find_child("ResultShade", true, false) as Panel
-	var completion_button := completion_screen.find_child("NextButton", true, false) as Button
-	# Read the shared StyleBox resource itself (not the node) before freeing -- the resource is an
-	# independent external object and stays valid after its consuming node is gone, but the node
-	# reference itself would dangle.
-	var completion_shade_style := completion_shade_panel.get_theme_stylebox("panel")
-	var completion_action_style := completion_button.get_theme_stylebox("normal")
 	level.free()
 
 	var failure_level := await _make_level()
-	var failure_shade_panel := failure_level.get("_failure_screen").find_child("ResultShade", true, false) as Panel
+	var failure := failure_level.get("_failure_screen") as LevelFailureScreen
+	var failure_shade := failure.find_child("Shade", true, false) as Panel
+	var failure_outer := failure.find_child("OuterPanel", true, false) as Panel
+	var failure_close := failure.find_child("CloseButton", true, false) as Button
 	_check(
-		completion_shade_style == failure_shade_panel.get_theme_stylebox("panel"),
-		"Completion and Failure should share one terminal-result shade StyleBox instance."
+		pause_shade_style == failure_shade.get_theme_stylebox("panel")
+			and pause_outer_style == failure_outer.get_theme_stylebox("panel")
+			and pause_close_style == failure_close.get_theme_stylebox("normal"),
+		"Failure should consume the shared gameplay modal shade, panel, and close-button resources."
 	)
-	var failure_button := failure_level.get("_failure_screen").find_child("MainMenuButton", true, false) as Button
+	var failure_content := failure.find_child("ContentRegion", true, false) as Control
 	_check(
-		completion_action_style == failure_button.get_theme_stylebox("normal"),
-		"Completion and Failure should consume the same positive-action StyleBox instance."
+		failure_outer.size.is_equal_approx(Vector2(520.0, 620.0))
+			and is_equal_approx(failure_content.size.y, 336.0),
+		"Failure should use its documented taller modal and compact result-content height."
 	)
 	failure_level.free()
 
@@ -320,8 +326,8 @@ func _test_rewarded_ad_placeholder() -> void:
 	await process_frame
 
 
-## Completion's action reads "Continue" (same return-to-menu behavior); Failure has a working exit
-## instead of being a terminal dead end. Both route through their documented signal.
+## Completion keeps its Continue route. Failure owns modal title/content plus distinct Retry and X
+## intents, leaving level.gd to decide whether Retry can start immediately or needs a life offer.
 func _test_completion_and_failure_routing() -> void:
 	var level := await _make_level()
 	var completion = level.get("_completion_screen")
@@ -338,13 +344,28 @@ func _test_completion_and_failure_routing() -> void:
 
 	var failure_level := await _make_level()
 	var failure = failure_level.get("_failure_screen")
-	var main_menu_button := failure.find_child("MainMenuButton", true, false) as Button
-	_check(main_menu_button.text == "Main Menu", "Failure should expose a working Main Menu action.")
+	failure.set_level_number(7)
+	var title := failure.find_child("TitleLabel", true, false) as Label
+	var message := failure.find_child("MessageLabel", true, false) as Label
+	var heart := failure.find_child("BrokenHeartImage", true, false) as TextureRect
+	var retry_button := failure.find_child("RetryButton", true, false) as Button
+	var close_button := failure.find_child("CloseButton", true, false) as Button
+	_check(title.text == "LEVEL 7", "Failure should show the configured level number as its title.")
+	_check(message.text == "LEVEL FAILED", "Failure should show the requested failed-level message.")
+	_check(
+		heart.texture != null and heart.texture.resource_path == "res://assets/ui/broken_heart.png",
+		"Failure should show the dedicated transparent broken-heart art."
+	)
+	_check(retry_button.text == "Retry", "Failure should expose a Retry action.")
 
-	var failure_signal_fired := [false]
-	failure.main_menu_pressed.connect(func() -> void: failure_signal_fired[0] = true)
-	main_menu_button.pressed.emit()
-	_check(failure_signal_fired[0], "Pressing Failure's action should emit main_menu_pressed.")
+	var retry_signal_fired := [false]
+	var main_menu_signal_fired := [false]
+	failure.retry_pressed.connect(func() -> void: retry_signal_fired[0] = true)
+	failure.main_menu_pressed.connect(func() -> void: main_menu_signal_fired[0] = true)
+	retry_button.pressed.emit()
+	close_button.pressed.emit()
+	_check(retry_signal_fired[0], "Pressing Failure's action should emit retry_pressed.")
+	_check(main_menu_signal_fired[0], "Pressing Failure's X should emit main_menu_pressed.")
 	failure_level.free()
 
 

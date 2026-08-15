@@ -40,7 +40,7 @@ const CLOSE_BUTTON_SIZE := Vector2(72.0, 72.0)
 const MODAL_TITLE_REGULAR_SIZE := 44
 const MODAL_TITLE_LONG_SIZE := 40
 
-## Terminal-result hero title role shared by Completion and Failure, plus the responsive scale
+## Completion terminal-result hero title role, plus the responsive scale
 ## clamp applied to the whole result shell (matches level_completion_screen.gd's pre-existing
 ## scale formula so Completion's on-screen size does not change).
 const RESULT_HERO_TITLE_SIZE := 58

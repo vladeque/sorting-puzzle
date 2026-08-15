@@ -1,12 +1,9 @@
 extends Control
 class_name GameplayResultShell
 
-## Shared terminal-result shell (UI-003) for a level's two end states, Completion and Failure. Owns
-## the shared result shade, hero title role, action-button placement, safe-area layout, and
-## open/close motion. Each owning scene keeps and positions its own state-specific content
-## (Completion's star/earned-count, Failure's body copy) inside the content region this shell
-## exposes -- shade/title/action/safe-area/motion are shared without merging that content. See
-## docs/SCENES.md "Shared Gameplay UI Roles".
+## Terminal-result shell retained for Completion. Owns the full-screen result shade, hero title,
+## action placement, safe-area layout, and open/close motion; Failure now uses the centered gameplay
+## modal shell. See docs/SCENES.md "Shared Gameplay UI Roles".
 
 signal opened
 signal closed
@@ -39,14 +36,13 @@ func get_content_region() -> Control:
 	return _content_region
 
 
-## Exposes the shared title node so a state-specific owner can add presentation motion without
-## duplicating the shell's title hierarchy or changing the Failure screen's behavior.
+## Exposes the title node so Completion can add its presentation motion.
 func get_title_label() -> Label:
 	return _title_label
 
 
-## The single CTA slot (Completion's Continue, Failure's Main Menu). The owning scene reparents its
-## own button here and anchors it full-rect so it fills whatever size apply_safe_layout() computes.
+## Completion's single CTA slot. The owning scene reparents its Continue button here and anchors it
+## full-rect so it fills whatever size apply_safe_layout() computes.
 func get_action_region() -> Control:
 	return _action_region
 

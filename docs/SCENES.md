@@ -181,7 +181,7 @@ inside gameplay `.tscn` files):
 - `style_box_gameplay_modal_shade.tres` / `style_box_gameplay_result_shade.tres`: the two shade
   roles the ticket calls for -- one modal dim (`Color(0.02, 0.025, 0.03, 0.66)`, shared by Pause/
   Leave Confirmation/Ability Purchase) and one stronger terminal-result shade
-  (`Color(0.04, 0.035, 0.045, 0.76)`, shared by Completion and Failure -- unified from Completion's
+  (`Color(0.04, 0.035, 0.045, 0.76)`, retained by Completion after Failure moved to the modal shell --
   and Failure's previously-different 0.76/0.68 values onto Completion's, the more deliberately tuned
   of the two).
 - `style_box_gameplay_modal_outer_panel.tres` / `style_box_gameplay_modal_inner_panel.tres`: the
@@ -228,12 +228,13 @@ owns shade/panel/title/close/safe-area/motion; the owning scene keeps its own co
 The modal shell preserves the authored 520x500 composition and uniformly scales the complete panel
 subtree when safe insets leave less room; this keeps title, close cutout, content, and action-row
 minimum sizes inside the same fitted rect instead of shrinking only the outer panel. Owners set a
-compact content-region height (224px for Pause/Purchase, 240px for Leave Confirmation) so the cream
-panel fits its content instead of stretching to fill the outer shell.
+compact content-region height (224px for Purchase/Out of Lives, 234px for Pause, 240px for Leave
+Confirmation, and 336px inside Failure's taller 520x620 panel) so the cream panel fits its content
+instead of stretching to fill the outer shell.
 
 **Interaction/motion** -- every gameplay button now uses `press_scale_button.gd`: `0.94` for CTAs
 (including Pause's warm settings-role control, Leave/Continue/Buy/Watch-Ad/Completion's Continue/
-Failure's Main Menu action), `0.97` for ability and modal-close icon buttons. Every gameplay-owned
+Failure's orange Retry action), `0.97` for ability and modal-close icon buttons. Every gameplay-owned
 control is `FOCUS_NONE` with the pointing-hand cursor
 while enabled and the arrow cursor while disabled, matching the menu system's touch-only policy.
 Modal/result open and close fade via
@@ -244,9 +245,9 @@ closed before hiding their root, so an interrupted close cannot hide a freshly r
 
 **`ui_cancel` back stack** -- `scripts/level.gd::_unhandled_input()` (there was no back-button
 handling at all during gameplay before this ticket) implements one topmost-state-first order: the
-in-level Shop returns to Ability Purchase; Leave Confirmation returns to Pause; Ability Purchase
+retry Out of Lives returns to the main menu; the in-level Shop returns to Ability Purchase; Leave Confirmation returns to Pause; Ability Purchase
 closes and restores the state it opened from (Pause if opened from Pause, otherwise resumes
-gameplay); Pause resumes; Completion invokes its `Continue` route and Failure its `Main Menu`
+gameplay); Pause resumes; Completion invokes its `Continue` route and Failure its close/main-menu
 route; otherwise (active gameplay) opens Pause. Every branch
 reuses the exact handler its equivalent button already calls, so it can never spend a life, coin, or
 star by itself, and a press during any overlay/result screen's in-flight transition is dropped
@@ -266,8 +267,10 @@ fabricated insets using post-layout rendered rectangles (including a tight viewp
 the modal's action and close controls instead of only shrinking its outer panel),
 regular/compact ability icon+badge bounds, long-value formatting (`LEVEL 99`, `59:59`, a six-digit
 star total, a six-digit ability count, an active ability timer), disabled cursor restoration,
-interrupted modal close/reopen behavior, shared Completion/Failure CTA identity, and locked-shelf
-count-pulse/unlock-animation feedback.
+interrupted modal close/reopen behavior, Failure's shared modal-resource identity, and locked-shelf
+count-pulse/unlock-animation feedback. `tests/ui/test_level_failure_screen.gd` separately covers
+immediate Retry, the zero-life offer, decline-to-menu, successful life purchase + same-level
+restart, and an unaffordable purchase returning to the menu.
 
 ## `scenes/main_menu.tscn`
 
@@ -767,22 +770,24 @@ Script:
 - `scripts/out_of_lives_menu.gd`
 
 Purpose:
-- Main-menu modal for campaign lives, opened either after the player requests a campaign level with
-  zero lives or by pressing the top status bar's `LivesWidget` at any life count.
+- Reusable campaign-lives modal. The Main Menu opens it after a zero-life launch request or from the
+  top status bar's `LivesWidget`; `level.tscn` also opens it while closing Failure when Retry is
+  pressed after the failed run consumed the last life.
 - Composes `scenes/ui/gameplay_modal_shell.tscn` for the shared shade, cream content region, title,
   close action, responsive safe-area fitting, and fade motion.
 - Renders one of two states, chosen entirely from the count `set_offer()` receives, so a countdown
   that restores the last missing life switches the open modal in place:
   - **Below the cap**: `assets/ui/main_menu_lives.png` with the live count, the `MM:SS` restoration
-    countdown, a green clover-coin price action, and a production-visible disabled `Coming Soon`
-    action. Titled `OUT OF LIVES` at zero lives and `GET MORE LIVES` above it -- the zero-lives
-    wording belongs to the interrupted-launch case that opens the modal to explain a blocked play.
+	countdown, a green clover-coin price action, and a production-visible disabled `Coming Soon`
+	action. Titled `OUT OF LIVES` at zero lives and `GET MORE LIVES` above it -- the zero-lives
+	wording belongs to the interrupted-launch case that opens the modal to explain a blocked play.
   - **At the cap**: the countdown swaps to the full-lives message and both purchase actions swap to
-    a single dismissing `Got it`, under the title `LIVES FULL`. Nothing is for sale at the cap, so
-    offering a purchase action there would be an inert affordance.
-- Emits purchase/close intent only; `production_main_menu.gd` owns navigation while
-  `PlayerProgress` owns the atomic offline economy mutation. `Got it` reuses `close_requested`,
-  since dismissing is exactly what the shell's close action already does.
+	a single dismissing `Got it`, under the title `LIVES FULL`. Nothing is for sale at the cap, so
+	offering a purchase action there would be an inert affordance.
+- Emits purchase/close intent only. `production_main_menu.gd` owns its Main Menu behavior;
+  `scripts/level.gd` owns retry purchase/restart/decline behavior; `PlayerProgress` owns the atomic
+  offline economy mutation. `Got it` reuses `close_requested`, since dismissing is exactly what the
+  shell's close action already does.
 
 Important nodes:
 - `%LifeCountLabel`, `%CountdownLabel`, and `%PriceLabel`: state supplied by the Main Menu.
@@ -1339,30 +1344,32 @@ Script:
 - `scripts/level_failure_screen.gd`
 
 Purpose:
-- Reusable level-failure overlay instanced by `level.tscn` (UI-003 P0, new). `level.tscn` previously
-  embedded a bare shade + `LEVEL FAILED` label directly with no action at all --
-  `scripts/level.gd::_fail_level()` only made it visible, leaving the player in a terminal screen
-  with no route forward. This scene gives Failure the same working exit Completion already has.
-- Composes `scenes/ui/gameplay_result_shell.tscn` (`Shell`) for the same shared terminal shade, hero
-  title (`LEVEL FAILED`), action placement, safe-area layout, and open/close fade Completion uses,
-  without merging their state-specific content.
-- Emits `main_menu_pressed` so `scripts/level.gd` can return to the main menu.
+- Reusable level-failure modal instanced by `level.tscn`. Composes
+  `scenes/ui/gameplay_modal_shell.tscn` for its dimmed backdrop, safe-area-fitted 520x620 panel,
+  chapter-local `LEVEL N` title, circular close action, 336px content region, action row, and fade.
+- Shows the transparent `assets/ui/broken_heart.png` art above the `LEVEL FAILED` message.
+- Emits `retry_pressed` from its orange Retry action and preserves `main_menu_pressed` for the
+  shared X. `scripts/level.gd` owns the resulting run/economy/navigation behavior.
 
 Important nodes:
-- `Shell`: the shared result shell instance.
-- `MessageLabel`: short body copy, reparented into `Shell`'s content region.
-- `MainMenuButton`: green blank-image button reading `Main Menu` (the same positive/CTA role and
-  size as Completion's `Continue`), reparented into `Shell`'s action row, with
+- `Shell`: the shared gameplay modal shell instance, including `%CloseButton`.
+- `FailureContent`: reparented into `Shell`'s cream content region; owns `%BrokenHeartImage` and
+  `%MessageLabel`.
+- `%RetryButton`: orange 250x76 utility action, reparented into `Shell`'s action row, with
   `scripts/press_scale_button.gd` (0.94 held scale).
 
 Depends on:
-- `scenes/ui/gameplay_result_shell.tscn`.
-- The shared `style_box_green_primary_button.tres`.
+- `scenes/ui/gameplay_modal_shell.tscn`.
+- `assets/ui/broken_heart.png`.
+- The shared `style_box_orange_utility_{normal,pressed}.tres` resources.
 - `scripts/press_scale_button.gd`, `scripts/gameplay_ui_theme.gd`.
+- `tests/ui/test_level_failure_screen.gd` for retry/life-purchase/navigation coverage.
+- `scripts/tools/captures/level_failure_setup.gd` and
+  `level_failure_out_of_lives_setup.gd` for rendered responsive states.
 
 Do not use for:
-- Retry/run-lifecycle behavior (out of this ticket's scope -- Failure exits to Main Menu only).
-  Puzzle failure conditions and life spending stay in `scripts/level.gd`.
+- Retry/run lifecycle, life availability, the purchase transaction, or navigation. Those stay in
+  `scripts/level.gd` and `PlayerProgress`.
 
 ## `scenes/effects/level_completion_confetti.tscn`
 
@@ -1664,13 +1671,11 @@ Script:
 - `scripts/gameplay_result_shell.gd`
 
 Purpose:
-- Shared terminal-result shell (UI-003) for a level's two end states, Completion and Failure. Owns
-  the shared result shade, hero title role, action-button placement, safe-area layout, and
-  open/close motion. See "Shared Gameplay UI Roles" above.
-- `scenes/ui/level_completion_screen.tscn` and `scenes/ui/level_failure_screen.tscn` each instance
-  this as their first child (`Shell`) and keep their own state-specific content (star/earned-count,
-  body copy) in the content region it exposes, so shade/title/action/safe-area/motion are shared
-  without merging that content.
+- Terminal-result shell retained for Completion. Owns the full-screen result shade, hero title
+  role, action-button placement, safe-area layout, and open/close motion. Failure now uses the
+  centered `gameplay_modal_shell.tscn` instead.
+- `scenes/ui/level_completion_screen.tscn` instances this as `Shell` and keeps its reward star,
+  earned-count, and sparkle content in the exposed content region.
 
 Important nodes:
 - `ResultShade`: full-rect `Panel`, `style_box_gameplay_result_shade.tres`.
@@ -1678,8 +1683,8 @@ Important nodes:
   `GameplayUITheme.get_result_title_scale()`.
 - `%ContentRegion`: full-viewport-sized passthrough; the owning scene positions its own content
   within it.
-- `%ActionRegion`: the single CTA slot (Completion's `Continue`, Failure's `Main Menu`); the owning
-  scene reparents its own button here and anchors it full-rect.
+- `%ActionRegion`: Completion's single `Continue` CTA slot; the owning scene reparents its button
+  here and anchors it full-rect.
 
 Depends on:
 - `assets/themes/style_box_gameplay_result_shade.tres`.

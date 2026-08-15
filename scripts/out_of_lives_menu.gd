@@ -1,9 +1,9 @@
 extends Control
 class_name OutOfLivesMenu
 
-## Main-menu modal for campaign lives, opened either by a launch request at zero lives or by the
-## top status bar's lives widget. Presentation and motion stay inside this scene; ProductionMainMenu
-## supplies the live count/countdown/price and handles the purchase or close signals.
+## Reusable campaign-lives modal. ProductionMainMenu opens it from a zero-life launch request or the
+## lives widget; level.gd also opens it when Failure's Retry finds zero lives. Presentation and
+## motion stay inside this scene while the current owner supplies the offer and handles intent.
 ##
 ## The modal renders one of two states, chosen entirely from the count set_offer() receives. Below
 ## the cap it offers recovery: the `MM:SS` countdown plus the coin-price purchase action. At the cap

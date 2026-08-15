@@ -42,6 +42,7 @@ const LEVEL_CONFIG_TEMPLATE := "res://configs/levels/level_%03d.json"
 const DEFAULT_LEVEL_CONFIG := "res://configs/levels/level_001.json"
 const LAYOUT_SCENE_TEMPLATE := "res://scenes/layouts/layout_%s.tscn"
 const DEFAULT_LAYOUT_PRESET := "grid_3x3"
+const LEVEL_SCENE_PATH := "res://level.tscn"
 const MAIN_MENU_SCENE := "res://scenes/main_menu.tscn"
 const ITEM_PLACE_SOUND := preload("res://assets/audio/item_place.wav")
 const TRIPLE_CLEAR_SOUND := preload("res://assets/audio/triple_clear.wav")
@@ -161,6 +162,7 @@ var _pause_menu_overlay: PauseMenu
 var _leave_confirmation_overlay: LeaveConfirmationMenu
 var _ability_purchase_overlay: AbilityPurchaseMenu
 var _in_level_shop_overlay: ShopScreen
+var _out_of_lives_overlay: OutOfLivesMenu
 var _ability_bar: AbilityBar
 var _lantern_screen_effect: LanternScreenEffectClass
 var _freezer_screen_effect: FreezerScreenEffect
@@ -180,6 +182,7 @@ var _level_completed := false
 var _level_paused := false
 var _returning_to_menu := false
 var _life_spent_for_run := false
+var _retry_purchase_in_progress := false
 var _highlight_timer := 0.0
 var _freezer_time_remaining := 0.0
 var _app_interrupted := false
@@ -223,6 +226,7 @@ func _ready() -> void:
 	_leave_confirmation_overlay = get_node("UI/LeaveConfirmationOverlay") as LeaveConfirmationMenu
 	_ability_purchase_overlay = get_node("UI/AbilityPurchaseOverlay") as AbilityPurchaseMenu
 	_in_level_shop_overlay = get_node("UI/InLevelShopOverlay") as ShopScreen
+	_out_of_lives_overlay = get_node("UI/OutOfLivesOverlay") as OutOfLivesMenu
 	_ability_bar = get_node("UI/AbilityBar") as AbilityBar
 	_lantern_screen_effect = get_node("LanternScreenEffect") as LanternScreenEffectClass
 	_freezer_screen_effect = get_node("FreezerScreenEffect") as FreezerScreenEffect
@@ -232,6 +236,7 @@ func _ready() -> void:
 	_leave_confirmation_overlay.visible = false
 	_ability_purchase_overlay.visible = false
 	_in_level_shop_overlay.visible = false
+	_out_of_lives_overlay.visible = false
 	_setup_star_reward_effect_layer()
 	get_viewport().size_changed.connect(_apply_responsive_layout)
 	_rng.randomize()
@@ -293,6 +298,8 @@ func _apply_responsive_layout() -> void:
 	_leave_confirmation_overlay.apply_safe_layout(safe_margins, viewport_size)
 	if _ability_purchase_overlay != null:
 		_ability_purchase_overlay.apply_safe_layout(safe_margins, viewport_size)
+	if _out_of_lives_overlay != null:
+		_out_of_lives_overlay.apply_safe_layout(safe_margins, viewport_size)
 	_layout_star_reward_effect_layer(viewport_size)
 	_layout_shelves(viewport_size, safe_margins)
 	if _lantern_screen_effect != null:
@@ -585,7 +592,7 @@ func _input(event: InputEvent) -> void:
 ##   3. Ability Purchase closes and restores the state it opened from.
 ##   4. Pause closes and resumes active gameplay.
 ##   5. The post-clear confetti celebration skips ahead to the Completion screen.
-##   6. Completion invokes its Continue route; Failure invokes its Main Menu route.
+##   6. Completion invokes Continue; Failure invokes its X/main-menu route.
 ##   7. Otherwise (active gameplay) opens Pause.
 ## Every branch reuses the exact handler its equivalent button already calls, so this can never
 ## spend a life, coin, or star by itself, and behaves identically to tapping that button. If any
@@ -600,7 +607,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 
 	get_viewport().set_input_as_handled()
-	if _in_level_shop_overlay != null and _in_level_shop_overlay.visible:
+	if _out_of_lives_overlay != null and _out_of_lives_overlay.visible:
+		_on_retry_out_of_lives_close_requested()
+	elif _in_level_shop_overlay != null and _in_level_shop_overlay.visible:
 		_in_level_shop_overlay.handle_back()
 	elif _leave_confirmation_overlay.visible:
 		_on_leave_confirmation_close_pressed()
@@ -624,6 +633,8 @@ func _is_any_overlay_transitioning() -> bool:
 	if _ability_purchase_overlay != null and _ability_purchase_overlay.is_transitioning():
 		return true
 	if _in_level_shop_overlay != null and _in_level_shop_overlay.is_transitioning():
+		return true
+	if _out_of_lives_overlay != null and _out_of_lives_overlay.is_transitioning():
 		return true
 	return _completion_screen.is_transitioning() or _failure_screen.is_transitioning()
 
@@ -704,6 +715,7 @@ func _apply_level_config(config: Dictionary) -> void:
 	_reset_combo()
 	_update_star_counter_label()
 	_returning_to_menu = false
+	_retry_purchase_in_progress = false
 	_failure_screen.visible = false
 	_completion_screen.visible = false
 	if _pause_menu_overlay != null:
@@ -712,6 +724,8 @@ func _apply_level_config(config: Dictionary) -> void:
 		_leave_confirmation_overlay.visible = false
 	if _ability_purchase_overlay != null:
 		_ability_purchase_overlay.visible = false
+	if _out_of_lives_overlay != null:
+		_out_of_lives_overlay.visible = false
 	_ability_purchase_pending_id = StringName()
 	_is_resolving_shelves = false
 	_shelves_pending_resolve.clear()
@@ -1789,6 +1803,8 @@ func _fail_level() -> void:
 	_drag_offset = Vector2.ZERO
 	_pressed_item = null
 	_pressed_origin_slot = null
+	var local_level := ChapterCatalog.get_local_level_number(selected_level)
+	_failure_screen.set_level_number(local_level if local_level > 0 else selected_level)
 	_failure_screen.open()
 	_pause_menu_overlay.visible = false
 	_leave_confirmation_overlay.visible = false
@@ -1867,6 +1883,35 @@ func _return_to_main_menu() -> void:
 		push_error("Could not return to main menu: %s" % menu_scene_path)
 
 
+## Replaces the terminal run with a fresh instance while preserving the exact launch context. A
+## fresh scene is intentional: it cannot retain stale shelf items, tweens, timers, ability effects,
+## or one-run life-spend guards from the failed attempt.
+func _restart_level() -> void:
+	if _returning_to_menu:
+		return
+
+	_returning_to_menu = true
+	var packed_level := load(LEVEL_SCENE_PATH) as PackedScene
+	if packed_level == null:
+		_returning_to_menu = false
+		push_error("Could not load level scene for retry: %s" % LEVEL_SCENE_PATH)
+		return
+
+	var next_level := packed_level.instantiate()
+	next_level.set("selected_level", selected_level)
+	next_level.set("launched_from_dev_mode", launched_from_dev_mode)
+	next_level.set("return_menu_scene_path", return_menu_scene_path)
+
+	var tree := get_tree()
+	var current_scene := tree.current_scene
+	tree.root.add_child(next_level)
+	tree.current_scene = next_level
+	if current_scene != null:
+		current_scene.queue_free()
+	elif is_inside_tree():
+		queue_free()
+
+
 func _spend_campaign_life_for_run(outcome: String = "left") -> void:
 	if launched_from_dev_mode or _life_spent_for_run:
 		return
@@ -1894,6 +1939,10 @@ func _setup_completion_buttons() -> void:
 
 func _setup_failure_screen() -> void:
 	_failure_screen.main_menu_pressed.connect(_on_failure_main_menu_pressed)
+	_failure_screen.retry_pressed.connect(_on_failure_retry_pressed)
+	if _out_of_lives_overlay != null:
+		_out_of_lives_overlay.close_requested.connect(_on_retry_out_of_lives_close_requested)
+		_out_of_lives_overlay.purchase_requested.connect(_on_retry_life_purchase_requested)
 
 
 func _setup_ability_purchase_menu() -> void:
@@ -1920,6 +1969,71 @@ func _on_failure_main_menu_pressed() -> void:
 		return
 
 	_return_to_main_menu()
+
+
+func _on_failure_retry_pressed() -> void:
+	if not _level_failed or _is_ui_action_blocked():
+		return
+
+	if launched_from_dev_mode:
+		_restart_level()
+		return
+
+	PlayerProgress.refresh_lives()
+	if PlayerProgress.get_lives() > 0:
+		_restart_level()
+		return
+
+	_open_retry_out_of_lives_menu()
+
+
+func _open_retry_out_of_lives_menu() -> void:
+	if _out_of_lives_overlay == null or _out_of_lives_overlay.visible:
+		return
+
+	_refresh_retry_out_of_lives_offer()
+	_failure_screen.close()
+	_out_of_lives_overlay.open()
+
+
+func _refresh_retry_out_of_lives_offer() -> void:
+	if _out_of_lives_overlay == null:
+		return
+
+	_out_of_lives_overlay.set_offer(
+		PlayerProgress.get_lives(),
+		PlayerProgress.get_max_lives(),
+		PlayerProgress.get_next_life_restore_seconds_remaining(),
+		PlayerProgress.get_life_purchase_coin_price()
+	)
+	_out_of_lives_overlay.set_purchase_enabled(not _retry_purchase_in_progress)
+
+
+## Declining the retry purchase, through either the modal X or system Back, ends the failed run and
+## returns to the same menu route the level was launched from.
+func _on_retry_out_of_lives_close_requested() -> void:
+	if not _level_failed or _retry_purchase_in_progress or _is_ui_action_blocked():
+		return
+
+	_return_to_main_menu()
+
+
+## A life may have restored while the modal was open; in that case retry immediately without
+## charging coins. Otherwise buy exactly one life through the existing crash-safe economy method.
+## If the purchase cannot be completed, the failed run ends at the main menu as requested.
+func _on_retry_life_purchase_requested() -> void:
+	if not _level_failed or _retry_purchase_in_progress or _is_ui_action_blocked():
+		return
+
+	_retry_purchase_in_progress = true
+	_out_of_lives_overlay.set_purchase_enabled(false)
+	PlayerProgress.refresh_lives()
+	if PlayerProgress.get_lives() <= 0 and not PlayerProgress.purchase_life():
+		_retry_purchase_in_progress = false
+		_return_to_main_menu()
+		return
+
+	_restart_level()
 
 
 func _on_pause_menu_setting_toggled(setting_id: StringName, is_disabled: bool) -> void:

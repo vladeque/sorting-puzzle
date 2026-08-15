@@ -23,8 +23,8 @@ Playable level scene:
 - Owns shelf layout, timer, drag and tap movement, triple matching, abilities, pause-menu wiring, failure, and completion flow.
 - Uses the original procedural gameplay background for Chapter 1 and chapter artwork for chapters
   whose catalog entry selects `artwork` mode.
-- Uses one shared gameplay UI system for its HUD, ability bar, Pause/Leave Confirmation/Ability
-  Purchase modals, and Completion/Failure terminal results (UI-003, implemented and validated --
+- Uses one shared gameplay UI system for its HUD, ability bar, Pause/Leave Confirmation/Ability/
+  Out-of-Lives/Failure modals, and the Completion terminal result (UI-003, implemented and validated --
   see `docs/UI_003_LEVEL_UI_CONSISTENCY_TICKET.md` and "Shared Gameplay UI" below).
 
 Player progression:
@@ -409,12 +409,11 @@ Responsibility:
   role because both controls open settings/navigation UI.
 - `gameplay_modal_shell.tscn` owns the shared shade, safe-area-fitted outer panel, regular/long
   title role, true-circular close action, cream content region, and action row for Pause, Leave
-  Confirmation, and Ability Purchase -- each composes it and keeps only its own content and signals.
-  All three use a 520x500 authored shell; owners set compact cream-panel heights (224px Pause/
-  Purchase, 240px Leave Confirmation) before safe-area scaling.
-- `gameplay_result_shell.tscn` owns the shared terminal shade, hero title role, action placement,
-  and safe-area layout for Completion and Failure -- each keeps its own state-specific content
-  (star/earned-count, body copy) without merging it into the shell.
+  Confirmation, Ability Purchase, Out of Lives, and Failure -- each composes it and keeps only its
+  own content and signals. Standard owners use a 520x500 authored shell with compact cream-panel
+  heights; Failure uses the same shell resources in a taller 520x620 composition for its heart art.
+- `gameplay_result_shell.tscn` owns Completion's terminal shade, hero title role, action placement,
+  and safe-area layout. Failure now uses the centered gameplay modal shell.
 - `level_top_hud.tscn` owns the top strip background, combo slot, timer, level label, star pill,
   and Pause button as one safe-area-aware component (the strip background and combo slot now
   grow/shift with the safe-top inset; the timer stays clear of the level label and star/pause
@@ -549,8 +548,9 @@ Responsibility:
 - Applies responsive layout by delegating to each component's own
   `apply_safe_layout(safe_margins, viewport_size)` (UI-003): the top HUD
   (`scenes/ui/level_top_hud.tscn`), the ability bar over the floor/baseboard transition strip,
-  Pause/Leave Confirmation/Ability Purchase (each composing `scenes/ui/gameplay_modal_shell.tscn`),
-  Completion/Failure (each composing `scenes/ui/gameplay_result_shell.tscn`), and the scaled/
+  Pause/Leave Confirmation/Ability Purchase/Out of Lives/Failure (each composing
+  `scenes/ui/gameplay_modal_shell.tscn`), Completion (composing
+  `scenes/ui/gameplay_result_shell.tscn`), and the scaled/
   centered shelf root. `scripts/level.gd` no longer owns fixed panel sizes or reaches into overlay
   children by path -- see "Shared Gameplay UI" below.
 - Instantiates `scenes/shelf.tscn` for each configured shelf and places shelf cells from `scenes/layouts/layout_*.tscn` preset templates.
@@ -566,8 +566,13 @@ Responsibility:
   curls continue falling. Progress commits at clear time; Back during the lead-in skips the wait.
 - Shows the completed-level reward overlay through `UI/CompletionScreen`, with a title pop, reward
   star overshoot, earned-count bounce, rising `Continue` action, and small tinted paper-star glints.
-- Shows a working failure exit through the `UI/FailureScreen` instance of `scenes/ui/level_failure_screen.tscn` (new, UI-003 P0 -- Failure was previously a dead-end embedded label with no action), composing the same shared result shell as Completion.
-- Sends completed campaign stars to `PlayerProgress`; Completion's `Continue` and Failure's `Main Menu` both return to the main menu, where one reward star per earned star flies from the house to the reward chest and advances its visible count.
+- Shows `UI/FailureScreen` as a centered modal with `LEVEL N`, broken-heart art, `LEVEL FAILED`,
+  Retry, and X. Retry recreates the same level when a life remains; at zero lives it opens the
+  reusable `UI/OutOfLivesOverlay`. A successful life purchase restarts, while decline or purchase
+  failure returns to the originating main menu.
+- Sends completed campaign stars to `PlayerProgress`; Completion's `Continue` and Failure's X both
+  return to the main menu, where one reward star per earned star flies from the house to the reward
+  chest and advances its visible count.
 - Uses `scripts/press_scale_button.gd` on every gameplay action (Pause, all four ability buttons, every modal close button, and both result screens' actions -- UI-003 extended this to controls that previously had no press feedback at all).
 - Tracks cleared triples and unlocks shelves whose configs require progress before becoming
   accessible. It passes remaining counts/state to `ShelfLockOverlay`; that component pops the badge,
@@ -588,7 +593,9 @@ Responsibility:
   once, holds without recoloring the configured level background, and thaws when the 30-second
   active-gameplay window ends. While gameplay modals pause the level, the upper copy mirrors the
   shared modal-shade fade so its brightness continues matching the shaded main frame.
-- Wires the in-level pause menu, including the shared circular Pause button (`scenes/ui/level_top_hud.tscn`), modal overlay, Leave action, Continue action, leave confirmation overlay, and campaign life spend for confirmed Leave. Implements the `ui_cancel` back stack (Leave Confirmation -> Pause -> resume; Ability Purchase restores its prior state; Completion/Failure invoke their routes; otherwise opens Pause) -- there was no back-button handling at all during gameplay before UI-003.
+- Wires the in-level pause and retry recovery modals. Implements the `ui_cancel` back stack (retry
+  Out of Lives -> main menu; Leave Confirmation -> Pause -> resume; Ability Purchase restores its
+  prior state; Completion/Failure invoke their routes; otherwise opens Pause).
 - Displays a responsive Godot-authored level backdrop with a top HUD strip (now owned by `scenes/ui/level_top_hud.tscn`), monotone shop wall, baseboard, and bottom floor band behind generated shelves.
 
 Change here when:

@@ -801,9 +801,9 @@ Class:
 Attached to (self-scaling, no `visual_target_path` -- the whole button is the visual):
 - `scenes/ui/level_button.tscn` root `LevelButton`.
 - `scenes/ui/level_completion_screen.tscn` `NextButton`, `scenes/ui/level_failure_screen.tscn`
-  `MainMenuButton` (UI-003; 0.94, the CTA role).
+  `RetryButton` (UI-003; 0.94, the CTA role).
 - `scenes/ui/gameplay_modal_shell.tscn` `%CloseButton` (UI-003; 0.97, the gameplay icon/close role
-  -- shared by Pause, Leave Confirmation, and Ability Purchase's close action).
+  -- shared by Pause, Leave Confirmation, Ability Purchase, Out of Lives, and Failure).
 - `scenes/ui/level_top_hud.tscn` `%PauseButton` (UI-003; 0.97, the gameplay HUD icon-button role
   shared with the four ability buttons).
 - `scenes/ui/ability_bar.tscn` `%HammerButton`/`%ShuffleButton`/`%HighlightButton`/`%FreezerButton`
@@ -1590,21 +1590,29 @@ Key responsibilities:
 - Queue shelf resolution requests made while another match animation is still finishing.
 - Promote back layers with `_promote_back_layer()`, `_play_layer_promotion_animation()`, and `_advance_back_layers()`.
 - Check win/loss state with `_check_level_completed()`, `_fail_level()`, and `_complete_level()`.
-  Both call `open()` on their result screen (a shared fade, UI-003) instead of snapping
-  `.visible = true`. `_fail_level()` opens `UI/FailureScreen` (`scripts/level_failure_screen.gd`,
-  new -- Failure was previously a bare embedded shade + label with no action, trapping the player);
+  Both call `open()` on their extracted screen instead of snapping `.visible = true`.
+  `_fail_level()` passes the chapter-local level number into the centered `UI/FailureScreen`
+  modal (`scripts/level_failure_screen.gd`);
   `_complete_level()` starts the layered paper-confetti effect, then shows `UI/CompletionScreen`
   after `COMPLETION_REVEAL_SECONDS` while pieces continue falling. The screen receives the run's
   earned star count and its action reads `Continue` (`next_pressed` signal unchanged).
 - Spend one campaign life on campaign failure and on confirmed pause-menu Leave through `_spend_campaign_life_for_run()`, guarded so one level run cannot spend twice.
-- Return to the configured menu scene when leaving a level, when Completion's `Continue` is pressed, or when Failure's `Main Menu` is pressed.
+- Return to the configured menu scene when leaving a level, when Completion's `Continue` is
+  pressed, when Failure's X is pressed, or when the retry Out of Lives offer is declined.
+- Handle Failure Retry through `_on_failure_retry_pressed()`: restart immediately when a campaign
+  life remains (or for dev mode), otherwise open the reusable `UI/OutOfLivesOverlay`. A successful
+  `PlayerProgress.purchase_life()` restarts the same level; close/Back or a failed purchase returns
+  to the originating main menu. `_restart_level()` creates a fresh `level.tscn` while preserving
+  `selected_level`, `launched_from_dev_mode`, and `return_menu_scene_path`, so no failed-run shelf,
+  timer, effect, or one-run life-spend state leaks into the retry.
 - Keep the level countdown idle until the first meaningful player action, then format the active timer as zero-padded `MM:SS` text with `_update_timer_label()`, forwarded to `LevelTopHud.set_timer_text()`.
 - Pause and resume active gameplay through the top HUD's Pause button (`scripts/level_top_hud.gd`'s
   `pause_pressed` signal), and the instanced `UI/PauseMenuOverlay`
   (`scripts/pause_menu.gd`)/`UI/LeaveConfirmationOverlay` (`scripts/leave_confirmation_menu.gd`),
   each composing `scenes/ui/gameplay_modal_shell.tscn` (UI-003) and exposing
   `leave_pressed`/`continue_pressed`/`close_requested` signals instead of `level.gd` reaching into
-  their buttons by child path. `_unhandled_input()` implements the `ui_cancel` back stack: Leave
+  their buttons by child path. `_unhandled_input()` implements the `ui_cancel` back stack: retry
+  Out of Lives returns to the main menu; Leave
   Confirmation returns to Pause; Ability Purchase restores the state it opened from (Pause if
   opened from Pause, otherwise resumes gameplay); Pause resumes; Completion/Failure invoke their
   routes; otherwise active gameplay opens Pause. Every branch reuses the exact handler its
@@ -1686,7 +1694,10 @@ Depends on:
 - `scenes/ui/level_completion_screen.tscn` (`scripts/level_completion_screen.gd`) for completed-level
   reward UI, its `next_pressed` signal, and `set_earned_stars()`/`open()`/`close()`/`apply_safe_layout()`.
 - `scenes/ui/level_failure_screen.tscn` (`scripts/level_failure_screen.gd`) for the failure result
-  UI, its `main_menu_pressed` signal, and `open()`/`close()`/`apply_safe_layout()`.
+  modal, its `retry_pressed`/`main_menu_pressed` signals, `set_level_number()`, and
+  `open()`/`close()`/`apply_safe_layout()`.
+- `scenes/ui/out_of_lives_menu.tscn` (`scripts/out_of_lives_menu.gd`) for the zero-life retry offer;
+  the scene emits intent while `level.gd` owns purchase/restart/menu routing.
 - `scenes/item.tscn` and `ShelfItem`.
 - `assets/audio/item_place.wav` and `assets/audio/triple_clear.wav`.
 - `configs/item_sprites.json` item IDs and texture paths.
@@ -2176,7 +2187,7 @@ Constants:
   (regular for short titles like "PAUSE", long for titles needing to fit more text in the same
   width, like "LEAVING THE LEVEL").
 - `RESULT_HERO_TITLE_SIZE` (58) / `RESULT_TITLE_SCALE_MIN` (0.75) / `RESULT_TITLE_SCALE_MAX` (1.35):
-  the terminal-result hero title role shared by Completion and Failure, and the responsive scale
+  Completion's terminal-result hero title role and responsive scale
   clamp applied to the whole result shell (matches Completion's pre-existing formula so its
   on-screen size is unchanged).
 - `CTA_HELD_SCALE` (0.94) / `ICON_HELD_SCALE` (0.97): named gameplay-scope aliases for the UI-002
@@ -2245,22 +2256,18 @@ Attached to:
 - `scenes/ui/gameplay_result_shell.tscn` root `GameplayResultShell`.
 
 Purpose:
-- Shared terminal-result shell (UI-003) for a level's two end states, Completion and Failure. Owns
-  the shared result shade, hero title role, action-button placement, safe-area layout, and
-  open/close motion. Each owning scene (`scripts/level_completion_screen.gd`,
-  `scripts/level_failure_screen.gd`) keeps and positions its own state-specific content (star/
-  earned-count, body copy) inside the content region this shell exposes -- shade/title/action/
-  safe-area/motion are shared without merging that content.
+- Terminal-result shell retained for `scripts/level_completion_screen.gd`. Owns Completion's
+  full-screen result shade, hero title role, action-button placement, safe-area layout, and
+  open/close motion. Failure now composes `gameplay_modal_shell.gd`.
 
 Key methods:
 - `configure(title)`.
-- `get_title_label()`: exposes the shared title to state-specific presentation motion without
-  duplicating its hierarchy or changing Failure behavior.
+- `get_title_label()`: exposes Completion's title to its presentation motion.
 - `get_content_region()`: full-viewport-sized passthrough; the owning scene positions its own
   content within it using the same absolute-viewport-relative math it used before this shell
   existed, since the region's rect matches the old root's rect.
-- `get_action_region()`: the single CTA slot (Completion's Continue, Failure's Main Menu). The
-  owning scene reparents its own button here and anchors it full-rect.
+- `get_action_region()`: Completion's single Continue CTA slot; the owning scene reparents its
+  button here and anchors it full-rect.
 - `is_transitioning()` / `apply_safe_layout(safe_margins, viewport_size)` / `open()` / `close()`:
   same contract as `scripts/gameplay_modal_shell.gd`.
 
@@ -2329,23 +2336,22 @@ Attached to:
 - `scenes/ui/level_failure_screen.tscn` root `LevelFailureScreen`.
 
 Purpose:
-- Reusable level-failure overlay instanced by `level.tscn` (UI-003 P0, new). Previously `level.tscn`
-  embedded a bare shade + `"LEVEL FAILED"` label directly with no action at all --
-  `scripts/level.gd::_fail_level()` only made it visible, trapping the player in a terminal screen
-  with no route forward. This scene gives Failure the same working exit Completion already has,
-  sharing terminal shade, hero title, action placement, safe-area layout, and open/close motion with
-  Completion through `scenes/ui/gameplay_result_shell.tscn` without merging their state-specific content.
-- Emits `main_menu_pressed` when its `Main Menu` action (green, matching Completion's CTA size/role)
-  is pressed.
+- Reusable centered level-failure modal instanced by `level.tscn`, composing
+  `scenes/ui/gameplay_modal_shell.tscn` for the shade, 520x620 panel, title, circular X, safe-area
+  fit, action row, and open/close motion.
+- Owns the broken-heart image, `LEVEL FAILED` message, and orange Retry button.
+- Emits `retry_pressed` from Retry and `main_menu_pressed` from the shared X. The owner decides
+  whether Retry starts immediately or opens the life offer.
 
 Key methods:
+- `set_level_number(level_number)`: writes the chapter-local `LEVEL N` modal title.
 - `apply_safe_layout(safe_margins, viewport_size)` / `is_transitioning()` / `open()` / `close()`:
-  same contract as `scripts/level_completion_screen.gd`.
+  delegates to the shared gameplay modal shell.
 
 Depends on:
-- `scenes/ui/gameplay_result_shell.tscn` (`scripts/gameplay_result_shell.gd`).
+- `scenes/ui/gameplay_modal_shell.tscn` (`scripts/gameplay_modal_shell.gd`).
 - `scripts/gameplay_ui_theme.gd`, `scripts/press_scale_button.gd`.
-- The shared `style_box_green_primary_button.tres` for its action button.
+- `assets/ui/broken_heart.png` and the shared orange utility button styles.
 
 ## `scripts/leave_confirmation_menu.gd`
 
