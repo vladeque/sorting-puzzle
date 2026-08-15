@@ -1851,6 +1851,10 @@ Purpose:
 - Runtime shelf instances are scaled slightly by `scripts/level.gd`, with layout template markers and moving-row windows authored to match the scaled cell footprint.
 - Can be switched by `scripts/level.gd` to a `floor_only` visual variant for moving rows by hiding wall and ceiling nodes at runtime.
 - Can be switched by `scripts/level.gd` to `left`, `middle`, or `right` row-placement visuals for static shelves. Moving-row shelves currently stay on the neutral `middle` row-placement visual.
+- Uses `assets/shelves/standard_shelf_light_oak.png` on its existing `Polygon2D` frame faces. Broad
+  faces sample the grain horizontally, while the side-wall UVs rotate it vertically; keeping the
+  faces separate preserves their placement visibility and item/back-layer z-order. This material is
+  standard-shelf-only and does not change `scenes/dispenser_shelf.tscn`.
 
 Important nodes:
 - `BackWall`: muted panel behind shelf items.
@@ -1859,10 +1863,13 @@ Important nodes:
 - `PlacementVisuals/Left`: left shelf role visuals. Contains `BackWallLeftShade`, `LeftWall`, `RightWall`, and the left-specific `TopCeilingCap`.
 - `PlacementVisuals/Middle`: middle shelf role visuals. Contains row divider art and the middle-specific `TopCeilingCap`.
 - `PlacementVisuals/Right`: right shelf role visuals. Contains right edge art and the right-specific `TopCeilingCap`.
-- `Ceiling`: shared wooden top frame. Placement-specific `TopCeilingCap` nodes are shown at runtime only for top shelves.
+- `Ceiling`: shared image-textured wooden top frame. Placement-specific `TopCeilingCap/BackBoard`
+  faces use the same light-oak material and are shown at runtime only for top shelves.
 - `Shadow` and `RightColumnShadow`: solid-color perspective cast shadows, shown at runtime for full shelf visuals and drawn below shelf bodies, items, and generated back-layer item previews so they remain visible only on exposed wall/background areas.
-- `FloorSurface` and `FloorFrontLip`: wooden floor where items visually rest.
-- `FloorGrain*`: subtle line details on the floor; generated back-layer item previews draw above the floor and grain, while active front items draw above back-layer previews.
+- `FloorSurface` and `FloorFrontLip`: image-textured wooden floor where items visually rest.
+- `FloorGrain*`: retained hidden as legacy editable guides; the image texture now supplies visible
+  grain. Generated back-layer item previews still draw above the floor, while active front items
+  draw above back-layer previews.
 - `LockedOverlay`: standard-layout instance of `scenes/ui/shelf_lock_overlay.tscn`; the component owns
   its four chain arms, hanging lock, decorative `AD`, remaining-clears badge, and feedback motion.
 - `Slot01`, `Slot02`, `Slot03`: front slots used by runtime movement and matching logic, positioned so default item silhouettes sit next to each other.

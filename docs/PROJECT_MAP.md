@@ -614,6 +614,9 @@ Change here when:
 Files:
 - `scenes/shelf.tscn`
 - `scripts/shelf.gd`
+- `assets/shelves/standard_shelf_light_oak.png`
+- `scripts/tools/captures/standard_shelf_setup.gd`
+- `tests/gameplay/test_standard_shelf_wood_texture.gd`
 - `scenes/ui/shelf_lock_overlay.tscn`
 
 Responsibility:
@@ -621,7 +624,12 @@ Responsibility:
   source-only variant lives in `scenes/dispenser_shelf.tscn` -- see "Dispenser Shelf" below.
 - `scripts/shelf.gd` owns the shelf-type capability surface every shelf type answers.
 - Owns generated back-layer slot layout and preview styling defaults.
-- Contains the visible back wall, opaque non-compounding interior/cast shadows, wood floor, frame, floor lip, floor grain nodes, and hidden top edge details shown by `scripts/level.gd` for shelves with no stacked neighbor above. Shelf cast shadows draw below generated back-layer item previews and remain enabled for full shelves so neighboring shelf bodies and items cover them.
+- Contains the visible back wall, opaque non-compounding interior/cast shadows, image-textured
+  light-oak floor/frame/lip, and hidden top edge details shown by `scripts/level.gd` for shelves with
+  no stacked neighbor above. One shared material image is sampled horizontally for broad faces and
+  with rotated UVs for vertical supports; the former line-only grain nodes remain hidden. Shelf cast
+  shadows draw below generated back-layer item previews and remain enabled for full shelves so
+  neighboring shelf bodies and items cover them.
 - Instances the reusable hidden lock overlay used by triple-gated shelves; the shelf owns only its
   placement, while `ShelfLockOverlay` owns chains, lock, badge, labels, and motion.
 - Keeps the shelf width, height, and slot positions aligned with the level grid constants so a three-shelf row fills most of the gameplay viewport.

@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dxsnfvwv34noq" path="res://scripts/shelf.gd" id="1_shelf_script"]
 [ext_resource type="PackedScene" uid="uid://5oa3wa7li56n" path="res://scenes/ui/shelf_lock_overlay.tscn" id="2_lock_overlay"]
+[ext_resource type="Texture2D" uid="uid://c40e6qjm2qu7a" path="res://assets/shelves/standard_shelf_light_oak.png" id="3_wood_texture"]
 
 [node name="Shelf" type="Node2D" unique_id=961540884]
 script = ExtResource("1_shelf_script")
@@ -25,6 +26,7 @@ color = Color(0.7490196, 0.65882355, 0.54901963, 1)
 polygon = PackedVector2Array(-104, -81, 104, -81, 104.0658, -68.57907, -104.16662, -68.57907)
 
 [node name="PlacementVisuals" type="Node2D" parent="." unique_id=932094543]
+texture_filter = 4
 
 [node name="Left" type="Node2D" parent="PlacementVisuals" unique_id=1466146339]
 visible = false
@@ -37,22 +39,29 @@ uv = PackedVector2Array(-54.97803, -80.7905, -54.485466, -74.25448, -87.18676, -
 
 [node name="LeftWall" type="Polygon2D" parent="PlacementVisuals/Left" unique_id=1529082060]
 z_index = 4
-color = Color(0.78039217, 0.52156866, 0.2901961, 1)
+color = Color(0.94, 0.85, 0.74, 1)
+texture = ExtResource("3_wood_texture")
 polygon = PackedVector2Array(-112, -89, -104, -89, -104, 46, -112, 46)
+uv = PackedVector2Array(32, 720, 32, 752, 572, 752, 572, 720)
 
 [node name="RightWall" type="Polygon2D" parent="PlacementVisuals/Left" unique_id=1412430343]
 z_index = 4
-color = Color(0.78039217, 0.52156866, 0.2901961, 1)
+color = Color(0.94, 0.85, 0.74, 1)
+texture = ExtResource("3_wood_texture")
 polygon = PackedVector2Array(104, -89, 112, -89, 112, 46, 104, 46)
+uv = PackedVector2Array(416, 720, 416, 752, 956, 752, 956, 720)
 
 [node name="TopCeilingCap" type="Node2D" parent="PlacementVisuals/Left" unique_id=38665874]
 z_index = 7
 
 [node name="BackBoard" type="Polygon2D" parent="PlacementVisuals/Left/TopCeilingCap" unique_id=1551102547]
-color = Color(0.6392157, 0.3882353, 0.1882353, 1)
+color = Color(0.78, 0.68, 0.57, 1)
+texture = ExtResource("3_wood_texture")
 polygon = PackedVector2Array(-108, -103, 112, -103, 112, -89, -112, -89)
+uv = PackedVector2Array(80, 40, 960, 40, 960, 96, 64, 96)
 
 [node name="GrainTop" type="Line2D" parent="PlacementVisuals/Left/TopCeilingCap" unique_id=1580024918]
+visible = false
 z_index = 3
 points = PackedVector2Array(-82, -100, -28, -100, 26, -99, 82, -100)
 width = 1.0
@@ -69,13 +78,17 @@ uv = PackedVector2Array(-120.070244, -88.05257, -111.93141, -88.05257, -111.9410
 
 [node name="RightWall" type="Polygon2D" parent="PlacementVisuals/Middle" unique_id=1980170564]
 z_index = 8
-color = Color(0.78039217, 0.52156866, 0.2901961, 1)
+color = Color(0.94, 0.85, 0.74, 1)
+texture = ExtResource("3_wood_texture")
 polygon = PackedVector2Array(104, -89, 112, -89, 112, 46, 104, 46)
+uv = PackedVector2Array(320, 800, 320, 832, 860, 832, 860, 800)
 
 [node name="LeftWall" type="Polygon2D" parent="PlacementVisuals/Middle" unique_id=1666305439]
 z_index = 8
-color = Color(0.78039217, 0.52156866, 0.2901961, 1)
+color = Color(0.94, 0.85, 0.74, 1)
+texture = ExtResource("3_wood_texture")
 polygon = PackedVector2Array(-112, -89, -104, -89, -104, 46, -112, 46)
+uv = PackedVector2Array(128, 760, 128, 792, 668, 792, 668, 760)
 
 [node name="BackWallLeftShade" type="Polygon2D" parent="PlacementVisuals/Middle" unique_id=1865343099]
 z_index = 1
@@ -87,10 +100,13 @@ uv = PackedVector2Array(-54.97803, -80.7905, -54.485466, -74.25448, -87.18676, -
 z_index = 7
 
 [node name="BackBoard" type="Polygon2D" parent="PlacementVisuals/Middle/TopCeilingCap" unique_id=74705353]
-color = Color(0.6392157, 0.3882353, 0.1882353, 1)
+color = Color(0.78, 0.68, 0.57, 1)
+texture = ExtResource("3_wood_texture")
 polygon = PackedVector2Array(-112, -103, 112, -103, 112, -89, -112, -89)
+uv = PackedVector2Array(64, 128, 960, 128, 960, 184, 64, 184)
 
 [node name="GrainTop" type="Line2D" parent="PlacementVisuals/Middle/TopCeilingCap" unique_id=1457537679]
+visible = false
 z_index = 3
 points = PackedVector2Array(-82, -100, -28, -100, 26, -99, 82, -100)
 width = 1.0
@@ -115,8 +131,10 @@ visible = false
 
 [node name="RightWall" type="Polygon2D" parent="PlacementVisuals/Right" unique_id=2092875442]
 z_index = 4
-color = Color(0.78039217, 0.52156866, 0.2901961, 1)
+color = Color(0.94, 0.85, 0.74, 1)
+texture = ExtResource("3_wood_texture")
 polygon = PackedVector2Array(104, -89, 112, -89, 112, 46, 104, 46)
+uv = PackedVector2Array(384, 880, 384, 912, 924, 912, 924, 880)
 
 [node name="BackWallLeftShade" type="Polygon2D" parent="PlacementVisuals/Right" unique_id=586309773]
 z_index = 1
@@ -126,17 +144,22 @@ uv = PackedVector2Array(-54.97803, -80.7905, -54.485466, -74.25448, -87.18676, -
 
 [node name="LeftWall" type="Polygon2D" parent="PlacementVisuals/Right" unique_id=540570740]
 z_index = 4
-color = Color(0.78039217, 0.52156866, 0.2901961, 1)
+color = Color(0.94, 0.85, 0.74, 1)
+texture = ExtResource("3_wood_texture")
 polygon = PackedVector2Array(-112, -89, -104, -89, -104, 46, -112, 46)
+uv = PackedVector2Array(224, 840, 224, 872, 764, 872, 764, 840)
 
 [node name="TopCeilingCap" type="Node2D" parent="PlacementVisuals/Right" unique_id=1886034244]
 z_index = 7
 
 [node name="BackBoard" type="Polygon2D" parent="PlacementVisuals/Right/TopCeilingCap" unique_id=1203583019]
-color = Color(0.6392157, 0.3882353, 0.1882353, 1)
+color = Color(0.78, 0.68, 0.57, 1)
+texture = ExtResource("3_wood_texture")
 polygon = PackedVector2Array(-112, -103, 108, -103, 112, -89, -112, -89)
+uv = PackedVector2Array(64, 216, 944, 216, 960, 272, 64, 272)
 
 [node name="GrainTop" type="Line2D" parent="PlacementVisuals/Right/TopCeilingCap" unique_id=559407362]
+visible = false
 z_index = 3
 points = PackedVector2Array(-82, -100, -28, -100, 26, -99, 82, -100)
 width = 1.0
@@ -151,38 +174,51 @@ uv = PackedVector2Array(-120.070244, -88.05257, -111.93141, -88.05257, -111.9410
 
 [node name="Ceiling" type="Polygon2D" parent="." unique_id=590220440]
 z_index = 3
-color = Color(0.78039217, 0.52156866, 0.2901961, 1)
+texture_filter = 4
+color = Color(0.92, 0.82, 0.7, 1)
+texture = ExtResource("3_wood_texture")
 polygon = PackedVector2Array(-104, -89, 104, -89, 112, -81, -112, -81)
+uv = PackedVector2Array(96, 320, 928, 320, 960, 352, 64, 352)
 
 [node name="FloorSurface" type="Polygon2D" parent="." unique_id=211239445]
 z_index = 5
-color = Color(0.64, 0.39, 0.19, 1)
+texture_filter = 4
+color = Color(0.82, 0.7, 0.57, 1)
+texture = ExtResource("3_wood_texture")
 polygon = PackedVector2Array(-104, 16, 104, 16, 104, 42, -104, 42)
+uv = PackedVector2Array(96, 448, 928, 448, 928, 552, 96, 552)
 
 [node name="FloorFrontLip" type="Polygon2D" parent="." unique_id=348182537]
 z_index = 5
-color = Color(0.78039217, 0.52156866, 0.2901961, 1)
+texture_filter = 4
+color = Color(0.9, 0.79, 0.66, 1)
+texture = ExtResource("3_wood_texture")
 polygon = PackedVector2Array(-112, 38, 112, 38, 112, 46, -112, 46)
+uv = PackedVector2Array(64, 608, 960, 608, 960, 640, 64, 640)
 
 [node name="FloorGrainBack" type="Line2D" parent="." unique_id=810284]
+visible = false
 z_index = 6
 points = PackedVector2Array(-96, 21, 60, 20.99997, 96, 21)
 width = 1.2
 default_color = Color(0.38, 0.21, 0.1, 0.34)
 
 [node name="FloorGrainMiddle" type="Line2D" parent="." unique_id=87843650]
+visible = false
 z_index = 6
 points = PackedVector2Array(-96, 29, -28, 28, 24, 31, 98, 29)
 width = 1.0
 default_color = Color(0.38, 0.21, 0.1, 0.34)
 
 [node name="FloorGrainKnot" type="Line2D" parent="." unique_id=27174572]
+visible = false
 z_index = 6
 points = PackedVector2Array(30, 35, 42, 31, 62, 34, 80, 39)
 width = 1.0
 default_color = Color(0.32, 0.17, 0.08, 0.28)
 
 [node name="FloorGrainFront" type="Line2D" parent="." unique_id=35188272]
+visible = false
 z_index = 6
 points = PackedVector2Array(-104, 39, 104, 39)
 width = 1.2
