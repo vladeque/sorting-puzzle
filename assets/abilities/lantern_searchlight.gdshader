@@ -12,11 +12,10 @@ uniform vec2 target_positions[MAX_TARGETS];
 uniform vec4 shade_color : source_color = vec4(0.105, 0.055, 0.018, 1.0);
 uniform vec4 warm_color : source_color = vec4(1.0, 0.58, 0.075, 1.0);
 uniform vec4 core_color : source_color = vec4(1.0, 0.86, 0.32, 1.0);
-uniform float shade_opacity : hint_range(0.0, 0.4) = 0.22;
+uniform float shade_opacity : hint_range(0.0, 0.4) = 0.30;
 uniform float edge_glow_opacity : hint_range(0.0, 0.25) = 0.12;
 uniform float focus_radius : hint_range(0.05, 0.3) = 0.145;
 uniform float focus_warmth : hint_range(0.0, 0.4) = 0.24;
-uniform float ray_opacity : hint_range(0.0, 0.3) = 0.13;
 uniform float search_opacity : hint_range(0.0, 0.3) = 0.15;
 uniform float activation_opacity : hint_range(0.0, 0.6) = 0.42;
 
@@ -29,7 +28,6 @@ void fragment() {
 	float focus_cutout = 0.0;
 	float focus_light = 0.0;
 	float focus_core = 0.0;
-	float upward_rays = 0.0;
 	float pulse = 0.92 + 0.08 * sin(elapsed_seconds * 4.2);
 
 	for (int target_index = 0; target_index < MAX_TARGETS; target_index++) {
@@ -44,18 +42,6 @@ void fragment() {
 		focus_cutout = max(focus_cutout, pool);
 		focus_light = max(focus_light, pool * pulse);
 		focus_core = max(focus_core, core * pulse);
-
-		// A tapered shaft rises from each target and fades before reaching the HUD.
-		float height_above = target.y - UV.y;
-		float ray_height = smoothstep(0.0, 0.035, height_above)
-			* (1.0 - smoothstep(0.24, 0.48, height_above));
-		float ray_half_width = 0.018 + max(height_above, 0.0) * 0.12;
-		float ray_x = abs(target_delta.x);
-		float ray = 1.0 - smoothstep(ray_half_width * 0.52, ray_half_width, ray_x);
-		float ray_flicker = 0.88 + 0.12 * sin(
-			elapsed_seconds * 3.1 + float(target_index) * 1.73
-		);
-		upward_rays = max(upward_rays, ray * ray_height * ray_flicker);
 	}
 
 	// Lantern stays visibly active when no target exists yet by searching the shelves continuously.
@@ -91,7 +77,6 @@ void fragment() {
 	float dark_alpha = shade_opacity * (1.0 - focus_cutout * 0.94);
 	float warm_alpha = edge_glow * edge_glow_opacity
 		+ focus_light * focus_warmth
-		+ upward_rays * ray_opacity
 		+ targetless_search * search_opacity
 		+ activation_glow * activation_opacity;
 	float core_alpha = focus_core * 0.12;

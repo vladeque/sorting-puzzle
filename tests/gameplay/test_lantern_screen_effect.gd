@@ -49,7 +49,7 @@ func _verify_effect_scene() -> void:
 	_check(
 		warm_color.r > warm_color.g
 		and warm_color.g > warm_color.b
-		and shade_opacity >= 0.2
+		and shade_opacity >= 0.3
 		and focus_warmth >= 0.2,
 		"Focus Mode strongly separates the shaded board from warm target pools."
 	)

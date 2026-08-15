@@ -13,11 +13,10 @@ shader_parameter/target_count = 0
 shader_parameter/shade_color = Color(0.105, 0.055, 0.018, 1)
 shader_parameter/warm_color = Color(1, 0.58, 0.075, 1)
 shader_parameter/core_color = Color(1, 0.86, 0.32, 1)
-shader_parameter/shade_opacity = 0.22
+shader_parameter/shade_opacity = 0.3
 shader_parameter/edge_glow_opacity = 0.12
 shader_parameter/focus_radius = 0.145
 shader_parameter/focus_warmth = 0.24
-shader_parameter/ray_opacity = 0.13
 shader_parameter/search_opacity = 0.15
 shader_parameter/activation_opacity = 0.42
 

@@ -1155,8 +1155,8 @@ Important nodes:
 - `Shelves`: parent for generated shelf nodes and optional moving shelf row containers; `scripts/level.gd` scales and centers it in the available play area for the current viewport size.
 - `DragLayer`: temporary parent for dragged items, drawn above shelves.
 - `LanternScreenEffect`: `scenes/abilities/lantern_screen_effect.tscn` instance on canvas layer 4;
-  Focus Mode shades non-target gameplay and tracks bright pools, upward rays, and concentrated
-  motes to highlighted items while remaining below Freezer, the HUD, and modal shades.
+  Focus Mode shades non-target gameplay and tracks bright pools and concentrated motes to
+  highlighted items while remaining below Freezer, the HUD, and modal shades.
 - `FreezerScreenEffect`: `scenes/abilities/freezer_screen_effect.tscn` instance whose main frame
   renders on canvas layer 5 below UI and whose top-edge-only copy renders on layer 11 over `TopHud`.
   Both use transparent crack art plus a narrow blue edge glow and never recolor the level center.
@@ -1408,8 +1408,8 @@ Script:
 Purpose:
 - Reusable fullscreen Lantern Focus Mode presentation owned separately from `scripts/level.gd`.
 - Uses `lantern_searchlight.gdshader` for a clearly visible warm shade over non-target gameplay,
-  sixteen-capacity target-position uniform array, pulsing item-centered light pools, upward shafts,
-  perimeter glow, and an expanding activation wave from the Lantern button area.
+  sixteen-capacity target-position uniform array, pulsing item-centered light pools, perimeter
+  glow, and an expanding activation wave from the Lantern button area.
 - When no immediate target exists, replaces the target pools with a continuous diagonal search beam.
 - Adds twenty slow additive motes with a scene-authored radial `GradientTexture2D`; their emission
   rectangle follows the highlighted targets rather than filling the whole screen. No generated or

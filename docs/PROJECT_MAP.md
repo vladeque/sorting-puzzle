@@ -579,10 +579,10 @@ Responsibility:
 - Tracks the countdown timer, starting it only after the first meaningful player action, and win/loss overlays.
 - Plays the hammer ability by gathering the targeted items into one center-screen item, striking it with the fullscreen hammer, then dropping combo reward stars from the impact point.
 - Plays the shuffle ability by showing a center-screen delivery box, flying visible unlocked items into it, swapping item identities while hidden, flying them back to their slots, then resolving shelf matches.
-- Shows Lantern as Focus Mode on canvas layer 4: a 22% warm shade over non-target gameplay, bright
-  pulsing pools and upward shafts tracked to every highlighted item, a stronger button-origin
-  activation wave, and twenty target-biased motes persist for the same 15-second window as the
-  item outlines. With no current targets, a diagonal beam visibly keeps searching the shelves.
+- Shows Lantern as Focus Mode on canvas layer 4: a 30% warm shade over non-target gameplay, bright
+  pulsing pools tracked to every highlighted item, a stronger button-origin activation wave, and
+  twenty target-biased motes persist for the same 15-second window as the item outlines. With no
+  current targets, a diagonal beam visibly keeps searching the shelves.
 - Shows Freezer as transparent cyan-white perimeter cracks: the main frame sits between gameplay
   and UI, while a clipped copy of only its top edge renders over `TopHud`. The effect reveals inward
   once, holds without recoloring the configured level background, and thaws when the 30-second

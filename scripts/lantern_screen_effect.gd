@@ -2,8 +2,8 @@ class_name LanternScreenEffect
 extends CanvasLayer
 
 ## Full-screen Lantern Focus Mode presentation. A procedural overlay shades non-target gameplay,
-## cuts warm pools and upward rays around highlighted items, and falls back to a searching beam when
-## no target currently exists. A target-biased particle layer supplies drifting light motes.
+## cuts warm pools around highlighted items, and falls back to a searching beam when no target
+## currently exists. A target-biased particle layer supplies drifting light motes.
 ## Gameplay owns the timer; this scene only mirrors visual state and never intercepts input.
 
 const MAX_TARGET_COUNT := 16
