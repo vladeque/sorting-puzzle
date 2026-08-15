@@ -196,7 +196,7 @@ color = Color(0.25, 0.16, 0.09, 0.28)
 polygon = PackedVector2Array(-48.18182, 39.99999, -41.818184, 39.999992, -35.454544, 48, -43.636364, 48)
 
 [node name="RightWallInnerFace" type="Polygon2D" parent="." unique_id=301018592]
-z_index = 4
+z_index = 9
 position = Vector2(82, -86)
 rotation = -6.2831855
 scale = Vector2(1.1, 1)
@@ -207,7 +207,7 @@ polygon = PackedVector2Array(-48.18182, 39.99999, -43.636368, 47.999992, -43.636
 uv = PackedVector2Array(640, 900, 672, 918, 992, 918, 992, 900)
 
 [node name="Shade" type="Polygon2D" parent="RightWallInnerFace" unique_id=1603767559]
-z_index = 4
+z_index = 9
 z_as_relative = false
 color = Color(0.22, 0.14, 0.08, 0.38)
 polygon = PackedVector2Array(-48.18182, 39.99999, -43.636368, 47.999992, -43.636383, 127.99999, -48.181835, 127.999985)

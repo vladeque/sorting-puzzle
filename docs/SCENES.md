@@ -1913,7 +1913,9 @@ Important nodes:
   the recessed back and cast-depth treatment of the compact cradle.
 - `LeftWall*` and `RightWall*`: semantically paired upper/lower faces, top/lower bevels, and inner
   faces for the two chunky image-textured side guards. Each bevel/inner-face node owns a translucent
-  local `Shade` child.
+  local `Shade` child. The right upper face, top bevel, inner face, and lower bevel render above item
+  shadows so the up-right contact projection cannot stain the guard; item shadows remain above the
+  floor and level background.
 - `FloorSurface`, `FloorFrontLip`, and hidden legacy `FloorGrain*`: the textured item floor and front
   lip inside the 96-wide packing cell. There is intentionally no `Ceiling` or `TopCeilingCap`.
 - `LayerIndicator`: `scenes/shelf_layer_indicator.tscn` instance overlapping the front lip; its

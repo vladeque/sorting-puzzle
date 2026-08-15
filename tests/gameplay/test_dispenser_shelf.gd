@@ -15,6 +15,7 @@ extends SceneTree
 const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
 const LEVEL_SCENE_PATH := "res://level.tscn"
 const LAYER_INDICATOR_SCENE_PATH := "res://scenes/shelf_layer_indicator.tscn"
+const ITEM_SCENE_PATH := "res://scenes/item.tscn"
 const WOOD_TEXTURE_PATH := "res://assets/shelves/standard_shelf_light_oak.png"
 
 ## Two standard shelves and one dispenser. The standard pair starts one candy_bag short of a triple
@@ -54,6 +55,7 @@ func _run() -> void:
 	await process_frame
 
 	_test_visual_nodes_have_semantic_names()
+	_test_item_shadow_layering()
 	_test_indicator_visuals_are_scene_authored()
 	await _test_construction_and_capabilities()
 	await _test_preset_layout_offsets_only_dispensers()
@@ -138,6 +140,44 @@ func _test_visual_nodes_have_semantic_names() -> void:
 			"Legacy line grain %s should stay hidden behind the image texture." % grain_name
 		)
 	dispenser.free()
+
+
+func _test_item_shadow_layering() -> void:
+	var dispenser_scene := load("res://scenes/dispenser_shelf.tscn") as PackedScene
+	var item_scene := load(ITEM_SCENE_PATH) as PackedScene
+	var dispenser := dispenser_scene.instantiate() if dispenser_scene != null else null
+	var item := item_scene.instantiate() if item_scene != null else null
+	_check(dispenser != null and item != null, "Shadow-layer verification scenes should instantiate.")
+	if dispenser == null or item == null:
+		if dispenser != null:
+			dispenser.free()
+		if item != null:
+			item.free()
+		return
+
+	var shadow := item.get_node_or_null("Shadow") as CanvasItem
+	var floor_surface := dispenser.get_node_or_null("FloorSurface") as CanvasItem
+	_check(shadow != null and floor_surface != null, "Item shadow and dispenser floor should exist.")
+	if shadow != null and floor_surface != null:
+		var shadow_z: int = item.z_index + shadow.z_index if shadow.z_as_relative else shadow.z_index
+		_check(
+			floor_surface.z_index < shadow_z,
+			"The item shadow should render over the dispenser floor and level background."
+		)
+		for wall_name in [
+			"RightWallInnerFace",
+			"RightWallTopBevel",
+			"RightWallUpperFace",
+			"RightWallLowerBevel",
+		]:
+			var wall := dispenser.get_node_or_null(wall_name) as CanvasItem
+			_check(
+				wall != null and wall.z_index > shadow_z,
+				"%s should render over the item shadow." % wall_name
+			)
+
+	dispenser.free()
+	item.free()
 
 
 func _test_indicator_visuals_are_scene_authored() -> void:
