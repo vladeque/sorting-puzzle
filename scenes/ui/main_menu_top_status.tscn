@@ -54,11 +54,15 @@ custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="LivesWidget" type="Control" parent="." unique_id=764292924]
+[node name="LivesWidget" type="Button" parent="." unique_id=764292924]
 custom_minimum_size = Vector2(150, 60)
 layout_mode = 2
 size_flags_vertical = 4
-mouse_filter = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+flat = true
+script = ExtResource("4_press_scale_button")
+held_scale = 0.97
 
 [node name="LivesPill" type="Panel" parent="LivesWidget" unique_id=747220015]
 layout_mode = 1

@@ -45,6 +45,7 @@ const MAIN_MENU_OVERLAY_Z_INDEX := 100
 @onready var _settings_button := %TopStatusBar.get_node("MainMenuTopStatus/SettingsWidget/SettingsButton") as Button
 @onready var _profile_avatar_texture := %TopStatusBar.get_node("MainMenuTopStatus/ProfileWidget/AvatarTexture") as TextureRect
 @onready var _coin_shortcut := %TopStatusBar.get_node("MainMenuTopStatus/CoinsWidget") as Button
+@onready var _life_shortcut := %TopStatusBar.get_node("MainMenuTopStatus/LivesWidget") as Button
 @onready var _life_count_label := %TopStatusBar.get_node("MainMenuTopStatus/LivesWidget/LifeCount") as Label
 @onready var _life_status_label := %TopStatusBar.get_node("MainMenuTopStatus/LivesWidget/LifeStatus") as Label
 
@@ -57,6 +58,10 @@ var _animated_reward_stars := 0
 var _animated_reward_goal_index := 0
 var _is_navigating := false
 var _life_purchase_in_progress := false
+## True only while the lives modal is open on top of an interrupted campaign launch. The top-status
+## lives widget opens the same modal informationally, and that entry point must never resume a
+## launch or be dismissed out from under the player when a countdown restores a life.
+var _out_of_lives_launch_pending := false
 
 
 func _ready() -> void:
@@ -70,6 +75,7 @@ func _ready() -> void:
 	_profile_button.pressed.connect(_open_profile_menu)
 	_settings_button.pressed.connect(_open_settings_menu)
 	_coin_shortcut.pressed.connect(_open_shop)
+	_life_shortcut.pressed.connect(_open_out_of_lives_menu.bind(false))
 	_out_of_lives_menu.close_requested.connect(_on_out_of_lives_close_requested)
 	_out_of_lives_menu.purchase_requested.connect(_on_out_of_lives_purchase_requested)
 	if _reward_chest.has_signal("chest_pressed"):
@@ -130,7 +136,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if _out_of_lives_menu.visible:
 		get_viewport().set_input_as_handled()
 		if not _out_of_lives_menu.is_transitioning():
-			_out_of_lives_menu.close()
+			_close_out_of_lives_menu()
 	elif is_instance_valid(_profile_menu):
 		get_viewport().set_input_as_handled()
 		_profile_menu.call("close")
@@ -335,12 +341,18 @@ func _refresh_out_of_lives_offer() -> void:
 	var lives := PlayerProgress.get_lives()
 	_out_of_lives_menu.set_offer(
 		lives,
+		PlayerProgress.get_max_lives(),
 		PlayerProgress.get_next_life_restore_seconds_remaining(),
 		PlayerProgress.get_life_purchase_coin_price()
 	)
 	_out_of_lives_menu.set_purchase_enabled(not _life_purchase_in_progress)
-	if lives > 0 and _out_of_lives_menu.visible and not _out_of_lives_menu.is_transitioning():
-		_out_of_lives_menu.close()
+	if (
+		_out_of_lives_launch_pending
+		and lives > 0
+		and _out_of_lives_menu.visible
+		and not _out_of_lives_menu.is_transitioning()
+	):
+		_close_out_of_lives_menu()
 
 
 func _update_reward_chest_status() -> void:
@@ -549,7 +561,7 @@ func _launch_campaign_level() -> void:
 	if PlayerProgress.get_lives() <= 0:
 		_update_lives_status()
 		_update_level_button()
-		_open_out_of_lives_menu()
+		_open_out_of_lives_menu(true)
 		return
 
 	var chapter_id := PlayerProgress.get_selected_chapter_id()
@@ -571,17 +583,28 @@ func _launch_campaign_level() -> void:
 		current_scene.queue_free()
 
 
-func _open_out_of_lives_menu() -> void:
+## `is_launch_pending` separates the two entry points: true only from `_launch_campaign_level()`,
+## which resumes that launch once a life exists, and false from the top-status lives widget, which
+## only ever reports and sells lives without leaving the Main Menu.
+func _open_out_of_lives_menu(is_launch_pending: bool) -> void:
 	if _out_of_lives_menu.visible or _is_navigating:
 		return
+	_out_of_lives_launch_pending = is_launch_pending
 	_refresh_out_of_lives_offer()
 	_out_of_lives_menu.open()
+
+
+## Single close path for the lives modal, so no route can leave a stale pending launch behind and
+## resume it the next time the modal is opened from the top status bar.
+func _close_out_of_lives_menu() -> void:
+	_out_of_lives_launch_pending = false
+	await _out_of_lives_menu.close()
 
 
 func _on_out_of_lives_close_requested() -> void:
 	if _life_purchase_in_progress or _out_of_lives_menu.is_transitioning():
 		return
-	_out_of_lives_menu.close()
+	_close_out_of_lives_menu()
 
 
 func _on_out_of_lives_purchase_requested() -> void:
@@ -589,9 +612,15 @@ func _on_out_of_lives_purchase_requested() -> void:
 		return
 
 	PlayerProgress.refresh_lives()
-	if PlayerProgress.get_lives() > 0:
-		await _out_of_lives_menu.close()
+	if _out_of_lives_launch_pending and PlayerProgress.get_lives() > 0:
+		await _close_out_of_lives_menu()
 		_launch_campaign_level()
+		return
+
+	# Defensive: the purchase action is hidden at the cap, so this can only be a stale press.
+	# Falling through would reach the coin check and send a player with a full life bar to the Shop.
+	if PlayerProgress.get_lives() >= PlayerProgress.get_max_lives():
+		_refresh_out_of_lives_offer()
 		return
 
 	if PlayerProgress.get_coins() < PlayerProgress.get_life_purchase_coin_price():
@@ -608,6 +637,8 @@ func _on_out_of_lives_purchase_requested() -> void:
 	_update_coin_balance()
 	_update_lives_status()
 	_update_level_button()
-	await _out_of_lives_menu.close()
+	var should_resume_launch := _out_of_lives_launch_pending
+	await _close_out_of_lives_menu()
 	_life_purchase_in_progress = false
-	_launch_campaign_level()
+	if should_resume_launch:
+		_launch_campaign_level()

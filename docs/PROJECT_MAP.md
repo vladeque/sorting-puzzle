@@ -185,8 +185,9 @@ Responsibility:
   economy, abilities, reward chest, leaderboard totals, and profile state.
 - Defaults fresh and legacy profile saves to `avatar_cat` and a generated `player_` name with a five-character random suffix.
 - Restores one missing life per elapsed real-time hour until the five-life cap is reached.
-- Keeps the campaign level action enabled at zero lives, shows the responsive Out of Lives modal,
-  and buys one offline-capable life for the configured 500-coin default before launching.
+- Keeps the campaign level action enabled at zero lives, shows the responsive lives modal from
+  either that launch request or the top-status lives widget, and buys one offline-capable life for
+  the configured 500-coin default; only the launch request resumes into the level afterwards.
 - Spends one campaign life when a campaign level fails or the player leaves from the pause menu.
 - Commits ability/coin spends after effect preflight and before starting the gameplay effect.
 - Accepts only the selected chapter's first incomplete level, prevents replay after completion, and
@@ -223,7 +224,9 @@ Change here when:
 Files:
 - `scripts/tools/capture_ui.ps1`
 - `scripts/tools/capture_scene.gd`
-- `scripts/tools/captures/shelf_lock_overlay_setup.gd`
+- `scripts/tools/captures/*_setup.gd` (per-scene runtime state, such as
+  `shelf_lock_overlay_setup.gd` and the `lives_menu_full_setup.gd`/`lives_menu_offer_setup.gd` pair
+  that opens each lives-modal state over the real Main Menu)
 
 Responsibility:
 - Renders any scene at the responsive resolutions from AGENTS.md and writes one PNG per resolution to

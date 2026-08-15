@@ -11,7 +11,10 @@ Purpose:
 - Shows the production campaign entry point over the selected chapter's configured menu background.
 - Labels the bottom button with the saved current level.
 - Displays saved campaign lives in the top status bar and keeps campaign play pressable at zero
-  lives so the dedicated Out of Lives modal can explain recovery and purchase options.
+  lives so the dedicated lives modal can explain recovery and purchase options.
+- Opens that same modal from the top status bar's lives widget at any life count. The two entry
+  points differ only in what follows: a launch-interrupted open resumes the requested level once a
+  life exists, while a widget open stays on the Main Menu.
 - Displays saved gold coins in the top status bar.
 - Displays the saved profile avatar and opens the profile editor from the top status bar.
 - Displays the saved reward chest star progress in a separate left-side widget under the profile icon.
@@ -62,6 +65,8 @@ Important nodes:
 - `MainMenuTopStatus/CoinsWidget`: `scenes/ui/main_menu_coin_shortcut.tscn` instance; shows the
   saved gold coin balance and opens the Shop when pressed.
 - `MainMenuTopStatus/SettingsWidget/SettingsButton`: opens the main-menu settings popup.
+- `MainMenuTopStatus/LivesWidget`: flat button that opens `%OutOfLivesMenu` informationally
+  (`_open_out_of_lives_menu(false)`), the lives counterpart of the `CoinsWidget` shortcut.
 - `MainMenuTopStatus/LivesWidget/LifeCount`: shows current campaign lives; the owning scene's
   `LivesPill` shares `assets/themes/style_box_status_counter_pill.tres` and compact 118x44 geometry
   with the coin balance background.
@@ -69,7 +74,7 @@ Important nodes:
 - `%BottomBar`: bottom-anchored container positioned at runtime with safe-area padding.
 - `%LevelButton`: `scenes/ui/level_button.tscn` instance that starts the saved campaign level.
 - `%OutOfLivesMenu`: persistent hidden `scenes/ui/out_of_lives_menu.tscn` instance shown when a
-  launch request finds zero lives.
+  launch request finds zero lives, or when the top-status lives widget is pressed.
 - `%ChapterButton`: compact yellow-orange selected-chapter button that opens
   `chapter_selection_screen.tscn`; see `docs/SCENES.md` "Shared UI Style Tokens" for why
   yellow-orange is the intentional secondary/alternative-action role here.
@@ -121,10 +126,17 @@ Key methods:
   opens Out of Lives when needed, and resumes the same launch after a successful life purchase;
   otherwise instantiates the level, sets campaign launch metadata, swaps current scene, and queues
   the menu.
-- `_refresh_out_of_lives_offer()`: keeps the modal's zero count, configured price, and next-life
-  countdown current; closes it without auto-launch if time restores a life.
-- `_on_out_of_lives_purchase_requested()`: opens Shop when unaffordable, otherwise persists one
-  atomic offline life purchase, closes the modal, and launches the originally requested level.
+- `_refresh_out_of_lives_offer()`: keeps the modal's life count, cap, configured price, and
+  next-life countdown current, which is also what switches an open modal between its below-cap and
+  full-lives states; closes it without auto-launch if time restores a life during an interrupted
+  launch, and leaves a widget-opened modal alone.
+- `_open_out_of_lives_menu(is_launch_pending)`: opens the lives modal and records which entry point
+  it came from in `_out_of_lives_launch_pending`.
+- `_close_out_of_lives_menu()`: single close path for the modal; clears the pending-launch flag
+  before awaiting the fade so no route can leave a stale launch to resume later.
+- `_on_out_of_lives_purchase_requested()`: ignores a stale press at the life cap, opens Shop when
+  unaffordable, otherwise persists one atomic offline life purchase and closes the modal; it
+  launches the originally requested level only when a campaign launch was pending.
 
 ## `scripts/chapters/*.gd`
 

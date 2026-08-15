@@ -296,6 +296,9 @@ Purpose:
 - Places a small yellow-orange `%ChapterButton` directly against the level button and opens the
   dedicated chapter selection screen.
 - Opens the player profile menu when the profile widget is pressed.
+- Opens the lives modal when the top status bar's lives widget is pressed, at any life count. This
+  entry point only reports and sells lives: unlike the zero-lives launch case it never resumes a
+  campaign launch afterwards, and never closes itself when a countdown restores a life.
 - Opens the main settings menu when the settings widget is pressed.
 - Opens the reward chest detail modal when the reward chest widget is pressed.
 - Starts the saved campaign level when the bottom button is pressed.
@@ -764,23 +767,36 @@ Script:
 - `scripts/out_of_lives_menu.gd`
 
 Purpose:
-- Main-menu modal shown after the player requests a campaign level with zero lives.
+- Main-menu modal for campaign lives, opened either after the player requests a campaign level with
+  zero lives or by pressing the top status bar's `LivesWidget` at any life count.
 - Composes `scenes/ui/gameplay_modal_shell.tscn` for the shared shade, cream content region, title,
   close action, responsive safe-area fitting, and fade motion.
-- Shows `OUT OF LIVES`, `assets/ui/main_menu_lives.png` with a zero count, the live `MM:SS`
-  restoration countdown, a green clover-coin price action, and a production-visible disabled
-  `Coming Soon` action.
+- Renders one of two states, chosen entirely from the count `set_offer()` receives, so a countdown
+  that restores the last missing life switches the open modal in place:
+  - **Below the cap**: `assets/ui/main_menu_lives.png` with the live count, the `MM:SS` restoration
+    countdown, a green clover-coin price action, and a production-visible disabled `Coming Soon`
+    action. Titled `OUT OF LIVES` at zero lives and `GET MORE LIVES` above it -- the zero-lives
+    wording belongs to the interrupted-launch case that opens the modal to explain a blocked play.
+  - **At the cap**: the countdown swaps to the full-lives message and both purchase actions swap to
+    a single dismissing `Got it`, under the title `LIVES FULL`. Nothing is for sale at the cap, so
+    offering a purchase action there would be an inert affordance.
 - Emits purchase/close intent only; `production_main_menu.gd` owns navigation while
-  `PlayerProgress` owns the atomic offline economy mutation.
+  `PlayerProgress` owns the atomic offline economy mutation. `Got it` reuses `close_requested`,
+  since dismissing is exactly what the shell's close action already does.
 
 Important nodes:
 - `%LifeCountLabel`, `%CountdownLabel`, and `%PriceLabel`: state supplied by the Main Menu.
+- `%TimerCenter` / `%MessageCenter`: the two mutually exclusive right-hand content columns beside
+  the heart (countdown vs. `%FullLivesLabel`), occupying the same 190x154 slot so the heart never
+  moves between states.
 - `%PurchaseButton`: green 194x76 coin-price action using the shared primary style.
-- `%ComingSoonButton`: always-visible, always-disabled neutral placeholder.
+- `%ComingSoonButton`: always-disabled neutral placeholder, visible below the cap.
+- `%GotItButton`: 194x76 dismiss action in the shared orange utility style (see "Shared UI Style
+  Tokens"), visible only at the cap.
 
 Depends on:
 - `scenes/ui/gameplay_modal_shell.tscn`, `assets/ui/main_menu_lives.png`, the canonical clover coin
-  art, and the shared green/disabled action styles.
+  art, and the shared green/disabled/orange-utility action styles.
 
 ## `scenes/ui/shop_purchase_dialog.tscn`
 
@@ -980,7 +996,11 @@ Important nodes:
 - `Spacer02`: non-expanding center exclusion corridor resized around camera cutouts.
 - `LivesWidget`: generated heart icon, current life count label, and `Full` or `MM:SS` countdown
   status label, vertically centered within the pill. Its compact pill background matches `CoinsWidget` through the shared
-  `assets/themes/style_box_status_counter_pill.tres` resource and matching 118x44 geometry.
+  `assets/themes/style_box_status_counter_pill.tres` resource and matching 118x44 geometry. A flat
+  `Button` (`FOCUS_NONE`, pointing-hand cursor, `press_scale_button.gd` at 0.97) that opens the
+  owning menu's lives modal, matching the `CoinsWidget` shortcut precedent. Its child labels stay
+  direct children with `MOUSE_FILTER_IGNORE`, so the `LivesWidget/LifeCount` and
+  `LivesWidget/LifeStatus` paths the owning menu writes into are unchanged.
 - `SettingsWidget`: warm rounded settings button matching the chapter selection screen's `BackButton` styling and held-press behavior; `FOCUS_NONE` with the pointing-hand cursor.
 
 Depends on:
