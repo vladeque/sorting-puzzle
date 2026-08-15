@@ -15,6 +15,7 @@ extends SceneTree
 const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
 const LEVEL_SCENE_PATH := "res://level.tscn"
 const LAYER_INDICATOR_SCENE_PATH := "res://scenes/shelf_layer_indicator.tscn"
+const WOOD_TEXTURE_PATH := "res://assets/shelves/standard_shelf_light_oak.png"
 
 ## Two standard shelves and one dispenser. The standard pair starts one candy_bag short of a triple
 ## and the dispenser holds the third, so the first move extinguishes one segment and clears a match.
@@ -101,6 +102,40 @@ func _test_visual_nodes_have_semantic_names() -> void:
 		_check(
 			dispenser.get_node_or_null(node_name) is Polygon2D,
 			"Dispenser visual node %s should be authored with a semantic name." % node_name
+		)
+
+	var textured_nodes := [
+		"BackWall",
+		"BackWallLowerPanel",
+		"LeftWallUpperFace",
+		"LeftWallTopBevel",
+		"LeftWallInnerFace",
+		"LeftWallLowerBevel",
+		"LeftWallLowerFace",
+		"RightWallUpperFace",
+		"RightWallTopBevel",
+		"RightWallInnerFace",
+		"RightWallLowerBevel",
+		"RightWallLowerFace",
+		"FloorSurface",
+		"FloorFrontLip",
+	]
+	for node_name in textured_nodes:
+		var face := dispenser.get_node_or_null(node_name) as Polygon2D
+		_check(
+			face != null and face.texture != null and face.texture.resource_path == WOOD_TEXTURE_PATH,
+			"Dispenser wood face %s should use the shared light-oak texture." % node_name
+		)
+		_check(
+			face != null and face.uv.size() == face.polygon.size(),
+			"Dispenser wood face %s should map one UV per polygon vertex." % node_name
+		)
+
+	for grain_name in ["FloorGrainBack", "FloorGrainMiddle", "FloorGrainFront"]:
+		var legacy_grain := dispenser.get_node_or_null(grain_name) as CanvasItem
+		_check(
+			legacy_grain != null and not legacy_grain.visible,
+			"Legacy line grain %s should stay hidden behind the image texture." % grain_name
 		)
 	dispenser.free()
 

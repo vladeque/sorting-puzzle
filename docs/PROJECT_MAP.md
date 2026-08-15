@@ -670,6 +670,7 @@ Change here when:
 
 Files:
 - `scenes/dispenser_shelf.tscn`, `scripts/dispenser_shelf.gd`
+- `assets/shelves/standard_shelf_light_oak.png`
 - `scenes/shelf_layer_indicator.tscn`, `scripts/shelf_layer_indicator.gd`
 - `scripts/shelf.gd`
 - `scripts/level.gd`
@@ -680,6 +681,9 @@ Responsibility:
 - A second shelf type: a narrow one-slot open wooden cradle holding 2-4 stacked layers that the
   player can take from but never place onto. Its circular badge reuses the ability count style, and
   its thin-outlined segmented stock rail shows both remaining items and total capacity at a glance.
+- Shares the standard shelf's light-oak image across its back, floor, lip, guard faces, bevels, and
+  inner returns. Each `Polygon2D` owns UVs suited to its face direction; tint and translucent shade
+  overlays retain the recessed-cradle depth, while the former line-only floor grain stays hidden.
 - The queue is not a separate stacking system. `Shelf`'s back-layer machinery already models "one
   hidden item per layer, promoted when the front layer empties", and with a single front slot that
   is exactly a dispenser.

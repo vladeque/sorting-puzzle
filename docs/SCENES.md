@@ -1856,8 +1856,8 @@ Purpose:
 - Can be switched by `scripts/level.gd` to `left`, `middle`, or `right` row-placement visuals for static shelves. Moving-row shelves currently stay on the neutral `middle` row-placement visual.
 - Uses `assets/shelves/standard_shelf_light_oak.png` on its existing `Polygon2D` frame faces. Broad
   faces sample the grain horizontally, while the side-wall UVs rotate it vertically; keeping the
-  faces separate preserves their placement visibility and item/back-layer z-order. This material is
-  standard-shelf-only and does not change `scenes/dispenser_shelf.tscn`.
+  faces separate preserves their placement visibility and item/back-layer z-order. The dispenser
+  shelf shares this material but owns UV mappings and shading for its compact open-cradle geometry.
 
 Important nodes:
 - `BackWall`: muted panel behind shelf items.
@@ -1902,6 +1902,9 @@ Purpose:
   guards, a frame-level cast shadow, an ability-style circular count badge, and a wide segmented
   stock rail identify the one-way source while keeping the standard shelf palette and item resting
   position.
+- Uses `assets/shelves/standard_shelf_light_oak.png` across the back, floor, front lip, lower panel,
+  and every guard face. Horizontal UVs suit broad planes, rotated UVs run grain along the vertical
+  supports, and face-specific tint/shade overlays preserve the inset depth.
 - Its root authors a `Vector2(0, -10)` position that `scripts/level.gd::_add_shelf()` preserves as a
   per-scene layout offset, keeping the complete dispenser 10px above a standard neighbour.
 
@@ -1909,9 +1912,10 @@ Important nodes:
 - `FrameShadow`, `BackWall`, `BackWallLowerPanel`, and the `BackWall*Shade`/`*ShadowEdge` nodes:
   the recessed back and cast-depth treatment of the compact cradle.
 - `LeftWall*` and `RightWall*`: semantically paired upper/lower faces, top/lower bevels, and inner
-  faces for the two chunky side guards. Each bevel/inner-face node owns a local `Shade` child.
-- `FloorSurface`, `FloorFrontLip`, and `FloorGrain*`: the item floor and front lip inside the 96-wide
-  packing cell. There is intentionally no `Ceiling` or `TopCeilingCap`.
+  faces for the two chunky image-textured side guards. Each bevel/inner-face node owns a translucent
+  local `Shade` child.
+- `FloorSurface`, `FloorFrontLip`, and hidden legacy `FloorGrain*`: the textured item floor and front
+  lip inside the 96-wide packing cell. There is intentionally no `Ceiling` or `TopCeilingCap`.
 - `LayerIndicator`: `scenes/shelf_layer_indicator.tscn` instance overlapping the front lip; its
   compact circular badge shows the exact count and its wide, thin-outlined rail shows one cell per
   authored item with narrow straight seams like one continuous segmented strip.
@@ -1921,6 +1925,7 @@ Important nodes:
   position as a standard shelf's so items rest identically.
 
 Depends on:
+- `assets/shelves/standard_shelf_light_oak.png`.
 - `scenes/ui/shelf_lock_overlay.tscn`, `scenes/shelf_layer_indicator.tscn`.
 
 Do not use for:
