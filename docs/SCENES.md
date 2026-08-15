@@ -683,6 +683,8 @@ Runtime children:
 - Dedicated inherited Shop variant configured with `ShopScreen.IN_LEVEL_OVERLAY`.
 - Instanced by `level.tscn` above Ability Purchase when the player presses its coin-price action
   without enough coins.
+- Its root uses canvas `z_index = 2`, keeping the full-screen Shop above the ability bar's
+  `z_index = 1` count/timer badges instead of letting those gameplay labels leak through.
 - Reuses the exact destination Shop catalog, StoreService purchase flow, balance widget, offer
   scenes, selected-chapter background, loading/error state, and purchase-result dialog.
 - Has no Bottom Navigation; X/system back closes it and restores Ability Purchase without spending

@@ -174,6 +174,11 @@ func _test_paid_use_and_persistence() -> void:
 	_check(not bool(level.call("_is_freezer_active")), "insufficient coins do not activate Freezer")
 	var in_level_shop = level.get("_in_level_shop_overlay")
 	_check(bool(in_level_shop.visible), "insufficient coins open the in-level Shop")
+	var hammer_uses_label := level.get_node("UI/AbilityBar/ButtonRow/HammerButton/UsesLabel") as Label
+	_check(
+		in_level_shop.z_index > hammer_uses_label.z_index,
+		"in-level Shop renders above gameplay ability counters"
+	)
 	_check(
 		not bool((in_level_shop.get_node("%BottomNavigation") as Control).visible),
 		"in-level Shop hides BottomNavigation"
