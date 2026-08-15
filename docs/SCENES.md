@@ -791,12 +791,15 @@ Important nodes:
   moves between states.
 - `%PurchaseButton`: green 194x76 coin-price action using the shared primary style.
 - `%ComingSoonButton`: always-disabled neutral placeholder, visible below the cap.
-- `%GotItButton`: 194x76 dismiss action in the shared orange utility style (see "Shared UI Style
-  Tokens"), visible only at the cap.
+- `%GotItButton`: 194x76 dismiss action, visible only at the cap. Deliberately shares
+  `style_box_green_primary_button.tres` with `%PurchaseButton` rather than taking the orange
+  dismiss role (see "Shared UI Style Tokens"): it is the modal's only action in that state, so it
+  reads as the primary action rather than as the secondary half of a pair. It carries the same
+  white/dark-green-outlined text treatment the Pause menu's `Continue` uses on that art.
 
 Depends on:
 - `scenes/ui/gameplay_modal_shell.tscn`, `assets/ui/main_menu_lives.png`, the canonical clover coin
-  art, and the shared green/disabled/orange-utility action styles.
+  art, and the shared green/disabled action styles.
 
 ## `scenes/ui/shop_purchase_dialog.tscn`
 

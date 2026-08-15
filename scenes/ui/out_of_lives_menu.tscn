@@ -7,8 +7,6 @@
 [ext_resource type="Script" path="res://scripts/press_scale_button.gd" id="5_press_scale"]
 [ext_resource type="StyleBoxTexture" path="res://assets/themes/style_box_green_primary_button.tres" id="6_green"]
 [ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_disabled_action_button.tres" id="7_disabled"]
-[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_orange_utility_normal.tres" id="8_orange_normal"]
-[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_orange_utility_pressed.tres" id="9_orange_pressed"]
 
 [node name="OutOfLivesMenu" type="Control"]
 anchors_preset = 15
@@ -220,12 +218,14 @@ layout_mode = 2
 focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.92, 1, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 28
-theme_override_styles/normal = ExtResource("8_orange_normal")
-theme_override_styles/pressed = ExtResource("9_orange_pressed")
-theme_override_styles/hover = ExtResource("8_orange_normal")
+theme_override_colors/font_outline_color = Color(0.03, 0.25, 0.04, 0.95)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = ExtResource("6_green")
+theme_override_styles/pressed = ExtResource("6_green")
+theme_override_styles/hover = ExtResource("6_green")
 text = "Got it"
 script = ExtResource("5_press_scale")
 held_scale = 0.94
