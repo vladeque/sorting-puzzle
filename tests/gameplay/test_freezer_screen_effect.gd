@@ -54,7 +54,7 @@ func _verify_effect_scene() -> void:
 	_check(
 		glow_color.b > glow_color.r
 		and glow_color.b > glow_color.g
-		and glow_intensity > 0.0
+		and glow_intensity >= 0.3
 		and is_equal_approx(glow_intensity, hud_glow_intensity),
 		"Both Freezer passes share a subtle blue edge glow."
 	)

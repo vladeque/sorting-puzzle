@@ -7,7 +7,7 @@ uniform float reveal_depth : hint_range(0.1, 0.5) = 0.38;
 uniform float reveal_softness : hint_range(0.001, 0.08) = 0.025;
 uniform vec4 glow_color : source_color = vec4(0.08, 0.58, 1.0, 1.0);
 uniform float glow_width : hint_range(0.005, 0.08) = 0.035;
-uniform float glow_intensity : hint_range(0.0, 0.6) = 0.22;
+uniform float glow_intensity : hint_range(0.0, 0.6) = 0.30;
 
 
 void fragment() {
