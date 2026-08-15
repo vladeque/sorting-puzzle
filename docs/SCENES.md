@@ -1154,6 +1154,9 @@ Important nodes:
 - `Background/HudCenterSlot/ComboLabel`: hidden until the player clears a triple, then shows the active combo count.
 - `Shelves`: parent for generated shelf nodes and optional moving shelf row containers; `scripts/level.gd` scales and centers it in the available play area for the current viewport size.
 - `DragLayer`: temporary parent for dragged items, drawn above shelves.
+- `LanternScreenEffect`: `scenes/abilities/lantern_screen_effect.tscn` instance on canvas layer 4;
+  Golden Searchlight adds a warm vignette, expanding bloom, shelf-search sweep, and sparse motes
+  above gameplay while remaining below Freezer, the HUD, and modal shades.
 - `FreezerScreenEffect`: `scenes/abilities/freezer_screen_effect.tscn` instance whose main frame
   renders on canvas layer 5 below UI and whose top-edge-only copy renders on layer 11 over `TopHud`.
   Both use transparent crack art plus a narrow blue edge glow and never recolor the level center.
@@ -1200,6 +1203,7 @@ Depends on:
 - `configs/levels/level_*.json`
 - `assets/abilities/*.png`
 - `scenes/abilities/hammer_impact_effect.tscn` for the hammer ability's fullscreen strike animation.
+- `scenes/abilities/lantern_screen_effect.tscn` for the Lantern ability's persistent Golden Searchlight.
 - `scenes/abilities/freezer_screen_effect.tscn` for the Freezer ability's persistent perimeter ice.
 
 Do not use for:
@@ -1392,6 +1396,37 @@ Depends on:
 Do not use for:
 - Star awards, completion rules, or the reward screen. Those stay in `scripts/level.gd` and
   `scenes/ui/level_completion_screen.tscn`.
+
+## `scenes/abilities/lantern_screen_effect.tscn`
+
+Root:
+- `LanternScreenEffect` (`CanvasLayer`, layer 4)
+
+Script:
+- `scripts/lantern_screen_effect.gd`
+
+Purpose:
+- Reusable fullscreen Golden Searchlight presentation owned separately from `scripts/level.gd`.
+- Uses `lantern_searchlight.gdshader` for a low-opacity brown-gold edge vignette, slight center
+  warmth, expanding activation ring from the Lantern button area, and a periodic diagonal beam.
+- Adds twelve slow glowing motes with a scene-authored radial `GradientTexture2D`; no generated or
+  external bitmap asset is required.
+- Ignores mouse/touch input and stays below both the layer-5 Freezer effect and layer-10 gameplay UI.
+  Its particle emission rectangle follows the responsive viewport.
+
+Important nodes:
+- `Overlay/SearchlightWash`: fullscreen texture-free procedural shader pass.
+- `Overlay/Motes`: sparse `CPUParticles2D` warm-light ambience.
+
+Verification:
+- `tests/gameplay/test_lantern_screen_effect.gd` checks layering, input pass-through, restrained
+  shader values, responsive particle layout, idempotent activation, fade cleanup, and level integration.
+- `scripts/tools/captures/lantern_effect_setup.gd` activates Lantern for responsive rendered
+  captures of `level.tscn`.
+
+Do not use for:
+- Lantern timing, highlighted-item selection, inventory spending, or persistence. Those remain in
+  `scripts/level.gd` and `PlayerProgress`.
 
 ## `scenes/abilities/freezer_screen_effect.tscn`
 

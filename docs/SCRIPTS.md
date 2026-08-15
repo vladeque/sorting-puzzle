@@ -1643,6 +1643,10 @@ Key responsibilities:
 - Find items to highlight with `_find_immediate_triple_items()`: prefer a shelf that is one item away from a full match plus a loose match elsewhere (single-move triple), otherwise fall back to any visible items sharing a type. Only one item type is ever highlighted at a time even when several types qualify, but every visible item of that chosen type is highlighted, not just three.
 - After every move, `_refresh_ability_highlights()` calls `_find_current_highlight_type_items()` first so the highlighted item type stays put as long as it still has enough visible matches; it only calls `_find_immediate_triple_items()` for a new type once the current one can no longer complete a triple. This stops the highlight from jumping to an unrelated item type after an unconnected move.
 - Apply highlight ability visuals through `ShelfItem.set_outline()` and `ShelfItem.set_highlight_scale()` so highlighted items get an even border and a slightly larger sprite, and update the highlight button countdown label while that window is active.
+- Mirror the Lantern timer into the reusable `LanternScreenEffect`: a low-opacity warm vignette,
+  expanding activation bloom, slow diagonal shelf-search sweep, and sparse drifting motes render
+  above gameplay but below Freezer and the HUD. The effect fades with normal Lantern expiry or
+  cancellation and clears immediately when a new level configuration is applied.
 - Activate Freezer for exactly 30 seconds of active gameplay. Only `_time_remaining` is gated;
   item interaction, combo expiry, Lantern expiry, moving shelf rows, animations, matching, and
   other abilities continue. Pause menus, the ability-purchase modal, and application interruption
@@ -1784,6 +1788,36 @@ Verification:
 Do not use for:
 - Completion rules, star awards, or the reward screen itself. Those stay in `scripts/level.gd` and
   `scripts/level_completion_screen.gd`.
+
+## `scripts/lantern_screen_effect.gd`
+
+Class:
+- `LanternScreenEffect`
+
+Attached to:
+- `scenes/abilities/lantern_screen_effect.tscn` root `LanternScreenEffect`.
+
+Purpose:
+- Owns the Lantern ability's Golden Searchlight presentation independently from its gameplay,
+  inventory, and timer state.
+- Drives a procedural fullscreen wash on canvas layer 4 with an expanding button-origin bloom,
+  restrained warm edge vignette, subtle center warmth, and a diagonal light sweep every 6.4 seconds.
+- Distributes twelve slow `CPUParticles2D` light motes across the live viewport. `apply_layout()`
+  updates the particle center and emission rectangle for every responsive size.
+- Keeps repeated `set_active(true)` calls idempotent, fades on normal expiry/cancellation, and offers
+  an immediate cleanup path for level rebuilds. The complete effect ignores input and remains under
+  Freezer's layer-5 frame and the layer-10 HUD/modal system.
+
+Depends on:
+- `assets/abilities/lantern_searchlight.gdshader`: texture-free Golden Searchlight compositing.
+- `scripts/level.gd`: authoritative Lantern timer and visual-state orchestration.
+
+Verification:
+- `tests/gameplay/test_lantern_screen_effect.gd`.
+- Responsive `level.tscn` capture through `scripts/tools/captures/lantern_effect_setup.gd`.
+
+Do not use for:
+- Lantern duration, item selection/highlighting, inventory spending, purchase, or persistence.
 
 ## `scripts/freezer_screen_effect.gd`
 

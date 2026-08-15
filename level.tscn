@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" path="res://scenes/effects/level_completion_confetti.tscn" id="15_completion_confetti"]
 [ext_resource type="PackedScene" path="res://scenes/ui/in_level_shop_screen.tscn" id="16_in_level_shop"]
 [ext_resource type="PackedScene" path="res://scenes/abilities/freezer_screen_effect.tscn" id="17_freezer_effect"]
+[ext_resource type="PackedScene" path="res://scenes/abilities/lantern_screen_effect.tscn" id="18_lantern_effect"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_baseboard"]
 bg_color = Color(0.83, 0.66, 0.47, 1)
@@ -176,6 +177,8 @@ position = Vector2(360, 570)
 
 [node name="DragLayer" type="Node2D" parent="." unique_id=1163629860]
 z_index = 100
+
+[node name="LanternScreenEffect" parent="." instance=ExtResource("18_lantern_effect")]
 
 [node name="FreezerScreenEffect" parent="." unique_id=765524835 instance=ExtResource("17_freezer_effect")]
 

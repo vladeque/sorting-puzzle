@@ -1,0 +1,81 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/lantern_screen_effect.gd" id="1_script"]
+[ext_resource type="Shader" path="res://assets/abilities/lantern_searchlight.gdshader" id="2_shader"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_searchlight"]
+shader = ExtResource("2_shader")
+shader_parameter/intensity = 0.0
+shader_parameter/activation_progress = 1.0
+shader_parameter/elapsed_seconds = 0.0
+shader_parameter/activation_origin = Vector2(0.64, 0.88)
+shader_parameter/vignette_color = Color(0.12, 0.045, 0.005, 1)
+shader_parameter/warm_color = Color(1, 0.56, 0.08, 1)
+shader_parameter/vignette_opacity = 0.12
+shader_parameter/ambient_warmth = 0.045
+shader_parameter/sweep_opacity = 0.085
+shader_parameter/activation_opacity = 0.3
+
+[sub_resource type="Gradient" id="Gradient_mote_texture"]
+offsets = PackedFloat32Array(0, 0.28, 1)
+colors = PackedColorArray(1, 0.92, 0.5, 1, 1, 0.66, 0.12, 0.72, 1, 0.52, 0.04, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture_mote"]
+gradient = SubResource("Gradient_mote_texture")
+width = 64
+height = 64
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="Gradient" id="Gradient_mote_fade"]
+offsets = PackedFloat32Array(0, 0.16, 0.72, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 0.72, 1, 1, 1, 0.52, 1, 1, 1, 0)
+
+[node name="LanternScreenEffect" type="CanvasLayer"]
+layer = 4
+script = ExtResource("1_script")
+
+[node name="Overlay" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="SearchlightWash" type="ColorRect" parent="Overlay"]
+unique_name_in_owner = true
+material = SubResource("ShaderMaterial_searchlight")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 1)
+
+[node name="Motes" type="CPUParticles2D" parent="Overlay"]
+unique_name_in_owner = true
+position = Vector2(360, 640)
+emitting = false
+amount = 12
+lifetime = 4.5
+preprocess = 4.5
+randomness = 0.72
+lifetime_randomness = 0.35
+emission_shape = 3
+emission_rect_extents = Vector2(360, 640)
+direction = Vector2(0, -1)
+spread = 28.0
+gravity = Vector2(2, -2)
+initial_velocity_min = 8.0
+initial_velocity_max = 18.0
+scale_amount_min = 0.08
+scale_amount_max = 0.16
+color = Color(1, 0.72, 0.2, 0.72)
+color_ramp = SubResource("Gradient_mote_fade")
+texture = SubResource("GradientTexture_mote")

@@ -533,12 +533,15 @@ Files:
 - `configs/item_sprites.json`
 - `scenes/abilities/hammer_impact_effect.tscn`
 - `scripts/hammer_impact_effect.gd`
+- `scenes/abilities/lantern_screen_effect.tscn`
+- `scripts/lantern_screen_effect.gd`
 - `scenes/abilities/freezer_screen_effect.tscn`
 - `scripts/freezer_screen_effect.gd`
 - `scenes/effects/level_completion_confetti.tscn`
 - `scripts/level_completion_confetti.gd`
 - `assets/abilities/ability_hammer_swing_*.png`
 - `assets/abilities/ability_shuffle_box.png`
+- `assets/abilities/lantern_searchlight.gdshader`
 - `assets/abilities/freezer_cracked_ice_overlay.png`
 
 Responsibility:
@@ -576,6 +579,9 @@ Responsibility:
 - Tracks the countdown timer, starting it only after the first meaningful player action, and win/loss overlays.
 - Plays the hammer ability by gathering the targeted items into one center-screen item, striking it with the fullscreen hammer, then dropping combo reward stars from the impact point.
 - Plays the shuffle ability by showing a center-screen delivery box, flying visible unlocked items into it, swapping item identities while hidden, flying them back to their slots, then resolving shelf matches.
+- Shows Lantern as Golden Searchlight on canvas layer 4: a restrained warm vignette and center wash,
+  activation bloom from the Lantern-button area, periodic diagonal shelf-search beam, and sparse
+  responsive light motes persist for the same 15-second window as the highlighted-item outlines.
 - Shows Freezer as transparent cyan-white perimeter cracks: the main frame sits between gameplay
   and UI, while a clipped copy of only its top edge renders over `TopHud`. The effect reveals inward
   once, holds without recoloring the configured level background, and thaws when the 30-second
@@ -743,6 +749,8 @@ Files:
 - `configs/ability_purchase_prices.json`
 - `scenes/abilities/hammer_impact_effect.tscn`
 - `scripts/hammer_impact_effect.gd`
+- `scenes/abilities/lantern_screen_effect.tscn`
+- `scripts/lantern_screen_effect.gd`
 - `scenes/abilities/freezer_screen_effect.tscn`
 - `scripts/freezer_screen_effect.gd`
 - `assets/abilities/*.png`
@@ -762,7 +770,8 @@ Responsibility:
 - Disables abilities after failure, completion, pause, or active ability animations. A zero-use ability button stays pressable during gameplay so `scenes/ability_purchase_menu.tscn` can offer a paid immediate use, presented as "USE ABILITY" (UI-003, not an inventory acquisition) with the canonical clover coin art and a genuine unavailable style (not alpha dimming) when unaffordable.
 - Loads per-ability paid-use prices from `configs/ability_purchase_prices.json`, spends coins through `PlayerProgress.spend_coins()`, and applies the selected paid ability immediately without adding saved inventory.
 - Starts the highlight timer even when no current shelf state can be highlighted.
-- Uses `ShelfItem` outline state for border-only highlight ability visuals.
+- Uses `ShelfItem` outline/scale state for item-local highlight visuals and mirrors the same timer
+  into the responsive Golden Searchlight screen treatment below the HUD.
 - Shows the active highlight countdown in a bottom-right badge on the highlight button.
 - Pauses only the level countdown for Freezer, shows its active badge and frozen timer treatment,
   and mirrors that state into the transparent cracked-ice perimeter with a subtle four-sided blue

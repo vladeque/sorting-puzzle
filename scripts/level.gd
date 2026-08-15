@@ -16,6 +16,7 @@ const ABILITY_HAMMER := &"hammer"
 const ABILITY_SHUFFLE := &"shuffle"
 const ABILITY_HIGHLIGHT := &"highlight"
 const ABILITY_FREEZER := &"freezer"
+const LanternScreenEffectClass := preload("res://scripts/lantern_screen_effect.gd")
 const HIGHLIGHT_DURATION_SECONDS := 15.0
 const FREEZER_DURATION_SECONDS := 30.0
 ## The reward overlay begins before the longer confetti fall ends, bridging the cleared board and
@@ -161,6 +162,7 @@ var _leave_confirmation_overlay: LeaveConfirmationMenu
 var _ability_purchase_overlay: AbilityPurchaseMenu
 var _in_level_shop_overlay: ShopScreen
 var _ability_bar: AbilityBar
+var _lantern_screen_effect: LanternScreenEffectClass
 var _freezer_screen_effect: FreezerScreenEffect
 var _ability_uses: Dictionary = {
 	ABILITY_HAMMER: 3,
@@ -222,6 +224,7 @@ func _ready() -> void:
 	_ability_purchase_overlay = get_node("UI/AbilityPurchaseOverlay") as AbilityPurchaseMenu
 	_in_level_shop_overlay = get_node("UI/InLevelShopOverlay") as ShopScreen
 	_ability_bar = get_node("UI/AbilityBar") as AbilityBar
+	_lantern_screen_effect = get_node("LanternScreenEffect") as LanternScreenEffectClass
 	_freezer_screen_effect = get_node("FreezerScreenEffect") as FreezerScreenEffect
 	_failure_screen.visible = false
 	_completion_screen.visible = false
@@ -277,6 +280,8 @@ func _apply_responsive_layout() -> void:
 		_background.size = viewport_size
 
 	_top_hud.apply_safe_layout(safe_margins, viewport_size)
+	if _lantern_screen_effect != null:
+		_lantern_screen_effect.apply_layout(viewport_size)
 	if _freezer_screen_effect != null:
 		_freezer_screen_effect.apply_layout(viewport_size, _top_hud.size.y)
 	_layout_ability_bar(safe_margins)
@@ -710,7 +715,7 @@ func _apply_level_config(config: Dictionary) -> void:
 	_shelves_pending_resolve.clear()
 	_shelves_resolving_ids.clear()
 
-	_clear_ability_highlights()
+	_clear_ability_highlights(true)
 	_clear_freezer(true)
 	_load_ability_uses()
 
@@ -4010,23 +4015,26 @@ func _find_current_highlight_type_items() -> Array[ShelfItem]:
 	return matches
 
 
-func _clear_ability_highlights() -> void:
+func _clear_ability_highlights(immediate_visual := false) -> void:
 	var previous_items := _highlighted_items.duplicate()
 	_highlighted_items.clear()
 	_highlight_timer = 0.0
-	_update_highlight_timer_label()
+	_update_highlight_timer_label(immediate_visual)
 
 	for item in previous_items:
 		if item != null and is_instance_valid(item):
 			_apply_item_visual_state(item)
 
 
-func _update_highlight_timer_label() -> void:
+func _update_highlight_timer_label(immediate := false) -> void:
+	var is_active := _highlight_timer > 0.0 and not _level_failed and not _level_completed
+	if _lantern_screen_effect != null:
+		_lantern_screen_effect.set_active(is_active, immediate)
 	if _ability_bar == null:
 		return
 	_ability_bar.set_active_seconds(
 		ABILITY_HIGHLIGHT,
-		_highlight_timer if not _level_failed and not _level_completed else 0.0
+		_highlight_timer if is_active else 0.0
 	)
 
 
