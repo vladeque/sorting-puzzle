@@ -31,6 +31,8 @@ func _run() -> void:
 
 func _test_freezer_runtime_semantics() -> void:
 	var level = await _make_level(true, 8)
+	var ability_bar := level.get("_ability_bar") as AbilityBar
+	var freezer_button := ability_bar.get_ability_button(ABILITY_FREEZER)
 	level.set("_time_remaining", 120.0)
 	level.set("_has_player_started_timer", false)
 	level.set("_combo_count", 2)
@@ -82,8 +84,16 @@ func _test_freezer_runtime_semantics() -> void:
 	level.call("_process", 5.0)
 	_check(is_equal_approx(float(level.get("_time_remaining")), 97.0), "only the exact frozen portion of a delta is suppressed")
 	_check(not bool(level.call("_is_freezer_active")), "Freezer expires without an extra frame")
+	_check(not freezer_button.disabled, "Freezer button is enabled again after expiry")
 
-	level.call("_use_freezer")
+	_check(
+		bool(level.call("_apply_ability_from_button", ABILITY_FREEZER)),
+		"Freezer can be activated again after expiry"
+	)
+	_check(
+		int((level.get("_ability_uses") as Dictionary).get(ABILITY_FREEZER, 0)) == starting_uses - 2,
+		"reactivation spends exactly one additional use"
+	)
 	level.set("_level_paused", true)
 	var paused_remaining := float(level.get("_freezer_time_remaining"))
 	level.call("_process", 6.0)

@@ -1651,6 +1651,8 @@ Key responsibilities:
   item interaction, combo expiry, Lantern expiry, moving shelf rows, animations, matching, and
   other abilities continue. Pause menus, the ability-purchase modal, and application interruption
   suspend only the Freezer window. A partial expiry delta suppresses only its frozen portion.
+- Refresh the ability bar when Freezer expires so its anti-stacking disabled state is removed and
+  another remaining use can be activated immediately.
 - Mirror that active state into the reusable `FreezerScreenEffect`: its transparent perimeter
   cracks reveal once on activation, keep their main frame below normal UI, repeat only the clipped
   top edge above `TopHud`, and add a narrow blue glow along all four sides without tinting the level

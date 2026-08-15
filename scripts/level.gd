@@ -4043,7 +4043,12 @@ func _update_freezer_timer(delta: float) -> float:
 		return delta
 	var frozen_delta := minf(maxf(delta, 0.0), _freezer_time_remaining)
 	_freezer_time_remaining = maxf(_freezer_time_remaining - frozen_delta, 0.0)
-	_update_freezer_visuals()
+	if _is_freezer_active():
+		_update_freezer_visuals()
+	else:
+		# Activation disables the Freezer button to prevent stacking. Refresh the complete
+		# interaction state when the timer expires so a remaining use can be activated again.
+		_update_ability_buttons()
 	return maxf(delta - frozen_delta, 0.0)
 
 
