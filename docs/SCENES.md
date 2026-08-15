@@ -1155,8 +1155,8 @@ Important nodes:
 - `Shelves`: parent for generated shelf nodes and optional moving shelf row containers; `scripts/level.gd` scales and centers it in the available play area for the current viewport size.
 - `DragLayer`: temporary parent for dragged items, drawn above shelves.
 - `LanternScreenEffect`: `scenes/abilities/lantern_screen_effect.tscn` instance on canvas layer 4;
-  Golden Searchlight adds a warm vignette, expanding bloom, shelf-search sweep, and sparse motes
-  above gameplay while remaining below Freezer, the HUD, and modal shades.
+  Focus Mode shades non-target gameplay and tracks bright pools, upward rays, and concentrated
+  motes to highlighted items while remaining below Freezer, the HUD, and modal shades.
 - `FreezerScreenEffect`: `scenes/abilities/freezer_screen_effect.tscn` instance whose main frame
   renders on canvas layer 5 below UI and whose top-edge-only copy renders on layer 11 over `TopHud`.
   Both use transparent crack art plus a narrow blue edge glow and never recolor the level center.
@@ -1203,7 +1203,7 @@ Depends on:
 - `configs/levels/level_*.json`
 - `assets/abilities/*.png`
 - `scenes/abilities/hammer_impact_effect.tscn` for the hammer ability's fullscreen strike animation.
-- `scenes/abilities/lantern_screen_effect.tscn` for the Lantern ability's persistent Golden Searchlight.
+- `scenes/abilities/lantern_screen_effect.tscn` for the Lantern ability's persistent Focus Mode.
 - `scenes/abilities/freezer_screen_effect.tscn` for the Freezer ability's persistent perimeter ice.
 
 Do not use for:
@@ -1406,10 +1406,13 @@ Script:
 - `scripts/lantern_screen_effect.gd`
 
 Purpose:
-- Reusable fullscreen Golden Searchlight presentation owned separately from `scripts/level.gd`.
-- Uses `lantern_searchlight.gdshader` for a low-opacity brown-gold edge vignette, slight center
-  warmth, expanding activation ring from the Lantern button area, and a periodic diagonal beam.
-- Adds twelve slow glowing motes with a scene-authored radial `GradientTexture2D`; no generated or
+- Reusable fullscreen Lantern Focus Mode presentation owned separately from `scripts/level.gd`.
+- Uses `lantern_searchlight.gdshader` for a clearly visible warm shade over non-target gameplay,
+  sixteen-capacity target-position uniform array, pulsing item-centered light pools, upward shafts,
+  perimeter glow, and an expanding activation wave from the Lantern button area.
+- When no immediate target exists, replaces the target pools with a continuous diagonal search beam.
+- Adds twenty slow additive motes with a scene-authored radial `GradientTexture2D`; their emission
+  rectangle follows the highlighted targets rather than filling the whole screen. No generated or
   external bitmap asset is required.
 - Ignores mouse/touch input and stays below both the layer-5 Freezer effect and layer-10 gameplay UI.
   Its particle emission rectangle follows the responsive viewport.
@@ -1419,8 +1422,9 @@ Important nodes:
 - `Overlay/Motes`: sparse `CPUParticles2D` warm-light ambience.
 
 Verification:
-- `tests/gameplay/test_lantern_screen_effect.gd` checks layering, input pass-through, restrained
-  shader values, responsive particle layout, idempotent activation, fade cleanup, and level integration.
+- `tests/gameplay/test_lantern_screen_effect.gd` checks layering, input pass-through, Focus Mode
+  contrast values, target normalization, concentrated particle layout, idempotent activation, fade
+  cleanup, and level integration.
 - `scripts/tools/captures/lantern_effect_setup.gd` activates Lantern for responsive rendered
   captures of `level.tscn`.
 

@@ -1,6 +1,6 @@
 extends SceneTree
 
-## Focused verification for the reusable Golden Searchlight overlay and its level integration.
+## Focused verification for the reusable Lantern Focus Mode overlay and its level integration.
 
 const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
 const EFFECT_SCENE_PATH := "res://scenes/abilities/lantern_screen_effect.tscn"
@@ -37,7 +37,8 @@ func _verify_effect_scene() -> void:
 	var motes := effect.get_node("Overlay/Motes") as CPUParticles2D
 	var material := wash.material as ShaderMaterial
 	var warm_color: Color = material.get_shader_parameter(&"warm_color")
-	var vignette_opacity := float(material.get_shader_parameter(&"vignette_opacity"))
+	var shade_opacity := float(material.get_shader_parameter(&"shade_opacity"))
+	var focus_warmth := float(material.get_shader_parameter(&"focus_warmth"))
 	_check(effect.layer == 4, "Lantern renders above gameplay and below Freezer/UI layers.")
 	_check(not effect.visible, "Lantern overlay starts hidden.")
 	_check(
@@ -48,12 +49,13 @@ func _verify_effect_scene() -> void:
 	_check(
 		warm_color.r > warm_color.g
 		and warm_color.g > warm_color.b
-		and vignette_opacity <= 0.12,
-		"The searchlight uses a restrained warm-gold treatment."
+		and shade_opacity >= 0.2
+		and focus_warmth >= 0.2,
+		"Focus Mode strongly separates the shaded board from warm target pools."
 	)
 	_check(
-		motes.amount <= 12 and motes.lifetime >= 4.0,
-		"The ambience uses a sparse, slow-moving mote field."
+		motes.amount >= 18 and motes.amount <= 24 and motes.lifetime >= 4.0,
+		"Focus Mode uses a visible but bounded slow-moving mote field."
 	)
 
 	effect.apply_layout(Vector2(720.0, 1280.0))
@@ -61,6 +63,20 @@ func _verify_effect_scene() -> void:
 		motes.position.is_equal_approx(Vector2(360.0, 640.0))
 		and motes.emission_rect_extents.is_equal_approx(Vector2(360.0, 640.0)),
 		"The mote field follows the responsive viewport."
+	)
+	effect.set_target_positions([Vector2(180.0, 320.0), Vector2(540.0, 960.0)])
+	var normalized_targets := effect.get_target_positions_normalized()
+	_check(
+		effect.get_target_count() == 2
+		and normalized_targets.size() == 2
+		and normalized_targets[0].is_equal_approx(Vector2(0.25, 0.25))
+		and normalized_targets[1].is_equal_approx(Vector2(0.75, 0.75)),
+		"Target item centers are normalized for the fullscreen focus shader."
+	)
+	_check(
+		motes.emission_rect_extents.x < 360.0
+		and motes.emission_rect_extents.y < 640.0,
+		"Active target positions concentrate motes around highlighted goods."
 	)
 
 	effect.set_active(true)
@@ -85,7 +101,14 @@ func _verify_effect_scene() -> void:
 		effect.get_effect_intensity() > 0.99
 		and effect.get_activation_progress() > 0.99
 		and effect.get_elapsed_seconds() > 0.4,
-		"Repeated active updates preserve the completed Golden Searchlight entrance."
+		"Repeated active updates preserve the completed Focus Mode entrance."
+	)
+	effect.set_target_positions([])
+	_check(
+		effect.get_target_count() == 0
+		and motes.position.is_equal_approx(Vector2(360.0, 640.0))
+		and motes.emission_rect_extents.is_equal_approx(Vector2(360.0, 640.0)),
+		"Targetless Lantern returns motes to the full-screen searching state."
 	)
 
 	effect.set_active(false)
@@ -120,13 +143,13 @@ func _verify_level_integration() -> void:
 	_check(level.call("_use_highlight"), "Lantern starts from an inactive level state.")
 	await process_frame
 	_check(
-		effect != null and effect.is_active(),
-		"Starting the gameplay Lantern also starts Golden Searchlight."
+		effect != null and effect.is_active() and effect.get_target_count() >= 3,
+		"Starting gameplay Lantern tracks highlighted items in Focus Mode."
 	)
 	level.call("_clear_ability_highlights", true)
 	_check(
 		effect != null and not effect.visible and not effect.is_active(),
-		"An immediate level reset clears every trace of Golden Searchlight."
+		"An immediate level reset clears every trace of Lantern Focus Mode."
 	)
 	level.queue_free()
 	await process_frame
@@ -134,7 +157,7 @@ func _verify_level_integration() -> void:
 
 func _finish() -> void:
 	if _failures.is_empty():
-		print("Lantern screen effect verification passed.")
+		print("Lantern Focus Mode verification passed.")
 		quit(0)
 		return
 	for failure in _failures:

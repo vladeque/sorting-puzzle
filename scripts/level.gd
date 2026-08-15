@@ -295,6 +295,8 @@ func _apply_responsive_layout() -> void:
 		_ability_purchase_overlay.apply_safe_layout(safe_margins, viewport_size)
 	_layout_star_reward_effect_layer(viewport_size)
 	_layout_shelves(viewport_size, safe_margins)
+	if _lantern_screen_effect != null:
+		_lantern_screen_effect.set_target_positions(_get_lantern_target_screen_positions())
 
 
 func _setup_star_reward_effect_layer() -> void:
@@ -4029,6 +4031,7 @@ func _clear_ability_highlights(immediate_visual := false) -> void:
 func _update_highlight_timer_label(immediate := false) -> void:
 	var is_active := _highlight_timer > 0.0 and not _level_failed and not _level_completed
 	if _lantern_screen_effect != null:
+		_lantern_screen_effect.set_target_positions(_get_lantern_target_screen_positions())
 		_lantern_screen_effect.set_active(is_active, immediate)
 	if _ability_bar == null:
 		return
@@ -4036,6 +4039,15 @@ func _update_highlight_timer_label(immediate := false) -> void:
 		ABILITY_HIGHLIGHT,
 		_highlight_timer if is_active else 0.0
 	)
+
+
+func _get_lantern_target_screen_positions() -> Array[Vector2]:
+	var target_positions: Array[Vector2] = []
+	for item in _highlighted_items:
+		if item == null or not is_instance_valid(item) or item.is_queued_for_deletion():
+			continue
+		target_positions.append(item.get_global_transform_with_canvas().origin)
+	return target_positions
 
 
 func _update_freezer_timer(delta: float) -> float:

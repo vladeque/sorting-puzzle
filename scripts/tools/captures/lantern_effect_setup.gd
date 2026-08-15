@@ -1,6 +1,6 @@
 extends RefCounted
 
-## Capture setup for Golden Searchlight on a representative real level board.
+## Capture setup for Lantern Focus Mode on a representative real level board.
 
 const LEVEL_NUMBER := 5
 

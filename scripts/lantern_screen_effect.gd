@@ -1,10 +1,13 @@
 class_name LanternScreenEffect
 extends CanvasLayer
 
-## Full-screen Golden Searchlight presentation for the Lantern ability. A procedural overlay adds
-## a restrained warm vignette, an activation bloom, and a slow shelf-search beam while a small
-## particle layer supplies drifting light motes. Gameplay owns the timer; this scene only mirrors
-## active/inactive visual state and never intercepts input.
+## Full-screen Lantern Focus Mode presentation. A procedural overlay shades non-target gameplay,
+## cuts warm pools and upward rays around highlighted items, and falls back to a searching beam when
+## no target currently exists. A target-biased particle layer supplies drifting light motes.
+## Gameplay owns the timer; this scene only mirrors visual state and never intercepts input.
+
+const MAX_TARGET_COUNT := 16
+const TARGET_MOTE_MARGIN_SHORT_SIDE := 0.13
 
 @export_range(0.05, 1.5, 0.01) var activation_duration_seconds := 0.52
 @export_range(0.05, 1.5, 0.01) var fade_duration_seconds := 0.38
@@ -17,6 +20,8 @@ var _is_active := false
 var _intensity := 0.0
 var _activation_progress := 1.0
 var _elapsed_seconds := 0.0
+var _viewport_size := Vector2.ZERO
+var _target_screen_positions: Array[Vector2] = []
 var _transition_tween: Tween
 var _wash_material: ShaderMaterial
 
@@ -40,11 +45,36 @@ func _process(delta: float) -> void:
 		_wash_material.set_shader_parameter(&"elapsed_seconds", _elapsed_seconds)
 
 
-## Keeps the low-count particle field distributed across the live portrait/tablet viewport.
+## Keeps the mote field distributed across the live portrait/tablet viewport.
 func apply_layout(viewport_size: Vector2) -> void:
-	var safe_size := Vector2(maxf(viewport_size.x, 0.0), maxf(viewport_size.y, 0.0))
-	_motes.position = safe_size * 0.5
-	_motes.emission_rect_extents = safe_size * 0.5
+	_viewport_size = Vector2(maxf(viewport_size.x, 0.0), maxf(viewport_size.y, 0.0))
+	_apply_target_shader_parameters()
+	_apply_mote_layout()
+
+
+## Receives viewport-space item centers from Level. Positions are refreshed during the Lantern
+## window so pools follow moving shelves and item transitions instead of lagging behind them.
+func set_target_positions(screen_positions: Array[Vector2]) -> void:
+	_target_screen_positions.clear()
+	for screen_position in screen_positions:
+		if _target_screen_positions.size() >= MAX_TARGET_COUNT:
+			break
+		_target_screen_positions.append(screen_position)
+	_apply_target_shader_parameters()
+	_apply_mote_layout()
+
+
+func get_target_count() -> int:
+	return _target_screen_positions.size()
+
+
+func get_target_positions_normalized() -> PackedVector2Array:
+	var normalized_positions := PackedVector2Array()
+	if _viewport_size.x <= 0.0 or _viewport_size.y <= 0.0:
+		return normalized_positions
+	for screen_position in _target_screen_positions:
+		normalized_positions.append(screen_position / _viewport_size)
+	return normalized_positions
 
 
 ## Repeated active updates are intentionally idempotent because Level refreshes timed visuals
@@ -161,6 +191,44 @@ func _set_activation_progress(value: float) -> void:
 	_activation_progress = clampf(value, 0.0, 1.0)
 	if _wash_material != null:
 		_wash_material.set_shader_parameter(&"activation_progress", _activation_progress)
+
+
+func _apply_target_shader_parameters() -> void:
+	if _wash_material == null:
+		return
+	var normalized_positions := PackedVector2Array()
+	normalized_positions.resize(MAX_TARGET_COUNT)
+	for target_index in range(MAX_TARGET_COUNT):
+		normalized_positions[target_index] = Vector2(-2.0, -2.0)
+	if _viewport_size.x > 0.0 and _viewport_size.y > 0.0:
+		for target_index in range(_target_screen_positions.size()):
+			normalized_positions[target_index] = (
+				_target_screen_positions[target_index] / _viewport_size
+			)
+	_wash_material.set_shader_parameter(&"target_count", _target_screen_positions.size())
+	_wash_material.set_shader_parameter(&"target_positions", normalized_positions)
+
+
+func _apply_mote_layout() -> void:
+	if _viewport_size.x <= 0.0 or _viewport_size.y <= 0.0:
+		return
+	if _target_screen_positions.is_empty():
+		_motes.position = _viewport_size * 0.5
+		_motes.emission_rect_extents = _viewport_size * 0.5
+		return
+
+	var minimum := _target_screen_positions[0]
+	var maximum := _target_screen_positions[0]
+	for screen_position in _target_screen_positions:
+		minimum = minimum.min(screen_position)
+		maximum = maximum.max(screen_position)
+	var margin := minf(_viewport_size.x, _viewport_size.y) * TARGET_MOTE_MARGIN_SHORT_SIDE
+	minimum -= Vector2.ONE * margin
+	maximum += Vector2.ONE * margin
+	minimum = minimum.clamp(Vector2.ZERO, _viewport_size)
+	maximum = maximum.clamp(Vector2.ZERO, _viewport_size)
+	_motes.position = (minimum + maximum) * 0.5
+	_motes.emission_rect_extents = (maximum - minimum) * 0.5
 
 
 func _kill_transition() -> void:

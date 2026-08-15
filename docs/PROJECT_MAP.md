@@ -579,9 +579,10 @@ Responsibility:
 - Tracks the countdown timer, starting it only after the first meaningful player action, and win/loss overlays.
 - Plays the hammer ability by gathering the targeted items into one center-screen item, striking it with the fullscreen hammer, then dropping combo reward stars from the impact point.
 - Plays the shuffle ability by showing a center-screen delivery box, flying visible unlocked items into it, swapping item identities while hidden, flying them back to their slots, then resolving shelf matches.
-- Shows Lantern as Golden Searchlight on canvas layer 4: a restrained warm vignette and center wash,
-  activation bloom from the Lantern-button area, periodic diagonal shelf-search beam, and sparse
-  responsive light motes persist for the same 15-second window as the highlighted-item outlines.
+- Shows Lantern as Focus Mode on canvas layer 4: a 22% warm shade over non-target gameplay, bright
+  pulsing pools and upward shafts tracked to every highlighted item, a stronger button-origin
+  activation wave, and twenty target-biased motes persist for the same 15-second window as the
+  item outlines. With no current targets, a diagonal beam visibly keeps searching the shelves.
 - Shows Freezer as transparent cyan-white perimeter cracks: the main frame sits between gameplay
   and UI, while a clipped copy of only its top edge renders over `TopHud`. The effect reveals inward
   once, holds without recoloring the configured level background, and thaws when the 30-second
@@ -771,7 +772,7 @@ Responsibility:
 - Loads per-ability paid-use prices from `configs/ability_purchase_prices.json`, spends coins through `PlayerProgress.spend_coins()`, and applies the selected paid ability immediately without adding saved inventory.
 - Starts the highlight timer even when no current shelf state can be highlighted.
 - Uses `ShelfItem` outline/scale state for item-local highlight visuals and mirrors the same timer
-  into the responsive Golden Searchlight screen treatment below the HUD.
+  and live item screen positions into the responsive Lantern Focus Mode treatment below the HUD.
 - Shows the active highlight countdown in a bottom-right badge on the highlight button.
 - Pauses only the level countdown for Freezer, shows its active badge and frozen timer treatment,
   and mirrors that state into the transparent cracked-ice perimeter with a subtle four-sided blue

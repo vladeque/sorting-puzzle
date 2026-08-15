@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/lantern_screen_effect.gd" id="1_script"]
 [ext_resource type="Shader" path="res://assets/abilities/lantern_searchlight.gdshader" id="2_shader"]
@@ -9,12 +9,17 @@ shader_parameter/intensity = 0.0
 shader_parameter/activation_progress = 1.0
 shader_parameter/elapsed_seconds = 0.0
 shader_parameter/activation_origin = Vector2(0.64, 0.88)
-shader_parameter/vignette_color = Color(0.12, 0.045, 0.005, 1)
-shader_parameter/warm_color = Color(1, 0.56, 0.08, 1)
-shader_parameter/vignette_opacity = 0.12
-shader_parameter/ambient_warmth = 0.045
-shader_parameter/sweep_opacity = 0.085
-shader_parameter/activation_opacity = 0.3
+shader_parameter/target_count = 0
+shader_parameter/shade_color = Color(0.105, 0.055, 0.018, 1)
+shader_parameter/warm_color = Color(1, 0.58, 0.075, 1)
+shader_parameter/core_color = Color(1, 0.86, 0.32, 1)
+shader_parameter/shade_opacity = 0.22
+shader_parameter/edge_glow_opacity = 0.12
+shader_parameter/focus_radius = 0.145
+shader_parameter/focus_warmth = 0.24
+shader_parameter/ray_opacity = 0.13
+shader_parameter/search_opacity = 0.15
+shader_parameter/activation_opacity = 0.42
 
 [sub_resource type="Gradient" id="Gradient_mote_texture"]
 offsets = PackedFloat32Array(0, 0.28, 1)
@@ -31,6 +36,9 @@ fill_to = Vector2(1, 0.5)
 [sub_resource type="Gradient" id="Gradient_mote_fade"]
 offsets = PackedFloat32Array(0, 0.16, 0.72, 1)
 colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 0.72, 1, 1, 1, 0.52, 1, 1, 1, 0)
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_motes"]
+blend_mode = 1
 
 [node name="LanternScreenEffect" type="CanvasLayer"]
 layer = 4
@@ -60,9 +68,10 @@ color = Color(1, 1, 1, 1)
 
 [node name="Motes" type="CPUParticles2D" parent="Overlay"]
 unique_name_in_owner = true
+material = SubResource("CanvasItemMaterial_motes")
 position = Vector2(360, 640)
 emitting = false
-amount = 12
+amount = 20
 lifetime = 4.5
 preprocess = 4.5
 randomness = 0.72
@@ -74,8 +83,8 @@ spread = 28.0
 gravity = Vector2(2, -2)
 initial_velocity_min = 8.0
 initial_velocity_max = 18.0
-scale_amount_min = 0.08
-scale_amount_max = 0.16
-color = Color(1, 0.72, 0.2, 0.72)
+scale_amount_min = 0.11
+scale_amount_max = 0.22
+color = Color(1, 0.74, 0.2, 0.9)
 color_ramp = SubResource("Gradient_mote_fade")
 texture = SubResource("GradientTexture_mote")
