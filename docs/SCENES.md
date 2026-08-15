@@ -1892,10 +1892,15 @@ Purpose:
   guards, a frame-level cast shadow, an ability-style circular count badge, and a wide segmented
   stock rail identify the one-way source while keeping the standard shelf palette and item resting
   position.
+- Its root authors a `Vector2(0, -10)` position that `scripts/level.gd::_add_shelf()` preserves as a
+  per-scene layout offset, keeping the complete dispenser 10px above a standard neighbour.
 
 Important nodes:
-- `FrameShadow`, `BackWall`, `BackWallTopShade`, `LeftWall`, `RightWall`, wall highlight/shade nodes,
-  `FloorSurface`, `FloorFrontLip`, and `FloorGrain*`: the compact open-cradle art inside the 96-wide
+- `FrameShadow`, `BackWall`, `BackWallLowerPanel`, and the `BackWall*Shade`/`*ShadowEdge` nodes:
+  the recessed back and cast-depth treatment of the compact cradle.
+- `LeftWall*` and `RightWall*`: semantically paired upper/lower faces, top/lower bevels, and inner
+  faces for the two chunky side guards. Each bevel/inner-face node owns a local `Shade` child.
+- `FloorSurface`, `FloorFrontLip`, and `FloorGrain*`: the item floor and front lip inside the 96-wide
   packing cell. There is intentionally no `Ceiling` or `TopCeilingCap`.
 - `LayerIndicator`: `scenes/shelf_layer_indicator.tscn` instance overlapping the front lip; its
   compact circular badge shows the exact count and its wide, thin-outlined rail shows one cell per
@@ -1922,10 +1927,13 @@ Script:
 Purpose:
 - The dispenser's exact circular count badge and attached segmented stock rail.
 - `CountLabel` is authored with `style_box_gameplay_count_badge.tres`, matching ability counters.
-  `TrackBacking`, `TrackInset`, and all four supported `Segment##` node hierarchies are also authored
-  in the scene, so their colors, polygons, layering, and gloss are directly editable in Godot.
-- Each segment owns `Empty` plus `Light/Body` and `Light/Gloss`. At runtime the script only fits the
-  authored nodes to the configured 2-4 capacity and controls which `Light` nodes stay lit.
+  `TrackBacking` and all four supported `Segment##` node hierarchies are also authored in the scene,
+  so their colors, polygons, layering, and gloss are directly editable in Godot.
+- Each segment owns `Light/Body` and `Light/Gloss`; the shared backing is the visible empty state.
+  At runtime the script only fits the authored nodes to the configured 2-4 capacity and controls
+  which `Light` nodes stay lit.
+- Track and outer-segment capsule ends use eight polygon subdivisions per quarter arc, keeping the
+  small 13-15px-high curves circular after shelf and responsive board scaling.
 - Rail size, border width, center, gap, corner radius, and gloss dimensions are exposed under the
   root node's `Rail Layout` inspector group.
 
