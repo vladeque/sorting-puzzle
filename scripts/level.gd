@@ -277,6 +277,8 @@ func _apply_responsive_layout() -> void:
 		_background.size = viewport_size
 
 	_top_hud.apply_safe_layout(safe_margins, viewport_size)
+	if _freezer_screen_effect != null:
+		_freezer_screen_effect.apply_layout(viewport_size, _top_hud.size.y)
 	_layout_ability_bar(safe_margins)
 	_failure_screen.apply_safe_layout(safe_margins, viewport_size)
 	_completion_screen.apply_safe_layout(safe_margins, viewport_size)

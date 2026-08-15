@@ -1,32 +1,62 @@
 class_name FreezerScreenEffect
 extends CanvasLayer
 
-## Full-screen visual treatment for the Freezer ability. The scene sits between gameplay and the
-## HUD, so the transparent cracked-ice texture never recolors the chapter background or intercepts
-## input. Repeated state updates are intentionally idempotent because Level refreshes Freezer UI
-## once per active gameplay frame.
+## Full-screen visual treatment for the Freezer ability. The main frame sits between gameplay and
+## UI, while a second copy clips to the responsive top-HUD strip and renders above it. The
+## transparent texture never recolors the chapter background or intercepts input. Repeated state
+## updates are intentionally idempotent because Level refreshes Freezer UI every active frame.
 
 @export_range(0.05, 1.5, 0.01) var activation_duration_seconds := 0.42
 @export_range(0.05, 1.5, 0.01) var thaw_duration_seconds := 0.46
 
 @onready var _overlay := %Overlay as Control
 @onready var _ice_frame := %IceFrame as TextureRect
+@onready var _hud_overlay_layer := %HudOverlayLayer as CanvasLayer
+@onready var _hud_clip := %HudClip as Control
+@onready var _hud_ice_frame := %HudIceFrame as TextureRect
 
 var _is_active := false
 var _reveal_amount := 0.0
 var _opacity := 0.0
 var _transition_tween: Tween
-var _ice_material: ShaderMaterial
+var _ice_materials: Array[ShaderMaterial] = []
 
 
 func _ready() -> void:
 	_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_ice_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_ice_material = _ice_frame.material as ShaderMaterial
-	if _ice_material != null:
-		_ice_material = _ice_material.duplicate() as ShaderMaterial
-		_ice_frame.material = _ice_material
+	_hud_clip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_hud_ice_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_duplicate_and_register_material(_ice_frame)
+	_duplicate_and_register_material(_hud_ice_frame)
+	apply_layout(get_viewport().get_visible_rect().size, 112.0)
 	_apply_inactive_state()
+
+
+## Keeps the upper copy at full-viewport texture scale, then clips it to exactly the live TopHud
+## height. This avoids vertically squeezing the ice artwork into the short HUD strip.
+func apply_layout(viewport_size: Vector2, top_hud_height: float) -> void:
+	_hud_clip.anchor_left = 0.0
+	_hud_clip.anchor_top = 0.0
+	_hud_clip.anchor_right = 1.0
+	_hud_clip.anchor_bottom = 0.0
+	_hud_clip.offset_left = 0.0
+	_hud_clip.offset_top = 0.0
+	_hud_clip.offset_right = 0.0
+	_hud_clip.offset_bottom = maxf(top_hud_height, 0.0)
+
+	_hud_ice_frame.anchor_left = 0.0
+	_hud_ice_frame.anchor_top = 0.0
+	_hud_ice_frame.anchor_right = 0.0
+	_hud_ice_frame.anchor_bottom = 0.0
+	_hud_ice_frame.offset_left = 0.0
+	_hud_ice_frame.offset_top = 0.0
+	_hud_ice_frame.offset_right = maxf(viewport_size.x, 0.0)
+	_hud_ice_frame.offset_bottom = maxf(viewport_size.y, 0.0)
+
+
+func get_hud_overlay_height() -> float:
+	return _hud_clip.size.y
 
 
 ## Starts the edge-in freeze or thaw transition only when the logical state changes. `immediate` is
@@ -62,7 +92,7 @@ func get_effect_opacity() -> float:
 
 
 func _play_freeze_transition(immediate: bool) -> void:
-	visible = true
+	_set_effect_visible(true)
 	if immediate:
 		_apply_active_state()
 		return
@@ -113,27 +143,41 @@ func _on_thaw_finished() -> void:
 
 
 func _apply_active_state() -> void:
-	visible = true
+	_set_effect_visible(true)
 	_set_reveal_amount(1.0)
 	_set_effect_opacity(1.0)
 
 
 func _apply_inactive_state() -> void:
-	visible = false
+	_set_effect_visible(false)
 	_set_reveal_amount(0.0)
 	_set_effect_opacity(0.0)
 
 
 func _set_reveal_amount(value: float) -> void:
 	_reveal_amount = clampf(value, 0.0, 1.0)
-	if _ice_material != null:
-		_ice_material.set_shader_parameter(&"reveal_amount", _reveal_amount)
+	for material in _ice_materials:
+		material.set_shader_parameter(&"reveal_amount", _reveal_amount)
 
 
 func _set_effect_opacity(value: float) -> void:
 	_opacity = clampf(value, 0.0, 1.0)
-	if _ice_material != null:
-		_ice_material.set_shader_parameter(&"opacity", _opacity)
+	for material in _ice_materials:
+		material.set_shader_parameter(&"opacity", _opacity)
+
+
+func _duplicate_and_register_material(frame: TextureRect) -> void:
+	var material := frame.material as ShaderMaterial
+	if material == null:
+		return
+	material = material.duplicate() as ShaderMaterial
+	frame.material = material
+	_ice_materials.append(material)
+
+
+func _set_effect_visible(should_be_visible: bool) -> void:
+	visible = should_be_visible
+	_hud_overlay_layer.visible = should_be_visible
 
 
 func _kill_transition() -> void:

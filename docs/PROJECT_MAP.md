@@ -573,9 +573,10 @@ Responsibility:
 - Tracks the countdown timer, starting it only after the first meaningful player action, and win/loss overlays.
 - Plays the hammer ability by gathering the targeted items into one center-screen item, striking it with the fullscreen hammer, then dropping combo reward stars from the impact point.
 - Plays the shuffle ability by showing a center-screen delivery box, flying visible unlocked items into it, swapping item identities while hidden, flying them back to their slots, then resolving shelf matches.
-- Shows Freezer as transparent cyan-white perimeter cracks on a dedicated layer between gameplay
-  and the HUD. The effect reveals inward once, holds without recoloring the configured level
-  background, and thaws when the 30-second active-gameplay window ends.
+- Shows Freezer as transparent cyan-white perimeter cracks: the main frame sits between gameplay
+  and UI, while a clipped copy of only its top edge renders over `TopHud`. The effect reveals inward
+  once, holds without recoloring the configured level background, and thaws when the 30-second
+  active-gameplay window ends.
 - Wires the in-level pause menu, including the shared circular Pause button (`scenes/ui/level_top_hud.tscn`), modal overlay, Leave action, Continue action, leave confirmation overlay, and campaign life spend for confirmed Leave. Implements the `ui_cancel` back stack (Leave Confirmation -> Pause -> resume; Ability Purchase restores its prior state; Completion/Failure invoke their routes; otherwise opens Pause) -- there was no back-button handling at all during gameplay before UI-003.
 - Displays a responsive Godot-authored level backdrop with a top HUD strip (now owned by `scenes/ui/level_top_hud.tscn`), monotone shop wall, baseboard, and bottom floor band behind generated shelves.
 
@@ -748,7 +749,8 @@ Responsibility:
 - Uses `ShelfItem` outline state for border-only highlight ability visuals.
 - Shows the active highlight countdown in a bottom-right badge on the highlight button.
 - Pauses only the level countdown for Freezer, shows its active badge and frozen timer treatment,
-  and mirrors that state into the transparent cracked-ice perimeter effect below the HUD.
+  and mirrors that state into the transparent cracked-ice perimeter effect, including the clipped
+  top-HUD pass.
 
 Change here when:
 - Adding, removing, rebalancing, or restyling player abilities.

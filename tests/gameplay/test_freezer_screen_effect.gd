@@ -33,12 +33,24 @@ func _verify_effect_scene() -> void:
 
 	var overlay := effect.get_node("Overlay") as Control
 	var ice_frame := effect.get_node("Overlay/IceFrame") as TextureRect
+	var hud_overlay_layer := effect.get_node("HudOverlayLayer") as CanvasLayer
+	var hud_clip := effect.get_node("HudOverlayLayer/HudClip") as Control
+	var hud_ice_frame := effect.get_node("HudOverlayLayer/HudClip/HudIceFrame") as TextureRect
 	_check(effect.layer == 5, "Freezer renders between gameplay and the layer-10 HUD.")
+	_check(hud_overlay_layer.layer == 11, "Freezer's clipped top edge renders above the TopHud.")
 	_check(not effect.visible, "Freezer overlay starts hidden.")
 	_check(
 		overlay.mouse_filter == Control.MOUSE_FILTER_IGNORE
-		and ice_frame.mouse_filter == Control.MOUSE_FILTER_IGNORE,
+		and ice_frame.mouse_filter == Control.MOUSE_FILTER_IGNORE
+		and hud_clip.mouse_filter == Control.MOUSE_FILTER_IGNORE
+		and hud_ice_frame.mouse_filter == Control.MOUSE_FILTER_IGNORE,
 		"Every fullscreen Freezer control ignores gameplay input."
+	)
+	effect.apply_layout(Vector2(720.0, 1280.0), 144.0)
+	_check(
+		is_equal_approx(effect.get_hud_overlay_height(), 144.0)
+		and hud_ice_frame.size.is_equal_approx(Vector2(720.0, 1280.0)),
+		"The HUD copy clips to the responsive strip without squeezing its full-screen texture."
 	)
 
 	effect.set_active(true)
@@ -80,7 +92,12 @@ func _verify_level_integration() -> void:
 	_check(effect != null, "The playable level owns the reusable Freezer screen effect scene.")
 	_check(
 		effect != null and effect.layer < ui.layer,
-		"The cracked ice stays below HUD buttons and gameplay modals."
+		"The main cracked-ice frame stays below HUD buttons and gameplay modals."
+	)
+	_check(
+		effect != null
+		and (effect.get_node("HudOverlayLayer") as CanvasLayer).layer > ui.layer,
+		"The dedicated clipped top edge renders over the TopHud."
 	)
 	_check(level.call("_use_freezer"), "The Freezer ability starts from an inactive level state.")
 	await process_frame

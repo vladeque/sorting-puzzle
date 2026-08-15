@@ -1635,9 +1635,10 @@ Key responsibilities:
   item interaction, combo expiry, Lantern expiry, moving shelf rows, animations, matching, and
   other abilities continue. Pause menus, the ability-purchase modal, and application interruption
   suspend only the Freezer window. A partial expiry delta suppresses only its frozen portion.
-- Mirror that active state into the reusable layer-5 `FreezerScreenEffect`: its transparent
-  perimeter cracks reveal once on activation, remain below the HUD without tinting chapter art,
-  and thaw on expiry/failure/completion. Level rebuild and teardown paths clear it immediately.
+- Mirror that active state into the reusable `FreezerScreenEffect`: its transparent perimeter
+  cracks reveal once on activation, keep their main frame below normal UI, repeat only the clipped
+  top edge above `TopHud`, and never tint chapter art. The effect thaws on expiry/failure/completion;
+  level rebuild and teardown paths clear it immediately.
 - Treat Freezer activation before the first move as the first meaningful action, disable only its
   button while active, and clear runtime state/visuals on level load, completion, failure, leave,
   application scene teardown, or a new level configuration.
@@ -1780,14 +1781,16 @@ Attached to:
 
 Purpose:
 - Owns the Freezer ability's visual lifecycle independently from gameplay/economy state.
-- Drives the cracked-ice shader's edge-distance reveal and opacity with short activation and thaw
-  tweens. Repeated `set_active(true)` calls are idempotent because `scripts/level.gd` refreshes
+- Drives two synchronized copies of the cracked-ice shader with short activation and thaw tweens:
+  one full frame on layer 5 below UI and one full-scale texture clipped to the responsive HUD height
+  on layer 11. Repeated `set_active(true)` calls are idempotent because `scripts/level.gd` refreshes
   Freezer visuals every active frame.
 - Keeps the effect hidden when inactive and provides an immediate reset path for board rebuild,
   scene teardown, and deterministic verification.
 
 Key methods:
 - `set_active(should_be_active, immediate)`: starts one state transition or applies its final state.
+- `apply_layout(viewport_size, top_hud_height)`: clips the layer-11 copy to the safe-area-aware HUD.
 - `is_active()`, `get_reveal_amount()`, `get_effect_opacity()`: focused state/verification accessors.
 
 Depends on:

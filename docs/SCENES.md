@@ -1129,9 +1129,9 @@ Important nodes:
 - `Background/HudCenterSlot/ComboLabel`: hidden until the player clears a triple, then shows the active combo count.
 - `Shelves`: parent for generated shelf nodes and optional moving shelf row containers; `scripts/level.gd` scales and centers it in the available play area for the current viewport size.
 - `DragLayer`: temporary parent for dragged items, drawn above shelves.
-- `FreezerScreenEffect`: `scenes/abilities/freezer_screen_effect.tscn` instance on canvas layer 5;
-  its transparent cracked-ice perimeter renders above gameplay without recoloring the level and
-  below the layer-10 HUD/modals.
+- `FreezerScreenEffect`: `scenes/abilities/freezer_screen_effect.tscn` instance whose main frame
+  renders on canvas layer 5 below UI and whose top-edge-only copy renders on layer 11 over `TopHud`.
+  Both use transparent crack art and never recolor the level.
 - `UI`: `CanvasLayer` for gameplay labels, the reusable ability bar, and overlays; top-level
   controls are anchored or positioned at runtime for non-720x1280 portrait screens.
 - `UI/TimerLabel`: countdown display.
@@ -1371,7 +1371,7 @@ Do not use for:
 ## `scenes/abilities/freezer_screen_effect.tscn`
 
 Root:
-- `FreezerScreenEffect` (`CanvasLayer`, layer 5)
+- `FreezerScreenEffect` (`CanvasLayer`, layer 5), with a nested layer-11 HUD pass
 
 Script:
 - `scripts/freezer_screen_effect.gd`
@@ -1382,13 +1382,15 @@ Purpose:
   tint, blur, or replace the current chapter background.
 - Reveals the cracks inward from the viewport edges when Freezer starts, holds them for the active
   gameplay window, and retracts/fades them when Freezer ends.
-- Ignores mouse/touch input and stays below the HUD, ability buttons, purchase flow, pause menu,
-  and result screens.
+- Ignores mouse/touch input. The full frame stays below UI; only a top-height-clipped copy renders
+  over `TopHud`, leaving ability buttons and central modal content unobstructed.
 
 Important nodes:
 - `Overlay`: fullscreen, mouse-ignored control that follows the live viewport.
 - `Overlay/IceFrame`: stretches `assets/abilities/freezer_cracked_ice_overlay.png` to the viewport
   and uses `freezer_cracked_ice_reveal.gdshader` for the edge-distance reveal.
+- `HudOverlayLayer/HudClip/HudIceFrame`: layer-11 duplicate kept at full viewport scale and clipped
+  to the safe-area-aware `TopHud` height so the art is not squeezed into the strip.
 
 Verification:
 - `tests/gameplay/test_freezer_screen_effect.gd` checks layering, input pass-through, idempotent

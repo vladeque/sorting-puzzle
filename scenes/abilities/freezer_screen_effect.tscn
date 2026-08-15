@@ -1,10 +1,17 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/freezer_screen_effect.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://assets/abilities/freezer_cracked_ice_overlay.png" id="2_texture"]
 [ext_resource type="Shader" path="res://assets/abilities/freezer_cracked_ice_reveal.gdshader" id="3_shader"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_freezer"]
+shader = ExtResource("3_shader")
+shader_parameter/reveal_amount = 0.0
+shader_parameter/opacity = 0.0
+shader_parameter/reveal_depth = 0.38
+shader_parameter/reveal_softness = 0.025
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hud_freezer"]
 shader = ExtResource("3_shader")
 shader_parameter/reveal_amount = 0.0
 shader_parameter/opacity = 0.0
@@ -34,6 +41,30 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_texture")
+expand_mode = 1
+stretch_mode = 0
+
+[node name="HudOverlayLayer" type="CanvasLayer" parent="."]
+unique_name_in_owner = true
+layer = 11
+
+[node name="HudClip" type="Control" parent="HudOverlayLayer"]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 112.0
+grow_horizontal = 2
+mouse_filter = 2
+clip_contents = true
+
+[node name="HudIceFrame" type="TextureRect" parent="HudOverlayLayer/HudClip"]
+unique_name_in_owner = true
+material = SubResource("ShaderMaterial_hud_freezer")
+offset_right = 720.0
+offset_bottom = 1280.0
 mouse_filter = 2
 texture = ExtResource("2_texture")
 expand_mode = 1
