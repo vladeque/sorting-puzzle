@@ -36,6 +36,8 @@ func _verify_effect_scene() -> void:
 	var hud_overlay_layer := effect.get_node("HudOverlayLayer") as CanvasLayer
 	var hud_clip := effect.get_node("HudOverlayLayer/HudClip") as Control
 	var hud_ice_frame := effect.get_node("HudOverlayLayer/HudClip/HudIceFrame") as TextureRect
+	var ice_material := ice_frame.material as ShaderMaterial
+	var hud_ice_material := hud_ice_frame.material as ShaderMaterial
 	_check(effect.layer == 5, "Freezer renders between gameplay and the layer-10 HUD.")
 	_check(hud_overlay_layer.layer == 11, "Freezer's clipped top edge renders above the TopHud.")
 	_check(not effect.visible, "Freezer overlay starts hidden.")
@@ -45,6 +47,16 @@ func _verify_effect_scene() -> void:
 		and hud_clip.mouse_filter == Control.MOUSE_FILTER_IGNORE
 		and hud_ice_frame.mouse_filter == Control.MOUSE_FILTER_IGNORE,
 		"Every fullscreen Freezer control ignores gameplay input."
+	)
+	var glow_color: Color = ice_material.get_shader_parameter(&"glow_color")
+	var glow_intensity := float(ice_material.get_shader_parameter(&"glow_intensity"))
+	var hud_glow_intensity := float(hud_ice_material.get_shader_parameter(&"glow_intensity"))
+	_check(
+		glow_color.b > glow_color.r
+		and glow_color.b > glow_color.g
+		and glow_intensity > 0.0
+		and is_equal_approx(glow_intensity, hud_glow_intensity),
+		"Both Freezer passes share a subtle blue edge glow."
 	)
 	effect.apply_layout(Vector2(720.0, 1280.0), 144.0)
 	_check(

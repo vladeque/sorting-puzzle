@@ -1131,7 +1131,7 @@ Important nodes:
 - `DragLayer`: temporary parent for dragged items, drawn above shelves.
 - `FreezerScreenEffect`: `scenes/abilities/freezer_screen_effect.tscn` instance whose main frame
   renders on canvas layer 5 below UI and whose top-edge-only copy renders on layer 11 over `TopHud`.
-  Both use transparent crack art and never recolor the level.
+  Both use transparent crack art plus a narrow blue edge glow and never recolor the level center.
 - `UI`: `CanvasLayer` for gameplay labels, the reusable ability bar, and overlays; top-level
   controls are anchored or positioned at runtime for non-720x1280 portrait screens.
 - `UI/TimerLabel`: countdown display.
@@ -1380,6 +1380,8 @@ Purpose:
 - Reusable fullscreen Freezer presentation owned by a separate scene instead of `scripts/level.gd`.
 - Composites only the transparent cyan-white crack artwork over gameplay; it does not sample,
   tint, blur, or replace the current chapter background.
+- Adds a subtle cyan-blue halo along all four screen edges; its width scales from the shorter
+  viewport dimension so it remains visually even across portrait aspect ratios.
 - Reveals the cracks inward from the viewport edges when Freezer starts, holds them for the active
   gameplay window, and retracts/fades them when Freezer ends.
 - Ignores mouse/touch input. The full frame stays below UI; only a top-height-clipped copy renders
@@ -1388,7 +1390,7 @@ Purpose:
 Important nodes:
 - `Overlay`: fullscreen, mouse-ignored control that follows the live viewport.
 - `Overlay/IceFrame`: stretches `assets/abilities/freezer_cracked_ice_overlay.png` to the viewport
-  and uses `freezer_cracked_ice_reveal.gdshader` for the edge-distance reveal.
+  and uses `freezer_cracked_ice_reveal.gdshader` for the edge-distance reveal and blue inner halo.
 - `HudOverlayLayer/HudClip/HudIceFrame`: layer-11 duplicate kept at full viewport scale and clipped
   to the safe-area-aware `TopHud` height so the art is not squeezed into the strip.
 

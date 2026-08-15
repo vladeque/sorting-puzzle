@@ -749,8 +749,8 @@ Responsibility:
 - Uses `ShelfItem` outline state for border-only highlight ability visuals.
 - Shows the active highlight countdown in a bottom-right badge on the highlight button.
 - Pauses only the level countdown for Freezer, shows its active badge and frozen timer treatment,
-  and mirrors that state into the transparent cracked-ice perimeter effect, including the clipped
-  top-HUD pass.
+  and mirrors that state into the transparent cracked-ice perimeter with a subtle four-sided blue
+  glow, including the clipped top-HUD pass.
 
 Change here when:
 - Adding, removing, rebalancing, or restyling player abilities.

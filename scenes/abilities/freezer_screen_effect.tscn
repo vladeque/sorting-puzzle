@@ -10,6 +10,9 @@ shader_parameter/reveal_amount = 0.0
 shader_parameter/opacity = 0.0
 shader_parameter/reveal_depth = 0.38
 shader_parameter/reveal_softness = 0.025
+shader_parameter/glow_color = Color(0.08, 0.58, 1, 1)
+shader_parameter/glow_width = 0.035
+shader_parameter/glow_intensity = 0.22
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_hud_freezer"]
 shader = ExtResource("3_shader")
@@ -17,6 +20,9 @@ shader_parameter/reveal_amount = 0.0
 shader_parameter/opacity = 0.0
 shader_parameter/reveal_depth = 0.38
 shader_parameter/reveal_softness = 0.025
+shader_parameter/glow_color = Color(0.08, 0.58, 1, 1)
+shader_parameter/glow_width = 0.035
+shader_parameter/glow_intensity = 0.22
 
 [node name="FreezerScreenEffect" type="CanvasLayer"]
 layer = 5

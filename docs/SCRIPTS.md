@@ -1637,8 +1637,9 @@ Key responsibilities:
   suspend only the Freezer window. A partial expiry delta suppresses only its frozen portion.
 - Mirror that active state into the reusable `FreezerScreenEffect`: its transparent perimeter
   cracks reveal once on activation, keep their main frame below normal UI, repeat only the clipped
-  top edge above `TopHud`, and never tint chapter art. The effect thaws on expiry/failure/completion;
-  level rebuild and teardown paths clear it immediately.
+  top edge above `TopHud`, and add a narrow blue glow along all four sides without tinting the level
+  center. The effect thaws on expiry/failure/completion; level rebuild and teardown paths clear it
+  immediately.
 - Treat Freezer activation before the first move as the first meaningful action, disable only its
   button while active, and clear runtime state/visuals on level load, completion, failure, leave,
   application scene teardown, or a new level configuration.
@@ -1797,7 +1798,7 @@ Depends on:
 - `assets/abilities/freezer_cracked_ice_overlay.png`: selected cracked-ice candidate converted to
   an alpha PNG with no baked background color.
 - `assets/abilities/freezer_cracked_ice_reveal.gdshader`: one texture sample plus an edge-distance
-  reveal mask; it does not read the screen texture.
+  reveal mask and aspect-correct four-sided blue halo; it does not read the screen texture.
 
 Verification:
 - `tests/gameplay/test_freezer_screen_effect.gd`.
