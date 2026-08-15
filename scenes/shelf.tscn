@@ -183,7 +183,7 @@ uv = PackedVector2Array(96, 320, 928, 320, 960, 352, 64, 352)
 [node name="FloorSurface" type="Polygon2D" parent="." unique_id=211239445]
 z_index = 5
 texture_filter = 4
-color = Color(0.82, 0.7, 0.57, 1)
+color = Color(0.74020934, 0.61359555, 0.4685769, 1)
 texture = ExtResource("3_wood_texture")
 polygon = PackedVector2Array(-104, 16, 104, 16, 104, 42, -104, 42)
 uv = PackedVector2Array(96, 448, 928, 448, 928, 552, 96, 552)
