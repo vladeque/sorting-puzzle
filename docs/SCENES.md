@@ -1386,6 +1386,8 @@ Purpose:
   gameplay window, and retracts/fades them when Freezer ends.
 - Ignores mouse/touch input. The full frame stays below UI; only a top-height-clipped copy renders
   over `TopHud`, leaving ability buttons and central modal content unobstructed.
+- Mirrors the shared gameplay modal shade and 0.2-second fade into that layer-11 copy whenever the
+  level is paused, keeping its cracks and glow the same brightness as the shaded main frame.
 
 Important nodes:
 - `Overlay`: fullscreen, mouse-ignored control that follows the live viewport.
@@ -1396,9 +1398,12 @@ Important nodes:
 
 Verification:
 - `tests/gameplay/test_freezer_screen_effect.gd` checks layering, input pass-through, idempotent
-  active-state refresh, activation, thaw cleanup, and `level.tscn` integration.
+  active-state refresh, activation, pause/resume shade synchronization, thaw cleanup, and
+  `level.tscn` integration.
 - `scripts/tools/captures/freezer_effect_setup.gd` activates Freezer for responsive rendered
   captures of `level.tscn`.
+- `scripts/tools/captures/freezer_paused_setup.gd` activates Freezer and opens Pause to verify both
+  render passes receive the same dimming at responsive sizes.
 
 Do not use for:
 - Freezer timing, inventory spending, timer gating, or persistence. Those remain in

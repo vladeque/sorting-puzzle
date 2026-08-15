@@ -576,7 +576,8 @@ Responsibility:
 - Shows Freezer as transparent cyan-white perimeter cracks: the main frame sits between gameplay
   and UI, while a clipped copy of only its top edge renders over `TopHud`. The effect reveals inward
   once, holds without recoloring the configured level background, and thaws when the 30-second
-  active-gameplay window ends.
+  active-gameplay window ends. While gameplay modals pause the level, the upper copy mirrors the
+  shared modal-shade fade so its brightness continues matching the shaded main frame.
 - Wires the in-level pause menu, including the shared circular Pause button (`scenes/ui/level_top_hud.tscn`), modal overlay, Leave action, Continue action, leave confirmation overlay, and campaign life spend for confirmed Leave. Implements the `ui_cancel` back stack (Leave Confirmation -> Pause -> resume; Ability Purchase restores its prior state; Completion/Failure invoke their routes; otherwise opens Pause) -- there was no back-button handling at all during gameplay before UI-003.
 - Displays a responsive Godot-authored level backdrop with a top HUD strip (now owned by `scenes/ui/level_top_hud.tscn`), monotone shop wall, baseboard, and bottom floor band behind generated shelves.
 
@@ -750,7 +751,7 @@ Responsibility:
 - Shows the active highlight countdown in a bottom-right badge on the highlight button.
 - Pauses only the level countdown for Freezer, shows its active badge and frozen timer treatment,
   and mirrors that state into the transparent cracked-ice perimeter with a subtle four-sided blue
-  glow, including the clipped top-HUD pass.
+  glow, including the clipped top-HUD pass and its synchronized pause/modal shading.
 
 Change here when:
 - Adding, removing, rebalancing, or restyling player abilities.

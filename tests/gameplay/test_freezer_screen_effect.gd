@@ -80,6 +80,22 @@ func _verify_effect_scene() -> void:
 		effect.get_reveal_amount() > 0.99 and effect.get_effect_opacity() > 0.99,
 		"Repeated active updates do not restart the Freezer entrance."
 	)
+	effect.set_modal_dimmed(true)
+	await create_timer(0.1).timeout
+	_check(
+		effect.get_modal_shade_amount() > 0.0 and effect.get_modal_shade_amount() < 1.0,
+		"The TopHud cracks fade into the gameplay modal shade instead of changing abruptly."
+	)
+	await create_timer(0.14).timeout
+	_check(
+		effect.get_modal_shade_amount() > 0.99,
+		"The TopHud cracks reach the full gameplay modal shade."
+	)
+	effect.set_modal_dimmed(false, true)
+	_check(
+		effect.get_modal_shade_amount() < 0.01,
+		"An immediate modal reset restores the bright active-gameplay cracks."
+	)
 
 	effect.set_active(false)
 	await create_timer(effect.thaw_duration_seconds + 0.08).timeout
@@ -116,6 +132,18 @@ func _verify_level_integration() -> void:
 	_check(
 		effect != null and effect.is_active(),
 		"Starting the gameplay Freezer also starts its screen effect."
+	)
+	level.call("_open_pause_menu")
+	await create_timer(0.24).timeout
+	_check(
+		effect != null and effect.get_modal_shade_amount() > 0.99,
+		"Pausing an active Freezer tints its TopHud cracks like the main frame."
+	)
+	level.call("_close_pause_menu")
+	await create_timer(0.24).timeout
+	_check(
+		effect != null and effect.get_modal_shade_amount() < 0.01,
+		"Resuming restores matching bright cracks across both render passes."
 	)
 
 	level.set("_freezer_time_remaining", 0.0)

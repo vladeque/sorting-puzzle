@@ -8,6 +8,8 @@ uniform float reveal_softness : hint_range(0.001, 0.08) = 0.025;
 uniform vec4 glow_color : source_color = vec4(0.08, 0.58, 1.0, 1.0);
 uniform float glow_width : hint_range(0.005, 0.08) = 0.035;
 uniform float glow_intensity : hint_range(0.0, 0.6) = 0.30;
+uniform vec4 modal_shade_color : source_color = vec4(0.02, 0.025, 0.03, 0.66);
+uniform float modal_shade_amount : hint_range(0.0, 1.0) = 0.0;
 
 
 void fragment() {
@@ -38,5 +40,10 @@ void fragment() {
 			+ glow_color.rgb * glow_alpha * (1.0 - ice.a)
 		) / combined_alpha;
 	}
+	combined_rgb = mix(
+		combined_rgb,
+		modal_shade_color.rgb,
+		modal_shade_color.a * modal_shade_amount
+	);
 	COLOR = vec4(combined_rgb, combined_alpha);
 }

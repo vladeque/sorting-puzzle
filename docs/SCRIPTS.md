@@ -1638,8 +1638,9 @@ Key responsibilities:
 - Mirror that active state into the reusable `FreezerScreenEffect`: its transparent perimeter
   cracks reveal once on activation, keep their main frame below normal UI, repeat only the clipped
   top edge above `TopHud`, and add a narrow blue glow along all four sides without tinting the level
-  center. The effect thaws on expiry/failure/completion; level rebuild and teardown paths clear it
-  immediately.
+  center. When a pause/modal shade covers the main frame, synchronize that shade's fade into the
+  upper copy so both remain equally tinted. The effect thaws on expiry/failure/completion; level
+  rebuild and teardown paths clear it immediately.
 - Treat Freezer activation before the first move as the first meaningful action, disable only its
   button while active, and clear runtime state/visuals on level load, completion, failure, leave,
   application scene teardown, or a new level configuration.
@@ -1786,23 +1787,31 @@ Purpose:
   one full frame on layer 5 below UI and one full-scale texture clipped to the responsive HUD height
   on layer 11. Repeated `set_active(true)` calls are idempotent because `scripts/level.gd` refreshes
   Freezer visuals every active frame.
+- Mirrors the shared gameplay modal shade resource into only the layer-11 copy with the same
+  `UIMotion.OVERLAY_DURATION` fade. The main layer-5 copy receives the real layer-10 shade directly.
 - Keeps the effect hidden when inactive and provides an immediate reset path for board rebuild,
   scene teardown, and deterministic verification.
 
 Key methods:
 - `set_active(should_be_active, immediate)`: starts one state transition or applies its final state.
+- `set_modal_dimmed(should_be_dimmed, immediate)`: synchronizes the layer-11 copy with modal shade.
 - `apply_layout(viewport_size, top_hud_height)`: clips the layer-11 copy to the safe-area-aware HUD.
-- `is_active()`, `get_reveal_amount()`, `get_effect_opacity()`: focused state/verification accessors.
+- `is_active()`, `get_reveal_amount()`, `get_effect_opacity()`, `get_modal_shade_amount()`: focused
+  state/verification accessors.
 
 Depends on:
 - `assets/abilities/freezer_cracked_ice_overlay.png`: selected cracked-ice candidate converted to
   an alpha PNG with no baked background color.
 - `assets/abilities/freezer_cracked_ice_reveal.gdshader`: one texture sample plus an edge-distance
-  reveal mask and aspect-correct four-sided blue halo; it does not read the screen texture.
+  reveal mask, aspect-correct four-sided blue halo, and optional modal shade; it does not read the
+  screen texture.
+- `assets/themes/style_box_gameplay_modal_shade.tres`: authoritative shade color/opacity mirrored
+  by the layer-11 pass.
 
 Verification:
 - `tests/gameplay/test_freezer_screen_effect.gd`.
 - Responsive `level.tscn` capture through `scripts/tools/captures/freezer_effect_setup.gd`.
+- Paused responsive capture through `scripts/tools/captures/freezer_paused_setup.gd`.
 
 Do not use for:
 - Freezer duration, timer suppression, inventory, purchase, or save behavior.

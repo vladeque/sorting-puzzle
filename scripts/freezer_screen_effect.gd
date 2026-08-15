@@ -6,6 +6,11 @@ extends CanvasLayer
 ## transparent texture never recolors the chapter background or intercepts input. Repeated state
 ## updates are intentionally idempotent because Level refreshes Freezer UI every active frame.
 
+const UIMotionScript := preload("res://scripts/ui_motion.gd")
+const GAMEPLAY_MODAL_SHADE_STYLE := preload(
+	"res://assets/themes/style_box_gameplay_modal_shade.tres"
+)
+
 @export_range(0.05, 1.5, 0.01) var activation_duration_seconds := 0.42
 @export_range(0.05, 1.5, 0.01) var thaw_duration_seconds := 0.46
 
@@ -19,7 +24,11 @@ var _is_active := false
 var _reveal_amount := 0.0
 var _opacity := 0.0
 var _transition_tween: Tween
+var _modal_dim_tween: Tween
 var _ice_materials: Array[ShaderMaterial] = []
+var _hud_ice_material: ShaderMaterial
+var _is_modal_dimmed := false
+var _modal_shade_amount := 0.0
 
 
 func _ready() -> void:
@@ -28,8 +37,14 @@ func _ready() -> void:
 	_hud_clip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_hud_ice_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_duplicate_and_register_material(_ice_frame)
-	_duplicate_and_register_material(_hud_ice_frame)
+	_hud_ice_material = _duplicate_and_register_material(_hud_ice_frame)
+	if _hud_ice_material != null:
+		_hud_ice_material.set_shader_parameter(
+			&"modal_shade_color",
+			GAMEPLAY_MODAL_SHADE_STYLE.bg_color
+		)
 	apply_layout(get_viewport().get_visible_rect().size, 112.0)
+	_set_modal_shade_amount(0.0)
 	_apply_inactive_state()
 
 
@@ -89,6 +104,37 @@ func get_reveal_amount() -> float:
 
 func get_effect_opacity() -> float:
 	return _opacity
+
+
+## Mirrors the gameplay modal shade into the layer-11 TopHud copy. The main frame already receives
+## the real layer-10 shade; matching its fade here prevents the upper cracks from staying bright.
+func set_modal_dimmed(should_be_dimmed: bool, immediate := false) -> void:
+	if should_be_dimmed == _is_modal_dimmed:
+		if immediate:
+			_kill_modal_dim_transition()
+			_set_modal_shade_amount(1.0 if should_be_dimmed else 0.0)
+		return
+
+	_is_modal_dimmed = should_be_dimmed
+	_kill_modal_dim_transition()
+	var target_amount := 1.0 if should_be_dimmed else 0.0
+	if immediate or not visible:
+		_set_modal_shade_amount(target_amount)
+		return
+
+	_modal_dim_tween = create_tween()
+	_modal_dim_tween.tween_method(
+		_set_modal_shade_amount,
+		_modal_shade_amount,
+		target_amount,
+		UIMotionScript.OVERLAY_DURATION
+	).set_trans(Tween.TRANS_SINE).set_ease(
+		Tween.EASE_OUT if should_be_dimmed else Tween.EASE_IN
+	)
+
+
+func get_modal_shade_amount() -> float:
+	return _modal_shade_amount
 
 
 func _play_freeze_transition(immediate: bool) -> void:
@@ -166,13 +212,20 @@ func _set_effect_opacity(value: float) -> void:
 		material.set_shader_parameter(&"opacity", _opacity)
 
 
-func _duplicate_and_register_material(frame: TextureRect) -> void:
+func _set_modal_shade_amount(value: float) -> void:
+	_modal_shade_amount = clampf(value, 0.0, 1.0)
+	if _hud_ice_material != null:
+		_hud_ice_material.set_shader_parameter(&"modal_shade_amount", _modal_shade_amount)
+
+
+func _duplicate_and_register_material(frame: TextureRect) -> ShaderMaterial:
 	var material := frame.material as ShaderMaterial
 	if material == null:
-		return
+		return null
 	material = material.duplicate() as ShaderMaterial
 	frame.material = material
 	_ice_materials.append(material)
+	return material
 
 
 func _set_effect_visible(should_be_visible: bool) -> void:
@@ -184,3 +237,9 @@ func _kill_transition() -> void:
 	if _transition_tween != null and _transition_tween.is_valid():
 		_transition_tween.kill()
 	_transition_tween = null
+
+
+func _kill_modal_dim_transition() -> void:
+	if _modal_dim_tween != null and _modal_dim_tween.is_valid():
+		_modal_dim_tween.kill()
+	_modal_dim_tween = null

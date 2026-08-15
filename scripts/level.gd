@@ -4058,6 +4058,7 @@ func _update_freezer_visuals(immediate := false) -> void:
 	if _top_hud != null:
 		_top_hud.set_timer_frozen_visual(is_active)
 	if _freezer_screen_effect != null:
+		_freezer_screen_effect.set_modal_dimmed(_level_paused, immediate)
 		_freezer_screen_effect.set_active(is_active, immediate)
 
 
