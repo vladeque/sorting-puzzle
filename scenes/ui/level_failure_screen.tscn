@@ -4,8 +4,7 @@
 [ext_resource type="Texture2D" path="res://assets/ui/broken_heart.png" id="2_broken_heart"]
 [ext_resource type="Script" path="res://scripts/level_failure_screen.gd" id="3_failure_screen_script"]
 [ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="4_press_scale_button"]
-[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_orange_utility_normal.tres" id="5_retry_normal"]
-[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_orange_utility_pressed.tres" id="6_retry_pressed"]
+[ext_resource type="StyleBoxTexture" path="res://assets/themes/style_box_green_primary_button.tres" id="5_retry_button"]
 
 [node name="LevelFailureScreen" type="Control"]
 anchors_preset = 15
@@ -71,14 +70,14 @@ layout_mode = 2
 focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.92, 1, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_colors/font_outline_color = Color(0.38, 0.08, 0.02, 0.95)
+theme_override_colors/font_outline_color = Color(0.03, 0.25, 0.04, 0.95)
 theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 32
-theme_override_styles/normal = ExtResource("5_retry_normal")
-theme_override_styles/pressed = ExtResource("6_retry_pressed")
-theme_override_styles/hover = ExtResource("5_retry_normal")
+theme_override_styles/normal = ExtResource("5_retry_button")
+theme_override_styles/pressed = ExtResource("5_retry_button")
+theme_override_styles/hover = ExtResource("5_retry_button")
 text = "Retry"
 script = ExtResource("4_press_scale_button")
 held_scale = 0.94

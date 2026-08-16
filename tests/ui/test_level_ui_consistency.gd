@@ -358,6 +358,11 @@ func _test_completion_and_failure_routing() -> void:
 		"Failure should show the dedicated transparent broken-heart art."
 	)
 	_check(retry_button.text == "Retry", "Failure should expose a Retry action.")
+	_check(
+		retry_button.get_theme_stylebox("normal").resource_path
+			== "res://assets/themes/style_box_green_primary_button.tres",
+		"Failure Retry should use the shared green primary-button style."
+	)
 
 	var retry_signal_fired := [false]
 	var main_menu_signal_fired := [false]

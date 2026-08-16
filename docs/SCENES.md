@@ -170,7 +170,7 @@ above: the level intentionally keeps a denser, higher-contrast gameplay presenta
 `docs/UI_003_LEVEL_UI_CONSISTENCY_TICKET.md`'s Objective), so equivalent concepts share gameplay-
 scoped colors/shapes/components instead of either scene-local approximations or the menu system's
 brighter cream/red palette. Reused directly where the semantic role already matches exactly:
-`style_box_green_primary_button.tres` (positive: Continue/Buy) and
+`style_box_green_primary_button.tres` (positive: Continue/Buy/Retry) and
 `style_box_disabled_action_button.tres` (unavailable: disabled Buy, the dev-preview Watch-Ad
 placeholder).
 
@@ -1348,20 +1348,20 @@ Purpose:
   `scenes/ui/gameplay_modal_shell.tscn` for its dimmed backdrop, safe-area-fitted 520x620 panel,
   chapter-local `LEVEL N` title, circular close action, 336px content region, action row, and fade.
 - Shows the transparent `assets/ui/broken_heart.png` art above the `LEVEL FAILED` message.
-- Emits `retry_pressed` from its orange Retry action and preserves `main_menu_pressed` for the
+- Emits `retry_pressed` from its green primary Retry action and preserves `main_menu_pressed` for the
   shared X. `scripts/level.gd` owns the resulting run/economy/navigation behavior.
 
 Important nodes:
 - `Shell`: the shared gameplay modal shell instance, including `%CloseButton`.
 - `FailureContent`: reparented into `Shell`'s cream content region; owns `%BrokenHeartImage` and
   `%MessageLabel`.
-- `%RetryButton`: orange 250x76 utility action, reparented into `Shell`'s action row, with
+- `%RetryButton`: green 250x76 primary action, reparented into `Shell`'s action row, with
   `scripts/press_scale_button.gd` (0.94 held scale).
 
 Depends on:
 - `scenes/ui/gameplay_modal_shell.tscn`.
 - `assets/ui/broken_heart.png`.
-- The shared `style_box_orange_utility_{normal,pressed}.tres` resources.
+- The shared `style_box_green_primary_button.tres` resource.
 - `scripts/press_scale_button.gd`, `scripts/gameplay_ui_theme.gd`.
 - `tests/ui/test_level_failure_screen.gd` for retry/life-purchase/navigation coverage.
 - `scripts/tools/captures/level_failure_setup.gd` and
