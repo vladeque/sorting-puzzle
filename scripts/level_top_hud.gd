@@ -17,7 +17,7 @@ signal pause_pressed
 const GameplayUIThemeScript := preload("res://scripts/gameplay_ui_theme.gd")
 
 const STRIP_BASE_HEIGHT := 112.0
-const HUD_TOP_MARGIN := 28.0
+const TIMER_TOP_MARGIN := 18.0
 const HUD_ROW_CENTER_Y := 60.0
 const HUD_SIDE_MARGIN := 24.0
 const LEVEL_LABEL_MARGIN_LEFT := 32.0
@@ -285,7 +285,7 @@ func apply_safe_layout(safe_margins: Vector4, viewport_size: Vector2) -> void:
 	# The compact side roles above reserve a real, font-sized center region. Giving the timer a known
 	# width prevents Label minimum-size resolution from expanding a nominal 1-2px allocation into
 	# the star pill after the layout pass.
-	var timer_top_y := safe_margins.y + HUD_TOP_MARGIN
+	var timer_top_y := safe_margins.y + TIMER_TOP_MARGIN
 	var timer_center_x := viewport_size.x * 0.5
 	_layout_absolute(
 		_timer_critical_background,

@@ -2297,7 +2297,8 @@ Purpose:
   background). The timer stays centered in a real font-sized center region. At compact widths the
   level, timer, star pill, Pause control, fonts, and gaps scale as one row using safe usable width,
   so Label minimum-size resolution cannot expand the timer into either side after layout. The
-  timer, star pill, and Pause control share the authored 60px row center.
+  timer is positioned 10px above its former top-strip placement, while the star pill and Pause
+  control retain the authored 60px row center.
 - The Pause button matches the Main Menu settings-button role at 72x64, consuming the same warm
   normal/pressed resources and 0.94 held scale. Its explicit disabled StyleBox override preserves
   that shape while overlays are open, and its `font_disabled_color` override keeps the `"II"` glyph

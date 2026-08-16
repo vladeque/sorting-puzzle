@@ -1708,9 +1708,10 @@ Purpose:
 - The background strip height and the combo slot both grow/shift with the safe-top inset (before,
   only the timer/level/star/pause row did). The timer stays centered but is kept clear of the level
   label and star/pause cluster so long values (`LEVEL 99`, `59:59`, large star totals) can never
-  overlap either side. Timer, star pill, and Pause share the authored 60px row center, and the star
-  pill keeps a deliberately wide 36px regular-width gap from Pause (30px compact) so the status
-  readout and the control read as two roles rather than one cluster.
+  overlap either side. The timer sits 10px above its former position for clearer top-strip balance;
+  the star pill and Pause retain the authored 60px row center. The star pill keeps a deliberately
+  wide 36px regular-width gap from Pause (30px compact) so the status readout and the control read
+  as two roles rather than one cluster.
 - During the final 30 active countdown seconds, `%TimerCriticalBackground` adds a dark-red rounded
   warning badge behind the digits and `%TimerLabel` pulses once when each new integer second is
   displayed. The badge uses the same responsive bounds as the normal timer and stays visible but
