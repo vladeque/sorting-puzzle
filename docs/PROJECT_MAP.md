@@ -613,10 +613,13 @@ Files:
 - `scripts/shelf_layout_row.gd`
 - `scripts/level.gd`
 - `configs/levels/level_*.json`
+- `tests/gameplay/test_moving_shelf_row.gd`
 
 Responsibility:
 - Clips a shelf row to a configured visible window.
 - Moves shelves horizontally or vertically at runtime and wraps them back through the opposite side.
+- Keeps moving shelf bodies visually independent by reducing their rendered width by `15` design
+  pixels without compressing item art, slot positions, or hit areas.
 - Keeps each level to one moving-shelf axis: horizontal or vertical.
 - Lets layout templates author moving-row center positions and metadata.
 - Lets `scripts/level.gd` decide drag/drop eligibility based on whether a moving shelf is currently inside the row window.

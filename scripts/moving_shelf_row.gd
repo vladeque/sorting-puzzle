@@ -2,6 +2,7 @@ class_name MovingShelfRow
 extends Control
 
 const ROW_HEIGHT_PADDING := 50.88
+const SHELF_WIDTH_REDUCTION := 15.0
 const WINDOW_EDGE_EPSILON := 0.1
 const MOTION_HORIZONTAL_WRAP := "horizontal_wrap"
 const MOTION_VERTICAL_WRAP := "vertical_wrap"
@@ -16,6 +17,7 @@ const MOTION_VERTICAL_WRAP := "vertical_wrap"
 var _motion_offset := 0.0
 var _movement_paused := false
 var _shelves: Array[Node2D] = []
+var _shelf_horizontal_visual_scale := 1.0
 
 
 func _ready() -> void:
@@ -35,7 +37,11 @@ func configure(
 ) -> void:
 	visible_shelf_count = maxi(row_visible_shelf_count, 1)
 	shelf_step = Vector2(maxf(row_shelf_step.x, 1.0), maxf(row_shelf_step.y, 1.0))
-	shelf_cell_size = row_shelf_cell_size
+	shelf_cell_size = Vector2(
+		maxf(row_shelf_cell_size.x - SHELF_WIDTH_REDUCTION, 1.0),
+		row_shelf_cell_size.y
+	)
+	_shelf_horizontal_visual_scale = shelf_cell_size.x / maxf(row_shelf_cell_size.x, 1.0)
 	motion_type = _normalize_motion_type(row_motion_type)
 	speed_pixels_per_second = maxf(row_speed_pixels_per_second, 0.0)
 	direction = -1 if row_direction < 0 else 1
@@ -49,6 +55,8 @@ func add_shelf(shelf: Node2D) -> void:
 
 	if not _shelves.has(shelf):
 		_shelves.append(shelf)
+		if shelf.has_method("set_horizontal_visual_scale"):
+			shelf.call("set_horizontal_visual_scale", _shelf_horizontal_visual_scale)
 
 	_layout_shelves()
 

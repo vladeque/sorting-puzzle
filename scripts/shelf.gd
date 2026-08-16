@@ -19,6 +19,21 @@ const LEFT_PLACEMENT_NODE := "PlacementVisuals/Left"
 const MIDDLE_PLACEMENT_NODE := "PlacementVisuals/Middle"
 const RIGHT_PLACEMENT_NODE := "PlacementVisuals/Right"
 const TOP_CEILING_CAP_NODE := "TopCeilingCap"
+const HORIZONTAL_VISUAL_SCALE_NODES := [
+	"Shadow",
+	"RightColumnShadow",
+	"BackWall",
+	"BackWallTopShade",
+	"PlacementVisuals",
+	"Ceiling",
+	"FloorSurface",
+	"FloorFrontLip",
+	"FloorGrainBack",
+	"FloorGrainMiddle",
+	"FloorGrainKnot",
+	"FloorGrainFront",
+	"Highlight",
+]
 const FLOOR_ONLY_HIDDEN_NODES := [
 	"BackWall",
 	"BackWallTopShade",
@@ -121,6 +136,15 @@ func set_row_placement(row_placement: String) -> void:
 
 func get_row_placement() -> String:
 	return _row_placement
+
+
+## Moving rows can shorten the shelf body without squeezing item art, slot positions, or hit areas.
+func set_horizontal_visual_scale(horizontal_scale: float) -> void:
+	var safe_scale := maxf(horizontal_scale, 0.01)
+	for node_path in HORIZONTAL_VISUAL_SCALE_NODES:
+		var visual := get_node_or_null(node_path) as Node2D
+		if visual != null:
+			visual.scale.x = safe_scale
 
 
 func set_top_ceiling_cap_visible(should_show: bool) -> void:

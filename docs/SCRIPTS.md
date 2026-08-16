@@ -1975,6 +1975,8 @@ Key methods:
 - `set_visual_variant(visual_variant)`: applies `full` or `floor_only` shelf presentation and records the active variant as metadata for `scripts/level.gd` shelf edge and cast-shadow visibility checks.
 - `get_visual_variant()`: returns the active shelf visual variant.
 - `set_row_placement(row_placement)`: toggles the matching `PlacementVisuals/Left`, `PlacementVisuals/Middle`, or `PlacementVisuals/Right` container and records the active placement as metadata.
+- `set_horizontal_visual_scale(horizontal_scale)`: narrows shelf artwork for a moving row while
+  preserving item, slot, and input proportions.
 - `get_row_placement()`: returns the active shelf row placement.
 - `set_top_ceiling_cap_visible(should_show)`: applies layout-derived visibility to every placement-specific `TopCeilingCap`, gated by the active shelf visual variant.
 - `add_back_layer(layer_index, front_slots)`: creates a generated back-layer container and slot nodes aligned to the shelf front slots.
@@ -2097,6 +2099,8 @@ Attached to:
 Purpose:
 - Clips a moving shelf group to a visible window.
 - Moves child shelves horizontally or vertically and wraps them when they pass the row bounds.
+- Narrows each registered shelf body by `SHELF_WIDTH_REDUCTION` (`15` design pixels), leaving a
+  visible gap at the unchanged grid step while item art and hit areas keep their proportions.
 - Reports whether a shelf center is inside the visible window for drag/drop targeting.
 
 Exports:
@@ -2112,6 +2116,10 @@ Key methods:
 - `add_shelf()`: registers a child shelf for wrapping layout.
 - `set_movement_paused()`: pauses row motion during pause, failure, or completion states.
 - `is_shelf_inside_visible_window()`: used by `scripts/level.gd` drag/drop targeting.
+
+Verification:
+- `tests/gameplay/test_moving_shelf_row.gd` checks the exact `15` px reduction, the resulting gap,
+  clipping-window width, visual scaling, and unchanged slot proportions.
 
 Do not use for:
 - Shelf item rules, matching, ability behavior, locking, or level completion. Those stay in `scripts/level.gd`.
