@@ -5,6 +5,10 @@ When an eligible attempt reaches `00:00`, `scripts/level.gd` pauses the existing
 shared gameplay shell and owns only its presentation, signals, responsive fitting, and transitions;
 `scripts/level.gd` owns attempt state, Shop routing, payment, timer mutation, and Failure.
 
+The modal's extra-time illustration is the dedicated transparent production asset
+`assets/ui/time_extension_continue_icon_256x256.png`: a golden stopwatch wrapped by a green
+continuation arrow. It is intentionally distinct from the Freezer ability's ice-clock artwork.
+
 The launch-default policy lives in `configs/time_extension.json` and matches the versioned backend
 economy configuration: grant 60 seconds for 500 coins, with at most one coin extension and one
 rewarded-ad extension per attempt. Per-attempt counters reset when a new attempt is configured, not
