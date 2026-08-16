@@ -556,6 +556,20 @@ func _test_safe_area_layout() -> void:
 		"Timer should stay clear of the star/pause cluster (right exclusion zone)."
 	)
 
+	var tablet_viewport := Vector2(1200.0, 1600.0)
+	top_hud.call("apply_safe_layout", Vector4.ZERO, tablet_viewport)
+	await process_frame
+	_check(
+		is_equal_approx(timer_label.get_rect().get_center().x, tablet_viewport.x * 0.5)
+			and timer_critical_background.get_rect().is_equal_approx(timer_label.get_rect()),
+		"The timer and critical background should remain centered and aligned at 1200x1600."
+	)
+	_check(
+		timer_label.get_rect().position.x >= level_label.get_rect().end.x
+			and timer_label.get_rect().end.x <= star_counter.get_rect().position.x,
+		"The critical timer should preserve both side exclusion zones at tablet width."
+	)
+
 	# A viewport far too narrow for the modal's preferred 520px width must clamp, not overflow.
 	var tight_margins := Vector4(200.0, 100.0, 200.0, 100.0)
 	var tight_viewport := Vector2(540.0, 960.0)
