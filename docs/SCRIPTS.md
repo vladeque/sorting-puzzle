@@ -1017,7 +1017,8 @@ Key methods:
 - `get_weekly_earned_stars()`: resets an expired weekly period when needed and returns the current weekly score.
 - `get_current_leaderboard_week_start_unix()`: returns the current Monday 00:00 UTC boundary.
 - `get_current_leaderboard_week_end_unix()`: returns the next Monday boundary used by the UI countdown.
-- `spend_coins(amount, reason)`: atomically subtracts coins and appends a resource-spend operation.
+- `spend_coins(amount, reason)`: atomically subtracts coins and appends a resource-spend operation;
+  `time_extension` is the dedicated reason for the recoverable-timeout purchase.
 - `apply_shop_purchase(transaction_id, rewards)`: development-mock/server-fact compatibility path;
   production grants must originate from a verified checkpoint.
 - `record_weekly_leaderboard_rank(rank)`: records `rank` as this week's best-known standing if it
@@ -1530,6 +1531,9 @@ Important constants:
 - `ITEM_SCENE`: `res://scenes/item.tscn`.
 - `ITEM_SPRITES_CONFIG`: `res://configs/item_sprites.json`.
 - `ABILITY_PURCHASE_PRICES_CONFIG`: `res://configs/ability_purchase_prices.json`.
+- `TIME_EXTENSION_CONFIG`: `res://configs/time_extension.json`; client launch defaults matching the
+  versioned backend economy policy (60 seconds, 500 coins, one coin use and one ad use per attempt,
+  with rewarded ads disabled).
 - `LEVEL_CONFIG_TEMPLATE`: `res://configs/levels/level_%03d.json`.
 - `DEFAULT_LEVEL_CONFIG`: fallback level config.
 - `LAYOUT_SCENE_TEMPLATE`: `res://scenes/layouts/layout_%s.tscn` path pattern used by `layout_preset`.
@@ -1549,9 +1553,9 @@ Key responsibilities:
   own `apply_safe_layout(safe_margins, viewport_size)` (UI-003 -- each owns its own safe-area
   fitting instead of `level.gd` reaching into fixed panel sizes and child paths), then scales and
   centers the generated shelf root between them.
-- Keep the insufficient-coins stack paused: Ability Purchase stays beneath
-  `InLevelShopOverlay`; closing the Shop refreshes coins and saved ability inventory, while opening
-  it never spends coins or applies the pending ability.
+- Keep insufficient-coins stacks paused: Ability Purchase or Time Up stays beneath
+  `InLevelShopOverlay`; closing Shop restores the originating modal, while opening it never spends
+  coins or consumes the pending action.
 - Resize the scene-owned `Background` control. Chapter 1 restores the original procedural wall,
   play wall, baseboard, and floor; chapters configured for `artwork` use
   `Background/ChapterArtwork`. The HUD strip remains scene-owned above either presentation.
@@ -1626,6 +1630,15 @@ Key responsibilities:
 - Manage Hammer, Shuffle, Lantern/highlight, and Freezer abilities. Campaign levels read and
   spend saved ability counts through `PlayerProgress`; dev/test levels use isolated temporary
   counts.
+- Intercept the first eligible timer expiry with `_handle_level_time_expired()`: cancel the active
+  drag, freeze moving shelves, keep the timer at zero, and open `TimeUpExtensionModal` before the
+  run becomes terminal. A successful 500-coin request is committed with resource-spend reason
+  `time_extension`, consumes the attempt's single coin slot, sets the timer to 60 seconds, and
+  resumes the same board. Decline proceeds to normal Failure. A later timeout fails immediately
+  when the coin slot is consumed and rewarded ads remain unsupported.
+- Keep one coin slot and one rewarded-ad slot as per-attempt runtime state, reset only when a new
+  level attempt is configured. The ad action stays production-visible/disabled; both the versioned
+  config and the hard integration capability must be true before it can become actionable.
 - Keep zero-use ability buttons pressable during active gameplay so `_open_ability_purchase_menu()` can pause the level and show `UI/AbilityPurchaseOverlay` (`scripts/ability_purchase_menu.gd`, composing the same shared modal shell) with the tapped ability icon, configured coin price, and current affordability state via `set_offer()`.
 - Apply paid ability uses through `_can_apply_ability()`, `PlayerProgress.spend_coins()`, and
   `_apply_paid_ability()`: the local spend commits after successful preflight and before the
@@ -1695,6 +1708,8 @@ Depends on:
 - `scenes/ability_purchase_menu.tscn` (`scripts/ability_purchase_menu.gd`) for the Ability Purchase
   overlay's `close_pressed`/`buy_pressed`/`ad_pressed` signals, `set_offer()`, and
   `open()`/`close()`/`apply_safe_layout()`.
+- `scenes/ui/time_up_extension_modal.tscn` (`scripts/time_up_extension_modal.gd`) for the recoverable
+  timeout offer and its `declined`/`coin_requested`/`ad_requested` intents.
 - `scenes/ui/level_completion_screen.tscn` (`scripts/level_completion_screen.gd`) for completed-level
   reward UI, its `next_pressed` signal, and `set_earned_stars()`/`open()`/`close()`/`apply_safe_layout()`.
 - `scenes/ui/level_failure_screen.tscn` (`scripts/level_failure_screen.gd`) for the failure result
@@ -1706,6 +1721,7 @@ Depends on:
 - `assets/audio/item_place.wav` and `assets/audio/triple_clear.wav`.
 - `configs/item_sprites.json` item IDs and texture paths.
 - `configs/ability_purchase_prices.json` paid-use prices for zero-use ability purchases.
+- `configs/time_extension.json` launch-default grant, price, per-attempt limits, and ad availability.
 - `configs/levels/level_*.json` shelf schema.
 - `ChapterCatalog` for chapter-local numbering and gameplay background selection.
 - `PlayerProgress` autoload for campaign progress, lives, coin spending, and ability inventory.
@@ -2449,6 +2465,33 @@ Depends on:
 - `assets/ui/clover_coin_transparent_96x96.png`.
 - `assets/themes/style_box_gameplay_item_slot.tres`, `style_box_green_primary_button.tres`,
   `style_box_disabled_action_button.tres`.
+
+## `scripts/time_up_extension_modal.gd`
+
+Class:
+- `TimeUpExtensionModal`.
+
+Attached to:
+- `scenes/ui/time_up_extension_modal.tscn` root `TimeUpExtensionModal`.
+
+Purpose:
+- Owns the recoverable timeout offer's shared-shell composition, configured duration/price copy,
+  button presentation, disabled production ad placeholder, responsive fitting, and transitions.
+- Emits `declined`, `coin_requested`, and `ad_requested` intents without mutating timer or economy
+  state; `scripts/level.gd` remains the orchestrator.
+
+Key methods:
+- `set_offer(seconds_granted, coin_price, coin_available, rewarded_ad_available,
+  rewarded_ad_used)`: formats the `+MM:SS` grant, shows the canonical coin price or `Used`, and
+  selects the enabled/used/`Coming Soon` ad presentation.
+- `set_coin_action_enabled(is_enabled)`: provides an in-flight purchase lock without losing the
+  configured per-attempt availability state.
+- `is_transitioning()` / `apply_safe_layout(safe_margins, viewport_size)` / `open()` / `close()`:
+  same reusable overlay contract as the other gameplay modals.
+
+Depends on:
+- `scenes/ui/gameplay_modal_shell.tscn`, `scripts/gameplay_ui_theme.gd`, and
+  `scripts/press_scale_button.gd`.
 
 ## `scripts/item.gd`
 

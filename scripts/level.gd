@@ -38,6 +38,7 @@ const ITEM_SCENE := preload("res://scenes/item.tscn")
 const HAMMER_IMPACT_EFFECT_SCENE := preload("res://scenes/abilities/hammer_impact_effect.tscn")
 const ITEM_SPRITES_CONFIG := "res://configs/item_sprites.json"
 const ABILITY_PURCHASE_PRICES_CONFIG := "res://configs/ability_purchase_prices.json"
+const TIME_EXTENSION_CONFIG := "res://configs/time_extension.json"
 const LEVEL_CONFIG_TEMPLATE := "res://configs/levels/level_%03d.json"
 const DEFAULT_LEVEL_CONFIG := "res://configs/levels/level_001.json"
 const LAYOUT_SCENE_TEMPLATE := "res://scenes/layouts/layout_%s.tscn"
@@ -123,6 +124,15 @@ const DEFAULT_ABILITY_PURCHASE_PRICES := {
 	ABILITY_HIGHLIGHT: 100,
 	ABILITY_FREEZER: 100,
 }
+const DEFAULT_TIME_EXTENSION_SECONDS := 60
+const DEFAULT_TIME_EXTENSION_COIN_PRICE := 500
+const DEFAULT_MAX_COIN_TIME_EXTENSIONS_PER_ATTEMPT := 1
+const DEFAULT_MAX_REWARDED_AD_TIME_EXTENSIONS_PER_ATTEMPT := 1
+## The approved UI reserves one ad extension, but no rewarded-ad SDK/provider exists yet. Keep this
+## separate from configuration so a mistaken config toggle can never expose an enabled no-op.
+const REWARDED_AD_TIME_EXTENSION_INTEGRATION_AVAILABLE := false
+const SHOP_RETURN_ABILITY_PURCHASE := &"ability_purchase"
+const SHOP_RETURN_TIME_EXTENSION := &"time_extension"
 @export var slot_snap_distance := BASE_SLOT_SNAP_DISTANCE * SHELF_CELL_VISUAL_SCALE
 @export var item_pick_size := BASE_ITEM_PICK_SIZE * SHELF_CELL_VISUAL_SCALE
 @export var drag_start_distance := 12.0
@@ -161,6 +171,7 @@ var _completion_confetti: LevelCompletionConfetti
 var _pause_menu_overlay: PauseMenu
 var _leave_confirmation_overlay: LeaveConfirmationMenu
 var _ability_purchase_overlay: AbilityPurchaseMenu
+var _time_up_extension_overlay: TimeUpExtensionModal
 var _in_level_shop_overlay: ShopScreen
 var _out_of_lives_overlay: OutOfLivesMenu
 var _ability_bar: AbilityBar
@@ -175,6 +186,16 @@ var _ability_uses: Dictionary = {
 var _ability_purchase_prices: Dictionary = DEFAULT_ABILITY_PURCHASE_PRICES.duplicate()
 var _ability_purchase_pending_id := StringName()
 var _ability_purchase_was_paused := false
+var _time_extension_seconds := DEFAULT_TIME_EXTENSION_SECONDS
+var _time_extension_coin_price := DEFAULT_TIME_EXTENSION_COIN_PRICE
+var _max_coin_time_extensions_per_attempt := DEFAULT_MAX_COIN_TIME_EXTENSIONS_PER_ATTEMPT
+var _max_rewarded_ad_time_extensions_per_attempt := DEFAULT_MAX_REWARDED_AD_TIME_EXTENSIONS_PER_ATTEMPT
+var _rewarded_ad_time_extension_configured := false
+var _coin_time_extensions_used := 0
+var _rewarded_ad_time_extensions_used := 0
+var _time_extension_offer_active := false
+var _time_extension_purchase_in_progress := false
+var _in_level_shop_return_destination := StringName()
 var _time_remaining := 0.0
 var _has_player_started_timer := false
 var _level_failed := false
@@ -225,6 +246,7 @@ func _ready() -> void:
 	_pause_menu_overlay = get_node("UI/PauseMenuOverlay") as PauseMenu
 	_leave_confirmation_overlay = get_node("UI/LeaveConfirmationOverlay") as LeaveConfirmationMenu
 	_ability_purchase_overlay = get_node("UI/AbilityPurchaseOverlay") as AbilityPurchaseMenu
+	_time_up_extension_overlay = get_node("UI/TimeUpExtensionOverlay") as TimeUpExtensionModal
 	_in_level_shop_overlay = get_node("UI/InLevelShopOverlay") as ShopScreen
 	_out_of_lives_overlay = get_node("UI/OutOfLivesOverlay") as OutOfLivesMenu
 	_ability_bar = get_node("UI/AbilityBar") as AbilityBar
@@ -235,6 +257,7 @@ func _ready() -> void:
 	_pause_menu_overlay.visible = false
 	_leave_confirmation_overlay.visible = false
 	_ability_purchase_overlay.visible = false
+	_time_up_extension_overlay.visible = false
 	_in_level_shop_overlay.visible = false
 	_out_of_lives_overlay.visible = false
 	_setup_star_reward_effect_layer()
@@ -245,8 +268,10 @@ func _ready() -> void:
 	_setup_completion_buttons()
 	_setup_failure_screen()
 	_setup_ability_purchase_menu()
+	_setup_time_up_extension_modal()
 	_setup_ability_buttons()
 	_load_ability_purchase_prices()
+	_load_time_extension_configuration()
 	_load_item_textures()
 	_apply_chapter_background()
 	_apply_level_config(_load_level_config(selected_level))
@@ -298,6 +323,8 @@ func _apply_responsive_layout() -> void:
 	_leave_confirmation_overlay.apply_safe_layout(safe_margins, viewport_size)
 	if _ability_purchase_overlay != null:
 		_ability_purchase_overlay.apply_safe_layout(safe_margins, viewport_size)
+	if _time_up_extension_overlay != null:
+		_time_up_extension_overlay.apply_safe_layout(safe_margins, viewport_size)
 	if _out_of_lives_overlay != null:
 		_out_of_lives_overlay.apply_safe_layout(safe_margins, viewport_size)
 	_layout_star_reward_effect_layer(viewport_size)
@@ -537,7 +564,7 @@ func _process(delta: float) -> void:
 	_update_timer_label()
 
 	if _time_remaining <= 0.0:
-		_fail_level()
+		_handle_level_time_expired()
 
 
 func _notification(what: int) -> void:
@@ -611,6 +638,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		_on_retry_out_of_lives_close_requested()
 	elif _in_level_shop_overlay != null and _in_level_shop_overlay.visible:
 		_in_level_shop_overlay.handle_back()
+	elif _time_up_extension_overlay != null and _time_up_extension_overlay.visible:
+		_on_time_extension_declined()
 	elif _leave_confirmation_overlay.visible:
 		_on_leave_confirmation_close_pressed()
 	elif _ability_purchase_overlay != null and _ability_purchase_overlay.visible:
@@ -631,6 +660,8 @@ func _is_any_overlay_transitioning() -> bool:
 	if _leave_confirmation_overlay.is_transitioning() or _pause_menu_overlay.is_transitioning():
 		return true
 	if _ability_purchase_overlay != null and _ability_purchase_overlay.is_transitioning():
+		return true
+	if _time_up_extension_overlay != null and _time_up_extension_overlay.is_transitioning():
 		return true
 	if _in_level_shop_overlay != null and _in_level_shop_overlay.is_transitioning():
 		return true
@@ -673,6 +704,41 @@ func _load_ability_purchase_prices() -> void:
 	for ability_id in DEFAULT_ABILITY_PURCHASE_PRICES.keys():
 		var ability_key := String(ability_id)
 		_ability_purchase_prices[ability_id] = maxi(int(prices.get(ability_key, _ability_purchase_prices[ability_id])), 0)
+
+
+func _load_time_extension_configuration() -> void:
+	_time_extension_seconds = DEFAULT_TIME_EXTENSION_SECONDS
+	_time_extension_coin_price = DEFAULT_TIME_EXTENSION_COIN_PRICE
+	_max_coin_time_extensions_per_attempt = DEFAULT_MAX_COIN_TIME_EXTENSIONS_PER_ATTEMPT
+	_max_rewarded_ad_time_extensions_per_attempt = DEFAULT_MAX_REWARDED_AD_TIME_EXTENSIONS_PER_ATTEMPT
+	_rewarded_ad_time_extension_configured = false
+	if not FileAccess.file_exists(TIME_EXTENSION_CONFIG):
+		return
+
+	var config := _load_json_file(TIME_EXTENSION_CONFIG)
+	_time_extension_seconds = maxi(
+		int(config.get("seconds_granted", _time_extension_seconds)),
+		1
+	)
+	_time_extension_coin_price = maxi(
+		int(config.get("coin_price", _time_extension_coin_price)),
+		1
+	)
+	_max_coin_time_extensions_per_attempt = maxi(
+		int(config.get(
+			"max_coin_uses_per_attempt",
+			_max_coin_time_extensions_per_attempt
+		)),
+		0
+	)
+	_max_rewarded_ad_time_extensions_per_attempt = maxi(
+		int(config.get(
+			"max_rewarded_ad_uses_per_attempt",
+			_max_rewarded_ad_time_extensions_per_attempt
+		)),
+		0
+	)
+	_rewarded_ad_time_extension_configured = bool(config.get("rewarded_ad_enabled", false))
 
 
 func _load_level_config(level_number: int) -> Dictionary:
@@ -718,6 +784,11 @@ func _apply_level_config(config: Dictionary) -> void:
 	_update_star_counter_label()
 	_returning_to_menu = false
 	_retry_purchase_in_progress = false
+	_coin_time_extensions_used = 0
+	_rewarded_ad_time_extensions_used = 0
+	_time_extension_offer_active = false
+	_time_extension_purchase_in_progress = false
+	_in_level_shop_return_destination = StringName()
 	_failure_screen.visible = false
 	_completion_screen.visible = false
 	if _pause_menu_overlay != null:
@@ -726,6 +797,8 @@ func _apply_level_config(config: Dictionary) -> void:
 		_leave_confirmation_overlay.visible = false
 	if _ability_purchase_overlay != null:
 		_ability_purchase_overlay.visible = false
+	if _time_up_extension_overlay != null:
+		_time_up_extension_overlay.visible = false
 	if _out_of_lives_overlay != null:
 		_out_of_lives_overlay.visible = false
 	_ability_purchase_pending_id = StringName()
@@ -1790,7 +1863,64 @@ func _start_level_timer_from_player_action() -> void:
 	_update_timer_label()
 
 
+func _handle_level_time_expired() -> void:
+	if _time_extension_offer_active or _level_failed or _level_completed:
+		return
+
+	if not _has_available_time_extension():
+		_fail_level()
+		return
+
+	_cancel_active_interaction()
+	_time_remaining = 0.0
+	_time_extension_offer_active = true
+	_level_paused = true
+	_set_moving_shelf_rows_paused(true)
+	_refresh_time_extension_offer()
+	_time_up_extension_overlay.open()
+	_pause_menu_overlay.close()
+	_leave_confirmation_overlay.close()
+	if _ability_purchase_overlay != null:
+		_ability_purchase_overlay.close()
+	_update_timer_label()
+	_update_ability_buttons()
+	_update_pause_menu_button()
+
+
+func _has_available_time_extension() -> bool:
+	if _coin_time_extensions_used < _max_coin_time_extensions_per_attempt:
+		return true
+	return (
+		_is_rewarded_ad_time_extension_available()
+		and _rewarded_ad_time_extensions_used < _max_rewarded_ad_time_extensions_per_attempt
+	)
+
+
+func _is_rewarded_ad_time_extension_available() -> bool:
+	return (
+		REWARDED_AD_TIME_EXTENSION_INTEGRATION_AVAILABLE
+		and _rewarded_ad_time_extension_configured
+	)
+
+
+func _refresh_time_extension_offer() -> void:
+	if _time_up_extension_overlay == null:
+		return
+
+	_time_up_extension_overlay.set_offer(
+		_time_extension_seconds,
+		_time_extension_coin_price,
+		_coin_time_extensions_used < _max_coin_time_extensions_per_attempt,
+		_is_rewarded_ad_time_extension_available()
+			and _rewarded_ad_time_extensions_used < _max_rewarded_ad_time_extensions_per_attempt,
+		_rewarded_ad_time_extensions_used >= _max_rewarded_ad_time_extensions_per_attempt
+	)
+	_time_up_extension_overlay.set_coin_action_enabled(not _time_extension_purchase_in_progress)
+
+
 func _fail_level() -> void:
+	_time_extension_offer_active = false
+	_time_extension_purchase_in_progress = false
 	_level_failed = true
 	_level_paused = false
 	_top_hud.reset_timer_attention()
@@ -1818,6 +1948,8 @@ func _fail_level() -> void:
 	_leave_confirmation_overlay.visible = false
 	if _ability_purchase_overlay != null:
 		_ability_purchase_overlay.visible = false
+	if _time_up_extension_overlay != null:
+		_time_up_extension_overlay.visible = false
 
 
 ## Freezes the cleared board, starts the confetti celebration, and opens the completion screen after
@@ -1851,6 +1983,8 @@ func _complete_level() -> void:
 	_leave_confirmation_overlay.visible = false
 	if _ability_purchase_overlay != null:
 		_ability_purchase_overlay.visible = false
+	if _time_up_extension_overlay != null:
+		_time_up_extension_overlay.visible = false
 
 	_completion_celebration_active = true
 	if _completion_confetti != null:
@@ -1964,6 +2098,15 @@ func _setup_ability_purchase_menu() -> void:
 	if _in_level_shop_overlay != null:
 		_in_level_shop_overlay.close_requested.connect(_on_in_level_shop_close_requested)
 		_in_level_shop_overlay.closed.connect(_on_in_level_shop_closed)
+
+
+func _setup_time_up_extension_modal() -> void:
+	if _time_up_extension_overlay == null:
+		return
+
+	_time_up_extension_overlay.declined.connect(_on_time_extension_declined)
+	_time_up_extension_overlay.coin_requested.connect(_on_time_extension_coin_requested)
+	_time_up_extension_overlay.ad_requested.connect(_on_time_extension_ad_requested)
 
 
 func _on_completion_next_pressed() -> void:
@@ -2210,9 +2353,10 @@ func _on_ability_purchase_buy_pressed() -> void:
 	_close_ability_purchase_menu(false)
 
 
-func _open_in_level_shop() -> void:
+func _open_in_level_shop(return_destination: StringName = SHOP_RETURN_ABILITY_PURCHASE) -> void:
 	if _in_level_shop_overlay == null or _in_level_shop_overlay.visible:
 		return
+	_in_level_shop_return_destination = return_destination
 	_in_level_shop_overlay.open()
 
 
@@ -2223,6 +2367,13 @@ func _on_in_level_shop_close_requested() -> void:
 
 
 func _on_in_level_shop_closed() -> void:
+	var return_destination := _in_level_shop_return_destination
+	_in_level_shop_return_destination = StringName()
+	if return_destination == SHOP_RETURN_TIME_EXTENSION:
+		if _time_extension_offer_active:
+			_refresh_time_extension_offer()
+		return
+
 	# The Shop can sell bundles as well as coins, so both economy values must be synchronized before
 	# restoring the screen that opened it. Never consume a newly purchased ability automatically.
 	if not launched_from_dev_mode:
@@ -2239,6 +2390,56 @@ func _on_in_level_shop_closed() -> void:
 
 func _on_ability_purchase_ad_pressed() -> void:
 	pass
+
+
+func _on_time_extension_declined() -> void:
+	if not _time_extension_offer_active or _time_extension_purchase_in_progress or _is_ui_action_blocked():
+		return
+
+	_time_extension_offer_active = false
+	await _time_up_extension_overlay.close()
+	if not is_inside_tree() or _returning_to_menu or _level_failed or _level_completed:
+		return
+	_fail_level()
+
+
+func _on_time_extension_coin_requested() -> void:
+	if not _time_extension_offer_active or _time_extension_purchase_in_progress or _is_ui_action_blocked():
+		return
+	if _coin_time_extensions_used >= _max_coin_time_extensions_per_attempt:
+		_refresh_time_extension_offer()
+		return
+	if PlayerProgress.get_coins() < _time_extension_coin_price:
+		_open_in_level_shop(SHOP_RETURN_TIME_EXTENSION)
+		return
+
+	_time_extension_purchase_in_progress = true
+	_time_up_extension_overlay.set_coin_action_enabled(false)
+	if not PlayerProgress.spend_coins(_time_extension_coin_price, "time_extension"):
+		_time_extension_purchase_in_progress = false
+		_refresh_time_extension_offer()
+		return
+
+	_coin_time_extensions_used += 1
+	_time_remaining = float(_time_extension_seconds)
+	_time_extension_offer_active = false
+	await _time_up_extension_overlay.close()
+	if not is_inside_tree() or _returning_to_menu or _level_failed or _level_completed:
+		return
+
+	_time_extension_purchase_in_progress = false
+	_level_paused = false
+	_set_moving_shelf_rows_paused(false)
+	_update_timer_label()
+	_update_ability_buttons()
+	_update_pause_menu_button()
+
+
+func _on_time_extension_ad_requested() -> void:
+	# The button remains visible but disabled until a rewarded-ad provider is approved and connected.
+	# Do not grant time from a placeholder signal.
+	if not _is_rewarded_ad_time_extension_available():
+		return
 
 
 func _is_ui_action_blocked() -> bool:

@@ -1,0 +1,149 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/gameplay_modal_shell.tscn" id="1_shell"]
+[ext_resource type="Script" path="res://scripts/time_up_extension_modal.gd" id="2_script"]
+[ext_resource type="Texture2D" path="res://assets/abilities/ice_clock_icon_256x256.png" id="3_clock"]
+[ext_resource type="Texture2D" path="res://assets/ui/clover_coin_transparent_96x96.png" id="4_coin"]
+[ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="5_press_scale"]
+[ext_resource type="StyleBoxTexture" path="res://assets/themes/style_box_green_primary_button.tres" id="6_green"]
+[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_disabled_action_button.tres" id="7_disabled"]
+
+[node name="TimeUpExtensionModal" type="Control"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_script")
+
+[node name="Shell" parent="." instance=ExtResource("1_shell")]
+unique_name_in_owner = true
+layout_mode = 1
+
+[node name="ExtensionContent" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ExtensionColumn" type="VBoxContainer" parent="ExtensionContent"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 22.0
+offset_top = 10.0
+offset_right = -22.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="ClockIcon" type="TextureRect" parent="ExtensionContent/ExtensionColumn"]
+custom_minimum_size = Vector2(108, 108)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+texture = ExtResource("3_clock")
+expand_mode = 3
+stretch_mode = 5
+
+[node name="ExtensionLabel" type="Label" parent="ExtensionContent/ExtensionColumn"]
+unique_name_in_owner = true
+theme_type_variation = &"GameNumberLabel"
+custom_minimum_size = Vector2(280, 54)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.58, 0.08, 0.1, 1)
+theme_override_colors/font_shadow_color = Color(1, 1, 1, 0.78)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 42
+text = "+01:00"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MessageLabel" type="Label" parent="ExtensionContent/ExtensionColumn"]
+theme_type_variation = &"GameSmallLabel"
+custom_minimum_size = Vector2(360, 46)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.42, 0.08, 0.22, 1)
+theme_override_font_sizes/font_size = 21
+text = "Add one minute and keep sorting!"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="CoinButton" type="Button" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(194, 76)
+layout_mode = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = ExtResource("6_green")
+theme_override_styles/pressed = ExtResource("6_green")
+theme_override_styles/hover = ExtResource("6_green")
+theme_override_styles/disabled = ExtResource("7_disabled")
+script = ExtResource("5_press_scale")
+held_scale = 0.94
+
+[node name="PriceRow" type="HBoxContainer" parent="CoinButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 26.0
+offset_right = -26.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="CoinIcon" type="TextureRect" parent="CoinButton/PriceRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(42, 42)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("4_coin")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PriceLabel" type="Label" parent="CoinButton/PriceRow"]
+unique_name_in_owner = true
+theme_type_variation = &"GameNumberLabel"
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.01, 0.18, 0.03, 0.72)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 4
+theme_override_font_sizes/font_size = 30
+text = "500"
+vertical_alignment = 1
+
+[node name="WatchAdButton" type="Button" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(194, 76)
+layout_mode = 2
+disabled = true
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_disabled_color = Color(1, 1, 1, 0.86)
+theme_override_constants/line_spacing = -4
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = ExtResource("7_disabled")
+theme_override_styles/pressed = ExtResource("7_disabled")
+theme_override_styles/hover = ExtResource("7_disabled")
+theme_override_styles/disabled = ExtResource("7_disabled")
+text = "Watch Ad\nComing Soon"
+script = ExtResource("5_press_scale")
+held_scale = 0.94

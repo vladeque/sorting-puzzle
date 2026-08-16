@@ -322,7 +322,11 @@ func spend_coins(amount: int, reason: String = "gameplay") -> bool:
 		"payload": {
 			"asset": "coins",
 			"amount": normalized_amount,
-			"reason": reason if ["ability_use", "gameplay", "shop"].has(reason) else "gameplay",
+			"reason": (
+				reason
+				if ["ability_use", "gameplay", "shop", "time_extension"].has(reason)
+				else "gameplay"
+			),
 		},
 	}])
 

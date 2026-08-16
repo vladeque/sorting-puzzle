@@ -510,7 +510,9 @@ func _validate_operation_payload(operation_type: String, payload: Dictionary) ->
 			if (
 				not ["coins", "hammer", "shuffle", "highlight", "freezer"].has(str(payload.get("asset", "")))
 				or int(payload.get("amount", 0)) <= 0
-				or not ["ability_use", "gameplay", "shop"].has(str(payload.get("reason", "")))
+				or not ["ability_use", "gameplay", "shop", "time_extension"].has(
+					str(payload.get("reason", ""))
+				)
 			):
 				return _error("Resource-spend payload values are invalid.")
 		"life_purchase":
