@@ -4,7 +4,7 @@ class_name LevelTopHud
 ## Extracted top HUD (UI-003): owns the top strip background, combo slot, timer, level label, star
 ## pill, and Pause button as one safe-area-aware component instead of level.tscn embedding them
 ## piecemeal across the Background control and the UI canvas layer. scripts/level.gd only supplies
-## data (set_level_text/set_timer_text/set_star_count/set_combo/set_pause_enabled), calls
+## data (set_level_text/set_timer_state/set_star_count/set_combo/set_pause_enabled), calls
 ## apply_safe_layout() on resize, and listens for pause_pressed.
 ##
 ## The background strip height and the combo slot both now grow/shift with the safe-top inset --
@@ -54,11 +54,17 @@ const STAR_PULSE_OUT_SECONDS := 0.12
 const TIMER_FROZEN_FONT_COLOR := Color(0.68, 0.96, 1.0, 1.0)
 const TIMER_FROZEN_OUTLINE_COLOR := Color(0.08, 0.34, 0.52, 0.95)
 const TIMER_FROZEN_OUTLINE_SIZE := 5
+const TIMER_PULSE_SCALE := Vector2(1.08, 1.08)
+const TIMER_PULSE_IN_SECONDS := 0.09
+const TIMER_PULSE_OUT_SECONDS := 0.18
+
+@export_range(1, 120, 1) var critical_time_seconds := 30
 
 @onready var _strip := %Strip as Control
 @onready var _hud_center_slot := %HudCenterSlot as Control
 @onready var _combo_fill := %ComboFill as Control
 @onready var _combo_label := %ComboLabel as Label
+@onready var _timer_critical_background := %TimerCriticalBackground as Panel
 @onready var _timer_label := %TimerLabel as Label
 @onready var _level_label := %LevelLabel as Label
 @onready var _star_counter := %StarCounter as Control
@@ -67,6 +73,10 @@ const TIMER_FROZEN_OUTLINE_SIZE := 5
 @onready var _pause_button := %PauseButton as Button
 
 var _star_pulse_tween: Tween
+var _timer_pulse_tween: Tween
+var _last_timer_seconds := -1
+var _timer_is_critical := false
+var _timer_is_frozen := false
 
 
 func _ready() -> void:
@@ -79,6 +89,40 @@ func set_level_text(text: String) -> void:
 
 func set_timer_text(text: String) -> void:
 	_timer_label.text = text
+
+
+## Updates both timer copy and its critical visual state. `is_counting_down` keeps a short level
+## from alarming before the player's first meaningful action. Repeated frame updates inside the
+## same displayed second do not restart the pulse; only entering the critical range or advancing
+## to a new displayed second does.
+func set_timer_state(text: String, displayed_seconds: int, is_counting_down: bool) -> void:
+	_timer_label.text = text
+	var normalized_seconds := maxi(displayed_seconds, 0)
+	var should_be_critical := (
+		is_counting_down
+		and normalized_seconds > 0
+		and normalized_seconds <= critical_time_seconds
+	)
+	var entered_critical := should_be_critical and not _timer_is_critical
+	var displayed_second_changed := normalized_seconds != _last_timer_seconds
+
+	_timer_critical_background.visible = should_be_critical
+	_timer_is_critical = should_be_critical
+	_last_timer_seconds = normalized_seconds
+
+	if not should_be_critical:
+		_stop_timer_pulse()
+	elif not _timer_is_frozen and (entered_critical or displayed_second_changed):
+		_play_timer_second_pulse()
+
+
+## Clears all transient critical-timer state at a run boundary. The next active countdown update
+## can then treat 00:30 as a fresh threshold entry even if the previous run ended on that value.
+func reset_timer_attention() -> void:
+	_timer_critical_background.visible = false
+	_timer_is_critical = false
+	_last_timer_seconds = -1
+	_stop_timer_pulse()
 
 
 func set_star_count(stars: int) -> void:
@@ -127,7 +171,9 @@ func reset_star_pulse() -> void:
 
 ## Recolors the countdown timer to the frozen cyan treatment while Freezer is active.
 func set_timer_frozen_visual(is_frozen: bool) -> void:
+	_timer_is_frozen = is_frozen
 	if is_frozen:
+		_stop_timer_pulse()
 		_timer_label.add_theme_color_override("font_color", TIMER_FROZEN_FONT_COLOR)
 		_timer_label.add_theme_color_override("font_outline_color", TIMER_FROZEN_OUTLINE_COLOR)
 		_timer_label.add_theme_constant_override("outline_size", TIMER_FROZEN_OUTLINE_SIZE)
@@ -135,6 +181,31 @@ func set_timer_frozen_visual(is_frozen: bool) -> void:
 		_timer_label.remove_theme_color_override("font_color")
 		_timer_label.remove_theme_color_override("font_outline_color")
 		_timer_label.remove_theme_constant_override("outline_size")
+
+
+func _play_timer_second_pulse() -> void:
+	_stop_timer_pulse()
+	_timer_label.pivot_offset = _timer_label.size * 0.5
+	_timer_pulse_tween = _timer_label.create_tween()
+	_timer_pulse_tween.tween_property(
+		_timer_label,
+		"scale",
+		TIMER_PULSE_SCALE,
+		TIMER_PULSE_IN_SECONDS
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_timer_pulse_tween.tween_property(
+		_timer_label,
+		"scale",
+		Vector2.ONE,
+		TIMER_PULSE_OUT_SECONDS
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+
+
+func _stop_timer_pulse() -> void:
+	if _timer_pulse_tween != null and _timer_pulse_tween.is_valid():
+		_timer_pulse_tween.kill()
+	_timer_pulse_tween = null
+	_timer_label.scale = Vector2.ONE
 
 
 func set_combo(is_combo_active: bool, combo_count: int, time_ratio: float) -> void:
@@ -217,12 +288,20 @@ func apply_safe_layout(safe_margins: Vector4, viewport_size: Vector2) -> void:
 	var timer_top_y := safe_margins.y + HUD_TOP_MARGIN
 	var timer_center_x := viewport_size.x * 0.5
 	_layout_absolute(
+		_timer_critical_background,
+		timer_center_x - timer_width * 0.5,
+		timer_top_y,
+		timer_center_x + timer_width * 0.5,
+		timer_top_y + TIMER_LABEL_HEIGHT * compact_scale
+	)
+	_layout_absolute(
 		_timer_label,
 		timer_center_x - timer_width * 0.5,
 		timer_top_y,
 		timer_center_x + timer_width * 0.5,
 		timer_top_y + TIMER_LABEL_HEIGHT * compact_scale
 	)
+	_timer_label.pivot_offset = Vector2(timer_width, TIMER_LABEL_HEIGHT * compact_scale) * 0.5
 
 	_hud_center_slot.anchor_left = 0.5
 	_hud_center_slot.anchor_right = 0.5

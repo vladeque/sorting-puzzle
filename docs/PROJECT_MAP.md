@@ -417,7 +417,9 @@ Responsibility:
 - `level_top_hud.tscn` owns the top strip background, combo slot, timer, level label, star pill,
   and Pause button as one safe-area-aware component (the strip background and combo slot now
   grow/shift with the safe-top inset; the timer stays clear of the level label and star/pause
-  cluster at any value length).
+  cluster at any value length). It also owns the final-30-seconds timer warning: a responsive red
+  badge stays behind the digits while the label pulses once per displayed decrement; the visual
+  resets at run boundaries and suppresses pulse motion while Freezer holds the countdown.
 - `gameplay_ui_theme.gd` holds the ability-icon compact/regular sizes and breakpoint, modal
   safe-fit geometry, modal-title regular/long sizes, and the result-hero title role + responsive
   scale -- the gameplay-scope equivalent of `destination_screen_layout.gd`.

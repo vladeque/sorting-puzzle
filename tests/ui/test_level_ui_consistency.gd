@@ -51,6 +51,7 @@ func _run() -> void:
 	await _test_modal_transition_interruption()
 	await _test_safe_area_layout()
 	await _test_ability_bar_responsive_bounds()
+	await _test_critical_timer_feedback()
 	await _test_long_value_formatting()
 	await _test_locked_shelf_feedback()
 
@@ -503,6 +504,7 @@ func _test_safe_area_layout() -> void:
 	var pause_overlay = level.get("_pause_menu_overlay")
 	var pause_button := top_hud.find_child("PauseButton", true, false) as Control
 	var timer_label := top_hud.find_child("TimerLabel", true, false) as Control
+	var timer_critical_background := top_hud.find_child("TimerCriticalBackground", true, false) as Control
 	var level_label := top_hud.find_child("LevelLabel", true, false) as Control
 	var star_counter := top_hud.find_child("StarCounter", true, false) as Control
 
@@ -517,6 +519,10 @@ func _test_safe_area_layout() -> void:
 	_check(
 		is_equal_approx(star_counter.get_rect().get_center().y, timer_label.get_rect().get_center().y),
 		"Star counter and timer should share the same top-HUD row center."
+	)
+	_check(
+		timer_critical_background.get_rect().is_equal_approx(timer_label.get_rect()),
+		"The critical background should share the timer's responsive bounds."
 	)
 	_check(
 		is_equal_approx(pause_button.get_rect().position.x - star_counter.get_rect().end.x, 36.0),
@@ -625,6 +631,104 @@ func _test_ability_bar_responsive_bounds() -> void:
 	_check(
 		compact_badge_right < regular_badge_right,
 		"Compact badge offset should shrink relative to the regular one, not stay at the 96px value."
+	)
+
+	level.free()
+
+
+## The final 30 displayed seconds get a persistent non-color-only warning (red badge plus motion),
+## but the pulse advances only with the visible countdown. Pre-start, repeated-frame, and frozen
+## updates must not create misleading or continuously-restarted motion.
+func _test_critical_timer_feedback() -> void:
+	var level := await _make_level()
+	var top_hud = level.get("_top_hud")
+	var timer_label := top_hud.find_child("TimerLabel", true, false) as Label
+	var critical_background := top_hud.find_child("TimerCriticalBackground", true, false) as Panel
+	var critical_style := critical_background.get_theme_stylebox("panel") as StyleBoxFlat
+
+	level.set("_time_remaining", 20.0)
+	level.set("_has_player_started_timer", false)
+	level.call("_update_timer_label")
+	_check(
+		not critical_background.visible,
+		"A short timer must not alarm before the first meaningful player action."
+	)
+	level.call("_start_level_timer_from_player_action")
+	_check(
+		critical_background.visible and top_hud.get("_timer_pulse_tween") != null,
+		"Starting a short level should immediately enter and pulse its critical timer state."
+	)
+	top_hud.call("reset_timer_attention")
+
+	level.set("_time_remaining", 31.0)
+	level.set("_has_player_started_timer", true)
+	level.call("_update_timer_label")
+	_check(not critical_background.visible, "31 seconds should retain the normal timer treatment.")
+
+	level.set("_time_remaining", 30.0)
+	level.call("_update_timer_label")
+	_check(critical_background.visible, "00:30 should enter the critical timer treatment.")
+	_check(
+		critical_style != null and critical_style.bg_color.r > critical_style.bg_color.g * 4.0,
+		"The critical timer background should render as a clearly red warning badge."
+	)
+
+	var threshold_tween: Tween = top_hud.get("_timer_pulse_tween")
+	_check(threshold_tween != null, "Entering 00:30 should start one attention pulse.")
+	if threshold_tween != null:
+		threshold_tween.pause()
+		threshold_tween.custom_step(0.05)
+		_check(timer_label.scale.x > 1.0, "The timer digits should grow during the pulse.")
+
+	level.call("_update_timer_label")
+	_check(
+		top_hud.get("_timer_pulse_tween") == threshold_tween,
+		"Repeated frame updates in the same displayed second must not restart the pulse."
+	)
+	if threshold_tween != null:
+		threshold_tween.custom_step(1.0)
+	_check(
+		timer_label.scale.is_equal_approx(Vector2.ONE),
+		"The critical timer pulse should settle back to its authored scale."
+	)
+
+	level.set("_time_remaining", 29.0)
+	level.call("_update_timer_label")
+	var next_second_tween: Tween = top_hud.get("_timer_pulse_tween")
+	_check(
+		next_second_tween != null and next_second_tween != threshold_tween,
+		"Advancing from 00:30 to 00:29 should start a fresh pulse."
+	)
+
+	top_hud.call("set_timer_frozen_visual", true)
+	level.set("_time_remaining", 28.0)
+	level.call("_update_timer_label")
+	_check(
+		critical_background.visible
+			and top_hud.get("_timer_pulse_tween") == null
+			and timer_label.scale.is_equal_approx(Vector2.ONE),
+		"Freezer should retain the low-time badge but suppress countdown pulses."
+	)
+
+	top_hud.call("set_timer_frozen_visual", false)
+	level.set("_time_remaining", 27.0)
+	level.call("_update_timer_label")
+	_check(
+		top_hud.get("_timer_pulse_tween") != null,
+		"The next displayed decrement after Freezer should resume the pulse."
+	)
+
+	top_hud.call("reset_timer_attention")
+	_check(
+		not critical_background.visible and timer_label.scale.is_equal_approx(Vector2.ONE),
+		"A run-boundary reset should remove the warning and cancel its pulse."
+	)
+	level.set("_time_remaining", 15.0)
+	level.call("_update_timer_label")
+	level.call("_fail_level")
+	_check(
+		not critical_background.visible and timer_label.scale.is_equal_approx(Vector2.ONE),
+		"Level failure should clear the critical timer treatment before opening its result UI."
 	)
 
 	level.free()

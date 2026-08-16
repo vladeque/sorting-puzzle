@@ -1605,7 +1605,11 @@ Key responsibilities:
   to the originating main menu. `_restart_level()` creates a fresh `level.tscn` while preserving
   `selected_level`, `launched_from_dev_mode`, and `return_menu_scene_path`, so no failed-run shelf,
   timer, effect, or one-run life-spend state leaks into the retry.
-- Keep the level countdown idle until the first meaningful player action, then format the active timer as zero-padded `MM:SS` text with `_update_timer_label()`, forwarded to `LevelTopHud.set_timer_text()`.
+- Keep the level countdown idle until the first meaningful player action, then format the active
+  timer as zero-padded `MM:SS` text with `_update_timer_label()`, forwarded with its displayed
+  integer seconds and started state to `LevelTopHud.set_timer_state()`. The HUD enters its critical
+  treatment at `00:30`, so a level configured at 30 seconds or less does not alarm before the first
+  player action.
 - Pause and resume active gameplay through the top HUD's Pause button (`scripts/level_top_hud.gd`'s
   `pause_pressed` signal), and the instanced `UI/PauseMenuOverlay`
   (`scripts/pause_menu.gd`)/`UI/LeaveConfirmationOverlay` (`scripts/leave_confirmation_menu.gd`),
@@ -2303,9 +2307,17 @@ Purpose:
 - Also owns the reward-star flight's landing point and receive pulse, and the Freezer countdown's
   frozen timer-color visual (moved here from `scripts/level.gd` so it does not reach into this
   scene's `TimerLabel` directly).
+- Owns the configurable final-30-seconds attention treatment: `%TimerCriticalBackground` adds a
+  fixed dark-red rounded badge, while only `%TimerLabel` scales to 1.08 and settles once per new
+  displayed second. Repeated frame updates cannot restart the tween. Freezer retains the warning
+  badge and cyan digits but cancels pulse motion until the countdown advances again; run resets,
+  completion, and failure restore the authored scale and hide the badge.
 
 Key methods:
 - `set_level_text(text)` / `set_timer_text(text)` / `set_star_count(stars)`.
+- `set_timer_state(text, displayed_seconds, is_counting_down)`: updates the formatted timer and
+  drives threshold entry/per-second critical feedback without coupling the HUD to gameplay time.
+- `reset_timer_attention()`: cancels any active timer pulse and clears its run-local state.
 - `set_combo(is_combo_active, combo_count, time_ratio)`.
 - `set_pause_enabled(is_enabled)`: also switches between pointing-hand and arrow cursors so a
   disabled Pause action does not retain an enabled affordance.

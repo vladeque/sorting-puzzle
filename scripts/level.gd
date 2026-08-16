@@ -703,6 +703,8 @@ func _apply_level_config(config: Dictionary) -> void:
 	level_duration_seconds = float(config.get("time_seconds", level_duration_seconds))
 	_time_remaining = level_duration_seconds
 	_has_player_started_timer = false
+	if _top_hud != null:
+		_top_hud.reset_timer_attention()
 	_max_layer_count = 1
 	_level_failed = false
 	_level_completed = false
@@ -1707,7 +1709,11 @@ func _update_timer_label() -> void:
 	var remaining_seconds := ceili(_time_remaining)
 	var minutes := floori(float(remaining_seconds) / 60.0)
 	var seconds := remaining_seconds % 60
-	_top_hud.set_timer_text("%02d:%02d" % [minutes, seconds])
+	_top_hud.set_timer_state(
+		"%02d:%02d" % [minutes, seconds],
+		remaining_seconds,
+		_has_player_started_timer and not _level_failed and not _level_completed
+	)
 
 
 func _update_level_label() -> void:
@@ -1781,11 +1787,13 @@ func _start_level_timer_from_player_action() -> void:
 		return
 
 	_has_player_started_timer = true
+	_update_timer_label()
 
 
 func _fail_level() -> void:
 	_level_failed = true
 	_level_paused = false
+	_top_hud.reset_timer_attention()
 	_clear_freezer()
 	_spend_campaign_life_for_run("failed")
 	_reset_combo()
@@ -1824,6 +1832,7 @@ func _complete_level() -> void:
 
 	_level_completed = true
 	_level_paused = false
+	_top_hud.reset_timer_attention()
 	_clear_freezer()
 	_reset_combo()
 	_clear_selected_item()

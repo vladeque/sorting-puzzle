@@ -1711,6 +1711,10 @@ Purpose:
   overlap either side. Timer, star pill, and Pause share the authored 60px row center, and the star
   pill keeps a deliberately wide 36px regular-width gap from Pause (30px compact) so the status
   readout and the control read as two roles rather than one cluster.
+- During the final 30 active countdown seconds, `%TimerCriticalBackground` adds a dark-red rounded
+  warning badge behind the digits and `%TimerLabel` pulses once when each new integer second is
+  displayed. The badge uses the same responsive bounds as the normal timer and stays visible but
+  motionless under Pause or Freezer; Freezer's existing cyan digits remain the frozen-state cue.
 - `%PauseButton` matches the Main Menu settings-button role: 72x64 with the shared warm normal/
   pressed resources, a matching 0.94 held scale, and an explicit warm disabled override. Its pause
   mark is the `"II"` text glyph, authored in the same dark brown as the settings button for every
@@ -1722,7 +1726,10 @@ Purpose:
 Important nodes:
 - `%Strip`: full-rect `Panel`, the top strip background.
 - `%HudCenterSlot`, `%ComboFill`, `%ComboLabel`: the combo count/timer pill.
-- `%TimerLabel`, `%LevelLabel`: the countdown and chapter-local level number.
+- `%TimerCriticalBackground`, `%TimerLabel`: the responsive critical badge and countdown digits;
+  `set_timer_state()` gates the badge/pulse on started countdown state, and
+  `reset_timer_attention()` clears it at run boundaries. `%LevelLabel` is the chapter-local level
+  number.
 - `%StarCounter` (`style_box_gameplay_status_pill.tres`, a true pill), `%StarCountLabel`: the run's
   star total; `get_star_counter_global_center()` is the reward-star flight's landing point and
   `play_star_receive_pulse()`/`reset_star_pulse()` own its receive-pulse animation. The pulse
