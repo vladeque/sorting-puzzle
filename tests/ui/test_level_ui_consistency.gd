@@ -504,7 +504,6 @@ func _test_safe_area_layout() -> void:
 	var pause_overlay = level.get("_pause_menu_overlay")
 	var pause_button := top_hud.find_child("PauseButton", true, false) as Control
 	var timer_label := top_hud.find_child("TimerLabel", true, false) as Control
-	var timer_critical_background := top_hud.find_child("TimerCriticalBackground", true, false) as Control
 	var level_label := top_hud.find_child("LevelLabel", true, false) as Control
 	var star_counter := top_hud.find_child("StarCounter", true, false) as Control
 
@@ -512,17 +511,18 @@ func _test_safe_area_layout() -> void:
 	var viewport_size := Vector2(720.0, 1280.0)
 	top_hud.call("apply_safe_layout", Vector4.ZERO, viewport_size)
 	await process_frame
+	# The timer deliberately sits above the status row (see TIMER_TOP_MARGIN); only the star pill and
+	# Pause hold the authored HUD_ROW_CENTER_Y.
 	_check(
-		is_equal_approx(pause_button.get_rect().get_center().y, timer_label.get_rect().get_center().y),
-		"Pause button and timer should share the same top-HUD row center."
+		is_equal_approx(
+			pause_button.get_rect().get_center().y,
+			star_counter.get_rect().get_center().y
+		),
+		"Pause button and star counter should share the authored top-HUD row center."
 	)
 	_check(
-		is_equal_approx(star_counter.get_rect().get_center().y, timer_label.get_rect().get_center().y),
-		"Star counter and timer should share the same top-HUD row center."
-	)
-	_check(
-		timer_critical_background.get_rect().is_equal_approx(timer_label.get_rect()),
-		"The critical background should share the timer's responsive bounds."
+		timer_label.get_rect().get_center().y < pause_button.get_rect().get_center().y,
+		"The timer should sit above the star/Pause row center for top-strip balance."
 	)
 	_check(
 		is_equal_approx(pause_button.get_rect().position.x - star_counter.get_rect().end.x, 36.0),
@@ -560,9 +560,8 @@ func _test_safe_area_layout() -> void:
 	top_hud.call("apply_safe_layout", Vector4.ZERO, tablet_viewport)
 	await process_frame
 	_check(
-		is_equal_approx(timer_label.get_rect().get_center().x, tablet_viewport.x * 0.5)
-			and timer_critical_background.get_rect().is_equal_approx(timer_label.get_rect()),
-		"The timer and critical background should remain centered and aligned at 1200x1600."
+		is_equal_approx(timer_label.get_rect().get_center().x, tablet_viewport.x * 0.5),
+		"The timer should remain centered at 1200x1600."
 	)
 	_check(
 		timer_label.get_rect().position.x >= level_label.get_rect().end.x
@@ -650,26 +649,24 @@ func _test_ability_bar_responsive_bounds() -> void:
 	level.free()
 
 
-## The final 30 displayed seconds get a persistent non-color-only warning (red badge plus motion),
+## The final 30 displayed seconds get a persistent non-color-only warning (red digits plus motion),
 ## but the pulse advances only with the visible countdown. Pre-start, repeated-frame, and frozen
 ## updates must not create misleading or continuously-restarted motion.
 func _test_critical_timer_feedback() -> void:
 	var level := await _make_level()
 	var top_hud = level.get("_top_hud")
 	var timer_label := top_hud.find_child("TimerLabel", true, false) as Label
-	var critical_background := top_hud.find_child("TimerCriticalBackground", true, false) as Panel
-	var critical_style := critical_background.get_theme_stylebox("panel") as StyleBoxFlat
 
 	level.set("_time_remaining", 20.0)
 	level.set("_has_player_started_timer", false)
 	level.call("_update_timer_label")
 	_check(
-		not critical_background.visible,
+		_is_normal_timer_treatment(timer_label),
 		"A short timer must not alarm before the first meaningful player action."
 	)
 	level.call("_start_level_timer_from_player_action")
 	_check(
-		critical_background.visible and top_hud.get("_timer_pulse_tween") != null,
+		_is_critical_timer_treatment(timer_label) and top_hud.get("_timer_pulse_tween") != null,
 		"Starting a short level should immediately enter and pulse its critical timer state."
 	)
 	top_hud.call("reset_timer_attention")
@@ -677,14 +674,23 @@ func _test_critical_timer_feedback() -> void:
 	level.set("_time_remaining", 31.0)
 	level.set("_has_player_started_timer", true)
 	level.call("_update_timer_label")
-	_check(not critical_background.visible, "31 seconds should retain the normal timer treatment.")
+	_check(
+		_is_normal_timer_treatment(timer_label),
+		"31 seconds should retain the normal timer treatment."
+	)
 
 	level.set("_time_remaining", 30.0)
 	level.call("_update_timer_label")
-	_check(critical_background.visible, "00:30 should enter the critical timer treatment.")
 	_check(
-		critical_style != null and critical_style.bg_color.r > critical_style.bg_color.g * 4.0,
-		"The critical timer background should render as a clearly red warning badge."
+		_is_critical_timer_treatment(timer_label),
+		"00:30 should enter the critical timer treatment."
+	)
+	# Red on the warm terracotta strip is only readable because of the dark outline behind it, so the
+	# outline is part of the treatment rather than decoration.
+	_check(
+		LevelTopHud.TIMER_CRITICAL_FONT_COLOR.r > LevelTopHud.TIMER_CRITICAL_FONT_COLOR.g * 4.0
+			and timer_label.get_theme_constant("outline_size") > 0,
+		"The critical timer should render as clearly red digits carried by a contrasting outline."
 	)
 
 	var threshold_tween: Tween = top_hud.get("_timer_pulse_tween")
@@ -714,17 +720,28 @@ func _test_critical_timer_feedback() -> void:
 		"Advancing from 00:30 to 00:29 should start a fresh pulse."
 	)
 
+	# Both states now speak through the digits, so Freezer takes the label over while it holds the
+	# countdown -- the low-time alarm is not currently true.
 	top_hud.call("set_timer_frozen_visual", true)
 	level.set("_time_remaining", 28.0)
 	level.call("_update_timer_label")
 	_check(
-		critical_background.visible
+		timer_label.get_theme_color("font_color").is_equal_approx(
+			LevelTopHud.TIMER_FROZEN_FONT_COLOR
+		)
 			and top_hud.get("_timer_pulse_tween") == null
 			and timer_label.scale.is_equal_approx(Vector2.ONE),
-		"Freezer should retain the low-time badge but suppress countdown pulses."
+		"Freezer should take the digits over from the low-time alarm and suppress countdown pulses."
 	)
 
+	# Clearing the frozen look must restore whatever the countdown is actually in, not wipe the
+	# label back to its default: level.gd calls set_timer_frozen_visual(false) from several routine
+	# refreshes, so a destructive clear would silently drop the alarm mid-countdown.
 	top_hud.call("set_timer_frozen_visual", false)
+	_check(
+		_is_critical_timer_treatment(timer_label),
+		"Leaving Freezer inside the threshold should restore the critical digits, not plain white."
+	)
 	level.set("_time_remaining", 27.0)
 	level.call("_update_timer_label")
 	_check(
@@ -734,18 +751,36 @@ func _test_critical_timer_feedback() -> void:
 
 	top_hud.call("reset_timer_attention")
 	_check(
-		not critical_background.visible and timer_label.scale.is_equal_approx(Vector2.ONE),
+		_is_normal_timer_treatment(timer_label) and timer_label.scale.is_equal_approx(Vector2.ONE),
 		"A run-boundary reset should remove the warning and cancel its pulse."
 	)
 	level.set("_time_remaining", 15.0)
 	level.call("_update_timer_label")
 	level.call("_fail_level")
 	_check(
-		not critical_background.visible and timer_label.scale.is_equal_approx(Vector2.ONE),
+		_is_normal_timer_treatment(timer_label) and timer_label.scale.is_equal_approx(Vector2.ONE),
 		"Level failure should clear the critical timer treatment before opening its result UI."
 	)
 
 	level.free()
+
+
+func _is_critical_timer_treatment(timer_label: Label) -> bool:
+	return (
+		timer_label.get_theme_color("font_color").is_equal_approx(
+			LevelTopHud.TIMER_CRITICAL_FONT_COLOR
+		)
+		and timer_label.get_theme_constant("outline_size") == LevelTopHud.TIMER_CRITICAL_OUTLINE_SIZE
+	)
+
+
+func _is_normal_timer_treatment(timer_label: Label) -> bool:
+	return (
+		timer_label.get_theme_color("font_color").is_equal_approx(
+			LevelTopHud.TIMER_NORMAL_FONT_COLOR
+		)
+		and timer_label.get_theme_constant("outline_size") == LevelTopHud.TIMER_NORMAL_OUTLINE_SIZE
+	)
 
 
 ## LEVEL 99, 59:59, a large star total, a large ability-use count, and an active ability timer must

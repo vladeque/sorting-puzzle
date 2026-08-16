@@ -1712,10 +1712,12 @@ Purpose:
   the star pill and Pause retain the authored 60px row center. The star pill keeps a deliberately
   wide 36px regular-width gap from Pause (30px compact) so the status readout and the control read
   as two roles rather than one cluster.
-- During the final 30 active countdown seconds, `%TimerCriticalBackground` adds a dark-red rounded
-  warning badge behind the digits and `%TimerLabel` pulses once when each new integer second is
-  displayed. The badge uses the same responsive bounds as the normal timer and stays visible but
-  motionless under Pause or Freezer; Freezer's existing cyan digits remain the frozen-state cue.
+- During the final 30 active countdown seconds, `%TimerLabel` turns alarm red over a dark maroon
+  outline and pulses once when each new integer second is displayed. The outline is load-bearing:
+  red alone sits too close to the warm terracotta strip to stay readable. The red treatment persists
+  but goes motionless under Pause. Freezer's cyan digits take the label over while they are active,
+  because both states now speak through the same channel and a held countdown is not an active
+  alarm; the red returns on the next update after Freezer ends if the timer is still under 30s.
 - `%PauseButton` matches the Main Menu settings-button role: 72x64 with the shared warm normal/
   pressed resources, a matching 0.94 held scale, and an explicit warm disabled override. Its pause
   mark is the `"II"` text glyph, authored in the same dark brown as the settings button for every
@@ -1727,8 +1729,8 @@ Purpose:
 Important nodes:
 - `%Strip`: full-rect `Panel`, the top strip background.
 - `%HudCenterSlot`, `%ComboFill`, `%ComboLabel`: the combo count/timer pill.
-- `%TimerCriticalBackground`, `%TimerLabel`: the responsive critical badge and countdown digits;
-  `set_timer_state()` gates the badge/pulse on started countdown state, and
+- `%TimerLabel`: the countdown digits, and the single surface for every countdown state;
+  `set_timer_state()` gates the critical recolor/pulse on started countdown state, and
   `reset_timer_attention()` clears it at run boundaries. `%LevelLabel` is the chapter-local level
   number.
 - `%StarCounter` (`style_box_gameplay_status_pill.tres`, a true pill), `%StarCountLabel`: the run's

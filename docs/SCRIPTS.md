@@ -2308,11 +2308,16 @@ Purpose:
 - Also owns the reward-star flight's landing point and receive pulse, and the Freezer countdown's
   frozen timer-color visual (moved here from `scripts/level.gd` so it does not reach into this
   scene's `TimerLabel` directly).
-- Owns the configurable final-30-seconds attention treatment: `%TimerCriticalBackground` adds a
-  fixed dark-red rounded badge, while only `%TimerLabel` scales to 1.08 and settles once per new
-  displayed second. Repeated frame updates cannot restart the tween. Freezer retains the warning
-  badge and cyan digits but cancels pulse motion until the countdown advances again; run resets,
-  completion, and failure restore the authored scale and hide the badge.
+- Owns the configurable final-30-seconds attention treatment: `%TimerLabel` turns alarm red over a
+  dark maroon outline and scales to 1.08, settling once per new displayed second. Repeated frame
+  updates cannot restart the tween. Run resets, completion, and failure restore the normal digits
+  and the authored scale.
+- Every countdown treatment (normal, critical, frozen) is written from one
+  `_refresh_timer_label_colors()` derived from `_timer_is_critical`/`_timer_is_frozen`, with frozen
+  taking precedence. Callers must not add or remove `TimerLabel` color/outline overrides directly:
+  `set_timer_frozen_visual(false)` previously cleared them outright, and because `level.gd` reaches
+  it from several routine `_update_freezer_visuals()` refreshes -- not only Freezer expiry -- any
+  second writer to that label is dropped without warning.
 
 Key methods:
 - `set_level_text(text)` / `set_timer_text(text)` / `set_star_count(stars)`.

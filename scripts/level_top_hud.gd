@@ -51,6 +51,17 @@ const PAUSE_BAR_GAP_RATIO := 0.10
 const STAR_PULSE_SCALE := Vector2(1.12, 1.12)
 const STAR_PULSE_IN_SECONDS := 0.08
 const STAR_PULSE_OUT_SECONDS := 0.12
+## The timer digits carry every countdown state on one channel, so all three treatments are written
+## from _refresh_timer_label_colors() instead of each caller adding and removing its own overrides.
+## The normal values mirror what level_top_hud.tscn authors on %TimerLabel; the scene keeps them so
+## the editor still previews the default state.
+const TIMER_NORMAL_FONT_COLOR := Color(1.0, 1.0, 1.0, 1.0)
+const TIMER_NORMAL_OUTLINE_SIZE := 0
+## The final-30-seconds alarm. The dark maroon outline is what keeps the red digits legible against
+## the warm terracotta strip, which is close enough to the font color to swallow it on its own.
+const TIMER_CRITICAL_FONT_COLOR := Color(1.0, 0.23, 0.18, 1.0)
+const TIMER_CRITICAL_OUTLINE_COLOR := Color(0.23, 0.02, 0.01, 0.96)
+const TIMER_CRITICAL_OUTLINE_SIZE := 5
 const TIMER_FROZEN_FONT_COLOR := Color(0.68, 0.96, 1.0, 1.0)
 const TIMER_FROZEN_OUTLINE_COLOR := Color(0.08, 0.34, 0.52, 0.95)
 const TIMER_FROZEN_OUTLINE_SIZE := 5
@@ -64,7 +75,6 @@ const TIMER_PULSE_OUT_SECONDS := 0.18
 @onready var _hud_center_slot := %HudCenterSlot as Control
 @onready var _combo_fill := %ComboFill as Control
 @onready var _combo_label := %ComboLabel as Label
-@onready var _timer_critical_background := %TimerCriticalBackground as Panel
 @onready var _timer_label := %TimerLabel as Label
 @onready var _level_label := %LevelLabel as Label
 @onready var _star_counter := %StarCounter as Control
@@ -81,6 +91,7 @@ var _timer_is_frozen := false
 
 func _ready() -> void:
 	_pause_button.pressed.connect(func() -> void: pause_pressed.emit())
+	_refresh_timer_label_colors()
 
 
 func set_level_text(text: String) -> void:
@@ -106,9 +117,9 @@ func set_timer_state(text: String, displayed_seconds: int, is_counting_down: boo
 	var entered_critical := should_be_critical and not _timer_is_critical
 	var displayed_second_changed := normalized_seconds != _last_timer_seconds
 
-	_timer_critical_background.visible = should_be_critical
 	_timer_is_critical = should_be_critical
 	_last_timer_seconds = normalized_seconds
+	_refresh_timer_label_colors()
 
 	if not should_be_critical:
 		_stop_timer_pulse()
@@ -119,9 +130,9 @@ func set_timer_state(text: String, displayed_seconds: int, is_counting_down: boo
 ## Clears all transient critical-timer state at a run boundary. The next active countdown update
 ## can then treat 00:30 as a fresh threshold entry even if the previous run ended on that value.
 func reset_timer_attention() -> void:
-	_timer_critical_background.visible = false
 	_timer_is_critical = false
 	_last_timer_seconds = -1
+	_refresh_timer_label_colors()
 	_stop_timer_pulse()
 
 
@@ -170,17 +181,37 @@ func reset_star_pulse() -> void:
 
 
 ## Recolors the countdown timer to the frozen cyan treatment while Freezer is active.
+##
+## level.gd reaches this through _update_freezer_visuals(), which several routine refreshes call
+## with is_frozen false, so clearing the frozen look must not disturb anything else the label is
+## showing -- restoring it through _refresh_timer_label_colors() is what lets a Freezer that expires
+## mid-countdown fall back to the critical red instead of plain white.
 func set_timer_frozen_visual(is_frozen: bool) -> void:
 	_timer_is_frozen = is_frozen
 	if is_frozen:
 		_stop_timer_pulse()
-		_timer_label.add_theme_color_override("font_color", TIMER_FROZEN_FONT_COLOR)
-		_timer_label.add_theme_color_override("font_outline_color", TIMER_FROZEN_OUTLINE_COLOR)
-		_timer_label.add_theme_constant_override("outline_size", TIMER_FROZEN_OUTLINE_SIZE)
-	else:
-		_timer_label.remove_theme_color_override("font_color")
-		_timer_label.remove_theme_color_override("font_outline_color")
-		_timer_label.remove_theme_constant_override("outline_size")
+	_refresh_timer_label_colors()
+
+
+## Frozen wins over critical: both states now speak through the digits, and while Freezer holds the
+## countdown the low-time alarm is not currently true. The critical treatment returns on the next
+## update after Freezer ends if the countdown is still inside the threshold.
+func _refresh_timer_label_colors() -> void:
+	var font_color := TIMER_NORMAL_FONT_COLOR
+	var outline_color := Color(0.0, 0.0, 0.0, 0.0)
+	var outline_size := TIMER_NORMAL_OUTLINE_SIZE
+	if _timer_is_frozen:
+		font_color = TIMER_FROZEN_FONT_COLOR
+		outline_color = TIMER_FROZEN_OUTLINE_COLOR
+		outline_size = TIMER_FROZEN_OUTLINE_SIZE
+	elif _timer_is_critical:
+		font_color = TIMER_CRITICAL_FONT_COLOR
+		outline_color = TIMER_CRITICAL_OUTLINE_COLOR
+		outline_size = TIMER_CRITICAL_OUTLINE_SIZE
+
+	_timer_label.add_theme_color_override("font_color", font_color)
+	_timer_label.add_theme_color_override("font_outline_color", outline_color)
+	_timer_label.add_theme_constant_override("outline_size", outline_size)
 
 
 func _play_timer_second_pulse() -> void:
@@ -287,13 +318,6 @@ func apply_safe_layout(safe_margins: Vector4, viewport_size: Vector2) -> void:
 	# the star pill after the layout pass.
 	var timer_top_y := safe_margins.y + TIMER_TOP_MARGIN
 	var timer_center_x := viewport_size.x * 0.5
-	_layout_absolute(
-		_timer_critical_background,
-		timer_center_x - timer_width * 0.5,
-		timer_top_y,
-		timer_center_x + timer_width * 0.5,
-		timer_top_y + TIMER_LABEL_HEIGHT * compact_scale
-	)
 	_layout_absolute(
 		_timer_label,
 		timer_center_x - timer_width * 0.5,
