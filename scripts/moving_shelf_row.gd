@@ -15,6 +15,7 @@ const MOTION_VERTICAL_WRAP := "vertical_wrap"
 @export var direction := 1
 
 var _motion_offset := 0.0
+var _previous_motion_offset := 0.0
 var _movement_paused := false
 var _shelves: Array[Node2D] = []
 var _shelf_horizontal_visual_scale := 1.0
@@ -45,6 +46,7 @@ func configure(
 	motion_type = _normalize_motion_type(row_motion_type)
 	speed_pixels_per_second = maxf(row_speed_pixels_per_second, 0.0)
 	direction = -1 if row_direction < 0 else 1
+	_previous_motion_offset = _motion_offset
 	_apply_visible_size()
 	_layout_shelves()
 
@@ -63,6 +65,9 @@ func add_shelf(shelf: Node2D) -> void:
 
 func set_movement_paused(should_pause: bool) -> void:
 	_movement_paused = should_pause
+	# Collapse the interpolation pair at pause boundaries so resuming never blends from a stale tick.
+	_previous_motion_offset = _motion_offset
+	_layout_shelves(_motion_offset)
 
 
 ## The window is exactly `visible_shelf_count` cells along the axis the row travels, and one cell plus
@@ -97,7 +102,10 @@ func is_shelf_inside_visible_window(shelf: Node2D) -> bool:
 	return shelf.position.x >= 0.0 and shelf.position.x <= visible_size.x
 
 
-func _process(delta: float) -> void:
+## Advance the authoritative belt offset on fixed ticks. Rendering interpolates between these two
+## samples in `_process()`, avoiding uneven visible steps when the display refresh rate and physics
+## tick do not line up.
+func _physics_process(delta: float) -> void:
 	if _movement_paused or speed_pixels_per_second <= 0.0:
 		return
 
@@ -108,11 +116,18 @@ func _process(delta: float) -> void:
 	if cycle_length <= 0.0:
 		return
 
-	_motion_offset = fposmod(
-		_motion_offset + speed_pixels_per_second * float(direction) * delta,
-		cycle_length
-	)
-	_layout_shelves()
+	_previous_motion_offset = _motion_offset
+	_motion_offset += speed_pixels_per_second * float(direction) * delta
+
+
+func _process(_delta: float) -> void:
+	if _movement_paused or speed_pixels_per_second <= 0.0:
+		return
+
+	if _get_live_shelves().is_empty() or _get_cycle_length() <= 0.0:
+		return
+
+	_layout_shelves(_get_interpolated_motion_offset(Engine.get_physics_interpolation_fraction()))
 
 
 func _apply_visible_size() -> void:
@@ -121,7 +136,7 @@ func _apply_visible_size() -> void:
 	size = visible_size
 
 
-func _layout_shelves() -> void:
+func _layout_shelves(rendered_motion_offset := _motion_offset) -> void:
 	var live_shelves := _get_live_shelves()
 	if live_shelves.is_empty():
 		return
@@ -136,20 +151,28 @@ func _layout_shelves() -> void:
 		var shelf := live_shelves[shelf_index]
 		if motion_type == MOTION_VERTICAL_WRAP:
 			var base_y := shelf_cell_size.y * 0.5 + float(shelf_index) * shelf_step.y
-			var wrapped_y := fposmod(base_y + _motion_offset, cycle_length)
+			var wrapped_y := fposmod(base_y + rendered_motion_offset, cycle_length)
 			if wrapped_y > visible_size.y + shelf_cell_size.y * 0.5:
 				wrapped_y -= cycle_length
 
 			shelf.position = Vector2(row_center.x, wrapped_y)
 		else:
 			var base_x := shelf_cell_size.x * 0.5 + float(shelf_index) * shelf_step.x
-			var wrapped_x := fposmod(base_x + _motion_offset, cycle_length)
+			var wrapped_x := fposmod(base_x + rendered_motion_offset, cycle_length)
 			if wrapped_x > visible_size.x + shelf_cell_size.x * 0.5:
 				wrapped_x -= cycle_length
 
 			shelf.position = Vector2(wrapped_x, row_center.y)
 
 		shelf.visible = _is_shelf_cell_touching_window(shelf.position, visible_size)
+
+
+func _get_interpolated_motion_offset(interpolation_fraction: float) -> float:
+	return lerpf(
+		_previous_motion_offset,
+		_motion_offset,
+		clampf(interpolation_fraction, 0.0, 1.0)
+	)
 
 
 ## Items stand taller than the cell they sit on, so a shelf parked just outside the window still

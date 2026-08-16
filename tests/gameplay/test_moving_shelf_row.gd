@@ -78,6 +78,30 @@ func _run() -> void:
 			"%s and its item should keep their original proportions." % slot_name
 		)
 
+	row.speed_pixels_per_second = 60.0
+	row.call("_physics_process", 1.0 / 60.0)
+	_check(
+		is_equal_approx(float(row.get("_motion_offset")), 1.0),
+		"A fixed motion tick should advance the belt by speed multiplied by delta."
+	)
+	_check(
+		is_equal_approx(float(row.call("_get_interpolated_motion_offset", 0.5)), 0.5),
+		"Render motion should interpolate halfway between consecutive fixed-tick samples."
+	)
+	row.call("_layout_shelves", row.call("_get_interpolated_motion_offset", 0.5))
+	_check(
+		is_equal_approx(shelf.position.x, expected_width * 0.5 + 0.5),
+		"The shelf should render at the interpolated subpixel position."
+	)
+	row.set_movement_paused(true)
+	_check(
+		is_equal_approx(
+			float(row.get("_previous_motion_offset")),
+			float(row.get("_motion_offset"))
+		),
+		"Pausing should collapse interpolation history so resume cannot jump."
+	)
+
 	row.free()
 	_finish()
 

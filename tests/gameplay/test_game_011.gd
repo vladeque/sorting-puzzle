@@ -73,7 +73,7 @@ func _test_freezer_runtime_semantics() -> void:
 	if not moving_rows.is_empty():
 		var moving_row := moving_rows[0] as MovingShelfRow
 		var movement_before := float(moving_row.get("_motion_offset"))
-		moving_row.call("_process", 2.0)
+		moving_row.call("_physics_process", 2.0)
 		_check(
 			not is_equal_approx(float(moving_row.get("_motion_offset")), movement_before),
 			"moving shelves continue during Freezer"

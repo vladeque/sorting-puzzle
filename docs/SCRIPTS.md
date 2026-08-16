@@ -2115,6 +2115,8 @@ Attached to:
 Purpose:
 - Clips a moving shelf group to a visible window.
 - Moves child shelves horizontally or vertically and wraps them when they pass the row bounds.
+- Advances motion on fixed physics ticks and interpolates the rendered position each display frame,
+  preventing uneven stepping when the physics and display refresh rates differ.
 - Narrows each registered shelf body by `SHELF_WIDTH_REDUCTION` (`15` design pixels), leaving a
   visible gap at the unchanged grid step while item art and hit areas keep their proportions.
 - Reports whether a shelf center is inside the visible window for drag/drop targeting.
@@ -2135,7 +2137,8 @@ Key methods:
 
 Verification:
 - `tests/gameplay/test_moving_shelf_row.gd` checks the exact `15` px reduction, the resulting gap,
-  clipping-window width, visual scaling, and unchanged slot proportions.
+  clipping-window width, visual scaling, unchanged slot proportions, fixed-tick advancement, and
+  subpixel render interpolation.
 
 Do not use for:
 - Shelf item rules, matching, ability behavior, locking, or level completion. Those stay in `scripts/level.gd`.

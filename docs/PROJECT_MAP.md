@@ -617,7 +617,8 @@ Files:
 
 Responsibility:
 - Clips a shelf row to a configured visible window.
-- Moves shelves horizontally or vertically at runtime and wraps them back through the opposite side.
+- Moves shelves horizontally or vertically on fixed ticks, interpolates them on render frames for
+  smooth frame pacing, and wraps them back through the opposite side.
 - Keeps moving shelf bodies visually independent by reducing their rendered width by `15` design
   pixels and aligning the floor lip to the floor surface without compressing item art, slot
   positions, or hit areas.
