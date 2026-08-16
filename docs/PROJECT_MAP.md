@@ -619,7 +619,8 @@ Responsibility:
 - Clips a shelf row to a configured visible window.
 - Moves shelves horizontally or vertically at runtime and wraps them back through the opposite side.
 - Keeps moving shelf bodies visually independent by reducing their rendered width by `15` design
-  pixels without compressing item art, slot positions, or hit areas.
+  pixels and aligning the floor lip to the floor surface without compressing item art, slot
+  positions, or hit areas.
 - Keeps each level to one moving-shelf axis: horizontal or vertical.
 - Lets layout templates author moving-row center positions and metadata.
 - Lets `scripts/level.gd` decide drag/drop eligibility based on whether a moving shelf is currently inside the row window.

@@ -1991,8 +1991,8 @@ Key methods:
 - `set_visual_variant(visual_variant)`: applies `full` or `floor_only` shelf presentation and records the active variant as metadata for `scripts/level.gd` shelf edge and cast-shadow visibility checks.
 - `get_visual_variant()`: returns the active shelf visual variant.
 - `set_row_placement(row_placement)`: toggles the matching `PlacementVisuals/Left`, `PlacementVisuals/Middle`, or `PlacementVisuals/Right` container and records the active placement as metadata.
-- `set_horizontal_visual_scale(horizontal_scale)`: narrows shelf artwork for a moving row while
-  preserving item, slot, and input proportions.
+- `set_horizontal_visual_scale(horizontal_scale)`: narrows shelf artwork for a moving row, trims the
+  static shelf lip overhang to the floor-surface width, and preserves item, slot, and input proportions.
 - `get_row_placement()`: returns the active shelf row placement.
 - `set_top_ceiling_cap_visible(should_show)`: applies layout-derived visibility to every placement-specific `TopCeilingCap`, gated by the active shelf visual variant.
 - `add_back_layer(layer_index, front_slots)`: creates a generated back-layer container and slot nodes aligned to the shelf front slots.

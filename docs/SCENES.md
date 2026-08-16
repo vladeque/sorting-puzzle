@@ -1561,6 +1561,8 @@ Authored geometry:
 - Markers sit on the runtime shelf grid: `228.96` between columns (`114.48` for a half-step stagger) and `134.62` between static rows.
 - Moving shelf bodies are `15` design pixels narrower than a standard shelf cell while their centers
   keep the authored `228.96` step, leaving a `6.52` pixel visual gap instead of an interlocked edge.
+- Their `FloorSurface` and `FloorFrontLip` terminate at the same horizontal edges; the front lip's
+  authored static-shelf overhang is removed only when the shelf belongs to a moving row.
 - A moving row is `50.88` taller than a static one (`MovingShelfRow.ROW_HEIGHT_PADDING`), so a static row and an adjacent moving row are placed `176.49` apart and two adjacent moving rows `185.50` apart. Both keep the same visual gap static rows have.
 
 Static presets:

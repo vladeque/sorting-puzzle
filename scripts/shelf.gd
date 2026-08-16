@@ -19,6 +19,8 @@ const LEFT_PLACEMENT_NODE := "PlacementVisuals/Left"
 const MIDDLE_PLACEMENT_NODE := "PlacementVisuals/Middle"
 const RIGHT_PLACEMENT_NODE := "PlacementVisuals/Right"
 const TOP_CEILING_CAP_NODE := "TopCeilingCap"
+const FLOOR_SURFACE_NODE := "FloorSurface"
+const FLOOR_FRONT_LIP_NODE := "FloorFrontLip"
 const HORIZONTAL_VISUAL_SCALE_NODES := [
 	"Shadow",
 	"RightColumnShadow",
@@ -146,6 +148,16 @@ func set_horizontal_visual_scale(horizontal_scale: float) -> void:
 		if visual != null:
 			visual.scale.x = safe_scale
 
+	# The authored front lip is wider than the floor so static shelves can interlock. Moving shelves
+	# are independent cells, so trim that extra overhang and finish both faces at the same edges.
+	var floor_surface := get_node_or_null(FLOOR_SURFACE_NODE) as Polygon2D
+	var floor_front_lip := get_node_or_null(FLOOR_FRONT_LIP_NODE) as Polygon2D
+	if floor_surface != null and floor_front_lip != null:
+		var surface_width := _get_polygon_horizontal_span(floor_surface.polygon) * safe_scale
+		var lip_width := _get_polygon_horizontal_span(floor_front_lip.polygon)
+		if lip_width > 0.0:
+			floor_front_lip.scale.x = surface_width / lip_width
+
 
 func set_top_ceiling_cap_visible(should_show: bool) -> void:
 	_should_show_top_ceiling_cap = should_show
@@ -244,6 +256,19 @@ func _set_node_visible(node_name: String, should_show: bool) -> void:
 	var node := get_node_or_null(node_name) as CanvasItem
 	if node != null:
 		node.visible = should_show
+
+
+func _get_polygon_horizontal_span(points: PackedVector2Array) -> float:
+	if points.is_empty():
+		return 0.0
+
+	var minimum_x := points[0].x
+	var maximum_x := points[0].x
+	for point in points:
+		minimum_x = minf(minimum_x, point.x)
+		maximum_x = maxf(maximum_x, point.x)
+
+	return maximum_x - minimum_x
 
 
 func _get_slot_item(slot: Node2D) -> ShelfItem:

@@ -53,11 +53,23 @@ func _run() -> void:
 	for node_path in Shelf.HORIZONTAL_VISUAL_SCALE_NODES:
 		var visual := shelf.get_node_or_null(node_path) as Node2D
 		_check(visual != null, "%s should remain a moving-shelf visual node." % node_path)
-		if visual != null:
+		if visual != null and node_path != Shelf.FLOOR_FRONT_LIP_NODE:
 			_check(
 				is_equal_approx(visual.scale.x, expected_visual_scale),
 				"%s should be shortened with the moving shelf body." % node_path
 			)
+
+	var floor_surface := shelf.get_node_or_null(Shelf.FLOOR_SURFACE_NODE) as Polygon2D
+	var floor_front_lip := shelf.get_node_or_null(Shelf.FLOOR_FRONT_LIP_NODE) as Polygon2D
+	_check(floor_surface != null, "The moving shelf should keep its floor surface.")
+	_check(floor_front_lip != null, "The moving shelf should keep its front lip.")
+	if floor_surface != null and floor_front_lip != null:
+		var surface_width := _get_polygon_width(floor_surface)
+		var lip_width := _get_polygon_width(floor_front_lip)
+		_check(
+			is_equal_approx(surface_width, lip_width),
+			"The moving shelf floor surface and front lip should finish at identical edges."
+		)
 
 	for slot_name in ["Slot01", "Slot02", "Slot03"]:
 		var slot := shelf.get_node_or_null(slot_name) as Node2D
@@ -73,6 +85,20 @@ func _run() -> void:
 func _check(condition: bool, message: String) -> void:
 	if not condition:
 		_failures.append(message)
+
+
+func _get_polygon_width(polygon: Polygon2D) -> float:
+	var points := polygon.polygon
+	if points.is_empty():
+		return 0.0
+
+	var minimum_x := points[0].x
+	var maximum_x := points[0].x
+	for point in points:
+		minimum_x = minf(minimum_x, point.x)
+		maximum_x = maxf(maximum_x, point.x)
+
+	return (maximum_x - minimum_x) * absf(polygon.scale.x)
 
 
 func _finish() -> void:
