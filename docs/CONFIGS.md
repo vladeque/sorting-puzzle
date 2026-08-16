@@ -171,7 +171,7 @@ Row layout shape:
       "visible_count": 3,
       "motion": {
         "type": "horizontal_wrap",
-        "speed": 70,
+        "speed": 60,
         "direction": "right"
       },
       "visual_variant": "floor_only"
@@ -185,7 +185,8 @@ Row layout rules:
 - `shelf_count` is required for each row and consumes shelves in order from the `shelves` array.
 - `visible_count` is optional. Moving rows default to `3` visible shelves, clamped to `shelf_count`; static rows default to their full `shelf_count`.
 - `motion.type` supports `horizontal_wrap` and `vertical_wrap`.
-- `motion.speed` is pixels per second. Use `0` for a row that is structured as a moving row but currently stopped.
+- `motion.speed` is pixels per second. Built-in campaign presets use `60` for an even cadence on
+  common 60 Hz displays. Use `0` for a row that is structured as a moving row but currently stopped.
 - `motion.direction` supports `right` and `left` for `horizontal_wrap`, and `down` and `up` for `vertical_wrap`. Vertical rows default to `down`, moving shelves from top to bottom.
 - A level may use horizontal moving shelves or vertical moving shelves, but not both at the same time.
 - A `vertical_wrap` row carries at least six shelves. Below that the off-window part of the belt is

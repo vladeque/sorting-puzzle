@@ -1582,14 +1582,14 @@ Static presets:
 - `scenes/layouts/layout_staggered_columns_5_4_5.tscn` (14)
 
 Presets with moving rows:
-- `scenes/layouts/layout_grid_3x2_moving_4_bottom.tscn` (10; two static rows over one 4-shelf belt, 3 visible, 45 px/s right)
+- `scenes/layouts/layout_grid_3x2_moving_4_bottom.tscn` (10; two static rows over one 4-shelf belt, 3 visible, 60 px/s right)
 - `scenes/layouts/layout_grid_3x3_moving_4_middle.tscn` (13; a 4-shelf belt between the top static row and the two below it, 3 visible, 60 px/s right)
 - `scenes/layouts/layout_grid_3x2_moving_4_4_center.tscn` (14; two counter-running 4-shelf belts between two static rows, 3 visible each, 60 px/s)
-- `scenes/layouts/layout_grid_3x3_moving_5_bottom.tscn` (14; a 3x3 static grid over one 5-shelf belt, 3 visible, 70 px/s right)
-- `scenes/layouts/layout_staggered_columns_4_moving_6_4.tscn` (14; a vertical 6-shelf belt between two static columns of four, 3 visible, 55 px/s down)
-- `scenes/layouts/layout_staggered_columns_5_moving_6_5.tscn` (16; a vertical 6-shelf belt between two static columns of five, 4 visible, 55 px/s down)
-- `scenes/layouts/layout_grid_2x4_moving_6_left.tscn` (14; a vertical 6-shelf belt down the left edge beside a static 2x4 block, 4 visible, 55 px/s down)
-- `scenes/layouts/layout_grid_1x4_moving_6_6_sides.tscn` (16; two vertical 6-shelf belts around a static column of four, 4 visible each, 55 px/s, left down and right up)
+- `scenes/layouts/layout_grid_3x3_moving_5_bottom.tscn` (14; a 3x3 static grid over one 5-shelf belt, 3 visible, 60 px/s right)
+- `scenes/layouts/layout_staggered_columns_4_moving_6_4.tscn` (14; a vertical 6-shelf belt between two static columns of four, 3 visible, 60 px/s down)
+- `scenes/layouts/layout_staggered_columns_5_moving_6_5.tscn` (16; a vertical 6-shelf belt between two static columns of five, 4 visible, 60 px/s down)
+- `scenes/layouts/layout_grid_2x4_moving_6_left.tscn` (14; a vertical 6-shelf belt down the left edge beside a static 2x4 block, 4 visible, 60 px/s down)
+- `scenes/layouts/layout_grid_1x4_moving_6_6_sides.tscn` (16; two vertical 6-shelf belts around a static column of four, 4 visible each, 60 px/s, left down and right up)
 
 Vertical belts:
 - A `vertical_wrap` row carries at least six shelves. Fewer makes the hidden part of the belt shorter

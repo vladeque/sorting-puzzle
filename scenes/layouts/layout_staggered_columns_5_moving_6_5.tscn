@@ -24,7 +24,7 @@ script = ExtResource("1_layout_row")
 shelf_count = 6
 visible_count = 4
 motion_type = "vertical_wrap"
-speed_pixels_per_second = 55.0
+speed_pixels_per_second = 60.0
 direction = "down"
 
 [node name="Shelf12" type="Marker2D" parent="."]

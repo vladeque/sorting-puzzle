@@ -619,9 +619,13 @@ Responsibility:
 - Clips a shelf row to a configured visible window.
 - Moves shelves horizontally or vertically on fixed ticks, interpolates them on render frames for
   smooth frame pacing, and wraps them back through the opposite side.
+- Standardizes campaign moving rows at `60` design pixels per second for an even cadence on common
+  60 Hz mobile displays.
 - Keeps moving shelf bodies visually independent by reducing their rendered width by `15` design
   pixels and aligning the floor lip to the floor surface without compressing item art, slot
   positions, or hit areas.
+- Antialiases moving shelf polygons so subpixel positions do not shimmer at scaled resolutions or
+  refresh rates above 60 Hz.
 - Keeps each level to one moving-shelf axis: horizontal or vertical.
 - Lets layout templates author moving-row center positions and metadata.
 - Lets `scripts/level.gd` decide drag/drop eligibility based on whether a moving shelf is currently inside the row window.

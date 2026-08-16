@@ -3,6 +3,9 @@ extends SceneTree
 const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
 const MOVING_ROW_SCENE_PATH := "res://scenes/moving_shelf_row.tscn"
 const SHELF_SCENE_PATH := "res://scenes/shelf.tscn"
+const LEVEL_SCENE_PATH := "res://level.tscn"
+const PREVIEW_ARGUMENT := "--moving-shelf-motion-preview"
+const LAYOUT_DIRECTORY := "res://scenes/layouts"
 const CELL_SIZE := Vector2(237.44, 143.1)
 const CELL_STEP := Vector2(228.96, 134.62)
 
@@ -10,7 +13,8 @@ var _failures: Array[String] = []
 
 
 func _init() -> void:
-	if not str(ProjectSettings.get_setting("application/config/name", "")).begins_with(
+	var preview_mode := OS.get_cmdline_user_args().has(PREVIEW_ARGUMENT)
+	if not preview_mode and not str(ProjectSettings.get_setting("application/config/name", "")).begins_with(
 		ISOLATED_TEST_PROJECT_PREFIX
 	):
 		push_error("Moving-shelf-row verification must run through run_isolated_godot_test.ps1.")
@@ -21,6 +25,10 @@ func _init() -> void:
 
 func _run() -> void:
 	await process_frame
+	if OS.get_cmdline_user_args().has(PREVIEW_ARGUMENT):
+		await _run_preview()
+		return
+
 	var row_scene := load(MOVING_ROW_SCENE_PATH) as PackedScene
 	var shelf_scene := load(SHELF_SCENE_PATH) as PackedScene
 	var row := row_scene.instantiate() as MovingShelfRow if row_scene != null else null
@@ -57,6 +65,12 @@ func _run() -> void:
 			_check(
 				is_equal_approx(visual.scale.x, expected_visual_scale),
 				"%s should be shortened with the moving shelf body." % node_path
+			)
+		var polygon := visual as Polygon2D
+		if polygon != null:
+			_check(
+				polygon.antialiased,
+				"%s should antialias its moving outer edges." % node_path
 			)
 
 	var floor_surface := shelf.get_node_or_null(Shelf.FLOOR_SURFACE_NODE) as Polygon2D
@@ -101,9 +115,57 @@ func _run() -> void:
 		),
 		"Pausing should collapse interpolation history so resume cannot jump."
 	)
+	_verify_authored_motion_speeds()
 
 	row.free()
 	_finish()
+
+
+func _run_preview() -> void:
+	root.content_scale_size = Vector2i(720, 1280)
+	root.size = Vector2i(720, 1280)
+	var level_scene := load(LEVEL_SCENE_PATH) as PackedScene
+	var level = level_scene.instantiate() if level_scene != null else null
+	if level == null:
+		push_error("The moving-shelf preview could not instantiate level.tscn.")
+		quit(1)
+		return
+
+	level.set("launched_from_dev_mode", true)
+	level.set("selected_level", 8)
+	level.set("_sound_effects_enabled", false)
+	root.add_child(level)
+	await create_timer(2.0).timeout
+	level.queue_free()
+	quit(0)
+
+
+func _verify_authored_motion_speeds() -> void:
+	for file_name in DirAccess.get_files_at(LAYOUT_DIRECTORY):
+		if not file_name.ends_with(".tscn"):
+			continue
+
+		var scene_path := "%s/%s" % [LAYOUT_DIRECTORY, file_name]
+		var packed_scene := load(scene_path) as PackedScene
+		var layout := packed_scene.instantiate() if packed_scene != null else null
+		_check(layout != null, "%s should remain loadable." % scene_path)
+		if layout == null:
+			continue
+
+		for child in layout.get_children():
+			var moving_row := child as ShelfLayoutRow
+			if moving_row == null:
+				continue
+			_check(
+				is_equal_approx(
+					moving_row.speed_pixels_per_second,
+					ShelfLayoutRow.DEFAULT_SMOOTH_SPEED
+				),
+				"%s/%s should use the smooth 60 px/s campaign cadence."
+					% [file_name, child.name]
+			)
+
+		layout.free()
 
 
 func _check(condition: bool, message: String) -> void:

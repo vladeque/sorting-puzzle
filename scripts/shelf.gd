@@ -147,6 +147,9 @@ func set_horizontal_visual_scale(horizontal_scale: float) -> void:
 		var visual := get_node_or_null(node_path) as Node2D
 		if visual != null:
 			visual.scale.x = safe_scale
+			var polygon := visual as Polygon2D
+			if polygon != null:
+				polygon.antialiased = true
 
 	# The authored front lip is wider than the floor so static shelves can interlock. Moving shelves
 	# are independent cells, so trim that extra overhang and finish both faces at the same edges.
