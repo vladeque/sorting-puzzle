@@ -609,7 +609,8 @@ Purpose:
 Depends on:
 - `assets/ui/avatars/*.png`.
 - `assets/ui/avatar_circle_clip.gdshader`, which keeps the circular crop while rendering avatar
-  content at 90% and extending its outer background colors to the frame edge.
+  content at 92%, restoring detail sharpness, and extending its outer background colors to the
+  frame edge.
 - `assets/ui/reward_star_34_glossy_b.png`.
 - `scenes/ui/leaderboard_rank_reward.tscn`.
 
@@ -1016,8 +1017,8 @@ Important nodes:
 
 Depends on:
 - `assets/ui/avatars/avatar_cat.png` for the default editor/display texture. The owning menu script replaces it with the saved avatar at runtime.
-- `assets/ui/avatar_circle_clip.gdshader` for the circular crop and 90% content scale that reveals
-  more of each avatar's original background.
+- `assets/ui/avatar_circle_clip.gdshader` for the circular crop, detail sharpening, and 92% content
+  scale that reveals more of each avatar's original background.
 - `scenes/ui/main_menu_coin_shortcut.tscn`.
 - `assets/ui/main_menu_lives.png`.
 - `scripts/press_scale_button.gd`.
@@ -1093,7 +1094,8 @@ Depends on:
 - `assets/ui/avatar_frames/*.png`, the supplied frame geometry plus its color variants, rendered as
   a separate layer above the avatar.
 - `assets/ui/avatar_circle_clip.gdshader`, which keeps the circular crop while rendering avatar
-  content at 90% and extending its outer background colors to the frame edge.
+  content at 92%, restoring detail sharpness, and extending its outer background colors to the
+  frame edge.
 - `configs/profile_frames.json`.
 - `scenes/ui/profile_avatar_view.tscn` and `scenes/ui/profile_choice_tile.tscn`.
 - `scenes/ui/level_button.tscn`.

@@ -3,7 +3,8 @@ class_name ProfileAvatarView
 
 const ProfileFrameCatalogScript := preload("res://scripts/profile_frame_catalog.gd")
 const AVATAR_CLIP_SHADER := preload("res://assets/ui/avatar_circle_clip.gdshader")
-const AVATAR_CONTENT_SCALE := 0.9
+const AVATAR_CONTENT_SCALE := 0.92
+const AVATAR_SHARPEN_STRENGTH := 0.35
 
 @export var avatar_id := "avatar_cat"
 @export var frame_id := "frame_classic"
@@ -17,6 +18,7 @@ func _ready() -> void:
 		var clip_material := ShaderMaterial.new()
 		clip_material.shader = AVATAR_CLIP_SHADER
 		clip_material.set_shader_parameter("content_scale", AVATAR_CONTENT_SCALE)
+		clip_material.set_shader_parameter("sharpen_strength", AVATAR_SHARPEN_STRENGTH)
 		_avatar_texture.material = clip_material
 	_apply_profile()
 
