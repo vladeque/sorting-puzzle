@@ -1000,7 +1000,8 @@ Important nodes:
   `ProfileAvatarView` (0.97 held scale), so the avatar visibly presses without shrinking the 76x76 tap
   target (see "Shared Interaction Roles" above) -- it had no press feedback at all before UI-002.
 - `ProfileWidget/ProfileAvatarView`: `scenes/ui/profile_avatar_view.tscn` instance showing the saved
-  avatar and local cosmetic frame.
+  avatar and local cosmetic frame; its 92x92 visual is centered over the 76x76 touch target so
+  scene-specific enlargement cannot shift the animal or frame off-axis.
 - `CoinsWidget`: `scenes/ui/main_menu_coin_shortcut.tscn` instance (compact coin balance + "+"
   badge, tappable to open the Shop). Kept named `CoinsWidget` so `scripts/main_menu_top_status.gd`'s
   `$CoinsWidget` center-exclusion-width lookup is unchanged.

@@ -328,6 +328,12 @@ func _test_focus_and_cursor_policy() -> void:
 
 	var profile_widget := menu.get_node("%TopStatusBar/MainMenuTopStatus/ProfileWidget") as Button
 	_check(profile_widget.focus_mode == Control.FOCUS_NONE, "ProfileWidget should stay FOCUS_NONE.")
+	var profile_avatar := profile_widget.get_node("ProfileAvatarView") as Control
+	var profile_avatar_center := profile_avatar.position + profile_avatar.size * 0.5
+	_check(
+		profile_avatar_center.is_equal_approx(profile_widget.size * 0.5),
+		"Main Menu profile avatar should stay centered inside its touch target."
+	)
 
 	var chest_button := menu.get_node("%RewardChest/ChestButton") as Button
 	_check(chest_button.focus_mode == Control.FOCUS_NONE, "Reward Chest's ChestButton should stay FOCUS_NONE.")

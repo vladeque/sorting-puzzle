@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://0dvvrnre3uhv" path="res://scripts/main_menu_top_status.gd" id="1_top_status_script"]
 [ext_resource type="Texture2D" uid="uid://kvmueps1ax4n" path="res://assets/ui/main_menu_lives.png" id="2_lives"]
-[ext_resource type="PackedScene" path="res://scenes/ui/profile_avatar_view.tscn" id="3_avatar_view"]
+[ext_resource type="PackedScene" uid="uid://dapnucxiyjsjg" path="res://scenes/ui/profile_avatar_view.tscn" id="3_avatar_view"]
 [ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="4_press_scale_button"]
 [ext_resource type="PackedScene" path="res://scenes/ui/main_menu_coin_shortcut.tscn" id="5_coin_shortcut"]
 [ext_resource type="StyleBox" path="res://assets/themes/style_box_warm_icon_normal.tres" id="6_warm_normal"]
@@ -28,17 +28,21 @@ script = ExtResource("4_press_scale_button")
 visual_target_path = NodePath("ProfileAvatarView")
 held_scale = 0.97
 
-[node name="ProfileAvatarView" parent="ProfileWidget" instance=ExtResource("3_avatar_view")]
+[node name="ProfileAvatarView" parent="ProfileWidget" unique_id=208147841 instance=ExtResource("3_avatar_view")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(76, 76)
+custom_minimum_size = Vector2(92, 92)
 layout_mode = 1
-anchors_preset = 0
-anchor_right = 0.0
-anchor_bottom = 0.0
-offset_left = 2.0
-offset_top = 2.0
-offset_right = 78.0
-offset_bottom = 78.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -46.0
+offset_top = -46.0
+offset_right = 46.0
+offset_bottom = 46.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="Spacer01" type="Control" parent="." unique_id=987735707]
 layout_mode = 2
