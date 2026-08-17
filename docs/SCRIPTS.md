@@ -61,7 +61,7 @@ Important nodes:
 - `%RewardStarFlyer`: dedicated fullscreen completed-level reward-star effect (renamed from
   `%RewardCoinFlyer` in UI-002; see `docs/SCENES.md`'s "Reward-Progress Semantics").
 - `MainMenuTopStatus/ProfileWidget`: opens the profile menu.
-- `MainMenuTopStatus/ProfileWidget/AvatarTexture`: displays the saved avatar texture.
+- `MainMenuTopStatus/ProfileWidget/ProfileAvatarView`: displays the saved avatar and local frame.
 - `MainMenuTopStatus/CoinsWidget`: `scenes/ui/main_menu_coin_shortcut.tscn` instance; shows the
   saved gold coin balance and opens the Shop when pressed.
 - `MainMenuTopStatus/SettingsWidget/SettingsButton`: opens the main-menu settings popup.
@@ -108,7 +108,8 @@ Key methods:
 - `_on_reward_star_animation_finished()`: reconciles the displayed chest value with saved progress once the flight finishes (renamed from `_on_reward_coin_animation_finished`).
 - `_on_home_tab_reselected()`: documented no-op for retapping the already-active Home tab.
 - `_format_life_restore_time(seconds_remaining)`: formats the next-life restore timer as zero-padded minutes and seconds.
-- `_update_profile_avatar()`: loads the saved avatar texture into the top status profile widget.
+- `_update_profile_customization()`: loads the saved avatar/frame combination into the top status
+  profile widget.
 - `_open_profile_menu()`: creates the centered profile menu window and listens for saved avatar changes.
 - `_open_settings_menu()`: creates the centered settings popup and wires its close button.
 - `_close_settings_menu()`: fades the settings popup out, then frees it.
@@ -121,7 +122,8 @@ Key methods:
   call while `_is_navigating` is already true, so a rapid double-tap (including via the top-status
   coin shortcut) can never call it twice, and disables this screen's own `process_mode` so no
   descendant can react to further input before the deferred scene swap resolves.
-- `_on_profile_avatar_saved(avatar_id)`: refreshes the top status avatar after the profile menu saves.
+- `_on_profile_saved(avatar_id, avatar_frame_id)`: refreshes the top status customization after the
+  profile menu saves.
 - `_launch_campaign_level()`: resolves the selected chapter's next incomplete global level,
   opens Out of Lives when needed, and resumes the same launch after a successful life purchase;
   otherwise instantiates the level, sets campaign launch metadata, swaps current scene, and queues
@@ -711,24 +713,24 @@ Attached to:
 - `scenes/ui/profile_menu.tscn` root `ProfileMenu`.
 
 Purpose:
-- Builds the player profile name editor and avatar picker.
-- Loads the current player name into an editable field above the avatar section.
-- Creates one avatar button for each id exposed by `PlayerProgress.get_available_avatar_ids()`.
-- Keeps the pause-style menu panel responsive, with the avatar grid at three columns.
-- Displays alpha-cleaned circular avatar PNGs in the top profile widget and picker.
-- Emits `avatar_saved(avatar_id)` after the profile save succeeds so the main menu can refresh the avatar.
+- Builds the draft-based name, avatar, and frame profile editor.
+- Switches one three-column choice grid between the 18 avatars and configured cosmetic frames.
+- Updates the summary preview immediately while deferring persistence until Save.
+- Emits `profile_saved(avatar_id, avatar_frame_id)` after the complete customization saves so the
+  main menu can refresh its reusable profile view.
 
 Key constants:
-- `AVATAR_CLIP_SHADER`: defensive circular clip that keeps avatar edges consistent at runtime.
 - `GRID_COLUMNS`: fixed to `3`.
 - `PANEL_MAX_WIDTH`, `PANEL_MAX_HEIGHT`, and `PANEL_MIN_MARGIN`: centered popup panel bounds.
-- `AVATAR_BUTTON_MIN_SIZE` and `AVATAR_BUTTON_MAX_SIZE`: responsive avatar button bounds.
+- `TILE_MIN_SIZE` and `TILE_MAX_SIZE`: responsive shared choice-tile bounds.
 - `SAVE_BUTTON_MAX_WIDTH`: width cap for the bottom `Save` button.
 
 Important nodes:
 - `%ProfileMenuPanel`: centered pause-style popup panel resized by the script.
-- `%NameLineEdit`: editable player-name field populated from `PlayerProgress.get_player_name()`.
-- `%AvatarGrid`: `GridContainer` populated with generated avatar buttons.
+- `%ProfilePreview`: live pending avatar/frame composition.
+- `%NameLabel`, `%EditNameButton`, and `%NameLineEdit`: display/edit states for the pending name.
+- `%AvatarTab` and `%FrameTab`: segmented selector controls.
+- `%ChoiceGrid`: `GridContainer` populated with reusable avatar or frame tiles.
 - `%SaveButton`: `scenes/ui/level_button.tscn` instance labeled `Save`.
 - `%CloseButton`: dismisses the picker without saving, through the shared `close()` method.
 
@@ -736,22 +738,60 @@ Key methods:
 - `close()`: fades this modal out via `scripts/ui_motion.gd`, then frees it. Safe to call more than
   once (Close pressed, Save pressed, or Main Menu's `ui_cancel` handling can all reach here) -- a
   repeat call while already closing is ignored.
-- `_build_avatar_buttons()`: creates the 18 avatar buttons and loads their textures.
-- `_select_avatar(avatar_id)`: updates the pending avatar selection.
-- `_save_selection()`: writes the entered player name and selected avatar through `PlayerProgress.set_profile()` and calls `close()`.
-- `_save_from_name_submit(new_text)`: saves the full profile when the name field is submitted.
-- `_apply_responsive_layout()`: updates panel bounds, avatar button sizes, and save button width.
-- `_apply_avatar_clip_material(avatar_texture)`: applies circular clipping to an avatar `TextureRect`.
+- `_switch_tab(tab_id)`: updates segmented control state and rebuilds the shared grid.
+- `_select_choice(choice_id)`: updates the pending avatar or frame and live preview.
+- `_begin_name_edit()` / `_finish_name_edit()`: enter and leave inline name editing without saving
+  or closing the modal.
+- `_save_selection()`: commits the complete customization through
+  `PlayerProgress.set_profile_customization()` and calls `close()`.
+- `_apply_responsive_layout()`: updates panel bounds, choice-tile sizes, and Save width.
 
 Depends on:
 - `PlayerProgress`
 - `scripts/ui_motion.gd`.
 - `assets/ui/avatars/*.png`
 - `assets/ui/avatar_circle_clip.gdshader`
+- `configs/profile_frames.json`
+- `scenes/ui/profile_avatar_view.tscn`
+- `scenes/ui/profile_choice_tile.tscn`
 - `scenes/ui/level_button.tscn`
 
 Do not use for:
 - Owning saved profile data, campaign progress, lives state, or main menu navigation.
+
+## `scripts/profile_avatar_view.gd`
+
+Attached to:
+- `scenes/ui/profile_avatar_view.tscn` root `ProfileAvatarView`.
+
+Purpose:
+- Applies an avatar texture and catalog-driven frame style as one reusable profile visual.
+- Owns the defensive circular clipping material used by every instance.
+
+Public methods:
+- `set_profile(avatar_id, frame_id)`: updates both layers together.
+- `set_avatar(avatar_id)` and `set_frame(frame_id)`: update one layer while preserving the other.
+
+## `scripts/profile_choice_tile.gd`
+
+Attached to:
+- `scenes/ui/profile_choice_tile.tscn` root `ProfileChoiceTile`.
+
+Purpose:
+- Configures the avatar/frame preview for one editor choice and owns its normal, hover, pressed,
+  selected, and check-badge state.
+- Emits `choice_selected(choice_id)` without deciding whether the ID represents an avatar or frame.
+
+## `scripts/profile_frame_catalog.gd`
+
+Purpose:
+- Loads and validates the ordered `configs/profile_frames.json` catalog on first use.
+- Sanitizes unknown saved frame IDs to the configured default and builds matching `StyleBoxFlat`
+  resources for `ProfileAvatarView`.
+
+Do not use for:
+- Backend allowlisting or synchronization. That boundary is tracked in
+  `docs/BACKEND_PROFILE_FRAMES_TICKET.md`.
 
 ## `scripts/main_menu.gd`
 
@@ -829,7 +869,7 @@ Attached to (self-scaling, no `visual_target_path` -- the whole button is the vi
 
 Attached to (`visual_target_path` set -- an invisible or full-rect hit target animates a sibling/
 child visual instead of itself, so its own touch rectangle never shrinks; all added in UI-002):
-- `scenes/ui/main_menu_top_status.tscn` `ProfileWidget` (target `AvatarTexture`).
+- `scenes/ui/main_menu_top_status.tscn` `ProfileWidget` (target `ProfileAvatarView`).
 - `scenes/ui/main_menu_reward_chest.tscn` `%ChestButton` (target `Visual`).
 - `scenes/ui/main_menu_bottom_navigation.tscn` `%ShopButton`/`%HomeButton`/`%LeaderboardButton`
   (each targets its own `Icon`).
@@ -989,6 +1029,9 @@ Saved fields:
 - `purchased_shop_offer_ids`: offer ids purchased through the local/mock Shop, used to persist
   once-per-account lifetime eligibility across reloads.
 - `avatar_id`: selected profile avatar id. Fresh and legacy saves default to `avatar_cat`.
+- `avatar_frame_id`: account-scoped local cosmetic frame. Schema-7 and older saves default to
+  `frame_classic`; it is intentionally omitted from backend operations pending
+  `docs/BACKEND_PROFILE_FRAMES_TICKET.md`.
 - `player_name`: saved profile display name. Fresh and legacy saves without a valid value receive a generated `player_` name with a five-character random suffix, such as `player_g26f3`.
 - `settings_disabled`: disabled-state map for `music`, `sound_effects`, and `vibration` settings buttons.
 - `reward_chest_stars`: stars accumulated toward the active reward chest goal.
@@ -1034,7 +1077,10 @@ Key methods:
 - `consume_pending_reward_chest_animation()`: returns and clears the in-memory completed-level animation payload.
 - `add_reward_chest_stars(star_count)`: adds stars to the reward chest and rolls over reached goals.
 - `get_available_avatar_ids()`: returns the 18 valid profile avatar ids.
+- `get_available_avatar_frame_ids()`: returns the ordered frame IDs from
+  `configs/profile_frames.json`.
 - `get_avatar_id()`: returns the selected avatar id, sanitized to `avatar_cat` when needed.
+- `get_avatar_frame_id()`: returns the selected frame id, sanitized to the configured default.
 - `get_avatar_texture_path(avatar_id)`: returns the resource path for a valid or sanitized avatar id.
 - `get_player_name()`: returns a non-empty saved or generated player name.
 - `get_disabled_settings()`: returns saved disabled states for the settings buttons.
@@ -1042,7 +1088,10 @@ Key methods:
 - `set_setting_disabled(setting_id, is_disabled)`: validates, stores, and saves one settings-button disabled state.
 - `set_avatar_id(avatar_id)`: validates, stores, and saves the selected profile avatar.
 - `set_player_name(player_name)`: trims, stores, and saves a non-empty player name.
-- `set_profile(avatar_id, player_name)`: validates and saves the avatar and player name together.
+- `set_profile(avatar_id, player_name)`: backward-compatible avatar/name save that preserves the
+  current frame.
+- `set_profile_customization(avatar_id, avatar_frame_id, player_name)`: atomically saves all three
+  local fields while journaling only the backend-supported avatar/name changes.
 - `get_lives()`: refreshes and returns current campaign lives.
 - `get_max_lives()`: returns the lives cap.
 - `get_life_purchase_coin_price()`: returns the positive bundled value from

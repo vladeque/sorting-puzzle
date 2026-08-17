@@ -1,0 +1,68 @@
+{
+  "default_frame_id": "frame_classic",
+  "frames": [
+    {
+      "id": "frame_classic",
+      "background_color": "#8f514eff",
+      "border_color": "#ffe6a6ff",
+      "border_width": 4,
+      "shadow_color": "#2f0f0a55"
+    },
+    {
+      "id": "frame_gold",
+      "background_color": "#c67b2cff",
+      "border_color": "#ffd65aff",
+      "border_width": 5,
+      "shadow_color": "#5b260955"
+    },
+    {
+      "id": "frame_leaf",
+      "background_color": "#527044ff",
+      "border_color": "#b4dd72ff",
+      "border_width": 5,
+      "shadow_color": "#18310d55"
+    },
+    {
+      "id": "frame_rose",
+      "background_color": "#91475dff",
+      "border_color": "#f7a8bbff",
+      "border_width": 5,
+      "shadow_color": "#45132155"
+    },
+    {
+      "id": "frame_coral",
+      "background_color": "#a84a32ff",
+      "border_color": "#ff9d72ff",
+      "border_width": 5,
+      "shadow_color": "#4f170d55"
+    },
+    {
+      "id": "frame_sky",
+      "background_color": "#467889ff",
+      "border_color": "#8bd8ddff",
+      "border_width": 5,
+      "shadow_color": "#12364155"
+    },
+    {
+      "id": "frame_plum",
+      "background_color": "#654972ff",
+      "border_color": "#cda2ddff",
+      "border_width": 5,
+      "shadow_color": "#2e153855"
+    },
+    {
+      "id": "frame_cocoa",
+      "background_color": "#674132ff",
+      "border_color": "#cf9567ff",
+      "border_width": 5,
+      "shadow_color": "#32160d55"
+    },
+    {
+      "id": "frame_cream",
+      "background_color": "#b88b59ff",
+      "border_color": "#fff0c0ff",
+      "border_width": 5,
+      "shadow_color": "#4b2a1155"
+    }
+  ]
+}

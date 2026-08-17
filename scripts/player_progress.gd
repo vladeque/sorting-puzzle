@@ -6,11 +6,12 @@ const AccountSaveCoordinatorScript := preload("res://scripts/save/account_save_c
 const GuestSessionBootstrapServiceScript := preload("res://scripts/save/guest_session_bootstrap_service.gd")
 const SaveSyncServiceScript := preload("res://scripts/save/save_sync_service.gd")
 const BackendTransportScript := preload("res://scripts/backend/backend_transport.gd")
+const ProfileFrameCatalogScript := preload("res://scripts/profile_frame_catalog.gd")
 const ContentProvenanceManifestScript := preload(
 	"res://scripts/save/content_provenance_manifest.gd"
 )
 const SAVE_PATH := "user://player_progress.json"
-const SAVE_VERSION := 7
+const SAVE_VERSION := 8
 const MIN_LEVEL := 1
 const ABILITY_HAMMER := "hammer"
 const ABILITY_SHUFFLE := "shuffle"
@@ -464,8 +465,19 @@ func get_available_avatar_ids() -> Array:
 	return AVAILABLE_AVATAR_IDS.duplicate()
 
 
+func get_available_avatar_frame_ids() -> Array[String]:
+	return ProfileFrameCatalogScript.get_available_frame_ids()
+
+
 func get_avatar_id() -> String:
 	return _sanitize_avatar_id(str(_data.get("avatar_id", DEFAULT_AVATAR_ID)))
+
+
+func get_avatar_frame_id() -> String:
+	return _sanitize_avatar_frame_id(str(_data.get(
+		"avatar_frame_id",
+		ProfileFrameCatalogScript.get_default_frame_id()
+	)))
 
 
 func get_avatar_texture_path(avatar_id: String) -> String:
@@ -533,27 +545,42 @@ func set_player_name(player_name: String) -> bool:
 
 
 func set_profile(avatar_id: String, player_name: String) -> bool:
+	return set_profile_customization(avatar_id, get_avatar_frame_id(), player_name)
+
+
+func set_profile_customization(avatar_id: String, avatar_frame_id: String, player_name: String) -> bool:
 	if not AVAILABLE_AVATAR_IDS.has(avatar_id):
+		return false
+	if not ProfileFrameCatalogScript.get_available_frame_ids().has(avatar_frame_id):
 		return false
 
 	var sanitized_player_name := _sanitize_player_name(player_name, get_player_name())
 	var previous_data := _data.duplicate(true)
 	var did_change := false
+	var did_public_profile_change := false
 	var profile_payload := {}
 	if get_avatar_id() != avatar_id:
 		_data["avatar_id"] = avatar_id
 		profile_payload["avatar_id"] = avatar_id
 		did_change = true
+		did_public_profile_change = true
+	if get_avatar_frame_id() != avatar_frame_id:
+		_data["avatar_frame_id"] = avatar_frame_id
+		did_change = true
 	if get_player_name() != sanitized_player_name:
 		_data["player_name"] = sanitized_player_name
 		profile_payload["display_name"] = sanitized_player_name
 		did_change = true
+		did_public_profile_change = true
 
 	if did_change:
-		return _commit_or_restore(previous_data, [{
-			"operation_type": "profile_edit",
-			"payload": profile_payload,
-		}])
+		var journal_operations := []
+		if did_public_profile_change:
+			journal_operations.append({
+				"operation_type": "profile_edit",
+				"payload": profile_payload,
+			})
+		return _commit_or_restore(previous_data, journal_operations)
 
 	return true
 
@@ -735,6 +762,10 @@ func _sanitize_data(raw_data: Dictionary) -> Dictionary:
 		raw_data.get("purchased_shop_offer_ids", [])
 	)
 	sanitized["avatar_id"] = _sanitize_avatar_id(str(raw_data.get("avatar_id", DEFAULT_AVATAR_ID)))
+	sanitized["avatar_frame_id"] = _sanitize_avatar_frame_id(str(raw_data.get(
+		"avatar_frame_id",
+		ProfileFrameCatalogScript.get_default_frame_id()
+	)))
 	sanitized["player_name"] = _sanitize_player_name(str(raw_data.get("player_name", sanitized["player_name"])), sanitized["player_name"])
 	sanitized["moderation_state"] = str(raw_data.get("moderation_state", "active"))
 	sanitized["settings_disabled"] = _sanitize_disabled_settings(raw_data.get("settings_disabled", {}))
@@ -798,6 +829,7 @@ func _default_data() -> Dictionary:
 		"purchased_shop_offer_ids": [],
 		"ability_uses": DEFAULT_ABILITY_USES.duplicate(),
 		"avatar_id": DEFAULT_AVATAR_ID,
+		"avatar_frame_id": ProfileFrameCatalogScript.get_default_frame_id(),
 		"player_name": _generate_player_name(),
 		"moderation_state": "active",
 		"settings_disabled": DEFAULT_DISABLED_SETTINGS.duplicate(),
@@ -817,6 +849,10 @@ func _sanitize_avatar_id(avatar_id: String) -> String:
 		return avatar_id
 
 	return DEFAULT_AVATAR_ID
+
+
+func _sanitize_avatar_frame_id(avatar_frame_id: String) -> String:
+	return ProfileFrameCatalogScript.sanitize_frame_id(avatar_frame_id)
 
 
 func _sanitize_player_name(player_name: String, fallback_name: String = "") -> String:

@@ -7,7 +7,6 @@ const REWARD_CHEST_MENU_SCENE := preload("res://scenes/ui/reward_chest_menu.tscn
 const CHAPTER_SELECTION_SCENE := preload("res://scenes/ui/chapter_selection_screen.tscn")
 const MenuBackgroundResolverScript := preload("res://scripts/chapters/menu_background_resolver.gd")
 const UIMotionScript := preload("res://scripts/ui_motion.gd")
-const AVATAR_CLIP_SHADER := preload("res://assets/ui/avatar_circle_clip.gdshader")
 const PRODUCTION_MENU_SCENE := "res://scenes/main_menu.tscn"
 const SHOP_SCENE := "res://scenes/ui/shop_screen.tscn"
 const LEADERBOARD_SCENE := "res://scenes/ui/leaderboard_screen.tscn"
@@ -43,7 +42,7 @@ const MAIN_MENU_OVERLAY_Z_INDEX := 100
 @onready var _top_status := %TopStatusBar.get_node("MainMenuTopStatus") as HBoxContainer
 @onready var _profile_button := %TopStatusBar.get_node("MainMenuTopStatus/ProfileWidget") as Button
 @onready var _settings_button := %TopStatusBar.get_node("MainMenuTopStatus/SettingsWidget/SettingsButton") as Button
-@onready var _profile_avatar_texture := %TopStatusBar.get_node("MainMenuTopStatus/ProfileWidget/AvatarTexture") as TextureRect
+@onready var _profile_avatar_view := %TopStatusBar.get_node("MainMenuTopStatus/ProfileWidget/ProfileAvatarView") as ProfileAvatarView
 @onready var _coin_shortcut := %TopStatusBar.get_node("MainMenuTopStatus/CoinsWidget") as Button
 @onready var _life_shortcut := %TopStatusBar.get_node("MainMenuTopStatus/LivesWidget") as Button
 @onready var _life_count_label := %TopStatusBar.get_node("MainMenuTopStatus/LivesWidget/LifeCount") as Label
@@ -86,7 +85,7 @@ func _ready() -> void:
 	if _bottom_navigation.has_method("set_active_tab"):
 		_bottom_navigation.call("set_active_tab", &"home")
 	get_viewport().size_changed.connect(_apply_responsive_layout)
-	_update_profile_avatar()
+	_update_profile_customization()
 	_update_coin_balance()
 	_update_lives_status()
 	if pending_reward_animation.is_empty():
@@ -428,16 +427,13 @@ func _format_life_restore_time(seconds_remaining: int) -> String:
 	return "%02d:%02d" % [minutes_remaining, remaining_seconds]
 
 
-func _update_profile_avatar() -> void:
-	if _profile_avatar_texture == null:
+func _update_profile_customization() -> void:
+	if _profile_avatar_view == null:
 		return
-
-	var avatar_id := PlayerProgress.get_avatar_id()
-	_profile_avatar_texture.texture = load(PlayerProgress.get_avatar_texture_path(avatar_id)) as Texture2D
-	if _profile_avatar_texture.material == null:
-		var clip_material := ShaderMaterial.new()
-		clip_material.shader = AVATAR_CLIP_SHADER
-		_profile_avatar_texture.material = clip_material
+	_profile_avatar_view.set_profile(
+		PlayerProgress.get_avatar_id(),
+		PlayerProgress.get_avatar_frame_id()
+	)
 
 
 func _update_coin_balance() -> void:
@@ -451,7 +447,7 @@ func _open_profile_menu() -> void:
 
 	_profile_menu = PROFILE_MENU_SCENE.instantiate() as Control
 	_add_main_menu_overlay(_profile_menu)
-	_profile_menu.connect("avatar_saved", Callable(self, "_on_profile_avatar_saved"))
+	_profile_menu.connect("profile_saved", Callable(self, "_on_profile_saved"))
 	_profile_menu.tree_exited.connect(_clear_profile_menu_reference)
 
 
@@ -516,8 +512,8 @@ func _clear_reward_chest_menu_reference() -> void:
 	_reward_chest_menu = null
 
 
-func _on_profile_avatar_saved(_avatar_id: String) -> void:
-	_update_profile_avatar()
+func _on_profile_saved(_avatar_id: String, _avatar_frame_id: String) -> void:
+	_update_profile_customization()
 
 
 func _clear_profile_menu_reference() -> void:

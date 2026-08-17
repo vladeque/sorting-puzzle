@@ -77,6 +77,8 @@ Files:
 - `scenes/ui/main_menu_reward_chest.tscn`
 - `scenes/ui/reward_chest_menu.tscn`
 - `scenes/ui/profile_menu.tscn`
+- `scenes/ui/profile_avatar_view.tscn`
+- `scenes/ui/profile_choice_tile.tscn`
 - `scenes/ui/settings_menu.tscn`
 - `scenes/ui/level_button.tscn`
 - `scenes/ui/main_menu_chapter_button.tscn`
@@ -115,6 +117,9 @@ Files:
 - `scripts/main_menu_reward_star_flyer.gd`
 - `scripts/reward_chest_menu.gd`
 - `scripts/profile_menu.gd`
+- `scripts/profile_avatar_view.gd`
+- `scripts/profile_choice_tile.gd`
+- `scripts/profile_frame_catalog.gd`
 - `scripts/main_menu.gd`
 - `scripts/player_progress.gd`
 
@@ -141,7 +146,10 @@ Responsibility:
   press feedback and overlay/destination fades; retapping an already-active bottom-navigation tab is
   a no-op; `ui_cancel` closes the topmost overlay or returns to Main Menu; every control is
   `FOCUS_NONE` (documented touch-only policy). See `docs/SCENES.md`'s "Shared Interaction Roles".
-- Opens `scenes/ui/profile_menu.tscn` from the profile widget, shows an editable player-name field above all 18 avatars in a centered pause-style window with a 3-column grid, and saves the name plus selected avatar through `PlayerProgress`.
+- Opens `scenes/ui/profile_menu.tscn` from the profile widget; its summary card previews the pending
+  avatar/frame combination, its edit button reveals the player-name field, and its Avatar/Frame
+  tabs share a scrollable 3-column choice grid. Save commits the name and avatar as the public
+  profile edit plus the account-scoped local `avatar_frame_id` through `PlayerProgress`.
 - Opens `scenes/ui/settings_menu.tscn` from the settings widget, with pause-menu-style music, sound-effects, and vibration toggle visuals plus no-op `Support` and `Language` buttons.
 - Disables campaign launch when saved lives are zero; the lives widget shows current lives and the `MM:SS` countdown until the next hourly restore.
 - Uses `scenes/ui/level_button.tscn` and `assets/ui/level_button_blank_new.png` for the reusable glossy green level button visuals while keeping the label dynamic (also the shared `assets/themes/style_box_green_primary_button.tres` "regular" tier used by Shop purchase buttons); red, light-blue, and yellow-orange variants remain available beside the source texture for alternate states or future UI variants -- yellow-orange is the intentional Main Menu Chapter-button and in-level `Watch ad` secondary/alternative-action role (see `docs/SCENES.md` "Shared UI Style Tokens"), while light-blue is currently unused by any scene. The Chapter cover CTA instead uses a scene-local flat treatment sampled from the glossy green palette and matching the neutral disabled style's geometry.
