@@ -7,8 +7,8 @@ const AVATAR_CLIP_SHADER := preload("res://assets/ui/avatar_circle_clip.gdshader
 @export var avatar_id := "avatar_cat"
 @export var frame_id := "frame_classic"
 
-@onready var _frame_panel := %FramePanel as Panel
 @onready var _avatar_texture := %AvatarTexture as TextureRect
+@onready var _frame_texture := %FrameTexture as TextureRect
 
 
 func _ready() -> void:
@@ -39,10 +39,7 @@ func set_frame(next_frame_id: String) -> void:
 
 
 func _apply_profile() -> void:
-	if _frame_panel == null or _avatar_texture == null:
+	if _frame_texture == null or _avatar_texture == null:
 		return
-	_frame_panel.add_theme_stylebox_override(
-		"panel",
-		ProfileFrameCatalogScript.create_frame_style(frame_id)
-	)
 	_avatar_texture.texture = load(PlayerProgress.get_avatar_texture_path(avatar_id)) as Texture2D
+	_frame_texture.texture = load(ProfileFrameCatalogScript.get_frame_texture_path(frame_id)) as Texture2D

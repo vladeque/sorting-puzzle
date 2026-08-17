@@ -750,6 +750,7 @@ Depends on:
 - `PlayerProgress`
 - `scripts/ui_motion.gd`.
 - `assets/ui/avatars/*.png`
+- `assets/ui/avatar_frames/*.png`
 - `assets/ui/avatar_circle_clip.gdshader`
 - `configs/profile_frames.json`
 - `scenes/ui/profile_avatar_view.tscn`
@@ -765,7 +766,8 @@ Attached to:
 - `scenes/ui/profile_avatar_view.tscn` root `ProfileAvatarView`.
 
 Purpose:
-- Applies an avatar texture and catalog-driven frame style as one reusable profile visual.
+- Composes an avatar texture and catalog-driven transparent frame texture as one reusable profile
+  visual.
 - Owns the defensive circular clipping material used by every instance.
 
 Public methods:
@@ -786,8 +788,8 @@ Purpose:
 
 Purpose:
 - Loads and validates the ordered `configs/profile_frames.json` catalog on first use.
-- Sanitizes unknown saved frame IDs to the configured default and builds matching `StyleBoxFlat`
-  resources for `ProfileAvatarView`.
+- Sanitizes unknown saved frame IDs to the configured default and resolves matching frame-texture
+  paths for `ProfileAvatarView`.
 
 Do not use for:
 - Backend allowlisting or synchronization. That boundary is tracked in

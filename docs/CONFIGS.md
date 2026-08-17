@@ -7,13 +7,15 @@ This file describes data files that drive gameplay and tooling.
 Purpose:
 - Defines the ordered cosmetic avatar-frame catalog used by the profile editor and reusable profile
   avatar view.
-- Keeps frame colors, border widths, and the legacy-compatible default outside UI scripts.
+- Maps stable frame IDs to transparent frame textures and keeps the legacy-compatible default
+  outside UI scripts.
 
 Contract:
 - `default_frame_id` references one entry in `frames` and is currently `frame_classic`.
 - Frame IDs are unique, stable opaque identifiers saved as `avatar_frame_id`.
-- Each frame defines parseable HTML colors for its background, border, and shadow plus a positive
-  border width.
+- Each frame references one transparent PNG under `assets/ui/avatar_frames/`. Every variant is
+  normalized to the same 256x256 canvas and shares the supplied source frame's geometry, alpha,
+  highlights, and shadows.
 - The client currently stores the selection locally and does not send it in backend profile-edit
   operations. See `docs/BACKEND_PROFILE_FRAMES_TICKET.md`.
 

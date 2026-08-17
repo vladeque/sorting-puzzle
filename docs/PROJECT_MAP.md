@@ -97,6 +97,7 @@ Files:
 - `assets/abilities/ability_shuffle.png`
 - `assets/ui/avatar_circle_clip.gdshader`
 - `assets/ui/avatars/*.png`
+- `assets/ui/avatar_frames/*.png`
 - `assets/ui/level_button_blank*.png`
 - `assets/themes/style_box_green_primary_button.tres`
 - `assets/themes/style_box_disabled_action_button.tres`

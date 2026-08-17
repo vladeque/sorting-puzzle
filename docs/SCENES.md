@@ -1085,7 +1085,9 @@ Important nodes:
 - `ButtonRow/SaveButton`: `scenes/ui/level_button.tscn` instance labeled `Save`.
 
 Depends on:
-- `assets/ui/avatars/*.png`, stored with transparent pixels outside each circular badge.
+- `assets/ui/avatars/*.png`, the supplied standalone circular avatar art with no decorative frame.
+- `assets/ui/avatar_frames/*.png`, the supplied frame geometry plus its color variants, rendered as
+  a separate layer above the avatar.
 - `assets/ui/avatar_circle_clip.gdshader`.
 - `configs/profile_frames.json`.
 - `scenes/ui/profile_avatar_view.tscn` and `scenes/ui/profile_choice_tile.tscn`.
@@ -1099,7 +1101,8 @@ Do not use for:
 ## `scenes/ui/profile_avatar_view.tscn`
 
 Purpose:
-- Reusable composition of a circular-clipped avatar and a catalog-driven cosmetic frame.
+- Reusable two-texture composition of a circular-clipped avatar below a catalog-driven transparent
+  cosmetic frame.
 - Used by the editor preview, choice tiles, and Main Menu profile widget so the saved combination is
   rendered consistently.
 

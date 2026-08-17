@@ -2,6 +2,7 @@ extends SceneTree
 
 const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
 const PROFILE_MENU_SCENE_PATH := "res://scenes/ui/profile_menu.tscn"
+const ProfileFrameCatalogScript := preload("res://scripts/profile_frame_catalog.gd")
 
 var _failures: Array[String] = []
 var _progress: Node
@@ -31,7 +32,19 @@ func _run() -> void:
 	await process_frame
 
 	var grid := menu.get_node("%ChoiceGrid") as GridContainer
+	var profile_preview := menu.get_node("%ProfilePreview") as Control
+	var preview_avatar_texture := profile_preview.get_node("%AvatarTexture") as TextureRect
+	var preview_frame_texture := profile_preview.get_node("%FrameTexture") as TextureRect
 	_check(grid.get_child_count() == 18, "Avatar tab shows all 18 avatars.")
+	_check(preview_avatar_texture.texture != null, "Profile preview has a standalone avatar layer.")
+	_check(preview_frame_texture.texture != null, "Profile preview has a standalone frame layer.")
+	_check(
+		preview_avatar_texture.texture.resource_path != preview_frame_texture.texture.resource_path,
+		"Avatar and frame layers use separate textures."
+	)
+	for frame_id in _progress.get_available_avatar_frame_ids():
+		var texture_path := ProfileFrameCatalogScript.get_frame_texture_path(str(frame_id))
+		_check(ResourceLoader.exists(texture_path, "Texture2D"), "Frame texture exists: %s" % frame_id)
 	_check(
 		str(menu.get("_selected_avatar_frame_id")) == "frame_classic",
 		"Existing profiles begin with the classic frame."
@@ -40,6 +53,10 @@ func _run() -> void:
 	await process_frame
 	_check(grid.get_child_count() == 9, "Frame tab shows all configured frames.")
 	menu.call("_select_choice", "frame_plum")
+	_check(
+		preview_frame_texture.texture.resource_path.ends_with("frame_plum.png"),
+		"Selecting a frame updates only the frame texture layer."
+	)
 	menu.call("_switch_tab", &"avatar")
 	await process_frame
 	menu.call("_select_choice", "avatar_penguin")
