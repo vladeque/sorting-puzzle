@@ -71,14 +71,9 @@ func _run() -> void:
 	var avatar_material := preview_avatar_texture.material as ShaderMaterial
 	_check(avatar_material != null, "Avatar preview uses the shared background-preserving shader.")
 	var avatar_content_scale: float = avatar_material.get_shader_parameter("content_scale")
-	var avatar_sharpen_strength: float = avatar_material.get_shader_parameter("sharpen_strength")
 	_check(
-		is_equal_approx(avatar_content_scale, 0.92),
-		"Avatar content is scaled to 92% so more background remains visible."
-	)
-	_check(
-		is_equal_approx(avatar_sharpen_strength, 0.35),
-		"Scaled avatar content uses restrained detail sharpening."
+		is_equal_approx(avatar_content_scale, 0.9),
+		"Avatar content is scaled to 90% so more background remains visible."
 	)
 	_check(
 		preview_avatar_texture.texture.resource_path != preview_frame_texture.texture.resource_path,

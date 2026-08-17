@@ -784,9 +784,8 @@ Public methods:
 - `set_avatar(avatar_id)` and `set_frame(frame_id)`: update one layer while preserving the other.
 
 Rendering:
-- `assets/ui/avatar_circle_clip.gdshader` scales avatar content to 92%, applies a restrained
-  four-sample sharpening pass, and extends the source image's outer background colors to the frame
-  edge, revealing more backdrop without shrinking the frame or softening facial details.
+- `assets/ui/avatar_circle_clip.gdshader` scales avatar content to 90% and extends the source image's
+  outer background colors to the frame edge, revealing more backdrop without shrinking the frame.
 
 ## `scripts/profile_choice_tile.gd`
 
