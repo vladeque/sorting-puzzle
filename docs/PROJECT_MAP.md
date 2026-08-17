@@ -118,6 +118,7 @@ Files:
 - `scripts/main_menu_reward_star_flyer.gd`
 - `scripts/reward_chest_menu.gd`
 - `scripts/profile_menu.gd`
+- `scripts/pencil_icon.gd`
 - `scripts/profile_avatar_view.gd`
 - `scripts/profile_choice_tile.gd`
 - `scripts/profile_frame_catalog.gd`

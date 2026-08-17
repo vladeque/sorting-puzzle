@@ -1,8 +1,9 @@
-[gd_scene load_steps=13 format=3 uid="uid://b5yb0hlfitnqa"]
+[gd_scene load_steps=14 format=3 uid="uid://b5yb0hlfitnqa"]
 
 [ext_resource type="Script" uid="uid://cemgcq68qegb" path="res://scripts/profile_menu.gd" id="1_profile_menu"]
 [ext_resource type="PackedScene" path="res://scenes/ui/level_button.tscn" id="2_level_button"]
 [ext_resource type="PackedScene" path="res://scenes/ui/profile_avatar_view.tscn" id="3_avatar_view"]
+[ext_resource type="Script" path="res://scripts/pencil_icon.gd" id="4_pencil_icon"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_outer_panel"]
 bg_color = Color(0.67, 0.32, 0.22, 1)
@@ -277,18 +278,36 @@ text_overrun_behavior = 3
 
 [node name="EditNameButton" type="Button" parent="ProfileMenuPanel/ProfileSummary/SummaryMargin/SummaryRow/NameColumn/NameDisplayRow"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(64, 52)
+custom_minimum_size = Vector2(52, 52)
 layout_mode = 2
 focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.42, 0.14, 0.02, 1)
-theme_override_constants/outline_size = 2
-theme_override_font_sizes/font_size = 17
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 29
 theme_override_styles/normal = SubResource("StyleBoxFlat_edit_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_edit_normal")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_edit_pressed")
-text = "EDIT"
+text = ""
+tooltip_text = "Edit player name"
+
+[node name="PencilIcon" type="Control" parent="ProfileMenuPanel/ProfileSummary/SummaryMargin/SummaryRow/NameColumn/NameDisplayRow/EditNameButton"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -19.0
+offset_top = -19.0
+offset_right = 19.0
+offset_bottom = 19.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("4_pencil_icon")
 
 [node name="NameLineEdit" type="LineEdit" parent="ProfileMenuPanel/ProfileSummary/SummaryMargin/SummaryRow/NameColumn"]
 unique_name_in_owner = true
@@ -372,11 +391,12 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxEmpty_scroll")
 horizontal_scroll_mode = 0
+vertical_scroll_mode = 3
 
 [node name="ChoiceGrid" type="GridContainer" parent="ProfileMenuPanel/SelectorPanel/SelectorMargin/SelectorStack/ChoiceScroll"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 4
+size_flags_horizontal = 3
 theme_override_constants/h_separation = 14
 theme_override_constants/v_separation = 14
 columns = 3

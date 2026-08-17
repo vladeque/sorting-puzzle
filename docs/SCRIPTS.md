@@ -728,9 +728,11 @@ Key constants:
 Important nodes:
 - `%ProfileMenuPanel`: centered pause-style popup panel resized by the script.
 - `%ProfilePreview`: live pending avatar/frame composition.
-- `%NameLabel`, `%EditNameButton`, and `%NameLineEdit`: display/edit states for the pending name.
+- `%NameLabel`, compact pencil `%EditNameButton`, and `%NameLineEdit`: display/edit states for the
+  pending name.
 - `%AvatarTab` and `%FrameTab`: segmented selector controls.
-- `%ChoiceGrid`: `GridContainer` populated with reusable avatar or frame tiles.
+- `%ChoiceGrid`: full-width `GridContainer` populated with reusable avatar or frame tiles inside a
+  touch-scrollable container whose visual scrollbar is hidden.
 - `%SaveButton`: `scenes/ui/level_button.tscn` instance labeled `Save`.
 - `%CloseButton`: dismisses the picker without saving, through the shared `close()` method.
 
@@ -759,6 +761,13 @@ Depends on:
 
 Do not use for:
 - Owning saved profile data, campaign progress, lives state, or main menu navigation.
+
+## `scripts/pencil_icon.gd`
+
+Purpose:
+- Draws the compact white-and-gold pencil used by the profile name edit button without relying on
+  platform emoji glyphs or a resolution-specific bitmap.
+- Ignores mouse input so the parent button retains the complete touch target.
 
 ## `scripts/profile_avatar_view.gd`
 

@@ -32,10 +32,36 @@ func _run() -> void:
 	await process_frame
 
 	var grid := menu.get_node("%ChoiceGrid") as GridContainer
+	var choice_scroll := menu.get_node("%ChoiceScroll") as ScrollContainer
+	var edit_name_button := menu.get_node("%EditNameButton") as Button
 	var profile_preview := menu.get_node("%ProfilePreview") as Control
 	var preview_avatar_texture := profile_preview.get_node("%AvatarTexture") as TextureRect
 	var preview_frame_texture := profile_preview.get_node("%FrameTexture") as TextureRect
 	_check(grid.get_child_count() == 18, "Avatar tab shows all 18 avatars.")
+	_check(edit_name_button.text.is_empty(), "Name edit no longer uses a text label.")
+	_check(
+		edit_name_button.get_node_or_null("%PencilIcon") != null,
+		"Name edit uses the compact code-drawn pencil icon."
+	)
+	_check(
+		edit_name_button.custom_minimum_size == Vector2(52, 52),
+		"Name edit pencil keeps a compact square touch target."
+	)
+	_check(
+		choice_scroll.vertical_scroll_mode == ScrollContainer.SCROLL_MODE_SHOW_NEVER,
+		"Avatar list stays scrollable without a visible scrollbar."
+	)
+	_check(
+		not choice_scroll.get_v_scroll_bar().visible,
+		"Avatar list does not render a vertical scroll indicator."
+	)
+	choice_scroll.scroll_vertical = 64
+	await process_frame
+	_check(choice_scroll.scroll_vertical > 0, "Hidden-indicator avatar list still scrolls.")
+	_check(
+		grid.size_flags_horizontal & Control.SIZE_EXPAND != 0,
+		"Avatar grid expands across the available light panel width."
+	)
 	_check(preview_avatar_texture.texture != null, "Profile preview has a standalone avatar layer.")
 	_check(preview_frame_texture.texture != null, "Profile preview has a standalone frame layer.")
 	_check(
