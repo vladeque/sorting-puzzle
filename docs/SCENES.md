@@ -608,7 +608,8 @@ Purpose:
 
 Depends on:
 - `assets/ui/avatars/*.png`.
-- `assets/ui/avatar_circle_clip.gdshader`.
+- `assets/ui/avatar_circle_clip.gdshader`, which keeps the circular crop while rendering avatar
+  content at 90% and extending its outer background colors to the frame edge.
 - `assets/ui/reward_star_34_glossy_b.png`.
 - `scenes/ui/leaderboard_rank_reward.tscn`.
 
@@ -1015,7 +1016,8 @@ Important nodes:
 
 Depends on:
 - `assets/ui/avatars/avatar_cat.png` for the default editor/display texture. The owning menu script replaces it with the saved avatar at runtime.
-- `assets/ui/avatar_circle_clip.gdshader` as a defensive runtime clip around the alpha-cleaned avatar PNGs.
+- `assets/ui/avatar_circle_clip.gdshader` for the circular crop and 90% content scale that reveals
+  more of each avatar's original background.
 - `scenes/ui/main_menu_coin_shortcut.tscn`.
 - `assets/ui/main_menu_lives.png`.
 - `scripts/press_scale_button.gd`.
@@ -1078,8 +1080,8 @@ Important nodes:
 - `ProfileMenuPanel`: centered rounded panel using the pause-menu visual treatment.
 - `CloseButton`: protruding red close button that dismisses without saving.
 - `ProfileSummary/ProfilePreview`: reusable avatar/frame view that updates before saving.
-- `ProfileSummary/NameDisplayRow`: saved/pending name plus the compact pencil button;
-  `%NameLineEdit` replaces it temporarily while the keyboard editor is active.
+- `ProfileSummary/NameDisplayRow`: an always-visible, input-styled `%NameLineEdit` plus the compact
+  pencil button; the field stays locked until the pencil enables keyboard editing.
 - `SelectorPanel/TabRow`: mutually exclusive Avatar and Frame buttons.
 - `SelectorPanel/ChoiceScroll/ChoiceGrid`: touch-scrollable `GridContainer` with `columns = 3` that
   fills the light panel width; the scrollbar is intentionally hidden and reusable choice tiles are
@@ -1090,7 +1092,8 @@ Depends on:
 - `assets/ui/avatars/*.png`, the supplied standalone circular avatar art with no decorative frame.
 - `assets/ui/avatar_frames/*.png`, the supplied frame geometry plus its color variants, rendered as
   a separate layer above the avatar.
-- `assets/ui/avatar_circle_clip.gdshader`.
+- `assets/ui/avatar_circle_clip.gdshader`, which keeps the circular crop while rendering avatar
+  content at 90% and extending its outer background colors to the frame edge.
 - `configs/profile_frames.json`.
 - `scenes/ui/profile_avatar_view.tscn` and `scenes/ui/profile_choice_tile.tscn`.
 - `scenes/ui/level_button.tscn`.

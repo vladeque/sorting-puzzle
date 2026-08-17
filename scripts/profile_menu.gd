@@ -19,8 +19,6 @@ const TAB_FRAME := &"frame"
 
 @onready var _panel := %ProfileMenuPanel as Panel
 @onready var _profile_preview := %ProfilePreview as ProfileAvatarView
-@onready var _name_display_row := %NameDisplayRow as HBoxContainer
-@onready var _name_label := %NameLabel as Label
 @onready var _name_line_edit := %NameLineEdit as LineEdit
 @onready var _edit_name_button := %EditNameButton as Button
 @onready var _avatar_tab := %AvatarTab as Button
@@ -42,7 +40,6 @@ func _ready() -> void:
 	_selected_avatar_id = PlayerProgress.get_avatar_id()
 	_selected_avatar_frame_id = PlayerProgress.get_avatar_frame_id()
 	_pending_player_name = PlayerProgress.get_player_name()
-	_name_label.text = _pending_player_name
 	_name_line_edit.text = _pending_player_name
 	_profile_preview.set_profile(_selected_avatar_id, _selected_avatar_frame_id)
 	_choice_grid.columns = GRID_COLUMNS
@@ -110,23 +107,24 @@ func _select_choice(choice_id: String) -> void:
 
 
 func _begin_name_edit() -> void:
-	_name_display_row.visible = false
-	_name_line_edit.visible = true
+	_name_line_edit.editable = true
+	_name_line_edit.selecting_enabled = true
+	_name_line_edit.focus_mode = Control.FOCUS_ALL
 	_name_line_edit.text = _pending_player_name
 	_name_line_edit.grab_focus()
 	_name_line_edit.caret_column = _name_line_edit.text.length()
 
 
 func _finish_name_edit(_submitted_text: String = "") -> void:
-	if not _name_line_edit.visible:
+	if not _name_line_edit.editable:
 		return
 	var candidate := _name_line_edit.text.strip_edges()
 	if not candidate.is_empty():
 		_pending_player_name = candidate.left(24)
 	_name_line_edit.text = _pending_player_name
-	_name_label.text = _pending_player_name
-	_name_line_edit.visible = false
-	_name_display_row.visible = true
+	_name_line_edit.editable = false
+	_name_line_edit.selecting_enabled = false
+	_name_line_edit.focus_mode = Control.FOCUS_NONE
 
 
 func _save_selection() -> void:

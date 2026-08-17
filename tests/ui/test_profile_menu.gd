@@ -34,11 +34,15 @@ func _run() -> void:
 	var grid := menu.get_node("%ChoiceGrid") as GridContainer
 	var choice_scroll := menu.get_node("%ChoiceScroll") as ScrollContainer
 	var edit_name_button := menu.get_node("%EditNameButton") as Button
+	var name_input := menu.get_node("%NameLineEdit") as LineEdit
 	var profile_preview := menu.get_node("%ProfilePreview") as Control
 	var preview_avatar_texture := profile_preview.get_node("%AvatarTexture") as TextureRect
 	var preview_frame_texture := profile_preview.get_node("%FrameTexture") as TextureRect
 	_check(grid.get_child_count() == 18, "Avatar tab shows all 18 avatars.")
 	_check(edit_name_button.text.is_empty(), "Name edit no longer uses a text label.")
+	_check(name_input.visible, "Player name is always displayed in a real input field.")
+	_check(not name_input.editable, "Player name input begins in a locked display state.")
+	_check(name_input.focus_mode == Control.FOCUS_NONE, "Locked name input does not take focus.")
 	_check(
 		edit_name_button.get_node_or_null("%PencilIcon") != null,
 		"Name edit uses the compact code-drawn pencil icon."
@@ -64,6 +68,13 @@ func _run() -> void:
 	)
 	_check(preview_avatar_texture.texture != null, "Profile preview has a standalone avatar layer.")
 	_check(preview_frame_texture.texture != null, "Profile preview has a standalone frame layer.")
+	var avatar_material := preview_avatar_texture.material as ShaderMaterial
+	_check(avatar_material != null, "Avatar preview uses the shared background-preserving shader.")
+	var avatar_content_scale: float = avatar_material.get_shader_parameter("content_scale")
+	_check(
+		is_equal_approx(avatar_content_scale, 0.9),
+		"Avatar content is scaled to 90% so more background remains visible."
+	)
 	_check(
 		preview_avatar_texture.texture.resource_path != preview_frame_texture.texture.resource_path,
 		"Avatar and frame layers use separate textures."
@@ -87,9 +98,11 @@ func _run() -> void:
 	await process_frame
 	menu.call("_select_choice", "avatar_penguin")
 	menu.call("_begin_name_edit")
-	var name_input := menu.get_node("%NameLineEdit") as LineEdit
+	_check(name_input.editable, "Pencil unlocks the player name input for editing.")
+	_check(name_input.focus_mode == Control.FOCUS_ALL, "Editable name input accepts keyboard focus.")
 	name_input.text = "Profile Tester"
 	menu.call("_finish_name_edit", name_input.text)
+	_check(not name_input.editable, "Submitting locks the player name input again.")
 	var saved_customization: Array = []
 	menu.connect("profile_saved", func(avatar_id: String, frame_id: String) -> void:
 		saved_customization.assign([avatar_id, frame_id])

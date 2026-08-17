@@ -728,8 +728,8 @@ Key constants:
 Important nodes:
 - `%ProfileMenuPanel`: centered pause-style popup panel resized by the script.
 - `%ProfilePreview`: live pending avatar/frame composition.
-- `%NameLabel`, compact pencil `%EditNameButton`, and `%NameLineEdit`: display/edit states for the
-  pending name.
+- Always-visible `%NameLineEdit` and compact pencil `%EditNameButton`: the field is visually an
+  input at all times but remains locked until the pencil enables editing.
 - `%AvatarTab` and `%FrameTab`: segmented selector controls.
 - `%ChoiceGrid`: full-width `GridContainer` populated with reusable avatar or frame tiles inside a
   touch-scrollable container whose visual scrollbar is hidden.
@@ -782,6 +782,10 @@ Purpose:
 Public methods:
 - `set_profile(avatar_id, frame_id)`: updates both layers together.
 - `set_avatar(avatar_id)` and `set_frame(frame_id)`: update one layer while preserving the other.
+
+Rendering:
+- `assets/ui/avatar_circle_clip.gdshader` scales avatar content to 90% and extends the source image's
+  outer background colors to the frame edge, revealing more backdrop without shrinking the frame.
 
 ## `scripts/profile_choice_tile.gd`
 
