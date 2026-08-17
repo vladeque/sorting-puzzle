@@ -1,12 +1,13 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://m1f6jo2k1kip"]
 
 [ext_resource type="PackedScene" path="res://scenes/ui/gameplay_modal_shell.tscn" id="1_shell"]
-[ext_resource type="Texture2D" path="res://assets/ui/broken_heart.png" id="2_broken_heart"]
-[ext_resource type="Script" path="res://scripts/level_failure_screen.gd" id="3_failure_screen_script"]
+[ext_resource type="Texture2D" uid="uid://i0qowdpjhd16" path="res://assets/ui/broken_heart.png" id="2_broken_heart"]
+[ext_resource type="Script" uid="uid://cdyxd6obqalln" path="res://scripts/level_failure_screen.gd" id="3_failure_screen_script"]
 [ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="4_press_scale_button"]
 [ext_resource type="StyleBoxTexture" path="res://assets/themes/style_box_green_primary_button.tres" id="5_retry_button"]
 
-[node name="LevelFailureScreen" type="Control"]
+[node name="LevelFailureScreen" type="Control" unique_id=1650945518]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -14,11 +15,11 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("3_failure_screen_script")
 
-[node name="Shell" parent="." instance=ExtResource("1_shell")]
+[node name="Shell" parent="." unique_id=1485074431 instance=ExtResource("1_shell")]
 unique_name_in_owner = true
 layout_mode = 1
 
-[node name="FailureContent" type="Control" parent="."]
+[node name="FailureContent" type="Control" parent="." unique_id=988389023]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -28,7 +29,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="BrokenHeartImage" type="TextureRect" parent="FailureContent"]
+[node name="BrokenHeartImage" type="TextureRect" parent="FailureContent" unique_id=1698354427]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 10
@@ -43,9 +44,8 @@ texture = ExtResource("2_broken_heart")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="MessageLabel" type="Label" parent="FailureContent"]
+[node name="MessageLabel" type="Label" parent="FailureContent" unique_id=1017841824]
 unique_name_in_owner = true
-theme_type_variation = &"GameTitleLabel"
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -54,6 +54,7 @@ offset_top = 264.0
 offset_right = -18.0
 offset_bottom = 328.0
 grow_horizontal = 2
+theme_type_variation = &"GameTitleLabel"
 theme_override_colors/font_color = Color(0.58, 0.08, 0.1, 1)
 theme_override_colors/font_shadow_color = Color(1, 1, 1, 0.78)
 theme_override_constants/shadow_offset_x = 0
@@ -63,10 +64,10 @@ text = "LEVEL FAILED"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="RetryButton" type="Button" parent="."]
+[node name="RetryButton" type="Button" parent="." unique_id=960114456]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(250, 76)
-layout_mode = 2
+layout_mode = 0
 focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
@@ -80,4 +81,3 @@ theme_override_styles/pressed = ExtResource("5_retry_button")
 theme_override_styles/hover = ExtResource("5_retry_button")
 text = "Retry"
 script = ExtResource("4_press_scale_button")
-held_scale = 0.94
