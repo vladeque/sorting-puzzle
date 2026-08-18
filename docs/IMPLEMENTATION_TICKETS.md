@@ -13,6 +13,10 @@ and project-owner console/setup work remain unambiguous:
 - [`DEV_BACKEND_CODE_TICKETS.md`](DEV_BACKEND_CODE_TICKETS.md)
 - [`DEV_BACKEND_OWNER_TICKETS.md`](DEV_BACKEND_OWNER_TICKETS.md)
 
+Focused client UX implementation tickets:
+
+- [`AUDIO-001 — Implement Godot-Authored Core Sound Effects`](AUDIO_001_GODOT_ONLY_SFX_TICKET.md)
+
 ## Shared definition of done
 
 Unless a ticket explicitly narrows its scope, it is complete when:
