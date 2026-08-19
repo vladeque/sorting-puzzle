@@ -19,7 +19,7 @@ schema and save-operation validation forbid unknown profile-edit fields.
 
 - Add `avatar_frame_id` to the authoritative public player profile.
 - Allow only these launch IDs: `frame_classic`, `frame_gold`, `frame_leaf`, `frame_rose`,
-  `frame_coral`, `frame_sky`, `frame_plum`, `frame_cocoa`, and `frame_cream`.
+  `frame_coral`, `frame_sky`, `frame_plum`, `frame_ruby`, and `frame_aqua`.
 - Use `frame_classic` for existing profiles and for invalid legacy values.
 - Accept frame-only edits and combined name/avatar/frame edits.
 - Resolve frame conflicts by the same most-recent explicit profile-selection policy used for avatar

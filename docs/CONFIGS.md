@@ -14,8 +14,11 @@ Contract:
 - `default_frame_id` references one entry in `frames` and is currently `frame_classic`.
 - Frame IDs are unique, stable opaque identifiers saved as `avatar_frame_id`.
 - Each frame references one transparent PNG under `assets/ui/avatar_frames/`. Every variant is
-  normalized to the same 256x256 canvas and shares the supplied source frame's geometry, alpha,
-  highlights, and shadows.
+  normalized to the same 256x256 canvas and shares the same transparent inner aperture, so the
+  avatar layer beneath aligns identically under any frame.
+- `frame_classic` keeps the original muted ring art. The eight color variants use the supplied
+  glossy ring art, whose band is a few pixels thicker and reaches slightly closer to the canvas
+  edge than `frame_classic`; the inner aperture is unchanged.
 - The client currently stores the selection locally and does not send it in backend profile-edit
   operations. See `docs/BACKEND_PROFILE_FRAMES_TICKET.md`.
 
