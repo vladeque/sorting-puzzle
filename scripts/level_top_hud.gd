@@ -13,6 +13,10 @@ class_name LevelTopHud
 ## long values (LEVEL 99, 59:59, large star totals) can't overlap either side.
 
 signal pause_pressed
+## Emitted from the same decision that starts the critical-second pulse, so the countdown's audio
+## follows the HUD's own threshold/frozen/counting-down state instead of a second copy of it
+## somewhere else (AUDIO-001 section 4). `displayed_seconds` is the second now on screen.
+signal critical_second_pulsed(displayed_seconds: int)
 
 const GameplayUIThemeScript := preload("res://scripts/gameplay_ui_theme.gd")
 
@@ -125,6 +129,7 @@ func set_timer_state(text: String, displayed_seconds: int, is_counting_down: boo
 		_stop_timer_pulse()
 	elif not _timer_is_frozen and (entered_critical or displayed_second_changed):
 		_play_timer_second_pulse()
+		critical_second_pulsed.emit(normalized_seconds)
 
 
 ## Clears all transient critical-timer state at a run boundary. The next active countdown update

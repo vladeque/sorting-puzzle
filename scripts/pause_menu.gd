@@ -50,6 +50,12 @@ func _ready() -> void:
 		var cross_out := _create_cross_out_marker(button)
 		cross_out.visible = is_setting_disabled(setting_id)
 		button.pressed.connect(_on_setting_button_pressed.bind(cross_out, setting_id))
+		if setting_id == SETTING_SOUND_EFFECTS:
+			# This one button owns a complete replacement cue: turning sound effects off has to
+			# acknowledge the press before muting, and turning them on after enabling, which the
+			# generic click policy cannot express. Every other settings toggle keeps the normal
+			# click (AUDIO-001 section 7).
+			SfxManager.set_button_click_suppressed(button)
 
 	if _shell != null:
 		_shell.configure("PAUSE")
@@ -121,6 +127,10 @@ func _on_setting_button_pressed(cross_out: Control, setting_id: StringName) -> v
 		push_warning("Ignoring unsupported setting toggle: %s" % setting_id)
 	cross_out.visible = is_disabled
 	setting_toggled.emit(setting_id, is_disabled)
+	if setting_id == SETTING_SOUND_EFFECTS:
+		# Emitted first on purpose: owners react to the new state (scripts/level.gd stops its
+		# gameplay cues) and only then does the acknowledgement sound, so nothing cuts it off.
+		SfxManager.acknowledge_sound_effects_toggle(is_disabled)
 
 
 static func _ensure_settings_loaded() -> void:

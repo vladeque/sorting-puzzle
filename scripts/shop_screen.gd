@@ -9,6 +9,7 @@ enum PresentationMode {
 	IN_LEVEL_OVERLAY,
 }
 
+const SfxCatalogScript := preload("res://scripts/audio/sfx_catalog.gd")
 const StoreServiceScript := preload("res://scripts/store/store_service.gd")
 const DestinationScreenLayoutScript := preload("res://scripts/destination_screen_layout.gd")
 const UIMotionScript := preload("res://scripts/ui_motion.gd")
@@ -233,6 +234,7 @@ func _purchase_offer(offer_id: StringName) -> void:
 		)
 	else:
 		_update_coin_balance()
+		_play_purchase_success_audio(grant_result)
 		_purchase_dialog.call(
 			"show_result",
 			"Purchase complete",
@@ -245,6 +247,19 @@ func _purchase_offer(offer_id: StringName) -> void:
 		await _load_shop()
 	else:
 		_set_offers_locked(false)
+
+
+## The confirmation cue is tied to rewards actually landing, not to the button or the dialog: a
+## duplicate transaction resolves `ok` with `applied` false and grants nothing, so it stays silent.
+## A grant that includes coins layers one `coin_gain` with the confirmation; an ability-only bundle
+## gets the confirmation alone (AUDIO-001 section 5).
+func _play_purchase_success_audio(grant_result: Dictionary) -> void:
+	if not bool(grant_result.get("applied", false)):
+		return
+
+	SfxManager.play(SfxCatalogScript.EVENT_SHOP_PURCHASE_SUCCESS)
+	if maxi(int(grant_result.get("coins", 0)), 0) > 0:
+		SfxManager.play(SfxCatalogScript.EVENT_COIN_GAIN)
 
 
 func _format_reward_message(rewards: Dictionary) -> String:

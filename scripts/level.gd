@@ -45,11 +45,15 @@ const LAYOUT_SCENE_TEMPLATE := "res://scenes/layouts/layout_%s.tscn"
 const DEFAULT_LAYOUT_PRESET := "grid_3x3"
 const LEVEL_SCENE_PATH := "res://level.tscn"
 const MAIN_MENU_SCENE := "res://scenes/main_menu.tscn"
-const ITEM_PLACE_SOUND := preload("res://assets/audio/item_place.wav")
-const TRIPLE_CLEAR_SOUND := preload("res://assets/audio/triple_clear.wav")
+const SfxCatalogScript := preload("res://scripts/audio/sfx_catalog.gd")
 const REWARD_STAR_TEXTURE := preload("res://assets/ui/reward_star_34_glossy_b.png")
 const SHUFFLE_BOX_TEXTURE := preload("res://assets/abilities/ability_shuffle_box.png")
 const PAUSE_SETTING_SOUND_EFFECTS := &"sound_effects"
+## The last five displayed seconds get a small upward pitch step and a restrained trim instead of a
+## louder tick, so urgency rises without the countdown becoming the loudest thing in the mix.
+const FINAL_COUNTDOWN_ACCENT_SECONDS := 5
+const FINAL_COUNTDOWN_ACCENT_PITCH := 1.09
+const FINAL_COUNTDOWN_ACCENT_VOLUME_DB := 0.75
 const SHELF_UNLOCK_REQUIREMENT_META := &"unlock_after_triples"
 const SHELF_LOCKED_META := &"is_locked"
 const LOCKED_OVERLAY_NAME := "LockedOverlay"
@@ -146,8 +150,6 @@ const SHOP_RETURN_TIME_EXTENSION := &"time_extension"
 @export var match_shrink_duration_seconds := 0.16
 @export_range(0.25, 30.0, 0.25) var combo_window_seconds := 8.0
 @export var level_duration_seconds := 300.0
-@export_range(-40.0, 6.0, 0.5) var item_place_volume_db := -5.0
-@export_range(-40.0, 6.0, 0.5) var triple_clear_volume_db := -5.0
 @export var hammer_haptics_enabled := true
 @export var selected_level := 1
 @export var launched_from_dev_mode := false
@@ -223,8 +225,9 @@ var _shelves_pending_resolve: Array[Node] = []
 var _shelves_resolving_ids: Array[int] = []
 var _clearing_item_ids: Array[int] = []
 var _transitioning_item_ids: Array[int] = []
-var _item_place_audio_player: AudioStreamPlayer
-var _triple_clear_audio_player: AudioStreamPlayer
+## Level-local audio gate, kept separate from the saved setting so automated captures and tests can
+## silence this scene alone (scripts/tools/captures/*.gd set it). SfxManager still applies the saved
+## sound-effects preference on top of it for every request.
 var _sound_effects_enabled := true
 var _triples_cleared := 0
 var _shelves_layout_scale := 1.0
@@ -263,7 +266,6 @@ func _ready() -> void:
 	_setup_star_reward_effect_layer()
 	get_viewport().size_changed.connect(_apply_responsive_layout)
 	_rng.randomize()
-	_setup_audio_players()
 	_setup_pause_menu_buttons()
 	_setup_completion_buttons()
 	_setup_failure_screen()
@@ -493,42 +495,18 @@ func _get_shelves_root_child_bounds(child: Node) -> Rect2:
 	return Rect2()
 
 
-func _setup_audio_players() -> void:
-	_item_place_audio_player = _create_audio_player("ItemPlaceAudio", ITEM_PLACE_SOUND, item_place_volume_db)
-	_triple_clear_audio_player = _create_audio_player("TripleClearAudio", TRIPLE_CLEAR_SOUND, triple_clear_volume_db)
-
-
-func _create_audio_player(player_name: String, stream: AudioStream, volume: float) -> AudioStreamPlayer:
-	var player := AudioStreamPlayer.new()
-	player.name = player_name
-	player.stream = stream
-	player.volume_db = volume
-	add_child(player)
-	return player
-
-
-func _play_item_place_sound() -> void:
-	if not _sound_effects_enabled or _item_place_audio_player == null:
+## The level's only route to audio. Every gameplay cue goes through the shared SfxManager pool, so
+## rapid placements and matches overlap within their catalog limits instead of cutting each other
+## off the way the retired per-level players did.
+func _play_sfx(event_id: StringName, context: Dictionary = {}) -> void:
+	if not _sound_effects_enabled:
 		return
 
-	_item_place_audio_player.stop()
-	_item_place_audio_player.play()
-
-
-func _play_triple_clear_sound() -> void:
-	if not _sound_effects_enabled or _triple_clear_audio_player == null:
-		return
-
-	_triple_clear_audio_player.stop()
-	_triple_clear_audio_player.play()
+	SfxManager.play(event_id, context)
 
 
 func _stop_sound_effects() -> void:
-	if _item_place_audio_player != null:
-		_item_place_audio_player.stop()
-
-	if _triple_clear_audio_player != null:
-		_triple_clear_audio_player.stop()
+	SfxManager.stop_all()
 
 	for effect in get_tree().get_nodes_in_group(&"hammer_impact_effect"):
 		if effect is HammerImpactEffect:
@@ -1867,6 +1845,10 @@ func _handle_level_time_expired() -> void:
 	if _time_extension_offer_active or _level_failed or _level_completed:
 		return
 
+	# One cue per accepted expiry. The guards above are what stop it repeating while the extension
+	# modal is open or refreshing, and _fail_level() below opens failure without a second cue.
+	_play_sfx(SfxCatalogScript.EVENT_TIME_UP)
+
 	if not _has_available_time_extension():
 		_fail_level()
 		return
@@ -2067,6 +2049,7 @@ func _spend_campaign_life_for_run(outcome: String = "left") -> void:
 
 func _setup_pause_menu_buttons() -> void:
 	_top_hud.pause_pressed.connect(_on_pause_menu_button_pressed)
+	_top_hud.critical_second_pulsed.connect(_on_critical_second_pulsed)
 	_pause_menu_overlay.leave_pressed.connect(_on_pause_menu_leave_pressed)
 	_pause_menu_overlay.continue_pressed.connect(_on_pause_menu_continue_pressed)
 	_pause_menu_overlay.setting_toggled.connect(_on_pause_menu_setting_toggled)
@@ -2180,12 +2163,33 @@ func _on_retry_life_purchase_requested() -> void:
 	_retry_purchase_in_progress = true
 	_out_of_lives_overlay.set_purchase_enabled(false)
 	PlayerProgress.refresh_lives()
-	if PlayerProgress.get_lives() <= 0 and not PlayerProgress.purchase_life():
-		_retry_purchase_in_progress = false
-		_return_to_main_menu()
-		return
+	if PlayerProgress.get_lives() <= 0:
+		if not PlayerProgress.purchase_life():
+			_retry_purchase_in_progress = false
+			_return_to_main_menu()
+			return
+
+		_play_sfx(SfxCatalogScript.EVENT_COIN_SPEND)
 
 	_restart_level()
+
+
+## scripts/level_top_hud.gd owns the critical threshold, the frozen treatment, and the
+## "is counting down" decision, and only pulses on a genuinely new critical second -- so this adds
+## nothing but the level's terminal-state guard and the final-five accent. A paused level stops
+## updating the countdown entirely, which is what keeps the ticking silent while a modal is open.
+func _on_critical_second_pulsed(displayed_seconds: int) -> void:
+	if _level_failed or _level_completed or _level_paused or _time_extension_offer_active:
+		return
+
+	var context := {}
+	if displayed_seconds <= FINAL_COUNTDOWN_ACCENT_SECONDS:
+		context = {
+			"pitch_scale": FINAL_COUNTDOWN_ACCENT_PITCH,
+			"volume_offset_db": FINAL_COUNTDOWN_ACCENT_VOLUME_DB,
+		}
+
+	_play_sfx(SfxCatalogScript.EVENT_TIMER_CRITICAL_TICK, context)
 
 
 func _on_pause_menu_setting_toggled(setting_id: StringName, is_disabled: bool) -> void:
@@ -2343,6 +2347,8 @@ func _on_ability_purchase_buy_pressed() -> void:
 		_set_moving_shelf_rows_paused(true)
 		_refresh_ability_purchase_offer()
 		return
+
+	_play_sfx(SfxCatalogScript.EVENT_COIN_SPEND)
 	if not _apply_paid_ability(ability_id):
 		_level_paused = true
 		_set_moving_shelf_rows_paused(true)
@@ -2420,6 +2426,7 @@ func _on_time_extension_coin_requested() -> void:
 		_refresh_time_extension_offer()
 		return
 
+	_play_sfx(SfxCatalogScript.EVENT_COIN_SPEND)
 	_coin_time_extensions_used += 1
 	_time_remaining = float(_time_extension_seconds)
 	_time_extension_offer_active = false
@@ -2521,6 +2528,9 @@ func _handle_release_at(pointer_global_position: Vector2) -> void:
 
 	if _pressed_item.get_parent() == _pressed_origin_slot and _is_slot_move_source_eligible(_pressed_origin_slot):
 		_set_selected_item(_pressed_item, _pressed_origin_slot)
+		# Only this branch is a finished tap that selected an eligible item. A press that became a
+		# drag cleared _pressed_item on the way, and a locked/ineligible shelf fails the guard.
+		_play_sfx(SfxCatalogScript.EVENT_ITEM_SELECT)
 
 	_pressed_item = null
 	_pressed_origin_slot = null
@@ -2757,19 +2767,26 @@ func _place_item_in_slot(item: ShelfItem, slot: Node2D, should_play_landing := f
 	_apply_item_visual_state(item)
 	if should_play_landing:
 		item.play_land_impact()
-		_play_item_place_sound()
+		_play_sfx(SfxCatalogScript.EVENT_ITEM_PLACE_VALID)
 
 
 func _move_item_to_slot_after_animation(item: ShelfItem, target_slot: Node2D, shelves_to_check: Array[Node]) -> void:
-	await _play_item_move_animation(item, target_slot)
+	await _play_item_move_animation(item, target_slot, true)
 	_resolve_shelves(shelves_to_check)
 
 
+## An invalid or no-target drop rewinds the item to where it came from. It still plays the landing
+## impact so the item visibly settles, but it must stay silent: `item_place_valid` may never
+## reinforce a rejected move as a successful one.
 func _return_item_to_origin_after_animation(item: ShelfItem, origin_slot: Node2D) -> void:
-	await _play_item_move_animation(item, origin_slot)
+	await _play_item_move_animation(item, origin_slot, false)
 
 
-func _play_item_move_animation(item: ShelfItem, target_slot: Node2D) -> void:
+func _play_item_move_animation(
+	item: ShelfItem,
+	target_slot: Node2D,
+	is_accepted_landing: bool
+) -> void:
 	if item == null or target_slot == null or not is_instance_valid(item):
 		return
 
@@ -2809,7 +2826,8 @@ func _play_item_move_animation(item: ShelfItem, target_slot: Node2D) -> void:
 	# Deliberately not awaited: the bounce is presentation only, and blocking here would delay
 	# _resolve_shelves() (and therefore every match clear) by the length of the impact.
 	item.play_land_impact()
-	_play_item_place_sound()
+	if is_accepted_landing:
+		_play_sfx(SfxCatalogScript.EVENT_ITEM_PLACE_VALID)
 
 
 func _add_shelf_to_check(shelves_to_check: Array[Node], slot: Node2D) -> void:
@@ -2944,7 +2962,7 @@ func _play_match_clear_animation(shelf_items: Array[ShelfItem]) -> void:
 		).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 
 	await gather_tween.finished
-	_play_triple_clear_sound()
+	_play_sfx(SfxCatalogScript.EVENT_MATCH_CLEAR)
 
 	for item in shelf_items:
 		if item != center_item and item != null and is_instance_valid(item):
@@ -2993,6 +3011,7 @@ func _play_combo_star_reward_animation(origin_global_position: Vector2, star_cou
 		+ STAR_REWARD_STAGGER_SECONDS * maxf(float(star_count - 1), 0.0)
 	)
 	await get_tree().create_timer(total_duration).timeout
+	_play_sfx(SfxCatalogScript.EVENT_STAR_HUD_ARRIVAL, {"count": star_count})
 	_top_hud.play_star_receive_pulse()
 
 

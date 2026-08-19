@@ -1,6 +1,7 @@
 # AUDIO-001 — Implement Godot-Authored Core Sound Effects
 
-**Status:** Proposed
+**Status:** Implemented (see "Implementation Record" at the end; the audible manual pass and the
+Android device check are still outstanding)
 
 **Type:** Audio/UX
 
@@ -80,6 +81,7 @@ Requirements:
   explicit regeneration argument is supplied.
 - Print every output path, duration, sample rate, peak level, and generator version.
 - Document the exact regeneration command in this ticket and `docs/SCRIPTS.md` when implemented.
+  (Done — see "Regeneration command" under "Implementation Record".)
 
 Recommended generated palette:
 
@@ -298,3 +300,143 @@ When implemented, update:
 - Music, music transitions, vibration/haptics, voice, spatial audio, analytics, monetization changes,
   economy changes, save-schema changes, or backend work.
 
+
+## Implementation Record
+
+**Completion status:** Implemented. Every required section is in place and the automated coverage
+below passes. The audible manual pass and the Android device check listed under "Verification"
+remain outstanding and must be done by a human before this ticket is closed.
+
+### Regeneration command
+
+```powershell
+& 'D:\Godot\godot.exe' --headless --path . --script res://scripts/tools/generate_core_sfx.gd -- --regenerate
+& 'D:\Godot\godot.exe' --headless --path . --import
+```
+
+The second command re-imports the regenerated WAVs. A generation without an import leaves the
+catalog pointing at stale audio. Omit `--regenerate` for a normal run: the generator refuses to
+overwrite outputs whose `generated_sfx_manifest.json` records a different generator version, or WAV
+files with no manifest at all.
+
+Options after the `--` separator:
+
+- `--regenerate`: allow replacing outputs recorded under a different generator version.
+- `--output-dir=<res path>`: write elsewhere instead of `res://assets/audio/generated`.
+
+### Implemented files
+
+Owners:
+
+- `scripts/audio/sfx_manager.gd` — the `SfxManager` autoload: pooled players, per-event cooldown and
+  polyphony, variant selection, mute paths, `SFX` bus routing.
+- `scripts/audio/sfx_catalog.gd` — the one event catalog for all eleven approved events.
+- `scripts/audio/ui_click_binder.gd` — the single generic `ui_click` policy for every `BaseButton`.
+- `scripts/tools/generate_core_sfx.gd` — the generator CLI (overwrite guard, manifest, report).
+- `scripts/tools/core_sfx_synthesis.gd` — deterministic synthesis, the cue table, and the WAV encoder.
+- `assets/audio/default_bus_layout.tres` — `Master` plus a dedicated `SFX` bus, referenced from
+  `project.godot`'s `audio/buses/default_bus_layout`.
+
+Wiring:
+
+- `scripts/level.gd`, `scripts/level_top_hud.gd` (new `critical_second_pulsed` signal),
+  `scripts/pause_menu.gd`, `scripts/shop_screen.gd`, `scripts/production_main_menu.gd`,
+  `scripts/main_menu_bottom_navigation.gd`, `scripts/player_progress.gd` (new read-only
+  `get_reward_chest_goal_coin_reward_at_index()`), `scripts/tools/capture_scene.gd` (capture mute).
+
+Tests:
+
+- `tests/audio/test_core_sfx_assets.gd`, `tests/audio/test_sfx_manager.gd`,
+  `tests/audio/test_sfx_event_wiring.gd`.
+
+### Generated asset list
+
+Generator version `1.0.0`. All files are mono 16-bit PCM at 44 100 Hz under
+`assets/audio/generated/`, imported with `compress/mode=0` (uncompressed PCM). Measured peaks are the
+authored relative loudness, not a loudness match; every one is at or under the -1 dBFS ceiling.
+
+| File | Duration | Peak | DC offset |
+| --- | --- | --- | --- |
+| `ui_click_01.wav` | 32.0 ms | -18.00 dBFS | -0.00014 |
+| `ui_click_02.wav` | 38.0 ms | -18.50 dBFS | -0.00010 |
+| `ui_click_03.wav` | 44.0 ms | -17.50 dBFS | -0.00018 |
+| `item_select_01.wav` | 55.0 ms | -14.00 dBFS | +0.00007 |
+| `item_select_02.wav` | 62.0 ms | -14.50 dBFS | +0.00003 |
+| `item_select_03.wav` | 48.0 ms | -13.50 dBFS | +0.00011 |
+| `star_hud_arrival.wav` | 205.0 ms | -8.00 dBFS | +0.00000 |
+| `timer_tick_01.wav` | 42.0 ms | -16.00 dBFS | -0.00021 |
+| `timer_tick_02.wav` | 36.0 ms | -16.50 dBFS | -0.00025 |
+| `timer_tick_03.wav` | 50.0 ms | -15.50 dBFS | -0.00020 |
+| `time_up.wav` | 520.0 ms | -4.00 dBFS | -0.00005 |
+| `coin_gain.wav` | 520.0 ms | -5.00 dBFS | -0.00000 |
+| `coin_spend.wav` | 285.0 ms | -7.00 dBFS | +0.00000 |
+| `shop_purchase_success.wav` | 620.0 ms | -3.50 dBFS | -0.00001 |
+| `reward_chest_star_arrival_01.wav` | 130.0 ms | -11.00 dBFS | -0.00001 |
+| `reward_chest_star_arrival_02.wav` | 150.0 ms | -11.50 dBFS | -0.00001 |
+| `reward_chest_star_arrival_03.wav` | 115.0 ms | -10.50 dBFS | -0.00000 |
+
+`assets/audio/item_place.wav` and `assets/audio/triple_clear.wav` are unchanged and remain the source
+recordings for `item_place_valid` and `match_clear`. No replacements were synthesized for them.
+
+### Event catalog
+
+| Event ID | Streams | Trim | Pitch window | Cooldown | Max polyphony |
+| --- | --- | --- | --- | --- | --- |
+| `item_select` | `item_select_01..03` | -1.0 dB ±0.5 | 0.97–1.03 | 35 ms | 3 |
+| `item_place_valid` | `item_place.wav` | -5.0 dB ±1.0 | 0.95–1.05 | 20 ms | 4 |
+| `match_clear` | `triple_clear.wav` | -5.0 dB ±0.5 | 0.97–1.03 | 20 ms | 3 |
+| `star_hud_arrival` | `star_hud_arrival.wav` | -2.0 dB | 0.99–1.01 | 90 ms | 2 |
+| `timer_critical_tick` | `timer_tick_01..03` | -3.0 dB ±0.4 | 0.98–1.02 | 300 ms | 2 |
+| `time_up` | `time_up.wav` | -1.0 dB | none | 750 ms | 1 |
+| `coin_gain` | `coin_gain.wav` | -1.0 dB | 0.995–1.005 | 200 ms | 2 |
+| `coin_spend` | `coin_spend.wav` | -2.0 dB | 0.995–1.005 | 150 ms | 2 |
+| `shop_purchase_success` | `shop_purchase_success.wav` | -1.0 dB | none | 600 ms | 1 |
+| `reward_chest_star_arrival` | `reward_chest_star_arrival_01..03` | -3.0 dB ±0.6 | 0.98–1.04 | 50 ms | 3 |
+| `ui_click` | `ui_click_01..03` | -2.0 dB ±0.4 | 0.97–1.03 | 40 ms | 3 |
+
+`star_hud_arrival` additionally carries count scaling (+0.9 dB and +0.012 pitch per extra star,
+capped at +3.0 dB and 1.05), so a multi-star combo is one bigger arrival rather than one cue per
+star.
+
+### Validation results
+
+Automated, all through `scripts/tools/run_isolated_godot_test.ps1`:
+
+- `tests/audio/test_core_sfx_assets.gd` — **passed.** Generator determinism (two in-process renders
+  byte-identical), committed WAVs byte-identical to a fresh render, manifest contents, and per-file
+  mono/16-bit/44.1 kHz encoding, non-empty PCM, ticket duration windows, the -1 dBFS ceiling, the
+  authored per-cue peak, bounded DC offset, and edge fades landing on silence. Also catalog
+  completeness (all eleven events, every stream importable), the two retained source recordings, and
+  no orphan generated assets.
+- `tests/audio/test_sfx_manager.gd` — **passed.** `SFX` bus present and sending to `Master`, all
+  pooled players routed to it, pool reuse across 40 rapid plays, per-event polyphony with the newest
+  cue surviving a burst, cooldown rejection, no immediate variant repeat, unknown-event and
+  missing-stream safety, bounded count scaling, global mute stopping active cues, the saved setting
+  gating every request and stopping active cues on disable, owner identity and setting behavior
+  across a scene change, and the button-click policy (single binding across reparenting, exactly one
+  click per accepted press, silence for disabled/hidden/suppressed buttons).
+- `tests/audio/test_sfx_event_wiring.gd` — **passed.** Accepted landings versus silent invalid
+  returns and silent forced restores; `item_select` only on a finished selecting tap; critical-timer
+  entry, per-second ticking, no repeat inside one displayed second, no tick above the threshold, no
+  tick while not counting down, no tick while frozen, the final-five pitch accent, and no ticking
+  after a terminal state; one `time_up` per accepted expiry with no replay on re-entry or modal
+  refresh; `coin_spend` on a successful time extension and silence when it cannot be afforded; Shop
+  routing for granted coins, ability-only bundles, and duplicate transactions; and reward-chest
+  arrivals with goal-rollover `coin_gain` versus silent state reconciliation.
+
+Existing suites re-run after the refactor (all `tests/**/test_*.gd`, plus
+`scenes/shop_verification.tscn` and `scenes/leaderboard_verification.tscn`): gameplay, UI, Shop,
+save, Hammer, Freezer, and Lantern coverage all pass. Four pre-existing failures are unrelated to
+audio and were failing before this work: `tests/backend/test_game_007.gd` and
+`tests/backend/test_game_010.gd` need `../sorting-puzzle-backend/contracts/fixtures/`, which the
+isolated scratch project cannot reach; `tests/save/test_game_001.gd` and `tests/save/test_game_002.gd`
+fail on a stale `configs/backend/content_provenance.json` (21 of its 29 tracked config files have
+drifted since it was published).
+
+Visual check: `scripts/tools/capture_ui.ps1 -Scene scenes/main_menu.tscn` renders unchanged, as
+expected — this ticket changed no layout.
+
+### Still outstanding
+
+- The audible manual pass through all six listed flows, at normal device volume.
+- The Android build check for short-transient balance and device-volume behavior.

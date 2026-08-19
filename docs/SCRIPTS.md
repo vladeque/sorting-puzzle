@@ -19,6 +19,12 @@ Purpose:
 - Displays the saved profile avatar and opens the profile editor from the top status bar.
 - Displays the saved reward chest star progress in a separate left-side widget under the profile icon.
 - Consumes completed-level reward payloads, displays the pre-reward chest value, and advances it once for each reward star that reaches the chest.
+- `_on_reward_star_arrived()` is the one accepted-arrival callback: it advances the visible count,
+  starts the chest receive pulse, and plays `reward_chest_star_arrival` together (AUDIO-001). An
+  arrival that crosses a chest goal layers exactly one `coin_gain` for the completed goal, read
+  through `PlayerProgress.get_reward_chest_goal_coin_reward_at_index()`. Silent state
+  reconciliation (`_update_reward_chest_status()`, `_prepare_pending_reward_animation()`) plays
+  nothing.
 - Opens the reward chest detail modal when the reward chest widget emits `chest_pressed`.
 - Opens the main-menu settings popup from the top status bar.
 - Adds every main-menu modal through a shared overlay helper so no menu action can render or receive
@@ -30,6 +36,10 @@ Purpose:
 - Opens the dedicated Shop scene when the top-status coin balance shortcut is pressed (in addition
   to the bottom navigation cart).
 - Consumes `PlayerProgress.consume_pending_leaderboard_reward()` and shows `%LeaderboardRewardDialog` when a weekly leaderboard rollover granted a coin reward since the last launch.
+  That presentation plays one `coin_gain`; the pending reward is consumed once, so it is a visible
+  accepted payout rather than initial balance population.
+- A successful life purchase from the out-of-lives modal plays `coin_spend`; a rejected purchase
+  stays silent.
 - Fades the whole screen in on `_ready()`; retapping the already-active Home bottom-navigation tab
   is a documented no-op; `ui_cancel` closes the topmost open overlay (skipping its own handling
   entirely while Chapter Selection is open, since that screen owns its own `ui_cancel`) or does
@@ -288,6 +298,9 @@ Purpose:
   tween already in flight per icon/label first, so rapid re-entry never accumulates offsets or
   opacity. Screens never live-switch their own bottom nav's active tab -- Home, Shop, and
   Leaderboard are separate scenes -- so scene entry is the only moment this animation is visible.
+- `_apply_active_tab()` also marks the active tab's button `sfx_click_suppressed` through
+  `SfxManager.set_button_click_suppressed()` and clears it on the other two. A global click policy
+  cannot know that retapping the active tab is a no-op, so it is declared here (AUDIO-001).
 
 Depends on:
 - `scripts/ui_motion.gd`.
@@ -394,6 +407,11 @@ Depends on:
 - Owns Shop loading/error states, creates reusable offer scenes, coordinates one purchase at a time, and routes the shared navigation.
 - Passes purchase results and their offer ids to `PlayerProgress.apply_shop_purchase()`, refreshes
   the visible balance after a grant, and reloads the catalog so a claimed one-time offer disappears.
+- `_play_purchase_success_audio(grant_result)` ties the confirmation cue to rewards actually
+  landing rather than to the button or the dialog (AUDIO-001): it plays `shop_purchase_success`
+  only when the grant reports `applied`, layers one `coin_gain` when the grant included coins,
+  and stays silent for a duplicate transaction (`ok` with `applied` false) or a failed grant.
+  Ability-only bundles get the confirmation alone; there is no purchase-failure cue.
 - Applies maximum content width, compact offer sizing, fixed bottom navigation, and mobile
   safe-area margins through `scripts/destination_screen_layout.gd` (shared with Leaderboard); loading/error states go through `%StatusPanel`.
 - Follows the selected chapter's background through `%DestinationShell` in `_ready()` instead of a
@@ -975,6 +993,142 @@ Used by:
   `scripts/leaderboard_reward_dialog.gd`, `scripts/shop_screen.gd`, `scripts/leaderboard_screen.gd`
   (overlay/destination fade in/out).
 
+## `scripts/audio/sfx_manager.gd`
+
+Registered as:
+- The `SfxManager` autoload in `project.godot`, after `PlayerProgress` (it reads the saved
+  sound-effects setting).
+
+Purpose:
+- The single sound-effect playback owner for the whole game (AUDIO-001). Gameplay, Main Menu,
+  Chapter Selection, Shop, Leaderboard, and every modal reach playback through
+  `SfxManager.play(event_id, context)`. Nothing else creates an `AudioStreamPlayer` for a shared
+  cue, so there is exactly one path that can double-trigger, one place that honours the saved
+  setting, and one pool that bounds how many transients overlap.
+- Owns a fixed pool of 16 `AudioStreamPlayer` children, all routed to the dedicated `SFX` bus from
+  `assets/audio/default_bus_layout.tres`.
+
+Playback rules:
+- Every request re-reads `PlayerProgress.is_setting_disabled(&"sound_effects")`, so a setting
+  changed on any screen applies immediately and survives scene changes and restart.
+- Disabling sound effects also stops everything currently sounding.
+- A pool with no free player reclaims the requesting event's own oldest instance first, so a rapid
+  burst keeps its newest cue rather than its oldest; only then does it reclaim the globally oldest.
+- Variant pools never repeat the immediately previous variant, and pitch variation stays inside the
+  catalog's narrow per-event window.
+- A missing event id or unloadable stream warns once and returns null; it never blocks the gameplay
+  or UI action that asked for it.
+
+Key methods:
+- `play(event_id, context = {})`: returns the started player or null. `context` accepts `count`
+  (count-scaled reward cue), `volume_offset_db`, `pitch_scale`, `force` (bypasses the mute check --
+  only the sound-effects toggle acknowledgement uses it), and `bypass_cooldown`.
+- `stop_all(except_player = null)`: stops every sounding cue, optionally sparing one acknowledgement.
+- `is_enabled()` / `set_muted(is_muted)` / `is_muted()`: `set_muted` is the capture/test mute,
+  independent of the player-facing setting. A headless run starts muted, so automated tests never
+  need an audio device; `scripts/tools/capture_scene.gd` mutes explicitly because captures run
+  windowed. Audio tests opt back in with `set_muted(false)`.
+- `notify_sound_effects_setting_changed()`: silences active cues after a disable.
+- `acknowledge_sound_effects_toggle(is_disabled)`: the deliberate settings-toggle behavior --
+  switching Off acknowledges the accepted press and then mutes everything else; switching On
+  acknowledges immediately after enabling.
+- `set_button_click_suppressed(button, is_suppressed = true)` / `is_button_click_suppressed(button)`:
+  the scene-facing way to keep the generic click off a button.
+- `get_active_play_count(event_id = &"")`, `get_player_pool_size()`, `reset_playback_state()`:
+  observable bookkeeping used by the audio tests instead of asserting on audible output.
+
+Signals:
+- `event_played(event_id, context)`: emitted only when a request actually starts sounding, after the
+  mute, cooldown, catalog, and pool checks.
+
+## `scripts/audio/sfx_catalog.gd`
+
+Purpose:
+- The one AUDIO-001 event catalog: every sound effect the game can play with its streams, mix trim,
+  volume/pitch variation, cooldown, and polyphony budget. Gameplay and UI scripts never preload an
+  `AudioStream`; they pass `SfxCatalogScript.EVENT_*` to `SfxManager.play()`, so rebalancing the mix
+  or swapping a variant pool is a change to this file alone.
+- Holds the eleven approved events: `item_select`, `item_place_valid`, `match_clear`,
+  `star_hud_arrival`, `timer_critical_tick`, `time_up`, `coin_gain`, `coin_spend`,
+  `shop_purchase_success`, `reward_chest_star_arrival`, `ui_click`.
+- `item_place_valid` and `match_clear` keep the project's existing source recordings
+  (`assets/audio/item_place.wav`, `assets/audio/triple_clear.wav`). Every other event uses the
+  deterministic generated palette under `assets/audio/generated/`.
+- `star_hud_arrival` carries a `count_scaling` block so a multi-star reward becomes one bigger cue
+  instead of one full-volume sound per star.
+
+## `scripts/audio/ui_click_binder.gd`
+
+Owned by:
+- `scripts/audio/sfx_manager.gd`, which instantiates it as its `UiClickBinder` child.
+
+Purpose:
+- The single generic `ui_click` policy. It watches `SceneTree.node_added` and binds every
+  `BaseButton` -- authored in a scene or created at runtime -- exactly once, so no screen has to
+  remember to wire a click and no button can end up with two generic owners.
+- Plays on the accepted `pressed` action, never on pointer-down, so a press released outside the
+  button stays silent. Disabled buttons never emit `pressed`, and a button that is not visible in
+  the tree is ignored.
+- Binding is recorded on the button itself, so rebinding, reparenting, pooling, or re-entering the
+  tree cannot produce a second click.
+- A button carrying the `sfx_click_suppressed` meta stays silent. Set it through
+  `SfxManager.set_button_click_suppressed()`. Current users: the already-active destination tab in
+  `scripts/main_menu_bottom_navigation.gd` (a documented no-op) and the `SoundEffectsButton` in
+  `scripts/pause_menu.gd` (which owns a complete replacement cue).
+
+## `scripts/tools/generate_core_sfx.gd`
+
+Purpose:
+- Writes the project-owned, deterministic core SFX palette to `assets/audio/generated/`.
+
+Regenerate with:
+
+```powershell
+& 'D:\Godot\godot.exe' --headless --path . --script res://scripts/tools/generate_core_sfx.gd -- --regenerate
+& 'D:\Godot\godot.exe' --headless --path . --import
+```
+
+- The second command re-imports the new WAVs. A generation without an import leaves the catalog
+  pointing at stale audio.
+- Options after the `--` separator: `--regenerate` allows replacing outputs recorded under a
+  different generator version; `--output-dir=<res path>` writes elsewhere.
+- Refuses to overwrite outputs whose `generated_sfx_manifest.json` records a different generator
+  version (or WAV files with no manifest at all) unless `--regenerate` is supplied.
+- Prints every output path, duration, sample rate, peak level, and DC offset, and fails if any cue
+  exceeds the -1 dBFS ceiling.
+- Deliberately does not synthesize replacements for `item_place.wav` or `triple_clear.wav`.
+
+## `scripts/tools/core_sfx_synthesis.gd`
+
+Purpose:
+- All synthesis for the generated palette: the committed cue table (name, recipe, variant, seed,
+  duration, authored peak), the recipes, the WAV encoder, and the measurement helpers.
+- Tool-side only -- nothing in the shipped game loads it. `tests/audio/test_core_sfx_assets.gd`
+  re-renders the same cues in memory and compares them byte-for-byte with the committed files.
+- Self-contained arithmetic (a fixed xorshift PRNG, additive partials, one-pole filters) so the same
+  seeds and parameters produce the same PCM on every run. Do not introduce Godot's global RNG, time,
+  or frame state.
+- Every cue is mono 16-bit PCM at 44.1 kHz, DC-blocked, edge-faded, and scaled to its own authored
+  peak. Cues are deliberately not loudness-matched: UI clicks and timer ticks sit 10-15 dB under the
+  currency and confirmation cues.
+- `GENERATOR_VERSION` gates the generator's overwrite guard. Bump it whenever a recipe, seed, or
+  parameter changes.
+
+## `tests/audio/*.gd`
+
+- `tests/audio/test_core_sfx_assets.gd`: generator determinism, the committed files matching a fresh
+  render, the manifest, and per-file encoding/duration/peak/DC/fade constraints, plus catalog
+  completeness, retained source recordings, and the absence of orphan generated assets.
+- `tests/audio/test_sfx_manager.gd`: bus routing, pool reuse, per-event polyphony and cooldown,
+  variant selection, missing-event/missing-stream safety, count scaling, both mute paths, setting
+  persistence across a scene change, and the generic button-click policy.
+- `tests/audio/test_sfx_event_wiring.gd`: which owner asks for which event -- accepted landings
+  versus invalid returns, item selection, the HUD-driven critical countdown and its final-five
+  accent, one `time_up` per accepted expiry, coin spending, Shop grant routing, and reward-chest
+  arrivals versus silent reconciliation.
+
+All three run through `scripts/tools/run_isolated_godot_test.ps1 -Script <path>`.
+
 ## `scripts/level_completion_screen.gd`
 
 Class:
@@ -1087,6 +1241,10 @@ Key methods:
 - `get_leaderboard_reward_tiers()`: returns the configured `{min_rank, max_rank, coin_reward}` tiers
   from `configs/leaderboard_reward_tiers.json`, used both to grant rewards and to render the Shop-style
   "Weekly rewards" summary so the displayed promise can't drift from the payout.
+- `get_reward_chest_goal_coin_reward_at_index(goal_index)`: the coin reward attached to one
+  specific goal, for owners animating past goals the player has already crossed (the Main Menu's
+  staggered star flight). Read-only; the grant itself still happens once inside the chest-star
+  application.
 - `get_reward_chest_progress()`: returns the saved reward chest stars, active goal, and goal index.
 - `get_reward_chest_goal_at_index(goal_index)`: exposes a configured goal threshold for menu animation rollover.
 - `consume_pending_reward_chest_animation()`: returns and clears the in-memory completed-level animation payload.
@@ -1551,6 +1709,32 @@ Attached to:
 Purpose:
 - Owns active level state, runtime shelf creation, item spawning, input handling, matching, abilities, timer, failure, and completion.
 
+Audio (AUDIO-001):
+- Plays no audio itself. `_play_sfx(event_id, context)` is the level's only route to sound and
+  forwards to the `SfxManager` autoload; the retired per-level `ItemPlaceAudio`/`TripleClearAudio`
+  players are gone, along with their volume exports (the mix now lives in
+  `scripts/audio/sfx_catalog.gd`).
+- `_sound_effects_enabled` remains as the level-local gate that automated captures and tests set
+  (`scripts/tools/captures/*.gd`), and still drives the Hammer effect's own scene players. The
+  saved sound-effects preference is applied on top of it by `SfxManager`.
+- `item_select` fires from `_handle_release_at()` only when a finished tap actually selected an
+  eligible item; a press that became a drag or targeted an ineligible shelf never reaches it.
+- `item_place_valid` fires from `_place_item_in_slot(..., should_play_landing = true)` and from
+  `_play_item_move_animation(..., is_accepted_landing = true)`. `_return_item_to_origin_after_animation()`
+  passes `false`: an invalid or no-target return still plays the visible landing impact but must
+  never sound like an accepted move.
+- `match_clear` stays on the existing post-gather disappearance beat in `_clear_matching_shelves()`.
+- `star_hud_arrival` fires once per reward with `{"count": star_count}` as the HUD receive pulse
+  begins, so a multi-star combo is one count-scaled cue rather than one sound per star.
+- `timer_critical_tick` comes from `LevelTopHud.critical_second_pulsed`; `_on_critical_second_pulsed()`
+  adds only the level's terminal-state guard and the final-five pitch accent
+  (`FINAL_COUNTDOWN_ACCENT_*`). The threshold, the frozen suppression, and the counting-down
+  decision stay owned by the HUD.
+- `time_up` fires once from `_handle_level_time_expired()` after its guards accept the expiry, so
+  neither a modal refresh nor `_fail_level()` replays it.
+- `coin_spend` fires only after a successful `PlayerProgress.spend_coins()` (ability purchase,
+  time extension) or `purchase_life()` (out-of-lives retry).
+
 Important exports:
 - `slot_snap_distance`: maximum snap distance for drag or tap placement, sized for the wider shelf spacing.
 - `item_pick_size`: rectangle used to detect clicked or touched visible items at the default item scale.
@@ -1565,8 +1749,6 @@ Important exports:
 - `match_shrink_duration_seconds`: duration for the center item shrink-out after a triple gathers.
 - `combo_window_seconds`: time allowed after a triple clear to extend the active combo before the center HUD combo label and fill disappear.
 - `level_duration_seconds`: fallback duration if config does not define `time_seconds`.
-- `item_place_volume_db`: volume for the item placement sound effect.
-- `triple_clear_volume_db`: volume for the matched triple clear sound effect.
 - `selected_level`: global campaign level ID loaded from `configs/levels/level_%03d.json`; the HUD
   displays its chapter-local level number.
 - `launched_from_dev_mode`: makes a level use isolated temporary ability counts and return to the menu instead of saving campaign progress.
@@ -1604,8 +1786,10 @@ Important constants:
 - `DEFAULT_LAYOUT_PRESET`: fallback layout preset.
 - `MAIN_MENU_SCENE`: default scene returned to after completion.
 - `LEVEL_SCENE_PATH`: scene loaded when the completion `Next` button advances normal campaign play to the next level.
-- `ITEM_PLACE_SOUND`: short sound played when the player drops or moves an item into a shelf slot.
-- `TRIPLE_CLEAR_SOUND`: sound played when a matched triple gathers and disappears.
+- `SfxCatalogScript`: `res://scripts/audio/sfx_catalog.gd`, the source of the `EVENT_*` ids this
+  script passes to `SfxManager` (AUDIO-001). The level no longer preloads audio streams.
+- `FINAL_COUNTDOWN_ACCENT_SECONDS` / `_PITCH` / `_VOLUME_DB`: the restrained final-five-seconds
+  treatment applied to `timer_critical_tick`.
 - `HAMMER_IMPACT_EFFECT_SCENE`: `res://scenes/abilities/hammer_impact_effect.tscn`, spawned when the hammer ability is used.
 - `COMPLETION_REVEAL_SECONDS`: 1.35-second cleared-board lead-in before the reward overlay begins;
   the longer confetti effect continues independently across that reveal.
@@ -2241,6 +2425,11 @@ Purpose:
   NodePath, so this one script keeps working for both `scenes/pause_menu.tscn`'s shell-composed
   layout and `scenes/ui/settings_menu.tscn`'s own unrelated `PauseMenuPanel/InnerPanel/IconRow` layout.
 - Initializes every pause-menu and main-menu settings instance from the saved disabled-state dictionary so matching buttons stay visually synchronized after game restarts.
+- Owns the deliberate sound-effects toggle audio (AUDIO-001). `SoundEffectsButton` is marked
+  `sfx_click_suppressed` so the generic click policy leaves it alone, and
+  `_on_setting_button_pressed()` calls `SfxManager.acknowledge_sound_effects_toggle()` after
+  emitting `setting_toggled` -- owners react to the new state first, then the acknowledgement
+  sounds, so nothing cuts it off. Every other settings toggle keeps the normal click.
 
 Key methods:
 - `is_setting_disabled(setting_id)`: returns the shared disabled state for owning scripts such as `scripts/level.gd`.
@@ -2414,6 +2603,12 @@ Purpose:
   `set_timer_frozen_visual(false)` previously cleared them outright, and because `level.gd` reaches
   it from several routine `_update_freezer_visuals()` refreshes -- not only Freezer expiry -- any
   second writer to that label is dropped without warning.
+
+Signals:
+- `pause_pressed`.
+- `critical_second_pulsed(displayed_seconds)`: emitted from the same decision that starts the
+  critical-second pulse, so `scripts/level.gd` can play `timer_critical_tick` from the HUD's own
+  threshold/frozen/counting-down state instead of maintaining a second copy of it (AUDIO-001).
 
 Key methods:
 - `set_level_text(text)` / `set_timer_text(text)` / `set_star_count(stars)`.

@@ -403,6 +403,14 @@ func get_reward_chest_goal_at_index(goal_index: int) -> int:
 	return _get_reward_chest_goal_stars(goals, clampi(goal_index, 0, goals.size() - 1))
 
 
+## The coin reward attached to one specific goal, for owners animating past goals the player has
+## already crossed (the Main Menu's staggered star flight). Read-only: the grant itself still
+## happens once inside _apply_reward_chest_stars().
+func get_reward_chest_goal_coin_reward_at_index(goal_index: int) -> int:
+	var goals := _get_reward_chest_goals()
+	return _get_reward_chest_goal_coin_reward(goals, clampi(goal_index, 0, goals.size() - 1))
+
+
 func get_reward_chest_last_goal_index() -> int:
 	return maxi(_get_reward_chest_goals().size() - 1, 0)
 

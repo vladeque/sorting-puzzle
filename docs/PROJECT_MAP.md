@@ -39,6 +39,12 @@ Player progression:
   active local backend publication. Future unpublished levels remain local and never receive fabricated
   protocol provenance.
 
+Sound effects:
+- `scripts/audio/sfx_manager.gd`
+- Registered in `project.godot` as the `SfxManager` autoload, after `PlayerProgress`.
+- The only playback owner for shared sound effects; every screen reaches it through
+  `SfxManager.play(event_id, context)`.
+
 Reusable item scene:
 - `scenes/item.tscn`
 - Instantiated by `scripts/level.gd` for every shelf item.
@@ -614,6 +620,50 @@ Change here when:
 - Editing puzzle rules, input behavior, runtime shelf construction, procedural level background styling, level timing, completion conditions, or ability behavior.
 - Changing the shared gameplay HUD/modal/result shell system: see "Shared Gameplay UI" below.
 
+### Sound Effects (AUDIO-001)
+
+Global path:
+- `SfxManager` autoload (`scripts/audio/sfx_manager.gd`) -> pooled `AudioStreamPlayer`s -> the `SFX`
+  audio bus -> `Master`.
+- `scripts/audio/sfx_catalog.gd` maps each of the eleven approved event ids to its streams, mix trim,
+  volume/pitch variation, cooldown, and polyphony budget. Gameplay and UI scripts never preload an
+  `AudioStream`.
+- `scripts/audio/ui_click_binder.gd` (a child of the manager) binds every enabled, visible
+  `BaseButton` in every scene to `ui_click` exactly once.
+
+Bus layout:
+- `assets/audio/default_bus_layout.tres`, referenced by `project.godot`'s
+  `audio/buses/default_bus_layout`. `Master` plus a dedicated `SFX` bus that sends to it, so short
+  gameplay/UI transients can be trimmed, muted, or metered as one group without touching `Master`
+  (which future music work will share).
+
+Assets:
+- `assets/audio/item_place.wav` and `assets/audio/triple_clear.wav` remain the project's source
+  recordings, used for `item_place_valid` and `match_clear`.
+- `assets/audio/generated/*.wav` is the deterministic synthesized palette (mono 16-bit PCM at
+  44.1 kHz, imported uncompressed), written by `scripts/tools/generate_core_sfx.gd` from
+  `scripts/tools/core_sfx_synthesis.gd`, with `generated_sfx_manifest.json` recording the generator
+  version and each file's encoding, duration, and peak.
+
+Event owners:
+- `scripts/level.gd`: `item_select`, `item_place_valid`, `match_clear`, `star_hud_arrival`,
+  `timer_critical_tick` (driven by `LevelTopHud.critical_second_pulsed`), `time_up`, `coin_spend`.
+- `scripts/shop_screen.gd`: `shop_purchase_success` and the layered `coin_gain` for granted coins.
+- `scripts/production_main_menu.gd`: `reward_chest_star_arrival`, the goal-rollover and weekly
+  leaderboard `coin_gain`, and the life-purchase `coin_spend`.
+- `scripts/pause_menu.gd`: the sound-effects toggle acknowledgement.
+- `scripts/audio/ui_click_binder.gd`: `ui_click` everywhere else.
+
+Settings and muting:
+- Every request re-reads `PlayerProgress.is_setting_disabled(&"sound_effects")`; disabling also stops
+  what is already sounding.
+- `SfxManager.set_muted()` is a separate capture/test mute. Headless runs start muted and
+  `scripts/tools/capture_scene.gd` mutes explicitly, so no automated run needs an audio device.
+
+Verification:
+- `tests/audio/test_core_sfx_assets.gd`, `tests/audio/test_sfx_manager.gd`,
+  `tests/audio/test_sfx_event_wiring.gd`.
+
 ### Moving Shelf Rows
 
 Files:
@@ -925,9 +975,36 @@ Change moving shelf rows:
 - Update `scripts/tools/validate_level_solvable.py` when row layout config validation changes.
 - Keep `docs/CONFIGS.md` row-layout schema and moving-row lock restrictions aligned.
 
-Change gameplay sound effects:
-- Update `assets/audio/item_place.wav`, `assets/audio/triple_clear.wav`, and the audio player helpers in `scripts/level.gd`.
-- Keep the `SoundEffectsButton` setting path in `scripts/pause_menu.gd` and `scripts/level.gd` aligned when changing pause menu sound-effect controls.
+Change a sound effect's mix, variants, cooldown, or polyphony:
+- Update only that event's entry in `scripts/audio/sfx_catalog.gd`. Do not add preloads or
+  `AudioStreamPlayer` nodes to gameplay or UI scripts.
+
+Change a generated sound effect's character:
+- Update the cue's row and recipe in `scripts/tools/core_sfx_synthesis.gd` and bump
+  `GENERATOR_VERSION`.
+- Regenerate and re-import:
+
+```powershell
+& 'D:\Godot\godot.exe' --headless --path . --script res://scripts/tools/generate_core_sfx.gd -- --regenerate
+& 'D:\Godot\godot.exe' --headless --path . --import
+```
+
+- Re-run `tests/audio/test_core_sfx_assets.gd`; it compares the committed WAVs against a fresh
+  render byte-for-byte and enforces the encoding, duration, peak, DC, and fade constraints.
+- `assets/audio/item_place.wav` and `assets/audio/triple_clear.wav` are source recordings, not
+  generator outputs; replace those files directly if their roles ever change.
+
+Add a new sound event:
+- Add its cue to `scripts/tools/core_sfx_synthesis.gd` (if it needs a new asset), regenerate, and
+  add the event to `scripts/audio/sfx_catalog.gd`.
+- Play it from the owner that already knows the semantic moment succeeded, through
+  `SfxManager.play()`.
+- Extend `tests/audio/*.gd` for the new event and its silence cases.
+
+Change pause-menu sound-effect controls:
+- Keep the `SoundEffectsButton` setting path in `scripts/pause_menu.gd` and `scripts/level.gd`
+  aligned, along with the button's `sfx_click_suppressed` mark and
+  `SfxManager.acknowledge_sound_effects_toggle()`.
 
 Change level win or loss flow:
 - Update `_process()`, `_fail_level()`, `_complete_level()`, `_check_level_completed()`, pause-menu helpers, `level.tscn`, and `scenes/ui/level_completion_screen.tscn`.

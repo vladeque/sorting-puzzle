@@ -162,6 +162,43 @@ Leaderboard scope switching and Shop reloads/purchase-dialog dismissal leaving n
 state, the reward-chest flight's star art and untouched `PlayerProgress` values, and the duplicate
 navigation guard.
 
+## Shared Sound-Effect Roles (AUDIO-001)
+
+Sound effects are owned globally, not by scenes. The `SfxManager` autoload
+(`scripts/audio/sfx_manager.gd`) holds the only shared `AudioStreamPlayer` pool, routed to the
+dedicated `SFX` bus in `assets/audio/default_bus_layout.tres`, and
+`scripts/audio/sfx_catalog.gd` holds the one event catalog. See `docs/SCRIPTS.md` for the full
+API and `docs/AUDIO_001_GODOT_ONLY_SFX_TICKET.md` for the approved event scope.
+
+**No scene authors an `AudioStreamPlayer` for a shared cue.** The only remaining scene-owned audio
+is `scenes/abilities/hammer_impact_effect.tscn`, whose five layered players belong to that one
+effect's authored timing and stay outside this ticket's scope.
+
+**Generic button click.** Every enabled, visible `BaseButton` in every scene plays `ui_click` on its
+accepted `pressed` action, bound automatically by `scripts/audio/ui_click_binder.gd`. Scenes do not
+wire it, and must not add a second click of their own.
+
+**Suppressing the generic click.** Mark a button through
+`SfxManager.set_button_click_suppressed(button)` when it is a documented no-op or owns a complete
+replacement cue. Current users:
+- the already-active bottom-navigation tab (`scripts/main_menu_bottom_navigation.gd`), because
+  retapping the active destination does nothing -- see "Active-Tab Reselection Rule" below;
+- `scenes/pause_menu.tscn`'s `SoundEffectsButton` (and the same button in
+  `scenes/ui/settings_menu.tscn`), because turning sound effects off has to acknowledge the accepted
+  press *before* muting, and turning them on has to acknowledge *after* enabling.
+
+**Scene-owned hooks.** Two components expose the moment their own animation accepts something, so
+the owning screen can play a cue at exactly that beat rather than guessing at it:
+- `scenes/ui/level_top_hud.tscn` emits `critical_second_pulsed(displayed_seconds)` from the same
+  decision that starts its critical-second pulse; `scripts/level.gd` turns that into
+  `timer_critical_tick`.
+- `scenes/ui/main_menu_reward_star_flyer.tscn` already emitted `star_arrived` per landed star;
+  `scripts/production_main_menu.gd`'s handler now plays `reward_chest_star_arrival` in the same
+  callback that advances the visible chest count and starts its receive pulse.
+
+**Captures and tests.** `scripts/tools/capture_scene.gd` mutes `SfxManager` for every capture, and a
+headless run starts muted, so neither needs an audio device.
+
 ## Shared Gameplay UI Roles (UI-003)
 
 The playable level (`level.tscn`'s HUD, ability bar, Pause, Leave Confirmation, Ability Purchase,
@@ -884,6 +921,9 @@ Purpose:
 - Defaults to Home and exposes `set_active_tab(tab_name)` so Shop and Leaderboard screens can select their matching visual state.
 - Adds bottom safe-area padding supplied by the production menu without narrowing the full-width background.
 - Emits focused button signals so each destination can route without moving navigation ownership into the shared component; `pressed` always forwards regardless of prior state; whether retapping the already-active destination does anything is up to the owning screen (a documented no-op everywhere -- see "Active-Tab Reselection Rule" above).
+- Because that retap is a no-op, `set_active_tab()` also marks the active button
+  `sfx_click_suppressed`, keeping it silent while the other two keep the generic click (see
+  "Shared Sound-Effect Roles" above).
 
 Depends on:
 - `assets/ui/shopping_cart_icon_128x128.png`.
@@ -1823,6 +1863,9 @@ Important nodes:
   `VibrationOption/VibrationButton`: square toggle buttons with shadow-only button styling,
   held-press scaling, and a scene-authored hidden `CrossOut` child (`Border` + `Slash` ColorRects)
   toggled by `scripts/pause_menu.gd` instead of being built at runtime (UI-003 P3).
+  `SoundEffectsButton` is additionally marked `sfx_click_suppressed` so it can own its complete
+  acknowledge-then-mute cue (see "Shared Sound-Effect Roles" above); the other two toggles keep
+  the generic click.
 - `LeaveButton`, `ContinueButton`: reparented into `Shell`'s action row at `_ready()`. `LeaveButton`
   uses the shared `style_box_gameplay_destructive_action.tres`; `ContinueButton` uses the shared
   `style_box_green_primary_button.tres`.

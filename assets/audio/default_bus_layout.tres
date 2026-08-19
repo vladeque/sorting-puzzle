@@ -1,0 +1,21 @@
+[gd_resource type="AudioBusLayout" format=3]
+
+; AUDIO-001 bus layout. Every cue played through scripts/audio/sfx_manager.gd is routed to the
+; dedicated "SFX" bus so short gameplay/UI transients can be trimmed, muted, or metered as one
+; group without touching Master (which future music work will share).
+;
+; Referenced from project.godot's audio/buses/default_bus_layout.
+
+[resource]
+bus/0/name = &"Master"
+bus/0/solo = false
+bus/0/mute = false
+bus/0/bypass_fx = false
+bus/0/volume_db = 0.0
+bus/0/send = &""
+bus/1/name = &"SFX"
+bus/1/solo = false
+bus/1/mute = false
+bus/1/bypass_fx = false
+bus/1/volume_db = 0.0
+bus/1/send = &"Master"

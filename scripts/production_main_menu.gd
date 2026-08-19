@@ -5,6 +5,7 @@ const PROFILE_MENU_SCENE := preload("res://scenes/ui/profile_menu.tscn")
 const SETTINGS_MENU_SCENE := preload("res://scenes/ui/settings_menu.tscn")
 const REWARD_CHEST_MENU_SCENE := preload("res://scenes/ui/reward_chest_menu.tscn")
 const CHAPTER_SELECTION_SCENE := preload("res://scenes/ui/chapter_selection_screen.tscn")
+const SfxCatalogScript := preload("res://scripts/audio/sfx_catalog.gd")
 const MenuBackgroundResolverScript := preload("res://scripts/chapters/menu_background_resolver.gd")
 const UIMotionScript := preload("res://scripts/ui_motion.gd")
 const PRODUCTION_MENU_SCENE := "res://scenes/main_menu.tscn"
@@ -101,11 +102,16 @@ func _ready() -> void:
 	if not pending_reward_animation.is_empty():
 		_play_pending_reward_animation.call_deferred(pending_reward_animation)
 	if not pending_leaderboard_reward.is_empty():
+		var weekly_coin_reward := maxi(int(pending_leaderboard_reward.get("coin_reward", 0)), 0)
 		_leaderboard_reward_dialog.call(
 			"show_reward",
 			int(pending_leaderboard_reward.get("rank", 0)),
-			int(pending_leaderboard_reward.get("coin_reward", 0))
+			weekly_coin_reward
 		)
+		# A weekly reward is a visible accepted payout being presented, not initial balance
+		# population -- consume_pending_leaderboard_reward() only returns it once.
+		if weekly_coin_reward > 0:
+			SfxManager.play(SfxCatalogScript.EVENT_COIN_GAIN)
 
 
 func _process(delta: float) -> void:
@@ -390,10 +396,17 @@ func _play_pending_reward_animation(pending: Dictionary) -> void:
 	_reward_star_flyer.call("play", amount, start_position, target_position)
 
 
+## The one accepted-arrival callback: it advances the visible chest count, starts the receive
+## pulse, and plays the arrival cue together. Silent state reconciliation goes through
+## _update_reward_chest_status()/_prepare_pending_reward_animation() instead and stays quiet.
 func _on_reward_star_arrived() -> void:
 	_animated_reward_stars += 1
 	var goal := PlayerProgress.get_reward_chest_goal_at_index(_animated_reward_goal_index)
+	var completed_goal_coin_reward := 0
 	if _animated_reward_stars >= goal:
+		completed_goal_coin_reward = PlayerProgress.get_reward_chest_goal_coin_reward_at_index(
+			_animated_reward_goal_index
+		)
 		_animated_reward_stars -= goal
 		_animated_reward_goal_index = mini(
 			_animated_reward_goal_index + 1,
@@ -403,6 +416,12 @@ func _on_reward_star_arrived() -> void:
 	_set_animated_reward_chest_status()
 	if _reward_chest.has_method("play_receive_pulse"):
 		_reward_chest.call("play_receive_pulse")
+
+	# The catalog's variant pool, subtle pitch spread, cooldown, and polyphony budget are what keep
+	# a long staggered flight intelligible instead of turning it into one loud stack.
+	SfxManager.play(SfxCatalogScript.EVENT_REWARD_CHEST_STAR_ARRIVAL)
+	if completed_goal_coin_reward > 0:
+		SfxManager.play(SfxCatalogScript.EVENT_COIN_GAIN)
 
 
 func _on_reward_star_animation_finished() -> void:
@@ -630,6 +649,7 @@ func _on_out_of_lives_purchase_requested() -> void:
 		_refresh_out_of_lives_offer()
 		return
 
+	SfxManager.play(SfxCatalogScript.EVENT_COIN_SPEND)
 	_update_coin_balance()
 	_update_lives_status()
 	_update_level_button()

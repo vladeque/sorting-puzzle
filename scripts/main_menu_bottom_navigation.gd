@@ -60,6 +60,12 @@ func _apply_active_tab() -> void:
 	_set_tab_active(_shop_icon, _shop_label, active_tab == TAB_SHOP)
 	_set_tab_active(_home_icon, _home_label, active_tab == TAB_HOME)
 	_set_tab_active(_leaderboard_icon, _leaderboard_label, active_tab == TAB_LEADERBOARD)
+	# The owning screen turns a retap of the active tab into nothing, and a global click policy
+	# cannot know that on its own -- so the active button is marked silent explicitly while the
+	# other two keep the normal click (AUDIO-001 section 7).
+	SfxManager.set_button_click_suppressed(_shop_button, active_tab == TAB_SHOP)
+	SfxManager.set_button_click_suppressed(_home_button, active_tab == TAB_HOME)
+	SfxManager.set_button_click_suppressed(_leaderboard_button, active_tab == TAB_LEADERBOARD)
 
 
 ## Animates the active-tab icon raise/lower and label fade over
