@@ -15,8 +15,8 @@ extends RefCounted
 
 ## Compact/regular size variants for the four ability buttons. The top HUD also uses their compact
 ## scale factor to keep its independently-sized Pause/settings control inside extreme side insets.
-const HUD_ICON_COMPACT_SIZE := Vector2(82.0, 82.0)
-const HUD_ICON_REGULAR_SIZE := Vector2(96.0, 96.0)
+const HUD_ICON_COMPACT_SIZE := Vector2(98.4, 98.4)
+const HUD_ICON_REGULAR_SIZE := Vector2(115.2, 115.2)
 const HUD_ICON_COMPACT_REFERENCE_WIDTH := 540.0
 ## Usable-width breakpoint below which HUD icon buttons (and the ability bar) switch to compact.
 ## Matches the ability bar's pre-existing threshold.

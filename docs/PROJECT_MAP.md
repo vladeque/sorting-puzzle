@@ -837,11 +837,11 @@ Files:
 
 Responsibility:
 - Provides hammer, shuffle, highlight, and Freezer buttons using the circular ability icon-button
-  role (compact 82px/regular 96px, with an explicit disabled style); all four are icon-only with a
+  role (compact 98.4px/regular 115.2px, with an explicit disabled style); all four are icon-only with a
   tooltip, use `press_scale_button.gd` (0.97), and rescale
   their icon/badge children proportionally to the actual button size instead of overflowing a
   compact button.
-- Uses a shared cozy, low-detail 2D illustration style for the four transparent 256px ability
+- Uses a shared cozy, low-detail 2D illustration style for the four transparent 128px ability
   textures while giving each ability a distinct palette; the Freezer clock has a complete
   12-mark dial and four external snowflakes.
 - Reads campaign ability uses from `PlayerProgress`, spends campaign uses immediately, and uses temporary three-use counts for isolated dev/test levels.

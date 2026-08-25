@@ -229,7 +229,7 @@ inside gameplay `.tscn` files):
   gameplay modal's close button.
 - `style_box_gameplay_hud_icon_{normal,pressed,hover,disabled}.tres`: the circular ability-button
   role used by all four abilities. One set of four styles (not one set per size) covers both the
-  compact (82px) and regular (96px) sizes: each uses a deliberately
+  compact (98.4px) and regular (115.2px) sizes: each uses a deliberately
   oversized `corner_radius`, which Godot clamps to half the control's smaller dimension, so it
   renders as a true circle at either size without needing size-specific resources. Includes an
   explicit `disabled` style so blocked abilities never fall back to Godot's default square style.
@@ -1304,10 +1304,10 @@ Script:
 
 Purpose:
 - Reusable four-ability gameplay control extracted from `level.tscn`.
-- Owns Hammer, Shuffle, Lantern/highlight, and Freezer buttons; each has a minimum 82x82 compact
-  touch target and a 96x96 regular target -- the circular ability icon-button role (UI-003, see
+- Owns Hammer, Shuffle, Lantern/highlight, and Freezer buttons; each has a 98.4x98.4 compact
+  touch target and a 115.2x115.2 regular target -- the circular ability icon-button role (UI-003, see
   "Shared Gameplay UI Roles" above).
-- Displays the four transparent 256x256 ability textures in one cozy, simplified illustration
+- Displays the four transparent 128x128 ability textures in one cozy, simplified illustration
   style with distinct per-ability palettes; Freezer uses the blue/periwinkle clock variant with
   four snowflakes and a complete 12-mark dial.
 - Owns remaining-use badges (`style_box_gameplay_count_badge.tres`) plus independent Lantern and
@@ -1318,8 +1318,8 @@ Purpose:
   no longer sets unique visible button text, so all four read as icon-only.
 - `apply_responsive_layout(usable_width)` rescales each button's Icon/UsesLabel/TimerLabel rects
   proportionally to the actual button size (UI-003), not only the parent button's
-  `custom_minimum_size` -- previously those children stayed at their 96px-authored offsets and
-  overflowed the 82px compact button.
+  `custom_minimum_size` -- previously those children stayed at their regular authored offsets and
+  overflowed the compact button.
 
 Important nodes:
 - `ButtonRow/HammerButton`

@@ -386,12 +386,23 @@ func _test_responsive_ability_bar() -> void:
 		level.call("_apply_responsive_layout")
 		await process_frame
 		var bar := level.get_node("UI/AbilityBar") as AbilityBar
+		var button_row := bar.get_node("ButtonRow") as HBoxContainer
 		var previous_right := -INF
+		var expected_separation := 18 if viewport_size.x <= 620 else 34
+		_check(
+			button_row.get_theme_constant("separation") == expected_separation,
+			"Ability row preserves the %dpx separation at %s"
+			% [expected_separation, viewport_size]
+		)
+		_check(
+			button_row.alignment == BoxContainer.ALIGNMENT_CENTER,
+			"Ability row stays center-aligned at %s" % viewport_size
+		)
 		for ability_id in [&"hammer", &"shuffle", &"highlight", &"freezer"]:
 			var button := bar.get_ability_button(ability_id)
 			var button_rect := button.get_global_rect()
 			_check(
-				button_rect.size.x >= 82.0 and button_rect.size.y >= 82.0,
+				button_rect.size.x >= 98.0 and button_rect.size.y >= 98.0,
 				"%s keeps large touch targets at %s" % [ability_id, viewport_size]
 			)
 			_check(

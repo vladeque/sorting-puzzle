@@ -1689,11 +1689,11 @@ Key methods:
 - `set_active_seconds(ability_id, seconds_remaining)`.
 - `get_icon_texture(ability_id)`.
 - `get_ability_button(ability_id)`.
-- `apply_responsive_layout(usable_width)`: switches between `GameplayUITheme`'s compact (82px),
-  safe-inset-scaled compact, and regular (96px) ability icon sizes. Also captures each button's
-  authored (96px) Icon/UsesLabel/TimerLabel rects once at
+- `apply_responsive_layout(usable_width)`: switches between `GameplayUITheme`'s compact (98.4px),
+  safe-inset-scaled compact, and regular (115.2px) ability icon sizes. Also captures each button's
+  authored regular Icon/UsesLabel/TimerLabel rects once at
   `_ready()` and rescales them proportionally to the actual button size (UI-003) -- previously only
-  the parent button resized, so the icon and both badge types stayed at their 96px offsets and
+  the parent button resized, so the icon and both badge types stayed at their regular offsets and
   overflowed the smaller compact button. `scripts/level.gd` passes the safe-inset-adjusted usable
   width, not raw viewport width.
 
@@ -2462,7 +2462,7 @@ Purpose:
   `preload` this script and call its static consts/funcs by the preloaded constant.
 
 Constants:
-- `HUD_ICON_COMPACT_SIZE` (82x82) / `HUD_ICON_REGULAR_SIZE` (96x96) /
+- `HUD_ICON_COMPACT_SIZE` (98.4x98.4) / `HUD_ICON_REGULAR_SIZE` (115.2x115.2) /
   `HUD_ICON_COMPACT_REFERENCE_WIDTH` (540) /
   `HUD_ICON_COMPACT_VIEWPORT_WIDTH` (620): the circular ability icon-button role's two sizes and
   breakpoint. The top HUD reuses the same compact scale factor for its independently-sized 72x64

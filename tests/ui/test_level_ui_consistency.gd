@@ -609,8 +609,8 @@ func _test_safe_area_layout() -> void:
 
 
 ## Compact ability layout must resize/reposition the icon and both badge types, not only the parent
-## button -- previously the icon and badges stayed at their 96px-authored offsets and overflowed an
-## 82px compact button.
+## button -- previously the icon and badges stayed at their regular authored offsets and overflowed
+## the compact button.
 func _test_ability_bar_responsive_bounds() -> void:
 	var level := await _make_level()
 	var top_hud = level.get("_top_hud")
@@ -623,6 +623,10 @@ func _test_ability_bar_responsive_bounds() -> void:
 	await process_frame
 	var regular_size: Vector2 = hammer_button.custom_minimum_size
 	var regular_badge_right: float = hammer_badge.offset_right
+	_check(
+		regular_size.is_equal_approx(Vector2(115.2, 115.2)),
+		"Regular ability buttons should use the enlarged 115.2px size."
+	)
 
 	ability_bar.call("apply_responsive_layout", 400.0)
 	top_hud.call(
@@ -634,8 +638,13 @@ func _test_ability_bar_responsive_bounds() -> void:
 	var compact_size: Vector2 = hammer_button.custom_minimum_size
 	var compact_icon_right: float = hammer_icon.offset_right
 	var compact_badge_right: float = hammer_badge.offset_right
+	var expected_compact_size := Vector2(98.4, 98.4) * (400.0 / 540.0)
 
 	_check(compact_size.x < regular_size.x, "Compact ability button should be smaller than regular.")
+	_check(
+		compact_size.is_equal_approx(expected_compact_size),
+		"Compact ability buttons should preserve the enlarged responsive size contract."
+	)
 	var pause_button := top_hud.find_child("PauseButton", true, false) as Control
 	var expected_pause_size := Vector2(72.0, 64.0) * (400.0 / 540.0)
 	_check(
@@ -648,7 +657,7 @@ func _test_ability_bar_responsive_bounds() -> void:
 	)
 	_check(
 		compact_badge_right < regular_badge_right,
-		"Compact badge offset should shrink relative to the regular one, not stay at the 96px value."
+		"Compact badge offset should shrink relative to the regular authored value."
 	)
 
 	level.free()

@@ -26,7 +26,7 @@ const ABILITY_IDS := [
 ## Each button's Icon/UsesLabel/TimerLabel rects as authored in the scene (calibrated for
 ## GameplayUITheme.HUD_ICON_REGULAR_SIZE). apply_responsive_layout() scales these proportionally
 ## for the compact size instead of only resizing the parent button -- previously the icon and both
-## badge types stayed at their 96px-authored offsets and overflowed an 82px compact button.
+## badge types stayed at their 115.2px-authored offsets and overflowed a 98.4px compact button.
 var _reference_child_rects: Dictionary = {}
 
 
