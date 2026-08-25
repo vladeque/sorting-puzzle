@@ -55,10 +55,10 @@ held_scale = 0.97
 
 [node name="Icon" type="TextureRect" parent="ButtonRow/HammerButton" unique_id=1532768853]
 layout_mode = 0
-offset_left = 13.2
-offset_top = 18.0
-offset_right = 97.2
-offset_bottom = 102.0
+offset_left = 18.8
+offset_top = 21.8
+offset_right = 102.8
+offset_bottom = 105.8
 mouse_filter = 2
 texture = ExtResource("2_hammer")
 expand_mode = 1
@@ -139,10 +139,10 @@ held_scale = 0.97
 
 [node name="Icon" type="TextureRect" parent="ButtonRow/HighlightButton" unique_id=185698927]
 layout_mode = 0
-offset_left = 15.6
-offset_top = 10.8
-offset_right = 99.6
-offset_bottom = 94.8
+offset_left = 15.9
+offset_top = 12.2
+offset_right = 99.9
+offset_bottom = 96.2
 mouse_filter = 2
 texture = ExtResource("4_lantern")
 expand_mode = 1
@@ -199,10 +199,10 @@ held_scale = 0.97
 
 [node name="Icon" type="TextureRect" parent="ButtonRow/FreezerButton" unique_id=956361512]
 layout_mode = 0
-offset_left = 15.6
-offset_top = 15.6
-offset_right = 99.6
-offset_bottom = 99.6
+offset_left = 15.7
+offset_top = 11.9
+offset_right = 99.7
+offset_bottom = 95.9
 mouse_filter = 2
 texture = ExtResource("5_bymt5")
 expand_mode = 1

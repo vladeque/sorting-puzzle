@@ -1312,6 +1312,9 @@ Purpose:
 - Displays the four transparent 128x128 ability textures in one cozy, simplified illustration
   style with distinct per-ability palettes; Freezer uses the blue/periwinkle clock variant with
   four snowflakes and a complete 12-mark dial.
+- Keeps the icon controls equal-sized but uses small per-texture optical offsets derived from each
+  PNG's alpha-weighted visual center, so asymmetric Hammer, Lantern, and Freezer silhouettes read
+  as centered inside the circular button rather than merely centering their square canvases.
 - Owns remaining-use badges (`style_box_gameplay_count_badge.tres`) plus independent Lantern and
   Freezer active countdown badges (`style_box_gameplay_timer_badge.tres`).
 - Emits `ability_pressed(ability_id)` and exposes focused state/layout methods; `scripts/level.gd`
