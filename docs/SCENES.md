@@ -1307,6 +1307,9 @@ Purpose:
 - Owns Hammer, Shuffle, Lantern/highlight, and Freezer buttons; each has a minimum 82x82 compact
   touch target and a 96x96 regular target -- the circular ability icon-button role (UI-003, see
   "Shared Gameplay UI Roles" above).
+- Displays the four transparent 256x256 ability textures in one cozy, simplified illustration
+  style with distinct per-ability palettes; Freezer uses the blue/periwinkle clock variant with
+  four snowflakes and a complete 12-mark dial.
 - Owns remaining-use badges (`style_box_gameplay_count_badge.tres`) plus independent Lantern and
   Freezer active countdown badges (`style_box_gameplay_timer_badge.tres`).
 - Emits `ability_pressed(ability_id)` and exposes focused state/layout methods; `scripts/level.gd`

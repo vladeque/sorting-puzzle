@@ -101,6 +101,7 @@ Files:
 - `assets/abilities/ability_hammer.png`
 - `assets/abilities/ability_lantern.png`
 - `assets/abilities/ability_shuffle.png`
+- `assets/abilities/ice_clock_icon_256x256.png`
 - `assets/ui/avatar_circle_clip.gdshader`
 - `assets/ui/avatars/*.png`
 - `assets/ui/avatar_frames/*.png`
@@ -840,6 +841,9 @@ Responsibility:
   tooltip, use `press_scale_button.gd` (0.97), and rescale
   their icon/badge children proportionally to the actual button size instead of overflowing a
   compact button.
+- Uses a shared cozy, low-detail 2D illustration style for the four transparent 256px ability
+  textures while giving each ability a distinct palette; the Freezer clock has a complete
+  12-mark dial and four external snowflakes.
 - Reads campaign ability uses from `PlayerProgress`, spends campaign uses immediately, and uses temporary three-use counts for isolated dev/test levels.
 - Lets hammer clear matching visible/front items first, or supplement visible/front items with first-back-layer copies of the same type if no visible item type can make a triple.
 - Gathers hammer targets to the exact viewport center, merges them into one item with a short settle
