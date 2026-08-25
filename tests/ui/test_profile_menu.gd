@@ -34,6 +34,7 @@ func _run() -> void:
 	var grid := menu.get_node("%ChoiceGrid") as GridContainer
 	var choice_scroll := menu.get_node("%ChoiceScroll") as ScrollContainer
 	var edit_name_button := menu.get_node("%EditNameButton") as Button
+	var pencil_icon := edit_name_button.get_node_or_null("%PencilIcon") as TextureRect
 	var name_input := menu.get_node("%NameLineEdit") as LineEdit
 	var profile_preview := menu.get_node("%ProfilePreview") as Control
 	var preview_avatar_texture := profile_preview.get_node("%AvatarTexture") as TextureRect
@@ -44,8 +45,13 @@ func _run() -> void:
 	_check(not name_input.editable, "Player name input begins in a locked display state.")
 	_check(name_input.focus_mode == Control.FOCUS_NONE, "Locked name input does not take focus.")
 	_check(
-		edit_name_button.get_node_or_null("%PencilIcon") != null,
-		"Name edit uses the compact code-drawn pencil icon."
+		pencil_icon != null and pencil_icon.texture != null,
+		"Name edit uses the compact generated pencil texture."
+	)
+	_check(
+		pencil_icon != null
+		and pencil_icon.texture.resource_path == "res://assets/ui/pencil_icon.png",
+		"Name edit uses the intended project pencil asset."
 	)
 	_check(
 		edit_name_button.custom_minimum_size == Vector2(52, 52),

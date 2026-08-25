@@ -93,6 +93,7 @@ Files:
 - `scenes/ui/horizontal_pager.tscn`
 - `scenes/ui/coin_balance_widget.tscn`
 - `scenes/ui/main_menu_coin_shortcut.tscn`
+- `assets/ui/pencil_icon.png`
 - `assets/ui/clover_coin_transparent_96x96.png`
 - `assets/ui/reward_star_84x84.png`
 - `assets/ui/main_menu_lives.png`
@@ -125,7 +126,6 @@ Files:
 - `scripts/main_menu_reward_star_flyer.gd`
 - `scripts/reward_chest_menu.gd`
 - `scripts/profile_menu.gd`
-- `scripts/pencil_icon.gd`
 - `scripts/profile_avatar_view.gd`
 - `scripts/profile_choice_tile.gd`
 - `scripts/profile_frame_catalog.gd`

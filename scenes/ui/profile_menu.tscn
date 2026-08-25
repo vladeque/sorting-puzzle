@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://cemgcq68qegb" path="res://scripts/profile_menu.gd" id="1_profile_menu"]
 [ext_resource type="PackedScene" path="res://scenes/ui/level_button.tscn" id="2_level_button"]
 [ext_resource type="PackedScene" path="res://scenes/ui/profile_avatar_view.tscn" id="3_avatar_view"]
-[ext_resource type="Script" path="res://scripts/pencil_icon.gd" id="4_pencil_icon"]
+[ext_resource type="Texture2D" path="res://assets/ui/pencil_icon.png" id="4_pencil_icon"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_outer_panel"]
 bg_color = Color(0.67, 0.32, 0.22, 1)
@@ -299,7 +299,7 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_edit_pressed")
 text = ""
 tooltip_text = "Edit player name"
 
-[node name="PencilIcon" type="Control" parent="ProfileMenuPanel/ProfileSummary/SummaryMargin/SummaryRow/NameColumn/NameDisplayRow/EditNameButton"]
+[node name="PencilIcon" type="TextureRect" parent="ProfileMenuPanel/ProfileSummary/SummaryMargin/SummaryRow/NameColumn/NameDisplayRow/EditNameButton"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 8
@@ -314,7 +314,9 @@ offset_bottom = 19.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-script = ExtResource("4_pencil_icon")
+texture = ExtResource("4_pencil_icon")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="SelectorPanel" type="Panel" parent="ProfileMenuPanel"]
 layout_mode = 1

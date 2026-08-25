@@ -1122,7 +1122,8 @@ Important nodes:
 - `CloseButton`: protruding red close button that dismisses without saving.
 - `ProfileSummary/ProfilePreview`: reusable avatar/frame view that updates before saving.
 - `ProfileSummary/NameDisplayRow`: an always-visible, input-styled `%NameLineEdit` plus the compact
-  pencil button; the field stays locked until the pencil enables keyboard editing.
+  pencil button; `%PencilIcon` displays the generated transparent `assets/ui/pencil_icon.png`
+  texture, and the field stays locked until the button enables keyboard editing.
 - `SelectorPanel/TabRow`: mutually exclusive Avatar and Frame buttons.
 - `SelectorPanel/ChoiceScroll/ChoiceGrid`: touch-scrollable `GridContainer` with `columns = 3` that
   fills the light panel width; the scrollbar is intentionally hidden and reusable choice tiles are
@@ -1130,6 +1131,7 @@ Important nodes:
 - `ButtonRow/SaveButton`: `scenes/ui/level_button.tscn` instance labeled `Save`.
 
 Depends on:
+- `assets/ui/pencil_icon.png`, the generated minimal pencil texture used by the name edit button.
 - `assets/ui/avatars/*.png`, the supplied standalone circular avatar art with no decorative frame.
 - `assets/ui/avatar_frames/*.png`, the supplied frame geometry plus its color variants, rendered as
   a separate layer above the avatar.

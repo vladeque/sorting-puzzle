@@ -780,13 +780,6 @@ Depends on:
 Do not use for:
 - Owning saved profile data, campaign progress, lives state, or main menu navigation.
 
-## `scripts/pencil_icon.gd`
-
-Purpose:
-- Draws the compact white-and-gold pencil used by the profile name edit button without relying on
-  platform emoji glyphs or a resolution-specific bitmap.
-- Ignores mouse input so the parent button retains the complete touch target.
-
 ## `scripts/profile_avatar_view.gd`
 
 Attached to:
