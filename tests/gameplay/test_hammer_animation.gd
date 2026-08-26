@@ -121,8 +121,31 @@ func _run() -> void:
 			"Hammer strike swaps through the eight swing poses."
 		)
 		_check(
-			strike.track_get_key_time(texture_track, 7) <= 0.59,
-			"Hammer reaches supplied frame 8 on the impact beat."
+			is_equal_approx(strike.track_get_key_time(texture_track, 6), 0.48),
+			"Hammer reaches supplied frame 7 on the impact beat."
+		)
+	var position_track := strike.find_track(
+		NodePath("ImpactAnchor/HammerPivot:position"),
+		Animation.TYPE_VALUE
+	)
+	_check(position_track >= 0, "Hammer strike owns a position track.")
+	if position_track >= 0:
+		var frame_1_position: Vector2 = strike.track_get_key_value(position_track, 0)
+		var frame_2_position: Vector2 = strike.track_get_key_value(position_track, 1)
+		_check(
+			frame_2_position.length() < frame_1_position.length(),
+			"Hammer flies toward the item from frame 1 through frame 2."
+		)
+		for frame_index in range(2, 7):
+			_check(
+				(strike.track_get_key_value(position_track, frame_index) as Vector2)
+					.is_equal_approx(Vector2.ZERO),
+				"Hammer reaches the item on frame 3 and holds through frame 7."
+			)
+		_check(
+			(strike.track_get_key_value(position_track, 7) as Vector2)
+				.is_equal_approx(Vector2(-24.0, 24.0)),
+			"Hammer moves 24 design pixels bottom-left between frames 7 and 8."
 		)
 	for property_path in [
 		NodePath(".:_trail_amount"),
@@ -174,10 +197,10 @@ func _run() -> void:
 		"Hammer begins in its raised upper-right approach pose."
 	)
 
-	await create_timer(0.24 / animation_player.speed_scale).timeout
+	await create_timer(0.08 / animation_player.speed_scale).timeout
 	_check(
 		pivot.position.x > 0.0 and pivot.position.y < 0.0,
-		"Hammer circles above the already-merged center item before descending."
+		"Hammer remains on its approach path during frame 2."
 	)
 
 	await effect.pre_impact
@@ -192,8 +215,8 @@ func _run() -> void:
 	await effect.impact
 	var impact_animation_position := animation_player.current_animation_position
 	_check(
-		impact_animation_position >= 0.57 and impact_animation_position <= 0.62,
-		"Hammer impact signal is aligned to the 580 ms final supplied frame."
+		impact_animation_position >= 0.47 and impact_animation_position <= 0.52,
+		"Hammer impact signal is aligned to the 480 ms frame 7 contact pose."
 	)
 	await process_frame
 	_check(
@@ -302,7 +325,7 @@ func _verify_edge_target_framing() -> void:
 			"Hammer keeps its raised pose on screen for target ratio %s." % target_ratio
 		)
 
-		animation_player.seek(0.58, true)
+		animation_player.seek(0.48, true)
 		animation_player.pause()
 		await process_frame
 		var pose_offsets: Dictionary = effect.get_script().get_script_constant_map().get(

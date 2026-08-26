@@ -1898,8 +1898,9 @@ Key responsibilities:
   visuals, and gives the remaining merged item a short 120 ms settle pop. Only after that merge is
   visibly complete does it start the fullscreen eight-frame hammer strike. The merged item
   compresses on the authored 400 ms `pre_impact` signal (about 308 ms into playback), becomes
-  invisible and is freed on the authored 580 ms `impact` signal (about 446 ms into playback), and
-  the combo reward starts 140 ms later while the roughly 0.97 second VFX playback is still fading.
+  invisible and is freed on the frame-7 authored 480 ms `impact` signal (about 369 ms into
+  playback), and the combo reward starts 140 ms later while the roughly 0.97 second VFX playback is
+  still fading.
   Gameplay scoring, shelf resolution, and ability input lock rules are unchanged.
 - Hammer passes the live sound-effects setting and exported `hammer_haptics_enabled` flag into the
   effect scene. Disabling sound while the strike is active stops every scene-owned hammer cue;
@@ -2192,8 +2193,8 @@ Purpose:
   instead of a fixed screen-space arc.
 - Coordinates the scene's entrance/downstroke, layered impact, and sparkle-tail audio players,
   plus the optional mobile impact vibration.
-- Emits `pre_impact` at authored time 400 ms (about 308 ms into playback), `impact` on the authored
-  580 ms visual hit frame (about 446 ms into playback), and `finished` after the hammer and VFX
+- Emits `pre_impact` at authored time 400 ms (about 308 ms into playback), `impact` on frame 7 at
+  authored time 480 ms (about 369 ms into playback), and `finished` after the hammer and VFX
   fade out.
 
 Exports:
@@ -2215,7 +2216,8 @@ Verification:
 - `tests/gameplay/test_hammer_animation.gd` checks all eight poses, center convergence, the
   three-to-one merge, deferred strike start, the impact-pose hold through the dissolve, all five
   procedural VFX tracks, two afterimages, audio ownership/muting, raised approach, pre-impact
-  compression, exact-frame target disappearance, delayed reward overlap, 580 ms impact timing, the full tail duration, cleanup, and responsive layout at
+  compression, exact-frame target disappearance, delayed reward overlap, 480 ms frame-7 impact
+  timing, the full tail duration, cleanup, and responsive layout at
   540x960, 720x1280, 1080x1920, 1080x2400, and 900x1200. It also seeks the paused animation to
   verify head-on-pivot alignment and on-screen framing for left, centre, and right targets. It can
   render an in-level timing preview with `--write-movie` and the `--hammer-animation-preview` user

@@ -1593,14 +1593,14 @@ Purpose:
   1-through-8 order. Frames 1-6 share a 680x680 canvas; the portrait source canvases for frames 7-8
   become 453x680 so their intended closer head framing is retained.
 - Owns the editable 1.26 second `AnimationPlayer` `strike` animatic, played at `1.3x` speed for an
-  effective duration of about 0.97 seconds: raised upper-right approach,
-  eight evenly readable texture swaps, accelerating center descent, final-frame impact, short
-  recoil/dissolve, subtle frame-derived afterimages, layered impact amounts, audio callbacks, and
-  gameplay signal timing.
+  effective duration of about 0.97 seconds: frames 1–3 fly from the raised upper-right approach to
+  the item, frames 4–7 hold position, frame 7 makes contact, and frame 8 follows through 24 design
+  pixels toward the bottom-left. It also owns the recoil/dissolve, subtle frame-derived afterimages,
+  layered impact amounts, audio callbacks, and gameplay signal timing.
 - Ends the hammer with a fade-and-flare dissolve rather than a rebound, so the head does not sit
   over the cell it just cleared while the burst plays.
 - Emits `pre_impact` at authored time 400 ms (about 308 ms into playback) for item compression and
-  `impact` at authored time 580 ms (about 446 ms into playback) so gameplay hides and
+  `impact` on frame 7 at authored time 480 ms (about 369 ms into playback) so gameplay hides and
   frees the merged item on the visual hit frame. Reward stars begin 140 ms later, during the
   remaining recoil/VFX tail.
 - Owns the entrance/downstroke, impact-thump/magic, and sparkle-tail `AudioStreamPlayer` nodes. The

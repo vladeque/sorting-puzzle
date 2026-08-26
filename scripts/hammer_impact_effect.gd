@@ -28,8 +28,8 @@ const IMPACT_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_7.p
 const IMPACT_OVERSHOOT_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_8.png")
 
 ## Offset of each supplied frame's head centre from its texture centre, in texture pixels. The
-## sprite is shifted by the negation of this so the head follows one continuous arc and the final
-## frame lands on the pivot where the impact VFX are drawn.
+## sprite is shifted by the negation of this so the head follows one continuous arc and frame 7
+## lands on the pivot where the impact VFX are drawn.
 const POSE_HEAD_OFFSETS := {
 	WINDUP_TEXTURE: Vector2(-8.0, -145.0),
 	RISE_TEXTURE: Vector2(4.0, -148.0),
