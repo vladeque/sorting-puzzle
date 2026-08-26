@@ -34,13 +34,16 @@ func _verify_effect_scene() -> void:
 
 	var overlay := effect.get_node("Overlay") as Control
 	var wash := effect.get_node("Overlay/SearchlightWash") as ColorRect
-	var motes := effect.get_node("Overlay/Motes") as CPUParticles2D
 	var material := wash.material as ShaderMaterial
 	var warm_color: Color = material.get_shader_parameter(&"warm_color")
 	var shade_opacity := float(material.get_shader_parameter(&"shade_opacity"))
 	var focus_warmth := float(material.get_shader_parameter(&"focus_warmth"))
 	_check(effect.layer == 4, "Lantern renders above gameplay and below Freezer/UI layers.")
 	_check(not effect.visible, "Lantern overlay starts hidden.")
+	_check(
+		not effect.has_node("Overlay/Motes"),
+		"Lantern Focus Mode does not include drifting golden motes."
+	)
 	_check(
 		overlay.mouse_filter == Control.MOUSE_FILTER_IGNORE
 		and wash.mouse_filter == Control.MOUSE_FILTER_IGNORE,
@@ -53,17 +56,7 @@ func _verify_effect_scene() -> void:
 		and focus_warmth >= 0.2,
 		"Focus Mode strongly separates the shaded board from warm target pools."
 	)
-	_check(
-		motes.amount >= 18 and motes.amount <= 24 and motes.lifetime >= 4.0,
-		"Focus Mode uses a visible but bounded slow-moving mote field."
-	)
-
 	effect.apply_layout(Vector2(720.0, 1280.0))
-	_check(
-		motes.position.is_equal_approx(Vector2(360.0, 640.0))
-		and motes.emission_rect_extents.is_equal_approx(Vector2(360.0, 640.0)),
-		"The mote field follows the responsive viewport."
-	)
 	effect.set_target_positions([Vector2(180.0, 320.0), Vector2(540.0, 960.0)])
 	var normalized_targets := effect.get_target_positions_normalized()
 	_check(
@@ -73,12 +66,6 @@ func _verify_effect_scene() -> void:
 		and normalized_targets[1].is_equal_approx(Vector2(0.75, 0.75)),
 		"Target item centers are normalized for the fullscreen focus shader."
 	)
-	_check(
-		motes.emission_rect_extents.x < 360.0
-		and motes.emission_rect_extents.y < 640.0,
-		"Active target positions concentrate motes around highlighted goods."
-	)
-
 	effect.set_active(true)
 	await create_timer(0.16).timeout
 	var partial_intensity: float = effect.get_effect_intensity()
@@ -86,12 +73,11 @@ func _verify_effect_scene() -> void:
 	_check(
 		effect.visible
 		and effect.is_active()
-		and motes.emitting
 		and partial_intensity > 0.0
 		and partial_intensity < 1.0
 		and partial_activation > 0.0
 		and partial_activation < 1.0,
-		"Activation blooms outward while the drifting motes start."
+		"Activation blooms outward while Focus Mode starts."
 	)
 
 	# Level may refresh active state repeatedly; a repeat must not restart the entrance tween.
@@ -105,16 +91,14 @@ func _verify_effect_scene() -> void:
 	)
 	effect.set_target_positions([])
 	_check(
-		effect.get_target_count() == 0
-		and motes.position.is_equal_approx(Vector2(360.0, 640.0))
-		and motes.emission_rect_extents.is_equal_approx(Vector2(360.0, 640.0)),
-		"Targetless Lantern returns motes to the full-screen searching state."
+		effect.get_target_count() == 0,
+		"Targetless Lantern returns to the full-screen searching state."
 	)
 
 	effect.set_active(false)
 	await create_timer(effect.fade_duration_seconds + 0.08).timeout
 	_check(
-		not effect.visible and not effect.is_active() and not motes.emitting,
+		not effect.visible and not effect.is_active(),
 		"Ending Lantern fades and hides every part of the screen effect."
 	)
 	effect.queue_free()

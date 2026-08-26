@@ -1910,8 +1910,8 @@ Key responsibilities:
 - After every move, `_refresh_ability_highlights()` calls `_find_current_highlight_type_items()` first so the highlighted item type stays put as long as it still has enough visible matches; it only calls `_find_immediate_triple_items()` for a new type once the current one can no longer complete a triple. This stops the highlight from jumping to an unrelated item type after an unconnected move.
 - Apply highlight ability visuals through `ShelfItem.set_outline()` and `ShelfItem.set_highlight_scale()` so highlighted items get an even border and a slightly larger sprite, and update the highlight button countdown label while that window is active.
 - Mirror the Lantern timer and highlighted items' live viewport positions into `LanternScreenEffect`:
-  Focus Mode shades non-target gameplay, tracks bright pulsing pools and additive motes to the
-  targets, and shows a searching beam when none currently exist. It renders above gameplay
+  Focus Mode shades non-target gameplay, tracks bright pulsing pools to the targets, and shows a
+  searching beam when none currently exist. It renders above gameplay
   but below Freezer and the HUD, fades with normal expiry/cancellation, and clears immediately on a
   new level configuration.
 - Activate Freezer for exactly 30 seconds of active gameplay. Only `_time_remaining` is gated;
@@ -2078,9 +2078,8 @@ Purpose:
 - Drives a procedural fullscreen wash on canvas layer 4 with a 30% warm non-target shade, expanding
   button-origin wave, pulsing pools for as many as sixteen tracked target centers, and a continuous
   diagonal search beam only while no current target exists.
-- Distributes twenty additive `CPUParticles2D` light motes inside the targets' padded screen-space
-  bounds. `apply_layout()` and `set_target_positions()` keep the shader coordinates and particle
-  emission responsive, including while highlighted items ride moving shelves.
+- `apply_layout()` and `set_target_positions()` keep the shader coordinates responsive, including
+  while highlighted items ride moving shelves.
 - Keeps repeated `set_active(true)` calls idempotent, fades on normal expiry/cancellation, and offers
   an immediate cleanup path for level rebuilds. The complete effect ignores input and remains under
   Freezer's layer-5 frame and the layer-10 HUD/modal system.

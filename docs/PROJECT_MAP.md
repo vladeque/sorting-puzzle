@@ -610,9 +610,9 @@ Responsibility:
 - Plays the hammer ability by gathering the targeted items into one center-screen item, striking it with the fullscreen hammer, then dropping combo reward stars from the impact point.
 - Plays the shuffle ability by showing a center-screen delivery box, flying visible unlocked items into it, swapping item identities while hidden, flying them back to their slots, then resolving shelf matches.
 - Shows Lantern as Focus Mode on canvas layer 4: a 30% warm shade over non-target gameplay, bright
-  pulsing pools tracked to every highlighted item, a stronger button-origin activation wave, and
-  twenty target-biased motes persist for the same 15-second window as the item outlines. With no
-  current targets, a diagonal beam visibly keeps searching the shelves.
+  pulsing pools tracked to every highlighted item, and a stronger button-origin activation wave for
+  the same 15-second window as the item outlines. With no current targets, a diagonal beam visibly
+  keeps searching the shelves.
 - Shows Freezer as a wide blue perimeter glow with sparse procedural snowflakes flying inward from
   all four edges and disappearing within 0.45-0.8 seconds. The main pass sits between gameplay and
   UI, while a clipped glow and synchronized flake copy render over `TopHud`, all without recoloring

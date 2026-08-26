@@ -1242,8 +1242,8 @@ Important nodes:
 - `Shelves`: parent for generated shelf nodes and optional moving shelf row containers; `scripts/level.gd` scales and centers it in the available play area for the current viewport size.
 - `DragLayer`: temporary parent for dragged items, drawn above shelves.
 - `LanternScreenEffect`: `scenes/abilities/lantern_screen_effect.tscn` instance on canvas layer 4;
-  Focus Mode shades non-target gameplay and tracks bright pools and concentrated motes to
-  highlighted items while remaining below Freezer, the HUD, and modal shades.
+  Focus Mode shades non-target gameplay and tracks bright pools to highlighted items while
+  remaining below Freezer, the HUD, and modal shades.
 - `FreezerScreenEffect`: `scenes/abilities/freezer_screen_effect.tscn` instance whose main frame
   renders on canvas layer 5 below UI and whose top-edge-only copy renders on layer 11 over `TopHud`.
   Both use a texture-free wide blue edge glow plus synchronized, short-lived snowflakes and never
@@ -1507,20 +1507,14 @@ Purpose:
   sixteen-capacity target-position uniform array, pulsing item-centered light pools, perimeter
   glow, and an expanding activation wave from the Lantern button area.
 - When no immediate target exists, replaces the target pools with a continuous diagonal search beam.
-- Adds twenty slow additive motes with a scene-authored radial `GradientTexture2D`; their emission
-  rectangle follows the highlighted targets rather than filling the whole screen. No generated or
-  external bitmap asset is required.
 - Ignores mouse/touch input and stays below both the layer-5 Freezer effect and layer-10 gameplay UI.
-  Its particle emission rectangle follows the responsive viewport.
 
 Important nodes:
 - `Overlay/SearchlightWash`: fullscreen texture-free procedural shader pass.
-- `Overlay/Motes`: sparse `CPUParticles2D` warm-light ambience.
 
 Verification:
 - `tests/gameplay/test_lantern_screen_effect.gd` checks layering, input pass-through, Focus Mode
-  contrast values, target normalization, concentrated particle layout, idempotent activation, fade
-  cleanup, and level integration.
+  contrast values, target normalization, idempotent activation, fade cleanup, and level integration.
 - `scripts/tools/captures/lantern_effect_setup.gd` activates Lantern for responsive rendered
   captures of `level.tscn`.
 

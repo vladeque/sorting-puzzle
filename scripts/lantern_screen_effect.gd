@@ -3,18 +3,16 @@ extends CanvasLayer
 
 ## Full-screen Lantern Focus Mode presentation. A procedural overlay shades non-target gameplay,
 ## cuts warm pools around highlighted items, and falls back to a searching beam when no target
-## currently exists. A target-biased particle layer supplies drifting light motes.
+## currently exists.
 ## Gameplay owns the timer; this scene only mirrors visual state and never intercepts input.
 
 const MAX_TARGET_COUNT := 16
-const TARGET_MOTE_MARGIN_SHORT_SIDE := 0.13
 
 @export_range(0.05, 1.5, 0.01) var activation_duration_seconds := 0.52
 @export_range(0.05, 1.5, 0.01) var fade_duration_seconds := 0.38
 
 @onready var _overlay := %Overlay as Control
 @onready var _searchlight_wash := %SearchlightWash as ColorRect
-@onready var _motes := %Motes as CPUParticles2D
 
 var _is_active := false
 var _intensity := 0.0
@@ -45,11 +43,9 @@ func _process(delta: float) -> void:
 		_wash_material.set_shader_parameter(&"elapsed_seconds", _elapsed_seconds)
 
 
-## Keeps the mote field distributed across the live portrait/tablet viewport.
 func apply_layout(viewport_size: Vector2) -> void:
 	_viewport_size = Vector2(maxf(viewport_size.x, 0.0), maxf(viewport_size.y, 0.0))
 	_apply_target_shader_parameters()
-	_apply_mote_layout()
 
 
 ## Receives viewport-space item centers from Level. Positions are refreshed during the Lantern
@@ -61,7 +57,6 @@ func set_target_positions(screen_positions: Array[Vector2]) -> void:
 			break
 		_target_screen_positions.append(screen_position)
 	_apply_target_shader_parameters()
-	_apply_mote_layout()
 
 
 func get_target_count() -> int:
@@ -118,8 +113,6 @@ func _play_activation(immediate: bool) -> void:
 	_elapsed_seconds = 0.0
 	if _wash_material != null:
 		_wash_material.set_shader_parameter(&"elapsed_seconds", 0.0)
-	_motes.restart()
-	_motes.emitting = true
 	if immediate:
 		_apply_active_state()
 		return
@@ -143,7 +136,6 @@ func _play_activation(immediate: bool) -> void:
 
 
 func _play_fade(immediate: bool) -> void:
-	_motes.emitting = false
 	if immediate or not visible:
 		_apply_inactive_state()
 		return
@@ -165,13 +157,11 @@ func _on_fade_finished() -> void:
 
 func _apply_active_state() -> void:
 	visible = true
-	_motes.emitting = true
 	_set_effect_intensity(1.0)
 	_set_activation_progress(1.0)
 
 
 func _apply_inactive_state() -> void:
-	_motes.emitting = false
 	visible = false
 	_elapsed_seconds = 0.0
 	_set_effect_intensity(0.0)
@@ -184,7 +174,6 @@ func _set_effect_intensity(value: float) -> void:
 	_intensity = clampf(value, 0.0, 1.0)
 	if _wash_material != null:
 		_wash_material.set_shader_parameter(&"intensity", _intensity)
-	_motes.modulate = Color(1.0, 1.0, 1.0, _intensity)
 
 
 func _set_activation_progress(value: float) -> void:
@@ -207,28 +196,6 @@ func _apply_target_shader_parameters() -> void:
 			)
 	_wash_material.set_shader_parameter(&"target_count", _target_screen_positions.size())
 	_wash_material.set_shader_parameter(&"target_positions", normalized_positions)
-
-
-func _apply_mote_layout() -> void:
-	if _viewport_size.x <= 0.0 or _viewport_size.y <= 0.0:
-		return
-	if _target_screen_positions.is_empty():
-		_motes.position = _viewport_size * 0.5
-		_motes.emission_rect_extents = _viewport_size * 0.5
-		return
-
-	var minimum := _target_screen_positions[0]
-	var maximum := _target_screen_positions[0]
-	for screen_position in _target_screen_positions:
-		minimum = minimum.min(screen_position)
-		maximum = maximum.max(screen_position)
-	var margin := minf(_viewport_size.x, _viewport_size.y) * TARGET_MOTE_MARGIN_SHORT_SIDE
-	minimum -= Vector2.ONE * margin
-	maximum += Vector2.ONE * margin
-	minimum = minimum.clamp(Vector2.ZERO, _viewport_size)
-	maximum = maximum.clamp(Vector2.ZERO, _viewport_size)
-	_motes.position = (minimum + maximum) * 0.5
-	_motes.emission_rect_extents = (maximum - minimum) * 0.5
 
 
 func _kill_transition() -> void:
