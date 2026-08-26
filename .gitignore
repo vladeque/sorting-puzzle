@@ -15,5 +15,6 @@ __pycache__/
 # IDE metadata
 .idea/
 
-# Regenerated UI review captures (scripts/tools/capture_ui.ps1)
-/tmp/ui_capture/
+# Developer-local generated assets, review captures, and scratch output.
+/tmp/*
+!/tmp/.gdignore

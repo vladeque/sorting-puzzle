@@ -244,10 +244,14 @@ Files:
 - `scripts/tools/captures/*_setup.gd` (per-scene runtime state, such as
   `shelf_lock_overlay_setup.gd` and the `lives_menu_full_setup.gd`/`lives_menu_offer_setup.gd` pair
   that opens each lives-modal state over the real Main Menu)
+- `tmp/.gdignore`
 
 Responsibility:
 - Renders any scene at the responsive resolutions from AGENTS.md and writes one PNG per resolution to
-  the git-ignored `tmp/ui_capture/`, plus an ImageMagick contact sheet for a single review pass.
+  `tmp/ui_capture/`, plus an ImageMagick contact sheet for a single review pass.
+- Keeps all generated assets, review captures, and scratch output under `tmp/` local-only. The root
+  `.gdignore` prevents Godot from importing or exporting this directory, while `.gitignore` excludes
+  its contents except for the marker itself.
 - Runs through the isolated test project with `run_isolated_godot_test.ps1 -Windowed`, because a
   headless display server resolves the viewport texture to null and produces no image.
 - Reports results through `<name>_manifest.json` rather than stdout, since the windowed Godot binary
