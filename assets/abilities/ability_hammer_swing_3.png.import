@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cwb17jmdvuslq"
-path="res://.godot/imported/ability_hammer_swing_impact.png-f29c83b717c1806f2942b3603deb213b.ctex"
+uid="uid://bgr2uo6w1k1gl"
+path="res://.godot/imported/ability_hammer_swing_3.png-ed048ce48abc34944d51ce3fd4d053cc.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/abilities/ability_hammer_swing_impact.png"
-dest_files=["res://.godot/imported/ability_hammer_swing_impact.png-f29c83b717c1806f2942b3603deb213b.ctex"]
+source_file="res://assets/abilities/ability_hammer_swing_3.png"
+dest_files=["res://.godot/imported/ability_hammer_swing_3.png-ed048ce48abc34944d51ce3fd4d053cc.ctex"]
 
 [params]
 

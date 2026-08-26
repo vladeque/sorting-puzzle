@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://un6fd3c7ivmn"
-path="res://.godot/imported/ability_hammer_swing_rise.png-08402499f66d4f5880b60f0d4472ef88.ctex"
+path="res://.godot/imported/ability_hammer_swing_2.png-951a3ba96702499c33f9a2cc296e7dff.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/abilities/ability_hammer_swing_rise.png"
-dest_files=["res://.godot/imported/ability_hammer_swing_rise.png-08402499f66d4f5880b60f0d4472ef88.ctex"]
+source_file="res://assets/abilities/ability_hammer_swing_2.png"
+dest_files=["res://.godot/imported/ability_hammer_swing_2.png-951a3ba96702499c33f9a2cc296e7dff.ctex"]
 
 [params]
 

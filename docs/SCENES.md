@@ -1612,7 +1612,8 @@ Important nodes:
 - `AnimationPlayer`: owns the `strike` animation; edit this timeline for most hammer motion and timing adjustments.
 
 Depends on:
-- `assets/abilities/ability_hammer_swing_*.png` for the normalized supplied frames 1 through 8. The
+- `assets/abilities/ability_hammer_swing_1.png` through `ability_hammer_swing_8.png`, numbered in
+  strike playback order, for the normalized supplied frames. The
   `rebound` and `rebound_transition` art is no longer referenced.
 - `assets/audio/item_place.wav`, `assets/audio/triple_clear.wav`, and
   `assets/audio/A_short_satisfying_i_#3-1782529645197.wav`, layered with scene-specific pitch and

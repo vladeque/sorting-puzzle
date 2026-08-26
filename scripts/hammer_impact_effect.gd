@@ -18,14 +18,14 @@ const WARM := Color(1.0, 0.86, 0.42, 1.0)
 ## stays inside the viewport instead of hanging off the right edge.
 const MIRROR_THRESHOLD_RATIO := 0.55
 
-const WINDUP_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_windup.png")
-const RISE_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_rise.png")
-const ANTICIPATION_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_anticipation.png")
-const MID_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_mid.png")
-const SMEAR_EARLY_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_smear_early.png")
-const SMEAR_LATE_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_smear_late.png")
-const IMPACT_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_impact.png")
-const IMPACT_OVERSHOOT_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_impact_overshoot.png")
+const WINDUP_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_1.png")
+const RISE_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_2.png")
+const ANTICIPATION_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_3.png")
+const MID_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_4.png")
+const SMEAR_EARLY_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_5.png")
+const SMEAR_LATE_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_6.png")
+const IMPACT_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_7.png")
+const IMPACT_OVERSHOOT_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_8.png")
 
 ## Offset of each supplied frame's head centre from its texture centre, in texture pixels. The
 ## sprite is shifted by the negation of this so the head follows one continuous arc and the final

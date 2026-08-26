@@ -561,7 +561,7 @@ Files:
 - `scripts/freezer_screen_effect.gd`
 - `scenes/effects/level_completion_confetti.tscn`
 - `scripts/level_completion_confetti.gd`
-- `assets/abilities/ability_hammer_swing_*.png`
+- `assets/abilities/ability_hammer_swing_1.png` through `ability_hammer_swing_8.png` (playback order)
 - `assets/abilities/ability_shuffle_box.png`
 - `assets/abilities/lantern_searchlight.gdshader`
 - `assets/abilities/freezer_cracked_ice_overlay.png`

@@ -2173,7 +2173,8 @@ Exports:
   roughly one shelf cell at impact; larger values bury the cell being cleared.
 
 Depends on:
-- `assets/abilities/ability_hammer_swing_*.png` for normalized supplied frames 1 through 8.
+- `assets/abilities/ability_hammer_swing_1.png` through `ability_hammer_swing_8.png`, numbered in
+  strike playback order, for the normalized supplied frames.
 - The existing item-place, triple-clear, and short satisfying SFX for layered hammer cues; no new
   audio asset is required.
 - `scenes/abilities/hammer_impact_effect.tscn` `AnimationPlayer` keyframes for hammer motion,
