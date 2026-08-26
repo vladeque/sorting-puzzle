@@ -9,8 +9,9 @@ Backend implementation: sibling commit `e3a090e` (`Synchronize public avatar fra
 Client implementation: the Godot client stores authoritative `avatar_frame_id` in save schema `9`,
 synchronizes it in protocol-v2 `profile_edit` operations, maps it from recovery checkpoints and v1
 public reads, and renders it in the profile editor, Main Menu profile widget, and remote leaderboard
-rows. The exact client commit is recorded in the completion note appended after the implementation
-commit.
+rows.
+
+Client implementation commit: `af50843` (`Synchronize profile frames with backend`).
 
 ## Original problem
 
@@ -79,8 +80,8 @@ save schema and save-operation validation forbade unknown profile-edit fields.
   local-only preference.
 - [x] Render returned frames in remote leaderboard rows.
 - [x] Add cross-repository conformance coverage against the backend fixtures.
-- [ ] Record the verified client implementation commit below and rerun the live disposable
-  GAME-010 backend gate when Docker is available.
+- [x] Record the backend and verified client implementation commits in this ticket.
+- [ ] Rerun the live disposable GAME-010 backend gate when Docker is available.
 
 Implementation notes:
 
