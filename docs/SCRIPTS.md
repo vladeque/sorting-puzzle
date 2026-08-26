@@ -1897,9 +1897,10 @@ Key responsibilities:
 - Hammer flies all three chosen targets to the exact viewport center, removes the two duplicate
   visuals, and gives the remaining merged item a short 120 ms settle pop. Only after that merge is
   visibly complete does it start the fullscreen eight-frame hammer strike. The merged item
-  compresses on the 400 ms `pre_impact` signal, becomes invisible and is freed on the 580 ms
-  `impact` signal, and the combo reward starts 140 ms later while the 1.26 second VFX tail is still
-  fading. Gameplay scoring, shelf resolution, and ability input lock rules are unchanged.
+  compresses on the authored 400 ms `pre_impact` signal (about 308 ms into playback), becomes
+  invisible and is freed on the authored 580 ms `impact` signal (about 446 ms into playback), and
+  the combo reward starts 140 ms later while the roughly 0.97 second VFX playback is still fading.
+  Gameplay scoring, shelf resolution, and ability input lock rules are unchanged.
 - Hammer passes the live sound-effects setting and exported `hammer_haptics_enabled` flag into the
   effect scene. Disabling sound while the strike is active stops every scene-owned hammer cue;
   supported mobile builds receive a short 65 ms impact vibration when haptics are enabled.
@@ -2175,7 +2176,8 @@ Attached to:
 Purpose:
 - Runtime controller and procedural VFX renderer for the hammer ability's fullscreen strike.
 - Positions and scales the scene over a provided screen-space target point, plays the scene-owned
-  1.26 second `AnimationPlayer` `strike` animatic, and draws mobile-capped swing trails, a radial
+  1.26 second `AnimationPlayer` `strike` animatic at `1.3x` speed (about 0.97 seconds effective),
+  and draws mobile-capped swing trails, a radial
   magenta glow, tapered white/warm starburst spikes, a localised hot core, and deterministic
   sparks/debris from five animated scalar amounts. All `_draw()` output uses the root's additive
   canvas material so the burst brightens the board instead of staining the warm background; a
@@ -2190,12 +2192,15 @@ Purpose:
   instead of a fixed screen-space arc.
 - Coordinates the scene's entrance/downstroke, layered impact, and sparkle-tail audio players,
   plus the optional mobile impact vibration.
-- Emits `pre_impact` at 400 ms, `impact` on the 580 ms visual hit frame, and `finished` after the
-  hammer and VFX fade out.
+- Emits `pre_impact` at authored time 400 ms (about 308 ms into playback), `impact` on the authored
+  580 ms visual hit frame (about 446 ms into playback), and `finished` after the hammer and VFX
+  fade out.
 
 Exports:
-- `base_hammer_scale`: base visual size before responsive viewport scaling. Tuned so the head covers
-  roughly one shelf cell at impact; larger values bury the cell being cleared.
+- `base_hammer_scale`: `0.2` base visual size before responsive viewport scaling, half the prior
+  size so the head covers the converged target without hiding most of the surrounding shelf.
+- `strike_playback_speed`: `1.3` playback multiplier for a 30% faster strike while keeping the
+  authored animation keys and signal beats together.
 
 Depends on:
 - `assets/abilities/ability_hammer_swing_1.png` through `ability_hammer_swing_8.png`, numbered in

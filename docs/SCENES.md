@@ -1592,13 +1592,15 @@ Purpose:
 - Displays the normalized transparent versions of the supplied numbered hammer frames in exact
   1-through-8 order. Frames 1-6 share a 680x680 canvas; the portrait source canvases for frames 7-8
   become 453x680 so their intended closer head framing is retained.
-- Owns the editable 1.26 second `AnimationPlayer` `strike` animatic: raised upper-right approach,
+- Owns the editable 1.26 second `AnimationPlayer` `strike` animatic, played at `1.3x` speed for an
+  effective duration of about 0.97 seconds: raised upper-right approach,
   eight evenly readable texture swaps, accelerating center descent, final-frame impact, short
   recoil/dissolve, subtle frame-derived afterimages, layered impact amounts, audio callbacks, and
   gameplay signal timing.
 - Ends the hammer with a fade-and-flare dissolve rather than a rebound, so the head does not sit
   over the cell it just cleared while the burst plays.
-- Emits `pre_impact` at 400 ms for item compression and `impact` at 580 ms so gameplay hides and
+- Emits `pre_impact` at authored time 400 ms (about 308 ms into playback) for item compression and
+  `impact` at authored time 580 ms (about 446 ms into playback) so gameplay hides and
   frees the merged item on the visual hit frame. Reward stars begin 140 ms later, during the
   remaining recoil/VFX tail.
 - Owns the entrance/downstroke, impact-thump/magic, and sparkle-tail `AudioStreamPlayer` nodes. The
@@ -1630,6 +1632,7 @@ Depends on:
   volume settings.
 - Runtime instancing and target positioning from `scripts/level.gd`.
 - `tests/gameplay/test_hammer_animation.gd` for deterministic timing/integration verification and optional movie capture.
+- `scripts/tools/captures/hammer_effect_setup.gd` for responsive in-level impact-pose screenshots.
 
 Do not use for:
 - Choosing hammer targets, spending ability inventory, destroying items, or resolving shelves. Those stay in `scripts/level.gd`.

@@ -102,6 +102,14 @@ func _run() -> void:
 	var impact_anchor := effect.get_node("ImpactAnchor") as Node2D
 	var animation_player := effect.get_node("AnimationPlayer") as AnimationPlayer
 	var strike := animation_player.get_animation(&"strike")
+	_check(
+		is_equal_approx(float(effect.get("base_hammer_scale")), 0.2),
+		"Hammer renders at half of its previous base scale."
+	)
+	_check(
+		is_equal_approx(animation_player.speed_scale, 1.3),
+		"Hammer strike runs 30% faster than the authored timeline."
+	)
 	var texture_track := strike.find_track(
 		NodePath("ImpactAnchor/HammerPivot/HammerSprite:texture"),
 		Animation.TYPE_VALUE
@@ -166,7 +174,7 @@ func _run() -> void:
 		"Hammer begins in its raised upper-right approach pose."
 	)
 
-	await create_timer(0.24).timeout
+	await create_timer(0.24 / animation_player.speed_scale).timeout
 	_check(
 		pivot.position.x > 0.0 and pivot.position.y < 0.0,
 		"Hammer circles above the already-merged center item before descending."
@@ -215,7 +223,7 @@ func _run() -> void:
 	await effect.finished
 	_check(
 		animation_player.current_animation_position >= 1.24,
-		"Hammer recoil and layered VFX remain visible for the full 1.26 second strike."
+		"Hammer recoil and layered VFX reach the end of the 1.26 second authored timeline."
 	)
 	await create_timer(0.45).timeout
 	_check(not bool(level.get("_hammer_effect_active")), "Hammer input lock clears after the effect finishes.")
@@ -250,7 +258,7 @@ func _verify_responsive_effect_layout() -> void:
 			"Hammer keeps its board-relative target at %s." % viewport_size
 		)
 		_check(
-			sprite.scale.x >= 0.28 and sprite.scale.x <= 0.56,
+			sprite.scale.x >= 0.14 and sprite.scale.x <= 0.28,
 			"Hammer scale remains capped for mobile/tablet viewport %s." % viewport_size
 		)
 		effect.queue_free()

@@ -41,7 +41,10 @@ const POSE_HEAD_OFFSETS := {
 	IMPACT_OVERSHOOT_TEXTURE: Vector2(46.0, -195.0),
 }
 
-@export_range(0.1, 2.0, 0.01) var base_hammer_scale := 0.4
+## The supplied artwork is intentionally kept compact so the strike does not obscure nearby goods.
+@export_range(0.1, 2.0, 0.01) var base_hammer_scale := 0.2
+## Multiplier applied to the authored 1.26 second strike timeline.
+@export_range(0.1, 3.0, 0.05) var strike_playback_speed := 1.3
 
 @onready var _impact_anchor: Node2D = %ImpactAnchor
 @onready var _hammer_pivot: Node2D = %HammerPivot
@@ -118,6 +121,7 @@ func play(target_screen_position: Vector2, sound_enabled := true, haptics_enable
 	_align_sprite_to_pivot(_afterimage_early)
 	_align_sprite_to_pivot(_afterimage_late)
 	_animation_player.stop()
+	_animation_player.speed_scale = strike_playback_speed
 	_animation_player.play(&"strike")
 
 
