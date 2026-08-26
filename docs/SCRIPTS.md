@@ -1920,12 +1920,12 @@ Key responsibilities:
   suspend only the Freezer window. A partial expiry delta suppresses only its frozen portion.
 - Refresh the ability bar when Freezer expires so its anti-stacking disabled state is removed and
   another remaining use can be activated immediately.
-- Mirror that active state into the reusable `FreezerScreenEffect`: its transparent perimeter
-  cracks reveal once on activation, keep their main frame below normal UI, repeat only the clipped
-  top edge above `TopHud`, and add a narrow blue glow along all four sides without tinting the level
-  center. When a pause/modal shade covers the main frame, synchronize that shade's fade into the
-  upper copy so both remain equally tinted. The effect thaws on expiry/failure/completion; level
-  rebuild and teardown paths clear it immediately.
+- Mirror that active state into the reusable `FreezerScreenEffect`: its wide blue perimeter glow
+  expands once on activation and continuously emits sparse, short-lived snowflakes inward from all
+  four sides without tinting the level center. Keep the main pass below normal UI and repeat only
+  the clipped top strip above `TopHud`. When a pause/modal shade covers the main pass, synchronize
+  that shade's fade into the upper copy so both remain equally tinted. The effect fades on
+  expiry/failure/completion; level rebuild and teardown paths clear it immediately.
 - Treat Freezer activation before the first move as the first meaningful action, disable only its
   button while active, and clear runtime state/visuals on level load, completion, failure, leave,
   application scene teardown, or a new level configuration.
@@ -2106,10 +2106,12 @@ Attached to:
 
 Purpose:
 - Owns the Freezer ability's visual lifecycle independently from gameplay/economy state.
-- Drives two synchronized copies of the cracked-ice shader with short activation and thaw tweens:
-  one full frame on layer 5 below UI and one full-scale texture clipped to the responsive HUD height
-  on layer 11. Repeated `set_active(true)` calls are idempotent because `scripts/level.gd` refreshes
-  Freezer visuals every active frame.
+- Drives two synchronized copies of the glow-only shader with short activation and fade-out tweens:
+  one full frame on layer 5 below UI and one full-scale render pass clipped to the responsive HUD
+  height on layer 11. Repeated `set_active(true)` calls are idempotent because `scripts/level.gd`
+  refreshes Freezer visuals every active frame.
+- Starts and stops `FreezerSnowflakeField` with the same lifecycle. The layer-11 field mirrors the
+  main field's particle data instead of simulating another particle set.
 - Mirrors the shared gameplay modal shade resource into only the layer-11 copy with the same
   `UIMotion.OVERLAY_DURATION` fade. The main layer-5 copy receives the real layer-10 shade directly.
 - Keeps the effect hidden when inactive and provides an immediate reset path for board rebuild,
@@ -2119,15 +2121,14 @@ Key methods:
 - `set_active(should_be_active, immediate)`: starts one state transition or applies its final state.
 - `set_modal_dimmed(should_be_dimmed, immediate)`: synchronizes the layer-11 copy with modal shade.
 - `apply_layout(viewport_size, top_hud_height)`: clips the layer-11 copy to the safe-area-aware HUD.
-- `is_active()`, `get_reveal_amount()`, `get_effect_opacity()`, `get_modal_shade_amount()`: focused
-  state/verification accessors.
+- `is_active()`, `get_activation_amount()`, `get_effect_opacity()`,
+  `get_modal_shade_amount()`: focused state/verification accessors.
 
 Depends on:
-- `assets/abilities/freezer_cracked_ice_overlay.png`: selected cracked-ice candidate converted to
-  an alpha PNG with no baked background color.
-- `assets/abilities/freezer_cracked_ice_reveal.gdshader`: one texture sample plus an edge-distance
-  reveal mask, aspect-correct four-sided blue halo, and optional modal shade; it does not read the
-  screen texture.
+- `assets/abilities/freezer_edge_glow.gdshader`: texture-free, aspect-correct four-sided blue halo
+  with activation width, opacity, and optional modal shade controls; it does not read the screen.
+- `scenes/abilities/freezer_snowflake_field.tscn` and
+  `scripts/freezer_snowflake_field.gd`: pooled procedural flakes shared by both render passes.
 - `assets/themes/style_box_gameplay_modal_shade.tres`: authoritative shade color/opacity mirrored
   by the layer-11 pass.
 
@@ -2138,6 +2139,31 @@ Verification:
 
 Do not use for:
 - Freezer duration, timer suppression, inventory, purchase, or save behavior.
+
+## `scripts/freezer_snowflake_field.gd`
+
+Class:
+- `FreezerSnowflakeField`
+
+Attached to:
+- `scenes/abilities/freezer_snowflake_field.tscn` root `FreezerSnowflakeField`.
+
+Purpose:
+- Draws crisp six-armed snowflakes procedurally, so the effect remains resolution-independent and
+  needs no bitmap particle asset.
+- Reuses a bounded 24-particle array, emits a ten-flake activation burst followed by a sparse
+  trickle, sends every flake inward from one of the four glowing edges, and fades each within
+  0.45-0.8 seconds.
+- Supports a mirror mode that draws the source field's live particle data in the clipped TopHud
+  pass without advancing another simulation.
+- Shortens remaining lifetimes when emission stops and clears immediately for level teardown.
+
+Key methods:
+- `set_emitting(should_emit, immediate)`: starts idempotent emission or stops/clears the field.
+- `set_effect_opacity(value)`: synchronizes flake alpha with the parent glow transition.
+- `set_modal_shade(color, amount)`: provides the shade used only by the mirrored HUD rendering.
+- `is_emitting()`, `get_particle_count()`, `get_maximum_lifetime()`, `get_mirror_source()`:
+  focused lifecycle and verification accessors.
 
 ## `scripts/hammer_impact_effect.gd`
 

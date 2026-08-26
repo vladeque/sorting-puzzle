@@ -1246,7 +1246,8 @@ Important nodes:
   highlighted items while remaining below Freezer, the HUD, and modal shades.
 - `FreezerScreenEffect`: `scenes/abilities/freezer_screen_effect.tscn` instance whose main frame
   renders on canvas layer 5 below UI and whose top-edge-only copy renders on layer 11 over `TopHud`.
-  Both use transparent crack art plus a narrow blue edge glow and never recolor the level center.
+  Both use a texture-free wide blue edge glow plus synchronized, short-lived snowflakes and never
+  recolor the level center.
 - `UI`: `CanvasLayer` for gameplay labels, the reusable ability bar, and overlays; top-level
   controls are anchored or positioned at runtime for non-720x1280 portrait screens.
 - `UI/TimerLabel`: countdown display.
@@ -1537,23 +1538,25 @@ Script:
 
 Purpose:
 - Reusable fullscreen Freezer presentation owned by a separate scene instead of `scripts/level.gd`.
-- Composites only the transparent cyan-white crack artwork over gameplay; it does not sample,
+- Adds a wide cyan-blue halo along all four screen edges; its width scales from the shorter viewport
+  dimension so it remains visually even across portrait aspect ratios. The glow does not sample,
   tint, blur, or replace the current chapter background.
-- Adds a subtle cyan-blue halo along all four screen edges; its width scales from the shorter
-  viewport dimension so it remains visually even across portrait aspect ratios.
-- Reveals the cracks inward from the viewport edges when Freezer starts, holds them for the active
-  gameplay window, and retracts/fades them when Freezer ends.
+- Expands the glow inward when Freezer starts and continuously emits sparse procedural snowflakes
+  from all four edges. Flakes rotate, drift inward, and disappear within 0.45-0.8 seconds.
+- Fades the glow, stops emission, and shortens remaining flake lifetimes when Freezer ends.
 - Ignores mouse/touch input. The full frame stays below UI; only a top-height-clipped copy renders
   over `TopHud`, leaving ability buttons and central modal content unobstructed.
 - Mirrors the shared gameplay modal shade and 0.2-second fade into that layer-11 copy whenever the
-  level is paused, keeping its cracks and glow the same brightness as the shaded main frame.
+  level is paused, keeping its glow and flakes the same brightness as the shaded main pass.
 
 Important nodes:
 - `Overlay`: fullscreen, mouse-ignored control that follows the live viewport.
-- `Overlay/IceFrame`: stretches `assets/abilities/freezer_cracked_ice_overlay.png` to the viewport
-  and uses `freezer_cracked_ice_reveal.gdshader` for the edge-distance reveal and blue inner halo.
-- `HudOverlayLayer/HudClip/HudIceFrame`: layer-11 duplicate kept at full viewport scale and clipped
-  to the safe-area-aware `TopHud` height so the art is not squeezed into the strip.
+- `Overlay/EdgeGlow`: uses `freezer_edge_glow.gdshader` for the aspect-correct four-sided halo.
+- `Overlay/SnowflakeField`: owns the bounded snowflake simulation below normal UI.
+- `HudOverlayLayer/HudClip/HudEdgeGlow`: layer-11 glow duplicate kept at full viewport scale and
+  clipped to the safe-area-aware `TopHud` height.
+- `HudOverlayLayer/HudClip/HudSnowflakeField`: draws the main field's same particle data above the
+  TopHud, clipped to the same strip.
 
 Verification:
 - `tests/gameplay/test_freezer_screen_effect.gd` checks layering, input pass-through, idempotent
@@ -1567,6 +1570,20 @@ Verification:
 Do not use for:
 - Freezer timing, inventory spending, timer gating, or persistence. Those remain in
   `scripts/level.gd` and `PlayerProgress`.
+
+## `scenes/abilities/freezer_snowflake_field.tscn`
+
+Root:
+- `FreezerSnowflakeField` (`Control`)
+
+Script:
+- `scripts/freezer_snowflake_field.gd`
+
+Purpose:
+- Focused, reusable owner for the Freezer's procedural six-armed snowflake animation.
+- Can run the bounded source simulation or mirror another field's data for a clipped render pass.
+- Has no texture children, does not intercept input, and scales flake size/speed from the shorter
+  viewport dimension.
 
 ## `scenes/abilities/hammer_impact_effect.tscn`
 

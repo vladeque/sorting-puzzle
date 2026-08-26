@@ -1,12 +1,13 @@
 class_name FreezerScreenEffect
 extends CanvasLayer
 
-## Full-screen visual treatment for the Freezer ability. The main frame sits between gameplay and
-## UI, while a second copy clips to the responsive top-HUD strip and renders above it. The
-## transparent texture never recolors the chapter background or intercepts input. Repeated state
-## updates are intentionally idempotent because Level refreshes Freezer UI every active frame.
+## Full-screen visual treatment for the Freezer ability. A wide perimeter glow and small inward-
+## moving snowflakes sit between gameplay and UI, while synchronized copies clip to the responsive
+## top-HUD strip and render above it. Repeated state updates are intentionally idempotent because
+## Level refreshes Freezer UI every active frame.
 
 const UIMotionScript := preload("res://scripts/ui_motion.gd")
+const FreezerSnowflakeFieldScript := preload("res://scripts/freezer_snowflake_field.gd")
 const GAMEPLAY_MODAL_SHADE_STYLE := preload(
 	"res://assets/themes/style_box_gameplay_modal_shade.tres"
 )
@@ -15,41 +16,46 @@ const GAMEPLAY_MODAL_SHADE_STYLE := preload(
 @export_range(0.05, 1.5, 0.01) var thaw_duration_seconds := 0.46
 
 @onready var _overlay := %Overlay as Control
-@onready var _ice_frame := %IceFrame as TextureRect
+@onready var _edge_glow := %EdgeGlow as ColorRect
+@onready var _snowflake_field := %SnowflakeField as FreezerSnowflakeFieldScript
 @onready var _hud_overlay_layer := %HudOverlayLayer as CanvasLayer
 @onready var _hud_clip := %HudClip as Control
-@onready var _hud_ice_frame := %HudIceFrame as TextureRect
+@onready var _hud_edge_glow := %HudEdgeGlow as ColorRect
+@onready var _hud_snowflake_field := %HudSnowflakeField as FreezerSnowflakeFieldScript
 
 var _is_active := false
-var _reveal_amount := 0.0
+var _activation_amount := 0.0
 var _opacity := 0.0
 var _transition_tween: Tween
 var _modal_dim_tween: Tween
-var _ice_materials: Array[ShaderMaterial] = []
-var _hud_ice_material: ShaderMaterial
+var _glow_materials: Array[ShaderMaterial] = []
+var _hud_glow_material: ShaderMaterial
 var _is_modal_dimmed := false
 var _modal_shade_amount := 0.0
 
 
 func _ready() -> void:
 	_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_ice_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_edge_glow.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_snowflake_field.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_hud_clip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_hud_ice_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_duplicate_and_register_material(_ice_frame)
-	_hud_ice_material = _duplicate_and_register_material(_hud_ice_frame)
-	if _hud_ice_material != null:
-		_hud_ice_material.set_shader_parameter(
+	_hud_edge_glow.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_hud_snowflake_field.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_duplicate_and_register_material(_edge_glow)
+	_hud_glow_material = _duplicate_and_register_material(_hud_edge_glow)
+	if _hud_glow_material != null:
+		_hud_glow_material.set_shader_parameter(
 			&"modal_shade_color",
 			GAMEPLAY_MODAL_SHADE_STYLE.bg_color
 		)
+	_snowflake_field.set_modal_shade(GAMEPLAY_MODAL_SHADE_STYLE.bg_color, 0.0)
 	apply_layout(get_viewport().get_visible_rect().size, 112.0)
 	_set_modal_shade_amount(0.0)
 	_apply_inactive_state()
 
 
-## Keeps the upper copy at full-viewport texture scale, then clips it to exactly the live TopHud
-## height. This avoids vertically squeezing the ice artwork into the short HUD strip.
+## Keeps the upper render pass at full-viewport scale, then clips it to exactly the live TopHud
+## height. The glow and snowflakes therefore cross the HUD boundary without being squeezed.
 func apply_layout(viewport_size: Vector2, top_hud_height: float) -> void:
 	_hud_clip.anchor_left = 0.0
 	_hud_clip.anchor_top = 0.0
@@ -60,14 +66,8 @@ func apply_layout(viewport_size: Vector2, top_hud_height: float) -> void:
 	_hud_clip.offset_right = 0.0
 	_hud_clip.offset_bottom = maxf(top_hud_height, 0.0)
 
-	_hud_ice_frame.anchor_left = 0.0
-	_hud_ice_frame.anchor_top = 0.0
-	_hud_ice_frame.anchor_right = 0.0
-	_hud_ice_frame.anchor_bottom = 0.0
-	_hud_ice_frame.offset_left = 0.0
-	_hud_ice_frame.offset_top = 0.0
-	_hud_ice_frame.offset_right = maxf(viewport_size.x, 0.0)
-	_hud_ice_frame.offset_bottom = maxf(viewport_size.y, 0.0)
+	_apply_full_viewport_rect(_hud_edge_glow, viewport_size)
+	_apply_full_viewport_rect(_hud_snowflake_field, viewport_size)
 
 
 func get_hud_overlay_height() -> float:
@@ -98,16 +98,16 @@ func is_active() -> bool:
 	return _is_active
 
 
-func get_reveal_amount() -> float:
-	return _reveal_amount
+func get_activation_amount() -> float:
+	return _activation_amount
 
 
 func get_effect_opacity() -> float:
 	return _opacity
 
 
-## Mirrors the gameplay modal shade into the layer-11 TopHud copy. The main frame already receives
-## the real layer-10 shade; matching its fade here prevents the upper cracks from staying bright.
+## Mirrors the gameplay modal shade into the layer-11 TopHud copy. The main pass already receives
+## the real layer-10 shade; matching its fade keeps the upper glow and flakes equally dimmed.
 func set_modal_dimmed(should_be_dimmed: bool, immediate := false) -> void:
 	if should_be_dimmed == _is_modal_dimmed:
 		if immediate:
@@ -139,16 +139,17 @@ func get_modal_shade_amount() -> float:
 
 func _play_freeze_transition(immediate: bool) -> void:
 	_set_effect_visible(true)
+	_snowflake_field.set_emitting(true)
 	if immediate:
 		_apply_active_state()
 		return
 
-	_set_reveal_amount(0.0)
+	_set_activation_amount(0.0)
 	_set_effect_opacity(0.0)
 	_transition_tween = create_tween()
 	_transition_tween.set_parallel(true)
 	_transition_tween.tween_method(
-		_set_reveal_amount,
+		_set_activation_amount,
 		0.0,
 		1.0,
 		activation_duration_seconds
@@ -162,6 +163,7 @@ func _play_freeze_transition(immediate: bool) -> void:
 
 
 func _play_thaw_transition(immediate: bool) -> void:
+	_snowflake_field.set_emitting(false, immediate)
 	if immediate or not visible:
 		_apply_inactive_state()
 		return
@@ -169,8 +171,8 @@ func _play_thaw_transition(immediate: bool) -> void:
 	_transition_tween = create_tween()
 	_transition_tween.set_parallel(true)
 	_transition_tween.tween_method(
-		_set_reveal_amount,
-		_reveal_amount,
+		_set_activation_amount,
+		_activation_amount,
 		0.0,
 		thaw_duration_seconds
 	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
@@ -190,42 +192,60 @@ func _on_thaw_finished() -> void:
 
 func _apply_active_state() -> void:
 	_set_effect_visible(true)
-	_set_reveal_amount(1.0)
+	_snowflake_field.set_emitting(true)
+	_set_activation_amount(1.0)
 	_set_effect_opacity(1.0)
 
 
 func _apply_inactive_state() -> void:
+	_snowflake_field.set_emitting(false, true)
 	_set_effect_visible(false)
-	_set_reveal_amount(0.0)
+	_set_activation_amount(0.0)
 	_set_effect_opacity(0.0)
 
 
-func _set_reveal_amount(value: float) -> void:
-	_reveal_amount = clampf(value, 0.0, 1.0)
-	for material in _ice_materials:
-		material.set_shader_parameter(&"reveal_amount", _reveal_amount)
+func _set_activation_amount(value: float) -> void:
+	_activation_amount = clampf(value, 0.0, 1.0)
+	for material in _glow_materials:
+		material.set_shader_parameter(&"activation_amount", _activation_amount)
 
 
 func _set_effect_opacity(value: float) -> void:
 	_opacity = clampf(value, 0.0, 1.0)
-	for material in _ice_materials:
+	for material in _glow_materials:
 		material.set_shader_parameter(&"opacity", _opacity)
+	_snowflake_field.set_effect_opacity(_opacity)
 
 
 func _set_modal_shade_amount(value: float) -> void:
 	_modal_shade_amount = clampf(value, 0.0, 1.0)
-	if _hud_ice_material != null:
-		_hud_ice_material.set_shader_parameter(&"modal_shade_amount", _modal_shade_amount)
+	if _hud_glow_material != null:
+		_hud_glow_material.set_shader_parameter(&"modal_shade_amount", _modal_shade_amount)
+	_snowflake_field.set_modal_shade(
+		GAMEPLAY_MODAL_SHADE_STYLE.bg_color,
+		_modal_shade_amount
+	)
 
 
-func _duplicate_and_register_material(frame: TextureRect) -> ShaderMaterial:
+func _duplicate_and_register_material(frame: ColorRect) -> ShaderMaterial:
 	var material := frame.material as ShaderMaterial
 	if material == null:
 		return null
 	material = material.duplicate() as ShaderMaterial
 	frame.material = material
-	_ice_materials.append(material)
+	_glow_materials.append(material)
 	return material
+
+
+func _apply_full_viewport_rect(control: Control, viewport_size: Vector2) -> void:
+	control.anchor_left = 0.0
+	control.anchor_top = 0.0
+	control.anchor_right = 0.0
+	control.anchor_bottom = 0.0
+	control.offset_left = 0.0
+	control.offset_top = 0.0
+	control.offset_right = maxf(viewport_size.x, 0.0)
+	control.offset_bottom = maxf(viewport_size.y, 0.0)
 
 
 func _set_effect_visible(should_be_visible: bool) -> void:

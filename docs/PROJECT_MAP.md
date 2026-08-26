@@ -559,12 +559,14 @@ Files:
 - `scripts/lantern_screen_effect.gd`
 - `scenes/abilities/freezer_screen_effect.tscn`
 - `scripts/freezer_screen_effect.gd`
+- `scenes/abilities/freezer_snowflake_field.tscn`
+- `scripts/freezer_snowflake_field.gd`
 - `scenes/effects/level_completion_confetti.tscn`
 - `scripts/level_completion_confetti.gd`
 - `assets/abilities/ability_hammer_swing_1.png` through `ability_hammer_swing_8.png` (playback order)
 - `assets/abilities/ability_shuffle_box.png`
 - `assets/abilities/lantern_searchlight.gdshader`
-- `assets/abilities/freezer_cracked_ice_overlay.png`
+- `assets/abilities/freezer_edge_glow.gdshader`
 
 Responsibility:
 - Loads level JSON and item sprite config.
@@ -611,11 +613,12 @@ Responsibility:
   pulsing pools tracked to every highlighted item, a stronger button-origin activation wave, and
   twenty target-biased motes persist for the same 15-second window as the item outlines. With no
   current targets, a diagonal beam visibly keeps searching the shelves.
-- Shows Freezer as transparent cyan-white perimeter cracks: the main frame sits between gameplay
-  and UI, while a clipped copy of only its top edge renders over `TopHud`. The effect reveals inward
-  once, holds without recoloring the configured level background, and thaws when the 30-second
-  active-gameplay window ends. While gameplay modals pause the level, the upper copy mirrors the
-  shared modal-shade fade so its brightness continues matching the shaded main frame.
+- Shows Freezer as a wide blue perimeter glow with sparse procedural snowflakes flying inward from
+  all four edges and disappearing within 0.45-0.8 seconds. The main pass sits between gameplay and
+  UI, while a clipped glow and synchronized flake copy render over `TopHud`, all without recoloring
+  the configured level background. The effect stops emission and fades when the 30-second active-
+  gameplay window ends. While gameplay modals pause the level, the upper copy mirrors the shared
+  modal-shade fade so its brightness continues matching the shaded main pass.
 - Wires the in-level pause and retry recovery modals. Implements the `ui_cancel` back stack (retry
   Out of Lives -> main menu; Leave Confirmation -> Pause -> resume; Ability Purchase restores its
   prior state; Completion/Failure invoke their routes; otherwise opens Pause).
@@ -837,6 +840,8 @@ Files:
 - `scripts/lantern_screen_effect.gd`
 - `scenes/abilities/freezer_screen_effect.tscn`
 - `scripts/freezer_screen_effect.gd`
+- `scenes/abilities/freezer_snowflake_field.tscn`
+- `scripts/freezer_snowflake_field.gd`
 - `assets/abilities/*.png`
 
 Responsibility:
@@ -861,8 +866,8 @@ Responsibility:
   and live item screen positions into the responsive Lantern Focus Mode treatment below the HUD.
 - Shows the active highlight countdown in a bottom-right badge on the highlight button.
 - Pauses only the level countdown for Freezer, shows its active badge and frozen timer treatment,
-  and mirrors that state into the transparent cracked-ice perimeter with a subtle four-sided blue
-  glow, including the clipped top-HUD pass and its synchronized pause/modal shading.
+  and mirrors that state into the wide four-sided blue glow with inward-flying snowflakes,
+  including the clipped top-HUD pass and its synchronized pause/modal shading.
 
 Change here when:
 - Adding, removing, rebalancing, or restyling player abilities.
