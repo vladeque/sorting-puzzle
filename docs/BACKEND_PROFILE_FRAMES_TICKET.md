@@ -1,19 +1,23 @@
 # Backend Ticket: Synchronize Public Avatar Frames
 
-Status: **Open**
+Status: **Backend and client implemented; live GAME-010 rerun pending Docker availability**
 
 Owner repository: `../sorting-puzzle-backend`
 
-Client implementation: the Godot client stores `avatar_frame_id` locally in save schema `8`,
-renders it in the profile editor and Main Menu profile widget, and deliberately omits it from
-protocol-v2 `profile_edit` operations until this ticket is implemented.
+Backend implementation: sibling commit `e3a090e` (`Synchronize public avatar frames`).
 
-## Problem
+Client implementation: the Godot client stores authoritative `avatar_frame_id` in save schema `9`,
+synchronizes it in protocol-v2 `profile_edit` operations, maps it from recovery checkpoints and v1
+public reads, and renders it in the profile editor, Main Menu profile widget, and remote leaderboard
+rows. The exact client commit is recorded in the completion note appended after the implementation
+commit.
 
-The authoritative profile currently contains only `display_name` and `avatar_id`. A selected avatar
-frame therefore does not survive account recovery or multi-device merge and cannot be shown for
-remote players in leaderboards. Sending `avatar_frame_id` now would be rejected because the v2 save
-schema and save-operation validation forbid unknown profile-edit fields.
+## Original problem
+
+The authoritative profile originally contained only `display_name` and `avatar_id`. A selected
+avatar frame therefore did not survive account recovery or multi-device merge and could not be
+shown for remote players in leaderboards. Sending `avatar_frame_id` was rejected because the v2
+save schema and save-operation validation forbade unknown profile-edit fields.
 
 ## Required behavior
 
@@ -68,13 +72,26 @@ schema and save-operation validation forbid unknown profile-edit fields.
    - Protocol-v2 golden fixtures for save state, save sync, and leaderboard responses.
    - Run `pnpm lint`, `pnpm typecheck`, `pnpm test:unit`, `pnpm test:integration`, and `pnpm build`.
 
-## Client follow-up after backend release
+## Completed client follow-up
 
-- Add `avatar_frame_id` to the Godot `profile_edit` journal payload and backend read parsers.
-- Map the authoritative checkpoint frame into `PlayerProgress` instead of preserving it as a
+- [x] Add `avatar_frame_id` to the Godot `profile_edit` journal payload and backend read parsers.
+- [x] Map the authoritative checkpoint frame into `PlayerProgress` instead of preserving it as a
   local-only preference.
-- Render returned frames in remote leaderboard rows.
-- Add cross-repository conformance fixtures and record the backend/client commits in this ticket.
+- [x] Render returned frames in remote leaderboard rows.
+- [x] Add cross-repository conformance coverage against the backend fixtures.
+- [ ] Record the verified client implementation commit below and rerun the live disposable
+  GAME-010 backend gate when Docker is available.
+
+Implementation notes:
+
+- Schema `9` converts a non-classic schema-8 local selection into one signed frame-only edit before
+  the first authoritative checkpoint can replace it. The indistinguishable schema-8 classic
+  default is not uploaded, so it cannot overwrite an explicit remote selection.
+- Older cached leaderboard rows and older checkpoints without the additive field render/preserve
+  `frame_classic` or the current local value safely during rollout.
+- Godot fixture tests consume the backend's updated player-state and leaderboard fixtures directly.
+- The local backend integration gate submits both combined and frame-only edits and verifies final
+  state readback.
 
 ## Acceptance criteria
 

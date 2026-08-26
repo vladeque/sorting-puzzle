@@ -1,10 +1,9 @@
 [gd_scene format=3 uid="uid://c0ucphw26bcxj"]
 
 [ext_resource type="Script" uid="uid://djyj6d35bwfjf" path="res://scripts/leaderboard_row.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://d2pn1p1r8alak" path="res://assets/ui/avatars/avatar_cat.png" id="2_avatar"]
 [ext_resource type="Texture2D" uid="uid://xbjatvx3natv" path="res://assets/ui/reward_star_34_glossy_b.png" id="3_star"]
-[ext_resource type="Shader" uid="uid://mwkm0trr4gi1" path="res://assets/ui/avatar_circle_clip.gdshader" id="4_clip_shader"]
 [ext_resource type="PackedScene" uid="uid://c7mgnix3e7sha" path="res://scenes/ui/leaderboard_rank_reward.tscn" id="5_reward"]
+[ext_resource type="PackedScene" uid="uid://dapnucxiyjsjg" path="res://scenes/ui/profile_avatar_view.tscn" id="6_profile_avatar"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_row"]
 bg_color = Color(0.97, 0.91, 0.76, 1)
@@ -80,21 +79,6 @@ corner_radius_bottom_left = 32
 shadow_color = Color(0.35, 0.18, 0.04, 0.4)
 shadow_size = 4
 shadow_offset = Vector2(0, 2)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_avatar"]
-bg_color = Color(0.56, 0.32, 0.31, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(1, 0.9, 0.65, 0.92)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_avatar_clip"]
-shader = ExtResource("4_clip_shader")
 
 [node name="LeaderboardRow" type="Control" unique_id=1491207903]
 custom_minimum_size = Vector2(0, 92)
@@ -207,21 +191,12 @@ text = "#1"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="AvatarFrame" type="PanelContainer" parent="ContentMargin/Content" unique_id=243598047]
+[node name="ProfileAvatarView" parent="ContentMargin/Content" unique_id=243598047 instance=ExtResource("6_profile_avatar")]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
+size_flags_vertical = 4
 mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_avatar")
-
-[node name="AvatarTexture" type="TextureRect" parent="ContentMargin/Content/AvatarFrame" unique_id=1802136640]
-unique_name_in_owner = true
-material = SubResource("ShaderMaterial_avatar_clip")
-layout_mode = 2
-mouse_filter = 2
-texture = ExtResource("2_avatar")
-expand_mode = 1
-stretch_mode = 5
 
 [node name="NameLabel" type="Label" parent="ContentMargin/Content" unique_id=427903482]
 unique_name_in_owner = true

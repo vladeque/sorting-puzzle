@@ -622,7 +622,8 @@ Depends on:
 - `scenes/ui/destination_screen_shell.tscn`, `scenes/ui/destination_status_panel.tscn`.
 - `scripts/destination_screen_layout.gd`, `scripts/ui_motion.gd`, `scripts/press_scale_button.gd`.
 - `scripts/leaderboards/leaderboard_service.gd`.
-- `PlayerProgress` for the local player's name, avatar, lifetime stars, and weekly stars, and for the selected chapter id.
+- `PlayerProgress` for the local player's name, avatar, avatar frame, lifetime stars, and weekly
+  stars, and for the selected chapter id.
 
 ## `scenes/ui/leaderboard_row.tscn`
 
@@ -633,7 +634,8 @@ Script:
 - `scripts/leaderboard_row.gd`
 
 Purpose:
-- Reusable ranking entry with rank, circular-clipped avatar, ellipsized player name, reward-star icon, and formatted score.
+- Reusable ranking entry with rank, authoritative composed avatar/frame, ellipsized player name,
+  reward-star icon, and formatted score.
 - Keeps normal cream row art and the green local-player highlight authored in the scene.
 - `RankSlot` layers three hidden gold/silver/bronze medal circles behind `RankLabel`; exactly one
   shows for rank 1/2/3 (with the label reading a bare "1"/"2"/"3"), none for rank 4+ (label reads
@@ -645,6 +647,8 @@ Purpose:
 
 Depends on:
 - `assets/ui/avatars/*.png`.
+- `assets/ui/avatar_frames/*.png` and `scenes/ui/profile_avatar_view.tscn`, which compose the same
+  sanitized avatar/frame presentation used by the Main Menu and profile editor.
 - `assets/ui/avatar_circle_clip.gdshader`, which keeps the circular crop while rendering avatar
   content at 90% and extending its outer background colors to the frame edge.
 - `assets/ui/reward_star_34_glossy_b.png`.

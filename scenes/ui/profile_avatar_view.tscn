@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cnnjxnswvnoug" path="res://scripts/profile_avatar_view.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://cchfwobe1guj8" path="res://assets/ui/avatars/avatar_cat.png" id="2_avatar"]
-[ext_resource type="Texture2D" uid="uid://bmy3qqyhxgtv3" path="res://assets/ui/avatar_frames/frame_classic.png" id="3_frame"]
+[ext_resource type="Texture2D" uid="uid://dmlt2pip1p24t" path="res://assets/ui/avatar_frames/frame_classic.png" id="3_frame"]
 
 [node name="ProfileAvatarView" type="Control" unique_id=293872960]
 custom_minimum_size = Vector2(92, 92)

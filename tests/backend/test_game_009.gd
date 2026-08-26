@@ -141,6 +141,10 @@ func _check_current_player_outside_page_is_pinned_from_current_player_field() ->
 	var player_entry := result.get("player_entry", {}) as Dictionary
 	_check(str(player_entry.get("player_id", "")) == TEST_PLAYER_ID, "player_entry comes from the current_player field")
 	_check(int(player_entry.get("rank", 0)) == 51, "player_entry keeps the backend-reported rank")
+	_check(
+		str(player_entry.get("avatar_frame_id", "")) == "frame_gold",
+		"player_entry keeps the backend-reported avatar frame"
+	)
 	_check(result.get("period_end_unix", 0) is int and int(result.get("period_end_unix", 0)) > 0, "period_end is converted to a unix timestamp")
 
 
@@ -278,6 +282,14 @@ func _check_unavailable_falls_back_to_cache() -> void:
 		not (offline_result.get("entries", []) as Array).is_empty(),
 		"the cached fallback still has the previously fetched entries"
 	)
+	if not (offline_result.get("entries", []) as Array).is_empty():
+		_check(
+			str(((offline_result.get("entries", []) as Array)[0] as Dictionary).get(
+				"avatar_frame_id",
+				""
+			)) == "frame_gold",
+			"the cached fallback preserves the public avatar frame"
+		)
 	_check(not bool(offline_result.get("has_more", true)), "a cached fallback page never claims more pages")
 
 
@@ -416,6 +428,7 @@ func _entry(
 		"score": score,
 		"display_name": display_name,
 		"avatar_id": "avatar_cat",
+		"avatar_frame_id": "frame_gold",
 		"is_current_player": is_current_player,
 	}
 	if not country_code.is_empty():

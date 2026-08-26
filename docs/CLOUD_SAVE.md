@@ -53,9 +53,12 @@ global level IDs and `selected_chapter_id` as a device preference. `current_leve
 explicit completion map from `campaign.selected_completions`, so chapter-shaped progress does not
 depend on one contiguous campaign cursor.
 
-PlayerProgress snapshot schema `8` also stores the account-scoped local `avatar_frame_id`. It is
-preserved when a server checkpoint is mapped over the current snapshot, but is not yet a public
-cloud field and never appears in a `profile_edit` operation. The backend follow-up is specified in
+PlayerProgress snapshot schema `9` stores authoritative `avatar_frame_id`. Frame-only and combined
+profile changes are signed as `profile_edit` operations, authoritative checkpoints replace the
+acknowledged local value, and unacknowledged edits replay over the checkpoint. A non-classic frame
+from schema `8` is backfilled exactly once during migration; the schema-8 classic default is not
+uploaded because it cannot be distinguished from an explicit selection and must not overwrite a
+newer remote choice. The cross-repository contract is recorded in
 `docs/BACKEND_PROFILE_FRAMES_TICKET.md`.
 
 `current.json`, `previous.json`, and `pending.tmp` implement temporary-write, flush, validate,

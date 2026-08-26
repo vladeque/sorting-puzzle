@@ -157,8 +157,9 @@ Responsibility:
   `FOCUS_NONE` (documented touch-only policy). See `docs/SCENES.md`'s "Shared Interaction Roles".
 - Opens `scenes/ui/profile_menu.tscn` from the profile widget; its summary card previews the pending
   avatar/frame combination, its edit button reveals the player-name field, and its Avatar/Frame
-  tabs share a scrollable 3-column choice grid. Save commits the name and avatar as the public
-  profile edit plus the account-scoped local `avatar_frame_id` through `PlayerProgress`.
+  tabs share a scrollable 3-column choice grid. Save commits the name, avatar, and avatar frame as
+  one authoritative public `profile_edit` through `PlayerProgress`; a frame-only change produces a
+  frame-only edit.
 - Opens `scenes/ui/settings_menu.tscn` from the settings widget, with pause-menu-style music, sound-effects, and vibration toggle visuals plus no-op `Support` and `Language` buttons.
 - Disables campaign launch when saved lives are zero; the lives widget shows current lives and the `MM:SS` countdown until the next hourly restore.
 - Uses `scenes/ui/level_button.tscn` and `assets/ui/level_button_blank_new.png` for the reusable glossy green level button visuals while keeping the label dynamic (also the shared `assets/themes/style_box_green_primary_button.tres` "regular" tier used by Shop purchase buttons); red, light-blue, and yellow-orange variants remain available beside the source texture for alternate states or future UI variants -- yellow-orange is the intentional Main Menu Chapter-button and in-level `Watch ad` secondary/alternative-action role (see `docs/SCENES.md` "Shared UI Style Tokens"), while light-blue is currently unused by any scene. The Chapter cover CTA instead uses a scene-local flat treatment sampled from the glossy green palette and matching the neutral disabled style's geometry.

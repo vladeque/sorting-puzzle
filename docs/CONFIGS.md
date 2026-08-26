@@ -507,10 +507,10 @@ Runtime files:
 - `pending.tmp`: flushed and validated candidate awaiting promotion.
 - `legacy_v4.previous.json`: retained read-only copy of the migrated schema-4 file.
 
-The gameplay snapshot schema is version 6. It retains the former schema-5 fields, adds
-`purchased_shop_offer_ids` for account-scoped local/mock lifetime-offer claims, retains
-`reward_chest_completed_cycles` and `moderation_state`, and intentionally excludes
-`settings_disabled`, which now belongs to `preferences`.
+The gameplay snapshot schema is version 9. It retains campaign completion maps, account-scoped
+offer claims, reward-chest cycles, moderation state, the four-ability inventory, and the
+authoritative public `avatar_frame_id`; it intentionally excludes `settings_disabled`, which
+belongs to `preferences`.
 
 Runtime behavior:
 - Fresh saves start at level 1 with five lives, 300 gold coins, three uses for each ability, `avatar_cat` selected as the profile avatar, a generated `player_` name with a five-character random suffix, and all settings buttons enabled.
@@ -528,8 +528,9 @@ Runtime behavior:
 - The same completion adds stars to `total_earned_stars` and `weekly_earned_stars`; neither is reduced by reward chest rollover.
 - Schema-4 migration retains campaign, coins, lives/timer, existing ability inventory, processed
   mock transaction ids, profile, settings, chest progress, and lifetime/weekly stars, advances the
-  snapshot to schema 6, and grants exactly three Freezer uses once. Schema-5 migration advances to
-  schema 6 with an empty purchased-offer claim list and never repeats the Freezer grant.
+  snapshot to schema 9, and grants exactly three Freezer uses once. Later migrations never repeat
+  the Freezer grant; schema 7 defaults the new frame to `frame_classic`, and schema 8 preserves a
+  non-default local frame by appending one signed `profile_edit` during the schema-9 migration.
 - Weekly stars reset when the saved Monday-UTC boundary no longer matches the current week.
 - Reward chest stars roll over when a configured goal is reached, grant that goal's `coin_reward`, then the next configured goal starts.
 - Developer/test level selection is isolated from this save data.

@@ -111,6 +111,7 @@ func _build_current_player_profile() -> Dictionary:
 		"player_id": "local_player",
 		"display_name": PlayerProgress.get_player_name(),
 		"avatar_id": PlayerProgress.get_avatar_id(),
+		"avatar_frame_id": PlayerProgress.get_avatar_frame_id(),
 		"country_code": "",
 		"total_score": PlayerProgress.get_total_earned_stars(),
 		"weekly_score": PlayerProgress.get_weekly_earned_stars(),

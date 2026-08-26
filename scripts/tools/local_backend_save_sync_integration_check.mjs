@@ -387,12 +387,21 @@ async function main() {
 
   const profileEdit = buildOperation(
     "profile_edit",
-    { display_name: "Integration Tester", avatar_id: "avatar_cat" },
+    { display_name: "Integration Tester", avatar_id: "avatar_cat", avatar_frame_id: "frame_gold" },
     sequence++,
     previousHash,
   );
   operations.push(profileEdit);
   previousHash = profileEdit.operation_hash;
+
+  const frameOnlyEdit = buildOperation(
+    "profile_edit",
+    { avatar_frame_id: "frame_aqua" },
+    sequence++,
+    previousHash,
+  );
+  operations.push(frameOnlyEdit);
+  previousHash = frameOnlyEdit.operation_hash;
 
   const batchRequest = {
     meta: requestMeta({ protocolVersion: SAVE_PROTOCOL_VERSION, sessionId }),
@@ -442,6 +451,10 @@ async function main() {
   check(
     batchData.checkpoint.profile.display_name === "Integration Tester",
     "the checkpoint reflects the profile edit",
+  );
+  check(
+    batchData.checkpoint.profile.avatar_frame_id === "frame_aqua",
+    "the checkpoint reflects the last frame-only profile edit without changing name/avatar",
   );
   check(batchData.continuation.has_more === false, "the batch reaches the journal head");
 
@@ -571,6 +584,10 @@ async function main() {
   check(
     finalState.json?.data?.checkpoint?.generation === secondContinuationData.checkpoint.generation,
     "the readback checkpoint generation matches the last synchronize response",
+  );
+  check(
+    finalState.json?.data?.checkpoint?.profile?.avatar_frame_id === "frame_aqua",
+    "the final readback preserves the synchronized avatar frame",
   );
   const finalDeviceCursor = (finalState.json?.data?.device_cursors ?? []).find(
     (cursor) => cursor.device_id === deviceId,

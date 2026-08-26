@@ -17,6 +17,10 @@ const MOCK_AVATAR_IDS := [
 	"avatar_cat", "avatar_dog", "avatar_koala", "avatar_tiger", "avatar_penguin",
 	"avatar_bear", "avatar_owl", "avatar_frog", "avatar_lion", "avatar_turtle",
 ]
+const MOCK_AVATAR_FRAME_IDS := [
+	"frame_classic", "frame_gold", "frame_leaf", "frame_rose", "frame_coral",
+	"frame_sky", "frame_plum", "frame_ruby", "frame_aqua",
+]
 
 
 func get_provider_name() -> String:
@@ -56,6 +60,7 @@ func _build_mock_entries(scope: StringName) -> Array:
 			"player_id": "mock_%02d" % index,
 			"display_name": MOCK_NAMES[index],
 			"avatar_id": MOCK_AVATAR_IDS[index % MOCK_AVATAR_IDS.size()],
+			"avatar_frame_id": MOCK_AVATAR_FRAME_IDS[index % MOCK_AVATAR_FRAME_IDS.size()],
 			"country_code": "UA" if scope == SCOPE_COUNTRY else "",
 			"score": _get_mock_score(scope, index),
 			"rank": 0,
@@ -81,6 +86,7 @@ func _build_current_player_entry(scope: StringName, current_player: Dictionary) 
 		"player_id": str(current_player.get("player_id", "local_player")),
 		"display_name": str(current_player.get("display_name", "You")),
 		"avatar_id": str(current_player.get("avatar_id", "avatar_cat")),
+		"avatar_frame_id": str(current_player.get("avatar_frame_id", "frame_classic")),
 		"country_code": str(current_player.get("country_code", "")),
 		"score": maxi(int(current_player.get(score_key, 0)), 0),
 		"rank": 0,

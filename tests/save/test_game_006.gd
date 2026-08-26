@@ -531,6 +531,7 @@ func _test_overspend_adjustment_clamps_without_rolling_back_campaign() -> void:
 		"ability_uses": {"hammer": 3, "shuffle": 3, "highlight": 3},
 		"processed_shop_purchase_ids": [],
 		"avatar_id": "avatar_cat",
+		"avatar_frame_id": "frame_leaf",
 		"player_name": "test_player",
 		"reward_chest_stars": 0,
 		"reward_chest_goal_index": 0,
@@ -548,7 +549,12 @@ func _test_overspend_adjustment_clamps_without_rolling_back_campaign() -> void:
 		"lives": {"available_lives": 5, "next_restore_at": null},
 		"reward_chest": {"stars": 0, "goal_index": 0, "completed_cycles": 0},
 		"leaderboards": {"lifetime_stars": 15, "weekly_stars": 15, "weekly_period_start": null},
-		"profile": {"avatar_id": "avatar_cat", "display_name": "test_player", "moderation_state": "active"},
+		"profile": {
+			"avatar_id": "avatar_cat",
+			"avatar_frame_id": "frame_gold",
+			"display_name": "test_player",
+			"moderation_state": "active",
+		},
 	}
 	var mapped = progress.call("_map_checkpoint_to_snapshot", checkpoint, current_snapshot, [])
 	_check(
@@ -558,6 +564,10 @@ func _test_overspend_adjustment_clamps_without_rolling_back_campaign() -> void:
 	_check(
 		int(mapped.get("highest_completed_level", -1)) == 5 and int(mapped.get("current_level", -1)) == 6,
 		"an overspend clamp does not roll back campaign levels the server already accepted"
+	)
+	_check(
+		str(mapped.get("avatar_frame_id", "")) == "frame_gold",
+		"the authoritative checkpoint replaces the local-only frame"
 	)
 
 	# A still-unacknowledged local operation replays on top of the clamped checkpoint: a further
@@ -571,6 +581,10 @@ func _test_overspend_adjustment_clamps_without_rolling_back_campaign() -> void:
 			"operation_type": "campaign_completion",
 			"payload": {"campaign_level": 6, "stars": 2},
 		},
+		{
+			"operation_type": "profile_edit",
+			"payload": {"avatar_frame_id": "frame_ruby"},
+		},
 	]
 	var mapped_with_remaining = progress.call("_map_checkpoint_to_snapshot", checkpoint, current_snapshot, remaining)
 	_check(
@@ -580,6 +594,10 @@ func _test_overspend_adjustment_clamps_without_rolling_back_campaign() -> void:
 	_check(
 		int(mapped_with_remaining.get("highest_completed_level", -1)) == 6,
 		"a still-unacknowledged completion still advances progress on top of a clamped checkpoint"
+	)
+	_check(
+		str(mapped_with_remaining.get("avatar_frame_id", "")) == "frame_ruby",
+		"a still-unacknowledged frame edit replays on top of the authoritative checkpoint"
 	)
 
 
@@ -658,6 +676,7 @@ func _snapshot() -> Dictionary:
 		"ability_uses": {"hammer": 3, "shuffle": 3, "highlight": 3},
 		"processed_shop_purchase_ids": [],
 		"avatar_id": "avatar_cat",
+		"avatar_frame_id": "frame_classic",
 		"player_name": "test_player",
 		"reward_chest_stars": 0,
 		"reward_chest_goal_index": 0,

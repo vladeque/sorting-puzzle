@@ -136,6 +136,10 @@ func _check_player_state_fixture() -> void:
 		str((result.get("profile") as Dictionary).get("avatar_id", "")) == "avatar_cat",
 		"player-state profile.avatar_id"
 	)
+	_check(
+		str((result.get("profile") as Dictionary).get("avatar_frame_id", "")) == "frame_classic",
+		"player-state profile.avatar_frame_id"
+	)
 
 
 func _check_player_devices_fixture() -> void:
@@ -207,6 +211,11 @@ func _check_leaderboard_fixture() -> void:
 	_check(str(result.get("scope", "")) == "weekly", "leaderboard scope")
 	var entries := result.get("entries", []) as Array
 	_check(entries.size() == 2, "leaderboard returns two entries")
+	if not entries.is_empty():
+		_check(
+			str((entries[0] as Dictionary).get("avatar_frame_id", "")) == "frame_gold",
+			"leaderboard entry exposes the remote avatar frame"
+		)
 	_check(result.has("current_player"), "leaderboard includes current_player")
 	if result.has("current_player"):
 		_check(
@@ -242,6 +251,7 @@ func _check_unknown_enum_mapping() -> void:
 	data["account_kind"] = "some_future_account_kind"
 	var profile := (data.get("profile") as Dictionary).duplicate(true)
 	profile["moderation_state"] = "some_future_moderation_state"
+	profile["avatar_frame_id"] = "some_future_avatar_frame"
 	data["profile"] = profile
 	var result := BackendReadOperationsScript.parse_player_state(data)
 	_check(bool(result.get("ok", false)), "player-state with unrecognized enums still parses")
@@ -249,6 +259,10 @@ func _check_unknown_enum_mapping() -> void:
 	_check(
 		str((result.get("profile") as Dictionary).get("moderation_state", "")) == "unknown",
 		"unrecognized moderation_state maps to unknown"
+	)
+	_check(
+		str((result.get("profile") as Dictionary).get("avatar_frame_id", "")) == "unknown",
+		"unrecognized avatar_frame_id maps to unknown"
 	)
 
 

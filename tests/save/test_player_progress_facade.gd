@@ -33,7 +33,7 @@ func _run() -> void:
 		"ability_uses": {"hammer": 7, "shuffle": 6, "highlight": 5},
 	}) as Dictionary
 	var migrated_uses := migrated_v4.get("ability_uses", {}) as Dictionary
-	_check(int(migrated_v4.get("version", 0)) == 8, "schema-4 snapshots migrate to schema 8")
+	_check(int(migrated_v4.get("version", 0)) == 9, "schema-4 snapshots migrate to schema 9")
 	_check(int(migrated_uses.get("freezer", 0)) == 3, "schema-4 migration grants exactly three freezers")
 	var sanitized_v5 := progress.call("_sanitize_data", {
 		"version": 5,
@@ -54,6 +54,26 @@ func _run() -> void:
 	_check(
 		str(migrated_v7.get("avatar_frame_id", "")) == "frame_classic",
 		"schema-7 profiles receive the classic avatar frame"
+	)
+	var schema_8_frame_migration := progress.call("_schema_migration_operations", {
+		"version": 8,
+		"avatar_frame_id": "frame_leaf",
+	}) as Array
+	_check(schema_8_frame_migration.size() == 1, "schema-8 non-default frames backfill exactly once")
+	if schema_8_frame_migration.size() == 1:
+		_check(
+			str(((schema_8_frame_migration[0] as Dictionary).get("payload", {}) as Dictionary).get(
+				"avatar_frame_id",
+				""
+			)) == "frame_leaf",
+			"schema-8 frame migration journals the preserved selection"
+		)
+	_check(
+		(progress.call("_schema_migration_operations", {
+			"version": 8,
+			"avatar_frame_id": "frame_classic",
+		}) as Array).is_empty(),
+		"schema-8 default frames do not overwrite a remote explicit selection"
 	)
 	var migrated_campaign := progress.call("_sanitize_data", {
 		"version": 6,
@@ -132,10 +152,26 @@ func _run() -> void:
 			profile_operations.append(operation)
 		if str(operation.get("operation_type", "")).begins_with("campaign_"):
 			campaign_operations.append(operation)
-	_check(profile_operations.size() == 1, "public avatar and name share one profile-edit operation")
+	_check(profile_operations.size() == 1, "public name, avatar, and frame share one profile-edit operation")
 	if not profile_operations.is_empty():
 		var profile_payload := (profile_operations[0] as Dictionary).get("payload", {}) as Dictionary
-		_check(not profile_payload.has("avatar_frame_id"), "local avatar frame is omitted from backend sync")
+		_check(
+			str(profile_payload.get("avatar_frame_id", "")) == "frame_leaf",
+			"combined profile edit synchronizes the selected avatar frame"
+		)
+	_check(
+		progress.set_profile_customization("avatar_bear", "frame_ruby", "Offline Player"),
+		"frame-only profile customization commits"
+	)
+	var updated_journal = progress.get("_local_store").get_journal()
+	var frame_only_operation := updated_journal[updated_journal.size() - 1] as Dictionary
+	_check(
+		str(frame_only_operation.get("operation_type", "")) == "profile_edit"
+		and (frame_only_operation.get("payload", {}) as Dictionary) == {
+			"avatar_frame_id": "frame_ruby",
+		},
+		"frame-only customization produces a frame-only profile edit"
+	)
 	_check(campaign_operations.size() == 11, "all Chapter 1 campaign mutations are journaled")
 	for raw_operation in campaign_operations:
 		var payload := (raw_operation as Dictionary).get("payload", {}) as Dictionary
@@ -162,7 +198,7 @@ func _run() -> void:
 	_check(progress.get_current_level() == 11, "facade snapshot survives restart load")
 	_check(progress.get_completed_level_stars().size() == 10, "completion history survives restart")
 	_check(progress.get_player_name() == "Offline Player", "profile remains account-scoped")
-	_check(progress.get_avatar_frame_id() == "frame_leaf", "avatar frame survives restart load")
+	_check(progress.get_avatar_frame_id() == "frame_ruby", "avatar frame survives restart load")
 	_check(
 		progress.has_purchased_shop_offer(&"new_player_bundle"),
 		"purchased shop offer survives restart load"

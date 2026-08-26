@@ -535,12 +535,14 @@ Attached to:
 - `scenes/ui/leaderboard_row.tscn` root `LeaderboardRow`.
 
 Purpose:
-- Binds one provider entry to rank, avatar, display name, and comma-formatted star score controls.
+- Binds one provider entry to rank, composed avatar/frame, display name, and comma-formatted star
+  score controls.
 - Toggles the scene-authored current-player highlight.
 - Toggles the scene-authored gold/silver/bronze `RankSlot` medal circle for rank 1/2/3 and switches
   `RankLabel` between a bare number (top 3) and "#N" (rank 4+).
 - Forwards reward image/amount binding and compact sizing to the focused `%RankReward` component.
-- Applies compact or regular row and font sizing, including `RankSlot`'s size to match the avatar.
+- Applies compact or regular row and font sizing, including `RankSlot` and the reusable
+  `%ProfileAvatarView` size.
 
 ## `scripts/leaderboard_rank_reward.gd`
 
@@ -1191,9 +1193,9 @@ Saved fields:
 - `purchased_shop_offer_ids`: offer ids purchased through the local/mock Shop, used to persist
   once-per-account lifetime eligibility across reloads.
 - `avatar_id`: selected profile avatar id. Fresh and legacy saves default to `avatar_cat`.
-- `avatar_frame_id`: account-scoped local cosmetic frame. Schema-7 and older saves default to
-  `frame_classic`; it is intentionally omitted from backend operations pending
-  `docs/BACKEND_PROFILE_FRAMES_TICKET.md`.
+- `avatar_frame_id`: authoritative public cosmetic frame. Schema-7 and older saves default to
+  `frame_classic`; a non-default schema-8 local selection migrates once into a signed frame-only
+  `profile_edit`.
 - `player_name`: saved profile display name. Fresh and legacy saves without a valid value receive a generated `player_` name with a five-character random suffix, such as `player_g26f3`.
 - `settings_disabled`: disabled-state map for `music`, `sound_effects`, and `vibration` settings buttons.
 - `reward_chest_stars`: stars accumulated toward the active reward chest goal.
@@ -1257,7 +1259,7 @@ Key methods:
 - `set_profile(avatar_id, player_name)`: backward-compatible avatar/name save that preserves the
   current frame.
 - `set_profile_customization(avatar_id, avatar_frame_id, player_name)`: atomically saves all three
-  local fields while journaling only the backend-supported avatar/name changes.
+  authoritative public fields and journals the exact changed subset, including frame-only edits.
 - `get_lives()`: refreshes and returns current campaign lives.
 - `get_max_lives()`: returns the lives cap.
 - `get_life_purchase_coin_price()`: returns the positive bundled value from

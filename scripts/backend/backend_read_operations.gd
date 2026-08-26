@@ -19,6 +19,10 @@ const AVATAR_IDS := [
 	"avatar_monkey", "avatar_owl", "avatar_penguin", "avatar_sheep", "avatar_sloth",
 	"avatar_tiger", "avatar_turtle",
 ]
+const AVATAR_FRAME_IDS := [
+	"frame_classic", "frame_gold", "frame_leaf", "frame_rose", "frame_coral",
+	"frame_sky", "frame_plum", "frame_ruby", "frame_aqua",
+]
 const DEVICE_PLATFORMS := ["android", "ios"]
 const OFFER_TYPES := ["starter", "timed_bundle", "evergreen_bundle", "coin_pack"]
 const LIMIT_PERIODS := ["lifetime", "campaign", "day", "week", "offer_window", "none"]
@@ -369,6 +373,7 @@ static func _parse_player_profile(value: Variant) -> Dictionary:
 	var result := {
 		"display_name": display_name,
 		"avatar_id": _normalize_enum(profile.get("avatar_id"), AVATAR_IDS),
+		"avatar_frame_id": _normalize_enum(profile.get("avatar_frame_id"), AVATAR_FRAME_IDS),
 		"created_at": str(profile.get("created_at", "")),
 		"updated_at": str(profile.get("updated_at", "")),
 		"moderation_state": _normalize_enum(profile.get("moderation_state"), MODERATION_STATES),
@@ -485,6 +490,7 @@ static func _parse_leaderboard_entry(value: Variant) -> Dictionary:
 		"score": int(score),
 		"display_name": display_name,
 		"avatar_id": _normalize_enum(entry.get("avatar_id"), AVATAR_IDS),
+		"avatar_frame_id": _normalize_enum(entry.get("avatar_frame_id"), AVATAR_FRAME_IDS),
 		"is_current_player": bool(entry.get("is_current_player", false)),
 	}
 	if entry.get("country_code") != null:

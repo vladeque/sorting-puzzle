@@ -101,6 +101,18 @@ func _run() -> void:
 	)
 	var rows := leaderboard.get_node("%RowsContainer") as VBoxContainer
 	_check(rows.get_child_count() == 50, "Expected 50 mock leaderboard rows.")
+	if rows.get_child_count() >= 2:
+		var first_profile := rows.get_child(0).get_node("%ProfileAvatarView") as Control
+		var second_profile := rows.get_child(1).get_node("%ProfileAvatarView") as Control
+		var first_frame := first_profile.get_node("%FrameTexture") as TextureRect
+		var second_frame := second_profile.get_node("%FrameTexture") as TextureRect
+		_check(
+			first_frame.texture != null
+			and second_frame.texture != null
+			and first_frame.texture.resource_path.ends_with("frame_classic.png")
+			and second_frame.texture.resource_path.ends_with("frame_gold.png"),
+			"Leaderboard rows should render each provider entry's avatar frame."
+		)
 	_verify_weekly_rewards(rows)
 
 	leaderboard.call("_select_scope", &"country")

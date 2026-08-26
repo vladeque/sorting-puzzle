@@ -567,10 +567,10 @@ func _validate_operation_payload(operation_type: String, payload: Dictionary) ->
 			):
 				return _error("Life-state payload values are invalid.")
 		"profile_edit":
-			if payload.is_empty() or payload.size() > 2:
+			if payload.is_empty() or payload.size() > 3:
 				return _error("Profile-edit payload fields are invalid.")
 			for key in payload.keys():
-				if not ["display_name", "avatar_id"].has(str(key)):
+				if not ["display_name", "avatar_id", "avatar_frame_id"].has(str(key)):
 					return _error("Profile-edit payload contains an unknown field.")
 			if payload.has("display_name"):
 				var display_name := str(payload.get("display_name", ""))
@@ -578,6 +578,11 @@ func _validate_operation_payload(operation_type: String, payload: Dictionary) ->
 					return _error("Profile display name is invalid.")
 			if payload.has("avatar_id") and not LocalSaveCodecScript.is_opaque_id(payload.get("avatar_id")):
 				return _error("Profile avatar id is invalid.")
+			if (
+				payload.has("avatar_frame_id")
+				and not LocalSaveCodecScript.is_opaque_id(payload.get("avatar_frame_id"))
+			):
+				return _error("Profile avatar frame id is invalid.")
 	return _success()
 
 

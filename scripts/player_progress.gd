@@ -11,7 +11,7 @@ const ContentProvenanceManifestScript := preload(
 	"res://scripts/save/content_provenance_manifest.gd"
 )
 const SAVE_PATH := "user://player_progress.json"
-const SAVE_VERSION := 8
+const SAVE_VERSION := 9
 const MIN_LEVEL := 1
 const ABILITY_HAMMER := "hammer"
 const ABILITY_SHUFFLE := "shuffle"
@@ -134,13 +134,18 @@ func load_progress() -> void:
 
 	_local_store = _account_coordinator.get_store()
 	var opened_snapshot := open_result.get("snapshot", {}) as Dictionary
-	var requires_schema_migration := int(opened_snapshot.get("version", 0)) < SAVE_VERSION
+	var opened_version := int(opened_snapshot.get("version", 0))
+	var requires_schema_migration := opened_version < SAVE_VERSION
+	var migration_operations := _schema_migration_operations(opened_snapshot)
 	_apply_loaded_partitions(
 		opened_snapshot,
 		open_result.get("preferences", {}) as Dictionary
 	)
-	if requires_schema_migration and not bool(_commit_current_state().get("ok", false)):
-		push_error("Could not persist the gameplay save schema-6 migration.")
+	if (
+		requires_schema_migration
+		and not bool(_commit_current_state(migration_operations).get("ok", false))
+	):
+		push_error("Could not persist the gameplay save schema-%d migration." % SAVE_VERSION)
 	if _sync_service == null:
 		_sync_service = SaveSyncServiceScript.new()
 		add_child(_sync_service)
@@ -565,30 +570,25 @@ func set_profile_customization(avatar_id: String, avatar_frame_id: String, playe
 	var sanitized_player_name := _sanitize_player_name(player_name, get_player_name())
 	var previous_data := _data.duplicate(true)
 	var did_change := false
-	var did_public_profile_change := false
 	var profile_payload := {}
 	if get_avatar_id() != avatar_id:
 		_data["avatar_id"] = avatar_id
 		profile_payload["avatar_id"] = avatar_id
 		did_change = true
-		did_public_profile_change = true
 	if get_avatar_frame_id() != avatar_frame_id:
 		_data["avatar_frame_id"] = avatar_frame_id
+		profile_payload["avatar_frame_id"] = avatar_frame_id
 		did_change = true
 	if get_player_name() != sanitized_player_name:
 		_data["player_name"] = sanitized_player_name
 		profile_payload["display_name"] = sanitized_player_name
 		did_change = true
-		did_public_profile_change = true
 
 	if did_change:
-		var journal_operations := []
-		if did_public_profile_change:
-			journal_operations.append({
-				"operation_type": "profile_edit",
-				"payload": profile_payload,
-			})
-		return _commit_or_restore(previous_data, journal_operations)
+		return _commit_or_restore(previous_data, [{
+			"operation_type": "profile_edit",
+			"payload": profile_payload,
+		}])
 
 	return true
 
@@ -850,6 +850,26 @@ func _default_data() -> Dictionary:
 		"reward_chest_goal_index": 0,
 		"reward_chest_completed_cycles": 0,
 	}
+
+
+## Schema 8 introduced avatar frames as a local-only field. Preserve a non-default selection made
+## by those clients by turning it into one signed profile edit before the first authoritative
+## checkpoint can replace it. A classic value is not backfilled because schema 8 cannot distinguish
+## an explicit classic selection from the default; uploading every default would incorrectly win
+## over a frame selected on another device.
+func _schema_migration_operations(source_snapshot: Dictionary) -> Array:
+	if int(source_snapshot.get("version", 0)) != 8:
+		return []
+	var frame_id := _sanitize_avatar_frame_id(str(source_snapshot.get(
+		"avatar_frame_id",
+		ProfileFrameCatalogScript.get_default_frame_id()
+	)))
+	if frame_id == ProfileFrameCatalogScript.get_default_frame_id():
+		return []
+	return [{
+		"operation_type": "profile_edit",
+		"payload": {"avatar_frame_id": frame_id},
+	}]
 
 
 func _sanitize_avatar_id(avatar_id: String) -> String:
@@ -1535,6 +1555,13 @@ func _map_checkpoint_to_snapshot(
 		leaderboards.get("weekly_period_start")
 	)
 	mapped["avatar_id"] = str(profile.get("avatar_id", DEFAULT_AVATAR_ID))
+	mapped["avatar_frame_id"] = _sanitize_avatar_frame_id(str(profile.get(
+		"avatar_frame_id",
+		current_snapshot.get(
+			"avatar_frame_id",
+			ProfileFrameCatalogScript.get_default_frame_id()
+		)
+	)))
 	mapped["player_name"] = str(profile.get("display_name", mapped.get("player_name", "")))
 	mapped["moderation_state"] = str(profile.get("moderation_state", "active"))
 	for operation in remaining_operations:
@@ -1594,6 +1621,10 @@ func _apply_unacknowledged_operation(snapshot: Dictionary, operation: Dictionary
 				result["player_name"] = str(payload.get("display_name"))
 			if payload.has("avatar_id"):
 				result["avatar_id"] = str(payload.get("avatar_id"))
+			if payload.has("avatar_frame_id"):
+				result["avatar_frame_id"] = _sanitize_avatar_frame_id(str(
+					payload.get("avatar_frame_id")
+				))
 	return result
 
 

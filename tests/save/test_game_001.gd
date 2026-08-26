@@ -40,6 +40,7 @@ func _init() -> void:
 	_session = SessionStore.new()
 	_check(bool(_session.initialize().get("ok", false)), "installation identity initializes")
 	_test_backend_fixture_hash()
+	_test_backend_profile_frame_fixture()
 	_test_guest_registration_proof_contract()
 	_test_all_operation_types_and_recovery()
 	_test_schema_rejection()
@@ -76,6 +77,38 @@ func _test_backend_fixture_hash() -> void:
 		Codec.operation_hash(operation) == str(operation.get("operation_hash", "")),
 		"Godot canonical operation hash matches the backend golden fixture"
 	)
+
+
+func _test_backend_profile_frame_fixture() -> void:
+	var fixture_path := ProjectSettings.globalize_path(
+		"res://../sorting-puzzle-backend/contracts/fixtures/v2/save-sync.profile-frame.request.json"
+	)
+	var file := FileAccess.open(fixture_path, FileAccess.READ)
+	_check(file != null, "backend profile-frame fixture is available")
+	if file == null:
+		return
+	var fixture = JSON.parse_string(file.get_as_text())
+	_check(fixture is Dictionary, "backend profile-frame fixture parses")
+	if not (fixture is Dictionary):
+		return
+	var operations := (fixture as Dictionary).get("data", {}).get("operations", []) as Array
+	_check(operations.size() == 2, "backend fixture covers frame-only and combined profile edits")
+	var store = SaveStore.new(_session)
+	for raw_operation in operations:
+		var operation := raw_operation as Dictionary
+		_check(
+			Codec.operation_hash(operation) == str(operation.get("operation_hash", "")),
+			"Godot canonical hash matches the backend profile-frame fixture"
+		)
+		var validation: Dictionary = store.call(
+			"_validate_operation_payload",
+			str(operation.get("operation_type", "")),
+			operation.get("payload", {})
+		)
+		_check(
+			bool(validation.get("ok", false)),
+			"Godot accepts the backend profile-frame payload"
+		)
 
 
 func _test_guest_registration_proof_contract() -> void:
@@ -147,7 +180,11 @@ func _test_all_operation_types_and_recovery() -> void:
 		},
 		{
 			"operation_type": "profile_edit",
-			"payload": {"display_name": "Fixture Player", "avatar_id": "avatar_cat"},
+			"payload": {
+				"display_name": "Fixture Player",
+				"avatar_id": "avatar_cat",
+				"avatar_frame_id": "frame_gold",
+			},
 		},
 	]
 	var result: Dictionary = store.commit_snapshot(_snapshot(290), _preferences(), operations)
