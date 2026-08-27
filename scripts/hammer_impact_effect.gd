@@ -14,6 +14,10 @@ const PINK := Color(1.0, 0.18, 0.72, 1.0)
 const LIGHT_PINK := Color(1.0, 0.76, 0.94, 1.0)
 const WARM := Color(1.0, 0.86, 0.42, 1.0)
 const DEFAULT_APPROACH_POSITION_RATIO := Vector2(0.14, 0.86)
+const POSE_BLEND_SECONDS := 0.035
+const PREVIOUS_POSE_START_ALPHA := 0.28
+const NEW_POSE_START_ALPHA := 0.72
+const POSE_SMEAR_OFFSET := Vector2(-10.0, 10.0)
 
 const WINDUP_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_1.png")
 const WINDUP_TRANSITION_EARLY_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_1.3.png")
@@ -53,6 +57,7 @@ const POSE_HEAD_OFFSETS := {
 
 @onready var _impact_anchor: Node2D = %ImpactAnchor
 @onready var _hammer_pivot: Node2D = %HammerPivot
+@onready var _previous_pose: Sprite2D = %PreviousPose
 @onready var _hammer_sprite: Sprite2D = %HammerSprite
 @onready var _afterimage_early: Sprite2D = %AfterimageEarly
 @onready var _afterimage_late: Sprite2D = %AfterimageLate
@@ -73,6 +78,8 @@ var _haptics_enabled := true
 var _pre_impact_reached := false
 var _has_impacted := false
 var _trail_points: PackedVector2Array = PackedVector2Array()
+var _last_hammer_texture: Texture2D
+var _pose_blend_tween: Tween
 var _burst_amount := 0.0:
 	set(value):
 		_burst_amount = value
@@ -135,12 +142,17 @@ func play(
 	_impact_anchor.position = _approach_start_position
 	_impact_anchor.scale = Vector2.ONE
 	_hammer_sprite.scale = Vector2.ONE * base_hammer_scale * _layout_scale
+	_previous_pose.scale = _hammer_sprite.scale
 	_afterimage_early.scale = _hammer_sprite.scale
 	_afterimage_late.scale = _hammer_sprite.scale
 	_align_sprite_to_pivot(_hammer_sprite)
+	_align_sprite_to_pivot(_previous_pose, POSE_SMEAR_OFFSET)
 	_align_sprite_to_pivot(_afterimage_early)
 	_align_sprite_to_pivot(_afterimage_late)
 	_animation_player.stop()
+	_hammer_sprite.texture = WINDUP_TEXTURE
+	_reset_pose_crossfade()
+	_last_hammer_texture = _hammer_sprite.texture
 	_animation_player.speed_scale = strike_playback_speed
 	_animation_player.play(&"strike")
 
@@ -171,16 +183,65 @@ func _process(_delta: float) -> void:
 		return
 
 	_impact_anchor.position = _impact_position + _approach_offset * _approach_amount
+	_update_pose_crossfade()
 	_align_sprite_to_pivot(_hammer_sprite)
+	if _previous_pose.visible:
+		_align_sprite_to_pivot(_previous_pose, POSE_SMEAR_OFFSET)
 	_sample_trail_point()
 
 
 ## Keeps the head centre of whichever supplied frame is on screen pinned to the pivot origin.
-func _align_sprite_to_pivot(sprite: Sprite2D) -> void:
+func _align_sprite_to_pivot(sprite: Sprite2D, extra_offset := Vector2.ZERO) -> void:
 	if sprite == null or sprite.texture == null:
 		return
 	var head_offset: Vector2 = POSE_HEAD_OFFSETS.get(sprite.texture, Vector2.ZERO)
-	sprite.position = -head_offset * sprite.scale
+	sprite.position = -head_offset * sprite.scale + extra_offset
+
+
+## Briefly retains the outgoing silhouette behind each fast pose change. The impact pose bypasses
+## the blend so contact remains sharp instead of showing a double hammer over the burst.
+func _update_pose_crossfade() -> void:
+	var current_texture := _hammer_sprite.texture
+	if current_texture == null or current_texture == _last_hammer_texture:
+		return
+	if _last_hammer_texture == null or current_texture == IMPACT_TEXTURE:
+		_reset_pose_crossfade()
+		_last_hammer_texture = current_texture
+		return
+
+	if _pose_blend_tween != null and _pose_blend_tween.is_valid():
+		_pose_blend_tween.kill()
+	_previous_pose.texture = _last_hammer_texture
+	_previous_pose.scale = _hammer_sprite.scale
+	_previous_pose.visible = true
+	_previous_pose.modulate = Color(1.0, 1.0, 1.0, PREVIOUS_POSE_START_ALPHA)
+	_hammer_sprite.self_modulate = Color(1.0, 1.0, 1.0, NEW_POSE_START_ALPHA)
+	_align_sprite_to_pivot(_previous_pose, POSE_SMEAR_OFFSET)
+
+	_pose_blend_tween = create_tween().set_parallel(true)
+	_pose_blend_tween.tween_property(
+		_previous_pose,
+		"modulate:a",
+		0.0,
+		POSE_BLEND_SECONDS
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_pose_blend_tween.tween_property(
+		_hammer_sprite,
+		"self_modulate:a",
+		1.0,
+		POSE_BLEND_SECONDS
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_pose_blend_tween.chain().tween_callback(func() -> void: _previous_pose.visible = false)
+	_last_hammer_texture = current_texture
+
+
+func _reset_pose_crossfade() -> void:
+	if _pose_blend_tween != null and _pose_blend_tween.is_valid():
+		_pose_blend_tween.kill()
+	_pose_blend_tween = null
+	_previous_pose.visible = false
+	_previous_pose.modulate = Color(1.0, 1.0, 1.0, 0.0)
+	_hammer_sprite.self_modulate = Color.WHITE
 
 
 func _get_head_position() -> Vector2:
@@ -345,6 +406,7 @@ func _play_audio(player: AudioStreamPlayer) -> void:
 
 
 func _emit_finished() -> void:
+	_reset_pose_crossfade()
 	visible = false
 	finished.emit()
 

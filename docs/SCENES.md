@@ -1603,6 +1603,8 @@ Purpose:
   button to the item, frames 4–6 hold position, and the final frame 7 makes contact. It owns the
   immediate hammer hide, subtle frame-derived afterimages, layered impact amounts, audio callbacks,
   and gameplay signal timing.
+- Softens non-impact texture changes with a 35 ms outgoing-pose crossfade and small backward smear;
+  frame 7 bypasses this blend so the contact silhouette remains crisp.
 - Hides the hammer by authored time 500 ms, immediately after frame 7 makes contact at 480 ms, while
   the enlarged burst, glow, flash, and debris continue through the remaining VFX tail.
 - Emits `pre_impact` at authored time 400 ms (about 308 ms into playback) for item compression and
@@ -1618,6 +1620,8 @@ Important nodes:
   the first 160 authored milliseconds, then remains at the impact point for the strike.
 - `ImpactAnchor/HammerPivot`: keyframed by `AnimationPlayer` for wind-up rotation, scale, and
   visibility.
+- `ImpactAnchor/HammerPivot/PreviousPose`: low-alpha outgoing texture retained for 35 ms behind the
+  live sprite during non-impact pose changes.
 - `ImpactAnchor/HammerPivot/HammerSprite`: transparent hammer sprite whose texture is value-keyframed
   by the `strike` animation. Its position is not keyframed — the script derives it each frame from
   `POSE_HEAD_OFFSETS` so every frame's head centre stays on the pivot the impact VFX are drawn

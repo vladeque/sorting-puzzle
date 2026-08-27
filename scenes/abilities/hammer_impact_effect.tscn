@@ -246,6 +246,12 @@ position = Vector2(0, 0)
 rotation = -1.0472
 scale = Vector2(0.56, 0.56)
 
+[node name="PreviousPose" type="Sprite2D" parent="ImpactAnchor/HammerPivot"]
+unique_name_in_owner = true
+visible = false
+modulate = Color(1, 1, 1, 0)
+texture = ExtResource("2_hammer_windup")
+
 [node name="HammerSprite" type="Sprite2D" parent="ImpactAnchor/HammerPivot"]
 unique_name_in_owner = true
 position = Vector2(8, 50)

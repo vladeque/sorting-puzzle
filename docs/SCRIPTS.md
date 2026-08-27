@@ -2191,6 +2191,9 @@ Purpose:
 - Keeps each supplied frame's head centre on the pivot via `POSE_HEAD_OFFSETS`, applied every frame
   in `_process()` (which runs at `process_priority = 1`, after the child `AnimationPlayer`). The
   hammer art is not centred on its head, so without this the impact lands beside the burst it causes.
+- Detects texture swaps after `AnimationPlayer` updates, places the outgoing texture in
+  `%PreviousPose`, and crossfades it behind the incoming pose for 35 ms with a restrained backward
+  smear. The final frame-7 impact skips blending and remains fully opaque.
 - Accepts the live Hammer-button screen centre from `scripts/level.gd` and moves `ImpactAnchor`
   from that bottom-left origin to the target during the first 160 authored milliseconds.
 - Samples the head's real path into a short ring buffer so the swing trail follows the swing
@@ -2221,8 +2224,8 @@ Depends on:
 Verification:
 - `tests/gameplay/test_hammer_animation.gd` checks all eleven base and transitional poses, center
   convergence, the three-to-one merge, deferred strike start, immediate post-impact hammer hide,
-  all five procedural VFX tracks, two afterimages, audio ownership/muting, bottom-left approach,
-  pre-impact compression, exact-frame target disappearance, delayed reward overlap, 480 ms frame-7
+  all five procedural VFX tracks, two afterimages, outgoing-pose crossfade, audio ownership/muting,
+  bottom-left approach, pre-impact compression, exact-frame target disappearance, 480 ms frame-7
   impact timing, the full tail duration, cleanup, and responsive layout at
   540x960, 720x1280, 1080x1920, 1080x2400, and 900x1200. It also seeks the paused animation to
   verify head-on-pivot alignment and the supplied bottom-left origin for left, centre, and right

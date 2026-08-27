@@ -207,6 +207,8 @@ func _run() -> void:
 	_check(effect.get_node_or_null("SparkleTailAudio") != null, "Hammer owns a dedicated sparkle-tail cue.")
 	var early_afterimage := effect.get_node_or_null("ImpactAnchor/HammerPivot/AfterimageEarly") as Sprite2D
 	var late_afterimage := effect.get_node_or_null("ImpactAnchor/HammerPivot/AfterimageLate") as Sprite2D
+	var previous_pose := effect.get_node_or_null("ImpactAnchor/HammerPivot/PreviousPose") as Sprite2D
+	_check(previous_pose != null, "Hammer owns a dedicated outgoing-pose crossfade sprite.")
 	_check(early_afterimage != null, "Hammer owns an early downstroke afterimage.")
 	_check(late_afterimage != null, "Hammer owns a late downstroke afterimage.")
 	_check(
@@ -222,6 +224,11 @@ func _run() -> void:
 			and int(script_constants.get("SPARK_COUNT", 999)) <= 24
 			and int(script_constants.get("TRAIL_LINE_COUNT", 999)) <= 4,
 		"Hammer procedural VFX stays inside the mobile element-count budget."
+	)
+	_check(
+		is_equal_approx(float(script_constants.get("POSE_BLEND_SECONDS", 0.0)), 0.035)
+			and float(script_constants.get("PREVIOUS_POSE_START_ALPHA", 1.0)) <= 0.3,
+		"Hammer pose crossfades stay brief and subtle."
 	)
 	_check(not bool(effect.get("_sound_enabled")), "Hammer inherits the disabled sound-effects setting.")
 	var hammer_uses_before_repeat := int((level.get("_ability_uses") as Dictionary).get(&"hammer", -1))
@@ -376,6 +383,17 @@ func _verify_supplied_approach_origins() -> void:
 			"Hammer starts exactly at the supplied ability origin for target ratio %s." % target_ratio
 		)
 
+		animation_player.seek(0.04, true)
+		await process_frame
+		var previous_pose := effect.get_node("ImpactAnchor/HammerPivot/PreviousPose") as Sprite2D
+		var live_pose := effect.get_node("ImpactAnchor/HammerPivot/HammerSprite") as Sprite2D
+		_check(
+			previous_pose.visible
+				and previous_pose.modulate.a > 0.0
+				and live_pose.self_modulate.a < 1.0,
+			"Hammer crossfades its first texture switch for target ratio %s." % target_ratio
+		)
+
 		animation_player.seek(0.48, true)
 		animation_player.pause()
 		await process_frame
@@ -392,6 +410,10 @@ func _verify_supplied_approach_origins() -> void:
 		_check(
 			(effect.call("_get_head_position") as Vector2).distance_to(target) < 0.01,
 			"Hammer head lands exactly on the impact point for target ratio %s." % target_ratio
+		)
+		_check(
+			not previous_pose.visible and is_equal_approx(live_pose.self_modulate.a, 1.0),
+			"Hammer keeps its impact pose crisp for target ratio %s." % target_ratio
 		)
 		effect.queue_free()
 		await process_frame
