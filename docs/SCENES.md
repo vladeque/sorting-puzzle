@@ -2185,9 +2185,13 @@ Important nodes:
   Its smaller filtered fill and weighted source-alpha core keep the carried shadow close to the
   item's recognizable shape, while reduced opacity prevents it from reading as a dark duplicate.
   Compare and tune both in `scenes/shadow_style_preview.tscn`.
-- `OutlineSprite`: hidden sprite used by `ShelfItem` to draw alpha-based highlight borders.
+- `OutlineSprite`: hidden sprite used by `ShelfItem` to draw alpha-based borders. Lantern enables it
+  in gold; ordinary tap selection enables the same silhouette treatment in white and takes color
+  priority when both states apply.
 - `Sprite2D`: main item sprite; texture and visual scale are controlled by `ShelfItem`.
-- `CollisionShape2D`: rectangular item hitbox used by runtime interaction.
+- `CollisionShape2D`: rectangular item hitbox used by runtime interaction. Tap selection shifts it
+  down with the sprite, outline, and shadow so the item reads closer to the shelf lip without
+  moving its logical slot anchor or leaving the visible art outside its touch target.
 
 Depends on:
 - Texture assignment from `scripts/level.gd`.

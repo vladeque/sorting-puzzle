@@ -1738,9 +1738,10 @@ Important exports:
 - `layer_promotion_duration_seconds`: duration for back-layer items to slide forward into active front slots.
 - `item_move_duration_seconds`: duration for moved items to slide into destination slots after tap or drag placement, including invalid drag returns.
 - `highlight_outline_color`: border color used by the highlight ability.
-- `selected_highlight_outline_color`: border color used when a highlighted item is also selected.
+- `selected_outline_color`: white silhouette-border color used by ordinary tap selection; it takes visual priority if Lantern also highlights the selected item.
 - `highlight_outline_width`: screen-pixel thickness of the item outline border, kept even around the item silhouette by the outline shader's dilation.
 - `highlight_item_scale`: scale multiplier applied to a highlighted item's sprite and outline so it visually stands out.
+- `selected_item_forward_offset`: local downward offset that moves selected item art, outline, shadow, and hit area toward the shelf's front edge without changing its logical slot position.
 - `match_gather_duration_seconds`: duration for side items to pull into the center item when a triple clears.
 - `match_shrink_duration_seconds`: duration for the center item shrink-out after a triple gathers.
 - `combo_window_seconds`: time allowed after a triple clear to extend the active combo before the center HUD combo label and fill disappear.
@@ -2842,6 +2843,7 @@ Do not use for:
 - `_get_sprite_scale()` / `_get_contact_pivot_offset_y()`: compose the squash with the uniform scale and keep the art's ground contact planted so the item does not lift off the shelf while deforming. `CONTACT_ANCHOR_Y` is the landing bounce's pivot and is tuned by eye; it is deliberately not the same value as the shadow's `SHADOW_GROUND_TEXELS` anchor, which is measured from the texture contract.
 - `set_outline(enabled, color, width)`: enables or disables the sprite border highlight.
 - `set_highlight_scale(multiplier)`: scales the sprite and outline up (without changing the persistent `visual_scale`) while an item is highlighted by the Lantern ability.
+- `set_selection_forward_offset(offset_y)`: shifts the item sprite, outline, silhouette-derived shadow, and collision shape toward the shelf lip while leaving the root anchored to its logical slot. Clearing selection restores a zero offset, so tap/drag placement math never inherits presentation state.
 - `set_contact_shadow_enabled(enabled)`: hard on/off switch for the ground shadow, still respecting texture availability; used by back-layer previews, clearing items, and the shuffle fly-in. Dragging no longer uses it -- see `set_drag_lifted()`.
 - `_apply_outline()`: sends outline color/threshold and the computed dilation radius to the `OutlineSprite` shader material, and keeps the outline node visible only while enabled. The `OutlineSprite` shader dilates the alpha mask by sampling a ring of points around each pixel (in source-texture texels) rather than scaling the whole sprite up, so the border thickness stays even around irregular silhouettes.
 
@@ -2859,6 +2861,8 @@ Do not use for:
 Verified by:
 - `tests/gameplay/test_item_landing_impact.gd` (run through `scripts/tools/run_isolated_godot_test.ps1`).
 - `tests/gameplay/test_item_contact_shadow.gd` for the item-sized silhouette-derived ground shadow: the soft upright resting silhouette, carried source-alpha core and compact filtered fill, ground-line anchor, and drag lift travelling with the item.
+- `tests/gameplay/test_item_selection_visual.gd` for the white selection outline, shelf-edge offset, hit-area alignment, and selection/Lantern visual priority.
+- `scripts/tools/captures/item_selection_setup.gd` for responsive rendered selection review on `level.tscn`.
 
 ## `scripts/tools/generate_level_shelves.py`
 

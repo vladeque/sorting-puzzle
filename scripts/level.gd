@@ -144,9 +144,10 @@ const SHOP_RETURN_TIME_EXTENSION := &"time_extension"
 @export var layer_promotion_duration_seconds := 0.22
 @export var item_move_duration_seconds := 0.16
 @export var highlight_outline_color := Color(1.0, 0.86, 0.18, 1.0)
-@export var selected_highlight_outline_color := Color(1.0, 0.96, 0.36, 1.0)
+@export var selected_outline_color := Color.WHITE
 @export_range(0.0, 8.0, 0.25) var highlight_outline_width := 6.0
 @export_range(1.0, 1.5, 0.01) var highlight_item_scale := 1.15
+@export_range(0.0, 32.0, 0.5) var selected_item_forward_offset := 12.0
 @export var match_gather_duration_seconds := 0.18
 @export var match_shrink_duration_seconds := 0.16
 @export_range(0.25, 30.0, 0.25) var combo_window_seconds := 8.0
@@ -3498,20 +3499,12 @@ func _clear_selected_item() -> void:
 
 
 func _apply_item_visual_state(item: ShelfItem) -> void:
-	var sprite := item.get_node_or_null("Sprite2D") as Sprite2D
-	if sprite == null:
-		return
-
 	var is_selected := item == _selected_item
 	var is_highlighted := _highlighted_items.has(item)
-	if is_selected:
-		sprite.modulate = Color(1.12, 1.12, 1.12, 1.0)
-	else:
-		sprite.modulate = Color.WHITE
-
-	var outline_color := selected_highlight_outline_color if is_selected else highlight_outline_color
-	item.set_outline(is_highlighted, outline_color, highlight_outline_width)
+	var outline_color := selected_outline_color if is_selected else highlight_outline_color
+	item.set_outline(is_selected or is_highlighted, outline_color, highlight_outline_width)
 	item.set_highlight_scale(highlight_item_scale if is_highlighted else 1.0)
+	item.set_selection_forward_offset(selected_item_forward_offset if is_selected else 0.0)
 
 
 func _setup_ability_buttons() -> void:

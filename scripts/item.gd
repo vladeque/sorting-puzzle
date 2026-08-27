@@ -113,6 +113,7 @@ var _shadow_material: ShaderMaterial
 var _shadow_base_color := Color(0.1, 0.05, 0.02, 0.34)
 var _contact_shadow_enabled := true
 var _highlight_scale_multiplier := 1.0
+var _selection_forward_offset := 0.0
 
 func _ready() -> void:
 	_prepare_outline_material()
@@ -132,6 +133,21 @@ func set_highlight_scale(multiplier: float) -> void:
 
 	_highlight_scale_multiplier = multiplier
 	_apply_visual_scale()
+
+
+## Moves only the item's presentation toward the shelf edge while its logical slot position stays
+## fixed. Keeping the collision shape aligned with the shifted art preserves accurate follow-up
+## taps, while leaving the root at the slot avoids leaking selection state into move calculations.
+func set_selection_forward_offset(offset_y: float) -> void:
+	var safe_offset := maxf(offset_y, 0.0)
+	if is_equal_approx(_selection_forward_offset, safe_offset):
+		return
+
+	_selection_forward_offset = safe_offset
+	_apply_visual_scale()
+	var collision_shape := get_node_or_null("CollisionShape2D") as CollisionShape2D
+	if collision_shape != null:
+		collision_shape.position.y = _selection_forward_offset
 
 
 func set_contact_shadow_enabled(enabled: bool) -> void:
@@ -216,12 +232,12 @@ func _apply_visual_scale() -> void:
 	var sprite := get_node_or_null("Sprite2D") as Sprite2D
 	if sprite != null:
 		sprite.scale = sprite_scale
-		sprite.position.y = contact_pivot_offset_y
+		sprite.position.y = _selection_forward_offset + contact_pivot_offset_y
 
 	var outline_sprite := get_node_or_null("OutlineSprite") as Sprite2D
 	if outline_sprite != null:
 		outline_sprite.scale = sprite_scale
-		outline_sprite.position.y = contact_pivot_offset_y
+		outline_sprite.position.y = _selection_forward_offset + contact_pivot_offset_y
 
 	_apply_shadow()
 	_apply_outline()
@@ -264,6 +280,7 @@ func _apply_shadow() -> void:
 	)
 	shadow.position = Vector2(0.0, SHADOW_GROUND_TEXELS * sprite_scale)
 	shadow.position += SHADOW_REST_OFFSET.lerp(SHADOW_CARRY_OFFSET, lift) * sprite_scale
+	shadow.position.y += _selection_forward_offset
 
 	if _shadow_material != null:
 		var shadow_color := _shadow_base_color
@@ -330,7 +347,7 @@ func _apply_outline() -> void:
 		# property changes, and writing a plain uniform scale here would flatten an in-flight
 		# landing bounce on any highlighted item.
 		outline_sprite.scale = _get_sprite_scale()
-		outline_sprite.position.y = _get_contact_pivot_offset_y()
+		outline_sprite.position.y = _selection_forward_offset + _get_contact_pivot_offset_y()
 
 	_outline_material.set_shader_parameter("outline_color", outline_color)
 	_outline_material.set_shader_parameter("alpha_threshold", outline_alpha_threshold)
