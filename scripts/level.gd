@@ -114,6 +114,7 @@ const SHUFFLE_BOX_DISPLAY_WIDTH := 272.0
 const SHUFFLE_BOX_OPENING_OFFSET := Vector2(0.0, -52.0)
 const SHUFFLE_BOX_POP_DURATION_SECONDS := 0.16
 const SHUFFLE_BOX_OUT_DURATION_SECONDS := 0.12
+const SHUFFLE_BOX_EARLY_OUT_SECONDS := 0.3
 const SHUFFLE_ITEM_GATHER_DURATION_SECONDS := 0.34
 const SHUFFLE_ITEM_RETURN_DURATION_SECONDS := 0.38
 const SHUFFLE_ITEM_STAGGER_SECONDS := 0.008
@@ -3945,6 +3946,7 @@ func _play_shuffle_ability(items_to_shuffle: Array[ShelfItem]) -> void:
 
 	var animation_entries := _prepare_shuffle_animation_entries(items_to_shuffle)
 	var shuffle_box := _create_shuffle_box()
+	var shuffle_box_outro: Tween = null
 	if shuffle_box != null:
 		await _play_shuffle_box_intro(shuffle_box)
 
@@ -3952,13 +3954,20 @@ func _play_shuffle_ability(items_to_shuffle: Array[ShelfItem]) -> void:
 		var box_center := _get_shuffle_box_opening_global_position(shuffle_box)
 		await _play_shuffle_items_into_box(animation_entries, box_center)
 		_shuffle_item_id_assignments(items_to_shuffle)
+		if shuffle_box != null:
+			var return_duration := _get_shuffle_item_return_duration(animation_entries)
+			var outro_delay := maxf(return_duration - SHUFFLE_BOX_EARLY_OUT_SECONDS, 0.0)
+			shuffle_box_outro = _play_shuffle_box_outro(shuffle_box, outro_delay)
 		await _play_shuffle_items_out_of_box(animation_entries, box_center)
 	else:
 		_shuffle_item_id_assignments(items_to_shuffle)
 
 	_finish_shuffle_animation_entries(animation_entries)
 	if shuffle_box != null:
-		await _play_shuffle_box_outro(shuffle_box)
+		if shuffle_box_outro == null:
+			shuffle_box_outro = _play_shuffle_box_outro(shuffle_box)
+		if shuffle_box_outro != null and shuffle_box_outro.is_running():
+			await shuffle_box_outro.finished
 		shuffle_box.queue_free()
 
 	_set_moving_shelf_rows_paused(false)
@@ -4051,15 +4060,32 @@ func _play_shuffle_box_intro(box: Sprite2D) -> void:
 	await tween.finished
 
 
-func _play_shuffle_box_outro(box: Sprite2D) -> void:
+func _play_shuffle_box_outro(box: Sprite2D, delay: float = 0.0) -> Tween:
 	if box == null or not is_instance_valid(box):
-		return
+		return null
 
 	var tween := create_tween()
 	tween.set_parallel(true)
-	tween.tween_property(box, "scale", box.scale * 0.88, SHUFFLE_BOX_OUT_DURATION_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	tween.tween_property(box, "modulate", Color(1.0, 1.0, 1.0, 0.0), SHUFFLE_BOX_OUT_DURATION_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	await tween.finished
+	tween.tween_property(box, "scale", box.scale * 0.88, SHUFFLE_BOX_OUT_DURATION_SECONDS).set_delay(delay).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.tween_property(box, "modulate", Color(1.0, 1.0, 1.0, 0.0), SHUFFLE_BOX_OUT_DURATION_SECONDS).set_delay(delay).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	return tween
+
+
+func _get_shuffle_item_return_duration(entries: Array[Dictionary]) -> float:
+	var last_valid_entry_index := -1
+	for entry_index in range(entries.size()):
+		var item := entries[entry_index].get("item") as ShelfItem
+		if item != null and is_instance_valid(item):
+			last_valid_entry_index = entry_index
+
+	if last_valid_entry_index < 0:
+		return 0.0
+
+	var final_delay := minf(
+		float(last_valid_entry_index) * SHUFFLE_ITEM_STAGGER_SECONDS,
+		SHUFFLE_ITEM_MAX_STAGGER_SECONDS
+	)
+	return final_delay + SHUFFLE_ITEM_RETURN_DURATION_SECONDS
 
 
 func _get_shuffle_box_opening_global_position(box: Sprite2D) -> Vector2:

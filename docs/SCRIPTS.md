@@ -1909,7 +1909,7 @@ Key responsibilities:
 - Hammer passes the live sound-effects setting and exported `hammer_haptics_enabled` flag into the
   effect scene. Disabling sound while the strike is active stops every scene-owned hammer cue;
   supported mobile builds receive a short 65 ms impact vibration when haptics are enabled.
-- Shuffle now pauses moving shelf rows, shows the center-screen delivery box, flies visible unlocked items into the box, changes unlocked item identity assignments while they are hidden, flies them back to their original slots, and resolves shelves only after the return animation completes.
+- Shuffle now pauses moving shelf rows, shows the center-screen delivery box, flies visible unlocked items into the box, changes unlocked item identity assignments while they are hidden, and flies them back to their original slots. The box begins its outro 0.3 seconds before the item-return phase finishes, while shelf resolution still waits for every item to land.
 - Count hammer destroys as cleared triples for shelf unlocking.
 - Let highlight uses start their timed window even when no immediate triple can currently be highlighted.
 - Find items to highlight with `_find_immediate_triple_items()`: prefer a shelf that is one item away from a full match plus a loose match elsewhere (single-move triple), otherwise fall back to any visible items sharing a type. Only one item type is ever highlighted at a time even when several types qualify, but every visible item of that chosen type is highlighted, not just three.
