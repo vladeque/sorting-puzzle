@@ -2192,7 +2192,7 @@ Purpose:
   in `_process()` (which runs at `process_priority = 1`, after the child `AnimationPlayer`). The
   hammer art is not centred on its head, so without this the impact lands beside the burst it causes.
 - Detects texture swaps after `AnimationPlayer` updates, places the outgoing texture in
-  `%PreviousPose`, and crossfades it behind the incoming pose for 35 ms with a restrained backward
+  `%PreviousPose`, and crossfades it behind the incoming pose for 55 ms with a restrained backward
   smear. The final frame-7 impact skips blending and remains fully opaque.
 - Accepts the live Hammer-button screen centre from `scripts/level.gd` and moves `ImpactAnchor`
   from that bottom-left origin to the target during the first 320 authored milliseconds. Texture

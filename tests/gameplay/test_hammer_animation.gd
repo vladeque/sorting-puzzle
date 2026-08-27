@@ -231,9 +231,13 @@ func _run() -> void:
 		"Hammer procedural VFX stays inside the mobile element-count budget."
 	)
 	_check(
-		is_equal_approx(float(script_constants.get("POSE_BLEND_SECONDS", 0.0)), 0.035)
-			and float(script_constants.get("PREVIOUS_POSE_START_ALPHA", 1.0)) <= 0.3,
-		"Hammer pose crossfades stay brief and subtle."
+		is_equal_approx(float(script_constants.get("POSE_BLEND_SECONDS", 0.0)), 0.055)
+			and is_equal_approx(
+				float(script_constants.get("PREVIOUS_POSE_START_ALPHA", 0.0)),
+				0.42
+			)
+			and is_equal_approx(float(script_constants.get("NEW_POSE_START_ALPHA", 0.0)), 0.58),
+		"Hammer pose crossfades use a clearly visible but balanced overlap."
 	)
 	_check(not bool(effect.get("_sound_enabled")), "Hammer inherits the disabled sound-effects setting.")
 	var hammer_uses_before_repeat := int((level.get("_ability_uses") as Dictionary).get(&"hammer", -1))

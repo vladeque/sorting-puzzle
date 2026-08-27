@@ -14,9 +14,9 @@ const PINK := Color(1.0, 0.18, 0.72, 1.0)
 const LIGHT_PINK := Color(1.0, 0.76, 0.94, 1.0)
 const WARM := Color(1.0, 0.86, 0.42, 1.0)
 const DEFAULT_APPROACH_POSITION_RATIO := Vector2(0.14, 0.86)
-const POSE_BLEND_SECONDS := 0.035
-const PREVIOUS_POSE_START_ALPHA := 0.28
-const NEW_POSE_START_ALPHA := 0.72
+const POSE_BLEND_SECONDS := 0.055
+const PREVIOUS_POSE_START_ALPHA := 0.42
+const NEW_POSE_START_ALPHA := 0.58
 const POSE_SMEAR_OFFSET := Vector2(-10.0, 10.0)
 
 const WINDUP_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_1.png")
