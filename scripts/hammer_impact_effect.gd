@@ -29,7 +29,6 @@ const SMEAR_TRANSITION_EARLY_TEXTURE := preload("res://assets/abilities/ability_
 const SMEAR_TRANSITION_LATE_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_5.7.png")
 const SMEAR_LATE_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_6.png")
 const IMPACT_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_7.png")
-const IMPACT_OVERSHOOT_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_8.png")
 
 ## Offset of each supplied frame's head centre from its texture centre, in texture pixels. The
 ## sprite is shifted by the negation of this so the head follows one continuous arc and frame 7
@@ -46,11 +45,12 @@ const POSE_HEAD_OFFSETS := {
 	SMEAR_TRANSITION_LATE_TEXTURE: Vector2(-2.1, -166.4),
 	SMEAR_LATE_TEXTURE: Vector2(-3.0, -170.0),
 	IMPACT_TEXTURE: Vector2(34.0, -205.0),
-	IMPACT_OVERSHOOT_TEXTURE: Vector2(46.0, -195.0),
 }
 
 ## The supplied artwork is intentionally kept compact so the strike does not obscure nearby goods.
 @export_range(0.1, 2.0, 0.01) var base_hammer_scale := 0.2
+## Enlarges only the contact burst, glow, flash, and debris, leaving the hammer and trail unchanged.
+@export_range(1.0, 2.0, 0.05) var impact_vfx_scale := 1.25
 ## Multiplier applied to the authored 1.26 second strike timeline.
 @export_range(0.1, 3.0, 0.05) var strike_playback_speed := 1.3
 
@@ -226,8 +226,9 @@ func _draw_swing_trails() -> void:
 func _draw_radial_glow() -> void:
 	var alpha := _glow_amount
 	var expansion := 1.0 - alpha
+	var effect_scale := _layout_scale * impact_vfx_scale
 	for glow_index in range(6, 0, -1):
-		var radius := lerpf(150.0, 218.0, expansion) * float(glow_index) / 6.0 * _layout_scale
+		var radius := lerpf(150.0, 218.0, expansion) * float(glow_index) / 6.0 * effect_scale
 		var glow_color := PINK if glow_index % 2 == 0 else LIGHT_PINK
 		glow_color.a = alpha * (0.035 + float(7 - glow_index) * 0.024)
 		draw_circle(_impact_position, radius, glow_color)
@@ -236,15 +237,16 @@ func _draw_radial_glow() -> void:
 func _draw_starburst() -> void:
 	var alpha := _burst_amount
 	var expansion := 1.0 - alpha
+	var effect_scale := _layout_scale * impact_vfx_scale
 	for ray_index in range(BURST_RAY_COUNT):
 		var direction := Vector2.RIGHT.rotated(TAU * float(ray_index) / float(BURST_RAY_COUNT))
 		var tangent := direction.orthogonal()
 		var long_ray := ray_index % 3 == 0
-		var base_distance := 30.0 * _layout_scale
+		var base_distance := 30.0 * effect_scale
 		var initial_distance := 168.0 if long_ray else 126.0
 		var final_distance := 258.0 if long_ray else 190.0
-		var tip_distance := lerpf(initial_distance, final_distance, expansion) * _layout_scale
-		var half_width := (13.0 if long_ray else 7.5) * _layout_scale * alpha
+		var tip_distance := lerpf(initial_distance, final_distance, expansion) * effect_scale
+		var half_width := (13.0 if long_ray else 7.5) * effect_scale * alpha
 		var spike := PackedVector2Array([
 			_impact_position + direction * tip_distance,
 			_impact_position + direction * base_distance + tangent * half_width,
@@ -259,8 +261,9 @@ func _draw_starburst() -> void:
 func _draw_flash_core() -> void:
 	var alpha := _flash_amount
 	var expansion := 1.0 - alpha
+	var effect_scale := _layout_scale * impact_vfx_scale
 	for core_index in range(4, 0, -1):
-		var radius := lerpf(46.0, 112.0, expansion) * float(core_index) / 4.0 * _layout_scale
+		var radius := lerpf(46.0, 112.0, expansion) * float(core_index) / 4.0 * effect_scale
 		var core_color := Color(1.0, 0.94, 0.99, alpha * (0.1 + float(5 - core_index) * 0.11))
 		draw_circle(_impact_position, radius, core_color)
 
@@ -268,13 +271,14 @@ func _draw_flash_core() -> void:
 func _draw_sparks_and_debris() -> void:
 	var alpha := _debris_amount
 	var travel := 1.0 - alpha
+	var effect_scale := _layout_scale * impact_vfx_scale
 	for spark_index in range(SPARK_COUNT):
 		var angle := TAU * float(spark_index) / float(SPARK_COUNT) + 0.17 * float(spark_index % 3)
 		var direction := Vector2.RIGHT.rotated(angle)
 		var distance_scale := 0.78 + 0.16 * float(spark_index % 4)
-		var distance := lerpf(72.0, 248.0 * distance_scale, travel) * _layout_scale
+		var distance := lerpf(72.0, 248.0 * distance_scale, travel) * effect_scale
 		var position := _impact_position + direction * distance
-		var size := (7.0 if spark_index % 3 == 0 else 4.5) * _layout_scale * maxf(alpha, 0.35)
+		var size := (7.0 if spark_index % 3 == 0 else 4.5) * effect_scale * maxf(alpha, 0.35)
 		var color := WARM if spark_index % 2 == 0 else LIGHT_PINK
 		color.a = 0.88 * alpha
 		if spark_index % 3 == 0:

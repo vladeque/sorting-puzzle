@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://bwejmpw6brl73"]
+[gd_scene load_steps=19 format=3 uid="uid://bwejmpw6brl73"]
 
 [ext_resource type="Script" uid="uid://djqf15hllksrw" path="res://scripts/hammer_impact_effect.gd" id="1_hammer_script"]
 [ext_resource type="Texture2D" uid="uid://bb7dkgc56jya1" path="res://assets/abilities/ability_hammer_swing_1.png" id="2_hammer_windup"]
@@ -12,7 +12,6 @@
 [ext_resource type="Texture2D" uid="uid://des5wkron8odf" path="res://assets/abilities/ability_hammer_swing_5.7.png" id="6b_hammer_smear_transition_late"]
 [ext_resource type="Texture2D" uid="uid://5y041y34p0sm" path="res://assets/abilities/ability_hammer_swing_6.png" id="7_hammer_smear_late"]
 [ext_resource type="Texture2D" uid="uid://cwb17jmdvuslq" path="res://assets/abilities/ability_hammer_swing_7.png" id="8_hammer_impact"]
-[ext_resource type="Texture2D" uid="uid://ddiwsg1yjvsut" path="res://assets/abilities/ability_hammer_swing_8.png" id="9_hammer_impact_overshoot"]
 [ext_resource type="AudioStream" uid="uid://cwd8pbvkx38bh" path="res://assets/audio/item_place.wav" id="12_item_place"]
 [ext_resource type="AudioStream" uid="uid://dp5wrl310xgo" path="res://assets/audio/triple_clear.wav" id="13_triple_clear"]
 [ext_resource type="AudioStream" uid="uid://6la25ugplv7c" path="res://assets/audio/A_short_satisfying_i_#3-1782529645197.wav" id="14_magic"]
@@ -138,10 +137,10 @@ tracks/9/path = NodePath("ImpactAnchor/HammerPivot/HammerSprite:texture")
 tracks/9/interp = 1
 tracks/9/loop_wrap = true
 tracks/9/keys = {
-"times": PackedFloat32Array(0, 0.024, 0.056, 0.08, 0.16, 0.24, 0.32, 0.344, 0.376, 0.4, 0.48, 0.58),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.024, 0.056, 0.08, 0.16, 0.24, 0.32, 0.344, 0.376, 0.4, 0.48),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
 "update": 1,
-"values": [ExtResource("2_hammer_windup"), ExtResource("2a_hammer_windup_transition_early"), ExtResource("2b_hammer_windup_transition_late"), ExtResource("3_hammer_rise"), ExtResource("4_hammer_anticipation"), ExtResource("5_hammer_mid"), ExtResource("6_hammer_smear_early"), ExtResource("6a_hammer_smear_transition_early"), ExtResource("6b_hammer_smear_transition_late"), ExtResource("7_hammer_smear_late"), ExtResource("8_hammer_impact"), ExtResource("9_hammer_impact_overshoot")]
+"values": [ExtResource("2_hammer_windup"), ExtResource("2a_hammer_windup_transition_early"), ExtResource("2b_hammer_windup_transition_late"), ExtResource("3_hammer_rise"), ExtResource("4_hammer_anticipation"), ExtResource("5_hammer_mid"), ExtResource("6_hammer_smear_early"), ExtResource("6a_hammer_smear_transition_early"), ExtResource("6b_hammer_smear_transition_late"), ExtResource("7_hammer_smear_late"), ExtResource("8_hammer_impact")]
 }
 tracks/10/type = "value"
 tracks/10/imported = false
@@ -150,7 +149,7 @@ tracks/10/path = NodePath("ImpactAnchor/HammerPivot:modulate")
 tracks/10/interp = 1
 tracks/10/loop_wrap = true
 tracks/10/keys = {
-"times": PackedFloat32Array(0, 0.035, 0.72, 1.02),
+"times": PackedFloat32Array(0, 0.035, 0.48, 0.5),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
 "values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]

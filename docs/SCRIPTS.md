@@ -1898,7 +1898,7 @@ Key responsibilities:
 - Hammer targets visible/front triples first, then can supplement visible/front matches with first-back-layer copies of the same item type when no visible item type has three available copies.
 - Hammer flies all three chosen targets to the exact viewport center, removes the two duplicate
   visuals, and gives the remaining merged item a short 120 ms settle pop. Only after that merge is
-  visibly complete does it start the fullscreen eight-frame hammer strike. The merged item
+  visibly complete does it start the fullscreen eleven-pose hammer strike. The merged item
   compresses on the authored 400 ms `pre_impact` signal (about 308 ms into playback), becomes
   invisible and is freed on the frame-7 authored 480 ms `impact` signal (about 369 ms into
   playback), and the combo reward starts 140 ms later while the roughly 0.97 second VFX playback is
@@ -2183,9 +2183,9 @@ Purpose:
   and draws mobile-capped swing trails, a radial
   magenta glow, tapered white/warm starburst spikes, a localised hot core, and deterministic
   sparks/debris from five animated scalar amounts. All `_draw()` output uses the root's additive
-  canvas material so the burst brightens the board instead of staining the warm background; a
-  full-screen flash rect was removed for the same reason. The effect does not allocate runtime
-  particle emitters.
+  canvas material so the burst brightens the board instead of staining the warm background. The
+  impact-only burst, glow, flash, and debris use `impact_vfx_scale = 1.25`; a full-screen flash rect
+  was removed for the same reason. The effect does not allocate runtime particle emitters.
 - Keeps each supplied frame's head centre on the pivot via `POSE_HEAD_OFFSETS`, applied every frame
   in `_process()` (which runs at `process_priority = 1`, after the child `AnimationPlayer`). The
   hammer art is not centred on its head, so without this the impact lands beside the burst it causes.
@@ -2196,17 +2196,19 @@ Purpose:
 - Coordinates the scene's entrance/downstroke, layered impact, and sparkle-tail audio players,
   plus the optional mobile impact vibration.
 - Emits `pre_impact` at authored time 400 ms (about 308 ms into playback), `impact` on frame 7 at
-  authored time 480 ms (about 369 ms into playback), and `finished` after the hammer and VFX
-  fade out.
+  authored time 480 ms (about 369 ms into playback), hides the hammer by authored time 500 ms, and
+  emits `finished` after the remaining VFX fade out.
 
 Exports:
 - `base_hammer_scale`: `0.2` base visual size before responsive viewport scaling, half the prior
   size so the head covers the converged target without hiding most of the surrounding shelf.
+- `impact_vfx_scale`: `1.25` multiplier for the contact burst, glow, flash, and debris; it does not
+  enlarge the hammer or its approach trail.
 - `strike_playback_speed`: `1.3` playback multiplier for a 30% faster strike while keeping the
   authored animation keys and signal beats together.
 
 Depends on:
-- `assets/abilities/ability_hammer_swing_1.png` through `ability_hammer_swing_8.png`, plus fractional
+- `assets/abilities/ability_hammer_swing_1.png` through `ability_hammer_swing_7.png`, plus fractional
   transition frames `1.3`, `1.7`, `5.3`, and `5.7`, in strike playback order.
 - The existing item-place, triple-clear, and short satisfying SFX for layered hammer cues; no new
   audio asset is required.
@@ -2215,9 +2217,9 @@ Depends on:
 - `scripts/level.gd` for runtime instancing and gameplay response to `impact`.
 
 Verification:
-- `tests/gameplay/test_hammer_animation.gd` checks all twelve base and transitional poses, center
-  convergence, the
-  three-to-one merge, deferred strike start, the impact-pose hold through the dissolve, all five
+- `tests/gameplay/test_hammer_animation.gd` checks all eleven base and transitional poses, center
+  convergence, the three-to-one merge, deferred strike start, immediate post-impact hammer hide,
+  all five
   procedural VFX tracks, two afterimages, audio ownership/muting, raised approach, pre-impact
   compression, exact-frame target disappearance, delayed reward overlap, 480 ms frame-7 impact
   timing, the full tail duration, cleanup, and responsive layout at

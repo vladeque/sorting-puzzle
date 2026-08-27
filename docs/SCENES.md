@@ -1594,15 +1594,15 @@ Script:
 Purpose:
 - Reusable fullscreen hammer strike effect spawned by `scripts/level.gd` when the hammer ability is used.
 - Displays the transparent supplied hammer poses in exact
-  `1, 1.3, 1.7, 2, 3, 4, 5, 5.3, 5.7, 6, 7, 8` order. The fractional frames subdivide the original
+  `1, 1.3, 1.7, 2, 3, 4, 5, 5.3, 5.7, 6, 7` order. The fractional frames subdivide the original
   `1 → 2` and `5 → 6` intervals without extending the strike timeline.
 - Owns the editable 1.26 second `AnimationPlayer` `strike` animatic, played at `1.3x` speed for an
   effective duration of about 0.97 seconds: frames 1–3 fly from the raised upper-right approach to
-  the item, frames 4–7 hold position, frame 7 makes contact, and frame 8 follows through 24 design
-  pixels toward the bottom-left. It also owns the recoil/dissolve, subtle frame-derived afterimages,
-  layered impact amounts, audio callbacks, and gameplay signal timing.
-- Ends the hammer with a fade-and-flare dissolve rather than a rebound, so the head does not sit
-  over the cell it just cleared while the burst plays.
+  the item, frames 4–6 hold position, and the final frame 7 makes contact. It also owns the immediate
+  hammer hide, subtle frame-derived afterimages, layered impact amounts, audio callbacks, and
+  gameplay signal timing.
+- Hides the hammer by authored time 500 ms, immediately after frame 7 makes contact at 480 ms, while
+  the enlarged burst, glow, flash, and debris continue through the remaining VFX tail.
 - Emits `pre_impact` at authored time 400 ms (about 308 ms into playback) for item compression and
   `impact` on frame 7 at authored time 480 ms (about 369 ms into playback) so gameplay hides and
   frees the merged item on the visual hit frame. Reward stars begin 140 ms later, during the
@@ -1629,7 +1629,7 @@ Important nodes:
 - `AnimationPlayer`: owns the `strike` animation; edit this timeline for most hammer motion and timing adjustments.
 
 Depends on:
-- `assets/abilities/ability_hammer_swing_1.png` through `ability_hammer_swing_8.png`, plus fractional
+- `assets/abilities/ability_hammer_swing_1.png` through `ability_hammer_swing_7.png`, plus fractional
   transition frames `1.3`, `1.7`, `5.3`, and `5.7`, in strike playback order.
 - `assets/audio/item_place.wav`, `assets/audio/triple_clear.wav`, and
   `assets/audio/A_short_satisfying_i_#3-1782529645197.wav`, layered with scene-specific pitch and

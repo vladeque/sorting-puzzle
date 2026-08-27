@@ -564,7 +564,7 @@ Files:
 - `scripts/freezer_snowflake_field.gd`
 - `scenes/effects/level_completion_confetti.tscn`
 - `scripts/level_completion_confetti.gd`
-- `assets/abilities/ability_hammer_swing_1.png` through `ability_hammer_swing_8.png`, including
+- `assets/abilities/ability_hammer_swing_1.png` through `ability_hammer_swing_7.png`, including
   fractional transition frames `1.3`, `1.7`, `5.3`, and `5.7` (playback order)
 - `assets/abilities/ability_shuffle_box.png`
 - `assets/abilities/lantern_searchlight.gdshader`
@@ -858,7 +858,7 @@ Responsibility:
 - Reads campaign ability uses from `PlayerProgress`, spends campaign uses immediately, and uses temporary three-use counts for isolated dev/test levels.
 - Lets hammer clear matching visible/front items first, or supplement visible/front items with first-back-layer copies of the same type if no visible item type can make a triple.
 - Gathers hammer targets to the exact viewport center, merges them into one item with a short settle
-  pop, then spawns the fullscreen strike and swaps through the supplied twelve-pose hammer sequence
+  pop, then spawns the fullscreen strike and swaps through the supplied eleven-pose hammer sequence
   before destroying the merged item and dropping combo reward stars from the center impact point.
 - Shows the shuffle delivery box sprite from `assets/abilities/ability_shuffle_box.png` and pauses moving shelf rows while shuffle items fly through the center-screen box.
 - Disables abilities after failure, completion, pause, or active ability animations. A zero-use ability button stays pressable during gameplay so `scenes/ability_purchase_menu.tscn` can offer a paid immediate use, presented as "USE ABILITY" (UI-003, not an inventory acquisition) with the canonical clover coin art and a genuine unavailable style (not alpha dimming) when unaffordable.

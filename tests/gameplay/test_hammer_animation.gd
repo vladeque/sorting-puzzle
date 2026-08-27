@@ -107,6 +107,10 @@ func _run() -> void:
 		"Hammer renders at half of its previous base scale."
 	)
 	_check(
+		is_equal_approx(float(effect.get("impact_vfx_scale")), 1.25),
+		"Hammer contact VFX render 25% larger without scaling the hammer."
+	)
+	_check(
 		is_equal_approx(animation_player.speed_scale, 1.3),
 		"Hammer strike runs 30% faster than the authored timeline."
 	)
@@ -117,8 +121,8 @@ func _run() -> void:
 	_check(texture_track >= 0, "Hammer strike owns a texture-swap track.")
 	if texture_track >= 0:
 		_check(
-			strike.track_get_key_count(texture_track) == 12,
-			"Hammer strike swaps through all twelve base and transitional poses."
+			strike.track_get_key_count(texture_track) == 11,
+			"Hammer strike swaps through eleven base and transitional poses."
 		)
 		var expected_pose_paths := PackedStringArray([
 			"res://assets/abilities/ability_hammer_swing_1.png",
@@ -132,7 +136,6 @@ func _run() -> void:
 			"res://assets/abilities/ability_hammer_swing_5.7.png",
 			"res://assets/abilities/ability_hammer_swing_6.png",
 			"res://assets/abilities/ability_hammer_swing_7.png",
-			"res://assets/abilities/ability_hammer_swing_8.png",
 		])
 		for pose_index in range(expected_pose_paths.size()):
 			var pose_texture := strike.track_get_key_value(texture_track, pose_index) as Texture2D
@@ -152,7 +155,19 @@ func _run() -> void:
 		)
 		_check(
 			is_equal_approx(strike.track_get_key_time(texture_track, 10), 0.48),
-			"Hammer reaches supplied frame 7 on the impact beat."
+			"Hammer reaches supplied frame 7 as its final pose on the impact beat."
+		)
+	var hammer_modulate_track := strike.find_track(
+		NodePath("ImpactAnchor/HammerPivot:modulate"),
+		Animation.TYPE_VALUE
+	)
+	_check(hammer_modulate_track >= 0, "Hammer strike owns a visibility track.")
+	if hammer_modulate_track >= 0:
+		var last_modulate_key := strike.track_get_key_count(hammer_modulate_track) - 1
+		_check(
+			is_equal_approx(strike.track_get_key_time(hammer_modulate_track, last_modulate_key), 0.5)
+				and (strike.track_get_key_value(hammer_modulate_track, last_modulate_key) as Color).a == 0.0,
+			"Hammer disappears immediately after the 480 ms impact while contact VFX continue."
 		)
 	var position_track := strike.find_track(
 		NodePath("ImpactAnchor/HammerPivot:position"),
@@ -254,6 +269,8 @@ func _run() -> void:
 			< 24.0,
 		"Hammer head lands on the impact point instead of beside it."
 	)
+	await create_timer(0.03).timeout
+	_check(pivot.modulate.a < 0.05, "Hammer is hidden immediately after its impact pose.")
 	for item in hammer_targets:
 		_check(
 			item == null
