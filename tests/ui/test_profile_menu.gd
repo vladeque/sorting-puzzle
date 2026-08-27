@@ -76,10 +76,15 @@ func _run() -> void:
 	_check(preview_frame_texture.texture != null, "Profile preview has a standalone frame layer.")
 	var avatar_material := preview_avatar_texture.material as ShaderMaterial
 	_check(avatar_material != null, "Avatar preview uses the shared background-preserving shader.")
-	var avatar_content_scale: float = avatar_material.get_shader_parameter("content_scale")
+	var expected_avatar_position := (profile_preview.size - preview_avatar_texture.size) * 0.5
 	_check(
-		is_equal_approx(avatar_content_scale, 0.9),
-		"Avatar content is scaled to 90% so more background remains visible."
+		preview_avatar_texture.position.is_equal_approx(expected_avatar_position),
+		"Avatar preview remains centered beneath its frame."
+	)
+	_check(
+		is_equal_approx(preview_avatar_texture.position.x, 7.0)
+		and is_equal_approx(preview_avatar_texture.position.y, 7.0),
+		"Avatar preview overlaps the frame's inner rim without leaving a visible seam."
 	)
 	_check(
 		preview_avatar_texture.texture.resource_path != preview_frame_texture.texture.resource_path,

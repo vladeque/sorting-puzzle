@@ -648,9 +648,11 @@ Purpose:
 Depends on:
 - `assets/ui/avatars/*.png`.
 - `assets/ui/avatar_frames/*.png` and `scenes/ui/profile_avatar_view.tscn`, which compose the same
-  sanitized avatar/frame presentation used by the Main Menu and profile editor.
+  sanitized avatar/frame presentation used by the Main Menu and profile editor. The avatar layer
+  uses symmetric 7 px insets so it stays centered while overlapping the frame's inner rim enough
+  to prevent a visible seam at regular and compact leaderboard sizes.
 - `assets/ui/avatar_circle_clip.gdshader`, which keeps the circular crop while rendering avatar
-  content at 90% and extending its outer background colors to the frame edge.
+  content beneath the frame's transparent opening.
 - `assets/ui/reward_star_34_glossy_b.png`.
 - `scenes/ui/leaderboard_rank_reward.tscn`.
 

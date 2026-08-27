@@ -104,8 +104,19 @@ func _run() -> void:
 	if rows.get_child_count() >= 2:
 		var first_profile := rows.get_child(0).get_node("%ProfileAvatarView") as Control
 		var second_profile := rows.get_child(1).get_node("%ProfileAvatarView") as Control
+		var first_avatar := first_profile.get_node("%AvatarTexture") as TextureRect
 		var first_frame := first_profile.get_node("%FrameTexture") as TextureRect
 		var second_frame := second_profile.get_node("%FrameTexture") as TextureRect
+		var expected_avatar_position := (first_profile.size - first_avatar.size) * 0.5
+		_check(
+			first_avatar.position.is_equal_approx(expected_avatar_position),
+			"Leaderboard avatar texture should be centered inside its frame."
+		)
+		_check(
+			is_equal_approx(first_avatar.position.x, 7.0)
+			and is_equal_approx(first_avatar.position.y, 7.0),
+			"Leaderboard avatar should overlap the frame's inner rim without leaving a seam."
+		)
 		_check(
 			first_frame.texture != null
 			and second_frame.texture != null

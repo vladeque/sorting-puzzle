@@ -542,7 +542,8 @@ Purpose:
   `RankLabel` between a bare number (top 3) and "#N" (rank 4+).
 - Forwards reward image/amount binding and compact sizing to the focused `%RankReward` component.
 - Applies compact or regular row and font sizing, including `RankSlot` and the reusable
-  `%ProfileAvatarView` size.
+- Relies on `ProfileAvatarView`'s symmetric 7 px avatar-layer insets so the avatar remains centered
+  and slightly overlaps the inner rim of every returned frame at both row sizes.
 
 ## `scripts/leaderboard_rank_reward.gd`
 
