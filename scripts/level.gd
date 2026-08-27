@@ -146,7 +146,6 @@ const SHOP_RETURN_TIME_EXTENSION := &"time_extension"
 @export var highlight_outline_color := Color(1.0, 0.86, 0.18, 1.0)
 @export var selected_outline_color := Color.WHITE
 @export_range(0.0, 8.0, 0.25) var highlight_outline_width := 6.0
-@export_range(1.0, 1.5, 0.01) var highlight_item_scale := 1.15
 @export_range(0.0, 32.0, 0.5) var selected_item_forward_offset := 12.0
 @export var match_gather_duration_seconds := 0.18
 @export var match_shrink_duration_seconds := 0.16
@@ -3503,8 +3502,10 @@ func _apply_item_visual_state(item: ShelfItem) -> void:
 	var is_highlighted := _highlighted_items.has(item)
 	var outline_color := selected_outline_color if is_selected else highlight_outline_color
 	item.set_outline(is_selected or is_highlighted, outline_color, highlight_outline_width)
-	item.set_highlight_scale(highlight_item_scale if is_highlighted else 1.0)
-	item.set_selection_forward_offset(selected_item_forward_offset if is_selected else 0.0)
+	item.set_highlight_scale(1.0)
+	item.set_selection_forward_offset(
+		selected_item_forward_offset if is_selected or is_highlighted else 0.0
+	)
 
 
 func _setup_ability_buttons() -> void:

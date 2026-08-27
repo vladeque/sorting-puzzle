@@ -42,6 +42,8 @@ func _run() -> void:
 	var outline := item.get_node("OutlineSprite") as Sprite2D
 	var shadow := item.get_node("Shadow") as Sprite2D
 	var collision := item.get_node("CollisionShape2D") as CollisionShape2D
+	var resting_sprite_scale := sprite.scale
+	var resting_outline_scale := outline.scale
 	var resting_shadow_y := shadow.position.y
 	var selected_offset := float(level.get("selected_item_forward_offset"))
 
@@ -72,6 +74,11 @@ func _run() -> void:
 	highlighted_items.append(item)
 	level.call("_apply_item_visual_state", item)
 	_check(
+		sprite.scale.is_equal_approx(resting_sprite_scale)
+		and outline.scale.is_equal_approx(resting_outline_scale),
+		"Lantern does not enlarge a highlighted item or its outline."
+	)
+	_check(
 		outline.visible
 		and _is_color_approx(
 			outline.material.get_shader_parameter("outline_color"),
@@ -91,19 +98,25 @@ func _run() -> void:
 		"Clearing selection restores Lantern's gold outline when its highlight remains active."
 	)
 	_check(
-		is_zero_approx(sprite.position.y)
-		and is_zero_approx(outline.position.y)
-		and is_zero_approx(collision.position.y),
-		"Clearing selection returns the item presentation and hit area to the slot."
+		is_equal_approx(sprite.position.y, selected_offset)
+		and is_equal_approx(outline.position.y, selected_offset)
+		and is_equal_approx(collision.position.y, selected_offset),
+		"A Lantern-highlighted item stays shifted toward the shelf edge after selection clears."
 	)
 	_check(
-		is_equal_approx(shadow.position.y, selected_highlighted_shadow_y - selected_offset),
-		"Clearing selection removes the shelf-edge offset from the Lantern-scaled shadow."
+		is_equal_approx(shadow.position.y, selected_highlighted_shadow_y),
+		"A Lantern-highlighted item's shadow stays aligned with its shelf-edge offset."
 	)
 
 	highlighted_items.clear()
 	level.call("_apply_item_visual_state", item)
 	_check(not outline.visible, "An ordinary deselected item has no outline.")
+	_check(
+		is_zero_approx(sprite.position.y)
+		and is_zero_approx(outline.position.y)
+		and is_zero_approx(collision.position.y),
+		"Removing Lantern returns the deselected item and hit area to the slot."
+	)
 	_check(
 		is_equal_approx(shadow.position.y, resting_shadow_y),
 		"Removing Lantern returns the deselected ground shadow to its original resting position."
