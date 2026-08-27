@@ -1597,10 +1597,10 @@ Purpose:
   `1, 1.3, 1.7, 2, 3, 4, 5, 5.3, 5.7, 6, 7` order. The fractional frames subdivide the original
   `1 → 2` and `5 → 6` intervals without extending the strike timeline.
 - Owns the editable 1.26 second `AnimationPlayer` `strike` animatic, played at `1.3x` speed for an
-  effective duration of about 0.97 seconds: frames 1–3 fly from the raised upper-right approach to
-  the item, frames 4–6 hold position, and the final frame 7 makes contact. It also owns the immediate
-  hammer hide, subtle frame-derived afterimages, layered impact amounts, audio callbacks, and
-  gameplay signal timing.
+  effective duration of about 0.97 seconds: frames 1–3 fly from the live bottom-left Hammer ability
+  button to the item, frames 4–6 hold position, and the final frame 7 makes contact. It owns the
+  immediate hammer hide, subtle frame-derived afterimages, layered impact amounts, audio callbacks,
+  and gameplay signal timing.
 - Hides the hammer by authored time 500 ms, immediately after frame 7 makes contact at 480 ms, while
   the enlarged burst, glow, flash, and debris continue through the remaining VFX tail.
 - Emits `pre_impact` at authored time 400 ms (about 308 ms into playback) for item compression and
@@ -1612,12 +1612,10 @@ Purpose:
   `hammer_impact_effect` group.
 
 Important nodes:
-- `ImpactAnchor`: runtime-positioned at the exact viewport center after the three selected items
-  finish converging and settle as one visible item; scales the full hammer for the current
-  viewport. Its `scale.x` flips to `-1` for reusable targets past
-  `MIRROR_THRESHOLD_RATIO` so right-side strikes approach from the left instead of hanging the
-  raised pose off the viewport edge.
-- `ImpactAnchor/HammerPivot`: keyframed by `AnimationPlayer` for wind-up, strike, and dissolve motion.
+- `ImpactAnchor`: moves from the runtime Hammer-button screen centre to the exact impact point during
+  the first 160 authored milliseconds, then remains at the impact point for the strike.
+- `ImpactAnchor/HammerPivot`: keyframed by `AnimationPlayer` for wind-up rotation, scale, and
+  visibility.
 - `ImpactAnchor/HammerPivot/HammerSprite`: transparent hammer sprite whose texture is value-keyframed
   by the `strike` animation. Its position is not keyframed — the script derives it each frame from
   `POSE_HEAD_OFFSETS` so every frame's head centre stays on the pivot the impact VFX are drawn

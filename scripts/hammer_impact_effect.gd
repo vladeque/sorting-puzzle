@@ -13,10 +13,7 @@ const TRAIL_SAMPLE_COUNT := 7
 const PINK := Color(1.0, 0.18, 0.72, 1.0)
 const LIGHT_PINK := Color(1.0, 0.76, 0.94, 1.0)
 const WARM := Color(1.0, 0.86, 0.42, 1.0)
-
-## Strikes landing right of this fraction of the overlay mirror their approach so the opening pose
-## stays inside the viewport instead of hanging off the right edge.
-const MIRROR_THRESHOLD_RATIO := 0.55
+const DEFAULT_APPROACH_POSITION_RATIO := Vector2(0.14, 0.86)
 
 const WINDUP_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_1.png")
 const WINDUP_TRANSITION_EARLY_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_1.3.png")
@@ -67,6 +64,9 @@ const POSE_HEAD_OFFSETS := {
 @onready var _sparkle_tail_audio: AudioStreamPlayer = %SparkleTailAudio
 
 var _impact_position := Vector2.ZERO
+var _approach_start_position := Vector2.ZERO
+var _approach_offset := Vector2.ZERO
+var _approach_amount := 0.0
 var _layout_scale := 1.0
 var _sound_enabled := true
 var _haptics_enabled := true
@@ -104,9 +104,21 @@ func _ready() -> void:
 	_apply_full_rect()
 
 
-func play(target_screen_position: Vector2, sound_enabled := true, haptics_enabled := true) -> void:
+func play(
+	target_screen_position: Vector2,
+	sound_enabled := true,
+	haptics_enabled := true,
+	approach_start_screen_position := Vector2.INF
+) -> void:
 	_apply_full_rect()
 	_impact_position = target_screen_position
+	_approach_start_position = (
+		approach_start_screen_position
+		if approach_start_screen_position.is_finite()
+		else size * DEFAULT_APPROACH_POSITION_RATIO
+	)
+	_approach_offset = _approach_start_position - _impact_position
+	_approach_amount = 1.0
 	_layout_scale = clampf(size.x / DESIGN_WIDTH, 0.75, 1.35)
 	_sound_enabled = sound_enabled
 	_haptics_enabled = haptics_enabled
@@ -120,8 +132,8 @@ func play(target_screen_position: Vector2, sound_enabled := true, haptics_enable
 	_debris_amount = 0.0
 	_trail_points.clear()
 
-	_impact_anchor.position = _impact_position
-	_impact_anchor.scale = Vector2(-1.0, 1.0) if _should_mirror_approach() else Vector2.ONE
+	_impact_anchor.position = _approach_start_position
+	_impact_anchor.scale = Vector2.ONE
 	_hammer_sprite.scale = Vector2.ONE * base_hammer_scale * _layout_scale
 	_afterimage_early.scale = _hammer_sprite.scale
 	_afterimage_late.scale = _hammer_sprite.scale
@@ -141,6 +153,10 @@ func has_impacted() -> bool:
 	return _has_impacted
 
 
+func get_approach_start_position() -> Vector2:
+	return _approach_start_position
+
+
 func set_sound_enabled(enabled: bool) -> void:
 	_sound_enabled = enabled
 	if enabled:
@@ -154,6 +170,7 @@ func _process(_delta: float) -> void:
 	if not visible:
 		return
 
+	_impact_anchor.position = _impact_position + _approach_offset * _approach_amount
 	_align_sprite_to_pivot(_hammer_sprite)
 	_sample_trail_point()
 
@@ -169,7 +186,7 @@ func _align_sprite_to_pivot(sprite: Sprite2D) -> void:
 func _get_head_position() -> Vector2:
 	# The sprite alignment above places the head centre exactly on the pivot origin, so the head
 	# position collapses to the pivot's own transform.
-	return _impact_anchor.position + _impact_anchor.scale * _hammer_pivot.position
+	return _impact_anchor.position + _hammer_pivot.position
 
 
 func _sample_trail_point() -> void:
@@ -292,10 +309,6 @@ func _draw_sparks_and_debris() -> void:
 			draw_colored_polygon(points, color)
 		else:
 			draw_circle(position, size, color)
-
-
-func _should_mirror_approach() -> bool:
-	return size.x > 0.0 and _impact_position.x > size.x * MIRROR_THRESHOLD_RATIO
 
 
 func _play_windup_audio() -> void:

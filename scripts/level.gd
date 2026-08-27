@@ -3648,12 +3648,18 @@ func _play_hammer_ability(items_to_destroy: Array[ShelfItem]) -> void:
 	var shelves_to_check := _get_hammer_shelves_to_check(items_to_destroy)
 	var destroyed_triples := floori(float(_get_valid_item_count(items_to_destroy)) / float(SLOT_COUNT))
 	var impact_screen_position := get_viewport_rect().size * 0.5
+	var approach_start_screen_position := _get_ability_button_screen_center(ABILITY_HAMMER)
 	var impact_global_position := _screen_position_to_global(impact_screen_position)
 	var merged_item := await _play_hammer_gather_animation(items_to_destroy, impact_global_position)
 	var ui_layer := get_node("UI") as CanvasLayer
 	var effect := HAMMER_IMPACT_EFFECT_SCENE.instantiate() as HammerImpactEffect
 	ui_layer.add_child(effect)
-	effect.play(impact_screen_position, _sound_effects_enabled, hammer_haptics_enabled)
+	effect.play(
+		impact_screen_position,
+		_sound_effects_enabled,
+		hammer_haptics_enabled,
+		approach_start_screen_position
+	)
 
 	if not effect.has_reached_pre_impact():
 		await effect.pre_impact
@@ -3670,6 +3676,15 @@ func _play_hammer_ability(items_to_destroy: Array[ShelfItem]) -> void:
 
 	_hammer_effect_active = false
 	_update_ability_buttons()
+
+
+func _get_ability_button_screen_center(ability_id: StringName) -> Vector2:
+	if _ability_bar != null:
+		var button := _ability_bar.get_ability_button(ability_id)
+		if button != null:
+			return button.get_global_rect().get_center()
+	var viewport_size := get_viewport_rect().size
+	return viewport_size * Vector2(0.14, 0.86)
 
 func _get_hammer_shelves_to_check(items_to_destroy: Array[ShelfItem]) -> Array[Node]:
 	var shelves_to_check: Array[Node] = []

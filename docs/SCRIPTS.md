@@ -1898,7 +1898,8 @@ Key responsibilities:
 - Hammer targets visible/front triples first, then can supplement visible/front matches with first-back-layer copies of the same item type when no visible item type has three available copies.
 - Hammer flies all three chosen targets to the exact viewport center, removes the two duplicate
   visuals, and gives the remaining merged item a short 120 ms settle pop. Only after that merge is
-  visibly complete does it start the fullscreen eleven-pose hammer strike. The merged item
+  visibly complete does it start the fullscreen eleven-pose hammer strike from the live bottom-left
+  Hammer ability button. The merged item
   compresses on the authored 400 ms `pre_impact` signal (about 308 ms into playback), becomes
   invisible and is freed on the frame-7 authored 480 ms `impact` signal (about 369 ms into
   playback), and the combo reward starts 140 ms later while the roughly 0.97 second VFX playback is
@@ -2189,8 +2190,8 @@ Purpose:
 - Keeps each supplied frame's head centre on the pivot via `POSE_HEAD_OFFSETS`, applied every frame
   in `_process()` (which runs at `process_priority = 1`, after the child `AnimationPlayer`). The
   hammer art is not centred on its head, so without this the impact lands beside the burst it causes.
-- Mirrors the whole approach through `ImpactAnchor.scale.x` for targets past
-  `MIRROR_THRESHOLD_RATIO`, keeping the raised pose inside the viewport on right-column strikes.
+- Accepts the live Hammer-button screen centre from `scripts/level.gd` and moves `ImpactAnchor`
+  from that bottom-left origin to the target during the first 160 authored milliseconds.
 - Samples the head's real path into a short ring buffer so the swing trail follows the swing
   instead of a fixed screen-space arc.
 - Coordinates the scene's entrance/downstroke, layered impact, and sparkle-tail audio players,
@@ -2219,13 +2220,13 @@ Depends on:
 Verification:
 - `tests/gameplay/test_hammer_animation.gd` checks all eleven base and transitional poses, center
   convergence, the three-to-one merge, deferred strike start, immediate post-impact hammer hide,
-  all five
-  procedural VFX tracks, two afterimages, audio ownership/muting, raised approach, pre-impact
-  compression, exact-frame target disappearance, delayed reward overlap, 480 ms frame-7 impact
-  timing, the full tail duration, cleanup, and responsive layout at
+  all five procedural VFX tracks, two afterimages, audio ownership/muting, bottom-left approach,
+  pre-impact compression, exact-frame target disappearance, delayed reward overlap, 480 ms frame-7
+  impact timing, the full tail duration, cleanup, and responsive layout at
   540x960, 720x1280, 1080x1920, 1080x2400, and 900x1200. It also seeks the paused animation to
-  verify head-on-pivot alignment and on-screen framing for left, centre, and right targets. It can
-  render an in-level timing preview with `--write-movie` and the `--hammer-animation-preview` user
+  verify head-on-pivot alignment and the supplied bottom-left origin for left, centre, and right
+  targets. It can render an in-level timing preview with `--write-movie` and the
+  `--hammer-animation-preview` user
   argument; use a `.png` movie path, since the `.avi` output is not readable by common ffmpeg builds.
 
 Do not use for:

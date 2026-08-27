@@ -57,6 +57,8 @@ func _run() -> void:
 		return
 
 	var expected_impact_screen_position: Vector2 = level.get_viewport_rect().size * 0.5
+	var hammer_button := level.get_node("UI/AbilityBar/ButtonRow/HammerButton") as Button
+	var expected_approach_start_position := hammer_button.get_global_rect().get_center()
 	var expected_impact_global_position: Vector2 = level.call(
 		"_screen_position_to_global", expected_impact_screen_position
 	)
@@ -175,22 +177,19 @@ func _run() -> void:
 	)
 	_check(position_track >= 0, "Hammer strike owns a position track.")
 	if position_track >= 0:
-		var frame_1_position: Vector2 = strike.track_get_key_value(position_track, 0)
-		var frame_2_position: Vector2 = strike.track_get_key_value(position_track, 1)
 		_check(
-			frame_2_position.length() < frame_1_position.length(),
-			"Hammer flies toward the item from frame 1 through frame 2."
+			strike.track_get_key_count(position_track) == 1
+				and (strike.track_get_key_value(position_track, 0) as Vector2).is_zero_approx(),
+			"Hammer pivot stays impact-centred while the runtime approach offset drives its flight."
 		)
-		for frame_index in range(2, 7):
-			_check(
-				(strike.track_get_key_value(position_track, frame_index) as Vector2)
-					.is_equal_approx(Vector2.ZERO),
-				"Hammer reaches the item on frame 3 and holds through frame 7."
-			)
+	var approach_track := strike.find_track(NodePath(".:_approach_amount"), Animation.TYPE_VALUE)
+	_check(approach_track >= 0, "Hammer strike owns a runtime approach-progress track.")
+	if approach_track >= 0:
 		_check(
-			(strike.track_get_key_value(position_track, 7) as Vector2)
-				.is_equal_approx(Vector2(-24.0, 24.0)),
-			"Hammer moves 24 design pixels bottom-left between frames 7 and 8."
+			strike.track_get_key_count(approach_track) == 3
+				and is_equal_approx(strike.track_get_key_time(approach_track, 2), 0.16)
+				and is_zero_approx(float(strike.track_get_key_value(approach_track, 2))),
+			"Hammer completes its ability-icon-to-impact flight by authored time 160 ms."
 		)
 	for property_path in [
 		NodePath(".:_trail_amount"),
@@ -234,18 +233,20 @@ func _run() -> void:
 		"Repeated Hammer taps are ignored while the strike owns the ability input lock."
 	)
 	_check(
-		impact_anchor.position.is_equal_approx(expected_impact_screen_position),
-		"Hammer strikes at the exact viewport center."
+		(effect.get_approach_start_position() as Vector2).distance_to(
+			expected_approach_start_position
+		) < 0.01,
+		"Hammer flight starts at the live Hammer ability button."
 	)
-	_check(
-		pivot.position.x > 0.0 and pivot.position.y < 0.0,
-		"Hammer begins in its raised upper-right approach pose."
+	var approach_start_distance := expected_approach_start_position.distance_to(
+		expected_impact_screen_position
 	)
 
 	await create_timer(0.08 / animation_player.speed_scale).timeout
 	_check(
-		pivot.position.x > 0.0 and pivot.position.y < 0.0,
-		"Hammer remains on its approach path during frame 2."
+		(effect.call("_get_head_position") as Vector2).distance_to(expected_impact_screen_position)
+			< approach_start_distance,
+		"Hammer flies inward from the bottom-left ability button during its opening poses."
 	)
 
 	await effect.pre_impact
@@ -264,6 +265,10 @@ func _run() -> void:
 		"Hammer impact signal is aligned to the 480 ms frame 7 contact pose."
 	)
 	await process_frame
+	_check(
+		impact_anchor.position.is_equal_approx(expected_impact_screen_position),
+		"Hammer strikes at the exact viewport center."
+	)
 	_check(
 		(effect.call("_get_head_position") as Vector2).distance_to(expected_impact_screen_position)
 			< 24.0,
@@ -315,17 +320,17 @@ func _verify_responsive_effect_layout() -> void:
 		root.add_child(effect)
 		await process_frame
 		var target := Vector2(viewport_size) * Vector2(0.5, 0.58)
-		effect.play(target, false, false)
+		var approach_start := Vector2(viewport_size) * Vector2(0.14, 0.86)
+		effect.play(target, false, false, approach_start)
 		await process_frame
-		var anchor := effect.get_node("ImpactAnchor") as Node2D
 		var sprite := effect.get_node("ImpactAnchor/HammerPivot/HammerSprite") as Sprite2D
 		_check(
 			effect.size.is_equal_approx(Vector2(viewport_size)),
 			"Hammer overlay fills the %s viewport." % viewport_size
 		)
 		_check(
-			anchor.position.is_equal_approx(target),
-			"Hammer keeps its board-relative target at %s." % viewport_size
+			(effect.get_approach_start_position() as Vector2).is_equal_approx(approach_start),
+			"Hammer preserves its bottom-left ability origin at %s." % viewport_size
 		)
 		_check(
 			sprite.scale.x >= 0.14 and sprite.scale.x <= 0.28,
@@ -334,12 +339,12 @@ func _verify_responsive_effect_layout() -> void:
 		effect.queue_free()
 		await process_frame
 
-	await _verify_edge_target_framing()
+	await _verify_supplied_approach_origins()
 
 
-## Targets near the right edge must mirror their approach, otherwise the raised pose hangs off the
-## viewport and the player never sees the wind-up.
-func _verify_edge_target_framing() -> void:
+## The caller supplies the live ability-button centre, so every target shares the same visible
+## bottom-left origin without mirroring or hard-coded design-resolution offsets.
+func _verify_supplied_approach_origins() -> void:
 	var effect_scene := load("res://scenes/abilities/hammer_impact_effect.tscn") as PackedScene
 	var viewport_size := Vector2i(720, 1280)
 	get_root().content_scale_size = viewport_size
@@ -351,25 +356,24 @@ func _verify_edge_target_framing() -> void:
 		root.add_child(effect)
 		await process_frame
 		var target := Vector2(viewport_size) * Vector2(target_ratio, 0.5)
-		effect.play(target, false, false)
+		var approach_start := Vector2(82.0, 1120.0)
+		effect.play(target, false, false, approach_start)
 		await process_frame
 		var anchor := effect.get_node("ImpactAnchor") as Node2D
-		var mirrored := anchor.scale.x < 0.0
 		_check(
-			mirrored == (target_ratio > 0.55),
-			"Hammer mirrors its approach only for right-side targets (ratio %s)." % target_ratio
+			anchor.scale.is_equal_approx(Vector2.ONE),
+			"Hammer keeps one consistent orientation for target ratio %s." % target_ratio
 		)
 
 		var animation_player := effect.get_node("AnimationPlayer") as AnimationPlayer
 		# Pausing keeps the pose fixed while the effect's own _process aligns the sprite, so these
 		# assertions do not depend on how far a frame advances the strike.
-		animation_player.seek(0.3, true)
+		animation_player.seek(0.0, true)
 		animation_player.pause()
 		await process_frame
-		var raised_head: Vector2 = effect.call("_get_head_position")
 		_check(
-			raised_head.x >= 0.0 and raised_head.x <= float(viewport_size.x),
-			"Hammer keeps its raised pose on screen for target ratio %s." % target_ratio
+			(effect.call("_get_head_position") as Vector2).distance_to(approach_start) < 0.01,
+			"Hammer starts exactly at the supplied ability origin for target ratio %s." % target_ratio
 		)
 
 		animation_player.seek(0.48, true)
