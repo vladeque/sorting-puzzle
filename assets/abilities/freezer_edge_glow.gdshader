@@ -4,8 +4,10 @@ render_mode unshaded;
 uniform float activation_amount : hint_range(0.0, 1.0) = 0.0;
 uniform float opacity : hint_range(0.0, 1.0) = 0.0;
 uniform vec4 glow_color : source_color = vec4(0.08, 0.58, 1.0, 1.0);
-uniform float glow_width : hint_range(0.01, 0.12) = 0.06;
-uniform float glow_intensity : hint_range(0.0, 0.75) = 0.34;
+uniform float glow_width : hint_range(0.01, 0.15) = 0.09;
+uniform float glow_intensity : hint_range(0.0, 0.75) = 0.42;
+uniform float edge_rim_width_ratio : hint_range(0.05, 0.4) = 0.12;
+uniform float edge_rim_boost : hint_range(0.0, 1.0) = 0.78;
 uniform vec4 modal_shade_color : source_color = vec4(0.02, 0.025, 0.03, 0.66);
 uniform float modal_shade_amount : hint_range(0.0, 1.0) = 0.0;
 
@@ -22,9 +24,13 @@ void fragment() {
 	float eased_activation = smoothstep(0.0, 1.0, activation_amount);
 	float active_width = glow_width * mix(0.28, 1.0, eased_activation);
 	float soft_halo = 1.0 - smoothstep(0.0, active_width, normalized_edge);
-	float bright_rim = 1.0 - smoothstep(0.0, active_width * 0.16, normalized_edge);
+	float bright_rim = 1.0 - smoothstep(
+		0.0,
+		active_width * edge_rim_width_ratio,
+		normalized_edge
+	);
 	float glow_alpha = min(
-		soft_halo * glow_intensity + bright_rim * glow_intensity * 0.28,
+		soft_halo * glow_intensity + bright_rim * glow_intensity * edge_rim_boost,
 		1.0
 	) * opacity * eased_activation * glow_color.a;
 

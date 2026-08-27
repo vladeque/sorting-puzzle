@@ -61,13 +61,19 @@ func _verify_effect_scene() -> void:
 	)
 	var glow_color: Color = glow_material.get_shader_parameter(&"glow_color")
 	var glow_width := float(glow_material.get_shader_parameter(&"glow_width"))
+	var glow_intensity := float(glow_material.get_shader_parameter(&"glow_intensity"))
+	var edge_rim_boost := float(glow_material.get_shader_parameter(&"edge_rim_boost"))
 	var hud_glow_width := float(hud_glow_material.get_shader_parameter(&"glow_width"))
+	var hud_edge_rim_boost := float(hud_glow_material.get_shader_parameter(&"edge_rim_boost"))
 	_check(
 		glow_color.b > glow_color.r
 		and glow_color.b > glow_color.g
-		and glow_width >= 0.055
-		and is_equal_approx(glow_width, hud_glow_width),
-		"Both Freezer passes share the wider blue edge glow."
+		and glow_width >= 0.085
+		and glow_intensity >= 0.4
+		and edge_rim_boost >= 0.7
+		and is_equal_approx(glow_width, hud_glow_width)
+		and is_equal_approx(edge_rim_boost, hud_edge_rim_boost),
+		"Both Freezer passes share the larger blue glow and bright near-edge rim."
 	)
 	_check(
 		hud_snowflake_field.get_mirror_source() == snowflake_field,
@@ -95,8 +101,10 @@ func _verify_effect_scene() -> void:
 		snowflake_field.is_emitting()
 		and snowflake_field.get_particle_count() > 0
 		and snowflake_field.get_particle_count() <= snowflake_field.max_particles
-		and snowflake_field.get_maximum_lifetime() <= 0.8,
-		"Freezer activation emits a bounded set of short-lived snowflakes."
+		and snowflake_field.activation_burst_count >= 16
+		and snowflake_field.emission_rate_per_second >= 30.0
+		and snowflake_field.get_maximum_lifetime() <= 0.5,
+		"Freezer activation emits a denser bounded set of faster-disappearing snowflakes."
 	)
 
 	# Level refreshes the active state every frame; a repeat must not restart the entrance tween.

@@ -1538,11 +1538,12 @@ Script:
 
 Purpose:
 - Reusable fullscreen Freezer presentation owned by a separate scene instead of `scripts/level.gd`.
-- Adds a wide cyan-blue halo along all four screen edges; its width scales from the shorter viewport
-  dimension so it remains visually even across portrait aspect ratios. The glow does not sample,
-  tint, blur, or replace the current chapter background.
-- Expands the glow inward when Freezer starts and continuously emits sparse procedural snowflakes
-  from all four edges. Flakes rotate, drift inward, and disappear within 0.45-0.8 seconds.
+- Adds a large cyan-blue halo along all four screen edges, with a concentrated bright rim nearest
+  the screen boundary; its width scales from the shorter viewport dimension so it remains visually
+  even across portrait aspect ratios. The glow does not sample, tint, blur, or replace the current
+  chapter background.
+- Expands the glow inward when Freezer starts and continuously emits dense procedural snowflakes
+  from all four edges. Flakes rotate, drift inward, and disappear within 0.24-0.46 seconds.
 - Fades the glow, stops emission, and shortens remaining flake lifetimes when Freezer ends.
 - Ignores mouse/touch input. The full frame stays below UI; only a top-height-clipped copy renders
   over `TopHud`, leaving ability buttons and central modal content unobstructed.

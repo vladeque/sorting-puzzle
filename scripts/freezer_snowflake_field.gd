@@ -21,12 +21,12 @@ class Snowflake:
 	var highlight_mix := 0.5
 
 
-@export_range(1, 64, 1) var max_particles := 24
-@export_range(0, 32, 1) var activation_burst_count := 10
-@export_range(0.0, 30.0, 0.5) var emission_rate_per_second := 14.0
-@export_range(0.1, 2.0, 0.01) var minimum_lifetime_seconds := 0.45
-@export_range(0.1, 2.0, 0.01) var maximum_lifetime_seconds := 0.8
-@export_range(0.05, 0.6, 0.01) var shutdown_fade_seconds := 0.28
+@export_range(1, 64, 1) var max_particles := 40
+@export_range(0, 48, 1) var activation_burst_count := 18
+@export_range(0.0, 48.0, 0.5) var emission_rate_per_second := 36.0
+@export_range(0.1, 2.0, 0.01) var minimum_lifetime_seconds := 0.24
+@export_range(0.1, 2.0, 0.01) var maximum_lifetime_seconds := 0.46
+@export_range(0.05, 0.6, 0.01) var shutdown_fade_seconds := 0.16
 @export var random_seed := 824_631
 @export var mirror_source_path: NodePath
 

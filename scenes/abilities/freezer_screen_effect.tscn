@@ -9,8 +9,10 @@ shader = ExtResource("2_shader")
 shader_parameter/activation_amount = 0.0
 shader_parameter/opacity = 0.0
 shader_parameter/glow_color = Color(0.08, 0.58, 1, 1)
-shader_parameter/glow_width = 0.06
-shader_parameter/glow_intensity = 0.34
+shader_parameter/glow_width = 0.09
+shader_parameter/glow_intensity = 0.42
+shader_parameter/edge_rim_width_ratio = 0.12
+shader_parameter/edge_rim_boost = 0.78
 shader_parameter/modal_shade_color = Color(0.02, 0.025, 0.03, 0.66)
 shader_parameter/modal_shade_amount = 0.0
 
@@ -19,8 +21,10 @@ shader = ExtResource("2_shader")
 shader_parameter/activation_amount = 0.0
 shader_parameter/opacity = 0.0
 shader_parameter/glow_color = Color(0.08, 0.58, 1, 1)
-shader_parameter/glow_width = 0.06
-shader_parameter/glow_intensity = 0.34
+shader_parameter/glow_width = 0.09
+shader_parameter/glow_intensity = 0.42
+shader_parameter/edge_rim_width_ratio = 0.12
+shader_parameter/edge_rim_boost = 0.78
 shader_parameter/modal_shade_color = Color(0.02, 0.025, 0.03, 0.66)
 shader_parameter/modal_shade_amount = 0.0
 

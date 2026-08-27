@@ -615,8 +615,9 @@ Responsibility:
   pulsing pools tracked to every highlighted item, and a stronger button-origin activation wave for
   the same 15-second window as the item outlines. With no current targets, a diagonal beam visibly
   keeps searching the shelves.
-- Shows Freezer as a wide blue perimeter glow with sparse procedural snowflakes flying inward from
-  all four edges and disappearing within 0.45-0.8 seconds. The main pass sits between gameplay and
+- Shows Freezer as a large blue perimeter glow with a concentrated bright near-edge rim and dense
+  procedural snowflakes flying inward from all four edges and disappearing within 0.24-0.46
+  seconds. The main pass sits between gameplay and
   UI, while a clipped glow and synchronized flake copy render over `TopHud`, all without recoloring
   the configured level background. The effect stops emission and fades when the 30-second active-
   gameplay window ends. While gameplay modals pause the level, the upper copy mirrors the shared

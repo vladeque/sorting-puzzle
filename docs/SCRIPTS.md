@@ -1926,7 +1926,7 @@ Key responsibilities:
   suspend only the Freezer window. A partial expiry delta suppresses only its frozen portion.
 - Refresh the ability bar when Freezer expires so its anti-stacking disabled state is removed and
   another remaining use can be activated immediately.
-- Mirror that active state into the reusable `FreezerScreenEffect`: its wide blue perimeter glow
+- Mirror that active state into the reusable `FreezerScreenEffect`: its large blue perimeter glow
   expands once on activation and continuously emits sparse, short-lived snowflakes inward from all
   four sides without tinting the level center. Keep the main pass below normal UI and repeat only
   the clipped top strip above `TopHud`. When a pause/modal shade covers the main pass, synchronize
@@ -2156,9 +2156,9 @@ Attached to:
 Purpose:
 - Draws crisp six-armed snowflakes procedurally, so the effect remains resolution-independent and
   needs no bitmap particle asset.
-- Reuses a bounded 24-particle array, emits a ten-flake activation burst followed by a sparse
+- Reuses a bounded 40-particle array, emits an eighteen-flake activation burst followed by a denser
   trickle, sends every flake inward from one of the four glowing edges, and fades each within
-  0.45-0.8 seconds.
+  0.24-0.46 seconds.
 - Supports a mirror mode that draws the source field's live particle data in the clipped TopHud
   pass without advancing another simulation.
 - Shortens remaining lifetimes when emission stops and clears immediately for level teardown.
