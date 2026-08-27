@@ -117,11 +117,41 @@ func _run() -> void:
 	_check(texture_track >= 0, "Hammer strike owns a texture-swap track.")
 	if texture_track >= 0:
 		_check(
-			strike.track_get_key_count(texture_track) == 8,
-			"Hammer strike swaps through the eight swing poses."
+			strike.track_get_key_count(texture_track) == 12,
+			"Hammer strike swaps through all twelve base and transitional poses."
+		)
+		var expected_pose_paths := PackedStringArray([
+			"res://assets/abilities/ability_hammer_swing_1.png",
+			"res://assets/abilities/ability_hammer_swing_1.3.png",
+			"res://assets/abilities/ability_hammer_swing_1.7.png",
+			"res://assets/abilities/ability_hammer_swing_2.png",
+			"res://assets/abilities/ability_hammer_swing_3.png",
+			"res://assets/abilities/ability_hammer_swing_4.png",
+			"res://assets/abilities/ability_hammer_swing_5.png",
+			"res://assets/abilities/ability_hammer_swing_5.3.png",
+			"res://assets/abilities/ability_hammer_swing_5.7.png",
+			"res://assets/abilities/ability_hammer_swing_6.png",
+			"res://assets/abilities/ability_hammer_swing_7.png",
+			"res://assets/abilities/ability_hammer_swing_8.png",
+		])
+		for pose_index in range(expected_pose_paths.size()):
+			var pose_texture := strike.track_get_key_value(texture_track, pose_index) as Texture2D
+			_check(
+				pose_texture != null and pose_texture.resource_path == expected_pose_paths[pose_index],
+				"Hammer pose %d uses %s." % [pose_index + 1, expected_pose_paths[pose_index]]
+			)
+		_check(
+			is_equal_approx(strike.track_get_key_time(texture_track, 1), 0.024)
+				and is_equal_approx(strike.track_get_key_time(texture_track, 2), 0.056),
+			"Frames 1.3 and 1.7 subdivide the original frame 1-to-2 interval."
 		)
 		_check(
-			is_equal_approx(strike.track_get_key_time(texture_track, 6), 0.48),
+			is_equal_approx(strike.track_get_key_time(texture_track, 7), 0.344)
+				and is_equal_approx(strike.track_get_key_time(texture_track, 8), 0.376),
+			"Frames 5.3 and 5.7 subdivide the original frame 5-to-6 interval."
+		)
+		_check(
+			is_equal_approx(strike.track_get_key_time(texture_track, 10), 0.48),
 			"Hammer reaches supplied frame 7 on the impact beat."
 		)
 	var position_track := strike.find_track(

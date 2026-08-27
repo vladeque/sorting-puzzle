@@ -1593,9 +1593,9 @@ Script:
 
 Purpose:
 - Reusable fullscreen hammer strike effect spawned by `scripts/level.gd` when the hammer ability is used.
-- Displays the normalized transparent versions of the supplied numbered hammer frames in exact
-  1-through-8 order. Frames 1-6 share a 680x680 canvas; the portrait source canvases for frames 7-8
-  become 453x680 so their intended closer head framing is retained.
+- Displays the transparent supplied hammer poses in exact
+  `1, 1.3, 1.7, 2, 3, 4, 5, 5.3, 5.7, 6, 7, 8` order. The fractional frames subdivide the original
+  `1 → 2` and `5 → 6` intervals without extending the strike timeline.
 - Owns the editable 1.26 second `AnimationPlayer` `strike` animatic, played at `1.3x` speed for an
   effective duration of about 0.97 seconds: frames 1–3 fly from the raised upper-right approach to
   the item, frames 4–7 hold position, frame 7 makes contact, and frame 8 follows through 24 design
@@ -1629,8 +1629,8 @@ Important nodes:
 - `AnimationPlayer`: owns the `strike` animation; edit this timeline for most hammer motion and timing adjustments.
 
 Depends on:
-- `assets/abilities/ability_hammer_swing_1.png` through `ability_hammer_swing_8.png`, numbered in
-  strike playback order, for the normalized supplied frames.
+- `assets/abilities/ability_hammer_swing_1.png` through `ability_hammer_swing_8.png`, plus fractional
+  transition frames `1.3`, `1.7`, `5.3`, and `5.7`, in strike playback order.
 - `assets/audio/item_place.wav`, `assets/audio/triple_clear.wav`, and
   `assets/audio/A_short_satisfying_i_#3-1782529645197.wav`, layered with scene-specific pitch and
   volume settings.

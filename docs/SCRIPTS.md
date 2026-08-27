@@ -2206,8 +2206,8 @@ Exports:
   authored animation keys and signal beats together.
 
 Depends on:
-- `assets/abilities/ability_hammer_swing_1.png` through `ability_hammer_swing_8.png`, numbered in
-  strike playback order, for the normalized supplied frames.
+- `assets/abilities/ability_hammer_swing_1.png` through `ability_hammer_swing_8.png`, plus fractional
+  transition frames `1.3`, `1.7`, `5.3`, and `5.7`, in strike playback order.
 - The existing item-place, triple-clear, and short satisfying SFX for layered hammer cues; no new
   audio asset is required.
 - `scenes/abilities/hammer_impact_effect.tscn` `AnimationPlayer` keyframes for hammer motion,
@@ -2215,7 +2215,8 @@ Depends on:
 - `scripts/level.gd` for runtime instancing and gameplay response to `impact`.
 
 Verification:
-- `tests/gameplay/test_hammer_animation.gd` checks all eight poses, center convergence, the
+- `tests/gameplay/test_hammer_animation.gd` checks all twelve base and transitional poses, center
+  convergence, the
   three-to-one merge, deferred strike start, the impact-pose hold through the dissolve, all five
   procedural VFX tracks, two afterimages, audio ownership/muting, raised approach, pre-impact
   compression, exact-frame target disappearance, delayed reward overlap, 480 ms frame-7 impact

@@ -19,10 +19,14 @@ const WARM := Color(1.0, 0.86, 0.42, 1.0)
 const MIRROR_THRESHOLD_RATIO := 0.55
 
 const WINDUP_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_1.png")
+const WINDUP_TRANSITION_EARLY_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_1.3.png")
+const WINDUP_TRANSITION_LATE_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_1.7.png")
 const RISE_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_2.png")
 const ANTICIPATION_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_3.png")
 const MID_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_4.png")
 const SMEAR_EARLY_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_5.png")
+const SMEAR_TRANSITION_EARLY_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_5.3.png")
+const SMEAR_TRANSITION_LATE_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_5.7.png")
 const SMEAR_LATE_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_6.png")
 const IMPACT_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_7.png")
 const IMPACT_OVERSHOOT_TEXTURE := preload("res://assets/abilities/ability_hammer_swing_8.png")
@@ -32,10 +36,14 @@ const IMPACT_OVERSHOOT_TEXTURE := preload("res://assets/abilities/ability_hammer
 ## lands on the pivot where the impact VFX are drawn.
 const POSE_HEAD_OFFSETS := {
 	WINDUP_TEXTURE: Vector2(-8.0, -145.0),
+	WINDUP_TRANSITION_EARLY_TEXTURE: Vector2(-4.4, -145.9),
+	WINDUP_TRANSITION_LATE_TEXTURE: Vector2(0.4, -147.1),
 	RISE_TEXTURE: Vector2(4.0, -148.0),
 	ANTICIPATION_TEXTURE: Vector2(0.0, 0.0),
 	MID_TEXTURE: Vector2(2.0, -140.0),
 	SMEAR_EARLY_TEXTURE: Vector2(0.0, -158.0),
+	SMEAR_TRANSITION_EARLY_TEXTURE: Vector2(-0.9, -161.6),
+	SMEAR_TRANSITION_LATE_TEXTURE: Vector2(-2.1, -166.4),
 	SMEAR_LATE_TEXTURE: Vector2(-3.0, -170.0),
 	IMPACT_TEXTURE: Vector2(34.0, -205.0),
 	IMPACT_OVERSHOOT_TEXTURE: Vector2(46.0, -195.0),
