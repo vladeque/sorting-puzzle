@@ -859,8 +859,8 @@ Responsibility:
 - Lets hammer clear matching visible/front items first, or supplement visible/front items with first-back-layer copies of the same type if no visible item type can make a triple.
 - Gathers hammer targets to the exact viewport center, merges them into one item with a short settle
   pop, then flies the hammer from the live bottom-left Hammer ability button through the supplied
-  eleven-pose strike sequence before destroying the merged item and dropping combo reward stars
-  from the center impact point.
+  eleven-pose strike sequence. Poses 1–3 switch quickly, pose 3 holds while the 320 ms flight reaches
+  center, and the later poses lead into the hit before combo reward stars drop from the impact point.
 - Shows the shuffle delivery box sprite from `assets/abilities/ability_shuffle_box.png` and pauses moving shelf rows while shuffle items fly through the center-screen box.
 - Disables abilities after failure, completion, pause, or active ability animations. A zero-use ability button stays pressable during gameplay so `scenes/ability_purchase_menu.tscn` can offer a paid immediate use, presented as "USE ABILITY" (UI-003, not an inventory acquisition) with the canonical clover coin art and a genuine unavailable style (not alpha dimming) when unaffordable.
 - Loads per-ability paid-use prices from `configs/ability_purchase_prices.json`, spends coins through `PlayerProgress.spend_coins()`, and applies the selected paid ability immediately without adding saved inventory.

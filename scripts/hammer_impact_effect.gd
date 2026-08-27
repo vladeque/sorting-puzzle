@@ -52,7 +52,7 @@ const POSE_HEAD_OFFSETS := {
 @export_range(0.1, 2.0, 0.01) var base_hammer_scale := 0.2
 ## Enlarges only the contact burst, glow, flash, and debris, leaving the hammer and trail unchanged.
 @export_range(1.0, 2.0, 0.05) var impact_vfx_scale := 1.25
-## Multiplier applied to the authored 1.26 second strike timeline.
+## Multiplier applied to the authored 1.34 second strike timeline.
 @export_range(0.1, 3.0, 0.05) var strike_playback_speed := 1.3
 
 @onready var _impact_anchor: Node2D = %ImpactAnchor

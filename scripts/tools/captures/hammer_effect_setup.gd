@@ -21,7 +21,7 @@ func setup(scene_root: Node, tree: SceneTree) -> void:
 	var effect := scene_root.get_node_or_null("UI/HammerImpactEffect") as HammerImpactEffect
 	if effect != null:
 		var animation_player := effect.get_node("AnimationPlayer") as AnimationPlayer
-		animation_player.seek(0.48, true)
+		animation_player.seek(0.56, true)
 		animation_player.pause()
 
 	for _frame in range(2):

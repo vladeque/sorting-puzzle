@@ -1901,9 +1901,9 @@ Key responsibilities:
   visuals, and gives the remaining merged item a short 120 ms settle pop. Only after that merge is
   visibly complete does it start the fullscreen eleven-pose hammer strike from the live bottom-left
   Hammer ability button. The merged item
-  compresses on the authored 400 ms `pre_impact` signal (about 308 ms into playback), becomes
-  invisible and is freed on the frame-7 authored 480 ms `impact` signal (about 369 ms into
-  playback), and the combo reward starts 140 ms later while the roughly 0.97 second VFX playback is
+  compresses on the authored 480 ms `pre_impact` signal (about 369 ms into playback), becomes
+  invisible and is freed on the frame-7 authored 560 ms `impact` signal (about 431 ms into
+  playback), and the combo reward starts 140 ms later while the roughly 1.03 second VFX playback is
   still fading.
   Gameplay scoring, shelf resolution, and ability input lock rules are unchanged.
 - Hammer passes the live sound-effects setting and exported `hammer_haptics_enabled` flag into the
@@ -2181,7 +2181,7 @@ Attached to:
 Purpose:
 - Runtime controller and procedural VFX renderer for the hammer ability's fullscreen strike.
 - Positions and scales the scene over a provided screen-space target point, plays the scene-owned
-  1.26 second `AnimationPlayer` `strike` animatic at `1.3x` speed (about 0.97 seconds effective),
+  1.34 second `AnimationPlayer` `strike` animatic at `1.3x` speed (about 1.03 seconds effective),
   and draws mobile-capped swing trails, a radial
   magenta glow, tapered white/warm starburst spikes, a localised hot core, and deterministic
   sparks/debris from five animated scalar amounts. All `_draw()` output uses the root's additive
@@ -2195,13 +2195,14 @@ Purpose:
   `%PreviousPose`, and crossfades it behind the incoming pose for 35 ms with a restrained backward
   smear. The final frame-7 impact skips blending and remains fully opaque.
 - Accepts the live Hammer-button screen centre from `scripts/level.gd` and moves `ImpactAnchor`
-  from that bottom-left origin to the target during the first 160 authored milliseconds.
+  from that bottom-left origin to the target during the first 320 authored milliseconds. Texture
+  changes through pose 3 retain their fast cadence, then pose 3 holds for the rest of the flight.
 - Samples the head's real path into a short ring buffer so the swing trail follows the swing
   instead of a fixed screen-space arc.
 - Coordinates the scene's entrance/downstroke, layered impact, and sparkle-tail audio players,
   plus the optional mobile impact vibration.
-- Emits `pre_impact` at authored time 400 ms (about 308 ms into playback), `impact` on frame 7 at
-  authored time 480 ms (about 369 ms into playback), hides the hammer by authored time 500 ms, and
+- Emits `pre_impact` at authored time 480 ms (about 369 ms into playback), `impact` on frame 7 at
+  authored time 560 ms (about 431 ms into playback), hides the hammer by authored time 580 ms, and
   emits `finished` after the remaining VFX fade out.
 
 Exports:
@@ -2209,7 +2210,7 @@ Exports:
   size so the head covers the converged target without hiding most of the surrounding shelf.
 - `impact_vfx_scale`: `1.25` multiplier for the contact burst, glow, flash, and debris; it does not
   enlarge the hammer or its approach trail.
-- `strike_playback_speed`: `1.3` playback multiplier for a 30% faster strike while keeping the
+- `strike_playback_speed`: `1.3` playback multiplier for the authored strike while keeping the
   authored animation keys and signal beats together.
 
 Depends on:
@@ -2225,8 +2226,8 @@ Verification:
 - `tests/gameplay/test_hammer_animation.gd` checks all eleven base and transitional poses, center
   convergence, the three-to-one merge, deferred strike start, immediate post-impact hammer hide,
   all five procedural VFX tracks, two afterimages, outgoing-pose crossfade, audio ownership/muting,
-  bottom-left approach, pre-impact compression, exact-frame target disappearance, 480 ms frame-7
-  impact timing, the full tail duration, cleanup, and responsive layout at
+  bottom-left approach, pose-3 flight hold, pre-impact compression, exact-frame target disappearance,
+  560 ms frame-7 impact timing, the full tail duration, cleanup, and responsive layout at
   540x960, 720x1280, 1080x1920, 1080x2400, and 900x1200. It also seeks the paused animation to
   verify head-on-pivot alignment and the supplied bottom-left origin for left, centre, and right
   targets. It can render an in-level timing preview with `--write-movie` and the

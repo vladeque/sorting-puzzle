@@ -1598,17 +1598,18 @@ Purpose:
 - Displays the transparent supplied hammer poses in exact
   `1, 1.3, 1.7, 2, 3, 4, 5, 5.3, 5.7, 6, 7` order. The fractional frames subdivide the original
   `1 → 2` and `5 → 6` intervals without extending the strike timeline.
-- Owns the editable 1.26 second `AnimationPlayer` `strike` animatic, played at `1.3x` speed for an
-  effective duration of about 0.97 seconds: frames 1–3 fly from the live bottom-left Hammer ability
-  button to the item, frames 4–6 hold position, and the final frame 7 makes contact. It owns the
+- Owns the editable 1.34 second `AnimationPlayer` `strike` animatic, played at `1.3x` speed for an
+  effective duration of about 1.03 seconds. Poses 1–3 still switch quickly, but pose 3 remains on
+  screen while the hammer completes its 320 ms flight from the live bottom-left ability button to
+  the item; frames 4–6 then lead into the final frame-7 contact. It owns the
   immediate hammer hide, subtle frame-derived afterimages, layered impact amounts, audio callbacks,
   and gameplay signal timing.
 - Softens non-impact texture changes with a 35 ms outgoing-pose crossfade and small backward smear;
   frame 7 bypasses this blend so the contact silhouette remains crisp.
-- Hides the hammer by authored time 500 ms, immediately after frame 7 makes contact at 480 ms, while
+- Hides the hammer by authored time 580 ms, immediately after frame 7 makes contact at 560 ms, while
   the enlarged burst, glow, flash, and debris continue through the remaining VFX tail.
-- Emits `pre_impact` at authored time 400 ms (about 308 ms into playback) for item compression and
-  `impact` on frame 7 at authored time 480 ms (about 369 ms into playback) so gameplay hides and
+- Emits `pre_impact` at authored time 480 ms (about 369 ms into playback) for item compression and
+  `impact` on frame 7 at authored time 560 ms (about 431 ms into playback) so gameplay hides and
   frees the merged item on the visual hit frame. Reward stars begin 140 ms later, during the
   remaining recoil/VFX tail.
 - Owns the entrance/downstroke, impact-thump/magic, and sparkle-tail `AudioStreamPlayer` nodes. The
@@ -1617,7 +1618,7 @@ Purpose:
 
 Important nodes:
 - `ImpactAnchor`: moves from the runtime Hammer-button screen centre to the exact impact point during
-  the first 160 authored milliseconds, then remains at the impact point for the strike.
+  the first 320 authored milliseconds, then remains at the impact point for the strike.
 - `ImpactAnchor/HammerPivot`: keyframed by `AnimationPlayer` for wind-up rotation, scale, and
   visibility.
 - `ImpactAnchor/HammerPivot/PreviousPose`: low-alpha outgoing texture retained for 35 ms behind the

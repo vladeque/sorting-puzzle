@@ -151,12 +151,17 @@ func _run() -> void:
 			"Frames 1.3 and 1.7 subdivide the original frame 1-to-2 interval."
 		)
 		_check(
-			is_equal_approx(strike.track_get_key_time(texture_track, 7), 0.344)
-				and is_equal_approx(strike.track_get_key_time(texture_track, 8), 0.376),
+			is_equal_approx(strike.track_get_key_time(texture_track, 7), 0.424)
+				and is_equal_approx(strike.track_get_key_time(texture_track, 8), 0.456),
 			"Frames 5.3 and 5.7 subdivide the original frame 5-to-6 interval."
 		)
 		_check(
-			is_equal_approx(strike.track_get_key_time(texture_track, 10), 0.48),
+			is_equal_approx(strike.track_get_key_time(texture_track, 4), 0.16)
+				and is_equal_approx(strike.track_get_key_time(texture_track, 5), 0.32),
+			"Hammer reaches pose 3 quickly, then holds it through the extended flight."
+		)
+		_check(
+			is_equal_approx(strike.track_get_key_time(texture_track, 10), 0.56),
 			"Hammer reaches supplied frame 7 as its final pose on the impact beat."
 		)
 	var hammer_modulate_track := strike.find_track(
@@ -167,9 +172,9 @@ func _run() -> void:
 	if hammer_modulate_track >= 0:
 		var last_modulate_key := strike.track_get_key_count(hammer_modulate_track) - 1
 		_check(
-			is_equal_approx(strike.track_get_key_time(hammer_modulate_track, last_modulate_key), 0.5)
+			is_equal_approx(strike.track_get_key_time(hammer_modulate_track, last_modulate_key), 0.58)
 				and (strike.track_get_key_value(hammer_modulate_track, last_modulate_key) as Color).a == 0.0,
-			"Hammer disappears immediately after the 480 ms impact while contact VFX continue."
+			"Hammer disappears immediately after the 560 ms impact while contact VFX continue."
 		)
 	var position_track := strike.find_track(
 		NodePath("ImpactAnchor/HammerPivot:position"),
@@ -187,9 +192,9 @@ func _run() -> void:
 	if approach_track >= 0:
 		_check(
 			strike.track_get_key_count(approach_track) == 3
-				and is_equal_approx(strike.track_get_key_time(approach_track, 2), 0.16)
+				and is_equal_approx(strike.track_get_key_time(approach_track, 2), 0.32)
 				and is_zero_approx(float(strike.track_get_key_value(approach_track, 2))),
-			"Hammer completes its ability-icon-to-impact flight by authored time 160 ms."
+			"Hammer completes its ability-icon-to-impact flight by authored time 320 ms."
 		)
 	for property_path in [
 		NodePath(".:_trail_amount"),
@@ -268,8 +273,8 @@ func _run() -> void:
 	await effect.impact
 	var impact_animation_position := animation_player.current_animation_position
 	_check(
-		impact_animation_position >= 0.47 and impact_animation_position <= 0.52,
-		"Hammer impact signal is aligned to the 480 ms frame 7 contact pose."
+		impact_animation_position >= 0.55 and impact_animation_position <= 0.60,
+		"Hammer impact signal is aligned to the 560 ms frame 7 contact pose."
 	)
 	await process_frame
 	_check(
@@ -304,8 +309,8 @@ func _run() -> void:
 
 	await effect.finished
 	_check(
-		animation_player.current_animation_position >= 1.24,
-		"Hammer recoil and layered VFX reach the end of the 1.26 second authored timeline."
+		animation_player.current_animation_position >= 1.32,
+		"Hammer recoil and layered VFX reach the end of the 1.34 second authored timeline."
 	)
 	await create_timer(0.45).timeout
 	_check(not bool(level.get("_hammer_effect_active")), "Hammer input lock clears after the effect finishes.")
@@ -394,7 +399,7 @@ func _verify_supplied_approach_origins() -> void:
 			"Hammer crossfades its first texture switch for target ratio %s." % target_ratio
 		)
 
-		animation_player.seek(0.48, true)
+		animation_player.seek(0.56, true)
 		animation_player.pause()
 		await process_frame
 		var pose_offsets: Dictionary = effect.get_script().get_script_constant_map().get(
