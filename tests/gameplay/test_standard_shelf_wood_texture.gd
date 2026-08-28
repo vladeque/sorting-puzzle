@@ -33,6 +33,18 @@ const LEGACY_GRAIN_PATHS := [
 	"FloorGrainKnot",
 	"FloorGrainFront",
 ]
+const SHADOW_OVERLAY_PATHS := [
+	"Shadow",
+	"RightColumnShadow",
+	"BackWallTopShade",
+	"PlacementVisuals/Left/BackWallLeftShade",
+	"PlacementVisuals/Left/LeftShadowEdge",
+	"PlacementVisuals/Middle/BackWallLeftShade",
+	"PlacementVisuals/Middle/LeftShadowEdge",
+	"PlacementVisuals/Middle/RightShadowEdge",
+	"PlacementVisuals/Right/BackWallLeftShade",
+	"PlacementVisuals/Right/RightShadowEdge",
+]
 
 var _failures: Array[String] = []
 
@@ -81,6 +93,18 @@ func _run() -> void:
 	for node_path in LEGACY_GRAIN_PATHS:
 		var grain := shelf.get_node_or_null(node_path) as CanvasItem
 		_check(grain != null and not grain.visible, "%s should stay hidden behind image grain." % node_path)
+
+	for node_path in SHADOW_OVERLAY_PATHS:
+		var shadow := shelf.get_node_or_null(node_path) as Polygon2D
+		_check(shadow != null, "%s should remain a shelf shadow polygon." % node_path)
+		_check(
+			shadow != null and shadow.color.a > 0.0 and shadow.color.a < 1.0,
+			"%s should stay translucent so item-shadow overlap compounds." % node_path
+		)
+		_check(
+			shadow != null and shadow.material == null,
+			"%s should use CanvasItem's default alpha blending." % node_path
+		)
 
 	shelf.free()
 	_finish()

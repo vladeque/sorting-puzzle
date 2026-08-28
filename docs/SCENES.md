@@ -2022,7 +2022,8 @@ Purpose:
 - Owns the visible shelf back wall, floor, frame, front slot positions, and item snap markers.
 - Owns generated back-layer slot layout and preview styling defaults through `scripts/shelf.gd`.
 - Owns soft internal left/top wall shadows, the diagonal bottom cast shadow, the hidden top ceiling cap, and the right-column cast shadow toggled by `scripts/level.gd`.
-- Uses opaque pre-blended shadow colors so overlapping shadow polygons do not compound into darker patches.
+- Uses slightly stronger translucent warm-brown shadow overlays, allowing an item's alpha-blended
+  contact shadow to compound into a visibly darker region wherever the two shadows overlap.
 - Instances the reusable hidden `scenes/ui/shelf_lock_overlay.tscn` when a level config gates the
   shelf behind cleared triples.
 - Uses wide, slightly shorter cell bounds so three generated shelves span most of the 720 px gameplay viewport with compact row spacing.
@@ -2043,7 +2044,9 @@ Important nodes:
 - `PlacementVisuals/Right`: right shelf role visuals. Contains right edge art and the right-specific `TopCeilingCap`.
 - `Ceiling`: shared image-textured wooden top frame. Placement-specific `TopCeilingCap/BackBoard`
   faces use the same light-oak material and are shown at runtime only for top shelves.
-- `Shadow` and `RightColumnShadow`: solid-color perspective cast shadows, shown at runtime for full shelf visuals and drawn below shelf bodies, items, and generated back-layer item previews so they remain visible only on exposed wall/background areas.
+- `Shadow` and `RightColumnShadow`: translucent perspective cast shadows, shown at runtime for full
+  shelf visuals and drawn below shelf bodies, items, and generated back-layer item previews. Their
+  normal alpha blending preserves the receiving surface and darkens further under item shadows.
 - `FloorSurface` and `FloorFrontLip`: image-textured wooden floor where items visually rest.
 - `FloorGrain*`: retained hidden as legacy editable guides; the image texture now supplies visible
   grain. Generated back-layer item previews still draw above the floor, while active front items

@@ -17,6 +17,18 @@ const LEVEL_SCENE_PATH := "res://level.tscn"
 const LAYER_INDICATOR_SCENE_PATH := "res://scenes/shelf_layer_indicator.tscn"
 const ITEM_SCENE_PATH := "res://scenes/item.tscn"
 const WOOD_TEXTURE_PATH := "res://assets/shelves/standard_shelf_light_oak.png"
+const SHADOW_OVERLAY_PATHS := [
+	"FrameShadow",
+	"BackWallLeftShade",
+	"LeftShadowEdge",
+	"RightShadowEdge",
+	"LeftWallLowerBevel/Shade",
+	"RightWallLowerBevel/Shade",
+	"RightWallTopBevel/Shade",
+	"RightWallInnerFace/Shade",
+	"LeftWallTopBevel/Shade",
+	"LeftWallInnerFace/Shade",
+]
 
 ## Two standard shelves and one dispenser. The standard pair starts one candy_bag short of a triple
 ## and the dispenser holds the third, so the first move extinguishes one segment and clears a match.
@@ -138,6 +150,19 @@ func _test_visual_nodes_have_semantic_names() -> void:
 		_check(
 			legacy_grain != null and not legacy_grain.visible,
 			"Legacy line grain %s should stay hidden behind the image texture." % grain_name
+		)
+
+	for node_path in SHADOW_OVERLAY_PATHS:
+		var shadow := dispenser.get_node_or_null(node_path) as Polygon2D
+		_check(shadow != null, "Dispenser shadow %s should remain a polygon." % node_path)
+		_check(
+			shadow != null and shadow.color.a > 0.0 and shadow.color.a < 1.0,
+			"Dispenser shadow %s should stay translucent so item-shadow overlap compounds."
+				% node_path
+		)
+		_check(
+			shadow != null and shadow.material == null,
+			"Dispenser shadow %s should use CanvasItem's default alpha blending." % node_path
 		)
 	dispenser.free()
 

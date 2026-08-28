@@ -720,12 +720,13 @@ Responsibility:
   source-only variant lives in `scenes/dispenser_shelf.tscn` -- see "Dispenser Shelf" below.
 - `scripts/shelf.gd` owns the shelf-type capability surface every shelf type answers.
 - Owns generated back-layer slot layout and preview styling defaults.
-- Contains the visible back wall, opaque non-compounding interior/cast shadows, image-textured
+- Contains the visible back wall, translucent compounding interior/cast shadows, image-textured
   light-oak floor/frame/lip, and hidden top edge details shown by `scripts/level.gd` for shelves with
   no stacked neighbor above. One shared material image is sampled horizontally for broad faces and
   with rotated UVs for vertical supports; the former line-only grain nodes remain hidden. Shelf cast
   shadows draw below generated back-layer item previews and remain enabled for full shelves so
-  neighboring shelf bodies and items cover them.
+  neighboring shelf bodies and items cover them. Item contact shadows alpha-blend over shelf
+  shadows, making their overlap darker than either shadow on its own.
 - Instances the reusable hidden lock overlay used by triple-gated shelves; the shelf owns only its
   placement, while `ShelfLockOverlay` owns chains, lock, badge, labels, and motion.
 - Keeps the shelf width, height, and slot positions aligned with the level grid constants so a three-shelf row fills most of the gameplay viewport.
@@ -778,8 +779,9 @@ Responsibility:
   player can take from but never place onto. Its circular badge reuses the ability count style, and
   its thin-outlined segmented stock rail shows both remaining items and total capacity at a glance.
 - Shares the standard shelf's light-oak image across its back, floor, lip, guard faces, bevels, and
-  inner returns. Each `Polygon2D` owns UVs suited to its face direction; tint and translucent shade
-  overlays retain the recessed-cradle depth, while the former line-only floor grain stays hidden.
+  inner returns. Each `Polygon2D` owns UVs suited to its face direction; slightly stronger
+  translucent shade overlays retain the recessed-cradle depth and compound with item contact
+  shadows, while the former line-only floor grain stays hidden.
 - The queue is not a separate stacking system. `Shelf`'s back-layer machinery already models "one
   hidden item per layer, promoted when the front layer empties", and with a single front slot that
   is exactly a dispenser.
