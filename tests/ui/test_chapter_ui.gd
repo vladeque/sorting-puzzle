@@ -375,8 +375,15 @@ func _run() -> void:
 	for legacy_node_path in ["Wall", "PlayWall", "Baseboard", "Floor"]:
 		_check(
 			(chapter_one_level.get_node("Background/%s" % legacy_node_path) as CanvasItem).visible,
-			"Chapter 1 should restore its original %s background layer." % legacy_node_path
+			"Chapter 1 should restore its scene-authored %s background layer." % legacy_node_path
 		)
+	var chapter_one_floor := chapter_one_level.get_node("Background/Floor") as TextureRect
+	_check(chapter_one_floor.texture != null, "Chapter 1 floor texture did not load.")
+	_check(
+		chapter_one_floor.texture.resource_path
+			== "res://assets/backgrounds/chapter_01_floor_terracotta_diagonal.png",
+		"Chapter 1 did not use the selected diagonal-terracotta floor texture."
+	)
 
 	menu.queue_free()
 	chapter_background.queue_free()

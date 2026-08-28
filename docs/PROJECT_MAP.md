@@ -625,7 +625,7 @@ Responsibility:
 - Wires the in-level pause and retry recovery modals. Implements the `ui_cancel` back stack (retry
   Out of Lives -> main menu; Leave Confirmation -> Pause -> resume; Ability Purchase restores its
   prior state; Completion/Failure invoke their routes; otherwise opens Pause).
-- Displays a responsive Godot-authored level backdrop with a top HUD strip (now owned by `scenes/ui/level_top_hud.tscn`), monotone shop wall, baseboard, and bottom floor band behind generated shelves.
+- Displays a responsive level backdrop with a top HUD strip (now owned by `scenes/ui/level_top_hud.tscn`), monotone shop wall, baseboard, and a generated diagonal-terracotta floor texture behind generated shelves for Chapter 1.
 
 Change here when:
 - Editing puzzle rules, input behavior, runtime shelf construction, procedural level background styling, level timing, completion conditions, or ability behavior.

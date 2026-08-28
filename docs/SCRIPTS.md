@@ -1800,8 +1800,8 @@ Key responsibilities:
 - Keep insufficient-coins stacks paused: Ability Purchase or Time Up stays beneath
   `InLevelShopOverlay`; closing Shop restores the originating modal, while opening it never spends
   coins or consumes the pending action.
-- Resize the scene-owned `Background` control. Chapter 1 restores the original procedural wall,
-  play wall, baseboard, and floor; chapters configured for `artwork` use
+- Resize the scene-owned `Background` control. Chapter 1 restores the scene-authored wall,
+  play wall, baseboard, and generated terracotta floor texture; chapters configured for `artwork` use
   `Background/ChapterArtwork`. The HUD strip remains scene-owned above either presentation.
 - Load JSON configs with `_load_json_file()`.
 - Instantiate reusable shelf cells with `_add_shelf()`, preserve each scene root's authored position

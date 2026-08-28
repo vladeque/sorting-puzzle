@@ -37,7 +37,7 @@ Contract:
   the same ID in its `level` field.
 - A future locked chapter may have an empty `level_ids` list so it can be previewed before content
   ships.
-- `gameplay_background_mode` is `legacy` for the original procedural wall/floor presentation or
+- `gameplay_background_mode` is `legacy` for Chapter 1's scene-authored wall/baseboard and generated floor-texture presentation or
   `artwork` for the chapter's full-screen gameplay texture. Chapter 1 uses `legacy`.
 - `background_texture` and `selection_preview` must reference existing Godot textures.
   `background_texture` owns gameplay presentation, while `selection_preview` supplies both the

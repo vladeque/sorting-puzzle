@@ -1242,7 +1242,7 @@ Purpose:
   configured menu and do not touch campaign save data.
 
 Important nodes:
-- `Background`: fullscreen procedural gameplay backdrop with child nodes for the top HUD strip, simple shop wall, baseboard, and bottom floor band.
+- `Background`: fullscreen gameplay backdrop. Chapter 1 combines a scene-authored shop wall and baseboard with the generated diagonal-terracotta texture in `assets/backgrounds/chapter_01_floor_terracotta_diagonal.png`; artwork-mode chapters use `Background/ChapterArtwork` instead.
 - `Background/HudCenterSlot/ComboFill`: rounded green combo-window strip that shrinks as the time left to extend the combo runs out.
 - `Background/HudCenterSlot/ComboLabel`: hidden until the player clears a triple, then shows the active combo count.
 - `Shelves`: parent for generated shelf nodes and optional moving shelf row containers; `scripts/level.gd` scales and centers it in the available play area for the current viewport size.
