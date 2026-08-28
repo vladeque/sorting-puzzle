@@ -17,11 +17,13 @@ const LEVEL_SCENE_PATH := "res://level.tscn"
 const LAYER_INDICATOR_SCENE_PATH := "res://scenes/shelf_layer_indicator.tscn"
 const ITEM_SCENE_PATH := "res://scenes/item.tscn"
 const WOOD_TEXTURE_PATH := "res://assets/shelves/standard_shelf_light_oak.png"
-const SHADOW_OVERLAY_PATHS := [
+const NON_COMPOUNDING_SHADOW_PATHS := [
 	"FrameShadow",
 	"BackWallLeftShade",
 	"LeftShadowEdge",
 	"RightShadowEdge",
+]
+const LOCAL_SHADE_OVERLAY_PATHS := [
 	"LeftWallLowerBevel/Shade",
 	"RightWallLowerBevel/Shade",
 	"RightWallTopBevel/Shade",
@@ -152,17 +154,21 @@ func _test_visual_nodes_have_semantic_names() -> void:
 			"Legacy line grain %s should stay hidden behind the image texture." % grain_name
 		)
 
-	for node_path in SHADOW_OVERLAY_PATHS:
+	for node_path in NON_COMPOUNDING_SHADOW_PATHS:
+		var shadow := dispenser.get_node_or_null(node_path) as Polygon2D
+		_check(shadow != null, "Dispenser shadow %s should remain a polygon." % node_path)
+		_check(
+			shadow != null and is_equal_approx(shadow.color.a, 1.0),
+			"Dispenser shadow %s should stay opaque so shelves cannot compound." % node_path
+		)
+
+	for node_path in LOCAL_SHADE_OVERLAY_PATHS:
 		var shadow := dispenser.get_node_or_null(node_path) as Polygon2D
 		_check(shadow != null, "Dispenser shadow %s should remain a polygon." % node_path)
 		_check(
 			shadow != null and shadow.color.a > 0.0 and shadow.color.a < 1.0,
-			"Dispenser shadow %s should stay translucent so item-shadow overlap compounds."
+			"Dispenser face shade %s should stay translucent over its own textured face."
 				% node_path
-		)
-		_check(
-			shadow != null and shadow.material == null,
-			"Dispenser shadow %s should use CanvasItem's default alpha blending." % node_path
 		)
 	dispenser.free()
 
@@ -189,6 +195,12 @@ func _test_item_shadow_layering() -> void:
 			floor_surface.z_index < shadow_z,
 			"The item shadow should render over the dispenser floor and level background."
 		)
+		for shadow_path in NON_COMPOUNDING_SHADOW_PATHS:
+			var shelf_shadow := dispenser.get_node_or_null(shadow_path) as CanvasItem
+			_check(
+				shelf_shadow != null and shelf_shadow.z_index < shadow_z,
+				"The item shadow should render above dispenser shadow %s." % shadow_path
+			)
 		for wall_name in [
 			"RightWallInnerFace",
 			"RightWallTopBevel",
