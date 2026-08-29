@@ -2,7 +2,7 @@
 
 importer="wav"
 type="AudioStreamWAV"
-uid="uid://cadxqq7qo5jq8"
+uid="uid://cl57sck73hs41"
 path="res://.godot/imported/star_hud_arrival.wav-06fce5cc1a53b45c2cd969e663747683.sample"
 
 [deps]
@@ -21,4 +21,4 @@ edit/normalize=false
 edit/loop_mode=0
 edit/loop_begin=0
 edit/loop_end=-1
-compress/mode=0
+compress/mode=2

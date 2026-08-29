@@ -2,7 +2,7 @@
 
 importer="wav"
 type="AudioStreamWAV"
-uid="uid://e11fhvqkglvg"
+uid="uid://ry1pr5ws0ek"
 path="res://.godot/imported/reward_chest_star_arrival_02.wav-dfa3d619819915f4e469bfd473226115.sample"
 
 [deps]
@@ -21,4 +21,4 @@ edit/normalize=false
 edit/loop_mode=0
 edit/loop_begin=0
 edit/loop_end=-1
-compress/mode=0
+compress/mode=2
