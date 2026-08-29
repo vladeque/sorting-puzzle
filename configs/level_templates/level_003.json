@@ -7,27 +7,13 @@
   {
 	"layers": [
 	  [
-		"item_01",
-		"item_11",
-        "item_10"
+		"item_17",
+		"item_14",
+		null
 	  ],
 	  [
-		null,
-		"item_03",
-        "item_08"
-	  ]
-	]
-  },
-  {
-	"layers": [
-	  [
-		"item_07",
-		"item_08",
-        "item_06"
-	  ],
-	  [
+		"item_17",
 		"item_02",
-		"item_05",
         "item_11"
 	  ]
 	]
@@ -35,42 +21,113 @@
   {
 	"layers": [
 	  [
-		"item_09",
-		"item_13",
-        "item_04"
-	  ],
-	  [
-		"item_09",
-		"item_10",
-        "item_04"
-	  ]
-	]
-  },
-  {
-	"layers": [
-	  [
-		null,
-		"item_12",
+		"item_07",
+		"item_05",
 		null
 	  ],
 	  [
 		null,
-		"item_05",
-        "item_12"
+		"item_11",
+        "item_09"
 	  ]
 	]
   },
   {
 	"layers": [
+	  [
+		"item_02",
+		"item_03",
+        "item_07"
+	  ],
+	  [
+		"item_04",
+		"item_17",
+        "item_10"
+	  ]
+	],
+	"unlock_after_triples": 5
+  },
+  {
+	"layers": [
+	  [
+		"item_18",
+		"item_08",
+        "item_08"
+	  ],
+	  [
+		"item_09",
+		"item_14",
+        "item_04"
+	  ]
+	]
+  },
+  {
+	"layers": [
+	  [
+		"item_04",
+		"item_13",
+        "item_02"
+	  ],
+	  [
+		"item_10",
+		null,
+        "item_09"
+	  ]
+	]
+  },
+  {
+	"layers": [
+	  [
+		"item_05",
+		"item_05",
+		null
+	  ],
+	  [
+		"item_12",
+		"item_06",
+        "item_16"
+	  ]
+	]
+  },
+  {
+	"layers": [
+	  [
+		"item_03",
+		"item_21",
+        "item_20"
+	  ],
+	  [
+		"item_19",
+		"item_19",
+        "item_10"
+	  ]
+	]
+  },
+  {
+	"layers": [
+	  [
+		"item_14",
+		"item_21",
+        "item_08"
+	  ],
+	  [
+		null,
+		"item_01",
+        "item_21"
+	  ]
+	]
+  },
+  {
+	"layers": [
+	  [
+		"item_03",
+		null,
+        "item_07"
+	  ],
 	  [
 		"item_06",
-		"item_02",
-        "item_10"
-	  ],
-	  [
-		"item_13",
-		"item_02",
-        "item_10"
+		"item_15",
+        "item_01"
 	  ]
 	]
   },
@@ -78,82 +135,12 @@
 	"layers": [
 	  [
 		null,
-		null,
-        "item_03"
+		"item_19",
+        "item_12"
 	  ],
 	  [
-		"item_14",
-		"item_04",
-        "item_07"
-	  ]
-	]
-  },
-  {
-	"layers": [
-	  [
-		"item_05",
-		null,
-        "item_10"
-	  ],
-	  [
-		"item_03",
-		"item_11",
-        "item_07"
-	  ]
-	]
-  },
-  {
-	"layers": [
-	  [
-		"item_03",
-		"item_08",
-        "item_07"
-	  ],
-	  [
-		null,
-		"item_07",
-        "item_03"
-	  ]
-	]
-  },
-  {
-	"layers": [
-	  [
-		"item_11",
-		"item_07",
-        "item_14"
-	  ],
-	  [
-		"item_14",
-		null,
-        "item_05"
-	  ]
-	]
-  },
-  {
-	"layers": [
-	  [
-		"item_14",
-		null,
-        "item_14"
-	  ],
-	  [
-		null,
-		"item_12",
-        "item_14"
-	  ]
-	]
-  },
-  {
-	"layers": [
-	  [
-		"item_05",
-		"item_05",
-        "item_03"
-	  ],
-	  [
-		"item_11",
-		null,
+		"item_01",
+		"item_16",
         "item_13"
 	  ]
 	]
@@ -161,17 +148,32 @@
   {
 	"layers": [
 	  [
-		"item_11",
-		"item_09",
-        "item_01"
+		"item_20",
+		null,
+        "item_20"
 	  ],
 	  [
-		"item_01",
+		"item_15",
 		"item_06",
-        "item_10"
+        "item_13"
+	  ]
+	]
+  },
+  {
+	"layers": [
+	  [
+		"item_18",
+		"item_11",
+        "item_12"
+	  ],
+	  [
+		"item_18",
+		"item_15",
+        "item_16"
 	  ]
 	]
   }
 ]
+
 
 }

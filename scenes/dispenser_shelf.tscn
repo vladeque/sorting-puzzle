@@ -53,7 +53,7 @@ z_index = 5
 texture_filter = 4
 position = Vector2(1.5497208e-06, -1.6153823)
 scale = Vector2(1.0294118, 1.0384613)
-color = Color(0.7411765, 0.6117647, 0.46666667, 1)
+color = Color(0.6538316, 0.528008, 0.38584614, 1)
 texture = ExtResource("4_wood_texture")
 polygon = PackedVector2Array(-34, 16, 34, 16, 34, 42, -0.20666504, 42, -34, 42)
 uv = PackedVector2Array(96, 448, 368, 448, 368, 552, 231, 552, 96, 552)
@@ -135,7 +135,7 @@ position = Vector2(4, -24)
 scale = Vector2(1.1, 1)
 color = Color(0.84, 0.73, 0.61, 1)
 texture = ExtResource("4_wood_texture")
-polygon = PackedVector2Array(-42.727272, 39, -34.545452, 39, -35.454544, 48, -43.636364, 48)
+polygon = PackedVector2Array(-34.545452, 39, -35.454544, 48, -43.636364, 48, -42.727272, 39)
 uv = PackedVector2Array(64, 320, 96.7, 320, 93.1, 356, 60.4, 356)
 
 [node name="Shade" type="Polygon2D" parent="LeftWallLowerBevel" unique_id=959997199]
@@ -161,7 +161,7 @@ rotation = -6.2831855
 scale = Vector2(1.1, 1)
 color = Color(0.84, 0.73, 0.61, 1)
 texture = ExtResource("4_wood_texture")
-polygon = PackedVector2Array(-44.545464, 38.999992, -36.363647, 38.999992, -35.454544, 48, -43.636364, 48)
+polygon = PackedVector2Array(-36.363644, 38.999992, -35.454556, 47.999992, -43.636375, 47.999992, -44.545464, 38.999992)
 uv = PackedVector2Array(128, 368, 160.7, 368, 164.4, 404, 131.6, 404)
 
 [node name="Shade" type="Polygon2D" parent="RightWallLowerBevel" unique_id=1029582897]
@@ -172,8 +172,8 @@ polygon = PackedVector2Array(-44.545464, 38.999992, -36.363647, 38.999992, -35.4
 [node name="RightWallUpperFace" type="Polygon2D" parent="." unique_id=1377447835]
 z_index = 9
 texture_filter = 4
-position = Vector2(78, -15.830518)
-scale = Vector2(1, 0.65204364)
+position = Vector2(78, -16.024395)
+scale = Vector2(1, 0.64634144)
 color = Color(0.94, 0.85, 0.74, 1)
 texture = ExtResource("4_wood_texture")
 polygon = PackedVector2Array(-44, -34, -35, -34, -35, 48, -44, 48)
@@ -196,21 +196,21 @@ color = Color(0.25, 0.16, 0.09, 0.33)
 polygon = PackedVector2Array(-48.18182, 39.99999, -41.818184, 39.999992, -35.454544, 48, -43.636364, 48)
 
 [node name="RightWallInnerFace" type="Polygon2D" parent="." unique_id=301018592]
-z_index = 9
+z_index = 5
 texture_filter = 4
 position = Vector2(82, -73.70786)
 rotation = -6.2831855
 scale = Vector2(1.1, 0.69269645)
 color = Color(0.72, 0.62, 0.52, 1)
 texture = ExtResource("4_wood_texture")
-polygon = PackedVector2Array(-48.18182, 39.99999, -43.63637, 51.549065, -43.636383, 127.99999, -48.181835, 127.999985)
+polygon = PackedVector2Array(-48.18182, 39.99999, -43.63637, 51.549065, -42.727295, 167.03976, -48.181835, 127.999985)
 uv = PackedVector2Array(640, 900, 672, 918, 992, 918, 992, 900)
 
 [node name="Shade" type="Polygon2D" parent="RightWallInnerFace" unique_id=1603767559]
-z_index = 9
+z_index = 5
 z_as_relative = false
 color = Color(0.22, 0.14, 0.08, 0.43)
-polygon = PackedVector2Array(-48.18182, 39.99999, -43.63637, 51.549065, -43.636383, 127.99999, -48.181835, 127.999985)
+polygon = PackedVector2Array(-48.18182, 39.99999, -43.63637, 51.549065, -42.727295, 165.59613, -48.181835, 127.999985)
 
 [node name="LeftWallTopBevel" type="Polygon2D" parent="." unique_id=589000422]
 z_index = 9
@@ -229,21 +229,21 @@ color = Color(0.25, 0.16, 0.09, 0.33)
 polygon = PackedVector2Array(-39.090916, 39.999992, -31.818188, 39.999996, -36.363644, 47.999992, -44.54546, 47.999992)
 
 [node name="LeftWallInnerFace" type="Polygon2D" parent="." unique_id=879516250]
-z_index = 4
+z_index = 5
 texture_filter = 4
 position = Vector2(19, -86)
 rotation = -6.2831855
 scale = Vector2(1.1, 1)
 color = Color(0.72, 0.62, 0.52, 1)
 texture = ExtResource("4_wood_texture")
-polygon = PackedVector2Array(-48.181824, 47.999992, -43.636368, 39.999996, -43.636383, 127.99999, -48.181835, 127.999985)
+polygon = PackedVector2Array(-48.181824, 47.999992, -43.636368, 39.999996, -43.636375, 100.99999, -49.090927, 127.99999)
 uv = PackedVector2Array(672, 944, 640, 962, 992, 962, 992, 944)
 
 [node name="Shade" type="Polygon2D" parent="LeftWallInnerFace" unique_id=1490050770]
-z_index = 4
+z_index = 5
 z_as_relative = false
 color = Color(0.22, 0.14, 0.08, 0.43)
-polygon = PackedVector2Array(-48.181824, 47.999992, -43.636368, 39.999996, -43.636383, 127.99999, -48.181835, 127.999985)
+polygon = PackedVector2Array(-48.181824, 47.999992, -43.636368, 39.999996, -43.636375, 100.99999, -49.090927, 127.99999)
 
 [node name="BackWallLowerPanel" type="Polygon2D" parent="." unique_id=827236665]
 z_index = 9

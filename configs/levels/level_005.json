@@ -5,223 +5,223 @@
   "seed": 5005,
   "difficulty": "hard",
   "shelves": [
-    {
-      "type": "dispenser",
-      "layers": [
-        [
+	{
+	  "type": "dispenser",
+	  "layers": [
+		[
           "chips_can_cheese"
-        ],
-        [
+		],
+		[
           "cereal_box"
-        ],
-        [
+		],
+		[
           "plant_pot"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          null,
-          "soda_can_lime",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  null,
+		  "soda_can_lime",
           "cookie_box_blue"
-        ],
-        [
-          "ice_cream_tub_pink",
-          "ice_cream_tub_pink",
+		],
+		[
+		  "ice_cream_tub_pink",
+		  "ice_cream_tub_pink",
           "ice_cream_tub_pink"
-        ],
-        [
-          null,
-          null,
+		],
+		[
+		  null,
+		  null,
           "cookie_box_blue"
-        ]
-      ]
-    },
-    {
-      "type": "dispenser",
-      "layers": [
-        [
+		]
+	  ]
+	},
+	{
+	  "type": "dispenser",
+	  "layers": [
+		[
           "jam_jar_strawberry"
-        ],
-        [
+		],
+		[
           "chips_can_classic"
-        ],
-        [
+		],
+		[
           "plant_pot"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "jam_jar_blueberry",
-          "ketchup_bottle",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "jam_jar_blueberry",
+		  "ketchup_bottle",
           "chips_can_cheese"
-        ],
-        [
-          "cookie_box_blue",
-          "frozen_yogurt_cup_strawberry",
+		],
+		[
+		  "cookie_box_blue",
+		  "frozen_yogurt_cup_strawberry",
           "chips_can_cheese"
-        ],
-        [
-          null,
-          "plant_pot",
+		],
+		[
+		  null,
+		  "plant_pot",
           "jam_jar_strawberry"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "cupcake",
-          null,
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "cupcake",
+		  null,
           "cereal_box"
-        ],
-        [
-          null,
-          "cereal_box",
+		],
+		[
+		  null,
+		  "cereal_box",
           "chips_can_classic"
-        ],
-        [
-          "chips_can_classic",
-          "frozen_yogurt_cup_strawberry",
-          null
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          null,
-          "frozen_yogurt_cup_strawberry",
+		],
+		[
+		  "chips_can_classic",
+		  "frozen_yogurt_cup_strawberry",
+		  null
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  null,
+		  "frozen_yogurt_cup_strawberry",
           "vegetable_can_tomato"
-        ],
-        [
-          "soda_can_lime",
-          "cereal_box",
-          null
-        ],
-        [
-          "toothpaste_box",
-          "vegetable_can_corn",
+		],
+		[
+		  "soda_can_lime",
+		  "cereal_box",
+		  null
+		],
+		[
+		  "toothpaste_box",
+		  "vegetable_can_corn",
           "cookie_box_blue"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "vegetable_can_tomato",
-          "teddy_bear",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "vegetable_can_tomato",
+		  "teddy_bear",
           "ketchup_bottle"
-        ],
-        [
-          "toothpaste_box",
-          "chips_can_cheese",
+		],
+		[
+		  "toothpaste_box",
+		  "chips_can_cheese",
           "frozen_yogurt_cup_strawberry"
-        ],
-        [
-          "jam_jar_blueberry",
-          null,
-          null
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "teddy_bear",
-          "ketchup_bottle",
+		],
+		[
+		  "jam_jar_blueberry",
+		  null,
+		  null
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "teddy_bear",
+		  "ketchup_bottle",
           "cupcake"
-        ],
-        [
-          "toothpaste_box",
-          "soda_can_lime",
+		],
+		[
+		  "toothpaste_box",
+		  "soda_can_lime",
           "frozen_yogurt_cup_chocolate"
-        ],
-        [
-          "vegetable_can_corn",
-          "jam_jar_blueberry",
-          null
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "ice_cream_tub_pink",
-          "vegetable_can_corn",
+		],
+		[
+		  "vegetable_can_corn",
+		  "jam_jar_blueberry",
+		  null
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "ice_cream_tub_pink",
+		  "vegetable_can_corn",
           "vegetable_can_corn"
-        ],
-        [
-          "frozen_yogurt_cup_chocolate",
-          "jam_jar_blueberry",
+		],
+		[
+		  "frozen_yogurt_cup_chocolate",
+		  "jam_jar_blueberry",
           "chips_can_classic"
-        ],
-        [
-          "frozen_yogurt_cup_strawberry",
-          "cookie_box_blue",
+		],
+		[
+		  "frozen_yogurt_cup_strawberry",
+		  "cookie_box_blue",
           "cereal_box"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          null,
-          null,
-          null
-        ],
-        [
-          "frozen_yogurt_cup_strawberry",
-          "jam_jar_blueberry",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  null,
+		  null,
+		  null
+		],
+		[
+		  "frozen_yogurt_cup_strawberry",
+		  "jam_jar_blueberry",
           "cereal_box"
-        ],
-        [
-          "chips_can_cheese",
-          "chips_can_classic",
-          null
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "ice_cream_tub_pink",
-          "chips_can_cheese",
-          null
-        ],
-        [
-          "vegetable_can_corn",
-          "cupcake",
+		],
+		[
+		  "chips_can_cheese",
+		  "chips_can_classic",
+		  null
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "ice_cream_tub_pink",
+		  "chips_can_cheese",
+		  null
+		],
+		[
+		  "vegetable_can_corn",
+		  "cupcake",
           "chips_can_classic"
-        ],
-        [
-          "frozen_yogurt_cup_chocolate",
-          null,
-          null
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "ice_cream_tub_pink",
-          "vegetable_can_tomato",
+		],
+		[
+		  "frozen_yogurt_cup_chocolate",
+		  null,
+		  null
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "ice_cream_tub_pink",
+		  "vegetable_can_tomato",
           "teddy_bear"
-        ],
-        [
-          "jam_jar_blueberry",
-          "vegetable_can_corn",
+		],
+		[
+		  "jam_jar_blueberry",
+		  "vegetable_can_corn",
           "cookie_box_blue"
-        ],
-        [
-          null,
-          null,
+		],
+		[
+		  null,
+		  null,
           "jam_jar_strawberry"
-        ]
-      ]
-    }
+		]
+	  ]
+	}
   ]
 }

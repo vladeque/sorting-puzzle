@@ -7,7 +7,7 @@
 [ext_resource type="Script" uid="uid://cy80oincxrrc5" path="res://scripts/level.gd" id="10_level_script"]
 [ext_resource type="PackedScene" uid="uid://db6gp1qpotd1l" path="res://scenes/ui/ability_bar.tscn" id="11_ability_bar"]
 [ext_resource type="PackedScene" path="res://scenes/backgrounds/chapter_level_background.tscn" id="12_chapter_background"]
-[ext_resource type="PackedScene" path="res://scenes/ui/level_failure_screen.tscn" id="13_failure_screen"]
+[ext_resource type="PackedScene" uid="uid://m1f6jo2k1kip" path="res://scenes/ui/level_failure_screen.tscn" id="13_failure_screen"]
 [ext_resource type="PackedScene" uid="uid://dtmnblnytywl0" path="res://scenes/ui/level_top_hud.tscn" id="14_top_hud"]
 [ext_resource type="PackedScene" path="res://scenes/effects/level_completion_confetti.tscn" id="15_completion_confetti"]
 [ext_resource type="PackedScene" path="res://scenes/ui/in_level_shop_screen.tscn" id="16_in_level_shop"]
@@ -15,7 +15,7 @@
 [ext_resource type="PackedScene" path="res://scenes/abilities/lantern_screen_effect.tscn" id="18_lantern_effect"]
 [ext_resource type="PackedScene" path="res://scenes/ui/out_of_lives_menu.tscn" id="19_out_of_lives"]
 [ext_resource type="PackedScene" path="res://scenes/ui/time_up_extension_modal.tscn" id="20_time_up_extension"]
-[ext_resource type="Texture2D" path="res://assets/backgrounds/chapter_01_floor_terracotta_diagonal.png" id="21_floor_texture"]
+[ext_resource type="Texture2D" uid="uid://7u0kffnirvc8" path="res://assets/backgrounds/chapter_01_floor_terracotta_diagonal.png" id="21_floor_texture"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_baseboard"]
 bg_color = Color(0.83, 0.66, 0.47, 1)
@@ -97,10 +97,10 @@ stretch_mode = 6
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_bottom = 34.0
+offset_bottom = 156.0
 grow_horizontal = 2
 mouse_filter = 2
-color = Color(0.48, 0.18, 0.13, 0.32)
+color = Color(0.47843137, 0.18039216, 0.12941177, 0.45882353)
 
 [node name="Shelves" type="Node2D" parent="." unique_id=1655339205]
 position = Vector2(360, 570)
@@ -108,7 +108,7 @@ position = Vector2(360, 570)
 [node name="DragLayer" type="Node2D" parent="." unique_id=1163629860]
 z_index = 100
 
-[node name="LanternScreenEffect" parent="." instance=ExtResource("18_lantern_effect")]
+[node name="LanternScreenEffect" parent="." unique_id=1292432817 instance=ExtResource("18_lantern_effect")]
 
 [node name="FreezerScreenEffect" parent="." unique_id=765524835 instance=ExtResource("17_freezer_effect")]
 
@@ -123,7 +123,6 @@ offset_bottom = -96.0
 
 [node name="FailureScreen" parent="UI" unique_id=784630851 instance=ExtResource("13_failure_screen")]
 visible = false
-layout_mode = 3
 
 [node name="CompletionScreen" parent="UI" unique_id=620620184 instance=ExtResource("7_completion_screen")]
 layout_mode = 3
@@ -136,13 +135,13 @@ layout_mode = 3
 [node name="AbilityPurchaseOverlay" parent="UI" unique_id=38239463 instance=ExtResource("9_ability_purchase")]
 layout_mode = 3
 
-[node name="TimeUpExtensionOverlay" parent="UI" instance=ExtResource("20_time_up_extension")]
+[node name="TimeUpExtensionOverlay" parent="UI" unique_id=1093368738 instance=ExtResource("20_time_up_extension")]
 visible = false
 layout_mode = 3
 
 [node name="InLevelShopOverlay" parent="UI" unique_id=1914713539 instance=ExtResource("16_in_level_shop")]
 
-[node name="OutOfLivesOverlay" parent="UI" instance=ExtResource("19_out_of_lives")]
+[node name="OutOfLivesOverlay" parent="UI" unique_id=1730003424 instance=ExtResource("19_out_of_lives")]
 visible = false
 layout_mode = 3
 
