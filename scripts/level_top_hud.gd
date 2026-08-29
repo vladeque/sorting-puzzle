@@ -44,7 +44,7 @@ const STAR_COUNTER_SIZE := Vector2(112.0, 52.0)
 ## status readout and a control), so they read as two things rather than one cluster.
 const STAR_COUNTER_GAP := 36.0
 const COMBO_SLOT_SIZE := Vector2(170.0, 29.0)
-const COMBO_SLOT_TOP := 92.0
+const COMBO_SLOT_TOP := 112.0
 const COMBO_FILL_INSET := 3.0
 ## Matches MainMenuTopStatus/SettingsWidget at supported widths. On exceptionally narrow usable
 ## widths it follows the row's existing compact scale so safe-area fitting still wins.

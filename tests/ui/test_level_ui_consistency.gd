@@ -511,6 +511,7 @@ func _test_safe_area_layout() -> void:
 	var timer_label := top_hud.find_child("TimerLabel", true, false) as Control
 	var level_label := top_hud.find_child("LevelLabel", true, false) as Control
 	var star_counter := top_hud.find_child("StarCounter", true, false) as Control
+	var hud_center_slot := top_hud.find_child("HudCenterSlot", true, false) as Control
 
 	var safe_margins := Vector4(60.0, 90.0, 60.0, 70.0)
 	var viewport_size := Vector2(720.0, 1280.0)
@@ -519,6 +520,11 @@ func _test_safe_area_layout() -> void:
 	_check(
 		is_equal_approx(top_hud.size.y, 132.0),
 		"The top HUD should use its authored 132px base height."
+	)
+	_check(
+		is_equal_approx(hud_center_slot.position.y, 112.0)
+			and is_equal_approx(hud_center_slot.get_rect().end.y - top_hud.size.y, 9.0),
+		"The center slot should retain its authored 20px inset and 9px bottom-edge overhang."
 	)
 	# The timer deliberately sits above the status row (see TIMER_TOP_MARGIN); only the star pill and
 	# Pause hold the authored HUD_ROW_CENTER_Y.
