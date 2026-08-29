@@ -2027,7 +2027,9 @@ Purpose:
   them, so item/shelf overlap still becomes visibly darker.
 - Instances the reusable hidden `scenes/ui/shelf_lock_overlay.tscn` when a level config gates the
   shelf behind cleared triples.
-- Uses wide, slightly shorter cell bounds so three generated shelves span most of the 720 px gameplay viewport with compact row spacing.
+- Uses wide cell bounds so three generated shelves span most of the 720 px gameplay viewport with
+  compact row spacing. Its floor-anchored interior opening is 106.7 px tall (10% above the original
+  97 px), while item snap points, the 224x135 cell footprint, and row spacing remain unchanged.
 - Runtime shelf instances are scaled slightly by `scripts/level.gd`, with layout template markers and moving-row windows authored to match the scaled cell footprint.
 - Can be switched by `scripts/level.gd` to a `floor_only` visual variant for moving rows by hiding wall and ceiling nodes at runtime.
 - Can be switched by `scripts/level.gd` to `left`, `middle`, or `right` row-placement visuals for static shelves. Moving-row shelves currently stay on the neutral `middle` row-placement visual.

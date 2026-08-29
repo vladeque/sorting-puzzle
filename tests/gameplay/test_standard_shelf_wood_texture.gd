@@ -8,6 +8,10 @@ const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
 const SHELF_SCENE_PATH := "res://scenes/shelf.tscn"
 const ITEM_SCENE_PATH := "res://scenes/item.tscn"
 const WOOD_TEXTURE_PATH := "res://assets/shelves/standard_shelf_light_oak.png"
+const ORIGINAL_INTERIOR_HEIGHT := 97.0
+const EXPECTED_INTERIOR_HEIGHT := ORIGINAL_INTERIOR_HEIGHT * 1.1
+const EXPECTED_FLOOR_TOP := 16.0
+const EXPECTED_SLOT_POSITIONS := [Vector2(-60, 15), Vector2(0, 15), Vector2(60, 15)]
 
 const WALL_PATHS := [
 	"PlacementVisuals/Left/LeftWall",
@@ -103,10 +107,37 @@ func _run() -> void:
 			"%s should stay opaque so overlapping shelves cannot compound." % node_path
 		)
 
+	_check_taller_frame_geometry(shelf)
 	_check_item_shadow_layers_over_shelf_shadows(shelf)
 
 	shelf.free()
 	_finish()
+
+
+func _check_taller_frame_geometry(shelf: Node) -> void:
+	var back_wall := shelf.get_node_or_null("BackWall") as Polygon2D
+	_check(back_wall != null, "The standard shelf should keep its back-wall polygon.")
+	if back_wall != null:
+		var minimum_y := back_wall.polygon[0].y
+		var maximum_y := back_wall.polygon[0].y
+		for point in back_wall.polygon:
+			minimum_y = minf(minimum_y, point.y)
+			maximum_y = maxf(maximum_y, point.y)
+		_check(
+			is_equal_approx(maximum_y - minimum_y, EXPECTED_INTERIOR_HEIGHT),
+			"The standard shelf interior should be exactly 10% taller."
+		)
+		_check(
+			is_equal_approx(maximum_y, EXPECTED_FLOOR_TOP),
+			"The taller shelf should stay anchored to the existing floor."
+		)
+
+	for slot_index in range(EXPECTED_SLOT_POSITIONS.size()):
+		var slot := shelf.get_node_or_null("Slot%02d" % (slot_index + 1)) as Node2D
+		_check(
+			slot != null and slot.position == EXPECTED_SLOT_POSITIONS[slot_index],
+			"The taller frame should not move Slot%02d or its item." % (slot_index + 1)
+		)
 
 
 func _check_item_shadow_layers_over_shelf_shadows(shelf: Node) -> void:

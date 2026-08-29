@@ -729,7 +729,9 @@ Responsibility:
   tone, while later item contact shadows alpha-blend over shelf shadows and darken that overlap.
 - Instances the reusable hidden lock overlay used by triple-gated shelves; the shelf owns only its
   placement, while `ShelfLockOverlay` owns chains, lock, badge, labels, and motion.
-- Keeps the shelf width, height, and slot positions aligned with the level grid constants so a three-shelf row fills most of the gameplay viewport.
+- Keeps the shelf width and slot positions aligned with the level grid constants so a three-shelf
+  row fills most of the gameplay viewport. The standard frame's floor-anchored interior is 10%
+  taller than its original 97 px opening; the cell footprint and row packing remain unchanged.
 
 Change here when:
 - Editing shelf visual details, back-layer preview presentation, lock-overlay placement, front slot
