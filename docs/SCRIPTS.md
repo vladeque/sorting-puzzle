@@ -1757,7 +1757,10 @@ Important constants:
 - `SHELF_BASE_CELL_SIZE`: unscaled reusable shelf scene bounds from `scenes/shelf.tscn`.
 - `SHELF_CELL_SIZE`: scaled reusable shelf scene bounds; three cells in a row are packed to fill most of the 720 px gameplay viewport, with compact vertical row spacing.
 - `SHELF_SHARED_EDGE_THICKNESS`: shelf boundary thickness that neighboring cells overlap.
-- `SHELF_GRID_STEP`: packed layout spacing after overlapping shared shelf edges.
+- `SHELF_ROW_HEIGHT_EXTENSION`: scaled 10.282 px vertical allowance for the standard frame's 10%
+  taller opening.
+- `SHELF_GRID_STEP`: packed layout spacing after overlapping shared shelf edges and adding the
+  taller-frame allowance vertically; its effective Y step is 144.902 px.
 - `DISPENSER_LOWER_CLEARANCE`: per-dispenser upward offset used when another row follows, leaving
   room for the attached stock meter without moving standard neighbours out of the interlocked grid;
   this 32px conditional clearance is additional to the dispenser scene's authored 10px root lift.
@@ -1809,7 +1812,9 @@ Key responsibilities:
   left/middle/right row placement visuals for static shelves, and ask `Shelf` to add generated back
   layers. `scenes/dispenser_shelf.tscn` uses this offset to sit 10px higher than standard shelves.
 - Ask each shelf scene to show or hide its placement-specific `TopCeilingCap` when it has no stacked neighbor above. Show each shelf scene's bottom `Shadow` and `RightColumnShadow` whenever the shelf uses full visuals so neighboring shelf bodies and items cover those low-layer cast shadows while exposed wall/background areas still receive them.
-- Load `layout_preset` scene templates from `scenes/layouts/`, group authored `ShelfXX` markers into rows by position, and place runtime shelves with derived row-placement visuals.
+- Load `layout_preset` scene templates from `scenes/layouts/`, group authored `ShelfXX` markers into
+  rows by position, expand adjacent rows by the taller-frame allowance around the layout center,
+  and place runtime shelves with derived row-placement visuals.
 - Build optional `row_layouts` rows with `_add_row_layout_shelves()`, including horizontal or vertical moving rows and static rows mixed in one level. Moving-row shelves currently use the neutral middle row-placement visual, and moving rows in a level must all use the same axis.
 - Build moving rows declared by layout template `MovingRowXX` nodes with `scripts/shelf_layout_row.gd`; their shelves also use the neutral middle row-placement visual.
 - Keep moving-row shelves out of drag/drop targeting while they are outside the row's visible window, while abilities still use unlocked shelf items.

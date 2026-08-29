@@ -731,7 +731,8 @@ Responsibility:
   placement, while `ShelfLockOverlay` owns chains, lock, badge, labels, and motion.
 - Keeps the shelf width and slot positions aligned with the level grid constants so a three-shelf
   row fills most of the gameplay viewport. The standard frame's floor-anchored interior is 10%
-  taller than its original 97 px opening; the cell footprint and row packing remain unchanged.
+  taller than its original 97 px opening; the cell footprint remains unchanged, while runtime row
+  packing adds the scaled 10.282 px extension between rows so every opening stays visible.
 
 Change here when:
 - Editing shelf visual details, back-layer preview presentation, lock-overlay placement, front slot

@@ -8,8 +8,7 @@ const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
 const SHELF_SCENE_PATH := "res://scenes/shelf.tscn"
 const ITEM_SCENE_PATH := "res://scenes/item.tscn"
 const WOOD_TEXTURE_PATH := "res://assets/shelves/standard_shelf_light_oak.png"
-const ORIGINAL_INTERIOR_HEIGHT := 97.0
-const EXPECTED_INTERIOR_HEIGHT := ORIGINAL_INTERIOR_HEIGHT * 1.1
+const EXPECTED_INTERIOR_HEIGHT := Shelf.ORIGINAL_INTERIOR_HEIGHT * Shelf.INTERIOR_HEIGHT_SCALE
 const EXPECTED_FLOOR_TOP := 16.0
 const EXPECTED_SLOT_POSITIONS := [Vector2(-60, 15), Vector2(0, 15), Vector2(60, 15)]
 

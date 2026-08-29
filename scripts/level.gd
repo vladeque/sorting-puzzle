@@ -9,7 +9,12 @@ const SHELF_BASE_CELL_SIZE := Shelf.BASE_CELL_SIZE
 const SHELF_CELL_SIZE := SHELF_BASE_CELL_SIZE * SHELF_CELL_VISUAL_SCALE
 const SHELF_BASE_SHARED_EDGE_THICKNESS := 8.0
 const SHELF_SHARED_EDGE_THICKNESS := SHELF_BASE_SHARED_EDGE_THICKNESS * SHELF_CELL_VISUAL_SCALE
-const SHELF_GRID_STEP := SHELF_CELL_SIZE - Vector2(SHELF_SHARED_EDGE_THICKNESS, SHELF_SHARED_EDGE_THICKNESS)
+const SHELF_ROW_HEIGHT_EXTENSION := Shelf.INTERIOR_HEIGHT_EXTENSION * SHELF_CELL_VISUAL_SCALE
+const SHELF_GRID_STEP := (
+	SHELF_CELL_SIZE
+	- Vector2(SHELF_SHARED_EDGE_THICKNESS, SHELF_SHARED_EDGE_THICKNESS)
+	+ Vector2(0.0, SHELF_ROW_HEIGHT_EXTENSION)
+)
 const BASE_SLOT_SNAP_DISTANCE := 98.0
 const BASE_ITEM_PICK_SIZE := Vector2(74, 112)
 const ABILITY_HAMMER := &"hammer"
@@ -1211,9 +1216,10 @@ func _add_layout_template_shelves(shelves: Node2D, shelves_config: Array, layout
 	return true
 
 
-## Layout-template markers author the normal interlocked shelf spacing. A dispenser with a row below
-## moves upward by its own readout clearance; standard shelves on the same authored row stay put so
-## they remain joined to standard shelves below.
+## Layout-template markers retain the original interlocked shelf spacing. Runtime adds the standard
+## frame's scaled height extension between each logical row so every taller opening stays exposed
+## without rewriting every authored preset. A dispenser with a row below then moves upward by its own
+## readout clearance; standard shelves on the same authored row stay aligned.
 func _get_layout_template_node_positions(
 	layout_template: Node2D,
 	shelves_config: Array
@@ -1274,16 +1280,21 @@ func _get_layout_template_node_positions(
 	var positions := {}
 	for row_index in range(rows.size()):
 		var row := rows[row_index] as Dictionary
+		var row_vertical_offset := (
+			(float(row_index) - float(rows.size() - 1) * 0.5) * SHELF_ROW_HEIGHT_EXTENSION
+		)
 		for layout_node in row["nodes"] as Array:
 			var node_2d := layout_node as Node2D
-			positions[node_2d.get_instance_id()] = node_2d.global_position
+			positions[node_2d.get_instance_id()] = (
+				node_2d.global_position + Vector2(0.0, row_vertical_offset)
+			)
 
 		if row_index >= rows.size() - 1:
 			continue
 		for dispenser_node in row["dispenser_nodes"] as Array:
 			var dispenser_marker := dispenser_node as Node2D
 			positions[dispenser_marker.get_instance_id()] = (
-				dispenser_marker.global_position
+				positions[dispenser_marker.get_instance_id()]
 				- Vector2(0.0, DISPENSER_LOWER_CLEARANCE)
 			)
 

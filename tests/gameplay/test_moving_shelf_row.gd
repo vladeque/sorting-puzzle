@@ -7,7 +7,7 @@ const LEVEL_SCENE_PATH := "res://level.tscn"
 const PREVIEW_ARGUMENT := "--moving-shelf-motion-preview"
 const LAYOUT_DIRECTORY := "res://scenes/layouts"
 const CELL_SIZE := Vector2(237.44, 143.1)
-const CELL_STEP := Vector2(228.96, 134.62)
+const CELL_STEP := Vector2(228.96, 144.902)
 
 var _failures: Array[String] = []
 
@@ -116,6 +116,7 @@ func _run() -> void:
 		"Pausing should collapse interpolation history so resume cannot jump."
 	)
 	_verify_authored_motion_speeds()
+	_verify_taller_template_spacing()
 
 	row.free()
 	_finish()
@@ -166,6 +167,43 @@ func _verify_authored_motion_speeds() -> void:
 			)
 
 		layout.free()
+
+
+func _verify_taller_template_spacing() -> void:
+	var level_scene := load(LEVEL_SCENE_PATH) as PackedScene
+	var layout_scene := load("%s/layout_grid_3x3.tscn" % LAYOUT_DIRECTORY) as PackedScene
+	var level := level_scene.instantiate() if level_scene != null else null
+	var layout := layout_scene.instantiate() if layout_scene != null else null
+	_check(level != null and layout != null, "The 3x3 layout should load for row-spacing verification.")
+	if level == null or layout == null:
+		if level != null:
+			level.free()
+		if layout != null:
+			layout.free()
+		return
+
+	var shelves_config: Array = []
+	for _index in range(9):
+		shelves_config.append({"layers": [[null, null, null]]})
+	var positions := level.call("_get_layout_template_node_positions", layout, shelves_config) as Dictionary
+	var top_marker := layout.get_node("Shelf01") as Marker2D
+	var middle_marker := layout.get_node("Shelf04") as Marker2D
+	var bottom_marker := layout.get_node("Shelf07") as Marker2D
+	var top_position: Vector2 = positions.get(top_marker.get_instance_id(), Vector2.ZERO)
+	var middle_position: Vector2 = positions.get(middle_marker.get_instance_id(), Vector2.ZERO)
+	var bottom_position: Vector2 = positions.get(bottom_marker.get_instance_id(), Vector2.ZERO)
+	_check(
+		is_equal_approx(middle_position.y - top_position.y, CELL_STEP.y)
+		and is_equal_approx(bottom_position.y - middle_position.y, CELL_STEP.y),
+		"Every authored shelf row should receive the taller 144.902 px runtime step."
+	)
+	_check(
+		is_equal_approx(middle_position.y, 0.0),
+		"Expanding template rows should preserve the layout's vertical center."
+	)
+
+	level.free()
+	layout.free()
 
 
 func _check(condition: bool, message: String) -> void:

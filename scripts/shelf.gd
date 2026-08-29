@@ -4,6 +4,12 @@ extends Node2D
 ## Cell footprint one shelf occupies in the level grid, before `SHELF_CELL_VISUAL_SCALE`.
 ## `scripts/level.gd` reads this as the authority for `SHELF_BASE_CELL_SIZE`.
 const BASE_CELL_SIZE := Vector2(224, 135)
+## Standard shelf art is floor-anchored. The frame grows upward by this delta; level row packing
+## adds the scaled delta between rows so every opening remains visible instead of being overdrawn
+## by the shelf above.
+const ORIGINAL_INTERIOR_HEIGHT := 97.0
+const INTERIOR_HEIGHT_SCALE := 1.1
+const INTERIOR_HEIGHT_EXTENSION := ORIGINAL_INTERIOR_HEIGHT * (INTERIOR_HEIGHT_SCALE - 1.0)
 const SLOT_COUNT := 3
 const BACK_LAYER_PREFIX := "ShelfLayer"
 const FIRST_BACK_LAYER_INDEX := 1

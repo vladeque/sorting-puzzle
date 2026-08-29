@@ -1670,12 +1670,17 @@ Naming:
 - Row and column counts in a preset name always describe the authored markers, so a name plus the shelf count is enough to tell whether a level fits the preset.
 
 Authored geometry:
-- Markers sit on the runtime shelf grid: `228.96` between columns (`114.48` for a half-step stagger) and `134.62` between static rows.
+- Markers retain the original shelf grid: `228.96` between columns (`114.48` for a half-step
+  stagger) and `134.62` between static rows. Runtime preserves marker shapes while adding the
+  taller standard frame's scaled `10.282` px extension between every adjacent logical row, making
+  the effective standard row step `144.902`.
 - Moving shelf bodies are `15` design pixels narrower than a standard shelf cell while their centers
   keep the authored `228.96` step, leaving a `6.52` pixel visual gap instead of an interlocked edge.
 - Their `FloorSurface` and `FloorFrontLip` terminate at the same horizontal edges; the front lip's
   authored static-shelf overhang is removed only when the shelf belongs to a moving row.
-- A moving row is `50.88` taller than a static one (`MovingShelfRow.ROW_HEIGHT_PADDING`), so a static row and an adjacent moving row are placed `176.49` apart and two adjacent moving rows `185.50` apart. Both keep the same visual gap static rows have.
+- A moving row is `50.88` taller than a static one (`MovingShelfRow.ROW_HEIGHT_PADDING`). After the
+  runtime height extension, a static row and an adjacent moving row are placed about `186.77` apart
+  and two adjacent moving rows about `195.78` apart. Both keep the intended visual gap.
 
 Static presets:
 - `scenes/layouts/layout_grid_2x3.tscn` (6 shelves)
@@ -2029,7 +2034,8 @@ Purpose:
   shelf behind cleared triples.
 - Uses wide cell bounds so three generated shelves span most of the 720 px gameplay viewport with
   compact row spacing. Its floor-anchored interior opening is 106.7 px tall (10% above the original
-  97 px), while item snap points, the 224x135 cell footprint, and row spacing remain unchanged.
+  97 px), while item snap points and the 224x135 cell footprint remain unchanged. Runtime adds the
+  scaled 10.282 px height extension between rows so lower shelves are not covered by upper ones.
 - Runtime shelf instances are scaled slightly by `scripts/level.gd`, with layout template markers and moving-row windows authored to match the scaled cell footprint.
 - Can be switched by `scripts/level.gd` to a `floor_only` visual variant for moving rows by hiding wall and ceiling nodes at runtime.
 - Can be switched by `scripts/level.gd` to `left`, `middle`, or `right` row-placement visuals for static shelves. Moving-row shelves currently stay on the neutral `middle` row-placement visual.

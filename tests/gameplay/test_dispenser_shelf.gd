@@ -422,11 +422,11 @@ func _test_preset_layout_offsets_only_dispensers() -> void:
 			"Only dispensers should combine their authored 10px lift with 32px rail clearance."
 		)
 		_check(
-			is_equal_approx(second_row_center_y - center_standard_y, 134.62),
-			"The standard center shelf should keep the authored interlocked row step."
+			is_equal_approx(second_row_center_y - center_standard_y, 144.902),
+			"The standard center shelf should receive the taller-frame row step."
 		)
 		_check(
-			is_equal_approx(second_row_left_y - left_dispenser_y, 176.62),
+			is_equal_approx(second_row_left_y - left_dispenser_y, 186.902),
 			"A dispenser should keep its 10px lift plus 32px rail clearance above the row below."
 		)
 
@@ -491,8 +491,8 @@ func _test_row_layout_offsets_only_dispenser() -> void:
 			"row_layouts should retain the dispenser's 10px lift plus stock-rail clearance."
 		)
 		_check(
-			is_equal_approx(bottom_standard_y - top_standard_y, 134.62),
-			"A row_layouts standard neighbour should retain the interlocked row step."
+			is_equal_approx(bottom_standard_y - top_standard_y, 144.902),
+			"A row_layouts standard neighbour should receive the taller-frame row step."
 		)
 
 		var bottom_left_cap := (

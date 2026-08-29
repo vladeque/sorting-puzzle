@@ -9,7 +9,7 @@ const MOTION_VERTICAL_WRAP := "vertical_wrap"
 
 @export_range(1, 12, 1) var visible_shelf_count := 3
 @export var shelf_cell_size := Vector2(237.44, 143.1)
-@export var shelf_step := Vector2(228.96, 134.62)
+@export var shelf_step := Vector2(228.96, 144.902)
 @export_enum("horizontal_wrap", "vertical_wrap") var motion_type := MOTION_HORIZONTAL_WRAP
 @export var speed_pixels_per_second := 0.0
 @export var direction := 1
