@@ -1757,6 +1757,8 @@ Important constants:
 - `SHELF_BASE_CELL_SIZE`: unscaled reusable shelf scene bounds from `scenes/shelf.tscn`.
 - `SHELF_CELL_SIZE`: scaled reusable shelf scene bounds; three cells in a row are packed to fill most of the 720 px gameplay viewport, with compact vertical row spacing.
 - `SHELF_SHARED_EDGE_THICKNESS`: shelf boundary thickness that neighboring cells overlap.
+- `SHELF_AUTHORED_GRID_STEP`: original interlocked layout-template step before the taller-frame
+  allowance is applied.
 - `SHELF_ROW_HEIGHT_EXTENSION`: scaled 10.282 px vertical allowance for the standard frame's 10%
   taller opening.
 - `SHELF_GRID_STEP`: packed layout spacing after overlapping shared shelf edges and adding the
@@ -1766,8 +1768,9 @@ Important constants:
   this 32px conditional clearance is additional to the dispenser scene's authored 10px root lift.
 - `LAYOUT_ROW_VERTICAL_EPSILON`: tolerance used to group authored layout-template shelf markers into horizontal rows before assigning left/middle/right shelf visuals.
 - `ABILITY_BAR_*`, `SHELVES_*`: responsive layout constants for positioning the ability bar and
-  generated shelf root across portrait viewport sizes, including minimum and maximum shelf layout
-  scale. The top HUD, gameplay modals, and terminal result screens now own their own responsive
+  generated shelf root across portrait viewport sizes, including the back-wall bottom boundary and
+  minimum/maximum shelf layout scale. Shelf boards center against the visible back wall instead of
+  being pulled upward by the floor-level ability overlay. The top HUD, gameplay modals, and terminal result screens now own their own responsive
   layout (UI-003) -- see `scripts/level_top_hud.gd`, `scripts/gameplay_modal_shell.gd`, and
   `scripts/gameplay_result_shell.gd` below; `level.gd` only calls each one's
   `apply_safe_layout(safe_margins, viewport_size)`.
@@ -1799,7 +1802,10 @@ Key responsibilities:
   Failure/Completion result screens, and Pause/Leave Confirmation/Ability Purchase modals to their
   own `apply_safe_layout(safe_margins, viewport_size)` (UI-003 -- each owns its own safe-area
   fitting instead of `level.gd` reaching into fixed panel sizes and child paths), then scales and
-  centers the generated shelf root between them.
+  centers the generated shelf root on the room's visible back wall.
+- Read display-server safe areas only on mobile platforms and only when the rectangle is contained
+  by the current window. Desktop monitor work areas are not mobile insets and no longer lift the
+  board and ability bar during responsive window or capture resizes.
 - Keep insufficient-coins stacks paused: Ability Purchase or Time Up stays beneath
   `InLevelShopOverlay`; closing Shop restores the originating modal, while opening it never spends
   coins or consumes the pending action.
@@ -1813,8 +1819,9 @@ Key responsibilities:
   layers. `scenes/dispenser_shelf.tscn` uses this offset to sit 10px higher than standard shelves.
 - Ask each shelf scene to show or hide its placement-specific `TopCeilingCap` when it has no stacked neighbor above. Show each shelf scene's bottom `Shadow` and `RightColumnShadow` whenever the shelf uses full visuals so neighboring shelf bodies and items cover those low-layer cast shadows while exposed wall/background areas still receive them.
 - Load `layout_preset` scene templates from `scenes/layouts/`, group authored `ShelfXX` markers into
-  rows by position, expand adjacent rows by the taller-frame allowance around the layout center,
-  and place runtime shelves with derived row-placement visuals.
+  rows by position, expand their logical row distances by the taller-frame allowance around the
+  layout center (including proportional half-row expansion for staggered columns), and place
+  runtime shelves with derived row-placement visuals.
 - Build optional `row_layouts` rows with `_add_row_layout_shelves()`, including horizontal or vertical moving rows and static rows mixed in one level. Moving-row shelves currently use the neutral middle row-placement visual, and moving rows in a level must all use the same axis.
 - Build moving rows declared by layout template `MovingRowXX` nodes with `scripts/shelf_layout_row.gd`; their shelves also use the neutral middle row-placement visual.
 - Keep moving-row shelves out of drag/drop targeting while they are outside the row's visible window, while abilities still use unlocked shelf items.

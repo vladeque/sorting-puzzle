@@ -9,10 +9,12 @@ const SHELF_BASE_CELL_SIZE := Shelf.BASE_CELL_SIZE
 const SHELF_CELL_SIZE := SHELF_BASE_CELL_SIZE * SHELF_CELL_VISUAL_SCALE
 const SHELF_BASE_SHARED_EDGE_THICKNESS := 8.0
 const SHELF_SHARED_EDGE_THICKNESS := SHELF_BASE_SHARED_EDGE_THICKNESS * SHELF_CELL_VISUAL_SCALE
+const SHELF_AUTHORED_GRID_STEP := (
+	SHELF_CELL_SIZE - Vector2(SHELF_SHARED_EDGE_THICKNESS, SHELF_SHARED_EDGE_THICKNESS)
+)
 const SHELF_ROW_HEIGHT_EXTENSION := Shelf.INTERIOR_HEIGHT_EXTENSION * SHELF_CELL_VISUAL_SCALE
 const SHELF_GRID_STEP := (
-	SHELF_CELL_SIZE
-	- Vector2(SHELF_SHARED_EDGE_THICKNESS, SHELF_SHARED_EDGE_THICKNESS)
+	SHELF_AUTHORED_GRID_STEP
 	+ Vector2(0.0, SHELF_ROW_HEIGHT_EXTENSION)
 )
 const BASE_SLOT_SNAP_DISTANCE := 98.0
@@ -78,7 +80,10 @@ const ABILITY_BAR_HEIGHT := 151.2
 const ABILITY_BAR_DESIGN_BOTTOM_MARGIN := 96.0
 const ABILITY_BAR_SAFE_BOTTOM_PADDING := 24.0
 const SHELVES_TOP_CLEARANCE := 128.0
-const SHELVES_BOTTOM_CLEARANCE := 52.0
+## Matches Background/Baseboard's 190 design-pixel top offset from the bottom of level.tscn. Shelf
+## boards center against the visible back wall, while the ability buttons remain an overlay near the
+## floor instead of pulling the whole board upward.
+const SHELVES_BACK_WALL_BOTTOM_MARGIN := 190.0
 const SHELVES_SIDE_MARGIN := 16.0
 const SHELVES_MIN_LAYOUT_SCALE := 0.45
 const SHELVES_MAX_LAYOUT_SCALE := 1.5
@@ -369,6 +374,12 @@ func _layout_star_reward_effect_layer(viewport_size: Vector2) -> void:
 
 
 func _get_safe_area_margins(viewport_size: Vector2) -> Vector4:
+	# Desktop DisplayServer implementations expose the monitor work area, not notch/home-indicator
+	# insets for the game window. Only mobile platforms supply the screen-safe rectangle this layout
+	# contract is designed to consume.
+	if not OS.has_feature("mobile"):
+		return Vector4.ZERO
+
 	var window_size := Vector2(DisplayServer.window_get_size())
 	var safe_area := DisplayServer.get_display_safe_area()
 	if window_size.x <= 0.0 or window_size.y <= 0.0 or safe_area.size.x <= 0 or safe_area.size.y <= 0:
@@ -376,6 +387,14 @@ func _get_safe_area_margins(viewport_size: Vector2) -> Vector4:
 
 	var scale := Vector2(viewport_size.x / window_size.x, viewport_size.y / window_size.y)
 	var safe_end := safe_area.position + safe_area.size
+	# Reject malformed platform rectangles that cannot describe the current fullscreen window.
+	if (
+		safe_area.position.x < 0
+		or safe_area.position.y < 0
+		or safe_end.x > window_size.x
+		or safe_end.y > window_size.y
+	):
+		return Vector4.ZERO
 	return Vector4(
 		maxf(float(safe_area.position.x) * scale.x, 0.0),
 		maxf(float(safe_area.position.y) * scale.y, 0.0),
@@ -411,8 +430,10 @@ func _layout_shelves(viewport_size: Vector2, safe_margins: Vector4) -> void:
 		return
 
 	var play_top := safe_margins.y + SHELVES_TOP_CLEARANCE
-	var ability_top := viewport_size.y - _get_ability_bar_bottom_margin(safe_margins) - ABILITY_BAR_HEIGHT
-	var play_bottom := maxf(play_top, ability_top - SHELVES_BOTTOM_CLEARANCE)
+	var play_bottom := maxf(
+		play_top,
+		viewport_size.y - maxf(safe_margins.w, SHELVES_BACK_WALL_BOTTOM_MARGIN)
+	)
 	var play_left := safe_margins.x + SHELVES_SIDE_MARGIN
 	var play_right := viewport_size.x - safe_margins.z - SHELVES_SIDE_MARGIN
 	var shelf_bounds := _get_shelves_local_bounds()
@@ -1218,8 +1239,10 @@ func _add_layout_template_shelves(shelves: Node2D, shelves_config: Array, layout
 
 ## Layout-template markers retain the original interlocked shelf spacing. Runtime adds the standard
 ## frame's scaled height extension between each logical row so every taller opening stays exposed
-## without rewriting every authored preset. A dispenser with a row below then moves upward by its own
-## readout clearance; standard shelves on the same authored row stay aligned.
+## without rewriting every authored preset. Half-row stagger coordinates receive half the extension,
+## while gaps already enlarged for moving-row clearance receive only one full extension. A dispenser
+## with a row below then moves upward by its own readout clearance; standard shelves on the same
+## authored row stay aligned.
 func _get_layout_template_node_positions(
 	layout_template: Node2D,
 	shelves_config: Array
@@ -1277,12 +1300,29 @@ func _get_layout_template_node_positions(
 	rows.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		return float(a["y"]) < float(b["y"])
 	)
+	var row_vertical_offsets: Array[float] = []
+	var accumulated_extension := 0.0
+	for row_index in range(rows.size()):
+		if row_index > 0:
+			var previous_y := float((rows[row_index - 1] as Dictionary)["y"])
+			var current_y := float((rows[row_index] as Dictionary)["y"])
+			var authored_gap := maxf(current_y - previous_y, 0.0)
+			var logical_row_fraction := clampf(
+				authored_gap / SHELF_AUTHORED_GRID_STEP.y,
+				0.0,
+				1.0
+			)
+			accumulated_extension += SHELF_ROW_HEIGHT_EXTENSION * logical_row_fraction
+		row_vertical_offsets.append(accumulated_extension)
+
+	# Grow symmetrically around the authored layout center. This keeps ordinary grids centered and
+	# prevents staggered-column presets from drifting merely because one column starts half a row
+	# above another.
+	var extension_center := accumulated_extension * 0.5
 	var positions := {}
 	for row_index in range(rows.size()):
 		var row := rows[row_index] as Dictionary
-		var row_vertical_offset := (
-			(float(row_index) - float(rows.size() - 1) * 0.5) * SHELF_ROW_HEIGHT_EXTENSION
-		)
+		var row_vertical_offset := row_vertical_offsets[row_index] - extension_center
 		for layout_node in row["nodes"] as Array:
 			var node_2d := layout_node as Node2D
 			positions[node_2d.get_instance_id()] = (

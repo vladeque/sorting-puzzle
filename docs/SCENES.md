@@ -1672,8 +1672,9 @@ Naming:
 Authored geometry:
 - Markers retain the original shelf grid: `228.96` between columns (`114.48` for a half-step
   stagger) and `134.62` between static rows. Runtime preserves marker shapes while adding the
-  taller standard frame's scaled `10.282` px extension between every adjacent logical row, making
-  the effective standard row step `144.902`.
+  taller standard frame's scaled `10.282` px extension per logical row, making the effective
+  standard row step `144.902`. A half-row vertical stagger receives half that extension, so
+  staggered-column shelves stay interlocked instead of developing wall and floor seams.
 - Moving shelf bodies are `15` design pixels narrower than a standard shelf cell while their centers
   keep the authored `228.96` step, leaving a `6.52` pixel visual gap instead of an interlocked edge.
 - Their `FloorSurface` and `FloorFrontLip` terminate at the same horizontal edges; the front lip's

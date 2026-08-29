@@ -8,6 +8,8 @@ const PREVIEW_ARGUMENT := "--moving-shelf-motion-preview"
 const LAYOUT_DIRECTORY := "res://scenes/layouts"
 const CELL_SIZE := Vector2(237.44, 143.1)
 const CELL_STEP := Vector2(228.96, 144.902)
+const BACK_WALL_TOP := 128.0
+const BACK_WALL_BOTTOM_MARGIN := 190.0
 
 var _failures: Array[String] = []
 
@@ -117,6 +119,8 @@ func _run() -> void:
 	)
 	_verify_authored_motion_speeds()
 	_verify_taller_template_spacing()
+	_verify_taller_staggered_column_spacing()
+	await _verify_level_four_back_wall_centering()
 
 	row.free()
 	_finish()
@@ -204,6 +208,94 @@ func _verify_taller_template_spacing() -> void:
 
 	level.free()
 	layout.free()
+
+
+func _verify_taller_staggered_column_spacing() -> void:
+	var level_scene := load(LEVEL_SCENE_PATH) as PackedScene
+	var layout_scene := load(
+		"%s/layout_staggered_columns_4_5_4.tscn" % LAYOUT_DIRECTORY
+	) as PackedScene
+	var level := level_scene.instantiate() if level_scene != null else null
+	var layout := layout_scene.instantiate() if layout_scene != null else null
+	_check(
+		level != null and layout != null,
+		"The Level 4 staggered-column layout should load for row-spacing verification."
+	)
+	if level == null or layout == null:
+		if level != null:
+			level.free()
+		if layout != null:
+			layout.free()
+		return
+
+	var shelves_config: Array = []
+	for _index in range(13):
+		shelves_config.append({"layers": [[null, null, null]]})
+	var positions := level.call(
+		"_get_layout_template_node_positions",
+		layout,
+		shelves_config
+	) as Dictionary
+	var left_top := layout.get_node("Shelf01") as Marker2D
+	var left_next := layout.get_node("Shelf02") as Marker2D
+	var center_top := layout.get_node("Shelf05") as Marker2D
+	var resolved_left_top: Vector2 = positions.get(left_top.get_instance_id(), Vector2.ZERO)
+	var resolved_left_next: Vector2 = positions.get(left_next.get_instance_id(), Vector2.ZERO)
+	var resolved_center_top: Vector2 = positions.get(center_top.get_instance_id(), Vector2.ZERO)
+	_check(
+		is_equal_approx(resolved_left_next.y - resolved_left_top.y, CELL_STEP.y),
+		"Level 4 shelves in one column should keep the interlocked 144.902 px row step."
+	)
+	_check(
+		is_equal_approx(
+			resolved_left_top.y - resolved_center_top.y,
+			CELL_STEP.y * 0.5
+		),
+		"Level 4's interleaved center column should keep an exact half-row stagger."
+	)
+	_check(
+		is_equal_approx(
+			resolved_center_top.y,
+			-CELL_STEP.y * 2.0
+		),
+		"Level 4's five-shelf center column should remain centered around y = 0."
+	)
+
+	level.free()
+	layout.free()
+
+
+func _verify_level_four_back_wall_centering() -> void:
+	var level_scene := load(LEVEL_SCENE_PATH) as PackedScene
+	var level := level_scene.instantiate() if level_scene != null else null
+	_check(level != null, "Level 4 should instantiate for responsive wall-centering verification.")
+	if level == null:
+		return
+
+	level.set("launched_from_dev_mode", true)
+	level.set("selected_level", 4)
+	level.set("_sound_effects_enabled", false)
+	root.add_child(level)
+	await process_frame
+	level.process_mode = Node.PROCESS_MODE_DISABLED
+
+	var shelves := level.get_node("Shelves") as Node2D
+	var shelf_bounds := level.call("_get_shelves_local_bounds") as Rect2
+	var scaled_bounds_center_y := (
+		(shelf_bounds.position.y + shelf_bounds.size.y * 0.5) * shelves.scale.y
+	)
+	var resolved_center_y := shelves.position.y + scaled_bounds_center_y
+	var viewport_height: float = level.get_viewport_rect().size.y
+	var expected_center_y: float = (
+		BACK_WALL_TOP + viewport_height - BACK_WALL_BOTTOM_MARGIN
+	) * 0.5
+	_check(
+		is_equal_approx(resolved_center_y, expected_center_y),
+		"Level 4's shelf bounds should center on the visible back wall."
+	)
+
+	level.queue_free()
+	await process_frame
 
 
 func _check(condition: bool, message: String) -> void:
