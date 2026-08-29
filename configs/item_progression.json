@@ -10,57 +10,102 @@
 		  "unlock": [
 			"candy_bag",
 			"cereal_box",
-			"chips_can_cheese",
 			"chips_can_classic",
-			"chips_can_tomato",
 			"chocolate_bar_classic",
-			"chocolate_bar_hazelnut",
-			"chocolate_bar_white_vanilla",
-			"cookie_box_berry",
 			"cookie_box_blue",
-			"cookie_box_chocolate",
 			"cupcake",
-			"cupcake_lemon",
-			"cupcake_strawberry",
-			"frozen_yogurt_cup_chocolate",
 			"frozen_yogurt_cup_strawberry",
-			"frozen_yogurt_cup_vanilla",
 			"ice_cream_cup",
-			"ice_cream_cup_blueberry",
-			"ice_cream_cup_chocolate",
-			"jam_jar_orange",
 			"jam_jar_raspberry",
-			"juice_box_apple",
-			"juice_box_grape_tall",
-			"juice_box_mixed_berry",
 			"juice_box_orange",
 			"ketchup_bottle",
 			"milk_carton",
-			"plant_pot",
 			"shampoo_bottle",
-			"smoothie_cup_blueberry",
-			"smoothie_cup_mango",
 			"smoothie_cup_strawberry_banana",
 			"soap_pump",
 			"soda_bottle",
-			"soda_bottle_grape",
 			"soda_can_grape",
-			"soda_can_orange",
-			"soda_can_strawberry",
 			"teddy_bear",
 			"toothpaste_box",
 			"toy_robot",
-			"toy_unicorn",
-			"vegetable_can_corn",
-			"vegetable_can_peas",
 			"vegetable_can_tomato",
 			"water_bottle",
 			"yogurt_cup_blueberry",
-			"yogurt_cup_peach",
-			"yogurt_cup_strawberry",
-			"yogurt_tub_blueberry",
 			"yogurt_tub_peach",
-            "yogurt_tub_vanilla"
+			"cereal_box_rainbow",
+			"frozen_yogurt_cup_blue",
+			"gift_box",
+			"gummy_bears_bag",
+			"ice_cream_tub_pink",
+			"jam_jar_strawberry",
+			"lollipop_rainbow",
+			"popcorn_box",
+			"soda_bottle_orange",
+			"soda_can_lime"
+		  ]
+		},
+		{
+		  "from_chapter_level": 3,
+		  "unlock": [
+			"chips_can_cheese",
+			"chocolate_bar_hazelnut",
+			"cookie_box_berry",
+			"frozen_yogurt_cup_chocolate",
+			"toy_unicorn",
+			"coffee_cup"
+		  ]
+		},
+		{
+		  "from_chapter_level": 5,
+		  "unlock": [
+			"chips_can_tomato",
+			"plant_pot",
+			"vegetable_can_corn",
+			"jam_jar_blueberry",
+			"yogurt_tub_strawberry",
+			"yogurt_cup_peach"
+		  ]
+		},
+		{
+		  "from_chapter_level": 7,
+		  "unlock": [
+			"soda_can_orange",
+			"juice_box_grape_tall",
+			"yogurt_cup_strawberry",
+			"juice_box_apple",
+			"smoothie_cup_mango",
+			"chocolate_bar_white_vanilla"
+		  ]
+		},
+		{
+		  "from_chapter_level": 10,
+		  "unlock": [
+			"yogurt_tub_vanilla",
+			"frozen_yogurt_cup_vanilla",
+			"lollipop_wrapped_rainbow",
+			"vegetable_can_peas",
+			"ice_cream_cup_chocolate",
+			"jam_jar_orange"
+		  ]
+		},
+		{
+		  "from_chapter_level": 15,
+		  "unlock": [
+			"juice_box_mixed_berry",
+			"yogurt_tub_blueberry",
+			"cupcake_lemon",
+			"cookie_box_chocolate",
+			"soda_can_strawberry"
+		  ]
+		},
+		{
+		  "from_chapter_level": 25,
+		  "unlock": [
+			"soda_bottle_grape",
+			"smoothie_cup_blueberry",
+			"ice_cream_cup_blueberry",
+			"cupcake_strawberry",
+			"smoothie_cup_green"
 		  ]
 		}
 	  ]

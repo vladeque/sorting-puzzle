@@ -70,7 +70,8 @@ Contract:
 ## `configs/item_progression.json`
 
 Purpose:
-- Defines the exclusive item-art pool available to each chapter during level materialization.
+- Defines the independently configured item-art pool available to each chapter during level
+  materialization.
 - Keeps progression tuning separate from abstract shelf generation and the texture catalog.
 
 Top-level fields:
@@ -84,11 +85,10 @@ Milestone fields:
 
 Contract:
 - Every configured chapter has a progression entry whose first milestone starts at local level `1`.
-- Every catalog item is scheduled exactly once across all chapters, so chapter pools never overlap.
+- Every catalog item is scheduled in at least one chapter.
+- An item may be unlocked only once within a chapter, but different chapter pools may reuse it.
 - A level's available pool is the cumulative union of its chapter milestones whose
   `from_chapter_level` is not greater than that level's chapter-local number.
-- Chapter 1 owns 53 item types available from local level 1; Chapter 2 owns the remaining 15
-  catalog types.
 - Materialization selects a deterministic subset and maps logical item tokens one-to-one. Different
   logical identities never collapse into the same concrete item.
 - The mapping follows the global level's catalog location and chapter-local number, not the

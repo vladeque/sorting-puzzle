@@ -5,235 +5,235 @@
   "seed": 7008,
   "difficulty": "hard",
   "shelves": [
-	{
-	  "layers": [
-		[
-		  "soda_can_grape",
-		  "juice_box_grape_tall",
-          "soda_bottle"
-		],
-		[
-		  "chocolate_bar_classic",
-		  "chips_can_cheese",
+    {
+      "layers": [
+        [
+          "soda_bottle",
+          "juice_box_grape_tall",
+          "popcorn_box"
+        ],
+        [
+          "coffee_cup",
+          "chips_can_cheese",
           "juice_box_grape_tall"
-		],
-		[
-		  "ice_cream_cup_blueberry",
-		  null,
+        ],
+        [
+          "jam_jar_raspberry",
+          null,
           "chips_can_tomato"
-		]
-	  ]
-	},
-	{
-	  "layers": [
-		[
-		  null,
-		  "yogurt_tub_vanilla",
-          "toy_unicorn"
-		],
-		[
-		  "jam_jar_raspberry",
-		  "chips_can_cheese",
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          null,
+          "soda_can_lime",
+          "soda_can_grape"
+        ],
+        [
+          "jam_jar_strawberry",
+          "chips_can_cheese",
           "chips_can_classic"
-		],
-		[
-		  "cookie_box_berry",
-		  "cupcake_lemon",
-          "frozen_yogurt_cup_strawberry"
-		]
-	  ]
-	},
-	{
-	  "layers": [
-		[
-		  "chips_can_tomato",
-		  "chocolate_bar_classic",
-          "chocolate_bar_classic"
-		],
-		[
-		  null,
-		  "soda_can_grape",
-          "ice_cream_cup_blueberry"
-		],
-		[
-		  "jam_jar_raspberry",
-		  "juice_box_apple",
+        ],
+        [
+          "cookie_box_berry",
+          "gift_box",
+          "jam_jar_blueberry"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "chips_can_tomato",
+          "coffee_cup",
+          "coffee_cup"
+        ],
+        [
+          null,
+          "soda_bottle",
+          "jam_jar_raspberry"
+        ],
+        [
+          "jam_jar_strawberry",
+          "juice_box_apple",
           "juice_box_grape_tall"
-		]
-	  ]
-	},
-	{
-	  "layers": [
-		[
-		  "chocolate_bar_classic",
-		  "jam_jar_raspberry",
-		  null
-		],
-		[
-		  "soda_bottle",
-		  "chips_can_tomato",
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "coffee_cup",
+          "jam_jar_strawberry",
+          null
+        ],
+        [
+          "popcorn_box",
+          "chips_can_tomato",
           "cookie_box_berry"
-		],
-		[
-		  "yogurt_tub_vanilla",
-		  "ice_cream_cup_blueberry",
-          "chocolate_bar_classic"
-		]
-	  ]
-	},
-	{
-	  "layers": [
-		[
-		  "soda_bottle",
-		  null,
+        ],
+        [
+          "soda_can_lime",
+          "jam_jar_raspberry",
+          "coffee_cup"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "popcorn_box",
+          null,
           "chips_can_cheese"
-		],
-		[
-		  "frozen_yogurt_cup_strawberry",
-		  null,
+        ],
+        [
+          "jam_jar_blueberry",
+          null,
           "chips_can_tomato"
-		],
-		[
-		  "chocolate_bar_classic",
-		  "soda_can_grape",
-          "toy_unicorn"
-		]
-	  ]
-	},
-	{
-	  "layers": [
-		[
-		  "juice_box_apple",
-		  "yogurt_tub_vanilla",
+        ],
+        [
+          "coffee_cup",
+          "soda_bottle",
+          "soda_can_grape"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "juice_box_apple",
+          "soda_can_lime",
           "chips_can_cheese"
-		],
-		[
-		  "chocolate_bar_classic",
-		  "cupcake_lemon",
+        ],
+        [
+          "coffee_cup",
+          "gift_box",
           "cookie_box_berry"
-		],
-		[
-		  "juice_box_grape_tall",
-		  "soda_can_grape",
+        ],
+        [
+          "juice_box_grape_tall",
+          "soda_bottle",
           "chips_can_classic"
-		]
-	  ],
-	  "unlock_after_triples": 4
-	},
-	{
-	  "layers": [
-		[
-		  null,
-		  "cookie_box_berry",
-          "cupcake_lemon"
-		],
-		[
-		  "soda_can_grape",
-		  "yogurt_tub_vanilla",
-          "frozen_yogurt_cup_strawberry"
-		],
-		[
-		  "jam_jar_raspberry",
-		  "cookie_box_berry",
+        ]
+      ],
+      "unlock_after_triples": 4
+    },
+    {
+      "layers": [
+        [
+          null,
+          "cookie_box_berry",
+          "gift_box"
+        ],
+        [
+          "soda_bottle",
+          "soda_can_lime",
+          "jam_jar_blueberry"
+        ],
+        [
+          "jam_jar_strawberry",
+          "cookie_box_berry",
           "chips_can_cheese"
-		]
-	  ],
-	  "unlock_after_triples": 9
-	},
-	{
-	  "layers": [
-		[
-		  "cookie_box_berry",
-		  "chips_can_classic",
-          "ice_cream_cup_blueberry"
-		],
-		[
-		  "chocolate_bar_classic",
-		  null,
-		  null
-		],
-		[
-		  "chips_can_classic",
-		  "frozen_yogurt_cup_strawberry",
+        ]
+      ],
+      "unlock_after_triples": 9
+    },
+    {
+      "layers": [
+        [
+          "cookie_box_berry",
+          "chips_can_classic",
+          "jam_jar_raspberry"
+        ],
+        [
+          "coffee_cup",
+          null,
+          null
+        ],
+        [
+          "chips_can_classic",
+          "jam_jar_blueberry",
           "chips_can_cheese"
-		]
-	  ]
-	},
-	{
-	  "layers": [
-		[
-		  "jam_jar_raspberry",
-		  "frozen_yogurt_cup_strawberry",
-		  null
-		],
-		[
-		  "juice_box_apple",
-		  "chips_can_classic",
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "jam_jar_strawberry",
+          "jam_jar_blueberry",
+          null
+        ],
+        [
+          "juice_box_apple",
+          "chips_can_classic",
           "juice_box_grape_tall"
-		],
-		[
-		  "juice_box_apple",
-		  "chips_can_tomato",
-          "cupcake_lemon"
-		]
-	  ]
-	},
-	{
-	  "layers": [
-		[
-		  "juice_box_grape_tall",
-		  "cupcake_lemon",
+        ],
+        [
+          "juice_box_apple",
+          "chips_can_tomato",
+          "gift_box"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "juice_box_grape_tall",
+          "gift_box",
           "chips_can_tomato"
-		],
-		[
-		  "juice_box_apple",
-		  "cupcake_lemon",
-          "toy_unicorn"
-		],
-		[
-		  null,
-		  "chocolate_bar_classic",
-		  null
-		]
-	  ]
-	},
-	{
-	  "layers": [
-		[
-		  "soda_can_grape",
-		  "ice_cream_cup_blueberry",
-          "frozen_yogurt_cup_strawberry"
-		],
-		[
-		  "yogurt_tub_vanilla",
-		  "toy_unicorn",
-          "soda_bottle"
-		],
-		[
-		  "toy_unicorn",
-		  null,
-          "soda_bottle"
-		]
-	  ]
-	},
-	{
-	  "layers": [
-		[
-		  "juice_box_apple",
-		  "toy_unicorn",
+        ],
+        [
+          "juice_box_apple",
+          "gift_box",
+          "soda_can_grape"
+        ],
+        [
+          null,
+          "coffee_cup",
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "soda_bottle",
+          "jam_jar_raspberry",
+          "jam_jar_blueberry"
+        ],
+        [
+          "soda_can_lime",
+          "soda_can_grape",
+          "popcorn_box"
+        ],
+        [
+          "soda_can_grape",
+          null,
+          "popcorn_box"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "juice_box_apple",
+          "soda_can_grape",
           "chips_can_classic"
-		],
-		[
-		  "ice_cream_cup_blueberry",
-		  "jam_jar_raspberry",
-		  null
-		],
-		[
-		  "yogurt_tub_vanilla",
-		  "soda_bottle",
-		  null
-		]
-	  ]
-	}
+        ],
+        [
+          "jam_jar_raspberry",
+          "jam_jar_strawberry",
+          null
+        ],
+        [
+          "soda_can_lime",
+          "popcorn_box",
+          null
+        ]
+      ]
+    }
   ]
 }

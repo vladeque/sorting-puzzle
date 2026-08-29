@@ -932,7 +932,7 @@ Files:
 
 Responsibility:
 - Stores ordered chapter/global-level membership and chapter presentation/unlock metadata.
-- Stores exclusive per-chapter item unlock milestones.
+- Stores independently configured per-chapter item unlock milestones; chapter pools may overlap.
 - Stores abstract level number, time limit, layout preset, and logical shelf layers.
 - Materializes abstract item identities into concrete runtime item IDs using each level's available pool.
 - Stores named layout preset positions in Godot scene templates.

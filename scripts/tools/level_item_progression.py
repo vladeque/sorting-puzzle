@@ -229,7 +229,7 @@ def load_item_progression(
 
     campaign_chapters = load_chapter_catalog(chapters_path)
     known_items = set(load_item_catalog_ids(item_config_path))
-    assigned_items: set[str] = set()
+    scheduled_items: set[str] = set()
     raw_chapters = document.get("chapters")
     if not isinstance(raw_chapters, list) or not raw_chapters:
         raise ValueError(f"{progression_path} must define chapter progressions")
@@ -246,6 +246,7 @@ def load_item_progression(
             raise ValueError(f"{progression_path} chapter '{chapter_id}' must define milestones")
 
         milestones: list[tuple[int, tuple[str, ...]]] = []
+        chapter_assigned_items: set[str] = set()
         previous_level = 0
         for milestone_index, raw_milestone in enumerate(raw_milestones):
             if not isinstance(raw_milestone, dict) or set(raw_milestone) != {
@@ -267,9 +268,13 @@ def load_item_progression(
                     raise ValueError(f"{progression_path} contains an invalid item ID")
                 if raw_item_id not in known_items:
                     raise ValueError(f"{progression_path} references unknown item '{raw_item_id}'")
-                if raw_item_id in assigned_items:
-                    raise ValueError(f"{progression_path} assigns item '{raw_item_id}' more than once")
-                assigned_items.add(raw_item_id)
+                if raw_item_id in chapter_assigned_items:
+                    raise ValueError(
+                        f"{progression_path} chapter '{chapter_id}' assigns item "
+                        f"'{raw_item_id}' more than once"
+                    )
+                chapter_assigned_items.add(raw_item_id)
+                scheduled_items.add(raw_item_id)
                 unlocked_items.append(raw_item_id)
             milestones.append((from_level, tuple(unlocked_items)))
             previous_level = from_level
@@ -280,7 +285,7 @@ def load_item_progression(
     if len(chapter_progressions) != len(expected_chapter_ids):
         raise ValueError(f"{progression_path} must define every configured chapter")
 
-    missing_items = known_items - assigned_items
+    missing_items = known_items - scheduled_items
     if missing_items:
         raise ValueError(
             f"{progression_path} does not schedule catalog items: {', '.join(sorted(missing_items))}"

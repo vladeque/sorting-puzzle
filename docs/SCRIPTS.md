@@ -2919,7 +2919,8 @@ Purpose:
 - Provides a single-template materialization CLI.
 
 Key behavior:
-- Rejects unknown, duplicated, unscheduled, or cross-chapter-overlapping catalog items.
+- Rejects unknown, unscheduled, or within-chapter duplicated catalog items while allowing an item
+  to be reused by different chapter pools.
 - Rejects concrete item IDs inside templates and templates that require more identities than their
   campaign-level pool provides.
 - Resolves the global level to its chapter/local number, hash-selects the concrete subset using

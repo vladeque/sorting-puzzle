@@ -23,43 +23,6 @@ from level_item_progression import (  # noqa: E402
 from generate_level_shelves import generate_shelves  # noqa: E402
 
 
-NEW_LEVEL_ONE_ITEM_IDS = {
-    "chips_can_cheese",
-    "chips_can_tomato",
-    "chocolate_bar_hazelnut",
-    "chocolate_bar_white_vanilla",
-    "cookie_box_berry",
-    "cookie_box_chocolate",
-    "cupcake_lemon",
-    "cupcake_strawberry",
-    "frozen_yogurt_cup_chocolate",
-    "frozen_yogurt_cup_strawberry",
-    "frozen_yogurt_cup_vanilla",
-    "ice_cream_cup_blueberry",
-    "ice_cream_cup_chocolate",
-    "jam_jar_orange",
-    "jam_jar_raspberry",
-    "juice_box_apple",
-    "juice_box_grape_tall",
-    "juice_box_mixed_berry",
-    "smoothie_cup_blueberry",
-    "smoothie_cup_mango",
-    "smoothie_cup_strawberry_banana",
-    "soda_bottle_grape",
-    "soda_can_grape",
-    "soda_can_orange",
-    "soda_can_strawberry",
-    "vegetable_can_corn",
-    "vegetable_can_peas",
-    "yogurt_cup_blueberry",
-    "yogurt_cup_peach",
-    "yogurt_cup_strawberry",
-    "yogurt_tub_blueberry",
-    "yogurt_tub_peach",
-    "yogurt_tub_vanilla",
-}
-
-
 class LevelItemProgressionTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
@@ -68,15 +31,14 @@ class LevelItemProgressionTests(unittest.TestCase):
             REPOSITORY_ROOT / "configs" / "item_sprites.json",
         )
 
-    def test_chapter_one_levels_share_one_exclusive_item_pool(self) -> None:
+    def test_chapter_level_pools_follow_configured_milestones(self) -> None:
         chapter_one_items = set(self.progression.chapter_item_ids("chapter_01"))
-        chapter_two_items = set(self.progression.chapter_item_ids("chapter_02"))
-        self.assertEqual(len(chapter_one_items), 53)
-        self.assertEqual(len(chapter_two_items), 15)
-        self.assertFalse(chapter_one_items & chapter_two_items)
-        self.assertLessEqual(NEW_LEVEL_ONE_ITEM_IDS, chapter_one_items)
+        previous_items: set[str] = set()
         for level_number in range(1, 11):
-            self.assertEqual(set(self.progression.available_items(level_number)), chapter_one_items)
+            available_items = set(self.progression.available_items(level_number))
+            self.assertLessEqual(previous_items, available_items)
+            self.assertLessEqual(available_items, chapter_one_items)
+            previous_items = available_items
 
     def test_chapter_catalog_maps_global_to_local_levels(self) -> None:
         chapters = load_chapter_catalog(REPOSITORY_ROOT / "configs" / "chapters.json")
@@ -137,8 +99,9 @@ class LevelItemProgressionTests(unittest.TestCase):
         )
 
     def test_materialization_rejects_more_types_than_the_level_pool(self) -> None:
-        logical_ids_for_level = tuple(logical_item_ids(54))
-        with self.assertRaisesRegex(ValueError, "only 53"):
+        pool_size = len(self.progression.available_items(5))
+        logical_ids_for_level = tuple(logical_item_ids(pool_size + 1))
+        with self.assertRaisesRegex(ValueError, f"only {pool_size}"):
             build_item_mapping(logical_ids_for_level, 5, self.progression)
 
     def test_templates_reject_concrete_or_malformed_item_ids(self) -> None:
@@ -248,6 +211,77 @@ class LevelItemProgressionTests(unittest.TestCase):
             progression_path.write_text(json.dumps(missing_progression), encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "does not schedule"):
                 load_item_progression(progression_path, catalog_path, chapters_path)
+
+    def test_progression_allows_an_item_in_different_chapters(self) -> None:
+        catalog = {
+            "items": [
+                {"id": "alpha", "texture": "res://alpha.png"},
+                {"id": "beta", "texture": "res://beta.png"},
+            ]
+        }
+        chapters = {
+            "schema_version": 1,
+            "default_unlock_required_levels": 25,
+            "chapters": [
+                {
+                    "id": "chapter_01",
+                    "order": 1,
+                    "title": "One",
+                    "level_ids": [1],
+                    "unlock": {"previous_chapter_id": None, "required_completed_levels": 0},
+                    "gameplay_background_mode": "legacy",
+                    "background_texture": "res://one.png",
+                    "selection_preview": "res://one.png",
+                },
+                {
+                    "id": "chapter_02",
+                    "order": 2,
+                    "title": "Two",
+                    "level_ids": [2],
+                    "unlock": {
+                        "previous_chapter_id": "chapter_01",
+                        "required_completed_levels": 1,
+                    },
+                    "gameplay_background_mode": "legacy",
+                    "background_texture": "res://two.png",
+                    "selection_preview": "res://two.png",
+                },
+            ],
+        }
+        progression_document = {
+            "schema_version": 2,
+            "mapping_salt": "test",
+            "chapters": [
+                {
+                    "chapter_id": "chapter_01",
+                    "milestones": [
+                        {"from_chapter_level": 1, "unlock": ["alpha", "beta"]}
+                    ],
+                },
+                {
+                    "chapter_id": "chapter_02",
+                    "milestones": [
+                        {"from_chapter_level": 1, "unlock": ["alpha"]}
+                    ],
+                },
+            ],
+        }
+        with tempfile.TemporaryDirectory() as temp_directory:
+            temp_path = Path(temp_directory)
+            catalog_path = temp_path / "items.json"
+            progression_path = temp_path / "progression.json"
+            chapters_path = temp_path / "chapters.json"
+            catalog_path.write_text(json.dumps(catalog), encoding="utf-8")
+            chapters_path.write_text(json.dumps(chapters), encoding="utf-8")
+            progression_path.write_text(json.dumps(progression_document), encoding="utf-8")
+            progression = load_item_progression(
+                progression_path,
+                catalog_path,
+                chapters_path,
+            )
+
+        self.assertEqual(progression.available_items(1), ("alpha", "beta"))
+        self.assertEqual(progression.available_items(2), ("alpha",))
 
     def test_committed_runtime_levels_match_templates_and_level_pools(self) -> None:
         for template_path in sorted(
