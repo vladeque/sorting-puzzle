@@ -1832,8 +1832,8 @@ Purpose:
   only the timer/level/star/pause row did). The timer stays centered but is kept clear of the level
   label and star/pause cluster so long values (`LEVEL 99`, `59:59`, large star totals) can never
   overlap either side. The strip uses a 132px base height before any safe-top inset is added, and
-  the combo slot remains attached to its lower edge with a 20px inset and 9px overhang. The timer
-  sits 10px above its former position for clearer top-strip balance;
+  the combo slot remains attached to its lower edge with a 20px inset and 9px overhang. The timer,
+  level label, star pill, and Pause read as one aligned status row;
   the star pill and Pause retain the authored 60px row center. The star pill keeps a deliberately
   wide 36px regular-width gap from Pause (30px compact) so the status readout and the control read
   as two roles rather than one cluster.

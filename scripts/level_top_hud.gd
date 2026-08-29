@@ -21,7 +21,7 @@ signal critical_second_pulsed(displayed_seconds: int)
 const GameplayUIThemeScript := preload("res://scripts/gameplay_ui_theme.gd")
 
 const STRIP_BASE_HEIGHT := 132.0
-const TIMER_TOP_MARGIN := 18.0
+const TIMER_TOP_MARGIN := 28.0
 const HUD_ROW_CENTER_Y := 60.0
 const HUD_SIDE_MARGIN := 24.0
 const LEVEL_LABEL_MARGIN_LEFT := 32.0

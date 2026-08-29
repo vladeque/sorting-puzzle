@@ -526,8 +526,8 @@ func _test_safe_area_layout() -> void:
 			and is_equal_approx(hud_center_slot.get_rect().end.y - top_hud.size.y, 9.0),
 		"The center slot should retain its authored 20px inset and 9px bottom-edge overhang."
 	)
-	# The timer deliberately sits above the status row (see TIMER_TOP_MARGIN); only the star pill and
-	# Pause hold the authored HUD_ROW_CENTER_Y.
+	# Timer, star pill, and Pause share the authored HUD_ROW_CENTER_Y; the level label's visual center
+	# is within 2px because its text box carries a slightly different height/baseline.
 	_check(
 		is_equal_approx(
 			pause_button.get_rect().get_center().y,
@@ -536,8 +536,14 @@ func _test_safe_area_layout() -> void:
 		"Pause button and star counter should share the authored top-HUD row center."
 	)
 	_check(
-		timer_label.get_rect().get_center().y < pause_button.get_rect().get_center().y,
-		"The timer should sit above the star/Pause row center for top-strip balance."
+		is_equal_approx(
+			timer_label.get_rect().get_center().y,
+			pause_button.get_rect().get_center().y
+		)
+			and absf(
+				timer_label.get_rect().get_center().y - level_label.get_rect().get_center().y
+			) <= 2.0,
+		"Timer, level label, star counter, and Pause should read as one aligned HUD row."
 	)
 	_check(
 		is_equal_approx(pause_button.get_rect().position.x - star_counter.get_rect().end.x, 36.0),
