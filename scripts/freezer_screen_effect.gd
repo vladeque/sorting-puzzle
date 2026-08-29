@@ -49,7 +49,7 @@ func _ready() -> void:
 			GAMEPLAY_MODAL_SHADE_STYLE.bg_color
 		)
 	_snowflake_field.set_modal_shade(GAMEPLAY_MODAL_SHADE_STYLE.bg_color, 0.0)
-	apply_layout(get_viewport().get_visible_rect().size, 112.0)
+	apply_layout(get_viewport().get_visible_rect().size, 132.0)
 	_set_modal_shade_amount(0.0)
 	_apply_inactive_state()
 

@@ -516,6 +516,10 @@ func _test_safe_area_layout() -> void:
 	var viewport_size := Vector2(720.0, 1280.0)
 	top_hud.call("apply_safe_layout", Vector4.ZERO, viewport_size)
 	await process_frame
+	_check(
+		is_equal_approx(top_hud.size.y, 132.0),
+		"The top HUD should use its authored 132px base height."
+	)
 	# The timer deliberately sits above the status row (see TIMER_TOP_MARGIN); only the star pill and
 	# Pause hold the authored HUD_ROW_CENTER_Y.
 	_check(
