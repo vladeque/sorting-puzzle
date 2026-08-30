@@ -462,6 +462,15 @@ func _layout_shelves(viewport_size: Vector2, safe_margins: Vector4) -> void:
 			root_position.y = min_root_y
 
 	_shelves_root.position = root_position
+	# Belts use the full safe background width (without the static board's side inset) and the
+	# playable back-wall height. Convert after fitting so shelf art and static placement stay fixed.
+	var moving_play_area := Rect2(
+		(Vector2(safe_margins.x, play_top) - root_position) / _shelves_layout_scale,
+		Vector2(viewport_size.x - safe_margins.x - safe_margins.z, play_bottom - play_top)
+			/ _shelves_layout_scale
+	)
+	for moving_row in _get_all_moving_shelf_rows():
+		moving_row.set_play_area(moving_play_area)
 
 
 func _get_shelves_layout_scale(
@@ -507,7 +516,7 @@ func _get_shelves_local_bounds() -> Rect2:
 func _get_shelves_root_child_bounds(child: Node) -> Rect2:
 	var moving_row := child as MovingShelfRow
 	if moving_row != null:
-		return Rect2(moving_row.position, moving_row.size)
+		return moving_row.get_layout_bounds()
 
 	# Visual bounds, not the grid cell: a dispenser's indicator hangs below its shelf body, and the
 	# responsive fit has to keep that on screen even though row packing ignores it.
@@ -1014,10 +1023,9 @@ func _add_moving_shelf_row(
 		SHELF_CELL_SIZE,
 		_get_row_motion_type(row_config),
 		_get_row_motion_speed(row_config),
-		_get_row_motion_direction(row_config)
+		_get_row_motion_direction(row_config),
+		row_center_position
 	)
-	var visible_size := row.get_visible_size()
-	row.position = row_center_position - visible_size * 0.5
 	shelves.add_child(row)
 
 	for row_shelf_index in range(row_shelf_count):

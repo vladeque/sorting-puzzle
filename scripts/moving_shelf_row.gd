@@ -19,6 +19,8 @@ var _previous_motion_offset := 0.0
 var _movement_paused := false
 var _shelves: Array[Node2D] = []
 var _shelf_horizontal_visual_scale := 1.0
+var _layout_center := Vector2.ZERO
+var _travel_length := 0.0
 
 
 func _ready() -> void:
@@ -34,7 +36,8 @@ func configure(
 	row_shelf_cell_size: Vector2,
 	row_motion_type: String,
 	row_speed_pixels_per_second: float,
-	row_direction: int
+	row_direction: int,
+	row_layout_center := Vector2.ZERO
 ) -> void:
 	visible_shelf_count = maxi(row_visible_shelf_count, 1)
 	shelf_step = Vector2(maxf(row_shelf_step.x, 1.0), maxf(row_shelf_step.y, 1.0))
@@ -46,6 +49,9 @@ func configure(
 	motion_type = _normalize_motion_type(row_motion_type)
 	speed_pixels_per_second = maxf(row_speed_pixels_per_second, 0.0)
 	direction = -1 if row_direction < 0 else 1
+	_layout_center = row_layout_center
+	_travel_length = 0.0
+	position = get_layout_bounds().position
 	_previous_motion_offset = _motion_offset
 	_apply_visible_size()
 	_layout_shelves()
@@ -70,12 +76,39 @@ func set_movement_paused(should_pause: bool) -> void:
 	_layout_shelves(_motion_offset)
 
 
-## The window is exactly `visible_shelf_count` cells along the axis the row travels, and one cell plus
-## `ROW_HEIGHT_PADDING` across it. The padding is shadow room: a shelf's drop shadow leans past its
-## cell, and clipping it would cut the shadow off mid-row. Spending that padding on the travel axis
-## instead would open the window wide enough to also reveal a slice of the next shelf while the row
-## sits still, showing more shelves than the row says are visible.
+## Keep authored bounds separate from the expanded travel window so repeated responsive layout
+## passes fit the same board instead of shrinking it to fit the previous viewport's belt length.
+func get_layout_bounds() -> Rect2:
+	var authored_size := _get_authored_visible_size()
+	return Rect2(_layout_center - authored_size * 0.5, authored_size)
+
+
+## The level supplies the playable background in the shelf root's local coordinates, after fitting
+## the board. Only the motion axis expands; the authored lane and shelf spacing stay unchanged.
+func set_play_area(play_area: Rect2) -> void:
+	position = get_layout_bounds().position
+	if motion_type == MOTION_VERTICAL_WRAP:
+		position.y = play_area.position.y
+		_travel_length = maxf(play_area.size.y, 1.0)
+	else:
+		position.x = play_area.position.x
+		_travel_length = maxf(play_area.size.x, 1.0)
+	_apply_visible_size()
+	_layout_shelves()
+
+
 func get_visible_size() -> Vector2:
+	var visible_size := _get_authored_visible_size()
+	if _travel_length > 0.0:
+		if motion_type == MOTION_VERTICAL_WRAP:
+			visible_size.y = _travel_length
+		else:
+			visible_size.x = _travel_length
+	return visible_size
+
+
+## Standalone rows use their configured cell count. Cross-axis padding leaves room for shadows.
+func _get_authored_visible_size() -> Vector2:
 	if motion_type == MOTION_VERTICAL_WRAP:
 		# Whole steps rather than cells plus gaps: cells overlap by their shared edge, so a window
 		# ending at the last cell's own bottom edge would also expose the top sliver of the shelf
@@ -151,16 +184,18 @@ func _layout_shelves(rendered_motion_offset := _motion_offset) -> void:
 		var shelf := live_shelves[shelf_index]
 		if motion_type == MOTION_VERTICAL_WRAP:
 			var base_y := shelf_cell_size.y * 0.5 + float(shelf_index) * shelf_step.y
-			var wrapped_y := fposmod(base_y + rendered_motion_offset, cycle_length)
-			if wrapped_y > visible_size.y + shelf_cell_size.y * 0.5:
-				wrapped_y -= cycle_length
+			var half_height := shelf_cell_size.y * 0.5
+			var wrapped_y := (
+				fposmod(base_y + rendered_motion_offset + half_height, cycle_length) - half_height
+			)
 
 			shelf.position = Vector2(row_center.x, wrapped_y)
 		else:
 			var base_x := shelf_cell_size.x * 0.5 + float(shelf_index) * shelf_step.x
-			var wrapped_x := fposmod(base_x + rendered_motion_offset, cycle_length)
-			if wrapped_x > visible_size.x + shelf_cell_size.x * 0.5:
-				wrapped_x -= cycle_length
+			var half_width := shelf_cell_size.x * 0.5
+			var wrapped_x := (
+				fposmod(base_x + rendered_motion_offset + half_width, cycle_length) - half_width
+			)
 
 			shelf.position = Vector2(wrapped_x, row_center.y)
 
@@ -208,10 +243,14 @@ func _get_live_shelves() -> Array[Node2D]:
 
 
 func _get_cycle_length() -> float:
-	if motion_type == MOTION_VERTICAL_WRAP:
-		return maxf(float(maxi(_shelves.size(), visible_shelf_count)) * shelf_step.y, shelf_step.y)
-
-	return maxf(float(maxi(_shelves.size(), visible_shelf_count)) * shelf_step.x, shelf_step.x)
+	# Even a belt with fewer shelves than fit on screen must fully leave the window before wrapping.
+	# Keep the authored spacing and real shelf count; extend the empty part of the loop if needed.
+	var visible_size := get_visible_size()
+	var axis := 1 if motion_type == MOTION_VERTICAL_WRAP else 0
+	return maxf(
+		float(maxi(_shelves.size(), visible_shelf_count)) * shelf_step[axis],
+		visible_size[axis] + shelf_cell_size[axis]
+	)
 
 
 func _normalize_motion_type(row_motion_type: String) -> String:

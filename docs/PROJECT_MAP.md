@@ -687,7 +687,12 @@ Files:
 - `tests/gameplay/test_moving_shelf_row.gd`
 
 Responsibility:
-- Clips a shelf row to a configured visible window.
+- Clips each belt to the full playable background along its motion axis. `scripts/level.gd` supplies
+  the safe background width or playable wall height after fitting the authored board; the lane's
+  cross-axis position, shelf size, and spacing stay unchanged.
+- Keeps authored bounds separate from runtime clipping bounds so viewport resizing cannot shrink
+  or shift the static board. Extends short wrap loops with empty travel space so shelves leave the
+  background completely before reappearing on the opposite edge.
 - Moves shelves horizontally or vertically on fixed ticks, interpolates them on render frames for
   smooth frame pacing, and wraps them back through the opposite side.
 - Standardizes campaign moving rows at `60` design pixels per second for an even cadence on common

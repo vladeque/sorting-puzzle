@@ -1727,6 +1727,12 @@ Do not use for:
 
 ## `scenes/moving_shelf_row.tscn`
 
+Runtime travel spans the playable background along the motion axis. `scripts/level.gd` supplies
+the safe screen width for horizontal rows and the wall height below the HUD for vertical rows;
+`scripts/moving_shelf_row.gd` owns clipping and wrapping. Authored `visible_count` remains the board
+fitting footprint, while the runtime window may show additional configured shelves on larger
+screens. Static shelf placement, lane position across the motion axis, and shelf spacing do not change.
+
 Root:
 - `MovingShelfRow` (`Control`)
 
@@ -1735,7 +1741,7 @@ Script:
 
 Purpose:
 - Runtime row container for shelf groups with horizontal or vertical wrap motion.
-- Clips child shelf rendering to the configured visible shelf window.
+- Clips child shelf rendering to the runtime travel window supplied by the level.
 - Shortens each shelf body by `15` design pixels without scaling its items, slots, or hit areas, so
   adjacent shelves remain visually separate.
 - Keeps moving-row bounds separate from individual shelf cell visuals.

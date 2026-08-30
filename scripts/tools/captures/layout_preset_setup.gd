@@ -19,6 +19,7 @@ extends RefCounted
 ##
 ## Moving rows are paused after the board is built so every resolution captures the same authored
 ## belt offset instead of wherever the belt happened to have travelled.
+## Set SORTING_PUZZLE_CAPTURE_MOTION_OFFSET to a design-pixel offset to inspect belt entry/exit.
 
 const BOARD_SOURCE_LEVEL := 4
 const LAYOUT_PRESET_ENVIRONMENT_VARIABLE := "SORTING_PUZZLE_CAPTURE_LAYOUT_PRESET"
@@ -58,6 +59,10 @@ func setup(scene_root: Node, tree: SceneTree) -> void:
 	scene_root.call("_apply_level_config", config)
 	scene_root.call("_collect_slots")
 	scene_root.call("_set_moving_shelf_rows_paused", true)
+	var motion_offset := OS.get_environment("SORTING_PUZZLE_CAPTURE_MOTION_OFFSET").to_float()
+	for row in scene_root.call("_get_all_moving_shelf_rows"):
+		row.set("_motion_offset", motion_offset)
+		row.set_movement_paused(true)
 
 	for _frame in range(4):
 		await tree.process_frame

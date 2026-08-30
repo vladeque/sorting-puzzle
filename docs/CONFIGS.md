@@ -156,6 +156,10 @@ Supported static layout presets:
 - `staggered_columns_5_4_5`: 14 shelves arranged as five left, four centered, five right.
 
 Supported layout presets with moving rows:
+
+The visible counts below describe authored board footprints. Runtime travel expands to the full
+playable background along the motion axis, so additional configured shelves can be visible.
+
 - `grid_3x2_moving_4_bottom`: 10 shelves arranged as two static rows of three plus a bottom row of
   four moving shelves, three visible at 45 px/s to the right.
 - `grid_3x3_moving_4_middle`: 13 shelves arranged as a static row of three, a row of four moving
@@ -203,15 +207,17 @@ Row layout shape:
 
 Row layout rules:
 - `shelf_count` is required for each row and consumes shelves in order from the `shelves` array.
-- `visible_count` is optional. Moving rows default to `3` visible shelves, clamped to `shelf_count`; static rows default to their full `shelf_count`.
+- `visible_count` is optional. Moving rows default to a `3`-shelf authored footprint, clamped to
+  `shelf_count`; static rows default to their full `shelf_count`. The moving-row footprint controls
+  board fitting, while its travel window expands to the playable background at runtime.
 - `motion.type` supports `horizontal_wrap` and `vertical_wrap`.
 - `motion.speed` is pixels per second. Built-in campaign presets use `60` for an even cadence on
   common 60 Hz displays. Use `0` for a row that is structured as a moving row but currently stopped.
 - `motion.direction` supports `right` and `left` for `horizontal_wrap`, and `down` and `up` for `vertical_wrap`. Vertical rows default to `down`, moving shelves from top to bottom.
 - A level may use horizontal moving shelves or vertical moving shelves, but not both at the same time.
-- A `vertical_wrap` row carries at least six shelves. Below that the off-window part of the belt is
-  shorter than the window itself, so a shelf leaving the bottom edge is still on screen when it
-  re-enters at the top.
+- The built-in `vertical_wrap` presets carry six shelves per belt. Runtime wrapping also handles
+  shorter belts or taller windows by extending the empty portion of the loop until a shelf can fully
+  exit before re-entering on the other side.
 - `visual_variant` supports `full` and `floor_only`. Moving rows default to `floor_only`; static rows default to `full`.
 - Locked shelves are not allowed inside moving rows.
 - `grid_3x3_moving_5_bottom` is a shorthand preset for three static rows of three shelves plus the bottom moving row from the example above.
@@ -276,6 +282,10 @@ Runtime behavior:
 - `scripts/level.gd` instantiates one `scenes/shelf.tscn` cell for each configured shelf.
 - `scripts/level.gd` uses `layout_preset` to load `scenes/layouts/layout_%s.tscn`, then places generated shelf cells at the template's `ShelfXX` markers.
 - Layout template `MovingRowXX` nodes with `scripts/shelf_layout_row.gd` create moving rows from authored row positions and metadata.
+- Moving-row `visible_count` defines the authored footprint used to fit and center the board, not a
+  cap on shelves visible at runtime. After fitting, horizontal belts span the full safe background
+  width and vertical belts span the playable wall from below the HUD to the back-wall bottom
+  boundary. Taller screens can show more of the same configured shelves; none are duplicated.
 - Static shelf left/middle/right visuals are derived from authored shelf positions or `row_layouts` order at runtime; there is no per-shelf config field for row placement.
 - If `row_layouts` is present, `scripts/level.gd` creates shelves row by row instead. Moving rows are clipped to their visible window and wrap shelves horizontally or vertically according to their motion type.
 - `scripts/level.gd` uses `time_seconds` as the active timer.

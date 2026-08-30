@@ -10,6 +10,10 @@ const CELL_SIZE := Vector2(237.44, 143.1)
 const CELL_STEP := Vector2(228.96, 144.902)
 const BACK_WALL_TOP := 128.0
 const BACK_WALL_BOTTOM_MARGIN := 224.0
+const RESPONSIVE_VIEWPORTS := [
+	Vector2(540, 960), Vector2(720, 1280), Vector2(1080, 1920),
+	Vector2(1080, 2400), Vector2(1200, 1600),
+]
 
 var _failures: Array[String] = []
 
@@ -120,6 +124,8 @@ func _run() -> void:
 	_verify_authored_motion_speeds()
 	_verify_taller_template_spacing()
 	_verify_taller_staggered_column_spacing()
+	_verify_full_background_travel()
+	await _verify_responsive_moving_windows()
 	await _verify_level_four_back_wall_centering()
 
 	row.free()
@@ -143,6 +149,119 @@ func _run_preview() -> void:
 	await create_timer(2.0).timeout
 	level.queue_free()
 	quit(0)
+
+
+func _verify_full_background_travel() -> void:
+	for axis in [0, 1]:
+		for shelf_count in [2, 6]:
+			var row := MovingShelfRow.new()
+			var motion := (
+				MovingShelfRow.MOTION_HORIZONTAL_WRAP if axis == 0
+				else MovingShelfRow.MOTION_VERTICAL_WRAP
+			)
+			row.configure(3, CELL_STEP, CELL_SIZE, motion, 60.0, 1, Vector2(100, 200))
+			for _index in range(shelf_count):
+				var shelf := Node2D.new()
+				row.add_child(shelf)
+				row.add_shelf(shelf)
+			var authored_bounds := row.get_layout_bounds()
+			row.set_play_area(Rect2(-300, -400, 1500, 1800))
+			_check(
+				row.get_layout_bounds() == authored_bounds,
+				"Expanding a belt must preserve its authored layout bounds."
+			)
+			_check(
+				is_equal_approx(row.position[1 - axis], authored_bounds.position[1 - axis]),
+				"Expanding a belt must preserve its lane across the motion axis."
+			)
+			var window_length := row.get_visible_size()[axis]
+			var half_cell := row.shelf_cell_size[axis] * 0.5
+			var first_shelf := row.get_child(0) as Node2D
+			# A shelf must remain visible and selectable deep into the newly available background.
+			row.call("_layout_shelves", window_length - half_cell * 2.0)
+			_check(
+				first_shelf.visible and row.is_shelf_inside_visible_window(first_shelf),
+				"A shelf must travel through the expanded background before wrapping."
+			)
+			for motion_direction in [-1, 1]:
+				row.set("_motion_offset", 0.0)
+				row.direction = motion_direction
+				row.call("_layout_shelves")
+				var cycle: float = row.call("_get_cycle_length")
+				for _tick in range(ceili(cycle * 2.0 / 7.0)):
+					var previous := first_shelf.position[axis]
+					row.call("_physics_process", 7.0 / 60.0)
+					row.call("_layout_shelves")
+					var current := first_shelf.position[axis]
+					if absf(current - previous) > 7.1:
+						_check(
+							(previous >= window_length + half_cell - 7.1
+								and current <= -half_cell + 7.1)
+							or (current >= window_length + half_cell - 7.1
+								and previous <= -half_cell + 7.1),
+							"A shelf may wrap only after its full cell crosses a background edge."
+						)
+			row.free()
+
+
+func _verify_responsive_moving_windows() -> void:
+	var level_scene := load(LEVEL_SCENE_PATH) as PackedScene
+	var level := level_scene.instantiate()
+	level.set("launched_from_dev_mode", true)
+	level.set("selected_level", 4)
+	level.set("_sound_effects_enabled", false)
+	root.add_child(level)
+	await process_frame
+	level.process_mode = Node.PROCESS_MODE_DISABLED
+	for motion in [MovingShelfRow.MOTION_HORIZONTAL_WRAP, MovingShelfRow.MOTION_VERTICAL_WRAP]:
+		var shelves_config: Array = []
+		for _index in range(9):
+			shelves_config.append({"layers": [[null, null, null]]})
+		level.call("_apply_level_config", {
+			"shelves": shelves_config,
+			"row_layouts": [
+				{"shelf_count": 3},
+				{"shelf_count": 6, "visible_count": 3, "motion": {"type": motion, "speed": 60.0}},
+			],
+		})
+		var shelves := level.get_node("Shelves") as Node2D
+		var row := shelves.get_node("MovingShelfRow04") as MovingShelfRow
+		var static_shelf := shelves.get_node("Shelf01") as Node2D
+		var authored_static_position := static_shelf.position
+		var authored_bounds: Rect2 = level.call("_get_shelves_local_bounds")
+		for viewport in RESPONSIVE_VIEWPORTS:
+			for safe_margins in [Vector4.ZERO, Vector4(24, 40, 16, 32)]:
+				level.call("_layout_shelves", viewport, safe_margins)
+				var start := shelves.position + row.position * shelves.scale
+				var end := start + row.size * shelves.scale
+				if motion == MovingShelfRow.MOTION_HORIZONTAL_WRAP:
+					_check(
+						is_equal_approx(start.x, safe_margins.x)
+						and is_equal_approx(end.x, viewport.x - safe_margins.z),
+						"Horizontal belts must span the full safe background width at %s." % viewport
+					)
+				else:
+					_check(
+						is_equal_approx(start.y, BACK_WALL_TOP + safe_margins.y)
+						and is_equal_approx(end.y, viewport.y - BACK_WALL_BOTTOM_MARGIN),
+						"Vertical belts must span the full playable background height at %s." % viewport
+					)
+				var previous_position := shelves.position
+				var previous_scale := shelves.scale
+				for _pass in range(3):
+					level.call("_layout_shelves", viewport, safe_margins)
+				_check(
+					shelves.position.is_equal_approx(previous_position)
+					and shelves.scale.is_equal_approx(previous_scale),
+					"Repeated responsive passes must not shrink or shift the board."
+				)
+				_check(
+					static_shelf.position == authored_static_position
+					and level.call("_get_shelves_local_bounds") == authored_bounds,
+					"Expanded motion must not change static placement or authored board bounds."
+				)
+	level.queue_free()
+	await process_frame
 
 
 func _verify_authored_motion_speeds() -> void:

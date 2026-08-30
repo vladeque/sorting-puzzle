@@ -2413,7 +2413,14 @@ Attached to:
 - `scenes/moving_shelf_row.tscn` root `MovingShelfRow`.
 
 Purpose:
-- Clips a moving shelf group to a visible window.
+- Clips a moving shelf group to a visible window. In a level, `_layout_shelves()` supplies the full
+  playable background along the motion axis: safe left/right edges for horizontal belts, and
+  `SHELVES_TOP_CLEARANCE` through `SHELVES_BACK_WALL_BOTTOM_MARGIN` for vertical belts. The static
+  board's side margin does not inset horizontal motion.
+- Keeps the authored footprint separate from the travel window; responsive fitting uses
+  `get_layout_bounds()` so repeated resizes preserve shelf scale and static placement.
+- Preserves shelf spacing and count when the travel window grows. A short belt gains empty loop
+  space, allowing every shelf to fully exit before wrapping, without duplicate gameplay nodes.
 - Moves child shelves horizontally or vertically and wraps them when they pass the row bounds.
 - Advances motion on fixed physics ticks and interpolates the rendered position each display frame,
   preventing uneven stepping when the physics and display refresh rates differ.
@@ -2425,7 +2432,8 @@ Purpose:
 - Reports whether a shelf center is inside the visible window for drag/drop targeting.
 
 Exports:
-- `visible_shelf_count`: number of shelf positions in the clipped row window.
+- `visible_shelf_count`: authored shelf positions used to fit the board and size standalone rows.
+  Levels expand the actual travel window to the playable background, which can reveal more shelves.
 - `shelf_cell_size`: shelf cell bounds supplied by `scripts/level.gd`.
 - `shelf_step`: packed shelf spacing supplied by `scripts/level.gd`.
 - `motion_type`: `horizontal_wrap` or `vertical_wrap`.
@@ -2434,6 +2442,8 @@ Exports:
 
 Key methods:
 - `configure()`: applies runtime row settings from a level config.
+- `get_layout_bounds()`: stable authored rectangle, including the configured layout center.
+- `set_play_area()`: applies the playable rectangle in shelf-root coordinates along the motion axis.
 - `add_shelf()`: registers a child shelf for wrapping layout.
 - `set_movement_paused()`: pauses row motion during pause, failure, or completion states.
 - `is_shelf_inside_visible_window()`: used by `scripts/level.gd` drag/drop targeting.
@@ -2441,8 +2451,13 @@ Key methods:
 Verification:
 - `tests/gameplay/test_moving_shelf_row.gd` checks the exact `15` px reduction, the resulting gap,
   clipping-window width, visual scaling, unchanged slot proportions, fixed-tick advancement, and
-  subpixel render interpolation. Its optional `--moving-shelf-motion-preview` mode records a real
+  subpixel render interpolation. It also checks complete travel and offscreen wrapping in both axes
+  and directions, short belts, full responsive background coverage, safe insets, and repeat-layout
+  stability at five phone/tablet sizes. Its optional `--moving-shelf-motion-preview` mode records a real
   Level 8 moving-row sequence for frame-by-frame visual review.
+- `scripts/tools/captures/layout_preset_setup.gd` accepts
+  `SORTING_PUZZLE_CAPTURE_MOTION_OFFSET` to freeze a belt at a chosen design-pixel offset for visual
+  entry/exit review. Capture `level.tscn` with `-Position '0,0'`.
 
 Do not use for:
 - Shelf item rules, matching, ability behavior, locking, or level completion. Those stay in `scripts/level.gd`.
