@@ -7,32 +7,39 @@ Date: 2026-08-31.
 
 - Some individual items are sticky and cannot be moved by the player.
 - The player brings matching items onto that shelf to clear the sticky item in a normal triple.
-- A shelf may contain at most one sticky item.
+- Each individual shelf layer may contain at most one sticky item. Different layers of the same
+  shelf may each contain a sticky item.
+- Hammer cannot remove sticky items.
 - Level generation accepts a sticky-items percentage and distributes the resulting sticky items
   randomly across shelves.
 
 Sticky is an item-instance property, not an item type or another whole-shelf lock. Other items on
 the shelf remain movable and its empty slots remain valid destinations.
 
-## Product decisions to confirm
+## Confirmed product decisions
+
+Confirmed by the project owner on 2026-08-31:
+
+- The limit is one sticky item per shelf layer, not one across the entire shelf.
+- Hammer must not remove sticky items, including hidden sticky items.
+
+## Remaining proposed decisions
 
 These recommendations are proposals, not additional approved requirements. Settle them before
 implementing the affected behavior.
 
 | Decision | Recommendation | Consequence |
 | --- | --- | --- |
-| Scope of one sticky item per shelf | One across every authored layer, not one per layer | A shelf never contains two sticky items, including hidden ones. |
 | Placement depth | Allow any occupied layer | Hidden sticky items promote normally and become immovable when exposed. Promotion is automatic, not a player move. |
 | Eligible shelves | Standard shelves, including moving and initially locked standard shelves; never dispensers | Moving shelves carry sticky items with them. Existing visibility and shelf-lock rules still apply. Dispensers cannot receive drops or form triples. |
-| Hammer | Exclude sticky items and preserve enough matching copies for remaining sticky items | Sticky items clear only through shelf triples; Hammer must not destroy their required partners. |
+| Hammer partner protection | Preserve enough matching copies for all remaining sticky items | In addition to the confirmed ban on destroying sticky items, Hammer must not destroy their required partners. |
 | Shuffle | Exclude sticky items from both animation and identity reassignment | Their position, identity, and sticky state remain unchanged. |
 | Percentage meaning | Percentage of all non-null items in the finished board, including hidden and dispenser items | Placement still uses only eligible standard shelves. Empty slots do not count. |
-| Rounding and capacity | Round to nearest integer, halves upward; cap at the number of eligible occupied shelves; report the cap | Small positive percentages can produce zero sticky items. A requested percentage is a target, not always achievable. |
+| Rounding and capacity | Round to nearest integer, halves upward; cap at the number of eligible occupied shelf layers; report the cap | Small positive percentages can produce zero sticky items. A requested percentage is a target, not always achievable. |
 | Feedback | Persistent item marker and a short blocked-tap response; no timer start from a blocked tap alone | Item identity must remain readable, and blocked selection must not look like successful selection. |
 
-If one sticky item *per layer* is desired instead, change the proposed schema and placement capacity
-before implementation. If Hammer is allowed to remove sticky items, specify whether it can gather
-them away from their shelves and how its animation communicates that exception.
+The config schema and generator capacity below reflect the confirmed per-layer limit. Hammer has
+no exception allowing it to gather or destroy sticky items.
 
 ## Current implementation and change map
 
@@ -59,19 +66,27 @@ Recommended additive shelf field, with zero-based indices:
     ["item_01", null, "item_02"],
     ["item_03", "item_01", "item_02"]
   ],
-  "sticky_item": { "layer": 1, "slot": 0 }
+  "sticky_items": [
+    { "layer": 0, "slot": 0 },
+    { "layer": 1, "slot": 0 }
+  ]
 }
 ```
 
-This marks the specific `item_03` instance in the second layer. Keeping `layers` as strings/null
+This marks `item_01` in the first layer and `item_03` in the second layer of the same shelf.
+Keeping `layers` as strings/null
 avoids changing every item catalog/counting/materialization consumer to accept object-valued slots.
 The example illustrates the shelf shape, not a complete solvable level.
 
-- Omit `sticky_item` for an ordinary shelf. Existing configurations retain their behavior.
-- Require exactly the `layer` and `slot` integer fields, both nonnegative and in range; reject
-  booleans, fractions, null metadata, empty target slots, and metadata on dispensers.
-- A singular field structurally represents at most one sticky instance per shelf. Do not also add
-  a second flag format in the layer arrays.
+- Omit `sticky_items` for an ordinary shelf; an empty array also means no sticky items. Existing
+  configurations retain their behavior.
+- Require an array of objects with exactly the `layer` and `slot` integer fields, both nonnegative
+  and in range; reject booleans, fractions, null metadata, empty target slots, and nonempty sticky
+  metadata on dispensers.
+- Reject repeated layer indices, even when the slots differ: each shelf layer can have only one
+  sticky instance. Multiple entries on different layers are valid. Do not also add a second flag
+  format in the layer arrays. The earlier draft's singular `sticky_item` field was never implemented
+  and does not require a migration or legacy alias.
 - Store exact placement in the canonical template and preserve it in the materialized runtime
   level. Never roll sticky placement randomly when loading a level.
 - Coordinates identify the initial instance. After loading, sticky state follows that instance
@@ -89,7 +104,7 @@ Update the solver before enabling sticky generation. Merely marking an already v
 does not preserve solvability.
 
 - Model occupied cells with item identity and sticky state, or equivalently extend shelf state
-  with a sticky position that is correctly remapped on every transition.
+  with per-layer sticky positions that are correctly remapped on every transition.
 - Exclude sticky instances from legal move sources and enforce that in move application too.
   Other items can still move into empty slots on the sticky item's shelf.
 - Match by item identity only. A sticky flag must not prevent a three-of-a-kind clear.
@@ -110,9 +125,10 @@ A useful necessary condition is:
 sticky instances of type T <= total remaining copies of T / 3
 ```
 
-Each sticky instance needs its own triple because sticky instances on different shelves cannot be
-gathered together. With only three copies of an item, two sticky copies on different shelves make
-the level impossible. Check this early, but still run the solver: matching partners can also be
+Each sticky instance needs its own triple: sticky instances on different shelves cannot be gathered
+together, and a sticky item in a deeper layer cannot promote until the front layer clears. With only
+three copies of an item, two sticky copies on different shelves or different layers of the same shelf
+make the level impossible. Check this early, but still run the solver: matching partners can also be
 trapped in deeper layers, behind locks, or in circular dependencies.
 
 ## 3. Generator option and placement
@@ -125,21 +141,24 @@ Recommended count policy:
 
 ```text
 N = count of all non-null items after dispenser insertion
-E = count of occupied standard shelves eligible for sticky placement
+E = count of occupied standard shelf layers eligible for sticky placement
 requested_count = floor(N * percent / 100 + 0.5)
 target_count = min(requested_count, E)
 ```
 
-Example: 90 items, 9 eligible shelves, 20% requested gives 18 requested, 9 targeted, and 10%
-effective. Emit a clear capacity warning; never report that board as having 20% sticky items.
+Example: 90 items on 9 eligible shelves with 4 occupied layers each gives 36 eligible shelf layers.
+At 20%, the target is 18 sticky items, rather than the old draft's whole-shelf cap of 9. Multiple
+layers of a shelf may be selected. If a request exceeds the layer capacity, emit a clear warning
+and report the actual percentage. Capacity alone is not a solvability guarantee.
 
 Placement pipeline:
 
 1. Generate ordinary item distribution using existing difficulty, copy limits, and layer rules.
 2. Insert dispenser shelves and apply whole-shelf locks as today.
-3. Compute the count and sample eligible shelves without replacement, then occupied cells within
-   them. Use a deterministic RNG stream derived from the attempt seed for sticky placement.
-4. Respect per-item-type sticky limits. Use bounded retry/backtracking when shelf and type choices
+3. Compute the count and sample eligible `(shelf, layer)` pairs without replacement, then one
+   occupied cell within each selected layer. Use a deterministic RNG stream derived from the
+   attempt seed for sticky placement.
+4. Respect per-item-type sticky limits. Use bounded retry/backtracking when layer and type choices
    conflict; an unlucky greedy choice must not be reported as proof that placement is impossible.
 5. Check the opening-progress requirement after sticky placement and locks. Counting three visible
    copies is insufficient if they cannot legally be gathered. Preserve the existing meaning of
@@ -149,11 +168,11 @@ Placement pipeline:
 7. Under `--require-solvable`, write only a result with `valid: true` and `solvable: true`; return a
    clear failure on exhausted attempts. Outside that mode, explicitly report unverified results.
 
-The shelf capacity cap is the only proposed automatic reduction. If the targeted count cannot be
+The shelf-layer capacity cap is the only proposed automatic reduction. If the targeted count cannot be
 placed with the type limits or cannot be proven solvable within the budget, report that distinction
 and suggest a lower percentage or larger budget instead of silently delivering fewer sticky items.
 
-Extend `--stats` with requested percentage/count, eligible shelf count, targeted/actual count,
+Extend `--stats` with requested percentage/count, eligible shelf-layer count, targeted/actual count,
 effective percentage, chosen coordinates, cap reason, used seed, attempts, and solver outcome.
 Recompute final-board statistics after dispenser and sticky passes.
 
@@ -177,6 +196,8 @@ validation instructions when implementing the CLI; do not change the skill as pa
   Preserve source restrictions even when an item becomes visible or an animation ends.
 - Match clearing removes the sticky instance and its marker with the other two items. Stars,
   combo progression, shelf unlock counts, and completion behavior remain normal.
+- If the next layer also contains a sticky item, its own flag and marker promote with it. Clearing
+  one layer's sticky item must not remove the restriction from later layers or transfer it to a slot.
 - Reset/retry reloads the authored sticky placement. Moving shelves carry the anchored instance;
   clipping and reachable-window checks remain unchanged.
 - No new persistent player-save field is expected: this feature belongs to level content and
@@ -188,7 +209,7 @@ validation instructions when implementing the CLI; do not change the skill as pa
 | --- | --- |
 | Shuffle | Filter sticky instances before animation and ID reassignment, including hidden layers. Preserve all sticky identities and positions; continue shuffling eligible ordinary items. |
 | Hammer | Exclude sticky targets in both front and back-layer selection. For a candidate type, require `remaining_count - 3 >= 3 * remaining_sticky_count` before destroying three ordinary copies. Count all layers and shelves for this reserve check. |
-| Highlight / lantern | Include sticky instances as match destinations, but never propose gathering two sticky instances on different shelves into one triple. Choose ordinary movable partners and respect target-shelf capacity, locks, and reachability. |
+| Highlight / lantern | Include exposed sticky instances as match destinations, but never propose gathering two sticky instances into one triple. Hidden sticky instances cannot act as partners for an earlier layer. Choose ordinary movable partners and respect target-shelf capacity, locks, and reachability. |
 | Freezer | Keep its existing timer behavior; no sticky-specific rule is needed. |
 
 Ability availability, target selection, and execution must use consistent eligibility checks. A
@@ -206,15 +227,19 @@ scoped runtime search/validated-assignment policy rather than an undocumented pr
 - Add a reusable marker scene such as `scenes/ui/sticky_item_indicator.tscn`, with a focused script
   if it has animation. Instance it from `scenes/item.tscn`; do not construct its hierarchy in
   `level.gd`.
-- Select a visual treatment before asset production: for example, a small glue patch, a fastening
-  badge, or a restraint around the item. It must differ from the whole-shelf lock overlay and remain
-  recognizable without relying only on color.
+- A clear marker is required, but generated artwork is optional. Simple Godot 2D shapes can provide
+  the prototype or final marker; a polished illustrated treatment can use one reusable transparent
+  overlay shared by all item types. Do not regenerate every item sprite as a sticky variant.
+- Art direction options, not yet selected: a glossy glue/gum patch around the item's base
+  (recommended), a short adhesive tape strip across the lower edge, or a small fastening badge.
+  Keep the center of the item uncovered. The treatment must differ from the whole-shelf lock
+  overlay and remain recognizable without relying only on color.
 - Keep the item art recognizable. Define front/back-preview appearance, correct scaling on narrow
   and moving shelves, blocked feedback, hint overlap, and marker removal during a triple clear.
 - A brief pulse or restraint response must not look like the item has been picked up or unblocked.
 - No generated art is required for the mechanics prototype. If generated assets are requested,
   follow the repository's direction/candidate selection workflow before integrating them.
-- Add a capture setup with ordinary/sticky neighbors, a hidden sticky item, a locked shelf, a
+- Add a capture setup with ordinary/sticky neighbors, sticky items in successive layers, a locked shelf, a
   moving shelf, highlighted state, and a match-ready example.
 - Render and inspect at 540x960, 720x1280, 1080x1920, 1080x2400, and a tablet-like portrait viewport
   using `scripts/tools/capture_ui.ps1`. Verify actual capture dimensions and review the contact
@@ -249,16 +274,19 @@ Extend the existing Python suites:
 
 - `tests/tools/test_validate_level_solvable.py`: valid/invalid metadata, ordinary versus sticky
   source moves, matching by identity, promotion, locks, dispenser rejection, distinct canonical
-  states, insufficient-partner deadlocks, deeper-layer dependency traps, and replayable solutions.
+  states, two sticky entries on different layers accepted, duplicate-layer entries rejected,
+  insufficient-partner deadlocks across shelves and within one shelf, deeper-layer dependency traps,
+  and replayable solutions.
 - `tests/tools/test_generate_level_shelves.py`: default/zero regression, deterministic seeds,
-  percentage validation, rounding, saturation, one sticky per shelf, per-type limits, no empty or
+  percentage validation, rounding, layer-capacity saturation, one sticky per shelf layer, multiple
+  sticky layers on the same shelf, per-type limits, no empty or
   dispenser targets, final opening-progress checks, and explicit exhausted-budget failures.
 - `tests/tools/test_level_item_progression.py`: preserve coordinates exactly, map the targeted item
   normally, reject malformed metadata, and retain unchanged ordinary-level outputs.
 
 Add focused Godot gameplay tests for both input modes and direct move calls; normal-item moves on a
-sticky shelf; dropping/tapping onto the occupied sticky target; triple clearing and rewards; hidden
-promotion; unlock; retry; moving rows; and malformed content. Add ability regressions covering
+sticky shelf; dropping/tapping onto the occupied sticky target; triple clearing and rewards; repeated
+promotion through successive sticky layers; unlock; retry; moving rows; and malformed content. Add ability regressions covering
 sticky identity preservation, Hammer partner reservation, valid highlight grouping, and no charge
 on failure. Reuse the existing hammer, lantern, dispenser, and moving-shelf tests where appropriate.
 
@@ -272,7 +300,8 @@ implementation. Keep tests and visual evidence tied to the behavior each batch c
 
 ## Delivery order
 
-1. Confirm the product decisions above and the final config/percentage contract.
+1. Confirm the remaining proposed decisions and the final config/percentage contract. The per-layer
+   limit and Hammer exclusion are already confirmed and must not be reopened as approval requests.
 2. Implement config validation and sticky-aware solver with regression fixtures.
 3. Add generator placement/stats and materialization coverage, with default behavior unchanged.
 4. Implement item state, movement guards, lifecycle handling, and ability/hint rules.
