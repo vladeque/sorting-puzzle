@@ -678,6 +678,8 @@ Verification:
 ### Moving Shelf Rows
 
 Files:
+- `scenes/moving_shelf.tscn` (one shelf's independently editable art and slots)
+- `scripts/moving_shelf.gd` (single-shelf presentation defaults, extending `Shelf`)
 - `scenes/moving_shelf_row.tscn`
 - `scenes/layouts/layout_*.tscn`
 - `scripts/moving_shelf_row.gd`
@@ -687,6 +689,9 @@ Files:
 - `tests/gameplay/test_moving_shelf_row.gd`
 
 Responsibility:
+- Instantiates each moving shelf from `scenes/moving_shelf.tscn`; static shelves continue to use
+  `scenes/shelf.tscn`. Edit the single moving scene's `FloorSurface`, shade, and `FloorFrontLip` for
+  unique moving-shelf artwork. Its default appearance and three-slot gameplay remain unchanged.
 - Clips each belt to the full playable background along its motion axis. `scripts/level.gd` supplies
   the safe background width or playable wall height after fitting the authored board; the lane's
   cross-axis position, shelf size, and spacing stay unchanged.

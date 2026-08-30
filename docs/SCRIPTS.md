@@ -1778,6 +1778,9 @@ Important constants:
   `apply_safe_layout(safe_margins, viewport_size)`.
 - `SHELF_SCENE`: `res://scenes/shelf.tscn`.
 - `MOVING_SHELF_ROW_SCENE`: `res://scenes/moving_shelf_row.tscn`.
+- `MOVING_SHELF_SCENE`: `res://scenes/moving_shelf.tscn`, the independent art/slot scene used by
+  `_add_moving_shelf_row()` via `_add_shelf()`'s scene override. Static and dispenser creation keep
+  their existing scene paths; this adds no new level-config shelf type.
 - `ITEM_SCENE`: `res://scenes/item.tscn`.
 - `ITEM_SPRITES_CONFIG`: `res://configs/item_sprites.json`.
 - `ABILITY_PURCHASE_PRICES_CONFIG`: `res://configs/ability_purchase_prices.json`.
@@ -2307,6 +2310,21 @@ Depends on:
 
 Do not use for:
 - Level JSON parsing, item identity assignment, matching, abilities, lock progression, or promotion timing. Those stay in `scripts/level.gd`.
+
+## `scripts/moving_shelf.gd`
+
+Class: `MovingShelf`, extending `Shelf`.
+
+Attached to `scenes/moving_shelf.tscn`, the standalone visual scene for one shelf on a moving belt.
+It starts with the `floor_only` variant and restores the scene's optional hidden frame/cast shadows
+when a row explicitly requests `full`. Art and slots are authored in the scene; shared three-slot
+gameplay capabilities, generated back layers, and visual scaling are inherited from `Shelf`.
+The script does not move itself: `MovingShelfRow` still owns belt motion and clipping.
+
+Verification: `tests/gameplay/test_moving_shelf_row.gd` loads this actual moving-shelf scene for its
+width, slot-proportion, and motion checks; verifies default/full variants; and checks that moving
+rows use the new scene while static shelves continue using `scenes/shelf.tscn`. Existing responsive
+travel and edge-pickup regressions exercise the extracted scene.
 
 ## `scripts/dispenser_shelf.gd`
 

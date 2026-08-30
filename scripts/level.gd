@@ -33,6 +33,7 @@ const HAMMER_ITEM_COMPRESSION_SECONDS := 0.08
 const HAMMER_MERGE_POP_SECONDS := 0.12
 const HAMMER_REWARD_DELAY_SECONDS := 0.14
 const SHELF_SCENE := preload("res://scenes/shelf.tscn")
+const MOVING_SHELF_SCENE := preload("res://scenes/moving_shelf.tscn")
 const DISPENSER_SHELF_SCENE := preload("res://scenes/dispenser_shelf.tscn")
 const SHELF_TYPE_STANDARD := "standard"
 const SHELF_TYPE_DISPENSER := "dispenser"
@@ -1045,7 +1046,7 @@ func _add_moving_shelf_row(
 			)
 			shelf_type = SHELF_TYPE_STANDARD
 
-		var shelf := _add_shelf(row, shelf_number, Vector2.ZERO, shelf_type)
+		var shelf := _add_shelf(row, shelf_number, Vector2.ZERO, shelf_type, MOVING_SHELF_SCENE)
 		row.add_shelf(shelf)
 		_apply_shelf_visual_variant(shelf, visual_variant)
 		_apply_shelf_row_placement(shelf, Shelf.ROW_PLACEMENT_MIDDLE)
@@ -1593,9 +1594,12 @@ func _add_shelf(
 	parent: Node,
 	shelf_number: int,
 	shelf_position: Vector2,
-	shelf_type := SHELF_TYPE_STANDARD
+	shelf_type := SHELF_TYPE_STANDARD,
+	shelf_scene_override: PackedScene = null
 ) -> Shelf:
-	var shelf_scene := DISPENSER_SHELF_SCENE if shelf_type == SHELF_TYPE_DISPENSER else SHELF_SCENE
+	var shelf_scene := shelf_scene_override
+	if shelf_scene == null:
+		shelf_scene = DISPENSER_SHELF_SCENE if shelf_type == SHELF_TYPE_DISPENSER else SHELF_SCENE
 	var shelf := shelf_scene.instantiate() as Shelf
 	# A reusable shelf scene may author a small per-type layout offset on its root. Capture it before
 	# assigning the generated grid position; the dispenser uses this to keep its whole cradle 10px

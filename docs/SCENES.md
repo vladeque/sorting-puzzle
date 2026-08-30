@@ -1725,6 +1725,36 @@ Depends on:
 Do not use for:
 - Shelf contents, item layers, locks, matching rules, or runtime state. Those stay in level JSON and `scripts/level.gd`.
 
+## `scenes/moving_shelf.tscn`
+
+One independently editable moving shelf, separate from both the static `scenes/shelf.tscn` art and
+the belt container `scenes/moving_shelf_row.tscn`. This is a standalone scene, not an inherited
+instance of the static shelf. Moving rows in both layout presets and `row_layouts` instantiate it.
+
+Root and behavior:
+- `MovingShelf` (`Node2D`) uses `scripts/moving_shelf.gd`, extending the shared `Shelf` helpers.
+- Opens as the current floor-only moving shelf. Its optional hidden frame is retained for existing
+  configs that request `visual_variant: "full"`; the script restores that frame when requested.
+- Owns its artwork, `Slot01`–`Slot03`, and each slot's `ItemSlotXX` marker. Keep those slot names and
+  marker positions when changing artwork so item placement, back layers, and touch targets stay aligned.
+
+Customize the moving shelf here:
+- Edit `FloorSurface`, `FloorSurface/Shade`, and `FloorFrontLip` for the default moving appearance.
+  Add decorations as children of this scene, not of the moving-row container.
+- Current body narrowing, trimmed lip, and polygon antialiasing are authored into the scene for an
+  accurate standalone preview. Row registration reapplies the existing horizontal visual scale;
+  customize polygon points/textures rather than relying on a different X scale for these nodes.
+- The initial wood texture is shared with static shelves. Assign a separate texture resource here
+  if the texture itself should change only on moving shelves.
+- Movement, wrapping, clipping, and edge pickup remain owned by the row and level scripts.
+
+Preview (no setup script required):
+
+```powershell
+& .\scripts\tools\capture_ui.ps1 -Scene scenes/moving_shelf.tscn -Name single_moving_shelf `
+    -Zoom 3 -Background '#2b2f3a'
+```
+
 ## `scenes/moving_shelf_row.tscn`
 
 Runtime travel spans the playable background along the motion axis. `scripts/level.gd` supplies
@@ -1751,11 +1781,11 @@ Important properties:
 - `mouse_filter`: ignored so gameplay input remains owned by `scripts/level.gd`.
 
 Runtime-created nodes:
-- `ShelfXX`: `scenes/shelf.tscn` instances parented under the row and registered with `MovingShelfRow.add_shelf()`.
+- `ShelfXX`: `scenes/moving_shelf.tscn` instances parented under the row and registered with `MovingShelfRow.add_shelf()`.
 
 Depends on:
 - Runtime configuration from `scripts/level.gd`.
-- Child shelf scenes from `scenes/shelf.tscn`.
+- Child shelf scenes from `scenes/moving_shelf.tscn`.
 
 Do not use for:
 - Puzzle rules, item movement rules, matching, abilities, or lock progression. Those stay in `scripts/level.gd`.

@@ -279,7 +279,9 @@ Item count rules:
 - The runtime clears three identical visible items on one standard shelf; dispensers never match.
 
 Runtime behavior:
-- `scripts/level.gd` instantiates one `scenes/shelf.tscn` cell for each configured shelf.
+- `scripts/level.gd` instantiates standard static cells from `scenes/shelf.tscn` and cells belonging
+  to a moving row from `scenes/moving_shelf.tscn`. Moving shelf art can be edited independently;
+  shelf counts, item layers, and the existing `full`/`floor_only` config values do not change.
 - `scripts/level.gd` uses `layout_preset` to load `scenes/layouts/layout_%s.tscn`, then places generated shelf cells at the template's `ShelfXX` markers.
 - Layout template `MovingRowXX` nodes with `scripts/shelf_layout_row.gd` create moving rows from authored row positions and metadata.
 - Moving-row `visible_count` defines the authored footprint used to fit and center the board, not a

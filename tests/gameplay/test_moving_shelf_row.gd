@@ -3,6 +3,7 @@ extends SceneTree
 const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
 const MOVING_ROW_SCENE_PATH := "res://scenes/moving_shelf_row.tscn"
 const SHELF_SCENE_PATH := "res://scenes/shelf.tscn"
+const MOVING_SHELF_SCENE_PATH := "res://scenes/moving_shelf.tscn"
 const LEVEL_SCENE_PATH := "res://level.tscn"
 const PREVIEW_ARGUMENT := "--moving-shelf-motion-preview"
 const LAYOUT_DIRECTORY := "res://scenes/layouts"
@@ -36,11 +37,11 @@ func _run() -> void:
 		return
 
 	var row_scene := load(MOVING_ROW_SCENE_PATH) as PackedScene
-	var shelf_scene := load(SHELF_SCENE_PATH) as PackedScene
+	var shelf_scene := load(MOVING_SHELF_SCENE_PATH) as PackedScene
 	var row := row_scene.instantiate() as MovingShelfRow if row_scene != null else null
 	var shelf := shelf_scene.instantiate() as Shelf if shelf_scene != null else null
 	_check(row != null, "The moving shelf row scene should instantiate.")
-	_check(shelf != null, "The standard shelf scene should instantiate.")
+	_check(shelf != null, "The single moving shelf scene should instantiate.")
 	if row == null or shelf == null:
 		_finish()
 		return
@@ -48,6 +49,14 @@ func _run() -> void:
 	row.configure(3, CELL_STEP, CELL_SIZE, MovingShelfRow.MOTION_HORIZONTAL_WRAP, 0.0, 1)
 	row.add_child(shelf)
 	row.add_shelf(shelf)
+	_check(
+		shelf.get_visual_variant() == Shelf.VISUAL_VARIANT_FLOOR_ONLY
+		and not shelf.get_node("BackWall").visible,
+		"The independent moving shelf should open with its floor-only appearance."
+	)
+	shelf.set_visual_variant(Shelf.VISUAL_VARIANT_FULL)
+	_check(shelf.get_node("BackWall").visible, "Moving shelves must preserve the optional full variant.")
+	shelf.set_visual_variant(Shelf.VISUAL_VARIANT_FLOOR_ONLY)
 
 	var expected_width := CELL_SIZE.x - MovingShelfRow.SHELF_WIDTH_REDUCTION
 	_check(
@@ -228,6 +237,11 @@ func _verify_responsive_moving_windows() -> void:
 		var shelves := level.get_node("Shelves") as Node2D
 		var row := shelves.get_node("MovingShelfRow04") as MovingShelfRow
 		var static_shelf := shelves.get_node("Shelf01") as Node2D
+		_check(
+			row.get_node("Shelf04").scene_file_path == MOVING_SHELF_SCENE_PATH
+			and static_shelf.scene_file_path == SHELF_SCENE_PATH,
+			"Moving and static shelves must instantiate their own independent visual scenes."
+		)
 		var authored_static_position := static_shelf.position
 		var authored_bounds: Rect2 = level.call("_get_shelves_local_bounds")
 		for viewport in RESPONSIVE_VIEWPORTS:
