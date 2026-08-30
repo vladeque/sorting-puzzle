@@ -128,11 +128,13 @@ func is_shelf_inside_visible_window(shelf: Node2D) -> bool:
 	if shelf.get_parent() != self:
 		return false
 
-	var visible_size := get_visible_size()
-	if motion_type == MOTION_VERTICAL_WRAP:
-		return shelf.position.y >= 0.0 and shelf.position.y <= visible_size.y
+	# The trailing/leading item can still be visible after the shelf center crosses the edge.
+	# Match rendering here; the level clips individual item picks and slot targets to the window.
+	return shelf.visible and _is_shelf_cell_touching_window(shelf.position, get_visible_size())
 
-	return shelf.position.x >= 0.0 and shelf.position.x <= visible_size.x
+
+func get_visible_global_rect() -> Rect2:
+	return get_global_transform() * Rect2(Vector2.ZERO, get_visible_size())
 
 
 ## Advance the authoritative belt offset on fixed ticks. Rendering interpolates between these two

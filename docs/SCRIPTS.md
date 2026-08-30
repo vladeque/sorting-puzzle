@@ -2429,7 +2429,12 @@ Purpose:
   two-pixel jumps from 45/55/70 px/s authored speeds.
 - Narrows each registered shelf body by `SHELF_WIDTH_REDUCTION` (`15` design pixels), leaving a
   visible gap at the unchanged grid step while item art and hit areas keep their proportions.
-- Reports whether a shelf center is inside the visible window for drag/drop targeting.
+- Reports whether any of a shelf cell still overlaps the visible window. A shelf remains reachable
+  after its center crosses an edge if one of its items is still visible.
+- `scripts/level.gd` clips each item's pick rectangle to `get_visible_global_rect()` for pickup and
+  press/selection retention. Hidden portions cannot be tapped, and fully hidden items lose selection.
+  Drops require a visible slot marker and a pointer inside the moving window; occupied-slot fallback
+  also skips hidden neighboring slots. Locked and source-only shelf restrictions remain in force.
 
 Exports:
 - `visible_shelf_count`: authored shelf positions used to fit the board and size standalone rows.
@@ -2447,6 +2452,8 @@ Key methods:
 - `add_shelf()`: registers a child shelf for wrapping layout.
 - `set_movement_paused()`: pauses row motion during pause, failure, or completion states.
 - `is_shelf_inside_visible_window()`: used by `scripts/level.gd` drag/drop targeting.
+- `get_visible_global_rect()`: clipping rectangle in the same global coordinates as item picks and
+  slot markers, including the responsive shelf-root scale.
 
 Verification:
 - `tests/gameplay/test_moving_shelf_row.gd` checks the exact `15` px reduction, the resulting gap,
@@ -2455,6 +2462,9 @@ Verification:
   and directions, short belts, full responsive background coverage, safe insets, and repeat-layout
   stability at five phone/tablet sizes. Its optional `--moving-shelf-motion-preview` mode records a real
   Level 8 moving-row sequence for frame-by-frame visual review.
+- Edge interaction regression coverage places an item on a partially clipped shelf, taps and drags
+  it after the shelf center crosses each horizontal/vertical edge, and checks hidden-item rejection,
+  selection cleanup, drop clipping, and hidden-neighbor fallback at all five viewport sizes.
 - `scripts/tools/captures/layout_preset_setup.gd` accepts
   `SORTING_PUZZLE_CAPTURE_MOTION_OFFSET` to freeze a belt at a chosen design-pixel offset for visual
   entry/exit review. Capture `level.tscn` with `-Position '0,0'`.

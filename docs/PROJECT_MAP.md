@@ -704,7 +704,9 @@ Responsibility:
   refresh rates above 60 Hz.
 - Keeps each level to one moving-shelf axis: horizontal or vertical.
 - Lets layout templates author moving-row center positions and metadata.
-- Lets `scripts/level.gd` decide drag/drop eligibility based on whether a moving shelf is currently inside the row window.
+- Lets `scripts/level.gd` pick the visible part of an item even after its moving shelf's center
+  crosses the window edge. The row exposes cell overlap and its global clip rectangle; the level
+  clips item hit areas and requires visible slot markers for drops and occupied-slot fallback.
 - Supports the floor-only shelf visual variant by runtime node hiding in `scripts/level.gd`.
 
 Change here when:

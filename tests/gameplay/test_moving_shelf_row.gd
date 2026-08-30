@@ -126,6 +126,7 @@ func _run() -> void:
 	_verify_taller_staggered_column_spacing()
 	_verify_full_background_travel()
 	await _verify_responsive_moving_windows()
+	await _verify_edge_item_pickup()
 	await _verify_level_four_back_wall_centering()
 
 	row.free()
@@ -260,6 +261,101 @@ func _verify_responsive_moving_windows() -> void:
 					and level.call("_get_shelves_local_bounds") == authored_bounds,
 					"Expanded motion must not change static placement or authored board bounds."
 				)
+	level.queue_free()
+	await process_frame
+
+
+func _verify_edge_item_pickup() -> void:
+	var level := (load(LEVEL_SCENE_PATH) as PackedScene).instantiate()
+	level.set("launched_from_dev_mode", true)
+	level.set("selected_level", 4)
+	level.set("_sound_effects_enabled", false)
+	level.set("item_move_duration_seconds", 0.0)
+	root.add_child(level)
+	await process_frame
+	level.process_mode = Node.PROCESS_MODE_DISABLED
+	for motion in [MovingShelfRow.MOTION_HORIZONTAL_WRAP, MovingShelfRow.MOTION_VERTICAL_WRAP]:
+		level.call("_apply_level_config", {
+			"shelves": [
+				{"layers": [["milk_carton", null, null]]},
+				{"layers": [[null, null, null]]},
+			],
+			"row_layouts": [
+				{"shelf_count": 1},
+				{"shelf_count": 1, "visible_count": 1, "motion": {"type": motion, "speed": 60}},
+			],
+		})
+		level.call("_collect_slots")
+		var shelves := level.get_node("Shelves") as Node2D
+		var source_slot := shelves.get_node("Shelf01/Slot01") as Node2D
+		var item := level.call("_get_slot_item", source_slot) as ShelfItem
+		var row := shelves.get_node("MovingShelfRow02") as MovingShelfRow
+		var shelf := row.get_node("Shelf02") as Node2D
+		var axis := 0 if motion == MovingShelfRow.MOTION_HORIZONTAL_WRAP else 1
+		for viewport in RESPONSIVE_VIEWPORTS:
+			level.call("_layout_shelves", viewport, Vector4.ZERO)
+			for edge in [-1, 1]:
+				# The shelf center is already offscreen, but the inward item is still visible.
+				var center := -10.0 if edge < 0 else row.get_visible_size()[axis] + 10.0
+				row.call("_layout_shelves", center - row.shelf_cell_size[axis] * 0.5)
+				var slot_name := "Slot02" if axis == 1 else ("Slot03" if edge < 0 else "Slot01")
+				var slot := shelf.get_node(slot_name) as Node2D
+				level.call("_place_item_in_slot", item, slot)
+				var window := row.get_global_transform() * Rect2(Vector2.ZERO, row.get_visible_size())
+				var pick_size: Vector2 = level.get("item_pick_size") * shelves.scale.x
+				var item_rect := Rect2(item.global_position - pick_size * 0.5, pick_size)
+				var visible_pick := item_rect.intersection(window)
+				_check(visible_pick.has_area(), "Edge fixture must leave part of the item visible.")
+				var pointer := visible_pick.get_center()
+				_check(
+					level.call("_find_item_at_position", pointer) == item,
+					"A placed item must remain pickable after the shelf center crosses edge %s/%s at %s."
+						% [motion, edge, viewport]
+				)
+				level.call("_handle_press_at", pointer)
+				level.call("_handle_release_at", pointer)
+				level.call("_clear_drag_drop_selection_if_unavailable")
+				_check(level.get("_selected_item") == item, "A visible edge item must stay tap-selected.")
+				level.call("_clear_selected_item")
+				level.call("_handle_press_at", pointer)
+				level.call("_handle_motion_at", pointer + Vector2(20, 0))
+				_check(level.get("_dragged_item") == item, "A visible edge item must start dragging.")
+				level.call("_handle_release_at", pointer)
+				# The release may choose a nearby static slot; restore this fixture's edge placement.
+				level.call("_place_item_in_slot", item, slot)
+				# Neither the clipped part of an item nor a hidden neighboring slot is interactive.
+				var clipped_pointer := item_rect.get_center()
+				clipped_pointer[axis] = window.position[axis] - 1.0 if edge < 0 else window.end[axis] + 1.0
+				_check(
+					level.call("_find_item_at_position", clipped_pointer) == null,
+					"Picking must not reach through the clipping boundary."
+				)
+				_check(
+					not level.call("_is_slot_drop_target_at_position", slot, clipped_pointer),
+					"Drop snapping must not reach through the clipping boundary."
+				)
+				if axis == 0:
+					_check(
+						level.call("_find_free_slot_on_target_shelf", slot, null) == null,
+						"An occupied edge slot must not redirect a drop into hidden neighboring slots."
+					)
+				for shelf_slot in level.call("_get_front_slots", shelf):
+					var marker := level.call("_get_slot_marker", shelf_slot) as Marker2D
+					if not window.has_point(marker.global_position):
+						_check(
+							not level.call("_is_slot_drop_target_eligible", shelf_slot),
+							"Hidden slot centers must not accept drops."
+						)
+				level.call("_set_selected_item", item, slot)
+				row.call("_layout_shelves", -row.shelf_cell_size[axis])
+				level.call("_clear_drag_drop_selection_if_unavailable")
+				_check(
+					level.get("_selected_item") == null
+					and level.call("_find_item_at_position", item.global_position) == null,
+					"A fully hidden shelf must clear selection and reject pickup at %s/%s/%s."
+						% [motion, edge, viewport]
+				)
+				level.call("_place_item_in_slot", item, source_slot)
 	level.queue_free()
 	await process_frame
 

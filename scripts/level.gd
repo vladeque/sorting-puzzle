@@ -1700,7 +1700,13 @@ func _is_slot_locked(slot: Node) -> bool:
 
 
 func _is_slot_move_source_eligible(slot: Node) -> bool:
-	return slot != null and _is_shelf_move_source_eligible(_get_owning_shelf(slot))
+	var slot_node := slot as Node2D
+	if slot_node == null or not _is_shelf_move_source_eligible(_get_owning_shelf(slot_node)):
+		return false
+	if _get_moving_shelf_row(slot_node) == null:
+		return true
+	var item := _get_slot_item(slot_node)
+	return item != null and _get_item_pick_rect(item).has_area()
 
 
 func _is_shelf_move_source_eligible(shelf: Node) -> bool:
@@ -1716,7 +1722,21 @@ func _is_shelf_move_source_eligible(shelf: Node) -> bool:
 
 
 func _is_slot_drop_target_eligible(slot: Node) -> bool:
-	return slot != null and _is_shelf_drop_target_eligible(_get_owning_shelf(slot))
+	var slot_node := slot as Node2D
+	if slot_node == null or not _is_shelf_drop_target_eligible(_get_owning_shelf(slot_node)):
+		return false
+	var moving_row := _get_moving_shelf_row(slot_node)
+	if moving_row == null:
+		return true
+	var marker := _get_slot_marker(slot_node)
+	return marker != null and moving_row.get_visible_global_rect().has_point(marker.global_position)
+
+
+func _is_slot_drop_target_at_position(slot: Node2D, pointer_global_position: Vector2) -> bool:
+	if not _is_slot_drop_target_eligible(slot):
+		return false
+	var moving_row := _get_moving_shelf_row(slot)
+	return moving_row == null or moving_row.get_visible_global_rect().has_point(pointer_global_position)
 
 
 func _is_shelf_drop_target_eligible(shelf: Node) -> bool:
@@ -2684,6 +2704,19 @@ func _record_dispenser_item_taken(origin_slot: Node2D, target_slot: Node2D) -> v
 		dispenser.take_one()
 
 
+## Use the same clipped hit area for picking and retaining a press/selection. Shelf-center checks
+## would make a still-visible edge item untouchable; unclipped hit areas would pick hidden items.
+func _get_item_pick_rect(item: ShelfItem) -> Rect2:
+	if not item.is_visible_in_tree():
+		return Rect2()
+	var scaled_pick_size := item_pick_size * _shelves_layout_scale
+	var item_rect := Rect2(item.global_position - scaled_pick_size * 0.5, scaled_pick_size)
+	var moving_row := _get_moving_shelf_row(item)
+	if moving_row != null:
+		return item_rect.intersection(moving_row.get_visible_global_rect())
+	return item_rect
+
+
 func _find_item_at_position(pointer_global_position: Vector2) -> ShelfItem:
 	for i in range(_slots.size() - 1, -1, -1):
 		var slot := _slots[i]
@@ -2694,9 +2727,7 @@ func _find_item_at_position(pointer_global_position: Vector2) -> ShelfItem:
 		if item == null or _is_item_busy(item):
 			continue
 
-		var scaled_pick_size := item_pick_size * _shelves_layout_scale
-		var item_rect := Rect2(item.global_position - scaled_pick_size * 0.5, scaled_pick_size)
-		if item_rect.has_point(pointer_global_position):
+		if _get_item_pick_rect(item).has_point(pointer_global_position):
 			return item
 
 	return null
@@ -2714,7 +2745,7 @@ func _find_nearest_slot(pointer_global_position: Vector2) -> Node2D:
 	var nearest_distance := _get_scaled_slot_snap_distance()
 
 	for slot in _slots:
-		if not _is_slot_drop_target_eligible(slot):
+		if not _is_slot_drop_target_at_position(slot, pointer_global_position):
 			continue
 
 		var marker := _get_slot_marker(slot)
@@ -2734,7 +2765,7 @@ func _find_nearest_empty_slot(pointer_global_position: Vector2) -> Node2D:
 	var nearest_distance := _get_scaled_slot_snap_distance()
 
 	for slot in _slots:
-		if not _is_slot_drop_target_eligible(slot):
+		if not _is_slot_drop_target_at_position(slot, pointer_global_position):
 			continue
 
 		if _get_slot_item(slot) != null:
@@ -2788,6 +2819,8 @@ func _find_free_slot_on_target_shelf(target_slot: Node2D, excluded_slot: Node2D)
 	var nearest_distance := INF
 	for shelf_slot in _get_front_slots(target_shelf):
 		if shelf_slot == excluded_slot or _get_slot_item(shelf_slot) != null:
+			continue
+		if not _is_slot_drop_target_eligible(shelf_slot):
 			continue
 
 		var marker := _get_slot_marker(shelf_slot)

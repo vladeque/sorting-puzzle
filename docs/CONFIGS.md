@@ -290,7 +290,10 @@ Runtime behavior:
 - If `row_layouts` is present, `scripts/level.gd` creates shelves row by row instead. Moving rows are clipped to their visible window and wrap shelves horizontally or vertically according to their motion type.
 - `scripts/level.gd` uses `time_seconds` as the active timer.
 - Locked shelves show a runtime lock overlay with the remaining triple count on the lock and cannot be used as move sources, move targets, match clears, promotions, or ability targets until unlocked.
-- Off-window moving shelves cannot be selected or targeted by drag/drop, but abilities can still target their front-layer items.
+- Partially clipped moving shelves keep their visible items pickable even after the shelf center
+  leaves the window. Pickup is limited to the visible part of each item's hit area; drops and
+  occupied-slot fallback require visible slot markers. Fully off-window shelves remain unavailable
+  to drag/drop, but abilities can still target their front-layer items.
 - Hammer clears count as cleared triples for shelf unlocking. If no unlocked visible/front item type has three available copies, hammer can combine visible/front items with first-back-layer copies of the same type to reach a triple.
 
 Validation:
