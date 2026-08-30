@@ -1243,6 +1243,10 @@ Purpose:
 
 Important nodes:
 - `Background`: fullscreen gameplay backdrop. Chapter 1 combines a scene-authored shop wall and baseboard with the generated diagonal-terracotta texture in `assets/backgrounds/chapter_01_floor_terracotta_diagonal.png`; artwork-mode chapters use `Background/ChapterArtwork` instead.
+- `Background/Baseboard`: 68 design pixels tall (twice its original 34), anchored above the unchanged
+  floor edge at 156 pixels from the bottom. Its top is 224 pixels from the bottom, taking 34 pixels
+  from the play wall; `scripts/level.gd` uses that boundary to fit and center shelves. Floor and
+  ability-bar placement stay unchanged.
 - `Background/HudCenterSlot/ComboFill`: rounded green combo-window strip that shrinks as the time left to extend the combo runs out.
 - `Background/HudCenterSlot/ComboLabel`: hidden until the player clears a triple, then shows the active combo count.
 - `Shelves`: parent for generated shelf nodes and optional moving shelf row containers; `scripts/level.gd` scales and centers it in the available play area for the current viewport size.

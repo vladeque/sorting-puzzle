@@ -1769,7 +1769,9 @@ Important constants:
 - `LAYOUT_ROW_VERTICAL_EPSILON`: tolerance used to group authored layout-template shelf markers into horizontal rows before assigning left/middle/right shelf visuals.
 - `ABILITY_BAR_*`, `SHELVES_*`: responsive layout constants for positioning the ability bar and
   generated shelf root across portrait viewport sizes, including the back-wall bottom boundary and
-  minimum/maximum shelf layout scale. Shelf boards center against the visible back wall instead of
+  minimum/maximum shelf layout scale. `SHELVES_BACK_WALL_BOTTOM_MARGIN` is 224 design pixels,
+  matching the top of the doubled-height (68 px) baseboard in `level.tscn`; the playable area loses
+  34 pixels vertically without moving the floor or ability bar. Shelf boards center against the visible back wall instead of
   being pulled upward by the floor-level ability overlay. The top HUD, gameplay modals, and terminal result screens now own their own responsive
   layout (UI-003) -- see `scripts/level_top_hud.gd`, `scripts/gameplay_modal_shell.gd`, and
   `scripts/gameplay_result_shell.gd` below; `level.gd` only calls each one's

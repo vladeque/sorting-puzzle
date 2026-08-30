@@ -80,10 +80,10 @@ const ABILITY_BAR_HEIGHT := 151.2
 const ABILITY_BAR_DESIGN_BOTTOM_MARGIN := 96.0
 const ABILITY_BAR_SAFE_BOTTOM_PADDING := 24.0
 const SHELVES_TOP_CLEARANCE := 128.0
-## Matches Background/Baseboard's 190 design-pixel top offset from the bottom of level.tscn. Shelf
+## Matches Background/Baseboard's 224 design-pixel top offset from the bottom of level.tscn. Shelf
 ## boards center against the visible back wall, while the ability buttons remain an overlay near the
 ## floor instead of pulling the whole board upward.
-const SHELVES_BACK_WALL_BOTTOM_MARGIN := 190.0
+const SHELVES_BACK_WALL_BOTTOM_MARGIN := 224.0
 const SHELVES_SIDE_MARGIN := 16.0
 const SHELVES_MIN_LAYOUT_SCALE := 0.45
 const SHELVES_MAX_LAYOUT_SCALE := 1.5

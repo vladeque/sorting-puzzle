@@ -9,7 +9,7 @@ const LAYOUT_DIRECTORY := "res://scenes/layouts"
 const CELL_SIZE := Vector2(237.44, 143.1)
 const CELL_STEP := Vector2(228.96, 144.902)
 const BACK_WALL_TOP := 128.0
-const BACK_WALL_BOTTOM_MARGIN := 190.0
+const BACK_WALL_BOTTOM_MARGIN := 224.0
 
 var _failures: Array[String] = []
 
