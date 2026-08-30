@@ -17,6 +17,10 @@ Focused client UX implementation tickets:
 
 - [`AUDIO-001 — Implement Godot-Authored Core Sound Effects`](AUDIO_001_GODOT_ONLY_SFX_TICKET.md)
 
+Gameplay feature plans:
+
+- [`Sticky items — rules, generation, runtime, and release plan`](STICKY_ITEMS_PLAN.md)
+
 ## Shared definition of done
 
 Unless a ticket explicitly narrows its scope, it is complete when:
