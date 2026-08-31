@@ -5,12 +5,12 @@
 [ext_resource type="Texture2D" uid="uid://x0qk7pd87bfv" path="res://assets/abilities/ability_shuffle.png" id="3_shuffle"]
 [ext_resource type="Texture2D" uid="uid://dwmyah5l2r82d" path="res://assets/abilities/ability_lantern.png" id="4_lantern"]
 [ext_resource type="Texture2D" uid="uid://x6rx0xrv78dw" path="res://assets/abilities/ice_clock_icon_256x256.png" id="5_bymt5"]
-[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_gameplay_hud_icon_normal.tres" id="6_hud_icon_normal"]
-[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_gameplay_hud_icon_pressed.tres" id="7_hud_icon_pressed"]
-[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_gameplay_hud_icon_hover.tres" id="8_hud_icon_hover"]
-[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_gameplay_hud_icon_disabled.tres" id="9_hud_icon_disabled"]
-[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_gameplay_count_badge.tres" id="10_count_badge"]
-[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_gameplay_timer_badge.tres" id="11_timer_badge"]
+[ext_resource type="StyleBox" path="res://assets/themes/style_box_gameplay_hud_icon_normal.tres" id="6_hud_icon_normal"]
+[ext_resource type="StyleBox" path="res://assets/themes/style_box_gameplay_hud_icon_pressed.tres" id="7_hud_icon_pressed"]
+[ext_resource type="StyleBox" path="res://assets/themes/style_box_gameplay_hud_icon_hover.tres" id="8_hud_icon_hover"]
+[ext_resource type="StyleBox" path="res://assets/themes/style_box_gameplay_hud_icon_disabled.tres" id="9_hud_icon_disabled"]
+[ext_resource type="StyleBox" uid="uid://clkxu830fi8fm" path="res://assets/themes/style_box_gameplay_count_badge.tres" id="10_count_badge"]
+[ext_resource type="StyleBox" path="res://assets/themes/style_box_gameplay_timer_badge.tres" id="11_timer_badge"]
 [ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="12_press_scale_button"]
 
 [node name="AbilityBar" type="Control" unique_id=2085968]
@@ -43,9 +43,9 @@ alignment = 1
 unique_name_in_owner = true
 custom_minimum_size = Vector2(115.2, 115.2)
 layout_mode = 2
+tooltip_text = "Hammer -- clears a matching triple"
 focus_mode = 0
 mouse_default_cursor_shape = 2
-tooltip_text = "Hammer -- clears a matching triple"
 theme_override_styles/normal = ExtResource("6_hud_icon_normal")
 theme_override_styles/pressed = ExtResource("7_hud_icon_pressed")
 theme_override_styles/hover = ExtResource("8_hud_icon_hover")
@@ -65,13 +65,13 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="UsesLabel" type="Label" parent="ButtonRow/HammerButton" unique_id=1079942988]
-theme_type_variation = &"GameNumberLabel"
 z_index = 1
 layout_mode = 0
 offset_left = 79.2
-offset_top = -8.4
-offset_right = 127.2
-offset_bottom = 39.6
+offset_top = -5.4
+offset_right = 121.2
+offset_bottom = 36.6
+theme_type_variation = &"GameNumberLabel"
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.86)
 theme_override_constants/shadow_offset_y = 1
@@ -85,9 +85,9 @@ vertical_alignment = 1
 unique_name_in_owner = true
 custom_minimum_size = Vector2(115.2, 115.2)
 layout_mode = 2
+tooltip_text = "Shuffle -- reshuffles unlocked items"
 focus_mode = 0
 mouse_default_cursor_shape = 2
-tooltip_text = "Shuffle -- reshuffles unlocked items"
 theme_override_styles/normal = ExtResource("6_hud_icon_normal")
 theme_override_styles/pressed = ExtResource("7_hud_icon_pressed")
 theme_override_styles/hover = ExtResource("8_hud_icon_hover")
@@ -107,13 +107,13 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="UsesLabel" type="Label" parent="ButtonRow/ShuffleButton" unique_id=1810139897]
-theme_type_variation = &"GameNumberLabel"
 z_index = 1
 layout_mode = 0
 offset_left = 79.2
-offset_top = -8.4
-offset_right = 127.2
-offset_bottom = 39.6
+offset_top = -5.4
+offset_right = 121.2
+offset_bottom = 36.6
+theme_type_variation = &"GameNumberLabel"
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.86)
 theme_override_constants/shadow_offset_y = 1
@@ -127,9 +127,9 @@ vertical_alignment = 1
 unique_name_in_owner = true
 custom_minimum_size = Vector2(115.2, 115.2)
 layout_mode = 2
+tooltip_text = "Lantern -- highlights a matchable triple"
 focus_mode = 0
 mouse_default_cursor_shape = 2
-tooltip_text = "Lantern -- highlights a matchable triple"
 theme_override_styles/normal = ExtResource("6_hud_icon_normal")
 theme_override_styles/pressed = ExtResource("7_hud_icon_pressed")
 theme_override_styles/hover = ExtResource("8_hud_icon_hover")
@@ -149,13 +149,13 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="UsesLabel" type="Label" parent="ButtonRow/HighlightButton" unique_id=552036959]
-theme_type_variation = &"GameNumberLabel"
 z_index = 1
 layout_mode = 0
 offset_left = 79.2
-offset_top = -8.4
-offset_right = 127.2
-offset_bottom = 39.6
+offset_top = -5.4
+offset_right = 121.2
+offset_bottom = 36.6
+theme_type_variation = &"GameNumberLabel"
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.86)
 theme_override_constants/shadow_offset_y = 1
@@ -166,7 +166,6 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="TimerLabel" type="Label" parent="ButtonRow/HighlightButton" unique_id=242069480]
-theme_type_variation = &"GameNumberLabel"
 visible = false
 z_index = 1
 layout_mode = 0
@@ -174,6 +173,7 @@ offset_left = 72.0
 offset_top = 70.8
 offset_right = 129.6
 offset_bottom = 128.4
+theme_type_variation = &"GameNumberLabel"
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.86)
 theme_override_constants/shadow_offset_y = 1
@@ -187,9 +187,9 @@ vertical_alignment = 1
 unique_name_in_owner = true
 custom_minimum_size = Vector2(115.2, 115.2)
 layout_mode = 2
+tooltip_text = "Freezer -- pauses the countdown timer"
 focus_mode = 0
 mouse_default_cursor_shape = 2
-tooltip_text = "Freezer -- pauses the countdown timer"
 theme_override_styles/normal = ExtResource("6_hud_icon_normal")
 theme_override_styles/pressed = ExtResource("7_hud_icon_pressed")
 theme_override_styles/hover = ExtResource("8_hud_icon_hover")
@@ -209,13 +209,13 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="UsesLabel" type="Label" parent="ButtonRow/FreezerButton" unique_id=564941140]
-theme_type_variation = &"GameNumberLabel"
 z_index = 1
 layout_mode = 0
 offset_left = 79.2
-offset_top = -8.4
-offset_right = 127.2
-offset_bottom = 39.6
+offset_top = -5.4
+offset_right = 121.2
+offset_bottom = 36.6
+theme_type_variation = &"GameNumberLabel"
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.86)
 theme_override_constants/shadow_offset_y = 1
@@ -226,7 +226,6 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="TimerLabel" type="Label" parent="ButtonRow/FreezerButton" unique_id=1424811219]
-theme_type_variation = &"GameNumberLabel"
 visible = false
 z_index = 1
 layout_mode = 0
@@ -234,6 +233,7 @@ offset_left = 69.6
 offset_top = 68.4
 offset_right = 132.0
 offset_bottom = 130.8
+theme_type_variation = &"GameNumberLabel"
 theme_override_colors/font_color = Color(0.82, 0.98, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.86)
 theme_override_constants/shadow_offset_y = 1

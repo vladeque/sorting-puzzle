@@ -1752,7 +1752,7 @@ Preview (no setup script required):
 
 ```powershell
 & .\scripts\tools\capture_ui.ps1 -Scene scenes/moving_shelf.tscn -Name single_moving_shelf `
-    -Zoom 3 -Background '#2b2f3a'
+	-Zoom 3 -Background '#2b2f3a'
 ```
 
 ## `scenes/moving_shelf_row.tscn`

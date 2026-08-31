@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://rjhn6n2gw1fa"]
 
-[ext_resource type="Script" path="res://scripts/shelf_layout_row.gd" id="1_layout_row"]
+[ext_resource type="Script" uid="uid://c7ucxk6s8a2nl" path="res://scripts/shelf_layout_row.gd" id="1_layout_row"]
 
 [node name="LayoutGrid3x3Moving5Bottom" type="Node2D" unique_id=197465711]
 
