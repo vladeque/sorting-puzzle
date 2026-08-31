@@ -1,0 +1,140 @@
+# Stronger feedback for blocked sticky items
+
+Status: Investigated design proposal, 2026-08-31. No gameplay implementation in this planning pass.
+Pink gum remains the primary asset. The item's artwork stays above the gum, and back-layer markers
+remain hidden until front promotion finishes. Existing scene edits, including the gum sprite's
+local vertical offset, must be preserved.
+
+## Findings in the current game
+
+- `StickyItemIndicator.play_blocked_feedback()` brightens only the gum to 1.35 for 70 ms, then
+  restores white over 180 ms. It cannot visibly communicate pulling resistance, and the player's
+  finger can cover the small area that changes.
+- `level.gd::_handle_press_at()` triggers this effect and returns before assigning `_pressed_item`.
+  Consequently `_handle_motion_at()` and release have no blocked gesture to follow. Increasing the
+  brightness alone would not fix this missing drag response.
+- `_begin_drag()` rejects the source immediately. `_move_item_to_slot()` separately rejects sticky
+  moves and triggers the current pulse. The movement guards are correct and must stay.
+- `item.gd::_apply_visual_scale()` already coordinates item/outline scale, contact offset, shadow,
+  and sticky presentation. Independent tweens directly writing those same sprite properties would
+  fight this owner. A new feedback channel needs to compose with it.
+- `ui_motion.gd` provides replaceable tweens and cancellation. `ShelfLockOverlay` is an existing
+  example of a focused visual owner, but its chain/lock artwork describes a different restriction.
+- `SfxManager` supports mute/settings and cooldowns, but its event catalog has no stuck-item cue.
+  Vibration is a saved setting; the Hammer's standalone haptics flag is not a shared preference.
+  No shared reduced-motion setting was found in the inspected gameplay/UI code.
+
+## Directions
+
+| Direction | What the player sees | Scope and tradeoff |
+| --- | --- | --- |
+| Stronger gum squeeze | Gum widens/compresses and rebounds; the item remains visually still. | Small change to the marker component; can still be hidden by the finger. |
+| Anchored wobble — recommended first | The item rocks briefly around its planted base while the gum squeezes and rebounds. | Stronger response without introducing a draggable item or changing input ownership. Reuses existing artwork. |
+| Finger resistance | While held, the item leans a little toward the finger, reaches a firm limit, and springs back on release. | Best connection to the attempted gesture; needs a separate blocked-press state, touch ownership, and cancellation handling. |
+
+The conversation includes an interactive motion sketch of these directions using the current
+bottle and pink gum images. It is a concept comparison, not a Godot implementation or proof of
+final in-game timing, layering, or performance.
+
+## Recommended first implementation: anchored wobble
+
+Start with one short response on press, approximately 350-420 ms total. These are tuning starting
+points, not measured requirements:
+
+| Phase | Initial tuning | Intent |
+| --- | --- | --- |
+| Resistance, 0-90 ms | Item leans about 3-5 degrees around its bottom contact point; gum widens 8-12% and compresses 10-15%. | Make the attempted pickup visibly meet resistance. |
+| Rebound, 90-220 ms | Item rocks a smaller amount in the opposite direction; gum returns past rest slightly. | Show elastic attachment. |
+| Settle, 220-400 ms | One small final correction back to the exact resting pose. | End cleanly without persistent jitter. |
+
+The item's root position, parent slot, collision shape, ID, and sticky flag never change. Animate
+the visible body/outline together around a contact pivot; leave the base planted, with no drag
+shadow lift, pickup sound, raised drag Z-order, or drop-target highlight. Any shadow adjustment is
+subtle and remains grounded. Gum always renders behind the item. Cap deformations to the available
+space so adjacent items and narrow/moving shelves remain readable.
+
+Use a single restartable effect with a short cooldown (start near 250-350 ms). Rapid taps must not
+stack tweens or accumulate a tilted pose. A tap on a sticky destination while an ordinary item is
+selected must still perform normal occupied-slot routing; it must not play a refusal effect for
+a valid move. A full destination shelf remains a normal failed drop, not a claim that the selected
+ordinary item has become sticky.
+
+Do not shake the whole shelf or camera, add a lock icon, emit match-style sparkles, or use the
+successful-selection outline as the main signal. Keep this a local response that says the item is
+attached to gum. A small non-rotating gum pulse is a reasonable low-motion variant; do not introduce
+a new global accessibility setting or save schema as part of this first pass.
+
+## Ownership and integration
+
+1. Add a focused `scenes/ui/sticky_blocked_feedback.tscn` and
+   `scripts/sticky_blocked_feedback.gd`, instanced by `scenes/item.tscn`. They own timing, exported
+   intensity/cooldown settings, and cancellation. They do not move gameplay items or decide rules.
+2. Extend `ShelfItem` with a separate blocked-feedback presentation channel, applied alongside its
+   current scale/outline/contact calculations. Keep `Sprite2D` and `OutlineSprite` paths intact if
+   possible. Do not reuse `land_squash` or selection offset as shared mutable animation state.
+3. Give `StickyItemIndicator` a deformation input for the gum sprite, composed with its existing
+   texture scale and authored offset. Replace the current brightness-only effect as the main cue;
+   a restrained brightness accent can remain secondary.
+4. Retain the existing `ShelfItem.play_sticky_blocked_feedback()` entry point. Let the two current
+   refusal call sites use it, with cooldown preventing duplicate responses. Suppress hidden,
+   back-layer, busy, or invalid targets.
+5. Restore all feedback channels on clear, promotion, becoming a back-layer preview, pause,
+   application interruption, retry, and scene exit. Rendering updates from hint/shuffle effects
+   must not overwrite the blocked animation or re-show a hidden back-layer marker.
+6. Extend the dedicated preview with a developer-only effect comparison/tuning control. Run the
+   effect on a tall bottle, a broad box, and a short item, on both stationary and moving shelves.
+   Keep this control inside the preview component, outside the production HUD.
+
+No level JSON, generator, solver, item identity, inventory, scoring, timer, or persistence rule
+changes are needed. Blocked attempts continue not to start the level timer.
+
+## Optional second pass: held resistance
+
+If the one-shot wobble does not sufficiently explain a sustained drag, add a distinct blocked
+gesture state in `level.gd`, separate from `_pressed_item`, `_dragged_item`, and ordinary selection.
+Track the item, press origin, and active touch index (or mouse identity). The current input helpers
+do not retain touch indices, so this must be addressed before supporting a held touch effect.
+
+- Begin only on an eligible exposed sticky source when no ordinary item is being routed there.
+- Convert the pointer delta to shelf/item-local coordinates so responsive scaling and moving
+  shelves do not manufacture a pull from shelf motion alone.
+- Use an asymptotic or clamped response, initially limited to approximately 3-5 degrees of lean.
+  Keep the ground contact fixed; do not let the item follow the finger freely.
+- On release, return to rest over roughly 180-240 ms. Cancel immediately when paused, interrupted,
+  hidden/off-window, cleared, replaced, or freed. Ensure a second finger cannot move or release the
+  first finger's blocked item. Other shelves should remain usable after the gesture ends.
+- Never reparent into the drag layer, invoke `_move_item_to_slot()`, create a drop preview, or start
+  the timer for this gesture. Keep the defensive source guard in every move path.
+
+## Optional supporting cues
+
+Keep the first implementation visual-only. A short soft rubbery creak could later reinforce the
+resistance, but requires a new catalog event, a reviewed sound asset, a cooldown, and the existing
+sound setting. Do not repurpose the successful pickup or placement sound. No new art is required.
+
+A brief light haptic could be evaluated on a physical device, gated by the saved vibration setting
+and rate-limited. Do not assume the existing Hammer flag handles that preference. Neither audio nor
+haptics should be necessary to understand the feedback.
+
+If players still misunderstand the mechanic, a one-time contextual hint such as **“Stuck! Bring
+matching items here.”** is an onboarding option. Keep it out of the repeat-tap effect, place it above
+the finger, and implement it as its own scene. Localization and its display frequency should be
+decided when that onboarding work is requested.
+
+## Verification and delivery
+
+- First implement the one-shot wobble and gum deformation with the existing art, then compare it
+  in the preview before adding held resistance or supporting cues.
+- Extend existing sticky gameplay coverage for repeated attempts, no root/slot/ID change, no timer
+  start, valid routing onto the sticky shelf, complete reset after interruption, and hidden marker
+  preservation. Add gesture-ownership/cancellation checks only if the held interaction is built.
+- Inspect timed captures at rest, maximum lean, rebound, and settled state; also record a short
+  motion sequence, since one screenshot cannot establish timing or reset. Check finger occlusion
+  on-device and avoid exaggerated motion that looks like successful pickup.
+- Capture 540x960, 720x1280, 1080x1920, 1080x2400, and a tablet-like viewport. Check the actual image
+  dimensions and retain the current warning if the tablet render target is narrower than requested.
+- Re-run sticky, item-selection, landing/contact-shadow, Lantern, and moving-shelf regression checks.
+  Keep unrelated existing rendering failures distinct from any new failures.
+- Update `STICKY_ITEMS.md`, scene/script ownership docs, and commit the implementation separately
+  from this planning document. Backend publication remains the existing release dependency; this
+  feedback proposal does not authorize or perform backend changes.

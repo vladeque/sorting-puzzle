@@ -2,6 +2,8 @@
 
 Implemented in the game client and level tools on 2026-08-31. Existing campaign layouts are unchanged.
 The earlier design discussion is retained in [STICKY_ITEMS_PLAN.md](STICKY_ITEMS_PLAN.md).
+Stronger blocked-attempt feedback is investigated separately in
+[STICKY_FEEDBACK_PLAN.md](STICKY_FEEDBACK_PLAN.md); its proposed animations are not implemented yet.
 
 ## Play and compare the artwork
 
