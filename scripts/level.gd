@@ -232,6 +232,11 @@ var _rng := RandomNumberGenerator.new()
 var _pressed_item: ShelfItem
 var _pressed_origin_slot: Node2D
 var _press_position := Vector2.ZERO
+## Blocked presses never enter ordinary selection/drag state. -1 is mouse; >=0 is a touch index.
+var _blocked_item: ShelfItem
+var _blocked_origin_slot: Node2D
+var _blocked_press_position := Vector2.ZERO
+var _blocked_pointer_id := -2
 var _selected_item: ShelfItem
 var _selected_slot: Node2D
 var _is_resolving_shelves := false
@@ -554,6 +559,7 @@ func _stop_sound_effects() -> void:
 
 
 func _process(delta: float) -> void:
+	_refresh_sticky_feedback_availability()
 	if not _level_config_error.is_empty():
 		return
 	if _level_completed:
@@ -590,21 +596,28 @@ func _process(delta: float) -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_PAUSED:
 		_app_interrupted = true
+		_cancel_sticky_feedback()
 	elif what == NOTIFICATION_APPLICATION_RESUMED:
 		_app_interrupted = false
+	elif what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
+		_cancel_sticky_feedback()
 
 
 func _exit_tree() -> void:
+	_cancel_blocked_press()
 	_clear_freezer(true)
 
 
 func _input(event: InputEvent) -> void:
+	# Native touch and mouse are both handled below; their synthesized counterparts are duplicates.
+	if event.device == InputEvent.DEVICE_ID_EMULATION:
+		return
 	if not _level_config_error.is_empty():
 		return
 	if _level_failed or _level_completed:
 		return
 
-	if _level_paused:
+	if _level_paused or _app_interrupted:
 		return
 
 	if _is_ability_effect_active():
@@ -616,7 +629,9 @@ func _input(event: InputEvent) -> void:
 			return
 
 		var pointer_position := get_global_mouse_position()
-		if mouse_event.pressed:
+		if mouse_event.canceled and _blocked_pointer_id == -1:
+			_cancel_blocked_press()
+		elif mouse_event.pressed:
 			_handle_press_at(pointer_position)
 		else:
 			_handle_release_at(pointer_position)
@@ -625,13 +640,16 @@ func _input(event: InputEvent) -> void:
 	elif event is InputEventScreenTouch:
 		var touch_event := event as InputEventScreenTouch
 		var pointer_position := _screen_position_to_global(touch_event.position)
-		if touch_event.pressed:
-			_handle_press_at(pointer_position)
+		if touch_event.canceled:
+			if _blocked_pointer_id == touch_event.index:
+				_cancel_blocked_press()
+		elif touch_event.pressed:
+			_handle_press_at(pointer_position, touch_event.index)
 		else:
-			_handle_release_at(pointer_position)
+			_handle_release_at(pointer_position, touch_event.index)
 	elif event is InputEventScreenDrag:
 		var drag_event := event as InputEventScreenDrag
-		_handle_motion_at(_screen_position_to_global(drag_event.position))
+		_handle_motion_at(_screen_position_to_global(drag_event.position), drag_event.index)
 
 
 ## System back / Android back / Escape (UI-003). Unlike _input() above, this always runs regardless
@@ -2575,8 +2593,8 @@ func _update_pause_menu_button() -> void:
 	_top_hud.set_pause_enabled(not (_level_failed or _level_completed or _level_paused))
 
 
-func _handle_press_at(pointer_global_position: Vector2) -> void:
-	if _dragged_item != null:
+func _handle_press_at(pointer_global_position: Vector2, pointer_id := -1) -> void:
+	if _dragged_item != null or _blocked_pointer_id != -2:
 		return
 
 	var clicked_item := _find_item_at_position(pointer_global_position, true)
@@ -2588,13 +2606,21 @@ func _handle_press_at(pointer_global_position: Vector2) -> void:
 			if moved_item:
 				get_viewport().set_input_as_handled()
 				return
+			if clicked_item != null and clicked_item.is_sticky:
+				return # A full destination is a failed ordinary drop, not a sticky pickup.
 		else:
 			_clear_selected_item()
 
 	if clicked_item == null:
 		return
 	if clicked_item.is_sticky:
-		clicked_item.play_sticky_blocked_feedback()
+		if _pressed_item != null or not _is_sticky_feedback_eligible(clicked_item):
+			return
+		_blocked_item = clicked_item
+		_blocked_origin_slot = clicked_item.get_parent() as Node2D
+		_blocked_press_position = pointer_global_position
+		_blocked_pointer_id = pointer_id
+		clicked_item.begin_sticky_hold()
 		get_viewport().set_input_as_handled()
 		return
 
@@ -2605,7 +2631,18 @@ func _handle_press_at(pointer_global_position: Vector2) -> void:
 	get_viewport().set_input_as_handled()
 
 
-func _handle_motion_at(pointer_global_position: Vector2) -> void:
+func _handle_motion_at(pointer_global_position: Vector2, pointer_id := -1) -> void:
+	if _blocked_pointer_id != -2:
+		if pointer_id == _blocked_pointer_id:
+			if not _is_blocked_press_eligible():
+				_cancel_blocked_press()
+			else:
+				# Transform a vector, not a point: moving shelf translation cannot create a pull.
+				var inverse := _blocked_item.global_transform.affine_inverse()
+				var delta := pointer_global_position - _blocked_press_position
+				_blocked_item.update_sticky_pull(inverse * delta - inverse.origin)
+			get_viewport().set_input_as_handled()
+		return
 	if _dragged_item != null:
 		_move_active_drag(pointer_global_position)
 		return
@@ -2626,7 +2663,15 @@ func _handle_motion_at(pointer_global_position: Vector2) -> void:
 	get_viewport().set_input_as_handled()
 
 
-func _handle_release_at(pointer_global_position: Vector2) -> void:
+func _handle_release_at(pointer_global_position: Vector2, pointer_id := -1) -> void:
+	if _blocked_pointer_id != -2:
+		if pointer_id == _blocked_pointer_id:
+			_handle_motion_at(pointer_global_position, pointer_id)
+			if _is_blocked_press_eligible():
+				_blocked_item.end_sticky_hold()
+			_clear_blocked_press_state()
+			get_viewport().set_input_as_handled()
+		return
 	if _dragged_item != null:
 		_finish_active_drag(pointer_global_position)
 		_pressed_item = null
@@ -2645,6 +2690,55 @@ func _handle_release_at(pointer_global_position: Vector2) -> void:
 	_pressed_item = null
 	_pressed_origin_slot = null
 	get_viewport().set_input_as_handled()
+
+
+func _is_sticky_feedback_eligible(item: ShelfItem) -> bool:
+	return is_instance_valid(item) and item.can_show_sticky_feedback() and not _is_item_busy(item) and _is_shelf_move_source_eligible(_get_owning_shelf(item)) and _get_item_pick_rect(item).has_area()
+
+
+func _is_blocked_press_eligible() -> bool:
+	return _is_sticky_feedback_eligible(_blocked_item) and _blocked_item.get_parent() == _blocked_origin_slot
+
+
+func _clear_blocked_press_state() -> void:
+	_blocked_item = null
+	_blocked_origin_slot = null
+	_blocked_pointer_id = -2
+	_blocked_press_position = Vector2.ZERO
+
+
+func _cancel_blocked_press() -> void:
+	if is_instance_valid(_blocked_item):
+		_blocked_item.reset_sticky_blocked_feedback()
+	_clear_blocked_press_state()
+
+
+func _cancel_sticky_feedback() -> void:
+	_cancel_blocked_press()
+	if not is_inside_tree():
+		return
+	for feedback in get_tree().get_nodes_in_group(&"active_sticky_feedback"):
+		if is_ancestor_of(feedback):
+			feedback.cancel()
+
+
+func _refresh_sticky_feedback_availability() -> void:
+	if _level_paused or _level_failed or _level_completed or _app_interrupted or _is_ability_effect_active():
+		_cancel_sticky_feedback()
+		return
+	if _blocked_pointer_id != -2 and not _is_blocked_press_eligible():
+		_cancel_blocked_press()
+	for feedback in get_tree().get_nodes_in_group(&"active_sticky_feedback"):
+		if is_ancestor_of(feedback) and not _is_sticky_feedback_eligible(feedback.get_parent() as ShelfItem):
+			feedback.cancel()
+
+
+func _set_sticky_feedback_busy(instance_id: int) -> void:
+	var item := instance_from_id(instance_id) as ShelfItem
+	if item != null:
+		item.sticky_feedback_suppressed = _is_item_busy(item)
+		if item == _blocked_item and item.sticky_feedback_suppressed:
+			_cancel_blocked_press()
 
 
 func _begin_drag(item: ShelfItem, pointer_global_position: Vector2) -> void:
@@ -3404,10 +3498,12 @@ func _clear_star_reward_effects() -> void:
 func _mark_item_clearing_by_id(instance_id: int) -> void:
 	if instance_id != 0 and not _clearing_item_ids.has(instance_id):
 		_clearing_item_ids.append(instance_id)
+		_set_sticky_feedback_busy(instance_id)
 
 
 func _unmark_item_clearing_by_id(instance_id: int) -> void:
 	_clearing_item_ids.erase(instance_id)
+	_set_sticky_feedback_busy(instance_id)
 
 
 func _is_item_clearing(item: ShelfItem) -> bool:
@@ -3417,10 +3513,12 @@ func _is_item_clearing(item: ShelfItem) -> bool:
 func _mark_item_transitioning_by_id(instance_id: int) -> void:
 	if instance_id != 0 and not _transitioning_item_ids.has(instance_id):
 		_transitioning_item_ids.append(instance_id)
+		_set_sticky_feedback_busy(instance_id)
 
 
 func _unmark_item_transitioning_by_id(instance_id: int) -> void:
 	_transitioning_item_ids.erase(instance_id)
+	_set_sticky_feedback_busy(instance_id)
 
 
 func _is_item_transitioning(item: ShelfItem) -> bool:
@@ -3738,6 +3836,7 @@ func _can_apply_ability(ability_id: StringName) -> bool:
 
 
 func _cancel_active_interaction() -> void:
+	_cancel_sticky_feedback()
 	_clear_selected_item()
 
 	if _dragged_item != null and _origin_slot != null:

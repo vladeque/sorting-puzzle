@@ -65,6 +65,8 @@ const LAND_IMPACT_TWEEN_META := &"_shelf_item_land_impact_tween"
 @export var is_sticky := false:
 	set(value):
 		is_sticky = value
+		if not value:
+			reset_sticky_blocked_feedback()
 		_apply_sticky_visual()
 
 @export_enum("pink", "amber") var sticky_variant := "pink":
@@ -76,6 +78,8 @@ const LAND_IMPACT_TWEEN_META := &"_shelf_item_land_impact_tween"
 var is_in_back_layer := false:
 	set(value):
 		is_in_back_layer = value
+		if value:
+			reset_sticky_blocked_feedback()
 		_apply_sticky_visual()
 
 ## Shared shadow material, assigned in scenes/item.tscn. Each item renders through its own copy,
@@ -130,8 +134,19 @@ var _shadow_base_color := Color(0.1, 0.05, 0.02, 0.34)
 var _contact_shadow_enabled := true
 var _highlight_scale_multiplier := 1.0
 var _selection_forward_offset := 0.0
+var _blocked_lean := 0.0
+var _blocked_stretch := 0.0
+var _blocked_pressure := 0.0
+var sticky_feedback_suppressed := false:
+	set(value):
+		sticky_feedback_suppressed = value
+		if value:
+			reset_sticky_blocked_feedback()
 
 func _ready() -> void:
+	var feedback := get_node_or_null("StickyBlockedFeedback")
+	if feedback != null and not Engine.is_editor_hint():
+		feedback.pose_changed.connect(_set_sticky_feedback_pose)
 	_prepare_outline_material()
 	_apply_texture()
 	_apply_visual_scale()
@@ -242,18 +257,13 @@ func _apply_texture() -> void:
 
 
 func _apply_visual_scale() -> void:
-	var sprite_scale := _get_sprite_scale()
-	var contact_pivot_offset_y := _get_contact_pivot_offset_y()
-
 	var sprite := get_node_or_null("Sprite2D") as Sprite2D
 	if sprite != null:
-		sprite.scale = sprite_scale
-		sprite.position.y = _selection_forward_offset + contact_pivot_offset_y
+		_apply_body_pose(sprite)
 
 	var outline_sprite := get_node_or_null("OutlineSprite") as Sprite2D
 	if outline_sprite != null:
-		outline_sprite.scale = sprite_scale
-		outline_sprite.position.y = _selection_forward_offset + contact_pivot_offset_y
+		_apply_body_pose(outline_sprite)
 
 	_apply_shadow()
 	_apply_outline()
@@ -268,12 +278,62 @@ func _apply_sticky_visual() -> void:
 	indicator.variant = sticky_variant
 	indicator.scale = Vector2.ONE * _get_effective_scale()
 	indicator.position.y = CONTACT_ANCHOR_Y * _get_effective_scale()
+	indicator.set_resistance_pose(_blocked_lean, _blocked_pressure)
 
 
 func play_sticky_blocked_feedback() -> void:
-	var indicator := get_node_or_null("StickyItemIndicator") as StickyItemIndicator
-	if is_sticky and indicator != null:
-		indicator.play_blocked_feedback()
+	if can_show_sticky_feedback():
+		get_node("StickyBlockedFeedback").play_tap()
+
+
+func begin_sticky_hold() -> void:
+	if can_show_sticky_feedback():
+		get_node("StickyBlockedFeedback").begin_hold()
+
+
+func update_sticky_pull(local_delta: Vector2) -> void:
+	if can_show_sticky_feedback():
+		get_node("StickyBlockedFeedback").update_pull(local_delta)
+
+
+func end_sticky_hold() -> void:
+	if can_show_sticky_feedback():
+		get_node("StickyBlockedFeedback").end_hold()
+	else:
+		reset_sticky_blocked_feedback()
+
+
+func reset_sticky_blocked_feedback() -> void:
+	var feedback := get_node_or_null("StickyBlockedFeedback")
+	if feedback != null:
+		feedback.cancel()
+
+
+func can_show_sticky_feedback() -> bool:
+	return is_inside_tree() and is_visible_in_tree() and is_sticky and not is_in_back_layer and not sticky_feedback_suppressed and input_pickable and not is_queued_for_deletion()
+
+
+func is_sticky_feedback_active() -> bool:
+	var feedback := get_node_or_null("StickyBlockedFeedback")
+	return feedback != null and feedback.is_active()
+
+
+func _set_sticky_feedback_pose(lean: float, stretch: float, pressure: float) -> void:
+	_blocked_lean = lean
+	_blocked_stretch = stretch
+	_blocked_pressure = pressure
+	_apply_visual_scale()
+
+
+## Rotate/stretch the body around its actual artwork ground line. Root, hitbox and shadow stay put.
+## Apply after landing's own pivot correction, so outline/highlight refreshes cannot erase the pose.
+func _apply_body_pose(sprite: Sprite2D) -> void:
+	var base_scale := _get_sprite_scale()
+	var foot := Vector2(0.0, SHADOW_GROUND_TEXELS * base_scale.y)
+	sprite.scale = base_scale * Vector2(1.0, 1.0 + _blocked_stretch)
+	sprite.rotation = _blocked_lean
+	sprite.position = Vector2(0.0, _selection_forward_offset + _get_contact_pivot_offset_y())
+	sprite.position += foot - (foot * (1.0 + _blocked_stretch)).rotated(_blocked_lean)
 
 
 ## Draws the item's own silhouette as its shadow, in one of two readings blended by `shadow_lift`:
@@ -379,8 +439,7 @@ func _apply_outline() -> void:
 		# Must mirror _apply_visual_scale() exactly: this runs on its own whenever an outline
 		# property changes, and writing a plain uniform scale here would flatten an in-flight
 		# landing bounce on any highlighted item.
-		outline_sprite.scale = _get_sprite_scale()
-		outline_sprite.position.y = _selection_forward_offset + _get_contact_pivot_offset_y()
+		_apply_body_pose(outline_sprite)
 
 	_outline_material.set_shader_parameter("outline_color", outline_color)
 	_outline_material.set_shader_parameter("alpha_threshold", outline_alpha_threshold)

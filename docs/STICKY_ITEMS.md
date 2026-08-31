@@ -2,8 +2,8 @@
 
 Implemented in the game client and level tools on 2026-08-31. Existing campaign layouts are unchanged.
 The earlier design discussion is retained in [STICKY_ITEMS_PLAN.md](STICKY_ITEMS_PLAN.md).
-Stronger blocked-attempt feedback is investigated separately in
-[STICKY_FEEDBACK_PLAN.md](STICKY_FEEDBACK_PLAN.md); its proposed animations are not implemented yet.
+Anchored tap wobble and held finger resistance are implemented; see
+[STICKY_FEEDBACK_PLAN.md](STICKY_FEEDBACK_PLAN.md) for timing, input ownership, and verification.
 
 ## Play and compare the artwork
 
@@ -17,6 +17,9 @@ across successive layers, an initially locked shelf, and a moving row. The board
 ability bar and account for safe-area insets. Both shows pink on the upper shelves and amber on
 the lower shelves. The preview starts with Pink selected, matching the chosen primary asset.
 Switching artwork updates hidden items too. Reset and retry retain the choice.
+Tap an exposed sticky item for a short anchored wobble. Hold and pull sideways or vertically to
+feel the capped resistance visually, then release for a spring return. Both behaviors run together;
+no effect-mode toggle is required. The same interactions work on moving shelves.
 This is a dev-mode level with temporary ability counts; completing it does not advance the campaign.
 
 The two selected generated assets are retained separately:
@@ -40,9 +43,10 @@ Amber is retained as an optional comparison asset.
 | Owner | Responsibility |
 | --- | --- |
 | `scripts/sticky_item_rules.gd` | Sticky config validation and Hammer partner reserves. |
-| `scripts/item.gd`, `scenes/item.tscn` | Instance flag, marker, and blocked-tap feedback. |
-| `scripts/sticky_item_indicator.gd`, `scenes/ui/sticky_item_indicator.tscn` | Texture variant beneath the item artwork and brief brightness pulse. |
-| `scripts/level.gd` | Load flags, movement guards, matching, sticky-aware ability selection and hints. |
+| `scripts/item.gd`, `scenes/item.tscn` | Instance flag, marker, separate resistance pose composed with body/outline/landing presentation. |
+| `scripts/sticky_item_indicator.gd`, `scenes/ui/sticky_item_indicator.tscn` | Texture beneath the artwork; gum squash/skew preserving the authored sprite offset. |
+| `scripts/sticky_blocked_feedback.gd`, `scenes/ui/sticky_blocked_feedback.tscn` | Tap wobble, held resistance, spring return, cooldown, and exact reset. |
+| `scripts/level.gd` | Flags, movement guards, matching, ability selection/hints, blocked pointer ownership and cancellation. |
 | `scripts/sticky_items_preview.gd`, `scenes/testing/sticky_items_preview.tscn` | Playable comparison, reset, dev-mode isolation. |
 | `scripts/sticky_preview_controls.gd`, `scenes/ui/sticky_preview_controls.tscn` | Variant/reset controls and safe-area placement. |
 | `scripts/tools/sticky_items.py` | Shared Python authoring validation. |
@@ -54,8 +58,9 @@ Sticky belongs to an item instance, not its type or its slot. There is at most o
 per individual shelf layer. Standard shelves may carry sticky items, including hidden layers,
 locked shelves, and moving shelves, subject to the existing shelf rules. Dispensers cannot.
 
-Sticky items cannot be selected, dragged, or moved through direct move calls. A blocked tap pulses
-the marker without starting the timer. With an ordinary item selected, tapping the sticky item
+Sticky items cannot be selected, dragged, or moved through direct move calls. A blocked tap wobbles
+the body around its planted feet; a held pull leans against resistance and deforms the gum. Neither
+starts the timer or moves the hitbox, slot, or grounded shadow. With an ordinary item selected, tapping the sticky item
 still routes to an empty slot on that shelf. The sticky item clears normally with two matching
 items, earning normal stars/combo progress. Hidden sticky items retain their flags on promotion.
 Shelf unlocking never removes an item's sticky flag. Retry reloads the authored placements.
@@ -128,6 +133,7 @@ accessible; timing and screen geometry are tested separately in Godot.
 ```powershell
 py -m unittest discover -s tests/tools -v
 & scripts/tools/run_isolated_godot_test.ps1 -Script tests/gameplay/test_sticky_items.gd -Windowed
+& scripts/tools/run_isolated_godot_test.ps1 -Script tests/gameplay/test_sticky_feedback.gd -Windowed
 & scripts/tools/capture_ui.ps1 -Scene scenes/testing/sticky_items_preview.tscn -Name sticky_preview -Position '0,0'
 & scripts/tools/capture_ui.ps1 -Scene scenes/testing/sticky_items_preview.tscn -Setup scripts/tools/captures/sticky_items_layers_setup.gd -Name sticky_layers -Position '0,0'
 ```
@@ -138,6 +144,13 @@ failed proof, and the shared `tests/fixtures/sticky_items_conformance.json` repl
 `tests/gameplay/test_sticky_items.gd` exercises tap/drag/direct moves, promotion, locks, moving rows,
 both artwork variants, partner reserves, actual Hammer execution, no-op ability charges, and the
 same Python solution clearing in Godot.
+
+`tests/gameplay/test_sticky_feedback.gd` adds five stages covering tap/hold animation, fixed feet,
+identity/hitbox/shadow invariants, repeated taps, native touch ownership, canceled/emulated events,
+interruption and busy/hidden states, moving-row translation/off-window cancellation, responsive
+scaling, valid/full destination routing, and freeing a held item. Selection, landing, contact-shadow,
+Lantern, moving-row, and progression suites also pass. Rendered held poses and a 90-frame motion
+sequence were inspected; commands and limits are in `STICKY_FEEDBACK_PLAN.md`.
 
 `scripts/tools/captures/sticky_items_layers_setup.gd` exposes sticky back-layer artwork through
 empty front slots and completes the moving-row robot triple. The resulting screenshot compares

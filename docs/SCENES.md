@@ -7,6 +7,12 @@ This file maps scenes to their responsibilities, scripts, important nodes, and r
 - `scenes/ui/sticky_item_indicator.tscn` is instanced by `scenes/item.tscn`. Its single sprite draws
   pink gum or amber glue beneath the item artwork. Ordinary and back-layer items hide the component;
   sticky items reveal it after promotion to the front finishes.
+- `scenes/ui/sticky_blocked_feedback.tscn`, also instanced by each item, owns tap wobble and held
+  finger-resistance timing in `scripts/sticky_blocked_feedback.gd`. It emits presentation channels;
+  `item.gd` composes body/outline rotation and stretch around the artwork's ground line and passes
+  squash/skew to the gum indicator, leaving the root, collision and grounded shadow unchanged.
+  `level.gd` owns the blocked pointer separately from ordinary selection/drag and cancels feedback
+  when the item becomes unavailable. Only active effects join `active_sticky_feedback` for checks.
 - `scenes/testing/sticky_items_preview.tscn` inherits `level.tscn`, uses a dedicated dev-mode board,
   and preserves the selected artwork on reset/retry without advancing campaign progress.
 - `scenes/ui/sticky_preview_controls.tscn` owns Pink, Amber, Both, and Reset controls, with safe-area
@@ -2257,6 +2263,10 @@ Important nodes:
   in gold; ordinary tap selection enables the same silhouette treatment in white and takes color
   priority when both states apply.
 - `Sprite2D`: main item sprite; texture and visual scale are controlled by `ShelfItem`.
+- `StickyItemIndicator`: pink gum (primary) or amber glue, drawn behind front-layer items only.
+- `StickyBlockedFeedback`: reusable visual controller for taps and held pulls. Its exported tuning
+  controls the lean cap, resistance distance, return timing, and cooldown. The dedicated blocked
+  pose composes with landing/highlight state without moving the item root or collision shape.
 - `CollisionShape2D`: rectangular item hitbox used by runtime interaction. Tap selection shifts it
   down with the sprite, outline, and shadow so the item reads closer to the shelf lip without
   moving its logical slot anchor or leaving the visible art outside its touch target.

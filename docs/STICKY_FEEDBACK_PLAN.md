@@ -1,11 +1,77 @@
 # Stronger feedback for blocked sticky items
 
-Status: Investigated design proposal, 2026-08-31. No gameplay implementation in this planning pass.
+Status: Implemented 2026-08-31 after approval of **Finger resistance for holding** and
+**Anchored wobble for taps**. Both behaviors are active together. The implementation record below
+supersedes the staged recommendation in the original investigation retained afterward.
 Pink gum remains the primary asset. The item's artwork stays above the gum, and back-layer markers
 remain hidden until front promotion finishes. Existing scene edits, including the gum sprite's
 local vertical offset, must be preserved.
 
-## Findings in the current game
+## Implemented behavior
+
+- Press begins gentle gum tension. A release within 180 ms, without a pull of at least 6 local
+  units, plays a 400 ms anchored wobble: 85 ms to 4.5 degrees, 105 ms reverse rebound, 90 ms small
+  correction, then 120 ms settling. Tap cooldown is 280 ms; repeated taps replace existing motion.
+- Held pulls follow the pointer smoothly with an asymptotic resistance curve (36 local units),
+  capped at 5 degrees. Vertical pulling stretches/compresses the body by at most 2.5% while its
+  ground contact stays fixed. Release springs past rest and settles over 220 ms.
+- Gum widens up to 11%, compresses up to 14%, and skews gently with the lean. This replaces the
+  brightness flash and preserves the authored sprite offset. No new artwork, audio or haptics.
+- The item root, slot, ID, sticky flag, hitbox and grounded shadow remain unchanged. Blocked
+  gestures do not select/drag, raise Z-order, create drop previews, play pickup SFX, or start time.
+- Ordinary selection still routes onto the sticky shelf first. A full destination fails normally
+  without incorrectly playing refusal on the destination item.
+
+`scenes/ui/sticky_blocked_feedback.tscn` and `scripts/sticky_blocked_feedback.gd` own exported
+timing/intensity, smoothing, tweens, cooldown and exact reset. Their `pose_changed` signal feeds a
+separate channel in `ShelfItem`, composed with landing/outline/highlight presentation around the
+source artwork's ground line. `StickyItemIndicator` applies gum pressure and skew while retaining
+texture sizing and authored positioning. Existing Sprite2D/OutlineSprite paths remain unchanged.
+
+`level.gd` owns a separate blocked item/slot, pointer origin and touch index (or mouse identity).
+Only the owning pointer may pull/release it. Emulated duplicates of native touch/mouse are ignored.
+Pointer delta is transformed as a vector through the inverse item basis, excluding translation:
+responsive scaling preserves the feel, and shelf motion beneath a stationary finger creates no pull.
+
+The level checks only active effects through `active_sticky_feedback`. Feedback cancels on pause,
+ability interruption, application pause, desktop focus loss, failure/completion, off-window/hidden
+items, back-layer state, clear/transition, reparenting of a held item, retry/exit, freeing, or loss
+of the sticky flag. Busy items suppress new effects until transition completion. Both interactions
+run directly in the existing preview; the proposed extra mode selector is unnecessary for the
+approved combined behavior. No content, inventory, persistence, protocol or backend changes.
+
+## Implementation verification
+
+The new `tests/gameplay/test_sticky_feedback.gd` passes five stages covering motion/invariants,
+native touch ownership/cancellation/emulation, lifecycle cancellation, moving rows/scaling, and
+destination routing/freeing. The existing sticky suite passes all six stages, including promotion,
+actual Hammer execution and solver conformance. Selection, landing impact, contact shadow, Lantern,
+moving-shelf and item-progression suites also pass.
+
+```powershell
+& scripts/tools/run_isolated_godot_test.ps1 -Script tests/gameplay/test_sticky_feedback.gd -Windowed
+& scripts/tools/run_isolated_godot_test.ps1 -Script tests/gameplay/test_sticky_items.gd -Windowed
+& scripts/tools/capture_ui.ps1 -Scene scenes/testing/sticky_items_preview.tscn -Setup scripts/tools/captures/sticky_feedback_setup.gd -Name sticky_resistance -Position '0,0'
+& scripts/tools/run_isolated_godot_test.ps1 -Script scripts/tools/capture_sticky_feedback_motion.gd -Windowed -GodotArguments @('--fixed-fps','60') -UserArguments @('--out','D:/projects/sorting-puzzle/tmp/ui_capture/sticky_motion')
+```
+
+Held poses on a bottle, candy bag and robot were rendered and inspected at 540x960, 720x1280,
+1080x1920 and 1080x2400: feet stay planted, the artwork covers the gum, and adjacent items remain
+readable without new overlaps. Requested 1200x1600 still renders 900x1600 under existing
+`keep_width` behavior, so it is not full tablet-resolution verification.
+
+The deterministic motion capture saves 90 frames at 30 samples per simulated second through actual
+input helpers and asserts return to rest. Rest, tap lean, rebound, held-right, held-left and settled
+frames were inspected; the assembled preview is `tmp/ui_capture/sticky_feedback.gif`. Captures are
+ignored artifacts. Physical-device finger occlusion is unverified. Existing resource-UID warnings
+and release/provenance boundaries in `STICKY_ITEMS.md` remain outside this visual feature.
+
+## Original investigation (historical)
+
+The remaining sections record the initial options and sequencing before the combined behavior was
+approved. Use the implementation record above for current behavior and tuning.
+
+### Findings before implementation
 
 - `StickyItemIndicator.play_blocked_feedback()` brightens only the gum to 1.35 for 70 ms, then
   restores white over 180 ms. It cannot visibly communicate pulling resistance, and the player's

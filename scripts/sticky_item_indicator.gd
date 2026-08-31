@@ -15,7 +15,8 @@ const AMBER := preload("res://assets/ui/sticky_items/glue_amber.png")
 		display_width = value
 		_refresh()
 
-var _feedback: Tween
+var _pressure := 0.0
+var _lean := 0.0
 
 
 func _ready() -> void:
@@ -27,15 +28,12 @@ func _refresh() -> void:
 	var sprite := get_node_or_null("Sprite2D") as Sprite2D
 	if sprite != null:
 		sprite.texture = texture
-		sprite.scale = Vector2.ONE * display_width / float(texture.get_width())
+		sprite.scale = Vector2(1.0 + 0.11 * _pressure, 1.0 - 0.14 * _pressure) * display_width / float(texture.get_width())
+		sprite.skew = _lean * 0.65
 
 
-func play_blocked_feedback() -> void:
-	if not is_inside_tree():
-		return
-	if _feedback != null and _feedback.is_valid():
-		_feedback.kill()
-	modulate = Color.WHITE
-	_feedback = create_tween()
-	_feedback.tween_property(self, "modulate", Color(1.35, 1.35, 1.35), 0.07)
-	_feedback.tween_property(self, "modulate", Color.WHITE, 0.18)
+## Scale/skew compose with texture sizing; never overwrite the scene-authored sprite position.
+func set_resistance_pose(lean: float, pressure: float) -> void:
+	_lean = lean
+	_pressure = clampf(pressure, -0.3, 1.0)
+	_refresh()
