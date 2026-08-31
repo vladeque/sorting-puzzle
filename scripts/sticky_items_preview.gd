@@ -3,7 +3,7 @@ extends "res://scripts/level.gd"
 const PREVIEW_CONFIG := "res://configs/test_levels/sticky_items_preview.json"
 const PREVIEW_SCENE := "res://scenes/testing/sticky_items_preview.tscn"
 
-var preview_variant := "both"
+var preview_variant := "pink"
 
 
 func _ready() -> void:

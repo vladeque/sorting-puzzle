@@ -29,7 +29,8 @@ Confirmed by the project owner on 2026-08-31:
 
 The implementation follows these recommendations alongside the confirmed per-layer and Hammer
 rules. The owner subsequently requested the full feature and both selected gum/glue candidates
-for an in-game comparison; the final artwork choice remains open.
+for an in-game comparison, then selected pink gum as the primary asset. Amber remains available
+as an optional comparison variant.
 
 | Decision | Recommendation | Consequence |
 | --- | --- | --- |

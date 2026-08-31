@@ -39,6 +39,7 @@ theme_override_font_sizes/font_size = 22
 toggle_mode = true
 button_group = SubResource("Variants")
 text = "Pink"
+button_pressed = true
 
 [node name="Amber" type="Button" parent="Column/Buttons"]
 unique_name_in_owner = true
@@ -55,7 +56,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 22
 toggle_mode = true
-button_pressed = true
 button_group = SubResource("Variants")
 text = "Both"
 

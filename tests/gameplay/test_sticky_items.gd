@@ -189,6 +189,7 @@ func _test_preview_and_locks() -> void:
 	root.add_child(level)
 	await _settle(level)
 	_check(level.launched_from_dev_mode, "Preview must not spend campaign resources")
+	level._set_preview_variant("both")
 	var shelves: Array = level._get_all_shelves()
 	var locked_slot: Node2D = level._get_front_slots(shelves[3])[0]
 	_check(level._is_slot_locked(locked_slot), "Preview contains locked sticky shelf")

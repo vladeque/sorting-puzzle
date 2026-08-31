@@ -13,7 +13,8 @@ The preview uses `configs/test_levels/sticky_items_preview.json`: nine shelves, 
 across successive layers, an initially locked shelf, and a moving row. The board is solvable in
 17 moves according to the Python validator. Pink, Amber, Both, and Reset controls stay below the
 ability bar and account for safe-area insets. Both shows pink on the upper shelves and amber on
-the lower shelves. Switching artwork updates hidden items too. Reset and retry retain the choice.
+the lower shelves. The preview starts with Pink selected, matching the chosen primary asset.
+Switching artwork updates hidden items too. Reset and retry retain the choice.
 This is a dev-mode level with temporary ability counts; completing it does not advance the campaign.
 
 The two selected generated assets are retained separately:
@@ -27,9 +28,10 @@ marker scene draws one texture beneath the item artwork, with no overlay over th
 Back-layer items keep their sticky state but show no sticky texture, even in the visible back preview;
 the marker appears when front-layer promotion finishes. `Shelf.configure_back_layer_item()` and
 `configure_back_layer()` set `ShelfItem.is_in_back_layer`; `level.gd` clears it after promotion.
-Authored sticky levels default to the pink variant; change `level.gd`'s exported `sticky_marker_variant`
+Pink gum is the selected primary sticky asset, and authored levels and the preview default to pink.
+Change `level.gd`'s exported `sticky_marker_variant`
 or call `set_sticky_marker_variant("amber")` to compare the other artwork on an authored level.
-No final art choice is implied by this default.
+Amber is retained as an optional comparison asset.
 
 ## Rules and ownership
 
