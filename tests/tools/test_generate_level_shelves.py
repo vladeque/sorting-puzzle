@@ -61,7 +61,7 @@ class GenerateLevelShelvesTests(unittest.TestCase):
         self.assertEqual(stats["item_type_count_source"], "inferred")
         self.assertEqual(stats["preferred_copies_per_type"], 4.5)
 
-    def test_defaults_to_six_preferred_copies_per_type(self) -> None:
+    def test_defaults_to_three_preferred_copies_per_type(self) -> None:
         _shelves, stats = generate_shelves(
             shelf_count=9,
             layer_count=2,
@@ -72,10 +72,10 @@ class GenerateLevelShelvesTests(unittest.TestCase):
             max_items_per_type_override=None,
             min_front_visible_triples=1,
         )
-        expected_type_count = infer_item_type_count(stats["target_filled_slots"], 6.0)
+        expected_type_count = infer_item_type_count(stats["target_filled_slots"], 3.0)
         self.assertEqual(stats["item_type_count"], expected_type_count)
         self.assertEqual(stats["item_type_count_source"], "inferred")
-        self.assertEqual(stats["preferred_copies_per_type"], 6.0)
+        self.assertEqual(stats["preferred_copies_per_type"], 3.0)
 
     def test_explicit_item_types_override_preferred_copy_inference(self) -> None:
         item_types = logical_item_ids(7)

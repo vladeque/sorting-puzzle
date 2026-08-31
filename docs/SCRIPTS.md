@@ -1,5 +1,16 @@
 # Scripts
 
+## Sticky item mechanic
+
+`scripts/sticky_item_rules.gd` validates one sticky item per shelf layer and reserves matching
+partners from Hammer. `scripts/level.gd` loads flags, rejects sticky move sources, and filters ability
+targets/hints; `scripts/item.gd` owns instance state. `scripts/sticky_item_indicator.gd` owns the two
+marker variants and blocked feedback. `scripts/sticky_items_preview.gd` and
+`scripts/sticky_preview_controls.gd` own the isolated playable art comparison and controls.
+Python validation is shared through `scripts/tools/sticky_items.py`, with generator/solver and
+materialization support in their existing tools. See [STICKY_ITEMS.md](STICKY_ITEMS.md) for the
+contract, CLI, tests, and release boundary.
+
 This file documents what each script owns. Keep script docs focused on responsibilities, exports, dependencies, and boundaries.
 
 ## `scripts/production_main_menu.gd`

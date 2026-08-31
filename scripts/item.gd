@@ -62,6 +62,16 @@ const LAND_IMPACT_TWEEN_META := &"_shelf_item_land_impact_tween"
 
 @export var item_id: StringName = &""
 
+@export var is_sticky := false:
+	set(value):
+		is_sticky = value
+		_apply_sticky_visual()
+
+@export_enum("pink", "amber") var sticky_variant := "pink":
+	set(value):
+		sticky_variant = value
+		_apply_sticky_visual()
+
 ## Shared shadow material, assigned in scenes/item.tscn. Each item renders through its own copy,
 ## because the resting/carried blend writes per-item shader uniforms.
 @export var shadow_material: ShaderMaterial
@@ -241,6 +251,23 @@ func _apply_visual_scale() -> void:
 
 	_apply_shadow()
 	_apply_outline()
+	_apply_sticky_visual()
+
+
+func _apply_sticky_visual() -> void:
+	var indicator := get_node_or_null("StickyItemIndicator") as StickyItemIndicator
+	if indicator == null:
+		return
+	indicator.visible = is_sticky
+	indicator.variant = sticky_variant
+	indicator.scale = Vector2.ONE * _get_effective_scale()
+	indicator.position.y = CONTACT_ANCHOR_Y * _get_effective_scale()
+
+
+func play_sticky_blocked_feedback() -> void:
+	var indicator := get_node_or_null("StickyItemIndicator") as StickyItemIndicator
+	if is_sticky and indicator != null:
+		indicator.play_blocked_feedback()
 
 
 ## Draws the item's own silhouette as its shadow, in one of two readings blended by `shadow_lift`:

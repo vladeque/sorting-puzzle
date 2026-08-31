@@ -1,6 +1,8 @@
 # Sticky Items Implementation Plan
 
-Status: Draft for product review; no gameplay changes implemented.
+Status: Historical implementation plan. The client mechanic, tools, and two-asset preview are now
+implemented; see [STICKY_ITEMS.md](STICKY_ITEMS.md) for current behavior, verification, and the separate
+backend publication gate. Proposal wording below records the original planning discussion.
 Date: 2026-08-31.
 
 ## Requested behavior
@@ -23,10 +25,11 @@ Confirmed by the project owner on 2026-08-31:
 - The limit is one sticky item per shelf layer, not one across the entire shelf.
 - Hammer must not remove sticky items, including hidden sticky items.
 
-## Remaining proposed decisions
+## Design decisions carried into implementation
 
-These recommendations are proposals, not additional approved requirements. Settle them before
-implementing the affected behavior.
+The implementation follows these recommendations alongside the confirmed per-layer and Hammer
+rules. The owner subsequently requested the full feature and both selected gum/glue candidates
+for an in-game comparison; the final artwork choice remains open.
 
 | Decision | Recommendation | Consequence |
 | --- | --- | --- |

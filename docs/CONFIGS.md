@@ -160,8 +160,8 @@ Supported layout presets with moving rows:
 The visible counts below describe authored board footprints. Runtime travel expands to the full
 playable background along the motion axis, so additional configured shelves can be visible.
 
-- `grid_3x2_moving_4_bottom`: 10 shelves arranged as two static rows of three plus a bottom row of
-  four moving shelves, three visible at 45 px/s to the right.
+- `grid_3x2_moving_5_bottom`: 11 shelves arranged as two static rows of three plus a bottom row of
+  five moving shelves, three visible at 60 px/s to the right.
 - `grid_3x3_moving_4_middle`: 13 shelves arranged as a static row of three, a row of four moving
   shelves, and two more static rows of three. Three moving shelves are visible at 60 px/s to the right.
 - `grid_3x2_moving_4_4_center`: 14 shelves arranged as a static row of three, two counter-running
@@ -175,8 +175,8 @@ playable background along the motion axis, so additional configured shelves can 
 - `staggered_columns_5_moving_6_5`: 16 shelves arranged as a static column of five, a vertical belt
   of six moving shelves, and a static column of five. Four moving shelves are visible at 55 px/s
   downward. This is the tallest board that fits the play area.
-- `grid_2x4_moving_6_left`: 14 shelves arranged as a vertical belt of six moving shelves down the
-  left edge and a static 2x4 block beside it. Four moving shelves are visible at 55 px/s downward.
+- `grid_2x4_moving_8_left`: 16 shelves arranged as a vertical belt of eight moving shelves down the
+  left edge and a static 2x4 block beside it. Four moving shelves are visible at 60 px/s downward.
 - `grid_1x4_moving_6_6_sides`: 16 shelves arranged as two vertical belts of six moving shelves around
   a static column of four. Four moving shelves per belt are visible at 55 px/s, the left belt
   downward and the right belt upward.
@@ -322,7 +322,7 @@ py scripts\tools\materialize_level_templates.py
 
 `--item-type-count` creates `item_01` through the requested count. When it is omitted, the generator
 uses `ceil(target_filled_slots / preferred_copies_per_type)` to infer the logical type count.
-`--preferred-copies-per-type` accepts integers or fractions of at least `3` and defaults to `6`.
+`--preferred-copies-per-type` accepts integers or fractions of at least `3` and defaults to `3`.
 It is a target average because each logical type's actual copy count must remain a multiple of three.
 An explicit `--item-type-count` overrides this inference.
 
@@ -361,6 +361,16 @@ The distribution engine is untouched: it lays out only the standard shelves, and
 stocked by relocating items out of the deepest layers, so every item ID keeps the multiple-of-three
 count it was given. Because relocation can change whether a board is winnable, pair the flag with
 `--require-solvable` so the search re-runs afterwards instead of assuming a solution survived.
+
+### Sticky items
+
+Each standard shelf may include `sticky_items: [{"layer": 0, "slot": 1}]`, using zero-based
+coordinates and at most one occupied sticky slot per individual layer. Multiple layers may each
+have one. The metadata survives abstract-to-runtime materialization; dispensers cannot use it.
+`--sticky-items-percent 10` adds deterministic placement, counting all items and capping at occupied
+standard layers. Use `--require-solvable` to validate the final sticky board; failed proof never
+overwrites output. See [STICKY_ITEMS.md](STICKY_ITEMS.md) for schema, rounding, statistics, and
+publication constraints. The isolated comparison board is `configs/test_levels/sticky_items_preview.json`.
 
 ## `configs/reward_chest_goals.json`
 

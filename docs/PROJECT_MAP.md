@@ -49,6 +49,10 @@ Reusable item scene:
 - `scenes/item.tscn`
 - Instantiated by `scripts/level.gd` for every shelf item.
 - Displays the item sprite and exposes item identity through `ShelfItem`.
+- Sticky instance state and marker live here; see `scripts/sticky_item_rules.gd`,
+  `scenes/ui/sticky_item_indicator.tscn`, and [STICKY_ITEMS.md](STICKY_ITEMS.md).
+- Compare the two selected art candidates in `scenes/testing/sticky_items_preview.tscn` (F6 or the
+  testing menu's **Sticky items preview** button). Campaign content is unchanged.
 
 ## Core Systems
 

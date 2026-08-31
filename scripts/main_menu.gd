@@ -17,6 +17,9 @@ func _ready() -> void:
 	_play_button.pressed.connect(_launch_campaign_level)
 	_update_campaign_progress()
 	_populate_level_selector()
+	%StickyPreviewButton.visible = _is_dev_level_select_enabled()
+	%StickyPreviewButton.pressed.connect(func() -> void:
+		get_tree().change_scene_to_file("res://scenes/testing/sticky_items_preview.tscn"))
 
 
 func _update_campaign_progress() -> void:

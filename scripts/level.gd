@@ -3,6 +3,7 @@ extends Node2D
 ## The size of a triple. Standard shelves happen to be exactly this wide, but shelf width now comes
 ## from `Shelf.get_slot_count()`; this constant only ever means "how many items make a match".
 const SLOT_COUNT := 3
+const StickyRules := preload("res://scripts/sticky_item_rules.gd")
 const SLOT_ITEM_POSITION := Vector2(0, -32)
 const SHELF_CELL_VISUAL_SCALE := 1.06
 const SHELF_BASE_CELL_SIZE := Shelf.BASE_CELL_SIZE
@@ -165,6 +166,7 @@ const SHOP_RETURN_TIME_EXTENSION := &"time_extension"
 @export var hammer_haptics_enabled := true
 @export var selected_level := 1
 @export var launched_from_dev_mode := false
+@export_enum("pink", "amber") var sticky_marker_variant := "pink"
 @export_file("*.tscn") var return_menu_scene_path := MAIN_MENU_SCENE
 
 var _slots: Array[Node2D] = []
@@ -247,6 +249,7 @@ var _hammer_effect_active := false
 var _shuffle_effect_active := false
 ## True from the moment the board is cleared until the completion screen opens (see _complete_level).
 var _completion_celebration_active := false
+var _level_config_error := ""
 
 
 func _ready() -> void:
@@ -551,6 +554,8 @@ func _stop_sound_effects() -> void:
 
 
 func _process(delta: float) -> void:
+	if not _level_config_error.is_empty():
+		return
 	if _level_completed:
 		return
 
@@ -594,6 +599,8 @@ func _exit_tree() -> void:
 
 
 func _input(event: InputEvent) -> void:
+	if not _level_config_error.is_empty():
+		return
 	if _level_failed or _level_completed:
 		return
 
@@ -781,6 +788,14 @@ func _load_json_file(path: String) -> Dictionary:
 
 
 func _apply_level_config(config: Dictionary) -> void:
+	var sticky_errors := StickyRules.validate_config(config)
+	_level_config_error = "; ".join(sticky_errors)
+	if not sticky_errors.is_empty():
+		_cancel_active_interaction()
+		_level_paused = true
+		_set_moving_shelf_rows_paused(true)
+		push_error("Invalid sticky level configuration: " + _level_config_error)
+		return
 	level_duration_seconds = float(config.get("time_seconds", level_duration_seconds))
 	_time_remaining = level_duration_seconds
 	_has_player_started_timer = false
@@ -1056,7 +1071,7 @@ func _add_moving_shelf_row(
 func _configure_shelf_from_config(shelf: Shelf, shelf_config: Dictionary, allow_locked := true) -> void:
 	var layers := shelf_config.get("layers", []) as Array
 	_max_layer_count = maxi(_max_layer_count, layers.size())
-	_add_configured_layers(shelf, layers)
+	_add_configured_layers(shelf, layers, shelf_config.get("sticky_items", []))
 	_configure_shelf_unlock(shelf, shelf_config, allow_locked)
 	_configure_dispenser_capacity(shelf, layers)
 
@@ -1615,7 +1630,7 @@ func _add_shelf(
 	return shelf
 
 
-func _add_configured_layers(shelf: Shelf, layers: Array) -> void:
+func _add_configured_layers(shelf: Shelf, layers: Array, sticky_items: Array = []) -> void:
 	var slot_count := shelf.get_slot_count()
 	for layer_index in range(layers.size()):
 		var item_ids := layers[layer_index] as Array
@@ -1629,7 +1644,8 @@ func _add_configured_layers(shelf: Shelf, layers: Array) -> void:
 		var layer_slots := _get_front_slots(shelf) if layer_index == 0 else shelf.add_back_layer(layer_index, _get_front_slots(shelf))
 		var fill_count = mini(slot_count, item_ids.size())
 		for slot_index in range(fill_count):
-			_add_configured_item(layer_slots[slot_index], item_ids[slot_index], layer_index, slot_index)
+			_add_configured_item(layer_slots[slot_index], item_ids[slot_index], layer_index, slot_index,
+				StickyRules.is_sticky_slot(sticky_items, layer_index, slot_index))
 
 
 func _configure_shelf_unlock(shelf: Node2D, shelf_config: Dictionary, allow_locked := true) -> void:
@@ -1706,6 +1722,9 @@ func _is_slot_locked(slot: Node) -> bool:
 func _is_slot_move_source_eligible(slot: Node) -> bool:
 	var slot_node := slot as Node2D
 	if slot_node == null or not _is_shelf_move_source_eligible(_get_owning_shelf(slot_node)):
+		return false
+	var source_item := _get_slot_item(slot_node)
+	if source_item != null and source_item.is_sticky:
 		return false
 	if _get_moving_shelf_row(slot_node) == null:
 		return true
@@ -1798,7 +1817,7 @@ func _update_shelf_input_pickable(shelf: Node, should_enable: bool) -> void:
 		item.input_pickable = should_enable and not _is_item_busy(item)
 
 
-func _add_configured_item(slot: Node2D, item_value, layer_index: int, slot_index: int) -> void:
+func _add_configured_item(slot: Node2D, item_value, layer_index: int, slot_index: int, sticky := false) -> void:
 	if item_value == null:
 		return
 
@@ -1809,6 +1828,8 @@ func _add_configured_item(slot: Node2D, item_value, layer_index: int, slot_index
 	var item := ITEM_SCENE.instantiate() as ShelfItem
 	item.name = "Item%sL%sS%s" % [item_id.to_pascal_case(), layer_index + 1, slot_index + 1]
 	item.item_id = StringName(item_id)
+	item.is_sticky = sticky
+	item.sticky_variant = sticky_marker_variant
 	item.texture = _item_textures.get(item_id)
 	if item.texture == null:
 		push_warning("No texture configured for item '%s'." % item_id)
@@ -2109,6 +2130,7 @@ func _restart_level() -> void:
 	var next_level := packed_level.instantiate()
 	next_level.set("selected_level", selected_level)
 	next_level.set("launched_from_dev_mode", launched_from_dev_mode)
+	next_level.set("sticky_marker_variant", sticky_marker_variant)
 	next_level.set("return_menu_scene_path", return_menu_scene_path)
 
 	var tree := get_tree()
@@ -2538,8 +2560,8 @@ func _is_ui_action_blocked() -> bool:
 
 
 func _close_pause_menu() -> void:
-	_level_paused = false
-	_set_moving_shelf_rows_paused(false)
+	_level_paused = not _level_config_error.is_empty()
+	_set_moving_shelf_rows_paused(_level_paused)
 	_pause_menu_overlay.close()
 	_leave_confirmation_overlay.close()
 	if _ability_purchase_overlay != null:
@@ -2557,7 +2579,7 @@ func _handle_press_at(pointer_global_position: Vector2) -> void:
 	if _dragged_item != null:
 		return
 
-	var clicked_item := _find_item_at_position(pointer_global_position)
+	var clicked_item := _find_item_at_position(pointer_global_position, true)
 	if _selected_item != null:
 		var target_slot := _find_clicked_slot(pointer_global_position, clicked_item)
 		if target_slot != null:
@@ -2570,6 +2592,10 @@ func _handle_press_at(pointer_global_position: Vector2) -> void:
 			_clear_selected_item()
 
 	if clicked_item == null:
+		return
+	if clicked_item.is_sticky:
+		clicked_item.play_sticky_blocked_feedback()
+		get_viewport().set_input_as_handled()
 		return
 
 	_start_level_timer_from_player_action()
@@ -2671,7 +2697,12 @@ func _finish_active_drag(pointer_global_position: Vector2) -> void:
 
 
 func _move_item_to_slot(item: ShelfItem, origin_slot: Node2D, target_slot: Node2D) -> bool:
+	if not _level_config_error.is_empty():
+		return false
 	if item == null or origin_slot == null or target_slot == null:
+		return false
+	if item.is_sticky:
+		item.play_sticky_blocked_feedback()
 		return false
 
 	if _is_slot_locked(origin_slot) or not _is_slot_drop_target_eligible(target_slot):
@@ -2721,10 +2752,10 @@ func _get_item_pick_rect(item: ShelfItem) -> Rect2:
 	return item_rect
 
 
-func _find_item_at_position(pointer_global_position: Vector2) -> ShelfItem:
+func _find_item_at_position(pointer_global_position: Vector2, include_sticky := false) -> ShelfItem:
 	for i in range(_slots.size() - 1, -1, -1):
 		var slot := _slots[i]
-		if not _is_slot_move_source_eligible(slot):
+		if not _is_slot_move_source_eligible(slot) and not (include_sticky and _is_shelf_move_source_eligible(_get_owning_shelf(slot))):
 			continue
 
 		var item := _get_slot_item(slot)
@@ -3577,6 +3608,8 @@ func _screen_position_to_global(screen_position: Vector2) -> Vector2:
 
 
 func _set_selected_item(item: ShelfItem, slot: Node2D) -> void:
+	if item == null or item.is_sticky or not _is_slot_move_source_eligible(slot):
+		return
 	_clear_selected_item()
 	_selected_item = item
 	_selected_slot = slot
@@ -3600,7 +3633,7 @@ func _apply_item_visual_state(item: ShelfItem) -> void:
 	item.set_outline(is_selected or is_highlighted, outline_color, highlight_outline_width)
 	item.set_highlight_scale(1.0)
 	item.set_selection_forward_offset(
-		selected_item_forward_offset if is_selected or is_highlighted else 0.0
+		selected_item_forward_offset if (is_selected or is_highlighted) and not item.is_sticky else 0.0
 	)
 
 
@@ -3682,10 +3715,12 @@ func _apply_paid_ability(ability_id: StringName) -> bool:
 
 
 func _can_apply_ability(ability_id: StringName) -> bool:
+	if not _level_config_error.is_empty():
+		return false
 	match ability_id:
 		ABILITY_HAMMER:
-			var front_groups := _group_hammer_items_by_type(_get_visible_items())
-			var back_groups := _group_hammer_items_by_type(_get_first_back_layer_items())
+			var front_groups := _group_hammer_items_by_type(_get_visible_items(true))
+			var back_groups := _group_hammer_items_by_type(_get_first_back_layer_items(true))
 			for item_id in front_groups.keys():
 				var front_count := (front_groups[item_id] as Array).size()
 				var back_count := (back_groups.get(item_id, []) as Array).size()
@@ -3695,7 +3730,7 @@ func _can_apply_ability(ability_id: StringName) -> bool:
 		ABILITY_SHUFFLE:
 			return not _is_resolving_shelves and _get_shuffle_eligible_items().size() >= 2
 		ABILITY_HIGHLIGHT:
-			return true
+			return not _find_immediate_triple_items().is_empty()
 		ABILITY_FREEZER:
 			return not _is_freezer_active()
 	return false
@@ -3985,8 +4020,9 @@ func _find_hammer_supplemented_targets(
 
 func _group_hammer_items_by_type(items: Array[ShelfItem]) -> Dictionary:
 	var items_by_type := {}
+	var blocked_types := StickyRules.hammer_reserves(_get_all_items())
 	for item in items:
-		if item.item_id == &"":
+		if item.item_id == &"" or item.is_sticky or blocked_types.has(item.item_id):
 			continue
 
 		if not items_by_type.has(item.item_id):
@@ -4011,20 +4047,24 @@ func _use_shuffle() -> bool:
 
 func _get_shuffle_eligible_items() -> Array[ShelfItem]:
 	var items: Array[ShelfItem] = []
+	var identities := {}
 	# Shuffle reassigns hidden back-layer identities as well as visible ones, so including a
 	# dispenser would rewrite the queue the level was authored (and validated) around.
 	for item in _get_unlocked_items(true):
 		if item == null or not is_instance_valid(item) or item.is_queued_for_deletion():
 			continue
 
-		if item.item_id == &"":
+		if item.item_id == &"" or item.is_sticky:
 			continue
 
 		if _is_item_busy(item):
 			return []
 
 		items.append(item)
+		identities[item.item_id] = true
 
+	if identities.size() < 2:
+		return []
 	return items
 
 
@@ -4304,6 +4344,7 @@ func _finish_shuffle_animation_entries(entries: Array[Dictionary]) -> void:
 
 
 func _shuffle_item_id_assignments(items: Array[ShelfItem]) -> void:
+	items = items.filter(func(item: ShelfItem) -> bool: return not item.is_sticky)
 	var item_ids: Array[StringName] = []
 	for item in items:
 		item_ids.append(item.item_id)
@@ -4316,6 +4357,13 @@ func _shuffle_item_id_assignments(items: Array[ShelfItem]) -> void:
 		_shuffle_array(item_ids)
 		if not _item_id_arrays_match(original_ids, item_ids):
 			break
+	if _item_id_arrays_match(original_ids, item_ids):
+		for item_index in range(1, item_ids.size()):
+			if item_ids[item_index] != item_ids[0]:
+				var first_id = item_ids[0]
+				item_ids[0] = item_ids[item_index]
+				item_ids[item_index] = first_id
+				break
 
 	for item_index in range(items.size()):
 		var item := items[item_index]
@@ -4341,6 +4389,8 @@ func _item_id_arrays_match(left: Array, right: Array) -> bool:
 
 func _use_highlight() -> bool:
 	var items_to_highlight := _find_immediate_triple_items()
+	if items_to_highlight.is_empty():
+		return false
 	_clear_ability_highlights()
 	_highlighted_items = items_to_highlight
 	_highlight_timer = HIGHLIGHT_DURATION_SECONDS
@@ -4384,6 +4434,8 @@ func _destroy_items(items_to_destroy: Array[ShelfItem]) -> void:
 
 
 func _find_immediate_triple_items() -> Array[ShelfItem]:
+	if _get_all_items().any(func(item: ShelfItem) -> bool: return item.is_sticky):
+		return _find_sticky_aware_highlight()
 	var items_by_id := {}
 	for item in _get_visible_items():
 		if item.item_id == &"":
@@ -4424,6 +4476,72 @@ func _find_immediate_triple_items() -> Array[ShelfItem]:
 			return _merge_highlight_items([], group)
 
 	return []
+
+
+## A sticky anchor is a destination, never a donor. Witness a gathering sequence by first parking
+## mismatching ordinary items outside the target shelf, then bringing its matching partners in.
+func _find_sticky_aware_highlight(preferred_id: StringName = &"") -> Array[ShelfItem]:
+	var boards: Array[Dictionary] = []
+	var donors: Array[ShelfItem] = []
+	var total_empty := 0
+	for shelf in _get_all_shelves():
+		if not _is_shelf_move_source_eligible(shelf):
+			continue
+		var items := _get_shelf_items(shelf)
+		if items.any(func(item: ShelfItem) -> bool: return _is_item_busy(item) or not _get_item_pick_rect(item).has_area()):
+			continue
+		var empty := 0
+		for slot in _get_front_slots(shelf):
+			if _get_slot_item(slot) == null and _is_slot_drop_target_eligible(slot):
+				empty += 1
+		for item in items:
+			if not item.is_sticky:
+				donors.append(item)
+		if _shelf_forms_triples(shelf) and _is_shelf_drop_target_eligible(shelf):
+			boards.append({"shelf": shelf, "items": items, "empty": empty})
+			total_empty += empty
+	boards.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.items.size() > b.items.size())
+	for board in boards:
+		var items: Array = board.items
+		var anchor: ShelfItem
+		for item: ShelfItem in items:
+			if item.is_sticky:
+				anchor = item
+		var ids: Array[StringName] = []
+		if anchor != null:
+			ids.append(anchor.item_id)
+		else:
+			for item in donors:
+				if not ids.has(item.item_id):
+					ids.append(item.item_id)
+		for item_id in ids:
+			if preferred_id != &"" and item_id != preferred_id:
+				continue
+			var result: Array[ShelfItem] = []
+			var blockers := 0
+			for item: ShelfItem in items:
+				if item.item_id == item_id:
+					result.append(item)
+				else:
+					blockers += 1
+			if total_empty - int(board.empty) < blockers:
+				continue
+			for donor in donors:
+				if result.size() >= SLOT_COUNT:
+					break
+				if donor.item_id == item_id and not items.has(donor):
+					result.append(donor)
+			if result.size() == SLOT_COUNT and int(board.empty) + blockers >= SLOT_COUNT - (items.size() - blockers):
+				return result
+	return []
+
+
+func set_sticky_marker_variant(variant: String) -> void:
+	if variant not in ["pink", "amber"]:
+		return
+	sticky_marker_variant = variant
+	for item in _get_all_items():
+		item.sticky_variant = variant
 
 
 func _merge_highlight_items(priority_items: Array, candidates: Array) -> Array[ShelfItem]:
@@ -4479,6 +4597,8 @@ func _find_current_highlight_type_items() -> Array[ShelfItem]:
 
 	if current_id == &"":
 		return []
+	if _get_all_items().any(func(item: ShelfItem) -> bool: return item.is_sticky):
+		return _find_sticky_aware_highlight(current_id)
 
 	var matches: Array[ShelfItem] = []
 	for item in _get_visible_items():

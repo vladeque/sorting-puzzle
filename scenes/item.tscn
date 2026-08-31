@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dvnlhf6t2bm4v"]
 
 [ext_resource type="Script" uid="uid://c3hge2sjd0d56" path="res://scripts/item.gd" id="1_item_script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/sticky_item_indicator.tscn" id="2_sticky"]
 
 [sub_resource type="Shader" id="Shader_item_outline"]
 code = "shader_type canvas_item;
@@ -122,6 +123,10 @@ scale = Vector2(0.92, 0.92)
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=800087730]
 scale = Vector2(0.92, 0.92)
+
+[node name="StickyItemIndicator" parent="." instance=ExtResource("2_sticky")]
+visible = false
+position = Vector2(0, 42)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=518417999]
 shape = SubResource("RectangleShape2D_item_hitbox")

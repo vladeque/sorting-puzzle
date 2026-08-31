@@ -80,3 +80,11 @@ size_flags_horizontal = 4
 theme_override_constants/h_separation = 16
 theme_override_constants/v_separation = 16
 columns = 5
+
+[node name="StickyPreviewButton" type="Button" parent="Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 60)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 26
+text = "Sticky items preview"

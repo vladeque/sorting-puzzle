@@ -1,0 +1,20 @@
+{
+  "level": 1,
+  "time_seconds": 600,
+  "row_layouts": [
+    {"shelf_count": 3},
+    {"shelf_count": 3},
+    {"shelf_count": 3, "visible_count": 3, "motion": {"type": "horizontal_wrap", "speed": 35, "direction": "right"}}
+  ],
+  "shelves": [
+    {"layers": [["soda_bottle", "plant_pot", null], ["milk_carton", null, null]], "sticky_items": [{"layer": 0, "slot": 0}, {"layer": 1, "slot": 0}]},
+    {"layers": [["soda_bottle", "soda_bottle", "cookie_box_blue"]]},
+    {"layers": [["milk_carton", "milk_carton", "cookie_box_blue"]]},
+    {"layers": [["candy_bag", null, null], ["cupcake", null, null]], "sticky_items": [{"layer": 0, "slot": 0}, {"layer": 1, "slot": 0}], "unlock_after_triples": 1},
+    {"layers": [["candy_bag", "candy_bag", "cookie_box_blue"]]},
+    {"layers": [["cupcake", "cupcake", "plant_pot"]]},
+    {"layers": [["toy_robot", null, null], ["teddy_bear", null, null]], "sticky_items": [{"layer": 0, "slot": 0}, {"layer": 1, "slot": 0}]},
+    {"layers": [["toy_robot", "toy_robot", null]]},
+    {"layers": [["teddy_bear", "teddy_bear", "plant_pot"]]}
+  ]
+}

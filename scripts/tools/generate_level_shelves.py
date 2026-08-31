@@ -32,8 +32,8 @@ LAYOUT_PRESETS = (
     "grid_4x3",
     "grid_4x4_hollow",
     "grid_1x4_moving_6_6_sides",
-    "grid_2x4_moving_6_left",
-    "grid_3x2_moving_4_bottom",
+    "grid_2x4_moving_8_left",
+    "grid_3x2_moving_5_bottom",
     "grid_3x2_moving_4_4_center",
     "grid_3x3_moving_4_middle",
     "grid_3x3_moving_5_bottom",
@@ -510,6 +510,97 @@ def validate_generated_shelves(
     }
 
 
+def apply_sticky_items(shelves: list[dict[str, Any]], percent: float, seed: int) -> dict[str, Any]:
+    """Seeded capacity matching assigns at most one sticky item per occupied standard layer.
+
+    Matching layers to per-type triple tokens avoids unlucky greedy choices stranding capacity.
+    It is only a necessary copy-count check; the final board must still pass the solver.
+    """
+    if not math.isfinite(percent) or not 0 <= percent <= 100:
+        raise ValueError("--sticky-items-percent must be finite and between 0 and 100")
+    counts = Counter(item for shelf in shelves for layer in shelf["layers"] for item in layer if item)
+    total = sum(counts.values())
+    layers = [(si, li) for si, shelf in enumerate(shelves)
+              if shelf.get("type", "standard") != SHELF_KIND_DISPENSER
+              for li, layer in enumerate(shelf["layers"]) if any(layer)]
+    requested = math.floor(total * percent / 100 + 0.5)
+    target = min(requested, len(layers))
+    stats: dict[str, Any] = {
+        "requested_percent": percent, "requested_count": requested,
+        "eligible_layer_count": len(layers), "target_count": target,
+        "actual_count": 0, "effective_percent": 0.0, "placements": [],
+        "cap_reason": "occupied_standard_layers" if requested > len(layers) else None,
+    }
+    if target == 0:
+        return stats
+    rng = random.Random(f"sticky:{seed}")
+    rng.shuffle(layers)
+    candidates: dict[tuple[int, int], list[tuple[str, int]]] = {}
+    for si, li in layers:
+        tokens = [(item, copy) for item in sorted(set(shelves[si]["layers"][li]) - {None})
+                  for copy in range(counts[item] // 3)]
+        rng.shuffle(tokens)
+        candidates[si, li] = tokens
+    owners: dict[tuple[str, int], tuple[int, int]] = {}
+
+    def assign(layer: tuple[int, int], seen: set[tuple[str, int]]) -> bool:
+        for token in candidates[layer]:
+            if token in seen:
+                continue
+            seen.add(token)
+            if token not in owners or assign(owners[token], seen):
+                owners[token] = layer
+                return True
+        return False
+
+    for layer in layers:
+        assign(layer, set())
+        if len(owners) == target:
+            break
+    if len(owners) < target:
+        raise ValueError(f"Cannot place {target} sticky items with one per layer and enough matching "
+                         f"copies; maximum assignment is {len(owners)}. Lower --sticky-items-percent.")
+    for (item, _copy), (si, li) in sorted(owners.items(), key=lambda pair: pair[1]):
+        slot = rng.choice([i for i, value in enumerate(shelves[si]["layers"][li]) if value == item])
+        shelves[si].setdefault("sticky_items", []).append({"layer": li, "slot": slot})
+        stats["placements"].append({"shelf": si, "layer": li, "slot": slot})
+    stats["actual_count"] = target
+    stats["effective_percent"] = 100 * target / total if total else 0.0
+    return stats
+
+
+def count_collectible_front_types(shelves: list[dict[str, Any]]) -> int:
+    """Conservative opening check: park blockers in free slots, then gather ordinary partners.
+
+    No hidden layer, locked shelf, or second sticky anchor is treated as an available partner.
+    This witnesses a gathering sequence without assuming that three visible copies suffice.
+    """
+    state = shelves_to_state(shelves)[1]
+    reachable = [(si, shelf) for si, shelf in enumerate(state) if shelf.unlock_after_triples == 0]
+    movable = Counter(item for _, shelf in reachable for slot, item in enumerate(shelf.layers[0])
+                      if item is not None and (0, slot) not in shelf.sticky_items)
+    available_empty = sum(shelf.layers[0].count(None) for _, shelf in reachable if shelf.accepts_dropped_items)
+    collectible: set[str] = set()
+    for _, shelf in reachable:
+        if not shelf.forms_triples:
+            continue
+        front = shelf.layers[0]
+        sticky = next((front[slot] for layer, slot in shelf.sticky_items if layer == 0), None)
+        for item in set(movable) | ({sticky} if sticky else set()):
+            if sticky is not None and sticky != item:
+                continue
+            blockers = sum(value is not None and value != item for value in front)
+            # Outside matching copies must be movable. Slots freed by them can also park blockers,
+            # but requiring initial buffer slots here deliberately gives a conservative witness.
+            if available_empty - front.count(None) < blockers:
+                continue
+            existing = front.count(item)
+            outside = movable[item] - existing + int(sticky == item)
+            if outside >= 3 - existing:
+                collectible.add(item)
+    return len(collectible)
+
+
 def generate_with_optional_validation(
     shelf_count: int,
     layer_count: int,
@@ -527,12 +618,16 @@ def generate_with_optional_validation(
     preferred_copies_per_type: float = DEFAULT_PREFERRED_COPIES_PER_TYPE,
     locked_shelves: dict[int, int] | None = None,
     dispenser_shelves: dict[int, int] | None = None,
+    sticky_items_percent: float = 0.0,
 ) -> tuple[list[dict[str, Any]], dict[str, Any], dict[str, Any] | None, int | None]:
+    if not math.isfinite(sticky_items_percent) or not 0 <= sticky_items_percent <= 100:
+        raise ValueError("--sticky-items-percent must be finite and between 0 and 100")
     attempts = max(1, max_attempts if require_solvable else 1)
     random_seed_source = random.SystemRandom()
     last_result = None
     locked_shelves = locked_shelves or {}
     dispenser_shelves = dispenser_shelves or {}
+    last_placement_error = None
 
     # Dispensers are inserted after generation, so the distribution engine lays out only the
     # standard shelves and the requested total still comes out right.
@@ -555,6 +650,43 @@ def generate_with_optional_validation(
         )
         apply_dispenser_shelves(shelves, dispenser_shelves, random.Random(attempt_seed))
         apply_locked_shelves(shelves, locked_shelves)
+        if sticky_items_percent > 0:
+            try:
+                stats["sticky_items"] = apply_sticky_items(shelves, sticky_items_percent, attempt_seed)
+            except ValueError as error:
+                last_placement_error = error
+                if require_solvable:
+                    continue
+                raise
+            shape_errors, _ = validate_shelves_shape(shelves, set(), True)
+            if shape_errors:
+                raise ValueError("Invalid final sticky layout: " + "; ".join(shape_errors))
+            ready = count_collectible_front_types(shelves)
+            stats["collectible_front_types"] = ready
+            if ready < min_front_visible_triples:
+                last_placement_error = ValueError("Sticky placement did not preserve the requested "
+                                                 "collectible front triples; try another seed or more attempts.")
+                if require_solvable:
+                    continue
+                raise last_placement_error
+            final_values = flatten_shelves(shelves)
+            final_depth = max(len(shelf["layers"]) for shelf in shelves)
+            final_counts = Counter(value for value in final_values if value is not None)
+            stats.update({
+                "shelf_count": len(shelves),
+                "total_slots": len(final_values),
+                "filled_slots": sum(final_counts.values()),
+                "empty_slots": final_values.count(None),
+                "item_counts": dict(sorted(final_counts.items())),
+                "front_visible_triple_candidates": count_front_visible_triple_candidates(shelves),
+                "layer_item_counts": [dict(sorted(c.items())) for c in build_layer_item_counts(shelves, final_depth)],
+                "layer_triple_readiness": build_layer_triple_readiness(shelves, final_depth),
+                "non_adjacent_item_spreads": find_non_adjacent_item_spreads(shelves, final_depth),
+                "layer_item_overloads": find_layer_item_overloads(
+                    shelves, final_depth, DIFFICULTIES[difficulty].max_same_item_per_layer),
+                "front_layer_matches": would_create_front_match(shelves),
+                "front_layer_match_count": count_front_layer_matches(shelves),
+            })
         stats["dispenser_shelves"] = {
             str(shelf_number): layer_count
             for shelf_number, layer_count in sorted(dispenser_shelves.items())
@@ -580,6 +712,8 @@ def generate_with_optional_validation(
             return last_result
 
     if last_result is None:
+        if last_placement_error is not None:
+            raise last_placement_error
         raise ValueError("Could not generate shelves")
 
     return last_result
@@ -1641,7 +1775,7 @@ def parse_args() -> argparse.Namespace:
         default=DEFAULT_PREFERRED_COPIES_PER_TYPE,
         help=(
             "Target average copies per item type when --item-type-count is omitted. "
-            "Accepts fractional values and defaults to 6."
+            f"Accepts fractional values and defaults to {DEFAULT_PREFERRED_COPIES_PER_TYPE:g}."
         ),
     )
     parser.add_argument(
@@ -1660,6 +1794,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--time-seconds", type=int, default=300)
     parser.add_argument("--layout-preset", choices=LAYOUT_PRESETS, default="grid_3x3")
     parser.add_argument("--stats", action="store_true", help="Print generation stats to stderr.")
+    parser.add_argument("--sticky-items-percent", type=float, default=0.0,
+                        help="Percent of occupied items made sticky (0-100, default 0); at most one per standard shelf layer.")
     parser.add_argument("--validate", action="store_true", help="Run the solvability validator once after generation.")
     parser.add_argument(
         "--require-solvable",
@@ -1732,6 +1868,7 @@ def main() -> int:
             preferred_copies_per_type=args.preferred_copies_per_type,
             locked_shelves=locked_shelves,
             dispenser_shelves=dispenser_shelves,
+            sticky_items_percent=args.sticky_items_percent,
         )
     except (OSError, ValueError, KeyError) as error:
         print(f"error: {error}", file=sys.stderr)
@@ -1744,6 +1881,14 @@ def main() -> int:
         return 3
 
     output_data: Any = shelves
+    sticky_stats = stats.get("sticky_items", {})
+    if args.sticky_items_percent > 0 and (validation is None or validation["solvable"] is not True):
+        reason = validation["reason"] if validation is not None else "validation not requested"
+        print(f"warning: sticky layout has no solvability proof ({reason}); use --require-solvable",
+              file=sys.stderr)
+    if sticky_stats.get("cap_reason"):
+        print(f"warning: sticky count capped to {sticky_stats['target_count']} occupied standard "
+              f"layers ({sticky_stats['effective_percent']:.2f}% effective)", file=sys.stderr)
     if args.full_level:
         output_data = wrap_level(
             shelves=shelves,
@@ -1753,6 +1898,8 @@ def main() -> int:
             seed=used_seed,
             difficulty=args.difficulty,
         )
+        if args.sticky_items_percent > 0:
+            output_data["sticky_items_percent"] = args.sticky_items_percent
 
     output_text = json.dumps(output_data, indent=2)
     if args.output:

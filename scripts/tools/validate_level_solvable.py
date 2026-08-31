@@ -10,6 +10,8 @@ from collections import Counter
 from pathlib import Path
 from typing import Any, NamedTuple
 
+from sticky_items import validate_sticky_items
+
 
 SLOTS_PER_SHELF = 3
 TRIPLE_SIZE = 3
@@ -31,6 +33,8 @@ LAYOUT_GRID_3X2_MOVING_4_4_CENTER = "grid_3x2_moving_4_4_center"
 LAYOUT_STAGGERED_COLUMNS_4_MOVING_6_4 = "staggered_columns_4_moving_6_4"
 LAYOUT_STAGGERED_COLUMNS_5_MOVING_6_5 = "staggered_columns_5_moving_6_5"
 LAYOUT_GRID_2X4_MOVING_6_LEFT = "grid_2x4_moving_6_left"
+LAYOUT_GRID_2X4_MOVING_8_LEFT = "grid_2x4_moving_8_left"
+LAYOUT_GRID_3X2_MOVING_5_BOTTOM = "grid_3x2_moving_5_bottom"
 LAYOUT_GRID_1X4_MOVING_6_6_SIDES = "grid_1x4_moving_6_6_sides"
 
 
@@ -59,6 +63,13 @@ def moving_row(
 # between static rows lists the static rows before and after it. Presets without a moving row need no
 # entry: `get_effective_row_layouts` only uses this table to recover moving-row metadata.
 LAYOUT_PRESET_ROW_LAYOUTS: dict[str, list[dict[str, Any]]] = {
+    LAYOUT_GRID_2X4_MOVING_8_LEFT: [
+        moving_row(8, 60, "down", motion_type=ROW_MOTION_VERTICAL_WRAP, visible_count=4),
+        {"shelf_count": 8},
+    ],
+    LAYOUT_GRID_3X2_MOVING_5_BOTTOM: [
+        {"shelf_count": 3}, {"shelf_count": 3}, moving_row(5, 60, "right"),
+    ],
     LAYOUT_GRID_3X3_MOVING_5_BOTTOM: [
         {"shelf_count": 3},
         {"shelf_count": 3},
@@ -114,6 +125,7 @@ class ShelfState(NamedTuple):
     unlock_after_triples: int
     layers: tuple[Layer, ...]
     kind: str = SHELF_KIND_STANDARD
+    sticky_items: tuple[tuple[int, int], ...] = ()
 
     @property
     def slot_count(self) -> int:
@@ -340,6 +352,8 @@ def validate_shelves_shape(
             errors.append(f"shelf {shelf_index + 1} must be an object")
             continue
 
+        errors.extend(f"shelf {shelf_index + 1}: {error}" for error in validate_sticky_items(shelf))
+
         unlock_after_triples = shelf.get("unlock_after_triples", 0)
         if type(unlock_after_triples) is not int or unlock_after_triples < 0:
             errors.append(f"shelf {shelf_index + 1} unlock_after_triples must be a non-negative integer")
@@ -415,6 +429,8 @@ def shelves_to_state(shelves: list[dict[str, Any]]) -> State:
                 unlock_after_triples=max(0, int(shelf.get("unlock_after_triples", 0))),
                 layers=tuple(layers),
                 kind=shelf_kind(shelf),
+                sticky_items=tuple(sorted((entry["layer"], entry["slot"])
+                                          for entry in shelf.get("sticky_items", []))),
             )
         )
 
@@ -425,11 +441,12 @@ def slot_sort_key(item: Item) -> tuple[int, str]:
     return (1, "") if item is None else (0, item)
 
 
-def shelf_sort_key(shelf: ShelfState) -> tuple[str, int, tuple[tuple[tuple[int, str], ...], ...]]:
+def shelf_sort_key(shelf: ShelfState) -> tuple:
     return (
         shelf.kind,
         shelf.unlock_after_triples,
         tuple(tuple(slot_sort_key(item) for item in layer) for layer in shelf.layers),
+        shelf.sticky_items,
     )
 
 
@@ -438,13 +455,19 @@ def canonicalize_state(state: State) -> State:
     canonical_shelves = []
     for shelf in shelves:
         canonical_layers = []
-        for layer in shelf.layers:
-            canonical_layers.append(tuple(sorted(layer, key=slot_sort_key)))
+        sticky_items = []
+        for layer_index, layer in enumerate(shelf.layers):
+            order = sorted(range(len(layer)), key=lambda slot: (
+                slot_sort_key(layer[slot]), (layer_index, slot) in shelf.sticky_items))
+            canonical_layers.append(tuple(layer[slot] for slot in order))
+            sticky_items.extend((layer_index, new_slot) for new_slot, old_slot in enumerate(order)
+                                if (layer_index, old_slot) in shelf.sticky_items)
         canonical_shelves.append(
             ShelfState(
                 unlock_after_triples=shelf.unlock_after_triples,
                 layers=tuple(canonical_layers),
                 kind=shelf.kind,
+                sticky_items=tuple(sticky_items),
             )
         )
 
@@ -496,6 +519,9 @@ def settle_state(state: State) -> State:
                 unlock_after_triples=state_shelves[shelf_index].unlock_after_triples,
                 layers=tuple(layers),
                 kind=state_shelves[shelf_index].kind,
+                sticky_items=tuple((layer - (len(state_shelves[shelf_index].layers) - len(layers)), slot)
+                                   for layer, slot in state_shelves[shelf_index].sticky_items
+                                   if layer >= len(state_shelves[shelf_index].layers) - len(layers)),
             )
         )
 
@@ -532,7 +558,7 @@ def legal_moves(state: State) -> list[Move]:
                 # A source-only shelf never offers its empty slot as somewhere to put an item.
                 if shelf.accepts_dropped_items:
                     targets.append((shelf_index, slot_index))
-            else:
+            elif (0, slot_index) not in shelf.sticky_items:
                 sources.append((shelf_index, slot_index, item_id))
 
     moves = []
@@ -565,6 +591,20 @@ def move_score(state: State, move: Move) -> int:
 
 def apply_move(state: State, move: Move) -> State:
     triples_cleared, state_shelves = state
+    if not (0 <= move.from_shelf < len(state_shelves) and 0 <= move.to_shelf < len(state_shelves)):
+        raise ValueError("move shelf out of range")
+    source, target = state_shelves[move.from_shelf], state_shelves[move.to_shelf]
+    if (move.from_shelf == move.to_shelf
+            or not 0 <= move.from_slot < source.slot_count
+            or not 0 <= move.to_slot < target.slot_count
+            or not is_shelf_unlocked(source, triples_cleared)
+            or not is_shelf_unlocked(target, triples_cleared)
+            or not target.accepts_dropped_items
+            or (0, move.from_slot) in source.sticky_items
+            or not move.item_id
+            or visible_layer(source)[move.from_slot] != move.item_id
+            or visible_layer(target)[move.to_slot] is not None):
+        raise ValueError("illegal move (source, sticky item, target, or lock)")
     shelves = [[list(layer) for layer in shelf.layers] for shelf in state_shelves]
 
     if not shelves[move.to_shelf]:
@@ -580,6 +620,7 @@ def apply_move(state: State, move: Move) -> State:
                 unlock_after_triples=state_shelves[shelf_index].unlock_after_triples,
                 layers=tuple(tuple(layer) for layer in shelf),
                 kind=state_shelves[shelf_index].kind,
+                sticky_items=state_shelves[shelf_index].sticky_items,
             )
         )
 
@@ -587,15 +628,23 @@ def apply_move(state: State, move: Move) -> State:
 
 
 def solve_level(initial_state: State, max_states: int, max_depth: int, keep_solution: bool) -> SearchResult:
-    start_state = normalize_state(initial_state)
+    # Keep real shelf/slot coordinates in the search path. Canonicalization is only a visited key;
+    # replaying a solution must never require rearranging the player's board between moves.
+    start_state = settle_state(initial_state)
+    counts = Counter(item for shelf in start_state[1] for layer in shelf.layers for item in layer if item)
+    sticky_counts = Counter(shelf.layers[layer][slot] for shelf in start_state[1]
+                            for layer, slot in shelf.sticky_items)
+    if any(count * TRIPLE_SIZE > counts[item] for item, count in sticky_counts.items()):
+        return SearchResult(False, "sticky_copy_limit", None, 1, 1, [])
     if is_cleared(start_state):
         return SearchResult(True, "solved", 0, 1, 1, [])
 
     queue = [(start_state, 0)]
-    visited = {start_state}
+    visited = {canonicalize_state(start_state): 0}
     parents: dict[State, tuple[State, Move]] = {}
     states_checked = 0
     max_queue_size = 1
+    hit_depth_limit = False
 
     while queue:
         state, depth = queue.pop()
@@ -604,12 +653,14 @@ def solve_level(initial_state: State, max_states: int, max_depth: int, keep_solu
         if states_checked > max_states:
             return SearchResult(None, "state_limit", None, states_checked, max_queue_size, [])
         if depth >= max_depth:
+            hit_depth_limit = True
             continue
 
         moves = legal_moves(state)
         for move in reversed(moves):
-            next_state = normalize_state(apply_move(state, move))
-            if next_state in visited:
+            next_state = settle_state(apply_move(state, move))
+            key = canonicalize_state(next_state)
+            if visited.get(key, max_depth + 1) <= depth + 1:
                 continue
 
             if keep_solution:
@@ -619,11 +670,13 @@ def solve_level(initial_state: State, max_states: int, max_depth: int, keep_solu
                 solution = reconstruct_solution(parents, start_state, next_state) if keep_solution else []
                 return SearchResult(True, "solved", depth + 1, states_checked, max_queue_size, solution)
 
-            visited.add(next_state)
+            visited[key] = depth + 1
             queue.append((next_state, depth + 1))
             max_queue_size = max(max_queue_size, len(queue))
 
-    return SearchResult(False, "exhausted", None, states_checked, max_queue_size, [])
+    return SearchResult(None if hit_depth_limit else False,
+                        "depth_limit" if hit_depth_limit else "exhausted",
+                        None, states_checked, max_queue_size, [])
 
 
 def reconstruct_solution(parents: dict[State, tuple[State, Move]], start_state: State, end_state: State) -> list[Move]:
@@ -676,12 +729,13 @@ def result_to_json(
     )
 
     if search_result.solution:
+        result["solution_indexing"] = "authored_1_based"
         result["solution"] = [
             {
                 "item": move.item_id,
-                "from_canonical_shelf": move.from_shelf + 1,
+                "from_shelf": move.from_shelf + 1,
                 "from_slot": move.from_slot + 1,
-                "to_canonical_shelf": move.to_shelf + 1,
+                "to_shelf": move.to_shelf + 1,
                 "to_slot": move.to_slot + 1,
             }
             for move in search_result.solution

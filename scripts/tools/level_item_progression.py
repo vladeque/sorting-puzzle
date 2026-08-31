@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from sticky_items import validate_sticky_items
+
 import argparse
 import copy
 import hashlib
@@ -313,6 +315,9 @@ def collect_logical_item_ids(level: dict[str, Any]) -> tuple[str, ...]:
     for shelf_index, shelf in enumerate(shelves):
         if not isinstance(shelf, dict):
             raise ValueError(f"shelf {shelf_index + 1} must be an object")
+        sticky_errors = validate_sticky_items(shelf)
+        if sticky_errors:
+            raise ValueError(f"shelf {shelf_index + 1}: {'; '.join(sticky_errors)}")
         layers = shelf.get("layers")
         if not isinstance(layers, list) or not layers:
             raise ValueError(f"shelf {shelf_index + 1} must contain layers")

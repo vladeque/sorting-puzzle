@@ -2,6 +2,17 @@
 
 This file maps scenes to their responsibilities, scripts, important nodes, and runtime relationships.
 
+## Sticky items and comparison scene
+
+- `scenes/ui/sticky_item_indicator.tscn` is instanced by `scenes/item.tscn`. Its back/front sprites
+  wrap the item base with selected pink gum or amber glue; ordinary items hide the component.
+- `scenes/testing/sticky_items_preview.tscn` inherits `level.tscn`, uses a dedicated dev-mode board,
+  and preserves the selected artwork on reset/retry without advancing campaign progress.
+- `scenes/ui/sticky_preview_controls.tscn` owns Pink, Amber, Both, and Reset controls, with safe-area
+  placement below the ability bar. A debug button in `scenes/main_menu_testing.tscn` launches it.
+
+See [STICKY_ITEMS.md](STICKY_ITEMS.md) for ownership, rules, capture commands, and verification limits.
+
 All UI scenes inherit the project typography theme from
 `assets/themes/game_typography.tres`. Scene labels select semantic variations
 such as `GameTitleLabel`, `GameNumberLabel`, and `GameBodyLabel`; see
