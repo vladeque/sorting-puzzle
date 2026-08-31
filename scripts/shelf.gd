@@ -206,11 +206,13 @@ func configure_back_layer(layer: Node2D, layer_index: int) -> void:
 
 		var item := _get_slot_item(slot)
 		if item != null:
+			item.is_in_back_layer = true
 			item.modulate = back_layer_item_modulate if should_show else Color.TRANSPARENT
 
 
 func configure_back_layer_item(item: ShelfItem, should_show: bool) -> void:
 	var is_previewed := should_show and shows_back_layer_preview()
+	item.is_in_back_layer = true
 	item.z_index = back_layer_item_z_index
 	item.modulate = back_layer_item_modulate if is_previewed else Color.TRANSPARENT
 	item.input_pickable = false

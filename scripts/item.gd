@@ -72,6 +72,12 @@ const LAND_IMPACT_TWEEN_META := &"_shelf_item_land_impact_tween"
 		sticky_variant = value
 		_apply_sticky_visual()
 
+## Back-layer items keep their sticky rule, but reveal the marker only after front promotion.
+var is_in_back_layer := false:
+	set(value):
+		is_in_back_layer = value
+		_apply_sticky_visual()
+
 ## Shared shadow material, assigned in scenes/item.tscn. Each item renders through its own copy,
 ## because the resting/carried blend writes per-item shader uniforms.
 @export var shadow_material: ShaderMaterial
@@ -258,7 +264,7 @@ func _apply_sticky_visual() -> void:
 	var indicator := get_node_or_null("StickyItemIndicator") as StickyItemIndicator
 	if indicator == null:
 		return
-	indicator.visible = is_sticky
+	indicator.visible = is_sticky and not is_in_back_layer
 	indicator.variant = sticky_variant
 	indicator.scale = Vector2.ONE * _get_effective_scale()
 	indicator.position.y = CONTACT_ANCHOR_Y * _get_effective_scale()

@@ -23,7 +23,10 @@ The two selected generated assets are retained separately:
 
 ImageMagick removed only the connected gray background, trimmed and resized the images, and added
 a transparent border. Originals in the user's generated-images directory were not modified. The
-marker scene draws back and front portions around the item's base without covering its identity.
+marker scene draws one texture beneath the item artwork, with no overlay over the item's feet.
+Back-layer items keep their sticky state but show no sticky texture, even in the visible back preview;
+the marker appears when front-layer promotion finishes. `Shelf.configure_back_layer_item()` and
+`configure_back_layer()` set `ShelfItem.is_in_back_layer`; `level.gd` clears it after promotion.
 Authored sticky levels default to the pink variant; change `level.gd`'s exported `sticky_marker_variant`
 or call `set_sticky_marker_variant("amber")` to compare the other artwork on an authored level.
 No final art choice is implied by this default.
@@ -34,7 +37,7 @@ No final art choice is implied by this default.
 | --- | --- |
 | `scripts/sticky_item_rules.gd` | Sticky config validation and Hammer partner reserves. |
 | `scripts/item.gd`, `scenes/item.tscn` | Instance flag, marker, and blocked-tap feedback. |
-| `scripts/sticky_item_indicator.gd`, `scenes/ui/sticky_item_indicator.tscn` | Texture variant, front/back presentation, and brief brightness pulse. |
+| `scripts/sticky_item_indicator.gd`, `scenes/ui/sticky_item_indicator.tscn` | Texture variant beneath the item artwork and brief brightness pulse. |
 | `scripts/level.gd` | Load flags, movement guards, matching, sticky-aware ability selection and hints. |
 | `scripts/sticky_items_preview.gd`, `scenes/testing/sticky_items_preview.tscn` | Playable comparison, reset, dev-mode isolation. |
 | `scripts/sticky_preview_controls.gd`, `scenes/ui/sticky_preview_controls.tscn` | Variant/reset controls and safe-area placement. |
@@ -122,6 +125,7 @@ accessible; timing and screen geometry are tested separately in Godot.
 py -m unittest discover -s tests/tools -v
 & scripts/tools/run_isolated_godot_test.ps1 -Script tests/gameplay/test_sticky_items.gd -Windowed
 & scripts/tools/capture_ui.ps1 -Scene scenes/testing/sticky_items_preview.tscn -Name sticky_preview -Position '0,0'
+& scripts/tools/capture_ui.ps1 -Scene scenes/testing/sticky_items_preview.tscn -Setup scripts/tools/captures/sticky_items_layers_setup.gd -Name sticky_layers -Position '0,0'
 ```
 
 `tests/tools/test_sticky_items.py` covers malformed metadata, deterministic placement/caps,
@@ -130,6 +134,13 @@ failed proof, and the shared `tests/fixtures/sticky_items_conformance.json` repl
 `tests/gameplay/test_sticky_items.gd` exercises tap/drag/direct moves, promotion, locks, moving rows,
 both artwork variants, partner reserves, actual Hammer execution, no-op ability charges, and the
 same Python solution clearing in Godot.
+
+`scripts/tools/captures/sticky_items_layers_setup.gd` exposes sticky back-layer artwork through
+empty front slots and completes the moving-row robot triple. The resulting screenshot compares
+unmarked back-layer items with front pink gum and the promoted teddy bear's amber glue.
+The revised rendering was checked at all four phone sizes: item artwork covers the marker, back
+previews have no marker, and the promoted item displays it. The existing tablet capture-size warning
+described below still applies. The dedicated Godot sticky suite also passes after these visual changes.
 
 The 2026-08-31 seed matrix solved 15/16 requests within 5 attempts, 3,000 states, and depth 150.
 It covers four difficulties, 1-3 layers, 10/20%, copy caps 3/6, locks, and dispensers, with seeds

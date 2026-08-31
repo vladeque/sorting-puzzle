@@ -24,11 +24,10 @@ func _ready() -> void:
 
 func _refresh() -> void:
 	var texture := AMBER if variant == "amber" else PINK
-	for node_name in ["Back", "Front"]:
-		var sprite := get_node_or_null(node_name) as Sprite2D
-		if sprite != null:
-			sprite.texture = texture
-			sprite.scale = Vector2.ONE * display_width / float(texture.get_width())
+	var sprite := get_node_or_null("Sprite2D") as Sprite2D
+	if sprite != null:
+		sprite.texture = texture
+		sprite.scale = Vector2.ONE * display_width / float(texture.get_width())
 
 
 func play_blocked_feedback() -> void:

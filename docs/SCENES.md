@@ -4,8 +4,9 @@ This file maps scenes to their responsibilities, scripts, important nodes, and r
 
 ## Sticky items and comparison scene
 
-- `scenes/ui/sticky_item_indicator.tscn` is instanced by `scenes/item.tscn`. Its back/front sprites
-  wrap the item base with selected pink gum or amber glue; ordinary items hide the component.
+- `scenes/ui/sticky_item_indicator.tscn` is instanced by `scenes/item.tscn`. Its single sprite draws
+  pink gum or amber glue beneath the item artwork. Ordinary and back-layer items hide the component;
+  sticky items reveal it after promotion to the front finishes.
 - `scenes/testing/sticky_items_preview.tscn` inherits `level.tscn`, uses a dedicated dev-mode board,
   and preserves the selected artwork on reset/retry without advancing campaign progress.
 - `scenes/ui/sticky_preview_controls.tscn` owns Pink, Amber, Both, and Reset controls, with safe-area
