@@ -3824,7 +3824,7 @@ func _setup_ability_buttons() -> void:
 func _on_ability_button_pressed(ability_id: StringName) -> void:
 	if _level_failed or _level_completed or _level_paused or _is_ability_effect_active():
 		return
-	if ability_id == ABILITY_FREEZER and _is_freezer_active():
+	if _is_timed_ability_blocked(ability_id):
 		return
 
 	if int(_ability_uses.get(ability_id, 0)) <= 0:
@@ -3905,9 +3905,12 @@ func _can_apply_ability(ability_id: StringName) -> bool:
 		ABILITY_SHUFFLE:
 			return not _is_resolving_shelves and _get_shuffle_eligible_items().size() >= 2
 		ABILITY_HIGHLIGHT:
-			return not _find_immediate_triple_items().is_empty()
+			return (
+				not _is_timed_ability_blocked(ability_id)
+				and not _find_immediate_triple_items().is_empty()
+			)
 		ABILITY_FREEZER:
-			return not _is_freezer_active()
+			return not _is_timed_ability_blocked(ability_id)
 	return false
 
 
@@ -4565,6 +4568,8 @@ func _item_id_arrays_match(left: Array, right: Array) -> bool:
 
 
 func _use_highlight() -> bool:
+	if _is_lantern_active() or _is_freezer_active():
+		return false
 	var items_to_highlight := _find_immediate_triple_items()
 	if items_to_highlight.is_empty():
 		return false
@@ -4576,15 +4581,17 @@ func _use_highlight() -> bool:
 
 	_play_sfx(SfxCatalogScript.EVENT_ABILITY_LANTERN)
 	_update_highlight_timer_label()
+	_update_ability_interaction_state()
 	return true
 
 
 func _use_freezer() -> bool:
-	if _is_freezer_active():
+	if _is_lantern_active() or _is_freezer_active():
 		return false
 	_stop_critical_timer_sfx()
 	_freezer_time_remaining = FREEZER_DURATION_SECONDS
 	_update_freezer_visuals()
+	_update_ability_interaction_state()
 	_play_sfx(SfxCatalogScript.EVENT_ABILITY_FREEZER)
 	return true
 
@@ -4744,6 +4751,7 @@ func _update_highlight_timer(delta: float) -> void:
 	_update_highlight_timer_label()
 	if _highlight_timer <= 0.0:
 		_clear_ability_highlights()
+		_update_ability_buttons()
 
 
 func _refresh_ability_highlights() -> void:
@@ -4796,6 +4804,7 @@ func _clear_ability_highlights(immediate_visual := false) -> void:
 	_highlighted_items.clear()
 	_highlight_timer = 0.0
 	_update_highlight_timer_label(immediate_visual)
+	_update_ability_interaction_state()
 
 	for item in previous_items:
 		if item != null and is_instance_valid(item):
@@ -4824,6 +4833,17 @@ func _get_lantern_target_screen_positions() -> Array[Vector2]:
 	return target_positions
 
 
+func _is_lantern_active() -> bool:
+	return _highlight_timer > 0.0
+
+
+func _is_timed_ability_blocked(ability_id: StringName) -> bool:
+	return (
+		ability_id in [ABILITY_HIGHLIGHT, ABILITY_FREEZER]
+		and (_is_lantern_active() or _is_freezer_active())
+	)
+
+
 func _update_freezer_timer(delta: float) -> float:
 	if not _is_freezer_active():
 		return delta
@@ -4845,6 +4865,7 @@ func _is_freezer_active() -> bool:
 func _clear_freezer(immediate_visual := false) -> void:
 	_freezer_time_remaining = 0.0
 	_update_freezer_visuals(immediate_visual)
+	_update_ability_interaction_state()
 
 
 func _update_freezer_visuals(immediate := false) -> void:
@@ -4864,12 +4885,18 @@ func _update_freezer_visuals(immediate := false) -> void:
 func _update_ability_buttons() -> void:
 	if _ability_bar != null:
 		_ability_bar.set_uses(_ability_uses)
-		_ability_bar.set_interaction_blocked(
-			_level_failed or _level_completed or _level_paused or _is_ability_effect_active(),
-			_is_freezer_active()
-		)
+	_update_ability_interaction_state()
 	_update_highlight_timer_label()
 	_update_freezer_visuals()
+
+
+func _update_ability_interaction_state() -> void:
+	if _ability_bar != null:
+		_ability_bar.set_interaction_blocked(
+			_level_failed or _level_completed or _level_paused or _is_ability_effect_active(),
+			_is_lantern_active(),
+			_is_freezer_active()
+		)
 
 
 func _reset_ability_uses() -> void:

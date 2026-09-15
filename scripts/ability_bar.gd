@@ -49,11 +49,19 @@ func set_uses(ability_uses: Dictionary) -> void:
 			_fit_uses_label(uses_label)
 
 
-func set_interaction_blocked(is_blocked: bool, freezer_active: bool) -> void:
+func set_interaction_blocked(
+	is_blocked: bool,
+	lantern_active: bool,
+	freezer_active: bool
+) -> void:
+	var timed_ability_active := lantern_active or freezer_active
 	for ability_id in ABILITY_IDS:
 		var button := _buttons.get(ability_id) as Button
 		if button != null:
-			button.disabled = is_blocked or (ability_id == ABILITY_FREEZER and freezer_active)
+			button.disabled = (
+				is_blocked
+				or (timed_ability_active and ability_id in [ABILITY_HIGHLIGHT, ABILITY_FREEZER])
+			)
 			button.mouse_default_cursor_shape = (
 				Control.CURSOR_ARROW if button.disabled else Control.CURSOR_POINTING_HAND
 			)

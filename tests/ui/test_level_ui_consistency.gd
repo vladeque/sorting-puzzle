@@ -288,14 +288,37 @@ func _test_focus_and_cursor_policy() -> void:
 			"%s should use the pointing-hand cursor." % button_name
 		)
 
-	ability_bar.call("set_interaction_blocked", true, false)
+	ability_bar.call("set_interaction_blocked", true, false, false)
 	for button_name in ["HammerButton", "ShuffleButton", "HighlightButton", "FreezerButton"]:
 		var disabled_button := ability_bar.find_child(button_name, true, false) as Button
 		_check(
 			disabled_button.mouse_default_cursor_shape == Control.CURSOR_ARROW,
 			"A disabled %s should restore the arrow cursor." % button_name
 		)
-	ability_bar.call("set_interaction_blocked", false, false)
+	ability_bar.call("set_interaction_blocked", false, false, false)
+	var hammer_button := ability_bar.find_child("HammerButton", true, false) as Button
+	var shuffle_button := ability_bar.find_child("ShuffleButton", true, false) as Button
+	var lantern_button := ability_bar.find_child("HighlightButton", true, false) as Button
+	var freezer_button := ability_bar.find_child("FreezerButton", true, false) as Button
+	ability_bar.call("set_interaction_blocked", false, true, false)
+	_check(
+		not hammer_button.disabled and not shuffle_button.disabled,
+		"An active Lantern should leave the non-timed abilities enabled."
+	)
+	_check(
+		lantern_button.disabled and freezer_button.disabled,
+		"An active Lantern should disable both timed-ability buttons."
+	)
+	ability_bar.call("set_interaction_blocked", false, false, true)
+	_check(
+		lantern_button.disabled and freezer_button.disabled,
+		"An active Freezer should disable both timed-ability buttons."
+	)
+	ability_bar.call("set_interaction_blocked", false, false, false)
+	_check(
+		not lantern_button.disabled and not freezer_button.disabled,
+		"Both timed-ability buttons should recover when the active effect ends."
+	)
 
 	var close_button := pause_overlay.find_child("CloseButton", true, false) as Button
 	_check(close_button.focus_mode == Control.FOCUS_NONE, "Modal close button should be FOCUS_NONE.")

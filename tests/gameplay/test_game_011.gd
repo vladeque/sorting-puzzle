@@ -32,14 +32,17 @@ func _run() -> void:
 func _test_freezer_runtime_semantics() -> void:
 	var level = await _make_level(true, 8)
 	var ability_bar := level.get("_ability_bar") as AbilityBar
+	var lantern_button := ability_bar.get_ability_button(ABILITY_HIGHLIGHT)
 	var freezer_button := ability_bar.get_ability_button(ABILITY_FREEZER)
 	level.set("_time_remaining", 120.0)
 	level.set("_has_player_started_timer", false)
 	level.set("_combo_count", 2)
 	level.set("_combo_time_remaining", 8.0)
-	level.set("_highlight_timer", 15.0)
 
 	var starting_uses := int((level.get("_ability_uses") as Dictionary).get(ABILITY_FREEZER, 0))
+	var starting_lantern_uses := int(
+		(level.get("_ability_uses") as Dictionary).get(ABILITY_HIGHLIGHT, 0)
+	)
 	_check(
 		bool(level.call("_apply_ability_from_button", ABILITY_FREEZER)),
 		"Freezer activates before the first move"
@@ -58,15 +61,24 @@ func _test_freezer_runtime_semantics() -> void:
 		"repeated activation spends nothing"
 	)
 	_check(
-		bool(level.call("_apply_ability_from_button", ABILITY_HIGHLIGHT)),
-		"non-blocking Freezer does not prevent another ability"
+		freezer_button.disabled and lantern_button.disabled,
+		"active Freezer disables both timed-ability buttons"
+	)
+	_check(
+		not bool(level.call("_apply_ability_from_button", ABILITY_HIGHLIGHT)),
+		"active Freezer rejects Lantern activation"
+	)
+	_check(
+		int((level.get("_ability_uses") as Dictionary).get(ABILITY_HIGHLIGHT, 0))
+		== starting_lantern_uses,
+		"Freezer-blocked Lantern activation spends nothing"
 	)
 
 	level.call("_process", 5.0)
 	_check(is_equal_approx(float(level.get("_time_remaining")), 120.0), "countdown is fully suppressed")
 	_check(is_equal_approx(float(level.get("_freezer_time_remaining")), 25.0), "Freezer uses active gameplay delta")
 	_check(is_equal_approx(float(level.get("_combo_time_remaining")), 3.0), "combo timer continues during Freezer")
-	_check(is_equal_approx(float(level.get("_highlight_timer")), 10.0), "Lantern timer continues during Freezer")
+	_check(is_zero_approx(float(level.get("_highlight_timer"))), "Lantern stays inactive during Freezer")
 
 	var moving_rows := level.call("_get_all_moving_shelf_rows") as Array
 	_check(not moving_rows.is_empty(), "moving-row fixture is available")
@@ -85,6 +97,39 @@ func _test_freezer_runtime_semantics() -> void:
 	_check(is_equal_approx(float(level.get("_time_remaining")), 97.0), "only the exact frozen portion of a delta is suppressed")
 	_check(not bool(level.call("_is_freezer_active")), "Freezer expires without an extra frame")
 	_check(not freezer_button.disabled, "Freezer button is enabled again after expiry")
+	_check(not lantern_button.disabled, "Lantern button is enabled again after Freezer expiry")
+
+	_check(
+		bool(level.call("_apply_ability_from_button", ABILITY_HIGHLIGHT)),
+		"Lantern can activate after Freezer expires"
+	)
+	_check(
+		lantern_button.disabled and freezer_button.disabled,
+		"active Lantern disables both timed-ability buttons"
+	)
+	_check(
+		not bool(level.call("_apply_ability_from_button", ABILITY_HIGHLIGHT)),
+		"Lantern cannot stack or refresh while active"
+	)
+	_check(
+		not bool(level.call("_apply_ability_from_button", ABILITY_FREEZER)),
+		"active Lantern rejects Freezer activation"
+	)
+	_check(
+		int((level.get("_ability_uses") as Dictionary).get(ABILITY_HIGHLIGHT, 0))
+		== starting_lantern_uses - 1,
+		"rejected timed-ability activations spend no additional Lantern use"
+	)
+	_check(
+		int((level.get("_ability_uses") as Dictionary).get(ABILITY_FREEZER, 0))
+		== starting_uses - 1,
+		"Lantern-blocked Freezer activation spends nothing"
+	)
+	level.set("_highlight_timer", 2.0)
+	level.call("_process", 5.0)
+	_check(is_zero_approx(float(level.get("_highlight_timer"))), "Lantern expires without an extra frame")
+	_check(not lantern_button.disabled, "Lantern button is enabled again after expiry")
+	_check(not freezer_button.disabled, "Freezer button is enabled again after Lantern expiry")
 
 	_check(
 		bool(level.call("_apply_ability_from_button", ABILITY_FREEZER)),

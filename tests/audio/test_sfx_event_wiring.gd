@@ -277,6 +277,7 @@ func _test_gameplay_source_cues() -> void:
 			and _played(SfxCatalogScript.EVENT_ABILITY_LANTERN) == 1,
 		"A successful Lantern activation plays its authored cue once."
 	)
+	level.call("_clear_ability_highlights", true)
 
 	_begin_recording()
 	_check(
