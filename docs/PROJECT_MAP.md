@@ -631,8 +631,12 @@ Responsibility:
   timer snap/shake, expanding red alarm ring, and dark-red shade synchronized to
   `assets/audio/time_up/times_up2.mp3`. It then hands the shade to the popped-in
   `UI/TimeUpExtensionOverlay`; later ineligible expiries still fail immediately.
-- Plays the hammer ability by gathering the targeted items into one center-screen item, striking it with the fullscreen hammer, then dropping combo reward stars from the impact point.
-- Plays the shuffle ability by showing a center-screen delivery box, flying visible unlocked items into it, swapping item identities while hidden, flying them back to their slots, then resolving shelf matches.
+- Plays the hammer ability by gathering the targeted items into one center-screen item, starting the
+  Hammer cue on the fullscreen strike's impact signal, then dropping combo reward stars from the
+  impact point.
+- Plays the shuffle ability by showing a center-screen delivery box, starting the Shuffle cue as
+  visible unlocked items begin flying into it, swapping item identities while hidden, flying them
+  back to their slots, then resolving shelf matches.
 - Shows Lantern as Focus Mode on canvas layer 4: a 30% warm shade over non-target gameplay, bright
   pulsing pools tracked to every highlighted item, and a stronger button-origin activation wave for
   the same 15-second window as the item outlines. With no current targets, a diagonal beam visibly

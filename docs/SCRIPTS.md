@@ -1781,8 +1781,10 @@ Audio (AUDIO-001):
   to the dedicated `level_failed` cue so the two result sounds never stack.
 - `sticky_move_blocked` fires only from the exposed-sticky input branch. Ordinary rejected drops
   remain silent. `shelf_unlock` fires once per threshold crossing even if several shelves unlock.
-- Successful ability starts fire `ability_hammer`, `ability_shuffle`, `ability_lantern`, or
-  `ability_freezer`; terminal transitions fire `level_complete` or `level_failed` once.
+- Successful Lantern and Freezer starts fire `ability_lantern` or `ability_freezer`. Hammer fires
+  `ability_hammer` on its authored `impact` signal, while Shuffle fires `ability_shuffle` when its
+  items begin flying into the visible box; terminal transitions fire `level_complete` or
+  `level_failed` once.
 - `coin_spend` fires only after a successful `PlayerProgress.spend_coins()` (ability purchase,
   time extension) or `purchase_life()` (out-of-lives retry).
 
@@ -1978,10 +1980,15 @@ Key responsibilities:
   playback), and the combo reward starts 140 ms later while the roughly 1.03 second VFX playback is
   still fading.
   Gameplay scoring, shelf resolution, and ability input lock rules are unchanged.
-- Hammer passes the live sound-effects setting and exported `hammer_haptics_enabled` flag into the
-  effect scene. Disabling sound while the strike is active stops every scene-owned hammer cue;
-  supported mobile builds receive a short 65 ms impact vibration when haptics are enabled.
-- Shuffle now pauses moving shelf rows, shows the center-screen delivery box, flies visible unlocked items into the box, changes unlocked item identity assignments while they are hidden, and flies them back to their original slots. The box begins its outro 0.3 seconds before the item-return phase finishes, while shelf resolution still waits for every item to land.
+- Hammer requests its shared cue from `scripts/level.gd` on the same authored `impact` signal that
+  destroys the merged item and starts the screen shake. Disabling sound while the strike is active
+  stops the cue through `SfxManager`; supported mobile builds receive a short 65 ms impact vibration
+  when the exported `hammer_haptics_enabled` flag is enabled.
+- Shuffle now pauses moving shelf rows, shows the center-screen delivery box, then starts its shared
+  cue with the first frame of item flight into the box so the single authored sound spans the fly-in
+  and fly-out sequence. It changes unlocked item identity assignments while they are hidden and
+  flies them back to their original slots. The box begins its outro 0.3 seconds before the item-return
+  phase finishes, while shelf resolution still waits for every item to land.
 - Count hammer destroys as cleared triples for shelf unlocking.
 - Let highlight uses start their timed window even when no immediate triple can currently be highlighted.
 - Find items to highlight with `_find_immediate_triple_items()`: prefer a shelf that is one item away from a full match plus a loose match elsewhere (single-move triple), otherwise fall back to any visible items sharing a type. Only one item type is ever highlighted at a time even when several types qualify, but every visible item of that chosen type is highlighted, not just three.
@@ -2275,7 +2282,7 @@ Purpose:
 - Samples the head's real path into a short ring buffer so the swing trail follows the swing
   instead of a fixed screen-space arc.
 - Coordinates the optional mobile impact vibration. Hammer audio is requested by `scripts/level.gd`
-  through `SfxManager` when this strike starts, so the effect scene owns no audio players.
+  through `SfxManager` when this effect emits `impact`, so the effect scene owns no audio players.
 - Emits `pre_impact` at authored time 480 ms (about 369 ms into playback), `impact` on frame 7 at
   authored time 560 ms (about 431 ms into playback), hides the hammer by authored time 580 ms, and
   emits `finished` after the remaining VFX fade out.

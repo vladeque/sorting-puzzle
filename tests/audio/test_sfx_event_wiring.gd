@@ -301,23 +301,46 @@ func _test_gameplay_source_cues() -> void:
 
 	level = await _open_level()
 	_begin_recording()
+	_check(bool(level.call("_use_shuffle")), "The audio fixture can start Shuffle.")
 	_check(
-		bool(level.call("_use_shuffle"))
-			and _played(SfxCatalogScript.EVENT_ABILITY_SHUFFLE) == 1,
-		"A successful Shuffle activation plays its authored cue once."
+		_played(SfxCatalogScript.EVENT_ABILITY_SHUFFLE) == 0,
+		"Shuffle stays silent while its delivery box appears."
 	)
-	await _wait_seconds(1.25)
+	await _wait_seconds(0.1)
+	_check(
+		_played(SfxCatalogScript.EVENT_ABILITY_SHUFFLE) == 0,
+		"Shuffle does not start its cue partway through the box intro."
+	)
+	await _wait_seconds(0.15)
+	_check(
+		_played(SfxCatalogScript.EVENT_ABILITY_SHUFFLE) == 1,
+		"Shuffle starts its authored cue when the items begin flying into the box."
+	)
+	await _wait_seconds(1.0)
+	_check(
+		_played(SfxCatalogScript.EVENT_ABILITY_SHUFFLE) == 1,
+		"The single Shuffle cue continues across fly-in and fly-out without replaying."
+	)
 	await _free_current_scene()
 
 	level = await _open_level()
 	_begin_recording()
 	_check(bool(level.call("_use_hammer")), "The audio fixture can start Hammer.")
+	_check(
+		_played(SfxCatalogScript.EVENT_ABILITY_HAMMER) == 0,
+		"Hammer stays silent while its targets gather and the strike winds up."
+	)
 	await _wait_seconds(0.65)
 	_check(
-		_played(SfxCatalogScript.EVENT_ABILITY_HAMMER) == 1,
-		"The Hammer strike starts its replacement authored cue once."
+		_played(SfxCatalogScript.EVENT_ABILITY_HAMMER) == 0,
+		"Hammer does not start its cue before the authored contact pose."
 	)
-	await _wait_seconds(0.85)
+	await _wait_seconds(0.2)
+	_check(
+		_played(SfxCatalogScript.EVENT_ABILITY_HAMMER) == 1,
+		"Hammer starts its authored cue on the strike's impact beat."
+	)
+	await _wait_seconds(0.65)
 	await _free_current_scene()
 
 	level = await _open_level()

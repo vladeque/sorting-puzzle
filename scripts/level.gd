@@ -3964,13 +3964,13 @@ func _play_hammer_ability(items_to_destroy: Array[ShelfItem]) -> void:
 		hammer_haptics_enabled,
 		approach_start_screen_position
 	)
-	_play_sfx(SfxCatalogScript.EVENT_ABILITY_HAMMER)
 
 	if not effect.has_reached_pre_impact():
 		await effect.pre_impact
 	_play_hammer_item_compression(merged_item)
 	if not effect.has_impacted():
 		await effect.impact
+	_play_sfx(SfxCatalogScript.EVENT_ABILITY_HAMMER)
 	_play_hammer_screen_shake()
 	_play_hammer_destroy_animation(merged_item, items_to_destroy)
 	var earned_stars := _record_triples_cleared(destroyed_triples)
@@ -4252,7 +4252,6 @@ func _play_shuffle_ability(items_to_shuffle: Array[ShelfItem]) -> void:
 	_set_moving_shelf_rows_paused(true)
 	_update_ability_buttons()
 	_clear_ability_highlights()
-	_play_sfx(SfxCatalogScript.EVENT_ABILITY_SHUFFLE)
 
 	var animation_entries := _prepare_shuffle_animation_entries(items_to_shuffle)
 	var shuffle_box := _create_shuffle_box()
@@ -4262,6 +4261,7 @@ func _play_shuffle_ability(items_to_shuffle: Array[ShelfItem]) -> void:
 
 	if not animation_entries.is_empty():
 		var box_center := _get_shuffle_box_opening_global_position(shuffle_box)
+		_play_sfx(SfxCatalogScript.EVENT_ABILITY_SHUFFLE)
 		await _play_shuffle_items_into_box(animation_entries, box_center)
 		_shuffle_item_id_assignments(items_to_shuffle)
 		if shuffle_box != null:
