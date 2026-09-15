@@ -1064,9 +1064,10 @@ Purpose:
   events for sticky rejection, shelf unlock, Hammer, Shuffle, Lantern, Freezer, level completion,
   and level failure.
 - `item_place_valid` and `match_clear` keep the project's existing source recordings
-  (`assets/audio/item_place.wav`, `assets/audio/triple_clear.wav`). The original synthesized palette
-  and the later authored source batch both live under `assets/audio/generated/`; only files listed
-  by `generated_sfx_manifest.json` are owned by the deterministic generator.
+  (`assets/audio/item_place_valid/item_place.wav`,
+  `assets/audio/match_clear/triple_clear.wav`). Every source lives in the folder named for its
+  catalog event; only paths listed by `assets/audio/generated_sfx_manifest.json` are owned by the
+  deterministic generator.
 - `invalid_action.wav`, `purchase_successful.wav`, `shuffle.wav`, and `timer_tick.wav` are committed
   as 48 kHz, 16-bit PCM because Godot 4.6.2 could not import their supplied 96 kHz, 24-bit
   WAVE-Extensible encoding. Their channels and audible content are otherwise retained.
@@ -1095,7 +1096,8 @@ Purpose:
 ## `scripts/tools/generate_core_sfx.gd`
 
 Purpose:
-- Writes the project-owned, deterministic core SFX palette to `assets/audio/generated/`.
+- Writes the project-owned, deterministic core SFX palette to event-named folders under
+  `assets/audio/` and records their relative paths in `assets/audio/generated_sfx_manifest.json`.
 
 Regenerate with:
 
@@ -1112,7 +1114,8 @@ Regenerate with:
   version (or WAV files with no manifest at all) unless `--regenerate` is supplied.
 - Prints every output path, duration, sample rate, peak level, and DC offset, and fails if any cue
   exceeds the -1 dBFS ceiling.
-- Deliberately does not synthesize replacements for `item_place.wav` or `triple_clear.wav`.
+- Deliberately does not synthesize replacements for `item_place.wav`, `triple_clear.wav`, the
+  authored 30-second timer bed, or the authored shop-purchase confirmation.
 
 ## `scripts/tools/core_sfx_synthesis.gd`
 
@@ -1125,8 +1128,8 @@ Purpose:
   seeds and parameters produce the same PCM on every run. Do not introduce Godot's global RNG, time,
   or frame state.
 - Every cue is mono 16-bit PCM at 44.1 kHz, DC-blocked, edge-faded, and scaled to its own authored
-  peak. Cues are deliberately not loudness-matched: UI clicks and timer ticks sit 10-15 dB under the
-  currency and confirmation cues.
+  peak. Cues are deliberately not loudness-matched; relative balance remains intentional before
+  catalog trims.
 - `GENERATOR_VERSION` gates the generator's overwrite guard. Bump it whenever a recipe, seed, or
   parameter changes.
 
@@ -2003,7 +2006,8 @@ Depends on:
 - `scenes/ui/out_of_lives_menu.tscn` (`scripts/out_of_lives_menu.gd`) for the zero-life retry offer;
   the scene emits intent while `level.gd` owns purchase/restart/menu routing.
 - `scenes/item.tscn` and `ShelfItem`.
-- `assets/audio/item_place.wav` and `assets/audio/triple_clear.wav`.
+- `assets/audio/item_place_valid/item_place.wav` and
+  `assets/audio/match_clear/triple_clear.wav`.
 - `configs/item_sprites.json` item IDs and texture paths.
 - `configs/ability_purchase_prices.json` paid-use prices for zero-use ability purchases.
 - `configs/time_extension.json` launch-default grant, price, per-attempt limits, and ad availability.

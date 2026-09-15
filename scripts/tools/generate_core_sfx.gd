@@ -1,7 +1,7 @@
 extends SceneTree
 
 ## AUDIO-001 asset generator: writes the project-owned, deterministic core SFX palette to
-## res://assets/audio/generated/.
+## event-named folders under res://assets/audio/.
 ##
 ## Regenerate with (see docs/SCRIPTS.md):
 ##
@@ -21,7 +21,7 @@ extends SceneTree
 
 const SynthesisScript := preload("res://scripts/tools/core_sfx_synthesis.gd")
 
-const DEFAULT_OUTPUT_DIRECTORY := "res://assets/audio/generated"
+const DEFAULT_OUTPUT_DIRECTORY := "res://assets/audio"
 const MANIFEST_FILE_NAME := "generated_sfx_manifest.json"
 
 var _failed := false
@@ -49,7 +49,13 @@ func _run() -> void:
 	var rendered := SynthesisScript.render_all()
 	var manifest_entries := []
 	for cue in rendered:
-		var file_path := output_directory.path_join(str(cue["file_name"]))
+		var relative_path := str(cue["relative_path"])
+		var file_path := output_directory.path_join(relative_path)
+		var directory_result := DirAccess.make_dir_recursive_absolute(file_path.get_base_dir())
+		if directory_result != OK:
+			push_error("Could not create the cue directory: %s" % file_path.get_base_dir())
+			quit(1)
+			return
 		if not _write_file(file_path, cue["pcm"] as PackedByteArray):
 			quit(1)
 			return
@@ -69,7 +75,7 @@ func _run() -> void:
 			float(cue["dc_offset"]),
 		])
 		manifest_entries.append({
-			"file_name": str(cue["file_name"]),
+			"file_name": relative_path,
 			"duration_seconds": snappedf(float(cue["duration_seconds"]), 0.000001),
 			"sample_rate": SynthesisScript.SAMPLE_RATE,
 			"bit_depth": SynthesisScript.BIT_DEPTH,
@@ -138,6 +144,9 @@ func _directory_has_wav_files(output_directory: String) -> bool:
 
 	for file_name in directory.get_files():
 		if file_name.get_extension().to_lower() == "wav":
+			return true
+	for child_directory in directory.get_directories():
+		if _directory_has_wav_files(output_directory.path_join(child_directory)):
 			return true
 
 	return false

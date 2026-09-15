@@ -15,35 +15,37 @@ const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
 const SynthesisScript := preload("res://scripts/tools/core_sfx_synthesis.gd")
 const SfxCatalogScript := preload("res://scripts/audio/sfx_catalog.gd")
 
-const GENERATED_DIRECTORY := "res://assets/audio/generated"
-const MANIFEST_PATH := "res://assets/audio/generated/generated_sfx_manifest.json"
+const AUDIO_DIRECTORY := "res://assets/audio"
+const MANIFEST_PATH := "res://assets/audio/generated_sfx_manifest.json"
 const RETAINED_RECORDINGS := {
-	"res://assets/audio/item_place.wav": SfxCatalogScript.EVENT_ITEM_PLACE_VALID,
-	"res://assets/audio/triple_clear.wav": SfxCatalogScript.EVENT_MATCH_CLEAR,
+	"res://assets/audio/item_place_valid/item_place.wav": SfxCatalogScript.EVENT_ITEM_PLACE_VALID,
+	"res://assets/audio/match_clear/triple_clear.wav": SfxCatalogScript.EVENT_MATCH_CLEAR,
 }
 const AUTHORED_SOURCE_CUES := [
-	"res://assets/audio/generated/freeze.wav",
-	"res://assets/audio/generated/hammer.wav",
-	"res://assets/audio/generated/invalid_action.wav",
-	"res://assets/audio/generated/lantern.wav",
-	"res://assets/audio/generated/level_complete.mp3",
-	"res://assets/audio/generated/level_failed.wav",
-	"res://assets/audio/generated/purchase_successful.wav",
-	"res://assets/audio/generated/shelve_unlock.wav",
-	"res://assets/audio/generated/shuffle.wav",
-	"res://assets/audio/generated/timer_tick.wav",
+	"res://assets/audio/ability_freezer/freeze.wav",
+	"res://assets/audio/ability_hammer/hammer.wav",
+	"res://assets/audio/sticky_move_blocked/invalid_action.wav",
+	"res://assets/audio/ability_lantern/lantern.wav",
+	"res://assets/audio/level_complete/level_complete.mp3",
+	"res://assets/audio/level_failed/level_failed.wav",
+	"res://assets/audio/shop_purchase_success/purchase_successful.wav",
+	"res://assets/audio/shelf_unlock/shelve_unlock.wav",
+	"res://assets/audio/ability_shuffle/shuffle.wav",
+	"res://assets/audio/timer_critical_tick/timer_tick.wav",
+	"res://assets/audio/star_hud_arrival/star_hud_arrival.wav",
+	"res://assets/audio/reward_chest_star_arrival/reward_chest_star_arrival_01.wav",
+	"res://assets/audio/reward_chest_star_arrival/reward_chest_star_arrival_02.wav",
+	"res://assets/audio/reward_chest_star_arrival/reward_chest_star_arrival_03.wav",
+	"res://assets/audio/ui_click/ui_click_01.wav",
+	"res://assets/audio/ui_click/ui_click_02.wav",
+	"res://assets/audio/ui_click/ui_click_03.wav",
 ]
 ## The ticket's per-cue duration windows, in milliseconds.
 const DURATION_WINDOWS_MS := {
-	"ui_click": Vector2(25.0, 50.0),
 	"item_select": Vector2(40.0, 75.0),
-	"star_hud_arrival": Vector2(140.0, 240.0),
-	"timer_tick": Vector2(30.0, 65.0),
 	"time_up": Vector2(300.0, 600.0),
 	"coin_gain": Vector2(300.0, 650.0),
 	"coin_spend": Vector2(180.0, 350.0),
-	"shop_purchase_success": Vector2(400.0, 750.0),
-	"reward_chest_star_arrival": Vector2(90.0, 180.0),
 }
 const MAX_DC_OFFSET := 0.002
 ## The ticket caps every cue in scope at roughly 750 ms.
@@ -103,7 +105,7 @@ func _test_generator_determinism() -> void:
 
 func _test_committed_files_match_the_generator() -> void:
 	for cue in SynthesisScript.render_all():
-		var file_path := GENERATED_DIRECTORY.path_join(str(cue["file_name"]))
+		var file_path := AUDIO_DIRECTORY.path_join(str(cue["relative_path"]))
 		var committed := _read_file(file_path)
 		if committed.is_empty():
 			_failures.append("Missing committed generated asset: %s" % file_path)
@@ -144,7 +146,7 @@ func _test_manifest() -> void:
 
 	var expected_names := []
 	for cue in SynthesisScript.CUES:
-		expected_names.append("%s.wav" % cue["name"])
+		expected_names.append("%s/%s.wav" % [cue["event"], cue["name"]])
 
 	_check(
 		manifest_names == expected_names,
@@ -155,7 +157,7 @@ func _test_manifest() -> void:
 func _test_committed_wav_constraints() -> void:
 	for cue in SynthesisScript.CUES:
 		var cue_name := str(cue["name"])
-		var file_path := GENERATED_DIRECTORY.path_join("%s.wav" % cue_name)
+		var file_path := AUDIO_DIRECTORY.path_join("%s/%s.wav" % [cue["event"], cue_name])
 		var bytes := _read_file(file_path)
 		if bytes.is_empty():
 			continue
@@ -220,8 +222,9 @@ func _test_committed_wav_constraints() -> void:
 		if str(source_path).get_extension().to_lower() == "wav":
 			authored_wav_count += 1
 	_check(
-		_get_generated_wav_names().size() == SynthesisScript.CUES.size() + authored_wav_count,
-		"The shared generated directory holds exactly the manifest palette and authored source batch."
+		_get_audio_wav_paths().size()
+			== SynthesisScript.CUES.size() + authored_wav_count + RETAINED_RECORDINGS.size(),
+		"Every committed WAV is owned by the generator, authored batch, or retained recordings."
 	)
 
 
@@ -277,8 +280,7 @@ func _test_catalog_completeness() -> void:
 			"%s keeps the project's source recording %s." % [owning_event, recording_path]
 		)
 
-	# The authored batch shares the directory with manifest-owned synthesized output. Every newly
-	# supplied source cue must be reachable even though retired generator outputs may remain archived.
+	# Every supplied source cue remains reachable from its one semantic event folder.
 	var catalog_paths := SfxCatalogScript.get_all_stream_paths()
 	for generated_path in AUTHORED_SOURCE_CUES:
 		_check(
@@ -300,19 +302,24 @@ func _get_duration_window(cue_name: String) -> Vector2:
 	return Vector2(0.0, MAX_CUE_DURATION_MS)
 
 
-func _get_generated_wav_names() -> Array[String]:
-	var names: Array[String] = []
-	var directory := DirAccess.open(GENERATED_DIRECTORY)
+func _get_audio_wav_paths() -> Array[String]:
+	var paths: Array[String] = []
+	_collect_wav_paths(AUDIO_DIRECTORY, paths)
+	return paths
+
+
+func _collect_wav_paths(directory_path: String, paths: Array[String]) -> void:
+	var directory := DirAccess.open(directory_path)
 	if directory == null:
-		_failures.append("Could not open %s." % GENERATED_DIRECTORY)
-		return names
+		_failures.append("Could not open %s." % directory_path)
+		return
 
 	for file_name in directory.get_files():
-		# A run against the imported project also sees the generated `.import` sidecars.
 		if file_name.get_extension().to_lower() == "wav":
-			names.append(file_name)
+			paths.append(directory_path.path_join(file_name))
 
-	return names
+	for child_directory in directory.get_directories():
+		_collect_wav_paths(directory_path.path_join(child_directory), paths)
 
 
 func _read_file(file_path: String) -> PackedByteArray:

@@ -555,7 +555,7 @@ Files:
 - `scripts/level_top_hud.gd`, `scripts/gameplay_modal_shell.gd`, `scripts/gameplay_result_shell.gd`, `scripts/gameplay_ui_theme.gd`
 - `scripts/moving_shelf_row.gd`
 - `scripts/shelf_layout_row.gd`
-- `assets/audio/*.wav`
+- `assets/audio/<event>/*.{wav,mp3}`
 - `configs/levels/level_*.json`
 - `configs/item_sprites.json`
 - `scenes/abilities/hammer_impact_effect.tscn`
@@ -640,7 +640,7 @@ Change here when:
 Global path:
 - `SfxManager` autoload (`scripts/audio/sfx_manager.gd`) -> pooled `AudioStreamPlayer`s -> the `SFX`
   audio bus -> `Master`.
-- `scripts/audio/sfx_catalog.gd` maps each of the eleven approved event ids to its streams, mix trim,
+- `scripts/audio/sfx_catalog.gd` maps each semantic event id to its streams, mix trim,
   volume/pitch variation, cooldown, and polyphony budget. Gameplay and UI scripts never preload an
   `AudioStream`.
 - `scripts/audio/ui_click_binder.gd` (a child of the manager) binds every enabled, visible
@@ -653,12 +653,14 @@ Bus layout:
   (which future music work will share).
 
 Assets:
-- `assets/audio/item_place.wav` and `assets/audio/triple_clear.wav` remain the project's source
-  recordings, used for `item_place_valid` and `match_clear`.
-- `assets/audio/generated/*.wav` is the deterministic synthesized palette (mono 16-bit PCM at
-  44.1 kHz, imported uncompressed), written by `scripts/tools/generate_core_sfx.gd` from
-  `scripts/tools/core_sfx_synthesis.gd`, with `generated_sfx_manifest.json` recording the generator
-  version and each file's encoding, duration, and peak.
+- Every runtime cue lives under `assets/audio/<event>/`, using the matching semantic catalog event
+  as its directory name. Variant pools share that one directory.
+- `assets/audio/item_place_valid/item_place.wav` and
+  `assets/audio/match_clear/triple_clear.wav` remain the project's retained source recordings.
+- The deterministic synthesized files are mono 16-bit PCM at 44.1 kHz and imported uncompressed.
+  `scripts/tools/generate_core_sfx.gd` writes them from `scripts/tools/core_sfx_synthesis.gd`, while
+  `assets/audio/generated_sfx_manifest.json` records each event-relative path, encoding, duration,
+  peak, and generator version.
 
 Event owners:
 - `scripts/level.gd`: `item_select`, `item_place_valid`, `match_clear`, `star_hud_arrival`,
@@ -1030,8 +1032,9 @@ Change a generated sound effect's character:
 
 - Re-run `tests/audio/test_core_sfx_assets.gd`; it compares the committed WAVs against a fresh
   render byte-for-byte and enforces the encoding, duration, peak, DC, and fade constraints.
-- `assets/audio/item_place.wav` and `assets/audio/triple_clear.wav` are source recordings, not
-  generator outputs; replace those files directly if their roles ever change.
+- `assets/audio/item_place_valid/item_place.wav` and
+  `assets/audio/match_clear/triple_clear.wav` are source recordings, not generator outputs; replace
+  those files directly if their roles ever change.
 
 Add a new sound event:
 - Add its cue to `scripts/tools/core_sfx_synthesis.gd` (if it needs a new asset), regenerate, and

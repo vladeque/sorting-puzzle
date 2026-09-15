@@ -8,9 +8,9 @@ extends RefCounted
 ## rebalancing the mix or swapping a variant pool is a change to this file alone.
 ##
 ## `item_place_valid` and `match_clear` intentionally keep the project's existing source
-## recordings. The original AUDIO-001 palette is deterministic output from
-## scripts/tools/generate_core_sfx.gd; later authored source cues also live under `generated/`
-## and are catalogued here without being claimed by that synthesizer's manifest.
+## recordings. Every stream is grouped under an event-named directory. The original AUDIO-001
+## palette is deterministic output from scripts/tools/generate_core_sfx.gd; later authored source
+## cues are catalogued here without being claimed by that synthesizer's manifest.
 ##
 ## Per-event fields:
 ##   streams              res:// paths. More than one makes the event a variant pool.
@@ -24,8 +24,6 @@ extends RefCounted
 ##                        most recent action is always the audible one.
 ##   count_scaling        Optional. Folds a multi-item reward into one coherent cue instead of one
 ##                        full-volume sound per item (see SfxManager._apply_count_scaling).
-
-const GENERATED_DIRECTORY := "res://assets/audio/generated"
 
 const EVENT_ITEM_SELECT := &"item_select"
 const EVENT_ITEM_PLACE_VALID := &"item_place_valid"
@@ -52,9 +50,9 @@ const EVENT_LEVEL_FAILED := &"level_failed"
 const EVENTS := {
 	EVENT_ITEM_SELECT: {
 		"streams": [
-			"res://assets/audio/generated/item_select_01.wav",
-			"res://assets/audio/generated/item_select_02.wav",
-			"res://assets/audio/generated/item_select_03.wav",
+			"res://assets/audio/item_select/item_select_01.wav",
+			"res://assets/audio/item_select/item_select_02.wav",
+			"res://assets/audio/item_select/item_select_03.wav",
 		],
 		"volume_db": -1.0,
 		"volume_variation_db": 0.5,
@@ -63,7 +61,7 @@ const EVENTS := {
 		"max_polyphony": 3,
 	},
 	EVENT_ITEM_PLACE_VALID: {
-		"streams": ["res://assets/audio/item_place.wav"],
+		"streams": ["res://assets/audio/item_place_valid/item_place.wav"],
 		"volume_db": -5.0,
 		"volume_variation_db": 1.0,
 		"pitch_range": Vector2(0.95, 1.05),
@@ -71,7 +69,7 @@ const EVENTS := {
 		"max_polyphony": 4,
 	},
 	EVENT_MATCH_CLEAR: {
-		"streams": ["res://assets/audio/triple_clear.wav"],
+		"streams": ["res://assets/audio/match_clear/triple_clear.wav"],
 		"volume_db": -5.0,
 		"volume_variation_db": 0.5,
 		"pitch_range": Vector2(0.97, 1.03),
@@ -79,7 +77,7 @@ const EVENTS := {
 		"max_polyphony": 3,
 	},
 	EVENT_STAR_HUD_ARRIVAL: {
-		"streams": ["res://assets/audio/generated/star_hud_arrival.wav"],
+		"streams": ["res://assets/audio/star_hud_arrival/star_hud_arrival.wav"],
 		"volume_db": -2.0,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(0.99, 1.01),
@@ -96,7 +94,7 @@ const EVENTS := {
 	EVENT_TIMER_CRITICAL_TICK: {
 		# One authored 30-second bed, started once on entry into the critical range and resumed at
 		# the matching offset after pause or Freezer. It must never be requested once per frame.
-		"streams": ["res://assets/audio/generated/timer_tick.wav"],
+		"streams": ["res://assets/audio/timer_critical_tick/timer_tick.wav"],
 		"volume_db": -3.0,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(1.0, 1.0),
@@ -104,7 +102,7 @@ const EVENTS := {
 		"max_polyphony": 1,
 	},
 	EVENT_TIME_UP: {
-		"streams": ["res://assets/audio/generated/time_up.wav"],
+		"streams": ["res://assets/audio/time_up/time_up.wav"],
 		"volume_db": -1.0,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(1.0, 1.0),
@@ -112,7 +110,7 @@ const EVENTS := {
 		"max_polyphony": 1,
 	},
 	EVENT_COIN_GAIN: {
-		"streams": ["res://assets/audio/generated/coin_gain.wav"],
+		"streams": ["res://assets/audio/coin_gain/coin_gain.wav"],
 		"volume_db": -1.0,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(0.995, 1.005),
@@ -120,7 +118,7 @@ const EVENTS := {
 		"max_polyphony": 2,
 	},
 	EVENT_COIN_SPEND: {
-		"streams": ["res://assets/audio/generated/coin_spend.wav"],
+		"streams": ["res://assets/audio/coin_spend/coin_spend.wav"],
 		"volume_db": -2.0,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(0.995, 1.005),
@@ -128,7 +126,7 @@ const EVENTS := {
 		"max_polyphony": 2,
 	},
 	EVENT_SHOP_PURCHASE_SUCCESS: {
-		"streams": ["res://assets/audio/generated/purchase_successful.wav"],
+		"streams": ["res://assets/audio/shop_purchase_success/purchase_successful.wav"],
 		"volume_db": 2.0,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(1.0, 1.0),
@@ -137,9 +135,9 @@ const EVENTS := {
 	},
 	EVENT_REWARD_CHEST_STAR_ARRIVAL: {
 		"streams": [
-			"res://assets/audio/generated/reward_chest_star_arrival_01.wav",
-			"res://assets/audio/generated/reward_chest_star_arrival_02.wav",
-			"res://assets/audio/generated/reward_chest_star_arrival_03.wav",
+			"res://assets/audio/reward_chest_star_arrival/reward_chest_star_arrival_01.wav",
+			"res://assets/audio/reward_chest_star_arrival/reward_chest_star_arrival_02.wav",
+			"res://assets/audio/reward_chest_star_arrival/reward_chest_star_arrival_03.wav",
 		],
 		"volume_db": -3.0,
 		"volume_variation_db": 0.6,
@@ -151,9 +149,9 @@ const EVENTS := {
 	},
 	EVENT_UI_CLICK: {
 		"streams": [
-			"res://assets/audio/generated/ui_click_01.wav",
-			"res://assets/audio/generated/ui_click_02.wav",
-			"res://assets/audio/generated/ui_click_03.wav",
+			"res://assets/audio/ui_click/ui_click_01.wav",
+			"res://assets/audio/ui_click/ui_click_02.wav",
+			"res://assets/audio/ui_click/ui_click_03.wav",
 		],
 		"volume_db": -2.0,
 		"volume_variation_db": 0.4,
@@ -163,7 +161,7 @@ const EVENTS := {
 	},
 	EVENT_STICKY_MOVE_BLOCKED: {
 		# Deliberately semantic rather than `invalid_action`: ordinary rejected moves stay silent.
-		"streams": ["res://assets/audio/generated/invalid_action.wav"],
+		"streams": ["res://assets/audio/sticky_move_blocked/invalid_action.wav"],
 		"volume_db": -2.0,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(1.0, 1.0),
@@ -171,7 +169,7 @@ const EVENTS := {
 		"max_polyphony": 1,
 	},
 	EVENT_SHELF_UNLOCK: {
-		"streams": ["res://assets/audio/generated/shelve_unlock.wav"],
+		"streams": ["res://assets/audio/shelf_unlock/shelve_unlock.wav"],
 		"volume_db": -5.0,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(1.0, 1.0),
@@ -179,7 +177,7 @@ const EVENTS := {
 		"max_polyphony": 1,
 	},
 	EVENT_ABILITY_HAMMER: {
-		"streams": ["res://assets/audio/generated/hammer.wav"],
+		"streams": ["res://assets/audio/ability_hammer/hammer.wav"],
 		"volume_db": -5.0,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(1.0, 1.0),
@@ -187,7 +185,7 @@ const EVENTS := {
 		"max_polyphony": 1,
 	},
 	EVENT_ABILITY_SHUFFLE: {
-		"streams": ["res://assets/audio/generated/shuffle.wav"],
+		"streams": ["res://assets/audio/ability_shuffle/shuffle.wav"],
 		"volume_db": 1.0,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(1.0, 1.0),
@@ -195,7 +193,7 @@ const EVENTS := {
 		"max_polyphony": 1,
 	},
 	EVENT_ABILITY_LANTERN: {
-		"streams": ["res://assets/audio/generated/lantern.wav"],
+		"streams": ["res://assets/audio/ability_lantern/lantern.wav"],
 		"volume_db": -3.0,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(1.0, 1.0),
@@ -203,7 +201,7 @@ const EVENTS := {
 		"max_polyphony": 1,
 	},
 	EVENT_ABILITY_FREEZER: {
-		"streams": ["res://assets/audio/generated/freeze.wav"],
+		"streams": ["res://assets/audio/ability_freezer/freeze.wav"],
 		"volume_db": -5.0,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(1.0, 1.0),
@@ -211,7 +209,7 @@ const EVENTS := {
 		"max_polyphony": 1,
 	},
 	EVENT_LEVEL_COMPLETE: {
-		"streams": ["res://assets/audio/generated/level_complete.mp3"],
+		"streams": ["res://assets/audio/level_complete/level_complete.mp3"],
 		"volume_db": -3.0,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(1.0, 1.0),
@@ -219,7 +217,7 @@ const EVENTS := {
 		"max_polyphony": 1,
 	},
 	EVENT_LEVEL_FAILED: {
-		"streams": ["res://assets/audio/generated/level_failed.wav"],
+		"streams": ["res://assets/audio/level_failed/level_failed.wav"],
 		"volume_db": -6.0,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(1.0, 1.0),

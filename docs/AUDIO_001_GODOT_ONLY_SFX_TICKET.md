@@ -28,8 +28,8 @@ Implement exactly these events:
 | Event ID | Player-visible trigger | Asset approach |
 | --- | --- | --- |
 | `item_select` | A tap finishes by selecting an eligible shelf item. | Synthesize 2–3 short tactile pop variants. |
-| `item_place_valid` | An item completes an accepted landing. | Retain `assets/audio/item_place.wav`; add safe pitch/volume variation and polyphonic playback. |
-| `match_clear` | A matched triple finishes gathering and begins disappearing. | Retain `assets/audio/triple_clear.wav`; replace the current stop/restart playback with polyphonic playback. |
+| `item_place_valid` | An item completes an accepted landing. | Retain `assets/audio/item_place_valid/item_place.wav`; add safe pitch/volume variation and polyphonic playback. |
+| `match_clear` | A matched triple finishes gathering and begins disappearing. | Retain `assets/audio/match_clear/triple_clear.wav`; replace the current stop/restart playback with polyphonic playback. |
 | `star_hud_arrival` | Match-earned stars finish flying into the in-level HUD star counter. | Synthesize a bright, short arrival chime. |
 | `timer_critical_tick` | The active, unfrozen countdown advances by one displayed second at or below the HUD's critical threshold. | Synthesize 2–3 dry clock-tick variants, with a restrained final-five-seconds accent. |
 | `time_up` | The timer reaches zero and the time-extension modal or terminal failure flow begins. | Synthesize a final tick plus short low clock-stop/alarm cue. |
@@ -61,10 +61,10 @@ Add a focused Godot tool script, recommended path:
 scripts/tools/generate_core_sfx.gd
 ```
 
-The tool must generate project-owned WAV files under:
+The tool must generate project-owned WAV files in event-named directories under:
 
 ```text
-assets/audio/generated/
+assets/audio/<event>/
 ```
 
 Requirements:
@@ -83,20 +83,17 @@ Requirements:
 - Document the exact regeneration command in this ticket and `docs/SCRIPTS.md` when implemented.
   (Done — see "Regeneration command" under "Implementation Record".)
 
-Recommended generated palette:
+Current generated palette:
 
-- `ui_click_01..03.wav`: 25–50 ms, soft transient with minimal tonal tail.
 - `item_select_01..03.wav`: 40–75 ms, slightly rounder and brighter than `ui_click`.
-- `star_hud_arrival.wav`: 140–240 ms, clean high chime without a long reverb tail.
-- `timer_tick_01..03.wav`: 30–65 ms, dry clock-like ticks that remain readable under gameplay audio.
 - `time_up.wav`: 300–600 ms, decisive but not harsh or horror-coded.
 - `coin_gain.wav`: 300–650 ms ascending metallic sequence.
 - `coin_spend.wav`: 180–350 ms descending metallic sequence.
-- `shop_purchase_success.wav`: 400–750 ms confirmation chord with enough space for an optional
-  simultaneous `coin_gain` layer.
-- `reward_chest_star_arrival_01..03.wav`: 90–180 ms, warmer and softer than the HUD-star arrival.
 
-Do not synthesize replacements for `item_place.wav` or `triple_clear.wav` in this ticket.
+The runtime now uses an authored 30-second `timer_tick.wav` bed and authored
+`purchase_successful.wav` confirmation. The UI-click and star-arrival pools are also authored
+recordings. None are generator outputs. Do not synthesize replacements for `item_place.wav` or
+`triple_clear.wav` in this ticket.
 
 ### 2. Add a Shared SFX Playback Owner
 
@@ -221,7 +218,7 @@ buttons.
 
 ## Acceptance Criteria
 
-- All eleven approved event IDs have a documented catalog entry and an audible implementation.
+- All approved event IDs have a documented catalog entry and an audible implementation.
 - Every new source WAV is reproducible from the committed Godot generator and passes the documented
   PCM, peak, fade, and duration constraints.
 - `item_place.wav` and `triple_clear.wav` remain the source recordings for their existing roles.
@@ -322,7 +319,8 @@ files with no manifest at all.
 Options after the `--` separator:
 
 - `--regenerate`: allow replacing outputs recorded under a different generator version.
-- `--output-dir=<res path>`: write elsewhere instead of `res://assets/audio/generated`.
+- `--output-dir=<res path>`: write the event-directory tree and manifest under another root instead
+  of `res://assets/audio`.
 
 ### Implemented files
 
@@ -330,7 +328,7 @@ Owners:
 
 - `scripts/audio/sfx_manager.gd` — the `SfxManager` autoload: pooled players, per-event cooldown and
   polyphony, variant selection, mute paths, `SFX` bus routing.
-- `scripts/audio/sfx_catalog.gd` — the one event catalog for all eleven approved events.
+- `scripts/audio/sfx_catalog.gd` — the one event catalog for every approved event.
 - `scripts/audio/ui_click_binder.gd` — the single generic `ui_click` policy for every `BaseButton`.
 - `scripts/tools/generate_core_sfx.gd` — the generator CLI (overwrite guard, manifest, report).
 - `scripts/tools/core_sfx_synthesis.gd` — deterministic synthesis, the cue table, and the WAV encoder.
@@ -351,32 +349,25 @@ Tests:
 
 ### Generated asset list
 
-Generator version `1.0.0`. All files are mono 16-bit PCM at 44 100 Hz under
-`assets/audio/generated/`, imported with `compress/mode=0` (uncompressed PCM). Measured peaks are the
-authored relative loudness, not a loudness match; every one is at or under the -1 dBFS ceiling.
+Generator version `1.1.0`. Generated files are mono 16-bit PCM at 44 100 Hz in their matching
+`assets/audio/<event>/` directories, imported with `compress/mode=0` (uncompressed PCM). Measured
+peaks are the authored relative loudness, not a loudness match; every one is at or under the -1 dBFS
+ceiling. `assets/audio/generated_sfx_manifest.json` owns only the generated paths.
 
 | File | Duration | Peak | DC offset |
 | --- | --- | --- | --- |
-| `ui_click_01.wav` | 32.0 ms | -18.00 dBFS | -0.00014 |
-| `ui_click_02.wav` | 38.0 ms | -18.50 dBFS | -0.00010 |
-| `ui_click_03.wav` | 44.0 ms | -17.50 dBFS | -0.00018 |
 | `item_select_01.wav` | 55.0 ms | -14.00 dBFS | +0.00007 |
 | `item_select_02.wav` | 62.0 ms | -14.50 dBFS | +0.00003 |
 | `item_select_03.wav` | 48.0 ms | -13.50 dBFS | +0.00011 |
-| `star_hud_arrival.wav` | 205.0 ms | -8.00 dBFS | +0.00000 |
-| `timer_tick_01.wav` | 42.0 ms | -16.00 dBFS | -0.00021 |
-| `timer_tick_02.wav` | 36.0 ms | -16.50 dBFS | -0.00025 |
-| `timer_tick_03.wav` | 50.0 ms | -15.50 dBFS | -0.00020 |
 | `time_up.wav` | 520.0 ms | -4.00 dBFS | -0.00005 |
 | `coin_gain.wav` | 520.0 ms | -5.00 dBFS | -0.00000 |
 | `coin_spend.wav` | 285.0 ms | -7.00 dBFS | +0.00000 |
-| `shop_purchase_success.wav` | 620.0 ms | -3.50 dBFS | -0.00001 |
-| `reward_chest_star_arrival_01.wav` | 130.0 ms | -11.00 dBFS | -0.00001 |
-| `reward_chest_star_arrival_02.wav` | 150.0 ms | -11.50 dBFS | -0.00001 |
-| `reward_chest_star_arrival_03.wav` | 115.0 ms | -10.50 dBFS | -0.00000 |
 
-`assets/audio/item_place.wav` and `assets/audio/triple_clear.wav` are unchanged and remain the source
-recordings for `item_place_valid` and `match_clear`. No replacements were synthesized for them.
+`assets/audio/item_place_valid/item_place.wav` and
+`assets/audio/match_clear/triple_clear.wav` are unchanged and remain the source recordings for
+`item_place_valid` and `match_clear`. No replacements were synthesized for them.
+All other catalog streams not listed in the generated table are authored source cues and are not
+overwritten by the generator.
 
 ### Event catalog
 
@@ -386,11 +377,11 @@ recordings for `item_place_valid` and `match_clear`. No replacements were synthe
 | `item_place_valid` | `item_place.wav` | -5.0 dB ±1.0 | 0.95–1.05 | 20 ms | 4 |
 | `match_clear` | `triple_clear.wav` | -5.0 dB ±0.5 | 0.97–1.03 | 20 ms | 3 |
 | `star_hud_arrival` | `star_hud_arrival.wav` | -2.0 dB | 0.99–1.01 | 90 ms | 2 |
-| `timer_critical_tick` | `timer_tick_01..03` | -3.0 dB ±0.4 | 0.98–1.02 | 300 ms | 2 |
+| `timer_critical_tick` | `timer_tick.wav` | -3.0 dB | none | none | 1 |
 | `time_up` | `time_up.wav` | -1.0 dB | none | 750 ms | 1 |
 | `coin_gain` | `coin_gain.wav` | -1.0 dB | 0.995–1.005 | 200 ms | 2 |
 | `coin_spend` | `coin_spend.wav` | -2.0 dB | 0.995–1.005 | 150 ms | 2 |
-| `shop_purchase_success` | `shop_purchase_success.wav` | -1.0 dB | none | 600 ms | 1 |
+| `shop_purchase_success` | `purchase_successful.wav` | +2.0 dB | none | 600 ms | 1 |
 | `reward_chest_star_arrival` | `reward_chest_star_arrival_01..03` | -3.0 dB ±0.6 | 0.98–1.04 | 50 ms | 3 |
 | `ui_click` | `ui_click_01..03` | -2.0 dB ±0.4 | 0.97–1.03 | 40 ms | 3 |
 
@@ -406,8 +397,8 @@ Automated, all through `scripts/tools/run_isolated_godot_test.ps1`:
   byte-identical), committed WAVs byte-identical to a fresh render, manifest contents, and per-file
   mono/16-bit/44.1 kHz encoding, non-empty PCM, ticket duration windows, the -1 dBFS ceiling, the
   authored per-cue peak, bounded DC offset, and edge fades landing on silence. Also catalog
-  completeness (all eleven events, every stream importable), the two retained source recordings, and
-  no orphan generated assets.
+  completeness (all catalog events, every stream importable), the two retained source recordings,
+  and no orphan audio assets.
 - `tests/audio/test_sfx_manager.gd` — **passed.** `SFX` bus present and sending to `Master`, all
   pooled players routed to it, pool reuse across 40 rapid plays, per-event polyphony with the newest
   cue surviving a burst, cooldown rejection, no immediate variant repeat, unknown-event and

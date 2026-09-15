@@ -1313,7 +1313,7 @@ Depends on:
 - `scenes/ability_purchase_menu.tscn`
 - `scenes/ui/in_level_shop_screen.tscn`
 - `scenes/ui/ability_bar.tscn`
-- `assets/audio/*.wav`
+- `assets/audio/<event>/*.{wav,mp3}`
 - `configs/item_sprites.json`
 - `configs/ability_purchase_prices.json`
 - `configs/levels/level_*.json`
@@ -1658,9 +1658,7 @@ Important nodes:
 Depends on:
 - `assets/abilities/ability_hammer_swing_1.png` through `ability_hammer_swing_7.png`, plus fractional
   transition frames `1.3`, `1.7`, `5.3`, and `5.7`, in strike playback order.
-- `assets/audio/item_place.wav`, `assets/audio/triple_clear.wav`, and
-  `assets/audio/A_short_satisfying_i_#3-1782529645197.wav`, layered with scene-specific pitch and
-  volume settings.
+- `assets/audio/ability_hammer/hammer.wav`, played through the global semantic SFX catalog.
 - Runtime instancing and target positioning from `scripts/level.gd`.
 - `tests/gameplay/test_hammer_animation.gd` for deterministic timing/integration verification and optional movie capture.
 - `scripts/tools/captures/hammer_effect_setup.gd` for responsive in-level impact-pose screenshots.

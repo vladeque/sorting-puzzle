@@ -3,7 +3,8 @@ extends RefCounted
 ## Deterministic offline synthesis for the AUDIO-001 generated SFX palette.
 ##
 ## Tool-side only: nothing in the shipped game loads this script. scripts/tools/generate_core_sfx.gd
-## drives it to write res://assets/audio/generated/*.wav, and tests/audio/test_core_sfx_assets.gd
+## drives it to write each cue under res://assets/audio/<event>/, and
+## tests/audio/test_core_sfx_assets.gd
 ## re-renders the same cues in memory to prove the committed files are still reproducible.
 ##
 ## Everything here is intentionally self-contained arithmetic -- a fixed xorshift PRNG, plain
@@ -12,13 +13,12 @@ extends RefCounted
 ##
 ## Authoring rules encoded below (see docs/AUDIO_001_GODOT_ONLY_SFX_TICKET.md "Asset and Mix
 ## Guidelines"): mono 16-bit PCM at one sample rate, DC-blocked, short attack/release fades, and a
-## per-cue authored peak target. Cues are deliberately NOT normalized to a common loudness -- UI
-## clicks and timer ticks sit far below currency and confirmation cues -- and every target stays at
-## or under the -1 dBFS ceiling.
+## per-cue authored peak target. Cues are deliberately NOT normalized to a common loudness, and
+## every target stays at or under the -1 dBFS ceiling.
 
-## Bump whenever a recipe, seed, or parameter changes. generate_core_sfx.gd refuses to overwrite
-## outputs recorded under a different version unless --regenerate is passed.
-const GENERATOR_VERSION := "1.0.0"
+## Bump whenever a recipe, seed, parameter, or output layout changes. generate_core_sfx.gd refuses
+## to overwrite outputs recorded under a different version unless --regenerate is passed.
+const GENERATOR_VERSION := "1.1.0"
 
 const SAMPLE_RATE := 44100
 const BIT_DEPTH := 16
@@ -33,26 +33,15 @@ const RELEASE_FADE_SECONDS := 0.008
 const DC_BLOCKER_POLE := 0.999
 
 ## Every generated cue, in output order. `peak_db` is the authored relative loudness, not a
-## loudness-matched target: ui_click/timer_tick sit ~10-15 dB under the currency and confirmation
-## cues so the mix balance is already right before the catalog's per-event trims.
+## loudness-matched target, so the mix balance is already intentional before the catalog's
+## per-event trims.
 const CUES: Array[Dictionary] = [
-	{"name": "ui_click_01", "recipe": "ui_click", "variant": 0, "seed": 0x51F3A17B, "duration": 0.032, "peak_db": -18.0},
-	{"name": "ui_click_02", "recipe": "ui_click", "variant": 1, "seed": 0x2C90D45D, "duration": 0.038, "peak_db": -18.5},
-	{"name": "ui_click_03", "recipe": "ui_click", "variant": 2, "seed": 0x7A1E6B03, "duration": 0.044, "peak_db": -17.5},
-	{"name": "item_select_01", "recipe": "item_select", "variant": 0, "seed": 0x1B4C77E9, "duration": 0.055, "peak_db": -14.0},
-	{"name": "item_select_02", "recipe": "item_select", "variant": 1, "seed": 0x63D2085F, "duration": 0.062, "peak_db": -14.5},
-	{"name": "item_select_03", "recipe": "item_select", "variant": 2, "seed": 0x0E8B3C21, "duration": 0.048, "peak_db": -13.5},
-	{"name": "star_hud_arrival", "recipe": "star_arrival", "variant": 0, "seed": 0x3F70C915, "duration": 0.205, "peak_db": -8.0},
-	{"name": "timer_tick_01", "recipe": "timer_tick", "variant": 0, "seed": 0x5D0A2E47, "duration": 0.042, "peak_db": -16.0},
-	{"name": "timer_tick_02", "recipe": "timer_tick", "variant": 1, "seed": 0x11C6F38D, "duration": 0.036, "peak_db": -16.5},
-	{"name": "timer_tick_03", "recipe": "timer_tick", "variant": 2, "seed": 0x69B5401F, "duration": 0.050, "peak_db": -15.5},
-	{"name": "time_up", "recipe": "time_up", "variant": 0, "seed": 0x24E8B76B, "duration": 0.520, "peak_db": -4.0},
-	{"name": "coin_gain", "recipe": "coin_gain", "variant": 0, "seed": 0x48A1D30F, "duration": 0.520, "peak_db": -5.0},
-	{"name": "coin_spend", "recipe": "coin_spend", "variant": 0, "seed": 0x0C57E2A9, "duration": 0.285, "peak_db": -7.0},
-	{"name": "shop_purchase_success", "recipe": "shop_success", "variant": 0, "seed": 0x76021BC3, "duration": 0.620, "peak_db": -3.5},
-	{"name": "reward_chest_star_arrival_01", "recipe": "chest_arrival", "variant": 0, "seed": 0x35FA6E81, "duration": 0.130, "peak_db": -11.0},
-	{"name": "reward_chest_star_arrival_02", "recipe": "chest_arrival", "variant": 1, "seed": 0x1D3B90C7, "duration": 0.150, "peak_db": -11.5},
-	{"name": "reward_chest_star_arrival_03", "recipe": "chest_arrival", "variant": 2, "seed": 0x5E47A20D, "duration": 0.115, "peak_db": -10.5},
+	{"event": "item_select", "name": "item_select_01", "recipe": "item_select", "variant": 0, "seed": 0x1B4C77E9, "duration": 0.055, "peak_db": -14.0},
+	{"event": "item_select", "name": "item_select_02", "recipe": "item_select", "variant": 1, "seed": 0x63D2085F, "duration": 0.062, "peak_db": -14.5},
+	{"event": "item_select", "name": "item_select_03", "recipe": "item_select", "variant": 2, "seed": 0x0E8B3C21, "duration": 0.048, "peak_db": -13.5},
+	{"event": "time_up", "name": "time_up", "recipe": "time_up", "variant": 0, "seed": 0x24E8B76B, "duration": 0.520, "peak_db": -4.0},
+	{"event": "coin_gain", "name": "coin_gain", "recipe": "coin_gain", "variant": 0, "seed": 0x48A1D30F, "duration": 0.520, "peak_db": -5.0},
+	{"event": "coin_spend", "name": "coin_spend", "recipe": "coin_spend", "variant": 0, "seed": 0x0C57E2A9, "duration": 0.285, "peak_db": -7.0},
 ]
 
 
@@ -116,7 +105,7 @@ static func render_cue(cue: Dictionary) -> PackedFloat32Array:
 	return samples
 
 
-## Renders every cue once. Returns `[{name, samples, duration_seconds, peak_db, pcm}]` in CUES order.
+## Renders every cue once. `relative_path` groups output by its semantic event.
 static func render_all() -> Array[Dictionary]:
 	var rendered: Array[Dictionary] = []
 	for cue in CUES:
@@ -125,6 +114,7 @@ static func render_all() -> Array[Dictionary]:
 		rendered.append({
 			"name": str(cue.get("name", "")),
 			"file_name": "%s.wav" % cue.get("name", ""),
+			"relative_path": "%s/%s.wav" % [cue.get("event", ""), cue.get("name", "")],
 			"samples": samples,
 			"duration_seconds": float(samples.size()) / float(SAMPLE_RATE),
 			"authored_peak_db": float(cue.get("peak_db", -6.0)),

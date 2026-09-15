@@ -198,7 +198,7 @@ func _test_missing_event_and_stream_are_safe() -> void:
 		"An unknown event id returns null instead of blocking its caller."
 	)
 	_check(
-		_manager.call("_load_stream", &"probe_event", "res://assets/audio/generated/missing.wav") == null,
+		_manager.call("_load_stream", &"probe_event", "res://assets/audio/missing_event/missing.wav") == null,
 		"A missing stream resolves to null instead of raising."
 	)
 	# Both branches warn once; reaching this line at all is the "never blocks the caller" assertion.
