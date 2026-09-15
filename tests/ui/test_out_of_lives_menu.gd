@@ -103,7 +103,7 @@ func _test_modal_and_successful_purchase(progress) -> void:
 
 	var purchase_button := modal.get_node("%PurchaseButton") as Button
 	purchase_button.emit_signal("pressed")
-	await _wait_seconds(0.4)
+	await _wait_for_level_transition(menu)
 	_check(current_scene != menu, "A successful purchase launches the originally requested level.")
 	_check(progress.get_lives() == 1, "A successful purchase grants exactly one life.")
 	_check(
@@ -282,6 +282,24 @@ func _drain_lives(progress) -> void:
 
 func _wait_seconds(seconds: float) -> void:
 	await create_timer(seconds).timeout
+
+
+func _wait_for_level_transition(previous_scene: Node, timeout_seconds := 4.0) -> void:
+	var transition := root.get_node_or_null("LevelTransition")
+	_check(transition != null, "LevelTransition autoload is available.")
+	if transition == null:
+		return
+	var deadline := Time.get_ticks_msec() + int(timeout_seconds * 1000.0)
+	while (
+		current_scene == previous_scene
+		and not bool(transition.call("is_transitioning"))
+		and Time.get_ticks_msec() < deadline
+	):
+		await process_frame
+	while bool(transition.call("is_transitioning")) and Time.get_ticks_msec() < deadline:
+		await process_frame
+	_check(not bool(transition.call("is_transitioning")), "Level transition finishes before timeout.")
+	await process_frame
 
 
 func _check(condition: bool, message: String) -> void:

@@ -58,7 +58,6 @@ Purpose:
   in flight is ignored (see `docs/SCENES.md`'s "Shared Interaction Roles").
 
 Key constants:
-- `LEVEL_SCENE`: preloads `res://level.tscn`.
 - `PROFILE_MENU_SCENE`: preloads `res://scenes/ui/profile_menu.tscn`.
 - `SETTINGS_MENU_SCENE`: preloads `res://scenes/ui/settings_menu.tscn`.
 - `REWARD_CHEST_MENU_SCENE`: preloads `res://scenes/ui/reward_chest_menu.tscn`.
@@ -147,8 +146,7 @@ Key methods:
   profile menu saves.
 - `_launch_campaign_level()`: resolves the selected chapter's next incomplete global level,
   opens Out of Lives when needed, and resumes the same launch after a successful life purchase;
-  otherwise instantiates the level, sets campaign launch metadata, swaps current scene, and queues
-  the menu.
+  otherwise sends the accepted request and campaign metadata to `LevelTransition`.
 - `_refresh_out_of_lives_offer()`: keeps the modal's life count, cap, configured price, and
   next-life countdown current, which is also what switches an open modal between its below-cap and
   full-lives states; closes it without auto-launch if time restores a life during an interrupted
@@ -160,6 +158,30 @@ Key methods:
 - `_on_out_of_lives_purchase_requested()`: ignores a stale press at the life cap, opens Shop when
   unaffordable, otherwise persists one atomic offline life purchase and closes the modal; it
   launches the originally requested level only when a campaign launch was pending.
+
+## `scripts/level_transition.gd`
+
+Attached to:
+- The `LevelTransition` autoload registered in `project.godot`.
+
+Purpose:
+- Owns every normal level start and retry across scene boundaries.
+- Starts a threaded load of `level.tscn`, keeps the loading overlay alive while scenes swap, rejects
+  duplicate requests, transfers launch properties, and activates gameplay after the reveal.
+
+Depends on:
+- `scenes/ui/level_loading_screen.tscn`.
+- `scripts/level.gd` transition preparation and activation methods.
+
+## `scripts/level_loading_screen.gd`
+
+Attached to:
+- `scenes/ui/level_loading_screen.tscn` root `LevelLoadingScreen`.
+
+Purpose:
+- Owns the iris close/reveal, mascot entrance/exit, animated loading dots, responsive shader size,
+  minimum visible duration, and full-screen input interception.
+- Exposes `show_preview()` for the responsive capture setup.
 
 ## `scripts/chapters/*.gd`
 
@@ -844,7 +866,6 @@ Purpose:
 - Launches campaign or isolated dev/test levels.
 
 Key constants:
-- `LEVEL_SCENE`: preloads `res://level.tscn`.
 - `MIN_LEVEL`: first selectable level number.
 - `MAX_LEVEL`: last selectable level number.
 - `DEV_LEVEL_SELECT_SETTING`: optional project setting that overrides debug-build dev level selection.
@@ -859,10 +880,11 @@ Key methods:
 - `_update_campaign_progress()`: displays the saved current level, no-lives state, or all-complete state.
 - `_populate_level_selector()`: clears old buttons and creates one isolated dev/test button per level when dev selection is enabled.
 - `_launch_campaign_level()`: launches `PlayerProgress.current_level`.
-- `_launch_level(level_number, launched_from_dev_mode)`: instantiates the level, sets launch metadata, swaps current scene, and queues the menu for deletion.
+- `_launch_level(level_number, launched_from_dev_mode)`: sends the accepted request, return route,
+  and dev-mode metadata to `LevelTransition`.
 
 Depends on:
-- `level.tscn`
+- `LevelTransition` autoload
 - `scripts/level.gd` export `selected_level`
 - `scripts/level.gd` export `launched_from_dev_mode`
 - `scripts/level.gd` export `return_menu_scene_path`
@@ -1727,6 +1749,9 @@ Attached to:
 
 Purpose:
 - Owns active level state, runtime shelf creation, item spawning, input handling, matching, abilities, timer, failure, and completion.
+- Exposes the `prepare_for_loading_transition()` / `activate_after_loading_transition()` gate used by
+  `LevelTransition`; while pending it blocks input and frame updates, pauses moving shelf rows, and
+  postpones the initial shelf resolution until the board is fully revealed.
 
 Audio (AUDIO-001):
 - Plays no audio itself. `_play_sfx(event_id, context)` is the level's only route to sound and
@@ -1818,7 +1843,6 @@ Important constants:
 - `LAYOUT_SCENE_TEMPLATE`: `res://scenes/layouts/layout_%s.tscn` path pattern used by `layout_preset`.
 - `DEFAULT_LAYOUT_PRESET`: fallback layout preset.
 - `MAIN_MENU_SCENE`: default scene returned to after completion.
-- `LEVEL_SCENE_PATH`: scene loaded when the completion `Next` button advances normal campaign play to the next level.
 - `SfxCatalogScript`: `res://scripts/audio/sfx_catalog.gd`, the source of the `EVENT_*` ids this
   script passes to `SfxManager` (AUDIO-001). The level no longer preloads audio streams.
 - `HAMMER_IMPACT_EFFECT_SCENE`: `res://scenes/abilities/hammer_impact_effect.tscn`, spawned when the hammer ability is used.

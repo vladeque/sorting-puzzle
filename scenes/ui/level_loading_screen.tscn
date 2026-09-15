@@ -1,0 +1,123 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/level_loading_screen.gd" id="1_script"]
+[ext_resource type="Shader" path="res://assets/shaders/loading_iris.gdshader" id="2_shader"]
+[ext_resource type="Texture2D" path="res://assets/ui/loading/loading_cat.png" id="3_hero"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_iris"]
+shader = ExtResource("2_shader")
+shader_parameter/hole_radius = 1.0
+shader_parameter/viewport_size = Vector2(720, 1280)
+shader_parameter/top_color = Color(0.075, 0.29, 0.48, 1)
+shader_parameter/bottom_color = Color(0.025, 0.12, 0.25, 1)
+shader_parameter/glow_color = Color(0.2, 0.67, 0.77, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dot"]
+bg_color = Color(0.94, 0.99, 1, 0.96)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0.01, 0.08, 0.16, 0.3)
+shadow_size = 4
+
+[node name="LevelLoadingScreen" type="CanvasLayer"]
+layer = 1000
+process_mode = 3
+script = ExtResource("1_script")
+
+[node name="ScreenRoot" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+
+[node name="Backdrop" type="ColorRect" parent="ScreenRoot"]
+unique_name_in_owner = true
+material = SubResource("ShaderMaterial_iris")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="HeroHolder" type="Control" parent="ScreenRoot"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_left = 0.035
+anchor_top = 0.105
+anchor_right = 0.965
+anchor_bottom = 0.845
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="HeroShadow" type="TextureRect" parent="ScreenRoot/HeroHolder"]
+unique_name_in_owner = true
+modulate = Color(0.015, 0.07, 0.12, 0.3)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 18.0
+offset_right = 10.0
+offset_bottom = 18.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_hero")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Hero" type="TextureRect" parent="ScreenRoot/HeroHolder"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_hero")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="LoadingDots" type="HBoxContainer" parent="ScreenRoot"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -32.0
+offset_top = -92.0
+offset_right = 32.0
+offset_bottom = -76.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="Dot1" type="Panel" parent="ScreenRoot/LoadingDots"]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_dot")
+
+[node name="Dot2" type="Panel" parent="ScreenRoot/LoadingDots"]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_dot")
+
+[node name="Dot3" type="Panel" parent="ScreenRoot/LoadingDots"]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_dot")

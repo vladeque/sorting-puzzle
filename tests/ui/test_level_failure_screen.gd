@@ -56,13 +56,17 @@ func _test_retry_with_available_life() -> void:
 
 	var failure = level.get("_failure_screen")
 	(failure.get_node("%RetryButton") as Button).pressed.emit()
-	await _wait_seconds(0.2)
+	await _wait_for_level_transition(level)
 	var restarted := current_scene
 	_check(restarted != null and restarted != level, "Retry replaces the failed run with a fresh level scene.")
 	_check(
 		int(restarted.get("selected_level")) == TEST_LEVEL
 			and not bool(restarted.get("launched_from_dev_mode")),
 		"Immediate Retry preserves the campaign level and launch mode."
+	)
+	_check(
+		not bool(restarted.get("_loading_transition_pending")),
+		"Retry activates gameplay only after the loading reveal completes."
 	)
 	_check(
 		_progress.get_lives() == starting_lives - 1,
@@ -118,7 +122,7 @@ func _test_zero_lives_purchase_restarts_level() -> void:
 	await _wait_seconds(0.35)
 	var lives_modal = level.get("_out_of_lives_overlay")
 	(lives_modal.get_node("%PurchaseButton") as Button).pressed.emit()
-	await _wait_seconds(0.3)
+	await _wait_for_level_transition(level)
 
 	var restarted := current_scene
 	_check(restarted != null and restarted != level, "Buying a retry life starts a fresh level scene.")
@@ -185,6 +189,24 @@ func _free_current_scene() -> void:
 
 func _wait_seconds(seconds: float) -> void:
 	await create_timer(seconds).timeout
+
+
+func _wait_for_level_transition(previous_scene: Node, timeout_seconds := 4.0) -> void:
+	var transition := root.get_node_or_null("LevelTransition")
+	_check(transition != null, "LevelTransition autoload is available.")
+	if transition == null:
+		return
+	var deadline := Time.get_ticks_msec() + int(timeout_seconds * 1000.0)
+	while (
+		current_scene == previous_scene
+		and not bool(transition.call("is_transitioning"))
+		and Time.get_ticks_msec() < deadline
+	):
+		await process_frame
+	while bool(transition.call("is_transitioning")) and Time.get_ticks_msec() < deadline:
+		await process_frame
+	_check(not bool(transition.call("is_transitioning")), "Level transition finishes before timeout.")
+	await process_frame
 
 
 func _check(condition: bool, message: String) -> void:

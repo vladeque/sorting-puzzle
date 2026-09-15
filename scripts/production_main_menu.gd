@@ -1,6 +1,5 @@
 extends Control
 
-const LEVEL_SCENE := preload("res://level.tscn")
 const PROFILE_MENU_SCENE := preload("res://scenes/ui/profile_menu.tscn")
 const SETTINGS_MENU_SCENE := preload("res://scenes/ui/settings_menu.tscn")
 const REWARD_CHEST_MENU_SCENE := preload("res://scenes/ui/reward_chest_menu.tscn")
@@ -584,18 +583,7 @@ func _launch_campaign_level() -> void:
 	if next_level <= 0:
 		return
 
-	var level_scene := LEVEL_SCENE.instantiate()
-	level_scene.selected_level = next_level
-	level_scene.launched_from_dev_mode = false
-	level_scene.return_menu_scene_path = PRODUCTION_MENU_SCENE
-
-	var tree := get_tree()
-	var current_scene := tree.current_scene
-	tree.root.add_child(level_scene)
-	tree.current_scene = level_scene
-
-	if current_scene != null:
-		current_scene.queue_free()
+	LevelTransition.launch_level(next_level, false, PRODUCTION_MENU_SCENE, {}, self)
 
 
 ## `is_launch_pending` separates the two entry points: true only from `_launch_campaign_level()`,

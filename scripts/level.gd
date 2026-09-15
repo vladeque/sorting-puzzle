@@ -52,7 +52,6 @@ const LEVEL_CONFIG_TEMPLATE := "res://configs/levels/level_%03d.json"
 const DEFAULT_LEVEL_CONFIG := "res://configs/levels/level_001.json"
 const LAYOUT_SCENE_TEMPLATE := "res://scenes/layouts/layout_%s.tscn"
 const DEFAULT_LAYOUT_PRESET := "grid_3x3"
-const LEVEL_SCENE_PATH := "res://level.tscn"
 const MAIN_MENU_SCENE := "res://scenes/main_menu.tscn"
 const SfxCatalogScript := preload("res://scripts/audio/sfx_catalog.gd")
 const REWARD_STAR_TEXTURE := preload("res://assets/ui/reward_star_34_glossy_b.png")
@@ -250,6 +249,7 @@ var _shuffle_effect_active := false
 ## True from the moment the board is cleared until the completion screen opens (see _complete_level).
 var _completion_celebration_active := false
 var _level_config_error := ""
+var _loading_transition_pending := false
 
 
 func _ready() -> void:
@@ -550,6 +550,8 @@ func _stop_sound_effects() -> void:
 
 
 func _process(delta: float) -> void:
+	if _loading_transition_pending:
+		return
 	_refresh_sticky_feedback_availability()
 	if not _level_config_error.is_empty():
 		_stop_critical_timer_sfx()
@@ -609,6 +611,8 @@ func _exit_tree() -> void:
 
 
 func _input(event: InputEvent) -> void:
+	if _loading_transition_pending:
+		return
 	# Native touch and mouse are both handled below; their synthesized counterparts are duplicates.
 	if event.device == InputEvent.DEVICE_ID_EMULATION:
 		return
@@ -666,6 +670,9 @@ func _input(event: InputEvent) -> void:
 ## overlay/result screen is mid open()/close() transition, the press is dropped rather than acted
 ## on, so a rapid double-press can never race two transitions or double-navigate.
 func _unhandled_input(event: InputEvent) -> void:
+	if _loading_transition_pending:
+		get_viewport().set_input_as_handled()
+		return
 	if not event.is_action_pressed(&"ui_cancel"):
 		return
 
@@ -871,8 +878,23 @@ func _apply_level_config(config: Dictionary) -> void:
 
 	_update_shelf_perspective_edges()
 	_apply_responsive_layout()
-	_set_moving_shelf_rows_paused(false)
+	_set_moving_shelf_rows_paused(_loading_transition_pending)
 	_update_locked_shelves()
+	if not _loading_transition_pending:
+		_resolve_shelves(_get_all_shelves())
+		_check_level_completed()
+	_update_pause_menu_button()
+
+
+func prepare_for_loading_transition() -> void:
+	_loading_transition_pending = true
+
+
+func activate_after_loading_transition() -> void:
+	if not _loading_transition_pending:
+		return
+	_loading_transition_pending = false
+	_set_moving_shelf_rows_paused(false)
 	_resolve_shelves(_get_all_shelves())
 	_check_level_completed()
 	_update_pause_menu_button()
@@ -2148,26 +2170,13 @@ func _restart_level() -> void:
 		return
 
 	_returning_to_menu = true
-	var packed_level := load(LEVEL_SCENE_PATH) as PackedScene
-	if packed_level == null:
-		_returning_to_menu = false
-		push_error("Could not load level scene for retry: %s" % LEVEL_SCENE_PATH)
-		return
-
-	var next_level := packed_level.instantiate()
-	next_level.set("selected_level", selected_level)
-	next_level.set("launched_from_dev_mode", launched_from_dev_mode)
-	next_level.set("sticky_marker_variant", sticky_marker_variant)
-	next_level.set("return_menu_scene_path", return_menu_scene_path)
-
-	var tree := get_tree()
-	var current_scene := tree.current_scene
-	tree.root.add_child(next_level)
-	tree.current_scene = next_level
-	if current_scene != null:
-		current_scene.queue_free()
-	elif is_inside_tree():
-		queue_free()
+	LevelTransition.launch_level(
+		selected_level,
+		launched_from_dev_mode,
+		return_menu_scene_path,
+		{"sticky_marker_variant": sticky_marker_variant},
+		self
+	)
 
 
 func _spend_campaign_life_for_run(outcome: String = "left") -> void:
@@ -2608,7 +2617,7 @@ func _on_time_extension_ad_requested() -> void:
 
 
 func _is_ui_action_blocked() -> bool:
-	return _returning_to_menu or _is_any_overlay_transitioning()
+	return _loading_transition_pending or _returning_to_menu or _is_any_overlay_transitioning()
 
 
 func _close_pause_menu() -> void:

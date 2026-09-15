@@ -2,6 +2,19 @@
 
 This file maps scenes to their responsibilities, scripts, important nodes, and runtime relationships.
 
+## Level loading transition
+
+- `scenes/ui/level_loading_screen.tscn` is a full-screen `CanvasLayer` that survives the swap from
+  either Main Menu or a failed level into a fresh `level.tscn` instance. Its root blocks pointer and
+  back input for the entire transition.
+- `%Backdrop` uses `assets/shaders/loading_iris.gdshader` for the blue gradient, subtle dot pattern,
+  and closing/opening circular mask. `%HeroHolder` presents the selected cat artwork from
+  `assets/ui/loading/loading_cat.png`; `%LoadingDots` provides the compact activity indicator.
+- The scene scales through full-rect anchors and keep-aspect texture placement across portrait phone
+  and tablet layouts. `scripts/tools/captures/level_loading_screen_setup.gd` holds its review state.
+- Runtime orchestration belongs to the `LevelTransition` autoload, while `scripts/level.gd` owns the
+  gameplay activation gate. See [LEVEL_LOADING_SCREEN.md](LEVEL_LOADING_SCREEN.md).
+
 ## Sticky items and comparison scene
 
 - `scenes/ui/sticky_item_indicator.tscn` is instanced by `scenes/item.tscn`. Its single sprite draws
@@ -1237,7 +1250,7 @@ Important nodes:
 - `Content/LevelGrid`: unique-name `GridContainer` used by the script for dev/test level selection.
 
 Depends on:
-- `level.tscn` through `scripts/main_menu.gd`.
+- `level.tscn` through the `LevelTransition` autoload.
 - `PlayerProgress` autoload for the saved campaign level and lives gate.
 
 Do not use for:

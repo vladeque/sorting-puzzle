@@ -19,13 +19,24 @@ Testing menu:
 
 Playable level scene:
 - `level.tscn`
-- Instantiated by `scripts/main_menu.gd`; the current completion action returns to the Main Menu.
+- Instantiated through the persistent `LevelTransition` autoload for production/testing menu starts
+  and failed-level retries; the current completion action returns to the Main Menu.
 - Owns shelf layout, timer, drag and tap movement, triple matching, abilities, pause-menu wiring, failure, and completion flow.
 - Uses the original procedural gameplay background for Chapter 1 and chapter artwork for chapters
   whose catalog entry selects `artwork` mode.
 - Uses one shared gameplay UI system for its HUD, ability bar, Pause/Leave Confirmation/Ability/
   Out-of-Lives/Failure modals, and the Completion terminal result (UI-003, implemented and validated --
   see `docs/UI_003_LEVEL_UI_CONSISTENCY_TICKET.md` and "Shared Gameplay UI" below).
+
+Level loading transition:
+- `scenes/ui/level_loading_screen.tscn`
+- `scripts/level_loading_screen.gd`
+- `scripts/level_transition.gd`
+- `assets/shaders/loading_iris.gdshader`
+- `assets/ui/loading/loading_cat.png`
+- Registered in `project.godot` as the `LevelTransition` autoload.
+- Covers production/testing menu launches and retries, blocks duplicate input, and keeps the fresh
+  level frozen until its circular reveal has completed. See [LEVEL_LOADING_SCREEN.md](LEVEL_LOADING_SCREEN.md).
 
 Player progression:
 - `scripts/player_progress.gd`
@@ -134,9 +145,12 @@ Files:
 - `scripts/profile_choice_tile.gd`
 - `scripts/profile_frame_catalog.gd`
 - `scripts/main_menu.gd`
+- `scripts/level_transition.gd`
+- `scenes/ui/level_loading_screen.tscn`
 - `scripts/player_progress.gd`
 
 Responsibility:
+- Routes all accepted level starts through the persistent loading transition before gameplay begins.
 - Shows the selected chapter's next chapter-local level and a chapter summary button directly below.
 - Uses each catalog entry's `selection_preview` for both its full-screen chapter cover and the
   production main-menu background after that chapter is selected, through the shared
