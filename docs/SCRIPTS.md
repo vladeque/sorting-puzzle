@@ -1090,6 +1090,9 @@ Purpose:
   `assets/audio/match_clear/triple_clear.wav`). Every source lives in the folder named for its
   catalog event; only paths listed by `assets/audio/generated_sfx_manifest.json` are owned by the
   deterministic generator.
+- Runtime `time_up` uses the supplied authored `assets/audio/time_up/times_up2.mp3`, synchronized
+  to the HUD snap and modal settle. The generator-owned `time_up.wav` remains reproducible and
+  validated as part of the original palette but is no longer the catalog stream.
 - `invalid_action.wav`, `purchase_successful.wav`, `shuffle.wav`, and `timer_tick.wav` are committed
   as 48 kHz, 16-bit PCM because Godot 4.6.2 could not import their supplied 96 kHz, 24-bit
   WAVE-Extensible encoding. Their channels and audible content are otherwise retained.
@@ -1725,8 +1728,9 @@ Key methods:
 - `set_uses(ability_uses)`: fits longer numeric values down to the shared badge minimum font size
   after both regular and compact layout changes, using `GameplayUITheme.COUNT_BADGE_*` constants
   shared with locked-shelf counters.
-- `set_interaction_blocked(is_blocked, freezer_active)`: updates disabled state and restores the
-  arrow cursor for blocked actions.
+- `set_interaction_blocked(is_blocked, lantern_active, freezer_active)`: updates disabled state,
+  mutually locks the two timed abilities while either is active, and restores the arrow cursor for
+  blocked actions.
 - `set_active_seconds(ability_id, seconds_remaining)`.
 - `get_icon_texture(ability_id)`.
 - `get_ability_button(ability_id)`.
@@ -1940,11 +1944,14 @@ Key responsibilities:
   spend saved ability counts through `PlayerProgress`; dev/test levels use isolated temporary
   counts.
 - Intercept the first eligible timer expiry with `_handle_level_time_expired()`: cancel the active
-  drag, freeze moving shelves, keep the timer at zero, and open `TimeUpExtensionModal` before the
-  run becomes terminal. A successful 500-coin request is committed with resource-spend reason
-  `time_extension`, consumes the attempt's single coin slot, sets the timer to 60 seconds, and
-  resumes the same board. Decline proceeds to normal Failure. A later timeout fails immediately
-  when the coin slot is consumed and rewarded ads remain unsupported.
+  drag, freeze moving shelves, keep the timer at zero, play the input-blocking
+  `TimeUpTransition`, and only then pop open `TimeUpExtensionModal` before the run becomes
+  terminal. The transition and supplied one-second `time_up` cue start together; its shade
+  crossfades into the modal shade without exposing a bright board frame. A successful 500-coin
+  request is committed with resource-spend reason `time_extension`, consumes the attempt's single
+  coin slot, sets the timer to 60 seconds, and resumes the same board. Decline proceeds to normal
+  Failure. A later timeout fails immediately when the coin slot is consumed and rewarded ads
+  remain unsupported.
 - Keep one coin slot and one rewarded-ad slot as per-attempt runtime state, reset only when a new
   level attempt is configured. The ad action stays production-visible/disabled; both the versioned
   config and the hard integration capability must be true before it can become actionable.
@@ -1986,8 +1993,8 @@ Key responsibilities:
   but below Freezer and the HUD, fades with normal expiry/cancellation, and clears immediately on a
   new level configuration.
 - Activate Freezer for exactly 30 seconds of active gameplay. Only `_time_remaining` is gated;
-  item interaction, combo expiry, Lantern expiry, moving shelf rows, animations, matching, and
-  other abilities continue. Pause menus, the ability-purchase modal, and application interruption
+  item interaction, combo expiry, moving shelf rows, animations, matching, and non-Lantern
+  abilities continue. Pause menus, the ability-purchase modal, and application interruption
   suspend only the Freezer window. A partial expiry delta suppresses only its frozen portion.
 - Refresh the ability bar when Freezer expires so its anti-stacking disabled state is removed and
   another remaining use can be activated immediately.
@@ -1997,9 +2004,10 @@ Key responsibilities:
   the clipped top strip above `TopHud`. When a pause/modal shade covers the main pass, synchronize
   that shade's fade into the upper copy so both remain equally tinted. The effect fades on
   expiry/failure/completion; level rebuild and teardown paths clear it immediately.
-- Treat Freezer activation before the first move as the first meaningful action, disable only its
-  button while active, and clear runtime state/visuals on level load, completion, failure, leave,
-  application scene teardown, or a new level configuration.
+- Treat Freezer activation before the first move as the first meaningful action. While Lantern or
+  Freezer is active, disable both timed-ability buttons and reject direct activation of either one;
+  re-enable them only after the active effect ends. Clear runtime state/visuals on level load,
+  completion, failure, leave, application scene teardown, or a new level configuration.
 
 Depends on:
 - `level.tscn` node names and paths.
@@ -2668,7 +2676,9 @@ Key methods:
 - `apply_safe_layout(safe_margins, viewport_size)`: centers the panel in the safe content rect and
   uniformly scales its full composed subtree to `GameplayUITheme.fit_outer_panel_size()`; fixed
   child/container minimum sizes therefore cannot overflow a shrunken outer panel.
-- `open()` / `close()`: fade via `scripts/ui_motion.gd`. `close()` is a no-op if already hidden; a
+- `open(with_pop = false)` / `close()`: fade via `scripts/ui_motion.gd`. `with_pop` preserves the
+  safe-area-fitted target scale while moving the panel 90% -> 102% -> 100%; the Time Up offer uses
+  it to land on its supplied cue. `close()` is a no-op if already hidden; a
   repeat call while already closing is absorbed by `UIMotion.close_with_fade()`'s own generation-token
   guard. Each owning wrapper hides its root only if the shell is still closed after the await, so a
   stale close superseded by `open()` cannot hide the reopened modal.
@@ -2745,6 +2755,9 @@ Purpose:
   `set_timer_frozen_visual(false)` previously cleared them outright, and because `level.gd` reaches
   it from several routine `_update_freezer_visuals()` refreshes -- not only Freezer expiry -- any
   second writer to that label is dropped without warning.
+- Owns the timeout beat on that same timer surface: `play_time_up_pulse()` replaces any in-flight
+  critical pulse with a 1.35x red snap and restrained five-pixel shake, while
+  `get_timer_global_center()` supplies the fullscreen transition's ring origin.
 
 Signals:
 - `pause_pressed`.
@@ -2757,6 +2770,8 @@ Key methods:
 - `set_timer_state(text, displayed_seconds, is_counting_down)`: updates the formatted timer and
   drives threshold entry/per-second critical feedback without coupling the HUD to gameplay time.
 - `reset_timer_attention()`: cancels any active timer pulse and clears its run-local state.
+- `play_time_up_pulse()` / `get_timer_global_center()`: the HUD-owned half of the timeout
+  transition and the ring's responsive screen-space origin.
 - `set_combo(is_combo_active, combo_count, time_ratio)`.
 - `set_pause_enabled(is_enabled)`: also switches between pointing-hand and arrow cursors so a
   disabled Pause action does not retain an enabled affordance.
@@ -2875,6 +2890,27 @@ Depends on:
 - `assets/themes/style_box_gameplay_item_slot.tres`, `style_box_green_primary_button.tres`,
   `style_box_disabled_action_button.tres`.
 
+## `scripts/time_up_transition.gd`
+
+Class:
+- `TimeUpTransition`.
+
+Attached to:
+- `scenes/ui/time_up_transition.tscn` root `TimeUpTransition`.
+
+Purpose:
+- Owns the 660 ms visual state between accepted timeout and the recoverable offer: an expanding
+  two-band alarm ring originating at the live HUD timer, a dark-red board shade, and a fullscreen
+  input block. It intentionally contains no gameplay, economy, or audio decisions.
+- Holds its final shade until `scripts/level.gd` starts the modal's popped reveal, then releases in
+  180 ms so the two overlays crossfade without a flash.
+
+Key methods:
+- `play(timer_global_center)`: starts the ring/dim sequence and awaits its reveal beat.
+- `release()`: fades away after the modal begins opening.
+- `reset()`: kills stale tweens and restores the reusable hidden state at run/terminal boundaries.
+- `is_transitioning()`: remains true for the full visible/input-blocking lifetime.
+
 ## `scripts/time_up_extension_modal.gd`
 
 Class:
@@ -2895,8 +2931,9 @@ Key methods:
   selects the enabled/used/`Coming Soon` ad presentation.
 - `set_coin_action_enabled(is_enabled)`: provides an in-flight purchase lock without losing the
   configured per-attempt availability state.
-- `is_transitioning()` / `apply_safe_layout(safe_margins, viewport_size)` / `open()` / `close()`:
-  same reusable overlay contract as the other gameplay modals.
+- `is_transitioning()` / `apply_safe_layout(safe_margins, viewport_size)` /
+  `open(with_pop = false)` / `close()`: same reusable overlay contract as the other gameplay
+  modals, with the timeout path selecting the shared shell's fitted pop reveal.
 
 Depends on:
 - `scenes/ui/gameplay_modal_shell.tscn`, `scripts/gameplay_ui_theme.gd`, and

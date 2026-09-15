@@ -263,6 +263,7 @@ func _test_critical_timer_and_time_up() -> void:
 		_played(SfxCatalogScript.EVENT_TIMER_CRITICAL_TICK) == 0,
 		"A terminal level does not keep ticking."
 	)
+	await _wait_seconds(0.7)
 
 	await _free_current_scene()
 
@@ -347,7 +348,7 @@ func _test_level_coin_spending() -> void:
 	var level := await _open_level()
 	level.set("_time_remaining", 0.0)
 	level.call("_handle_level_time_expired")
-	await _wait_seconds(0.3)
+	await _wait_seconds(1.1)
 
 	_begin_recording()
 	level.call("_on_time_extension_coin_requested")

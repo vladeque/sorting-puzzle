@@ -182,6 +182,7 @@ var _pause_menu_overlay: PauseMenu
 var _leave_confirmation_overlay: LeaveConfirmationMenu
 var _ability_purchase_overlay: AbilityPurchaseMenu
 var _time_up_extension_overlay: TimeUpExtensionModal
+var _time_up_transition_overlay: TimeUpTransition
 var _in_level_shop_overlay: ShopScreen
 var _out_of_lives_overlay: OutOfLivesMenu
 var _ability_bar: AbilityBar
@@ -265,6 +266,7 @@ func _ready() -> void:
 	_leave_confirmation_overlay = get_node("UI/LeaveConfirmationOverlay") as LeaveConfirmationMenu
 	_ability_purchase_overlay = get_node("UI/AbilityPurchaseOverlay") as AbilityPurchaseMenu
 	_time_up_extension_overlay = get_node("UI/TimeUpExtensionOverlay") as TimeUpExtensionModal
+	_time_up_transition_overlay = get_node("UI/TimeUpTransition") as TimeUpTransition
 	_in_level_shop_overlay = get_node("UI/InLevelShopOverlay") as ShopScreen
 	_out_of_lives_overlay = get_node("UI/OutOfLivesOverlay") as OutOfLivesMenu
 	_ability_bar = get_node("UI/AbilityBar") as AbilityBar
@@ -276,6 +278,7 @@ func _ready() -> void:
 	_leave_confirmation_overlay.visible = false
 	_ability_purchase_overlay.visible = false
 	_time_up_extension_overlay.visible = false
+	_time_up_transition_overlay.reset()
 	_in_level_shop_overlay.visible = false
 	_out_of_lives_overlay.visible = false
 	_setup_star_reward_effect_layer()
@@ -710,6 +713,8 @@ func _is_any_overlay_transitioning() -> bool:
 		return true
 	if _time_up_extension_overlay != null and _time_up_extension_overlay.is_transitioning():
 		return true
+	if _time_up_transition_overlay != null and _time_up_transition_overlay.is_transitioning():
+		return true
 	if _in_level_shop_overlay != null and _in_level_shop_overlay.is_transitioning():
 		return true
 	if _out_of_lives_overlay != null and _out_of_lives_overlay.is_transitioning():
@@ -854,6 +859,8 @@ func _apply_level_config(config: Dictionary) -> void:
 		_ability_purchase_overlay.visible = false
 	if _time_up_extension_overlay != null:
 		_time_up_extension_overlay.visible = false
+	if _time_up_transition_overlay != null:
+		_time_up_transition_overlay.reset()
 	if _out_of_lives_overlay != null:
 		_out_of_lives_overlay.visible = false
 	_ability_purchase_pending_id = StringName()
@@ -2001,17 +2008,12 @@ func _handle_level_time_expired() -> void:
 		_fail_level()
 		return
 
-	# time_up belongs to the accepted extension offer. The guards above stop it repeating when the
-	# modal refreshes; terminal expiry instead uses the dedicated failure cue above.
-	_play_sfx(SfxCatalogScript.EVENT_TIME_UP)
-
 	_cancel_active_interaction()
 	_time_remaining = 0.0
 	_time_extension_offer_active = true
 	_level_paused = true
 	_set_moving_shelf_rows_paused(true)
 	_refresh_time_extension_offer()
-	_time_up_extension_overlay.open()
 	_pause_menu_overlay.close()
 	_leave_confirmation_overlay.close()
 	if _ability_purchase_overlay != null:
@@ -2019,6 +2021,31 @@ func _handle_level_time_expired() -> void:
 	_update_timer_label()
 	_update_ability_buttons()
 	_update_pause_menu_button()
+
+	# time_up belongs to the accepted extension offer. The guards above stop it repeating when the
+	# modal refreshes; terminal expiry instead uses the dedicated failure cue above. Its supplied
+	# one-second cue begins with the HUD snap, while the modal's settling pop lands on the tail.
+	_play_sfx(SfxCatalogScript.EVENT_TIME_UP)
+	_top_hud.play_time_up_pulse()
+	if _time_up_transition_overlay != null:
+		await _time_up_transition_overlay.play(_top_hud.get_timer_global_center())
+
+	# The scene can be torn down while the transition is awaiting its reveal beat. The offer can also
+	# be superseded by a terminal path in a test/tool, so never open a stale modal afterward.
+	if (
+		not is_inside_tree()
+		or _returning_to_menu
+		or not _time_extension_offer_active
+		or _level_failed
+		or _level_completed
+	):
+		if is_instance_valid(_time_up_transition_overlay):
+			_time_up_transition_overlay.reset()
+		return
+
+	_time_up_extension_overlay.open(true)
+	if _time_up_transition_overlay != null:
+		_time_up_transition_overlay.release()
 
 
 func _has_available_time_extension() -> bool:
@@ -2085,6 +2112,8 @@ func _fail_level() -> void:
 		_ability_purchase_overlay.visible = false
 	if _time_up_extension_overlay != null:
 		_time_up_extension_overlay.visible = false
+	if _time_up_transition_overlay != null:
+		_time_up_transition_overlay.reset()
 
 
 ## Freezes the cleared board, starts the confetti celebration, and opens the completion screen after
@@ -2120,6 +2149,8 @@ func _complete_level() -> void:
 		_ability_purchase_overlay.visible = false
 	if _time_up_extension_overlay != null:
 		_time_up_extension_overlay.visible = false
+	if _time_up_transition_overlay != null:
+		_time_up_transition_overlay.reset()
 	_play_sfx(SfxCatalogScript.EVENT_LEVEL_COMPLETE)
 
 	_completion_celebration_active = true

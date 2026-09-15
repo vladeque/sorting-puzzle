@@ -83,9 +83,9 @@ func apply_safe_layout(safe_margins: Vector4, viewport_size: Vector2) -> void:
 	_shell.apply_safe_layout(safe_margins, viewport_size)
 
 
-func open() -> void:
+func open(with_pop := false) -> void:
 	show()
-	_shell.open()
+	_shell.open(with_pop)
 
 
 func close() -> void:

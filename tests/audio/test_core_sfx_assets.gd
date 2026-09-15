@@ -32,6 +32,7 @@ const AUTHORED_SOURCE_CUES := [
 	"res://assets/audio/shelf_unlock/shelve_unlock.wav",
 	"res://assets/audio/ability_shuffle/shuffle.wav",
 	"res://assets/audio/timer_critical_tick/timer_tick.wav",
+	"res://assets/audio/time_up/times_up2.mp3",
 	"res://assets/audio/star_hud_arrival/star_hud_arrival.wav",
 	"res://assets/audio/reward_chest_star_arrival/reward_chest_star_arrival_01.wav",
 	"res://assets/audio/reward_chest_star_arrival/reward_chest_star_arrival_02.wav",

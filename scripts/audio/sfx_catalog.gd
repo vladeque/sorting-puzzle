@@ -102,7 +102,7 @@ const EVENTS := {
 		"max_polyphony": 1,
 	},
 	EVENT_TIME_UP: {
-		"streams": ["res://assets/audio/time_up/time_up.wav"],
+		"streams": ["res://assets/audio/time_up/times_up2.mp3"],
 		"volume_db": -1.0,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(1.0, 1.0),

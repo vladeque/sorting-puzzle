@@ -378,7 +378,7 @@ overwritten by the generator.
 | `match_clear` | `triple_clear.wav` | -5.0 dB ±0.5 | 0.97–1.03 | 20 ms | 3 |
 | `star_hud_arrival` | `star_hud_arrival.wav` | -2.0 dB | 0.99–1.01 | 90 ms | 2 |
 | `timer_critical_tick` | `timer_tick.wav` | -3.0 dB | none | none | 1 |
-| `time_up` | `time_up.wav` | -1.0 dB | none | 750 ms | 1 |
+| `time_up` | `times_up2.mp3` | -1.0 dB | none | 750 ms | 1 |
 | `coin_gain` | `coin_gain.wav` | -1.0 dB | 0.995–1.005 | 200 ms | 2 |
 | `coin_spend` | `coin_spend.wav` | -2.0 dB | 0.995–1.005 | 150 ms | 2 |
 | `shop_purchase_success` | `purchase_successful.wav` | +2.0 dB | none | 600 ms | 1 |
@@ -388,6 +388,11 @@ overwritten by the generator.
 `star_hud_arrival` additionally carries count scaling (+0.9 dB and +0.012 pitch per extra star,
 capped at +3.0 dB and 1.05), so a multi-star combo is one bigger arrival rather than one cue per
 star.
+
+The later Time Up transition replaced the runtime stream with the supplied authored
+`assets/audio/time_up/times_up2.mp3`. The original `time_up.wav` remains listed in the generated
+asset table above because the deterministic generator still owns and verifies that artifact; the
+catalog intentionally no longer references it.
 
 ### Validation results
 

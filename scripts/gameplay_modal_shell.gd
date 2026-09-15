@@ -20,6 +20,10 @@ signal closed
 const UIMotionScript := preload("res://scripts/ui_motion.gd")
 const GameplayUIThemeScript := preload("res://scripts/gameplay_ui_theme.gd")
 const CONTENT_REGION_TOP := 116.0
+const POP_START_SCALE := 0.90
+const POP_OVERSHOOT_SCALE := 1.02
+const POP_RISE_SECONDS := 0.22
+const POP_SETTLE_SECONDS := 0.12
 
 @onready var _outer_panel := %OuterPanel as Control
 @onready var _title_label := %TitleLabel as Label
@@ -127,13 +131,36 @@ func apply_safe_layout(safe_margins: Vector4, viewport_size: Vector2) -> void:
 	_outer_panel.scale = Vector2.ONE * fit_scale
 
 
-## Fades the shell in. Cancels an in-flight close() first (UIMotion.fade_in() cancels any
-## close_with_fade() already in progress for this node), so re-opening mid-close never strands the
-## old close coroutine.
-func open() -> void:
+## Fades the shell in. `with_pop` adds a 90% -> 102% -> 100% panel settle for result-like reveals
+## while preserving the fitted responsive scale calculated by apply_safe_layout(). Cancels an
+## in-flight close() first (UIMotion.fade_in() cancels it), so re-opening mid-close never strands
+## the old close coroutine.
+func open(with_pop := false) -> void:
 	_is_transitioning = true
-	var tween := UIMotionScript.fade_in(self)
-	await tween.finished
+	if with_pop:
+		var fitted_scale := _outer_panel.scale
+		_outer_panel.scale = fitted_scale * POP_START_SCALE
+		UIMotionScript.fade_in(
+			self,
+			POP_RISE_SECONDS + POP_SETTLE_SECONDS
+		)
+		var pop_tween := create_tween()
+		pop_tween.tween_property(
+			_outer_panel,
+			"scale",
+			fitted_scale * POP_OVERSHOOT_SCALE,
+			POP_RISE_SECONDS
+		).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		pop_tween.tween_property(
+			_outer_panel,
+			"scale",
+			fitted_scale,
+			POP_SETTLE_SECONDS
+		).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		await pop_tween.finished
+	else:
+		var tween := UIMotionScript.fade_in(self)
+		await tween.finished
 	_is_transitioning = false
 	opened.emit()
 

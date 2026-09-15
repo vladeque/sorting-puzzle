@@ -627,6 +627,10 @@ Responsibility:
 - Keeps non-clearing items interactive while match animations run, resolves different shelves concurrently, and queues only repeated work for a shelf that is already resolving.
 - Promotes back layers as soon as their own visible shelf layer clears, without waiting for match or reward animations on other shelves.
 - Tracks the countdown timer, starting it only after the first meaningful player action, and win/loss overlays.
+- On the first eligible `00:00`, freezes the board and plays `UI/TimeUpTransition`: a short HUD
+  timer snap/shake, expanding red alarm ring, and dark-red shade synchronized to
+  `assets/audio/time_up/times_up2.mp3`. It then hands the shade to the popped-in
+  `UI/TimeUpExtensionOverlay`; later ineligible expiries still fail immediately.
 - Plays the hammer ability by gathering the targeted items into one center-screen item, striking it with the fullscreen hammer, then dropping combo reward stars from the impact point.
 - Plays the shuffle ability by showing a center-screen delivery box, flying visible unlocked items into it, swapping item identities while hidden, flying them back to their slots, then resolving shelf matches.
 - Shows Lantern as Focus Mode on canvas layer 4: a 30% warm shade over non-target gameplay, bright
@@ -671,6 +675,9 @@ Assets:
   as its directory name. Variant pools share that one directory.
 - `assets/audio/item_place_valid/item_place.wav` and
   `assets/audio/match_clear/triple_clear.wav` remain the project's retained source recordings.
+- `assets/audio/time_up/times_up2.mp3` is the supplied authored timeout cue used by the recoverable
+  Time's Up transition; the older generated `time_up.wav` remains generator-owned but is no longer
+  the runtime catalog stream.
 - The deterministic synthesized files are mono 16-bit PCM at 44.1 kHz and imported uncompressed.
   `scripts/tools/generate_core_sfx.gd` writes them from `scripts/tools/core_sfx_synthesis.gd`, while
   `assets/audio/generated_sfx_manifest.json` records each event-relative path, encoding, duration,
@@ -907,6 +914,8 @@ Responsibility:
 - Uses `ShelfItem` outline/scale state for item-local highlight visuals and mirrors the same timer
   and live item screen positions into the responsive Lantern Focus Mode treatment below the HUD.
 - Shows the active highlight countdown in a bottom-right badge on the highlight button.
+- Mutually disables Lantern and Freezer while either timed effect is active, preventing refreshes
+  and overlapping timed effects until the current countdown finishes.
 - Pauses only the level countdown for Freezer, shows its active badge and frozen timer treatment,
   and mirrors that state into the wide four-sided blue glow with inward-flying snowflakes,
   including the clipped top-HUD pass and its synchronized pause/modal shading.

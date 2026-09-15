@@ -72,6 +72,10 @@ const TIMER_FROZEN_OUTLINE_SIZE := 5
 const TIMER_PULSE_SCALE := Vector2(1.08, 1.08)
 const TIMER_PULSE_IN_SECONDS := 0.09
 const TIMER_PULSE_OUT_SECONDS := 0.18
+const TIME_UP_PULSE_SCALE := Vector2(1.35, 1.35)
+const TIME_UP_PULSE_IN_SECONDS := 0.12
+const TIME_UP_PULSE_OUT_SECONDS := 0.28
+const TIME_UP_SHAKE_OFFSET := 5.0
 
 @export_range(1, 120, 1) var critical_time_seconds := 30
 
@@ -88,9 +92,12 @@ const TIMER_PULSE_OUT_SECONDS := 0.18
 
 var _star_pulse_tween: Tween
 var _timer_pulse_tween: Tween
+var _timer_shake_tween: Tween
+var _timer_rest_position := Vector2.ZERO
 var _last_timer_seconds := -1
 var _timer_is_critical := false
 var _timer_is_frozen := false
+var _timer_is_time_up := false
 
 
 func _ready() -> void:
@@ -136,9 +143,68 @@ func set_timer_state(text: String, displayed_seconds: int, is_counting_down: boo
 ## can then treat 00:30 as a fresh threshold entry even if the previous run ended on that value.
 func reset_timer_attention() -> void:
 	_timer_is_critical = false
+	_timer_is_time_up = false
 	_last_timer_seconds = -1
 	_refresh_timer_label_colors()
 	_stop_timer_pulse()
+
+
+## The timeout transition's HUD-owned beat: enlarge the 00:00 digits, flash the established alarm
+## red, and add a restrained horizontal shake. The fullscreen pulse remains in TimeUpTransition.
+func play_time_up_pulse() -> void:
+	_stop_timer_pulse()
+	_timer_is_time_up = true
+	_refresh_timer_label_colors()
+	_timer_label.pivot_offset = _timer_label.size * 0.5
+	_timer_rest_position = _timer_label.position
+
+	_timer_pulse_tween = _timer_label.create_tween()
+	_timer_pulse_tween.tween_property(
+		_timer_label,
+		"scale",
+		TIME_UP_PULSE_SCALE,
+		TIME_UP_PULSE_IN_SECONDS
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_timer_pulse_tween.tween_property(
+		_timer_label,
+		"scale",
+		Vector2.ONE,
+		TIME_UP_PULSE_OUT_SECONDS
+	).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+	_timer_shake_tween = _timer_label.create_tween()
+	_timer_shake_tween.tween_property(
+		_timer_label,
+		"position:x",
+		_timer_rest_position.x + TIME_UP_SHAKE_OFFSET,
+		0.05
+	)
+	_timer_shake_tween.tween_property(
+		_timer_label,
+		"position:x",
+		_timer_rest_position.x - TIME_UP_SHAKE_OFFSET,
+		0.07
+	)
+	_timer_shake_tween.tween_property(
+		_timer_label,
+		"position:x",
+		_timer_rest_position.x + TIME_UP_SHAKE_OFFSET * 0.5,
+		0.06
+	)
+	_timer_shake_tween.tween_property(
+		_timer_label,
+		"position:x",
+		_timer_rest_position.x,
+		0.10
+	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+
+	await _timer_pulse_tween.finished
+	_timer_is_time_up = false
+	_refresh_timer_label_colors()
+
+
+func get_timer_global_center() -> Vector2:
+	return _timer_label.get_global_rect().get_center()
 
 
 func set_star_count(stars: int) -> void:
@@ -205,7 +271,11 @@ func _refresh_timer_label_colors() -> void:
 	var font_color := TIMER_NORMAL_FONT_COLOR
 	var outline_color := Color(0.0, 0.0, 0.0, 0.0)
 	var outline_size := TIMER_NORMAL_OUTLINE_SIZE
-	if _timer_is_frozen:
+	if _timer_is_time_up:
+		font_color = TIMER_CRITICAL_FONT_COLOR
+		outline_color = TIMER_CRITICAL_OUTLINE_COLOR
+		outline_size = TIMER_CRITICAL_OUTLINE_SIZE
+	elif _timer_is_frozen:
 		font_color = TIMER_FROZEN_FONT_COLOR
 		outline_color = TIMER_FROZEN_OUTLINE_COLOR
 		outline_size = TIMER_FROZEN_OUTLINE_SIZE
@@ -240,8 +310,13 @@ func _play_timer_second_pulse() -> void:
 func _stop_timer_pulse() -> void:
 	if _timer_pulse_tween != null and _timer_pulse_tween.is_valid():
 		_timer_pulse_tween.kill()
+	if _timer_shake_tween != null and _timer_shake_tween.is_valid():
+		_timer_shake_tween.kill()
 	_timer_pulse_tween = null
+	_timer_shake_tween = null
 	_timer_label.scale = Vector2.ONE
+	if _timer_rest_position != Vector2.ZERO:
+		_timer_label.position = _timer_rest_position
 
 
 func set_combo(is_combo_active: bool, combo_count: int, time_ratio: float) -> void:

@@ -48,13 +48,20 @@ func _test_timeout_offer_and_decline() -> void:
 	var level := await _open_campaign_level()
 	level.set("_time_remaining", 0.0)
 	level.call("_handle_level_time_expired")
-	await _wait_seconds(0.3)
+	await _wait_seconds(0.25)
 
 	var modal = level.get("_time_up_extension_overlay")
+	var transition = level.get("_time_up_transition_overlay")
 	var failure = level.get("_failure_screen")
 	var coin_button := modal.get_node("%CoinButton") as Button
 	var ad_button := modal.get_node("%WatchAdButton") as Button
+	_check(
+		transition.visible and not modal.visible,
+		"Timeout plays the input-blocking 00:00 transition before opening the offer."
+	)
+	await _wait_seconds(0.85)
 	_check(modal.visible, "Timeout opens the time-extension modal before Failure.")
+	_check(not transition.visible, "The timeout transition releases once the modal owns the shade.")
 	_check(not failure.visible and not bool(level.get("_level_failed")), "The offer is recoverable, not terminal.")
 	_check(bool(level.get("_level_paused")), "Gameplay stays paused while the timeout offer is open.")
 	_check(_progress.get_lives() == starting_lives, "Opening the offer does not spend a life.")
@@ -90,7 +97,7 @@ func _test_coin_extension_and_second_timeout() -> void:
 	var level := await _open_campaign_level()
 	level.set("_time_remaining", 0.0)
 	level.call("_handle_level_time_expired")
-	await _wait_seconds(0.3)
+	await _wait_seconds(1.1)
 
 	level.call("_on_time_extension_coin_requested")
 	level.call("_on_time_extension_coin_requested")
@@ -141,7 +148,7 @@ func _test_insufficient_coins_shop_round_trip() -> void:
 	var level := await _open_campaign_level()
 	level.set("_time_remaining", 0.0)
 	level.call("_handle_level_time_expired")
-	await _wait_seconds(0.3)
+	await _wait_seconds(1.1)
 	level.call("_on_time_extension_coin_requested")
 	await _wait_seconds(0.35)
 

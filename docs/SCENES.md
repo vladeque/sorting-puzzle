@@ -1297,7 +1297,12 @@ Important nodes:
 - `UI/PauseMenuButton`: circular top-right button that pauses the active level and opens the pause menu overlay.
 - `UI/AbilityBar`: `scenes/ui/ability_bar.tscn` instance; its focused owner script owns all four
   buttons, use badges, timed badges, touch-target sizing, and the `ability_pressed` signal.
-- `UI/FailurePanel`: shown when time runs out.
+- `UI/TimeUpTransition`: `scenes/ui/time_up_transition.tscn` instance; blocks input and owns the
+  timer-origin alarm ring/dark-red shade between an eligible `00:00` and the extension offer.
+- `UI/TimeUpExtensionOverlay`: `scenes/ui/time_up_extension_modal.tscn` instance opened after that
+  transition when the attempt still has an extension route.
+- `UI/FailureScreen`: shown after the offer is declined or immediately on an ineligible later
+  timeout.
 - `UI/CompletionScreen`: `scenes/ui/level_completion_screen.tscn` instance whose reveal begins 1.35
   seconds after all items clear, while the longer confetti fall continues.
 - `UI/CompletionConfetti`: `scenes/effects/level_completion_confetti.tscn` instance, kept last in the
@@ -1326,6 +1331,8 @@ Depends on:
 - `scenes/ability_purchase_menu.tscn`
 - `scenes/ui/in_level_shop_screen.tscn`
 - `scenes/ui/ability_bar.tscn`
+- `scenes/ui/time_up_transition.tscn`
+- `scenes/ui/time_up_extension_modal.tscn`
 - `assets/audio/<event>/*.{wav,mp3}`
 - `configs/item_sprites.json`
 - `configs/ability_purchase_prices.json`
@@ -1359,6 +1366,8 @@ Purpose:
   inside the circular button rather than merely centering their square canvases.
 - Owns remaining-use badges (`style_box_gameplay_count_badge.tres`) plus independent Lantern and
   Freezer active countdown badges (`style_box_gameplay_timer_badge.tres`).
+- Disables both Lantern and Freezer controls while either timed effect is active; the controls are
+  restored together when that effect finishes.
 - Emits `ability_pressed(ability_id)` and exposes focused state/layout methods; `scripts/level.gd`
   remains the gameplay/economy orchestrator.
 - All four buttons use `press_scale_button.gd` (0.97 held scale) and carry a `tooltip_text`; Freezer
@@ -1835,6 +1844,9 @@ Purpose:
   reparent their own content/action buttons into its slots at `_ready()`, instead of each repeating
   shade/panel/close-button styling locally. Composed (instanced as a child), not Godot scene
   inheritance -- matches the existing `scenes/ui/destination_screen_shell.tscn` pattern.
+- `open(with_pop = true)` adds a fitted 90% -> 102% -> 100% panel settle without changing any
+  owner's authored panel size. The Time Up offer uses this variant after its dedicated lead-in;
+  ordinary modal opens keep the standard fade.
 
 Important nodes:
 - `Shade`: full-rect `Panel`, `style_box_gameplay_modal_shade.tres`.
@@ -1912,6 +1924,9 @@ Purpose:
   but goes motionless under Pause. Freezer's cyan digits take the label over while they are active,
   because both states now speak through the same channel and a held countdown is not an active
   alarm; the red returns on the next update after Freezer ends if the timer is still under 30s.
+- On an accepted timeout, the same label owns the opening `00:00` beat: a red 1.35x snap plus a
+  restrained horizontal shake. It also exposes its global center to `TimeUpTransition`, keeping
+  the expanding alarm ring attached to the responsive HUD position.
 - `%PauseButton` matches the Main Menu settings-button role: 72x64 with the shared warm normal/
   pressed resources, a matching 0.94 held scale, and an explicit warm disabled override. Its pause
   mark is the `"II"` text glyph, authored in the same dark brown as the settings button for every
@@ -1943,6 +1958,28 @@ Depends on:
 Do not use for:
 - Gameplay timer/star/combo state ownership, or ability-bar layout. Those stay in
   `scripts/level.gd` and `scenes/ui/ability_bar.tscn` respectively.
+
+## `scenes/ui/time_up_transition.tscn`
+
+Root:
+- `TimeUpTransition` (`Control`).
+
+Script:
+- `scripts/time_up_transition.gd`.
+
+Purpose:
+- Reusable fullscreen timeout punctuation between an eligible `00:00` and
+  `TimeUpExtensionOverlay`. It owns a responsive timer-origin alarm ring, dark-red board shade,
+  and input block, then crossfades away once the modal starts its pop reveal.
+- It owns no sound player: `scripts/level.gd` starts the semantic `time_up` catalog event on the
+  same frame as `play()`.
+
+Important nodes:
+- `%Shade`: behind-parent `ColorRect` so the root's procedural ring renders above it.
+
+Do not use for:
+- Extension eligibility, purchases, timer mutation, or terminal failure; those remain in
+  `scripts/level.gd`.
 
 ## `scenes/pause_menu.tscn`
 
