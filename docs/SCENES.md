@@ -188,9 +188,9 @@ dedicated `SFX` bus in `assets/audio/default_bus_layout.tres`, and
 `scripts/audio/sfx_catalog.gd` holds the one event catalog. See `docs/SCRIPTS.md` for the full
 API and `docs/AUDIO_001_GODOT_ONLY_SFX_TICKET.md` for the approved event scope.
 
-**No scene authors an `AudioStreamPlayer` for a shared cue.** The only remaining scene-owned audio
-is `scenes/abilities/hammer_impact_effect.tscn`, whose five layered players belong to that one
-effect's authored timing and stay outside this ticket's scope.
+**No scene authors an `AudioStreamPlayer` for a shared cue.** Hammer's former five-player local mix
+has also moved into the catalog as one authored `ability_hammer` cue, so disabling sound effects and
+pool limits now have one owner for every gameplay sound.
 
 **Generic button click.** Every enabled, visible `BaseButton` in every scene plays `ui_click` on its
 accepted `pressed` action, bound automatically by `scripts/audio/ui_click_binder.gd`. Scenes do not
@@ -208,8 +208,8 @@ replacement cue. Current users:
 **Scene-owned hooks.** Two components expose the moment their own animation accepts something, so
 the owning screen can play a cue at exactly that beat rather than guessing at it:
 - `scenes/ui/level_top_hud.tscn` emits `critical_second_pulsed(displayed_seconds)` from the same
-  decision that starts its critical-second pulse; `scripts/level.gd` turns that into
-  `timer_critical_tick`.
+  decision that starts its critical-second pulse; `scripts/level.gd` uses that state to start the
+  supplied 30-second `timer_critical_tick` bed once and seek it after pause or Freezer.
 - `scenes/ui/main_menu_reward_star_flyer.tscn` already emitted `star_arrived` per landed star;
   `scripts/production_main_menu.gd`'s handler now plays `reward_chest_star_arrival` in the same
   callback that advances the visible chest count and starts its receive pulse.
@@ -1625,8 +1625,8 @@ Purpose:
   effective duration of about 1.03 seconds. Poses 1–3 still switch quickly, but pose 3 remains on
   screen while the hammer completes its 320 ms flight from the live bottom-left ability button to
   the item; frames 4–6 then lead into the final frame-7 contact. It owns the
-  immediate hammer hide, subtle frame-derived afterimages, layered impact amounts, audio callbacks,
-  and gameplay signal timing.
+  immediate hammer hide, subtle frame-derived afterimages, layered impact amounts, and gameplay
+  signal timing. The replacement Hammer cue is owned by the shared SFX catalog.
 - Softens non-impact texture changes with a 55 ms outgoing-pose crossfade and small backward smear;
   frame 7 bypasses this blend so the contact silhouette remains crisp.
 - Hides the hammer by authored time 580 ms, immediately after frame 7 makes contact at 560 ms, while
@@ -1635,9 +1635,8 @@ Purpose:
   `impact` on frame 7 at authored time 560 ms (about 431 ms into playback) so gameplay hides and
   frees the merged item on the visual hit frame. Reward stars begin 140 ms later, during the
   remaining recoil/VFX tail.
-- Owns the entrance/downstroke, impact-thump/magic, and sparkle-tail `AudioStreamPlayer` nodes. The
-  level passes the current sound setting into `play()` and can mute an active effect through the
-  `hammer_impact_effect` group.
+- Owns no audio players. `scripts/level.gd` starts the catalogued `hammer.wav` cue with the strike,
+  and `SfxManager` handles settings, muting, and bounded playback.
 
 Important nodes:
 - `ImpactAnchor`: moves from the runtime Hammer-button screen centre to the exact impact point during
@@ -1652,8 +1651,8 @@ Important nodes:
   around.
 - `ImpactAnchor/HammerPivot/AfterimageEarly` / `AfterimageLate`: subtle low-alpha tinted copies of
   frames 5 and 6 behind the live hammer during the descent, sharing one additive canvas material.
-- `WindupAudio`, `DownstrokeAudio`, `ImpactLowAudio`, `ImpactMagicAudio`, and `SparkleTailAudio`:
-  scene-owned layered cues built from the project's existing short SFX palette.
+- `AnimationPlayer`: owns only the visual and gameplay-signal timeline; Hammer sound is no longer
+  assembled from scene-local players.
 - `AnimationPlayer`: owns the `strike` animation; edit this timeline for most hammer motion and timing adjustments.
 
 Depends on:

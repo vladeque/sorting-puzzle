@@ -207,9 +207,10 @@ func _run() -> void:
 			strike.find_track(property_path, Animation.TYPE_VALUE) >= 0,
 			"Hammer strike animates the %s VFX layer." % property_path.get_subname(0)
 		)
-	_check(effect.get_node_or_null("ImpactLowAudio") != null, "Hammer owns a dedicated impact-thump cue.")
-	_check(effect.get_node_or_null("DownstrokeAudio") != null, "Hammer owns a dedicated downstroke cue.")
-	_check(effect.get_node_or_null("SparkleTailAudio") != null, "Hammer owns a dedicated sparkle-tail cue.")
+	_check(
+		effect.find_children("*", "AudioStreamPlayer", true, false).is_empty(),
+		"Hammer audio is owned by the shared SFX manager rather than scene-local players."
+	)
 	var early_afterimage := effect.get_node_or_null("ImpactAnchor/HammerPivot/AfterimageEarly") as Sprite2D
 	var late_afterimage := effect.get_node_or_null("ImpactAnchor/HammerPivot/AfterimageLate") as Sprite2D
 	var previous_pose := effect.get_node_or_null("ImpactAnchor/HammerPivot/PreviousPose") as Sprite2D
@@ -239,7 +240,6 @@ func _run() -> void:
 			and is_equal_approx(float(script_constants.get("NEW_POSE_START_ALPHA", 0.0)), 0.58),
 		"Hammer pose crossfades use a clearly visible but balanced overlap."
 	)
-	_check(not bool(effect.get("_sound_enabled")), "Hammer inherits the disabled sound-effects setting.")
 	var hammer_uses_before_repeat := int((level.get("_ability_uses") as Dictionary).get(&"hammer", -1))
 	level.call("_on_ability_button_pressed", &"hammer")
 	await process_frame
@@ -337,7 +337,7 @@ func _verify_responsive_effect_layout() -> void:
 		await process_frame
 		var target := Vector2(viewport_size) * Vector2(0.5, 0.58)
 		var approach_start := Vector2(viewport_size) * Vector2(0.14, 0.86)
-		effect.play(target, false, false, approach_start)
+		effect.play(target, false, approach_start)
 		await process_frame
 		var sprite := effect.get_node("ImpactAnchor/HammerPivot/HammerSprite") as Sprite2D
 		_check(
@@ -373,7 +373,7 @@ func _verify_supplied_approach_origins() -> void:
 		await process_frame
 		var target := Vector2(viewport_size) * Vector2(target_ratio, 0.5)
 		var approach_start := Vector2(82.0, 1120.0)
-		effect.play(target, false, false, approach_start)
+		effect.play(target, false, approach_start)
 		await process_frame
 		var anchor := effect.get_node("ImpactAnchor") as Node2D
 		_check(

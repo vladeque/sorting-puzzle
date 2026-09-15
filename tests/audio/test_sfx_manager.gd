@@ -52,6 +52,7 @@ func _run() -> void:
 
 	_test_bus_and_pool()
 	_test_pool_reuse()
+	_test_start_position_and_event_stop()
 	_test_polyphony_keeps_the_newest_cue()
 	_test_cooldown()
 	_test_variant_selection()
@@ -109,6 +110,30 @@ func _test_pool_reuse() -> void:
 			<= int(SfxCatalogScript.get_event(SfxCatalogScript.EVENT_ITEM_PLACE_VALID).get("max_polyphony", 0)),
 		"Placement polyphony stays inside its catalog budget."
 	)
+	_manager.call("stop_all")
+
+
+func _test_start_position_and_event_stop() -> void:
+	_manager.call("reset_playback_state")
+	var timer := _manager.call(
+		"play",
+		SfxCatalogScript.EVENT_TIMER_CRITICAL_TICK,
+		{"start_position_seconds": 7.0}
+	) as AudioStreamPlayer
+	var click := _manager.call(
+		"play", SfxCatalogScript.EVENT_UI_CLICK, {"bypass_cooldown": true}
+	) as AudioStreamPlayer
+	_check(
+		timer != null and timer.playing and timer.get_playback_position() >= 6.9,
+		"A long cue can start at a synchronized playback offset."
+	)
+	_manager.call("stop_event", SfxCatalogScript.EVENT_TIMER_CRITICAL_TICK)
+	_check(
+		timer != null and not timer.playing
+			and int(_manager.call("get_active_play_count", SfxCatalogScript.EVENT_TIMER_CRITICAL_TICK)) == 0,
+		"Stopping one semantic event removes every active instance of that event."
+	)
+	_check(click != null and click.playing, "Stopping the timer leaves unrelated feedback sounding.")
 	_manager.call("stop_all")
 
 

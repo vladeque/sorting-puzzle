@@ -78,6 +78,7 @@ func _ready() -> void:
 ##   force             bool   Bypasses the mute check (only the sound-effects toggle acknowledgement
 ##                            uses this, to confirm the press that turned playback off).
 ##   bypass_cooldown   bool   Skips the per-event cooldown for a deliberately paired layer.
+##   start_position_seconds float Starts a long authored cue at a synchronized offset.
 func play(event_id: StringName, context: Dictionary = {}) -> AudioStreamPlayer:
 	if not bool(context.get("force", false)) and not is_enabled():
 		return null
@@ -118,7 +119,7 @@ func play(event_id: StringName, context: Dictionary = {}) -> AudioStreamPlayer:
 	player.stream = stream
 	player.volume_db = scaled.x
 	player.pitch_scale = scaled.y
-	player.play()
+	player.play(maxf(float(context.get("start_position_seconds", 0.0)), 0.0))
 
 	_last_play_msec[event_id] = now_msec
 	_play_sequence += 1
@@ -140,6 +141,17 @@ func stop_all(except_player: AudioStreamPlayer = null) -> void:
 			continue
 
 		player.stop()
+
+	_prune_finished_plays()
+
+
+## Stops every active instance of one semantic event without disturbing unrelated feedback. Long
+## stateful cues use this when their owning gameplay state pauses or ends.
+func stop_event(event_id: StringName) -> void:
+	for entry in _get_active_entries(event_id):
+		var player := entry["player"] as AudioStreamPlayer
+		if is_instance_valid(player):
+			player.stop()
 
 	_prune_finished_plays()
 

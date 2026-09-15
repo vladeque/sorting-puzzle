@@ -1,8 +1,8 @@
 extends SceneTree
 
-## AUDIO-001 asset verification: the committed generated palette is still exactly what
+## Audio asset verification: the manifest-owned AUDIO-001 palette is still exactly what
 ## scripts/tools/generate_core_sfx.gd produces, it satisfies the ticket's PCM/peak/fade/duration
-## constraints, and scripts/audio/sfx_catalog.gd resolves every approved event to real streams.
+## constraints, and scripts/audio/sfx_catalog.gd resolves every shared event to real streams.
 ##
 ## Run through scripts/tools/run_isolated_godot_test.ps1:
 ##
@@ -21,6 +21,18 @@ const RETAINED_RECORDINGS := {
 	"res://assets/audio/item_place.wav": SfxCatalogScript.EVENT_ITEM_PLACE_VALID,
 	"res://assets/audio/triple_clear.wav": SfxCatalogScript.EVENT_MATCH_CLEAR,
 }
+const AUTHORED_SOURCE_CUES := [
+	"res://assets/audio/generated/freeze.wav",
+	"res://assets/audio/generated/hammer.wav",
+	"res://assets/audio/generated/invalid_action.wav",
+	"res://assets/audio/generated/lantern.wav",
+	"res://assets/audio/generated/level_complete.mp3",
+	"res://assets/audio/generated/level_failed.wav",
+	"res://assets/audio/generated/purchase_successful.wav",
+	"res://assets/audio/generated/shelve_unlock.wav",
+	"res://assets/audio/generated/shuffle.wav",
+	"res://assets/audio/generated/timer_tick.wav",
+]
 ## The ticket's per-cue duration windows, in milliseconds.
 const DURATION_WINDOWS_MS := {
 	"ui_click": Vector2(25.0, 50.0),
@@ -203,9 +215,13 @@ func _test_committed_wav_constraints() -> void:
 			"%s starts and ends on the attack/release fades." % cue_name
 		)
 
+	var authored_wav_count := 0
+	for source_path in AUTHORED_SOURCE_CUES:
+		if str(source_path).get_extension().to_lower() == "wav":
+			authored_wav_count += 1
 	_check(
-		_get_generated_wav_names().size() == SynthesisScript.CUES.size(),
-		"The generated directory holds no orphan WAV files."
+		_get_generated_wav_names().size() == SynthesisScript.CUES.size() + authored_wav_count,
+		"The shared generated directory holds exactly the manifest palette and authored source batch."
 	)
 
 
@@ -222,10 +238,18 @@ func _test_catalog_completeness() -> void:
 		SfxCatalogScript.EVENT_SHOP_PURCHASE_SUCCESS,
 		SfxCatalogScript.EVENT_REWARD_CHEST_STAR_ARRIVAL,
 		SfxCatalogScript.EVENT_UI_CLICK,
+		SfxCatalogScript.EVENT_STICKY_MOVE_BLOCKED,
+		SfxCatalogScript.EVENT_SHELF_UNLOCK,
+		SfxCatalogScript.EVENT_ABILITY_HAMMER,
+		SfxCatalogScript.EVENT_ABILITY_SHUFFLE,
+		SfxCatalogScript.EVENT_ABILITY_LANTERN,
+		SfxCatalogScript.EVENT_ABILITY_FREEZER,
+		SfxCatalogScript.EVENT_LEVEL_COMPLETE,
+		SfxCatalogScript.EVENT_LEVEL_FAILED,
 	]
 	_check(
 		SfxCatalogScript.EVENTS.size() == expected_events.size(),
-		"The catalog holds exactly the eleven approved events."
+		"The catalog holds exactly the expected shared events."
 	)
 	for event_id in expected_events:
 		if not SfxCatalogScript.has_event(event_id):
@@ -253,14 +277,17 @@ func _test_catalog_completeness() -> void:
 			"%s keeps the project's source recording %s." % [owning_event, recording_path]
 		)
 
-	# Every generated file must be reachable from the catalog: an asset nothing plays is either a
-	# wiring mistake or dead weight in the build.
+	# The authored batch shares the directory with manifest-owned synthesized output. Every newly
+	# supplied source cue must be reachable even though retired generator outputs may remain archived.
 	var catalog_paths := SfxCatalogScript.get_all_stream_paths()
-	for file_name in _get_generated_wav_names():
-		var generated_path := GENERATED_DIRECTORY.path_join(file_name)
+	for generated_path in AUTHORED_SOURCE_CUES:
+		_check(
+			ResourceLoader.exists(generated_path),
+			"The authored source cue is importable (%s)." % generated_path
+		)
 		_check(
 			catalog_paths.has(generated_path),
-			"The catalog references generated asset %s." % file_name
+			"The catalog references authored source cue %s." % generated_path
 		)
 
 

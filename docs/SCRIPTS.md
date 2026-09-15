@@ -1029,8 +1029,11 @@ Playback rules:
 Key methods:
 - `play(event_id, context = {})`: returns the started player or null. `context` accepts `count`
   (count-scaled reward cue), `volume_offset_db`, `pitch_scale`, `force` (bypasses the mute check --
-  only the sound-effects toggle acknowledgement uses it), and `bypass_cooldown`.
+  only the sound-effects toggle acknowledgement uses it), `bypass_cooldown`, and
+  `start_position_seconds` for synchronizing a long authored cue to gameplay state.
 - `stop_all(except_player = null)`: stops every sounding cue, optionally sparing one acknowledgement.
+- `stop_event(event_id)`: stops one semantic cue without cutting off unrelated feedback; the level
+  uses it to suspend the 30-second critical-timer bed during pause, Freezer, and terminal states.
 - `is_enabled()` / `set_muted(is_muted)` / `is_muted()`: `set_muted` is the capture/test mute,
   independent of the player-facing setting. A headless run starts muted, so automated tests never
   need an audio device; `scripts/tools/capture_scene.gd` mutes explicitly because captures run
@@ -1055,12 +1058,18 @@ Purpose:
   volume/pitch variation, cooldown, and polyphony budget. Gameplay and UI scripts never preload an
   `AudioStream`; they pass `SfxCatalogScript.EVENT_*` to `SfxManager.play()`, so rebalancing the mix
   or swapping a variant pool is a change to this file alone.
-- Holds the eleven approved events: `item_select`, `item_place_valid`, `match_clear`,
+- Holds the original eleven AUDIO-001 events: `item_select`, `item_place_valid`, `match_clear`,
   `star_hud_arrival`, `timer_critical_tick`, `time_up`, `coin_gain`, `coin_spend`,
-  `shop_purchase_success`, `reward_chest_star_arrival`, `ui_click`.
+  `shop_purchase_success`, `reward_chest_star_arrival`, `ui_click`; plus semantic authored-source
+  events for sticky rejection, shelf unlock, Hammer, Shuffle, Lantern, Freezer, level completion,
+  and level failure.
 - `item_place_valid` and `match_clear` keep the project's existing source recordings
-  (`assets/audio/item_place.wav`, `assets/audio/triple_clear.wav`). Every other event uses the
-  deterministic generated palette under `assets/audio/generated/`.
+  (`assets/audio/item_place.wav`, `assets/audio/triple_clear.wav`). The original synthesized palette
+  and the later authored source batch both live under `assets/audio/generated/`; only files listed
+  by `generated_sfx_manifest.json` are owned by the deterministic generator.
+- `invalid_action.wav`, `purchase_successful.wav`, `shuffle.wav`, and `timer_tick.wav` are committed
+  as 48 kHz, 16-bit PCM because Godot 4.6.2 could not import their supplied 96 kHz, 24-bit
+  WAVE-Extensible encoding. Their channels and audible content are otherwise retained.
 - `star_hud_arrival` carries a `count_scaling` block so a multi-star reward becomes one bigger cue
   instead of one full-volume sound per star.
 
@@ -1722,8 +1731,8 @@ Audio (AUDIO-001):
   players are gone, along with their volume exports (the mix now lives in
   `scripts/audio/sfx_catalog.gd`).
 - `_sound_effects_enabled` remains as the level-local gate that automated captures and tests set
-  (`scripts/tools/captures/*.gd`), and still drives the Hammer effect's own scene players. The
-  saved sound-effects preference is applied on top of it by `SfxManager`.
+  (`scripts/tools/captures/*.gd`). The saved sound-effects preference is applied on top of it by
+  `SfxManager`, including Hammer's replacement shared cue.
 - `item_select` fires from `_handle_release_at()` only when a finished tap actually selected an
   eligible item; a press that became a drag or targeted an ineligible shelf never reaches it.
 - `item_place_valid` fires from `_place_item_in_slot(..., should_play_landing = true)` and from
@@ -1733,12 +1742,15 @@ Audio (AUDIO-001):
 - `match_clear` stays on the existing post-gather disappearance beat in `_clear_matching_shelves()`.
 - `star_hud_arrival` fires once per reward with `{"count": star_count}` as the HUD receive pulse
   begins, so a multi-star combo is one count-scaled cue rather than one sound per star.
-- `timer_critical_tick` comes from `LevelTopHud.critical_second_pulsed`; `_on_critical_second_pulsed()`
-  adds only the level's terminal-state guard and the final-five pitch accent
-  (`FINAL_COUNTDOWN_ACCENT_*`). The threshold, the frozen suppression, and the counting-down
-  decision stay owned by the HUD.
-- `time_up` fires once from `_handle_level_time_expired()` after its guards accept the expiry, so
-  neither a modal refresh nor `_fail_level()` replays it.
+- `timer_critical_tick` is now the supplied 30-second authored bed. It starts once on critical-range
+  entry, seeks to the displayed countdown offset after pause/Freezer, and is stopped during pause,
+  Freezer, interruption, time-up, completion, failure, and scene teardown.
+- `time_up` fires once when expiry opens the time-extension offer. A terminal expiry goes straight
+  to the dedicated `level_failed` cue so the two result sounds never stack.
+- `sticky_move_blocked` fires only from the exposed-sticky input branch. Ordinary rejected drops
+  remain silent. `shelf_unlock` fires once per threshold crossing even if several shelves unlock.
+- Successful ability starts fire `ability_hammer`, `ability_shuffle`, `ability_lantern`, or
+  `ability_freezer`; terminal transitions fire `level_complete` or `level_failed` once.
 - `coin_spend` fires only after a successful `PlayerProgress.spend_coins()` (ability purchase,
   time extension) or `purchase_life()` (out-of-lives retry).
 
@@ -1806,8 +1818,6 @@ Important constants:
 - `LEVEL_SCENE_PATH`: scene loaded when the completion `Next` button advances normal campaign play to the next level.
 - `SfxCatalogScript`: `res://scripts/audio/sfx_catalog.gd`, the source of the `EVENT_*` ids this
   script passes to `SfxManager` (AUDIO-001). The level no longer preloads audio streams.
-- `FINAL_COUNTDOWN_ACCENT_SECONDS` / `_PITCH` / `_VOLUME_DB`: the restrained final-five-seconds
-  treatment applied to `timer_critical_tick`.
 - `HAMMER_IMPACT_EFFECT_SCENE`: `res://scenes/abilities/hammer_impact_effect.tscn`, spawned when the hammer ability is used.
 - `COMPLETION_REVEAL_SECONDS`: 1.35-second cleared-board lead-in before the reward overlay begins;
   the longer confetti effect continues independently across that reveal.
@@ -2227,8 +2237,8 @@ Purpose:
   changes through pose 3 retain their fast cadence, then pose 3 holds for the rest of the flight.
 - Samples the head's real path into a short ring buffer so the swing trail follows the swing
   instead of a fixed screen-space arc.
-- Coordinates the scene's entrance/downstroke, layered impact, and sparkle-tail audio players,
-  plus the optional mobile impact vibration.
+- Coordinates the optional mobile impact vibration. Hammer audio is requested by `scripts/level.gd`
+  through `SfxManager` when this strike starts, so the effect scene owns no audio players.
 - Emits `pre_impact` at authored time 480 ms (about 369 ms into playback), `impact` on frame 7 at
   authored time 560 ms (about 431 ms into playback), hides the hammer by authored time 580 ms, and
   emits `finished` after the remaining VFX fade out.
@@ -2244,8 +2254,7 @@ Exports:
 Depends on:
 - `assets/abilities/ability_hammer_swing_1.png` through `ability_hammer_swing_7.png`, plus fractional
   transition frames `1.3`, `1.7`, `5.3`, and `5.7`, in strike playback order.
-- The existing item-place, triple-clear, and short satisfying SFX for layered hammer cues; no new
-  audio asset is required.
+- `scripts/level.gd` and `scripts/audio/sfx_catalog.gd` for the shared `hammer.wav` cue.
 - `scenes/abilities/hammer_impact_effect.tscn` `AnimationPlayer` keyframes for hammer motion,
   opacity, texture swaps, afterimages, VFX layer amounts, cue callbacks, and gameplay signals.
 - `scripts/level.gd` for runtime instancing and gameplay response to `impact`.
@@ -2253,7 +2262,7 @@ Depends on:
 Verification:
 - `tests/gameplay/test_hammer_animation.gd` checks all eleven base and transitional poses, center
   convergence, the three-to-one merge, deferred strike start, immediate post-impact hammer hide,
-  all five procedural VFX tracks, two afterimages, outgoing-pose crossfade, audio ownership/muting,
+  all five procedural VFX tracks, two afterimages, outgoing-pose crossfade, shared audio ownership,
   bottom-left approach, pose-3 flight hold, pre-impact compression, exact-frame target disappearance,
   560 ms frame-7 impact timing, the full tail duration, cleanup, and responsive layout at
   540x960, 720x1280, 1080x1920, 1080x2400, and 900x1200. It also seeks the paused animation to

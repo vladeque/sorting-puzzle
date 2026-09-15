@@ -62,18 +62,12 @@ const POSE_HEAD_OFFSETS := {
 @onready var _afterimage_early: Sprite2D = %AfterimageEarly
 @onready var _afterimage_late: Sprite2D = %AfterimageLate
 @onready var _animation_player: AnimationPlayer = %AnimationPlayer
-@onready var _windup_audio: AudioStreamPlayer = %WindupAudio
-@onready var _downstroke_audio: AudioStreamPlayer = %DownstrokeAudio
-@onready var _impact_low_audio: AudioStreamPlayer = %ImpactLowAudio
-@onready var _impact_magic_audio: AudioStreamPlayer = %ImpactMagicAudio
-@onready var _sparkle_tail_audio: AudioStreamPlayer = %SparkleTailAudio
 
 var _impact_position := Vector2.ZERO
 var _approach_start_position := Vector2.ZERO
 var _approach_offset := Vector2.ZERO
 var _approach_amount := 0.0
 var _layout_scale := 1.0
-var _sound_enabled := true
 var _haptics_enabled := true
 var _pre_impact_reached := false
 var _has_impacted := false
@@ -113,7 +107,6 @@ func _ready() -> void:
 
 func play(
 	target_screen_position: Vector2,
-	sound_enabled := true,
 	haptics_enabled := true,
 	approach_start_screen_position := Vector2.INF
 ) -> void:
@@ -127,7 +120,6 @@ func play(
 	_approach_offset = _approach_start_position - _impact_position
 	_approach_amount = 1.0
 	_layout_scale = clampf(size.x / DESIGN_WIDTH, 0.75, 1.35)
-	_sound_enabled = sound_enabled
 	_haptics_enabled = haptics_enabled
 	_pre_impact_reached = false
 	_has_impacted = false
@@ -167,15 +159,6 @@ func has_impacted() -> bool:
 
 func get_approach_start_position() -> Vector2:
 	return _approach_start_position
-
-
-func set_sound_enabled(enabled: bool) -> void:
-	_sound_enabled = enabled
-	if enabled:
-		return
-	for player in [_windup_audio, _downstroke_audio, _impact_low_audio, _impact_magic_audio, _sparkle_tail_audio]:
-		if player != null:
-			player.stop()
 
 
 func _process(_delta: float) -> void:
@@ -372,14 +355,6 @@ func _draw_sparks_and_debris() -> void:
 			draw_circle(position, size, color)
 
 
-func _play_windup_audio() -> void:
-	_play_audio(_windup_audio)
-
-
-func _play_downstroke_audio() -> void:
-	_play_audio(_downstroke_audio)
-
-
 func _emit_pre_impact() -> void:
 	_pre_impact_reached = true
 	pre_impact.emit()
@@ -387,22 +362,9 @@ func _emit_pre_impact() -> void:
 
 func _emit_impact() -> void:
 	_has_impacted = true
-	_play_audio(_impact_low_audio)
-	_play_audio(_impact_magic_audio)
 	if _haptics_enabled and OS.has_feature("mobile"):
 		Input.vibrate_handheld(65, 0.75)
 	impact.emit()
-
-
-func _play_sparkle_tail_audio() -> void:
-	_play_audio(_sparkle_tail_audio)
-
-
-func _play_audio(player: AudioStreamPlayer) -> void:
-	if not _sound_enabled or player == null:
-		return
-	player.stop()
-	player.play()
 
 
 func _emit_finished() -> void:

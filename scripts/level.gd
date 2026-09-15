@@ -58,11 +58,6 @@ const SfxCatalogScript := preload("res://scripts/audio/sfx_catalog.gd")
 const REWARD_STAR_TEXTURE := preload("res://assets/ui/reward_star_34_glossy_b.png")
 const SHUFFLE_BOX_TEXTURE := preload("res://assets/abilities/ability_shuffle_box.png")
 const PAUSE_SETTING_SOUND_EFFECTS := &"sound_effects"
-## The last five displayed seconds get a small upward pitch step and a restrained trim instead of a
-## louder tick, so urgency rises without the countdown becoming the loudest thing in the mix.
-const FINAL_COUNTDOWN_ACCENT_SECONDS := 5
-const FINAL_COUNTDOWN_ACCENT_PITCH := 1.09
-const FINAL_COUNTDOWN_ACCENT_VOLUME_DB := 0.75
 const SHELF_UNLOCK_REQUIREMENT_META := &"unlock_after_triples"
 const SHELF_LOCKED_META := &"is_locked"
 const LOCKED_OVERLAY_NAME := "LockedOverlay"
@@ -553,25 +548,26 @@ func _play_sfx(event_id: StringName, context: Dictionary = {}) -> void:
 func _stop_sound_effects() -> void:
 	SfxManager.stop_all()
 
-	for effect in get_tree().get_nodes_in_group(&"hammer_impact_effect"):
-		if effect is HammerImpactEffect:
-			effect.set_sound_enabled(false)
-
 
 func _process(delta: float) -> void:
 	_refresh_sticky_feedback_availability()
 	if not _level_config_error.is_empty():
+		_stop_critical_timer_sfx()
 		return
 	if _level_completed:
+		_stop_critical_timer_sfx()
 		return
 
 	if _level_failed:
+		_stop_critical_timer_sfx()
 		return
 
 	if _level_paused:
+		_stop_critical_timer_sfx()
 		return
 
 	if _app_interrupted:
+		_stop_critical_timer_sfx()
 		return
 
 	var countdown_delta := _update_freezer_timer(delta)
@@ -584,10 +580,12 @@ func _process(delta: float) -> void:
 	_clear_drag_drop_selection_if_unavailable()
 
 	if not _has_player_started_timer:
+		_stop_critical_timer_sfx()
 		return
 
 	_time_remaining = maxf(_time_remaining - countdown_delta, 0.0)
 	_update_timer_label()
+	_sync_critical_timer_sfx(ceili(_time_remaining))
 
 	if _time_remaining <= 0.0:
 		_handle_level_time_expired()
@@ -597,6 +595,7 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_PAUSED:
 		_app_interrupted = true
 		_cancel_sticky_feedback()
+		_stop_critical_timer_sfx()
 	elif what == NOTIFICATION_APPLICATION_RESUMED:
 		_app_interrupted = false
 	elif what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
@@ -605,6 +604,7 @@ func _notification(what: int) -> void:
 
 func _exit_tree() -> void:
 	_cancel_blocked_press()
+	_stop_critical_timer_sfx()
 	_clear_freezer(true)
 
 
@@ -1707,6 +1707,10 @@ func _update_locked_shelves() -> Array[Node]:
 		if was_locked and not should_lock:
 			newly_unlocked_shelves.append(shelf_node)
 
+	if not newly_unlocked_shelves.is_empty():
+		# Multiple shelves crossing the same clear threshold share one unlock confirmation.
+		_play_sfx(SfxCatalogScript.EVENT_SHELF_UNLOCK)
+
 	return newly_unlocked_shelves
 
 
@@ -1968,13 +1972,16 @@ func _handle_level_time_expired() -> void:
 	if _time_extension_offer_active or _level_failed or _level_completed:
 		return
 
-	# One cue per accepted expiry. The guards above are what stop it repeating while the extension
-	# modal is open or refreshing, and _fail_level() below opens failure without a second cue.
-	_play_sfx(SfxCatalogScript.EVENT_TIME_UP)
+	_stop_critical_timer_sfx()
 
 	if not _has_available_time_extension():
+		# Terminal expiry is represented by level_failed; do not layer time_up underneath it.
 		_fail_level()
 		return
+
+	# time_up belongs to the accepted extension offer. The guards above stop it repeating when the
+	# modal refreshes; terminal expiry instead uses the dedicated failure cue above.
+	_play_sfx(SfxCatalogScript.EVENT_TIME_UP)
 
 	_cancel_active_interaction()
 	_time_remaining = 0.0
@@ -2036,6 +2043,7 @@ func _fail_level() -> void:
 	_set_moving_shelf_rows_paused(true)
 	_update_ability_buttons()
 	_update_pause_menu_button()
+	_play_sfx(SfxCatalogScript.EVENT_LEVEL_FAILED)
 
 	if _dragged_item != null and _origin_slot != null:
 		_dragged_item.set_drag_lifted(false)
@@ -2090,6 +2098,7 @@ func _complete_level() -> void:
 		_ability_purchase_overlay.visible = false
 	if _time_up_extension_overlay != null:
 		_time_up_extension_overlay.visible = false
+	_play_sfx(SfxCatalogScript.EVENT_LEVEL_COMPLETE)
 
 	_completion_celebration_active = true
 	if _completion_confetti != null:
@@ -2298,22 +2307,47 @@ func _on_retry_life_purchase_requested() -> void:
 	_restart_level()
 
 
-## scripts/level_top_hud.gd owns the critical threshold, the frozen treatment, and the
-## "is counting down" decision, and only pulses on a genuinely new critical second -- so this adds
-## nothing but the level's terminal-state guard and the final-five accent. A paused level stops
-## updating the countdown entirely, which is what keeps the ticking silent while a modal is open.
+## scripts/level_top_hud.gd owns the critical threshold and emits on entry/new displayed seconds.
+## The replacement timer asset is one authored 30-second bed, so the first eligible pulse starts it
+## once instead of stacking a fresh 30-second stream on every second.
 func _on_critical_second_pulsed(displayed_seconds: int) -> void:
-	if _level_failed or _level_completed or _level_paused or _time_extension_offer_active:
+	_sync_critical_timer_sfx(displayed_seconds)
+
+
+## Starts or resumes the long critical-timer bed at the offset matching the displayed countdown.
+## `_process()` also calls this after each timer update so returning from pause or Freezer resumes
+## immediately even when the HUD is still showing the same integer second.
+func _sync_critical_timer_sfx(displayed_seconds: int) -> void:
+	var critical_seconds := _top_hud.critical_time_seconds if _top_hud != null else 30
+	var should_play := (
+		_sound_effects_enabled
+		and _has_player_started_timer
+		and not _level_failed
+		and not _level_completed
+		and not _level_paused
+		and not _app_interrupted
+		and not _time_extension_offer_active
+		and not _is_freezer_active()
+		and displayed_seconds > 0
+		and displayed_seconds <= critical_seconds
+	)
+	if not should_play:
+		_stop_critical_timer_sfx()
 		return
 
-	var context := {}
-	if displayed_seconds <= FINAL_COUNTDOWN_ACCENT_SECONDS:
-		context = {
-			"pitch_scale": FINAL_COUNTDOWN_ACCENT_PITCH,
-			"volume_offset_db": FINAL_COUNTDOWN_ACCENT_VOLUME_DB,
-		}
+	if not SfxManager.is_enabled():
+		return
+	if SfxManager.get_active_play_count(SfxCatalogScript.EVENT_TIMER_CRITICAL_TICK) > 0:
+		return
 
-	_play_sfx(SfxCatalogScript.EVENT_TIMER_CRITICAL_TICK, context)
+	var elapsed_seconds := maxf(float(critical_seconds - displayed_seconds), 0.0)
+	_play_sfx(SfxCatalogScript.EVENT_TIMER_CRITICAL_TICK, {
+		"start_position_seconds": elapsed_seconds,
+	})
+
+
+func _stop_critical_timer_sfx() -> void:
+	SfxManager.stop_event(SfxCatalogScript.EVENT_TIMER_CRITICAL_TICK)
 
 
 func _on_pause_menu_setting_toggled(setting_id: StringName, is_disabled: bool) -> void:
@@ -2621,6 +2655,8 @@ func _handle_press_at(pointer_global_position: Vector2, pointer_id := -1) -> voi
 		_blocked_press_position = pointer_global_position
 		_blocked_pointer_id = pointer_id
 		clicked_item.begin_sticky_hold()
+		# This is the only owner of invalid_action.wav: ordinary failed drops remain silent.
+		_play_sfx(SfxCatalogScript.EVENT_STICKY_MOVE_BLOCKED)
 		get_viewport().set_input_as_handled()
 		return
 
@@ -3882,10 +3918,10 @@ func _play_hammer_ability(items_to_destroy: Array[ShelfItem]) -> void:
 	ui_layer.add_child(effect)
 	effect.play(
 		impact_screen_position,
-		_sound_effects_enabled,
 		hammer_haptics_enabled,
 		approach_start_screen_position
 	)
+	_play_sfx(SfxCatalogScript.EVENT_ABILITY_HAMMER)
 
 	if not effect.has_reached_pre_impact():
 		await effect.pre_impact
@@ -4173,6 +4209,7 @@ func _play_shuffle_ability(items_to_shuffle: Array[ShelfItem]) -> void:
 	_set_moving_shelf_rows_paused(true)
 	_update_ability_buttons()
 	_clear_ability_highlights()
+	_play_sfx(SfxCatalogScript.EVENT_ABILITY_SHUFFLE)
 
 	var animation_entries := _prepare_shuffle_animation_entries(items_to_shuffle)
 	var shuffle_box := _create_shuffle_box()
@@ -4497,6 +4534,7 @@ func _use_highlight() -> bool:
 	for item in _highlighted_items:
 		_apply_item_visual_state(item)
 
+	_play_sfx(SfxCatalogScript.EVENT_ABILITY_LANTERN)
 	_update_highlight_timer_label()
 	return true
 
@@ -4504,8 +4542,10 @@ func _use_highlight() -> bool:
 func _use_freezer() -> bool:
 	if _is_freezer_active():
 		return false
+	_stop_critical_timer_sfx()
 	_freezer_time_remaining = FREEZER_DURATION_SECONDS
 	_update_freezer_visuals()
+	_play_sfx(SfxCatalogScript.EVENT_ABILITY_FREEZER)
 	return true
 
 

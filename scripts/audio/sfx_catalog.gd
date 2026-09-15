@@ -8,8 +8,9 @@ extends RefCounted
 ## rebalancing the mix or swapping a variant pool is a change to this file alone.
 ##
 ## `item_place_valid` and `match_clear` intentionally keep the project's existing source
-## recordings; every other event uses the deterministic generated palette written by
-## scripts/tools/generate_core_sfx.gd (see docs/AUDIO_001_GODOT_ONLY_SFX_TICKET.md).
+## recordings. The original AUDIO-001 palette is deterministic output from
+## scripts/tools/generate_core_sfx.gd; later authored source cues also live under `generated/`
+## and are catalogued here without being claimed by that synthesizer's manifest.
 ##
 ## Per-event fields:
 ##   streams              res:// paths. More than one makes the event a variant pool.
@@ -37,9 +38,17 @@ const EVENT_COIN_SPEND := &"coin_spend"
 const EVENT_SHOP_PURCHASE_SUCCESS := &"shop_purchase_success"
 const EVENT_REWARD_CHEST_STAR_ARRIVAL := &"reward_chest_star_arrival"
 const EVENT_UI_CLICK := &"ui_click"
+const EVENT_STICKY_MOVE_BLOCKED := &"sticky_move_blocked"
+const EVENT_SHELF_UNLOCK := &"shelf_unlock"
+const EVENT_ABILITY_HAMMER := &"ability_hammer"
+const EVENT_ABILITY_SHUFFLE := &"ability_shuffle"
+const EVENT_ABILITY_LANTERN := &"ability_lantern"
+const EVENT_ABILITY_FREEZER := &"ability_freezer"
+const EVENT_LEVEL_COMPLETE := &"level_complete"
+const EVENT_LEVEL_FAILED := &"level_failed"
 
-## The eleven approved AUDIO-001 events. Adding a twelfth means adding it here first -- the manager
-## warns and stays silent for anything it cannot resolve.
+## The complete shared event catalog. The manager warns and stays silent for anything it cannot
+## resolve, so a gameplay owner must add its semantic event here before requesting playback.
 const EVENTS := {
 	EVENT_ITEM_SELECT: {
 		"streams": [
@@ -85,16 +94,14 @@ const EVENTS := {
 		},
 	},
 	EVENT_TIMER_CRITICAL_TICK: {
-		"streams": [
-			"res://assets/audio/generated/timer_tick_01.wav",
-			"res://assets/audio/generated/timer_tick_02.wav",
-			"res://assets/audio/generated/timer_tick_03.wav",
-		],
+		# One authored 30-second bed, started once on entry into the critical range and resumed at
+		# the matching offset after pause or Freezer. It must never be requested once per frame.
+		"streams": ["res://assets/audio/generated/timer_tick.wav"],
 		"volume_db": -3.0,
-		"volume_variation_db": 0.4,
-		"pitch_range": Vector2(0.98, 1.02),
-		"cooldown_seconds": 0.30,
-		"max_polyphony": 2,
+		"volume_variation_db": 0.0,
+		"pitch_range": Vector2(1.0, 1.0),
+		"cooldown_seconds": 0.0,
+		"max_polyphony": 1,
 	},
 	EVENT_TIME_UP: {
 		"streams": ["res://assets/audio/generated/time_up.wav"],
@@ -121,8 +128,8 @@ const EVENTS := {
 		"max_polyphony": 2,
 	},
 	EVENT_SHOP_PURCHASE_SUCCESS: {
-		"streams": ["res://assets/audio/generated/shop_purchase_success.wav"],
-		"volume_db": -1.0,
+		"streams": ["res://assets/audio/generated/purchase_successful.wav"],
+		"volume_db": 2.0,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(1.0, 1.0),
 		"cooldown_seconds": 0.60,
@@ -153,6 +160,71 @@ const EVENTS := {
 		"pitch_range": Vector2(0.97, 1.03),
 		"cooldown_seconds": 0.04,
 		"max_polyphony": 3,
+	},
+	EVENT_STICKY_MOVE_BLOCKED: {
+		# Deliberately semantic rather than `invalid_action`: ordinary rejected moves stay silent.
+		"streams": ["res://assets/audio/generated/invalid_action.wav"],
+		"volume_db": -2.0,
+		"volume_variation_db": 0.0,
+		"pitch_range": Vector2(1.0, 1.0),
+		"cooldown_seconds": 0.18,
+		"max_polyphony": 1,
+	},
+	EVENT_SHELF_UNLOCK: {
+		"streams": ["res://assets/audio/generated/shelve_unlock.wav"],
+		"volume_db": -5.0,
+		"volume_variation_db": 0.0,
+		"pitch_range": Vector2(1.0, 1.0),
+		"cooldown_seconds": 0.20,
+		"max_polyphony": 1,
+	},
+	EVENT_ABILITY_HAMMER: {
+		"streams": ["res://assets/audio/generated/hammer.wav"],
+		"volume_db": -5.0,
+		"volume_variation_db": 0.0,
+		"pitch_range": Vector2(1.0, 1.0),
+		"cooldown_seconds": 0.20,
+		"max_polyphony": 1,
+	},
+	EVENT_ABILITY_SHUFFLE: {
+		"streams": ["res://assets/audio/generated/shuffle.wav"],
+		"volume_db": 1.0,
+		"volume_variation_db": 0.0,
+		"pitch_range": Vector2(1.0, 1.0),
+		"cooldown_seconds": 0.20,
+		"max_polyphony": 1,
+	},
+	EVENT_ABILITY_LANTERN: {
+		"streams": ["res://assets/audio/generated/lantern.wav"],
+		"volume_db": -3.0,
+		"volume_variation_db": 0.0,
+		"pitch_range": Vector2(1.0, 1.0),
+		"cooldown_seconds": 0.20,
+		"max_polyphony": 1,
+	},
+	EVENT_ABILITY_FREEZER: {
+		"streams": ["res://assets/audio/generated/freeze.wav"],
+		"volume_db": -5.0,
+		"volume_variation_db": 0.0,
+		"pitch_range": Vector2(1.0, 1.0),
+		"cooldown_seconds": 0.20,
+		"max_polyphony": 1,
+	},
+	EVENT_LEVEL_COMPLETE: {
+		"streams": ["res://assets/audio/generated/level_complete.mp3"],
+		"volume_db": -3.0,
+		"volume_variation_db": 0.0,
+		"pitch_range": Vector2(1.0, 1.0),
+		"cooldown_seconds": 0.75,
+		"max_polyphony": 1,
+	},
+	EVENT_LEVEL_FAILED: {
+		"streams": ["res://assets/audio/generated/level_failed.wav"],
+		"volume_db": -6.0,
+		"volume_variation_db": 0.0,
+		"pitch_range": Vector2(1.0, 1.0),
+		"cooldown_seconds": 0.75,
+		"max_polyphony": 1,
 	},
 }
 

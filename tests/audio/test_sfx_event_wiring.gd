@@ -1,7 +1,7 @@
 extends SceneTree
 
-## AUDIO-001 event-wiring verification: the eleven approved events fire from the semantic moments
-## the ticket names, and stay silent everywhere it says they must.
+## Shared event-wiring verification: catalogued cues fire from their semantic gameplay moments and
+## stay silent everywhere their contracts say they must.
 ##
 ## Run through scripts/tools/run_isolated_godot_test.ps1:
 ##
@@ -59,6 +59,7 @@ func _run() -> void:
 	await _test_placement_routing()
 	await _test_item_selection()
 	await _test_critical_timer_and_time_up()
+	await _test_gameplay_source_cues()
 	await _test_level_coin_spending()
 	_test_shop_purchase_routing()
 	await _test_reward_chest_arrivals()
@@ -149,11 +150,23 @@ func _test_item_selection() -> void:
 		"A release with no pending press (drag or cancel) plays nothing."
 	)
 
+	# invalid_action.wav is intentionally narrower than a generic rejected-move sound.
+	item.is_sticky = true
+	_begin_recording()
+	level.call("_handle_press_at", item.global_position)
+	_check(
+		_played(SfxCatalogScript.EVENT_STICKY_MOVE_BLOCKED) == 1,
+		"Pressing an exposed sticky item plays the dedicated blocked-move cue."
+	)
+	level.call("_cancel_blocked_press")
+	item.is_sticky = false
+
 	await _free_current_scene()
 
 
 func _test_critical_timer_and_time_up() -> void:
 	var level := await _open_level()
+	level.set("_has_player_started_timer", true)
 	var hud = level.get("_top_hud")
 	if hud == null:
 		_failures.append("The level exposes no top HUD to drive the critical countdown.")
@@ -163,9 +176,11 @@ func _test_critical_timer_and_time_up() -> void:
 	hud.call("reset_timer_attention")
 	_begin_recording()
 	hud.call("set_timer_state", "00:20", 20, true)
+	var entered_context := _last_context(SfxCatalogScript.EVENT_TIMER_CRITICAL_TICK)
 	_check(
-		_played(SfxCatalogScript.EVENT_TIMER_CRITICAL_TICK) == 1,
-		"Entering the HUD's critical range ticks once."
+		_played(SfxCatalogScript.EVENT_TIMER_CRITICAL_TICK) == 1
+			and is_equal_approx(float(entered_context.get("start_position_seconds", -1.0)), 10.0),
+		"Entering the critical range starts the 30-second timer bed at the matching offset."
 	)
 
 	_begin_recording()
@@ -179,7 +194,7 @@ func _test_critical_timer_and_time_up() -> void:
 	hud.call("set_timer_state", "00:19", 19, true)
 	_check(
 		_played(SfxCatalogScript.EVENT_TIMER_CRITICAL_TICK) == 1,
-		"Each new critical displayed second ticks once."
+		"A stopped timer bed can resume from a later critical second."
 	)
 
 	# Above the threshold there is no alarm state at all.
@@ -210,24 +225,16 @@ func _test_critical_timer_and_time_up() -> void:
 	)
 	hud.call("set_timer_frozen_visual", false)
 
-	# The final five seconds change character without becoming the loudest thing in the mix.
+	# The authored bed carries its own final-seconds character without runtime pitch changes.
 	hud.call("reset_timer_attention")
 	_begin_recording()
 	hud.call("set_timer_state", "00:04", 4, true)
 	var accent := _last_context(SfxCatalogScript.EVENT_TIMER_CRITICAL_TICK)
 	_check(
 		_played(SfxCatalogScript.EVENT_TIMER_CRITICAL_TICK) == 1
-			and float(accent.get("pitch_scale", 0.0)) > 1.0,
-		"The final five seconds use a restrained pitch accent."
-	)
-
-	hud.call("reset_timer_attention")
-	_begin_recording()
-	hud.call("set_timer_state", "00:12", 12, true)
-	var normal := _last_context(SfxCatalogScript.EVENT_TIMER_CRITICAL_TICK)
-	_check(
-		not normal.has("pitch_scale"),
-		"Ordinary critical seconds keep the catalog's own subtle variation."
+			and is_equal_approx(float(accent.get("start_position_seconds", -1.0)), 26.0)
+			and not accent.has("pitch_scale"),
+		"The final seconds seek into the authored bed without runtime pitch alteration."
 	)
 
 	# One time_up per accepted expiry, and nothing when the expiry is re-entered.
@@ -257,6 +264,76 @@ func _test_critical_timer_and_time_up() -> void:
 		"A terminal level does not keep ticking."
 	)
 
+	await _free_current_scene()
+
+
+func _test_gameplay_source_cues() -> void:
+	var level := await _open_level()
+
+	_begin_recording()
+	_check(
+		bool(level.call("_use_highlight"))
+			and _played(SfxCatalogScript.EVENT_ABILITY_LANTERN) == 1,
+		"A successful Lantern activation plays its authored cue once."
+	)
+
+	_begin_recording()
+	_check(
+		bool(level.call("_use_freezer"))
+			and _played(SfxCatalogScript.EVENT_ABILITY_FREEZER) == 1,
+		"A successful Freezer activation plays its authored cue once."
+	)
+
+	var shelf := (level.call("_get_all_shelves") as Array)[0] as Node
+	shelf.set_meta(&"unlock_after_triples", 1)
+	level.set("_triples_cleared", 0)
+	level.call("_update_locked_shelves")
+	_begin_recording()
+	level.set("_triples_cleared", 1)
+	level.call("_update_locked_shelves")
+	_check(
+		_played(SfxCatalogScript.EVENT_SHELF_UNLOCK) == 1,
+		"Crossing a shelf's clear threshold plays one unlock cue."
+	)
+	await _free_current_scene()
+
+	level = await _open_level()
+	_begin_recording()
+	_check(
+		bool(level.call("_use_shuffle"))
+			and _played(SfxCatalogScript.EVENT_ABILITY_SHUFFLE) == 1,
+		"A successful Shuffle activation plays its authored cue once."
+	)
+	await _wait_seconds(1.25)
+	await _free_current_scene()
+
+	level = await _open_level()
+	_begin_recording()
+	_check(bool(level.call("_use_hammer")), "The audio fixture can start Hammer.")
+	await _wait_seconds(0.65)
+	_check(
+		_played(SfxCatalogScript.EVENT_ABILITY_HAMMER) == 1,
+		"The Hammer strike starts its replacement authored cue once."
+	)
+	await _wait_seconds(0.85)
+	await _free_current_scene()
+
+	level = await _open_level()
+	_begin_recording()
+	level.call("_fail_level")
+	_check(
+		_played(SfxCatalogScript.EVENT_LEVEL_FAILED) == 1,
+		"Opening the terminal failure flow plays level_failed once."
+	)
+	await _free_current_scene()
+
+	level = await _open_level()
+	_begin_recording()
+	level.call("_complete_level")
+	_check(
+		_played(SfxCatalogScript.EVENT_LEVEL_COMPLETE) == 1,
+		"Starting the completion celebration plays level_complete once."
+	)
 	await _free_current_scene()
 
 
