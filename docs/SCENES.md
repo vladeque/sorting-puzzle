@@ -1587,7 +1587,8 @@ Purpose:
   even across portrait aspect ratios. The glow does not sample, tint, blur, or replace the current
   chapter background.
 - Expands the glow inward when Freezer starts and continuously emits dense procedural snowflakes
-  from all four edges. Flakes rotate, drift inward, and disappear within 0.24-0.46 seconds.
+  from all four edges. Flakes rotate gently, drift inward at 28-52 design pixels per second, and
+  disappear within 1.6-2.4 seconds.
 - Fades the glow, stops emission, and shortens remaining flake lifetimes when Freezer ends.
 - Ignores mouse/touch input. The full frame stays below UI; only a top-height-clipped copy renders
   over `TopHud`, leaving ability buttons and central modal content unobstructed.

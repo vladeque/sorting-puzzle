@@ -24,8 +24,10 @@ class Snowflake:
 @export_range(1, 64, 1) var max_particles := 40
 @export_range(0, 48, 1) var activation_burst_count := 18
 @export_range(0.0, 48.0, 0.5) var emission_rate_per_second := 36.0
-@export_range(0.1, 2.0, 0.01) var minimum_lifetime_seconds := 0.24
-@export_range(0.1, 2.0, 0.01) var maximum_lifetime_seconds := 0.46
+@export_range(1.0, 120.0, 1.0) var minimum_speed_pixels_per_second := 28.0
+@export_range(1.0, 120.0, 1.0) var maximum_speed_pixels_per_second := 52.0
+@export_range(0.1, 4.0, 0.01) var minimum_lifetime_seconds := 1.6
+@export_range(0.1, 4.0, 0.01) var maximum_lifetime_seconds := 2.4
 @export_range(0.05, 0.6, 0.01) var shutdown_fade_seconds := 0.16
 @export var random_seed := 824_631
 @export var mirror_source_path: NodePath
@@ -172,7 +174,10 @@ func _spawn_snowflake(from_activation_burst: bool) -> void:
 			)
 			inward_direction = Vector2.LEFT
 
-	var speed := _rng.randf_range(85.0, 145.0) * layout_scale
+	var speed := _rng.randf_range(
+		minimum_speed_pixels_per_second,
+		maximum_speed_pixels_per_second
+	) * layout_scale
 	particle.velocity = inward_direction.rotated(_rng.randf_range(-0.34, 0.34)) * speed
 	particle.lifetime = _rng.randf_range(
 		minimum_lifetime_seconds,
@@ -180,7 +185,7 @@ func _spawn_snowflake(from_activation_burst: bool) -> void:
 	)
 	particle.radius = _rng.randf_range(4.0, 8.0) * layout_scale
 	particle.rotation = _rng.randf_range(0.0, TAU)
-	particle.angular_velocity = _rng.randf_range(-3.8, 3.8)
+	particle.angular_velocity = _rng.randf_range(-1.6, 1.6)
 	particle.highlight_mix = _rng.randf_range(0.15, 0.85)
 	if from_activation_burst:
 		particle.age = _rng.randf_range(0.0, particle.lifetime * 0.16)

@@ -2231,8 +2231,9 @@ Purpose:
 - Draws crisp six-armed snowflakes procedurally, so the effect remains resolution-independent and
   needs no bitmap particle asset.
 - Reuses a bounded 40-particle array, emits an eighteen-flake activation burst followed by a denser
-  trickle, sends every flake inward from one of the four glowing edges, and fades each within
-  0.24-0.46 seconds.
+  trickle, and sends every flake slowly inward from one of the four glowing edges at 28-52 design
+  pixels per second. Each flake remains visible for 1.6-2.4 seconds so the motion reads as a gentle
+  drift instead of a quick streak.
 - Supports a mirror mode that draws the source field's live particle data in the clipped TopHud
   pass without advancing another simulation.
 - Shortens remaining lifetimes when emission stops and clears immediately for level teardown.

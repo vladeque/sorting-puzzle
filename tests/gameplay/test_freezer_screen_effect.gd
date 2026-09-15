@@ -103,8 +103,10 @@ func _verify_effect_scene() -> void:
 		and snowflake_field.get_particle_count() <= snowflake_field.max_particles
 		and snowflake_field.activation_burst_count >= 16
 		and snowflake_field.emission_rate_per_second >= 30.0
-		and snowflake_field.get_maximum_lifetime() <= 0.5,
-		"Freezer activation emits a denser bounded set of faster-disappearing snowflakes."
+		and snowflake_field.maximum_speed_pixels_per_second <= 55.0
+		and snowflake_field.minimum_lifetime_seconds >= 1.5
+		and snowflake_field.get_maximum_lifetime() >= 2.0,
+		"Freezer activation emits a dense bounded set of slow, long-lived snowflakes."
 	)
 
 	# Level refreshes the active state every frame; a repeat must not restart the entrance tween.
