@@ -134,12 +134,14 @@ const EVENTS := {
 		"max_polyphony": 1,
 	},
 	EVENT_REWARD_CHEST_STAR_ARRIVAL: {
-		# Trial the brighter HUD arrival recording for chest impacts while keeping this separate
-		# semantic event's existing mix variation and rapid per-star playback policy.
-		"streams": ["res://assets/audio/star_hud_arrival/star_hud_arrival.wav"],
+		# A short, smoothly faded derivative of the HUD arrival keeps rapid impacts distinct without
+		# stacking its full tonal tail. The source HUD recording remains unchanged.
+		"streams": [
+			"res://assets/audio/reward_chest_star_arrival/reward_chest_star_arrival_short.wav"
+		],
 		"volume_db": -3.0,
 		"volume_variation_db": 0.6,
-		"pitch_range": Vector2(0.98, 1.04),
+		"pitch_range": Vector2(0.995, 1.005),
 		# Matches the flyer's authored stagger floor so a long flight keeps its rhythm instead of
 		# collapsing into one loud stack.
 		"cooldown_seconds": 0.05,

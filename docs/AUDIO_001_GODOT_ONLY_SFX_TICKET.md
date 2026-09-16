@@ -382,15 +382,16 @@ overwritten by the generator.
 | `coin_gain` | `coin_gain.wav` | -1.0 dB | 0.995–1.005 | 200 ms | 2 |
 | `coin_spend` | `coin_spend.wav` | -2.0 dB | 0.995–1.005 | 150 ms | 2 |
 | `shop_purchase_success` | `purchase_successful.wav` | +2.0 dB | none | 600 ms | 1 |
-| `reward_chest_star_arrival` | `star_hud_arrival.wav` | -3.0 dB ±0.6 | 0.98–1.04 | 50 ms | 3 |
+| `reward_chest_star_arrival` | `reward_chest_star_arrival_short.wav` | -3.0 dB ±0.6 | 0.995–1.005 | 50 ms | 3 |
 | `ui_click` | `ui_click_01..03` | -2.0 dB ±0.4 | 0.97–1.03 | 40 ms | 3 |
 
 `star_hud_arrival` additionally carries count scaling (+0.9 dB and +0.012 pitch per extra star,
 capped at +3.0 dB and 1.05), so a multi-star combo is one bigger arrival rather than one cue per
 star.
 
-The reward-chest event currently trials that same authored recording with its own per-star cooldown
-and polyphony policy. The three prior chest variants remain committed as inactive comparison assets.
+The reward-chest event uses a 200 ms derivative of that authored recording: its attack is retained,
+then a raised-cosine fade from 160–200 ms reaches sample-accurate silence before rapid arrivals can
+build a tonal tail. The three prior chest variants remain committed as inactive comparison assets.
 
 The later Time Up transition replaced the runtime stream with the supplied authored
 `assets/audio/time_up/times_up2.mp3`. The original `time_up.wav` remains listed in the generated

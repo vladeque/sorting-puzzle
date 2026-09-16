@@ -17,6 +17,9 @@ const SfxCatalogScript := preload("res://scripts/audio/sfx_catalog.gd")
 
 const AUDIO_DIRECTORY := "res://assets/audio"
 const MANIFEST_PATH := "res://assets/audio/generated_sfx_manifest.json"
+const REWARD_CHEST_SHORT_CUE := (
+	"res://assets/audio/reward_chest_star_arrival/reward_chest_star_arrival_short.wav"
+)
 const RETAINED_RECORDINGS := {
 	"res://assets/audio/item_place_valid/item_place.wav": SfxCatalogScript.EVENT_ITEM_PLACE_VALID,
 	"res://assets/audio/match_clear/triple_clear.wav": SfxCatalogScript.EVENT_MATCH_CLEAR,
@@ -48,6 +51,7 @@ const INACTIVE_AUTHORED_CUES := [
 	"res://assets/audio/reward_chest_star_arrival/reward_chest_star_arrival_02.wav",
 	"res://assets/audio/reward_chest_star_arrival/reward_chest_star_arrival_03.wav",
 ]
+const DERIVED_RUNTIME_CUES := [REWARD_CHEST_SHORT_CUE]
 ## The ticket's per-cue duration windows, in milliseconds.
 const DURATION_WINDOWS_MS := {
 	"item_select": Vector2(40.0, 75.0),
@@ -226,7 +230,7 @@ func _test_committed_wav_constraints() -> void:
 		)
 
 	var authored_wav_count := 0
-	for source_path in AUTHORED_SOURCE_CUES + INACTIVE_AUTHORED_CUES:
+	for source_path in AUTHORED_SOURCE_CUES + INACTIVE_AUTHORED_CUES + DERIVED_RUNTIME_CUES:
 		if str(source_path).get_extension().to_lower() == "wav":
 			authored_wav_count += 1
 	_check(
@@ -310,12 +314,25 @@ func _test_catalog_completeness() -> void:
 			"The inactive authored comparison cue stays out of the runtime catalog (%s)." % inactive_path
 		)
 
+	for derived_path in DERIVED_RUNTIME_CUES:
+		_check(
+			ResourceLoader.exists(derived_path) and catalog_paths.has(derived_path),
+			"The derived runtime cue is importable and catalogued (%s)." % derived_path
+		)
+
 	_check(
 		SfxCatalogScript.get_event(SfxCatalogScript.EVENT_REWARD_CHEST_STAR_ARRIVAL).get(
 			"streams", []
-		) == ["res://assets/audio/star_hud_arrival/star_hud_arrival.wav"],
-		"Reward chest arrivals trial the authored HUD arrival recording."
+		) == [REWARD_CHEST_SHORT_CUE],
+		"Reward chest arrivals use the short, chest-specific HUD arrival derivative."
 	)
+	var short_cue := load(REWARD_CHEST_SHORT_CUE) as AudioStreamWAV
+	_check(short_cue != null, "The short reward-chest cue imports as AudioStreamWAV.")
+	if short_cue != null:
+		_check(
+			absf(short_cue.get_length() - 0.2) <= 0.005,
+			"The short reward-chest cue lasts 200 ms."
+		)
 
 
 func _get_duration_window(cue_name: String) -> Vector2:

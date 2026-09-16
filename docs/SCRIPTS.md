@@ -1104,8 +1104,9 @@ Purpose:
   WAVE-Extensible encoding. Their channels and audible content are otherwise retained.
 - `star_hud_arrival` carries a `count_scaling` block so a multi-star reward becomes one bigger cue
   instead of one full-volume sound per star.
-- `reward_chest_star_arrival` currently shares `star_hud_arrival.wav` as a sound trial while
-  retaining its own per-impact volume variation, pitch range, cooldown, and polyphony settings.
+- `reward_chest_star_arrival` uses a 200 ms, smoothly faded derivative of `star_hud_arrival.wav`
+  while retaining its own per-impact volume variation, cooldown, and polyphony settings. Its narrow
+  0.995–1.005 pitch window avoids a random tonal cluster during rapid arrivals.
 
 ## `scripts/audio/ui_click_binder.gd`
 
@@ -1149,6 +1150,21 @@ Regenerate with:
   exceeds the -1 dBFS ceiling.
 - Deliberately does not synthesize replacements for `item_place.wav`, `triple_clear.wav`, the
   authored 30-second timer bed, or the authored shop-purchase confirmation.
+
+## `scripts/tools/build_reward_chest_arrival.ps1`
+
+Purpose:
+- Deterministically derives the short per-impact reward-chest cue from the authored
+  `star_hud_arrival.wav` without changing the HUD source.
+- Keeps 200 ms and applies a raised-cosine fade from 160–200 ms so the cue reaches silence before the
+  event's three-voice limit would need to cut a tail during the standard 90 ms arrival cadence.
+
+Run from the repository root with:
+
+```powershell
+& .\scripts\tools\build_reward_chest_arrival.ps1
+& 'D:\Godot\godot.exe' --headless --path . --import
+```
 
 ## `scripts/tools/core_sfx_synthesis.gd`
 
