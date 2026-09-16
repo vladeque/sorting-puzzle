@@ -134,11 +134,9 @@ const EVENTS := {
 		"max_polyphony": 1,
 	},
 	EVENT_REWARD_CHEST_STAR_ARRIVAL: {
-		"streams": [
-			"res://assets/audio/reward_chest_star_arrival/reward_chest_star_arrival_01.wav",
-			"res://assets/audio/reward_chest_star_arrival/reward_chest_star_arrival_02.wav",
-			"res://assets/audio/reward_chest_star_arrival/reward_chest_star_arrival_03.wav",
-		],
+		# Trial the brighter HUD arrival recording for chest impacts while keeping this separate
+		# semantic event's existing mix variation and rapid per-star playback policy.
+		"streams": ["res://assets/audio/star_hud_arrival/star_hud_arrival.wav"],
 		"volume_db": -3.0,
 		"volume_variation_db": 0.6,
 		"pitch_range": Vector2(0.98, 1.04),

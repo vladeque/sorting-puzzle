@@ -33,6 +33,17 @@ This file maps scenes to their responsibilities, scripts, important nodes, and r
 
 See [STICKY_ITEMS.md](STICKY_ITEMS.md) for ownership, rules, capture commands, and verification limits.
 
+## Reward chest fill preview
+
+- `scenes/testing/reward_chest_fill_preview.tscn` is a standalone F6 preview for the production
+  `main_menu_reward_chest.tscn` and `main_menu_reward_star_flyer.tscn` components.
+- It automatically flies twelve stars into an empty chest, advances the visible count on each
+  impact, pulses the real chest widget, and requests `reward_chest_star_arrival` through SfxManager.
+- Replay and Reset make sound comparisons repeatable. The preview owns presentation state only and
+  never reads or writes `PlayerProgress`.
+- `tests/ui/test_reward_chest_fill_preview.gd` runs a complete twelve-star flight and verifies the
+  visible fill, per-impact semantic audio requests, and unchanged saved progress.
+
 All UI scenes inherit the project typography theme from
 `assets/themes/game_typography.tres`. Scene labels select semantic variations
 such as `GameTitleLabel`, `GameNumberLabel`, and `GameBodyLabel`; see

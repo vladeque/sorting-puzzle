@@ -34,12 +34,19 @@ const AUTHORED_SOURCE_CUES := [
 	"res://assets/audio/timer_critical_tick/timer_tick.wav",
 	"res://assets/audio/time_up/times_up2.mp3",
 	"res://assets/audio/star_hud_arrival/star_hud_arrival.wav",
-	"res://assets/audio/reward_chest_star_arrival/reward_chest_star_arrival_01.wav",
-	"res://assets/audio/reward_chest_star_arrival/reward_chest_star_arrival_02.wav",
-	"res://assets/audio/reward_chest_star_arrival/reward_chest_star_arrival_03.wav",
 	"res://assets/audio/ui_click/ui_click_01.wav",
 	"res://assets/audio/ui_click/ui_click_02.wav",
 	"res://assets/audio/ui_click/ui_click_03.wav",
+]
+## Kept as easy-to-restore comparison material. This includes the prior chest variants while that
+## event trials star_hud_arrival.wav. Unlike AUTHORED_SOURCE_CUES, none are runtime-catalogued.
+const INACTIVE_AUTHORED_CUES := [
+	"res://assets/audio/ability_lantern/lantern1.wav",
+	"res://assets/audio/match_clear/triple_clear1.wav",
+	"res://assets/audio/match_clear/triple_clear2.wav",
+	"res://assets/audio/reward_chest_star_arrival/reward_chest_star_arrival_01.wav",
+	"res://assets/audio/reward_chest_star_arrival/reward_chest_star_arrival_02.wav",
+	"res://assets/audio/reward_chest_star_arrival/reward_chest_star_arrival_03.wav",
 ]
 ## The ticket's per-cue duration windows, in milliseconds.
 const DURATION_WINDOWS_MS := {
@@ -219,7 +226,7 @@ func _test_committed_wav_constraints() -> void:
 		)
 
 	var authored_wav_count := 0
-	for source_path in AUTHORED_SOURCE_CUES:
+	for source_path in AUTHORED_SOURCE_CUES + INACTIVE_AUTHORED_CUES:
 		if str(source_path).get_extension().to_lower() == "wav":
 			authored_wav_count += 1
 	_check(
@@ -292,6 +299,23 @@ func _test_catalog_completeness() -> void:
 			catalog_paths.has(generated_path),
 			"The catalog references authored source cue %s." % generated_path
 		)
+
+	for inactive_path in INACTIVE_AUTHORED_CUES:
+		_check(
+			ResourceLoader.exists(inactive_path),
+			"The inactive authored comparison cue is importable (%s)." % inactive_path
+		)
+		_check(
+			not catalog_paths.has(inactive_path),
+			"The inactive authored comparison cue stays out of the runtime catalog (%s)." % inactive_path
+		)
+
+	_check(
+		SfxCatalogScript.get_event(SfxCatalogScript.EVENT_REWARD_CHEST_STAR_ARRIVAL).get(
+			"streams", []
+		) == ["res://assets/audio/star_hud_arrival/star_hud_arrival.wav"],
+		"Reward chest arrivals trial the authored HUD arrival recording."
+	)
 
 
 func _get_duration_window(cue_name: String) -> Vector2:

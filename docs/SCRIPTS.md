@@ -13,6 +13,12 @@ contract, CLI, tests, and release boundary.
 
 This file documents what each script owns. Keep script docs focused on responsibilities, exports, dependencies, and boundaries.
 
+## `scripts/testing/reward_chest_fill_preview.gd`
+
+Attached to `scenes/testing/reward_chest_fill_preview.tscn`. It drives the production reward chest
+and star flyer in an isolated, replayable F6 preview, updates a local-only progress count, and plays
+the semantic chest-arrival event on each impact. It never touches saved progression.
+
 ## `scripts/production_main_menu.gd`
 
 Attached to:
@@ -1098,6 +1104,8 @@ Purpose:
   WAVE-Extensible encoding. Their channels and audible content are otherwise retained.
 - `star_hud_arrival` carries a `count_scaling` block so a multi-star reward becomes one bigger cue
   instead of one full-volume sound per star.
+- `reward_chest_star_arrival` currently shares `star_hud_arrival.wav` as a sound trial while
+  retaining its own per-impact volume variation, pitch range, cooldown, and polyphony settings.
 
 ## `scripts/audio/ui_click_binder.gd`
 

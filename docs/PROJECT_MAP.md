@@ -16,6 +16,8 @@ Main scene:
 Testing menu:
 - `scenes/main_menu_testing.tscn`
 - Preserves the previous main menu with campaign play and developer/test level selection.
+- `scenes/testing/reward_chest_fill_preview.tscn` can be run directly with F6 to replay a full
+  reward-star flight into the production chest widget without changing saved progress.
 
 Playable level scene:
 - `level.tscn`
