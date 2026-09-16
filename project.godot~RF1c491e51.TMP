@@ -1,0 +1,64 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="SortingPuzzle"
+config/version="0.1.0"
+run/main_scene="res://scenes/main_menu.tscn"
+config/features=PackedStringArray("4.6", "Mobile")
+config/icon="res://icon.svg"
+config/backend_base_url=""
+config/save_sync_v2_enabled=false
+config/secure_storage_bridge_singleton=""
+config/build_number=1
+config/leaderboard_provider="mock"
+config/store_provider="mock"
+config/mock_store_country="US"
+config/shop_catalog_source="local"
+
+[audio]
+
+buses/default_bus_layout="res://assets/audio/default_bus_layout.tres"
+
+[autoload]
+
+LocalBackendDebugBootstrap="*res://scripts/save/local_backend_debug_bootstrap.gd"
+ChapterCatalog="*res://scripts/chapters/chapter_catalog.gd"
+PlayerProgress="*res://scripts/player_progress.gd"
+SfxManager="*res://scripts/audio/sfx_manager.gd"
+LevelTransition="*res://scripts/level_transition.gd"
+
+[display]
+
+window/size/viewport_width=720
+window/size/viewport_height=1280
+window/stretch/mode="canvas_items"
+window/stretch/aspect="keep_width"
+window/handheld/orientation=1
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/sorting_puzzle_secure_store_bridge/plugin.cfg")
+
+[gui]
+
+theme/custom="res://assets/themes/game_typography.tres"
+
+[physics]
+
+3d/physics_engine="Jolt Physics"
+
+[rendering]
+
+rendering_device/driver.windows="d3d12"
+renderer/rendering_method="mobile"
+textures/vram_compression/import_etc2_astc=true
+anti_aliasing/quality/msaa_2d=1
