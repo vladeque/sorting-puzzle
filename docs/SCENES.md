@@ -1145,7 +1145,8 @@ Depends on:
 - Runtime open/close wiring from `scripts/production_main_menu.gd`.
 
 Do not use for:
-- Applying actual music, sound effects, vibration, support, or language settings. Those runtime systems are not implemented yet.
+- Applying actual music, support, or language settings. Sound effects and vibration are applied by
+  their global runtime managers through `scripts/pause_menu.gd`.
 
 ## `scenes/ui/profile_menu.tscn`
 
@@ -2038,7 +2039,8 @@ Depends on:
 - Shared settings-button visual toggles from `scripts/pause_menu.gd`, persisted through `PlayerProgress`.
 
 Do not use for:
-- Timer state, scene navigation, gameplay pause rules, music playback, or actual vibration settings. Those stay in owning runtime systems.
+- Timer state, scene navigation, gameplay pause rules, music playback, or vibration playback. Those
+  stay in owning runtime systems; this scene only exposes the saved toggle through `pause_menu.gd`.
 
 ## `scenes/leave_confirmation_menu.tscn`
 

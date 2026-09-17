@@ -54,6 +54,7 @@ const LAYOUT_SCENE_TEMPLATE := "res://scenes/layouts/layout_%s.tscn"
 const DEFAULT_LAYOUT_PRESET := "grid_3x3"
 const MAIN_MENU_SCENE := "res://scenes/main_menu.tscn"
 const SfxCatalogScript := preload("res://scripts/audio/sfx_catalog.gd")
+const HapticsCatalogScript := preload("res://scripts/haptics/haptics_catalog.gd")
 const REWARD_STAR_TEXTURE := preload("res://assets/ui/reward_star_34_glossy_b.png")
 const SHUFFLE_BOX_TEXTURE := preload("res://assets/abilities/ability_shuffle_box.png")
 const PAUSE_SETTING_SOUND_EFFECTS := &"sound_effects"
@@ -546,6 +547,12 @@ func _play_sfx(event_id: StringName, context: Dictionary = {}) -> void:
 		return
 
 	SfxManager.play(event_id, context)
+
+
+## The level's only route to handheld vibration. The manager applies the saved preference,
+## priority, cooldown, and platform fallback; this scene only identifies semantic moments.
+func _play_haptic(event_id: StringName, context: Dictionary = {}) -> void:
+	HapticsManager.play(event_id, context)
 
 
 func _stop_sound_effects() -> void:
@@ -1739,6 +1746,7 @@ func _update_locked_shelves() -> Array[Node]:
 	if not newly_unlocked_shelves.is_empty():
 		# Multiple shelves crossing the same clear threshold share one unlock confirmation.
 		_play_sfx(SfxCatalogScript.EVENT_SHELF_UNLOCK)
+		_play_haptic(HapticsCatalogScript.EVENT_SHELF_UNLOCK)
 
 	return newly_unlocked_shelves
 
@@ -2026,6 +2034,7 @@ func _handle_level_time_expired() -> void:
 	# modal refreshes; terminal expiry instead uses the dedicated failure cue above. Its supplied
 	# one-second cue begins with the HUD snap, while the modal's settling pop lands on the tail.
 	_play_sfx(SfxCatalogScript.EVENT_TIME_UP)
+	_play_haptic(HapticsCatalogScript.EVENT_TIME_UP)
 	_top_hud.play_time_up_pulse()
 	if _time_up_transition_overlay != null:
 		await _time_up_transition_overlay.play(_top_hud.get_timer_global_center())
@@ -2093,6 +2102,7 @@ func _fail_level() -> void:
 	_update_ability_buttons()
 	_update_pause_menu_button()
 	_play_sfx(SfxCatalogScript.EVENT_LEVEL_FAILED)
+	_play_haptic(HapticsCatalogScript.EVENT_LEVEL_FAILED)
 
 	if _dragged_item != null and _origin_slot != null:
 		_dragged_item.set_drag_lifted(false)
@@ -2152,6 +2162,7 @@ func _complete_level() -> void:
 	if _time_up_transition_overlay != null:
 		_time_up_transition_overlay.reset()
 	_play_sfx(SfxCatalogScript.EVENT_LEVEL_COMPLETE)
+	_play_haptic(HapticsCatalogScript.EVENT_LEVEL_COMPLETE)
 
 	_completion_celebration_active = true
 	if _completion_confetti != null:
@@ -2343,6 +2354,7 @@ func _on_retry_life_purchase_requested() -> void:
 			return
 
 		_play_sfx(SfxCatalogScript.EVENT_COIN_SPEND)
+		_play_haptic(HapticsCatalogScript.EVENT_LIFE_PURCHASE_SUCCESS)
 
 	_restart_level()
 
@@ -2625,6 +2637,7 @@ func _on_time_extension_coin_requested() -> void:
 		return
 
 	_play_sfx(SfxCatalogScript.EVENT_COIN_SPEND)
+	_play_haptic(HapticsCatalogScript.EVENT_TIME_EXTENSION_SUCCESS)
 	_coin_time_extensions_used += 1
 	_time_remaining = float(_time_extension_seconds)
 	_time_extension_offer_active = false
@@ -2697,6 +2710,7 @@ func _handle_press_at(pointer_global_position: Vector2, pointer_id := -1) -> voi
 		clicked_item.begin_sticky_hold()
 		# This is the only owner of invalid_action.wav: ordinary failed drops remain silent.
 		_play_sfx(SfxCatalogScript.EVENT_STICKY_MOVE_BLOCKED)
+		_play_haptic(HapticsCatalogScript.EVENT_STICKY_MOVE_BLOCKED)
 		get_viewport().set_input_as_handled()
 		return
 
@@ -2762,6 +2776,7 @@ func _handle_release_at(pointer_global_position: Vector2, pointer_id := -1) -> v
 		# Only this branch is a finished tap that selected an eligible item. A press that became a
 		# drag cleared _pressed_item on the way, and a locked/ineligible shelf fails the guard.
 		_play_sfx(SfxCatalogScript.EVENT_ITEM_SELECT)
+		_play_haptic(HapticsCatalogScript.EVENT_ITEM_SELECT)
 
 	_pressed_item = null
 	_pressed_origin_slot = null
@@ -2834,6 +2849,7 @@ func _begin_drag(item: ShelfItem, pointer_global_position: Vector2) -> void:
 	# is what separates "held above the board" from "resting in a slot".
 	item.set_drag_lifted(true)
 	item.global_position = pointer_global_position + _drag_offset
+	_play_haptic(HapticsCatalogScript.EVENT_ITEM_PICKUP)
 
 
 func _move_active_drag(pointer_global_position: Vector2) -> void:
@@ -3055,7 +3071,12 @@ func _get_slot_item(slot: Node2D) -> ShelfItem:
 
 ## `should_play_landing` distinguishes a player-visible drop, which gets the full landing feedback,
 ## from a silent forced restore (level failure, ability interrupt) that should not read as a move.
-func _place_item_in_slot(item: ShelfItem, slot: Node2D, should_play_landing := false) -> void:
+func _place_item_in_slot(
+	item: ShelfItem,
+	slot: Node2D,
+	should_play_landing := false,
+	should_play_haptic := false
+) -> void:
 	item.reparent(slot, true)
 	item.position = SLOT_ITEM_POSITION
 	item.z_index = 10
@@ -3066,6 +3087,8 @@ func _place_item_in_slot(item: ShelfItem, slot: Node2D, should_play_landing := f
 	if should_play_landing:
 		item.play_land_impact()
 		_play_sfx(SfxCatalogScript.EVENT_ITEM_PLACE_VALID)
+		if should_play_haptic:
+			_play_haptic(HapticsCatalogScript.EVENT_ITEM_PLACE_VALID)
 
 
 func _move_item_to_slot_after_animation(item: ShelfItem, target_slot: Node2D, shelves_to_check: Array[Node]) -> void:
@@ -3126,6 +3149,7 @@ func _play_item_move_animation(
 	item.play_land_impact()
 	if is_accepted_landing:
 		_play_sfx(SfxCatalogScript.EVENT_ITEM_PLACE_VALID)
+		_play_haptic(HapticsCatalogScript.EVENT_ITEM_PLACE_VALID)
 
 
 func _add_shelf_to_check(shelves_to_check: Array[Node], slot: Node2D) -> void:
@@ -3261,6 +3285,7 @@ func _play_match_clear_animation(shelf_items: Array[ShelfItem]) -> void:
 
 	await gather_tween.finished
 	_play_sfx(SfxCatalogScript.EVENT_MATCH_CLEAR)
+	_play_haptic(HapticsCatalogScript.EVENT_MATCH_CLEAR)
 
 	for item in shelf_items:
 		if item != center_item and item != null and is_instance_valid(item):
@@ -3971,6 +3996,8 @@ func _play_hammer_ability(items_to_destroy: Array[ShelfItem]) -> void:
 	if not effect.has_impacted():
 		await effect.impact
 	_play_sfx(SfxCatalogScript.EVENT_ABILITY_HAMMER)
+	if hammer_haptics_enabled:
+		_play_haptic(HapticsCatalogScript.EVENT_ABILITY_HAMMER)
 	_play_hammer_screen_shake()
 	_play_hammer_destroy_animation(merged_item, items_to_destroy)
 	var earned_stars := _record_triples_cleared(destroyed_triples)
@@ -4262,6 +4289,7 @@ func _play_shuffle_ability(items_to_shuffle: Array[ShelfItem]) -> void:
 	if not animation_entries.is_empty():
 		var box_center := _get_shuffle_box_opening_global_position(shuffle_box)
 		_play_sfx(SfxCatalogScript.EVENT_ABILITY_SHUFFLE)
+		_play_haptic(HapticsCatalogScript.EVENT_ABILITY_SHUFFLE)
 		await _play_shuffle_items_into_box(animation_entries, box_center)
 		_shuffle_item_id_assignments(items_to_shuffle)
 		if shuffle_box != null:
@@ -4580,6 +4608,7 @@ func _use_highlight() -> bool:
 		_apply_item_visual_state(item)
 
 	_play_sfx(SfxCatalogScript.EVENT_ABILITY_LANTERN)
+	_play_haptic(HapticsCatalogScript.EVENT_ABILITY_LANTERN)
 	_update_highlight_timer_label()
 	_update_ability_interaction_state()
 	return true
@@ -4593,6 +4622,7 @@ func _use_freezer() -> bool:
 	_update_freezer_visuals()
 	_update_ability_interaction_state()
 	_play_sfx(SfxCatalogScript.EVENT_ABILITY_FREEZER)
+	_play_haptic(HapticsCatalogScript.EVENT_ABILITY_FREEZER)
 	return true
 
 

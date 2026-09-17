@@ -1,7 +1,7 @@
 extends SceneTree
 
-## Shared event-wiring verification: catalogued cues fire from their semantic gameplay moments and
-## stay silent everywhere their contracts say they must.
+## Shared feedback event-wiring verification: catalogued audio and haptic events fire from their
+## semantic gameplay moments and stay silent everywhere their contracts say they must.
 ##
 ## Run through scripts/tools/run_isolated_godot_test.ps1:
 ##
@@ -12,6 +12,7 @@ extends SceneTree
 
 const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
 const SfxCatalogScript := preload("res://scripts/audio/sfx_catalog.gd")
+const HapticsCatalogScript := preload("res://scripts/haptics/haptics_catalog.gd")
 
 const LEVEL_SCENE_PATH := "res://level.tscn"
 const MAIN_MENU_SCENE_PATH := "res://scenes/main_menu.tscn"
@@ -21,8 +22,10 @@ const SOUND_EFFECTS_SETTING := &"sound_effects"
 
 var _failures: Array[String] = []
 var _manager: Node
+var _haptics_manager: Node
 var _progress: Node
 var _recorded: Array[Dictionary] = []
+var _recorded_haptics: Array[Dictionary] = []
 var _level_scene: PackedScene
 var _main_menu_scene: PackedScene
 var _shop_screen_script: GDScript
@@ -41,15 +44,19 @@ func _init() -> void:
 func _run() -> void:
 	await process_frame
 	_manager = root.get_node_or_null(^"SfxManager")
+	_haptics_manager = root.get_node_or_null(^"HapticsManager")
 	_progress = root.get_node_or_null(^"PlayerProgress")
-	if _manager == null or _progress == null:
-		push_error("SfxManager and PlayerProgress autoloads are required.")
+	if _manager == null or _haptics_manager == null or _progress == null:
+		push_error("SfxManager, HapticsManager, and PlayerProgress autoloads are required.")
 		quit(1)
 		return
 
 	_manager.connect("event_played", _on_event_played)
+	_haptics_manager.connect("event_played", _on_haptic_event_played)
 	_manager.call("set_muted", false)
+	_haptics_manager.call("set_muted", false)
 	_progress.call("set_setting_disabled", SOUND_EFFECTS_SETTING, false)
+	_progress.call("set_setting_disabled", &"vibration", false)
 	# Scenes loaded here compile scripts that reference the autoload globals, so they cannot be
 	# preloaded at class level (matching tests/ui/test_interaction_motion.gd).
 	_level_scene = load(LEVEL_SCENE_PATH) as PackedScene
@@ -66,7 +73,7 @@ func _run() -> void:
 
 	_progress.call("set_setting_disabled", SOUND_EFFECTS_SETTING, false)
 	if _failures.is_empty():
-		print("SFX event-wiring verification passed.")
+		print("Audio and haptics event-wiring verification passed.")
 		quit(0)
 		return
 
@@ -94,6 +101,10 @@ func _test_placement_routing() -> void:
 		_played(SfxCatalogScript.EVENT_ITEM_PLACE_VALID) == 1,
 		"A deliberate same-slot landing that runs the landing impact plays item_place_valid."
 	)
+	_check(
+		_haptic_played(HapticsCatalogScript.EVENT_ITEM_PLACE_VALID) == 0,
+		"A same-slot landing does not vibrate because it changed no logical state."
+	)
 
 	_begin_recording()
 	level.call("_place_item_in_slot", item, slot, false)
@@ -114,6 +125,10 @@ func _test_placement_routing() -> void:
 	_check(
 		_played(SfxCatalogScript.EVENT_ITEM_PLACE_VALID) == 1,
 		"An accepted move landing plays item_place_valid."
+	)
+	_check(
+		_haptic_played(HapticsCatalogScript.EVENT_ITEM_PLACE_VALID) == 1,
+		"An accepted move landing plays one light snap haptic."
 	)
 
 	await _free_current_scene()
@@ -137,6 +152,10 @@ func _test_item_selection() -> void:
 		_played(SfxCatalogScript.EVENT_ITEM_SELECT) == 1,
 		"A finished tap that selects an eligible item plays item_select."
 	)
+	_check(
+		_haptic_played(HapticsCatalogScript.EVENT_ITEM_SELECT) == 1,
+		"A finished tap that selects an eligible item plays item_select haptics."
+	)
 	_check(level.get("_selected_item") == item, "The tap actually selected the item.")
 
 	# A press that became a drag clears the pressed item on the way, so the release selects nothing.
@@ -150,6 +169,14 @@ func _test_item_selection() -> void:
 		"A release with no pending press (drag or cancel) plays nothing."
 	)
 
+	_begin_recording()
+	level.call("_begin_drag", item, item.global_position)
+	_check(
+		_haptic_played(HapticsCatalogScript.EVENT_ITEM_PICKUP) == 1,
+		"Crossing into a real drag plays one subtle pickup haptic."
+	)
+	level.call("_cancel_active_interaction")
+
 	# invalid_action.wav is intentionally narrower than a generic rejected-move sound.
 	item.is_sticky = true
 	_begin_recording()
@@ -157,6 +184,10 @@ func _test_item_selection() -> void:
 	_check(
 		_played(SfxCatalogScript.EVENT_STICKY_MOVE_BLOCKED) == 1,
 		"Pressing an exposed sticky item plays the dedicated blocked-move cue."
+	)
+	_check(
+		_haptic_played(HapticsCatalogScript.EVENT_STICKY_MOVE_BLOCKED) == 1,
+		"Pressing an exposed sticky item plays one rate-limited resistance haptic."
 	)
 	level.call("_cancel_blocked_press")
 	item.is_sticky = false
@@ -245,6 +276,10 @@ func _test_critical_timer_and_time_up() -> void:
 		_played(SfxCatalogScript.EVENT_TIME_UP) == 1,
 		"An accepted time expiry plays time_up exactly once."
 	)
+	_check(
+		_haptic_played(HapticsCatalogScript.EVENT_TIME_UP) == 1,
+		"An accepted time expiry starts one warning haptic pattern."
+	)
 
 	_begin_recording()
 	level.call("_handle_level_time_expired")
@@ -252,6 +287,10 @@ func _test_critical_timer_and_time_up() -> void:
 	_check(
 		_played(SfxCatalogScript.EVENT_TIME_UP) == 0,
 		"Re-entering the expiry or refreshing the modal does not replay time_up."
+	)
+	_check(
+		_haptic_played(HapticsCatalogScript.EVENT_TIME_UP) == 0,
+		"Re-entering the expiry does not replay its warning haptic."
 	)
 
 	# A terminal level keeps ticking silent even if the HUD is driven again.
@@ -277,6 +316,10 @@ func _test_gameplay_source_cues() -> void:
 			and _played(SfxCatalogScript.EVENT_ABILITY_LANTERN) == 1,
 		"A successful Lantern activation plays its authored cue once."
 	)
+	_check(
+		_haptic_played(HapticsCatalogScript.EVENT_ABILITY_LANTERN) == 1,
+		"A successful Lantern activation plays one reveal haptic."
+	)
 	level.call("_clear_ability_highlights", true)
 
 	_begin_recording()
@@ -284,6 +327,10 @@ func _test_gameplay_source_cues() -> void:
 		bool(level.call("_use_freezer"))
 			and _played(SfxCatalogScript.EVENT_ABILITY_FREEZER) == 1,
 		"A successful Freezer activation plays its authored cue once."
+	)
+	_check(
+		_haptic_played(HapticsCatalogScript.EVENT_ABILITY_FREEZER) == 1,
+		"A successful Freezer activation plays one freeze haptic."
 	)
 
 	var shelf := (level.call("_get_all_shelves") as Array)[0] as Node
@@ -297,6 +344,24 @@ func _test_gameplay_source_cues() -> void:
 		_played(SfxCatalogScript.EVENT_SHELF_UNLOCK) == 1,
 		"Crossing a shelf's clear threshold plays one unlock cue."
 	)
+	_check(
+		_haptic_played(HapticsCatalogScript.EVENT_SHELF_UNLOCK) == 1,
+		"Crossing a shelf's clear threshold starts one unlock haptic pattern."
+	)
+
+	var visible_items := level.call("_get_visible_items") as Array
+	if visible_items.size() >= 3:
+		var clearing_items: Array[ShelfItem] = []
+		for item_index in range(3):
+			clearing_items.append(visible_items[item_index] as ShelfItem)
+		_begin_recording()
+		await level.call("_play_match_clear_animation", clearing_items)
+		_check(
+			_haptic_played(HapticsCatalogScript.EVENT_MATCH_CLEAR) == 1,
+			"The post-gather triple-clear beat plays one match haptic."
+		)
+	else:
+		_failures.append("The gameplay fixture exposes fewer than three items for match haptics.")
 	await _free_current_scene()
 
 	level = await _open_level()
@@ -315,6 +380,10 @@ func _test_gameplay_source_cues() -> void:
 	_check(
 		_played(SfxCatalogScript.EVENT_ABILITY_SHUFFLE) == 1,
 		"Shuffle starts its authored cue when the items begin flying into the box."
+	)
+	_check(
+		_haptic_played(HapticsCatalogScript.EVENT_ABILITY_SHUFFLE) == 1,
+		"Shuffle starts its haptic pattern with the item fly-in."
 	)
 	await _wait_seconds(1.0)
 	_check(
@@ -340,6 +409,10 @@ func _test_gameplay_source_cues() -> void:
 		_played(SfxCatalogScript.EVENT_ABILITY_HAMMER) == 1,
 		"Hammer starts its authored cue on the strike's impact beat."
 	)
+	_check(
+		_haptic_played(HapticsCatalogScript.EVENT_ABILITY_HAMMER) == 1,
+		"Hammer starts its strong haptic on the authored impact beat."
+	)
 	await _wait_seconds(0.65)
 	await _free_current_scene()
 
@@ -350,6 +423,10 @@ func _test_gameplay_source_cues() -> void:
 		_played(SfxCatalogScript.EVENT_LEVEL_FAILED) == 1,
 		"Opening the terminal failure flow plays level_failed once."
 	)
+	_check(
+		_haptic_played(HapticsCatalogScript.EVENT_LEVEL_FAILED) == 1,
+		"Opening the terminal failure flow starts one failure pattern."
+	)
 	await _free_current_scene()
 
 	level = await _open_level()
@@ -358,6 +435,10 @@ func _test_gameplay_source_cues() -> void:
 	_check(
 		_played(SfxCatalogScript.EVENT_LEVEL_COMPLETE) == 1,
 		"Starting the completion celebration plays level_complete once."
+	)
+	_check(
+		_haptic_played(HapticsCatalogScript.EVENT_LEVEL_COMPLETE) == 1,
+		"Starting the completion celebration starts one success pattern."
 	)
 	await _free_current_scene()
 
@@ -381,6 +462,10 @@ func _test_level_coin_spending() -> void:
 		_played(SfxCatalogScript.EVENT_COIN_SPEND) == 1,
 		"A successful time-extension purchase plays coin_spend once."
 	)
+	_check(
+		_haptic_played(HapticsCatalogScript.EVENT_TIME_EXTENSION_SUCCESS) == 1,
+		"A successful time extension plays one confirmation haptic."
+	)
 
 	# A rejected spend (no coins left) must stay silent.
 	_progress.call("spend_coins", _progress.call("get_coins"), "gameplay")
@@ -394,6 +479,10 @@ func _test_level_coin_spending() -> void:
 		_played(SfxCatalogScript.EVENT_COIN_SPEND) == 0,
 		"An extension the player cannot afford does not play coin_spend."
 	)
+	_check(
+		_haptic_played(HapticsCatalogScript.EVENT_TIME_EXTENSION_SUCCESS) == 0,
+		"A rejected extension does not vibrate."
+	)
 
 	await _free_current_scene()
 	_progress.call("reset_progress")
@@ -405,15 +494,19 @@ func _test_shop_purchase_routing() -> void:
 	var shop = _shop_screen_script.new()
 
 	_begin_recording()
-	shop.call("_play_purchase_success_audio", {"ok": true, "applied": true, "coins": 500})
+	shop.call("_play_purchase_success_feedback", {"ok": true, "applied": true, "coins": 500})
 	_check(
 		_played(SfxCatalogScript.EVENT_SHOP_PURCHASE_SUCCESS) == 1
 			and _played(SfxCatalogScript.EVENT_COIN_GAIN) == 1,
 		"A granted coin pack plays the confirmation with one layered coin_gain."
 	)
+	_check(
+		_haptic_played(HapticsCatalogScript.EVENT_SHOP_PURCHASE_SUCCESS) == 1,
+		"A granted coin pack plays one composed purchase-success haptic."
+	)
 
 	_begin_recording()
-	shop.call("_play_purchase_success_audio", {"ok": true, "applied": true, "coins": 0})
+	shop.call("_play_purchase_success_feedback", {"ok": true, "applied": true, "coins": 0})
 	_check(
 		_played(SfxCatalogScript.EVENT_SHOP_PURCHASE_SUCCESS) == 1
 			and _played(SfxCatalogScript.EVENT_COIN_GAIN) == 0,
@@ -421,11 +514,15 @@ func _test_shop_purchase_routing() -> void:
 	)
 
 	_begin_recording()
-	shop.call("_play_purchase_success_audio", {"ok": true, "applied": false})
+	shop.call("_play_purchase_success_feedback", {"ok": true, "applied": false})
 	_check(
 		_played(SfxCatalogScript.EVENT_SHOP_PURCHASE_SUCCESS) == 0
 			and _played(SfxCatalogScript.EVENT_COIN_GAIN) == 0,
 		"A duplicate transaction that grants nothing stays silent."
+	)
+	_check(
+		_haptic_played(HapticsCatalogScript.EVENT_SHOP_PURCHASE_SUCCESS) == 0,
+		"A duplicate transaction that grants nothing does not vibrate."
 	)
 
 	shop.free()
@@ -456,6 +553,10 @@ func _test_reward_chest_arrivals() -> void:
 		"An accepted star arrival plays the chest arrival cue."
 	)
 	_check(
+		_haptic_played(HapticsCatalogScript.EVENT_REWARD_CHEST_GOAL_COMPLETE) == 0,
+		"An ordinary chest-star arrival does not vibrate."
+	)
+	_check(
 		_played(SfxCatalogScript.EVENT_COIN_GAIN) == 0,
 		"An arrival short of the goal does not pay out coins."
 	)
@@ -474,6 +575,10 @@ func _test_reward_chest_arrivals() -> void:
 	_check(
 		int(menu.get("_animated_reward_goal_index")) == 1,
 		"The goal-crossing arrival advanced the animated goal."
+	)
+	_check(
+		_haptic_played(HapticsCatalogScript.EVENT_REWARD_CHEST_GOAL_COMPLETE) == 1,
+		"Only a goal-crossing chest arrival starts the reward haptic."
 	)
 
 	await _free_current_scene()
@@ -506,7 +611,9 @@ func _wait_seconds(seconds: float) -> void:
 ## never suppresses the next subtest's first cue.
 func _begin_recording() -> void:
 	_manager.call("reset_playback_state")
+	_haptics_manager.call("reset_playback_state")
 	_recorded.clear()
+	_recorded_haptics.clear()
 
 
 func _played(event_id: StringName) -> int:
@@ -526,8 +633,20 @@ func _last_context(event_id: StringName) -> Dictionary:
 	return {}
 
 
+func _haptic_played(event_id: StringName) -> int:
+	var count := 0
+	for entry in _recorded_haptics:
+		if entry["event_id"] == event_id:
+			count += 1
+	return count
+
+
 func _on_event_played(event_id: StringName, context: Dictionary) -> void:
 	_recorded.append({"event_id": event_id, "context": context})
+
+
+func _on_haptic_event_played(event_id: StringName, context: Dictionary) -> void:
+	_recorded_haptics.append({"event_id": event_id, "context": context})
 
 
 func _check(condition: bool, message: String) -> void:

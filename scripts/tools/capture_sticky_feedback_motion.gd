@@ -21,6 +21,7 @@ func _run() -> void:
 	root.size = Vector2i(720, 1280)
 	await process_frame
 	root.get_node("SfxManager").set_muted(true)
+	root.get_node("HapticsManager").set_muted(true)
 	var level = load("res://scenes/testing/sticky_items_preview.tscn").instantiate()
 	root.add_child(level)
 	level._set_moving_shelf_rows_paused(true)

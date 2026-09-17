@@ -16,7 +16,9 @@ local vertical offset, must be preserved.
   capped at 5 degrees. Vertical pulling stretches/compresses the body by at most 2.5% while its
   ground contact stays fixed. Release springs past rest and settles over 220 ms.
 - Gum widens up to 11%, compresses up to 14%, and skews gently with the lean. This replaces the
-  brightness flash and preserves the authored sprite offset. No new artwork, audio or haptics.
+  brightness flash and preserves the authored sprite offset. The original visual implementation
+  added no supporting media; the later shared feedback pass adds one saved-setting-gated, 32 ms
+  resistance haptic on the initial blocked press.
 - The item root, slot, ID, sticky flag, hitbox and grounded shadow remain unchanged. Blocked
   gestures do not select/drag, raise Z-order, create drop previews, play pickup SFX, or start time.
 - Ordinary selection still routes onto the sticky shelf first. A full destination fails normally
@@ -86,8 +88,9 @@ approved. Use the implementation record above for current behavior and tuning.
   fight this owner. A new feedback channel needs to compose with it.
 - `ui_motion.gd` provides replaceable tweens and cancellation. `ShelfLockOverlay` is an existing
   example of a focused visual owner, but its chain/lock artwork describes a different restriction.
-- `SfxManager` supports mute/settings and cooldowns, but its event catalog has no stuck-item cue.
-  Vibration is a saved setting; the Hammer's standalone haptics flag is not a shared preference.
+- This historical finding predates the shared feedback systems. `SfxManager` now owns the
+  `sticky_move_blocked` cue, and `HapticsManager` owns the rate-limited resistance pulse through the
+  saved vibration preference.
   No shared reduced-motion setting was found in the inspected gameplay/UI code.
 
 ## Directions
@@ -178,9 +181,9 @@ Keep the first implementation visual-only. A short soft rubbery creak could late
 resistance, but requires a new catalog event, a reviewed sound asset, a cooldown, and the existing
 sound setting. Do not repurpose the successful pickup or placement sound. No new art is required.
 
-A brief light haptic could be evaluated on a physical device, gated by the saved vibration setting
-and rate-limited. Do not assume the existing Hammer flag handles that preference. Neither audio nor
-haptics should be necessary to understand the feedback.
+A brief light haptic is now implemented through `HapticsManager`, gated by the saved vibration
+setting and the same 280 ms semantic cooldown as the blocked gesture. Physical-device tuning is
+still required. Neither audio nor haptics is necessary to understand the feedback.
 
 If players still misunderstand the mechanic, a one-time contextual hint such as **“Stuck! Bring
 matching items here.”** is an onboarding option. Keep it out of the repeat-tap effect, place it above

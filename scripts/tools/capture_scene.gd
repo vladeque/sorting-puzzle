@@ -52,11 +52,15 @@ func _init() -> void:
 
 func _run() -> void:
 	await process_frame
-	# Captures need a windowed run, which is the one automated context where the SFX owner is not
-	# muted by default. Silence it here so a capture never plays audio on the reviewer's machine.
+	# Captures need a windowed run, which is the one automated context where feedback owners are not
+	# muted by default. Silence them here so a capture never plays audio or haptics on the reviewer's
+	# machine.
 	var sfx_manager := root.get_node_or_null(^"SfxManager")
 	if sfx_manager != null:
 		sfx_manager.call("set_muted", true)
+	var haptics_manager := root.get_node_or_null(^"HapticsManager")
+	if haptics_manager != null:
+		haptics_manager.call("set_muted", true)
 
 	var options := _parse_arguments()
 	var scene_path := str(options.get("scene", ""))

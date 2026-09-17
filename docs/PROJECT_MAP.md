@@ -708,6 +708,31 @@ Verification:
 - `tests/audio/test_core_sfx_assets.gd`, `tests/audio/test_sfx_manager.gd`,
   `tests/audio/test_sfx_event_wiring.gd`.
 
+### Haptics
+
+Global path:
+- `HapticsManager` autoload (`scripts/haptics/haptics_manager.gd`) -> saved vibration preference,
+  priority/cooldown arbitration, cancellable pattern timing -> injected native/test provider or
+  `Input.vibrate_handheld()` fallback.
+- `scripts/haptics/haptics_catalog.gd` maps semantic event ids to short pulse patterns, priorities,
+  cooldowns, and optional bounded count scaling.
+- `export_presets.cfg` enables the Android `VIBRATE` permission.
+
+Policy:
+- Core sorting feedback covers successful selection/pickup, accepted moves, sticky resistance,
+  triple clears, and shelf unlocks. Same-slot landings and ordinary rejected returns do not vibrate.
+- Hammer, Shuffle, Lantern, Freezer, recoverable time-up, time extension, level results, applied
+  purchases, life purchases, chest-goal rollover, and weekly rewards have distinct patterns.
+- Critical timer ticks, individual stars, moving shelves, promotion, passive restoration, generic
+  UI clicks, and modal/navigation changes intentionally remain silent.
+- `PlayerProgress.is_setting_disabled(&"vibration")` gates every ordinary request. The vibration
+  toggle owns one forced final preview when disabling; headless runs and captures can use the
+  manager's independent mute.
+
+Verification and detailed tuning:
+- `tests/haptics/test_haptics_manager.gd`, `tests/audio/test_sfx_event_wiring.gd`, and
+  `docs/HAPTICS.md`.
+
 ### Moving Shelf Rows
 
 Files:

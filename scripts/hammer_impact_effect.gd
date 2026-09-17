@@ -68,7 +68,6 @@ var _approach_start_position := Vector2.ZERO
 var _approach_offset := Vector2.ZERO
 var _approach_amount := 0.0
 var _layout_scale := 1.0
-var _haptics_enabled := true
 var _pre_impact_reached := false
 var _has_impacted := false
 var _trail_points: PackedVector2Array = PackedVector2Array()
@@ -107,7 +106,7 @@ func _ready() -> void:
 
 func play(
 	target_screen_position: Vector2,
-	haptics_enabled := true,
+	_haptics_enabled := true,
 	approach_start_screen_position := Vector2.INF
 ) -> void:
 	_apply_full_rect()
@@ -120,7 +119,6 @@ func play(
 	_approach_offset = _approach_start_position - _impact_position
 	_approach_amount = 1.0
 	_layout_scale = clampf(size.x / DESIGN_WIDTH, 0.75, 1.35)
-	_haptics_enabled = haptics_enabled
 	_pre_impact_reached = false
 	_has_impacted = false
 	visible = true
@@ -362,8 +360,6 @@ func _emit_pre_impact() -> void:
 
 func _emit_impact() -> void:
 	_has_impacted = true
-	if _haptics_enabled and OS.has_feature("mobile"):
-		Input.vibrate_handheld(65, 0.75)
 	impact.emit()
 
 

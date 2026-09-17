@@ -446,7 +446,7 @@ Depends on:
 - Owns Shop loading/error states, creates reusable offer scenes, coordinates one purchase at a time, and routes the shared navigation.
 - Passes purchase results and their offer ids to `PlayerProgress.apply_shop_purchase()`, refreshes
   the visible balance after a grant, and reloads the catalog so a claimed one-time offer disappears.
-- `_play_purchase_success_audio(grant_result)` ties the confirmation cue to rewards actually
+- `_play_purchase_success_feedback(grant_result)` ties audio and haptics to rewards actually
   landing rather than to the button or the dialog (AUDIO-001): it plays `shop_purchase_success`
   only when the grant reports `applied`, layers one `coin_gain` when the grant included coins,
   and stays silent for a duplicate transaction (`ok` with `applied` false) or a failed grant.
@@ -1027,6 +1027,34 @@ Used by:
   `scripts/profile_menu.gd`, `scripts/reward_chest_menu.gd`, `scripts/shop_purchase_dialog.gd`,
   `scripts/leaderboard_reward_dialog.gd`, `scripts/shop_screen.gd`, `scripts/leaderboard_screen.gd`
   (overlay/destination fade in/out).
+
+## `scripts/haptics/haptics_manager.gd`
+
+Registered as:
+- The `HapticsManager` autoload in `project.godot`, after `PlayerProgress` (it reads the saved
+  device-local vibration setting).
+
+Purpose:
+- Accepts semantic `play(event_id, context)` requests from gameplay and economy UI instead of
+  allowing scenes to call `Input.vibrate_handheld()` directly.
+- Runs only one pattern at a time. Higher-priority events invalidate the queued remainder of lower-
+  priority feedback; lower-priority requests are dropped until the important pattern finishes.
+- Applies per-event cooldowns, optional bounded count-based amplitude scaling, and an independent
+  capture/test mute. Headless runs start muted.
+- Emits `event_played` once per accepted event and `pulse_played` for each realized pattern step.
+  Tests inject a `(duration_ms, amplitude)` provider through `set_vibration_provider()`; production
+  falls back to `Input.vibrate_handheld()` on mobile/Web.
+- `acknowledge_vibration_toggle()` previews enabling normally and permits one forced final pulse
+  after disabling. `cancel_active_pattern()` invalidates delayed pulses immediately.
+
+## `scripts/haptics/haptics_catalog.gd`
+
+Purpose:
+- Defines the approved event ids and their fallback pulse patterns, priority, cooldown, and
+  optional match-count scaling in one data-only owner.
+- Keeps each pulse at or below 70 ms and 0.75 amplitude. Native platform bridges can preserve these
+  semantic ids while mapping them to device-tuned selection, impact, success, and warning effects.
+- See `docs/HAPTICS.md` for the complete event policy and physical-device verification boundary.
 
 ## `scripts/audio/sfx_manager.gd`
 
@@ -2006,8 +2034,9 @@ Key responsibilities:
   Gameplay scoring, shelf resolution, and ability input lock rules are unchanged.
 - Hammer requests its shared cue from `scripts/level.gd` on the same authored `impact` signal that
   destroys the merged item and starts the screen shake. Disabling sound while the strike is active
-  stops the cue through `SfxManager`; supported mobile builds receive a short 65 ms impact vibration
-  when the exported `hammer_haptics_enabled` flag is enabled.
+  stops the cue through `SfxManager`; `level.gd` requests the `ability_hammer` pattern from
+  `HapticsManager` on that same impact signal. The exported `hammer_haptics_enabled` flag remains a
+  local capture/test gate, while the manager applies the saved player preference.
 - Shuffle now pauses moving shelf rows, shows the center-screen delivery box, then starts its shared
   cue with the first frame of item flight into the box so the single authored sound spans the fly-in
   and fly-out sequence. It changes unlocked item identity assignments while they are hidden and
@@ -2305,8 +2334,8 @@ Purpose:
   changes through pose 3 retain their fast cadence, then pose 3 holds for the rest of the flight.
 - Samples the head's real path into a short ring buffer so the swing trail follows the swing
   instead of a fixed screen-space arc.
-- Coordinates the optional mobile impact vibration. Hammer audio is requested by `scripts/level.gd`
-  through `SfxManager` when this effect emits `impact`, so the effect scene owns no audio players.
+- Owns no vibration call. `scripts/level.gd` requests Hammer audio and haptics through their shared
+  managers when this effect emits `impact`, keeping the visual component platform-independent.
 - Emits `pre_impact` at authored time 480 ms (about 369 ms into playback), `impact` on frame 7 at
   authored time 560 ms (about 431 ms into playback), hides the hammer by authored time 580 ms, and
   emits `finished` after the remaining VFX fade out.
@@ -2612,6 +2641,9 @@ Purpose:
   `_on_setting_button_pressed()` calls `SfxManager.acknowledge_sound_effects_toggle()` after
   emitting `setting_toggled` -- owners react to the new state first, then the acknowledgement
   sounds, so nothing cuts it off. Every other settings toggle keeps the normal click.
+- Routes the vibration toggle to `HapticsManager.acknowledge_vibration_toggle()`: enabling previews
+  the newly active setting, while disabling forces one final short acknowledgement after saving the
+  disabled state. All later semantic haptics remain gated by that saved preference.
 
 Key methods:
 - `is_setting_disabled(setting_id)`: returns the shared disabled state for owning scripts such as `scripts/level.gd`.
@@ -2627,7 +2659,7 @@ Depends on:
 - `scripts/gameplay_ui_theme.gd` for the modal's preferred size.
 
 Do not use for:
-- Applying actual music or vibration settings until those runtime systems exist.
+- Applying actual music settings until that runtime system exists.
 - Level pause, continue, or leave flow. Those stay in `scripts/level.gd`.
 
 ## `scripts/gameplay_ui_theme.gd`

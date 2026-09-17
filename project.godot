@@ -34,6 +34,7 @@ LocalBackendDebugBootstrap="*res://scripts/save/local_backend_debug_bootstrap.gd
 ChapterCatalog="*res://scripts/chapters/chapter_catalog.gd"
 PlayerProgress="*res://scripts/player_progress.gd"
 SfxManager="*res://scripts/audio/sfx_manager.gd"
+HapticsManager="*res://scripts/haptics/haptics_manager.gd"
 LevelTransition="*res://scripts/level_transition.gd"
 
 [display]

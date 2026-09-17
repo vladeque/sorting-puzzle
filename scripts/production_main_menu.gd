@@ -5,6 +5,7 @@ const SETTINGS_MENU_SCENE := preload("res://scenes/ui/settings_menu.tscn")
 const REWARD_CHEST_MENU_SCENE := preload("res://scenes/ui/reward_chest_menu.tscn")
 const CHAPTER_SELECTION_SCENE := preload("res://scenes/ui/chapter_selection_screen.tscn")
 const SfxCatalogScript := preload("res://scripts/audio/sfx_catalog.gd")
+const HapticsCatalogScript := preload("res://scripts/haptics/haptics_catalog.gd")
 const MenuBackgroundResolverScript := preload("res://scripts/chapters/menu_background_resolver.gd")
 const UIMotionScript := preload("res://scripts/ui_motion.gd")
 const PRODUCTION_MENU_SCENE := "res://scenes/main_menu.tscn"
@@ -111,6 +112,7 @@ func _ready() -> void:
 		# population -- consume_pending_leaderboard_reward() only returns it once.
 		if weekly_coin_reward > 0:
 			SfxManager.play(SfxCatalogScript.EVENT_COIN_GAIN)
+			HapticsManager.play(HapticsCatalogScript.EVENT_LEADERBOARD_REWARD)
 
 
 func _process(delta: float) -> void:
@@ -421,6 +423,7 @@ func _on_reward_star_arrived() -> void:
 	SfxManager.play(SfxCatalogScript.EVENT_REWARD_CHEST_STAR_ARRIVAL)
 	if completed_goal_coin_reward > 0:
 		SfxManager.play(SfxCatalogScript.EVENT_COIN_GAIN)
+		HapticsManager.play(HapticsCatalogScript.EVENT_REWARD_CHEST_GOAL_COMPLETE)
 
 
 func _on_reward_star_animation_finished() -> void:
@@ -638,6 +641,7 @@ func _on_out_of_lives_purchase_requested() -> void:
 		return
 
 	SfxManager.play(SfxCatalogScript.EVENT_COIN_SPEND)
+	HapticsManager.play(HapticsCatalogScript.EVENT_LIFE_PURCHASE_SUCCESS)
 	_update_coin_balance()
 	_update_lives_status()
 	_update_level_button()

@@ -131,6 +131,10 @@ func _on_setting_button_pressed(cross_out: Control, setting_id: StringName) -> v
 		# Emitted first on purpose: owners react to the new state (scripts/level.gd stops its
 		# gameplay cues) and only then does the acknowledgement sound, so nothing cuts it off.
 		SfxManager.acknowledge_sound_effects_toggle(is_disabled)
+	elif setting_id == SETTING_VIBRATION:
+		# Preview after enabling and force one final short acknowledgement after disabling. The
+		# manager owns that exception so every other request still obeys the saved preference.
+		HapticsManager.acknowledge_vibration_toggle(is_disabled)
 
 
 static func _ensure_settings_loaded() -> void:
