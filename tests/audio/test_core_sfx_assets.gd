@@ -18,6 +18,7 @@ const SfxLoudnessStandardScript := preload("res://scripts/audio/sfx_loudness_sta
 
 const AUDIO_DIRECTORY := "res://assets/audio"
 const MANIFEST_PATH := "res://assets/audio/generated_sfx_manifest.json"
+const LOUDNESS_MEASUREMENTS_PATH := "res://assets/audio/sfx_loudness_measurements.json"
 const REWARD_CHEST_SHORT_CUE := (
 	"res://assets/audio/reward_chest_star_arrival/reward_chest_star_arrival_short.wav"
 )
@@ -86,6 +87,7 @@ func _run() -> void:
 	_test_manifest()
 	_test_committed_wav_constraints()
 	_test_catalog_completeness()
+	_test_loudness_measurements()
 
 	if _failures.is_empty():
 		print("Core SFX asset verification passed.")
@@ -349,6 +351,107 @@ func _test_catalog_completeness() -> void:
 		)
 
 
+func _test_loudness_measurements() -> void:
+	var bytes := _read_file(LOUDNESS_MEASUREMENTS_PATH)
+	if bytes.is_empty():
+		_failures.append("Missing loudness measurement snapshot: %s" % LOUDNESS_MEASUREMENTS_PATH)
+		return
+
+	var parsed = JSON.parse_string(bytes.get_string_from_utf8())
+	if not (parsed is Dictionary):
+		_failures.append("The loudness measurement snapshot is not a JSON object.")
+		return
+
+	var snapshot := parsed as Dictionary
+	_check(int(snapshot.get("schema_version", 0)) == 1, "The loudness snapshot uses schema 1.")
+	var measurements_by_path := {}
+	for raw_measurement in snapshot.get("measurements", []) as Array:
+		var measurement := raw_measurement as Dictionary
+		var path := str(measurement.get("path", ""))
+		_check(not path.is_empty(), "Every loudness measurement names its source path.")
+		_check(not measurements_by_path.has(path), "The loudness snapshot lists %s once." % path)
+		measurements_by_path[path] = measurement
+		_check(FileAccess.file_exists(path), "The measured audio file still exists (%s)." % path)
+		if FileAccess.file_exists(path):
+			_check(
+				FileAccess.get_sha256(path) == str(measurement.get("sha256", "")),
+				"%s has fresh loudness measurements for its current bytes." % path
+			)
+		_check(
+			float(measurement.get("true_peak_dbtp", INF))
+				<= SfxLoudnessStandardScript.ASSET_HARD_TRUE_PEAK_DBTP + 0.05,
+			"%s stays at or below the %.1f dBTP source ceiling." % [
+				path, SfxLoudnessStandardScript.ASSET_HARD_TRUE_PEAK_DBTP
+			]
+		)
+
+	var audio_paths := _get_audio_source_paths()
+	audio_paths.sort()
+	var measured_paths := measurements_by_path.keys()
+	measured_paths.sort()
+	_check(
+		measured_paths == audio_paths,
+		"The loudness snapshot covers every committed audio source exactly once."
+	)
+
+	for event_id in SfxCatalogScript.get_event_ids():
+		var config := SfxCatalogScript.get_event(event_id)
+		var class_id := config.get("loudness_class", &"") as StringName
+		var class_config := SfxLoudnessStandardScript.get_class_config(class_id)
+		if class_config.is_empty():
+			continue
+
+		var nominal_range := class_config["nominal_max_m_lufs"] as Vector2
+		var variant_levels: Array[float] = []
+		var stream_offsets := config.get("stream_volume_offsets_db", {}) as Dictionary
+		for raw_stream_path in config.get("streams", []) as Array:
+			var stream_path := str(raw_stream_path)
+			if not measurements_by_path.has(stream_path):
+				_failures.append("%s has no loudness measurement (%s)." % [event_id, stream_path])
+				continue
+
+			var measurement := measurements_by_path[stream_path] as Dictionary
+			var nominal := (
+				float(measurement.get("max_m_lufs", -INF))
+				+ float(config.get("volume_db", 0.0))
+				+ float(stream_offsets.get(stream_path, 0.0))
+			)
+			variant_levels.append(nominal)
+			_check(
+				nominal >= nominal_range.x - 0.25 and nominal <= nominal_range.y + 0.25,
+				"%s/%s is %.2f LUFS-M inside %s's %.1f to %.1f range." % [
+					event_id,
+					stream_path.get_file(),
+					nominal,
+					class_id,
+					nominal_range.x,
+					nominal_range.y,
+				]
+			)
+
+			var scaling := config.get("count_scaling", {}) as Dictionary
+			var burst := (
+				nominal
+				+ float(config.get("volume_variation_db", 0.0))
+				+ float(scaling.get("max_volume_db", 0.0))
+			)
+			_check(
+				burst <= float(class_config["burst_ceiling_lufs"]) + 0.25,
+				"%s remains under its %.1f LUFS-M burst ceiling." % [
+					event_id, float(class_config["burst_ceiling_lufs"])
+				]
+			)
+
+		if variant_levels.size() > 1:
+			var spread: float = variant_levels.max() - variant_levels.min()
+			_check(
+				spread <= SfxLoudnessStandardScript.MAX_VARIANT_SPREAD_LU + 0.05,
+				"%s variants stay within %.1f LU." % [
+					event_id, SfxLoudnessStandardScript.MAX_VARIANT_SPREAD_LU
+				]
+			)
+
+
 func _get_duration_window(cue_name: String) -> Vector2:
 	for prefix in DURATION_WINDOWS_MS:
 		if cue_name.begins_with(str(prefix)):
@@ -362,6 +465,27 @@ func _get_audio_wav_paths() -> Array[String]:
 	var paths: Array[String] = []
 	_collect_wav_paths(AUDIO_DIRECTORY, paths)
 	return paths
+
+
+func _get_audio_source_paths() -> Array:
+	var paths := []
+	_collect_audio_source_paths(AUDIO_DIRECTORY, paths)
+	return paths
+
+
+func _collect_audio_source_paths(directory_path: String, paths: Array) -> void:
+	var directory := DirAccess.open(directory_path)
+	if directory == null:
+		_failures.append("Could not open %s." % directory_path)
+		return
+
+	var extensions := ["wav", "mp3", "ogg", "flac", "m4a", "aac", "opus"]
+	for file_name in directory.get_files():
+		if extensions.has(file_name.get_extension().to_lower()):
+			paths.append(directory_path.path_join(file_name))
+
+	for child_directory in directory.get_directories():
+		_collect_audio_source_paths(directory_path.path_join(child_directory), paths)
 
 
 func _collect_wav_paths(directory_path: String, paths: Array[String]) -> void:

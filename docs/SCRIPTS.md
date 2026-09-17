@@ -1195,6 +1195,27 @@ Regenerate with:
 - Deliberately does not synthesize replacements for `item_place.wav`, `triple_clear.wav`, the
   authored 30-second timer bed, or the authored shop-purchase confirmation.
 
+## `scripts/tools/export_sfx_loudness_manifest.gd`
+
+Purpose:
+- Serializes the typed SFX catalog and machine-readable loudness classes to a temporary JSON file
+  for the PowerShell/FFmpeg audit. It keeps the audit from parsing GDScript source text and is not
+  part of the shipped game.
+
+## `scripts/tools/audit_sfx_loudness.ps1`
+
+Purpose:
+- Inventories every WAV/MP3/Ogg/FLAC/M4A/AAC/Opus file under `assets/audio`, measures 400 ms maximum
+  momentary and integrated BS.1770 loudness, RMS/sample peak, decoded true peak, duration, and hash,
+  then applies catalog event and per-stream gains to validate every runtime cue against its class.
+- Enforces the -1 dBTP source ceiling, one-LU variant spread, class ordinary/burst ranges, and the
+  committed `assets/audio/sfx_loudness_measurements.json` hashes.
+- Renders the required pre-limiter overlap scenarios with catalog gains, count scaling, variation,
+  cooldown spacing, and polyphony. A scenario fails above 0 dBTP or -14 LUFS-M.
+- Requires `ffmpeg` and `ffprobe`; pass `-FfmpegPath`/`-FfprobePath` when they are not on `PATH`.
+  `-UpdateSnapshot` rewrites the committed measurement snapshot only after review, and
+  `-SkipOverlap` narrows a diagnostic run without changing the normal gate.
+
 ## `scripts/tools/build_reward_chest_arrival.ps1`
 
 Purpose:
@@ -1230,7 +1251,10 @@ Purpose:
 
 - `tests/audio/test_core_sfx_assets.gd`: generator determinism, the committed files matching a fresh
   render, the manifest, and per-file encoding/duration/peak/DC/fade constraints, plus catalog
-  completeness, retained source recordings, and the absence of orphan generated assets.
+  completeness, retained source recordings, and the absence of orphan generated assets. It also
+  binds `assets/audio/sfx_loudness_measurements.json` to every committed audio file by SHA-256 and
+  enforces the source true-peak ceiling, event-class ranges, burst ceilings, and variant spread
+  without needing FFmpeg during the Godot test.
 - `tests/audio/test_sfx_manager.gd`: bus routing, pool reuse, per-event polyphony and cooldown,
   variant selection, missing-event/missing-stream safety, count scaling, both mute paths, setting
   persistence across a scene change, and the generic button-click policy.

@@ -75,7 +75,7 @@ const EVENTS := {
 	EVENT_MATCH_CLEAR: {
 		"loudness_class": &"reward_confirmation",
 		"streams": ["res://assets/audio/match_clear/triple_clear.wav"],
-		"volume_db": -2.0,
+		"volume_db": -3.0,
 		"volume_variation_db": 0.5,
 		"pitch_range": Vector2(0.97, 1.03),
 		"cooldown_seconds": 0.02,
@@ -102,7 +102,7 @@ const EVENTS := {
 		# One authored 30-second bed, started once on entry into the critical range and resumed at
 		# the matching offset after pause or Freezer. It must never be requested once per frame.
 		"streams": ["res://assets/audio/timer_critical_tick/timer_tick.wav"],
-		"volume_db": -3.0,
+		"volume_db": 3.0,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(1.0, 1.0),
 		"cooldown_seconds": 0.0,
@@ -170,7 +170,7 @@ const EVENTS := {
 		# The source variants differ by almost 4 LU. These offsets place all three near the same
 		# nominal loudness while retaining one shared creative event trim.
 		"stream_volume_offsets_db": {
-			"res://assets/audio/ui_click/ui_click_01.wav": 0.0,
+			"res://assets/audio/ui_click/ui_click_01.wav": -1.0,
 			"res://assets/audio/ui_click/ui_click_02.wav": 2.2,
 			"res://assets/audio/ui_click/ui_click_03.wav": 1.8,
 		},
@@ -192,7 +192,7 @@ const EVENTS := {
 	EVENT_SHELF_UNLOCK: {
 		"loudness_class": &"reward_confirmation",
 		"streams": ["res://assets/audio/shelf_unlock/shelve_unlock.wav"],
-		"volume_db": -5.0,
+		"volume_db": -3.05,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(1.0, 1.0),
 		"cooldown_seconds": 0.20,
@@ -201,7 +201,7 @@ const EVENTS := {
 	EVENT_ABILITY_HAMMER: {
 		"loudness_class": &"ability_warning",
 		"streams": ["res://assets/audio/ability_hammer/hammer.wav"],
-		"volume_db": -5.0,
+		"volume_db": -1.93,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(1.0, 1.0),
 		"cooldown_seconds": 0.20,
@@ -228,7 +228,7 @@ const EVENTS := {
 	EVENT_ABILITY_FREEZER: {
 		"loudness_class": &"ability_warning",
 		"streams": ["res://assets/audio/ability_freezer/freeze.wav"],
-		"volume_db": -5.0,
+		"volume_db": -1.44,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(1.0, 1.0),
 		"cooldown_seconds": 0.20,
@@ -246,7 +246,7 @@ const EVENTS := {
 	EVENT_LEVEL_FAILED: {
 		"loudness_class": &"terminal_stinger",
 		"streams": ["res://assets/audio/level_failed/level_failed.wav"],
-		"volume_db": -10.0,
+		"volume_db": -7.72,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(1.0, 1.0),
 		"cooldown_seconds": 0.75,

@@ -1,0 +1,306 @@
+{
+  "schema_version": 1,
+  "meter": "ITU-R BS.1770 / FFmpeg ebur128+loudnorm; clips shorter than 400 ms are silence-padded",
+  "measurements": [
+    {
+      "path": "res://assets/audio/ability_freezer/freeze.wav",
+      "sha256": "fc03577bfcdac81bb2870ab490b54f2a5af8dc1924d406597bde618154972283",
+      "duration_seconds": 1.335,
+      "max_m_lufs": -17.1,
+      "integrated_lufs": -20.03,
+      "true_peak_dbtp": -3.0,
+      "rms_dbfs": -27.7,
+      "sample_peak_dbfs": -3.6
+    },
+    {
+      "path": "res://assets/audio/ability_hammer/hammer.wav",
+      "sha256": "2bd985f092a7f5b2f1a9f89c982e27520e532f3246f7ee8c202a7838ca094ee0",
+      "duration_seconds": 0.704,
+      "max_m_lufs": -14.7,
+      "integrated_lufs": -19.2,
+      "true_peak_dbtp": -3.0,
+      "rms_dbfs": -20.4,
+      "sample_peak_dbfs": -3.1
+    },
+    {
+      "path": "res://assets/audio/ability_lantern/lantern.wav",
+      "sha256": "fc9faa32d076872c31928a8fa4ad42867636861bb4f764f4008755d1ced66199",
+      "duration_seconds": 1.144,
+      "max_m_lufs": -20.3,
+      "integrated_lufs": -22.69,
+      "true_peak_dbtp": -11.28,
+      "rms_dbfs": -28.3,
+      "sample_peak_dbfs": -11.4
+    },
+    {
+      "path": "res://assets/audio/ability_lantern/lantern1.wav",
+      "sha256": "331c51fd4d697a7a235c6a7ef6338b1056c737fd3e9728b28233138703d613b8",
+      "duration_seconds": 1.144,
+      "max_m_lufs": -12.3,
+      "integrated_lufs": -14.25,
+      "true_peak_dbtp": -4.4,
+      "rms_dbfs": -22.5,
+      "sample_peak_dbfs": -4.4
+    },
+    {
+      "path": "res://assets/audio/ability_shuffle/shuffle.wav",
+      "sha256": "5b665851bcaed0ecd7b67964cf2409dd766076d9e80a99ffc7c7ae81226fc199",
+      "duration_seconds": 0.911,
+      "max_m_lufs": -28.3,
+      "integrated_lufs": -29.26,
+      "true_peak_dbtp": -17.3,
+      "rms_dbfs": -33.8,
+      "sample_peak_dbfs": -17.3
+    },
+    {
+      "path": "res://assets/audio/coin_gain/coin_gain.wav",
+      "sha256": "93a8db414b11fbaead05c966eccb81332036e4d82157938b0cdbc9c39969488d",
+      "duration_seconds": 0.52,
+      "max_m_lufs": -15.0,
+      "integrated_lufs": -15.34,
+      "true_peak_dbtp": -4.95,
+      "rms_dbfs": -17.0,
+      "sample_peak_dbfs": -5.0
+    },
+    {
+      "path": "res://assets/audio/coin_spend/coin_spend.wav",
+      "sha256": "3c8876b1d2c72209e0f2f7a4722ef8a90759f7a8ab79970970a428ba7d5f0311",
+      "duration_seconds": 0.285,
+      "max_m_lufs": -18.5,
+      "integrated_lufs": -18.55,
+      "true_peak_dbtp": -6.98,
+      "rms_dbfs": -18.3,
+      "sample_peak_dbfs": -7.0
+    },
+    {
+      "path": "res://assets/audio/item_place_valid/item_place.wav",
+      "sha256": "6b7b58d8ed2e7da55c4e33ec9d58f9e5c2e6711b2633859c8a719d7b12b963ef",
+      "duration_seconds": 0.6,
+      "max_m_lufs": -29.8,
+      "integrated_lufs": -29.75,
+      "true_peak_dbtp": -14.72,
+      "rms_dbfs": -33.8,
+      "sample_peak_dbfs": -14.7
+    },
+    {
+      "path": "res://assets/audio/item_select/item_select_01.wav",
+      "sha256": "ebc86bb5d9be6fe631b9e6afaebc2c3cd8ae7b19ff8158bf8c2c5ff30cdd4ee1",
+      "duration_seconds": 0.055,
+      "max_m_lufs": -32.8,
+      "integrated_lufs": -32.85,
+      "true_peak_dbtp": -13.96,
+      "rms_dbfs": -24.0,
+      "sample_peak_dbfs": -14.0
+    },
+    {
+      "path": "res://assets/audio/item_select/item_select_02.wav",
+      "sha256": "4bd0f9fcc0d7bd21e2a988f98130e0b24cf51202b7e4c98b0052d6e6447d6847",
+      "duration_seconds": 0.062,
+      "max_m_lufs": -32.6,
+      "integrated_lufs": -32.65,
+      "true_peak_dbtp": -14.49,
+      "rms_dbfs": -24.4,
+      "sample_peak_dbfs": -14.5
+    },
+    {
+      "path": "res://assets/audio/item_select/item_select_03.wav",
+      "sha256": "615484c0bbd63b6ce2a23729c3488b4ca81a42badfbac61178714f17430b69f9",
+      "duration_seconds": 0.048,
+      "max_m_lufs": -32.9,
+      "integrated_lufs": -32.95,
+      "true_peak_dbtp": -13.43,
+      "rms_dbfs": -23.5,
+      "sample_peak_dbfs": -13.5
+    },
+    {
+      "path": "res://assets/audio/level_complete/level_complete.mp3",
+      "sha256": "0c765f662886e27537915b52aa735914efe43f4d52a9983e861c0e094aa0c5fd",
+      "duration_seconds": 1.959,
+      "max_m_lufs": -11.7,
+      "integrated_lufs": -13.8,
+      "true_peak_dbtp": -5.08,
+      "rms_dbfs": -19.4,
+      "sample_peak_dbfs": -5.1
+    },
+    {
+      "path": "res://assets/audio/level_failed/level_failed.wav",
+      "sha256": "cd6c721304ba29523528173a6aa236be81598a4eda6a313f943a0e7a3c028abe",
+      "duration_seconds": 2.0,
+      "max_m_lufs": -8.6,
+      "integrated_lufs": -11.23,
+      "true_peak_dbtp": -3.0,
+      "rms_dbfs": -17.3,
+      "sample_peak_dbfs": -3.4
+    },
+    {
+      "path": "res://assets/audio/match_clear/triple_clear.wav",
+      "sha256": "c89dfacd67fab73500916a2258b5a9b36cd4aec5adb5e743c9ee62a92de37f4a",
+      "duration_seconds": 0.461,
+      "max_m_lufs": -19.0,
+      "integrated_lufs": -19.05,
+      "true_peak_dbtp": -1.45,
+      "rms_dbfs": -22.0,
+      "sample_peak_dbfs": -1.5
+    },
+    {
+      "path": "res://assets/audio/match_clear/triple_clear1.wav",
+      "sha256": "ff4f5a244f82d568309cab3579cc9e1231a4e2345eadc219cdc865132913c2a8",
+      "duration_seconds": 0.6,
+      "max_m_lufs": -18.7,
+      "integrated_lufs": -18.75,
+      "true_peak_dbtp": -4.72,
+      "rms_dbfs": -22.8,
+      "sample_peak_dbfs": -4.7
+    },
+    {
+      "path": "res://assets/audio/match_clear/triple_clear2.wav",
+      "sha256": "5949e2a5f038722e49ec87d7b3969a00992ba0bc06b08e84b620e50e3f07e3f9",
+      "duration_seconds": 0.6,
+      "max_m_lufs": -18.7,
+      "integrated_lufs": -18.75,
+      "true_peak_dbtp": -1.52,
+      "rms_dbfs": -23.3,
+      "sample_peak_dbfs": -1.5
+    },
+    {
+      "path": "res://assets/audio/reward_chest_star_arrival/reward_chest_star_arrival_01.wav",
+      "sha256": "b3bb3743befdd5b765658f3fe677cfe663bc3bc9acb594f4dd5b1b1ba977310f",
+      "duration_seconds": 0.391,
+      "max_m_lufs": -34.0,
+      "integrated_lufs": -34.05,
+      "true_peak_dbtp": -22.94,
+      "rms_dbfs": -39.4,
+      "sample_peak_dbfs": -23.0
+    },
+    {
+      "path": "res://assets/audio/reward_chest_star_arrival/reward_chest_star_arrival_02.wav",
+      "sha256": "d450fad07cdd452096a11ccba3f12085313d2c26a09c06b9ef90ea4fef753bc3",
+      "duration_seconds": 0.494,
+      "max_m_lufs": -27.9,
+      "integrated_lufs": -27.95,
+      "true_peak_dbtp": -13.54,
+      "rms_dbfs": -34.3,
+      "sample_peak_dbfs": -13.5
+    },
+    {
+      "path": "res://assets/audio/reward_chest_star_arrival/reward_chest_star_arrival_03.wav",
+      "sha256": "b69d7e6bc6406372e00b4d6152a99cb46f68eae0c5e560569dcd0d7814d1b338",
+      "duration_seconds": 0.494,
+      "max_m_lufs": -20.1,
+      "integrated_lufs": -20.15,
+      "true_peak_dbtp": -6.83,
+      "rms_dbfs": -27.0,
+      "sample_peak_dbfs": -8.0
+    },
+    {
+      "path": "res://assets/audio/reward_chest_star_arrival/reward_chest_star_arrival_short.wav",
+      "sha256": "94eb4dcc50abfdbb1ebe39d57d13bd7bd0ce1915cd22bea7a708ba3a63977f5d",
+      "duration_seconds": 0.2,
+      "max_m_lufs": -29.2,
+      "integrated_lufs": -29.15,
+      "true_peak_dbtp": -17.56,
+      "rms_dbfs": -31.1,
+      "sample_peak_dbfs": -17.8
+    },
+    {
+      "path": "res://assets/audio/shelf_unlock/shelve_unlock.wav",
+      "sha256": "5a64eae75a8d6e9616d0a24289400b06dd953cd57af75e30f35550c3c96d4a93",
+      "duration_seconds": 1.0,
+      "max_m_lufs": -17.7,
+      "integrated_lufs": -19.34,
+      "true_peak_dbtp": -3.0,
+      "rms_dbfs": -27.4,
+      "sample_peak_dbfs": -3.1
+    },
+    {
+      "path": "res://assets/audio/shop_purchase_success/purchase_successful.wav",
+      "sha256": "8bc60998745bfafad4dda6d98041ac57f011e5e9431ef052e857ee5a22509c99",
+      "duration_seconds": 1.207,
+      "max_m_lufs": -30.0,
+      "integrated_lufs": -32.26,
+      "true_peak_dbtp": -19.13,
+      "rms_dbfs": -38.2,
+      "sample_peak_dbfs": -19.1
+    },
+    {
+      "path": "res://assets/audio/star_hud_arrival/star_hud_arrival.wav",
+      "sha256": "eb276dff21c13df843545be55e8af6b5f3bcac93173f09513f87daf51ca9ad1d",
+      "duration_seconds": 0.68,
+      "max_m_lufs": -28.9,
+      "integrated_lufs": -31.1,
+      "true_peak_dbtp": -17.56,
+      "rms_dbfs": -36.2,
+      "sample_peak_dbfs": -17.8
+    },
+    {
+      "path": "res://assets/audio/sticky_move_blocked/invalid_action.wav",
+      "sha256": "2cb85c72c21ffd854752aa8b01b21b9cad9591a3c6340df05a6f36fae61a80dc",
+      "duration_seconds": 0.469,
+      "max_m_lufs": -22.2,
+      "integrated_lufs": -22.25,
+      "true_peak_dbtp": -8.9,
+      "rms_dbfs": -25.1,
+      "sample_peak_dbfs": -8.9
+    },
+    {
+      "path": "res://assets/audio/time_up/time_up.wav",
+      "sha256": "aa9a2d7ac606ae2f19bb231112d2870beb217cecca2cbc6af67f716b843ac3da",
+      "duration_seconds": 0.52,
+      "max_m_lufs": -16.0,
+      "integrated_lufs": -16.34,
+      "true_peak_dbtp": -4.0,
+      "rms_dbfs": -16.0,
+      "sample_peak_dbfs": -4.0
+    },
+    {
+      "path": "res://assets/audio/time_up/times_up2.mp3",
+      "sha256": "cff6f71a5b6ae6864e219451960f80642166e2d0ad115ee289a6a027d2865f6e",
+      "duration_seconds": 1.62,
+      "max_m_lufs": -27.2,
+      "integrated_lufs": -27.58,
+      "true_peak_dbtp": -19.23,
+      "rms_dbfs": -33.6,
+      "sample_peak_dbfs": -19.9
+    },
+    {
+      "path": "res://assets/audio/timer_critical_tick/timer_tick.wav",
+      "sha256": "a2d8e8cbcb951db3cadf651a72fa461af957e1674f2445b58886fed05067a075",
+      "duration_seconds": 30.072,
+      "max_m_lufs": -31.6,
+      "integrated_lufs": -32.72,
+      "true_peak_dbtp": -9.87,
+      "rms_dbfs": -38.8,
+      "sample_peak_dbfs": -10.0
+    },
+    {
+      "path": "res://assets/audio/ui_click/ui_click_01.wav",
+      "sha256": "cdba529b35ac3daa7cb7679b1da878211f7c17c15dac872a19efa4f4503029d0",
+      "duration_seconds": 0.042,
+      "max_m_lufs": -39.3,
+      "integrated_lufs": -39.35,
+      "true_peak_dbtp": -18.24,
+      "rms_dbfs": -29.2,
+      "sample_peak_dbfs": -18.2
+    },
+    {
+      "path": "res://assets/audio/ui_click/ui_click_02.wav",
+      "sha256": "d743f0bb06650b7b8c0e06537e583e0d2385835949312a8f84bd7b34cd08d4f7",
+      "duration_seconds": 0.038,
+      "max_m_lufs": -43.2,
+      "integrated_lufs": -43.25,
+      "true_peak_dbtp": -20.41,
+      "rms_dbfs": -33.5,
+      "sample_peak_dbfs": -20.5
+    },
+    {
+      "path": "res://assets/audio/ui_click/ui_click_03.wav",
+      "sha256": "35a135b6af6c585b85de40e5a00abd810a68f5e481155a1c409b582b1bc15653",
+      "duration_seconds": 0.044,
+      "max_m_lufs": -42.8,
+      "integrated_lufs": -42.85,
+      "true_peak_dbtp": -21.1,
+      "rms_dbfs": -34.3,
+      "sample_peak_dbfs": -21.1
+    }
+  ]
+}

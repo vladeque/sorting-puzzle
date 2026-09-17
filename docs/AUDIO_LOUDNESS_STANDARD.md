@@ -88,9 +88,21 @@ Measure both the pre-limiter mix and the Master output for these deterministic c
 4. time-up + level failure transition;
 5. the maximum declared polyphony of any changed repeating event.
 
-The pre-limiter mix should not exceed 0 dBTP. Master must not exceed -1 dBTP. A scenario that
-drives sustained limiter reduction must be rebalanced even when its limited peak technically
-passes.
+The automated audit renders and meters the pre-limiter sum. It must not exceed 0 dBTP or the
+project's -14 LUFS-M overlap ceiling. A windowed/device capture then verifies that the actual Godot
+Master output stays at or below -1 dBTP. A scenario that drives sustained limiter reduction must be
+rebalanced even when its limited peak technically passes.
+
+Run the audit from the repository root. `ffmpeg` and `ffprobe` default to `PATH`; explicit paths are
+supported for environments that bundle them elsewhere:
+
+```powershell
+& .\scripts\tools\audit_sfx_loudness.ps1
+& .\scripts\tools\audit_sfx_loudness.ps1 -UpdateSnapshot
+```
+
+`-UpdateSnapshot` is an intentional review action after assets and catalog trims are approved. A
+normal run fails when a file hash no longer matches the committed measurement snapshot.
 
 ## Adding or changing an SFX
 
@@ -101,8 +113,8 @@ passes.
    only the runtime player.
 5. Add the semantic event or stream to `scripts/audio/sfx_catalog.gd`, including a required
    `loudness_class` and any variant-only `stream_volume_offsets_db`.
-6. Run the loudness audit and update its committed measurement snapshot. A changed file hash with
-   old measurements is invalid.
+6. Run `scripts/tools/audit_sfx_loudness.ps1`; review every event and overlap result, then run it
+   once with `-UpdateSnapshot`. A changed file hash with old measurements is invalid.
 7. Run all audio tests and all required overlap scenarios.
 8. Listen on a low-end phone speaker, a modern phone, earbuds, and headphones at fixed system
    volume. Meter compliance does not replace this listening check.
