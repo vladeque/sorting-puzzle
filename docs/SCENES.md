@@ -210,7 +210,9 @@ Sound effects are owned globally, not by scenes. The `SfxManager` autoload
 (`scripts/audio/sfx_manager.gd`) holds the only shared `AudioStreamPlayer` pool, routed to the
 dedicated `SFX` bus in `assets/audio/default_bus_layout.tres`, and
 `scripts/audio/sfx_catalog.gd` holds the one event catalog. See `docs/SCRIPTS.md` for the full
-API and `docs/AUDIO_001_GODOT_ONLY_SFX_TICKET.md` for the approved event scope.
+API, `docs/AUDIO_LOUDNESS_STANDARD.md` for the required loudness/true-peak policy, and
+`docs/AUDIO_001_GODOT_ONLY_SFX_TICKET.md` for the approved event scope. The SFX bus sends to
+Master, whose enabled `AudioEffectHardLimiter` has a -1 dB ceiling as final overlap protection.
 
 **No scene authors an `AudioStreamPlayer` for a shared cue.** Hammer's former five-player local mix
 has also moved into the catalog as one authored `ability_hammer` cue, so disabling sound effects and

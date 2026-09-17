@@ -101,6 +101,8 @@ func play(event_id: StringName, context: Dictionary = {}) -> AudioStreamPlayer:
 		return null
 
 	var volume_db := float(config.get("volume_db", 0.0))
+	var stream_volume_offsets := config.get("stream_volume_offsets_db", {}) as Dictionary
+	volume_db += float(stream_volume_offsets.get(stream.resource_path, 0.0))
 	var variation_db := float(config.get("volume_variation_db", 0.0))
 	if variation_db > 0.0:
 		volume_db += _rng.randf_range(-variation_db, variation_db)

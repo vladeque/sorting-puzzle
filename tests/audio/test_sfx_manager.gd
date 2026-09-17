@@ -51,6 +51,7 @@ func _run() -> void:
 	_manager.call("set_muted", false)
 
 	_test_bus_and_pool()
+	_test_master_limiter()
 	_test_pool_reuse()
 	_test_start_position_and_event_stop()
 	_test_polyphony_keeps_the_newest_cue()
@@ -93,6 +94,32 @@ func _test_bus_and_pool() -> void:
 		if player.bus != &"SFX":
 			_failures.append("Pooled player %s is not routed to the SFX bus." % player.name)
 			break
+
+
+func _test_master_limiter() -> void:
+	var master_index := AudioServer.get_bus_index(&"Master")
+	_check(master_index >= 0, "The committed bus layout provides the Master bus.")
+	if master_index < 0:
+		return
+
+	_check(
+		AudioServer.get_bus_effect_count(master_index) >= 1,
+		"Master carries a peak-safety effect."
+	)
+	if AudioServer.get_bus_effect_count(master_index) < 1:
+		return
+
+	var limiter := AudioServer.get_bus_effect(master_index, 0) as AudioEffectHardLimiter
+	_check(limiter != null, "Master's first effect is the hard limiter.")
+	if limiter != null:
+		_check(
+			is_equal_approx(limiter.ceiling_db, -1.0),
+			"The Master limiter ceiling is the documented -1 dB."
+		)
+		_check(
+			AudioServer.is_bus_effect_enabled(master_index, 0),
+			"The Master limiter is enabled."
+		)
 
 
 func _test_pool_reuse() -> void:
@@ -188,6 +215,27 @@ func _test_variant_selection() -> void:
 
 	_check(not repeated_immediately, "A variant is never selected twice in a row.")
 	_check(distinct.size() >= 2, "Variant selection actually rotates through the pool.")
+	_manager.call("stop_all")
+
+	var config := SfxCatalogScript.get_event(SfxCatalogScript.EVENT_UI_CLICK)
+	var offsets := config.get("stream_volume_offsets_db", {}) as Dictionary
+	var variation := float(config.get("volume_variation_db", 0.0))
+	_check(offsets.size() == 3, "The click pool declares one loudness-match offset per variant.")
+	_manager.call("reset_playback_state")
+	for index in range(12):
+		var player := _manager.call(
+			"play", SfxCatalogScript.EVENT_UI_CLICK, {"bypass_cooldown": true}
+		) as AudioStreamPlayer
+		if player == null or player.stream == null:
+			continue
+
+		var nominal := float(config.get("volume_db", 0.0)) + float(
+			offsets.get(player.stream.resource_path, 0.0)
+		)
+		_check(
+			absf(player.volume_db - nominal) <= variation + 0.001,
+			"Per-stream loudness matching is applied before bounded play variation."
+		)
 	_manager.call("stop_all")
 
 

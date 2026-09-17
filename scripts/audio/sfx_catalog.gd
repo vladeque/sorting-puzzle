@@ -14,8 +14,10 @@ extends RefCounted
 ##
 ## Per-event fields:
 ##   streams              res:// paths. More than one makes the event a variant pool.
-##   volume_db            Mix trim on top of the asset's authored peak. UI clicks and timer ticks
-##                        stay under gameplay matches and currency confirmations.
+##   loudness_class       Required category from docs/AUDIO_LOUDNESS_STANDARD.md.
+##   volume_db            Mix trim on top of the asset's authored level.
+##   stream_volume_offsets_db Optional per-path correction applied before random variation. Use it
+##                        to loudness-match variants; do not encode creative hierarchy here.
 ##   volume_variation_db  Symmetric random trim per play, for repeated gameplay cues.
 ##   pitch_range          Subtle random pitch window. Kept narrow so event identity and the
 ##                        currency cues' musical relationships stay stable.
@@ -49,36 +51,40 @@ const EVENT_LEVEL_FAILED := &"level_failed"
 ## resolve, so a gameplay owner must add its semantic event here before requesting playback.
 const EVENTS := {
 	EVENT_ITEM_SELECT: {
+		"loudness_class": &"interaction_micro",
 		"streams": [
 			"res://assets/audio/item_select/item_select_01.wav",
 			"res://assets/audio/item_select/item_select_02.wav",
 			"res://assets/audio/item_select/item_select_03.wav",
 		],
-		"volume_db": -1.0,
+		"volume_db": 1.0,
 		"volume_variation_db": 0.5,
 		"pitch_range": Vector2(0.97, 1.03),
 		"cooldown_seconds": 0.035,
 		"max_polyphony": 3,
 	},
 	EVENT_ITEM_PLACE_VALID: {
+		"loudness_class": &"interaction_micro",
 		"streams": ["res://assets/audio/item_place_valid/item_place.wav"],
-		"volume_db": -5.0,
+		"volume_db": 2.5,
 		"volume_variation_db": 1.0,
 		"pitch_range": Vector2(0.95, 1.05),
 		"cooldown_seconds": 0.02,
 		"max_polyphony": 4,
 	},
 	EVENT_MATCH_CLEAR: {
+		"loudness_class": &"reward_confirmation",
 		"streams": ["res://assets/audio/match_clear/triple_clear.wav"],
-		"volume_db": -5.0,
+		"volume_db": -2.0,
 		"volume_variation_db": 0.5,
 		"pitch_range": Vector2(0.97, 1.03),
 		"cooldown_seconds": 0.02,
 		"max_polyphony": 3,
 	},
 	EVENT_STAR_HUD_ARRIVAL: {
+		"loudness_class": &"gameplay_feedback",
 		"streams": ["res://assets/audio/star_hud_arrival/star_hud_arrival.wav"],
-		"volume_db": -2.0,
+		"volume_db": 4.0,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(0.99, 1.01),
 		"cooldown_seconds": 0.09,
@@ -92,6 +98,7 @@ const EVENTS := {
 		},
 	},
 	EVENT_TIMER_CRITICAL_TICK: {
+		"loudness_class": &"gameplay_feedback",
 		# One authored 30-second bed, started once on entry into the critical range and resumed at
 		# the matching offset after pause or Freezer. It must never be requested once per frame.
 		"streams": ["res://assets/audio/timer_critical_tick/timer_tick.wav"],
@@ -102,22 +109,25 @@ const EVENTS := {
 		"max_polyphony": 1,
 	},
 	EVENT_TIME_UP: {
+		"loudness_class": &"terminal_stinger",
 		"streams": ["res://assets/audio/time_up/times_up2.mp3"],
-		"volume_db": -1.0,
+		"volume_db": 10.2,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(1.0, 1.0),
 		"cooldown_seconds": 0.75,
 		"max_polyphony": 1,
 	},
 	EVENT_COIN_GAIN: {
+		"loudness_class": &"reward_confirmation",
 		"streams": ["res://assets/audio/coin_gain/coin_gain.wav"],
-		"volume_db": -1.0,
+		"volume_db": -2.0,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(0.995, 1.005),
 		"cooldown_seconds": 0.20,
 		"max_polyphony": 2,
 	},
 	EVENT_COIN_SPEND: {
+		"loudness_class": &"reward_confirmation",
 		"streams": ["res://assets/audio/coin_spend/coin_spend.wav"],
 		"volume_db": -2.0,
 		"volume_variation_db": 0.0,
@@ -126,20 +136,22 @@ const EVENTS := {
 		"max_polyphony": 2,
 	},
 	EVENT_SHOP_PURCHASE_SUCCESS: {
+		"loudness_class": &"reward_confirmation",
 		"streams": ["res://assets/audio/shop_purchase_success/purchase_successful.wav"],
-		"volume_db": 2.0,
+		"volume_db": 11.0,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(1.0, 1.0),
 		"cooldown_seconds": 0.60,
 		"max_polyphony": 1,
 	},
 	EVENT_REWARD_CHEST_STAR_ARRIVAL: {
+		"loudness_class": &"gameplay_feedback",
 		# A short, smoothly faded derivative of the HUD arrival keeps rapid impacts distinct without
 		# stacking its full tonal tail. The source HUD recording remains unchanged.
 		"streams": [
 			"res://assets/audio/reward_chest_star_arrival/reward_chest_star_arrival_short.wav"
 		],
-		"volume_db": -3.0,
+		"volume_db": 4.0,
 		"volume_variation_db": 0.6,
 		"pitch_range": Vector2(0.995, 1.005),
 		# Matches the flyer's authored stagger floor so a long flight keeps its rhythm instead of
@@ -148,18 +160,27 @@ const EVENTS := {
 		"max_polyphony": 3,
 	},
 	EVENT_UI_CLICK: {
+		"loudness_class": &"ui_micro",
 		"streams": [
 			"res://assets/audio/ui_click/ui_click_01.wav",
 			"res://assets/audio/ui_click/ui_click_02.wav",
 			"res://assets/audio/ui_click/ui_click_03.wav",
 		],
-		"volume_db": -2.0,
+		"volume_db": 8.0,
+		# The source variants differ by almost 4 LU. These offsets place all three near the same
+		# nominal loudness while retaining one shared creative event trim.
+		"stream_volume_offsets_db": {
+			"res://assets/audio/ui_click/ui_click_01.wav": 0.0,
+			"res://assets/audio/ui_click/ui_click_02.wav": 2.2,
+			"res://assets/audio/ui_click/ui_click_03.wav": 1.8,
+		},
 		"volume_variation_db": 0.4,
 		"pitch_range": Vector2(0.97, 1.03),
 		"cooldown_seconds": 0.04,
 		"max_polyphony": 3,
 	},
 	EVENT_STICKY_MOVE_BLOCKED: {
+		"loudness_class": &"gameplay_feedback",
 		# Deliberately semantic rather than `invalid_action`: ordinary rejected moves stay silent.
 		"streams": ["res://assets/audio/sticky_move_blocked/invalid_action.wav"],
 		"volume_db": -2.0,
@@ -169,6 +190,7 @@ const EVENTS := {
 		"max_polyphony": 1,
 	},
 	EVENT_SHELF_UNLOCK: {
+		"loudness_class": &"reward_confirmation",
 		"streams": ["res://assets/audio/shelf_unlock/shelve_unlock.wav"],
 		"volume_db": -5.0,
 		"volume_variation_db": 0.0,
@@ -177,6 +199,7 @@ const EVENTS := {
 		"max_polyphony": 1,
 	},
 	EVENT_ABILITY_HAMMER: {
+		"loudness_class": &"ability_warning",
 		"streams": ["res://assets/audio/ability_hammer/hammer.wav"],
 		"volume_db": -5.0,
 		"volume_variation_db": 0.0,
@@ -185,22 +208,25 @@ const EVENTS := {
 		"max_polyphony": 1,
 	},
 	EVENT_ABILITY_SHUFFLE: {
+		"loudness_class": &"ability_warning",
 		"streams": ["res://assets/audio/ability_shuffle/shuffle.wav"],
-		"volume_db": 1.0,
+		"volume_db": 9.5,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(1.0, 1.0),
 		"cooldown_seconds": 0.20,
 		"max_polyphony": 1,
 	},
 	EVENT_ABILITY_LANTERN: {
+		"loudness_class": &"ability_warning",
 		"streams": ["res://assets/audio/ability_lantern/lantern.wav"],
-		"volume_db": -3.0,
+		"volume_db": 1.5,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(1.0, 1.0),
 		"cooldown_seconds": 0.20,
 		"max_polyphony": 1,
 	},
 	EVENT_ABILITY_FREEZER: {
+		"loudness_class": &"ability_warning",
 		"streams": ["res://assets/audio/ability_freezer/freeze.wav"],
 		"volume_db": -5.0,
 		"volume_variation_db": 0.0,
@@ -209,16 +235,18 @@ const EVENTS := {
 		"max_polyphony": 1,
 	},
 	EVENT_LEVEL_COMPLETE: {
+		"loudness_class": &"terminal_stinger",
 		"streams": ["res://assets/audio/level_complete/level_complete.mp3"],
-		"volume_db": -3.0,
+		"volume_db": -4.0,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(1.0, 1.0),
 		"cooldown_seconds": 0.75,
 		"max_polyphony": 1,
 	},
 	EVENT_LEVEL_FAILED: {
+		"loudness_class": &"terminal_stinger",
 		"streams": ["res://assets/audio/level_failed/level_failed.wav"],
-		"volume_db": -6.0,
+		"volume_db": -10.0,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(1.0, 1.0),
 		"cooldown_seconds": 0.75,

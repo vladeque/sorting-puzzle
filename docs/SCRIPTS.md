@@ -1069,7 +1069,9 @@ Purpose:
   cue, so there is exactly one path that can double-trigger, one place that honours the saved
   setting, and one pool that bounds how many transients overlap.
 - Owns a fixed pool of 16 `AudioStreamPlayer` children, all routed to the dedicated `SFX` bus from
-  `assets/audio/default_bus_layout.tres`.
+  `assets/audio/default_bus_layout.tres`. The bus sends to Master, whose enabled hard limiter has a
+  -1 dB ceiling; tests treat that as emergency overlap protection, not as a substitute for a
+  balanced pre-limiter mix.
 
 Playback rules:
 - Every request re-reads `PlayerProgress.is_setting_disabled(&"sound_effects")`, so a setting
@@ -1078,7 +1080,9 @@ Playback rules:
 - A pool with no free player reclaims the requesting event's own oldest instance first, so a rapid
   burst keeps its newest cue rather than its oldest; only then does it reclaim the globally oldest.
 - Variant pools never repeat the immediately previous variant, and pitch variation stays inside the
-  catalog's narrow per-event window.
+  catalog's narrow per-event window. A pool may declare `stream_volume_offsets_db`; the manager
+  applies the selected stream's correction before bounded random variation so variants can be
+  loudness-matched without duplicating semantic events.
 - A missing event id or unloadable stream warns once and returns null; it never blocks the gameplay
   or UI action that asked for it.
 
@@ -1119,6 +1123,9 @@ Purpose:
   `shop_purchase_success`, `reward_chest_star_arrival`, `ui_click`; plus semantic authored-source
   events for sticky rejection, shelf unlock, Hammer, Shuffle, Lantern, Freezer, level completion,
   and level failure.
+- Every event declares a `loudness_class` from `scripts/audio/sfx_loudness_standard.gd` and
+  `docs/AUDIO_LOUDNESS_STANDARD.md`. `volume_db` places the whole event in that hierarchy, while
+  optional `stream_volume_offsets_db` corrects only differences inside a variant pool.
 - `item_place_valid` and `match_clear` keep the project's existing source recordings
   (`assets/audio/item_place_valid/item_place.wav`,
   `assets/audio/match_clear/triple_clear.wav`). Every source lives in the folder named for its
@@ -1135,6 +1142,15 @@ Purpose:
 - `reward_chest_star_arrival` uses a 200 ms, smoothly faded derivative of `star_hud_arrival.wav`
   while retaining its own per-impact volume variation, cooldown, and polyphony settings. Its narrow
   0.995–1.005 pitch window avoids a random tonal cluster during rapid arrivals.
+
+## `scripts/audio/sfx_loudness_standard.gd`
+
+Purpose:
+- Machine-readable master, source-peak, runtime-peak, variant-spread, and per-category maximum
+  momentary loudness targets. It is the test-facing counterpart to
+  `docs/AUDIO_LOUDNESS_STANDARD.md`; both must change together.
+- Defines ordinary-play ranges separately from burst ceilings so pitch/volume variation and bounded
+  count scaling cannot silently turn a compliant base event into an oversized burst.
 
 ## `scripts/audio/ui_click_binder.gd`
 

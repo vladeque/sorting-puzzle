@@ -14,6 +14,7 @@ extends SceneTree
 const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
 const SynthesisScript := preload("res://scripts/tools/core_sfx_synthesis.gd")
 const SfxCatalogScript := preload("res://scripts/audio/sfx_catalog.gd")
+const SfxLoudnessStandardScript := preload("res://scripts/audio/sfx_loudness_standard.gd")
 
 const AUDIO_DIRECTORY := "res://assets/audio"
 const MANIFEST_PATH := "res://assets/audio/generated_sfx_manifest.json"
@@ -272,12 +273,25 @@ func _test_catalog_completeness() -> void:
 			continue
 
 		var config := SfxCatalogScript.get_event(event_id)
+		var loudness_class := config.get("loudness_class", &"") as StringName
+		_check(
+			SfxLoudnessStandardScript.has_class(loudness_class),
+			"%s declares a recognized loudness class." % event_id
+		)
 		var streams := config.get("streams", []) as Array
 		_check(not streams.is_empty(), "%s resolves to at least one stream." % event_id)
 		for stream_path in streams:
 			_check(
 				ResourceLoader.exists(str(stream_path)),
 				"%s references an importable stream (%s)." % [event_id, stream_path]
+			)
+		var stream_offsets := config.get("stream_volume_offsets_db", {}) as Dictionary
+		for stream_path in stream_offsets:
+			_check(
+				streams.has(stream_path),
+				"%s only declares per-stream gain for a stream in its own pool (%s)." % [
+					event_id, stream_path
+				]
 			)
 		_check(
 			int(config.get("max_polyphony", 0)) >= 1,
