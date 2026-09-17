@@ -17,7 +17,8 @@ across successive layers, an initially locked shelf, and a moving row. The board
 ability bar and account for safe-area insets. Both shows pink on the upper shelves and amber on
 the lower shelves. The preview starts with Pink selected, matching the chosen primary asset.
 Switching artwork updates hidden items too. Reset and retry retain the choice.
-Tap an exposed sticky item for a short anchored wobble and the dedicated blocked-move sound. Hold and pull sideways or vertically to
+Tap an exposed sticky item for a short anchored wobble and the dedicated cartoon gum-pop
+blocked-move sound. Hold and pull sideways or vertically to
 feel the capped resistance visually, then release for a spring return. Both behaviors run together;
 no effect-mode toggle is required. The same interactions work on moving shelves.
 This is a dev-mode level with temporary ability counts; completing it does not advance the campaign.

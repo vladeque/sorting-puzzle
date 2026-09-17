@@ -32,7 +32,7 @@ per-stream offsets but exclude random variation unless shown as a burst.
 | `ui_click_01` | UI | -32.3 | -31.9 | -11.2 |
 | `ui_click_02` | UI | -33.0 | -32.6 | -10.2 |
 | `ui_click_03` | UI | -33.0 | -32.6 | -11.3 |
-| `sticky_move_blocked` | gameplay | -24.2 | -24.2 | -10.9 |
+| `sticky_move_blocked` | gameplay | -24.2 | -24.2 | -9.4 |
 | `shelf_unlock` | reward | -20.8 | -20.8 | -6.1 |
 | `ability_hammer` | ability | -16.6 | -16.6 | -4.9 |
 | `ability_shuffle` | ability | -18.8 | -18.8 | -7.8 |
@@ -43,6 +43,10 @@ per-stream offsets but exclude random variation unless shown as a burst.
 
 Every nominal and burst result is inside its class range from `docs/AUDIO_LOUDNESS_STANDARD.md`.
 The click variants now span 0.7 LU, below the one-LU limit.
+
+The selected 300 ms mono cartoon gum-pop source replaces the earlier invalid-action recording for
+`sticky_move_blocked`. Its catalog trim is -7.9 dB, retaining the event's -24.2 LUFS-M runtime
+level while presenting a simpler, non-realistic blocked-item cue.
 
 ## Source processing
 

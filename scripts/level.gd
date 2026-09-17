@@ -2708,7 +2708,7 @@ func _handle_press_at(pointer_global_position: Vector2, pointer_id := -1) -> voi
 		_blocked_press_position = pointer_global_position
 		_blocked_pointer_id = pointer_id
 		clicked_item.begin_sticky_hold()
-		# This is the only owner of invalid_action.wav: ordinary failed drops remain silent.
+		# This is the only owner of the gum-pop cue: ordinary failed drops remain silent.
 		_play_sfx(SfxCatalogScript.EVENT_STICKY_MOVE_BLOCKED)
 		_play_haptic(HapticsCatalogScript.EVENT_STICKY_MOVE_BLOCKED)
 		get_viewport().set_input_as_handled()

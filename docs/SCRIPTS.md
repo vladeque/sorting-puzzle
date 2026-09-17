@@ -1134,9 +1134,10 @@ Purpose:
 - Runtime `time_up` uses the supplied authored `assets/audio/time_up/times_up2.mp3`, synchronized
   to the HUD snap and modal settle. The generator-owned `time_up.wav` remains reproducible and
   validated as part of the original palette but is no longer the catalog stream.
-- `invalid_action.wav`, `purchase_successful.wav`, `shuffle.wav`, and `timer_tick.wav` are committed
-  as 48 kHz, 16-bit PCM because Godot 4.6.2 could not import their supplied 96 kHz, 24-bit
-  WAVE-Extensible encoding. Their channels and audible content are otherwise retained.
+- `cartoon_gum_pop.wav` retains its supplied 48 kHz, 16-bit mono PCM encoding.
+  `purchase_successful.wav`, `shuffle.wav`, and `timer_tick.wav` are committed as 48 kHz, 16-bit
+  PCM because Godot 4.6.2 could not import their supplied 96 kHz, 24-bit WAVE-Extensible encoding.
+  Their channels and audible content are otherwise retained.
 - `star_hud_arrival` carries a `count_scaling` block so a multi-star reward becomes one bigger cue
   instead of one full-volume sound per star.
 - `reward_chest_star_arrival` uses a 200 ms, smoothly faded derivative of `star_hud_arrival.wav`
@@ -1871,8 +1872,9 @@ Audio (AUDIO-001):
   Freezer, interruption, time-up, completion, failure, and scene teardown.
 - `time_up` fires once when expiry opens the time-extension offer. A terminal expiry goes straight
   to the dedicated `level_failed` cue so the two result sounds never stack.
-- `sticky_move_blocked` fires only from the exposed-sticky input branch. Ordinary rejected drops
-  remain silent. `shelf_unlock` fires once per threshold crossing even if several shelves unlock.
+- `sticky_move_blocked` fires the short cartoon gum-pop cue only from the exposed-sticky input
+  branch. Ordinary rejected drops remain silent. `shelf_unlock` fires once per threshold crossing
+  even if several shelves unlock.
 - Successful Lantern and Freezer starts fire `ability_lantern` or `ability_freezer`. Hammer fires
   `ability_hammer` on its authored `impact` signal, while Shuffle fires `ability_shuffle` when its
   items begin flying into the visible box; terminal transitions fire `level_complete` or

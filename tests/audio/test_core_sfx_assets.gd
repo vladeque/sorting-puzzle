@@ -29,7 +29,7 @@ const RETAINED_RECORDINGS := {
 const AUTHORED_SOURCE_CUES := [
 	"res://assets/audio/ability_freezer/freeze.wav",
 	"res://assets/audio/ability_hammer/hammer.wav",
-	"res://assets/audio/sticky_move_blocked/invalid_action.wav",
+	"res://assets/audio/sticky_move_blocked/cartoon_gum_pop.wav",
 	"res://assets/audio/ability_lantern/lantern.wav",
 	"res://assets/audio/level_complete/level_complete.mp3",
 	"res://assets/audio/level_failed/level_failed.wav",

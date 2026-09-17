@@ -181,9 +181,9 @@ const EVENTS := {
 	},
 	EVENT_STICKY_MOVE_BLOCKED: {
 		"loudness_class": &"gameplay_feedback",
-		# Deliberately semantic rather than `invalid_action`: ordinary rejected moves stay silent.
-		"streams": ["res://assets/audio/sticky_move_blocked/invalid_action.wav"],
-		"volume_db": -2.0,
+		# Deliberately scoped to sticky resistance: ordinary rejected moves stay silent.
+		"streams": ["res://assets/audio/sticky_move_blocked/cartoon_gum_pop.wav"],
+		"volume_db": -7.9,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(1.0, 1.0),
 		"cooldown_seconds": 0.18,

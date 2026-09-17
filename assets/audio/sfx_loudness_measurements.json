@@ -233,14 +233,14 @@
       "sample_peak_dbfs": -17.8
     },
     {
-      "path": "res://assets/audio/sticky_move_blocked/invalid_action.wav",
-      "sha256": "2cb85c72c21ffd854752aa8b01b21b9cad9591a3c6340df05a6f36fae61a80dc",
-      "duration_seconds": 0.469,
-      "max_m_lufs": -22.2,
-      "integrated_lufs": -22.25,
-      "true_peak_dbtp": -8.9,
-      "rms_dbfs": -25.1,
-      "sample_peak_dbfs": -8.9
+      "path": "res://assets/audio/sticky_move_blocked/cartoon_gum_pop.wav",
+      "sha256": "ab752f6d859609fba72ef50406077789f3d28818719ffd2714df7e86f7f71402",
+      "duration_seconds": 0.3,
+      "max_m_lufs": -16.3,
+      "integrated_lufs": -16.35,
+      "true_peak_dbtp": -1.51,
+      "rms_dbfs": -14.4,
+      "sample_peak_dbfs": -1.5
     },
     {
       "path": "res://assets/audio/time_up/time_up.wav",

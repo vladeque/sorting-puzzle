@@ -177,7 +177,7 @@ func _test_item_selection() -> void:
 	)
 	level.call("_cancel_active_interaction")
 
-	# invalid_action.wav is intentionally narrower than a generic rejected-move sound.
+	# The cartoon gum pop is intentionally narrower than a generic rejected-move sound.
 	item.is_sticky = true
 	_begin_recording()
 	level.call("_handle_press_at", item.global_position)
