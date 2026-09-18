@@ -315,6 +315,10 @@ must remain separate from reward settlement.
 
 ### ADS-001 — Approve product policy and provider
 
+Status: **In progress.** The proposed decisions, pinned provider artifacts, supply-chain controls,
+and remaining approval/platform gates are recorded in
+[`ADS_001_PRODUCT_POLICY_AND_PROVIDER.md`](ADS_001_PRODUCT_POLICY_AND_PROVIDER.md).
+
 - Confirm the audience/age policy, target countries, whether personalized ads are needed, and the
   exact reward/cap for each placement.
 - Choose and security/license-review the Godot 4.6.2 Android/iOS plugin through the platform spike.

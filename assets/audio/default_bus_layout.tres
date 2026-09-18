@@ -1,22 +1,9 @@
-[gd_resource type="AudioBusLayout" load_steps=2 format=3]
-
-; AUDIO-001 bus layout. Every cue played through scripts/audio/sfx_manager.gd is routed to the
-; dedicated "SFX" bus so short gameplay/UI transients can be trimmed, muted, or metered as one
-; group without touching Master (which future music work will share).
-;
-; Referenced from project.godot's audio/buses/default_bus_layout.
+[gd_resource type="AudioBusLayout" format=3 uid="uid://bubyykk74l0dh"]
 
 [sub_resource type="AudioEffectHardLimiter" id="AudioEffectHardLimiter_master"]
 ceiling_db = -1.0
-release = 0.1
 
 [resource]
-bus/0/name = &"Master"
-bus/0/solo = false
-bus/0/mute = false
-bus/0/bypass_fx = false
-bus/0/volume_db = 0.0
-bus/0/send = &""
 bus/0/effect/0/effect = SubResource("AudioEffectHardLimiter_master")
 bus/0/effect/0/enabled = true
 bus/1/name = &"SFX"
