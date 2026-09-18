@@ -192,7 +192,7 @@ const EVENTS := {
 	EVENT_SHELF_UNLOCK: {
 		"loudness_class": &"reward_confirmation",
 		"streams": ["res://assets/audio/shelf_unlock/shelve_unlock.wav"],
-		"volume_db": -3.05,
+		"volume_db": -10.3,
 		"volume_variation_db": 0.0,
 		"pitch_range": Vector2(1.0, 1.0),
 		"cooldown_seconds": 0.20,

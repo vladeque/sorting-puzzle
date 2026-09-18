@@ -204,12 +204,12 @@
     },
     {
       "path": "res://assets/audio/shelf_unlock/shelve_unlock.wav",
-      "sha256": "5a64eae75a8d6e9616d0a24289400b06dd953cd57af75e30f35550c3c96d4a93",
-      "duration_seconds": 1.0,
-      "max_m_lufs": -17.7,
-      "integrated_lufs": -19.34,
+      "sha256": "e8c9e15f207a83c11e1f020c67ced965344bcd5b7529a048e5d67da55c6a9615",
+      "duration_seconds": 1.2,
+      "max_m_lufs": -10.5,
+      "integrated_lufs": -12.9,
       "true_peak_dbtp": -3.0,
-      "rms_dbfs": -27.4,
+      "rms_dbfs": -17.8,
       "sample_peak_dbfs": -3.1
     },
     {

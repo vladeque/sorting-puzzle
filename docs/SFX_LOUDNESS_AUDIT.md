@@ -2,7 +2,7 @@
 
 ## Baseline
 
-Date: 2026-09-17
+Date: 2026-09-18
 
 This baseline covers all 30 committed audio files and all 19 semantic runtime events (23 runtime
 streams including variants). The authoritative per-file measurements and SHA-256 hashes are in
@@ -33,7 +33,7 @@ per-stream offsets but exclude random variation unless shown as a burst.
 | `ui_click_02` | UI | -33.0 | -32.6 | -10.2 |
 | `ui_click_03` | UI | -33.0 | -32.6 | -11.3 |
 | `sticky_move_blocked` | gameplay | -24.2 | -24.2 | -9.4 |
-| `shelf_unlock` | reward | -20.8 | -20.8 | -6.1 |
+| `shelf_unlock` | reward | -20.8 | -20.8 | -13.3 |
 | `ability_hammer` | ability | -16.6 | -16.6 | -4.9 |
 | `ability_shuffle` | ability | -18.8 | -18.8 | -7.8 |
 | `ability_lantern` | ability | -18.8 | -18.8 | -9.8 |
@@ -46,7 +46,10 @@ The click variants now span 0.7 LU, below the one-LU limit.
 
 The selected 300 ms mono cartoon gum-pop source replaces the earlier invalid-action recording for
 `sticky_move_blocked`. Its catalog trim is -7.9 dB, retaining the event's -24.2 LUFS-M runtime
-level while presenting a simpler, non-realistic blocked-item cue.
+level while presenting a simpler, non-realistic blocked-item cue. The selected 1.2-second stereo
+shelf-unlock cue replaces the earlier unlock recording. Its source was attenuated by 3.09 dB to
+the -3 dBTP working ceiling, and its -10.3 dB catalog trim retains the event's -20.8 LUFS-M
+runtime level.
 
 ## Source processing
 
@@ -64,7 +67,7 @@ and opposite catalog compensation where needed:
 | `ability_freezer/freeze.wav` | -3.56 dB | -3.00 | -18.5 |
 | `ability_hammer/hammer.wav` | -3.07 dB | -3.00 | -16.6 |
 | `level_failed/level_failed.wav` | -3.38 dB | -3.00 | -16.3 |
-| `shelf_unlock/shelve_unlock.wav` | -3.05 dB | -3.00 | -20.8 |
+| `shelf_unlock/shelve_unlock.wav` | -3.09 dB | -3.00 | -20.8 |
 
 No committed source now exceeds the -1 dBTP hard ceiling. The four repaired sources meet the
 preferred -3 dBTP working ceiling.
