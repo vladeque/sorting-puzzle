@@ -1,7 +1,7 @@
 # Collapsing Shelf Columns Implementation Task
 
-Status: Draft implementation task. Product decisions in the decision gate below must be confirmed
-before gameplay implementation begins.
+Status: Confirmed implementation task. The product decision gate below was answered on
+2026-09-18 and the recorded answers are the contract this implementation follows.
 
 Date: 2026-09-18.
 
@@ -33,15 +33,14 @@ Working name: `collapsing_columns`.
 
 ## Product decision gate
 
-The following behavior is recommended but has not yet been confirmed by the project owner. Do not
-silently choose different behavior during implementation. Record confirmed decisions and their date
-in this section before starting the runtime work.
+Confirmed by the project owner on 2026-09-18. The "Confirmed decision" column is authoritative;
+where it differs from the original recommendation, the confirmed value wins.
 
-| Decision | Recommended first version | Why it matters |
+| Decision | Confirmed decision | Why it matters |
 | --- | --- | --- |
 | Column count | Three columns | Matches the common three-shelf board width and existing standard shelf art. |
-| Visible height | Four shelves per column | Keeps a useful workspace while leaving clear room for the HUD and ability bar. |
-| Cross-device behavior | Keep the same logical visible count at every resolution; scale and center the board | A taller device must not expose extra legal moves and thereby change level solvability. |
+| Visible height | As many shelves per column as the fitted board area allows, never fewer than the authored `visible_shelves_per_column` | Uses the whole play area on taller devices while the authored minimum stays the solvability contract. |
+| Cross-device behavior | The visible count may grow with the screen; the solver proves the authored minimum | A larger window only ever adds legal moves, so proving the minimum proves every larger window. |
 | Playable shelves | Every fully visible shelf is a legal source and target | This matches the request that clearing any shelf makes the shelves above it fall. |
 | Partial shelves | Do not expose partially interactive shelves | Avoids device-dependent hit areas and ambiguous reachability. |
 | Hidden shelves | Hidden and unavailable to moves, abilities, hints, and automatic matching | Offscreen content must not affect current legal choices until revealed. |
@@ -50,16 +49,35 @@ in this section before starting the runtime work.
 | Interaction during collapse | Block item input and ability activation until all affected columns settle | Prevents drops against moving or soon-to-be-destroyed shelves. |
 | Core abilities | Support Hammer, Shuffle, Highlight/Lantern, and Freezer | These are normal level controls and should not silently disappear in this mode. |
 | Special shelf content | Disallow dispensers, moving rows, multiple layers, locks, and sticky items in the first version | Reduces the first implementation and solver matrix; each can be added later through an explicit compatibility task. |
-| Remaining-content indicator | Show a small remaining-shelf count per column or one total count | Makes the size of offscreen stacks understandable without revealing their item contents. |
+| Remaining-content indicator | None in the first version | Keeps the board free of extra HUD surface; can be added later as a separate presentation change. |
 | Completion | All column shelf collections are empty | An item-only check is insufficient because shelf destruction is the objective. |
 
-Questions requiring owner confirmation:
+### Confirmed answers (2026-09-18)
 
-1. Are three columns and four visible shelves per column the intended initial board size?
-2. Can the player interact with every visible shelf, or only the lowest shelf in each column?
-3. Should all four current abilities remain available in this mode?
-4. Are locks and sticky items intentionally deferred from the first version?
-5. Should the player see per-column remaining counts, one total count, or no explicit count?
+1. Board size: **three columns always**. The visible shelves per column are **as many as the screen
+   allows** rather than a single fixed number.
+2. Interaction: the player can interact with **every visible shelf**, not only the lowest one.
+3. Abilities: **all four** abilities (Hammer, Shuffle, Highlight/Lantern, Freezer) stay available.
+4. Locks, sticky items, dispensers, moving rows, and multiple layers stay **deferred** from the
+   first version, as recommended.
+5. Remaining-content indicator: **none**. The board shows no per-column or total remaining count.
+
+#### How the device-dependent visible count is kept solvable
+
+Answer 1 replaces the recommended "same logical visible count at every resolution". A larger visible
+window on a taller device would otherwise change which levels are solvable, so the contract splits
+the two meanings of the number:
+
+- `column_layout.visible_shelves_per_column` is the **authored guaranteed minimum**. Every supported
+  viewport reveals at least this many shelves per column, and it is the count the solver and the
+  generator prove the level against.
+- The runtime may reveal **more** shelves per column when the fitted board has room for them, up to
+  `MAX_VISIBLE_SHELVES_PER_COLUMN` and the column's own height.
+
+This is safe because solvability is monotone in the visible count: every move that is legal with a
+smaller window is still legal with a larger one, and the only forced extra event a larger window can
+trigger is an automatic triple clear, which only destroys shelves and therefore only advances the
+objective. Proving the minimum therefore proves every larger window.
 
 ## Scope
 
@@ -141,8 +159,9 @@ Contract rules:
   compatibility decision says otherwise.
 - `column_layout.shelf_counts` is a non-empty array of positive integers.
 - The sum of `shelf_counts` must equal `shelves.size()`.
-- `visible_shelves_per_column` is a positive integer. It can exceed a shorter column's current
-  height but should be capped to the maximum supported design footprint.
+- `visible_shelves_per_column` is a positive integer capped to `MAX_VISIBLE_SHELVES_PER_COLUMN`.
+  It can exceed a shorter column's current height. It is the guaranteed minimum window every
+  viewport reveals and the count the solver and generator prove; the runtime may reveal more.
 - The flat `shelves` array is consumed column-by-column, left-to-right. Within each column, entries
   are ordered bottom-to-top. Document and test this ordering; never infer it from node names or
   coordinates.
@@ -245,19 +264,22 @@ Update `scripts/level.gd` to:
 
 Responsive behavior:
 
-- Extend `_get_shelves_root_child_bounds()` to recognize the collapsing board and use its fixed
-  visible layout bounds.
+- Extend `_get_shelves_root_child_bounds()` to recognize the collapsing board and use its visible
+  layout bounds.
 - Never include hidden stack depth in responsive fitting.
-- Keep the configured logical visible count consistent at 540x960, 720x1280, 1080x1920,
-  1080x2400, and the selected tablet-like portrait viewport.
+- Reveal at least the authored `visible_shelves_per_column` at 540x960, 720x1280, 1080x1920,
+  1080x2400, and the selected tablet-like portrait viewport, and reveal more only when the fitted
+  play area genuinely has room for a further whole shelf.
 - Scale and center the board within the existing playable wall area between the HUD and ability bar.
 - Keep touch targets aligned with the rendered shelf scale.
-- Do not make additional shelves playable merely because a taller screen has spare pixels.
-- If a remaining-count indicator is approved, include it in visual bounds and safe-area checks.
+- Additional shelves become playable on a taller screen only through the one board-owned visible
+  count, which is resolved once at level build and never changes mid-level.
+- No remaining-count indicator is part of the first version.
 
 The board should keep a fixed logical footprint while its stacks become shorter. Do not recenter or
 rescale after each shelf removal; the column bases must remain visually anchored and the board must
-not jump as the player progresses.
+not jump as the player progresses. The footprint is the resolved visible count, not the authored
+stack depth, so it stays constant for the whole level even though it may differ between devices.
 
 ## 4. Shelf availability and input rules
 
@@ -467,7 +489,7 @@ Required presentation:
   seams or double-dark overlaps.
 - Hidden shelves and items do not render above the play window or through the HUD.
 - The board does not rescale or recenter as columns shrink.
-- Optional remaining counts are readable but do not reveal hidden item types.
+- No remaining-count indicator is drawn.
 
 If clipping cannot be achieved cleanly with the current `Node2D` hierarchy, prefer explicit
 visibility and one offscreen entering shelf over introducing a `SubViewport`. The gameplay contract
@@ -521,6 +543,7 @@ Extend `tests/tools/test_validate_level_solvable.py` with:
 - Valid and invalid column contract shapes.
 - Shelf-count sum mismatch.
 - Zero/negative/excessive visible counts.
+- A level that is solvable at the authored minimum visible count and stays solvable at a larger one.
 - Multiple layers, empty authored shelves, dispenser, lock, sticky, `layout_preset`, and
   `row_layouts` rejection under the first-version contract.
 - A solution that requires revealing a hidden shelf.
@@ -666,7 +689,6 @@ sticky-items documentation pattern.
 ### Batch 5: Add content, polish, and verification
 
 - Add the approved campaign template and materialized runtime level.
-- Add optional count presentation using existing UI primitives.
 - Capture all responsive resolutions and correct observed issues.
 - Update all ownership/configuration documentation.
 - Refresh content provenance only if the approved release path requires it.
@@ -680,7 +702,9 @@ these client commits.
 - Existing levels with no `gameplay_mode` behave exactly as before.
 - A valid `collapsing_columns` level builds the configured columns in documented bottom-to-top order.
 - Every shelf has exactly one three-slot layer and unsupported feature combinations fail clearly.
-- Only the fixed configured active window is visible and playable on every supported viewport.
+- At least the authored `visible_shelves_per_column` is visible and playable on every supported
+  viewport, the resolved count never changes during a level, and no partially visible shelf is
+  playable.
 - Hidden shelves cannot be accessed by direct input, fallback target selection, automatic matching,
   Hammer, Shuffle, or Highlight.
 - Emptying a shelf through a committed move, match, or Hammer destroys it exactly once.

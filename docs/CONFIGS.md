@@ -125,6 +125,9 @@ File naming:
 Top-level fields:
 - `level`: numeric level identifier.
 - `time_seconds`: countdown duration for the level.
+- `gameplay_mode`: optional board behavior. Omit it or use `classic` for every existing level; see
+  [Collapsing shelf columns](#collapsing-shelf-columns) for `collapsing_columns`.
+- `column_layout`: required by `collapsing_columns` and rejected by `classic`.
 - `layout_preset`: shelf placement preset used by `scripts/level.gd`; preset positions are authored in matching `scenes/layouts/layout_*.tscn` template scenes.
 - `difficulty`: generation metadata recording the difficulty preset used to create the shelf layout.
 - `row_layouts`: optional row-by-row shelf placement and motion config. When present, its `shelf_count` total must equal the `shelves` length and it replaces `layout_preset` placement at runtime.
@@ -361,6 +364,79 @@ The distribution engine is untouched: it lays out only the standard shelves, and
 stocked by relocating items out of the deepest layers, so every item ID keeps the multiple-of-three
 count it was given. Because relocation can change whether a board is winnable, pair the flag with
 `--require-solvable` so the search re-runs afterwards instead of assuming a solution survived.
+
+### Collapsing shelf columns
+
+`gameplay_mode: "collapsing_columns"` replaces the classic board with tall vertical columns of
+one-layer shelves. When a shelf becomes empty it is destroyed permanently and every shelf above it
+in the same column falls one position, so the level is finished when no shelf is left rather than
+when no item is left. `gameplay_mode` is optional and defaults to `classic`; every existing level
+loads unchanged.
+
+```json
+{
+  "level": 11,
+  "time_seconds": 300,
+  "gameplay_mode": "collapsing_columns",
+  "column_layout": {
+    "shelf_counts": [8, 8, 8],
+    "visible_shelves_per_column": 4
+  },
+  "shelves": [
+    { "layers": [["item_01", "item_02", null]] },
+    { "layers": [["item_03", "item_01", "item_02"]] }
+  ]
+}
+```
+
+Contract rules:
+- `column_layout.shelf_counts` is a non-empty array of positive integers, one per column, ordered
+  left to right. Its total must equal the `shelves` length.
+- The flat `shelves` array is consumed column by column, left to right, and bottom to top within each
+  column. This ordering is the contract; it is never inferred from node names or coordinates.
+- `column_layout.visible_shelves_per_column` is a positive integer no greater than
+  `MAX_VISIBLE_SHELVES_PER_COLUMN` (`8`). It may exceed a shorter column's height.
+- Every shelf must be `standard`, must have exactly one layer, and that layer must hold exactly three
+  item ID or `null` slots.
+- Every authored shelf must contain at least one item. A fully empty authored shelf would be
+  destroyed before the player could touch it and is rejected as a content error.
+- Each item ID must still appear a multiple of three times across the level.
+- `layout_preset`, `row_layouts`, `type: dispenser`, a positive `unlock_after_triples`, and non-empty
+  `sticky_items` are all rejected in this mode. Each needs its own compatibility task with solver
+  fixtures before content may use it.
+- Animation durations, easing, spacing, and presentation offsets are scene and script properties, not
+  level-content fields, and never affect solvability.
+- The runtime fails closed on an invalid collapsing level. It never falls back to `grid_3x3`, because
+  the same shelves array means something different under each mode.
+
+What `visible_shelves_per_column` means:
+- It is the **guaranteed minimum** window. Every supported viewport reveals at least this many
+  shelves per column, and it is the count the solver and generator prove the level against.
+- The runtime may reveal **more** shelves per column when the fitted board has room, up to
+  `MAX_VISIBLE_SHELVES_PER_COLUMN` and the column's own height. The resolved count is decided once
+  when the level is built and never changes during play.
+- Proving the minimum proves every larger window: a larger window only ever adds legal moves, and the
+  only extra forced event it can trigger is an automatic triple clear, which destroys a shelf and so
+  only advances the objective.
+
+Validation and solvability:
+
+```powershell
+py scripts\tools\validate_level_solvable.py configs\levels\level_011.json --show-solution
+```
+
+The validator selects a mode-specific rules object rather than branching through every helper.
+`CollapsingColumnsRules` restricts sources, targets, and matching to the shelves inside each column's
+visible window, destroys every active shelf whose only layer is empty, compacts the column while
+preserving survivor order, reveals the next shelves, and repeats until the board is stable. Its
+canonical state keeps column membership and bottom-to-top order, normalizing only slot order inside
+one shelf, so two boards that differ in pile topology are never treated as the same position. Moves
+address shelves by **stable authored shelf ID**, so a reported solution stays replayable after
+earlier shelves have disappeared, and `solution_indexing` stays `authored_1_based`.
+
+Item-count checks alone are not sufficient in this mode: a board can hold three copies of every item
+and still deadlock because the workspace needed to finish a triple is hidden behind a shelf that can
+never be emptied first.
 
 ### Sticky items
 

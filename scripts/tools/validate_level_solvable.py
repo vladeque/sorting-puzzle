@@ -36,6 +36,20 @@ LAYOUT_GRID_2X4_MOVING_6_LEFT = "grid_2x4_moving_6_left"
 LAYOUT_GRID_2X4_MOVING_8_LEFT = "grid_2x4_moving_8_left"
 LAYOUT_GRID_3X2_MOVING_5_BOTTOM = "grid_3x2_moving_5_bottom"
 LAYOUT_GRID_1X4_MOVING_6_6_SIDES = "grid_1x4_moving_6_6_sides"
+ROW_LAYOUTS_KEY = "row_layouts"
+LAYOUT_PRESET_KEY = "layout_preset"
+GAMEPLAY_MODE_KEY = "gameplay_mode"
+GAMEPLAY_MODE_CLASSIC = "classic"
+GAMEPLAY_MODE_COLLAPSING_COLUMNS = "collapsing_columns"
+GAMEPLAY_MODES = {GAMEPLAY_MODE_CLASSIC, GAMEPLAY_MODE_COLLAPSING_COLUMNS}
+COLUMN_LAYOUT_KEY = "column_layout"
+COLUMN_SHELF_COUNTS_KEY = "shelf_counts"
+COLUMN_VISIBLE_SHELVES_KEY = "visible_shelves_per_column"
+COLLAPSING_LAYERS_PER_SHELF = 1
+# Deepest window `scripts/collapsing_shelf_column.gd` is built to draw. A level authors the
+# guaranteed minimum window every device reveals; the runtime may reveal more when the fitted board
+# has room, but never more than this, so an authored value above it could never be honoured.
+MAX_VISIBLE_SHELVES_PER_COLUMN = 8
 
 
 def moving_row(
@@ -199,6 +213,154 @@ def load_shelves(path: Path, shelves_only: bool) -> list[dict[str, Any]]:
         return data
 
     raise ValueError("Expected a level JSON object with 'shelves' or a shelves array")
+
+
+def get_gameplay_mode(level_data: Any) -> Any:
+    """Raw `gameplay_mode` value, defaulting to classic. Validation decides whether it is legal."""
+    if not isinstance(level_data, dict):
+        return GAMEPLAY_MODE_CLASSIC
+
+    return level_data.get(GAMEPLAY_MODE_KEY, GAMEPLAY_MODE_CLASSIC)
+
+
+## Fails closed on purpose. An unrecognized mode or a malformed column contract is a content error,
+## never a reason to fall back to a classic board: the same shelves array means something different
+## under each mode, so a silent fallback would accept an invalid level and change its rules.
+def validate_gameplay_mode_shape(level_data: Any, shelves: list[dict[str, Any]]) -> list[str]:
+    if not isinstance(level_data, dict):
+        return []
+
+    mode = level_data.get(GAMEPLAY_MODE_KEY, GAMEPLAY_MODE_CLASSIC)
+    if mode not in GAMEPLAY_MODES:
+        return [f"{GAMEPLAY_MODE_KEY} must be one of {sorted(GAMEPLAY_MODES)}"]
+
+    if mode == GAMEPLAY_MODE_CLASSIC:
+        if COLUMN_LAYOUT_KEY in level_data:
+            return [
+                f"{COLUMN_LAYOUT_KEY} is only valid when {GAMEPLAY_MODE_KEY} is "
+                f"'{GAMEPLAY_MODE_COLLAPSING_COLUMNS}'"
+            ]
+        return []
+
+    return validate_column_layout_shape(level_data, shelves)
+
+
+def validate_column_layout_shape(level_data: dict[str, Any], shelves: list[dict[str, Any]]) -> list[str]:
+    errors = []
+    for exclusive_key in (LAYOUT_PRESET_KEY, ROW_LAYOUTS_KEY):
+        if exclusive_key in level_data:
+            errors.append(
+                f"{exclusive_key} cannot be combined with {GAMEPLAY_MODE_KEY} "
+                f"'{GAMEPLAY_MODE_COLLAPSING_COLUMNS}'"
+            )
+
+    column_layout = level_data.get(COLUMN_LAYOUT_KEY)
+    if not isinstance(column_layout, dict):
+        errors.append(
+            f"{COLUMN_LAYOUT_KEY} must be an object when {GAMEPLAY_MODE_KEY} is "
+            f"'{GAMEPLAY_MODE_COLLAPSING_COLUMNS}'"
+        )
+        return errors
+
+    shelf_counts = column_layout.get(COLUMN_SHELF_COUNTS_KEY)
+    if not isinstance(shelf_counts, list) or not shelf_counts:
+        errors.append(
+            f"{COLUMN_LAYOUT_KEY}.{COLUMN_SHELF_COUNTS_KEY} must be a non-empty array of "
+            "positive integers"
+        )
+    else:
+        total_shelf_count = 0
+        counts_are_valid = True
+        for column_index, shelf_count in enumerate(shelf_counts):
+            if type(shelf_count) is not int or shelf_count <= 0:
+                errors.append(
+                    f"{COLUMN_LAYOUT_KEY}.{COLUMN_SHELF_COUNTS_KEY}[{column_index}] must be a "
+                    "positive integer"
+                )
+                counts_are_valid = False
+                continue
+
+            total_shelf_count += shelf_count
+
+        if counts_are_valid and total_shelf_count != len(shelves):
+            errors.append(
+                f"{COLUMN_LAYOUT_KEY}.{COLUMN_SHELF_COUNTS_KEY} total is {total_shelf_count}, "
+                f"expected {len(shelves)} shelves"
+            )
+
+    visible_count = column_layout.get(COLUMN_VISIBLE_SHELVES_KEY)
+    if (
+        type(visible_count) is not int
+        or visible_count <= 0
+        or visible_count > MAX_VISIBLE_SHELVES_PER_COLUMN
+    ):
+        errors.append(
+            f"{COLUMN_LAYOUT_KEY}.{COLUMN_VISIBLE_SHELVES_KEY} must be a positive integer no "
+            f"greater than {MAX_VISIBLE_SHELVES_PER_COLUMN}"
+        )
+
+    errors.extend(validate_collapsing_shelf_contract(shelves))
+    return errors
+
+
+## First-version content restrictions. Each rejected feature needs its own compatibility task with
+## solver fixtures before content may use it; removing a rejection here without that work would let
+## an unproven board ship.
+def validate_collapsing_shelf_contract(shelves: list[dict[str, Any]]) -> list[str]:
+    errors = []
+    for shelf_index, shelf in enumerate(shelves):
+        if not isinstance(shelf, dict):
+            # Already reported by validate_shelves_shape.
+            continue
+
+        shelf_number = shelf_index + 1
+        if shelf.get("type", SHELF_KIND_STANDARD) != SHELF_KIND_STANDARD:
+            errors.append(
+                f"shelf {shelf_number} must be a standard shelf in {GAMEPLAY_MODE_KEY} "
+                f"'{GAMEPLAY_MODE_COLLAPSING_COLUMNS}'"
+            )
+
+        unlock_after_triples = shelf.get("unlock_after_triples", 0)
+        if type(unlock_after_triples) is int and unlock_after_triples > 0:
+            errors.append(
+                f"shelf {shelf_number} is locked; locked shelves are not supported in "
+                f"{GAMEPLAY_MODE_KEY} '{GAMEPLAY_MODE_COLLAPSING_COLUMNS}'"
+            )
+
+        sticky_items = shelf.get("sticky_items")
+        if isinstance(sticky_items, list) and sticky_items:
+            errors.append(
+                f"shelf {shelf_number} has sticky items; sticky items are not supported in "
+                f"{GAMEPLAY_MODE_KEY} '{GAMEPLAY_MODE_COLLAPSING_COLUMNS}'"
+            )
+
+        layers = shelf.get("layers")
+        if not isinstance(layers, list) or not layers:
+            # Already reported by validate_shelves_shape.
+            continue
+
+        if len(layers) != COLLAPSING_LAYERS_PER_SHELF:
+            errors.append(
+                f"shelf {shelf_number} has {len(layers)} layers, expected exactly "
+                f"{COLLAPSING_LAYERS_PER_SHELF} in {GAMEPLAY_MODE_KEY} "
+                f"'{GAMEPLAY_MODE_COLLAPSING_COLUMNS}'"
+            )
+            continue
+
+        layer = layers[0]
+        if not isinstance(layer, list) or len(layer) != SLOTS_PER_SHELF:
+            # Already reported by validate_shelves_shape.
+            continue
+
+        # An authored shelf with no items would be destroyed before the player could touch it, so it
+        # is a content mistake rather than a zero-cost head start.
+        if all(item_id is None for item_id in layer):
+            errors.append(
+                f"shelf {shelf_number} is empty; an authored collapsing shelf must contain at "
+                "least one item"
+            )
+
+    return errors
 
 
 def validate_row_layouts_shape(level_data: Any, shelves: list[dict[str, Any]]) -> list[str]:
@@ -450,26 +612,30 @@ def shelf_sort_key(shelf: ShelfState) -> tuple:
     )
 
 
+## Slot order inside one layer carries no meaning, so two boards that differ only by it are the same
+## position. Which shelf is which does carry meaning in collapsing columns, so shelf-level ordering
+## stays with the mode that owns it rather than living here.
+def canonicalize_shelf(shelf: ShelfState) -> ShelfState:
+    canonical_layers = []
+    sticky_items = []
+    for layer_index, layer in enumerate(shelf.layers):
+        order = sorted(range(len(layer)), key=lambda slot: (
+            slot_sort_key(layer[slot]), (layer_index, slot) in shelf.sticky_items))
+        canonical_layers.append(tuple(layer[slot] for slot in order))
+        sticky_items.extend((layer_index, new_slot) for new_slot, old_slot in enumerate(order)
+                            if (layer_index, old_slot) in shelf.sticky_items)
+
+    return ShelfState(
+        unlock_after_triples=shelf.unlock_after_triples,
+        layers=tuple(canonical_layers),
+        kind=shelf.kind,
+        sticky_items=tuple(sticky_items),
+    )
+
+
 def canonicalize_state(state: State) -> State:
     triples_cleared, shelves = state
-    canonical_shelves = []
-    for shelf in shelves:
-        canonical_layers = []
-        sticky_items = []
-        for layer_index, layer in enumerate(shelf.layers):
-            order = sorted(range(len(layer)), key=lambda slot: (
-                slot_sort_key(layer[slot]), (layer_index, slot) in shelf.sticky_items))
-            canonical_layers.append(tuple(layer[slot] for slot in order))
-            sticky_items.extend((layer_index, new_slot) for new_slot, old_slot in enumerate(order)
-                                if (layer_index, old_slot) in shelf.sticky_items)
-        canonical_shelves.append(
-            ShelfState(
-                unlock_after_triples=shelf.unlock_after_triples,
-                layers=tuple(canonical_layers),
-                kind=shelf.kind,
-                sticky_items=tuple(sticky_items),
-            )
-        )
+    canonical_shelves = [canonicalize_shelf(shelf) for shelf in shelves]
 
     return (triples_cleared, tuple(sorted(canonical_shelves, key=shelf_sort_key)))
 
@@ -573,13 +739,14 @@ def legal_moves(state: State) -> list[Move]:
     return moves
 
 
-def move_score(state: State, move: Move) -> int:
-    shelves = state[1]
-    target_front = visible_layer(shelves[move.to_shelf])
-    target_same_count = sum(1 for item_id in target_front if item_id == move.item_id)
-    target_empty_count = sum(1 for item_id in target_front if item_id is None)
-    source_front = visible_layer(shelves[move.from_shelf])
-    source_remaining_count = sum(1 for item_id in source_front if item_id == move.item_id) - 1
+## Move ordering only, never legality: the search still explores every move, this decides which it
+## looks at first. Shared by both modes because it reads two shelves, not a board shape.
+def score_move(source: ShelfState, target: ShelfState, item_id: str) -> int:
+    target_front = visible_layer(target)
+    target_same_count = sum(1 for slot_item in target_front if slot_item == item_id)
+    target_empty_count = sum(1 for slot_item in target_front if slot_item is None)
+    source_front = visible_layer(source)
+    source_remaining_count = sum(1 for slot_item in source_front if slot_item == item_id) - 1
 
     score = target_same_count * 10
     if target_same_count == 2 and target_empty_count == 1:
@@ -587,6 +754,11 @@ def move_score(state: State, move: Move) -> int:
     if source_remaining_count == 0:
         score += 3
     return score
+
+
+def move_score(state: State, move: Move) -> int:
+    shelves = state[1]
+    return score_move(shelves[move.from_shelf], shelves[move.to_shelf], move.item_id)
 
 
 def apply_move(state: State, move: Move) -> State:
@@ -627,21 +799,294 @@ def apply_move(state: State, move: Move) -> State:
     return (triples_cleared, tuple(moved_shelves))
 
 
-def solve_level(initial_state: State, max_states: int, max_depth: int, keep_solution: bool) -> SearchResult:
+class ColumnShelf(NamedTuple):
+    """One surviving shelf in a collapsing column, tagged with the authored ID that never changes.
+
+    Stack position moves as shelves below it are destroyed; `shelf_id` does not, so a reported
+    solution stays replayable against the authored board.
+    """
+
+    shelf_id: int
+    state: ShelfState
+
+
+# Surviving shelves per column, bottom-to-top, in authored column order.
+CollapsingState = tuple[int, tuple[tuple[ColumnShelf, ...], ...]]
+
+
+def replace_front_slot(shelf: ShelfState, slot_index: int, item_id: Item) -> ShelfState:
+    front = list(shelf.layers[0])
+    front[slot_index] = item_id
+    return shelf._replace(layers=(tuple(front),) + shelf.layers[1:])
+
+
+## One rules object per gameplay mode, rather than `if collapsing` branches through every helper.
+## The search drives only this interface, so a mode owns its own settle, reachability, move
+## addressing, and terminal condition.
+class SortingRules:
+    mode = GAMEPLAY_MODE_CLASSIC
+
+    def iter_shelf_states(self, state) -> list[ShelfState]:
+        raise NotImplementedError
+
+    def settle(self, state):
+        raise NotImplementedError
+
+    def canonicalize(self, state):
+        raise NotImplementedError
+
+    def legal_moves(self, state) -> list[Move]:
+        raise NotImplementedError
+
+    def apply_move(self, state, move: Move):
+        raise NotImplementedError
+
+    def is_cleared(self, state) -> bool:
+        raise NotImplementedError
+
+    ## A sticky item never leaves its slot, so its own shelf has to complete the triple around it.
+    ## More sticky copies of an item than the board has triples of it is decidable up front, in both
+    ## modes, without spending any search budget.
+    def preflight(self, state) -> SearchResult | None:
+        shelves = self.iter_shelf_states(state)
+        counts = Counter(item for shelf in shelves for layer in shelf.layers for item in layer if item)
+        sticky_counts = Counter(shelf.layers[layer][slot] for shelf in shelves
+                                for layer, slot in shelf.sticky_items)
+        if any(count * TRIPLE_SIZE > counts[item] for item, count in sticky_counts.items()):
+            return SearchResult(False, "sticky_copy_limit", None, 1, 1, [])
+
+        return None
+
+
+class ClassicRules(SortingRules):
+    """Shelves persist for the whole level and an emptied shelf stays a reusable destination."""
+
+    mode = GAMEPLAY_MODE_CLASSIC
+
+    def iter_shelf_states(self, state: State) -> list[ShelfState]:
+        return list(state[1])
+
+    def settle(self, state: State) -> State:
+        return settle_state(state)
+
+    def canonicalize(self, state: State) -> State:
+        return canonicalize_state(state)
+
+    def legal_moves(self, state: State) -> list[Move]:
+        return legal_moves(state)
+
+    def apply_move(self, state: State, move: Move) -> State:
+        return apply_move(state, move)
+
+    def is_cleared(self, state: State) -> bool:
+        return is_cleared(state)
+
+
+class CollapsingColumnsRules(SortingRules):
+    """Columns of one-layer shelves. An emptied shelf is destroyed and the shelves above it fall.
+
+    `visible_count` is the authored guaranteed minimum window, not a device measurement. The runtime
+    may reveal more shelves per column when the fitted board has room, and proving the minimum also
+    proves those larger windows: every move legal in a smaller window stays legal in a larger one,
+    and the only extra forced event a larger window can trigger is an automatic triple clear, which
+    destroys a shelf and therefore only advances the objective.
+    """
+
+    mode = GAMEPLAY_MODE_COLLAPSING_COLUMNS
+
+    def __init__(self, visible_count: int) -> None:
+        self.visible_count = max(1, int(visible_count))
+
+    def iter_shelf_states(self, state: CollapsingState) -> list[ShelfState]:
+        return [entry.state for column in state[1] for entry in column]
+
+    def active_entries(self, state: CollapsingState) -> list[ColumnShelf]:
+        """Every shelf currently inside a column's visible window, bottom-to-top."""
+        return [entry for column in state[1] for entry in column[: self.visible_count]]
+
+    def remaining_shelf_count(self, state: CollapsingState) -> int:
+        return sum(len(column) for column in state[1])
+
+    ## Clearing and destroying reveal the next shelf, which can itself be an authored triple, so this
+    ## repeats until nothing changes. A shelf outside the window is never touched: offscreen content
+    ## must not resolve before the player can see it.
+    def settle(self, state: CollapsingState) -> CollapsingState:
+        triples_cleared, columns = state
+        working = [list(column) for column in columns]
+        changed = True
+        while changed:
+            changed = False
+            for column_index, column in enumerate(working):
+                survivors: list[ColumnShelf] = []
+                for stack_index, entry in enumerate(column):
+                    shelf = entry.state
+                    if stack_index >= self.visible_count or not is_shelf_unlocked(shelf, triples_cleared):
+                        survivors.append(entry)
+                        continue
+
+                    front = visible_layer(shelf)
+                    if is_matching_layer(shelf, front):
+                        triples_cleared += 1
+                        changed = True
+                        continue
+                    if is_empty_layer(front):
+                        changed = True
+                        continue
+
+                    survivors.append(entry)
+
+                working[column_index] = survivors
+
+        return (triples_cleared, tuple(tuple(column) for column in working))
+
+    ## Column membership and bottom-to-top order are part of the position, so only slot order inside
+    ## one shelf is normalized here. Authored IDs are labels rather than state and are dropped, which
+    ## lets two boards that differ only in labelling share a visited entry.
+    def canonicalize(self, state: CollapsingState):
+        triples_cleared, columns = state
+        return (
+            triples_cleared,
+            tuple(tuple(canonicalize_shelf(entry.state) for entry in column) for column in columns),
+        )
+
+    def legal_moves(self, state: CollapsingState) -> list[Move]:
+        triples_cleared = state[0]
+        active_states: dict[int, ShelfState] = {}
+        sources: list[tuple[int, int, str]] = []
+        targets: list[tuple[int, int]] = []
+
+        for entry in self.active_entries(state):
+            shelf = entry.state
+            active_states[entry.shelf_id] = shelf
+            if not is_shelf_unlocked(shelf, triples_cleared):
+                continue
+
+            for slot_index, item_id in enumerate(visible_layer(shelf)):
+                if item_id is None:
+                    if shelf.accepts_dropped_items:
+                        targets.append((entry.shelf_id, slot_index))
+                elif (0, slot_index) not in shelf.sticky_items:
+                    sources.append((entry.shelf_id, slot_index, item_id))
+
+        moves = []
+        for from_shelf, from_slot, item_id in sources:
+            for to_shelf, to_slot in targets:
+                if from_shelf == to_shelf:
+                    continue
+
+                moves.append(Move(item_id, from_shelf, from_slot, to_shelf, to_slot))
+
+        moves.sort(
+            key=lambda move: score_move(
+                active_states[move.from_shelf], active_states[move.to_shelf], move.item_id
+            ),
+            reverse=True,
+        )
+        return moves
+
+    ## Moves address shelves by authored ID, so a coordinate stays valid after earlier shelves have
+    ## been destroyed. Resolving that ID through the visible window is also what makes a move against
+    ## a hidden or already-destroyed shelf impossible to apply.
+    def apply_move(self, state: CollapsingState, move: Move) -> CollapsingState:
+        triples_cleared, columns = state
+        source_location = self._active_location(state, move.from_shelf)
+        target_location = self._active_location(state, move.to_shelf)
+        if source_location is None or target_location is None:
+            raise ValueError("move addresses a shelf that is hidden or already destroyed")
+
+        source = columns[source_location[0]][source_location[1]].state
+        target = columns[target_location[0]][target_location[1]].state
+        if (move.from_shelf == move.to_shelf
+                or not source.layers
+                or not target.layers
+                or not 0 <= move.from_slot < source.slot_count
+                or not 0 <= move.to_slot < target.slot_count
+                or not is_shelf_unlocked(source, triples_cleared)
+                or not is_shelf_unlocked(target, triples_cleared)
+                or not target.accepts_dropped_items
+                or (0, move.from_slot) in source.sticky_items
+                or not move.item_id
+                or visible_layer(source)[move.from_slot] != move.item_id
+                or visible_layer(target)[move.to_slot] is not None):
+            raise ValueError("illegal move (source, sticky item, target, or lock)")
+
+        working = [list(column) for column in columns]
+        working[source_location[0]][source_location[1]] = ColumnShelf(
+            move.from_shelf, replace_front_slot(source, move.from_slot, None)
+        )
+        working[target_location[0]][target_location[1]] = ColumnShelf(
+            move.to_shelf, replace_front_slot(target, move.to_slot, move.item_id)
+        )
+
+        return (triples_cleared, tuple(tuple(column) for column in working))
+
+    ## Shelf destruction is the objective, so an item-free board is not the terminal condition.
+    def is_cleared(self, state: CollapsingState) -> bool:
+        return all(not column for column in state[1])
+
+    def _active_location(self, state: CollapsingState, shelf_id: int) -> tuple[int, int] | None:
+        for column_index, column in enumerate(state[1]):
+            for stack_index, entry in enumerate(column[: self.visible_count]):
+                if entry.shelf_id == shelf_id:
+                    return (column_index, stack_index)
+
+        return None
+
+
+CLASSIC_RULES = ClassicRules()
+
+
+def collapsing_shelves_to_state(
+    shelves: list[dict[str, Any]],
+    shelf_counts: list[int],
+) -> CollapsingState:
+    """Split the flat authored shelves array into columns, left-to-right and bottom-to-top."""
+    flat_shelves = shelves_to_state(shelves)[1]
+    columns = []
+    cursor = 0
+    for shelf_count in shelf_counts:
+        columns.append(
+            tuple(
+                ColumnShelf(cursor + offset, flat_shelves[cursor + offset])
+                for offset in range(shelf_count)
+            )
+        )
+        cursor += shelf_count
+
+    return (0, tuple(columns))
+
+
+def build_search_inputs(level_data: Any, shelves: list[dict[str, Any]]) -> tuple[SortingRules, Any]:
+    """Rules object and initial state for an already validated level."""
+    if get_gameplay_mode(level_data) != GAMEPLAY_MODE_COLLAPSING_COLUMNS:
+        return CLASSIC_RULES, shelves_to_state(shelves)
+
+    column_layout = level_data[COLUMN_LAYOUT_KEY]
+    shelf_counts = [int(shelf_count) for shelf_count in column_layout[COLUMN_SHELF_COUNTS_KEY]]
+    rules = CollapsingColumnsRules(int(column_layout[COLUMN_VISIBLE_SHELVES_KEY]))
+    return rules, collapsing_shelves_to_state(shelves, shelf_counts)
+
+
+def solve_level(
+    initial_state,
+    max_states: int,
+    max_depth: int,
+    keep_solution: bool,
+    rules: SortingRules | None = None,
+) -> SearchResult:
     # Keep real shelf/slot coordinates in the search path. Canonicalization is only a visited key;
     # replaying a solution must never require rearranging the player's board between moves.
-    start_state = settle_state(initial_state)
-    counts = Counter(item for shelf in start_state[1] for layer in shelf.layers for item in layer if item)
-    sticky_counts = Counter(shelf.layers[layer][slot] for shelf in start_state[1]
-                            for layer, slot in shelf.sticky_items)
-    if any(count * TRIPLE_SIZE > counts[item] for item, count in sticky_counts.items()):
-        return SearchResult(False, "sticky_copy_limit", None, 1, 1, [])
-    if is_cleared(start_state):
+    board_rules = rules if rules is not None else CLASSIC_RULES
+    start_state = board_rules.settle(initial_state)
+    preflight_result = board_rules.preflight(start_state)
+    if preflight_result is not None:
+        return preflight_result
+    if board_rules.is_cleared(start_state):
         return SearchResult(True, "solved", 0, 1, 1, [])
 
     queue = [(start_state, 0)]
-    visited = {canonicalize_state(start_state): 0}
-    parents: dict[State, tuple[State, Move]] = {}
+    visited = {board_rules.canonicalize(start_state): 0}
+    parents: dict[Any, tuple[Any, Move]] = {}
     states_checked = 0
     max_queue_size = 1
     hit_depth_limit = False
@@ -656,17 +1101,17 @@ def solve_level(initial_state: State, max_states: int, max_depth: int, keep_solu
             hit_depth_limit = True
             continue
 
-        moves = legal_moves(state)
+        moves = board_rules.legal_moves(state)
         for move in reversed(moves):
-            next_state = settle_state(apply_move(state, move))
-            key = canonicalize_state(next_state)
+            next_state = board_rules.settle(board_rules.apply_move(state, move))
+            key = board_rules.canonicalize(next_state)
             if visited.get(key, max_depth + 1) <= depth + 1:
                 continue
 
             if keep_solution:
                 parents[next_state] = (state, move)
 
-            if is_cleared(next_state):
+            if board_rules.is_cleared(next_state):
                 solution = reconstruct_solution(parents, start_state, next_state) if keep_solution else []
                 return SearchResult(True, "solved", depth + 1, states_checked, max_queue_size, solution)
 
@@ -698,10 +1143,12 @@ def result_to_json(
     errors: list[str],
     item_counts: Counter[str],
     search_result: SearchResult | None,
+    gameplay_mode: str = GAMEPLAY_MODE_CLASSIC,
 ) -> dict[str, Any]:
     result: dict[str, Any] = {
         "file": str(path),
         "valid": valid,
+        "gameplay_mode": gameplay_mode,
         "errors": errors,
         "item_counts": dict(sorted(item_counts.items())),
     }
@@ -775,23 +1222,30 @@ def main() -> int:
         errors, item_counts = validate_shelves_shape(shelves, known_item_ids, args.skip_known_items)
         if not args.shelves_only:
             errors.extend(validate_row_layouts_shape(level_data, shelves))
+            errors.extend(validate_gameplay_mode_shape(level_data, shelves))
     except (OSError, ValueError, json.JSONDecodeError) as error:
         result = result_to_json(args.level, False, [str(error)], Counter(), None)
         print(json.dumps(result, indent=2))
         return 1
 
+    reported_mode = get_gameplay_mode(None if args.shelves_only else level_data)
+    if not isinstance(reported_mode, str):
+        reported_mode = str(reported_mode)
+
     if errors:
-        result = result_to_json(args.level, False, errors, item_counts, None)
+        result = result_to_json(args.level, False, errors, item_counts, None, reported_mode)
         print(json.dumps(result, indent=2))
         return 1
 
+    rules, initial_state = build_search_inputs(None if args.shelves_only else level_data, shelves)
     search_result = solve_level(
-        initial_state=shelves_to_state(shelves),
+        initial_state=initial_state,
         max_states=args.max_states,
         max_depth=args.max_depth,
         keep_solution=args.show_solution,
+        rules=rules,
     )
-    result = result_to_json(args.level, True, [], item_counts, search_result)
+    result = result_to_json(args.level, True, [], item_counts, search_result, rules.mode)
     print(json.dumps(result, indent=2))
 
     if search_result.solvable is True:
