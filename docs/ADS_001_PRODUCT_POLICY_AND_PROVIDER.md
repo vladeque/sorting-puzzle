@@ -2,11 +2,12 @@
 
 ## Status
 
-**Proposed — owner approval and native platform acceptance tests are required.**
+**Owner-approved on 2026-09-18 — provider acceptance and compliance gates remain pending.**
 
-This record turns ADS-001 into an explicit launch policy. Approval of this document fixes the
-product defaults; it does not enable production ads. Rewarded placements still depend on their
-client and backend tickets, and interstitials remain disabled for the initial public release.
+The owner approved the policy baseline in this record on 2026-09-18. This fixes the product
+defaults; it does not enable production ads or complete ADS-001. Rewarded placements still depend
+on their client and backend tickets, interstitials remain disabled for the initial public release,
+and the provider remains conditional until the native platform and compliance gates pass.
 
 ## Existing product constraints
 
@@ -23,11 +24,11 @@ These constraints come from the current client-facing backend requirements and t
 backend privacy/retention policy. A future audience change reopens this decision before ads may
 continue to ship.
 
-## Recommended product policy
+## Approved product policy
 
 ### Audience, geography, and privacy
 
-| Decision | Recommended launch baseline |
+| Decision | Approved launch baseline |
 | --- | --- |
 | Audience treatment | Retain the current general-audience, 3+ classification. Do not claim that the app is child-directed without a separate product, legal, store, and SDK configuration review. |
 | Geography | Make rewarded placements available in countries where the game, AdMob, and the applicable app store support them, subject to the consent and policy gates below. A country can be disabled remotely without a client update. |
@@ -99,9 +100,10 @@ This behavior must be approved again when an ad-free product is actually scoped.
 
 ### Recommendation
 
-Conditionally select **Poing Studios Godot AdMob Plugin v5.1.0** as the first provider bridge,
-using Google Mobile Ads/AdMob on Android and iOS. The selection is conditional because repository
-inspection and artifact verification do not replace Android and iOS export/device tests.
+The owner conditionally approved **Poing Studios Godot AdMob Plugin v5.1.0** as the first provider
+bridge, using Google Mobile Ads/AdMob on Android and iOS. The selection is conditional because
+repository inspection and artifact verification do not replace Android and iOS export/device
+tests.
 
 Reasons for the recommendation:
 
@@ -175,11 +177,12 @@ A desktop/headless parse is not an acceptance substitute for either native platf
 
 ## Decision and acceptance checklist
 
-ADS-001 is complete only when the owner records approval and the evidence links are filled in.
+ADS-001 is complete only when the remaining evidence links are filled in and all gates pass.
 
-- [ ] Owner approves the audience/geography/non-personalized launch policy.
-- [ ] Owner approves all four exact reward and cap rules.
-- [ ] Owner approves the disabled-at-release and conservative post-release interstitial policy.
+- [x] Owner approved the audience/geography/non-personalized launch policy on 2026-09-18.
+- [x] Owner approved all four exact reward and cap rules on 2026-09-18.
+- [x] Owner approved the disabled-at-release and conservative post-release interstitial policy on
+      2026-09-18.
 - [ ] License and attribution review accepts the MIT plugin and Google SDK terms.
 - [ ] Security review accepts the pinned-artifact and no-auto-download controls.
 - [ ] Android 4.6.2 export/device spike passes. Evidence: _pending_
@@ -188,8 +191,8 @@ ADS-001 is complete only when the owner records approval and the evidence links 
 - [ ] AdMob app IDs, test IDs, production ad-unit ownership, and account access are assigned without
       committing secrets. Owner/evidence: _pending_
 
-After owner approval, ADS-002 may begin with the provider still marked conditional. Production
-activation remains blocked until every applicable native, backend, compliance, and placement gate
+With owner approval recorded, ADS-002 may begin while the provider remains conditional. Production
+activation stays blocked until every applicable native, backend, compliance, and placement gate
 passes.
 
 ## References
