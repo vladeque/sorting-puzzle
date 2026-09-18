@@ -317,7 +317,8 @@ must remain separate from reward settlement.
 
 Status: **In progress — product policy approved.** The owner approved the audience/privacy,
 reward/cap, and post-release interstitial defaults on 2026-09-18. The conditionally selected
-provider, pinned artifacts, supply-chain controls, and remaining native/compliance gates are in
+provider, pinned artifacts, passed Android compile spike, supply-chain controls, and remaining
+physical-device/iOS/compliance gates are in
 [`ADS_001_PRODUCT_POLICY_AND_PROVIDER.md`](ADS_001_PRODUCT_POLICY_AND_PROVIDER.md).
 
 - Confirm the audience/age policy, target countries, whether personalized ads are needed, and the

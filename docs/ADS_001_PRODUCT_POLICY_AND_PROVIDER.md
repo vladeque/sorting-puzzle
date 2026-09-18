@@ -154,6 +154,29 @@ does not verify the release SHA-256 before extraction. Production and CI must th
 
 The provider remains conditional until both platform spikes pass against the pinned inputs.
 
+### Local Android build evidence — 2026-09-18
+
+The locally testable build portion passed on Windows:
+
+- Godot `4.6.2.stable.official.71f334935` loaded plugin v5.1.0 and exported a core-only,
+  Gradle-built Android debug APK with exit code `0`.
+- The spike used Google's Android test application ID, targeted Android 35 with minimum Android
+  24, included only the plugin's `ads` and `core` AARs, and added no third-party mediation adapter.
+- The 89,459,872-byte APK verified under Android Signature Scheme v2. Its SHA-256 was
+  `9d052c982cf275719da18ff3b5d3967061826f1bfb8363ef7da1cff0c45f8e08`.
+- The merged manifest contains the test AdMob application ID and SDK-contributed permissions for
+  `INTERNET`, `ACCESS_NETWORK_STATE`, `AD_ID`, `com.google.android.gms.permission.AD_ID`,
+  `READ_BASIC_PHONE_STATE`, `WAKE_LOCK`, and `FOREGROUND_SERVICE`. The release disclosure review
+  must account for every retained permission and remove any unnecessary permission explicitly.
+- The exact downloaded editor, Android, and iOS archives matched the pinned SHA-256 values in this
+  record before extraction. Supplying both native packages prevented the plugin's unverified
+  headless auto-downloader from running.
+
+The isolated build and logs live under the git-ignored
+`tmp/ad_provider_android_export_20260918/` directory. No Android device was attached, so ad
+loading, consent UI, callbacks, lifecycle, audio restoration, and on-device network behavior are
+still unverified. This evidence passes the compile/artifact-inspection portion only.
+
 ### Android
 
 - Export a signed-like release APK/AAB with Godot 4.6.2 and inspect its dependency and permission
@@ -185,7 +208,8 @@ ADS-001 is complete only when the remaining evidence links are filled in and all
       2026-09-18.
 - [ ] License and attribution review accepts the MIT plugin and Google SDK terms.
 - [ ] Security review accepts the pinned-artifact and no-auto-download controls.
-- [ ] Android 4.6.2 export/device spike passes. Evidence: _pending_
+- [x] Android 4.6.2 core-only Gradle export and APK inspection pass; see local evidence above.
+- [ ] Android physical-device behavior spike passes. Evidence: _pending; no device attached_
 - [ ] iOS 4.6.2 archive/device spike passes. Evidence: _pending_
 - [ ] Store/privacy owner confirms disclosures for the exact release build. Evidence: _pending_
 - [ ] AdMob app IDs, test IDs, production ad-unit ownership, and account access are assigned without
