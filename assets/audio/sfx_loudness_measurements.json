@@ -54,13 +54,13 @@
     },
     {
       "path": "res://assets/audio/coin_gain/coin_gain.wav",
-      "sha256": "93a8db414b11fbaead05c966eccb81332036e4d82157938b0cdbc9c39969488d",
-      "duration_seconds": 0.52,
-      "max_m_lufs": -15.0,
-      "integrated_lufs": -15.34,
-      "true_peak_dbtp": -4.95,
-      "rms_dbfs": -17.0,
-      "sample_peak_dbfs": -5.0
+      "sha256": "35e121bcd0e1a74aba7bc22f2124ce07a3065a004dd236407c43409c51c27fdc",
+      "duration_seconds": 2.0,
+      "max_m_lufs": -18.4,
+      "integrated_lufs": -23.02,
+      "true_peak_dbtp": -13.59,
+      "rms_dbfs": -30.4,
+      "sample_peak_dbfs": -13.6
     },
     {
       "path": "res://assets/audio/coin_spend/coin_spend.wav",

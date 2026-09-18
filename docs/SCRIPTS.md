@@ -1134,6 +1134,10 @@ Purpose:
 - Runtime `time_up` uses the supplied authored `assets/audio/time_up/times_up2.mp3`, synchronized
   to the HUD snap and modal settle. The generator-owned `time_up.wav` remains reproducible and
   validated as part of the original palette but is no longer the catalog stream.
+- Runtime `coin_gain` uses the selected authored Epidemic Sound WAV at
+  `assets/audio/coin_gain/coin_gain.wav`. It retains its original stereo 96 kHz/24-bit PCM source
+  and is deliberately excluded from `generated_sfx_manifest.json` so regeneration cannot replace
+  it.
 - `cartoon_gum_pop.wav` retains its supplied 48 kHz, 16-bit mono PCM encoding.
   `purchase_successful.wav`, `shuffle.wav`, and `timer_tick.wav` are committed as 48 kHz, 16-bit
   PCM because Godot 4.6.2 could not import their supplied 96 kHz, 24-bit WAVE-Extensible encoding.
@@ -1194,7 +1198,8 @@ Regenerate with:
 - Prints every output path, duration, sample rate, peak level, and DC offset, and fails if any cue
   exceeds the -1 dBFS ceiling.
 - Deliberately does not synthesize replacements for `item_place.wav`, `triple_clear.wav`, the
-  authored 30-second timer bed, or the authored shop-purchase confirmation.
+  authored `coin_gain.wav`, the authored 30-second timer bed, or the authored shop-purchase
+  confirmation.
 
 ## `scripts/tools/export_sfx_loudness_manifest.gd`
 

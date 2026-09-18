@@ -18,7 +18,7 @@ extends RefCounted
 
 ## Bump whenever a recipe, seed, parameter, or output layout changes. generate_core_sfx.gd refuses
 ## to overwrite outputs recorded under a different version unless --regenerate is passed.
-const GENERATOR_VERSION := "1.1.0"
+const GENERATOR_VERSION := "1.2.0"
 
 const SAMPLE_RATE := 44100
 const BIT_DEPTH := 16
@@ -40,7 +40,6 @@ const CUES: Array[Dictionary] = [
 	{"event": "item_select", "name": "item_select_02", "recipe": "item_select", "variant": 1, "seed": 0x63D2085F, "duration": 0.062, "peak_db": -14.5},
 	{"event": "item_select", "name": "item_select_03", "recipe": "item_select", "variant": 2, "seed": 0x0E8B3C21, "duration": 0.048, "peak_db": -13.5},
 	{"event": "time_up", "name": "time_up", "recipe": "time_up", "variant": 0, "seed": 0x24E8B76B, "duration": 0.520, "peak_db": -4.0},
-	{"event": "coin_gain", "name": "coin_gain", "recipe": "coin_gain", "variant": 0, "seed": 0x48A1D30F, "duration": 0.520, "peak_db": -5.0},
 	{"event": "coin_spend", "name": "coin_spend", "recipe": "coin_spend", "variant": 0, "seed": 0x0C57E2A9, "duration": 0.285, "peak_db": -7.0},
 ]
 
@@ -88,8 +87,6 @@ static func render_cue(cue: Dictionary) -> PackedFloat32Array:
 			_render_timer_tick(samples, rng, variant)
 		"time_up":
 			_render_time_up(samples, rng)
-		"coin_gain":
-			_render_coin_sequence(samples, rng, [1046.50, 1318.51, 1567.98], 0.100, 1.0)
 		"coin_spend":
 			_render_coin_sequence(samples, rng, [1567.98, 1318.51, 1046.50], 0.075, 0.52)
 		"shop_success":
@@ -307,7 +304,7 @@ static func _apply_edge_fades(samples: PackedFloat32Array) -> void:
 		samples[index] *= float(index) / float(attack_length)
 
 	# `index + 1` so the last sample lands on exact silence. Without it a cue whose tail is still
-	# loud (coin_gain, shop_purchase_success) ends one fade step above zero and clicks.
+	# loud (shop_purchase_success) ends one fade step above zero and clicks.
 	var release_length := mini(int(round(RELEASE_FADE_SECONDS * SAMPLE_RATE)), samples.size())
 	for index in range(release_length):
 		var target_index := samples.size() - release_length + index
@@ -386,9 +383,8 @@ static func _render_time_up(samples: PackedFloat32Array, rng: DeterministicRng) 
 	_add_partial(samples, 0.215, 98.00, 0.30, 0.250, 0.010, 1.34, 0.130)
 
 
-## Shared metallic-coin voice for both currency cues: an inharmonic partial stack per note, played
-## as a short ascending or descending sequence. `decay_scale` shortens the whole voice for the
-## quicker spend cue.
+## Synthesized coin-spend voice: an inharmonic partial stack per note, played as a short descending
+## sequence. The authored coin-gain cue is intentionally outside this generator.
 static func _render_coin_sequence(
 	samples: PackedFloat32Array,
 	rng: DeterministicRng,

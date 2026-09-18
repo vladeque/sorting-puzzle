@@ -25,7 +25,7 @@ per-stream offsets but exclude random variation unless shown as a burst.
 | `star_hud_arrival` | gameplay | -24.9 | -21.9 | -13.6 |
 | `timer_critical_tick` | gameplay | -28.6 | -28.6 | -6.9 |
 | `time_up` | terminal | -17.0 | -17.0 | -9.0 |
-| `coin_gain` | reward | -17.0 | -17.0 | -7.0 |
+| `coin_gain` | reward | -20.4 | -20.4 | -15.6 |
 | `coin_spend` | reward | -20.5 | -20.5 | -9.0 |
 | `shop_purchase_success` | reward | -19.0 | -19.0 | -8.1 |
 | `reward_chest_star_arrival` | gameplay | -25.2 | -24.6 | -13.6 |
@@ -43,6 +43,10 @@ per-stream offsets but exclude random variation unless shown as a burst.
 
 Every nominal and burst result is inside its class range from `docs/AUDIO_LOUDNESS_STANDARD.md`.
 The click variants now span 0.7 LU, below the one-LU limit.
+
+The selected 2.0-second stereo Epidemic Sound cue replaces the synthesized `coin_gain` source.
+Its original 96 kHz/24-bit PCM encoding is retained; the existing -2 dB catalog trim places it at
+-20.4 LUFS-M with -15.6 dBTP runtime headroom, inside the reward-confirmation range.
 
 The selected 300 ms mono cartoon gum-pop source replaces the earlier invalid-action recording for
 `sticky_move_blocked`. Its catalog trim is -7.9 dB, retaining the event's -24.2 LUFS-M runtime
@@ -84,7 +88,7 @@ maximum count scaling, cooldown spacing, and declared polyphony where applicable
 | timer + Shuffle | -18.3 | -6.5 |
 | timer + Lantern | -18.3 | -6.1 |
 | timer + Freezer | -18.2 | -4.1 |
-| purchase + coin gain | -15.0 | -6.0 |
+| purchase + coin gain | -16.5 | -7.4 |
 | time-up + failure transition | -14.0 | -6.6 |
 | four placement voices | -21.7 | -11.2 |
 | three match voices | -16.6 | -3.2 |

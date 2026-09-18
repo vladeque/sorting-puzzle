@@ -9,8 +9,9 @@ extends RefCounted
 ##
 ## `item_place_valid` and `match_clear` intentionally keep the project's existing source
 ## recordings. Every stream is grouped under an event-named directory. The original AUDIO-001
-## palette is deterministic output from scripts/tools/generate_core_sfx.gd; later authored source
-## cues are catalogued here without being claimed by that synthesizer's manifest.
+## palette is deterministic output from scripts/tools/generate_core_sfx.gd; selected authored
+## source cues, including coin_gain, are catalogued here without being claimed by that
+## synthesizer's manifest.
 ##
 ## Per-event fields:
 ##   streams              res:// paths. More than one makes the event a variant pool.

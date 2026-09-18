@@ -684,6 +684,8 @@ Assets:
 - `assets/audio/time_up/times_up2.mp3` is the supplied authored timeout cue used by the recoverable
   Time's Up transition; the older generated `time_up.wav` remains generator-owned but is no longer
   the runtime catalog stream.
+- `assets/audio/coin_gain/coin_gain.wav` is the selected authored Epidemic Sound reward cue. It is
+  a stereo 96 kHz/24-bit PCM source and is not generator-owned.
 - The deterministic synthesized files are mono 16-bit PCM at 44.1 kHz and imported uncompressed.
   `scripts/tools/generate_core_sfx.gd` writes them from `scripts/tools/core_sfx_synthesis.gd`, while
   `assets/audio/generated_sfx_manifest.json` records each event-relative path, encoding, duration,

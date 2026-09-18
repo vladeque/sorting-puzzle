@@ -349,7 +349,7 @@ Tests:
 
 ### Generated asset list
 
-Generator version `1.1.0`. Generated files are mono 16-bit PCM at 44 100 Hz in their matching
+Generator version `1.2.0`. Generated files are mono 16-bit PCM at 44 100 Hz in their matching
 `assets/audio/<event>/` directories, imported with `compress/mode=0` (uncompressed PCM). Measured
 peaks are the authored relative loudness, not a loudness match; every one is at or under the -1 dBFS
 ceiling. `assets/audio/generated_sfx_manifest.json` owns only the generated paths.
@@ -360,7 +360,6 @@ ceiling. `assets/audio/generated_sfx_manifest.json` owns only the generated path
 | `item_select_02.wav` | 62.0 ms | -14.50 dBFS | +0.00003 |
 | `item_select_03.wav` | 48.0 ms | -13.50 dBFS | +0.00011 |
 | `time_up.wav` | 520.0 ms | -4.00 dBFS | -0.00005 |
-| `coin_gain.wav` | 520.0 ms | -5.00 dBFS | -0.00000 |
 | `coin_spend.wav` | 285.0 ms | -7.00 dBFS | +0.00000 |
 
 `assets/audio/item_place_valid/item_place.wav` and
@@ -368,6 +367,9 @@ ceiling. `assets/audio/generated_sfx_manifest.json` owns only the generated path
 `item_place_valid` and `match_clear`. No replacements were synthesized for them.
 All other catalog streams not listed in the generated table are authored source cues and are not
 overwritten by the generator.
+
+The runtime `coin_gain.wav` is now the selected authored Epidemic Sound cue (2.0 seconds, stereo
+96 kHz/24-bit PCM). It is excluded from the generated manifest so regeneration preserves it.
 
 ### Event catalog
 
@@ -379,7 +381,7 @@ overwritten by the generator.
 | `star_hud_arrival` | `star_hud_arrival.wav` | -2.0 dB | 0.99–1.01 | 90 ms | 2 |
 | `timer_critical_tick` | `timer_tick.wav` | -3.0 dB | none | none | 1 |
 | `time_up` | `times_up2.mp3` | -1.0 dB | none | 750 ms | 1 |
-| `coin_gain` | `coin_gain.wav` | -1.0 dB | 0.995–1.005 | 200 ms | 2 |
+| `coin_gain` | `coin_gain.wav` | -2.0 dB | 0.995–1.005 | 200 ms | 2 |
 | `coin_spend` | `coin_spend.wav` | -2.0 dB | 0.995–1.005 | 150 ms | 2 |
 | `shop_purchase_success` | `purchase_successful.wav` | +2.0 dB | none | 600 ms | 1 |
 | `reward_chest_star_arrival` | `reward_chest_star_arrival_short.wav` | -3.0 dB ±0.6 | 0.995–1.005 | 50 ms | 3 |

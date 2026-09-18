@@ -29,6 +29,7 @@ const RETAINED_RECORDINGS := {
 const AUTHORED_SOURCE_CUES := [
 	"res://assets/audio/ability_freezer/freeze.wav",
 	"res://assets/audio/ability_hammer/hammer.wav",
+	"res://assets/audio/coin_gain/coin_gain.wav",
 	"res://assets/audio/sticky_move_blocked/cartoon_gum_pop.wav",
 	"res://assets/audio/ability_lantern/lantern.wav",
 	"res://assets/audio/level_complete/level_complete.mp3",
@@ -58,7 +59,6 @@ const DERIVED_RUNTIME_CUES := [REWARD_CHEST_SHORT_CUE]
 const DURATION_WINDOWS_MS := {
 	"item_select": Vector2(40.0, 75.0),
 	"time_up": Vector2(300.0, 600.0),
-	"coin_gain": Vector2(300.0, 650.0),
 	"coin_spend": Vector2(180.0, 350.0),
 }
 const MAX_DC_OFFSET := 0.002
@@ -310,14 +310,14 @@ func _test_catalog_completeness() -> void:
 
 	# Every supplied source cue remains reachable from its one semantic event folder.
 	var catalog_paths := SfxCatalogScript.get_all_stream_paths()
-	for generated_path in AUTHORED_SOURCE_CUES:
+	for source_path in AUTHORED_SOURCE_CUES:
 		_check(
-			ResourceLoader.exists(generated_path),
-			"The authored source cue is importable (%s)." % generated_path
+			ResourceLoader.exists(source_path),
+			"The authored source cue is importable (%s)." % source_path
 		)
 		_check(
-			catalog_paths.has(generated_path),
-			"The catalog references authored source cue %s." % generated_path
+			catalog_paths.has(source_path),
+			"The catalog references authored source cue %s." % source_path
 		)
 
 	for inactive_path in INACTIVE_AUTHORED_CUES:
