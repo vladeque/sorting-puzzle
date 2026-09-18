@@ -20,6 +20,7 @@ Focused client UX implementation tickets:
 Gameplay feature plans:
 
 - [`Sticky items — rules, generation, runtime, and release plan`](STICKY_ITEMS_PLAN.md)
+- [`Collapsing shelf columns — configuration, runtime, solver, and release task`](COLLAPSING_SHELF_COLUMNS_IMPLEMENTATION_TASK.md)
 
 ## Shared definition of done
 
