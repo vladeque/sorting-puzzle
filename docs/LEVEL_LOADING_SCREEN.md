@@ -13,9 +13,9 @@ scene is removed and the fresh `level.tscn` instance enters the tree.
 - `scenes/ui/level_loading_screen.tscn` owns the visual hierarchy and input-blocking surface.
   `scripts/level_loading_screen.gd` owns the closing iris, mascot entrance, animated loading dots,
   minimum visible time, and opening reveal.
-- `assets/shaders/loading_iris.gdshader` draws the responsive blue gradient, center glow, subtle dot
-  pattern, and circular mask. `assets/ui/loading/loading_cat.png` is the selected transparent mascot
-  artwork.
+- `assets/shaders/loading_iris.gdshader` draws the responsive Golden Sunset burgundy-to-plum
+  gradient, warm amber center glow, subtle dot pattern, and circular mask.
+  `assets/ui/loading/loading_cat.png` is the selected transparent mascot artwork.
 - `scripts/production_main_menu.gd`, `scripts/main_menu.gd`, and `scripts/level.gd::_restart_level()`
   send requests to `LevelTransition`; they do not instantiate `level.tscn` themselves.
 

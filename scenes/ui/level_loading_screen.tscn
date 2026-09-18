@@ -8,17 +8,17 @@
 shader = ExtResource("2_shader")
 shader_parameter/hole_radius = 1.0
 shader_parameter/viewport_size = Vector2(720, 1280)
-shader_parameter/top_color = Color(0.075, 0.29, 0.48, 1)
-shader_parameter/bottom_color = Color(0.025, 0.12, 0.25, 1)
-shader_parameter/glow_color = Color(0.2, 0.67, 0.77, 1)
+shader_parameter/top_color = Color(0.72549, 0.282353, 0.356863, 1)
+shader_parameter/bottom_color = Color(0.298039, 0.129412, 0.278431, 1)
+shader_parameter/glow_color = Color(1, 0.690196, 0.360784, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dot"]
-bg_color = Color(0.94, 0.99, 1, 0.96)
+bg_color = Color(1, 0.952941, 0.862745, 0.96)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
-shadow_color = Color(0.01, 0.08, 0.16, 0.3)
+shadow_color = Color(0.164706, 0.062745, 0.164706, 0.3)
 shadow_size = 4
 
 [node name="LevelLoadingScreen" type="CanvasLayer"]
@@ -61,7 +61,7 @@ mouse_filter = 2
 
 [node name="HeroShadow" type="TextureRect" parent="ScreenRoot/HeroHolder"]
 unique_name_in_owner = true
-modulate = Color(0.015, 0.07, 0.12, 0.3)
+modulate = Color(0.164706, 0.062745, 0.164706, 0.3)
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

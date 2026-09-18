@@ -2,9 +2,9 @@ shader_type canvas_item;
 
 uniform float hole_radius : hint_range(0.0, 1.2) = 1.0;
 uniform vec2 viewport_size = vec2(720.0, 1280.0);
-uniform vec4 top_color : source_color = vec4(0.075, 0.29, 0.48, 1.0);
-uniform vec4 bottom_color : source_color = vec4(0.025, 0.12, 0.25, 1.0);
-uniform vec4 glow_color : source_color = vec4(0.20, 0.67, 0.77, 1.0);
+uniform vec4 top_color : source_color = vec4(0.72549, 0.282353, 0.356863, 1.0);
+uniform vec4 bottom_color : source_color = vec4(0.298039, 0.129412, 0.278431, 1.0);
+uniform vec4 glow_color : source_color = vec4(1.0, 0.690196, 0.360784, 1.0);
 
 void fragment() {
 	float aspect = viewport_size.x / max(viewport_size.y, 1.0);

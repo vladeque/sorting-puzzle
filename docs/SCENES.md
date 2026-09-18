@@ -7,8 +7,9 @@ This file maps scenes to their responsibilities, scripts, important nodes, and r
 - `scenes/ui/level_loading_screen.tscn` is a full-screen `CanvasLayer` that survives the swap from
   either Main Menu or a failed level into a fresh `level.tscn` instance. Its root blocks pointer and
   back input for the entire transition.
-- `%Backdrop` uses `assets/shaders/loading_iris.gdshader` for the blue gradient, subtle dot pattern,
-  and closing/opening circular mask. `%HeroHolder` presents the selected cat artwork from
+- `%Backdrop` uses `assets/shaders/loading_iris.gdshader` for the Golden Sunset burgundy-to-plum
+  gradient, warm amber glow, subtle dot pattern, and closing/opening circular mask. `%HeroHolder`
+  presents the selected cat artwork from
   `assets/ui/loading/loading_cat.png`; `%LoadingDots` provides the compact activity indicator.
 - The scene scales through full-rect anchors and keep-aspect texture placement across portrait phone
   and tablet layouts. `scripts/tools/captures/level_loading_screen_setup.gd` holds its review state.
