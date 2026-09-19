@@ -161,16 +161,18 @@ func get_layout_bounds() -> Rect2:
 	return Rect2(position + local_bounds.position, local_bounds.size)
 
 
-## Cell rectangles only, like every other board, so a collapsing level fits the play area the same
-## way a static grid does. Row 0 is centered on the board origin's y.
+## Cell rectangles plus the top row's ceiling cap. Static boards fit cell rectangles alone and
+## always leave spare height, but this board is sized to fill the play area, so a cap left out of the
+## bounds would rise into the HUD clearance. Row 0 is centered on the board origin's y.
 func get_layout_bounds_for_visible_count(visible_count: int) -> Rect2:
 	if _columns.is_empty():
 		return Rect2()
 
 	var rows := clampi(visible_count, 1, maxi(_get_tallest_authored_column(), 1))
 	var width := float(_columns.size() - 1) * _shelf_step.x + _cell_size.x
-	var height := float(rows - 1) * _shelf_step.y + _cell_size.y
-	return Rect2(Vector2(-width * 0.5, -float(rows - 1) * _shelf_step.y - _cell_size.y * 0.5), Vector2(width, height))
+	var top := -float(rows - 1) * _shelf_step.y - maxf(_get_cap_rise(), _cell_size.y * 0.5)
+	var bottom := _cell_size.y * 0.5
+	return Rect2(Vector2(-width * 0.5, top), Vector2(width, bottom - top))
 
 
 func owns_shelf(shelf: Node) -> bool:
@@ -334,6 +336,11 @@ func _get_column_row_placement(column_index: int) -> String:
 	return Shelf.ROW_PLACEMENT_MIDDLE
 
 
+## How far the shelf art rises above a row's center: the top of the ceiling cap.
+func _get_cap_rise() -> float:
+	return -Shelf.TOP_CEILING_CAP_TOP_Y * _shelf_scale
+
+
 func _get_tallest_authored_column() -> int:
 	var tallest := 0
 	for column_height in _authored_column_heights:
@@ -348,7 +355,7 @@ func _layout_window() -> void:
 	var window := _get_window()
 	var footprint := get_layout_bounds_for_visible_count(_visible_count)
 	var top_row := clampi(_visible_count, 1, maxi(_get_tallest_authored_column(), 1)) - 1
-	var window_top := -float(top_row) * _shelf_step.y + Shelf.TOP_CEILING_CAP_TOP_Y * _shelf_scale
+	var window_top := -float(top_row) * _shelf_step.y - _get_cap_rise()
 	var window_rect := Rect2(
 		Vector2(footprint.position.x - window_outer_margin, window_top),
 		Vector2(

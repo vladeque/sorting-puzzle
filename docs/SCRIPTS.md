@@ -1901,6 +1901,46 @@ Audio (AUDIO-001):
 - `coin_spend` fires only after a successful `PlayerProgress.spend_coins()` (ability purchase,
   time extension) or `purchase_life()` (out-of-lives retry).
 
+Collapsing columns (`gameplay_mode: "collapsing_columns"`):
+- `_apply_level_config()` validates the mode through `scripts/collapsing_column_rules.gd` before any
+  state is reset and fails closed on an invalid contract: it reports `_level_config_error`, builds
+  nothing, and never falls back to a grid preset.
+- `_add_collapsing_column_shelves()` instances `scenes/collapsing_shelf_board.tscn`, consumes the flat
+  `shelves` array column by column and bottom to top, creates each shelf through the ordinary
+  `_add_shelf()` / `_configure_shelf_from_config()` factory, and registers it with its authored
+  index as a stable shelf ID. `_collapsing_board` is null for classic levels, and every collapsing
+  branch is skipped.
+- `_resolve_collapsing_visible_count()` resolves the window once per build from the same play area
+  `_layout_shelves()` fits into (`_get_shelves_play_rect()`), capped by
+  `max_collapsing_visible_shelves` when that is non-zero. `_get_shelves_root_child_bounds()` fits
+  the board's fixed footprint, never its hidden depth.
+- `_is_shelf_gameplay_available()` is the one availability rule for input, matching, promotion,
+  and abilities. On a classic board it is exactly "not locked", so classic behavior is unchanged; on
+  a collapsing board it also requires `CollapsingShelfBoard.is_shelf_active()`. Every former lock
+  check in `_is_shelf_move_source_eligible()`, `_move_item_to_slot()`,
+  `_resolve_move_target_slot()`, `_clear_matching_shelves()`, `_promote_empty_front_layers()`,
+  `_find_immediate_triple_items()`, and the `_get_unlocked_items()` / `_get_visible_items()` /
+  `_get_first_back_layer_items()` enumerators goes through it. Moving-row window reachability stays
+  in the input helpers, because abilities deliberately still reach off-window moving shelves.
+- `_resolve_shelves()` registers a whole request before starting any resolver, so a resolver that
+  finishes synchronously can never declare resolution drained while the rest of its request -- for
+  example the target of the move that emptied it -- has not started.
+- When every resolver has drained, `_on_shelf_resolution_drained()` runs
+  `_collapse_emptied_shelves()` on a collapsing board: it finds active shelves with no committed
+  items (a drag origin is never empty), cancels any active drag or selection, releases every
+  reference to the shelves, and awaits one `CollapsingShelfBoard.collapse_shelves()` batch. Revealed
+  shelves, plus any resolution requested while the collapse ran, go back through `_resolve_shelves()`,
+  whose drain returns here, so the loop repeats until nothing is left empty. It skips while Shuffle
+  has items parked in the drag layer; Shuffle re-resolves the whole board when it ends.
+- `_is_collapse_in_progress()` blocks `_input()`, ability buttons, `_can_apply_ability()` (before any
+  use is spent), and completion. It is not an ability effect, so the countdown keeps running exactly
+  as it does through match-clear animations, and Freezer does not stop column movement.
+- `_check_level_completed()` completes a collapsing level only when the board reports no surviving
+  shelf and nothing is resolving or collapsing, so the last shelf's destruction plays first.
+- Pause and backgrounding follow the existing policy for gameplay animations: the collapse keeps
+  running under the pause menu. The new order is committed before any tween starts, so every
+  interruption point leaves a consistent board. Retry rebuilds the board from config.
+
 Important exports:
 - `slot_snap_distance`: maximum snap distance for drag or tap placement, sized for the wider shelf spacing.
 - `item_pick_size`: rectangle used to detect clicked or touched visible items at the default item scale.
@@ -1917,6 +1957,9 @@ Important exports:
 - `level_duration_seconds`: fallback duration if config does not define `time_seconds`.
 - `selected_level`: global campaign level ID loaded from `configs/levels/level_%03d.json`; the HUD
   displays its chapter-local level number.
+- `max_collapsing_visible_shelves`: caps how many shelves per column a collapsing board may reveal
+  when the screen has room for more; `0` lets the screen decide. It never lowers a level below its
+  authored `visible_shelves_per_column`. Tests and captures use it to pin the window.
 - `launched_from_dev_mode`: makes a level use isolated temporary ability counts and return to the menu instead of saving campaign progress.
 - `return_menu_scene_path`: menu scene path used by Leave and dev/test completion returns.
 
@@ -2652,6 +2695,18 @@ Verification:
 Do not use for:
 - Deciding which shelves are empty, move rules, matching, or abilities. Those stay in
   `scripts/level.gd`.
+
+## `scripts/collapsing_column_rules.gd`
+
+Class:
+- `CollapsingColumnRules` (static helpers, preloaded by `scripts/level.gd` as `CollapsingRules`).
+
+Purpose:
+- Runtime reading of the `gameplay_mode` / `column_layout` contract: `validate_config()`,
+  `is_collapsing()`, `get_column_heights()`, and `get_visible_count()`.
+- Mirrors the shape rules of `scripts/tools/validate_level_solvable.py`, which stays the
+  authoritative validator, so a malformed level fails closed at runtime instead of being guessed at.
+- Accepts whole-number floats, because Godot's JSON parser returns every number as a float.
 
 ## `scripts/collapsing_shelf_column.gd`
 

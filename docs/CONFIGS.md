@@ -438,6 +438,20 @@ Item-count checks alone are not sufficient in this mode: a board can hold three 
 and still deadlock because the workspace needed to finish a triple is hidden behind a shelf that can
 never be emptied first.
 
+Runtime behavior:
+- `scripts/level.gd` builds `scenes/collapsing_shelf_board.tscn` with one
+  `scenes/collapsing_shelf_column.tscn` per column and standard `scenes/shelf.tscn` shelves; see
+  `docs/SCENES.md` and `docs/SCRIPTS.md` for ownership.
+- Every visible shelf is playable. Shelves above the window are hidden and are never move sources,
+  drop targets, automatic-match candidates, or Hammer, Shuffle, or Highlight targets.
+- A shelf is destroyed once a committed move, a triple clear, or Hammer leaves it with no items.
+  Lifting an item into a drag never empties its shelf.
+- All shelves emptied in one resolution pass collapse together; columns animate in parallel, and
+  input and abilities stay blocked until every column settles. The countdown keeps running, as it
+  does through match-clear animations, and Freezer does not stop the movement.
+- The level completes after the last shelf has been destroyed and its collapse has settled.
+- No remaining-shelf count is shown.
+
 Generation:
 
 ```powershell

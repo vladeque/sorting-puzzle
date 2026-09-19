@@ -4,6 +4,7 @@ extends Node2D
 ## from `Shelf.get_slot_count()`; this constant only ever means "how many items make a match".
 const SLOT_COUNT := 3
 const StickyRules := preload("res://scripts/sticky_item_rules.gd")
+const CollapsingRules := preload("res://scripts/collapsing_column_rules.gd")
 const SLOT_ITEM_POSITION := Vector2(0, -32)
 const SHELF_CELL_VISUAL_SCALE := 1.06
 const SHELF_BASE_CELL_SIZE := Shelf.BASE_CELL_SIZE
@@ -43,6 +44,7 @@ const SHELF_TYPE_DISPENSER := "dispenser"
 ## and remain interlocked with standard shelves below.
 const DISPENSER_LOWER_CLEARANCE := 32.0
 const MOVING_SHELF_ROW_SCENE := preload("res://scenes/moving_shelf_row.tscn")
+const COLLAPSING_SHELF_BOARD_SCENE := preload("res://scenes/collapsing_shelf_board.tscn")
 const ITEM_SCENE := preload("res://scenes/item.tscn")
 const HAMMER_IMPACT_EFFECT_SCENE := preload("res://scenes/abilities/hammer_impact_effect.tscn")
 const ITEM_SPRITES_CONFIG := "res://configs/item_sprites.json"
@@ -162,6 +164,11 @@ const SHOP_RETURN_TIME_EXTENSION := &"time_extension"
 @export var selected_level := 1
 @export var launched_from_dev_mode := false
 @export_enum("pink", "amber") var sticky_marker_variant := "pink"
+## Caps how many shelves per column a `collapsing_columns` board may reveal when the screen has room
+## for more; 0 lets the screen decide. It can never lower a level below its authored
+## `visible_shelves_per_column`, so it cannot change which levels are solvable. Tests and captures
+## use it to pin the window.
+@export_range(0, 8) var max_collapsing_visible_shelves := 0
 @export_file("*.tscn") var return_menu_scene_path := MAIN_MENU_SCENE
 
 var _slots: Array[Node2D] = []
@@ -251,6 +258,14 @@ var _shuffle_effect_active := false
 ## True from the moment the board is cleared until the completion screen opens (see _complete_level).
 var _completion_celebration_active := false
 var _level_config_error := ""
+## Set only for `gameplay_mode: "collapsing_columns"`; classic levels leave it null and every
+## collapsing branch below is skipped.
+var _collapsing_board: CollapsingShelfBoard
+## From the moment emptied shelves are handed to the board until whatever it revealed has been
+## handed back to resolution. Input, abilities, and completion all wait on it.
+var _collapse_phase_active := false
+## Shelves whose resolution was requested while a collapse ran; resolved as soon as it settles.
+var _shelves_awaiting_collapse: Array[Node] = []
 var _loading_transition_pending := false
 
 
@@ -433,10 +448,9 @@ func _get_ability_bar_bottom_margin(safe_margins: Vector4) -> float:
 	return maxf(ABILITY_BAR_DESIGN_BOTTOM_MARGIN, safe_margins.w + ABILITY_BAR_SAFE_BOTTOM_PADDING)
 
 
-func _layout_shelves(viewport_size: Vector2, safe_margins: Vector4) -> void:
-	if _shelves_root == null:
-		return
-
+## Screen area the board is fitted into: below the HUD clearance, above the back-wall margin that
+## leaves room for the ability bar, inset from the safe sides.
+func _get_shelves_play_rect(viewport_size: Vector2, safe_margins: Vector4) -> Rect2:
 	var play_top := safe_margins.y + SHELVES_TOP_CLEARANCE
 	var play_bottom := maxf(
 		play_top,
@@ -444,6 +458,18 @@ func _layout_shelves(viewport_size: Vector2, safe_margins: Vector4) -> void:
 	)
 	var play_left := safe_margins.x + SHELVES_SIDE_MARGIN
 	var play_right := viewport_size.x - safe_margins.z - SHELVES_SIDE_MARGIN
+	return Rect2(play_left, play_top, play_right - play_left, play_bottom - play_top)
+
+
+func _layout_shelves(viewport_size: Vector2, safe_margins: Vector4) -> void:
+	if _shelves_root == null:
+		return
+
+	var play_rect := _get_shelves_play_rect(viewport_size, safe_margins)
+	var play_top := play_rect.position.y
+	var play_bottom := play_rect.end.y
+	var play_left := play_rect.position.x
+	var play_right := play_rect.end.x
 	var shelf_bounds := _get_shelves_local_bounds()
 	_shelves_layout_scale = _get_shelves_layout_scale(shelf_bounds, play_left, play_right, play_top, play_bottom)
 	_shelves_root.scale = Vector2.ONE * _shelves_layout_scale
@@ -525,6 +551,12 @@ func _get_shelves_root_child_bounds(child: Node) -> Rect2:
 	var moving_row := child as MovingShelfRow
 	if moving_row != null:
 		return moving_row.get_layout_bounds()
+
+	# The resolved window only: hidden stack depth never shrinks the board, and the footprint stays
+	# fixed as columns empty so the board never rescales or recenters mid-level.
+	var collapsing_board := child as CollapsingShelfBoard
+	if collapsing_board != null:
+		return collapsing_board.get_layout_bounds()
 
 	# Visual bounds, not the grid cell: a dispenser's indicator hangs below its shelf body, and the
 	# responsive fit has to keep that on screen even though row packing ignores it.
@@ -635,6 +667,10 @@ func _input(event: InputEvent) -> void:
 		return
 
 	if _is_ability_effect_active():
+		return
+
+	# Nothing may be dropped on a shelf that is moving or about to be destroyed.
+	if _is_collapse_in_progress():
 		return
 
 	if event is InputEventMouseButton:
@@ -833,6 +869,14 @@ func _apply_level_config(config: Dictionary) -> void:
 		_set_moving_shelf_rows_paused(true)
 		push_error("Invalid sticky level configuration: " + _level_config_error)
 		return
+	var mode_errors := CollapsingRules.validate_config(config)
+	if not mode_errors.is_empty():
+		_level_config_error = "; ".join(mode_errors)
+		_cancel_active_interaction()
+		_level_paused = true
+		_set_moving_shelf_rows_paused(true)
+		push_error("Invalid gameplay mode configuration: " + _level_config_error)
+		return
 	level_duration_seconds = float(config.get("time_seconds", level_duration_seconds))
 	_time_remaining = level_duration_seconds
 	_has_player_started_timer = false
@@ -874,6 +918,9 @@ func _apply_level_config(config: Dictionary) -> void:
 	_is_resolving_shelves = false
 	_shelves_pending_resolve.clear()
 	_shelves_resolving_ids.clear()
+	_collapsing_board = null
+	_collapse_phase_active = false
+	_shelves_awaiting_collapse.clear()
 
 	_clear_ability_highlights(true)
 	_clear_freezer(true)
@@ -885,12 +932,15 @@ func _apply_level_config(config: Dictionary) -> void:
 	_clear_shelves(shelves)
 
 	var row_layouts := config.get(ROW_LAYOUTS_KEY, []) as Array
-	if row_layouts != null and not row_layouts.is_empty():
+	if CollapsingRules.is_collapsing(config):
+		_add_collapsing_column_shelves(shelves, shelves_config, config)
+	elif row_layouts != null and not row_layouts.is_empty():
 		_add_row_layout_shelves(shelves, shelves_config, row_layouts)
 	else:
 		_add_preset_layout_shelves(shelves, shelves_config)
 
 	_update_shelf_perspective_edges()
+	_resolve_collapsing_visible_count()
 	_apply_responsive_layout()
 	_set_moving_shelf_rows_paused(_loading_transition_pending)
 	_update_locked_shelves()
@@ -939,6 +989,55 @@ func _add_preset_layout_shelves(shelves: Node2D, shelves_config: Array) -> void:
 		)
 		_apply_shelf_row_placement(shelf, _get_grid_row_shelf_placement(shelf_index, shelves_config.size(), 3))
 		_configure_shelf_from_config(shelf, shelf_config)
+
+
+## The flat `shelves` array is consumed column by column, left to right, and bottom to top inside
+## each column -- the documented contract, never inferred from node names or coordinates. Each shelf
+## comes from the ordinary shelf factory; the board owns where it sits and whether it is playable.
+func _add_collapsing_column_shelves(shelves: Node2D, shelves_config: Array, config: Dictionary) -> void:
+	var board := COLLAPSING_SHELF_BOARD_SCENE.instantiate() as CollapsingShelfBoard
+	board.name = "CollapsingShelfBoard"
+	shelves.add_child(board)
+	var column_heights := CollapsingRules.get_column_heights(config)
+	board.configure(
+		column_heights,
+		CollapsingRules.get_visible_count(config),
+		SHELF_GRID_STEP,
+		SHELF_CELL_SIZE,
+		SHELF_CELL_VISUAL_SCALE
+	)
+
+	var shelf_index := 0
+	for column_index in range(column_heights.size()):
+		for _stack_index in range(column_heights[column_index]):
+			var shelf_config := shelves_config[shelf_index] as Dictionary
+			var shelf := _add_shelf(board.get_column_parent(column_index), shelf_index + 1, Vector2.ZERO)
+			board.register_shelf(column_index, shelf_index, shelf)
+			_configure_shelf_from_config(shelf, shelf_config)
+			shelf_index += 1
+
+	board.settle_immediately()
+	_collapsing_board = board
+
+
+## "As many shelves as the screen allows": decided once per level from the play area the board is
+## about to be fitted into, and never changed while it is played. The authored minimum is always
+## kept, because that is the window the solver proved the level against.
+func _resolve_collapsing_visible_count() -> void:
+	if _collapsing_board == null:
+		return
+
+	var viewport_size := get_viewport_rect().size
+	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
+		return
+
+	var play_rect := _get_shelves_play_rect(viewport_size, _get_safe_area_margins(viewport_size))
+	var visible_count := _collapsing_board.resolve_visible_count(
+		play_rect.size, SHELVES_MIN_LAYOUT_SCALE, SHELVES_MAX_LAYOUT_SCALE
+	)
+	if max_collapsing_visible_shelves > 0:
+		visible_count = mini(visible_count, max_collapsing_visible_shelves)
+	_collapsing_board.set_visible_count(visible_count)
 
 
 func _add_row_layout_shelves(shelves: Node2D, shelves_config: Array, row_layouts: Array) -> void:
@@ -1548,6 +1647,10 @@ func _update_shelf_perspective_edges() -> void:
 		var shelf := shelf_node as Node2D
 		if shelf == null:
 			continue
+		# A collapsing column decides caps from its logical window, not from nearby positions: a
+		# hidden shelf parked above the window must never hide the top shelf's cap.
+		if _collapsing_board != null and _collapsing_board.owns_shelf(shelf):
+			continue
 
 		_set_shelf_top_ceiling_cap_visible(shelf, not _has_stacked_shelf_above(shelf, shelves))
 		_set_shelf_bottom_shadow_visible(shelf)
@@ -1738,7 +1841,7 @@ func _update_locked_shelves() -> Array[Node]:
 		var should_lock := _get_shelf_unlock_requirement(shelf_node) > _triples_cleared
 		shelf_node.set_meta(SHELF_LOCKED_META, should_lock)
 		_update_shelf_lock_overlay(shelf_node, should_lock)
-		_update_shelf_input_pickable(shelf_node, not should_lock)
+		_update_shelf_input_pickable(shelf_node, _is_shelf_gameplay_available(shelf_node))
 
 		if was_locked and not should_lock:
 			newly_unlocked_shelves.append(shelf_node)
@@ -1760,6 +1863,31 @@ func _get_shelf_unlock_requirement(shelf: Node) -> int:
 
 func _is_shelf_locked(shelf: Node) -> bool:
 	return shelf != null and bool(shelf.get_meta(SHELF_LOCKED_META, false))
+
+
+## The one availability rule shared by input, matching, promotion, and abilities. On a classic board
+## it is exactly "not locked". On a collapsing board it also requires the board to report the shelf
+## active, which excludes hidden, entering, and destroyed shelves and every shelf while a collapse
+## runs. Hidden shelves are invisible too, but invisibility is never what this relies on.
+## Moving-row window reachability stays with the input helpers that already own it, because
+## abilities deliberately still reach off-window moving shelves.
+func _is_shelf_gameplay_available(shelf: Node) -> bool:
+	if _is_shelf_locked(shelf):
+		return false
+	if _collapsing_board == null:
+		return true
+
+	return _collapsing_board.is_shelf_active(shelf)
+
+
+func _is_collapse_in_progress() -> bool:
+	return _collapse_phase_active or (_collapsing_board != null and _collapsing_board.is_collapsing())
+
+
+## Item hit state follows availability, so a hidden shelf's items are never pickable either.
+func _refresh_shelf_input_state() -> void:
+	for shelf in _get_all_shelves():
+		_update_shelf_input_pickable(shelf, _is_shelf_gameplay_available(shelf))
 
 
 ## A one-slot shelf could never hold three items anyway, but saying so explicitly keeps the rule from
@@ -1796,7 +1924,7 @@ func _is_shelf_move_source_eligible(shelf: Node) -> bool:
 	if shelf_node == null:
 		return false
 
-	if _is_shelf_locked(shelf_node):
+	if not _is_shelf_gameplay_available(shelf_node):
 		return false
 
 	var moving_row := _get_moving_shelf_row(shelf_node)
@@ -2187,6 +2315,14 @@ func _open_completion_screen() -> void:
 
 func _check_level_completed() -> void:
 	if _level_failed or _level_completed:
+		return
+
+	# Destroying shelves is the objective, so an empty-looking board is not enough: every shelf must
+	# be gone, and nothing may still be resolving or collapsing -- the last shelf plays its
+	# destruction before the celebration starts.
+	if _collapsing_board != null:
+		if not _is_resolving_shelves and not _is_collapse_in_progress() and _collapsing_board.is_cleared():
+			_complete_level()
 		return
 
 	if _get_all_items().is_empty():
@@ -2891,7 +3027,10 @@ func _move_item_to_slot(item: ShelfItem, origin_slot: Node2D, target_slot: Node2
 		item.play_sticky_blocked_feedback()
 		return false
 
-	if _is_slot_locked(origin_slot) or not _is_slot_drop_target_eligible(target_slot):
+	if (
+		not _is_shelf_gameplay_available(_get_owning_shelf(origin_slot))
+		or not _is_slot_drop_target_eligible(target_slot)
+	):
 		return false
 
 	target_slot = _resolve_move_target_slot(origin_slot, target_slot)
@@ -3009,7 +3148,10 @@ func _get_scaled_slot_snap_distance() -> float:
 
 
 func _resolve_move_target_slot(origin_slot: Node2D, target_slot: Node2D) -> Node2D:
-	if _is_slot_locked(origin_slot) or not _is_slot_drop_target_eligible(target_slot):
+	if (
+		not _is_shelf_gameplay_available(_get_owning_shelf(origin_slot))
+		or not _is_slot_drop_target_eligible(target_slot)
+	):
 		return null
 
 	if target_slot == origin_slot:
@@ -3159,6 +3301,18 @@ func _add_shelf_to_check(shelves_to_check: Array[Node], slot: Node2D) -> void:
 
 
 func _resolve_shelves(shelves_to_check: Array[Node]) -> void:
+	# A shelf cannot resolve while its column may be moving under it; hold the request until the
+	# collapse settles, then resolve it alongside whatever the collapse revealed.
+	if _is_collapse_in_progress():
+		for shelf in shelves_to_check:
+			if shelf != null and is_instance_valid(shelf) and not _shelves_awaiting_collapse.has(shelf):
+				_shelves_awaiting_collapse.append(shelf)
+		return
+
+	# Register the whole request before starting any resolver. A resolver with nothing to do finishes
+	# synchronously, and if it could see an empty set it would declare resolution drained while the
+	# rest of this request -- say, the target of the move that emptied it -- had not even started.
+	var started_shelves: Array[Node] = []
 	for shelf in shelves_to_check:
 		if shelf == null or not is_instance_valid(shelf):
 			continue
@@ -3169,9 +3323,11 @@ func _resolve_shelves(shelves_to_check: Array[Node]) -> void:
 			continue
 
 		_shelves_resolving_ids.append(shelf_instance_id)
-		_resolve_shelf(shelf, shelf_instance_id)
+		started_shelves.append(shelf)
 
 	_is_resolving_shelves = not _shelves_resolving_ids.is_empty()
+	for shelf in started_shelves:
+		_resolve_shelf(shelf, shelf.get_instance_id())
 
 
 func _resolve_shelf(shelf: Node, shelf_instance_id: int) -> void:
@@ -3192,9 +3348,110 @@ func _resolve_shelf(shelf: Node, shelf_instance_id: int) -> void:
 	if _is_resolving_shelves:
 		return
 
+	_on_shelf_resolution_drained()
+
+
+## Every shelf resolver has finished. A classic board is settled; a collapsing board first destroys
+## the shelves that resolution left empty, which may reveal more to resolve.
+func _on_shelf_resolution_drained() -> void:
+	if _collapsing_board != null:
+		_collapse_emptied_shelves()
+		return
+
+	_finish_shelf_resolution()
+
+
+func _finish_shelf_resolution() -> void:
 	_refresh_ability_highlights()
 	_check_level_completed()
 	_update_ability_buttons()
+
+
+## The collapsing-mode resolution phase. Runs only once every resolver has drained, so each
+## emptied shelf -- from a move, a triple clear, or a hammer strike -- joins one batch. The board
+## commits the new order, animates every affected column in parallel, and returns the revealed
+## shelves, which go back through ordinary resolution; that resolution ends here again, so the
+## loop repeats until nothing is left empty.
+func _collapse_emptied_shelves() -> void:
+	if _collapsing_board == null or _is_collapse_in_progress():
+		return
+	# Shuffle parks every item in the drag layer mid-animation, so its shelves only look empty. It
+	# re-resolves the whole board when it ends, which brings the check back here.
+	if _shuffle_effect_active:
+		_finish_shelf_resolution()
+		return
+
+	var emptied := _find_emptied_collapsing_shelves()
+	if emptied.is_empty():
+		_finish_shelf_resolution()
+		return
+
+	_collapse_phase_active = true
+	# An active drag or selection must not outlive the layout it was started on. Cancelling puts a
+	# lifted item back home, so emptiness is measured again afterwards.
+	_cancel_active_interaction()
+	emptied = _find_emptied_collapsing_shelves()
+	if emptied.is_empty():
+		_collapse_phase_active = false
+		_finish_shelf_resolution()
+		return
+
+	_release_collapsing_shelf_references(emptied)
+	_update_ability_buttons()
+	var result: Dictionary = await _collapsing_board.collapse_shelves(emptied)
+	if not is_inside_tree():
+		return
+
+	_collapse_phase_active = false
+	_collect_slots()
+	_refresh_shelf_input_state()
+
+	var to_resolve: Array[Node] = []
+	for shelf in result.get("revealed", []):
+		to_resolve.append(shelf)
+	for shelf in _shelves_awaiting_collapse:
+		if shelf != null and is_instance_valid(shelf) and shelf.is_inside_tree() and not to_resolve.has(shelf):
+			to_resolve.append(shelf)
+	_shelves_awaiting_collapse.clear()
+
+	if to_resolve.is_empty():
+		_finish_shelf_resolution()
+		return
+
+	_resolve_shelves(to_resolve)
+
+
+## Active shelves with nothing left on them. Only committed state counts: the shelf an item was just
+## lifted from for a drag is not empty, and items still clearing or landing are still present.
+func _find_emptied_collapsing_shelves() -> Array[Node]:
+	var emptied: Array[Node] = []
+	var drag_origin_shelf := _get_owning_shelf(_origin_slot) if _origin_slot != null else null
+	for shelf in _collapsing_board.get_active_shelves():
+		if shelf == drag_origin_shelf:
+			continue
+		if _front_layer_is_empty(shelf):
+			emptied.append(shelf)
+
+	return emptied
+
+
+## Nothing may keep pointing at a shelf about to be freed: pending resolution, selection, presses,
+## and highlights all let go before the board takes the shelves away.
+func _release_collapsing_shelf_references(shelves: Array[Node]) -> void:
+	for shelf in shelves:
+		_shelves_pending_resolve.erase(shelf)
+		_shelves_awaiting_collapse.erase(shelf)
+		if _selected_slot != null and _get_owning_shelf(_selected_slot) == shelf:
+			_clear_selected_item()
+		if _pressed_origin_slot != null and _get_owning_shelf(_pressed_origin_slot) == shelf:
+			_pressed_item = null
+			_pressed_origin_slot = null
+
+	var live_highlights: Array[ShelfItem] = []
+	for item in _highlighted_items:
+		if item != null and is_instance_valid(item) and not shelves.has(_get_owning_shelf(item)):
+			live_highlights.append(item)
+	_highlighted_items = live_highlights
 
 
 func _queue_shelves_to_resolve(shelves_to_check: Array[Node]) -> void:
@@ -3207,7 +3464,7 @@ func _clear_matching_shelves(shelves_to_check: Array[Node]) -> bool:
 	var cleared_any := false
 
 	for shelf in shelves_to_check:
-		if _is_shelf_locked(shelf) or not _shelf_forms_triples(shelf):
+		if not _is_shelf_gameplay_available(shelf) or not _shelf_forms_triples(shelf):
 			continue
 
 		var shelf_items := _get_shelf_items(shelf)
@@ -3638,7 +3895,7 @@ func _promote_empty_front_layers(shelves_to_check: Array[Node]) -> bool:
 		if shelf_node == null:
 			continue
 
-		if _is_shelf_locked(shelf_node):
+		if not _is_shelf_gameplay_available(shelf_node):
 			continue
 
 		if not _front_layer_is_empty(shelf_node):
@@ -3847,7 +4104,13 @@ func _setup_ability_buttons() -> void:
 
 
 func _on_ability_button_pressed(ability_id: StringName) -> void:
-	if _level_failed or _level_completed or _level_paused or _is_ability_effect_active():
+	if (
+		_level_failed
+		or _level_completed
+		or _level_paused
+		or _is_ability_effect_active()
+		or _is_collapse_in_progress()
+	):
 		return
 	if _is_timed_ability_blocked(ability_id):
 		return
@@ -3916,6 +4179,9 @@ func _apply_paid_ability(ability_id: StringName) -> bool:
 
 func _can_apply_ability(ability_id: StringName) -> bool:
 	if not _level_config_error.is_empty():
+		return false
+	# Checked before anything is spent, so an ability refused mid-collapse costs nothing.
+	if _is_collapse_in_progress():
 		return false
 	match ability_id:
 		ABILITY_HAMMER:
@@ -4665,7 +4931,7 @@ func _find_immediate_triple_items() -> Array[ShelfItem]:
 	# Prefer a triple that can be completed in a single move: a shelf that is
 	# one item away from a full match, plus a loose match elsewhere.
 	for shelf in _get_all_shelves():
-		if _is_shelf_locked(shelf):
+		if not _is_shelf_gameplay_available(shelf):
 			continue
 
 		var shelf_items := _get_shelf_items(shelf)
@@ -4923,7 +5189,13 @@ func _update_ability_buttons() -> void:
 func _update_ability_interaction_state() -> void:
 	if _ability_bar != null:
 		_ability_bar.set_interaction_blocked(
-			_level_failed or _level_completed or _level_paused or _is_ability_effect_active(),
+			(
+				_level_failed
+				or _level_completed
+				or _level_paused
+				or _is_ability_effect_active()
+				or _is_collapse_in_progress()
+			),
 			_is_lantern_active(),
 			_is_freezer_active()
 		)
@@ -5018,7 +5290,7 @@ func _get_all_items() -> Array[ShelfItem]:
 func _get_unlocked_items(only_ability_modifiable := false) -> Array[ShelfItem]:
 	var items: Array[ShelfItem] = []
 	for shelf in _get_all_shelves():
-		if _is_shelf_locked(shelf):
+		if not _is_shelf_gameplay_available(shelf):
 			continue
 
 		if only_ability_modifiable and not _shelf_allows_ability_modification(shelf):
@@ -5037,7 +5309,7 @@ func _shelf_allows_ability_modification(shelf: Node) -> bool:
 func _get_visible_items(only_ability_modifiable := false) -> Array[ShelfItem]:
 	var items: Array[ShelfItem] = []
 	for shelf in _get_all_shelves():
-		if _is_shelf_locked(shelf):
+		if not _is_shelf_gameplay_available(shelf):
 			continue
 
 		if only_ability_modifiable and not _shelf_allows_ability_modification(shelf):
@@ -5053,7 +5325,7 @@ func _get_visible_items(only_ability_modifiable := false) -> Array[ShelfItem]:
 func _get_first_back_layer_items(only_ability_modifiable := false) -> Array[ShelfItem]:
 	var items: Array[ShelfItem] = []
 	for shelf in _get_all_shelves():
-		if _is_shelf_locked(shelf):
+		if not _is_shelf_gameplay_available(shelf):
 			continue
 
 		if only_ability_modifiable and not _shelf_allows_ability_modification(shelf):

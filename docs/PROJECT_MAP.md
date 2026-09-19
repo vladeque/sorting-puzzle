@@ -786,6 +786,37 @@ Responsibility:
 Change here when:
 - Adding row motion types, changing wrap timing, changing moving-row drag/drop targeting, or changing moving-row visual variants.
 
+### Collapsing Shelf Columns
+
+Files:
+- `scenes/collapsing_shelf_board.tscn`, `scripts/collapsing_shelf_board.gd`
+- `scenes/collapsing_shelf_column.tscn`, `scripts/collapsing_shelf_column.gd`
+- `scripts/collapsing_column_rules.gd`
+- `scripts/level.gd`
+- `scripts/tools/validate_level_solvable.py`, `scripts/tools/generate_level_shelves.py`
+- `tests/gameplay/test_collapsing_shelf_columns.gd`
+- `tests/tools/test_validate_level_solvable.py`, `tests/tools/test_generate_level_shelves.py`,
+  `tests/tools/test_level_item_progression.py`
+
+Responsibility:
+- `gameplay_mode: "collapsing_columns"` arranges one-layer shelves in tall columns. An emptied shelf
+  is destroyed, the shelves above it fall one row, and the level ends when no shelf is left.
+- The board owns placement, the clipped window, the resolved visible count, and the single batched
+  collapse; each column owns its bottom-to-top order and movement. `scripts/level.gd` builds shelves
+  through its usual factory, decides which are empty, and asks the board which are playable.
+- `visible_shelves_per_column` is the authored minimum the solver proves. Taller screens reveal more
+  rows up to `MAX_VISIBLE_SHELVES_PER_COLUMN` (`8`), resolved once per level.
+- The solver models the mode through `CollapsingColumnsRules`, addressing moves by stable authored
+  shelf ID; the generator produces proven-solvable column boards.
+
+Change here when:
+- Changing how columns collapse or reveal, which shelves are playable, the collapse animation, the
+  column contract, or the collapsing solver/generator rules.
+
+Verification:
+- `.\scripts\tools\run_isolated_godot_test.ps1 -Script res://tests/gameplay/test_collapsing_shelf_columns.gd`
+- `py -m unittest discover -s tests/tools -p "test_*.py" -t tests/tools`
+
 ### Shelf Cell
 
 Files:
@@ -1027,6 +1058,8 @@ Responsibility:
 - Supports optional per-shelf triple-clear unlock requirements.
 - Generates shelf configs from difficulty, logical-item-count, shelf, and layer settings.
 - Validates shelf shape, known item IDs, row layout shape, item counts, and bounded solvability.
+- Supports the additive `gameplay_mode` field; `collapsing_columns` levels carry a `column_layout`
+  and are validated, generated, and solved with column-aware rules.
 
 Change here when:
 - Creating levels, adjusting level schema, adding layout presets, or improving validation/generation rules.
