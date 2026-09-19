@@ -2,8 +2,9 @@
 
 Status: Historical implementation task. The client mechanic, tools, and debug preview were
 implemented on 2026-09-19; see [COLLAPSING_SHELF_COLUMNS.md](COLLAPSING_SHELF_COLUMNS.md) for current
-behavior, verification, and the work still outstanding (campaign slot, touch-device testing, backend
-publication). The product decision gate below was answered on 2026-09-18, and those answers are the
+behavior, verification, and the work still outstanding: campaign slot/publication/activation and
+touch-device testing. Backend publication compatibility was implemented in sibling commit
+`9b8921d`. The product decision gate below was answered on 2026-09-18, and those answers are the
 contract the implementation follows.
 
 Date: 2026-09-18.
@@ -620,6 +621,11 @@ immediately before collapse, and pause/background restoration.
 
 ## 14. Backend and release dependency
 
+Compatibility status: implemented in `../sorting-puzzle-backend` commit `9b8921d`. The backend now
+preserves and validates the mode contract, emits a mode-aware immutable rules identity, and requires
+an explicit per-platform supporting-build range. Campaign content publication, provenance refresh,
+and activation remain pending the campaign-slot and release-build decisions.
+
 Current protocol 1.3 trusts bounded completion claims, and protocol 2 local-first synchronization
 does not upload move-by-move gameplay. The client feature therefore does not inherently require a
 completion payload or save-schema change.
@@ -734,5 +740,6 @@ these client commits.
 The feature is done when the configuration, solver, generator, materializer, scene components,
 runtime integration, abilities, completion rule, automated tests, responsive captures, manual touch
 verification, documentation, and approved campaign content all satisfy the acceptance criteria.
-Backend publication compatibility, if required for the target release, must be completed through a
-separately approved task before that content is activated for connected clients.
+Backend publication compatibility is implemented in sibling commit `9b8921d`. Campaign content must
+still be published and activated through the approved workflow with its chosen slot and supporting
+client-build ranges before connected clients can receive it.

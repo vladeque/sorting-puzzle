@@ -114,7 +114,9 @@ motion setup freezes a collapse part-way through its drop with `Tween.custom_ste
   template with `--require-solvable` and materialize it.
 - Hands-on touch-device testing: drag accuracy on the scaled board, rapid input just before a
   collapse, and pause/background restoration. The preview scene is set up for this.
-- Backend publication. The backend's normalized level artifact describes classic rules only, so
-  collapsing content must not be published to connected clients until a separately approved backend
-  task preserves `gameplay_mode` and `column_layout` and gates the content to clients that support
-  it. See section 14 of the task document.
+- Publishing and activating campaign content. Backend publication compatibility is implemented in
+  sibling commit `9b8921d`: normalization preserves `gameplay_mode` and `column_layout`, emits a
+  mode-aware immutable rules identity, and rejects client ranges not registered for the mode. The
+  production candidate/provenance manifest cannot be regenerated until a campaign slot and the
+  first supporting Android/iOS build numbers are chosen; activation remains an approved operational
+  action. See section 14 of the task document.
