@@ -1,12 +1,15 @@
 extends Node
 class_name RewardedTimeExtensionClient
 
-## ADS-003's authoritative boundary. The SDK callback only starts status reconciliation; gameplay
-## time is returned to Level after the backend has issued a run-bound authorization.
+## Authoritative owner for run-bound rewarded placements. ADS-003 uses time extension and ADS-005
+## adds one immediate ability use; both share this run so its life reservation and completion claim
+## can contain the exact authorization set once.
 
 const LocalSaveCodecScript := preload("res://scripts/save/local_save_codec.gd")
 
-const PLACEMENT := &"time_extension"
+const PLACEMENT_TIME_EXTENSION := &"time_extension"
+const PLACEMENT_ABILITY := &"ability"
+const SUPPORTED_REWARDED_ABILITIES := [&"hammer", &"shuffle", &"highlight"]
 const RUN_PROTOCOL_VERSION := "1.0"
 const COMPLETION_PROTOCOL_VERSION := "1.3"
 const REWARD_PROTOCOL_VERSION := "1.4"
@@ -27,7 +30,11 @@ var _run_id := ""
 var _online_ticket_id := ""
 var _intent_id := ""
 var _awaiting_verification := false
-var _authorization_id := ""
+var _pending_placement := StringName()
+var _pending_ability_id := StringName()
+var _time_authorization_id := ""
+var _ability_authorization_id := ""
+var _authorized_ability_id := StringName()
 
 
 func configure(transport, ad_service) -> void:
@@ -36,30 +43,42 @@ func configure(transport, ad_service) -> void:
 
 
 func can_offer() -> bool:
+	return can_offer_time_extension()
+
+
+func can_offer_time_extension() -> bool:
 	var backend_ready: bool = (
 		_transport != null
 		and _transport.has_method("can_use_backend")
 		and bool(_transport.call("can_use_backend"))
 	)
-	if not backend_ready or _busy or not _authorization_id.is_empty():
+	if not backend_ready or _busy or not _time_authorization_id.is_empty():
 		return false
 	if is_awaiting_verification():
-		return true
+		return _pending_placement == PLACEMENT_TIME_EXTENSION
 	return (
 		_ad_service != null
 		and _ad_service.has_method("is_rewarded_ready")
-		and bool(_ad_service.call("is_rewarded_ready", PLACEMENT, true))
+		and bool(_ad_service.call("is_rewarded_ready", PLACEMENT_TIME_EXTENSION, true))
 	)
 
 
 func prepare() -> Dictionary:
+	return await prepare_placement(PLACEMENT_TIME_EXTENSION)
+
+
+func prepare_ability() -> Dictionary:
+	return await prepare_placement(PLACEMENT_ABILITY)
+
+
+func prepare_placement(placement: StringName) -> Dictionary:
 	if _transport == null or not _transport.has_method("can_use_backend"):
 		return _error("backend.unavailable")
 	if not bool(_transport.call("can_use_backend")):
 		return _error("backend.unavailable")
 	if _ad_service == null or not _ad_service.has_method("preload_rewarded"):
 		return _error("ads.unavailable")
-	return await _ad_service.call("preload_rewarded", PLACEMENT, true)
+	return await _ad_service.call("preload_rewarded", placement, true)
 
 
 ## Returns {ok=true, seconds=60, authorization_id=...} only after authoritative settlement.
@@ -68,17 +87,67 @@ func prepare() -> Dictionary:
 func claim(level_number: int) -> Dictionary:
 	if _busy:
 		return _error("ad_request_in_progress")
-	if not _authorization_id.is_empty():
+	if not _time_authorization_id.is_empty():
 		return _error("ad_reward.already_authorized")
+	if is_awaiting_verification() and _pending_placement != PLACEMENT_TIME_EXTENSION:
+		return _error("ad_reward.other_verification_pending")
 	_busy = true
 
 	var result: Dictionary
 	if _awaiting_verification and not _intent_id.is_empty():
 		result = await _poll_authorization()
 	else:
-		result = await _begin_and_show(level_number)
+		result = await _begin_and_show(level_number, PLACEMENT_TIME_EXTENSION)
 	_busy = false
 	return result
+
+
+func can_offer_ability(ability_id: StringName) -> bool:
+	if ability_id not in SUPPORTED_REWARDED_ABILITIES or not _ability_authorization_id.is_empty():
+		return false
+	var backend_ready: bool = (
+		_transport != null
+		and _transport.has_method("can_use_backend")
+		and bool(_transport.call("can_use_backend"))
+	)
+	if not backend_ready or _busy:
+		return false
+	if is_awaiting_verification():
+		return _pending_placement == PLACEMENT_ABILITY and _pending_ability_id == ability_id
+	return (
+		_ad_service != null
+		and _ad_service.has_method("is_rewarded_ready")
+		and bool(_ad_service.call("is_rewarded_ready", PLACEMENT_ABILITY, true))
+	)
+
+
+func claim_ability(level_number: int, ability_id: StringName) -> Dictionary:
+	if ability_id not in SUPPORTED_REWARDED_ABILITIES:
+		return _error("ad_reward.ability_unsupported")
+	if _busy:
+		return _error("ad_request_in_progress")
+	if not _ability_authorization_id.is_empty():
+		return _error("ad_reward.ability_already_authorized")
+	if is_awaiting_verification() and (
+		_pending_placement != PLACEMENT_ABILITY or _pending_ability_id != ability_id
+	):
+		return _error("ad_reward.other_verification_pending")
+	_busy = true
+	var result: Dictionary
+	if is_awaiting_verification():
+		result = await _poll_authorization()
+	else:
+		result = await _begin_and_show(level_number, PLACEMENT_ABILITY, ability_id)
+	_busy = false
+	return result
+
+
+func is_awaiting_ability_verification(ability_id: StringName) -> bool:
+	return (
+		is_awaiting_verification()
+		and _pending_placement == PLACEMENT_ABILITY
+		and _pending_ability_id == ability_id
+	)
 
 
 func has_active_run() -> bool:
@@ -92,21 +161,36 @@ func is_awaiting_verification() -> bool:
 func settle_completed(stars: int) -> Dictionary:
 	if not has_active_run():
 		return _error("run.not_started")
-	var protocol_version := REWARD_PROTOCOL_VERSION if not _authorization_id.is_empty() else COMPLETION_PROTOCOL_VERSION
+	var has_reward_authorizations := (
+		not _time_authorization_id.is_empty() or not _ability_authorization_id.is_empty()
+	)
+	var protocol_version := REWARD_PROTOCOL_VERSION if has_reward_authorizations else COMPLETION_PROTOCOL_VERSION
+	var abilities_used := {"hammer": 0, "shuffle": 0, "highlight": 0}
+	if not _ability_authorization_id.is_empty():
+		abilities_used[String(_authorized_ability_id)] = 1
 	var claim := {
-		"claim_format": CLAIM_FORMAT_V2 if not _authorization_id.is_empty() else CLAIM_FORMAT_V1,
+		"claim_format": CLAIM_FORMAT_V2 if has_reward_authorizations else CLAIM_FORMAT_V1,
 		"outcome": "completed",
 		"stars": maxi(stars, 0),
-		# This compatibility run begins at the timeout boundary. Ability spends remain owned by the
-		# existing local-first journal, so reporting them here would debit the same use twice.
-		"abilities_used": {"hammer": 0, "shuffle": 0, "highlight": 0},
+		# Only the rewarded use belongs to this online run. Inventory and coin-funded ability uses
+		# remain owned by the existing local-first journal and must not be reported a second time.
+		"abilities_used": abilities_used,
 	}
-	if not _authorization_id.is_empty():
-		claim["rewarded_authorizations"] = [{
-			"authorization_id": _authorization_id,
-			"placement": String(PLACEMENT),
-			"seconds": VERIFIED_SECONDS,
-		}]
+	if has_reward_authorizations:
+		var authorizations: Array[Dictionary] = []
+		if not _time_authorization_id.is_empty():
+			authorizations.append({
+				"authorization_id": _time_authorization_id,
+				"placement": String(PLACEMENT_TIME_EXTENSION),
+				"seconds": VERIFIED_SECONDS,
+			})
+		if not _ability_authorization_id.is_empty():
+			authorizations.append({
+				"authorization_id": _ability_authorization_id,
+				"placement": String(PLACEMENT_ABILITY),
+				"ability_id": String(_authorized_ability_id),
+			})
+		claim["rewarded_authorizations"] = authorizations
 	var response: Dictionary = await _post_mutation(
 		"/v1/runs/%s/complete" % _run_id,
 		protocol_version,
@@ -156,15 +240,22 @@ func settle_terminal(outcome: String) -> Dictionary:
 	return {"ok": true, "life_state": life_state}
 
 
-func _begin_and_show(level_number: int) -> Dictionary:
+func _begin_and_show(
+	level_number: int,
+	placement: StringName,
+	ability_id: StringName = StringName()
+) -> Dictionary:
 	var started := await _ensure_started_run(level_number)
 	if not bool(started.get("ok", false)):
 		return started
 
+	var binding := {"placement": String(placement), "run_id": _run_id}
+	if placement == PLACEMENT_ABILITY:
+		binding["ability_id"] = String(ability_id)
 	var intent: Dictionary = await _post_mutation(
 		"/v1/ad-rewards/intents",
 		REWARD_PROTOCOL_VERSION,
-		{"placement": String(PLACEMENT), "run_id": _run_id}
+		binding
 	)
 	if not bool(intent.get("ok", false)):
 		return intent
@@ -174,25 +265,25 @@ func _begin_and_show(level_number: int) -> Dictionary:
 	if (
 		str(intent_data.get("policy_version", "")) != POLICY_VERSION
 		or not LocalSaveCodecScript.is_uuid(intent_data.get("intent_id"))
-		or str(intent_data.get("placement", "")) != String(PLACEMENT)
+		or str(intent_data.get("placement", "")) != String(placement)
 		or str(intent_data.get("status", "")) != "pending"
 		or custom_data.length() != 43
 		or not (effect is Dictionary)
-		or str((effect as Dictionary).get("kind", "")) != String(PLACEMENT)
-		or int((effect as Dictionary).get("seconds", 0)) != VERIFIED_SECONDS
+		or not _effect_matches(effect as Dictionary, placement, ability_id)
 	):
 		return _error("ad_reward.intent_response_malformed")
 	_intent_id = str(intent_data.get("intent_id", ""))
+	_pending_placement = placement
+	_pending_ability_id = ability_id
 
 	var provider_result: Dictionary = await _ad_service.call(
 		"request_rewarded",
-		PLACEMENT,
+		placement,
 		{"ssv_custom_data": custom_data},
 		true
 	)
 	if provider_result.get("status") != PROVIDER_STATUS_REWARDED:
-		_intent_id = ""
-		_awaiting_verification = false
+		_clear_pending_intent()
 		return _error("ads.%s" % str(provider_result.get("reason", "not_rewarded")))
 
 	_awaiting_verification = true
@@ -267,16 +358,29 @@ func _poll_authorization() -> Dictionary:
 			return validation
 		match str(data.get("status", "")):
 			"settled":
-				_authorization_id = str(data.get("authorization_id", ""))
-				_awaiting_verification = false
+				var authorization_id := str(data.get("authorization_id", ""))
+				var placement := _pending_placement
+				var ability_id := _pending_ability_id
+				if placement == PLACEMENT_TIME_EXTENSION:
+					_time_authorization_id = authorization_id
+				else:
+					_ability_authorization_id = authorization_id
+					_authorized_ability_id = ability_id
+				_clear_pending_intent()
+				if placement == PLACEMENT_TIME_EXTENSION:
+					return {
+						"ok": true,
+						"seconds": VERIFIED_SECONDS,
+						"authorization_id": authorization_id,
+					}
 				return {
 					"ok": true,
-					"seconds": VERIFIED_SECONDS,
-					"authorization_id": _authorization_id,
+					"ability_id": ability_id,
+					"uses": 1,
+					"authorization_id": authorization_id,
 				}
 			"rejected", "expired":
-				_intent_id = ""
-				_awaiting_verification = false
+				_clear_pending_intent()
 				return _error("ad_reward.%s" % str(data.get("status", "")))
 			"pending":
 				if attempt + 1 < maxi(poll_attempt_limit, 1):
@@ -289,11 +393,10 @@ func _validate_status_data(data: Dictionary) -> Dictionary:
 	if (
 		str(data.get("policy_version", "")) != POLICY_VERSION
 		or str(data.get("intent_id", "")) != _intent_id
-		or str(data.get("placement", "")) != String(PLACEMENT)
+		or str(data.get("placement", "")) != String(_pending_placement)
 		or not ["pending", "settled", "rejected", "expired"].has(str(data.get("status", "")))
 		or not (effect is Dictionary)
-		or str((effect as Dictionary).get("kind", "")) != String(PLACEMENT)
-		or int((effect as Dictionary).get("seconds", 0)) != VERIFIED_SECONDS
+		or not _effect_matches(effect as Dictionary, _pending_placement, _pending_ability_id)
 	):
 		return _error("ad_reward.status_response_malformed")
 	if str(data.get("status", "")) == "settled" and not LocalSaveCodecScript.is_uuid(data.get("authorization_id")):
@@ -348,9 +451,30 @@ func _clear_run() -> void:
 	_state_version = -1
 	_run_id = ""
 	_online_ticket_id = ""
+	_clear_pending_intent()
+	_time_authorization_id = ""
+	_ability_authorization_id = ""
+	_authorized_ability_id = StringName()
+
+
+func _clear_pending_intent() -> void:
 	_intent_id = ""
 	_awaiting_verification = false
-	_authorization_id = ""
+	_pending_placement = StringName()
+	_pending_ability_id = StringName()
+
+
+func _effect_matches(effect: Dictionary, placement: StringName, ability_id: StringName) -> bool:
+	if str(effect.get("kind", "")) != String(placement):
+		return false
+	if placement == PLACEMENT_TIME_EXTENSION:
+		return int(effect.get("seconds", 0)) == VERIFIED_SECONDS
+	if placement == PLACEMENT_ABILITY:
+		return (
+			str(effect.get("ability_id", "")) == String(ability_id)
+			and int(effect.get("uses", 0)) == 1
+		)
+	return false
 
 
 func _error(code: String, pending: bool = false) -> Dictionary:

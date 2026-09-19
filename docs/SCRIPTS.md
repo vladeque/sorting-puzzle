@@ -24,16 +24,17 @@ This file documents what each script owns. Keep script docs focused on responsib
 - `ad_provider.gd`: disabled provider contract; `mock_ad_provider.gd` is the deterministic test
   implementation; `admob_provider.gd` adapts the pinned native bridge without reward authority and
   keeps loaded rewarded inventory isolated by placement/ad unit.
-- `rewarded_time_extension_client.gd`: ADS-003 protocol-1.4 intent/status owner. It creates the
-  compatibility online run, forwards opaque SSV custom data, accepts only a settled 60-second
-  authorization, and binds that authorization into terminal run settlement.
+- `rewarded_time_extension_client.gd`: shared protocol-1.4 run owner for ADS-003 and ADS-005. It
+  forwards opaque SSV custom data, accepts only exact settled time/ability effects, and binds the
+  issued authorization set plus one rewarded immediate ability use into terminal settlement.
 - `rewarded_life_client.gd`: ADS-004 protocol-1.4 player-scoped intent/status owner. It forwards
   only opaque SSV custom data and returns the authoritative capped life state only after settlement.
 
 See [ADS_002_CLIENT_AD_INFRASTRUCTURE.md](ADS_002_CLIENT_AD_INFRASTRUCTURE.md) for release gates and
 the backend reward boundary, and
 [ADS_003_REWARDED_TIME_EXTENSION.md](ADS_003_REWARDED_TIME_EXTENSION.md) and
-[ADS_004_REWARDED_LIFE.md](ADS_004_REWARDED_LIFE.md) for implemented placements.
+[ADS_004_REWARDED_LIFE.md](ADS_004_REWARDED_LIFE.md) and
+[ADS_005_REWARDED_ABILITY.md](ADS_005_REWARDED_ABILITY.md) for implemented placements.
 
 ## `scripts/testing/reward_chest_fill_preview.gd`
 
@@ -3172,23 +3173,23 @@ Purpose:
   immediately -- it is not an inventory purchase, hence `"USE ABILITY"` rather than the previous
   `"GET MORE ITEMS"`/`"×1"`, which read like acquiring inventory. The redundant `"USE NOW"` badge
   was removed from the icon slot.
-- `scripts/level.gd` only calls `set_offer()`/`open()`/`close()` and listens for
-  `close_pressed`/`buy_pressed`/`ad_pressed`.
+- `scripts/level.gd` supplies coin and rewarded readiness/request state through the focused API and
+  listens for `close_pressed`/`buy_pressed`/`ad_pressed`.
 
 Key methods:
 - `set_offer(ability_texture, price, available_coins)`: sets the icon and price and keeps the green
   Buy action enabled. When coins are insufficient, its `buy_pressed` signal opens the in-level Shop
   instead of spending or applying the ability.
+- `set_buy_action_enabled(enabled)` and `set_ad_action_state(state, visible, enabled)`: render the
+  authoritative request lock plus ready/loading/verifying/pending/error CTA states.
 - `is_transitioning()` / `apply_safe_layout(safe_margins, viewport_size)` / `open()` / `close()`.
 
 Behavior notes:
 - The coin icon is the canonical `assets/ui/clover_coin_transparent_96x96.png` (was
   `assets/ui/main_menu_coin.png`).
-- `WatchAdButton` (the rewarded-ad placeholder) is authored `disabled = true` with `"Coming Soon"`
-  text and the shared `style_box_disabled_action_button.tres` in every state, and its `visible` is
-  set to `OS.is_debug_build()` at `_ready()` -- hidden in production, visible-but-disabled in a
-  debug build, mirroring `scripts/main_menu.gd`'s existing `DEV_LEVEL_SELECT_SETTING`
-  debug-build-gate convention. It can never be an enabled no-op in any build.
+- `WatchAdButton` is hidden and disabled by default. It becomes production-visible only for a
+  ready/reconcilable Hammer, Shuffle, or Lantern offer; Freezer remains coin-only. Successful
+  settlement applies immediately through the existing paid-use path without coins or inventory.
 
 Depends on:
 - `scenes/ui/gameplay_modal_shell.tscn`, `scripts/gameplay_ui_theme.gd`, `scripts/press_scale_button.gd`.

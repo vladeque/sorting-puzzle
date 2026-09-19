@@ -103,6 +103,7 @@ vertical_alignment = 1
 
 [node name="WatchAdButton" type="Button" parent="."]
 unique_name_in_owner = true
+visible = false
 custom_minimum_size = Vector2(214, 76)
 layout_mode = 2
 disabled = true
@@ -114,6 +115,6 @@ theme_override_styles/normal = ExtResource("8_disabled_button")
 theme_override_styles/pressed = ExtResource("8_disabled_button")
 theme_override_styles/hover = ExtResource("8_disabled_button")
 theme_override_styles/disabled = ExtResource("8_disabled_button")
-text = "Coming Soon"
+text = "Watch Ad"
 script = ExtResource("5_press_scale_button")
 held_scale = 0.94

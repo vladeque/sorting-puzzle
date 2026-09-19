@@ -330,21 +330,34 @@ func _test_focus_and_cursor_policy() -> void:
 	level.free()
 
 
-## The rewarded-ad placeholder must never be an enabled no-op, in any build. It hides entirely
-## outside a debug build and stays disabled with "Coming Soon" copy inside one.
+## Ability Purchase fails closed until the level owner supplies authoritative rewarded-ad state.
+## Once supplied, its CTA exposes explicit ready/loading/pending labels and enablement.
 func _test_rewarded_ad_placeholder() -> void:
 	var purchase := _ability_purchase_scene.instantiate()
 	root.add_child(purchase)
 	await process_frame
 
 	var watch_ad_button := purchase.find_child("WatchAdButton", true, false) as Button
-	_check(watch_ad_button.disabled, "WatchAdButton must never be enabled -- no enabled no-op in any build.")
+	_check(watch_ad_button.disabled, "WatchAdButton starts disabled before provider readiness is known.")
 	_check(
-		watch_ad_button.visible == OS.is_debug_build(),
-		"WatchAdButton visibility should exactly follow OS.is_debug_build() (hidden in production)."
+		not watch_ad_button.visible,
+		"WatchAdButton starts hidden rather than exposing an unready or no-op action."
 	)
-	if watch_ad_button.visible:
-		_check(watch_ad_button.text == "Coming Soon", "A visible dev-preview WatchAdButton should read Coming Soon.")
+	purchase.call("set_ad_action_state", &"ready", true, true)
+	_check(
+		watch_ad_button.visible and not watch_ad_button.disabled and watch_ad_button.text == "Watch Ad",
+		"A ready authoritative offer exposes an enabled Watch Ad action."
+	)
+	purchase.call("set_ad_action_state", &"pending", true, true)
+	_check(
+		not watch_ad_button.disabled and watch_ad_button.text == "Verify Reward",
+		"A pending authorization exposes retryable reconciliation rather than another ad."
+	)
+	purchase.call("set_ad_action_state", &"verifying", true, false)
+	_check(
+		watch_ad_button.disabled and watch_ad_button.text == "Verifying...",
+		"Verification locks the rewarded action while preserving explicit status."
+	)
 
 	purchase.queue_free()
 	await process_frame

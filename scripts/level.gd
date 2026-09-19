@@ -204,6 +204,9 @@ var _ability_uses: Dictionary = {
 var _ability_purchase_prices: Dictionary = DEFAULT_ABILITY_PURCHASE_PRICES.duplicate()
 var _ability_purchase_pending_id := StringName()
 var _ability_purchase_was_paused := false
+var _ability_reward_in_progress := false
+var _ability_reward_prepare_in_progress := false
+var _ability_reward_action_state := &"ready"
 var _time_extension_seconds := DEFAULT_TIME_EXTENSION_SECONDS
 var _time_extension_coin_price := DEFAULT_TIME_EXTENSION_COIN_PRICE
 var _max_coin_time_extensions_per_attempt := DEFAULT_MAX_COIN_TIME_EXTENSIONS_PER_ATTEMPT
@@ -326,6 +329,7 @@ func _ready() -> void:
 	_update_pause_menu_button()
 	if _rewarded_ad_time_extension_configured:
 		call_deferred("_prepare_rewarded_time_extension")
+	call_deferred("_prepare_rewarded_ability")
 	call_deferred("_prepare_rewarded_life")
 
 
@@ -863,6 +867,28 @@ func _prepare_rewarded_time_extension() -> void:
 		_refresh_time_extension_offer()
 
 
+func _prepare_rewarded_ability() -> void:
+	if (
+		_rewarded_time_extension_client == null
+		or not _rewarded_time_extension_client.has_method("prepare_ability")
+		or _ability_reward_prepare_in_progress
+	):
+		return
+	_ability_reward_prepare_in_progress = true
+	var result: Dictionary = await _rewarded_time_extension_client.prepare_ability()
+	if not is_inside_tree():
+		return
+	_ability_reward_prepare_in_progress = false
+	if _ability_purchase_overlay != null and _ability_purchase_overlay.visible:
+		# Preload/provider unavailability is not a player-action error: keep the action hidden. An
+		# error produced by an actual presentation/claim remains visible until a reload succeeds.
+		if result.get("status", &"") == &"ready":
+			_ability_reward_action_state = &"ready"
+		elif _ability_reward_action_state != &"error":
+			_ability_reward_action_state = &"ready"
+		_refresh_ability_purchase_offer()
+
+
 func _setup_rewarded_life_client() -> void:
 	if _rewarded_life_client != null:
 		return
@@ -969,6 +995,9 @@ func _apply_level_config(config: Dictionary) -> void:
 	if _out_of_lives_overlay != null:
 		_out_of_lives_overlay.visible = false
 	_ability_purchase_pending_id = StringName()
+	_ability_reward_in_progress = false
+	_ability_reward_prepare_in_progress = false
+	_ability_reward_action_state = &"ready"
 	_is_resolving_shelves = false
 	_shelves_pending_resolve.clear()
 	_shelves_resolving_ids.clear()
@@ -2807,6 +2836,11 @@ func _on_pause_menu_continue_pressed() -> void:
 func _open_ability_purchase_menu(ability_id: StringName) -> void:
 	if _ability_purchase_overlay == null:
 		return
+	if _ability_reward_in_progress or (
+		_rewarded_time_extension_client != null
+		and _rewarded_time_extension_client.is_awaiting_verification()
+	):
+		return
 
 	_cancel_active_interaction()
 	_ability_purchase_pending_id = ability_id
@@ -2817,6 +2851,8 @@ func _open_ability_purchase_menu(ability_id: StringName) -> void:
 	_pause_menu_overlay.close()
 	_leave_confirmation_overlay.close()
 	_ability_purchase_overlay.open()
+	if not _is_rewarded_ability_available(ability_id) and _is_rewarded_ability_supported(ability_id):
+		call_deferred("_prepare_rewarded_ability")
 	_update_ability_buttons()
 	_update_pause_menu_button()
 
@@ -2830,6 +2866,27 @@ func _refresh_ability_purchase_offer() -> void:
 		_get_ability_purchase_price(_ability_purchase_pending_id),
 		PlayerProgress.get_coins()
 	)
+	var awaiting_verification := _is_rewarded_ability_verification_pending(
+		_ability_purchase_pending_id
+	)
+	if awaiting_verification:
+		_ability_purchase_overlay.set_buy_action_enabled(false)
+		_ability_purchase_overlay.set_ad_action_state(&"pending", true, true)
+	elif _ability_reward_in_progress:
+		_ability_purchase_overlay.set_buy_action_enabled(false)
+		_ability_purchase_overlay.set_ad_action_state(
+			_ability_reward_action_state,
+			true,
+			false
+		)
+	else:
+		var ad_available := _is_rewarded_ability_available(_ability_purchase_pending_id)
+		_ability_purchase_overlay.set_buy_action_enabled(true)
+		_ability_purchase_overlay.set_ad_action_state(
+			_ability_reward_action_state,
+			ad_available or _ability_reward_action_state == &"error",
+			ad_available
+		)
 
 
 ## should_resume=true (the close/X button and ui_cancel) restores whatever state Ability Purchase was
@@ -2853,13 +2910,22 @@ func _close_ability_purchase_menu(should_resume: bool = true) -> void:
 
 
 func _on_ability_purchase_close_pressed() -> void:
-	if _is_ui_action_blocked():
+	if (
+		_is_ui_action_blocked()
+		or _ability_reward_in_progress
+		or _is_rewarded_ability_verification_pending(_ability_purchase_pending_id)
+	):
 		return
 	_close_ability_purchase_menu()
 
 
 func _on_ability_purchase_buy_pressed() -> void:
-	if _ability_purchase_pending_id == StringName() or _is_ui_action_blocked():
+	if (
+		_ability_purchase_pending_id == StringName()
+		or _is_ui_action_blocked()
+		or _ability_reward_in_progress
+		or _is_rewarded_ability_verification_pending(_ability_purchase_pending_id)
+	):
 		return
 
 	var ability_id := _ability_purchase_pending_id
@@ -2926,7 +2992,88 @@ func _on_in_level_shop_closed() -> void:
 
 
 func _on_ability_purchase_ad_pressed() -> void:
-	pass
+	if (
+		_ability_purchase_pending_id == StringName()
+		or _ability_reward_in_progress
+		or _is_ui_action_blocked()
+	):
+		return
+	var ability_id := _ability_purchase_pending_id
+	if not _is_rewarded_ability_available(ability_id) or not _can_apply_ability(ability_id):
+		_refresh_ability_purchase_offer()
+		return
+
+	_ability_reward_in_progress = true
+	_ability_reward_action_state = (
+		&"verifying"
+		if _rewarded_time_extension_client.is_awaiting_ability_verification(ability_id)
+		else &"loading"
+	)
+	_refresh_ability_purchase_offer()
+	var claim: Dictionary = await _rewarded_time_extension_client.claim_ability(
+		selected_level,
+		ability_id
+	)
+	if (
+		not is_inside_tree()
+		or _returning_to_menu
+		or _level_failed
+		or _level_completed
+		or not _ability_purchase_overlay.visible
+		or _ability_purchase_pending_id != ability_id
+	):
+		return
+	if not bool(claim.get("ok", false)):
+		_ability_reward_in_progress = false
+		_ability_reward_action_state = &"pending" if bool(claim.get("pending", false)) else &"error"
+		_refresh_ability_purchase_offer()
+		if not bool(claim.get("pending", false)):
+			call_deferred("_prepare_rewarded_ability")
+		return
+	if (
+		StringName(str(claim.get("ability_id", ""))) != ability_id
+		or int(claim.get("uses", 0)) != 1
+		or not _can_apply_ability(ability_id)
+	):
+		_ability_reward_in_progress = false
+		_ability_reward_action_state = &"error"
+		_refresh_ability_purchase_offer()
+		return
+
+	_level_paused = false
+	_set_moving_shelf_rows_paused(false)
+	if not _apply_paid_ability(ability_id):
+		_level_paused = true
+		_set_moving_shelf_rows_paused(true)
+		_ability_reward_in_progress = false
+		_ability_reward_action_state = &"error"
+		push_error("Rewarded ability passed preflight but could not start: %s" % String(ability_id))
+		_refresh_ability_purchase_offer()
+		return
+
+	_ability_reward_in_progress = false
+	_close_ability_purchase_menu(false)
+
+
+func _is_rewarded_ability_supported(ability_id: StringName) -> bool:
+	return ability_id in [ABILITY_HAMMER, ABILITY_SHUFFLE, ABILITY_HIGHLIGHT]
+
+
+func _is_rewarded_ability_available(ability_id: StringName) -> bool:
+	return (
+		_is_rewarded_ability_supported(ability_id)
+		and _rewarded_time_extension_client != null
+		and _rewarded_time_extension_client.has_method("can_offer_ability")
+		and _rewarded_time_extension_client.can_offer_ability(ability_id)
+	)
+
+
+func _is_rewarded_ability_verification_pending(ability_id: StringName) -> bool:
+	return (
+		_rewarded_time_extension_client != null
+		and _rewarded_time_extension_client.has_method("is_awaiting_ability_verification")
+		and _rewarded_time_extension_client.is_awaiting_ability_verification(ability_id)
+	)
 
 
 func _on_time_extension_declined() -> void:

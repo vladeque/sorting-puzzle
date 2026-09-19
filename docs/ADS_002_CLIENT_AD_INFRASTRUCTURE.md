@@ -1,6 +1,6 @@
 # ADS-002 Client Ad Infrastructure
 
-Status: **implemented; rewarded time extension and life enabled behind runtime release gates**.
+Status: **implemented; rewarded time extension, life, and ability enabled behind runtime release gates**.
 
 ## Ownership
 
@@ -15,8 +15,9 @@ Status: **implemented; rewarded time extension and life enabled behind runtime r
 - `AdPacingState` sanitizes the non-economic local counter/timestamps. `PlayerProgress` stores it in
   the local preference partition, excludes it from authoritative snapshots, and creates no backend
   journal operation.
-- `configs/ads.json` is the bundled release policy. ADS-003/ADS-004 enable provider policy plus the
-  rewarded time-extension and life gates; other rewarded placements and all interstitials remain disabled.
+- `configs/ads.json` is the bundled release policy. ADS-003 through ADS-005 enable provider policy
+  plus the rewarded time-extension, life, and ability gates; shelf unlock and all interstitials
+  remain disabled.
   It contains pacing limits but no reward amounts, production IDs, or secrets.
 
 ## Release switches
@@ -43,7 +44,8 @@ presentation does not reset the counter; only an impression does.
 A `REWARDED` provider callback is evidence for an authoritative claim, not a reward. The service
 returns no coin, life, time, ability, or shelf payload and requires callers to confirm that the
 server can accept a claim before presentation. ADS-003 owns time-extension reconciliation and
-ADS-004 owns life reconciliation; ADS-005 and ADS-006 still own the remaining placement UIs. The project/native provider switches
+ADS-004 owns life reconciliation; ADS-005 owns immediate-ability reconciliation; ADS-006 still
+owns the remaining shelf-unlock UI. The project/native provider switches
 remain disabled by default pending device/store/privacy activation checks; interstitial policy
 stays disabled for release.
 
@@ -65,7 +67,8 @@ Run:
 The infrastructure test covers invalid-policy fail-closed behavior, rewarded gates, activation
 baseline, first/subsequent thresholds, cooldown, cap, rewarded suppression, rollout, normalized
 provider outcomes, the one-active-request guard, audio restoration, non-authoritative reward
-results, and persistence without a backend journal operation.
+results, placement-isolated time/life/ability inventory, and persistence without a backend journal
+operation.
 
 On 2026-09-19, the project exported its Android debug preset with all committed native switches off;
 APK inspection found no Google Mobile Ads/UMP or Poing classes and no AdMob application metadata or

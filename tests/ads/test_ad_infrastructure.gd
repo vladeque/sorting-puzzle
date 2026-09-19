@@ -297,6 +297,7 @@ func _test_rewarded_placement_inventory_is_isolated() -> void:
 	await provider.update_consent()
 	await provider.load_ad(AdProviderScript.FORMAT_REWARDED, AdPolicyScript.PLACEMENT_TIME_EXTENSION)
 	await provider.load_ad(AdProviderScript.FORMAT_REWARDED, AdPolicyScript.PLACEMENT_LIFE)
+	await provider.load_ad(AdProviderScript.FORMAT_REWARDED, AdPolicyScript.PLACEMENT_ABILITY)
 	provider.queue_outcome(AdProviderScript.FORMAT_REWARDED, {
 		"status": AdProviderScript.STATUS_DISMISSED,
 		"reason": "test",
@@ -310,8 +311,12 @@ func _test_rewarded_placement_inventory_is_isolated() -> void:
 			and provider.is_ad_ready(
 				AdProviderScript.FORMAT_REWARDED,
 				AdPolicyScript.PLACEMENT_LIFE
+			)
+			and provider.is_ad_ready(
+				AdProviderScript.FORMAT_REWARDED,
+				AdPolicyScript.PLACEMENT_ABILITY
 			),
-		"Consuming one rewarded placement does not consume another placement's loaded ad."
+		"Consuming one rewarded placement does not consume life or ability ad inventory."
 	)
 
 

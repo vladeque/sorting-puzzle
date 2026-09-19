@@ -66,12 +66,14 @@ Ad infrastructure:
 - Owns fail-closed ad policy, provider/consent lifecycle, presentation normalization, local-only
   interstitial pacing, audio restoration, and diagnostics. ADS-003 adds the server-authorized
   time-extension placement in `rewarded_time_extension_client.gd`; ADS-004 adds the player-scoped
-  rewarded-life placement in `rewarded_life_client.gd`. Bundled rewarded policy enables both while
+  rewarded-life placement in `rewarded_life_client.gd`; ADS-005 shares the run owner for an exact
+  immediate Hammer/Shuffle/Lantern authorization. Bundled rewarded policy enables all three while
   default project/native provider switches remain off until release configuration.
   Interstitial policy remains disabled. See
   [ADS_002_CLIENT_AD_INFRASTRUCTURE.md](ADS_002_CLIENT_AD_INFRASTRUCTURE.md) and
   [ADS_003_REWARDED_TIME_EXTENSION.md](ADS_003_REWARDED_TIME_EXTENSION.md), plus
-  [ADS_004_REWARDED_LIFE.md](ADS_004_REWARDED_LIFE.md).
+  [ADS_004_REWARDED_LIFE.md](ADS_004_REWARDED_LIFE.md), and
+  [ADS_005_REWARDED_ABILITY.md](ADS_005_REWARDED_ABILITY.md).
 
 Reusable item scene:
 - `scenes/item.tscn`
@@ -1029,7 +1031,9 @@ Responsibility:
 - `scenes/pause_menu.tscn`, `scenes/leave_confirmation_menu.tscn`, and `scenes/ability_purchase_menu.tscn` each compose `scenes/ui/gameplay_modal_shell.tscn` for the shared shade, warm outer panel, cream inner content region, title, protruding true-circular red close button, and bottom action row (UI-003) instead of each owning local copies of that styling. Each keeps only its own content and action buttons:
   - Pause: `Pause` title, music / sound-effects / vibration square icon buttons with shadow-only button styling and a scene-authored crossed-out marker, and Leave/Continue actions.
   - Leave Confirmation: `Leaving the Level` title (the long-title role), crossed-out rectangular lost life/star slots, and red Leave / green Continue actions. Close/system-back returns to Pause; the explicit Continue action resumes gameplay directly -- these used to collapse into the same outcome.
-  - Ability Purchase: `Use Ability` title, selected ability icon without a redundant secondary badge, a coin-price button using the canonical clover coin art, and the rewarded-ad placeholder hidden in production (visible-but-disabled with `Coming Soon` copy in a debug build only).
+  - Ability Purchase: `Use Ability` title, selected ability icon without a redundant secondary
+    badge, the existing coin-price action, and a readiness-gated rewarded action for immediate
+    Hammer/Shuffle/Lantern use. Freezer remains coin-only.
 - All three modal owners use the same 520x500 outer shell and compact content-specific cream-panel
   heights, preventing taller inner panels from returning when one modal's content changes.
 - `scripts/press_scale_button.gd` provides the default held-press shrink behavior for every gameplay action, including the pause/settings icon buttons, all four ability buttons, every modal's close button, and the red/green bottom image buttons -- several of these had no press feedback at all before UI-003.

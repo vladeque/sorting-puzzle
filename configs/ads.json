@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "config_version": "rewarded-life-1",
+  "config_version": "rewarded-ability-1",
   "provider_enabled": true,
   "rewarded": {
     "enabled": true,
     "time_extension_enabled": true,
     "life_enabled": true,
-    "ability_enabled": false,
+    "ability_enabled": true,
     "shelf_unlock_enabled": false
   },
   "interstitial": {

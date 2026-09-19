@@ -7,7 +7,8 @@ class_name AbilityPurchaseMenu
 ## Roles"). Buying applies one ability immediately -- it is not an inventory purchase, hence "USE
 ## ABILITY" rather than "GET MORE ITEMS"/"×1" (see
 ## docs/UI_003_LEVEL_UI_CONSISTENCY_TICKET.md). scripts/level.gd only calls set_offer()/open()/
-## close() and listens for close_pressed/buy_pressed/ad_pressed.
+## close() and listens for close_pressed/buy_pressed/ad_pressed. The owner supplies rewarded-ad
+## visibility/readiness; this scene never decides authorization or applies an ability.
 
 signal close_pressed
 signal buy_pressed
@@ -39,11 +40,7 @@ func _ready() -> void:
 	_buy_button.pressed.connect(func() -> void: buy_pressed.emit())
 	_watch_ad_button.pressed.connect(func() -> void: ad_pressed.emit())
 
-	# The rewarded-ad placeholder grants nothing until a separate feature is approved (see
-	# docs/UI_003_LEVEL_UI_CONSISTENCY_TICKET.md). Hidden in production; visible-but-disabled with
-	# "Coming Soon" copy (the scene's authored default) in a debug build so it stays reviewable
-	# without ever exposing a live no-op to a player.
-	_watch_ad_button.visible = OS.is_debug_build()
+	_watch_ad_button.visible = false
 
 
 func set_offer(ability_texture: Texture2D, price: int, _available_coins: int) -> void:
@@ -59,6 +56,37 @@ func set_offer(ability_texture: Texture2D, price: int, _available_coins: int) ->
 	_buy_button.add_theme_stylebox_override("pressed", BUY_STYLE)
 	_buy_button.add_theme_stylebox_override("hover", BUY_STYLE)
 	_buy_button.add_theme_stylebox_override("disabled", BUY_STYLE)
+
+
+func set_buy_action_enabled(is_enabled: bool) -> void:
+	_buy_button.disabled = not is_enabled
+	_buy_button.mouse_default_cursor_shape = (
+		Control.CURSOR_POINTING_HAND if is_enabled else Control.CURSOR_ARROW
+	)
+
+
+func set_ad_action_state(state: StringName, is_visible: bool, is_enabled: bool = false) -> void:
+	_watch_ad_button.visible = is_visible
+	if not is_visible:
+		return
+	match state:
+		&"loading":
+			_watch_ad_button.text = "Loading..."
+		&"verifying":
+			_watch_ad_button.text = "Verifying..."
+		&"pending":
+			_watch_ad_button.text = "Verify Reward"
+		&"error":
+			_watch_ad_button.text = "Try Again"
+		_:
+			_watch_ad_button.text = "Watch Ad"
+	_watch_ad_button.disabled = not is_enabled
+	_watch_ad_button.mouse_default_cursor_shape = (
+		Control.CURSOR_POINTING_HAND if is_enabled else Control.CURSOR_ARROW
+	)
+	_watch_ad_button.add_theme_stylebox_override("normal", BUY_STYLE)
+	_watch_ad_button.add_theme_stylebox_override("pressed", BUY_STYLE)
+	_watch_ad_button.add_theme_stylebox_override("hover", BUY_STYLE)
 
 
 func is_transitioning() -> bool:

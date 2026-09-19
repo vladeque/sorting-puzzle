@@ -42,7 +42,7 @@ Ability Purchase, Completion, and Failure at the 720×1280 design viewport.
 | --- | --- | --- | --- |
 | P0 | Failure flow | `level.tscn` embeds a shade and `LEVEL FAILED` label with no action. `_fail_level()` only makes it visible, leaving the player in a terminal screen with no route forward. This also violates the project rule that multi-node result screens own separate scenes. | Extract `scenes/ui/level_failure_screen.tscn` with a focused owner script and a working `Main Menu` action. Keep retry/life-policy changes out of this ticket. |
 | P1 | Disabled pause button | `PauseMenuButton` has normal, hover, and pressed styles but no disabled style. Opening any overlay disables it and Godot falls back to a square default control, visibly changing the control. | Give Pause an explicit disabled override using the same warm resource as its normal Main Menu settings-button role; keep explicit disabled resources on every ability button. |
-| P1 | Rewarded-ad placeholder | `WatchAdButton` looks enabled, scales when pressed, and emits a signal, while `_on_ability_purchase_ad_pressed()` is empty. The authoritative backend requirement says the placeholder grants nothing until a separate rewarded-ad feature is approved. | Do not expose an enabled no-op. Hide it in production until approved; any developer preview must be disabled, use the shared unavailable style, and say `Coming Soon`. |
+| P1 | Rewarded-ad placeholder | At UI-003 implementation time, `WatchAdButton` looked enabled while `_on_ability_purchase_ad_pressed()` was empty. | UI-003 hid the no-op. ADS-005 subsequently replaced it with the authoritative readiness-gated flow documented in `ADS_005_REWARDED_ABILITY.md`. |
 | P1 | Back behavior | `scripts/level.gd::_input()` has no `ui_cancel` handling and returns immediately while paused. System back therefore does nothing during gameplay and overlays. Close/Continue also collapse the Leave Confirmation directly into gameplay instead of distinguishing “pop this confirmation” from “resume.” | Implement one topmost-overlay back stack: gameplay opens Pause; Pause resumes; Leave Confirmation returns to Pause; Ability Purchase restores its prior state; terminal results use their visible navigation action. |
 | P1 | Completion copy | Completion says `Next`, but `_on_completion_next_pressed()` returns to the Main Menu rather than starting the next level. | Use the minimal-risk contract: rename the action to `Continue` and preserve return-to-menu behavior. Starting another authoritative run is not part of this UI ticket. |
 | P1 | Ability-purchase copy | `GET MORE ITEMS` and `×1` read like inventory acquisition, but the implementation purchases and applies one ability immediately without adding inventory. | Rename the presentation to `USE ABILITY` and document that the purchase is one immediate use. Do not alter the transaction behavior; avoid a redundant secondary badge. |
@@ -234,7 +234,8 @@ Update `docs/SCENES.md`, `docs/SCRIPTS.md`, `docs/PROJECT_MAP.md`, and `docs/TYP
 - Gameplay color, shade, geometry, title, badge, and CTA roles.
 - Interaction/motion ownership and `ui_cancel` order.
 - Responsive variants and safe-area behavior.
-- Immediate paid-ability copy and the hidden rewarded-ad placeholder policy.
+- Immediate paid-ability copy and the then-hidden rewarded placeholder policy (superseded by
+  ADS-005's authoritative ready/loading/verifying flow).
 
 ## Follow-up Validation Fixes (2026-08-07)
 

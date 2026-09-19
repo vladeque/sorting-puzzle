@@ -335,15 +335,16 @@ reuses the exact handler its equivalent button already calls, so it can never sp
 star by itself, and a press during any overlay/result screen's in-flight transition is dropped
 rather than acted on.
 
-**Rewarded-ad placeholder policy** -- `WatchAdButton` (`scenes/ability_purchase_menu.tscn`) is never
-an enabled no-op. It is hidden entirely outside a debug build; inside one it stays visible but
-disabled with `"Coming Soon"` copy and the shared unavailable style, mirroring
-`scripts/main_menu.gd`'s existing `DEV_LEVEL_SELECT_SETTING` debug-build-gate convention.
+**Rewarded ability policy** -- `WatchAdButton` (`scenes/ability_purchase_menu.tscn`) is hidden and
+disabled until `scripts/level.gd` confirms a backend-capable, loaded offer. Hammer, Shuffle, and
+Lantern expose explicit ready/loading/verifying/`Verify Reward`/retry states; Freezer stays
+coin-only. The selection and modal are locked during verification so settlement cannot apply to a
+different ability.
 
 **Verification** -- `tests/ui/test_level_ui_consistency.gd` (run via
 `scripts/tools/run_isolated_godot_test.ps1`) covers shared gameplay resource identity, explicit
 disabled styles (no engine-default fallback), the `FOCUS_NONE`/pointing-hand-cursor sweep, the
-rewarded-ad placeholder never being an enabled no-op, Completion/Failure copy and signal routing,
+rewarded ability CTA failing closed before owner readiness, Completion/Failure copy and signal routing,
 the full `ui_cancel` chain including a dropped in-flight-transition press, safe-area layout at
 fabricated insets using post-layout rendered rectangles (including a tight viewport that must fit
 the modal's action and close controls instead of only shrinking its outer panel),

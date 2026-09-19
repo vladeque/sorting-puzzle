@@ -48,9 +48,11 @@ const IOS_INTERSTITIAL_TEST_ID := "ca-app-pub-3940256099942544/4411468910"
 
 const ANDROID_REWARDED_SETTING := "application/config/admob_android_rewarded_ad_unit_id"
 const ANDROID_REWARDED_LIFE_SETTING := "application/config/admob_android_rewarded_life_ad_unit_id"
+const ANDROID_REWARDED_ABILITY_SETTING := "application/config/admob_android_rewarded_ability_ad_unit_id"
 const ANDROID_INTERSTITIAL_SETTING := "application/config/admob_android_interstitial_ad_unit_id"
 const IOS_REWARDED_SETTING := "application/config/admob_ios_rewarded_ad_unit_id"
 const IOS_REWARDED_LIFE_SETTING := "application/config/admob_ios_rewarded_life_ad_unit_id"
+const IOS_REWARDED_ABILITY_SETTING := "application/config/admob_ios_rewarded_ability_ad_unit_id"
 const IOS_INTERSTITIAL_SETTING := "application/config/admob_ios_interstitial_ad_unit_id"
 
 var _initialized := false
@@ -367,16 +369,24 @@ func _get_ad_unit_id(format: StringName, placement: StringName = &"") -> String:
 	var setting := ""
 	if OS.get_name() == "Android":
 		if format == FORMAT_REWARDED:
-			setting = (
-				ANDROID_REWARDED_LIFE_SETTING
-				if placement == &"life"
-				else ANDROID_REWARDED_SETTING
-			)
+			match placement:
+				&"life":
+					setting = ANDROID_REWARDED_LIFE_SETTING
+				&"ability":
+					setting = ANDROID_REWARDED_ABILITY_SETTING
+				_:
+					setting = ANDROID_REWARDED_SETTING
 		else:
 			setting = ANDROID_INTERSTITIAL_SETTING
 	elif OS.get_name() == "iOS":
 		if format == FORMAT_REWARDED:
-			setting = IOS_REWARDED_LIFE_SETTING if placement == &"life" else IOS_REWARDED_SETTING
+			match placement:
+				&"life":
+					setting = IOS_REWARDED_LIFE_SETTING
+				&"ability":
+					setting = IOS_REWARDED_ABILITY_SETTING
+				_:
+					setting = IOS_REWARDED_SETTING
 		else:
 			setting = IOS_INTERSTITIAL_SETTING
 	return str(ProjectSettings.get_setting(setting, "")).strip_edges() if not setting.is_empty() else ""

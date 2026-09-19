@@ -670,6 +670,9 @@ Runtime behavior:
 - Missing lives restore at one life per real-time hour until the five-life cap is reached.
 - Ability uses are spent and saved immediately when an ability successfully applies.
 - Paid zero-use ability purchases spend configured coins immediately when the selected ability can start, without adding saved ability inventory.
+- A settled rewarded Hammer, Shuffle, or Lantern authorization applies one immediate use without
+  adding saved inventory or spending coins. Freezer is not in the backend rewarded enum and keeps
+  only the configured coin route.
 - Settings button disabled states are saved immediately when toggled and restored by the main-menu settings popup and in-level pause menu on later game starts.
 - Failed or abandoned levels do not refund ability uses.
 - Completing the current campaign level advances `current_level` by one and adds the run's earned stars to the reward chest.
