@@ -1843,6 +1843,68 @@ Depends on:
 Do not use for:
 - Puzzle rules, item movement rules, matching, abilities, or lock progression. Those stay in `scripts/level.gd`.
 
+## `scenes/collapsing_shelf_board.tscn`
+
+Board of a `gameplay_mode: "collapsing_columns"` level. `scripts/level.gd` instantiates it under
+`Shelves`, builds every shelf through its usual factory, parents each shelf to a column, and
+registers it; the board owns everything about where those shelves are and whether they are playable.
+
+Root:
+- `CollapsingShelfBoard` (`Node2D`)
+
+Script:
+- `scripts/collapsing_shelf_board.gd`
+
+Children:
+- `Window` (`Control`): `clip_contents` on, `mouse_filter` ignored. Its top edge sits exactly on the
+  top visible row's ceiling cap (`Shelf.TOP_CEILING_CAP_TOP_Y`), so shelves waiting above the window
+  are clipped while they slide in. The other three edges are pushed out by `window_outer_margin`, so
+  an item travelling between columns or gathered by the hammer is never cut off.
+
+Runtime-created nodes:
+- `ColumnXX`: `scenes/collapsing_shelf_column.tscn` instances under `Window`, one per
+  `column_layout.shelf_counts` entry, left to right.
+- `ShelfXX`: standard `scenes/shelf.tscn` instances parented under their column. There is no second
+  copy of standard shelf art for this mode.
+
+Lifecycle:
+- Built once per level attempt. Retry replaces the level scene, so the board is rebuilt from config
+  and carries no live column state between attempts.
+- The visible count is resolved once, when the level is built, and never changes during play. The
+  footprint follows that count rather than the shelves left, so the board never rescales or
+  recenters as columns shrink.
+- A collapse is one batch: every affected column commits its new order, then all of them animate in
+  parallel, and `collapse_finished` fires once after the last one settles.
+
+Do not use for:
+- Move legality, matching, abilities, the timer, or completion. Those stay in `scripts/level.gd`,
+  which asks the board which shelves are active and whether it is cleared.
+
+## `scenes/collapsing_shelf_column.tscn`
+
+One bottom-to-top pile of shelves inside a collapsing board.
+
+Root:
+- `CollapsingShelfColumn` (`Node2D`)
+
+Script:
+- `scripts/collapsing_shelf_column.gd`
+
+Runtime-created nodes:
+- `ShelfXX`: standard shelves registered bottom to top through `CollapsingShelfBoard.register_shelf()`.
+
+Behavior:
+- Places every shelf at an absolute logical row counted up from the column base, and only ever
+  animates toward those absolute rows, so repeated collapses cannot drift.
+- Renders only shelves inside the window. The window's top shelf carries the ceiling cap even when
+  more shelves wait above it.
+- A removed shelf first shrinks and fades (`destroy_duration_seconds`), then the shelves above it
+  drop (`shift_duration_seconds`). Shelves below never move. A revealed shelf fades in while it
+  drops from above the window instead of appearing in place.
+
+Do not use for:
+- Deciding which shelves are empty. The level decides that and hands them to the board.
+
 ## `scenes/ui/gameplay_modal_shell.tscn`
 
 Root:

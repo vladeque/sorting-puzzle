@@ -2586,6 +2586,89 @@ Do not use for:
 - Moving the shelves at runtime. That stays in `scripts/moving_shelf_row.gd`.
 - Shelf contents, locking, matching, or item spawning.
 
+## `scripts/collapsing_shelf_board.gd`
+
+Class:
+- `CollapsingShelfBoard`
+
+Attached to:
+- `scenes/collapsing_shelf_board.tscn` root `CollapsingShelfBoard`.
+
+Purpose:
+- Owns the columns of a `collapsing_columns` level, the clip window they draw through, the resolved
+  visible count, and the single coordinated collapse that removes emptied shelves.
+- Is the authority on shelf availability for this mode: `is_shelf_active()` is true only for a shelf
+  inside its column's window that has finished arriving, and false for every shelf while a collapse
+  runs. Hidden shelves are also invisible, but visibility is never the rule the level relies on.
+- Applies left/middle/right shelf art from the column's board position at registration, never from
+  how many shelves survive in a row.
+- Reports completion as "no shelf survives anywhere" through `is_cleared()`, which is false while a
+  collapse is still running.
+
+Visible count:
+- `configure()` takes the authored `visible_shelves_per_column`, the guaranteed minimum.
+- `resolve_visible_count(play_size, min_scale, max_scale)` returns the largest window that fits the
+  play area at the scale the authored minimum already needs, so extra rows only use spare height and
+  never shrink the board or its touch targets. The level calls it once and passes the result to
+  `set_visible_count()`, which clamps to the authored minimum, the tallest column, and
+  `MAX_VISIBLE_SHELVES_PER_COLUMN` (`8`, mirrored from `scripts/tools/validate_level_solvable.py`).
+
+Key methods:
+- `configure(column_heights, visible_count, shelf_step, cell_size, shelf_scale)`: builds the columns.
+- `get_column_parent()` / `register_shelf(column_index, authored_shelf_id, shelf)`: construction.
+- `get_layout_bounds()`: fixed footprint for responsive fitting; hidden depth never contributes.
+- `is_shelf_active()`, `get_active_shelves()`, `get_all_shelves()`, `owns_shelf()`.
+- `get_column_index()`, `get_stack_index()`, `get_authored_shelf_id()`.
+- `collapse_shelves(shelves)`: coroutine. Removes the given shelves in one batch and returns
+  `removed_ids`, `removed_count`, and `revealed` once every affected column has settled.
+- `settle_immediately()`: deterministic, animation-free completion of any running collapse.
+- `get_remaining_shelf_count()`, `get_remaining_shelf_counts()`, `is_cleared()`, `is_collapsing()`.
+
+Exports:
+- `window_outer_margin`: how far the non-top window edges sit outside the footprint.
+- `destroy_duration_seconds`, `shift_duration_seconds`: pushed to every column. Zero makes collapses
+  complete synchronously, which tests use.
+
+Signals:
+- `collapse_started`, `collapse_finished(result)`.
+
+Verification:
+- `tests/gameplay/test_collapsing_shelf_columns.gd`.
+
+Do not use for:
+- Deciding which shelves are empty, move rules, matching, or abilities. Those stay in
+  `scripts/level.gd`.
+
+## `scripts/collapsing_shelf_column.gd`
+
+Class:
+- `CollapsingShelfColumn`
+
+Attached to:
+- `scenes/collapsing_shelf_column.tscn` root `CollapsingShelfColumn`.
+
+Purpose:
+- Owns one bottom-to-top shelf order. Stack index is the logical row; the authored shelf ID travels
+  with the node as `collapsing_shelf_id` metadata and never changes.
+- Removal is logical first. `remove_shelves()` commits the new order and reports revealed shelves
+  immediately, ignoring shelves it no longer holds, so no shelf is destroyed twice and the result does
+  not depend on discovery order. `start_collapse()` then only moves visuals toward that order, so a
+  pause, backgrounding, teardown, or `settle_immediately()` can never leave a half-applied order.
+- Destroyed shelves leave the tree as the collapse finishes, not a frame later, so recursive shelf
+  discovery never finds one.
+
+Exports:
+- `destroy_duration_seconds`, `shift_duration_seconds`, `destroyed_shelf_end_scale`.
+- `COLLAPSE_TRANSITION` / `COLLAPSE_EASE`: one shared easing for every column.
+
+Signals:
+- `collapse_settled`: exactly once per collapse, including one cut short by `settle_immediately()`.
+
+Timer and pause policy:
+- A collapse is gameplay resolution, not a pause. Like match-clear animations it keeps running under
+  the pause menu, and Freezer does not stop it. Because the order is committed before any tween,
+  every interruption point leaves a consistent board.
+
 ## `scripts/moving_shelf_row.gd`
 
 Class:

@@ -10,6 +10,11 @@ const BASE_CELL_SIZE := Vector2(224, 135)
 const ORIGINAL_INTERIOR_HEIGHT := 97.0
 const INTERIOR_HEIGHT_SCALE := 1.1
 const INTERIOR_HEIGHT_EXTENSION := ORIGINAL_INTERIOR_HEIGHT * (INTERIOR_HEIGHT_SCALE - 1.0)
+## Highest point standard shelf art draws, before `SHELF_CELL_VISUAL_SCALE`: the top edge of the
+## `TopCeilingCap/BackBoard` polygons in `scenes/shelf.tscn`. The art rises above the grid cell here,
+## and `scripts/collapsing_shelf_board.gd` opens its clip window at this line so the top shelf's
+## cap is never cut off.
+const TOP_CEILING_CAP_TOP_Y := -112.7
 const SLOT_COUNT := 3
 const BACK_LAYER_PREFIX := "ShelfLayer"
 const FIRST_BACK_LAYER_INDEX := 1
