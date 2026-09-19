@@ -59,6 +59,7 @@ func _run() -> void:
 	await _verify_invalid_collapsing_configs_fail_closed()
 	await _verify_responsive_windows()
 	await _verify_classic_levels_are_unchanged()
+	await _verify_preview_scene_builds_the_fixture()
 	_finish()
 
 
@@ -835,6 +836,23 @@ func _verify_classic_levels_are_unchanged() -> void:
 	_check(bool(level.call("_is_shelf_drop_target_eligible", shelves[0])), "An emptied classic shelf stays a legal destination.")
 	_check(bool(level.get("_level_completed")), "Classic levels still complete when every item is gone.")
 	await _dispose(level)
+
+
+## The debug preview is the touch-device check for this mode, so it must build the real fixture
+## through the ordinary runtime.
+func _verify_preview_scene_builds_the_fixture() -> void:
+	var preview := (load("res://scenes/testing/collapsing_columns_preview.tscn") as PackedScene).instantiate()
+	preview.set("_sound_effects_enabled", false)
+	root.add_child(preview)
+	await process_frame
+	await process_frame
+	var board := _level_board(preview)
+	_check(String(preview.get("_level_config_error")).is_empty(), "The preview fixture passes runtime validation.")
+	_check(board != null and board.get_remaining_shelf_count() == 30, "The preview builds the 30-shelf fixture board.")
+	if board != null:
+		_check(board.get_column_count() == 3 and board.get_visible_count() >= 4, "The preview opens three columns with at least the authored window.")
+		_check(board.get_active_shelves().size() < board.get_remaining_shelf_count(), "The preview keeps shelves waiting above the window.")
+	await _dispose(preview)
 
 
 func _check(condition: bool, message: String) -> void:

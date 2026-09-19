@@ -19,6 +19,9 @@ func _ready() -> void:
 	%StickyPreviewButton.visible = _is_dev_level_select_enabled()
 	%StickyPreviewButton.pressed.connect(func() -> void:
 		get_tree().change_scene_to_file("res://scenes/testing/sticky_items_preview.tscn"))
+	%CollapsingColumnsPreviewButton.visible = _is_dev_level_select_enabled()
+	%CollapsingColumnsPreviewButton.pressed.connect(func() -> void:
+		get_tree().change_scene_to_file("res://scenes/testing/collapsing_columns_preview.tscn"))
 
 
 func _update_campaign_progress() -> void:

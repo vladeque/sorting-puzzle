@@ -2696,6 +2696,29 @@ Do not use for:
 - Deciding which shelves are empty, move rules, matching, or abilities. Those stay in
   `scripts/level.gd`.
 
+## `scripts/collapsing_columns_preview.gd`
+
+Attached to:
+- `scenes/testing/collapsing_columns_preview.tscn` root.
+
+Purpose:
+- Extends `scripts/level.gd` only to load `configs/test_levels/collapsing_columns_preview.json`,
+  title the HUD `COLUMNS PREVIEW`, and route retry back into the preview and Leave to
+  `scenes/main_menu_testing.tscn`. Gameplay is the unmodified level runtime.
+
+## Collapsing-columns capture setups
+
+- `scripts/tools/captures/collapsing_columns_initial_setup.gd`: the fixture as first opened, with
+  the window each resolution resolves for itself.
+- `scripts/tools/captures/collapsing_columns_progress_setup.gd`: the fixture after twelve moves of
+  its recorded solution, with the authored four-shelf window.
+- `scripts/tools/captures/collapsing_columns_motion_setup.gd`: a collapse frozen part-way through
+  its drop with `Tween.custom_step()`; `SORTING_PUZZLE_CAPTURE_COLLAPSE_PROGRESS` picks the point.
+- `scripts/tools/captures/collapsing_columns_capture_support.gd`: shared build, settle, and replay
+  steps, and `SOLUTION_PREFIX`, the fixture's recorded solution moves. The setups rebuild the board
+  on every resize, because the level resolves its window only when a board is built, and park
+  themselves on the scene so `capture_scene.gd` cannot free them before the resizes happen.
+
 ## `scripts/collapsing_column_rules.gd`
 
 Class:

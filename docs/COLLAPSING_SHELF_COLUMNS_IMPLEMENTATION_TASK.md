@@ -1,7 +1,10 @@
 # Collapsing Shelf Columns Implementation Task
 
-Status: Confirmed implementation task. The product decision gate below was answered on
-2026-09-18 and the recorded answers are the contract this implementation follows.
+Status: Historical implementation task. The client mechanic, tools, and debug preview were
+implemented on 2026-09-19; see [COLLAPSING_SHELF_COLUMNS.md](COLLAPSING_SHELF_COLUMNS.md) for current
+behavior, verification, and the work still outstanding (campaign slot, touch-device testing, backend
+publication). The product decision gate below was answered on 2026-09-18, and those answers are the
+contract the implementation follows.
 
 Date: 2026-09-18.
 

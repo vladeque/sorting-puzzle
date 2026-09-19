@@ -21,6 +21,8 @@ Gameplay feature plans:
 
 - [`Sticky items — rules, generation, runtime, and release plan`](STICKY_ITEMS_PLAN.md)
 - [`Collapsing shelf columns — configuration, runtime, solver, and release task`](COLLAPSING_SHELF_COLUMNS_IMPLEMENTATION_TASK.md)
+  — client implemented 2026-09-19; current behavior in [`COLLAPSING_SHELF_COLUMNS.md`](COLLAPSING_SHELF_COLUMNS.md).
+  Open: first campaign slot, touch-device testing, and backend publication.
 
 ## Shared definition of done
 

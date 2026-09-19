@@ -452,6 +452,10 @@ Runtime behavior:
 - The level completes after the last shelf has been destroyed and its collapse has settled.
 - No remaining-shelf count is shown.
 
+Development fixture: `configs/test_levels/collapsing_columns_preview.json` is three columns of ten
+shelves with an authored window of four, proven solvable in 50 moves, and is played by
+`scenes/testing/collapsing_columns_preview.tscn`. See [COLLAPSING_SHELF_COLUMNS.md](COLLAPSING_SHELF_COLUMNS.md).
+
 Generation:
 
 ```powershell

@@ -1880,6 +1880,19 @@ Do not use for:
 - Move legality, matching, abilities, the timer, or completion. Those stay in `scripts/level.gd`,
   which asks the board which shelves are active and whether it is cleared.
 
+## `scenes/testing/collapsing_columns_preview.tscn`
+
+Debug-build preview of the collapsing-columns mode, opened from `scenes/main_menu_testing.tscn`
+(**Collapsing columns preview**, shown only where developer level select is enabled).
+
+Root:
+- `CollapsingColumnsPreview`, an instance of `level.tscn` with `scripts/collapsing_columns_preview.gd`.
+
+Behavior:
+- Plays `configs/test_levels/collapsing_columns_preview.json` through the ordinary level runtime,
+  in dev mode, titled `COLUMNS PREVIEW`. Retry reloads the preview; leaving returns to the testing
+  menu. The window resolves from the device, so the preview doubles as the touch-device check.
+
 ## `scenes/collapsing_shelf_column.tscn`
 
 One bottom-to-top pile of shelves inside a collapsing board.
