@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from sticky_items import validate_sticky_items
+from validate_level_solvable import validate_gameplay_mode_shape
 
 import argparse
 import copy
@@ -396,6 +397,19 @@ def build_item_mapping(
     return dict(zip(logical_ids, selected_items, strict=True))
 
 
+## Materialization is the publication path, so a malformed board contract has to stop here rather
+## than reach `configs/levels/`. Item identities are resolved purely from the flat shelves array; no
+## logical item metadata is ever inferred from a shelf's column or stack position.
+def validate_board_contract(abstract_level: dict[str, Any]) -> None:
+    shelves = abstract_level.get("shelves")
+    if not isinstance(shelves, list):
+        raise ValueError("level must contain a non-empty shelves array")
+
+    errors = validate_gameplay_mode_shape(abstract_level, shelves)
+    if errors:
+        raise ValueError("; ".join(errors))
+
+
 def materialize_level(
     abstract_level: dict[str, Any],
     progression: ItemProgression,
@@ -404,6 +418,7 @@ def materialize_level(
     if type(level_number) is not int or level_number < 1:
         raise ValueError("level.level must be a positive integer")
 
+    validate_board_contract(abstract_level)
     logical_ids = collect_logical_item_ids(abstract_level)
     mapping = build_item_mapping(logical_ids, level_number, progression)
     materialized = copy.deepcopy(abstract_level)

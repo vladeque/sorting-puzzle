@@ -14,11 +14,26 @@ from pathlib import Path
 from typing import Any
 
 from level_item_progression import logical_item_ids
-from validate_level_solvable import solve_level, shelves_to_state, validate_shelves_shape
+from validate_level_solvable import (
+    CLASSIC_RULES,
+    COLUMN_SHELF_COUNTS_KEY,
+    COLUMN_VISIBLE_SHELVES_KEY,
+    GAMEPLAY_MODE_CLASSIC,
+    GAMEPLAY_MODE_COLLAPSING_COLUMNS,
+    MAX_VISIBLE_SHELVES_PER_COLUMN,
+    CollapsingColumnsRules,
+    collapsing_shelves_to_state,
+    solve_level,
+    shelves_to_state,
+    validate_collapsing_shelf_contract,
+    validate_shelves_shape,
+)
 
 
 SLOTS_PER_SHELF = 3
 SHELF_KIND_DISPENSER = "dispenser"
+COLLAPSING_LAYER_COUNT = 1
+DEFAULT_LAYOUT_PRESET = "grid_3x3"
 DISPENSER_MIN_LAYERS = 2
 DISPENSER_MAX_LAYERS = 4
 DEFAULT_PREFERRED_COPIES_PER_TYPE = 3.0
@@ -315,6 +330,96 @@ def count_front_layer_matches(shelves: list[dict[str, list[list[str | None]]]]) 
     return match_count
 
 
+def parse_column_heights(raw_column_heights: str | None) -> list[int]:
+    if not raw_column_heights:
+        return []
+
+    column_heights = []
+    for raw_entry in raw_column_heights.split(","):
+        entry = raw_entry.strip()
+        if not entry:
+            continue
+
+        try:
+            column_height = int(entry)
+        except ValueError as error:
+            raise ValueError(
+                f"--column-heights entries must be integers, found '{entry}'"
+            ) from error
+
+        if column_height <= 0:
+            raise ValueError("--column-heights entries must be greater than 0")
+
+        column_heights.append(column_height)
+
+    if not column_heights:
+        raise ValueError("--column-heights must list at least one column")
+
+    return column_heights
+
+
+def split_shelves_into_columns(
+    shelves: list[dict[str, Any]],
+    column_heights: list[int],
+) -> list[list[dict[str, Any]]]:
+    """The flat shelves array is consumed column by column, bottom to top inside each column."""
+    columns = []
+    cursor = 0
+    for column_height in column_heights:
+        columns.append(shelves[cursor : cursor + column_height])
+        cursor += column_height
+
+    return columns
+
+
+def active_collapsing_shelves(
+    shelves: list[dict[str, Any]],
+    column_heights: list[int],
+    visible_shelves_per_column: int,
+) -> list[dict[str, Any]]:
+    """The shelves a collapsing board opens with, which is all the player can act on at first."""
+    active = []
+    for column in split_shelves_into_columns(shelves, column_heights):
+        active.extend(column[:visible_shelves_per_column])
+
+    return active
+
+
+## An authored collapsing shelf with no items would be destroyed before the player could touch it, so
+## the distribution engine's empty slots are redistributed rather than rejected. Items only move
+## between shelves, so every item's copy count -- and its divisibility by three -- is preserved.
+def fill_empty_collapsing_shelves(shelves: list[dict[str, Any]], rng: random.Random) -> int:
+    def occupied_count(shelf: dict[str, Any]) -> int:
+        return sum(1 for item_id in shelf["layers"][0] if item_id is not None)
+
+    rescued_count = 0
+    for shelf in shelves:
+        layer = shelf["layers"][0]
+        if any(item_id is not None for item_id in layer):
+            continue
+
+        donor = max(
+            (candidate for candidate in shelves if candidate is not shelf),
+            key=lambda candidate: occupied_count(candidate),
+            default=None,
+        )
+        if donor is None or occupied_count(donor) < 2:
+            raise ValueError(
+                "Could not give every collapsing shelf an item; use fewer shelves, a denser "
+                "difficulty, or more item copies"
+            )
+
+        donor_layer = donor["layers"][0]
+        donor_slot = next(
+            slot for slot, item_id in enumerate(donor_layer) if item_id is not None
+        )
+        layer[rng.randrange(SLOTS_PER_SHELF)] = donor_layer[donor_slot]
+        donor_layer[donor_slot] = None
+        rescued_count += 1
+
+    return rescued_count
+
+
 def distribute_slots(slot_values: list[str | None], shelf_count: int, layer_count: int) -> list[dict[str, Any]]:
     shelves = []
     value_index = 0
@@ -474,15 +579,23 @@ def validate_generated_shelves(
     shelves: list[dict[str, Any]],
     max_states: int,
     max_depth: int,
+    column_heights: list[int] | None = None,
+    visible_shelves_per_column: int | None = None,
 ) -> dict[str, Any]:
     errors, item_counts = validate_shelves_shape(
         shelves=shelves,
         known_item_ids=set(),
         skip_known_items=True,
     )
+    rules = CLASSIC_RULES
+    if column_heights:
+        errors.extend(validate_collapsing_shelf_contract(shelves))
+        rules = CollapsingColumnsRules(int(visible_shelves_per_column or 1))
+
     if errors:
         return {
             "valid": False,
+            "gameplay_mode": rules.mode,
             "errors": errors,
             "item_counts": dict(sorted(item_counts.items())),
             "solvable": None,
@@ -492,14 +605,21 @@ def validate_generated_shelves(
             "max_queue_size": 0,
         }
 
+    initial_state = (
+        collapsing_shelves_to_state(shelves, column_heights)
+        if column_heights
+        else shelves_to_state(shelves)
+    )
     search_result = solve_level(
-        initial_state=shelves_to_state(shelves),
+        initial_state=initial_state,
         max_states=max_states,
         max_depth=max_depth,
         keep_solution=False,
+        rules=rules,
     )
     return {
         "valid": True,
+        "gameplay_mode": rules.mode,
         "errors": [],
         "item_counts": dict(sorted(item_counts.items())),
         "solvable": search_result.solvable,
@@ -619,6 +739,8 @@ def generate_with_optional_validation(
     locked_shelves: dict[int, int] | None = None,
     dispenser_shelves: dict[int, int] | None = None,
     sticky_items_percent: float = 0.0,
+    column_heights: list[int] | None = None,
+    visible_shelves_per_column: int | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any], dict[str, Any] | None, int | None]:
     if not math.isfinite(sticky_items_percent) or not 0 <= sticky_items_percent <= 100:
         raise ValueError("--sticky-items-percent must be finite and between 0 and 100")
@@ -650,6 +772,24 @@ def generate_with_optional_validation(
         )
         apply_dispenser_shelves(shelves, dispenser_shelves, random.Random(attempt_seed))
         apply_locked_shelves(shelves, locked_shelves)
+        if column_heights:
+            visible_count = int(visible_shelves_per_column or 1)
+            stats["rescued_empty_shelves"] = fill_empty_collapsing_shelves(
+                shelves, random.Random(attempt_seed)
+            )
+            active_shelves = active_collapsing_shelves(shelves, column_heights, visible_count)
+            # Opening progress is judged on the window the player actually opens with. A triple
+            # waiting behind a hidden shelf is not a start the player can act on.
+            active_ready = count_collectible_front_types(active_shelves)
+            stats["active_collectible_front_types"] = active_ready
+            if active_ready < min_front_visible_triples:
+                last_placement_error = ValueError(
+                    "Generated columns do not open with the requested collectible front triples; "
+                    "try another seed, more attempts, or a larger visible window."
+                )
+                if require_solvable:
+                    continue
+                raise last_placement_error
         if sticky_items_percent > 0:
             try:
                 stats["sticky_items"] = apply_sticky_items(shelves, sticky_items_percent, attempt_seed)
@@ -697,6 +837,9 @@ def generate_with_optional_validation(
             str(shelf_number): unlock_after_triples
             for shelf_number, unlock_after_triples in sorted(locked_shelves.items())
         }
+        stats.update(
+            build_collapsing_stats(shelves, column_heights, visible_shelves_per_column)
+        )
 
         validation = None
         if should_validate or require_solvable:
@@ -704,6 +847,8 @@ def generate_with_optional_validation(
                 shelves=shelves,
                 max_states=max_states,
                 max_depth=max_depth,
+                column_heights=column_heights,
+                visible_shelves_per_column=visible_shelves_per_column,
             )
             stats["validation"] = validation
 
@@ -1732,6 +1877,33 @@ def build_stats(
     }
 
 
+def build_collapsing_stats(
+    shelves: list[dict[str, Any]],
+    column_heights: list[int] | None,
+    visible_shelves_per_column: int | None,
+) -> dict[str, Any]:
+    if not column_heights:
+        return {"gameplay_mode": GAMEPLAY_MODE_CLASSIC}
+
+    visible_count = int(visible_shelves_per_column or 1)
+    active_shelf_count = sum(min(visible_count, height) for height in column_heights)
+    total_shelf_count = sum(column_heights)
+    return {
+        "gameplay_mode": GAMEPLAY_MODE_COLLAPSING_COLUMNS,
+        "column_heights": list(column_heights),
+        "visible_shelves_per_column": visible_count,
+        "total_shelf_count": total_shelf_count,
+        "active_shelf_count": active_shelf_count,
+        "hidden_shelf_count": total_shelf_count - active_shelf_count,
+        "active_occupied_slots": sum(
+            1
+            for shelf in active_collapsing_shelves(shelves, column_heights, visible_count)
+            for item_id in shelf["layers"][0]
+            if item_id is not None
+        ),
+    }
+
+
 def wrap_level(
     shelves: list[dict[str, Any]],
     level_number: int,
@@ -1739,7 +1911,25 @@ def wrap_level(
     layout_preset: str,
     seed: int | None,
     difficulty: str,
+    column_heights: list[int] | None = None,
+    visible_shelves_per_column: int | None = None,
 ) -> dict[str, Any]:
+    # `layout_preset` and the column contract are mutually exclusive, so a collapsing level must not
+    # carry a preset it would be rejected for.
+    if column_heights:
+        return {
+            "level": level_number,
+            "time_seconds": time_seconds,
+            "gameplay_mode": GAMEPLAY_MODE_COLLAPSING_COLUMNS,
+            "column_layout": {
+                COLUMN_SHELF_COUNTS_KEY: list(column_heights),
+                COLUMN_VISIBLE_SHELVES_KEY: int(visible_shelves_per_column or 1),
+            },
+            "seed": seed,
+            "difficulty": difficulty,
+            "shelves": shelves,
+        }
+
     return {
         "level": level_number,
         "time_seconds": time_seconds,
@@ -1754,8 +1944,28 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Generate the shelves array for a Sorting Puzzle level JSON file."
     )
-    parser.add_argument("--shelf-count", type=int, required=True)
-    parser.add_argument("--layer-count", type=int, required=True)
+    parser.add_argument(
+        "--gameplay-mode",
+        choices=sorted((GAMEPLAY_MODE_CLASSIC, GAMEPLAY_MODE_COLLAPSING_COLUMNS)),
+        default=GAMEPLAY_MODE_CLASSIC,
+    )
+    parser.add_argument(
+        "--column-heights",
+        help=(
+            "Comma-separated shelf count per collapsing column, left to right, such as 8,8,8. "
+            "Determines --shelf-count, which must not also be given."
+        ),
+    )
+    parser.add_argument(
+        "--visible-shelves-per-column",
+        type=int,
+        help=(
+            "Guaranteed minimum shelves revealed per collapsing column on every viewport. "
+            "This is the window the solvability proof is made against."
+        ),
+    )
+    parser.add_argument("--shelf-count", type=int)
+    parser.add_argument("--layer-count", type=int)
     parser.add_argument(
         "--filled-layer-count",
         type=int,
@@ -1792,7 +2002,9 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--level-number", type=int, default=1)
     parser.add_argument("--time-seconds", type=int, default=300)
-    parser.add_argument("--layout-preset", choices=LAYOUT_PRESETS, default="grid_3x3")
+    # No argparse default: `collapsing_columns` must be able to tell an omitted preset from an
+    # explicitly requested one, because a preset and the column contract are mutually exclusive.
+    parser.add_argument("--layout-preset", choices=LAYOUT_PRESETS)
     parser.add_argument("--stats", action="store_true", help="Print generation stats to stderr.")
     parser.add_argument("--sticky-items-percent", type=float, default=0.0,
                         help="Percent of occupied items made sticky (0-100, default 0); at most one per standard shelf layer.")
@@ -1836,24 +2048,96 @@ def parse_args() -> argparse.Namespace:
             "Each shelf unlocks after that many cleared triples."
         ),
     )
-    return parser.parse_args()
+    args = parser.parse_args()
+    validate_mode_arguments(parser, args)
+    return args
+
+
+## Mode conflicts are rejected here rather than being quietly reconciled. Silently accepting, say, a
+## dispenser request under collapsing columns would produce content the solver cannot prove.
+def validate_mode_arguments(parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
+    if args.gameplay_mode != GAMEPLAY_MODE_COLLAPSING_COLUMNS:
+        if args.column_heights is not None:
+            parser.error(
+                f"--column-heights requires --gameplay-mode {GAMEPLAY_MODE_COLLAPSING_COLUMNS}"
+            )
+        if args.visible_shelves_per_column is not None:
+            parser.error(
+                "--visible-shelves-per-column requires --gameplay-mode "
+                f"{GAMEPLAY_MODE_COLLAPSING_COLUMNS}"
+            )
+        if args.shelf_count is None:
+            parser.error("--shelf-count is required")
+        if args.layer_count is None:
+            parser.error("--layer-count is required")
+        return
+
+    if args.column_heights is None:
+        parser.error(
+            f"--gameplay-mode {GAMEPLAY_MODE_COLLAPSING_COLUMNS} requires --column-heights"
+        )
+    if args.shelf_count is not None:
+        parser.error("--column-heights determines the shelf count; do not also pass --shelf-count")
+    if args.visible_shelves_per_column is None:
+        parser.error(
+            f"--gameplay-mode {GAMEPLAY_MODE_COLLAPSING_COLUMNS} requires "
+            "--visible-shelves-per-column"
+        )
+    if not 1 <= args.visible_shelves_per_column <= MAX_VISIBLE_SHELVES_PER_COLUMN:
+        parser.error(
+            "--visible-shelves-per-column must be between 1 and "
+            f"{MAX_VISIBLE_SHELVES_PER_COLUMN}"
+        )
+    for layer_argument, value in (
+        ("--layer-count", args.layer_count),
+        ("--filled-layer-count", args.filled_layer_count),
+    ):
+        if value is not None and value != COLLAPSING_LAYER_COUNT:
+            parser.error(
+                f"{layer_argument} must be {COLLAPSING_LAYER_COUNT} for "
+                f"--gameplay-mode {GAMEPLAY_MODE_COLLAPSING_COLUMNS}"
+            )
+    if args.dispenser_shelves:
+        parser.error(
+            f"--dispenser-shelves is not supported by --gameplay-mode "
+            f"{GAMEPLAY_MODE_COLLAPSING_COLUMNS}"
+        )
+    if args.locked_shelves:
+        parser.error(
+            f"--locked-shelves is not supported by --gameplay-mode "
+            f"{GAMEPLAY_MODE_COLLAPSING_COLUMNS}"
+        )
+    if args.sticky_items_percent:
+        parser.error(
+            f"--sticky-items-percent is not supported by --gameplay-mode "
+            f"{GAMEPLAY_MODE_COLLAPSING_COLUMNS}"
+        )
+    if args.layout_preset is not None:
+        parser.error(
+            f"--layout-preset cannot be combined with --gameplay-mode "
+            f"{GAMEPLAY_MODE_COLLAPSING_COLUMNS}"
+        )
 
 
 def main() -> int:
     args = parse_args()
+    is_collapsing = args.gameplay_mode == GAMEPLAY_MODE_COLLAPSING_COLUMNS
+    layer_count = COLLAPSING_LAYER_COUNT if is_collapsing else args.layer_count
     filled_layer_count = args.filled_layer_count
     if filled_layer_count is None:
-        filled_layer_count = args.layer_count
+        filled_layer_count = layer_count
 
     try:
+        column_heights = parse_column_heights(args.column_heights) if is_collapsing else None
+        shelf_count = sum(column_heights) if column_heights else args.shelf_count
         item_types = None
         if args.item_type_count is not None:
             item_types = logical_item_ids(args.item_type_count)
         locked_shelves = parse_locked_shelves(args.locked_shelves)
         dispenser_shelves = parse_dispenser_shelves(args.dispenser_shelves)
         shelves, stats, validation, used_seed = generate_with_optional_validation(
-            shelf_count=args.shelf_count,
-            layer_count=args.layer_count,
+            shelf_count=shelf_count,
+            layer_count=layer_count,
             filled_layer_count=filled_layer_count,
             item_types=item_types,
             difficulty=args.difficulty,
@@ -1869,6 +2153,8 @@ def main() -> int:
             locked_shelves=locked_shelves,
             dispenser_shelves=dispenser_shelves,
             sticky_items_percent=args.sticky_items_percent,
+            column_heights=column_heights,
+            visible_shelves_per_column=args.visible_shelves_per_column,
         )
     except (OSError, ValueError, KeyError) as error:
         print(f"error: {error}", file=sys.stderr)
@@ -1894,9 +2180,11 @@ def main() -> int:
             shelves=shelves,
             level_number=args.level_number,
             time_seconds=args.time_seconds,
-            layout_preset=args.layout_preset,
+            layout_preset=args.layout_preset or DEFAULT_LAYOUT_PRESET,
             seed=used_seed,
             difficulty=args.difficulty,
+            column_heights=column_heights,
+            visible_shelves_per_column=args.visible_shelves_per_column,
         )
         if args.sticky_items_percent > 0:
             output_data["sticky_items_percent"] = args.sticky_items_percent

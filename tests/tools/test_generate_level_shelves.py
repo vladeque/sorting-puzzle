@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+import contextlib
 import copy
+import io
+import json
 import random
 import sys
+import tempfile
 import unittest
 from collections import Counter
 from pathlib import Path
@@ -14,11 +18,18 @@ sys.path.insert(0, str(TOOLS_PATH))
 
 from generate_level_shelves import (  # noqa: E402
     LAYOUT_PRESETS,
+    active_collapsing_shelves,
     apply_dispenser_shelves,
+    fill_empty_collapsing_shelves,
     generate_shelves,
+    generate_with_optional_validation,
     infer_item_type_count,
+    parse_column_heights,
     parse_dispenser_shelves,
+    split_shelves_into_columns,
+    wrap_level,
 )
+from generate_level_shelves import main as generate_main  # noqa: E402
 from level_item_progression import logical_item_ids  # noqa: E402
 
 
@@ -266,6 +277,266 @@ class DispenserShelfGenerationTests(unittest.TestCase):
         expected = copy.deepcopy(shelves)
         apply_dispenser_shelves(shelves, {}, random.Random(1))
         self.assertEqual(shelves, expected)
+
+
+COLLAPSING_ARGUMENTS = [
+    "--gameplay-mode", "collapsing_columns",
+    "--column-heights", "5,5,5",
+    "--visible-shelves-per-column", "4",
+    "--item-type-count", "10",
+    "--difficulty", "medium",
+    "--seed", "24601",
+    "--require-solvable",
+]
+
+
+def run_generator(arguments: list[str]) -> tuple[int, str, str]:
+    stdout, stderr = io.StringIO(), io.StringIO()
+    argv = sys.argv
+    sys.argv = ["generate_level_shelves.py", *arguments]
+    try:
+        with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            exit_code = generate_main()
+    except SystemExit as error:
+        exit_code = int(error.code or 0)
+    finally:
+        sys.argv = argv
+
+    return exit_code, stdout.getvalue(), stderr.getvalue()
+
+
+class CollapsingColumnArgumentTests(unittest.TestCase):
+    def test_parses_column_heights(self) -> None:
+        self.assertEqual(parse_column_heights("8, 8,8"), [8, 8, 8])
+
+    def test_rejects_malformed_column_heights(self) -> None:
+        for raw in ["8,x,8", "8,0,8", "8,-1", ","]:
+            with self.subTest(raw=raw):
+                with self.assertRaises(ValueError):
+                    parse_column_heights(raw)
+
+    ## argparse exits 2 on a conflicting request rather than quietly reconciling it: a silently
+    ## accepted conflict would produce content the mode's solver was never asked to prove.
+    def test_rejects_conflicting_arguments(self) -> None:
+        conflicts = [
+            (["--gameplay-mode", "collapsing_columns", "--visible-shelves-per-column", "4"],
+             "requires --column-heights"),
+            (["--gameplay-mode", "collapsing_columns", "--column-heights", "4,4"],
+             "requires --visible-shelves-per-column"),
+            ([*COLLAPSING_ARGUMENTS, "--shelf-count", "15"], "do not also pass --shelf-count"),
+            ([*COLLAPSING_ARGUMENTS, "--layer-count", "2"], "--layer-count must be 1"),
+            ([*COLLAPSING_ARGUMENTS, "--filled-layer-count", "2"], "--filled-layer-count must be 1"),
+            ([*COLLAPSING_ARGUMENTS, "--dispenser-shelves", "3:2"], "--dispenser-shelves is not supported"),
+            ([*COLLAPSING_ARGUMENTS, "--locked-shelves", "3:2"], "--locked-shelves is not supported"),
+            ([*COLLAPSING_ARGUMENTS, "--sticky-items-percent", "10"], "--sticky-items-percent is not supported"),
+            ([*COLLAPSING_ARGUMENTS, "--layout-preset", "grid_3x3"], "--layout-preset cannot be combined"),
+            (["--gameplay-mode", "collapsing_columns", "--column-heights", "4,4",
+              "--visible-shelves-per-column", "99"], "must be between 1 and"),
+            (["--column-heights", "4,4", "--shelf-count", "8", "--layer-count", "1"],
+             "--column-heights requires --gameplay-mode"),
+            (["--layer-count", "1"], "--shelf-count is required"),
+            (["--shelf-count", "9"], "--layer-count is required"),
+        ]
+        for arguments, expected in conflicts:
+            with self.subTest(expected=expected):
+                exit_code, _stdout, stderr = run_generator(arguments)
+                self.assertEqual(exit_code, 2)
+                self.assertIn(expected, stderr)
+
+
+class CollapsingColumnShelfRepairTests(unittest.TestCase):
+    def test_splits_the_flat_array_column_by_column_bottom_to_top(self) -> None:
+        shelves = [{"layers": [[f"item_{index:02d}", None, None]]} for index in range(1, 7)]
+        columns = split_shelves_into_columns(shelves, [2, 3, 1])
+        self.assertEqual([len(column) for column in columns], [2, 3, 1])
+        self.assertIs(columns[0][0], shelves[0])
+        self.assertIs(columns[1][0], shelves[2])
+        self.assertIs(columns[2][0], shelves[5])
+
+    def test_active_shelves_are_the_bottom_of_each_column(self) -> None:
+        shelves = [{"layers": [[f"item_{index:02d}", None, None]]} for index in range(1, 7)]
+        active = active_collapsing_shelves(shelves, [3, 3], 2)
+        self.assertEqual(
+            [shelf["layers"][0][0] for shelf in active],
+            ["item_01", "item_02", "item_04", "item_05"],
+        )
+
+    def test_rescues_an_empty_shelf_without_changing_any_item_count(self) -> None:
+        shelves = [
+            {"layers": [["item_01", "item_01", "item_01"]]},
+            {"layers": [[None, None, None]]},
+        ]
+        before = Counter(
+            item for shelf in shelves for item in shelf["layers"][0] if item is not None
+        )
+        rescued = fill_empty_collapsing_shelves(shelves, random.Random(7))
+        after = Counter(
+            item for shelf in shelves for item in shelf["layers"][0] if item is not None
+        )
+        self.assertEqual(rescued, 1)
+        self.assertEqual(before, after)
+        self.assertTrue(all(any(item is not None for item in shelf["layers"][0]) for shelf in shelves))
+
+    def test_refuses_to_rescue_a_board_with_too_few_items(self) -> None:
+        shelves = [
+            {"layers": [["item_01", None, None]]},
+            {"layers": [[None, None, None]]},
+        ]
+        with self.assertRaises(ValueError):
+            fill_empty_collapsing_shelves(shelves, random.Random(7))
+
+
+class CollapsingColumnGenerationTests(unittest.TestCase):
+    def generate(self, **overrides):
+        arguments = {
+            "shelf_count": 15,
+            "layer_count": 1,
+            "filled_layer_count": 1,
+            "item_types": logical_item_ids(10),
+            "difficulty": "medium",
+            "seed": 24601,
+            "should_validate": True,
+            "require_solvable": True,
+            "max_attempts": 25,
+            "max_items_per_type_override": None,
+            "min_front_visible_triples": 1,
+            "max_states": 20000,
+            "max_depth": 200,
+            "column_heights": [5, 5, 5],
+            "visible_shelves_per_column": 4,
+        }
+        arguments.update(overrides)
+        return generate_with_optional_validation(**arguments)
+
+    def test_generates_a_proven_solvable_board_with_the_requested_columns(self) -> None:
+        shelves, stats, validation, _seed = self.generate()
+        self.assertEqual(len(shelves), 15)
+        self.assertEqual(stats["gameplay_mode"], "collapsing_columns")
+        self.assertEqual(stats["column_heights"], [5, 5, 5])
+        self.assertEqual(stats["visible_shelves_per_column"], 4)
+        self.assertEqual(stats["total_shelf_count"], 15)
+        self.assertEqual(stats["active_shelf_count"], 12)
+        self.assertEqual(stats["hidden_shelf_count"], 3)
+        self.assertIn("active_occupied_slots", stats)
+        self.assertIn("rescued_empty_shelves", stats)
+        self.assertIn("attempt", stats)
+        self.assertTrue(validation["solvable"], validation["reason"])
+        self.assertEqual(validation["gameplay_mode"], "collapsing_columns")
+
+    def test_every_shelf_has_one_layer_and_at_least_one_item(self) -> None:
+        shelves, _stats, _validation, _seed = self.generate()
+        for shelf_index, shelf in enumerate(shelves):
+            with self.subTest(shelf=shelf_index + 1):
+                self.assertEqual(len(shelf["layers"]), 1)
+                self.assertEqual(len(shelf["layers"][0]), 3)
+                self.assertTrue(any(item is not None for item in shelf["layers"][0]))
+
+    def test_every_item_copy_count_stays_divisible_by_three(self) -> None:
+        shelves, _stats, _validation, _seed = self.generate()
+        counts = Counter(
+            item for shelf in shelves for item in shelf["layers"][0] if item is not None
+        )
+        self.assertTrue(counts)
+        for item_id, count in counts.items():
+            with self.subTest(item=item_id):
+                self.assertEqual(count % 3, 0)
+
+    def test_output_is_deterministic_for_a_fixed_seed(self) -> None:
+        first, first_stats, _validation, first_seed = self.generate()
+        second, second_stats, _second_validation, second_seed = self.generate()
+        self.assertEqual(first, second)
+        self.assertEqual(first_seed, second_seed)
+        self.assertEqual(first_stats["item_counts"], second_stats["item_counts"])
+
+    ## The opening-progress guarantee has to be judged on the window the player actually opens with;
+    ## a triple whose copies sit behind a hidden shelf is not progress they can make.
+    def test_opening_progress_is_measured_on_active_shelves_only(self) -> None:
+        _shelves, stats, _validation, _seed = self.generate()
+        self.assertGreaterEqual(stats["active_collectible_front_types"], 1)
+
+    def test_wrap_level_emits_the_column_contract_and_no_layout_preset(self) -> None:
+        level = wrap_level(
+            shelves=[{"layers": [["item_01", "item_01", "item_01"]]}],
+            level_number=11,
+            time_seconds=300,
+            layout_preset="grid_3x3",
+            seed=1,
+            difficulty="medium",
+            column_heights=[1],
+            visible_shelves_per_column=1,
+        )
+        self.assertNotIn("layout_preset", level)
+        self.assertEqual(level["gameplay_mode"], "collapsing_columns")
+        self.assertEqual(
+            level["column_layout"],
+            {"shelf_counts": [1], "visible_shelves_per_column": 1},
+        )
+
+
+class CollapsingColumnCommandLineTests(unittest.TestCase):
+    def test_writes_a_valid_solvable_full_level(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            output_path = Path(directory) / "level_011.json"
+            exit_code, _stdout, _stderr = run_generator(
+                [*COLLAPSING_ARGUMENTS, "--full-level", "--level-number", "11",
+                 "--output", str(output_path)]
+            )
+            self.assertEqual(exit_code, 0)
+            level = json.loads(output_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(level["gameplay_mode"], "collapsing_columns")
+        self.assertEqual(level["column_layout"]["shelf_counts"], [5, 5, 5])
+        self.assertEqual(len(level["shelves"]), 15)
+
+    ## `--require-solvable` must never leave an unproven board behind for someone to publish.
+    def test_writes_no_output_when_no_solvable_board_is_found(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            output_path = Path(directory) / "level_011.json"
+            exit_code, _stdout, stderr = run_generator(
+                ["--gameplay-mode", "collapsing_columns",
+                 "--column-heights", "6,6,6",
+                 "--visible-shelves-per-column", "1",
+                 "--item-type-count", "6",
+                 "--difficulty", "expert",
+                 "--seed", "99",
+                 "--require-solvable",
+                 "--max-generation-attempts", "2",
+                 "--validator-max-states", "2000",
+                 "--full-level", "--output", str(output_path)]
+            )
+            self.assertNotEqual(exit_code, 0)
+            self.assertFalse(output_path.exists(), stderr)
+
+
+class ClassicGenerationRegressionTests(unittest.TestCase):
+    ## Omitting the new mode must leave the classic generator byte-for-byte where it was.
+    def test_classic_output_is_unchanged_when_the_new_mode_is_omitted(self) -> None:
+        shelves, stats = generate_shelves(
+            shelf_count=9,
+            layer_count=2,
+            filled_layer_count=2,
+            item_types=logical_item_ids(7),
+            difficulty="medium",
+            seed=123,
+            max_items_per_type_override=None,
+            min_front_visible_triples=1,
+        )
+        self.assertEqual(len(shelves), 9)
+        self.assertTrue(all(len(shelf["layers"]) == 2 for shelf in shelves))
+        self.assertNotIn("gameplay_mode", stats)
+        self.assertNotIn("column_heights", stats)
+
+        level = wrap_level(
+            shelves=shelves,
+            level_number=2,
+            time_seconds=300,
+            layout_preset="grid_3x3",
+            seed=123,
+            difficulty="medium",
+        )
+        self.assertEqual(level["layout_preset"], "grid_3x3")
+        self.assertNotIn("gameplay_mode", level)
+        self.assertNotIn("column_layout", level)
 
 
 if __name__ == "__main__":

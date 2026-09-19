@@ -19,6 +19,7 @@ from level_item_progression import (  # noqa: E402
     load_item_progression,
     logical_item_ids,
     materialize_level,
+    validate_board_contract,
 )
 from generate_level_shelves import generate_shelves  # noqa: E402
 
@@ -304,6 +305,91 @@ class LevelItemProgressionTests(unittest.TestCase):
             self.assertEqual(runtime["level"], expected_level, runtime_path.name)
             available = set(self.progression.available_items(expected_level))
             self.assertLessEqual(set(_item_counts(runtime)), available, runtime_path.name)
+
+
+def _collapsing_template(**overrides) -> dict:
+    """Three columns of two shelves; the top shelf of each column starts hidden.
+
+    Uses a level number that belongs to a chapter, because materialization resolves the item pool
+    through the campaign chapter the level is assigned to.
+    """
+    level = {
+        "level": 3,
+        "time_seconds": 300,
+        "gameplay_mode": "collapsing_columns",
+        "column_layout": {"shelf_counts": [2, 2, 2], "visible_shelves_per_column": 1},
+        "shelves": [
+            {"layers": [["item_01", "item_01", "item_01"]]},
+            {"layers": [["item_02", "item_02", "item_02"]]},
+            {"layers": [["item_03", "item_03", "item_03"]]},
+            {"layers": [["item_04", "item_04", "item_04"]]},
+            {"layers": [["item_05", "item_05", "item_05"]]},
+            {"layers": [["item_06", "item_06", "item_06"]]},
+        ],
+    }
+    level.update(overrides)
+    return level
+
+
+class CollapsingColumnMaterializationTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.progression = load_item_progression(
+            REPOSITORY_ROOT / "configs" / "item_progression.json",
+            REPOSITORY_ROOT / "configs" / "item_sprites.json",
+        )
+
+    def test_mode_and_column_contract_survive_materialization_unchanged(self) -> None:
+        template = _collapsing_template()
+        materialized, _mapping = materialize_level(template, self.progression)
+        self.assertEqual(materialized["gameplay_mode"], "collapsing_columns")
+        self.assertEqual(materialized["column_layout"], template["column_layout"])
+        self.assertIsNot(materialized["column_layout"], template["column_layout"])
+
+    ## Shelves 2, 4 and 6 are the hidden top of each column. Item resolution walks the flat shelves
+    ## array, so hidden content is mapped exactly like visible content.
+    def test_maps_items_on_hidden_and_active_shelves_alike(self) -> None:
+        template = _collapsing_template()
+        materialized, mapping = materialize_level(template, self.progression)
+        self.assertEqual(len(mapping), 6)
+        for shelf_index, shelf in enumerate(materialized["shelves"]):
+            with self.subTest(shelf=shelf_index + 1):
+                logical_id = template["shelves"][shelf_index]["layers"][0][0]
+                self.assertEqual(shelf["layers"][0], [mapping[logical_id]] * 3)
+
+    ## Column position must never influence which concrete item a token becomes, or the same template
+    ## would materialize differently after a purely structural edit.
+    def test_column_grouping_does_not_change_the_item_mapping(self) -> None:
+        _first, first_mapping = materialize_level(_collapsing_template(), self.progression)
+        regrouped = _collapsing_template()
+        regrouped["column_layout"] = {"shelf_counts": [3, 3], "visible_shelves_per_column": 2}
+        _second, second_mapping = materialize_level(regrouped, self.progression)
+        self.assertEqual(first_mapping, second_mapping)
+
+    def test_a_malformed_column_contract_fails_before_publication(self) -> None:
+        malformed = [
+            {"column_layout": {"shelf_counts": [2, 2], "visible_shelves_per_column": 1}},
+            {"column_layout": {"shelf_counts": [2, 2, 2], "visible_shelves_per_column": 0}},
+            {"column_layout": {"shelf_counts": [], "visible_shelves_per_column": 1}},
+            {"layout_preset": "grid_3x3"},
+            {"gameplay_mode": "conveyor"},
+        ]
+        for overrides in malformed:
+            with self.subTest(overrides=overrides):
+                with self.assertRaises(ValueError):
+                    materialize_level(_collapsing_template(**overrides), self.progression)
+
+    def test_a_classic_template_still_materializes(self) -> None:
+        classic = {
+            "level": 1,
+            "time_seconds": 300,
+            "layout_preset": "grid_3x3",
+            "shelves": [{"layers": [["item_01", "item_01", "item_01"]]}],
+        }
+        validate_board_contract(classic)
+        materialized, mapping = materialize_level(classic, self.progression)
+        self.assertNotIn("gameplay_mode", materialized)
+        self.assertEqual(len(mapping), 1)
 
 
 def _item_counts(level: dict) -> Counter[str]:

@@ -438,6 +438,35 @@ Item-count checks alone are not sufficient in this mode: a board can hold three 
 and still deadlock because the workspace needed to finish a triple is hidden behind a shelf that can
 never be emptied first.
 
+Generation:
+
+```powershell
+py scripts\tools\generate_level_shelves.py --gameplay-mode collapsing_columns --column-heights 6,6,6 --visible-shelves-per-column 4 --item-type-count 12 --difficulty medium --seed 11011 --full-level --level-number 11 --output configs\level_templates\level_011.json --require-solvable --stats
+py scripts\tools\materialize_level_templates.py
+```
+
+- `--column-heights` determines the shelf count; passing `--shelf-count` as well is rejected.
+- `--visible-shelves-per-column` is required and becomes the authored minimum window.
+- `--layer-count` and `--filled-layer-count` default to `1` and may not be anything else.
+- `--dispenser-shelves`, `--locked-shelves`, `--sticky-items-percent`, and `--layout-preset` are
+  rejected with an argparse error rather than being silently ignored.
+- Items are distributed across the whole authored stack, hidden shelves included. A shelf the
+  distribution left empty receives one item moved from the fullest other shelf, so every item keeps
+  its multiple-of-three copy count; the move count is reported as `rescued_empty_shelves`.
+- `--min-front-visible-triples` is judged on the shelves the level opens with, not the whole stack;
+  an attempt that fails it is retried under `--require-solvable`.
+- Every candidate is validated with `CollapsingColumnsRules`, and under `--require-solvable` no file
+  is written unless the search proves the board solvable.
+- `--stats` adds `gameplay_mode`, `column_heights`, `visible_shelves_per_column`,
+  `total_shelf_count`, `active_shelf_count`, `hidden_shelf_count`, `active_occupied_slots`,
+  `active_collectible_front_types`, and `rescued_empty_shelves` alongside the existing attempt and
+  validation fields.
+
+Materialization keeps `gameplay_mode` and `column_layout` unchanged, maps items on hidden and
+active shelves alike from the flat `shelves` array, and never infers item identity from column
+position. `materialize_level()` validates the board contract first, so a malformed column layout
+fails before a stale runtime level can be written.
+
 ### Sticky items
 
 Each standard shelf may include `sticky_items: [{"layer": 0, "slot": 1}]`, using zero-based
