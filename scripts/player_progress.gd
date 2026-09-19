@@ -691,6 +691,26 @@ func spend_life(level_number: int = 0, outcome: String = "left") -> bool:
 	return _commit_or_restore(previous_data, operations)
 
 
+## Mirrors a life state already committed by an authoritative online-run transaction. This writes
+## no local-first operation: journaling another decrement would spend the same reserved life twice
+## when the v2 checkpoint is rebuilt from the online-run result.
+func apply_authoritative_life_state(life_state: Dictionary) -> bool:
+	if not life_state.has("current") or not life_state.has("maximum"):
+		return false
+	var maximum := int(life_state.get("maximum", 0))
+	var current := int(life_state.get("current", -1))
+	if maximum <= 0 or current < 0 or current > maximum:
+		return false
+	var previous_data := _data.duplicate(true)
+	_data["lives"] = clampi(current, 0, MAX_LIVES)
+	_data["next_life_restore_unix"] = LocalSaveCodecScript.unix_from_timestamp(
+		life_state.get("next_restore_at")
+	)
+	if int(_data.get("lives", 0)) >= MAX_LIVES:
+		_data["next_life_restore_unix"] = 0
+	return _commit_or_restore(previous_data)
+
+
 func spend_ability(ability_id: StringName) -> bool:
 	var ability_key := String(ability_id)
 	if not DEFAULT_ABILITY_USES.has(ability_key):

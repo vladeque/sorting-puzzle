@@ -64,8 +64,12 @@ Ad infrastructure:
 - `addons/admob/`
 - Registered in `project.godot` as the `AdService` autoload.
 - Owns fail-closed ad policy, provider/consent lifecycle, presentation normalization, local-only
-  interstitial pacing, audio restoration, and diagnostics. No placement currently grants a reward or
-  enables production requests; see [ADS_002_CLIENT_AD_INFRASTRUCTURE.md](ADS_002_CLIENT_AD_INFRASTRUCTURE.md).
+  interstitial pacing, audio restoration, and diagnostics. ADS-003 adds the server-authorized
+  time-extension placement in `rewarded_time_extension_client.gd`; its bundled rewarded policy is
+  enabled while default project/native provider switches remain off until release configuration.
+  Interstitial policy remains disabled. See
+  [ADS_002_CLIENT_AD_INFRASTRUCTURE.md](ADS_002_CLIENT_AD_INFRASTRUCTURE.md) and
+  [ADS_003_REWARDED_TIME_EXTENSION.md](ADS_003_REWARDED_TIME_EXTENSION.md).
 
 Reusable item scene:
 - `scenes/item.tscn`
@@ -393,6 +397,8 @@ Responsibility:
 - Owns bearer headers, a client-generated `X-Correlation-ID`, timeouts, response-envelope
   validation, structured errors, retry classification, and exactly one refresh-and-replay on `401`.
   Never invents a request body or protocol/app headers for these bodyless reads.
+- ADS-003 also uses its `post_json()` envelope path for online-run and rewarded-ad mutations/status
+  reads, with stable request/idempotency identities across bounded transient retries.
 - Retries only network failures, `429` (honoring `Retry-After`), and `502`/`503`/`504`, bounded to
   one initial try plus four retries within 30 seconds, per the backend's documented read retry
   policy; every other outcome (including `500`, which is mutation-retry-only) is terminal.
@@ -403,7 +409,7 @@ Responsibility:
 - Does not touch `scripts/save/save_sync_service.gd`'s mutation idempotency/retry behavior.
 
 Change here when:
-- Adding a new authenticated backend read, changing read retry/refresh policy, or building the
+- Adding a new authenticated backend read/protocol POST, changing retry/refresh policy, or building the
   catalog (`GAME-008`) or leaderboard (`GAME-009`) providers that consume this transport.
 
 ### Shared Destination-Screen UI

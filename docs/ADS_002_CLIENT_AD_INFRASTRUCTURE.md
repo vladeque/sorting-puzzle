@@ -1,6 +1,6 @@
 # ADS-002 Client Ad Infrastructure
 
-Status: **implemented behind disabled release gates**.
+Status: **implemented; rewarded time extension enabled behind runtime release gates**.
 
 ## Ownership
 
@@ -14,8 +14,9 @@ Status: **implemented behind disabled release gates**.
 - `AdPacingState` sanitizes the non-economic local counter/timestamps. `PlayerProgress` stores it in
   the local preference partition, excludes it from authoritative snapshots, and creates no backend
   journal operation.
-- `configs/ads.json` is the bundled release fallback. Both formats and the provider are disabled;
-  it contains pacing limits but no reward amounts, production IDs, or secrets.
+- `configs/ads.json` is the bundled release policy. ADS-003 enables provider policy plus the
+  rewarded/time-extension gates; other rewarded placements and all interstitials remain disabled.
+  It contains pacing limits but no reward amounts, production IDs, or secrets.
 
 ## Release switches
 
@@ -38,11 +39,12 @@ presentation does not reset the counter; only an impression does.
 
 ## Reward boundary
 
-A `REWARDED` provider callback is evidence for a future authoritative claim, not a reward. The
-service returns no coin, life, time, ability, or shelf payload and requires callers to confirm that
-the server can accept a claim before presentation. Placement UI and claim reconciliation remain in
-ADS-003 through ADS-006 and BE-ADS-001. Production rewarded policy therefore remains disabled in the
-bundled config even though rewarded ads are an approved launch feature.
+A `REWARDED` provider callback is evidence for an authoritative claim, not a reward. The service
+returns no coin, life, time, ability, or shelf payload and requires callers to confirm that the
+server can accept a claim before presentation. ADS-003 now owns time-extension claim reconciliation;
+ADS-004 through ADS-006 still own the other placement UIs. The project/native provider switches
+remain disabled by default pending device/store/privacy activation checks; interstitial policy
+stays disabled for release.
 
 ## Native dependency
 

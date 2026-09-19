@@ -1,13 +1,11 @@
 extends Node
 class_name BackendTransport
 
-## GAME-007 shared authenticated read transport for backend features outside the focused save
-## services (GAME-004/005/006 own POST /v2/saves/* and guest bootstrap separately under
-## scripts/save/ and are not touched here). Owns bearer headers, a client-generated correlation
-## id, timeouts, response-envelope validation, structured errors, retry classification, and one
-## refresh/replay for bodyless authenticated v1 GET reads, per the backend PROTOCOL_BOUNDARY.md
-## "bodyless GET exception" and "client retry policy" decisions. Mutation idempotency/retry
-## behavior in scripts/save/save_sync_service.gd is untouched by this file.
+## GAME-007 shared authenticated transport for backend features outside the focused save services
+## (GAME-004/005/006 own POST /v2/saves/* and guest bootstrap separately under scripts/save/).
+## Owns bearer headers, envelopes, timeouts, response validation, retry classification, and one
+## refresh/replay. Bodyless reads follow PROTOCOL_BOUNDARY.md's GET exception; ADS-003 protocol
+## POSTs retain stable request/idempotency identities. SaveSyncService behavior stays untouched.
 
 const LocalSaveCodecScript := preload("res://scripts/save/local_save_codec.gd")
 
@@ -67,6 +65,203 @@ func get_json(path: String) -> Dictionary:
 	if str(session.get("access_token", "")).is_empty():
 		return _local_error("auth.session_missing", "authentication", false)
 	return await _perform_read(path, player_id, session)
+
+
+## Issues an authenticated body-bearing POST using the standard client envelope. Mutations must
+## supply a stable idempotency key; body-bearing reads (currently rewarded-ad status) omit it. The
+## same request id, body, and idempotency key are retained across transient retries, and a 401 gets
+## exactly one refresh-and-replay. Callers remain responsible for closed response-data validation.
+func post_json(
+	path: String,
+	protocol_version: String,
+	data: Dictionary,
+	expected_state_version: int = -1,
+	idempotency_key: String = "",
+	retry_transient: bool = true
+) -> Dictionary:
+	if not can_use_backend():
+		return _local_error("backend.unavailable", "dependency", false)
+	if protocol_version.is_empty():
+		return _local_error("request.protocol_version_missing", "validation", false)
+	if expected_state_version >= 0 and idempotency_key.is_empty():
+		return _local_error("request.idempotency_key_missing", "validation", false)
+	var player_id := _active_player_id()
+	var session_result: Dictionary = _session_store.load_session(player_id)
+	if not bool(session_result.get("ok", false)):
+		return _local_error("auth.session_missing", "authentication", false)
+	var session := session_result.get("session", {}) as Dictionary
+	if str(session.get("access_token", "")).is_empty():
+		return _local_error("auth.session_missing", "authentication", false)
+	return await _perform_post(
+		path,
+		protocol_version,
+		data,
+		expected_state_version,
+		idempotency_key,
+		retry_transient,
+		player_id,
+		session
+	)
+
+
+func _perform_post(
+	path: String,
+	protocol_version: String,
+	data: Dictionary,
+	expected_state_version: int,
+	idempotency_key: String,
+	retry_transient: bool,
+	player_id: String,
+	session: Dictionary
+) -> Dictionary:
+	var base_url := str(ProjectSettings.get_setting(SERVER_URL_SETTING, "")).trim_suffix("/")
+	var request_id := LocalSaveCodecScript.create_uuid()
+	var refreshed := false
+	var attempt := 0
+	var start_msec := Time.get_ticks_msec()
+	while true:
+		attempt += 1
+		var correlation_id := LocalSaveCodecScript.create_uuid()
+		var envelope := _post_envelope(
+			protocol_version,
+			request_id,
+			session,
+			data,
+			expected_state_version
+		)
+		var headers := PackedStringArray([
+			"Authorization: Bearer %s" % str(session.get("access_token", "")),
+			"Content-Type: application/json",
+			"X-Correlation-ID: %s" % correlation_id,
+		])
+		if not idempotency_key.is_empty():
+			headers.append("Idempotency-Key: %s" % idempotency_key)
+		var raw_response: Array = await _send_post(
+			"%s%s" % [base_url, path],
+			headers,
+			JSON.stringify(envelope)
+		)
+		var classification := _classify_post_response(
+			raw_response,
+			protocol_version,
+			request_id,
+			not idempotency_key.is_empty()
+		)
+		match str(classification.get("kind", "")):
+			"success":
+				return classification.get("result")
+			"needs_refresh":
+				if refreshed:
+					return classification.get("result")
+				var refresh_result := await _refresh_session(session, player_id)
+				if not bool(refresh_result.get("ok", false)):
+					return refresh_result
+				session = refresh_result.get("session", {}) as Dictionary
+				refreshed = true
+				attempt -= 1
+			"retryable":
+				if not retry_transient or attempt >= MAX_READ_ATTEMPTS:
+					return classification.get("result")
+				var elapsed_seconds := float(Time.get_ticks_msec() - start_msec) / 1000.0
+				if elapsed_seconds >= RETRY_WALL_CLOCK_CAP_SECONDS:
+					return classification.get("result")
+				await _wait_before_retry(attempt, int(classification.get("retry_after_seconds", -1)))
+			_:
+				return classification.get("result")
+	return _local_error("internal.unexpected", "internal", false)
+
+
+func _post_envelope(
+	protocol_version: String,
+	request_id: String,
+	session: Dictionary,
+	data: Dictionary,
+	expected_state_version: int
+) -> Dictionary:
+	var meta := {
+		"protocol_version": protocol_version,
+		"request_id": request_id,
+		"device_id": _session_store.get_device_id(),
+		"session_id": str(session.get("session_id", "")),
+		"app": {
+			"platform": "android" if OS.get_name() == "Android" else "ios",
+			"version": str(ProjectSettings.get_setting(APP_VERSION_SETTING, "1.0.0")),
+			"build": maxi(int(ProjectSettings.get_setting(APP_BUILD_SETTING, 1)), 1),
+		},
+		"locale": TranslationServer.get_locale().replace("_", "-"),
+		"client_time": LocalSaveCodecScript.iso_timestamp(),
+	}
+	if expected_state_version >= 0:
+		meta["expected_state_version"] = expected_state_version
+	return {"meta": meta, "data": data.duplicate(true)}
+
+
+func _classify_post_response(
+	raw_response: Array,
+	protocol_version: String,
+	request_id: String,
+	is_mutation: bool
+) -> Dictionary:
+	var transport_result := int(raw_response[0]) if raw_response.size() > 0 else HTTPRequest.RESULT_CANT_CONNECT
+	if transport_result != HTTPRequest.RESULT_SUCCESS:
+		return {
+			"kind": "retryable",
+			"result": _local_error("network.transport_failed", "dependency", true),
+			"retry_after_seconds": -1,
+		}
+	var response_code := int(raw_response[1]) if raw_response.size() > 1 else 0
+	var response_headers := raw_response[2] as PackedStringArray if raw_response.size() > 2 else PackedStringArray()
+	var body := raw_response[3] as PackedByteArray if raw_response.size() > 3 else PackedByteArray()
+	var parsed = JSON.parse_string(body.get_string_from_utf8())
+	if response_code == 200:
+		var validated := _validate_post_success_envelope(parsed, protocol_version, request_id)
+		return {"kind": "success" if bool(validated.get("ok", false)) else "terminal", "result": validated}
+	if response_code == 401:
+		return {"kind": "needs_refresh", "result": _envelope_error(parsed, response_code)}
+	if response_code == 429:
+		return {
+			"kind": "retryable",
+			"result": _envelope_error(parsed, response_code),
+			"retry_after_seconds": _retry_after_seconds(response_headers),
+		}
+	if (
+		(response_code == 500 and is_mutation)
+		or response_code == 502
+		or response_code == 503
+		or response_code == 504
+	):
+		return {"kind": "retryable", "result": _envelope_error(parsed, response_code), "retry_after_seconds": -1}
+	return {"kind": "terminal", "result": _envelope_error(parsed, response_code)}
+
+
+func _validate_post_success_envelope(
+	parsed: Variant,
+	protocol_version: String,
+	request_id: String
+) -> Dictionary:
+	if not (parsed is Dictionary):
+		return _local_error("transport.malformed_response", "internal", false)
+	var document := parsed as Dictionary
+	var meta = document.get("meta")
+	var data = document.get("data")
+	if not (meta is Dictionary and data is Dictionary):
+		return _local_error("transport.malformed_response", "internal", false)
+	var response_meta := meta as Dictionary
+	var state_version = response_meta.get("state_version")
+	if (
+		str(response_meta.get("protocol_version", "")) != protocol_version
+		or str(response_meta.get("request_id", "")) != request_id
+		or str(response_meta.get("correlation_id", "")).is_empty()
+		or not LocalSaveCodecScript.is_timestamp(response_meta.get("server_time"))
+		or not _is_integer(state_version)
+		or int(state_version) < 0
+	):
+		return _local_error("transport.malformed_response", "internal", false)
+	return {
+		"ok": true,
+		"data": (data as Dictionary).duplicate(true),
+		"meta": (response_meta as Dictionary).duplicate(true),
+	}
 
 
 func _perform_read(path: String, player_id: String, session: Dictionary) -> Dictionary:
@@ -286,7 +481,7 @@ func _envelope_error(parsed: Variant, http_status: int) -> Dictionary:
 	if code.is_empty():
 		return _local_error("transport.malformed_response", "internal", false, http_status, correlation_id)
 	var retry_after = protocol_error.get("retry_after_seconds")
-	return {
+	var result := {
 		"ok": false,
 		"error": {
 			"code": code,
@@ -298,6 +493,11 @@ func _envelope_error(parsed: Variant, http_status: int) -> Dictionary:
 			"http_status": http_status,
 		},
 	}
+	if protocol_error.get("recovery") is Dictionary:
+		(result.get("error") as Dictionary)["recovery"] = (
+			protocol_error.get("recovery") as Dictionary
+		).duplicate(true)
+	return result
 
 
 func _normalize_category(value: Variant) -> String:

@@ -1315,7 +1315,9 @@ Important nodes:
 - `UI/TimeUpTransition`: `scenes/ui/time_up_transition.tscn` instance; blocks input and owns the
   timer-origin alarm ring/dark-red shade between an eligible `00:00` and the extension offer.
 - `UI/TimeUpExtensionOverlay`: `scenes/ui/time_up_extension_modal.tscn` instance opened after that
-  transition when the attempt still has an extension route.
+  transition when the attempt still has an extension route. Its rewarded action presents
+  ready/loading/verifying/retry/unavailable states while `scripts/level.gd` and
+  `rewarded_time_extension_client.gd` own the authoritative claim.
 - `UI/FailureScreen`: shown after the offer is declined or immediately on an ineligible later
   timeout.
 - `UI/CompletionScreen`: `scenes/ui/level_completion_screen.tscn` instance whose reveal begins 1.35

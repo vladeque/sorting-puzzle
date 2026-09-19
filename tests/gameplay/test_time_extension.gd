@@ -9,6 +9,30 @@ var _progress
 var _level_scene: PackedScene
 
 
+class VerifiedRewardClient extends Node:
+	var claim_calls := 0
+
+	func prepare() -> Dictionary:
+		return {"status": &"ready"}
+
+	func can_offer() -> bool:
+		return true
+
+	func is_awaiting_verification() -> bool:
+		return false
+
+	func claim(_level_number: int) -> Dictionary:
+		claim_calls += 1
+		return {
+			"ok": true,
+			"seconds": 60,
+			"authorization_id": "00000000-0000-4000-8000-000000000104",
+		}
+
+	func has_active_run() -> bool:
+		return false
+
+
 func _init() -> void:
 	if not str(ProjectSettings.get_setting("application/config/name", "")).begins_with(
 		ISOLATED_TEST_PROJECT_PREFIX
@@ -32,6 +56,7 @@ func _run() -> void:
 	await _test_timeout_offer_and_decline()
 	await _test_coin_extension_and_second_timeout()
 	await _test_insufficient_coins_shop_round_trip()
+	await _test_verified_rewarded_extension()
 
 	if _failures.is_empty():
 		print("Time-extension verification passed.")
@@ -74,8 +99,8 @@ func _test_timeout_offer_and_decline() -> void:
 		"The coin action shows the configured 500-coin price."
 	)
 	_check(
-		ad_button.visible and ad_button.disabled and ad_button.text.contains("Coming Soon"),
-		"The production ad option remains visible, disabled, and explicit."
+		ad_button.visible and ad_button.disabled and ad_button.text.contains("Unavailable"),
+		"The ad option stays visible, disabled, and honest when release gates are off."
 	)
 
 	(modal.find_child("CloseButton", true, false) as Button).pressed.emit()
@@ -176,11 +201,41 @@ func _test_insufficient_coins_shop_round_trip() -> void:
 	await _free_current_scene()
 
 
-func _open_campaign_level() -> Node:
+func _test_verified_rewarded_extension() -> void:
+	_progress.reset_progress()
+	var starting_lives: int = _progress.get_lives()
+	var reward_client := VerifiedRewardClient.new()
+	var level := await _open_campaign_level(reward_client)
+	level.set("_time_remaining", 0.0)
+	level.call("_handle_level_time_expired")
+	await _wait_seconds(1.1)
+
+	level.call("_on_time_extension_ad_requested")
+	level.call("_on_time_extension_ad_requested")
+	await _wait_seconds(0.45)
+	_check(reward_client.claim_calls == 1, "A rapid rewarded-ad double tap starts one claim flow.")
+	_check(
+		int(level.get("_rewarded_ad_time_extensions_used")) == 1
+			and is_equal_approx(float(level.get("_time_remaining")), 60.0),
+		"A verified claim consumes one rewarded slot and grants exactly 60 seconds."
+	)
+	_check(
+		not bool(level.get("_time_extension_offer_active"))
+			and not bool(level.get("_level_paused")),
+		"Verified rewarded time closes the offer and resumes the paused board."
+	)
+	_check(_progress.get_lives() == starting_lives, "Rewarded continuation does not spend a life.")
+	await _free_current_scene()
+
+
+func _open_campaign_level(reward_client: Node = null) -> Node:
 	var level := _level_scene.instantiate()
 	level.set("selected_level", TEST_LEVEL)
 	level.set("launched_from_dev_mode", false)
 	level.set("return_menu_scene_path", "res://scenes/main_menu.tscn")
+	if reward_client != null:
+		level.add_child(reward_client)
+		level.set("_rewarded_time_extension_client", reward_client)
 	root.add_child(level)
 	current_scene = level
 	await process_frame

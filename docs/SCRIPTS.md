@@ -23,9 +23,13 @@ This file documents what each script owns. Keep script docs focused on responsib
   timestamps.
 - `ad_provider.gd`: disabled provider contract; `mock_ad_provider.gd` is the deterministic test
   implementation; `admob_provider.gd` adapts the pinned native bridge without reward authority.
+- `rewarded_time_extension_client.gd`: ADS-003 protocol-1.4 intent/status owner. It creates the
+  compatibility online run, forwards opaque SSV custom data, accepts only a settled 60-second
+  authorization, and binds that authorization into terminal run settlement.
 
 See [ADS_002_CLIENT_AD_INFRASTRUCTURE.md](ADS_002_CLIENT_AD_INFRASTRUCTURE.md) for release gates and
-the backend reward boundary.
+the backend reward boundary, and
+[ADS_003_REWARDED_TIME_EXTENSION.md](ADS_003_REWARDED_TIME_EXTENSION.md) for the first placement.
 
 ## `scripts/testing/reward_chest_fill_preview.gd`
 
@@ -1430,6 +1434,8 @@ Key methods:
 - `get_next_life_restore_seconds_remaining()`: returns seconds until the next life restore, or `0` when full.
 - `refresh_lives()`: restores one life per elapsed real-time hour while lives are not full.
 - `spend_life(level_number, outcome)`: atomically appends the attempt and resulting life state.
+- `apply_authoritative_life_state(life_state)`: mirrors a life state already committed by an online
+  run without appending a duplicate local-first spend operation.
 - `spend_ability(ability_id)`: validates one of the four canonical ability ids, then immediately
   spends, journals, and saves one campaign ability use.
 - `complete_level(level_number, earned_stars)`: accepts only the next incomplete level in an
@@ -1749,8 +1755,8 @@ Class:
 - `BackendTransport`
 
 Purpose:
-- GAME-007 shared authenticated read transport for bodyless authenticated v1 `GET` reads used by
-  backend features outside the focused save services (`scripts/save/*`).
+- GAME-007 shared authenticated transport for bodyless v1 `GET` reads, extended by ADS-003 with a
+  standard body-bearing protocol POST used by online-run and reward-intent contracts.
 - `configure(session_store, active_player_id_provider)` wires an existing `SecureSessionStore` and
   a `Callable` that resolves the current active player id; `PlayerProgress` is the only configured
   owner today (`get_backend_transport()`).
@@ -1759,6 +1765,10 @@ Purpose:
   request body or protocol/app header. Returns `{"ok": true, "data", "meta"}` or
   `{"ok": false, "error": {"code", "category", "message", "retryable", "retry_after_seconds",
   "correlation_id", "http_status"}}`.
+- `post_json(path, protocol_version, data, expected_state_version, idempotency_key,
+  retry_transient)` builds the device/session/app envelope, retains a stable request id and
+  idempotency key across bounded transient retries, validates the echoed request/protocol and
+  authoritative state version, and performs the same single refresh-and-replay on `401`.
 - Retries network failures, `429` (honoring `Retry-After` over backoff), and `502`/`503`/`504` up
   to one initial try plus four retries within a 30-second wall-clock budget, matching the backend's
   documented client read retry policy; every other status (`400`/`403`/`404`/`409`/`413`/`415`/
@@ -1778,8 +1788,9 @@ Depends on:
 - `scripts/save/local_save_codec.gd` for UUID generation and timestamp validation.
 
 Do not use for:
-- `POST`/mutation traffic, save-sync idempotency/retry, or guest bootstrap. Those stay in
-  `scripts/save/save_sync_service.gd` and `scripts/save/guest_session_bootstrap_service.gd`.
+- Save-sync journal mutation traffic or guest bootstrap. Those retain their dedicated persisted
+  retry/state machines in `scripts/save/save_sync_service.gd` and
+  `scripts/save/guest_session_bootstrap_service.gd`.
 
 ## `scripts/backend/backend_read_operations.gd`
 
@@ -1999,7 +2010,7 @@ Important constants:
 - `ABILITY_PURCHASE_PRICES_CONFIG`: `res://configs/ability_purchase_prices.json`.
 - `TIME_EXTENSION_CONFIG`: `res://configs/time_extension.json`; client launch defaults matching the
   versioned backend economy policy (60 seconds, 500 coins, one coin use and one ad use per attempt,
-  with rewarded ads disabled).
+  with the compiled rewarded placement enabled but provider/policy release gates still independent).
 - `LEVEL_CONFIG_TEMPLATE`: `res://configs/levels/level_%03d.json`.
 - `DEFAULT_LEVEL_CONFIG`: fallback level config.
 - `LAYOUT_SCENE_TEMPLATE`: `res://scenes/layouts/layout_%s.tscn` path pattern used by `layout_preset`.
@@ -2108,11 +2119,13 @@ Key responsibilities:
   crossfades into the modal shade without exposing a bright board frame. A successful 500-coin
   request is committed with resource-spend reason `time_extension`, consumes the attempt's single
   coin slot, sets the timer to 60 seconds, and resumes the same board. Decline proceeds to normal
-  Failure. A later timeout fails immediately when the coin slot is consumed and rewarded ads
-  remain unsupported.
+  Failure. The rewarded route remains paused while ADS-003 creates a server intent, shows the ad,
+  and reconciles SSV; it consumes its slot and grants 60 seconds only after authoritative
+  settlement. A later timeout fails immediately when both slots are consumed or unavailable.
 - Keep one coin slot and one rewarded-ad slot as per-attempt runtime state, reset only when a new
-  level attempt is configured. The ad action stays production-visible/disabled; both the versioned
-  config and the hard integration capability must be true before it can become actionable.
+  level attempt is configured. The ad action requires the placement config, `AdService`
+  policy/consent/readiness, and an authenticated backend; otherwise it stays disabled and the coin
+  route remains independent.
 - Keep zero-use ability buttons pressable during active gameplay so `_open_ability_purchase_menu()` can pause the level and show `UI/AbilityPurchaseOverlay` (`scripts/ability_purchase_menu.gd`, composing the same shared modal shell) with the tapped ability icon, configured coin price, and current affordability state via `set_offer()`.
 - Apply paid ability uses through `_can_apply_ability()`, `PlayerProgress.spend_coins()`, and
   `_apply_paid_ability()`: the local spend commits after successful preflight and before the
@@ -3207,16 +3220,18 @@ Attached to:
 
 Purpose:
 - Owns the recoverable timeout offer's shared-shell composition, configured duration/price copy,
-  button presentation, disabled production ad placeholder, responsive fitting, and transitions.
+  coin/rewarded button presentation, request-state copy, responsive fitting, and transitions.
 - Emits `declined`, `coin_requested`, and `ad_requested` intents without mutating timer or economy
   state; `scripts/level.gd` remains the orchestrator.
 
 Key methods:
 - `set_offer(seconds_granted, coin_price, coin_available, rewarded_ad_available,
   rewarded_ad_used)`: formats the `+MM:SS` grant, shows the canonical coin price or `Used`, and
-  selects the enabled/used/`Coming Soon` ad presentation.
+  selects the enabled/used/unavailable ad presentation.
 - `set_coin_action_enabled(is_enabled)`: provides an in-flight purchase lock without losing the
   configured per-attempt availability state.
+- `set_ad_action_state(state)`: presents loading, verification, retry-verification, retry, ready,
+  unavailable, and used states without owning the claim.
 - `is_transitioning()` / `apply_safe_layout(safe_margins, viewport_size)` /
   `open(with_pop = false)` / `close()`: same reusable overlay contract as the other gameplay
   modals, with the timeout path selecting the shared shell's fitted pop reveal.

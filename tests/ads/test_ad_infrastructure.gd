@@ -38,8 +38,8 @@ func _run() -> void:
 	var bundled_diagnostics := autoload_service.call("get_diagnostics") as Dictionary
 	_check(bool(bundled_diagnostics.get("policy_valid", false)), "Bundled ad policy is valid.")
 	_check(
-		not bool(bundled_diagnostics.get("provider_enabled", true)),
-		"Bundled production policy fails closed with the provider disabled."
+		bool(bundled_diagnostics.get("provider_enabled", false)),
+		"Bundled policy enables the implemented rewarded-time placement."
 	)
 	_check(
 		str(bundled_diagnostics.get("provider", "")) == "disabled",

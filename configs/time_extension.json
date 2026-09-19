@@ -3,5 +3,5 @@
   "coin_price": 500,
   "max_coin_uses_per_attempt": 1,
   "max_rewarded_ad_uses_per_attempt": 1,
-  "rewarded_ad_enabled": false
+  "rewarded_ad_enabled": true
 }

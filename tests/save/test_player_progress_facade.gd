@@ -94,6 +94,21 @@ func _run() -> void:
 	_check(not progress.spend_ability(&"unknown"), "unknown ability spending is rejected")
 	_check(progress.spend_life(1, "left"), "life loss and attempt commit")
 	_check(progress.get_lives() == 4, "life loss is immediate")
+	var journal_before_authoritative_life: int = progress.get("_local_store").get_journal().size()
+	_check(
+		progress.apply_authoritative_life_state({
+			"current": 3,
+			"maximum": 5,
+			"restore_interval_seconds": 3600,
+			"next_restore_at": "2099-01-01T00:00:00.000Z",
+		}),
+		"authoritative online-run life state persists locally"
+	)
+	_check(progress.get_lives() == 3, "authoritative life state updates the local facade")
+	_check(
+		progress.get("_local_store").get_journal().size() == journal_before_authoritative_life,
+		"authoritative life mirroring creates no duplicate local-first spend operation"
+	)
 	_check(
 		progress.set_profile_customization("avatar_bear", "frame_leaf", "Offline Player"),
 		"profile customization commits"

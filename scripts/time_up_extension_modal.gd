@@ -2,8 +2,8 @@ extends Control
 class_name TimeUpExtensionModal
 
 ## Recoverable timeout offer shown before Level enters its terminal failure state. This scene owns
-## the shared-shell composition, copy, price presentation, and disabled rewarded-ad placeholder;
-## level.gd owns the timer state, per-attempt limits, Shop routing, and economy mutation.
+## the shared-shell composition, copy, price presentation, and rewarded-ad request state; level.gd
+## owns the timer state, authoritative claim flow, per-attempt limits, Shop routing, and economy.
 
 signal declined
 signal coin_requested
@@ -21,6 +21,8 @@ const CONTENT_REGION_HEIGHT := 224.0
 @onready var _watch_ad_button := %WatchAdButton as Button
 
 var _coin_available := true
+var _rewarded_ad_available := false
+var _rewarded_ad_used := false
 
 
 func _ready() -> void:
@@ -56,22 +58,42 @@ func set_offer(
 		Control.CURSOR_POINTING_HAND if coin_available else Control.CURSOR_ARROW
 	)
 
-	_watch_ad_button.disabled = not rewarded_ad_available or rewarded_ad_used
-	_watch_ad_button.mouse_default_cursor_shape = (
-		Control.CURSOR_POINTING_HAND if not _watch_ad_button.disabled else Control.CURSOR_ARROW
-	)
-	if rewarded_ad_used:
-		_watch_ad_button.text = "Used"
-	elif rewarded_ad_available:
-		_watch_ad_button.text = "Watch Ad"
-	else:
-		_watch_ad_button.text = "Watch Ad\nComing Soon"
+	_rewarded_ad_available = rewarded_ad_available
+	_rewarded_ad_used = rewarded_ad_used
+	set_ad_action_state(&"ready")
 
 
 func set_coin_action_enabled(is_enabled: bool) -> void:
 	_coin_button.disabled = not is_enabled or not _coin_available
 	_coin_button.mouse_default_cursor_shape = (
 		Control.CURSOR_POINTING_HAND if not _coin_button.disabled else Control.CURSOR_ARROW
+	)
+
+
+func set_ad_action_state(state: StringName) -> void:
+	match state:
+		&"loading":
+			_watch_ad_button.text = "Loading..."
+			_watch_ad_button.disabled = true
+		&"verifying":
+			_watch_ad_button.text = "Verifying..."
+			_watch_ad_button.disabled = true
+		&"retry_verification":
+			_watch_ad_button.text = "Verify Reward"
+			_watch_ad_button.disabled = false
+		&"retry":
+			_watch_ad_button.text = "Try Again"
+			_watch_ad_button.disabled = not _rewarded_ad_available
+		_:
+			_watch_ad_button.disabled = not _rewarded_ad_available or _rewarded_ad_used
+			if _rewarded_ad_used:
+				_watch_ad_button.text = "Used"
+			elif _rewarded_ad_available:
+				_watch_ad_button.text = "Watch Ad"
+			else:
+				_watch_ad_button.text = "Watch Ad\nUnavailable"
+	_watch_ad_button.mouse_default_cursor_shape = (
+		Control.CURSOR_POINTING_HAND if not _watch_ad_button.disabled else Control.CURSOR_ARROW
 	)
 
 

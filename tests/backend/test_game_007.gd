@@ -1,7 +1,8 @@
 extends SceneTree
 
-## GAME-007 coverage for the shared authenticated read transport (scripts/backend/backend_transport.gd)
-## and its closed protocol adapters (scripts/backend/backend_read_operations.gd).
+## GAME-007 coverage for the shared authenticated transport (scripts/backend/backend_transport.gd)
+## and its closed read adapters (scripts/backend/backend_read_operations.gd), including ADS-003's
+## standard body-bearing POST envelope.
 ##
 ## Two kinds of checks:
 ## 1. Fixture-driven adapter checks that feed the real backend contract fixtures from the sibling
@@ -290,6 +291,7 @@ func _load_fixture(relative_path: String) -> Variant:
 # ---------------------------------------------------------------------------
 
 func _run_transport_tests() -> void:
+	await _check_authenticated_post_envelope_and_idempotency()
 	await _check_network_failures_retry_then_succeed()
 	await _check_rate_limit_honors_retry_after()
 	await _check_retryable_dependency_status_codes()
@@ -300,6 +302,46 @@ func _run_transport_tests() -> void:
 	await _check_refresh_transport_failure_is_terminal()
 	await _check_malformed_refresh_response_is_terminal()
 	await _check_unavailable_backend_short_circuits()
+
+
+func _check_authenticated_post_envelope_and_idempotency() -> void:
+	var session_store := FakeSessionStore.new()
+	var transport := _make_transport(session_store)
+	var captured := {}
+	transport.post_queue = [func(_url: String, headers: PackedStringArray, body: String) -> Array:
+		captured["headers"] = headers
+		captured["body"] = JSON.parse_string(body)
+		var request := captured.get("body", {}) as Dictionary
+		var request_meta := request.get("meta", {}) as Dictionary
+		var response := {
+			"meta": {
+				"protocol_version": "1.4",
+				"request_id": request_meta.get("request_id"),
+				"correlation_id": "00000000-0000-4000-8000-0000000000c9",
+				"server_time": "2026-07-14T09:00:00.000Z",
+				"state_version": 43,
+			},
+			"data": {"status": "pending"},
+		}
+		return [HTTPRequest.RESULT_SUCCESS, 200, PackedStringArray(), JSON.stringify(response).to_utf8_buffer()]
+	]
+	var idempotency_key := "00000000-0000-4000-8000-0000000000d1"
+	var result: Dictionary = await transport.post_json(
+		"/v1/ad-rewards/intents",
+		"1.4",
+		{"placement": "time_extension"},
+		42,
+		idempotency_key
+	)
+	_check(bool(result.get("ok", false)), "authenticated POST accepts a matching success envelope")
+	_check(int((result.get("meta", {}) as Dictionary).get("state_version", -1)) == 43, "POST exposes authoritative state_version")
+	var request := captured.get("body", {}) as Dictionary
+	var meta := request.get("meta", {}) as Dictionary
+	_check(str(meta.get("protocol_version", "")) == "1.4", "POST selects the caller's protocol version")
+	_check(int(meta.get("expected_state_version", -1)) == 42, "POST includes expected_state_version")
+	_check(str(meta.get("device_id", "")) == TEST_DEVICE_ID, "POST binds the installation device")
+	var headers := captured.get("headers", PackedStringArray()) as PackedStringArray
+	_check(headers.has("Idempotency-Key: %s" % idempotency_key), "POST sends the stable idempotency key")
 
 
 func _make_transport(session_store) -> FakeTransport:

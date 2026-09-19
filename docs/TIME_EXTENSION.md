@@ -12,8 +12,8 @@ modal settle. Terminal later expiries still proceed directly to Failure and use 
 they do not replay this recoverable-offer transition.
 
 The modal composes the shared gameplay shell and owns only its presentation, signals, responsive
-fitting, and transitions; `scripts/level.gd` owns attempt state, Shop routing, payment, timer
-mutation, and Failure.
+fitting, request-state copy, and transitions; `scripts/level.gd` owns attempt state, Shop routing,
+payment/claim orchestration, timer mutation, and Failure.
 
 The modal's extra-time illustration is the dedicated transparent production asset
 `assets/ui/time_extension_continue_icon_256x256.png`: a golden stopwatch wrapped by a green
@@ -31,16 +31,21 @@ request calls `PlayerProgress.spend_coins(500, "time_extension")`, grants exactl
 resumes the same board. Rapid duplicate requests are locked, so payment and the offline journal are
 committed once.
 
-Rewarded ads have no provider integration yet. The approved production design intentionally keeps
-the ad action visible, disabled, and labeled `Coming Soon`. Configuration alone cannot enable it:
-`scripts/level.gd` also requires a separate hard integration-capability flag. Once both extension
-slots are unavailable, a later timeout proceeds directly to Failure.
+The rewarded action is implemented behind independent client, provider, consent/readiness, and
+backend gates. It starts a server-tracked run, requests a `time_extension` intent, passes the opaque
+nonce to AdMob SSV, and grants time only after the backend returns a settled authorization. The SDK
+callback alone never grants gameplay state. Pending verification can be retried without another ad;
+dismissal, failure, and malformed or rejected responses consume no rewarded slot. See
+`ADS_003_REWARDED_TIME_EXTENSION.md`. If ads are unavailable, the disabled action says
+`Watch Ad / Unavailable` and the coin route remains usable. Once both slots are unavailable, a
+later timeout proceeds directly to Failure.
 
 Verification ownership:
 
 - `tests/gameplay/test_time_extension.gd`: offer-before-Failure, decline/life spend, paid continue,
   input-blocking transition-before-offer, duplicate-use protection, dedicated journal reason,
-  second timeout, and insufficient-coins Shop round trip.
+  second timeout, insufficient-coins Shop round trip, and verified rewarded continuation.
+- `tests/ads/test_rewarded_time_extension.gd`: authoritative intent/status and completion binding.
 - `scripts/tools/captures/time_up_transition_setup.gd`: rendered transition keyframe at the
   supported responsive portrait resolutions.
 - `scripts/tools/captures/time_up_extension_setup.gd`: rendered modal review over an active board at

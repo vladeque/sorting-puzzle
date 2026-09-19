@@ -50,6 +50,7 @@ const HAMMER_IMPACT_EFFECT_SCENE := preload("res://scenes/abilities/hammer_impac
 const ITEM_SPRITES_CONFIG := "res://configs/item_sprites.json"
 const ABILITY_PURCHASE_PRICES_CONFIG := "res://configs/ability_purchase_prices.json"
 const TIME_EXTENSION_CONFIG := "res://configs/time_extension.json"
+const RewardedTimeExtensionClientScript := preload("res://scripts/ads/rewarded_time_extension_client.gd")
 const LEVEL_CONFIG_TEMPLATE := "res://configs/levels/level_%03d.json"
 const DEFAULT_LEVEL_CONFIG := "res://configs/levels/level_001.json"
 const LAYOUT_SCENE_TEMPLATE := "res://scenes/layouts/layout_%s.tscn"
@@ -142,9 +143,6 @@ const DEFAULT_TIME_EXTENSION_SECONDS := 60
 const DEFAULT_TIME_EXTENSION_COIN_PRICE := 500
 const DEFAULT_MAX_COIN_TIME_EXTENSIONS_PER_ATTEMPT := 1
 const DEFAULT_MAX_REWARDED_AD_TIME_EXTENSIONS_PER_ATTEMPT := 1
-## The approved UI reserves one ad extension, but no rewarded-ad SDK/provider exists yet. Keep this
-## separate from configuration so a mistaken config toggle can never expose an enabled no-op.
-const REWARDED_AD_TIME_EXTENSION_INTEGRATION_AVAILABLE := false
 const SHOP_RETURN_ABILITY_PURCHASE := &"ability_purchase"
 const SHOP_RETURN_TIME_EXTENSION := &"time_extension"
 @export var slot_snap_distance := BASE_SLOT_SNAP_DISTANCE * SHELF_CELL_VISUAL_SCALE
@@ -214,6 +212,9 @@ var _coin_time_extensions_used := 0
 var _rewarded_ad_time_extensions_used := 0
 var _time_extension_offer_active := false
 var _time_extension_purchase_in_progress := false
+var _rewarded_time_extension_client
+var _online_run_settlement_in_progress := false
+var _completion_settlement_in_progress := false
 var _in_level_shop_return_destination := StringName()
 var _time_remaining := 0.0
 var _has_player_started_timer := false
@@ -308,6 +309,7 @@ func _ready() -> void:
 	_setup_ability_buttons()
 	_load_ability_purchase_prices()
 	_load_time_extension_configuration()
+	_setup_rewarded_time_extension_client()
 	_load_item_textures()
 	_apply_chapter_background()
 	_apply_level_config(_load_level_config(selected_level))
@@ -317,6 +319,8 @@ func _ready() -> void:
 	_update_star_counter_label()
 	_update_ability_buttons()
 	_update_pause_menu_button()
+	if _rewarded_ad_time_extension_configured:
+		call_deferred("_prepare_rewarded_time_extension")
 
 
 func _apply_chapter_background() -> void:
@@ -834,6 +838,23 @@ func _load_time_extension_configuration() -> void:
 		0
 	)
 	_rewarded_ad_time_extension_configured = bool(config.get("rewarded_ad_enabled", false))
+
+
+func _setup_rewarded_time_extension_client() -> void:
+	if _rewarded_time_extension_client != null:
+		return
+	_rewarded_time_extension_client = RewardedTimeExtensionClientScript.new()
+	add_child(_rewarded_time_extension_client)
+	var ad_service := get_tree().root.get_node_or_null(^"AdService")
+	_rewarded_time_extension_client.configure(PlayerProgress.get_backend_transport(), ad_service)
+
+
+func _prepare_rewarded_time_extension() -> void:
+	if _rewarded_time_extension_client == null or not _rewarded_ad_time_extension_configured:
+		return
+	await _rewarded_time_extension_client.prepare()
+	if is_inside_tree() and _time_extension_offer_active:
+		_refresh_time_extension_offer()
 
 
 func _load_level_config(level_number: int) -> Dictionary:
@@ -2196,8 +2217,9 @@ func _has_available_time_extension() -> bool:
 
 func _is_rewarded_ad_time_extension_available() -> bool:
 	return (
-		REWARDED_AD_TIME_EXTENSION_INTEGRATION_AVAILABLE
-		and _rewarded_ad_time_extension_configured
+		_rewarded_ad_time_extension_configured
+		and _rewarded_time_extension_client != null
+		and bool(_rewarded_time_extension_client.can_offer())
 	)
 
 
@@ -2214,6 +2236,12 @@ func _refresh_time_extension_offer() -> void:
 		_rewarded_ad_time_extensions_used >= _max_rewarded_ad_time_extensions_per_attempt
 	)
 	_time_up_extension_overlay.set_coin_action_enabled(not _time_extension_purchase_in_progress)
+	if (
+		_rewarded_time_extension_client != null
+		and _rewarded_time_extension_client.is_awaiting_verification()
+		and not _time_extension_purchase_in_progress
+	):
+		_time_up_extension_overlay.set_ad_action_state(&"retry_verification")
 
 
 func _fail_level() -> void:
@@ -2254,12 +2282,29 @@ func _fail_level() -> void:
 		_time_up_transition_overlay.reset()
 
 
-## Freezes the cleared board, starts the confetti celebration, and opens the completion screen after
-## COMPLETION_REVEAL_SECONDS while foreground paper pieces continue falling. Progress is committed
-## and `_level_completed` is set before that wait, so the reward is banked even if the run is
-## interrupted mid-celebration, and the existing `_level_completed` guards already stop input,
-## `_process`, the timer, and the pause button for the whole window.
+## Freezes the cleared board, settles any server-authorized rewarded run, starts the confetti
+## celebration, and opens the completion screen after COMPLETION_REVEAL_SECONDS. Once settlement
+## finishes, local progress is committed and `_level_completed` is set before the reveal wait, so
+## the reward is banked if the celebration is interrupted.
 func _complete_level() -> void:
+	if _completion_settlement_in_progress:
+		return
+	if (
+		not launched_from_dev_mode
+		and _rewarded_time_extension_client != null
+		and _rewarded_time_extension_client.has_active_run()
+	):
+		_completion_settlement_in_progress = true
+		_level_paused = true
+		_set_moving_shelf_rows_paused(true)
+		var settlement: Dictionary = await _rewarded_time_extension_client.settle_completed(_stars)
+		_completion_settlement_in_progress = false
+		if not bool(settlement.get("ok", false)):
+			push_error("Rewarded run completion could not be settled: %s" % settlement.get("error", {}))
+			return
+		PlayerProgress.apply_authoritative_life_state(
+			settlement.get("life_state", {}) as Dictionary
+		)
 	if not launched_from_dev_mode and not PlayerProgress.complete_level(selected_level, _stars):
 		push_error("Level completion could not be committed; keeping the level active.")
 		return
@@ -2360,11 +2405,28 @@ func _restart_level() -> void:
 func _spend_campaign_life_for_run(outcome: String = "left") -> void:
 	if launched_from_dev_mode or _life_spent_for_run:
 		return
+	if (
+		_rewarded_time_extension_client != null
+		and _rewarded_time_extension_client.has_active_run()
+	):
+		_life_spent_for_run = true
+		_online_run_settlement_in_progress = true
+		_settle_rewarded_run_terminal(outcome)
+		return
 
 	if PlayerProgress.spend_life(selected_level, outcome):
 		_life_spent_for_run = true
 	else:
 		push_warning("Could not spend campaign life for level %d." % selected_level)
+
+
+func _settle_rewarded_run_terminal(outcome: String) -> void:
+	var result: Dictionary = await _rewarded_time_extension_client.settle_terminal(outcome)
+	_online_run_settlement_in_progress = false
+	if not bool(result.get("ok", false)):
+		push_warning("Rewarded run terminal state could not be settled: %s" % result.get("error", {}))
+		return
+	PlayerProgress.apply_authoritative_life_state(result.get("life_state", {}) as Dictionary)
 
 
 func _setup_pause_menu_buttons() -> void:
@@ -2589,7 +2651,23 @@ func _open_leave_confirmation() -> void:
 func _on_leave_confirmation_leave_pressed() -> void:
 	if _is_ui_action_blocked():
 		return
-
+	if (
+		not launched_from_dev_mode
+		and _rewarded_time_extension_client != null
+		and _rewarded_time_extension_client.has_active_run()
+	):
+		_loading_transition_pending = true
+		var settlement: Dictionary = await _rewarded_time_extension_client.settle_terminal("left")
+		_loading_transition_pending = false
+		if not bool(settlement.get("ok", false)):
+			push_warning("Rewarded run abandon could not be settled: %s" % settlement.get("error", {}))
+			return
+		_life_spent_for_run = true
+		PlayerProgress.apply_authoritative_life_state(
+			settlement.get("life_state", {}) as Dictionary
+		)
+		_return_to_main_menu()
+		return
 	_spend_campaign_life_for_run()
 	_return_to_main_menu()
 
@@ -2790,14 +2868,58 @@ func _on_time_extension_coin_requested() -> void:
 
 
 func _on_time_extension_ad_requested() -> void:
-	# The button remains visible but disabled until a rewarded-ad provider is approved and connected.
-	# Do not grant time from a placeholder signal.
-	if not _is_rewarded_ad_time_extension_available():
+	if (
+		not _time_extension_offer_active
+		or _time_extension_purchase_in_progress
+		or _is_ui_action_blocked()
+		or not _is_rewarded_ad_time_extension_available()
+		or _rewarded_ad_time_extensions_used >= _max_rewarded_ad_time_extensions_per_attempt
+	):
 		return
+
+	_time_extension_purchase_in_progress = true
+	_time_up_extension_overlay.set_coin_action_enabled(false)
+	_time_up_extension_overlay.set_ad_action_state(
+		&"verifying" if _rewarded_time_extension_client.is_awaiting_verification() else &"loading"
+	)
+	var claim: Dictionary = await _rewarded_time_extension_client.claim(selected_level)
+	if not is_inside_tree() or _returning_to_menu or _level_failed or _level_completed:
+		return
+	if (
+		bool(claim.get("ok", false))
+		and int(claim.get("seconds", 0)) == _time_extension_seconds
+	):
+		_rewarded_ad_time_extensions_used += 1
+		_time_remaining = float(_time_extension_seconds)
+		_time_extension_offer_active = false
+		_play_haptic(HapticsCatalogScript.EVENT_TIME_EXTENSION_SUCCESS)
+		await _time_up_extension_overlay.close()
+		if not is_inside_tree() or _returning_to_menu or _level_failed or _level_completed:
+			return
+		_time_extension_purchase_in_progress = false
+		_level_paused = false
+		_set_moving_shelf_rows_paused(false)
+		_update_timer_label()
+		_update_ability_buttons()
+		_update_pause_menu_button()
+		return
+
+	_time_extension_purchase_in_progress = false
+	_refresh_time_extension_offer()
+	if bool(claim.get("pending", false)):
+		_time_up_extension_overlay.set_ad_action_state(&"retry_verification")
+	elif _is_rewarded_ad_time_extension_available():
+		_time_up_extension_overlay.set_ad_action_state(&"retry")
 
 
 func _is_ui_action_blocked() -> bool:
-	return _loading_transition_pending or _returning_to_menu or _is_any_overlay_transitioning()
+	return (
+		_loading_transition_pending
+		or _returning_to_menu
+		or _online_run_settlement_in_progress
+		or _completion_settlement_in_progress
+		or _is_any_overlay_transitioning()
+	)
 
 
 func _close_pause_menu() -> void:
