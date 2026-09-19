@@ -10,6 +10,7 @@ const ProfileFrameCatalogScript := preload("res://scripts/profile_frame_catalog.
 const ContentProvenanceManifestScript := preload(
 	"res://scripts/save/content_provenance_manifest.gd"
 )
+const AdPacingStateScript := preload("res://scripts/ads/ad_pacing_state.gd")
 const SAVE_PATH := "user://player_progress.json"
 const SAVE_VERSION := 9
 const MIN_LEVEL := 1
@@ -115,9 +116,14 @@ func load_progress() -> void:
 	var initial_preferences := {
 		"settings_disabled": initial_data.get("settings_disabled", DEFAULT_DISABLED_SETTINGS).duplicate(true),
 		"selected_chapter_id": initial_data.get("selected_chapter_id", _default_chapter_id()),
+		"ad_pacing_state": initial_data.get(
+			"ad_pacing_state",
+			AdPacingStateScript.create_default()
+		).duplicate(true),
 	}
 	initial_data.erase("settings_disabled")
 	initial_data.erase("selected_chapter_id")
+	initial_data.erase("ad_pacing_state")
 	if _account_coordinator == null:
 		_account_coordinator = AccountSaveCoordinatorScript.new(_session_store)
 	var open_result: Dictionary = _account_coordinator.initialize(
@@ -509,6 +515,21 @@ func get_disabled_settings() -> Dictionary:
 	return disabled_settings.duplicate()
 
 
+## Local-only ad pacing is a preference partition: it controls presentation frequency but cannot
+## grant economy or gameplay state and is never emitted as a backend journal operation.
+func get_ad_pacing_state() -> Dictionary:
+	return AdPacingStateScript.sanitize(_data.get("ad_pacing_state", {}))
+
+
+func set_ad_pacing_state(raw_state: Dictionary) -> bool:
+	var sanitized := AdPacingStateScript.sanitize(raw_state)
+	if get_ad_pacing_state() == sanitized:
+		return true
+	var previous_data := _data.duplicate(true)
+	_data["ad_pacing_state"] = sanitized
+	return _commit_or_restore(previous_data)
+
+
 func is_setting_disabled(setting_id: StringName) -> bool:
 	var disabled_settings := get_disabled_settings()
 	return bool(disabled_settings.get(String(setting_id), false))
@@ -777,6 +798,9 @@ func _sanitize_data(raw_data: Dictionary) -> Dictionary:
 	sanitized["player_name"] = _sanitize_player_name(str(raw_data.get("player_name", sanitized["player_name"])), sanitized["player_name"])
 	sanitized["moderation_state"] = str(raw_data.get("moderation_state", "active"))
 	sanitized["settings_disabled"] = _sanitize_disabled_settings(raw_data.get("settings_disabled", {}))
+	sanitized["ad_pacing_state"] = AdPacingStateScript.sanitize(
+		raw_data.get("ad_pacing_state", {})
+	)
 	sanitized["selected_chapter_id"] = _sanitize_selected_chapter_id(
 		str(raw_data.get("selected_chapter_id", _default_chapter_id())),
 		sanitized["completion_stars_by_level"] as Dictionary
@@ -841,6 +865,7 @@ func _default_data() -> Dictionary:
 		"player_name": _generate_player_name(),
 		"moderation_state": "active",
 		"settings_disabled": DEFAULT_DISABLED_SETTINGS.duplicate(),
+		"ad_pacing_state": AdPacingStateScript.create_default(),
 		"selected_chapter_id": _default_chapter_id(),
 		"total_earned_stars": 0,
 		"leaderboard_week_start_unix": get_current_leaderboard_week_start_unix(),
@@ -1346,6 +1371,10 @@ func _apply_loaded_partitions(snapshot: Dictionary, preferences: Dictionary) -> 
 		"selected_chapter_id",
 		_default_chapter_id()
 	)
+	combined["ad_pacing_state"] = preferences.get(
+		"ad_pacing_state",
+		AdPacingStateScript.create_default()
+	)
 	_data = _sanitize_data(combined)
 
 
@@ -1357,6 +1386,7 @@ func _snapshot_without_preferences(source: Dictionary) -> Dictionary:
 	var snapshot := source.duplicate(true)
 	snapshot.erase("settings_disabled")
 	snapshot.erase("selected_chapter_id")
+	snapshot.erase("ad_pacing_state")
 	return snapshot
 
 
@@ -1364,6 +1394,7 @@ func _preferences_for_storage() -> Dictionary:
 	return {
 		"settings_disabled": get_disabled_settings(),
 		"selected_chapter_id": get_selected_chapter_id(),
+		"ad_pacing_state": get_ad_pacing_state(),
 	}
 
 

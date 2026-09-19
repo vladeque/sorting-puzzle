@@ -13,6 +13,20 @@ contract, CLI, tests, and release boundary.
 
 This file documents what each script owns. Keep script docs focused on responsibilities, exports, dependencies, and boundaries.
 
+## `scripts/ads/*.gd`
+
+- `ad_service.gd`: `AdService` autoload and sole gameplay-facing API. It coordinates lifecycle,
+  consent/privacy options, preload/show, one active request, audio restoration, normalized results,
+  diagnostics, and local pacing persistence.
+- `ad_policy.gd`: pure, bounded, fail-closed rewarded/interstitial eligibility rules.
+- `ad_pacing_state.gd`: schema/sanitizer and transition helpers for non-economic local counters and
+  timestamps.
+- `ad_provider.gd`: disabled provider contract; `mock_ad_provider.gd` is the deterministic test
+  implementation; `admob_provider.gd` adapts the pinned native bridge without reward authority.
+
+See [ADS_002_CLIENT_AD_INFRASTRUCTURE.md](ADS_002_CLIENT_AD_INFRASTRUCTURE.md) for release gates and
+the backend reward boundary.
+
 ## `scripts/testing/reward_chest_fill_preview.gd`
 
 Attached to `scenes/testing/reward_chest_fill_preview.tscn`. It drives the production reward chest

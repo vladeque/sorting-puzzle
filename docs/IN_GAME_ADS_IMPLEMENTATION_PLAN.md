@@ -127,6 +127,7 @@ Recommended policy inputs:
 ```json
 {
   "schema_version": 1,
+  "config_version": "post-launch-rollout-1",
   "provider_enabled": true,
   "rewarded": {
     "enabled": true,
@@ -139,17 +140,21 @@ Recommended policy inputs:
     "enabled": false,
     "rollout_percent": 0,
     "completed_levels_per_ad": 3,
-    "minimum_completed_levels_before_first_ad": 0,
-    "minimum_seconds_between_ads": 300,
-    "maximum_ads_per_session": 3,
-    "suppress_after_rewarded_seconds": 180
+    "minimum_completed_levels_before_first_ad": 5,
+    "minimum_seconds_between_ads": 600,
+    "maximum_ads_per_session": 2,
+    "suppress_after_rewarded_seconds": 300
   }
 }
 ```
 
-`3` is an example interval, not an approved post-release value. The remote service must validate
-that intervals and caps are positive and bounded. The rewarded section represents the intended
-production launch policy; interstitials remain off regardless of their configured pacing values.
+These are the approved post-release pacing defaults: first opportunity after five new campaign
+completions, then every three, with a ten-minute cooldown, two-impression session cap, five-minute
+suppression after a rewarded impression, and a five-percent initial rollout when automatic ads are
+eventually activated. The bundled release policy keeps `enabled` and `rollout_percent` at zero. The
+remote service must validate that intervals and caps are positive and bounded. The rewarded section
+represents the intended production launch policy; interstitials remain off regardless of their
+configured pacing values.
 
 Pacing behavior:
 
@@ -328,6 +333,13 @@ physical-device/iOS/compliance gates are in
   ad-free entitlement behavior.
 
 ### ADS-002 — Build client ad infrastructure
+
+Status: **Implemented behind disabled release gates.** The service, pure policy, deterministic mock,
+AdMob adapter, local-only pacing persistence, UMP/privacy plumbing, pinned native bridge, and
+fail-closed bundled policy are implemented. See
+[`ADS_002_CLIENT_AD_INFRASTRUCTURE.md`](ADS_002_CLIENT_AD_INFRASTRUCTURE.md). Physical-device
+Android and macOS/iOS acceptance remains part of the provider/release gates, not a reason to enable
+production requests.
 
 - Add `AdService`, policy, provider interface, mock provider, fail-closed config, and pacing save.
 - Add consent/privacy entry-point plumbing and test-mode diagnostics.

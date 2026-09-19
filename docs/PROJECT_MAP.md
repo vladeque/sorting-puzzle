@@ -58,6 +58,15 @@ Sound effects:
 - The only playback owner for shared sound effects; every screen reaches it through
   `SfxManager.play(event_id, context)`.
 
+Ad infrastructure:
+- `scripts/ads/*.gd`
+- `configs/ads.json`
+- `addons/admob/`
+- Registered in `project.godot` as the `AdService` autoload.
+- Owns fail-closed ad policy, provider/consent lifecycle, presentation normalization, local-only
+  interstitial pacing, audio restoration, and diagnostics. No placement currently grants a reward or
+  enables production requests; see [ADS_002_CLIENT_AD_INFRASTRUCTURE.md](ADS_002_CLIENT_AD_INFRASTRUCTURE.md).
+
 Reusable item scene:
 - `scenes/item.tscn`
 - Instantiated by `scripts/level.gd` for every shelf item.

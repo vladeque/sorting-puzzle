@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "config_version": "bundled-disabled-1",
+  "provider_enabled": false,
+  "rewarded": {
+    "enabled": false,
+    "time_extension_enabled": false,
+    "life_enabled": false,
+    "ability_enabled": false,
+    "shelf_unlock_enabled": false
+  },
+  "interstitial": {
+    "enabled": false,
+    "rollout_percent": 0,
+    "completed_levels_per_ad": 3,
+    "minimum_completed_levels_before_first_ad": 5,
+    "minimum_seconds_between_ads": 600,
+    "maximum_ads_per_session": 2,
+    "suppress_after_rewarded_seconds": 300
+  }
+}
