@@ -36,8 +36,8 @@ on this compatibility run, avoiding a second debit.
 ## Gates
 
 - `configs/time_extension.json` enables the compiled placement capability.
-- `configs/ads.json` enables only provider policy plus rewarded/time-extension policy; other
-  rewarded placements and interstitials remain disabled.
+- `configs/ads.json` enables provider policy plus the implemented rewarded time-extension and life
+  placements; ability/shelf rewarded placements and interstitials remain disabled.
 - `application/config/ad_provider`, native integration, platform AdMob enablement/application ID,
   consent, ad readiness, backend URL/session, and backend runtime ad-unit mapping must all be valid.
 - Interstitials remain independently disabled.

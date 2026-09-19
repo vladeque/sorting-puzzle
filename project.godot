@@ -27,8 +27,10 @@ config/ad_provider="disabled"
 config/ad_allow_mock_provider=false
 config/ad_native_integration_enabled=false
 config/admob_android_rewarded_ad_unit_id=""
+config/admob_android_rewarded_life_ad_unit_id=""
 config/admob_android_interstitial_ad_unit_id=""
 config/admob_ios_rewarded_ad_unit_id=""
+config/admob_ios_rewarded_life_ad_unit_id=""
 config/admob_ios_interstitial_ad_unit_id=""
 
 [audio]

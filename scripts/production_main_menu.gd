@@ -8,6 +8,7 @@ const SfxCatalogScript := preload("res://scripts/audio/sfx_catalog.gd")
 const HapticsCatalogScript := preload("res://scripts/haptics/haptics_catalog.gd")
 const MenuBackgroundResolverScript := preload("res://scripts/chapters/menu_background_resolver.gd")
 const UIMotionScript := preload("res://scripts/ui_motion.gd")
+const RewardedLifeClientScript := preload("res://scripts/ads/rewarded_life_client.gd")
 const PRODUCTION_MENU_SCENE := "res://scenes/main_menu.tscn"
 const SHOP_SCENE := "res://scenes/ui/shop_screen.tscn"
 const LEADERBOARD_SCENE := "res://scenes/ui/leaderboard_screen.tscn"
@@ -57,7 +58,10 @@ var _chapter_selection_screen: Control
 var _animated_reward_stars := 0
 var _animated_reward_goal_index := 0
 var _is_navigating := false
-var _life_purchase_in_progress := false
+var _life_recovery_in_progress := false
+var _rewarded_life_client
+var _rewarded_life_action_state := OutOfLivesMenu.REWARDED_STATE_UNAVAILABLE
+var _rewarded_life_prepare_in_progress := false
 ## True only while the lives modal is open on top of an interrupted campaign launch. The top-status
 ## lives widget opens the same modal informationally, and that entry point must never resume a
 ## launch or be dismissed out from under the player when a countdown restores a life.
@@ -78,6 +82,8 @@ func _ready() -> void:
 	_life_shortcut.pressed.connect(_open_out_of_lives_menu.bind(false))
 	_out_of_lives_menu.close_requested.connect(_on_out_of_lives_close_requested)
 	_out_of_lives_menu.purchase_requested.connect(_on_out_of_lives_purchase_requested)
+	_out_of_lives_menu.rewarded_ad_requested.connect(_on_out_of_lives_rewarded_ad_requested)
+	_setup_rewarded_life_client()
 	if _reward_chest.has_signal("chest_pressed"):
 		_reward_chest.connect("chest_pressed", Callable(self, "_open_reward_chest_menu"))
 	_bottom_navigation.connect("shop_pressed", Callable(self, "_open_shop"))
@@ -113,6 +119,7 @@ func _ready() -> void:
 		if weekly_coin_reward > 0:
 			SfxManager.play(SfxCatalogScript.EVENT_COIN_GAIN)
 			HapticsManager.play(HapticsCatalogScript.EVENT_LEADERBOARD_REWARD)
+	call_deferred("_prepare_rewarded_life")
 
 
 func _process(delta: float) -> void:
@@ -351,14 +358,62 @@ func _refresh_out_of_lives_offer() -> void:
 		PlayerProgress.get_next_life_restore_seconds_remaining(),
 		PlayerProgress.get_life_purchase_coin_price()
 	)
-	_out_of_lives_menu.set_purchase_enabled(not _life_purchase_in_progress)
+	_out_of_lives_menu.set_purchase_enabled(not _life_recovery_in_progress)
+	_refresh_rewarded_life_action()
 	if (
 		_out_of_lives_launch_pending
 		and lives > 0
 		and _out_of_lives_menu.visible
 		and not _out_of_lives_menu.is_transitioning()
+		and not _life_recovery_in_progress
 	):
-		_close_out_of_lives_menu()
+		_life_recovery_in_progress = true
+		_complete_life_recovery()
+
+
+func _setup_rewarded_life_client() -> void:
+	if _rewarded_life_client != null:
+		return
+	_rewarded_life_client = RewardedLifeClientScript.new()
+	add_child(_rewarded_life_client)
+	var ad_service := get_tree().root.get_node_or_null(^"AdService")
+	_rewarded_life_client.configure(PlayerProgress.get_backend_transport(), ad_service)
+
+
+func _prepare_rewarded_life() -> void:
+	if _rewarded_life_client == null or _life_recovery_in_progress or _rewarded_life_prepare_in_progress:
+		return
+	_rewarded_life_prepare_in_progress = true
+	_rewarded_life_action_state = OutOfLivesMenu.REWARDED_STATE_LOADING
+	_refresh_rewarded_life_action()
+	var result: Dictionary = await _rewarded_life_client.prepare()
+	if not is_inside_tree():
+		return
+	_rewarded_life_prepare_in_progress = false
+	_rewarded_life_action_state = (
+		OutOfLivesMenu.REWARDED_STATE_READY
+		if bool(result.get("status", &"") == &"ready") and _rewarded_life_client.can_offer()
+		else OutOfLivesMenu.REWARDED_STATE_UNAVAILABLE
+	)
+	_refresh_rewarded_life_action()
+
+
+func _refresh_rewarded_life_action() -> void:
+	if _out_of_lives_menu == null or _rewarded_life_client == null:
+		return
+	if _life_recovery_in_progress:
+		_out_of_lives_menu.set_rewarded_action_state(_rewarded_life_action_state, false)
+		return
+	if _rewarded_life_client.is_awaiting_verification():
+		_rewarded_life_action_state = OutOfLivesMenu.REWARDED_STATE_PENDING
+	elif _rewarded_life_client.can_offer():
+		_rewarded_life_action_state = OutOfLivesMenu.REWARDED_STATE_READY
+	elif _rewarded_life_action_state != OutOfLivesMenu.REWARDED_STATE_ERROR:
+		_rewarded_life_action_state = OutOfLivesMenu.REWARDED_STATE_UNAVAILABLE
+	_out_of_lives_menu.set_rewarded_action_state(
+		_rewarded_life_action_state,
+		_rewarded_life_client.can_offer()
+	)
 
 
 func _update_reward_chest_status() -> void:
@@ -598,6 +653,8 @@ func _open_out_of_lives_menu(is_launch_pending: bool) -> void:
 	_out_of_lives_launch_pending = is_launch_pending
 	_refresh_out_of_lives_offer()
 	_out_of_lives_menu.open()
+	if not _rewarded_life_client.can_offer() and not _rewarded_life_client.is_awaiting_verification():
+		call_deferred("_prepare_rewarded_life")
 
 
 ## Single close path for the lives modal, so no route can leave a stale pending launch behind and
@@ -608,13 +665,13 @@ func _close_out_of_lives_menu() -> void:
 
 
 func _on_out_of_lives_close_requested() -> void:
-	if _life_purchase_in_progress or _out_of_lives_menu.is_transitioning():
+	if _life_recovery_in_progress or _out_of_lives_menu.is_transitioning():
 		return
 	_close_out_of_lives_menu()
 
 
 func _on_out_of_lives_purchase_requested() -> void:
-	if _life_purchase_in_progress or _out_of_lives_menu.is_transitioning():
+	if _life_recovery_in_progress or _out_of_lives_menu.is_transitioning():
 		return
 
 	PlayerProgress.refresh_lives()
@@ -633,20 +690,76 @@ func _on_out_of_lives_purchase_requested() -> void:
 		_open_shop()
 		return
 
-	_life_purchase_in_progress = true
+	_life_recovery_in_progress = true
 	_out_of_lives_menu.set_purchase_enabled(false)
 	if not PlayerProgress.purchase_life():
-		_life_purchase_in_progress = false
+		_life_recovery_in_progress = false
 		_refresh_out_of_lives_offer()
 		return
 
 	SfxManager.play(SfxCatalogScript.EVENT_COIN_SPEND)
 	HapticsManager.play(HapticsCatalogScript.EVENT_LIFE_PURCHASE_SUCCESS)
 	_update_coin_balance()
+	await _complete_life_recovery()
+
+
+func _on_out_of_lives_rewarded_ad_requested() -> void:
+	if _life_recovery_in_progress or _out_of_lives_menu.is_transitioning():
+		return
+	PlayerProgress.refresh_lives()
+	if PlayerProgress.get_lives() > 0 and _out_of_lives_launch_pending:
+		_life_recovery_in_progress = true
+		await _complete_life_recovery()
+		return
+	if PlayerProgress.get_lives() >= PlayerProgress.get_max_lives():
+		_refresh_out_of_lives_offer()
+		return
+	if _rewarded_life_client == null or not _rewarded_life_client.can_offer():
+		_rewarded_life_action_state = OutOfLivesMenu.REWARDED_STATE_ERROR
+		_refresh_rewarded_life_action()
+		return
+
+	_life_recovery_in_progress = true
+	_rewarded_life_action_state = (
+		OutOfLivesMenu.REWARDED_STATE_VERIFYING
+		if _rewarded_life_client.is_awaiting_verification()
+		else OutOfLivesMenu.REWARDED_STATE_LOADING
+	)
+	_out_of_lives_menu.set_purchase_enabled(false)
+	_refresh_rewarded_life_action()
+	var result: Dictionary = await _rewarded_life_client.claim()
+	if not is_inside_tree():
+		return
+	if not bool(result.get("ok", false)):
+		_life_recovery_in_progress = false
+		_rewarded_life_action_state = (
+			OutOfLivesMenu.REWARDED_STATE_PENDING
+			if bool(result.get("pending", false))
+			else OutOfLivesMenu.REWARDED_STATE_ERROR
+		)
+		_refresh_out_of_lives_offer()
+		if not bool(result.get("pending", false)):
+			call_deferred("_prepare_rewarded_life")
+		return
+	if not PlayerProgress.apply_authoritative_life_state(result.get("life_state", {}) as Dictionary):
+		_life_recovery_in_progress = false
+		_rewarded_life_action_state = OutOfLivesMenu.REWARDED_STATE_ERROR
+		_refresh_out_of_lives_offer()
+		return
+	if PlayerProgress.get_lives() <= 0:
+		_life_recovery_in_progress = false
+		_rewarded_life_action_state = OutOfLivesMenu.REWARDED_STATE_ERROR
+		_refresh_out_of_lives_offer()
+		return
+	await _complete_life_recovery()
+
+
+func _complete_life_recovery() -> void:
 	_update_lives_status()
 	_update_level_button()
 	var should_resume_launch := _out_of_lives_launch_pending
 	await _close_out_of_lives_menu()
-	_life_purchase_in_progress = false
+	_life_recovery_in_progress = false
+	_rewarded_life_action_state = OutOfLivesMenu.REWARDED_STATE_UNAVAILABLE
 	if should_resume_launch:
 		_launch_campaign_level()

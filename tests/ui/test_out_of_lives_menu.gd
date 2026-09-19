@@ -12,6 +12,29 @@ const TEST_RESOLUTIONS := [
 var _failures: Array[String] = []
 
 
+class FakeRewardedLifeClient extends RefCounted:
+	var claim_count := 0
+	var result := {
+		"ok": true,
+		"life_state": {
+			"current": 1,
+			"maximum": 5,
+			"restore_interval_seconds": 3600,
+			"next_restore_at": "2026-09-20T12:00:00.000Z",
+		},
+	}
+
+	func can_offer() -> bool:
+		return true
+
+	func is_awaiting_verification() -> bool:
+		return false
+
+	func claim() -> Dictionary:
+		claim_count += 1
+		return result.duplicate(true)
+
+
 func _init() -> void:
 	if not str(ProjectSettings.get_setting("application/config/name", "")).begins_with(
 		ISOLATED_TEST_PROJECT_PREFIX
@@ -34,6 +57,7 @@ func _run() -> void:
 	await _test_insufficient_coins_open_shop(progress)
 	await _test_lives_widget_at_full_lives(progress)
 	await _test_lives_widget_purchase_stays_in_menu(progress)
+	await _test_rewarded_life_resumes_pending_launch_once(progress)
 
 	if _failures.is_empty():
 		print("Out-of-lives menu verification passed.")
@@ -82,11 +106,22 @@ func _test_modal_and_successful_purchase(progress) -> void:
 		modal.get_node("%PriceLabel").text == "500",
 		"The purchase action displays the configured 500-coin price."
 	)
-	var coming_soon := modal.get_node("%ComingSoonButton") as Button
+	var rewarded_ad := modal.get_node("%RewardedAdButton") as Button
 	_check(
-		coming_soon.visible and coming_soon.disabled and coming_soon.text == "Coming Soon",
-		"The Coming Soon action remains visible and disabled."
+		rewarded_ad.visible and rewarded_ad.disabled and rewarded_ad.text == "Watch Ad",
+		"The rewarded-life action fails closed when the provider is unavailable."
 	)
+	_check(modal.has_signal("rewarded_ad_requested"), "The modal owns a dedicated rewarded-ad intent signal.")
+	modal.call("set_rewarded_action_state", &"loading", false)
+	_check(rewarded_ad.disabled and rewarded_ad.text == "Loading...", "The modal exposes an explicit loading state.")
+	modal.call("set_rewarded_action_state", &"error", true)
+	_check(
+		not rewarded_ad.disabled
+			and rewarded_ad.text == "Try Again"
+			and (modal.get_node("%RewardStatusLabel") as Label).visible,
+		"The modal exposes a retryable error state with player-facing feedback."
+	)
+	modal.call("set_rewarded_action_state", &"unavailable", false)
 
 	var shell := modal.get_node("%Shell")
 	var outer := shell.get_node("%OuterPanel") as Control
@@ -197,7 +232,7 @@ func _test_lives_widget_at_full_lives(progress) -> void:
 			and not got_it.disabled
 			and got_it.text == "Got it"
 			and not (modal.get_node("%PurchaseButton") as Button).visible
-			and not (modal.get_node("%ComingSoonButton") as Button).visible,
+			and not (modal.get_node("%RewardedAdButton") as Button).visible,
 		"The full-lives modal offers a single enabled Got it action and no purchase."
 	)
 
@@ -266,6 +301,42 @@ func _test_lives_widget_purchase_stays_in_menu(progress) -> void:
 	await process_frame
 
 
+func _test_rewarded_life_resumes_pending_launch_once(progress) -> void:
+	progress.reset_progress()
+	_drain_lives(progress)
+	var starting_coins: int = progress.get_coins()
+	var starting_life_purchase_count := _count_life_purchase_operations(progress)
+	var menu := await _open_main_menu()
+	var old_client = menu.get("_rewarded_life_client")
+	var fake_client := FakeRewardedLifeClient.new()
+	menu.set("_rewarded_life_client", fake_client)
+	if old_client != null:
+		old_client.queue_free()
+	menu.call("_refresh_out_of_lives_offer")
+
+	(menu.get_node("%LevelButton") as Button).emit_signal("pressed")
+	await _wait_seconds(0.3)
+	var modal := menu.get_node("%OutOfLivesMenu") as Control
+	var rewarded_button := modal.get_node("%RewardedAdButton") as Button
+	_check(
+		rewarded_button.visible and not rewarded_button.disabled,
+		"A ready rewarded-life client enables Watch Ad."
+	)
+	rewarded_button.emit_signal("pressed")
+	await _wait_for_level_transition(menu)
+	_check(current_scene != menu, "A verified rewarded life resumes the interrupted launch.")
+	_check(fake_client.claim_count == 1, "The pending launch requests and consumes one verified grant.")
+	_check(progress.get_lives() == 1, "The authoritative rewarded state is mirrored locally.")
+	_check(progress.get_coins() == starting_coins, "The rewarded route spends no coins.")
+	_check(
+		_count_life_purchase_operations(progress) == starting_life_purchase_count,
+		"The server-settled grant creates no local life-purchase journal entry."
+	)
+	if current_scene != null:
+		current_scene.queue_free()
+	await process_frame
+
+
 func _open_main_menu() -> Control:
 	var menu := (load("res://scenes/main_menu.tscn") as PackedScene).instantiate() as Control
 	root.add_child(menu)
@@ -278,6 +349,13 @@ func _open_main_menu() -> Control:
 func _drain_lives(progress) -> void:
 	while progress.get_lives() > 0:
 		_check(progress.spend_life(), "Test setup spends one life.")
+
+
+func _count_life_purchase_operations(progress) -> int:
+	var journal := progress.get("_local_store").get_journal() as Array
+	return journal.filter(func(operation):
+		return str((operation as Dictionary).get("operation_type", "")) == "life_purchase"
+	).size()
 
 
 func _wait_seconds(seconds: float) -> void:

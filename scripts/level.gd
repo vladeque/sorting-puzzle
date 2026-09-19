@@ -51,6 +51,7 @@ const ITEM_SPRITES_CONFIG := "res://configs/item_sprites.json"
 const ABILITY_PURCHASE_PRICES_CONFIG := "res://configs/ability_purchase_prices.json"
 const TIME_EXTENSION_CONFIG := "res://configs/time_extension.json"
 const RewardedTimeExtensionClientScript := preload("res://scripts/ads/rewarded_time_extension_client.gd")
+const RewardedLifeClientScript := preload("res://scripts/ads/rewarded_life_client.gd")
 const LEVEL_CONFIG_TEMPLATE := "res://configs/levels/level_%03d.json"
 const DEFAULT_LEVEL_CONFIG := "res://configs/levels/level_001.json"
 const LAYOUT_SCENE_TEMPLATE := "res://scenes/layouts/layout_%s.tscn"
@@ -213,6 +214,9 @@ var _rewarded_ad_time_extensions_used := 0
 var _time_extension_offer_active := false
 var _time_extension_purchase_in_progress := false
 var _rewarded_time_extension_client
+var _rewarded_life_client
+var _rewarded_life_action_state := OutOfLivesMenu.REWARDED_STATE_UNAVAILABLE
+var _rewarded_life_prepare_in_progress := false
 var _online_run_settlement_in_progress := false
 var _completion_settlement_in_progress := false
 var _in_level_shop_return_destination := StringName()
@@ -310,6 +314,7 @@ func _ready() -> void:
 	_load_ability_purchase_prices()
 	_load_time_extension_configuration()
 	_setup_rewarded_time_extension_client()
+	_setup_rewarded_life_client()
 	_load_item_textures()
 	_apply_chapter_background()
 	_apply_level_config(_load_level_config(selected_level))
@@ -321,6 +326,7 @@ func _ready() -> void:
 	_update_pause_menu_button()
 	if _rewarded_ad_time_extension_configured:
 		call_deferred("_prepare_rewarded_time_extension")
+	call_deferred("_prepare_rewarded_life")
 
 
 func _apply_chapter_background() -> void:
@@ -855,6 +861,33 @@ func _prepare_rewarded_time_extension() -> void:
 	await _rewarded_time_extension_client.prepare()
 	if is_inside_tree() and _time_extension_offer_active:
 		_refresh_time_extension_offer()
+
+
+func _setup_rewarded_life_client() -> void:
+	if _rewarded_life_client != null:
+		return
+	_rewarded_life_client = RewardedLifeClientScript.new()
+	add_child(_rewarded_life_client)
+	var ad_service := get_tree().root.get_node_or_null(^"AdService")
+	_rewarded_life_client.configure(PlayerProgress.get_backend_transport(), ad_service)
+
+
+func _prepare_rewarded_life() -> void:
+	if _rewarded_life_client == null or _retry_purchase_in_progress or _rewarded_life_prepare_in_progress:
+		return
+	_rewarded_life_prepare_in_progress = true
+	_rewarded_life_action_state = OutOfLivesMenu.REWARDED_STATE_LOADING
+	_refresh_rewarded_life_action()
+	var result: Dictionary = await _rewarded_life_client.prepare()
+	if not is_inside_tree():
+		return
+	_rewarded_life_prepare_in_progress = false
+	_rewarded_life_action_state = (
+		OutOfLivesMenu.REWARDED_STATE_READY
+		if result.get("status", &"") == &"ready" and _rewarded_life_client.can_offer()
+		else OutOfLivesMenu.REWARDED_STATE_UNAVAILABLE
+	)
+	_refresh_rewarded_life_action()
 
 
 func _load_level_config(level_number: int) -> Dictionary:
@@ -2451,6 +2484,7 @@ func _setup_failure_screen() -> void:
 	if _out_of_lives_overlay != null:
 		_out_of_lives_overlay.close_requested.connect(_on_retry_out_of_lives_close_requested)
 		_out_of_lives_overlay.purchase_requested.connect(_on_retry_life_purchase_requested)
+		_out_of_lives_overlay.rewarded_ad_requested.connect(_on_retry_rewarded_life_requested)
 
 
 func _setup_ability_purchase_menu() -> void:
@@ -2511,6 +2545,8 @@ func _open_retry_out_of_lives_menu() -> void:
 	_refresh_retry_out_of_lives_offer()
 	_failure_screen.close()
 	_out_of_lives_overlay.open()
+	if not _rewarded_life_client.can_offer() and not _rewarded_life_client.is_awaiting_verification():
+		call_deferred("_prepare_rewarded_life")
 
 
 func _refresh_retry_out_of_lives_offer() -> void:
@@ -2524,6 +2560,25 @@ func _refresh_retry_out_of_lives_offer() -> void:
 		PlayerProgress.get_life_purchase_coin_price()
 	)
 	_out_of_lives_overlay.set_purchase_enabled(not _retry_purchase_in_progress)
+	_refresh_rewarded_life_action()
+
+
+func _refresh_rewarded_life_action() -> void:
+	if _out_of_lives_overlay == null or _rewarded_life_client == null:
+		return
+	if _retry_purchase_in_progress:
+		_out_of_lives_overlay.set_rewarded_action_state(_rewarded_life_action_state, false)
+		return
+	if _rewarded_life_client.is_awaiting_verification():
+		_rewarded_life_action_state = OutOfLivesMenu.REWARDED_STATE_PENDING
+	elif _rewarded_life_client.can_offer():
+		_rewarded_life_action_state = OutOfLivesMenu.REWARDED_STATE_READY
+	elif _rewarded_life_action_state != OutOfLivesMenu.REWARDED_STATE_ERROR:
+		_rewarded_life_action_state = OutOfLivesMenu.REWARDED_STATE_UNAVAILABLE
+	_out_of_lives_overlay.set_rewarded_action_state(
+		_rewarded_life_action_state,
+		_rewarded_life_client.can_offer()
+	)
 
 
 ## Declining the retry purchase, through either the modal X or system Back, ends the failed run and
@@ -2554,6 +2609,58 @@ func _on_retry_life_purchase_requested() -> void:
 		_play_sfx(SfxCatalogScript.EVENT_COIN_SPEND)
 		_play_haptic(HapticsCatalogScript.EVENT_LIFE_PURCHASE_SUCCESS)
 
+	_restart_after_life_recovery()
+
+
+func _on_retry_rewarded_life_requested() -> void:
+	if not _level_failed or _retry_purchase_in_progress or _is_ui_action_blocked():
+		return
+	PlayerProgress.refresh_lives()
+	if PlayerProgress.get_lives() > 0:
+		_retry_purchase_in_progress = true
+		_restart_after_life_recovery()
+		return
+	if _rewarded_life_client == null or not _rewarded_life_client.can_offer():
+		_rewarded_life_action_state = OutOfLivesMenu.REWARDED_STATE_ERROR
+		_refresh_rewarded_life_action()
+		return
+
+	_retry_purchase_in_progress = true
+	_rewarded_life_action_state = (
+		OutOfLivesMenu.REWARDED_STATE_VERIFYING
+		if _rewarded_life_client.is_awaiting_verification()
+		else OutOfLivesMenu.REWARDED_STATE_LOADING
+	)
+	_out_of_lives_overlay.set_purchase_enabled(false)
+	_refresh_rewarded_life_action()
+	var result: Dictionary = await _rewarded_life_client.claim()
+	if not is_inside_tree() or _returning_to_menu:
+		return
+	if not bool(result.get("ok", false)):
+		_retry_purchase_in_progress = false
+		_rewarded_life_action_state = (
+			OutOfLivesMenu.REWARDED_STATE_PENDING
+			if bool(result.get("pending", false))
+			else OutOfLivesMenu.REWARDED_STATE_ERROR
+		)
+		_refresh_retry_out_of_lives_offer()
+		if not bool(result.get("pending", false)):
+			call_deferred("_prepare_rewarded_life")
+		return
+	if not PlayerProgress.apply_authoritative_life_state(result.get("life_state", {}) as Dictionary):
+		_retry_purchase_in_progress = false
+		_rewarded_life_action_state = OutOfLivesMenu.REWARDED_STATE_ERROR
+		_refresh_retry_out_of_lives_offer()
+		return
+	if PlayerProgress.get_lives() <= 0:
+		_retry_purchase_in_progress = false
+		_rewarded_life_action_state = OutOfLivesMenu.REWARDED_STATE_ERROR
+		_refresh_retry_out_of_lives_offer()
+		return
+	_restart_after_life_recovery()
+
+
+func _restart_after_life_recovery() -> void:
 	_restart_level()
 
 

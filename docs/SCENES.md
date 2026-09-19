@@ -867,24 +867,27 @@ Purpose:
 - Renders one of two states, chosen entirely from the count `set_offer()` receives, so a countdown
   that restores the last missing life switches the open modal in place:
   - **Below the cap**: `assets/ui/main_menu_lives.png` with the live count, the `MM:SS` restoration
-	countdown, a green clover-coin price action, and a production-visible disabled `Coming Soon`
-	action. Titled `OUT OF LIVES` at zero lives and `GET MORE LIVES` above it -- the zero-lives
+	countdown, a green clover-coin price action, and a rewarded `Watch Ad` action with explicit
+	loading, verification, pending, and retry error presentation. Titled `OUT OF LIVES` at zero
+	lives and `GET MORE LIVES` above it -- the zero-lives
 	wording belongs to the interrupted-launch case that opens the modal to explain a blocked play.
   - **At the cap**: the countdown swaps to the full-lives message and both purchase actions swap to
 	a single dismissing `Got it`, under the title `LIVES FULL`. Nothing is for sale at the cap, so
 	offering a purchase action there would be an inert affordance.
-- Emits purchase/close intent only. `production_main_menu.gd` owns its Main Menu behavior;
+- Emits purchase, rewarded-ad, and close intent only. `production_main_menu.gd` owns its Main Menu behavior;
   `scripts/level.gd` owns retry purchase/restart/decline behavior; `PlayerProgress` owns the atomic
   offline economy mutation. `Got it` reuses `close_requested`, since dismissing is exactly what the
   shell's close action already does.
 
 Important nodes:
-- `%LifeCountLabel`, `%CountdownLabel`, and `%PriceLabel`: state supplied by the Main Menu.
+- `%LifeCountLabel`, `%CountdownLabel`, `%RewardStatusLabel`, and `%PriceLabel`: state supplied by
+  the current owner.
 - `%TimerCenter` / `%MessageCenter`: the two mutually exclusive right-hand content columns beside
   the heart (countdown vs. `%FullLivesLabel`), occupying the same 190x154 slot so the heart never
   moves between states.
 - `%PurchaseButton`: green 194x76 coin-price action using the shared primary style.
-- `%ComingSoonButton`: always-disabled neutral placeholder, visible below the cap.
+- `%RewardedAdButton`: rewarded-life action, visible below the cap and fail-closed when the
+  placement/provider/backend is unavailable.
 - `%GotItButton`: 194x76 dismiss action, visible only at the cap. Deliberately shares
   `style_box_green_primary_button.tres` with `%PurchaseButton` rather than taking the orange
   dismiss role (see "Shared UI Style Tokens"): it is the modal's only action in that state, so it

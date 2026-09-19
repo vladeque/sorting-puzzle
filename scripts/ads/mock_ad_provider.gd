@@ -47,12 +47,14 @@ func load_ad(format: StringName, placement: StringName = &"") -> Dictionary:
 	await _next_frame()
 	if not _initialized or not _consent_allows_ads:
 		return _result(STATUS_UNAVAILABLE, "mock_not_ready")
-	_ready_formats[format] = true
+	_ready_formats[_ready_key(format, placement)] = true
 	return _result(STATUS_READY)
 
 
-func is_ad_ready(format: StringName, _placement: StringName = &"") -> bool:
-	return _initialized and _consent_allows_ads and bool(_ready_formats.get(format, false))
+func is_ad_ready(format: StringName, placement: StringName = &"") -> bool:
+	return _initialized and _consent_allows_ads and bool(
+		_ready_formats.get(_ready_key(format, placement), false)
+	)
 
 
 func show_rewarded(placement: StringName, context: Dictionary) -> Dictionary:
@@ -61,12 +63,12 @@ func show_rewarded(placement: StringName, context: Dictionary) -> Dictionary:
 		"placement": placement,
 		"context": context.duplicate(true),
 	})
-	return await _consume_outcome(FORMAT_REWARDED)
+	return await _consume_outcome(FORMAT_REWARDED, placement)
 
 
 func show_interstitial(context: Dictionary) -> Dictionary:
 	_calls.append({"method": "show_interstitial", "context": context.duplicate(true)})
-	return await _consume_outcome(FORMAT_INTERSTITIAL)
+	return await _consume_outcome(FORMAT_INTERSTITIAL, &"")
 
 
 func set_consent(allows_ads: bool, privacy_options_required: bool = false) -> void:
@@ -96,16 +98,16 @@ func get_diagnostics() -> Dictionary:
 		"initialized": _initialized,
 		"consent_allows_ads": _consent_allows_ads,
 		"privacy_options_required": _privacy_options_required,
-		"rewarded_ready": is_ad_ready(FORMAT_REWARDED),
+		"rewarded_ready": _has_ready_rewarded(),
 		"interstitial_ready": is_ad_ready(FORMAT_INTERSTITIAL),
 	}
 
 
-func _consume_outcome(format: StringName) -> Dictionary:
-	if not is_ad_ready(format):
+func _consume_outcome(format: StringName, placement: StringName) -> Dictionary:
+	if not is_ad_ready(format, placement):
 		await _next_frame()
 		return _result(STATUS_UNAVAILABLE, "mock_ad_not_loaded")
-	_ready_formats[format] = false
+	_ready_formats[_ready_key(format, placement)] = false
 	var queue := _outcomes[format] as Array
 	var outcome := (
 		queue.pop_front() as Dictionary
@@ -119,3 +121,14 @@ func _consume_outcome(format: StringName) -> Dictionary:
 	if not outcome.has("impression"):
 		outcome["impression"] = true
 	return outcome
+
+
+func _ready_key(format: StringName, placement: StringName) -> String:
+	return "%s:%s" % [String(format), String(placement)]
+
+
+func _has_ready_rewarded() -> bool:
+	for key in _ready_formats:
+		if str(key).begins_with("rewarded:") and bool(_ready_formats.get(key, false)):
+			return true
+	return false

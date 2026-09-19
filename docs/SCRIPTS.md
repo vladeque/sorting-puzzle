@@ -22,14 +22,18 @@ This file documents what each script owns. Keep script docs focused on responsib
 - `ad_pacing_state.gd`: schema/sanitizer and transition helpers for non-economic local counters and
   timestamps.
 - `ad_provider.gd`: disabled provider contract; `mock_ad_provider.gd` is the deterministic test
-  implementation; `admob_provider.gd` adapts the pinned native bridge without reward authority.
+  implementation; `admob_provider.gd` adapts the pinned native bridge without reward authority and
+  keeps loaded rewarded inventory isolated by placement/ad unit.
 - `rewarded_time_extension_client.gd`: ADS-003 protocol-1.4 intent/status owner. It creates the
   compatibility online run, forwards opaque SSV custom data, accepts only a settled 60-second
   authorization, and binds that authorization into terminal run settlement.
+- `rewarded_life_client.gd`: ADS-004 protocol-1.4 player-scoped intent/status owner. It forwards
+  only opaque SSV custom data and returns the authoritative capped life state only after settlement.
 
 See [ADS_002_CLIENT_AD_INFRASTRUCTURE.md](ADS_002_CLIENT_AD_INFRASTRUCTURE.md) for release gates and
 the backend reward boundary, and
-[ADS_003_REWARDED_TIME_EXTENSION.md](ADS_003_REWARDED_TIME_EXTENSION.md) for the first placement.
+[ADS_003_REWARDED_TIME_EXTENSION.md](ADS_003_REWARDED_TIME_EXTENSION.md) and
+[ADS_004_REWARDED_LIFE.md](ADS_004_REWARDED_LIFE.md) for implemented placements.
 
 ## `scripts/testing/reward_chest_fill_preview.gd`
 
@@ -169,12 +173,12 @@ Key methods:
 - `_on_profile_saved(avatar_id, avatar_frame_id)`: refreshes the top status customization after the
   profile menu saves.
 - `_launch_campaign_level()`: resolves the selected chapter's next incomplete global level,
-  opens Out of Lives when needed, and resumes the same launch after a successful life purchase;
+  opens Out of Lives when needed, and resumes the same launch after a successful life recovery;
   otherwise sends the accepted request and campaign metadata to `LevelTransition`.
 - `_refresh_out_of_lives_offer()`: keeps the modal's life count, cap, configured price, and
   next-life countdown current, which is also what switches an open modal between its below-cap and
-  full-lives states; closes it without auto-launch if time restores a life during an interrupted
-  launch, and leaves a widget-opened modal alone.
+  full-lives states; resumes an interrupted launch exactly once if time restores a life, and leaves
+  a widget-opened modal alone.
 - `_open_out_of_lives_menu(is_launch_pending)`: opens the lives modal and records which entry point
   it came from in `_out_of_lives_launch_pending`.
 - `_close_out_of_lives_menu()`: single close path for the modal; clears the pending-launch flag
@@ -182,6 +186,9 @@ Key methods:
 - `_on_out_of_lives_purchase_requested()`: ignores a stale press at the life cap, opens Shop when
   unaffordable, otherwise persists one atomic offline life purchase and closes the modal; it
   launches the originally requested level only when a campaign launch was pending.
+- `_on_out_of_lives_rewarded_ad_requested()`: waits for authoritative rewarded-life settlement,
+  mirrors its life state without a local purchase operation, and uses the same one-time completion
+  route as coin/restoration recovery.
 
 ## `scripts/level_transition.gd`
 

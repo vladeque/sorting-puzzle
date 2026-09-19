@@ -37,7 +37,7 @@ plugin version and checksums; do not consume an unpinned Asset Library update in
 | --- | --- | --- | --- |
 | Ability purchase | `scenes/ability_purchase_menu.tscn` authors `%WatchAdButton` as disabled with `Coming Soon`; `scripts/ability_purchase_menu.gd` hides it in production and exposes it disabled in debug. `scripts/level.gd::_on_ability_purchase_ad_pressed()` is empty. | Apply the one selected ability immediately, matching the coin action rather than adding inventory. | Provider flow, enabled/loading states, one-request guard, backend-approved ad payment source, and gameplay authorization. |
 | Time-up extension | ADS-003 is implemented behind provider/backend gates. The paused modal exposes ready/loading/verifying/retry states; the client creates a run-bound intent and grants nothing until SSV settlement. | Add the configured 60 seconds once per attempt while the board remains paused. | Production provider IDs, backend runtime ad-unit mapping, and physical-device/store/privacy verification remain release gates. |
-| Out of lives | `scenes/ui/out_of_lives_menu.tscn` contains an always-disabled generic `%ComingSoonButton`. It has no signal or handler in `scripts/out_of_lives_menu.gd`. The same modal is owned by the main menu and the failed-level retry flow. | Restore exactly one life below the cap; resume the interrupted launch/retry only after the grant succeeds. | Replace the generic placeholder with a rewarded action, add intent routing to both owners, and add an authoritative life ledger grant. |
+| Out of lives | ADS-004 replaced the placeholder with `%RewardedAdButton`, explicit request/loading/error states, and authoritative settlement routing in both modal owners. | Restore exactly one life below the cap; resume the interrupted launch/retry only after the grant succeeds. | Implemented behind provider/backend release gates; see `ADS_004_REWARDED_LIFE.md`. |
 | Locked shelf | `scenes/ui/shelf_lock_overlay.tscn` already displays `AD`, but the overlay is presentational and has no input. `scripts/level.gd` currently unlocks shelves only when the global cleared-triple count reaches `unlock_after_triples`. | Unlock the one shelf the player selected without adding fake cleared triples or changing any other shelf's countdown. | Add an explicit tap/confirmation flow, stable shelf identity, per-attempt rewarded-unlock state, provider/claim routing, and gameplay-proof authorization. |
 
 ### “Coming Soon” UI that is not an ad placement
@@ -369,6 +369,8 @@ Status: **implemented behind provider/backend release gates**. See
 - Keep the coin extension independent and usable when ads are unavailable.
 
 ### ADS-004 — Enable rewarded life
+
+Status: **implemented behind release/provider gates**. See `ADS_004_REWARDED_LIFE.md`.
 
 - Give `OutOfLivesMenu` a dedicated `rewarded_ad_requested` signal and explicit loading/error states.
 - Route successful grants through both `production_main_menu.gd` and `level.gd` without duplicating

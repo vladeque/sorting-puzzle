@@ -9,6 +9,28 @@ var _progress
 var _level_scene: PackedScene
 
 
+class FakeRewardedLifeClient extends RefCounted:
+	var claim_count := 0
+
+	func can_offer() -> bool:
+		return true
+
+	func is_awaiting_verification() -> bool:
+		return false
+
+	func claim() -> Dictionary:
+		claim_count += 1
+		return {
+			"ok": true,
+			"life_state": {
+				"current": 1,
+				"maximum": 5,
+				"restore_interval_seconds": 3600,
+				"next_restore_at": "2026-09-20T12:00:00.000Z",
+			},
+		}
+
+
 func _init() -> void:
 	if not str(ProjectSettings.get_setting("application/config/name", "")).begins_with(
 		ISOLATED_TEST_PROJECT_PREFIX
@@ -33,6 +55,7 @@ func _run() -> void:
 	await _test_zero_lives_close_returns_to_menu()
 	await _test_zero_lives_purchase_restarts_level()
 	await _test_failed_purchase_returns_to_menu()
+	await _test_rewarded_life_restarts_failed_level_once()
 
 	if _failures.is_empty():
 		print("Level failure verification passed.")
@@ -161,6 +184,35 @@ func _test_failed_purchase_returns_to_menu() -> void:
 		_progress.get_lives() == 0 and _progress.get_coins() == starting_coins,
 		"A failed retry purchase changes neither lives nor coins."
 	)
+	await _free_current_scene()
+
+
+func _test_rewarded_life_restarts_failed_level_once() -> void:
+	_progress.reset_progress()
+	_drain_to_one_life()
+	var starting_coins: int = _progress.get_coins()
+	var level := await _open_campaign_level()
+	var old_client = level.get("_rewarded_life_client")
+	var fake_client := FakeRewardedLifeClient.new()
+	level.set("_rewarded_life_client", fake_client)
+	if old_client != null:
+		old_client.queue_free()
+	level.call("_fail_level")
+	await _wait_seconds(0.35)
+	var failure = level.get("_failure_screen")
+	(failure.get_node("%RetryButton") as Button).pressed.emit()
+	await _wait_seconds(0.35)
+	var lives_modal = level.get("_out_of_lives_overlay")
+	level.call("_refresh_retry_out_of_lives_offer")
+	var rewarded_button := lives_modal.get_node("%RewardedAdButton") as Button
+	_check(not rewarded_button.disabled, "A ready rewarded-life client enables failed-level recovery.")
+	rewarded_button.pressed.emit()
+	await _wait_for_level_transition(level)
+	var restarted := current_scene
+	_check(restarted != null and restarted != level, "A verified rewarded life restarts the failed level.")
+	_check(fake_client.claim_count == 1, "Failed-level recovery consumes one verified grant.")
+	_check(_progress.get_lives() == 1, "The retry mirrors the authoritative rewarded life state.")
+	_check(_progress.get_coins() == starting_coins, "Rewarded retry spends no coins.")
 	await _free_current_scene()
 
 

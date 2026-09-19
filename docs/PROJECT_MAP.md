@@ -65,11 +65,13 @@ Ad infrastructure:
 - Registered in `project.godot` as the `AdService` autoload.
 - Owns fail-closed ad policy, provider/consent lifecycle, presentation normalization, local-only
   interstitial pacing, audio restoration, and diagnostics. ADS-003 adds the server-authorized
-  time-extension placement in `rewarded_time_extension_client.gd`; its bundled rewarded policy is
-  enabled while default project/native provider switches remain off until release configuration.
+  time-extension placement in `rewarded_time_extension_client.gd`; ADS-004 adds the player-scoped
+  rewarded-life placement in `rewarded_life_client.gd`. Bundled rewarded policy enables both while
+  default project/native provider switches remain off until release configuration.
   Interstitial policy remains disabled. See
   [ADS_002_CLIENT_AD_INFRASTRUCTURE.md](ADS_002_CLIENT_AD_INFRASTRUCTURE.md) and
-  [ADS_003_REWARDED_TIME_EXTENSION.md](ADS_003_REWARDED_TIME_EXTENSION.md).
+  [ADS_003_REWARDED_TIME_EXTENSION.md](ADS_003_REWARDED_TIME_EXTENSION.md), plus
+  [ADS_004_REWARDED_LIFE.md](ADS_004_REWARDED_LIFE.md).
 
 Reusable item scene:
 - `scenes/item.tscn`

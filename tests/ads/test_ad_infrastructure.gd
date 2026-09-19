@@ -55,6 +55,7 @@ func _run() -> void:
 	_test_policy_validation_and_rewarded_gates()
 	_test_pacing_and_interstitial_gates()
 	await _test_service_normalization_and_persistence(progress)
+	await _test_rewarded_placement_inventory_is_isolated()
 	_finish()
 
 
@@ -287,6 +288,30 @@ func _capture_nested_rewarded_request(service: Node, result_holder: Dictionary) 
 		AdPolicyScript.PLACEMENT_TIME_EXTENSION,
 		{},
 		true
+	)
+
+
+func _test_rewarded_placement_inventory_is_isolated() -> void:
+	var provider := MockAdProviderScript.new()
+	await provider.initialize()
+	await provider.update_consent()
+	await provider.load_ad(AdProviderScript.FORMAT_REWARDED, AdPolicyScript.PLACEMENT_TIME_EXTENSION)
+	await provider.load_ad(AdProviderScript.FORMAT_REWARDED, AdPolicyScript.PLACEMENT_LIFE)
+	provider.queue_outcome(AdProviderScript.FORMAT_REWARDED, {
+		"status": AdProviderScript.STATUS_DISMISSED,
+		"reason": "test",
+	})
+	await provider.show_rewarded(AdPolicyScript.PLACEMENT_TIME_EXTENSION, {})
+	_check(
+		not provider.is_ad_ready(
+			AdProviderScript.FORMAT_REWARDED,
+			AdPolicyScript.PLACEMENT_TIME_EXTENSION
+		)
+			and provider.is_ad_ready(
+				AdProviderScript.FORMAT_REWARDED,
+				AdPolicyScript.PLACEMENT_LIFE
+			),
+		"Consuming one rewarded placement does not consume another placement's loaded ad."
 	)
 
 

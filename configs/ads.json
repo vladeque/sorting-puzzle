@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "config_version": "rewarded-time-extension-1",
+  "config_version": "rewarded-life-1",
   "provider_enabled": true,
   "rewarded": {
     "enabled": true,
     "time_extension_enabled": true,
-    "life_enabled": false,
+    "life_enabled": true,
     "ability_enabled": false,
     "shelf_unlock_enabled": false
   },
