@@ -7,7 +7,7 @@
 [ext_resource type="Material" path="res://assets/shelves/materials/shelf_left_inset_shadow.tres" id="5_left_inset_shadow"]
 [ext_resource type="Material" path="res://assets/shelves/materials/shelf_soft_cast_shadow.tres" id="6_bottom_cast_shadow"]
 [ext_resource type="Material" path="res://assets/shelves/materials/shelf_soft_cast_shadow_right.tres" id="7_right_cast_shadow"]
-[ext_resource type="Material" path="res://assets/shelves/materials/shelf_floor_corner_shadow.tres" id="9_floor_corner_shadow"]
+[ext_resource type="Material" uid="uid://cmgiqw5v31s4f" path="res://assets/shelves/materials/shelf_floor_corner_shadow.tres" id="9_floor_corner_shadow"]
 [ext_resource type="Material" path="res://assets/shelves/materials/collapsing_top_inset_shadow.tres" id="10_collapsing_top_shadow"]
 [ext_resource type="Material" path="res://assets/shelves/materials/collapsing_left_inset_shadow.tres" id="11_collapsing_left_shadow"]
 
