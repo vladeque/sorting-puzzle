@@ -37,7 +37,7 @@ config/admob_ios_interstitial_ad_unit_id=""
 
 [audio]
 
-buses/default_bus_layout="res://assets/audio/default_bus_layout.tres"
+buses/default_bus_layout="uid://bubyykk74l0dh"
 
 [autoload]
 
