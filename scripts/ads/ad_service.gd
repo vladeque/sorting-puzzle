@@ -114,6 +114,10 @@ func preload_interstitial() -> Dictionary:
 	return result
 
 
+func is_interstitial_enabled() -> bool:
+	return _policy.is_interstitial_enabled()
+
+
 func is_rewarded_ready(placement: StringName, server_can_accept_claim: bool = true) -> bool:
 	var decision := _policy.rewarded_decision(
 		placement,
@@ -154,7 +158,7 @@ func request_rewarded(
 func request_interstitial(context: Dictionary = {}) -> Dictionary:
 	if _active_request_id != 0:
 		return _result(AdProviderScript.STATUS_UNAVAILABLE, "ad_request_in_progress")
-	var eligibility_context := context.duplicate(true)
+	var eligibility_context := _interstitial_context(context)
 	eligibility_context["provider_ready"] = (
 		_initialized and _provider.is_ad_ready(AdProviderScript.FORMAT_INTERSTITIAL)
 	)
@@ -192,13 +196,15 @@ func activate_interstitial_pacing(total_completed_levels: int) -> bool:
 
 
 func record_campaign_completion() -> bool:
+	if not _policy.is_interstitial_enabled():
+		return false
 	var previous := _pacing_state
 	_pacing_state = AdPacingStateScript.record_campaign_completion(_pacing_state)
 	return previous != _pacing_state and _persist_pacing_state()
 
 
 func get_interstitial_decision(context: Dictionary = {}) -> Dictionary:
-	var eligibility_context := context.duplicate(true)
+	var eligibility_context := _interstitial_context(context)
 	eligibility_context["provider_ready"] = (
 		_initialized and _provider.is_ad_ready(AdProviderScript.FORMAT_INTERSTITIAL)
 	)
@@ -209,6 +215,32 @@ func get_interstitial_decision(context: Dictionary = {}) -> Dictionary:
 		eligibility_context,
 		int(Time.get_unix_time_from_system())
 	)
+
+
+func _interstitial_context(context: Dictionary) -> Dictionary:
+	var eligibility_context := context.duplicate(true)
+	# Rollout assignment is derived locally from the opaque active save namespace. Gameplay callers
+	# cannot choose or forge a bucket, and no account/install identifier is sent to the provider.
+	eligibility_context["rollout_bucket"] = _stable_rollout_bucket()
+	return eligibility_context
+
+
+func _stable_rollout_bucket() -> int:
+	var player_progress := _find_player_progress() as Node
+	if player_progress == null or not player_progress.has_method("get_active_save_namespace"):
+		return -1
+	var save_namespace := player_progress.call("get_active_save_namespace") as Dictionary
+	var kind := str(save_namespace.get("kind", ""))
+	var opaque_id := str(
+		save_namespace.get(
+			"player_id" if kind == "player" else "installation_id",
+			""
+		)
+	)
+	if kind.is_empty() or opaque_id.is_empty():
+		return -1
+	var digest := ("%s:%s" % [kind, opaque_id]).sha256_text()
+	return digest.substr(0, 8).hex_to_int() % 100
 
 
 func is_busy() -> bool:
@@ -229,6 +261,7 @@ func get_diagnostics() -> Dictionary:
 		"initialized": _initialized,
 		"consent_allows_ads": _consent_allows_ads,
 		"privacy_options_required": _privacy_options_required,
+		"rollout_bucket": _stable_rollout_bucket(),
 		"busy": is_busy(),
 		"pacing_state": _pacing_state.duplicate(true),
 		"provider_diagnostics": _provider.get_diagnostics(),

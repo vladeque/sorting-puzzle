@@ -404,6 +404,9 @@ forged, duplicate, wrong-shelf, and wrong-attempt claims stays with BE-ADS-001.
 
 ### ADS-007 — Add automatic interstitial pacing
 
+Status: **implemented and release-disabled**. See
+[`ADS_007_INTERSTITIAL_PACING.md`](ADS_007_INTERSTITIAL_PACING.md).
+
 - Increment pacing only after a committed new campaign completion.
 - Schedule presentation at the post-completion result transition and continue navigation on every
   terminal outcome.
@@ -411,6 +414,12 @@ forged, duplicate, wrong-shelf, and wrong-attempt claims stays with BE-ADS-001.
   consent, foreground, and readiness rules.
 
 ### ADS-008 — Compliance, QA, and release validation
+
+Status: **client safeguards implemented; external approvals remain incomplete**. See
+[`ADS_008_COMPLIANCE_RELEASE_VALIDATION.md`](ADS_008_COMPLIANCE_RELEASE_VALIDATION.md). The
+release validator intentionally fails against committed development settings until the owner adds
+store/legal/device evidence and production identifiers. Remote-policy transport remains a separate
+unimplemented dependency, so post-release interstitial activation is not yet permitted.
 
 - Complete store disclosures, privacy policy, consent/ATT, age treatment, and ad-reporting flow.
 - Run the full automated, visual, native-device, and backend conformance matrix.

@@ -122,6 +122,13 @@ func set_earned_stars(stars: int) -> void:
 	_earned_stars_label.text = earned_text
 
 
+func set_continue_enabled(is_enabled: bool) -> void:
+	_next_button.disabled = not is_enabled
+	_next_button.mouse_default_cursor_shape = (
+		Control.CURSOR_POINTING_HAND if is_enabled else Control.CURSOR_ARROW
+	)
+
+
 func is_transitioning() -> bool:
 	return _shell.is_transitioning() or _intro_active
 

@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "release_phase": "initial",
+  "audience_treatment": "general_3_plus",
+  "ad_personalization": "non_personalized",
+  "att_requested_for_ads": false,
+  "approvals": {
+    "license_and_security_review": {"complete": false, "evidence": ""},
+    "privacy_policy_review": {"complete": false, "evidence": ""},
+    "google_play_disclosures": {"complete": false, "evidence": ""},
+    "app_store_privacy_details": {"complete": false, "evidence": ""},
+    "android_physical_device": {"complete": false, "evidence": ""},
+    "ios_archive_and_device": {"complete": false, "evidence": ""}
+  }
+}

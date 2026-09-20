@@ -1139,7 +1139,10 @@ Script:
 Purpose:
 - Centered pause-style settings window opened from the production main menu over a dimmed modal background.
 - Reuses the pause menu visual treatment for the warm outer panel, cream inner panel, `Settings` title, protruding red close button, and saved music / sound-effects / vibration icon toggles.
-- Adds two no-op wide green blank-image buttons labeled `Support` and `Language` under the settings toggles.
+- Adds two policy-driven wide blue actions under the settings toggles. The first is labeled
+  `Privacy Choices` when UMP requires its form or `Privacy Policy` when backed by a configured HTTPS
+  URL. The second is `Report Ad`, backed by the configured inappropriate-ad reporting HTTPS URL.
+  URL-backed actions stay hidden when unconfigured.
 
 Important nodes:
 - `PauseMenuPanel`: centered popup panel kept named for reuse with `scripts/pause_menu.gd`.
@@ -1147,8 +1150,10 @@ Important nodes:
 - `PauseMenuPanel/InnerPanel/IconRow/MusicOption/MusicButton`: square music toggle button with shadow-only button styling, held-press scaling, and a plain red diagonal marker when disabled.
 - `PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption/SoundEffectsButton`: square sound effects toggle button with shadow-only button styling, held-press scaling, and a plain red diagonal marker when disabled.
 - `PauseMenuPanel/InnerPanel/IconRow/VibrationOption/VibrationButton`: square phone vibration toggle button with shadow-only button styling, held-press scaling, and a plain red diagonal marker when disabled.
-- `PauseMenuPanel/InnerPanel/ActionColumn/SupportButton`: wide no-op button using `assets/ui/level_button_blank_new.png`.
-- `PauseMenuPanel/InnerPanel/ActionColumn/LanguageButton`: wide no-op button using `assets/ui/level_button_blank_new.png`.
+- `PauseMenuPanel/InnerPanel/ActionColumn/AdPrivacyButton`: policy-driven privacy choices/policy
+  action using `assets/ui/level_button_blank_light_blue_new.png`.
+- `PauseMenuPanel/InnerPanel/ActionColumn/ReportAdButton`: inappropriate-ad reporting action using
+  `assets/ui/level_button_blank_light_blue_new.png`.
 
 Depends on:
 - `scripts/pause_menu.gd` for the same crossed-out toggle visuals and shared disabled state used by the in-level pause menu.
@@ -1158,8 +1163,9 @@ Depends on:
 - Runtime open/close wiring from `scripts/production_main_menu.gd`.
 
 Do not use for:
-- Applying actual music, support, or language settings. Sound effects and vibration are applied by
-  their global runtime managers through `scripts/pause_menu.gd`.
+- Applying actual music or ad compliance policy. Sound effects and vibration are applied by their
+  global runtime managers through `scripts/pause_menu.gd`; `scripts/production_main_menu.gd` owns
+  the HTTPS/UMP routes and action visibility.
 
 ## `scenes/ui/profile_menu.tscn`
 

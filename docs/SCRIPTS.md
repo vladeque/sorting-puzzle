@@ -21,6 +21,11 @@ This file documents what each script owns. Keep script docs focused on responsib
 - `ad_policy.gd`: pure, bounded, fail-closed rewarded/interstitial eligibility rules.
 - `ad_pacing_state.gd`: schema/sanitizer and transition helpers for non-economic local counters and
   timestamps.
+- `interstitial_completion_gate.gd`: ADS-007's level-scoped one-shot owner. It counts a committed
+  campaign completion once and makes at most one best-effort request at the completion-to-menu
+  transition.
+- `ad_release_readiness.gd`: ADS-008's pure, fail-closed evaluator for launch policy, injected
+  runtime identifiers, and evidence-backed legal/store/device approvals.
 - `ad_provider.gd`: disabled provider contract; `mock_ad_provider.gd` is the deterministic test
   implementation; `admob_provider.gd` adapts the pinned native bridge without reward authority and
   keeps loaded rewarded inventory isolated by placement/ad unit.
@@ -29,12 +34,16 @@ This file documents what each script owns. Keep script docs focused on responsib
   issued authorization set plus one rewarded immediate ability use into terminal settlement.
 - `rewarded_life_client.gd`: ADS-004 protocol-1.4 player-scoped intent/status owner. It forwards
   only opaque SSV custom data and returns the authoritative capped life state only after settlement.
+- `scripts/tools/check_ad_release_readiness.gd`: command-line ADS-008 release audit; the committed
+  development configuration is expected to fail until owner evidence and release settings exist.
 
 See [ADS_002_CLIENT_AD_INFRASTRUCTURE.md](ADS_002_CLIENT_AD_INFRASTRUCTURE.md) for release gates and
 the backend reward boundary, and
 [ADS_003_REWARDED_TIME_EXTENSION.md](ADS_003_REWARDED_TIME_EXTENSION.md) and
 [ADS_004_REWARDED_LIFE.md](ADS_004_REWARDED_LIFE.md) and
-[ADS_005_REWARDED_ABILITY.md](ADS_005_REWARDED_ABILITY.md) for implemented placements.
+[ADS_005_REWARDED_ABILITY.md](ADS_005_REWARDED_ABILITY.md) for implemented placements, plus
+[ADS_007_INTERSTITIAL_PACING.md](ADS_007_INTERSTITIAL_PACING.md) and
+[ADS_008_COMPLIANCE_RELEASE_VALIDATION.md](ADS_008_COMPLIANCE_RELEASE_VALIDATION.md).
 
 ## `scripts/testing/reward_chest_fill_preview.gd`
 
@@ -66,7 +75,8 @@ Purpose:
   reconciliation (`_update_reward_chest_status()`, `_prepare_pending_reward_animation()`) plays
   nothing.
 - Opens the reward chest detail modal when the reward chest widget emits `chest_pressed`.
-- Opens the main-menu settings popup from the top status bar.
+- Opens the main-menu settings popup from the top status bar and routes its policy-driven privacy
+  choices/privacy-policy and inappropriate-ad reporting actions.
 - Adds every main-menu modal through a shared overlay helper so no menu action can render or receive
   input above an open modal; each overlay fades in on open and out before it closes.
 - Launches the first incomplete level in the selected unlocked chapter.

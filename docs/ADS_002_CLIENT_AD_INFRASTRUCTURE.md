@@ -33,10 +33,11 @@ The mock provider additionally requires a debug build and
 unit IDs. Release unit IDs come only from environment-specific project settings and are committed as
 empty strings.
 
-Interstitial pacing is not activated by historical progress. A future rollout must call
-`activate_interstitial_pacing(total_completed_levels)` once, then call
-`record_campaign_completion()` only after a newly committed campaign completion. A failed/no-fill
-presentation does not reset the counter; only an impression does.
+ADS-007 now activates pacing from the then-current baseline after a newly committed campaign
+completion and makes its only presentation request at the completion-to-menu transition. Disabled
+policy records no completions, so the initial release cannot accumulate a backlog. A failed/no-fill
+presentation does not reset the counter; only an impression does. See
+[ADS_007_INTERSTITIAL_PACING.md](ADS_007_INTERSTITIAL_PACING.md).
 
 ## Reward boundary
 
@@ -75,4 +76,5 @@ APK inspection found no Google Mobile Ads/UMP or Poing classes and no AdMob appl
 test application ID succeeded with the native switch on and contained the expected SDK classes,
 manifest metadata, UMP, and ad permission. These are packaging checks only. Physical-device consent,
 lifecycle, audio, impression, SSV, and iOS archive checks remain release gates in
-`ADS_001_PRODUCT_POLICY_AND_PROVIDER.md` and the release checklist.
+`ADS_001_PRODUCT_POLICY_AND_PROVIDER.md` and the fail-closed ADS-008 checklist in
+[ADS_008_COMPLIANCE_RELEASE_VALIDATION.md](ADS_008_COMPLIANCE_RELEASE_VALIDATION.md).

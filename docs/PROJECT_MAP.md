@@ -61,19 +61,24 @@ Sound effects:
 Ad infrastructure:
 - `scripts/ads/*.gd`
 - `configs/ads.json`
+- `configs/ad_release_evidence.json`
 - `addons/admob/`
 - Registered in `project.godot` as the `AdService` autoload.
 - Owns fail-closed ad policy, provider/consent lifecycle, presentation normalization, local-only
   interstitial pacing, audio restoration, and diagnostics. ADS-003 adds the server-authorized
   time-extension placement in `rewarded_time_extension_client.gd`; ADS-004 adds the player-scoped
   rewarded-life placement in `rewarded_life_client.gd`; ADS-005 shares the run owner for an exact
-  immediate Hammer/Shuffle/Lantern authorization. Bundled rewarded policy enables all three while
-  default project/native provider switches remain off until release configuration.
-  Interstitial policy remains disabled. See
+  immediate Hammer/Shuffle/Lantern authorization; ADS-006 adds selected-shelf unlocks. Bundled
+  rewarded policy enables all four placements while default project/native provider switches
+  remain off until release configuration. ADS-007 owns post-completion interstitial pacing, which remains disabled
+  for release. ADS-008 owns the Settings privacy/report routes and fail-closed evidence audit. See
   [ADS_002_CLIENT_AD_INFRASTRUCTURE.md](ADS_002_CLIENT_AD_INFRASTRUCTURE.md) and
   [ADS_003_REWARDED_TIME_EXTENSION.md](ADS_003_REWARDED_TIME_EXTENSION.md), plus
   [ADS_004_REWARDED_LIFE.md](ADS_004_REWARDED_LIFE.md), and
-  [ADS_005_REWARDED_ABILITY.md](ADS_005_REWARDED_ABILITY.md).
+  [ADS_005_REWARDED_ABILITY.md](ADS_005_REWARDED_ABILITY.md),
+  [ADS_006_REWARDED_SHELF_UNLOCK.md](ADS_006_REWARDED_SHELF_UNLOCK.md),
+  [ADS_007_INTERSTITIAL_PACING.md](ADS_007_INTERSTITIAL_PACING.md), and
+  [ADS_008_COMPLIANCE_RELEASE_VALIDATION.md](ADS_008_COMPLIANCE_RELEASE_VALIDATION.md).
 
 Reusable item scene:
 - `scenes/item.tscn`
@@ -197,7 +202,9 @@ Responsibility:
   tabs share a scrollable 3-column choice grid. Save commits the name, avatar, and avatar frame as
   one authoritative public `profile_edit` through `PlayerProgress`; a frame-only change produces a
   frame-only edit.
-- Opens `scenes/ui/settings_menu.tscn` from the settings widget, with pause-menu-style music, sound-effects, and vibration toggle visuals plus no-op `Support` and `Language` buttons.
+- Opens `scenes/ui/settings_menu.tscn` from the settings widget, with pause-menu-style music,
+  sound-effects, and vibration toggles plus policy-driven Privacy Choices/Privacy Policy and
+  inappropriate-ad reporting actions.
 - Disables campaign launch when saved lives are zero; the lives widget shows current lives and the `MM:SS` countdown until the next hourly restore.
 - Uses `scenes/ui/level_button.tscn` and `assets/ui/level_button_blank_new.png` for the reusable glossy green level button visuals while keeping the label dynamic (also the shared `assets/themes/style_box_green_primary_button.tres` "regular" tier used by Shop purchase buttons); red, light-blue, and yellow-orange variants remain available beside the source texture for alternate states or future UI variants -- yellow-orange is the intentional Main Menu Chapter-button and in-level `Watch ad` secondary/alternative-action role (see `docs/SCENES.md` "Shared UI Style Tokens"), while light-blue is currently unused by any scene. The Chapter cover CTA instead uses a scene-local flat treatment sampled from the glossy green palette and matching the neutral disabled style's geometry.
 - Uses `scripts/press_scale_button.gd` as the default held-press behavior for visible game UI buttons so they shrink slightly while a click or touch is held.

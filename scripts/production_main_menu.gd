@@ -29,6 +29,8 @@ const CHAPTER_BUTTON_MAX_WIDTH := 280.0
 const BOTTOM_NAVIGATION_HEIGHT := 96.0
 const LIFE_STATUS_REFRESH_SECONDS := 1.0
 const MAIN_MENU_OVERLAY_Z_INDEX := 100
+const AD_PRIVACY_POLICY_SETTING := "application/config/ad_privacy_policy_url"
+const AD_REPORT_SETTING := "application/config/ad_report_url"
 
 @onready var _background := %Background as TextureRect
 @onready var _top_status_bar := %TopStatusBar as MarginContainer
@@ -84,6 +86,16 @@ func _ready() -> void:
 	_out_of_lives_menu.purchase_requested.connect(_on_out_of_lives_purchase_requested)
 	_out_of_lives_menu.rewarded_ad_requested.connect(_on_out_of_lives_rewarded_ad_requested)
 	_setup_rewarded_life_client()
+	var ad_service: Node = _get_ad_service()
+	var privacy_requirement_callback := Callable(
+		self,
+		"_on_privacy_options_requirement_changed"
+	)
+	if ad_service != null and not ad_service.is_connected(
+		"privacy_options_requirement_changed",
+		privacy_requirement_callback
+	):
+		ad_service.connect("privacy_options_requirement_changed", privacy_requirement_callback)
 	if _reward_chest.has_signal("chest_pressed"):
 		_reward_chest.connect("chest_pressed", Callable(self, "_open_reward_chest_menu"))
 	_bottom_navigation.connect("shop_pressed", Callable(self, "_open_shop"))
@@ -533,6 +545,9 @@ func _open_settings_menu() -> void:
 
 	_settings_menu = SETTINGS_MENU_SCENE.instantiate() as Control
 	_add_main_menu_overlay(_settings_menu)
+	_settings_menu.connect("ad_privacy_requested", Callable(self, "_on_ad_privacy_requested"))
+	_settings_menu.connect("ad_report_requested", Callable(self, "_on_ad_report_requested"))
+	_refresh_ad_compliance_actions()
 
 	var close_button := _settings_menu.get_node_or_null("PauseMenuPanel/CloseButton") as Button
 	if close_button != null:
@@ -544,6 +559,58 @@ func _open_settings_menu() -> void:
 func _close_settings_menu() -> void:
 	if is_instance_valid(_settings_menu):
 		UIMotionScript.close_with_fade(_settings_menu, _settings_menu.queue_free)
+
+
+func _refresh_ad_compliance_actions() -> void:
+	if not is_instance_valid(_settings_menu):
+		return
+	var ad_service: Node = _get_ad_service()
+	var privacy_options_required := (
+		ad_service != null and bool(ad_service.call("is_privacy_options_required"))
+	)
+	var privacy_url := str(ProjectSettings.get_setting(AD_PRIVACY_POLICY_SETTING, "")).strip_edges()
+	var report_url := str(ProjectSettings.get_setting(AD_REPORT_SETTING, "")).strip_edges()
+	_settings_menu.call(
+		"set_ad_compliance_actions",
+		"Privacy Choices" if privacy_options_required else "Privacy Policy",
+		privacy_options_required or _is_safe_external_url(privacy_url),
+		_is_safe_external_url(report_url)
+	)
+
+
+func _on_privacy_options_requirement_changed(_required: bool) -> void:
+	_refresh_ad_compliance_actions()
+
+
+func _on_ad_privacy_requested() -> void:
+	var ad_service: Node = _get_ad_service()
+	if ad_service != null and bool(ad_service.call("is_privacy_options_required")):
+		await ad_service.call("show_privacy_options")
+		_refresh_ad_compliance_actions()
+		return
+	_open_ad_compliance_url(AD_PRIVACY_POLICY_SETTING)
+
+
+func _on_ad_report_requested() -> void:
+	_open_ad_compliance_url(AD_REPORT_SETTING)
+
+
+func _open_ad_compliance_url(setting: String) -> void:
+	var url := str(ProjectSettings.get_setting(setting, "")).strip_edges()
+	if not _is_safe_external_url(url):
+		push_warning("Ad compliance URL is not configured: %s" % setting)
+		return
+	var error := OS.shell_open(url)
+	if error != OK:
+		push_warning("Could not open ad compliance URL: %s" % url)
+
+
+func _is_safe_external_url(url: String) -> bool:
+	return url.begins_with("https://") and url.length() <= 2048
+
+
+func _get_ad_service() -> Node:
+	return get_tree().root.get_node_or_null(^"AdService") as Node
 
 
 func _open_reward_chest_menu() -> void:

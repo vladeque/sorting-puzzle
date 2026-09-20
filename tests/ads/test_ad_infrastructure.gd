@@ -55,6 +55,7 @@ func _run() -> void:
 	_test_policy_validation_and_rewarded_gates()
 	_test_pacing_and_interstitial_gates()
 	await _test_service_normalization_and_persistence(progress)
+	await _test_interstitial_service_boundary(progress)
 	await _test_rewarded_placement_inventory_is_isolated()
 	_finish()
 
@@ -289,6 +290,46 @@ func _capture_nested_rewarded_request(service: Node, result_holder: Dictionary) 
 		{},
 		true
 	)
+
+
+func _test_interstitial_service_boundary(progress: Node) -> void:
+	progress.call("reset_progress")
+	var provider := MockAdProviderScript.new()
+	var service := AdServiceScript.new()
+	var policy := _enabled_policy()
+	(policy["interstitial"] as Dictionary)["rollout_percent"] = 100
+	_check(
+		service.configure_for_testing(policy, provider),
+		"The service accepts a fully rolled-out interstitial policy for boundary tests."
+	)
+	await service.initialize()
+	_check(service.activate_interstitial_pacing(0), "Interstitial pacing activates at a baseline.")
+	for _index in range(5):
+		_check(service.record_campaign_completion(), "A new committed completion advances pacing.")
+	await service.preload_interstitial()
+
+	var calls_before := provider.get_calls().size()
+	var unsafe: Dictionary = await service.request_interstitial({"safe_transition": false})
+	_check(
+		unsafe.get("reason") == AdPolicyScript.REASON_UNSAFE_CONTEXT
+		and provider.get_calls().size() == calls_before,
+		"An unsafe transition is rejected before provider presentation."
+	)
+
+	provider.queue_outcome(AdProviderScript.FORMAT_INTERSTITIAL, {
+		"status": AdProviderScript.STATUS_DISMISSED,
+		"reason": "test_dismissal",
+		"impression": true,
+	})
+	var shown: Dictionary = await service.request_interstitial({"safe_transition": true})
+	var pacing := (service.get_diagnostics() as Dictionary).get("pacing_state", {}) as Dictionary
+	_check(
+		shown.get("status") == AdProviderScript.STATUS_DISMISSED
+		and int(pacing.get("eligible_completions_since_interstitial", -1)) == 0
+		and int(pacing.get("session_interstitial_impressions", 0)) == 1,
+		"A recorded interstitial impression resets pacing and increments the session cap."
+	)
+	service.free()
 
 
 func _test_rewarded_placement_inventory_is_isolated() -> void:

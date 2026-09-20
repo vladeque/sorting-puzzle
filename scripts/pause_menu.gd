@@ -16,6 +16,8 @@ class_name PauseMenu
 signal setting_toggled(setting_id: StringName, is_disabled: bool)
 signal leave_pressed
 signal continue_pressed
+signal ad_privacy_requested
+signal ad_report_requested
 
 const SETTING_MUSIC := &"music"
 const SETTING_SOUND_EFFECTS := &"sound_effects"
@@ -76,6 +78,12 @@ func _ready() -> void:
 		_leave_button.pressed.connect(func() -> void: leave_pressed.emit())
 	if _continue_button != null:
 		_continue_button.pressed.connect(func() -> void: continue_pressed.emit())
+	var ad_privacy_button := find_child("AdPrivacyButton", true, false) as Button
+	if ad_privacy_button != null:
+		ad_privacy_button.pressed.connect(func() -> void: ad_privacy_requested.emit())
+	var report_ad_button := find_child("ReportAdButton", true, false) as Button
+	if report_ad_button != null:
+		report_ad_button.pressed.connect(func() -> void: ad_report_requested.emit())
 
 
 func is_setting_disabled(setting_id: StringName) -> bool:
@@ -93,6 +101,20 @@ func is_transitioning() -> bool:
 func apply_safe_layout(safe_margins: Vector4, viewport_size: Vector2) -> void:
 	if _shell != null:
 		_shell.apply_safe_layout(safe_margins, viewport_size)
+
+
+func set_ad_compliance_actions(
+	privacy_label: String,
+	privacy_visible: bool,
+	report_visible: bool
+) -> void:
+	var ad_privacy_button := find_child("AdPrivacyButton", true, false) as Button
+	if ad_privacy_button != null:
+		ad_privacy_button.text = privacy_label
+		ad_privacy_button.visible = privacy_visible
+	var report_ad_button := find_child("ReportAdButton", true, false) as Button
+	if report_ad_button != null:
+		report_ad_button.visible = report_visible
 
 
 ## Shows this overlay's root immediately (so the shell's own fade-in is actually visible), then

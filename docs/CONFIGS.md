@@ -2,6 +2,33 @@
 
 This file describes data files that drive gameplay and tooling.
 
+## `configs/ads.json`
+
+Purpose:
+- Defines the bounded client ad switches and automatic-interstitial pacing limits.
+- Contains no authoritative reward amounts, production ad-unit IDs, or secrets.
+
+Contract:
+- `provider_enabled` and the global/per-placement rewarded switches must all allow a voluntary
+  placement before the provider is used.
+- The initial release keeps `interstitial.enabled` false and `rollout_percent` zero. ADS-007 still
+  ships its pacing implementation so a later approved policy can activate from current progress
+  without backfilling historical completions.
+- Missing, malformed, or out-of-range policy fails closed in `scripts/ads/ad_policy.gd`.
+
+## `configs/ad_release_evidence.json`
+
+Purpose:
+- Records ADS-008 owner evidence for legal/privacy, store disclosure, dependency, and native-device
+  release gates without pretending repository automation can approve those external decisions.
+
+Contract:
+- The initial policy is general-audience 3+, non-personalized ads, and no ATT prompt solely for ads.
+- Every approval requires both `complete = true` and a durable non-empty evidence reference.
+- The committed file remains incomplete until the named owner reviews are actually performed.
+- `scripts/tools/check_ad_release_readiness.gd` combines this evidence with `configs/ads.json` and
+  environment-specific project settings; any missing requirement exits non-zero.
+
 ## `configs/profile_frames.json`
 
 Purpose:

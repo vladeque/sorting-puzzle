@@ -52,6 +52,7 @@ const ABILITY_PURCHASE_PRICES_CONFIG := "res://configs/ability_purchase_prices.j
 const TIME_EXTENSION_CONFIG := "res://configs/time_extension.json"
 const RewardedTimeExtensionClientScript := preload("res://scripts/ads/rewarded_time_extension_client.gd")
 const RewardedLifeClientScript := preload("res://scripts/ads/rewarded_life_client.gd")
+const InterstitialCompletionGateScript := preload("res://scripts/ads/interstitial_completion_gate.gd")
 const LEVEL_CONFIG_TEMPLATE := "res://configs/levels/level_%03d.json"
 const DEFAULT_LEVEL_CONFIG := "res://configs/levels/level_001.json"
 const LAYOUT_SCENE_TEMPLATE := "res://scenes/layouts/layout_%s.tscn"
@@ -225,6 +226,8 @@ var _rewarded_time_extension_client
 var _rewarded_life_client
 var _rewarded_life_action_state := OutOfLivesMenu.REWARDED_STATE_UNAVAILABLE
 var _rewarded_life_prepare_in_progress := false
+var _interstitial_completion_gate
+var _interstitial_navigation_in_progress := false
 ## ADS-006 per-attempt rewarded shelf unlocks, keyed by SHELF_CONFIG_ID_META. Membership makes one
 ## shelf interactable without touching `_triples_cleared` or any shelf's configured requirement, and
 ## it is deliberately attempt-scoped: a retry rebuilds the board with every configured lock intact.
@@ -335,6 +338,7 @@ func _ready() -> void:
 	_load_time_extension_configuration()
 	_setup_rewarded_time_extension_client()
 	_setup_rewarded_life_client()
+	_setup_interstitial_completion_gate()
 	_load_item_textures()
 	_apply_chapter_background()
 	_apply_level_config(_load_level_config(selected_level))
@@ -999,6 +1003,9 @@ func _apply_level_config(config: Dictionary) -> void:
 	_reset_combo()
 	_update_star_counter_label()
 	_returning_to_menu = false
+	_interstitial_navigation_in_progress = false
+	if _interstitial_completion_gate != null:
+		_interstitial_completion_gate.reset_attempt()
 	_retry_purchase_in_progress = false
 	_coin_time_extensions_used = 0
 	_rewarded_ad_time_extensions_used = 0
@@ -2444,6 +2451,10 @@ func _complete_level() -> void:
 	if not launched_from_dev_mode and not PlayerProgress.complete_level(selected_level, _stars):
 		push_error("Level completion could not be committed; keeping the level active.")
 		return
+	if not launched_from_dev_mode and _interstitial_completion_gate != null:
+		_interstitial_completion_gate.record_committed_completion(
+			PlayerProgress.get_completed_level_stars().size()
+		)
 
 	_level_completed = true
 	_level_paused = false
@@ -2584,6 +2595,12 @@ func _setup_completion_buttons() -> void:
 	_completion_screen.next_pressed.connect(_on_completion_next_pressed)
 
 
+func _setup_interstitial_completion_gate() -> void:
+	_interstitial_completion_gate = InterstitialCompletionGateScript.new()
+	add_child(_interstitial_completion_gate)
+	_interstitial_completion_gate.configure(get_tree().root.get_node_or_null(^"AdService"))
+
+
 func _setup_failure_screen() -> void:
 	_failure_screen.main_menu_pressed.connect(_on_failure_main_menu_pressed)
 	_failure_screen.retry_pressed.connect(_on_failure_retry_pressed)
@@ -2617,7 +2634,12 @@ func _setup_time_up_extension_modal() -> void:
 func _on_completion_next_pressed() -> void:
 	if not _level_completed or _is_ui_action_blocked():
 		return
-
+	_interstitial_navigation_in_progress = true
+	_completion_screen.set_continue_enabled(false)
+	if not launched_from_dev_mode and _interstitial_completion_gate != null:
+		await _interstitial_completion_gate.present_before_navigation()
+	if not is_inside_tree() or _returning_to_menu:
+		return
 	_return_to_main_menu()
 
 
@@ -3516,6 +3538,7 @@ func _is_ui_action_blocked() -> bool:
 	return (
 		_loading_transition_pending
 		or _returning_to_menu
+		or _interstitial_navigation_in_progress
 		or _online_run_settlement_in_progress
 		or _completion_settlement_in_progress
 		or _is_any_overlay_transitioning()

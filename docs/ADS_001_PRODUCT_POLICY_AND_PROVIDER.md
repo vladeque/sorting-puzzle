@@ -201,6 +201,8 @@ A desktop/headless parse is not an acceptance substitute for either native platf
 ## Decision and acceptance checklist
 
 ADS-001 is complete only when the remaining evidence links are filled in and all gates pass.
+`configs/ad_release_evidence.json` is the machine-checked ADS-008 mirror of the still-open owner
+gates below; see [ADS_008_COMPLIANCE_RELEASE_VALIDATION.md](ADS_008_COMPLIANCE_RELEASE_VALIDATION.md).
 
 - [x] Owner approved the audience/geography/non-personalized launch policy on 2026-09-18.
 - [x] Owner approved all four exact reward and cap rules on 2026-09-18.
