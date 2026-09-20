@@ -3199,6 +3199,10 @@ func _handle_press_at(pointer_global_position: Vector2, pointer_id := -1) -> voi
 	var clicked_item := _find_item_at_position(pointer_global_position, true)
 	if _selected_item != null:
 		var target_slot := _find_clicked_slot(pointer_global_position, clicked_item)
+		if target_slot == _selected_slot:
+			_deselect_item_in_place()
+			get_viewport().set_input_as_handled()
+			return
 		if target_slot != null:
 			var moved_item := _move_item_to_slot(_selected_item, _selected_slot, target_slot)
 			_clear_selected_item()
@@ -3293,6 +3297,23 @@ func _handle_release_at(pointer_global_position: Vector2, pointer_id := -1) -> v
 	_pressed_item = null
 	_pressed_origin_slot = null
 	get_viewport().set_input_as_handled()
+
+
+## Tapping the selected item a second time cancels the selection, and the item visibly settles back
+## into the slot it never left. This cannot be routed through `_move_item_to_slot`: that path
+## requires the destination to be a drop target, which a source-only shelf such as
+## `scenes/dispenser_shelf.tscn` never is, so the move would be refused and the release would
+## reselect the item instead of leaving it deselected.
+func _deselect_item_in_place() -> void:
+	var item := _selected_item
+	var slot := _selected_slot
+	_clear_selected_item()
+	if item == null or slot == null or item.get_parent() != slot:
+		return
+	if not _level_config_error.is_empty():
+		return
+
+	_place_item_in_slot(item, slot, true)
 
 
 func _is_sticky_feedback_eligible(item: ShelfItem) -> bool:

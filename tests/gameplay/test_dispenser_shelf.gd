@@ -76,6 +76,7 @@ func _run() -> void:
 	await _test_row_layout_offsets_only_dispenser()
 	await _test_taking_an_item_extinguishes_stock_segment()
 	await _test_cancelled_move_leaves_the_count_alone()
+	await _test_second_tap_deselects_on_every_shelf_type()
 	await _test_ability_targeting()
 	await _test_completion_waits_for_the_queue()
 
@@ -610,6 +611,62 @@ func _test_cancelled_move_leaves_the_count_alone() -> void:
 	await _teardown(level)
 
 
+## Tap-to-select is symmetric: the second tap on the selected item clears the selection wherever the
+## item sits. A dispenser refuses dropped items, so this cannot ride on the ordinary "moved onto its
+## own slot" path a standard shelf takes, and the standard shelf is checked alongside it to keep the
+## two reading the same way.
+func _test_second_tap_deselects_on_every_shelf_type() -> void:
+	var level := await _make_dispenser_level()
+	var dispenser := _find_dispenser(level)
+	var standard_slot := _find_filled_standard_slot(level)
+	if dispenser == null or standard_slot == null:
+		_check(standard_slot != null, "The board should have a standard shelf holding an item.")
+		await _teardown(level)
+		return
+
+	var dispenser_slot := (level.call("_get_front_slots", dispenser) as Array)[0] as Node2D
+	var dispenser_item := level.call("_get_slot_item", dispenser_slot) as ShelfItem
+
+	await _tap(level, dispenser_item.global_position)
+	_check(
+		level.get("_selected_item") == dispenser_item,
+		"A tap selects the item on display in the dispenser."
+	)
+
+	await _tap(level, dispenser_item.global_position)
+	_check(
+		level.get("_selected_item") == null,
+		"A second tap on a dispenser item clears the selection."
+	)
+	_check(
+		level.call("_get_slot_item", dispenser_slot) == dispenser_item,
+		"Deselecting leaves the item in the dispenser's slot."
+	)
+	_check(
+		int(dispenser.call("get_remaining_count")) == 3,
+		"Deselecting a dispenser item does not spend it."
+	)
+
+	var standard_item := level.call("_get_slot_item", standard_slot) as ShelfItem
+	await _tap(level, standard_item.global_position)
+	_check(
+		level.get("_selected_item") == standard_item,
+		"A tap selects an item on a standard shelf."
+	)
+
+	await _tap(level, standard_item.global_position)
+	_check(
+		level.get("_selected_item") == null,
+		"A second tap on a standard shelf item clears the selection."
+	)
+	_check(
+		level.call("_get_slot_item", standard_slot) == standard_item,
+		"Deselecting leaves the standard shelf item in its slot."
+	)
+
+	await _teardown(level)
+
+
 ## Hammer and shuffle leave dispensers alone so the authored queue survives; highlight still reads
 ## them, because it only draws an outline.
 func _test_ability_targeting() -> void:
@@ -724,6 +781,25 @@ func _find_empty_standard_slot(level: Node) -> Node2D:
 				return slot as Node2D
 
 	return null
+
+
+func _find_filled_standard_slot(level: Node) -> Node2D:
+	for shelf in level.call("_get_all_shelves") as Array:
+		if shelf is DispenserShelf:
+			continue
+
+		for slot in level.call("_get_front_slots", shelf) as Array:
+			if level.call("_get_slot_item", slot) != null:
+				return slot as Node2D
+
+	return null
+
+
+## One complete tap at a board position, then a frame so the selection outline settles.
+func _tap(level: Node, tap_position: Vector2) -> void:
+	level.call("_handle_press_at", tap_position)
+	level.call("_handle_release_at", tap_position)
+	await process_frame
 
 
 func _has_item_from(level: Node, items: Array, shelf: Node2D) -> bool:
