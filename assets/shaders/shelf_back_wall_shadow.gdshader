@@ -1,7 +1,7 @@
 shader_type canvas_item;
 render_mode unshaded;
 
-uniform vec4 shadow_color : source_color = vec4(0.24, 0.16, 0.09, 0.34);
+uniform vec4 shadow_color : source_color = vec4(0.24, 0.16, 0.09, 0.40);
 uniform vec2 shadow_origin = vec2(0.0);
 uniform vec2 shadow_axis = vec2(0.0, 1.0);
 uniform float fade_distance : hint_range(1.0, 48.0, 0.5) = 22.0;

@@ -7,14 +7,14 @@
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_top_wall_shadow"]
 shader = ExtResource("4_back_wall_shadow")
-shader_parameter/shadow_color = Color(0.24, 0.16, 0.09, 0.34)
+shader_parameter/shadow_color = Color(0.24, 0.16, 0.09, 0.4)
 shader_parameter/shadow_origin = Vector2(0, -90.7)
 shader_parameter/shadow_axis = Vector2(0, 1)
 shader_parameter/fade_distance = 22.0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_left_wall_shadow"]
 shader = ExtResource("4_back_wall_shadow")
-shader_parameter/shadow_color = Color(0.24, 0.16, 0.09, 0.28)
+shader_parameter/shadow_color = Color(0.24, 0.16, 0.09, 0.34)
 shader_parameter/shadow_origin = Vector2(-104, 0)
 shader_parameter/shadow_axis = Vector2(1, 0)
 shader_parameter/fade_distance = 24.0

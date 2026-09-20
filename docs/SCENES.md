@@ -2333,7 +2333,7 @@ Purpose:
 Important nodes:
 - `BackWall`: muted panel behind shelf items.
 - `BackWallTopShade`: procedural top-edge shadow behind items. Its shared canvas shader fades a
-  translucent warm shadow into the existing back-wall color instead of drawing a flat color band.
+  dark warm shadow into the existing back-wall color instead of drawing a flat color band.
 - `PlacementVisuals`: editable role-specific shelf art groups toggled by `scripts/shelf.gd`.
 - `PlacementVisuals/Left`: left shelf role visuals. Contains the shader-driven
   `BackWallLeftShade`, which fades inward from the side wall, plus `LeftWall`, `RightWall`, and the
