@@ -2317,7 +2317,7 @@ Purpose:
 - Reusable shelf cell instantiated by `scripts/level.gd` for each configured shelf.
 - Owns the visible shelf back wall, floor, frame, front slot positions, and item snap markers.
 - Owns generated back-layer slot layout and preview styling defaults through `scripts/shelf.gd`.
-- Owns soft internal left/top wall shadows, short seam occlusion, the diagonal bottom cast shadow,
+- Owns soft internal left/top wall shadows, the diagonal bottom cast shadow,
   the hidden top ceiling cap, and the right-column cast shadow toggled by `scripts/level.gd`.
 - Uses shared procedural materials for inset, seam, corner, and exterior cast shadows. Translucent
   exterior casts work over any level background; their trimmed low-layer geometry avoids stacking
@@ -2352,8 +2352,6 @@ Important nodes:
 - `Shadow` and `RightColumnShadow`: soft translucent perspective cast shadows, shown at runtime for
   full shelf visuals and drawn below shelf bodies, items, and generated back-layer item previews.
   Their UV-driven fade is independent of the level background color.
-- `LeftShadowEdge` and `RightShadowEdge`: short procedural ambient-occlusion fades at the floor/wall
-  seams. They draw below active item shadows so the item silhouette can still ground naturally.
 - `FloorCornerShade`: two-axis procedural corner occlusion where the back, side, and floor meet.
 - `FloorSurface` and `FloorFrontLip`: image-textured wooden floor where items visually rest.
 - `FloorGrain*`: retained hidden as legacy editable guides; the image texture now supplies visible
@@ -2397,9 +2395,10 @@ Purpose:
 Important nodes:
 - `FrameShadow`, `FrameRightShadow`, `BackWall`, `BackWallLowerPanel`, and the
   `BackWall*Shade`/`*ShadowEdge` nodes: the recessed back and cast-depth treatment of the compact
-  cradle. Exterior shadows are soft translucent casts, both back-wall sides use procedural inset
-  occlusion, and the short floor seams use the shared ambient-occlusion fade. The local bevel and
-  inner-face `Shade` children remain simple face-orientation tints rather than cast shadows.
+  cradle. Exterior shadows are soft translucent casts and both back-wall sides use procedural inset
+  occlusion. `LeftShadowEdge` and `RightShadowEdge` retain their original opaque edge treatment;
+  the local bevel and inner-face `Shade` children remain simple face-orientation tints rather than
+  cast shadows.
 - `LeftWall*` and `RightWall*`: semantically paired upper/lower faces, top/lower bevels, and inner
   faces for the two chunky image-textured side guards. Each bevel/inner-face node owns a translucent
   local `Shade` child. The right upper face, top bevel, inner face, and lower bevel render above item

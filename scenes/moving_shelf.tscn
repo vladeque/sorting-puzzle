@@ -7,7 +7,6 @@
 [ext_resource type="Material" path="res://assets/shelves/materials/shelf_left_inset_shadow.tres" id="5_left_inset_shadow"]
 [ext_resource type="Material" path="res://assets/shelves/materials/shelf_soft_cast_shadow.tres" id="6_bottom_cast_shadow"]
 [ext_resource type="Material" path="res://assets/shelves/materials/shelf_soft_cast_shadow_right.tres" id="7_right_cast_shadow"]
-[ext_resource type="Material" path="res://assets/shelves/materials/shelf_edge_ambient_occlusion.tres" id="8_edge_ao"]
 [ext_resource type="Material" path="res://assets/shelves/materials/moving_floor_contact_shadow.tres" id="9_floor_contact_shadow"]
 
 [node name="MovingShelf" type="Node2D" unique_id=1781534228]
@@ -90,12 +89,11 @@ width = 1.0
 default_color = Color(0.22, 0.12, 0.055, 0.32)
 
 [node name="LeftShadowEdge" type="Polygon2D" parent="PlacementVisuals/Left" unique_id=1416780309]
-z_index = 5
-antialiased = true
+z_index = 6
 position = Vector2(9, 7)
-material = ExtResource("8_edge_ao")
+color = Color(0.6, 0.35, 0.17, 1)
 polygon = PackedVector2Array(-112.9, -97.7, -107.9, -97.7, -108, 9, -113, 31)
-uv = PackedVector2Array(0, 0, 1, 0, 1, 1, 0, 1)
+uv = PackedVector2Array(-120.070244, -88.05257, -111.93141, -88.05257, -111.94102, -40.1336, -120.16375, -40.217506)
 
 [node name="Middle" type="Node2D" parent="PlacementVisuals" unique_id=1912159431]
 
@@ -136,20 +134,18 @@ width = 1.0
 default_color = Color(0.22, 0.12, 0.055, 0.32)
 
 [node name="LeftShadowEdge" type="Polygon2D" parent="PlacementVisuals/Middle" unique_id=1258293586]
-z_index = 5
-antialiased = true
+z_index = 6
 position = Vector2(9, 7)
-material = ExtResource("8_edge_ao")
+color = Color(0.6, 0.35, 0.17, 1)
 polygon = PackedVector2Array(-113, -97.7, -110.5, -97.7, -110.5, 11.629, -113, 30)
-uv = PackedVector2Array(0, 0, 1, 0, 1, 1, 0, 1)
+uv = PackedVector2Array(-120.070244, -88.05257, -111.93141, -88.05257, -111.94102, -40.1336, -120.16375, -40.217506)
 
 [node name="RightShadowEdge" type="Polygon2D" parent="PlacementVisuals/Middle" unique_id=2072711327]
-z_index = 5
-antialiased = true
+z_index = 6
 position = Vector2(216, 7)
-material = ExtResource("8_edge_ao")
+color = Color(0.6, 0.35, 0.17, 1)
 polygon = PackedVector2Array(-114.4, -97.7, -111.9, -97.7, -112, 30, -114.4, 11.686)
-uv = PackedVector2Array(1, 0, 0, 0, 0, 1, 1, 1)
+uv = PackedVector2Array(-120.070244, -88.05257, -111.93141, -88.05257, -111.94102, -40.1336, -120.16375, -40.217506)
 
 [node name="Right" type="Node2D" parent="PlacementVisuals" unique_id=119875976]
 visible = false
@@ -191,12 +187,11 @@ width = 1.0
 default_color = Color(0.22, 0.12, 0.055, 0.32)
 
 [node name="RightShadowEdge" type="Polygon2D" parent="PlacementVisuals/Right" unique_id=1303878299]
-z_index = 5
-antialiased = true
+z_index = 6
 position = Vector2(216, 7)
-material = ExtResource("8_edge_ao")
+color = Color(0.6, 0.35, 0.17, 1)
 polygon = PackedVector2Array(-116.9, -97.7, -111.9, -97.7, -112, 31, -117, 9)
-uv = PackedVector2Array(1, 0, 0, 0, 0, 1, 1, 1)
+uv = PackedVector2Array(-120.070244, -88.05257, -111.93141, -88.05257, -111.94102, -40.1336, -120.16375, -40.217506)
 
 [node name="Ceiling" type="Polygon2D" parent="." unique_id=969442549]
 visible = false

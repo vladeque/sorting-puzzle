@@ -24,6 +24,8 @@ const SOFT_SHADOW_PATHS := [
 	"FrameRightShadow",
 	"BackWallLeftShade",
 	"BackWallRightShade",
+]
+const LEGACY_EDGE_SHADOW_PATHS := [
 	"LeftShadowEdge",
 	"RightShadowEdge",
 ]
@@ -174,6 +176,15 @@ func _test_visual_nodes_have_semantic_names() -> void:
 			"Dispenser shadow %s should use its procedural soft-shadow shader." % node_path
 		)
 
+	for node_path in LEGACY_EDGE_SHADOW_PATHS:
+		var edge := dispenser.get_node_or_null(node_path) as Polygon2D
+		_check(
+			edge != null
+				and edge.material == null
+				and edge.color == Color(0.64, 0.55, 0.46, 1),
+			"Dispenser shadow %s should retain its original opaque edge treatment." % node_path
+		)
+
 	for node_path in LOCAL_SHADE_OVERLAY_PATHS:
 		var shadow := dispenser.get_node_or_null(node_path) as Polygon2D
 		_check(shadow != null, "Dispenser shadow %s should remain a polygon." % node_path)
@@ -207,7 +218,7 @@ func _test_item_shadow_layering() -> void:
 			floor_surface.z_index < shadow_z,
 			"The item shadow should render over the dispenser floor and level background."
 		)
-		for shadow_path in SOFT_SHADOW_PATHS:
+		for shadow_path in SOFT_SHADOW_PATHS + LEGACY_EDGE_SHADOW_PATHS:
 			var shelf_shadow := dispenser.get_node_or_null(shadow_path) as CanvasItem
 			_check(
 				shelf_shadow != null and shelf_shadow.z_index < shadow_z,

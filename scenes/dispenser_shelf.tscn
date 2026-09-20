@@ -8,7 +8,6 @@
 [ext_resource type="Material" path="res://assets/shelves/materials/shelf_soft_cast_shadow_right.tres" id="6_right_cast_shadow"]
 [ext_resource type="Material" path="res://assets/shelves/materials/dispenser_left_inset_shadow.tres" id="7_left_inset_shadow"]
 [ext_resource type="Material" path="res://assets/shelves/materials/dispenser_right_inset_shadow.tres" id="8_right_inset_shadow"]
-[ext_resource type="Material" path="res://assets/shelves/materials/shelf_edge_ambient_occlusion.tres" id="9_edge_ao"]
 
 [node name="DispenserShelf" type="Node2D" unique_id=1491387995]
 position = Vector2(0, -10)
@@ -58,17 +57,13 @@ uv = PackedVector2Array(96, 720, 96, 738, 96, 756, 424, 756, 424, 720)
 
 [node name="LeftShadowEdge" type="Polygon2D" parent="." unique_id=272511885]
 z_index = 3
-antialiased = true
-material = ExtResource("9_edge_ao")
+color = Color(0.64, 0.55, 0.46, 1)
 polygon = PackedVector2Array(-34, -44, -32.5, -44, -32.5, 18, -34, 18)
-uv = PackedVector2Array(0, 0, 1, 0, 1, 1, 0, 1)
 
 [node name="RightShadowEdge" type="Polygon2D" parent="." unique_id=1814545252]
 z_index = 3
-antialiased = true
-material = ExtResource("9_edge_ao")
+color = Color(0.64, 0.55, 0.46, 1)
 polygon = PackedVector2Array(32.5, -44, 34, -44, 34.000008, 4.0634747, 34, 18, 32.5, 18)
-uv = PackedVector2Array(1, 0, 0, 0, 0, 0.78, 0, 1, 1, 1)
 
 [node name="FloorSurface" type="Polygon2D" parent="." unique_id=593900722]
 z_index = 5

@@ -44,7 +44,7 @@ const SOFT_CAST_SHADOW_PATHS := [
 	"Shadow",
 	"RightColumnShadow",
 ]
-const EDGE_AMBIENT_OCCLUSION_PATHS := [
+const LEGACY_EDGE_SHADOW_PATHS := [
 	"PlacementVisuals/Left/LeftShadowEdge",
 	"PlacementVisuals/Middle/LeftShadowEdge",
 	"PlacementVisuals/Middle/RightShadowEdge",
@@ -55,12 +55,8 @@ const ITEM_SHADOW_UNDERLAY_PATHS := [
 	"RightColumnShadow",
 	"BackWallTopShade",
 	"PlacementVisuals/Left/BackWallLeftShade",
-	"PlacementVisuals/Left/LeftShadowEdge",
 	"PlacementVisuals/Middle/BackWallLeftShade",
-	"PlacementVisuals/Middle/LeftShadowEdge",
-	"PlacementVisuals/Middle/RightShadowEdge",
 	"PlacementVisuals/Right/BackWallLeftShade",
-	"PlacementVisuals/Right/RightShadowEdge",
 ]
 const SOFT_BACK_WALL_SHADOW_PATHS := [
 	"BackWallTopShade",
@@ -117,7 +113,7 @@ func _run() -> void:
 		var grain := shelf.get_node_or_null(node_path) as CanvasItem
 		_check(grain != null and not grain.visible, "%s should stay hidden behind image grain." % node_path)
 
-	for node_path in SOFT_CAST_SHADOW_PATHS + EDGE_AMBIENT_OCCLUSION_PATHS:
+	for node_path in SOFT_CAST_SHADOW_PATHS:
 		var shadow := shelf.get_node_or_null(node_path) as Polygon2D
 		var material := shadow.material as ShaderMaterial if shadow != null else null
 		_check(
@@ -131,6 +127,16 @@ func _run() -> void:
 		_check(
 			shadow != null and shadow.antialiased,
 			"%s should antialias its soft outer edge." % node_path
+		)
+
+	for node_path in LEGACY_EDGE_SHADOW_PATHS:
+		var edge := shelf.get_node_or_null(node_path) as Polygon2D
+		_check(
+			edge != null
+				and edge.material == null
+				and edge.z_index == 6
+				and edge.color == Color(0.6, 0.35, 0.17, 1),
+			"%s should retain its original opaque edge-shadow treatment." % node_path
 		)
 
 	for node_path in SOFT_BACK_WALL_SHADOW_PATHS:
