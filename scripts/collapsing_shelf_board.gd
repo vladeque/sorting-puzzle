@@ -9,7 +9,9 @@ extends Node2D
 ## it has found empty; it never reaches into a column's private order.
 ##
 ## The board keeps one footprint for the whole level: its size follows the resolved visible count,
-## not the shelves left, so it never rescales or recenters as columns shrink.
+## not the shelves left, so it never rescales or recenters as columns shrink. Above the window that
+## footprint reserves a peek strip, where the next shelf of each column draws cut off, so a pile
+## that continues past the top of the board reads as one instead of looking finished.
 
 signal collapse_started
 signal collapse_finished(result: Dictionary)
@@ -25,6 +27,17 @@ const WINDOW_NODE := "Window"
 ## other three edges sit this far out so items travelling between columns, or gathered by the
 ## hammer, are never cut off.
 @export var window_outer_margin := 4096.0
+## How far the clip window opens above the window's top row, as a share of one shelf row. The next
+## shelf of every column draws into that strip, cut off by the clip edge, instead of being hidden
+## outright. A peeking shelf is never playable -- the window alone decides that -- so this is
+## presentation only. Set it to 0 to close the strip and end the pile at the top row's ceiling cap.
+@export_range(0.0, 1.0, 0.01) var peek_reveal_ratio := 0.3:
+	set(value):
+		peek_reveal_ratio = clampf(value, 0.0, 1.0)
+		# Before `configure()` there is no window node to lay out yet.
+		if not _columns.is_empty():
+			_peek_height = minf(_peek_height, get_max_peek_height())
+			_layout_window()
 @export_range(0.0, 1.0, 0.01) var destroy_duration_seconds := 0.18:
 	set(value):
 		destroy_duration_seconds = maxf(value, 0.0)
@@ -45,6 +58,7 @@ var _visible_count := 1
 var _shelf_step := Vector2.ZERO
 var _cell_size := Vector2.ZERO
 var _shelf_scale := 1.0
+var _peek_height := 0.0
 var _pending_columns: Array[CollapsingShelfColumn] = []
 var _is_collapsing := false
 
@@ -65,6 +79,8 @@ func configure(
 	_shelf_step = shelf_step
 	_cell_size = cell_size
 	_shelf_scale = shelf_scale
+	# The strip reopens from the play area the level is about to fit this board into.
+	_peek_height = 0.0
 
 	var window := _get_window()
 	for column_index in range(_authored_column_heights.size()):
@@ -129,6 +145,8 @@ func get_max_visible_count() -> int:
 ## is the window the solver proved the level against.
 func set_visible_count(visible_count: int) -> void:
 	_visible_count = clampi(visible_count, _authored_visible_count, get_max_visible_count())
+	# A window that now holds the tallest column has nothing left to show above it.
+	_peek_height = minf(_peek_height, get_max_peek_height())
 	for column in _columns:
 		column.set_visible_count(_visible_count)
 	_layout_window()
@@ -168,7 +186,9 @@ func get_layout_bounds() -> Rect2:
 
 ## Cell rectangles plus the top row's ceiling cap. Static boards fit cell rectangles alone and
 ## always leave spare height, but this board is sized to fill the play area, so a cap left out of the
-## bounds would rise into the HUD clearance. Row 0 is centered on the board origin's y.
+## bounds would rise into the HUD clearance. The peek strip is deliberately absent: it is opened into
+## the spare height this footprint leaves, never into the footprint itself. Row 0 is centered on the
+## board origin's y.
 func get_layout_bounds_for_visible_count(visible_count: int) -> Rect2:
 	if _columns.is_empty():
 		return Rect2()
@@ -178,6 +198,35 @@ func get_layout_bounds_for_visible_count(visible_count: int) -> Rect2:
 	var top := -float(rows - 1) * _shelf_step.y - maxf(_get_cap_rise(), _cell_size.y * 0.5)
 	var bottom := _cell_size.y * 0.5
 	return Rect2(Vector2(-width * 0.5, top), Vector2(width, bottom - top))
+
+
+## Deepest strip this board would open above the window, in board-local units. Zero once the window
+## holds the tallest authored column, because no shelf could ever wait above it. Read from the
+## authored heights, never from the shelves left, so the strip does not close mid-level.
+func get_max_peek_height() -> float:
+	if peek_reveal_ratio <= 0.0 or _get_tallest_authored_column() <= _visible_count:
+		return 0.0
+
+	return peek_reveal_ratio * _shelf_step.y
+
+
+## How far the clip window actually opens above the window's top cap right now.
+func get_peek_height() -> float:
+	return _peek_height
+
+
+## The strip is spare height and nothing else: `scripts/level.gd` passes the room left between the
+## fitted footprint and the HUD clearance, in board-local units, and the board takes as much of it as
+## `peek_reveal_ratio` allows. So the shelf peeking in never costs board scale, touch-target size, a
+## playable row, or a pixel of the HUD's space -- on a screen with no room to spare the strip simply
+## closes, and the shelf above still reads through the overlap every stacked pair already has.
+func set_peek_height(available_height: float) -> void:
+	var height := clampf(available_height, 0.0, get_max_peek_height())
+	if is_equal_approx(height, _peek_height):
+		return
+
+	_peek_height = height
+	_layout_window()
 
 
 func owns_shelf(shelf: Node) -> bool:
@@ -354,13 +403,14 @@ func _get_tallest_authored_column() -> int:
 	return tallest
 
 
-## The window's top edge is the top shelf row's ceiling cap. Everything above it -- shelves waiting
-## to drop in -- is clipped; the other edges are pushed far out.
+## The window's top edge is the peek strip's ceiling: one strip above the top shelf row's cap, or the
+## cap itself when no shelf can ever wait above. Everything past that edge -- the shelves still deep
+## in the stack -- is clipped; the other edges are pushed far out.
 func _layout_window() -> void:
 	var window := _get_window()
 	var footprint := get_layout_bounds_for_visible_count(_visible_count)
 	var top_row := clampi(_visible_count, 1, maxi(_get_tallest_authored_column(), 1)) - 1
-	var window_top := -float(top_row) * _shelf_step.y - _get_cap_rise()
+	var window_top := -float(top_row) * _shelf_step.y - _get_cap_rise() - get_peek_height()
 	var window_rect := Rect2(
 		Vector2(footprint.position.x - window_outer_margin, window_top),
 		Vector2(
@@ -371,10 +421,16 @@ func _layout_window() -> void:
 	window.position = window_rect.position
 	window.size = window_rect.size
 
+	# The strip and the row drawn into it are one decision: without the row the strip stays empty,
+	# and without the strip that row would cover the window's top shelf instead of peeking over it.
+	# The row is drawn even where the strip closes to nothing, because stacked shelf art overlaps by
+	# more than the cap it replaces: the shelf above still shows through, just less of it.
+	var peek_rows := 1 if peek_reveal_ratio > 0.0 else 0
 	var column_count := _columns.size()
 	for column in _columns:
 		var column_x := (float(column.column_index) - float(column_count - 1) * 0.5) * _shelf_step.x
 		column.position = Vector2(column_x, 0.0) - window_rect.position
+		column.set_peek_row_count(peek_rows)
 
 
 func _apply_column_durations() -> void:

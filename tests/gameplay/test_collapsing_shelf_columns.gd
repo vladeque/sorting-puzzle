@@ -130,9 +130,9 @@ func _verify_construction_and_window() -> void:
 	_check(board.get_remaining_shelf_count() == 9, "Every registered shelf should count as remaining.")
 	_check(board.get_active_shelves().size() == 8, "Only min(window, height) shelves per column are active.")
 
-	var hidden := _shelf_by_id(board, 3)
-	_check(not board.is_shelf_active(hidden), "The fourth shelf of a three-shelf window must be inactive.")
-	_check(not hidden.visible, "A shelf above the window must not render.")
+	var peeking := _shelf_by_id(board, 3)
+	_check(not board.is_shelf_active(peeking), "The fourth shelf of a three-shelf window must be inactive.")
+	_check(peeking.visible, "The first shelf above the window peeks over it instead of vanishing.")
 	for authored_id in [0, 1, 2, 4, 5, 6, 7, 8]:
 		var shelf := _shelf_by_id(board, authored_id)
 		_check(board.is_shelf_active(shelf) and shelf.visible, "Shelf %s should be active and visible." % (authored_id + 1))
@@ -149,9 +149,10 @@ func _verify_construction_and_window() -> void:
 	_check(_shelf_by_id(board, 4).get_row_placement() == Shelf.ROW_PLACEMENT_MIDDLE, "Column 2 uses middle art.")
 	_check(_shelf_by_id(board, 6).get_row_placement() == Shelf.ROW_PLACEMENT_RIGHT, "Column 3 uses right art.")
 
-	_check(_cap_visible(_shelf_by_id(board, 2)), "The window's top shelf carries the cap even with more above.")
+	_check(not _cap_visible(_shelf_by_id(board, 2)), "The window's top shelf drops its cap once a shelf peeks over it.")
+	_check(_cap_visible(peeking), "The peeking shelf carries the cap, past the clip edge where it cannot cover the shelf below.")
 	_check(not _cap_visible(_shelf_by_id(board, 1)), "A shelf with an active shelf above has no cap.")
-	_check(_cap_visible(_shelf_by_id(board, 5)), "A short column's top shelf carries the cap.")
+	_check(_cap_visible(_shelf_by_id(board, 5)), "A column with nothing above the window keeps the cap on its top shelf.")
 
 	var window := board.get_node("Window") as Control
 	_check(window.clip_contents, "The board must clip shelves waiting above the window.")
@@ -160,9 +161,37 @@ func _verify_construction_and_window() -> void:
 	)
 	_check(
 		absf(window.position.y - top_row_cap.y) < 0.5,
-		"The clip window must open exactly at the top row's ceiling cap."
+		"Without spare height the clip window still opens exactly at the top row's ceiling cap."
 	)
+	var max_peek := board.get_max_peek_height()
+	_check(max_peek > 0.0, "A board with shelves above its window has a strip to open.")
+	board.set_peek_height(max_peek * 0.5)
+	_check(is_equal_approx(board.get_peek_height(), max_peek * 0.5), "Half the spare height opens half the strip.")
+	_check(
+		absf(window.position.y - (top_row_cap.y - max_peek * 0.5)) < 0.5,
+		"The clip window opens exactly that far above the cap."
+	)
+	board.set_peek_height(max_peek * 4.0)
+	_check(is_equal_approx(board.get_peek_height(), max_peek), "The strip never opens deeper than peek_reveal_ratio allows.")
+	_check(peeking.visible and not board.is_shelf_active(peeking), "An opened strip still does not make its shelf playable.")
 	board.free()
+
+	# One row peeks, however deep the stack: the strip is one shelf tall, not a second window.
+	var deep := _make_board([8], 3)
+	deep.set_peek_height(deep.get_max_peek_height())
+	_check(_shelf_by_id(deep, 3).visible, "The first shelf above the window peeks over it.")
+	for authored_id in [4, 5, 6, 7]:
+		_check(not _shelf_by_id(deep, authored_id).visible, "Shelf %s stays out of sight." % (authored_id + 1))
+	_check(deep.get_active_shelves().size() == 3, "Peeking never widens the playable window.")
+	deep.free()
+
+	# The escape hatch: no strip, and the pile ends at the window's cap as it did before.
+	var capped := _make_board([4], 3)
+	capped.peek_reveal_ratio = 0.0
+	_check(is_equal_approx(capped.get_max_peek_height(), 0.0), "A zero ratio leaves no strip to open.")
+	_check(not _shelf_by_id(capped, 3).visible, "A zero ratio hides every shelf above the window again.")
+	_check(_cap_visible(_shelf_by_id(capped, 2)), "The window's top shelf carries the cap again.")
+	capped.free()
 
 
 func _verify_removing_the_lowest_shelf() -> void:

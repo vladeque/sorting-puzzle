@@ -3,9 +3,10 @@ extends Node2D
 
 ## One bottom-to-top pile of shelves in a `collapsing_columns` level (`scenes/collapsing_shelf_column.tscn`).
 ##
-## The column owns placement, the active window, and every shelf movement. `Shelf` keeps owning its
-## slots and art, `CollapsingShelfBoard` owns the set of columns, and `scripts/level.gd` decides
-## which shelves are empty enough to remove.
+## The column owns placement, the active window, the rows that peek over it, and every shelf
+## movement. `Shelf` keeps owning its slots and art, `CollapsingShelfBoard` owns the set of columns
+## and how deep its clip window opens, and `scripts/level.gd` decides which shelves are empty enough
+## to remove.
 ##
 ## Removal is logical first. `remove_shelves()` commits the new order immediately and
 ## `start_collapse()` only moves visuals toward it, so anything that interrupts the animation --
@@ -29,6 +30,8 @@ const DESTRUCTION_EFFECT_SCENE := preload("res://scenes/effects/shelf_destructio
 
 var column_index := 0
 var _visible_count := 1
+## Shelves rendered above the window, cut off by the board's clip edge. Presentation only.
+var _peek_row_count := 0
 var _shelf_step := Vector2.ZERO
 ## Surviving shelves, bottom to top. Stack index is the logical row.
 var _shelves: Array[Shelf] = []
@@ -55,6 +58,18 @@ func set_visible_count(visible_count: int) -> void:
 
 func get_visible_count() -> int:
 	return _visible_count
+
+
+## How many shelves above the window draw into the board's peek strip. They are rendered, never
+## playable: `_visible_count` alone decides that, and a peeking shelf sits outside it.
+func set_peek_row_count(count: int) -> void:
+	_peek_row_count = maxi(count, 0)
+	_apply_window_state()
+
+
+## Shelves that currently render: the window, plus whatever peeks over it.
+func get_render_count() -> int:
+	return mini(_visible_count + _peek_row_count, _shelves.size())
 
 
 ## Shelves are stacked in the order they are added, so callers add them bottom to top. The authored
@@ -190,11 +205,13 @@ func start_collapse() -> void:
 		var fall_duration := shift_duration_seconds * 0.76
 		var rebound_duration := shift_duration_seconds * 0.10
 		var settle_duration := shift_duration_seconds - fall_duration - rebound_duration
+		var render_count := get_render_count()
 		for stack_index in range(_shelves.size()):
 			var shelf := _shelves[stack_index]
 			var destination := get_row_position(stack_index)
-			# Shelves still above the window after the drop are invisible; they snap at the end.
-			if stack_index >= _visible_count or shelf.position.is_equal_approx(destination):
+			# Shelves that stay out of sight after the drop are invisible; they snap at the end. A
+			# shelf falling into the peek strip is on screen, so it animates like any other.
+			if stack_index >= render_count or shelf.position.is_equal_approx(destination):
 				continue
 
 			has_tweeners = true
@@ -277,12 +294,13 @@ func _layout_immediately() -> void:
 	_apply_window_state()
 
 
-## Only shelves inside the window render. The window's top shelf carries the ceiling cap: the pile
-## visibly ends at the window edge even when more shelves wait above it, and a hidden shelf above
-## must never suppress the cap and leave the top shelf's ceiling exposed.
+## The window and the board's peek rows render; everything deeper in the stack stays hidden. The
+## topmost rendered shelf carries the ceiling cap, so a column that really ends here visibly ends,
+## while one that continues keeps its cap above the clip edge instead of drawing it over the shelf
+## peeking in -- the cap sits on a higher z index than the floor that should cover it.
 func _apply_window_state() -> void:
-	var window_top_index := mini(_visible_count, _shelves.size()) - 1
+	var render_count := get_render_count()
 	for stack_index in range(_shelves.size()):
 		var shelf := _shelves[stack_index]
-		shelf.visible = stack_index < _visible_count
-		shelf.set_top_ceiling_cap_visible(stack_index == window_top_index)
+		shelf.visible = stack_index < render_count
+		shelf.set_top_ceiling_cap_visible(stack_index == render_count - 1)

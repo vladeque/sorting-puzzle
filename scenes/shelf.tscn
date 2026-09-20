@@ -41,23 +41,23 @@ z_index = 2
 antialiased = true
 polygon = PackedVector2Array(-104, -90.7, 104, -90.7, 104, -68.7, -104, -68.7)
 
-[node name="CollapsingVisuals" type="Node2D" parent="."]
+[node name="CollapsingVisuals" type="Node2D" parent="." unique_id=1322987566]
 visible = false
 texture_filter = 4
 
-[node name="BackPanel" type="Polygon2D" parent="CollapsingVisuals"]
+[node name="BackPanel" type="Polygon2D" parent="CollapsingVisuals" unique_id=1210866333]
 z_index = 1
 color = Color(0.72, 0.48, 0.31, 1)
 texture = ExtResource("3_wood_texture")
-polygon = PackedVector2Array(-101, -88, 101, -88, 101, 15, -101, 15)
+polygon = PackedVector2Array(-101, -88, 102, -88, 102, 16, -102, 16)
 uv = PackedVector2Array(96, 80, 96, 944, 520, 944, 520, 80)
 
-[node name="BackPanelTopShade" type="Polygon2D" parent="CollapsingVisuals"]
+[node name="BackPanelTopShade" type="Polygon2D" parent="CollapsingVisuals" unique_id=1995050553]
 z_index = 2
 color = Color(0.34, 0.19, 0.1, 0.42)
 polygon = PackedVector2Array(-101, -88, 101, -88, 96, -78, -96, -78)
 
-[node name="BackPanelLeftShade" type="Polygon2D" parent="CollapsingVisuals"]
+[node name="BackPanelLeftShade" type="Polygon2D" parent="CollapsingVisuals" unique_id=1480569219]
 z_index = 2
 color = Color(0.3, 0.16, 0.08, 0.28)
 polygon = PackedVector2Array(-101, -88, -89, -78, -89, 15, -101, 15)

@@ -1051,8 +1051,8 @@ Responsibility:
   - Pause: `Pause` title, music / sound-effects / vibration square icon buttons with shadow-only button styling and a scene-authored crossed-out marker, and Leave/Continue actions.
   - Leave Confirmation: `Leaving the Level` title (the long-title role), crossed-out rectangular lost life/star slots, and red Leave / green Continue actions. Close/system-back returns to Pause; the explicit Continue action resumes gameplay directly -- these used to collapse into the same outcome.
   - Ability Purchase: `Use Ability` title, selected ability icon without a redundant secondary
-    badge, the existing coin-price action, and a readiness-gated rewarded action for immediate
-    Hammer/Shuffle/Lantern use. Freezer remains coin-only.
+	badge, the existing coin-price action, and a readiness-gated rewarded action for immediate
+	Hammer/Shuffle/Lantern use. Freezer remains coin-only.
 - All three modal owners use the same 520x500 outer shell and compact content-specific cream-panel
   heights, preventing taller inner panels from returning when one modal's content changes.
 - `scripts/press_scale_button.gd` provides the default held-press shrink behavior for every gameplay action, including the pause/settings icon buttons, all four ability buttons, every modal's close button, and the red/green bottom image buttons -- several of these had no press feedback at all before UI-003.
