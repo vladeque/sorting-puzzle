@@ -82,6 +82,7 @@ With the preview fixture and with campaign level 9, the window resolves to 6 row
 | Runtime contract check | `scripts/collapsing_column_rules.gd` |
 | Columns, clip window, visible count, batched collapse | `scenes/collapsing_shelf_board.tscn`, `scripts/collapsing_shelf_board.gd` |
 | One column's order and movement | `scenes/collapsing_shelf_column.tscn`, `scripts/collapsing_shelf_column.gd` |
+| Empty-shelf break visuals | `scenes/effects/shelf_destruction_effect.tscn`, `scripts/shelf_destruction_effect.gd` |
 | Construction, availability, resolution, abilities, completion | `scripts/level.gd` |
 | Debug preview | `scenes/testing/collapsing_columns_preview.tscn`, `scripts/collapsing_columns_preview.gd` |
 
@@ -95,6 +96,10 @@ With the preview fixture and with campaign level 9, the window resolves to 6 row
 - The new column order is committed before any animation starts. A collapse keeps running under the
   pause menu, like every other gameplay animation, so pausing, backgrounding, failing, or tearing
   the scene down mid-collapse always leaves a consistent board and never a stuck input lock.
+- Empty-shelf destruction recoils and separates the wooden frame into a short oak-chip/dust burst,
+  overlapping the opening of the accelerated column fall. Survivors pass their destination by a
+  few pixels and settle with a restrained rebound. Newly revealed shelves remain opaque and enter
+  physically through the board's clip edge instead of fading in as ghosted content.
 - Retry rebuilds the board from config. No live column state is saved.
 
 ## Verification
@@ -127,6 +132,8 @@ $env:SORTING_PUZZLE_CAPTURE_COLLAPSE_LEVEL = '9'
     -Setup scripts/tools/captures/collapsing_columns_progress_setup.gd
 & .\scripts\tools\capture_ui.ps1 -Scene level.tscn -Name collapsing_columns_motion -Position '0,0' -Settle 120 `
     -Setup scripts/tools/captures/collapsing_columns_motion_setup.gd
+& .\scripts\tools\capture_ui.ps1 -Scene level.tscn -Name collapsing_columns_destruction -Position '0,0' -Settle 120 `
+    -Setup scripts/tools/captures/collapsing_columns_destruction_setup.gd
 ```
 
 The capture setups rebuild the board on every resize, because the level resolves its window only
@@ -135,6 +142,8 @@ when a board is built. The progress and motion setups replay the fixture's recor
 window pinned to the authored four shelves; regenerate those moves if the fixture changes. The
 motion setup freezes a collapse part-way through its drop with `Tween.custom_step()`
 (`SORTING_PUZZLE_CAPTURE_COLLAPSE_PROGRESS`, default `0.5`).
+The destruction setup freezes the preceding wood-snap beat the same way
+(`SORTING_PUZZLE_CAPTURE_DESTRUCTION_PROGRESS`, default `0.58`).
 
 ## Not yet done
 

@@ -280,18 +280,30 @@ func _verify_animated_collapse_blocks_and_restores() -> void:
 	var finished_count := [0]
 	board.collapse_finished.connect(func(_result: Dictionary) -> void: finished_count[0] += 1)
 	var entering := _shelf_by_id(board, 2)
-	board.collapse_shelves([_shelf_by_id(board, 0), _shelf_by_id(board, 4)])
+	var removed := _shelf_by_id(board, 0)
+	board.collapse_shelves([removed, _shelf_by_id(board, 4)])
 	_check(board.is_collapsing(), "The board reports a running collapse.")
 	_check(board.get_active_shelves().is_empty(), "No shelf is playable while columns move.")
 	_check(not board.is_shelf_active(_shelf_by_id(board, 1)), "Even an unaffected-looking survivor is blocked.")
 	_check(not board.is_cleared(), "A running collapse is never read as a cleared board.")
-	_check(entering.visible and entering.modulate.a < 1.0, "The revealed shelf fades in rather than flashing.")
+	_check(
+		entering.visible and is_equal_approx(entering.modulate.a, 1.0),
+		"The revealed shelf stays opaque and enters physically through the clip window."
+	)
+	var effect := board.get_column(0).get_node_or_null(
+		"ShelfDestructionEffect_%s" % board.get_authored_shelf_id(removed)
+	)
+	_check(effect != null, "An animated removal creates the reusable wood destruction effect.")
 	await board.collapse_finished
 	await process_frame
 	_check(not board.is_collapsing(), "The collapse ends.")
 	_check(finished_count[0] == 1, "collapse_finished fires exactly once.")
 	_check(board.get_active_shelves().size() == 4, "Both windows are full again.")
 	_check(is_equal_approx(entering.position.y, _row_y(1)) and is_equal_approx(entering.modulate.a, 1.0), "The revealed shelf rests fully opaque on row 2.")
+	_check(
+		board.get_column(0).find_children("ShelfDestructionEffect_*").is_empty(),
+		"Destruction effects clean themselves up when the collapse settles."
+	)
 	board.free()
 
 

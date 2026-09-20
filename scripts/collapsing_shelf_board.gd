@@ -25,13 +25,17 @@ const WINDOW_NODE := "Window"
 ## other three edges sit this far out so items travelling between columns, or gathered by the
 ## hammer, are never cut off.
 @export var window_outer_margin := 4096.0
-@export_range(0.0, 1.0, 0.01) var destroy_duration_seconds := 0.14:
+@export_range(0.0, 1.0, 0.01) var destroy_duration_seconds := 0.18:
 	set(value):
 		destroy_duration_seconds = maxf(value, 0.0)
 		_apply_column_durations()
 @export_range(0.0, 1.0, 0.01) var shift_duration_seconds := 0.24:
 	set(value):
 		shift_duration_seconds = maxf(value, 0.0)
+		_apply_column_durations()
+@export_range(0.0, 0.25, 0.01) var shift_overlap_seconds := 0.04:
+	set(value):
+		shift_overlap_seconds = maxf(value, 0.0)
 		_apply_column_durations()
 
 var _columns: Array[CollapsingShelfColumn] = []
@@ -376,6 +380,7 @@ func _apply_column_durations() -> void:
 	for column in _columns:
 		column.destroy_duration_seconds = destroy_duration_seconds
 		column.shift_duration_seconds = shift_duration_seconds
+		column.shift_overlap_seconds = shift_overlap_seconds
 
 
 func _clear_columns() -> void:

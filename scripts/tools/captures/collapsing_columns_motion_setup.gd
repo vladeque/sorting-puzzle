@@ -56,7 +56,9 @@ func _rebuild() -> void:
 func _freeze(board: CollapsingShelfBoard) -> void:
 	var raw_progress := OS.get_environment(PROGRESS_ENVIRONMENT_VARIABLE).strip_edges()
 	var progress := 0.5 if raw_progress.is_empty() else clampf(raw_progress.to_float(), 0.0, 1.0)
-	var target_seconds := DESTROY_SECONDS + SHIFT_SECONDS * progress
+	var target_seconds := maxf(
+		DESTROY_SECONDS - minf(board.shift_overlap_seconds, DESTROY_SECONDS), 0.0
+	) + SHIFT_SECONDS * progress
 	for column_index in range(board.get_column_count()):
 		var tween := board.get_column(column_index).get("_collapse_tween") as Tween
 		if tween == null or not tween.is_valid():

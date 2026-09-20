@@ -2738,8 +2738,8 @@ Key methods:
 
 Exports:
 - `window_outer_margin`: how far the non-top window edges sit outside the footprint.
-- `destroy_duration_seconds`, `shift_duration_seconds`: pushed to every column. Zero makes collapses
-  complete synchronously, which tests use.
+- `destroy_duration_seconds`, `shift_duration_seconds`, `shift_overlap_seconds`: pushed to every
+  column. Zero durations make collapses complete synchronously, which tests use.
 
 Signals:
 - `collapse_started`, `collapse_finished(result)`.
@@ -2769,6 +2769,8 @@ Purpose:
   its recorded solution, with the authored four-shelf window.
 - `scripts/tools/captures/collapsing_columns_motion_setup.gd`: a collapse frozen part-way through
   its drop with `Tween.custom_step()`; `SORTING_PUZZLE_CAPTURE_COLLAPSE_PROGRESS` picks the point.
+- `scripts/tools/captures/collapsing_columns_destruction_setup.gd`: the preceding wood-snap beat,
+  frozen with the same column tween; `SORTING_PUZZLE_CAPTURE_DESTRUCTION_PROGRESS` picks the point.
 - `scripts/tools/captures/collapsing_columns_capture_support.gd`: shared build, settle, and replay
   steps, and `SOLUTION_PREFIX`, the fixture's recorded solution moves. The setups rebuild the board
   on every resize, because the level resolves its window only when a board is built, and park
@@ -2805,8 +2807,9 @@ Purpose:
   discovery never finds one.
 
 Exports:
-- `destroy_duration_seconds`, `shift_duration_seconds`, `destroyed_shelf_end_scale`.
-- `COLLAPSE_TRANSITION` / `COLLAPSE_EASE`: one shared easing for every column.
+- `destroy_duration_seconds`, `shift_duration_seconds`, `shift_overlap_seconds`: destruction and
+  fall timing, including their short overlap.
+- `landing_overshoot`, `landing_rebound`: the local-pixel contact positions around the exact row.
 
 Signals:
 - `collapse_settled`: exactly once per collapse, including one cut short by `settle_immediately()`.
@@ -2815,6 +2818,21 @@ Timer and pause policy:
 - A collapse is gameplay resolution, not a pause. Like match-clear animations it keeps running under
   the pause menu, and Freezer does not stop it. Because the order is committed before any tween,
   every interruption point leaves a consistent board.
+
+## `scripts/shelf_destruction_effect.gd`
+
+Class:
+- `ShelfDestructionEffect`.
+
+Attached to:
+- `scenes/effects/shelf_destruction_effect.tscn` root.
+
+Purpose:
+- Owns the collapsing shelf's visual break language: a small recoil, separated side walls and
+  planks, late fade, warm snap line, dust puffs, and deterministic oak-colored chips.
+- `add_to_tween(tween, shelf, duration, break_direction)` contributes all animation to the calling
+  column's shared tween. It deliberately creates no independent tween, owns no gameplay state, and
+  is freed by the column when the batch settles or is interrupted.
 
 ## `scripts/moving_shelf_row.gd`
 

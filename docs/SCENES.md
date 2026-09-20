@@ -1965,18 +1965,39 @@ Script:
 
 Runtime-created nodes:
 - `ShelfXX`: standard shelves registered bottom to top through `CollapsingShelfBoard.register_shelf()`.
+- `ShelfDestructionEffect_<id>`: one short-lived
+  `scenes/effects/shelf_destruction_effect.tscn` instance per removed shelf while its wood-snap beat
+  is visible.
 
 Behavior:
 - Places every shelf at an absolute logical row counted up from the column base, and only ever
   animates toward those absolute rows, so repeated collapses cannot drift.
 - Renders only shelves inside the window. The window's top shelf carries the ceiling cap even when
   more shelves wait above it.
-- A removed shelf first shrinks and fades (`destroy_duration_seconds`), then the shelves above it
-  drop (`shift_duration_seconds`). Shelves below never move. A revealed shelf fades in while it
-  drops from above the window instead of appearing in place.
+- A removed shelf recoils, separates its walls and planks, and emits deterministic oak chips and
+  dust (`destroy_duration_seconds`). The accelerated drop begins shortly before that beat ends,
+  overshoots the destination, and rebounds to its exact row (`shift_duration_seconds`). Shelves
+  below never move. A revealed shelf remains opaque and enters physically through the top clip.
 
 Do not use for:
 - Deciding which shelves are empty. The level decides that and hands them to the board.
+
+## `scenes/effects/shelf_destruction_effect.tscn`
+
+Asset-free visual accent for an emptied shelf in collapsing-columns mode.
+
+Root:
+- `ShelfDestructionEffect` (`Node2D`, `z_index = 40`).
+
+Script:
+- `scripts/shelf_destruction_effect.gd`.
+
+Behavior:
+- Draws a short warm snap line, expanding dust puffs, and deterministic oak-colored chips without
+  requiring a generated texture or particle resource.
+- Adds the shelf frame's recoil and child-piece separation to the column-owned tween. It never owns
+  gameplay state or an independent timeline, so deterministic capture stepping and interruption
+  settling still advance or remove the entire effect together.
 
 ## `scenes/ui/gameplay_modal_shell.tscn`
 

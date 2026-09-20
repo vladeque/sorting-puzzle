@@ -17,15 +17,15 @@ extends Node2D
 signal collapse_settled
 
 const AUTHORED_ID_META := &"collapsing_shelf_id"
-## One easing for every column, so parallel collapses read as a single coordinated drop.
-const COLLAPSE_TRANSITION := Tween.TRANS_QUAD
-const COLLAPSE_EASE := Tween.EASE_IN_OUT
+const DESTRUCTION_EFFECT_SCENE := preload("res://scenes/effects/shelf_destruction_effect.tscn")
 
-## The emptied shelf shrinks and fades first; only then does the pile above it drop. Keeping the two
-## beats separate is what makes a destruction read differently from an ordinary shift.
-@export_range(0.0, 1.0, 0.01) var destroy_duration_seconds := 0.14
+## The wood snap leads the fall, then overlaps its opening frames so the column responds without a
+## dead beat. Survivors accelerate down and finish with a restrained contact rebound.
+@export_range(0.0, 1.0, 0.01) var destroy_duration_seconds := 0.18
 @export_range(0.0, 1.0, 0.01) var shift_duration_seconds := 0.24
-@export_range(0.1, 1.0, 0.01) var destroyed_shelf_end_scale := 0.82
+@export_range(0.0, 0.25, 0.01) var shift_overlap_seconds := 0.04
+@export_range(0.0, 12.0, 0.5) var landing_overshoot := 4.0
+@export_range(0.0, 8.0, 0.5) var landing_rebound := 1.5
 
 var column_index := 0
 var _visible_count := 1
@@ -38,6 +38,7 @@ var _removing: Array[Shelf] = []
 var _entering: Array[Shelf] = []
 var _collapse_tween: Tween
 var _is_collapsing := false
+var _destruction_effects: Array[Node] = []
 
 
 func configure(index: int, visible_count: int, shelf_step: Vector2) -> void:
@@ -160,28 +161,35 @@ func start_collapse() -> void:
 		return
 
 	_apply_window_state()
-	# Revealed shelves wait above the window, where the board clips them, and fade in as they drop
-	# so none of them flashes into place.
+	# Revealed shelves wait above the window and enter through its clip edge. Keeping them opaque
+	# makes them read as physical shelves descending into view instead of ghosting into existence.
 	for shelf in _entering:
 		shelf.visible = true
-		shelf.modulate.a = 0.0
+		shelf.modulate.a = 1.0
 
 	var has_tweeners := false
 	var tween := create_tween()
-	tween.set_trans(COLLAPSE_TRANSITION).set_ease(COLLAPSE_EASE).set_parallel(true)
+	tween.set_parallel(true)
 	if destroy_duration_seconds > 0.0:
 		for shelf in _removing:
-			tween.tween_property(shelf, "modulate:a", 0.0, destroy_duration_seconds)
-			tween.tween_property(
-				shelf, "scale", shelf.scale * destroyed_shelf_end_scale, destroy_duration_seconds
-			)
+			var effect = DESTRUCTION_EFFECT_SCENE.instantiate()
+			effect.name = "ShelfDestructionEffect_%s" % get_authored_shelf_id(shelf)
+			effect.position = shelf.position
+			effect.scale = shelf.scale
+			add_child(effect)
+			_destruction_effects.append(effect)
+			var break_direction := -1.0 if column_index % 2 == 0 else 1.0
+			effect.add_to_tween(tween, shelf, destroy_duration_seconds, break_direction)
 			has_tweeners = true
 	else:
 		for shelf in _removing:
 			shelf.visible = false
 
-	var shift_started := false
 	if shift_duration_seconds > 0.0:
+		var shift_delay := get_shift_start_delay()
+		var fall_duration := shift_duration_seconds * 0.76
+		var rebound_duration := shift_duration_seconds * 0.10
+		var settle_duration := shift_duration_seconds - fall_duration - rebound_duration
 		for stack_index in range(_shelves.size()):
 			var shelf := _shelves[stack_index]
 			var destination := get_row_position(stack_index)
@@ -189,13 +197,16 @@ func start_collapse() -> void:
 			if stack_index >= _visible_count or shelf.position.is_equal_approx(destination):
 				continue
 
-			if has_tweeners and not shift_started:
-				tween.chain()
-			shift_started = true
 			has_tweeners = true
-			tween.tween_property(shelf, "position", destination, shift_duration_seconds)
-			if _entering.has(shelf):
-				tween.tween_property(shelf, "modulate:a", 1.0, shift_duration_seconds)
+			var overshoot_position := destination + Vector2(0.0, landing_overshoot)
+			var rebound_position := destination - Vector2(0.0, landing_rebound)
+			tween.tween_property(shelf, "position", overshoot_position, fall_duration) \
+				.set_delay(shift_delay).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+			tween.tween_property(shelf, "position", rebound_position, rebound_duration) \
+				.set_delay(shift_delay + fall_duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+			tween.tween_property(shelf, "position", destination, settle_duration) \
+				.set_delay(shift_delay + fall_duration + rebound_duration) \
+				.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
 
 	if not has_tweeners:
 		tween.kill()
@@ -204,6 +215,14 @@ func start_collapse() -> void:
 
 	_collapse_tween = tween
 	tween.finished.connect(_finish_collapse, CONNECT_ONE_SHOT)
+
+
+func get_shift_start_delay() -> float:
+	return maxf(destroy_duration_seconds - minf(shift_overlap_seconds, destroy_duration_seconds), 0.0)
+
+
+func get_authored_shelf_id(shelf: Shelf) -> int:
+	return int(shelf.get_meta(AUTHORED_ID_META, -1)) if shelf != null else -1
 
 
 ## Deterministic, animation-free settle for setup, tests, and teardown. Completes a running
@@ -223,6 +242,13 @@ func _finish_collapse() -> void:
 		if _collapse_tween.is_valid():
 			_collapse_tween.kill()
 		_collapse_tween = null
+
+	for effect in _destruction_effects:
+		if effect != null and is_instance_valid(effect):
+			if effect.get_parent() == self:
+				remove_child(effect)
+			effect.queue_free()
+	_destruction_effects.clear()
 
 	# Out of the tree at once, not merely queued: the level's recursive shelf discovery must never
 	# find a destroyed shelf in the frame before it is actually freed.
