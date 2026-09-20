@@ -1785,6 +1785,13 @@ func _apply_shelf_row_placement(shelf: Node2D, row_placement: String) -> void:
 
 func _update_shelf_perspective_edges() -> void:
 	var shelves := _get_all_shelves()
+	# Restore the authored exterior cast bounds before measuring intersections. This keeps repeated
+	# responsive relayouts deterministic after a previous pass partitioned shared shadow strips.
+	for shelf_node in shelves:
+		var shelf_cell := shelf_node as Shelf
+		if shelf_cell != null:
+			shelf_cell.set_exterior_shadow_connections(false, false, false, false)
+
 	for shelf_node in shelves:
 		var shelf := shelf_node as Node2D
 		if shelf == null:
@@ -1794,9 +1801,66 @@ func _update_shelf_perspective_edges() -> void:
 		if _collapsing_board != null and _collapsing_board.owns_shelf(shelf):
 			continue
 
+		_apply_shelf_exterior_shadow_connections(shelf, shelves)
 		_set_shelf_top_ceiling_cap_visible(shelf, not _has_stacked_shelf_above(shelf, shelves))
 		_set_shelf_bottom_shadow_visible(shelf)
 		_set_shelf_right_column_shadow_visible(shelf)
+
+
+func _apply_shelf_exterior_shadow_connections(shelf: Node2D, shelves: Array[Node]) -> void:
+	var shelf_cell := shelf as Shelf
+	if shelf_cell == null:
+		return
+
+	var shelf_position := _get_shelf_root_local_position(shelf)
+	var bottom_bounds := _get_shelf_shadow_bounds(shelf, SHELF_BOTTOM_SHADOW_NAME)
+	var right_bounds := _get_shelf_shadow_bounds(shelf, SHELF_RIGHT_COLUMN_SHADOW_NAME)
+	var has_left_neighbor := false
+	var has_right_neighbor := false
+	var has_above_neighbor := false
+	var has_below_neighbor := false
+	for other_node in shelves:
+		var other_shelf := other_node as Node2D
+		if other_shelf == null or other_shelf == shelf:
+			continue
+		if str(other_shelf.get_meta(SHELF_VISUAL_VARIANT_META, SHELF_VISUAL_VARIANT_FULL)) != SHELF_VISUAL_VARIANT_FULL:
+			continue
+
+		var other_position := _get_shelf_root_local_position(other_shelf)
+		if absf(other_position.y - shelf_position.y) <= LAYOUT_ROW_VERTICAL_EPSILON:
+			var other_bottom_bounds := _get_shelf_shadow_bounds(other_shelf, SHELF_BOTTOM_SHADOW_NAME)
+			if bottom_bounds.intersects(other_bottom_bounds):
+				if other_position.x < shelf_position.x:
+					has_left_neighbor = true
+				elif other_position.x > shelf_position.x:
+					has_right_neighbor = true
+
+		if absf(other_position.x - shelf_position.x) <= LAYOUT_ROW_VERTICAL_EPSILON:
+			var other_right_bounds := _get_shelf_shadow_bounds(other_shelf, SHELF_RIGHT_COLUMN_SHADOW_NAME)
+			if right_bounds.intersects(other_right_bounds):
+				if other_position.y < shelf_position.y:
+					has_above_neighbor = true
+				elif other_position.y > shelf_position.y:
+					has_below_neighbor = true
+
+	shelf_cell.set_exterior_shadow_connections(
+		has_left_neighbor,
+		has_right_neighbor,
+		has_above_neighbor,
+		has_below_neighbor
+	)
+
+
+func _get_shelf_shadow_bounds(shelf: Node2D, shadow_name: String) -> Rect2:
+	var shadow := shelf.get_node_or_null(shadow_name) as Polygon2D
+	if shadow == null or shadow.polygon.is_empty():
+		return Rect2()
+
+	var first_point := _shelves_root.to_local(shadow.to_global(shadow.polygon[0]))
+	var bounds := Rect2(first_point, Vector2.ZERO)
+	for point in shadow.polygon:
+		bounds = bounds.expand(_shelves_root.to_local(shadow.to_global(point)))
+	return bounds
 
 
 func _has_stacked_shelf_above(shelf: Node2D, shelves: Array[Node]) -> bool:

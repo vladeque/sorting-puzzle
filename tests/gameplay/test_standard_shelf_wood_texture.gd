@@ -158,10 +158,43 @@ func _run() -> void:
 		"The floor corner should use a feathered two-axis occlusion shader."
 	)
 	_check_taller_frame_geometry(shelf)
+	_check_exterior_shadow_partitioning(shelf)
 	_check_item_shadow_layers_over_shelf_shadows(shelf)
 
 	shelf.free()
 	_finish()
+
+
+func _check_exterior_shadow_partitioning(shelf: Shelf) -> void:
+	var bottom_shadow := shelf.get_node_or_null("Shadow") as Polygon2D
+	var right_shadow := shelf.get_node_or_null("RightColumnShadow") as Polygon2D
+	shelf.set_exterior_shadow_connections(false, true, false, true)
+	_check(
+		bottom_shadow != null
+			and is_equal_approx(bottom_shadow.polygon[1].x, 108.0)
+			and is_equal_approx(bottom_shadow.polygon[2].x, 114.0),
+		"A bottom cast should end at the midpoint of its shared strip on the right."
+	)
+	_check(
+		right_shadow != null
+			and is_equal_approx(right_shadow.polygon[1].y, 36.5)
+			and is_equal_approx(right_shadow.polygon[2].y, 42.0),
+		"A right cast should end at the midpoint of its shared strip below."
+	)
+	shelf.set_exterior_shadow_connections(true, false, true, false)
+	_check(
+		bottom_shadow != null
+			and is_equal_approx(bottom_shadow.polygon[0].x, -108.0)
+			and is_equal_approx(bottom_shadow.polygon[3].x, -102.0),
+		"A bottom cast should begin at the midpoint of its shared strip on the left."
+	)
+	_check(
+		right_shadow != null
+			and is_equal_approx(right_shadow.polygon[0].y, -100.2)
+			and is_equal_approx(right_shadow.polygon[3].y, -94.7),
+		"A right cast should begin at the midpoint of its shared strip above."
+	)
+	shelf.set_exterior_shadow_connections(false, false, false, false)
 
 
 func _check_taller_frame_geometry(shelf: Node) -> void:

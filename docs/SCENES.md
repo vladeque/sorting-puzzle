@@ -2319,9 +2319,10 @@ Purpose:
 - Owns generated back-layer slot layout and preview styling defaults through `scripts/shelf.gd`.
 - Owns soft internal left/top wall shadows, the diagonal bottom cast shadow,
   the hidden top ceiling cap, and the right-column cast shadow toggled by `scripts/level.gd`.
-- Uses shared procedural materials for inset, seam, corner, and exterior cast shadows. Translucent
-  exterior casts work over any level background; their trimmed low-layer geometry avoids stacking
-  at shelf joins. Item contact shadows still render above the floor but below foreground wall faces.
+- Uses shared procedural materials for inset, corner, and exterior cast shadows. Translucent
+  exterior casts work over any level background; runtime partitions their shared strips at the
+  midpoint so adjacent shelves meet without alpha-compounding. Item contact shadows still render
+  above the floor but below foreground wall faces.
 - Instances the reusable hidden `scenes/ui/shelf_lock_overlay.tscn` when a level config gates the
   shelf behind cleared triples.
 - Uses wide cell bounds so three generated shelves span most of the 720 px gameplay viewport with
@@ -2351,7 +2352,8 @@ Important nodes:
   faces use the same light-oak material and are shown at runtime only for top shelves.
 - `Shadow` and `RightColumnShadow`: soft translucent perspective cast shadows, shown at runtime for
   full shelf visuals and drawn below shelf bodies, items, and generated back-layer item previews.
-  Their UV-driven fade is independent of the level background color.
+  Their UV-driven fade is independent of the level background color. `scripts/level.gd` detects
+  neighboring cast bounds and asks `scripts/shelf.gd` to partition only their overlapping strips.
 - `FloorCornerShade`: two-axis procedural corner occlusion where the back, side, and floor meet.
 - `FloorSurface` and `FloorFrontLip`: image-textured wooden floor where items visually rest.
 - `FloorGrain*`: retained hidden as legacy editable guides; the image texture now supplies visible

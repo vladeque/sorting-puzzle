@@ -2061,7 +2061,10 @@ Key responsibilities:
   as a per-type offset from the generated grid position, apply the shared shelf visual scale, assign
   left/middle/right row placement visuals for static shelves, and ask `Shelf` to add generated back
   layers. `scenes/dispenser_shelf.tscn` uses this offset to sit 10px higher than standard shelves.
-- Ask each shelf scene to show or hide its placement-specific `TopCeilingCap` when it has no stacked neighbor above. Show each shelf scene's bottom `Shadow` and `RightColumnShadow` whenever the shelf uses full visuals so neighboring shelf bodies and items cover those low-layer cast shadows while exposed wall/background areas still receive them.
+- Ask each shelf scene to show or hide its placement-specific `TopCeilingCap` when it has no stacked
+  neighbor above. Show each full shelf's bottom `Shadow` and `RightColumnShadow`, detect neighboring
+  cast bounds, and partition their shared horizontal/vertical strips at the midpoint so translucent
+  shadows meet without alpha-compounding while exposed wall/background areas still receive them.
 - Load `layout_preset` scene templates from `scenes/layouts/`, group authored `ShelfXX` markers into
   rows by position, expand their logical row distances by the taller-frame allowance around the
   layout center (including proportional half-row expansion for staggered columns), and place
@@ -2572,6 +2575,9 @@ Key methods:
 - `set_visual_variant(visual_variant)`: applies `full` or `floor_only` shelf presentation and records the active variant as metadata for `scripts/level.gd` shelf edge and cast-shadow visibility checks.
 - `get_visual_variant()`: returns the active shelf visual variant.
 - `set_row_placement(row_placement)`: toggles the matching `PlacementVisuals/Left`, `PlacementVisuals/Middle`, or `PlacementVisuals/Right` container and records the active placement as metadata.
+- `set_exterior_shadow_connections(left, right, above, below)`: trims only the shared portions of
+  the bottom and right exterior cast polygons. The union of the original silhouettes is preserved,
+  but adjacent shelves no longer draw two translucent layers into the same pixels.
 - `set_horizontal_visual_scale(horizontal_scale)`: narrows shelf artwork for a moving row, trims the
   static shelf lip overhang to the floor-surface width, enables antialiasing on its moving polygon
   edges, and preserves item, slot, and input proportions.

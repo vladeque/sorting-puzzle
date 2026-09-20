@@ -858,13 +858,13 @@ Responsibility:
   source-only variant lives in `scenes/dispenser_shelf.tscn` -- see "Dispenser Shelf" below.
 - `scripts/shelf.gd` owns the shelf-type capability surface every shelf type answers.
 - Owns generated back-layer slot layout and preview styling defaults.
-- Contains the visible back wall, opaque non-compounding interior/cast shadows, image-textured
+- Contains the visible back wall, procedural inset/corner shading, soft translucent exterior casts, image-textured
   light-oak floor/frame/lip, and hidden top edge details shown by `scripts/level.gd` for shelves with
   no stacked neighbor above. One shared material image is sampled horizontally for broad faces and
   with rotated UVs for vertical supports; the former line-only grain nodes remain hidden. Shelf cast
   shadows draw below generated back-layer item previews and remain enabled for full shelves so
-  neighboring shelf bodies and items cover them. Shelf/shelf intersections keep one consistent
-  tone, while later item contact shadows alpha-blend over shelf shadows and darken that overlap.
+  neighboring shelf bodies and items cover them. Runtime partitions the casts at shared horizontal
+  and vertical boundaries so adjacent translucent polygons meet without darkening their overlap.
 - Instances the reusable hidden lock overlay used by triple-gated shelves; the shelf owns only its
   placement, while `ShelfLockOverlay` owns chains, lock, badge, labels, and motion.
 - Keeps the shelf width and slot positions aligned with the level grid constants so a three-shelf

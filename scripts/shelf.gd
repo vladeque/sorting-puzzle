@@ -34,6 +34,28 @@ const COLLAPSING_VISUALS_NODE := "CollapsingVisuals"
 const FLOOR_SURFACE_NODE := "FloorSurface"
 const FLOOR_FRONT_LIP_NODE := "FloorFrontLip"
 const FLOOR_CONTACT_SHADOW_NODE := "FloorContactShadow"
+const BOTTOM_SHADOW_NODE := "Shadow"
+const RIGHT_CAST_SHADOW_NODE := "RightColumnShadow"
+const BOTTOM_SHADOW_TOP_Y := 46.0
+const BOTTOM_SHADOW_BOTTOM_Y := 60.0
+const BOTTOM_SHADOW_LEFT_TOP_X := -112.0
+const BOTTOM_SHADOW_LEFT_BOTTOM_X := -106.0
+const BOTTOM_SHADOW_RIGHT_TOP_X := 112.0
+const BOTTOM_SHADOW_RIGHT_BOTTOM_X := 118.0
+const BOTTOM_SHADOW_JOIN_LEFT_TOP_X := -108.0
+const BOTTOM_SHADOW_JOIN_LEFT_BOTTOM_X := -102.0
+const BOTTOM_SHADOW_JOIN_RIGHT_TOP_X := 108.0
+const BOTTOM_SHADOW_JOIN_RIGHT_BOTTOM_X := 114.0
+const RIGHT_SHADOW_INNER_X := 109.0
+const RIGHT_SHADOW_OUTER_X := 137.0
+const RIGHT_SHADOW_TOP_INNER_Y := -109.7
+const RIGHT_SHADOW_TOP_OUTER_Y := -98.7
+const RIGHT_SHADOW_BOTTOM_INNER_Y := 46.0
+const RIGHT_SHADOW_BOTTOM_OUTER_Y := 46.0
+const RIGHT_SHADOW_JOIN_TOP_INNER_Y := -100.2
+const RIGHT_SHADOW_JOIN_TOP_OUTER_Y := -94.7
+const RIGHT_SHADOW_JOIN_BOTTOM_INNER_Y := 36.5
+const RIGHT_SHADOW_JOIN_BOTTOM_OUTER_Y := 42.0
 const HORIZONTAL_VISUAL_SCALE_NODES := [
 	"Shadow",
 	"RightColumnShadow",
@@ -155,6 +177,72 @@ func set_row_placement(row_placement: String) -> void:
 
 func get_row_placement() -> String:
 	return _row_placement
+
+
+## Neighboring shelves use translucent exterior casts, so shared geometry must meet rather than
+## overlap. These join coordinates preserve the union of the original polygons while assigning the
+## shared strip to exactly one side of each shelf boundary.
+func set_exterior_shadow_connections(
+	has_left_neighbor: bool,
+	has_right_neighbor: bool,
+	has_above_neighbor: bool,
+	has_below_neighbor: bool
+) -> void:
+	var bottom_shadow := get_node_or_null(BOTTOM_SHADOW_NODE) as Polygon2D
+	if bottom_shadow != null:
+		var left_top := (
+			BOTTOM_SHADOW_JOIN_LEFT_TOP_X if has_left_neighbor else BOTTOM_SHADOW_LEFT_TOP_X
+		)
+		var left_bottom := (
+			BOTTOM_SHADOW_JOIN_LEFT_BOTTOM_X
+			if has_left_neighbor
+			else BOTTOM_SHADOW_LEFT_BOTTOM_X
+		)
+		var right_top := (
+			BOTTOM_SHADOW_JOIN_RIGHT_TOP_X if has_right_neighbor else BOTTOM_SHADOW_RIGHT_TOP_X
+		)
+		var right_bottom := (
+			BOTTOM_SHADOW_JOIN_RIGHT_BOTTOM_X
+			if has_right_neighbor
+			else BOTTOM_SHADOW_RIGHT_BOTTOM_X
+		)
+		bottom_shadow.polygon = PackedVector2Array([
+			Vector2(left_top, BOTTOM_SHADOW_TOP_Y),
+			Vector2(right_top, BOTTOM_SHADOW_TOP_Y),
+			Vector2(right_bottom, BOTTOM_SHADOW_BOTTOM_Y),
+			Vector2(left_bottom, BOTTOM_SHADOW_BOTTOM_Y),
+		])
+		bottom_shadow.uv = PackedVector2Array([
+			Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(0, 1),
+		])
+
+	var right_shadow := get_node_or_null(RIGHT_CAST_SHADOW_NODE) as Polygon2D
+	if right_shadow != null:
+		var top_inner := (
+			RIGHT_SHADOW_JOIN_TOP_INNER_Y if has_above_neighbor else RIGHT_SHADOW_TOP_INNER_Y
+		)
+		var top_outer := (
+			RIGHT_SHADOW_JOIN_TOP_OUTER_Y if has_above_neighbor else RIGHT_SHADOW_TOP_OUTER_Y
+		)
+		var bottom_inner := (
+			RIGHT_SHADOW_JOIN_BOTTOM_INNER_Y
+			if has_below_neighbor
+			else RIGHT_SHADOW_BOTTOM_INNER_Y
+		)
+		var bottom_outer := (
+			RIGHT_SHADOW_JOIN_BOTTOM_OUTER_Y
+			if has_below_neighbor
+			else RIGHT_SHADOW_BOTTOM_OUTER_Y
+		)
+		right_shadow.polygon = PackedVector2Array([
+			Vector2(RIGHT_SHADOW_INNER_X, top_inner),
+			Vector2(RIGHT_SHADOW_INNER_X, bottom_inner),
+			Vector2(RIGHT_SHADOW_OUTER_X, bottom_outer),
+			Vector2(RIGHT_SHADOW_OUTER_X, top_outer),
+		])
+		right_shadow.uv = PackedVector2Array([
+			Vector2(0, 0), Vector2(0, 1), Vector2(1, 1), Vector2(1, 0),
+		])
 
 
 ## Collapsing-column levels reuse the standard shelf interaction geometry but give each cell a
