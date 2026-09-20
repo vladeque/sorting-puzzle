@@ -1,9 +1,9 @@
 extends SceneTree
 
 ## UI-003 level UI consistency verification: shared gameplay resource identity, explicit disabled
-## styles (no engine-default fallback), the star pill's receive pulse leaving its chrome alone, the
-## Completion/Failure signal routing and copy, the failure modal composition, the
-## ui_cancel back-stack precedence, safe-area layout at fabricated insets, responsive ability-bar
+## styles (no engine-default fallback), plain-red settings cross-outs, the star pill's receive pulse
+## leaving its chrome alone, the Completion/Failure signal routing and copy, the failure modal
+## composition, the ui_cancel back-stack precedence, safe-area layout at fabricated insets, responsive ability-bar
 ## icon/badge bounds, long-value formatting, the hidden rewarded-ad placeholder, and locked-shelf
 ## chain/count/unlock feedback. See docs/UI_003_LEVEL_UI_CONSISTENCY_TICKET.md and docs/SCENES.md's
 ## "Shared Gameplay UI Roles" section.
@@ -43,6 +43,7 @@ func _run() -> void:
 
 	await _test_shared_resource_identity()
 	await _test_explicit_disabled_styles()
+	await _test_plain_red_settings_cross_outs()
 	await _test_star_receive_pulse_keeps_pill_chrome()
 	await _test_focus_and_cursor_policy()
 	await _test_rewarded_ad_placeholder()
@@ -211,6 +212,36 @@ func _test_explicit_disabled_styles() -> void:
 		_check(button.get_theme_stylebox("disabled") != null, "%s must have an explicit disabled style." % button_name)
 
 	level.free()
+
+
+## The same off-state marker is scene-authored in Pause and created by script in Main Menu Settings.
+## Both routes must render only the red slash, without restoring the retired yellow backing rect.
+func _test_plain_red_settings_cross_outs() -> void:
+	var pause := _pause_menu_scene.instantiate()
+	var main_menu_settings_scene := load("res://scenes/ui/settings_menu.tscn") as PackedScene
+	var main_menu_settings := main_menu_settings_scene.instantiate()
+	root.add_child(pause)
+	root.add_child(main_menu_settings)
+	await process_frame
+
+	for settings_view in [pause, main_menu_settings]:
+		for button_name in ["MusicButton", "SoundEffectsButton", "VibrationButton"]:
+			var button := settings_view.find_child(button_name, true, false) as Button
+			var cross_out := button.get_node_or_null("CrossOut") as Control
+			var slash := cross_out.get_node_or_null("Slash") as ColorRect
+			_check(
+				cross_out.get_node_or_null("Border") == null,
+				"%s should not give its disabled marker a yellow border." % button_name
+			)
+			_check(
+				slash != null
+					and slash.color == Color(0.86, 0.08, 0.06, 1.0)
+					and slash.size.is_equal_approx(cross_out.size),
+				"%s should use one solid red slash across the full disabled marker." % button_name
+			)
+
+	pause.free()
+	main_menu_settings.free()
 
 
 ## The star pill's receive pulse must never scale the pill itself. Its StyleBoxFlat carries a 2px

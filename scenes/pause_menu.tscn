@@ -137,19 +137,10 @@ rotation = -0.7853982
 pivot_offset = Vector2(48, 7)
 mouse_filter = 2
 
-[node name="Border" type="ColorRect" parent="SettingsContent/IconRow/MusicOption/MusicButton/CrossOut" unique_id=1403047289]
+[node name="Slash" type="ColorRect" parent="SettingsContent/IconRow/MusicOption/MusicButton/CrossOut" unique_id=872563406]
 layout_mode = 0
 offset_right = 96.0
 offset_bottom = 14.0
-mouse_filter = 2
-color = Color(1, 0.82, 0.26, 1)
-
-[node name="Slash" type="ColorRect" parent="SettingsContent/IconRow/MusicOption/MusicButton/CrossOut" unique_id=872563406]
-layout_mode = 0
-offset_left = 3.0
-offset_top = 3.0
-offset_right = 90.0
-offset_bottom = 8.0
 mouse_filter = 2
 color = Color(0.86, 0.08, 0.06, 1)
 
@@ -206,19 +197,10 @@ rotation = -0.7853982
 pivot_offset = Vector2(48, 7)
 mouse_filter = 2
 
-[node name="Border" type="ColorRect" parent="SettingsContent/IconRow/SoundEffectsOption/SoundEffectsButton/CrossOut" unique_id=2085467772]
+[node name="Slash" type="ColorRect" parent="SettingsContent/IconRow/SoundEffectsOption/SoundEffectsButton/CrossOut" unique_id=377661743]
 layout_mode = 0
 offset_right = 96.0
 offset_bottom = 14.0
-mouse_filter = 2
-color = Color(1, 0.82, 0.26, 1)
-
-[node name="Slash" type="ColorRect" parent="SettingsContent/IconRow/SoundEffectsOption/SoundEffectsButton/CrossOut" unique_id=377661743]
-layout_mode = 0
-offset_left = 3.0
-offset_top = 3.0
-offset_right = 90.0
-offset_bottom = 8.0
 mouse_filter = 2
 color = Color(0.86, 0.08, 0.06, 1)
 
@@ -275,19 +257,10 @@ rotation = -0.7853982
 pivot_offset = Vector2(48, 7)
 mouse_filter = 2
 
-[node name="Border" type="ColorRect" parent="SettingsContent/IconRow/VibrationOption/VibrationButton/CrossOut" unique_id=2145372920]
+[node name="Slash" type="ColorRect" parent="SettingsContent/IconRow/VibrationOption/VibrationButton/CrossOut" unique_id=1635876193]
 layout_mode = 0
 offset_right = 96.0
 offset_bottom = 14.0
-mouse_filter = 2
-color = Color(1, 0.82, 0.26, 1)
-
-[node name="Slash" type="ColorRect" parent="SettingsContent/IconRow/VibrationOption/VibrationButton/CrossOut" unique_id=1635876193]
-layout_mode = 0
-offset_left = 3.0
-offset_top = 3.0
-offset_right = 90.0
-offset_bottom = 8.0
 mouse_filter = 2
 color = Color(0.86, 0.08, 0.06, 1)
 

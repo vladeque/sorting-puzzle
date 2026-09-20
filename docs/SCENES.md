@@ -1138,9 +1138,9 @@ Purpose:
 Important nodes:
 - `PauseMenuPanel`: centered popup panel kept named for reuse with `scripts/pause_menu.gd`.
 - `PauseMenuPanel/CloseButton`: protruding red close button wired by `scripts/production_main_menu.gd` to dismiss the settings popup.
-- `PauseMenuPanel/InnerPanel/IconRow/MusicOption/MusicButton`: square music toggle button with shadow-only button styling and held-press scaling.
-- `PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption/SoundEffectsButton`: square sound effects toggle button with shadow-only button styling and held-press scaling.
-- `PauseMenuPanel/InnerPanel/IconRow/VibrationOption/VibrationButton`: square phone vibration toggle button with shadow-only button styling and held-press scaling.
+- `PauseMenuPanel/InnerPanel/IconRow/MusicOption/MusicButton`: square music toggle button with shadow-only button styling, held-press scaling, and a plain red diagonal marker when disabled.
+- `PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption/SoundEffectsButton`: square sound effects toggle button with shadow-only button styling, held-press scaling, and a plain red diagonal marker when disabled.
+- `PauseMenuPanel/InnerPanel/IconRow/VibrationOption/VibrationButton`: square phone vibration toggle button with shadow-only button styling, held-press scaling, and a plain red diagonal marker when disabled.
 - `PauseMenuPanel/InnerPanel/ActionColumn/SupportButton`: wide no-op button using `assets/ui/level_button_blank_new.png`.
 - `PauseMenuPanel/InnerPanel/ActionColumn/LanguageButton`: wide no-op button using `assets/ui/level_button_blank_new.png`.
 
@@ -2103,8 +2103,8 @@ Important nodes:
   the inner title.
 - `IconRow/MusicOption/MusicButton`, `SoundEffectsOption/SoundEffectsButton`,
   `VibrationOption/VibrationButton`: square toggle buttons with shadow-only button styling,
-  held-press scaling, and a scene-authored hidden `CrossOut` child (`Border` + `Slash` ColorRects)
-  toggled by `scripts/pause_menu.gd` instead of being built at runtime (UI-003 P3).
+  held-press scaling, and a scene-authored hidden `CrossOut` child containing one plain red `Slash`
+  ColorRect, toggled by `scripts/pause_menu.gd` instead of being built at runtime (UI-003 P3).
   `SoundEffectsButton` is additionally marked `sfx_click_suppressed` so it can own its complete
   acknowledge-then-mute cue (see "Shared Sound-Effect Roles" above); the other two toggles keep
   the generic click.
