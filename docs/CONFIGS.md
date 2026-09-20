@@ -158,6 +158,10 @@ Supported static layout presets:
 - `staggered_columns_4_5_4`: 13 shelves arranged as four left, five centered, four right.
 - `staggered_columns_5_4_5`: 14 shelves arranged as five left, four centered, five right.
 
+Campaign Level 5 uses `grid_3x4` for its 12 shelves. Its two top-row dispensers therefore pass
+through the preset-marker placement path and receive the dispenser-only lower-row clearance instead
+of falling back to an unadjusted generic grid.
+
 Supported layout presets with moving rows:
 
 The visible counts below describe authored board footprints. Runtime travel expands to the full
