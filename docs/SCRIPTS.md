@@ -2543,8 +2543,8 @@ Purpose:
 - Owns shelf visual switching for `full` versus `floor_only` variants.
 - Owns row-placement visual switching for `left`, `middle`, and `right` shelf cells by toggling scene-authored `PlacementVisuals` containers.
 - Owns the optional scene-authored `CollapsingVisuals` layer. Collapsing boards enable its
-  darker vertical-grain back panel, stronger cabinet posts, warm top/front caps, and small metal
-  corner brackets; standard shelves keep the complete layer hidden.
+  darker vertical-grain back panel and inset shading; standard shelves keep the complete layer
+  hidden while retaining the same shared light-oak frame in both modes.
 - Creates generated back-layer slot nodes for one shelf.
 - Applies back-layer preview item scale, tint, visibility, z-index, and disabled collision state.
 

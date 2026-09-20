@@ -1926,8 +1926,8 @@ Runtime-created nodes:
   `column_layout.shelf_counts` entry, left to right.
 - `ShelfXX`: standard `scenes/shelf.tscn` instances parented under their column. Registration enables
   the scene's normally hidden `CollapsingVisuals` layer, so the mode reads as modular walnut-toned
-  cabinets with vertical-grain backs, darker posts and caps, inset shading, and small metal corner
-  brackets without maintaining a second shelf scene or changing interaction geometry.
+  cabinets with vertical-grain backs and inset shading, without maintaining a second shelf scene,
+  recoloring the shared light-oak frame, or changing interaction geometry.
 
 Lifecycle:
 - Built once per level attempt. Retry replaces the level scene, so the board is rebuilt from config

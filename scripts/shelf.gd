@@ -31,7 +31,6 @@ const MIDDLE_PLACEMENT_NODE := "PlacementVisuals/Middle"
 const RIGHT_PLACEMENT_NODE := "PlacementVisuals/Right"
 const TOP_CEILING_CAP_NODE := "TopCeilingCap"
 const COLLAPSING_VISUALS_NODE := "CollapsingVisuals"
-const COLLAPSING_TOP_CAP_NODE := "CollapsingVisuals/TopCap"
 const FLOOR_SURFACE_NODE := "FloorSurface"
 const FLOOR_FRONT_LIP_NODE := "FloorFrontLip"
 const HORIZONTAL_VISUAL_SCALE_NODES := [
@@ -157,8 +156,8 @@ func get_row_placement() -> String:
 
 
 ## Collapsing-column levels reuse the standard shelf interaction geometry but give each cell a
-## darker cabinet back, stronger side posts, and restrained metal joinery. Basic shelves leave this
-## scene-authored layer hidden.
+## darker wooden cabinet back and inset shading. Basic shelves leave this scene-authored layer
+## hidden.
 func set_collapsing_visuals_enabled(should_enable: bool) -> void:
 	_collapsing_visuals_enabled = should_enable
 	_apply_collapsing_visuals()
@@ -279,10 +278,6 @@ func _apply_top_ceiling_cap_visibility() -> void:
 	_set_node_visible(TOP_CEILING_CAP_NODE, should_show)
 	for placement_node in [LEFT_PLACEMENT_NODE, MIDDLE_PLACEMENT_NODE, RIGHT_PLACEMENT_NODE]:
 		_set_node_visible("%s/%s" % [placement_node, TOP_CEILING_CAP_NODE], should_show)
-	_set_node_visible(
-		COLLAPSING_TOP_CAP_NODE,
-		should_show and _collapsing_visuals_enabled
-	)
 
 
 func _apply_collapsing_visuals() -> void:

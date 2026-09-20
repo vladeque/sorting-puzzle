@@ -46,62 +46,6 @@ z_index = 2
 color = Color(0.3, 0.16, 0.08, 0.28)
 polygon = PackedVector2Array(-101, -88, -89, -78, -89, 15, -101, 15)
 
-[node name="LeftPost" type="Polygon2D" parent="CollapsingVisuals"]
-z_index = 8
-color = Color(0.57, 0.34, 0.18, 1)
-texture = ExtResource("3_wood_texture")
-polygon = PackedVector2Array(-112, -98.7, -103, -98.7, -103, 46, -112, 46)
-uv = PackedVector2Array(160, 72, 196, 72, 196, 652, 160, 652)
-
-[node name="RightPost" type="Polygon2D" parent="CollapsingVisuals"]
-z_index = 8
-color = Color(0.57, 0.34, 0.18, 1)
-texture = ExtResource("3_wood_texture")
-polygon = PackedVector2Array(103, -98.7, 112, -98.7, 112, 46, 103, 46)
-uv = PackedVector2Array(704, 72, 740, 72, 740, 652, 704, 652)
-
-[node name="FloorFront" type="Polygon2D" parent="CollapsingVisuals"]
-z_index = 6
-color = Color(0.62, 0.38, 0.21, 0.88)
-texture = ExtResource("3_wood_texture")
-polygon = PackedVector2Array(-112, 38, 112, 38, 112, 46, -112, 46)
-uv = PackedVector2Array(64, 608, 960, 608, 960, 640, 64, 640)
-
-[node name="LeftBracket" type="Polygon2D" parent="CollapsingVisuals"]
-z_index = 9
-color = Color(0.48, 0.37, 0.25, 1)
-polygon = PackedVector2Array(-100, 7, -86, 7, -100, -7)
-
-[node name="RightBracket" type="Polygon2D" parent="CollapsingVisuals"]
-z_index = 9
-color = Color(0.48, 0.37, 0.25, 1)
-polygon = PackedVector2Array(100, 7, 86, 7, 100, -7)
-
-[node name="LeftBolt" type="Polygon2D" parent="CollapsingVisuals"]
-z_index = 9
-color = Color(0.84, 0.68, 0.43, 1)
-polygon = PackedVector2Array(-96, 1, -94, -1, -92, 1, -94, 3)
-
-[node name="RightBolt" type="Polygon2D" parent="CollapsingVisuals"]
-z_index = 9
-color = Color(0.84, 0.68, 0.43, 1)
-polygon = PackedVector2Array(96, 1, 94, -1, 92, 1, 94, 3)
-
-[node name="TopCap" type="Node2D" parent="CollapsingVisuals"]
-z_index = 8
-
-[node name="BackBoard" type="Polygon2D" parent="CollapsingVisuals/TopCap"]
-color = Color(0.57, 0.34, 0.18, 1)
-texture = ExtResource("3_wood_texture")
-polygon = PackedVector2Array(-112, -112.7, 112, -112.7, 112, -98.7, -112, -98.7)
-uv = PackedVector2Array(64, 128, 960, 128, 960, 184, 64, 184)
-
-[node name="Highlight" type="Line2D" parent="CollapsingVisuals/TopCap"]
-z_index = 1
-points = PackedVector2Array(-104, -109.7, 104, -109.7)
-width = 1.5
-default_color = Color(0.92, 0.72, 0.45, 0.58)
-
 [node name="PlacementVisuals" type="Node2D" parent="." unique_id=932094543]
 texture_filter = 4
 
