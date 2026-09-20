@@ -17,8 +17,29 @@ solver proves it in 50 moves. The preview uses the ordinary level runtime, so it
 from the device exactly as a campaign level would, which also makes it the touch-device check for
 this mode.
 
-No campaign level uses the mode yet. Every chapter 1 slot (levels 1-10) is taken, and choosing
-where the first collapsing level goes is an open product decision.
+## The campaign level
+
+Level 9 is the first campaign level in this mode, replacing a hand-authored classic board that had
+no template. It is three columns of nine one-layer shelves (27 in total), an authored window of
+four, 69 items across 14 types, medium difficulty, seed 9009, and a 300-second timer. The solver
+proves it in 45 moves, and five item types can already be collected from the opening window.
+
+Columns of nine are deliberate: the window never exceeds eight, so shelves still wait above it even
+on the tallest supported screen. The window resolves to 6 rows at 540x960, 720x1280, 1080x1920, and
+900x1600, and to 8 rows at 1080x2400.
+
+Authored as `configs/level_templates/level_009.json` and materialized to
+`configs/levels/level_009.json`:
+
+```powershell
+py scripts\tools\generate_level_shelves.py --gameplay-mode collapsing_columns --column-heights 9,9,9 `
+    --visible-shelves-per-column 4 --item-type-count 14 --difficulty medium --seed 9009 --full-level `
+    --level-number 9 --time-seconds 300 --output configs\level_templates\level_009.json --require-solvable --stats
+py scripts\tools\level_item_progression.py configs\level_templates\level_009.json --output configs\levels\level_009.json
+```
+
+The replaced board was a nine-shelf, two-layer `grid_3x3` level with a 35-second timer; that short
+timer is gone, because a 27-shelf collapsing board cannot be finished in 35 seconds.
 
 ## Rules
 
@@ -48,8 +69,8 @@ This is safe for solvability because a larger window only adds legal moves. The 
 event it can trigger is an automatic triple clear, which destroys a shelf and so only advances the
 objective. Proving the minimum therefore proves every larger window.
 
-With the preview fixture the window resolves to 6 rows at 540x960, 720x1280, 1080x1920, and
-900x1600, and to 8 rows at 1080x2400.
+With the preview fixture and with campaign level 9, the window resolves to 6 rows at 540x960,
+720x1280, 1080x1920, and 900x1600, and to 8 rows at 1080x2400.
 
 ## Ownership
 
@@ -82,7 +103,12 @@ With the preview fixture the window resolves to 6 rows at 540x960, 720x1280, 108
 py -m unittest discover -s tests/tools -p "test_*.py" -t tests/tools
 & .\scripts\tools\run_isolated_godot_test.ps1 -Script res://tests/gameplay/test_collapsing_shelf_columns.gd
 py scripts\tools\validate_level_solvable.py configs\test_levels\collapsing_columns_preview.json --show-solution
+py scripts\tools\validate_level_solvable.py configs\levels\level_009.json
+py scripts\tools\materialize_level_templates.py --check
 ```
+
+`tests/tools/test_validate_level_solvable.py` also proves every committed campaign level in this
+mode is valid and solvable, so level 9 cannot drift into an unfinishable state unnoticed.
 
 `tests/gameplay/test_collapsing_shelf_columns.gd` covers the components in isolation and the full
 level: build order, hidden-shelf reachability, move/triple/Hammer destruction and reveal chains,
@@ -95,6 +121,8 @@ Rendered captures:
 ```powershell
 & .\scripts\tools\capture_ui.ps1 -Scene level.tscn -Name collapsing_columns_initial -Position '0,0' -Settle 30 `
     -Setup scripts/tools/captures/collapsing_columns_initial_setup.gd
+# A campaign level instead of the fixture:
+$env:SORTING_PUZZLE_CAPTURE_COLLAPSE_LEVEL = '9'
 & .\scripts\tools\capture_ui.ps1 -Scene level.tscn -Name collapsing_columns_progress -Position '0,0' -Settle 90 `
     -Setup scripts/tools/captures/collapsing_columns_progress_setup.gd
 & .\scripts\tools\capture_ui.ps1 -Scene level.tscn -Name collapsing_columns_motion -Position '0,0' -Settle 120 `
@@ -110,8 +138,8 @@ motion setup freezes a collapse part-way through its drop with `Tween.custom_ste
 
 ## Not yet done
 
-- Choosing a campaign slot for the first collapsing level. Once one is chosen, generate its
-  template with `--require-solvable` and materialize it.
+- Play-balancing level 9 against the rest of chapter 1: its 300-second timer and 45-move solution
+  are a first estimate, not a tuned difficulty curve.
 - Hands-on touch-device testing: drag accuracy on the scaled board, rapid input just before a
   collapse, and pause/background restoration. The preview scene is set up for this.
 - Publishing and activating campaign content. Backend publication compatibility is implemented in

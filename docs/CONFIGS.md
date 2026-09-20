@@ -350,6 +350,10 @@ Current authored generation parameters:
 - Level 2 uses 9 shelves, 2 filled layers, 7 logical item types, easy difficulty, and a maximum of 6 copies per logical item type.
 - Level 3 uses 12 shelves, 2 filled layers, 7 logical item types, medium difficulty, and a maximum of 6 copies per logical item type.
 - Level 4 uses 15 shelves, 3 filled layers, 19 logical item types, medium difficulty, and seed 4004.
+- Level 9 is the campaign's first `collapsing_columns` board: three columns of nine one-layer
+  shelves, an authored window of four, 14 logical item types, medium difficulty, and seed 9009.
+  Columns are deliberately taller than `MAX_VISIBLE_SHELVES_PER_COLUMN`, so shelves still wait
+  above the window on the tallest supported screen.
 
 Use `--locked-shelves` to add unlock requirements to generated shelves. Entries are 1-based shelf numbers and required cleared triples:
 

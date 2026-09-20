@@ -8,6 +8,10 @@ extends RefCounted
 ## load on that device would reveal.
 
 const FIXTURE_PATH := "res://configs/test_levels/collapsing_columns_preview.json"
+## Set to a campaign level number to review that level instead of the development fixture, for
+## example `$env:SORTING_PUZZLE_CAPTURE_COLLAPSE_LEVEL = '9'`. Only the initial setup honours it;
+## the progress and motion setups replay the fixture's own recorded solution.
+const LEVEL_NUMBER_ENVIRONMENT_VARIABLE := "SORTING_PUZZLE_CAPTURE_COLLAPSE_LEVEL"
 const AUTHORED_WINDOW := 4
 const SETTLE_TIMEOUT_MSEC := 6000
 ## Opening steps of the solver's solution for FIXTURE_PATH at its authored window of four shelves,
@@ -29,15 +33,26 @@ static func keep_alive(scene_root: Node, setup_instance: RefCounted) -> void:
 
 
 ## `pinned_window` 0 lets the screen decide, exactly as in play. Replayed solutions pin the authored
-## window because they were proven against it.
-static func build(level: Node, pinned_window: int, animated: bool) -> CollapsingShelfBoard:
+## window because they were proven against it. `use_requested_level` allows the campaign level named
+## by the environment variable to stand in for the fixture.
+static func build(
+	level: Node, pinned_window: int, animated: bool, use_requested_level := false
+) -> CollapsingShelfBoard:
 	level.set("launched_from_dev_mode", true)
 	level.set("_sound_effects_enabled", false)
 	level.set("item_move_duration_seconds", 0.0)
 	level.set("match_gather_duration_seconds", 0.0)
 	level.set("match_shrink_duration_seconds", 0.0)
 	level.set("max_collapsing_visible_shelves", pinned_window)
-	level.call("_apply_level_config", level.call("_load_json_file", FIXTURE_PATH))
+
+	var requested_level := requested_level_number() if use_requested_level else 0
+	if requested_level > 0:
+		level.set("selected_level", requested_level)
+		level.call("_apply_chapter_background")
+		level.call("_apply_level_config", level.call("_load_level_config", requested_level))
+		level.call("_update_level_label")
+	else:
+		level.call("_apply_level_config", level.call("_load_json_file", FIXTURE_PATH))
 	level.call("_collect_slots")
 	var board := level.get_node_or_null("Shelves/CollapsingShelfBoard") as CollapsingShelfBoard
 	if board == null:
@@ -88,6 +103,11 @@ static func replay(level: Node, tree: SceneTree, board: CollapsingShelfBoard, mo
 		if not play_move(level, board, SOLUTION_PREFIX[move_index]):
 			return
 		await settle(level, tree)
+
+
+static func requested_level_number() -> int:
+	var requested := OS.get_environment(LEVEL_NUMBER_ENVIRONMENT_VARIABLE).strip_edges()
+	return requested.to_int() if requested.is_valid_int() and requested.to_int() > 0 else 0
 
 
 static func find_shelf(board: CollapsingShelfBoard, authored_number: int) -> Shelf:

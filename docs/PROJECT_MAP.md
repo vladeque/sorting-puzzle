@@ -805,6 +805,7 @@ Files:
 - `scripts/level.gd`
 - `scenes/testing/collapsing_columns_preview.tscn`, `scripts/collapsing_columns_preview.gd`
 - `configs/test_levels/collapsing_columns_preview.json`
+- `configs/level_templates/level_009.json`, `configs/levels/level_009.json`
 - `scripts/tools/captures/collapsing_columns_*_setup.gd`
 - `scripts/tools/validate_level_solvable.py`, `scripts/tools/generate_level_shelves.py`
 - `tests/gameplay/test_collapsing_shelf_columns.gd`
@@ -821,8 +822,8 @@ Responsibility:
   rows up to `MAX_VISIBLE_SHELVES_PER_COLUMN` (`8`), resolved once per level.
 - The solver models the mode through `CollapsingColumnsRules`, addressing moves by stable authored
   shelf ID; the generator produces proven-solvable column boards.
-- Behavior reference and outstanding work: `docs/COLLAPSING_SHELF_COLUMNS.md`. No campaign level
-  uses the mode yet; the debug preview plays the development fixture.
+- Behavior reference and outstanding work: `docs/COLLAPSING_SHELF_COLUMNS.md`. Campaign level 9 is
+  the first level in this mode; the debug preview plays a separate development fixture.
 
 Change here when:
 - Changing how columns collapse or reveal, which shelves are playable, the collapse animation, the

@@ -1,7 +1,10 @@
 extends RefCounted
 
-## Capture setup for `level.tscn`: the collapsing-columns fixture as a player first sees it, with the
+## Capture setup for `level.tscn`: a collapsing-columns board as a player first sees it, with the
 ## window each resolution resolves for itself. Hidden shelves wait above the window at every size.
+##
+## Captures the development fixture by default, or a campaign level when
+## `SORTING_PUZZLE_CAPTURE_COLLAPSE_LEVEL` names one.
 ##
 ## ```powershell
 ## & .\scripts\tools\capture_ui.ps1 -Scene level.tscn -Name collapsing_columns_initial -Position '0,0' `
@@ -23,6 +26,6 @@ func setup(scene_root: Node, tree: SceneTree) -> void:
 
 
 func _rebuild() -> void:
-	if Support.build(_level, 0, false) == null:
+	if Support.build(_level, 0, false, true) == null:
 		return
 	await Support.settle(_level, _tree)

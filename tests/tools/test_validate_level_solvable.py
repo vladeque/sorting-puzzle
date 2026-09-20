@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -413,6 +414,30 @@ class CollapsingColumnSearchTests(unittest.TestCase):
         )
         self.assertFalse(rules.is_cleared(state))
         self.assertTrue(rules.is_cleared(rules.settle(state)))
+
+
+## The campaign guard: a shipped collapsing level must stay provably finishable. Classic levels are
+## covered by their own generation-time proof and are skipped here.
+class CommittedCollapsingLevelTests(unittest.TestCase):
+    def test_every_committed_collapsing_campaign_level_is_valid_and_solvable(self) -> None:
+        levels_directory = REPOSITORY_ROOT / "configs" / "levels"
+        collapsing_paths = []
+        for level_path in sorted(levels_directory.glob("level_*.json")):
+            level = json.loads(level_path.read_text(encoding="utf-8"))
+            if level.get("gameplay_mode") == "collapsing_columns":
+                collapsing_paths.append((level_path, level))
+
+        self.assertTrue(collapsing_paths, "no committed collapsing campaign level to check")
+        for level_path, level in collapsing_paths:
+            with self.subTest(level=level_path.name):
+                shelves = level["shelves"]
+                errors, _counts = validate_shelves_shape(shelves, set(), skip_known_items=True)
+                errors += validate_gameplay_mode_shape(level, shelves)
+                self.assertEqual(errors, [])
+
+                rules, state = build_search_inputs(level, shelves)
+                result = solve_level(state, max_states=60000, max_depth=400, keep_solution=False, rules=rules)
+                self.assertTrue(result.solvable, f"{level_path.name}: {result.reason}")
 
 
 class CollapsingColumnCanonicalizationTests(unittest.TestCase):
