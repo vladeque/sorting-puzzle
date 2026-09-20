@@ -3,6 +3,21 @@
 [ext_resource type="Script" uid="uid://dxsnfvwv34noq" path="res://scripts/shelf.gd" id="1_shelf_script"]
 [ext_resource type="PackedScene" uid="uid://5oa3wa7li56n" path="res://scenes/ui/shelf_lock_overlay.tscn" id="2_lock_overlay"]
 [ext_resource type="Texture2D" uid="uid://c40e6qjm2qu7a" path="res://assets/shelves/standard_shelf_light_oak.png" id="3_wood_texture"]
+[ext_resource type="Shader" path="res://assets/shaders/shelf_back_wall_shadow.gdshader" id="4_back_wall_shadow"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_top_wall_shadow"]
+shader = ExtResource("4_back_wall_shadow")
+shader_parameter/shadow_color = Color(0.24, 0.16, 0.09, 0.34)
+shader_parameter/shadow_origin = Vector2(0, -90.7)
+shader_parameter/shadow_axis = Vector2(0, 1)
+shader_parameter/fade_distance = 22.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_left_wall_shadow"]
+shader = ExtResource("4_back_wall_shadow")
+shader_parameter/shadow_color = Color(0.24, 0.16, 0.09, 0.28)
+shader_parameter/shadow_origin = Vector2(-104, 0)
+shader_parameter/shadow_axis = Vector2(1, 0)
+shader_parameter/fade_distance = 24.0
 
 [node name="Shelf" type="Node2D" unique_id=961540884]
 script = ExtResource("1_shelf_script")
@@ -21,9 +36,10 @@ color = Color(0.85882354, 0.76862746, 0.6509804, 1)
 polygon = PackedVector2Array(-104, -90.7, 104, -90.7, 104, 16, -104, 16)
 
 [node name="BackWallTopShade" type="Polygon2D" parent="." unique_id=2086175922]
+material = SubResource("ShaderMaterial_top_wall_shadow")
 z_index = 2
-color = Color(0.6666667, 0.5764706, 0.46666667, 1)
-polygon = PackedVector2Array(-104, -90.7, 104, -90.7, 104.0658, -78.27907, -104.16662, -78.27907)
+antialiased = true
+polygon = PackedVector2Array(-104, -90.7, 104, -90.7, 104, -68.7, -104, -68.7)
 
 [node name="CollapsingVisuals" type="Node2D" parent="."]
 visible = false
@@ -53,10 +69,10 @@ texture_filter = 4
 visible = false
 
 [node name="BackWallLeftShade" type="Polygon2D" parent="PlacementVisuals/Left" unique_id=1566344107]
+material = SubResource("ShaderMaterial_left_wall_shadow")
 z_index = 1
-color = Color(0.6666667, 0.5764706, 0.46666667, 1)
-polygon = PackedVector2Array(-104, -90.7, -79.955414, -90.6881, -79.886925, 16.17432, -104, 16)
-uv = PackedVector2Array(-54.97803, -80.7905, -54.485466, -74.25448, -87.18676, -74.15928)
+antialiased = true
+polygon = PackedVector2Array(-104, -90.7, -80, -90.7, -80, 16, -104, 16)
 
 [node name="LeftWall" type="Polygon2D" parent="PlacementVisuals/Left" unique_id=1529082060]
 z_index = 4
@@ -112,10 +128,10 @@ polygon = PackedVector2Array(-112, -98.7, -104, -98.7, -104, 46, -112, 46)
 uv = PackedVector2Array(128, 760, 128, 792, 668, 792, 668, 760)
 
 [node name="BackWallLeftShade" type="Polygon2D" parent="PlacementVisuals/Middle" unique_id=1865343099]
+material = SubResource("ShaderMaterial_left_wall_shadow")
 z_index = 1
-color = Color(0.6674786, 0.57727695, 0.46723723, 1)
-polygon = PackedVector2Array(-104, -90.7, -79.955414, -90.6881, -79.886925, 16.17432, -104, 16)
-uv = PackedVector2Array(-54.97803, -80.7905, -54.485466, -74.25448, -87.18676, -74.15928)
+antialiased = true
+polygon = PackedVector2Array(-104, -90.7, -80, -90.7, -80, 16, -104, 16)
 
 [node name="TopCeilingCap" type="Node2D" parent="PlacementVisuals/Middle" unique_id=1909899807]
 z_index = 7
@@ -158,10 +174,10 @@ polygon = PackedVector2Array(104, -98.7, 112, -98.7, 112, 46, 104, 46)
 uv = PackedVector2Array(384, 880, 384, 912, 924, 912, 924, 880)
 
 [node name="BackWallLeftShade" type="Polygon2D" parent="PlacementVisuals/Right" unique_id=586309773]
+material = SubResource("ShaderMaterial_left_wall_shadow")
 z_index = 1
-color = Color(0.6666667, 0.5764706, 0.46666667, 1)
-polygon = PackedVector2Array(-104, -90.7, -79.955414, -90.6881, -79.886925, 16.17432, -104, 16)
-uv = PackedVector2Array(-54.97803, -80.7905, -54.485466, -74.25448, -87.18676, -74.15928)
+antialiased = true
+polygon = PackedVector2Array(-104, -90.7, -80, -90.7, -80, 16, -104, 16)
 
 [node name="LeftWall" type="Polygon2D" parent="PlacementVisuals/Right" unique_id=540570740]
 z_index = 4

@@ -2332,9 +2332,13 @@ Purpose:
 
 Important nodes:
 - `BackWall`: muted panel behind shelf items.
-- `BackWallTopShade`: soft interior wall shadow layer behind items.
+- `BackWallTopShade`: procedural top-edge shadow behind items. Its shared canvas shader fades a
+  translucent warm shadow into the existing back-wall color instead of drawing a flat color band.
 - `PlacementVisuals`: editable role-specific shelf art groups toggled by `scripts/shelf.gd`.
-- `PlacementVisuals/Left`: left shelf role visuals. Contains `BackWallLeftShade`, `LeftWall`, `RightWall`, and the left-specific `TopCeilingCap`.
+- `PlacementVisuals/Left`: left shelf role visuals. Contains the shader-driven
+  `BackWallLeftShade`, which fades inward from the side wall, plus `LeftWall`, `RightWall`, and the
+  left-specific `TopCeilingCap`. The middle and right placement groups reuse the same material so
+  the directional interior shading stays consistent across a row and on full moving shelves.
 - `PlacementVisuals/Middle`: middle shelf role visuals. Contains row divider art and the middle-specific `TopCeilingCap`.
 - `PlacementVisuals/Right`: right shelf role visuals. Contains right edge art and the right-specific `TopCeilingCap`.
 - `Ceiling`: shared image-textured wooden top frame. Placement-specific `TopCeilingCap/BackBoard`

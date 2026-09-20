@@ -5,6 +5,7 @@ const MOVING_ROW_SCENE_PATH := "res://scenes/moving_shelf_row.tscn"
 const SHELF_SCENE_PATH := "res://scenes/shelf.tscn"
 const MOVING_SHELF_SCENE_PATH := "res://scenes/moving_shelf.tscn"
 const LEVEL_SCENE_PATH := "res://level.tscn"
+const BACK_WALL_SHADOW_SHADER_PATH := "res://assets/shaders/shelf_back_wall_shadow.gdshader"
 const PREVIEW_ARGUMENT := "--moving-shelf-motion-preview"
 const LAYOUT_DIRECTORY := "res://scenes/layouts"
 const CELL_SIZE := Vector2(237.44, 143.1)
@@ -56,6 +57,7 @@ func _run() -> void:
 	)
 	shelf.set_visual_variant(Shelf.VISUAL_VARIANT_FULL)
 	_check(shelf.get_node("BackWall").visible, "Moving shelves must preserve the optional full variant.")
+	_verify_soft_back_wall_shadows(shelf)
 	shelf.set_visual_variant(Shelf.VISUAL_VARIANT_FLOOR_ONLY)
 
 	var expected_width := CELL_SIZE.x - MovingShelfRow.SHELF_WIDTH_REDUCTION
@@ -140,6 +142,23 @@ func _run() -> void:
 
 	row.free()
 	_finish()
+
+
+func _verify_soft_back_wall_shadows(shelf: Shelf) -> void:
+	for node_path in [
+		"BackWallTopShade",
+		"PlacementVisuals/Left/BackWallLeftShade",
+		"PlacementVisuals/Middle/BackWallLeftShade",
+		"PlacementVisuals/Right/BackWallLeftShade",
+	]:
+		var shadow := shelf.get_node_or_null(node_path) as Polygon2D
+		var material := shadow.material as ShaderMaterial if shadow != null else null
+		_check(
+			material != null
+				and material.shader != null
+				and material.shader.resource_path == BACK_WALL_SHADOW_SHADER_PATH,
+			"%s should retain the procedural soft-shadow shader." % node_path
+		)
 
 
 func _run_preview() -> void:

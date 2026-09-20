@@ -8,6 +8,7 @@ const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
 const SHELF_SCENE_PATH := "res://scenes/shelf.tscn"
 const ITEM_SCENE_PATH := "res://scenes/item.tscn"
 const WOOD_TEXTURE_PATH := "res://assets/shelves/standard_shelf_light_oak.png"
+const BACK_WALL_SHADOW_SHADER_PATH := "res://assets/shaders/shelf_back_wall_shadow.gdshader"
 const EXPECTED_INTERIOR_HEIGHT := Shelf.ORIGINAL_INTERIOR_HEIGHT * Shelf.INTERIOR_HEIGHT_SCALE
 const EXPECTED_FLOOR_TOP := 16.0
 const EXPECTED_SLOT_POSITIONS := [Vector2(-60, 15), Vector2(0, 15), Vector2(60, 15)]
@@ -40,6 +41,14 @@ const LEGACY_GRAIN_PATHS := [
 const NON_COMPOUNDING_SHADOW_PATHS := [
 	"Shadow",
 	"RightColumnShadow",
+	"PlacementVisuals/Left/LeftShadowEdge",
+	"PlacementVisuals/Middle/LeftShadowEdge",
+	"PlacementVisuals/Middle/RightShadowEdge",
+	"PlacementVisuals/Right/RightShadowEdge",
+]
+const ITEM_SHADOW_UNDERLAY_PATHS := [
+	"Shadow",
+	"RightColumnShadow",
 	"BackWallTopShade",
 	"PlacementVisuals/Left/BackWallLeftShade",
 	"PlacementVisuals/Left/LeftShadowEdge",
@@ -48,6 +57,12 @@ const NON_COMPOUNDING_SHADOW_PATHS := [
 	"PlacementVisuals/Middle/RightShadowEdge",
 	"PlacementVisuals/Right/BackWallLeftShade",
 	"PlacementVisuals/Right/RightShadowEdge",
+]
+const SOFT_BACK_WALL_SHADOW_PATHS := [
+	"BackWallTopShade",
+	"PlacementVisuals/Left/BackWallLeftShade",
+	"PlacementVisuals/Middle/BackWallLeftShade",
+	"PlacementVisuals/Right/BackWallLeftShade",
 ]
 
 var _failures: Array[String] = []
@@ -106,6 +121,20 @@ func _run() -> void:
 			"%s should stay opaque so overlapping shelves cannot compound." % node_path
 		)
 
+	for node_path in SOFT_BACK_WALL_SHADOW_PATHS:
+		var shadow := shelf.get_node_or_null(node_path) as Polygon2D
+		var material := shadow.material as ShaderMaterial if shadow != null else null
+		_check(
+			material != null
+				and material.shader != null
+				and material.shader.resource_path == BACK_WALL_SHADOW_SHADER_PATH,
+			"%s should use the procedural soft-shadow shader." % node_path
+		)
+		_check(
+			shadow != null and shadow.antialiased,
+			"%s should antialias its soft outer edge." % node_path
+		)
+
 	_check_taller_frame_geometry(shelf)
 	_check_item_shadow_layers_over_shelf_shadows(shelf)
 
@@ -152,7 +181,7 @@ func _check_item_shadow_layers_over_shelf_shadows(shelf: Node) -> void:
 		var item_shadow_z: int = (
 			item.z_index + item_shadow.z_index if item_shadow.z_as_relative else item_shadow.z_index
 		)
-		for node_path in NON_COMPOUNDING_SHADOW_PATHS:
+		for node_path in ITEM_SHADOW_UNDERLAY_PATHS:
 			var shelf_shadow := shelf.get_node_or_null(node_path) as CanvasItem
 			_check(
 				shelf_shadow != null and shelf_shadow.z_index < item_shadow_z,
