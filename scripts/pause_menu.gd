@@ -168,7 +168,8 @@ func _create_cross_out_marker(button: Button) -> Control:
 	slash.name = "Slash"
 	slash.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	slash.color = Color(0.86, 0.08, 0.06, 1.0)
-	slash.size = cross_out.size
+	slash.position = Vector2(3, 3)
+	slash.size = cross_out.size - Vector2(6, 6)
 	cross_out.add_child(slash)
 
 	return cross_out

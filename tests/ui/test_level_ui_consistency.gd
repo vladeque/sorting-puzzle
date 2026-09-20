@@ -225,6 +225,9 @@ func _test_plain_red_settings_cross_outs() -> void:
 	await process_frame
 
 	for settings_view in [pause, main_menu_settings]:
+		var expected_slash_size := (
+			Vector2(87.0, 5.0) if settings_view == pause else Vector2(90.0, 8.0)
+		)
 		for button_name in ["MusicButton", "SoundEffectsButton", "VibrationButton"]:
 			var button := settings_view.find_child(button_name, true, false) as Button
 			var cross_out := button.get_node_or_null("CrossOut") as Control
@@ -236,8 +239,9 @@ func _test_plain_red_settings_cross_outs() -> void:
 			_check(
 				slash != null
 					and slash.color == Color(0.86, 0.08, 0.06, 1.0)
-					and slash.size.is_equal_approx(cross_out.size),
-				"%s should use one solid red slash across the full disabled marker." % button_name
+					and slash.position.is_equal_approx(Vector2(3.0, 3.0))
+					and slash.size.is_equal_approx(expected_slash_size),
+				"%s should keep the original inset red slash geometry." % button_name
 			)
 
 	pause.free()
