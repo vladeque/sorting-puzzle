@@ -341,6 +341,12 @@ Lantern expose explicit ready/loading/verifying/`Verify Reward`/retry states; Fr
 coin-only. The selection and modal are locked during verification so settlement cannot apply to a
 different ability.
 
+**Rewarded shelf-unlock policy** -- `RewardedAdButton` (`scenes/ui/shelf_unlock_menu.tscn`) follows
+the same fail-closed rule, and the modal itself only opens from a locked shelf's `AD` plate while
+`scripts/level.gd` offers the placement. Gameplay is paused and every other plate is withdrawn for
+the whole confirmation/ad/verification flow, so only one shelf claim can be pending; a dismissal or
+failure leaves that shelf locked with the same visible clear count.
+
 **Verification** -- `tests/ui/test_level_ui_consistency.gd` (run via
 `scripts/tools/run_isolated_godot_test.ps1`) covers shared gameplay resource identity, explicit
 disabled styles (no engine-default fallback), the `FOCUS_NONE`/pointing-hand-cursor sweep, the
@@ -1333,6 +1339,8 @@ Important nodes:
 - `UI/AbilityPurchaseOverlay`: `scenes/ability_purchase_menu.tscn` instance shown when the player taps an ability with zero saved uses remaining.
 - `UI/InLevelShopOverlay`: `scenes/ui/in_level_shop_screen.tscn` instance shown above Ability
   Purchase when its configured coin price is unaffordable.
+- `UI/ShelfUnlockOverlay`: `scenes/ui/shelf_unlock_menu.tscn` instance shown when the player taps a
+  locked shelf's rewarded `AD` plate (ADS-006).
 
 Runtime-created nodes:
 - `ShelfXX`: `scenes/shelf.tscn` instances generated under `Shelves`.
@@ -1354,6 +1362,7 @@ Depends on:
 - `scenes/ui/ability_bar.tscn`
 - `scenes/ui/time_up_transition.tscn`
 - `scenes/ui/time_up_extension_modal.tscn`
+- `scenes/ui/shelf_unlock_menu.tscn`
 - `assets/audio/<event>/*.{wav,mp3}`
 - `configs/item_sprites.json`
 - `configs/ability_purchase_prices.json`
@@ -1412,6 +1421,45 @@ Do not use for:
 - Mutating inventory/economy state or applying gameplay effects. Main Menu may route its own
   Out-of-Lives purchase intent, but persistence remains in `PlayerProgress`; in-level ability
   purchasing/effects remain in `scripts/level.gd`.
+
+## `scenes/ui/shelf_unlock_menu.tscn`
+
+Root:
+- `ShelfUnlockMenu` (`Control`)
+
+Script:
+- `scripts/shelf_unlock_menu.gd`
+
+Purpose:
+- ADS-006 rewarded locked-shelf confirmation, shown by `scripts/level.gd` after
+  `scenes/ui/shelf_lock_overlay.tscn` reports a tap on a shelf's `AD` plate. It exists so an
+  incidental shelf tap can never start an ad: the plate announces intent, this modal confirms it.
+- Composes `scenes/ui/gameplay_modal_shell.tscn` (`Shell`) for the shared shade, outer panel, title
+  (`UNLOCK SHELF`), close button, content region, and action row (UI-003; see "Shared Gameplay UI
+  Roles" above).
+- States the exact offer -- one ad unlocks this one shelf -- next to the clear count the shelf still
+  requires without it, so the non-ad path stays visible and honest.
+
+Important nodes:
+- `Shell`: the shared modal shell instance.
+- `UnlockContent`: reparented into `Shell`'s compact 224px content region at `_ready()`; holds the
+  `LockIcon`/`AdLabel` pair that mirrors the board's lock plate and the message column.
+- `%OfferLabel` and `%RewardStatusLabel`: the offer copy and the pending/failure status line, which
+  stays hidden while there is nothing honest to say.
+- `%RewardedAdButton`: reparented into `Shell`'s action row; disabled by default and rendered from
+  the owner's authoritative state. Its ready copy names both the ad and the reward
+  (`Watch Ad · Unlock Shelf`), matching the rewarded-copy rule the other placements use.
+
+Depends on:
+- `scenes/ui/gameplay_modal_shell.tscn`.
+- `assets/ui/lock_shelf_cutout.png`.
+- `assets/themes/style_box_green_primary_button.tres`, `style_box_disabled_action_button.tres`.
+- `scripts/press_scale_button.gd`.
+- Offer data, readiness, and claim routing from `scripts/level.gd`.
+
+Do not use for:
+- Deciding placement eligibility, requesting an ad, or unlocking a shelf. Those stay in
+  `scripts/level.gd` and `scripts/ads/rewarded_time_extension_client.gd`.
 
 ## `scenes/ability_purchase_menu.tscn`
 
@@ -2205,7 +2253,9 @@ Important nodes:
 - `VisualRig/WallAttachmentCovers`: reusable left/right wood strips drawn above chain endpoints so
   terminal links disappear beneath the actual shelf frame.
 - `VisualRig/LockRig`: drawn between the bottom and top arm depth layers; contains the lock sprite
-  and decorative `AdLabel`.
+  and the `AdLabel` plate. The plate is decorative until the owning level offers the rewarded
+  shelf-unlock placement, at which point the overlay accepts a tap on it and plays a gentle idle
+  pulse (ADS-006); it never changes appearance or accepts input while the placement is unavailable.
 - `VisualRig/CountdownBadge/RemainingLabel`: uses the same shared 40px count-badge style and numeric
   fitting contract as `AbilityBar/UsesLabel`, positioned above the chain intersection.
 
@@ -2217,8 +2267,9 @@ Depends on:
 - `scripts/ui_motion.gd` for replacement-safe tweens.
 
 Do not use for:
-- Counting cleared triples, deciding whether a shelf is locked, or changing item input. Those remain
-  authoritative in `scripts/level.gd`.
+- Counting cleared triples, deciding whether a shelf is locked, changing item input, or deciding
+  whether the rewarded `AD` plate may be offered. Those remain authoritative in
+  `scripts/level.gd`; this component only reports a completed plate tap as `unlock_requested`.
 
 ## `scenes/shelf.tscn`
 

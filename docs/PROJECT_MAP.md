@@ -280,8 +280,11 @@ Files:
 - `scripts/tools/capture_ui.ps1`
 - `scripts/tools/capture_scene.gd`
 - `scripts/tools/captures/*_setup.gd` (per-scene runtime state, such as
-  `shelf_lock_overlay_setup.gd` and the `lives_menu_full_setup.gd`/`lives_menu_offer_setup.gd` pair
-  that opens each lives-modal state over the real Main Menu)
+  `shelf_lock_overlay_setup.gd`, its `shelf_lock_overlay_ad_ready_setup.gd` rewarded counterpart,
+  `rewarded_shelf_unlock_setup.gd` (whose CTA state comes from
+  `SORTING_PUZZLE_CAPTURE_SHELF_UNLOCK_STATE`), and the
+  `lives_menu_full_setup.gd`/`lives_menu_offer_setup.gd` pair that opens each lives-modal state over
+  the real Main Menu)
 - `tmp/.gdignore`
 
 Responsibility:
@@ -872,6 +875,8 @@ Change here when:
 Files:
 - `scenes/ui/shelf_lock_overlay.tscn`
 - `scripts/shelf_lock_overlay.gd`
+- `scenes/ui/shelf_unlock_menu.tscn`
+- `scripts/shelf_unlock_menu.gd`
 - `assets/ui/shelf_lock_chain_arm_a.png` (legacy path, selected C2-7A art)
 - `assets/ui/lock_shelf_cutout.png`
 - `tests/ui/test_shelf_lock_overlay.gd`
@@ -889,6 +894,11 @@ Responsibility:
 - Replaces interrupted feedback tweens and restores authored transforms after both normal and rapid
   state changes.
 - Uses a compact layout when instanced by `scenes/dispenser_shelf.tscn`.
+- Owns the `AD` plate's input (ADS-006) and reports a completed tap as `unlock_requested`. The plate
+  is tappable, and pulses, only while `scripts/level.gd` offers the rewarded `shelf_unlock`
+  placement; otherwise it keeps its decorative appearance and accepts no input.
+  `scenes/ui/shelf_unlock_menu.tscn` is the confirmation modal that answers that signal, so no shelf
+  tap can start an ad by itself.
 
 Change here when:
 - Editing wall/shackle endpoints, wall-cover depth/color, chain/lock/badge art, `AD` styling, shared
@@ -1021,6 +1031,7 @@ Files:
 - `scenes/pause_menu.tscn`, `scripts/pause_menu.gd`
 - `scenes/leave_confirmation_menu.tscn`, `scripts/leave_confirmation_menu.gd`
 - `scenes/ability_purchase_menu.tscn`, `scripts/ability_purchase_menu.gd`
+- `scenes/ui/shelf_unlock_menu.tscn`, `scripts/shelf_unlock_menu.gd`
 - `assets/ui/*.png`
 - Settings icon assets use square textures with warm rectangular tile art, and the pause/settings buttons are square to avoid clipping or stretching.
 - `scripts/press_scale_button.gd`

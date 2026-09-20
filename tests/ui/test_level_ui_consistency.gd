@@ -4,7 +4,7 @@ extends SceneTree
 ## styles (no engine-default fallback), plain-red settings cross-outs, the star pill's receive pulse
 ## leaving its chrome alone, the Completion/Failure signal routing and copy, the failure modal
 ## composition, the ui_cancel back-stack precedence, safe-area layout at fabricated insets, responsive ability-bar
-## icon/badge bounds, long-value formatting, the hidden rewarded-ad placeholder, and locked-shelf
+## icon/badge bounds, long-value formatting, the fail-closed rewarded-ad offers, and locked-shelf
 ## chain/count/unlock feedback. See docs/UI_003_LEVEL_UI_CONSISTENCY_TICKET.md and docs/SCENES.md's
 ## "Shared Gameplay UI Roles" section.
 
@@ -20,6 +20,7 @@ var _level_scene: PackedScene
 var _pause_menu_scene: PackedScene
 var _leave_confirmation_scene: PackedScene
 var _ability_purchase_scene: PackedScene
+var _shelf_unlock_scene: PackedScene
 var _main_menu_top_status_scene: PackedScene
 
 
@@ -39,6 +40,7 @@ func _run() -> void:
 	_pause_menu_scene = load("res://scenes/pause_menu.tscn") as PackedScene
 	_leave_confirmation_scene = load("res://scenes/leave_confirmation_menu.tscn") as PackedScene
 	_ability_purchase_scene = load("res://scenes/ability_purchase_menu.tscn") as PackedScene
+	_shelf_unlock_scene = load("res://scenes/ui/shelf_unlock_menu.tscn") as PackedScene
 	_main_menu_top_status_scene = load("res://scenes/ui/main_menu_top_status.tscn") as PackedScene
 
 	await _test_shared_resource_identity()
@@ -47,6 +49,7 @@ func _run() -> void:
 	await _test_star_receive_pulse_keeps_pill_chrome()
 	await _test_focus_and_cursor_policy()
 	await _test_rewarded_ad_placeholder()
+	await _test_rewarded_shelf_unlock_offer()
 	await _test_completion_and_failure_routing()
 	await _test_ui_cancel_chain()
 	await _test_modal_transition_interruption()
@@ -395,6 +398,53 @@ func _test_rewarded_ad_placeholder() -> void:
 	)
 
 	purchase.queue_free()
+	await process_frame
+
+
+## ADS-006's confirmation modal fails closed the same way, and its ready CTA must name both the ad
+## and the exact reward rather than a bare "Watch Ad".
+func _test_rewarded_shelf_unlock_offer() -> void:
+	var shelf_unlock := _shelf_unlock_scene.instantiate()
+	root.add_child(shelf_unlock)
+	await process_frame
+
+	var rewarded_button := shelf_unlock.find_child("RewardedAdButton", true, false) as Button
+	_check(
+		rewarded_button.disabled,
+		"Shelf Unlock starts disabled before provider readiness is known."
+	)
+	shelf_unlock.call("set_rewarded_action_state", &"ready", true)
+	_check(
+		not rewarded_button.disabled and rewarded_button.text == ShelfUnlockMenu.READY_LABEL,
+		"A ready shelf-unlock offer states both the ad and the exact reward."
+	)
+	shelf_unlock.call("set_rewarded_action_state", &"pending", true)
+	_check(
+		not rewarded_button.disabled and rewarded_button.text == "Verify Reward",
+		"A pending shelf authorization reconciles instead of showing another ad."
+	)
+	shelf_unlock.call("set_rewarded_action_state", &"verifying", false)
+	_check(
+		rewarded_button.disabled and rewarded_button.text == "Verifying...",
+		"Verification locks the shelf-unlock action while preserving explicit status."
+	)
+	shelf_unlock.call("set_rewarded_action_state", &"error", false)
+	var status_label := shelf_unlock.find_child("RewardStatusLabel", true, false) as Label
+	_check(
+		rewarded_button.disabled
+			and rewarded_button.text == "Try Again"
+			and status_label.visible,
+		"A failed claim stays honest about the shelf remaining locked."
+	)
+
+	shelf_unlock.call("set_offer", 4)
+	var offer_label := shelf_unlock.find_child("OfferLabel", true, false) as Label
+	_check(
+		offer_label.text.contains("4"),
+		"The offer states the clear count the shelf still requires without the ad."
+	)
+
+	shelf_unlock.queue_free()
 	await process_frame
 
 

@@ -1,14 +1,15 @@
 extends Node
 class_name RewardedTimeExtensionClient
 
-## Authoritative owner for run-bound rewarded placements. ADS-003 uses time extension and ADS-005
-## adds one immediate ability use; both share this run so its life reservation and completion claim
-## can contain the exact authorization set once.
+## Authoritative owner for run-bound rewarded placements. ADS-003 uses time extension, ADS-005 adds
+## one immediate ability use, and ADS-006 adds a selected locked-shelf unlock; they share this run so
+## its life reservation and completion claim can contain the exact authorization set once.
 
 const LocalSaveCodecScript := preload("res://scripts/save/local_save_codec.gd")
 
 const PLACEMENT_TIME_EXTENSION := &"time_extension"
 const PLACEMENT_ABILITY := &"ability"
+const PLACEMENT_SHELF_UNLOCK := &"shelf_unlock"
 const SUPPORTED_REWARDED_ABILITIES := [&"hammer", &"shuffle", &"highlight"]
 const RUN_PROTOCOL_VERSION := "1.0"
 const COMPLETION_PROTOCOL_VERSION := "1.3"
@@ -32,9 +33,14 @@ var _intent_id := ""
 var _awaiting_verification := false
 var _pending_placement := StringName()
 var _pending_ability_id := StringName()
+var _pending_shelf_id := 0
 var _time_authorization_id := ""
 var _ability_authorization_id := ""
 var _authorized_ability_id := StringName()
+## Each configured locked shelf keeps its own rewarded route, so authorizations are kept per shelf
+## id rather than as one per-attempt slot. Presence of an id is also what rejects a second claim for
+## a shelf this attempt already unlocked.
+var _shelf_authorization_ids: Dictionary = {}
 
 
 func configure(transport, ad_service) -> void:
@@ -150,6 +156,72 @@ func is_awaiting_ability_verification(ability_id: StringName) -> bool:
 	)
 
 
+func prepare_shelf_unlock() -> Dictionary:
+	return await prepare_placement(PLACEMENT_SHELF_UNLOCK)
+
+
+## `shelf_id` is the shelf's position in the immutable level definition (1-based), not a node
+## instance or screen position, so the authorization stays bound across relayouts and node churn.
+func can_offer_shelf_unlock(shelf_id: int) -> bool:
+	if shelf_id <= 0 or is_shelf_unlock_authorized(shelf_id):
+		return false
+	var backend_ready: bool = (
+		_transport != null
+		and _transport.has_method("can_use_backend")
+		and bool(_transport.call("can_use_backend"))
+	)
+	if not backend_ready or _busy:
+		return false
+	if is_awaiting_verification():
+		return _pending_placement == PLACEMENT_SHELF_UNLOCK and _pending_shelf_id == shelf_id
+	return (
+		_ad_service != null
+		and _ad_service.has_method("is_rewarded_ready")
+		and bool(_ad_service.call("is_rewarded_ready", PLACEMENT_SHELF_UNLOCK, true))
+	)
+
+
+## Returns {ok=true, shelf_id=..., authorization_id=...} only after authoritative settlement. An
+## unsettled intent is retained so a later tap reconciles the same shelf's intent instead of showing
+## a second ad, and a claim for a different shelf while one is pending is refused outright.
+func claim_shelf_unlock(level_number: int, shelf_id: int) -> Dictionary:
+	if shelf_id <= 0:
+		return _error("ad_reward.shelf_unsupported")
+	if _busy:
+		return _error("ad_request_in_progress")
+	if is_shelf_unlock_authorized(shelf_id):
+		return _error("ad_reward.shelf_already_authorized")
+	if is_awaiting_verification() and (
+		_pending_placement != PLACEMENT_SHELF_UNLOCK or _pending_shelf_id != shelf_id
+	):
+		return _error("ad_reward.other_verification_pending")
+	_busy = true
+	var result: Dictionary
+	if is_awaiting_verification():
+		result = await _poll_authorization()
+	else:
+		result = await _begin_and_show(
+			level_number,
+			PLACEMENT_SHELF_UNLOCK,
+			StringName(),
+			shelf_id
+		)
+	_busy = false
+	return result
+
+
+func is_awaiting_shelf_unlock_verification(shelf_id: int) -> bool:
+	return (
+		is_awaiting_verification()
+		and _pending_placement == PLACEMENT_SHELF_UNLOCK
+		and _pending_shelf_id == shelf_id
+	)
+
+
+func is_shelf_unlock_authorized(shelf_id: int) -> bool:
+	return _shelf_authorization_ids.has(shelf_id)
+
+
 func has_active_run() -> bool:
 	return not _run_id.is_empty() and not _online_ticket_id.is_empty()
 
@@ -162,7 +234,9 @@ func settle_completed(stars: int) -> Dictionary:
 	if not has_active_run():
 		return _error("run.not_started")
 	var has_reward_authorizations := (
-		not _time_authorization_id.is_empty() or not _ability_authorization_id.is_empty()
+		not _time_authorization_id.is_empty()
+		or not _ability_authorization_id.is_empty()
+		or not _shelf_authorization_ids.is_empty()
 	)
 	var protocol_version := REWARD_PROTOCOL_VERSION if has_reward_authorizations else COMPLETION_PROTOCOL_VERSION
 	var abilities_used := {"hammer": 0, "shuffle": 0, "highlight": 0}
@@ -189,6 +263,16 @@ func settle_completed(stars: int) -> Dictionary:
 				"authorization_id": _ability_authorization_id,
 				"placement": String(PLACEMENT_ABILITY),
 				"ability_id": String(_authorized_ability_id),
+			})
+		# Reported in ascending shelf order so the proof carries a deterministic, replayable set of
+		# rewarded shelf unlocks rather than dictionary insertion order.
+		var unlocked_shelf_ids := _shelf_authorization_ids.keys()
+		unlocked_shelf_ids.sort()
+		for shelf_id in unlocked_shelf_ids:
+			authorizations.append({
+				"authorization_id": str(_shelf_authorization_ids[shelf_id]),
+				"placement": String(PLACEMENT_SHELF_UNLOCK),
+				"shelf_id": int(shelf_id),
 			})
 		claim["rewarded_authorizations"] = authorizations
 	var response: Dictionary = await _post_mutation(
@@ -243,7 +327,8 @@ func settle_terminal(outcome: String) -> Dictionary:
 func _begin_and_show(
 	level_number: int,
 	placement: StringName,
-	ability_id: StringName = StringName()
+	ability_id: StringName = StringName(),
+	shelf_id: int = 0
 ) -> Dictionary:
 	var started := await _ensure_started_run(level_number)
 	if not bool(started.get("ok", false)):
@@ -252,6 +337,8 @@ func _begin_and_show(
 	var binding := {"placement": String(placement), "run_id": _run_id}
 	if placement == PLACEMENT_ABILITY:
 		binding["ability_id"] = String(ability_id)
+	elif placement == PLACEMENT_SHELF_UNLOCK:
+		binding["shelf_id"] = shelf_id
 	var intent: Dictionary = await _post_mutation(
 		"/v1/ad-rewards/intents",
 		REWARD_PROTOCOL_VERSION,
@@ -269,12 +356,13 @@ func _begin_and_show(
 		or str(intent_data.get("status", "")) != "pending"
 		or custom_data.length() != 43
 		or not (effect is Dictionary)
-		or not _effect_matches(effect as Dictionary, placement, ability_id)
+		or not _effect_matches(effect as Dictionary, placement, ability_id, shelf_id)
 	):
 		return _error("ad_reward.intent_response_malformed")
 	_intent_id = str(intent_data.get("intent_id", ""))
 	_pending_placement = placement
 	_pending_ability_id = ability_id
+	_pending_shelf_id = shelf_id
 
 	var provider_result: Dictionary = await _ad_service.call(
 		"request_rewarded",
@@ -361,16 +449,26 @@ func _poll_authorization() -> Dictionary:
 				var authorization_id := str(data.get("authorization_id", ""))
 				var placement := _pending_placement
 				var ability_id := _pending_ability_id
-				if placement == PLACEMENT_TIME_EXTENSION:
-					_time_authorization_id = authorization_id
-				else:
-					_ability_authorization_id = authorization_id
-					_authorized_ability_id = ability_id
+				var shelf_id := _pending_shelf_id
+				match placement:
+					PLACEMENT_TIME_EXTENSION:
+						_time_authorization_id = authorization_id
+					PLACEMENT_SHELF_UNLOCK:
+						_shelf_authorization_ids[shelf_id] = authorization_id
+					_:
+						_ability_authorization_id = authorization_id
+						_authorized_ability_id = ability_id
 				_clear_pending_intent()
 				if placement == PLACEMENT_TIME_EXTENSION:
 					return {
 						"ok": true,
 						"seconds": VERIFIED_SECONDS,
+						"authorization_id": authorization_id,
+					}
+				if placement == PLACEMENT_SHELF_UNLOCK:
+					return {
+						"ok": true,
+						"shelf_id": shelf_id,
 						"authorization_id": authorization_id,
 					}
 				return {
@@ -396,7 +494,12 @@ func _validate_status_data(data: Dictionary) -> Dictionary:
 		or str(data.get("placement", "")) != String(_pending_placement)
 		or not ["pending", "settled", "rejected", "expired"].has(str(data.get("status", "")))
 		or not (effect is Dictionary)
-		or not _effect_matches(effect as Dictionary, _pending_placement, _pending_ability_id)
+		or not _effect_matches(
+			effect as Dictionary,
+			_pending_placement,
+			_pending_ability_id,
+			_pending_shelf_id
+		)
 	):
 		return _error("ad_reward.status_response_malformed")
 	if str(data.get("status", "")) == "settled" and not LocalSaveCodecScript.is_uuid(data.get("authorization_id")):
@@ -455,6 +558,7 @@ func _clear_run() -> void:
 	_time_authorization_id = ""
 	_ability_authorization_id = ""
 	_authorized_ability_id = StringName()
+	_shelf_authorization_ids.clear()
 
 
 func _clear_pending_intent() -> void:
@@ -462,9 +566,15 @@ func _clear_pending_intent() -> void:
 	_awaiting_verification = false
 	_pending_placement = StringName()
 	_pending_ability_id = StringName()
+	_pending_shelf_id = 0
 
 
-func _effect_matches(effect: Dictionary, placement: StringName, ability_id: StringName) -> bool:
+func _effect_matches(
+	effect: Dictionary,
+	placement: StringName,
+	ability_id: StringName,
+	shelf_id: int = 0
+) -> bool:
 	if str(effect.get("kind", "")) != String(placement):
 		return false
 	if placement == PLACEMENT_TIME_EXTENSION:
@@ -474,6 +584,9 @@ func _effect_matches(effect: Dictionary, placement: StringName, ability_id: Stri
 			str(effect.get("ability_id", "")) == String(ability_id)
 			and int(effect.get("uses", 0)) == 1
 		)
+	if placement == PLACEMENT_SHELF_UNLOCK:
+		# A settled authorization for another shelf is a wrong-shelf grant, not a usable one.
+		return shelf_id > 0 and int(effect.get("shelf_id", 0)) == shelf_id
 	return false
 
 

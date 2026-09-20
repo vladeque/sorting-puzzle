@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "config_version": "rewarded-ability-1",
+  "config_version": "rewarded-shelf-unlock-1",
   "provider_enabled": true,
   "rewarded": {
     "enabled": true,
     "time_extension_enabled": true,
     "life_enabled": true,
     "ability_enabled": true,
-    "shelf_unlock_enabled": false
+    "shelf_unlock_enabled": true
   },
   "interstitial": {
     "enabled": false,

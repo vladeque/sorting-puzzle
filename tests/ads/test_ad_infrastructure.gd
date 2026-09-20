@@ -298,6 +298,7 @@ func _test_rewarded_placement_inventory_is_isolated() -> void:
 	await provider.load_ad(AdProviderScript.FORMAT_REWARDED, AdPolicyScript.PLACEMENT_TIME_EXTENSION)
 	await provider.load_ad(AdProviderScript.FORMAT_REWARDED, AdPolicyScript.PLACEMENT_LIFE)
 	await provider.load_ad(AdProviderScript.FORMAT_REWARDED, AdPolicyScript.PLACEMENT_ABILITY)
+	await provider.load_ad(AdProviderScript.FORMAT_REWARDED, AdPolicyScript.PLACEMENT_SHELF_UNLOCK)
 	provider.queue_outcome(AdProviderScript.FORMAT_REWARDED, {
 		"status": AdProviderScript.STATUS_DISMISSED,
 		"reason": "test",
@@ -315,8 +316,12 @@ func _test_rewarded_placement_inventory_is_isolated() -> void:
 			and provider.is_ad_ready(
 				AdProviderScript.FORMAT_REWARDED,
 				AdPolicyScript.PLACEMENT_ABILITY
+			)
+			and provider.is_ad_ready(
+				AdProviderScript.FORMAT_REWARDED,
+				AdPolicyScript.PLACEMENT_SHELF_UNLOCK
 			),
-		"Consuming one rewarded placement does not consume life or ability ad inventory."
+		"Consuming one rewarded placement leaves life, ability, and shelf-unlock inventory intact."
 	)
 
 

@@ -681,6 +681,9 @@ Runtime behavior:
 - A settled rewarded Hammer, Shuffle, or Lantern authorization applies one immediate use without
   adding saved inventory or spending coins. Freezer is not in the backend rewarded enum and keeps
   only the configured coin route.
+- A settled rewarded shelf-unlock authorization releases only the configured shelf it names, for the
+  current attempt only. It adds no cleared triples, stars, or combo, and leaves every other shelf's
+  `unlock_after_triples` countdown unchanged.
 - Settings button disabled states are saved immediately when toggled and restored by the main-menu settings popup and in-level pause menu on later game starts.
 - Failed or abandoned levels do not refund ability uses.
 - Completing the current campaign level advances `current_level` by one and adds the run's earned stars to the reward chest.

@@ -2079,6 +2079,16 @@ Key responsibilities:
   counts/state to their extracted `ShelfLockOverlay`. `_update_shelf_input_pickable()` remains
   independent from `play_unlock()`, so chain release never delays interaction. Hammer destruction
   continues to call `_record_triples_cleared()` and therefore decrements the same counters.
+- Own ADS-006's rewarded locked-shelf unlock. `_add_shelf()` stamps `SHELF_CONFIG_ID_META` (the
+  shelf's 1-based index in the level definition's `shelves` array) so a claim binds to configured
+  identity rather than a node instance or screen position. `_refresh_shelf_unlock_offers()` --
+  driven by `_update_ability_interaction_state()`, so it follows the same "ordinary gameplay is
+  running" rule as the ability bar -- offers or withdraws each `ShelfLockOverlay`'s `AD` plate.
+  `_on_shelf_unlock_requested()` answers a plate tap by opening `UI/ShelfUnlockOverlay` rather than
+  an ad, and `_apply_rewarded_shelf_unlock()` records one entry in the per-attempt
+  `_ad_unlocked_shelf_ids` and then reuses `_update_locked_shelves()` and `_resolve_shelves()`.
+  `_triples_cleared`, stars, combo, and every shelf's configured `unlock_after_triples` are
+  untouched, so other shelves keep an unchanged visible countdown.
 - Play placement and triple-clear sound effects with runtime `AudioStreamPlayer` nodes.
 - Track clearing items so only disappearing items ignore input and abilities during the animation.
 - Track transitioning items so newly promoted back-layer items ignore input and abilities until their forward slide finishes.
@@ -2211,6 +2221,8 @@ Depends on:
 - `scenes/leave_confirmation_menu.tscn` (`scripts/leave_confirmation_menu.gd`) for the Leave
   Confirmation overlay's `leave_pressed`/`continue_pressed`/`close_requested` signals, `set_star_count()`,
   and `open()`/`close()`/`apply_safe_layout()`.
+- `scenes/ui/shelf_unlock_menu.tscn` (`scripts/shelf_unlock_menu.gd`) for ADS-006's rewarded
+  locked-shelf confirmation, opened from `ShelfLockOverlay.unlock_requested`.
 - `scenes/ability_purchase_menu.tscn` (`scripts/ability_purchase_menu.gd`) for the Ability Purchase
   overlay's `close_pressed`/`buy_pressed`/`ad_pressed` signals, `set_offer()`, and
   `open()`/`close()`/`apply_safe_layout()`.
@@ -2263,6 +2275,10 @@ Purpose:
   them; direct `.tscn` transform edits must be transferred to these constants to appear in a level.
 - Keeps `AD` and the remaining count scene-native; the count uses the shared ability/inventory badge
   resource and `GameplayUITheme.COUNT_BADGE_*` fitting contract.
+- Owns the `AD` plate's input (ADS-006). It is this component's one intentional input owner: a
+  press and release inside the plate's rect emits `unlock_requested` and nothing else. It never
+  starts an ad, decides eligibility, or unlocks a shelf -- `scripts/level.gd` answers the signal
+  with its own confirmation modal.
 
 API:
 - `show_locked(remaining)`: shows a clean locked state, fits 1-, 2-, or 3+-digit copy in the circular
@@ -2272,6 +2288,13 @@ API:
   component, and restores every authored transform. Gameplay eligibility is intentionally owned
   and updated by `scripts/level.gd` before this fire-and-forget method runs.
 - `reset_visual_state()`: stops tracked tweens and restores authored transforms for safe reuse.
+- `set_ad_unlock_available(is_available)` / `is_ad_unlock_available()`: offers or withdraws the
+  rewarded `AD` plate. Offering it enables `_input()` and starts a gentle idle pulse on `AdLabel`;
+  withdrawing it restores the plate's purely decorative appearance and stops listening entirely.
+  `play_unlock()`, `_finish_unlock()`, and `reset_visual_state()` all withdraw it.
+- `get_ad_plate_global_rect()`: the plate's hit area in canvas-global coordinates, derived from the
+  lock rig's own layout position/scale and clamped to `overlay_half_width`, so it stays correct
+  across responsive relayouts and both the standard and compact layouts.
 
 Motion ownership:
 - Uses independent `UIMotion.retween()` metadata keys for chain tension, lock swing, badge pop, and
@@ -2288,8 +2311,8 @@ Depends on:
 - `assets/themes/style_box_gameplay_count_badge.tres`.
 
 Do not use for:
-- Unlock requirements, cleared-triple ownership, Hammer counting, item eligibility, or shelf
-  resolution. Those remain in `scripts/level.gd`.
+- Unlock requirements, cleared-triple ownership, Hammer counting, item eligibility, rewarded
+  placement eligibility, or shelf resolution. Those remain in `scripts/level.gd`.
 
 ## `scripts/level_completion_confetti.gd`
 
@@ -3158,6 +3181,42 @@ Depends on:
 - The shared `style_box_gameplay_destructive_action.tres`/`style_box_green_primary_button.tres`
   action styles and `style_box_gameplay_item_slot.tres`/`style_box_gameplay_count_badge.tres` for
   the lost-life/lost-star cells.
+
+## `scripts/shelf_unlock_menu.gd`
+
+Class:
+- `ShelfUnlockMenu`
+
+Attached to:
+- `scenes/ui/shelf_unlock_menu.tscn` root `ShelfUnlockMenu`.
+
+Purpose:
+- ADS-006's rewarded locked-shelf confirmation. `scripts/shelf_lock_overlay.gd` reports a tap on a
+  shelf's `AD` plate and `scripts/level.gd` answers it by opening this modal, so an incidental shelf
+  tap can never start an ad. Composes `scenes/ui/gameplay_modal_shell.tscn` for shade, outer panel,
+  title (`"UNLOCK SHELF"`), close button, content region, and action row.
+- `scripts/level.gd` supplies the offer and authoritative rewarded state and listens for
+  `close_requested`/`rewarded_ad_requested`. This scene never decides eligibility, requests an ad,
+  or unlocks a shelf.
+
+Key methods:
+- `set_offer(remaining_clears)`: states the offer and the clear count the shelf still requires
+  without the ad, so the non-ad path stays visible.
+- `set_rewarded_action_state(state, enabled)`: renders `unavailable`/`ready`/`loading`/`verifying`/
+  `pending`/`error`. `READY_LABEL` (`"Watch Ad · Unlock Shelf"`) names both the ad and the exact
+  reward; `pending` and `error` also show an honest status line.
+- `is_transitioning()` / `apply_safe_layout(safe_margins, viewport_size)` / `open()` / `close()`.
+
+Behavior notes:
+- `RewardedAdButton` starts hidden-in-effect by being disabled with no authoritative state, matching
+  the fail-closed rule the other rewarded CTAs follow.
+- `enabled` stays the owner's decision, so a loaded ad the backend cannot yet accept still reads as
+  unavailable rather than as a button that will fail.
+
+Depends on:
+- `scenes/ui/gameplay_modal_shell.tscn`, `scripts/gameplay_ui_theme.gd`, `scripts/press_scale_button.gd`.
+- `assets/ui/lock_shelf_cutout.png`.
+- `assets/themes/style_box_green_primary_button.tres`, `style_box_disabled_action_button.tres`.
 
 ## `scripts/ability_purchase_menu.gd`
 

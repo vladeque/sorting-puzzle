@@ -64,6 +64,10 @@ const SHUFFLE_BOX_TEXTURE := preload("res://assets/abilities/ability_shuffle_box
 const PAUSE_SETTING_SOUND_EFFECTS := &"sound_effects"
 const SHELF_UNLOCK_REQUIREMENT_META := &"unlock_after_triples"
 const SHELF_LOCKED_META := &"is_locked"
+## ADS-006 shelf identity: the shelf's 1-based position in the immutable level definition's
+## `shelves` array, which every layout path already uses as its shelf number. It survives relayouts,
+## node rebuilds, and collapsing-column motion, so a rewarded authorization can be bound to it.
+const SHELF_CONFIG_ID_META := &"config_shelf_id"
 const LOCKED_OVERLAY_NAME := "LockedOverlay"
 const SHELF_VISUAL_VARIANT_META := &"visual_variant"
 const SHELF_TOP_CEILING_CAP_NAME := "TopCeilingCap"
@@ -192,6 +196,7 @@ var _time_up_extension_overlay: TimeUpExtensionModal
 var _time_up_transition_overlay: TimeUpTransition
 var _in_level_shop_overlay: ShopScreen
 var _out_of_lives_overlay: OutOfLivesMenu
+var _shelf_unlock_overlay: ShelfUnlockMenu
 var _ability_bar: AbilityBar
 var _lantern_screen_effect: LanternScreenEffectClass
 var _freezer_screen_effect: FreezerScreenEffect
@@ -220,6 +225,15 @@ var _rewarded_time_extension_client
 var _rewarded_life_client
 var _rewarded_life_action_state := OutOfLivesMenu.REWARDED_STATE_UNAVAILABLE
 var _rewarded_life_prepare_in_progress := false
+## ADS-006 per-attempt rewarded shelf unlocks, keyed by SHELF_CONFIG_ID_META. Membership makes one
+## shelf interactable without touching `_triples_cleared` or any shelf's configured requirement, and
+## it is deliberately attempt-scoped: a retry rebuilds the board with every configured lock intact.
+var _ad_unlocked_shelf_ids: Dictionary = {}
+var _shelf_unlock_pending_id := 0
+var _shelf_unlock_was_paused := false
+var _shelf_unlock_reward_in_progress := false
+var _shelf_unlock_prepare_in_progress := false
+var _shelf_unlock_action_state := ShelfUnlockMenu.REWARDED_STATE_UNAVAILABLE
 var _online_run_settlement_in_progress := false
 var _completion_settlement_in_progress := false
 var _in_level_shop_return_destination := StringName()
@@ -293,6 +307,7 @@ func _ready() -> void:
 	_time_up_transition_overlay = get_node("UI/TimeUpTransition") as TimeUpTransition
 	_in_level_shop_overlay = get_node("UI/InLevelShopOverlay") as ShopScreen
 	_out_of_lives_overlay = get_node("UI/OutOfLivesOverlay") as OutOfLivesMenu
+	_shelf_unlock_overlay = get_node("UI/ShelfUnlockOverlay") as ShelfUnlockMenu
 	_ability_bar = get_node("UI/AbilityBar") as AbilityBar
 	_lantern_screen_effect = get_node("LanternScreenEffect") as LanternScreenEffectClass
 	_freezer_screen_effect = get_node("FreezerScreenEffect") as FreezerScreenEffect
@@ -305,6 +320,7 @@ func _ready() -> void:
 	_time_up_transition_overlay.reset()
 	_in_level_shop_overlay.visible = false
 	_out_of_lives_overlay.visible = false
+	_shelf_unlock_overlay.visible = false
 	_setup_star_reward_effect_layer()
 	get_viewport().size_changed.connect(_apply_responsive_layout)
 	_rng.randomize()
@@ -312,6 +328,7 @@ func _ready() -> void:
 	_setup_completion_buttons()
 	_setup_failure_screen()
 	_setup_ability_purchase_menu()
+	_setup_shelf_unlock_menu()
 	_setup_time_up_extension_modal()
 	_setup_ability_buttons()
 	_load_ability_purchase_prices()
@@ -331,6 +348,7 @@ func _ready() -> void:
 		call_deferred("_prepare_rewarded_time_extension")
 	call_deferred("_prepare_rewarded_ability")
 	call_deferred("_prepare_rewarded_life")
+	call_deferred("_prepare_rewarded_shelf_unlock")
 
 
 func _apply_chapter_background() -> void:
@@ -377,6 +395,8 @@ func _apply_responsive_layout() -> void:
 		_time_up_extension_overlay.apply_safe_layout(safe_margins, viewport_size)
 	if _out_of_lives_overlay != null:
 		_out_of_lives_overlay.apply_safe_layout(safe_margins, viewport_size)
+	if _shelf_unlock_overlay != null:
+		_shelf_unlock_overlay.apply_safe_layout(safe_margins, viewport_size)
 	_layout_star_reward_effect_layer(viewport_size)
 	_layout_shelves(viewport_size, safe_margins)
 	if _lantern_screen_effect != null:
@@ -719,12 +739,13 @@ func _input(event: InputEvent) -> void:
 ## System back / Android back / Escape (UI-003). Unlike _input() above, this always runs regardless
 ## of pause/failed/completed state, implementing one topmost-state-first back stack:
 ##   1. The in-level Shop returns to Ability Purchase.
-##   2. Leave Confirmation returns to Pause.
-##   3. Ability Purchase closes and restores the state it opened from.
-##   4. Pause closes and resumes active gameplay.
-##   5. The post-clear confetti celebration skips ahead to the Completion screen.
-##   6. Completion invokes Continue; Failure invokes its X/main-menu route.
-##   7. Otherwise (active gameplay) opens Pause.
+##   2. Shelf Unlock closes and restores the state it opened from, unless a claim is unsettled.
+##   3. Leave Confirmation returns to Pause.
+##   4. Ability Purchase closes and restores the state it opened from.
+##   5. Pause closes and resumes active gameplay.
+##   6. The post-clear confetti celebration skips ahead to the Completion screen.
+##   7. Completion invokes Continue; Failure invokes its X/main-menu route.
+##   8. Otherwise (active gameplay) opens Pause.
 ## Every branch reuses the exact handler its equivalent button already calls, so this can never
 ## spend a life, coin, or star by itself, and behaves identically to tapping that button. If any
 ## overlay/result screen is mid open()/close() transition, the press is dropped rather than acted
@@ -747,6 +768,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		_in_level_shop_overlay.handle_back()
 	elif _time_up_extension_overlay != null and _time_up_extension_overlay.visible:
 		_on_time_extension_declined()
+	elif _shelf_unlock_overlay != null and _shelf_unlock_overlay.visible:
+		_on_shelf_unlock_close_pressed()
 	elif _leave_confirmation_overlay.visible:
 		_on_leave_confirmation_close_pressed()
 	elif _ability_purchase_overlay != null and _ability_purchase_overlay.visible:
@@ -775,6 +798,8 @@ func _is_any_overlay_transitioning() -> bool:
 	if _in_level_shop_overlay != null and _in_level_shop_overlay.is_transitioning():
 		return true
 	if _out_of_lives_overlay != null and _out_of_lives_overlay.is_transitioning():
+		return true
+	if _shelf_unlock_overlay != null and _shelf_unlock_overlay.is_transitioning():
 		return true
 	return _completion_screen.is_transitioning() or _failure_screen.is_transitioning()
 
@@ -994,10 +1019,18 @@ func _apply_level_config(config: Dictionary) -> void:
 		_time_up_transition_overlay.reset()
 	if _out_of_lives_overlay != null:
 		_out_of_lives_overlay.visible = false
+	if _shelf_unlock_overlay != null:
+		_shelf_unlock_overlay.visible = false
 	_ability_purchase_pending_id = StringName()
 	_ability_reward_in_progress = false
 	_ability_reward_prepare_in_progress = false
 	_ability_reward_action_state = &"ready"
+	_ad_unlocked_shelf_ids.clear()
+	_shelf_unlock_pending_id = 0
+	_shelf_unlock_was_paused = false
+	_shelf_unlock_reward_in_progress = false
+	_shelf_unlock_prepare_in_progress = false
+	_shelf_unlock_action_state = ShelfUnlockMenu.REWARDED_STATE_UNAVAILABLE
 	_is_resolving_shelves = false
 	_shelves_pending_resolve.clear()
 	_shelves_resolving_ids.clear()
@@ -1861,6 +1894,9 @@ func _add_shelf(
 	# higher than a standard neighbour in every construction path.
 	var authored_position_offset := shelf.position
 	shelf.name = "Shelf%02d" % shelf_number
+	# Every layout path passes the shelf's 1-based index in the level definition's `shelves` array,
+	# which is what a rewarded unlock authorization binds to.
+	shelf.set_meta(SHELF_CONFIG_ID_META, shelf_number)
 	shelf.position = shelf_position + authored_position_offset
 	shelf.scale = Vector2.ONE * SHELF_CELL_VISUAL_SCALE
 	shelf.set_visual_variant(SHELF_VISUAL_VARIANT_FULL)
@@ -1897,6 +1933,12 @@ func _configure_shelf_unlock(shelf: Node2D, shelf_config: Dictionary, allow_lock
 	shelf.set_meta(SHELF_UNLOCK_REQUIREMENT_META, unlock_after_triples)
 	shelf.set_meta(SHELF_LOCKED_META, false)
 
+	# The overlay owns the `AD` plate's input and reports only intent; this level decides whether a
+	# tap may open the confirmation modal. Shelves are rebuilt per attempt, so this connects once.
+	var overlay := shelf.get_node_or_null(LOCKED_OVERLAY_NAME) as ShelfLockOverlay
+	if overlay != null:
+		overlay.unlock_requested.connect(_on_shelf_unlock_requested.bind(shelf))
+
 
 func _record_triples_cleared(triple_count: int) -> int:
 	if triple_count <= 0:
@@ -1921,7 +1963,13 @@ func _update_locked_shelves() -> Array[Node]:
 			continue
 
 		var was_locked := _is_shelf_locked(shelf_node)
-		var should_lock := _get_shelf_unlock_requirement(shelf_node) > _triples_cleared
+		# A rewarded unlock releases exactly the shelf it was bound to. The configured requirement
+		# and `_triples_cleared` are both untouched, so every other shelf keeps counting normally
+		# and this shelf's own visible count never becomes a fake cleared triple.
+		var should_lock := (
+			_get_shelf_unlock_requirement(shelf_node) > _triples_cleared
+			and not _is_shelf_ad_unlocked(shelf_node)
+		)
 		shelf_node.set_meta(SHELF_LOCKED_META, should_lock)
 		_update_shelf_lock_overlay(shelf_node, should_lock)
 		_update_shelf_input_pickable(shelf_node, _is_shelf_gameplay_available(shelf_node))
@@ -1934,6 +1982,7 @@ func _update_locked_shelves() -> Array[Node]:
 		_play_sfx(SfxCatalogScript.EVENT_SHELF_UNLOCK)
 		_play_haptic(HapticsCatalogScript.EVENT_SHELF_UNLOCK)
 
+	_refresh_shelf_unlock_offers()
 	return newly_unlocked_shelves
 
 
@@ -1942,6 +1991,28 @@ func _get_shelf_unlock_requirement(shelf: Node) -> int:
 		return 0
 
 	return maxi(int(shelf.get_meta(SHELF_UNLOCK_REQUIREMENT_META, 0)), 0)
+
+
+func _get_shelf_config_id(shelf: Node) -> int:
+	if shelf == null:
+		return 0
+
+	return maxi(int(shelf.get_meta(SHELF_CONFIG_ID_META, 0)), 0)
+
+
+func _find_shelf_by_config_id(shelf_id: int) -> Node2D:
+	if shelf_id <= 0:
+		return null
+
+	for shelf in _get_all_shelves():
+		if _get_shelf_config_id(shelf) == shelf_id:
+			return shelf as Node2D
+
+	return null
+
+
+func _is_shelf_ad_unlocked(shelf: Node) -> bool:
+	return _ad_unlocked_shelf_ids.has(_get_shelf_config_id(shelf))
 
 
 func _is_shelf_locked(shelf: Node) -> bool:
@@ -2338,6 +2409,9 @@ func _fail_level() -> void:
 	_leave_confirmation_overlay.visible = false
 	if _ability_purchase_overlay != null:
 		_ability_purchase_overlay.visible = false
+	if _shelf_unlock_overlay != null:
+		_shelf_unlock_overlay.visible = false
+		_shelf_unlock_pending_id = 0
 	if _time_up_extension_overlay != null:
 		_time_up_extension_overlay.visible = false
 	if _time_up_transition_overlay != null:
@@ -2392,6 +2466,9 @@ func _complete_level() -> void:
 	_leave_confirmation_overlay.visible = false
 	if _ability_purchase_overlay != null:
 		_ability_purchase_overlay.visible = false
+	if _shelf_unlock_overlay != null:
+		_shelf_unlock_overlay.visible = false
+		_shelf_unlock_pending_id = 0
 	if _time_up_extension_overlay != null:
 		_time_up_extension_overlay.visible = false
 	if _time_up_transition_overlay != null:
@@ -3074,6 +3151,275 @@ func _is_rewarded_ability_verification_pending(ability_id: StringName) -> bool:
 		and _rewarded_time_extension_client.has_method("is_awaiting_ability_verification")
 		and _rewarded_time_extension_client.is_awaiting_ability_verification(ability_id)
 	)
+
+
+## ADS-006 rewarded locked-shelf unlock.
+##
+## `scenes/ui/shelf_lock_overlay.tscn` owns the `AD` plate's input and reports only a completed tap.
+## This level decides eligibility, opens the confirmation modal, keeps the claim bound to one
+## configured shelf id for the current attempt, and -- on authoritative settlement only -- reuses
+## the existing `_update_locked_shelves()` / `_resolve_shelves()` path so the unlock behaves exactly
+## like a triple-earned one without inventing cleared triples.
+func _setup_shelf_unlock_menu() -> void:
+	if _shelf_unlock_overlay == null:
+		return
+
+	_shelf_unlock_overlay.close_requested.connect(_on_shelf_unlock_close_pressed)
+	_shelf_unlock_overlay.rewarded_ad_requested.connect(_on_shelf_unlock_ad_requested)
+
+
+func _prepare_rewarded_shelf_unlock() -> void:
+	if (
+		_rewarded_time_extension_client == null
+		or not _rewarded_time_extension_client.has_method("prepare_shelf_unlock")
+		or _shelf_unlock_prepare_in_progress
+		or _shelf_unlock_reward_in_progress
+	):
+		return
+
+	_shelf_unlock_prepare_in_progress = true
+	var result: Dictionary = await _rewarded_time_extension_client.prepare_shelf_unlock()
+	if not is_inside_tree():
+		return
+
+	_shelf_unlock_prepare_in_progress = false
+	# Preload/provider unavailability is not a player-action error, so it only withdraws the offer.
+	# An error produced by an actual presentation/claim stays visible until the modal is dismissed.
+	if _shelf_unlock_action_state != ShelfUnlockMenu.REWARDED_STATE_ERROR:
+		_shelf_unlock_action_state = (
+			ShelfUnlockMenu.REWARDED_STATE_READY
+			if result.get("status", &"") == &"ready"
+			else ShelfUnlockMenu.REWARDED_STATE_UNAVAILABLE
+		)
+	_refresh_shelf_unlock_offers()
+	_refresh_shelf_unlock_offer()
+
+
+## Re-offers or withdraws every locked shelf's plate. Called from
+## `_update_ability_interaction_state()` so it follows exactly the same "is ordinary gameplay
+## running" rule the ability bar already uses, and from `_update_locked_shelves()` so a shelf that
+## just unlocked drops its plate immediately.
+func _refresh_shelf_unlock_offers() -> void:
+	if _shelf_unlock_overlay == null:
+		return
+
+	# Deliberately the ability bar's own blocked set plus this placement's extra conditions, and
+	# deliberately not `_is_ui_action_blocked()`: a modal's closing fade would otherwise leave every
+	# plate withdrawn, since nothing refreshes again once that fade finishes.
+	var gameplay_open := not (
+		_level_failed
+		or _level_completed
+		or _level_paused
+		or _returning_to_menu
+		or _loading_transition_pending
+		or _is_ability_effect_active()
+		or _is_collapse_in_progress()
+		or _shelf_unlock_pending_id > 0
+		or _shelf_unlock_reward_in_progress
+	)
+	for shelf in _get_all_shelves():
+		var overlay := shelf.get_node_or_null(LOCKED_OVERLAY_NAME) as ShelfLockOverlay
+		if overlay == null:
+			continue
+
+		overlay.set_ad_unlock_available(
+			gameplay_open and _is_shelf_unlock_offer_eligible(shelf)
+		)
+
+
+func _is_shelf_unlock_offer_eligible(shelf: Node) -> bool:
+	if not _is_shelf_locked(shelf) or _is_shelf_ad_unlocked(shelf):
+		return false
+	# A collapsing board hides, moves, and destroys shelves; only a settled, visible one may be sold.
+	if _collapsing_board != null and not _collapsing_board.is_shelf_active(shelf):
+		return false
+
+	return _is_rewarded_shelf_unlock_available(_get_shelf_config_id(shelf))
+
+
+func _is_rewarded_shelf_unlock_available(shelf_id: int) -> bool:
+	return (
+		shelf_id > 0
+		and _rewarded_time_extension_client != null
+		and _rewarded_time_extension_client.has_method("can_offer_shelf_unlock")
+		and _rewarded_time_extension_client.can_offer_shelf_unlock(shelf_id)
+	)
+
+
+func _is_rewarded_shelf_unlock_verification_pending(shelf_id: int) -> bool:
+	return (
+		shelf_id > 0
+		and _rewarded_time_extension_client != null
+		and _rewarded_time_extension_client.has_method("is_awaiting_shelf_unlock_verification")
+		and _rewarded_time_extension_client.is_awaiting_shelf_unlock_verification(shelf_id)
+	)
+
+
+## The plate reports intent only. Nothing here requests an ad -- an incidental tap can reach at most
+## the confirmation modal, and a tap on another shelf while one claim is bound is dropped.
+func _on_shelf_unlock_requested(shelf: Node) -> void:
+	if _shelf_unlock_pending_id > 0 or _shelf_unlock_reward_in_progress or _is_ui_action_blocked():
+		return
+	if not _is_shelf_unlock_offer_eligible(shelf):
+		return
+
+	_open_shelf_unlock_menu(shelf)
+
+
+func _open_shelf_unlock_menu(shelf: Node) -> void:
+	if _shelf_unlock_overlay == null:
+		return
+
+	var shelf_id := _get_shelf_config_id(shelf)
+	if shelf_id <= 0:
+		return
+
+	_cancel_active_interaction()
+	_shelf_unlock_pending_id = shelf_id
+	_shelf_unlock_was_paused = _level_paused
+	_level_paused = true
+	_set_moving_shelf_rows_paused(true)
+	_shelf_unlock_overlay.set_offer(
+		maxi(_get_shelf_unlock_requirement(shelf) - _triples_cleared, 0)
+	)
+	_refresh_shelf_unlock_offer()
+	_pause_menu_overlay.close()
+	_leave_confirmation_overlay.close()
+	_shelf_unlock_overlay.open()
+	if not _is_rewarded_shelf_unlock_available(shelf_id):
+		call_deferred("_prepare_rewarded_shelf_unlock")
+	_update_ability_buttons()
+	_update_pause_menu_button()
+
+
+func _refresh_shelf_unlock_offer() -> void:
+	if _shelf_unlock_overlay == null or _shelf_unlock_pending_id <= 0:
+		return
+
+	if _is_rewarded_shelf_unlock_verification_pending(_shelf_unlock_pending_id):
+		_shelf_unlock_overlay.set_rewarded_action_state(
+			ShelfUnlockMenu.REWARDED_STATE_VERIFYING
+			if _shelf_unlock_reward_in_progress
+			else ShelfUnlockMenu.REWARDED_STATE_PENDING,
+			not _shelf_unlock_reward_in_progress
+		)
+		return
+	if _shelf_unlock_reward_in_progress:
+		_shelf_unlock_overlay.set_rewarded_action_state(_shelf_unlock_action_state, false)
+		return
+
+	var ad_available := _is_rewarded_shelf_unlock_available(_shelf_unlock_pending_id)
+	var resolved_state := _shelf_unlock_action_state
+	if not ad_available and resolved_state != ShelfUnlockMenu.REWARDED_STATE_ERROR:
+		resolved_state = ShelfUnlockMenu.REWARDED_STATE_UNAVAILABLE
+	_shelf_unlock_overlay.set_rewarded_action_state(resolved_state, ad_available)
+
+
+## should_resume=true (the close/X button and ui_cancel) restores whatever state the modal was
+## opened from. should_resume=false follows a verified unlock, which has already resumed gameplay
+## itself so the freshly released shelf is immediately playable.
+func _close_shelf_unlock_menu(should_resume: bool = true) -> void:
+	if _shelf_unlock_overlay != null:
+		_shelf_unlock_overlay.close()
+
+	_shelf_unlock_pending_id = 0
+	_shelf_unlock_action_state = ShelfUnlockMenu.REWARDED_STATE_UNAVAILABLE
+	if should_resume and not _level_failed and not _level_completed:
+		if _shelf_unlock_was_paused:
+			_pause_menu_overlay.open()
+		else:
+			_level_paused = false
+			_set_moving_shelf_rows_paused(false)
+
+	_shelf_unlock_was_paused = false
+	_update_ability_buttons()
+	_update_pause_menu_button()
+
+
+func _on_shelf_unlock_close_pressed() -> void:
+	if _shelf_unlock_pending_id <= 0 or _is_ui_action_blocked() or _shelf_unlock_reward_in_progress:
+		return
+	# A close before an earned reward grants nothing; the shelf keeps its lock and visible count.
+	# An unsettled intent stays claimable, so the modal holds until it resolves either way.
+	if _is_rewarded_shelf_unlock_verification_pending(_shelf_unlock_pending_id):
+		return
+
+	_close_shelf_unlock_menu()
+
+
+func _on_shelf_unlock_ad_requested() -> void:
+	if (
+		_shelf_unlock_pending_id <= 0
+		or _shelf_unlock_reward_in_progress
+		or _is_ui_action_blocked()
+	):
+		return
+
+	var shelf_id := _shelf_unlock_pending_id
+	if not _is_rewarded_shelf_unlock_available(shelf_id):
+		_refresh_shelf_unlock_offer()
+		return
+
+	_shelf_unlock_reward_in_progress = true
+	_shelf_unlock_action_state = (
+		ShelfUnlockMenu.REWARDED_STATE_VERIFYING
+		if _is_rewarded_shelf_unlock_verification_pending(shelf_id)
+		else ShelfUnlockMenu.REWARDED_STATE_LOADING
+	)
+	_refresh_shelf_unlock_offer()
+	_refresh_shelf_unlock_offers()
+	var claim: Dictionary = await _rewarded_time_extension_client.claim_shelf_unlock(
+		selected_level,
+		shelf_id
+	)
+	if (
+		not is_inside_tree()
+		or _returning_to_menu
+		or _level_failed
+		or _level_completed
+		or _shelf_unlock_overlay == null
+		or not _shelf_unlock_overlay.visible
+		or _shelf_unlock_pending_id != shelf_id
+	):
+		return
+
+	if not bool(claim.get("ok", false)):
+		_shelf_unlock_reward_in_progress = false
+		_shelf_unlock_action_state = (
+			ShelfUnlockMenu.REWARDED_STATE_PENDING
+			if bool(claim.get("pending", false))
+			else ShelfUnlockMenu.REWARDED_STATE_ERROR
+		)
+		_refresh_shelf_unlock_offer()
+		if not bool(claim.get("pending", false)):
+			call_deferred("_prepare_rewarded_shelf_unlock")
+		return
+
+	# The authorization must name the exact shelf this modal is bound to. A grant for any other
+	# shelf is rejected outright rather than redirected to the one the player is looking at.
+	if int(claim.get("shelf_id", 0)) != shelf_id or _find_shelf_by_config_id(shelf_id) == null:
+		_shelf_unlock_reward_in_progress = false
+		_shelf_unlock_action_state = ShelfUnlockMenu.REWARDED_STATE_ERROR
+		_refresh_shelf_unlock_offer()
+		return
+
+	_level_paused = false
+	_set_moving_shelf_rows_paused(false)
+	_shelf_unlock_reward_in_progress = false
+	_apply_rewarded_shelf_unlock(shelf_id)
+	_close_shelf_unlock_menu(false)
+
+
+## Marks one shelf ad-unlocked and hands the rest to the paths that already own unlocking: the same
+## meta/input/overlay refresh every triple-earned unlock runs, and one shelf resolution in case the
+## shelf's visible items already form a triple. `_triples_cleared`, stars, and combo are untouched.
+func _apply_rewarded_shelf_unlock(shelf_id: int) -> void:
+	if shelf_id <= 0 or _ad_unlocked_shelf_ids.has(shelf_id):
+		return
+
+	_ad_unlocked_shelf_ids[shelf_id] = true
+	var newly_unlocked_shelves := _update_locked_shelves()
+	_resolve_shelves(newly_unlocked_shelves)
 
 
 func _on_time_extension_declined() -> void:
@@ -5596,6 +5942,9 @@ func _update_ability_interaction_state() -> void:
 			_is_lantern_active(),
 			_is_freezer_active()
 		)
+	# The rewarded shelf plate is offered under exactly the same conditions as the ability bar, so
+	# it is withdrawn and restored by the same state changes rather than a parallel set of hooks.
+	_refresh_shelf_unlock_offers()
 
 
 func _reset_ability_uses() -> void:

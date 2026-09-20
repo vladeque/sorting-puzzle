@@ -2,8 +2,15 @@ class_name ShelfLockOverlay
 extends Node2D
 
 ## Reusable visual owner for triple-gated shelves. `scripts/level.gd` supplies only the remaining
-## clear count and the locked/unlocked state; this component owns its wall-attached chains, badge,
-## lock, and all feedback motion.
+## clear count, the locked/unlocked state, and whether the rewarded shelf-unlock placement is
+## currently offerable; this component owns its wall-attached chains, badge, lock, the `AD` plate's
+## input, and all feedback motion.
+##
+## ADS-006: the `AD` plate is this overlay's one intentional input owner. It reports a completed tap
+## as `unlock_requested` and never starts an ad, decides eligibility, or unlocks anything itself --
+## `scripts/level.gd` answers that signal with its own confirmation modal.
+
+signal unlock_requested
 
 const UIMotionScript := preload("res://scripts/ui_motion.gd")
 const GameplayUIThemeScript := preload("res://scripts/gameplay_ui_theme.gd")
@@ -12,6 +19,7 @@ const CHAIN_TENSION_TWEEN_META := &"shelf_lock_chain_tension_tween"
 const LOCK_SWING_TWEEN_META := &"shelf_lock_swing_tween"
 const BADGE_POP_TWEEN_META := &"shelf_lock_badge_pop_tween"
 const UNLOCK_TWEEN_META := &"shelf_lock_unlock_tween"
+const AD_PLATE_PULSE_TWEEN_META := &"shelf_lock_ad_plate_pulse_tween"
 
 ## Selected C2-7A has 6px of transparent horizontal padding on each side of its 512px canvas.
 ## Geometry uses the visible 500px span so authored endpoints meet walls and the lock shackle.
@@ -69,6 +77,17 @@ const UNLOCK_RELEASE_SECONDS := 0.24
 const UNLOCK_LOCK_DROP := Vector2(0, 34)
 const UNLOCK_BADGE_LIFT := Vector2(0, -8)
 
+## The tappable `AD` plate, in `LockRig` local units: the padlock's 256x256 canvas at its authored
+## 0.31 sprite scale, which also contains `AdLabel`. Runtime scales and offsets it with the rig, so
+## both the standard and compact layouts get a plate that matches what the player actually sees.
+const LOCK_PLATE_RECT := Rect2(-39.68, -8.68, 79.36, 79.36)
+## Idle "this is tappable" affordance, played only while the level reports the rewarded placement
+## ready. Without it the plate would keep its existing purely decorative appearance.
+const AD_PLATE_PULSE_SCALE := Vector2(1.14, 1.14)
+const AD_PLATE_PULSE_SECONDS := 0.62
+const AD_PLATE_POINTER_NONE := -2
+const AD_PLATE_POINTER_MOUSE := -1
+
 @export var overlay_half_width := 104.0
 @export var overlay_top := -81.0
 @export var overlay_bottom := 46.0
@@ -85,6 +104,7 @@ const UNLOCK_BADGE_LIFT := Vector2(0, -8)
 @onready var _left_wall_cover := $VisualRig/WallAttachmentCovers/Left as Polygon2D
 @onready var _right_wall_cover := $VisualRig/WallAttachmentCovers/Right as Polygon2D
 @onready var _lock_rig := $VisualRig/LockRig as Node2D
+@onready var _ad_label := $VisualRig/LockRig/AdLabel as Label
 @onready var _countdown_badge := $VisualRig/CountdownBadge as Node2D
 @onready var _remaining_label := $VisualRig/CountdownBadge/RemainingLabel as Label
 
@@ -98,6 +118,8 @@ var _lock_base_position := Vector2.ZERO
 var _lock_base_scale := Vector2.ONE
 var _badge_base_position := Vector2.ZERO
 var _badge_base_scale := Vector2.ONE
+var _ad_unlock_available := false
+var _ad_plate_pointer_id := AD_PLATE_POINTER_NONE
 
 
 func _ready() -> void:
@@ -107,6 +129,9 @@ func _ready() -> void:
 	_chain_arms.append(_chain_bottom_right)
 	_apply_layout()
 	_reset_animated_nodes()
+	# The plate listens only while the owning level has offered the rewarded route, so an ordinary
+	# locked shelf costs nothing and can never swallow a gameplay press.
+	set_process_input(false)
 
 
 ## Shows a locked state and animates only genuine countdown decreases. Initial configuration and a
@@ -126,12 +151,46 @@ func show_locked(remaining: int) -> void:
 	_previous_remaining = next_remaining
 
 
+## Offers or withdraws the rewarded `AD` plate. The owning level is the only authority on whether
+## the placement is eligible -- it re-evaluates shelf lock state, policy/provider readiness, pause
+## and overlay state, and calls this whenever any of them change. A withdrawn plate keeps its
+## existing decorative appearance and accepts no input at all.
+func set_ad_unlock_available(is_available: bool) -> void:
+	var next_available := is_available and visible
+	if _ad_unlock_available == next_available:
+		return
+
+	_ad_unlock_available = next_available
+	_ad_plate_pointer_id = AD_PLATE_POINTER_NONE
+	set_process_input(_ad_unlock_available)
+	_refresh_ad_plate_affordance()
+
+
+func is_ad_unlock_available() -> bool:
+	return _ad_unlock_available
+
+
+## The plate's hit area in canvas-global coordinates, derived from the same rig position/scale the
+## lock is actually drawn with. Binding the area to the rig rather than a node instance or screen
+## position keeps it correct across responsive relayouts and shelf-scale changes.
+func get_ad_plate_global_rect() -> Rect2:
+	var plate_position := LOCK_PLATE_RECT.position * _lock_base_scale + _lock_base_position
+	var plate_size := LOCK_PLATE_RECT.size * _lock_base_scale
+	var left := maxf(plate_position.x, -overlay_half_width)
+	var right := minf(plate_position.x + plate_size.x, overlay_half_width)
+	return get_global_transform() * Rect2(
+		Vector2(left, plate_position.y),
+		Vector2(maxf(right - left, 0.0), plate_size.y)
+	)
+
+
 ## The owning level makes the shelf interactable before calling this method. The visual release is
 ## deliberately fire-and-forget so chain motion can never delay gameplay availability.
 func play_unlock() -> void:
 	if not visible:
 		return
 
+	set_ad_unlock_available(false)
 	_stop_all_tweens()
 	_reset_animated_nodes()
 	_set_remaining_text(0)
@@ -174,9 +233,98 @@ func play_unlock() -> void:
 
 
 func reset_visual_state() -> void:
+	set_ad_unlock_available(false)
 	_stop_all_tweens()
 	_reset_animated_nodes()
 	_previous_remaining = -1
+
+
+## Press and release are tracked as one gesture on one pointer: a press that slides off the plate,
+## a cancelled touch, or a release elsewhere reports nothing. A completed tap only announces intent
+## -- `scripts/level.gd` still opens its confirmation modal before any ad is requested.
+func _input(event: InputEvent) -> void:
+	if not _ad_unlock_available or not is_visible_in_tree():
+		return
+	# Native touch and mouse are both handled below; their synthesized counterparts are duplicates.
+	if event.device == InputEvent.DEVICE_ID_EMULATION:
+		return
+
+	if event is InputEventMouseButton:
+		var mouse_event := event as InputEventMouseButton
+		if mouse_event.button_index != MOUSE_BUTTON_LEFT:
+			return
+		if mouse_event.canceled:
+			_ad_plate_pointer_id = AD_PLATE_POINTER_NONE
+		elif mouse_event.pressed:
+			_begin_ad_plate_press(get_global_mouse_position(), AD_PLATE_POINTER_MOUSE)
+		else:
+			_finish_ad_plate_press(get_global_mouse_position(), AD_PLATE_POINTER_MOUSE)
+	elif event is InputEventMouseMotion:
+		_cancel_ad_plate_press_outside(get_global_mouse_position(), AD_PLATE_POINTER_MOUSE)
+	elif event is InputEventScreenTouch:
+		var touch_event := event as InputEventScreenTouch
+		var touch_position := _screen_position_to_global(touch_event.position)
+		if touch_event.canceled:
+			if _ad_plate_pointer_id == touch_event.index:
+				_ad_plate_pointer_id = AD_PLATE_POINTER_NONE
+		elif touch_event.pressed:
+			_begin_ad_plate_press(touch_position, touch_event.index)
+		else:
+			_finish_ad_plate_press(touch_position, touch_event.index)
+	elif event is InputEventScreenDrag:
+		var drag_event := event as InputEventScreenDrag
+		_cancel_ad_plate_press_outside(
+			_screen_position_to_global(drag_event.position),
+			drag_event.index
+		)
+
+
+func _begin_ad_plate_press(pointer_global_position: Vector2, pointer_id: int) -> void:
+	if _ad_plate_pointer_id != AD_PLATE_POINTER_NONE:
+		return
+	if not get_ad_plate_global_rect().has_point(pointer_global_position):
+		return
+
+	_ad_plate_pointer_id = pointer_id
+	get_viewport().set_input_as_handled()
+
+
+func _finish_ad_plate_press(pointer_global_position: Vector2, pointer_id: int) -> void:
+	if _ad_plate_pointer_id != pointer_id:
+		return
+
+	_ad_plate_pointer_id = AD_PLATE_POINTER_NONE
+	if not get_ad_plate_global_rect().has_point(pointer_global_position):
+		return
+
+	get_viewport().set_input_as_handled()
+	unlock_requested.emit()
+
+
+func _cancel_ad_plate_press_outside(pointer_global_position: Vector2, pointer_id: int) -> void:
+	if _ad_plate_pointer_id != pointer_id:
+		return
+	if not get_ad_plate_global_rect().has_point(pointer_global_position):
+		_ad_plate_pointer_id = AD_PLATE_POINTER_NONE
+
+
+func _screen_position_to_global(screen_position: Vector2) -> Vector2:
+	return get_canvas_transform().affine_inverse() * screen_position
+
+
+func _refresh_ad_plate_affordance() -> void:
+	if not _ad_unlock_available:
+		UIMotionScript.stop_tween(_ad_label, AD_PLATE_PULSE_TWEEN_META)
+		_ad_label.scale = Vector2.ONE
+		return
+
+	_ad_label.pivot_offset = _ad_label.size * 0.5
+	var tween := UIMotionScript.retween(_ad_label, AD_PLATE_PULSE_TWEEN_META)
+	tween.set_loops()
+	tween.tween_property(_ad_label, "scale", AD_PLATE_PULSE_SCALE, AD_PLATE_PULSE_SECONDS) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(_ad_label, "scale", Vector2.ONE, AD_PLATE_PULSE_SECONDS) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
 
 func _apply_layout() -> void:
@@ -363,5 +511,6 @@ func _reset_animated_nodes() -> void:
 
 func _finish_unlock() -> void:
 	visible = false
+	set_ad_unlock_available(false)
 	_reset_animated_nodes()
 	_previous_remaining = -1

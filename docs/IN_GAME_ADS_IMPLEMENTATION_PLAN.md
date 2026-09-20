@@ -38,7 +38,7 @@ plugin version and checksums; do not consume an unpinned Asset Library update in
 | Ability purchase | ADS-005 replaces the placeholder with a readiness-gated `Watch Ad` route for Hammer, Shuffle, and Lantern. It binds the exact ability to the current authoritative run, then applies one immediate use without coins or inventory. Freezer remains coin-only. | Apply the one selected ability immediately, matching the coin action rather than adding inventory. | Implemented behind provider/backend release gates; see `ADS_005_REWARDED_ABILITY.md`. |
 | Time-up extension | ADS-003 is implemented behind provider/backend gates. The paused modal exposes ready/loading/verifying/retry states; the client creates a run-bound intent and grants nothing until SSV settlement. | Add the configured 60 seconds once per attempt while the board remains paused. | Production provider IDs, backend runtime ad-unit mapping, and physical-device/store/privacy verification remain release gates. |
 | Out of lives | ADS-004 replaced the placeholder with `%RewardedAdButton`, explicit request/loading/error states, and authoritative settlement routing in both modal owners. | Restore exactly one life below the cap; resume the interrupted launch/retry only after the grant succeeds. | Implemented behind provider/backend release gates; see `ADS_004_REWARDED_LIFE.md`. |
-| Locked shelf | `scenes/ui/shelf_lock_overlay.tscn` already displays `AD`, but the overlay is presentational and has no input. `scripts/level.gd` currently unlocks shelves only when the global cleared-triple count reaches `unlock_after_triples`. | Unlock the one shelf the player selected without adding fake cleared triples or changing any other shelf's countdown. | Add an explicit tap/confirmation flow, stable shelf identity, per-attempt rewarded-unlock state, provider/claim routing, and gameplay-proof authorization. |
+| Locked shelf | ADS-006 gives the `AD` lock plate an input owner and a dedicated confirmation modal, binds the claim to a configured shelf id for the current attempt, and reuses the existing unlock path on settlement. | Unlock the one shelf the player selected without adding fake cleared triples or changing any other shelf's countdown. | Implemented behind provider/backend release gates; see `ADS_006_REWARDED_SHELF_UNLOCK.md`. Gameplay-proof authorization remains BE-ADS-001 work. |
 
 ### “Coming Soon” UI that is not an ad placement
 
@@ -388,6 +388,10 @@ Status: **implemented behind release/provider gates**. See `ADS_005_REWARDED_ABI
   reward to a different ability.
 
 ### ADS-006 — Enable rewarded locked-shelf unlock
+
+Status: **implemented behind release/provider gates**. See
+[`ADS_006_REWARDED_SHELF_UNLOCK.md`](ADS_006_REWARDED_SHELF_UNLOCK.md). Proof/validator coverage for
+forged, duplicate, wrong-shelf, and wrong-attempt claims stays with BE-ADS-001.
 
 - Give `ShelfLockOverlay` an intentional input owner and add a dedicated confirmation modal rather
   than starting an ad directly from a shelf tap.
