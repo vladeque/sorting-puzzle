@@ -17,9 +17,13 @@ const LEVEL_SCENE_PATH := "res://level.tscn"
 const LAYER_INDICATOR_SCENE_PATH := "res://scenes/shelf_layer_indicator.tscn"
 const ITEM_SCENE_PATH := "res://scenes/item.tscn"
 const WOOD_TEXTURE_PATH := "res://assets/shelves/standard_shelf_light_oak.png"
-const NON_COMPOUNDING_SHADOW_PATHS := [
+const BACK_WALL_SHADOW_SHADER_PATH := "res://assets/shaders/shelf_back_wall_shadow.gdshader"
+const LINEAR_SHADOW_SHADER_PATH := "res://assets/shaders/shelf_linear_shadow.gdshader"
+const SOFT_SHADOW_PATHS := [
 	"FrameShadow",
+	"FrameRightShadow",
 	"BackWallLeftShade",
+	"BackWallRightShade",
 	"LeftShadowEdge",
 	"RightShadowEdge",
 ]
@@ -100,6 +104,7 @@ func _test_visual_nodes_have_semantic_names() -> void:
 
 	var expected_nodes := [
 		"FrameShadow",
+		"FrameRightShadow",
 		"BackWall",
 		"BackWallLowerPanel",
 		"LeftWallUpperFace",
@@ -155,12 +160,18 @@ func _test_visual_nodes_have_semantic_names() -> void:
 			"Legacy line grain %s should stay hidden behind the image texture." % grain_name
 		)
 
-	for node_path in NON_COMPOUNDING_SHADOW_PATHS:
+	for node_path in SOFT_SHADOW_PATHS:
 		var shadow := dispenser.get_node_or_null(node_path) as Polygon2D
-		_check(shadow != null, "Dispenser shadow %s should remain a polygon." % node_path)
+		var material := shadow.material as ShaderMaterial if shadow != null else null
+		var expected_shader := (
+			BACK_WALL_SHADOW_SHADER_PATH if node_path.begins_with("BackWall")
+			else LINEAR_SHADOW_SHADER_PATH
+		)
 		_check(
-			shadow != null and is_equal_approx(shadow.color.a, 1.0),
-			"Dispenser shadow %s should stay opaque so shelves cannot compound." % node_path
+			material != null
+				and material.shader != null
+				and material.shader.resource_path == expected_shader,
+			"Dispenser shadow %s should use its procedural soft-shadow shader." % node_path
 		)
 
 	for node_path in LOCAL_SHADE_OVERLAY_PATHS:
@@ -196,7 +207,7 @@ func _test_item_shadow_layering() -> void:
 			floor_surface.z_index < shadow_z,
 			"The item shadow should render over the dispenser floor and level background."
 		)
-		for shadow_path in NON_COMPOUNDING_SHADOW_PATHS:
+		for shadow_path in SOFT_SHADOW_PATHS:
 			var shelf_shadow := dispenser.get_node_or_null(shadow_path) as CanvasItem
 			_check(
 				shelf_shadow != null and shelf_shadow.z_index < shadow_z,

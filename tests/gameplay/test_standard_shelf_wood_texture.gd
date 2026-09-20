@@ -9,6 +9,8 @@ const SHELF_SCENE_PATH := "res://scenes/shelf.tscn"
 const ITEM_SCENE_PATH := "res://scenes/item.tscn"
 const WOOD_TEXTURE_PATH := "res://assets/shelves/standard_shelf_light_oak.png"
 const BACK_WALL_SHADOW_SHADER_PATH := "res://assets/shaders/shelf_back_wall_shadow.gdshader"
+const LINEAR_SHADOW_SHADER_PATH := "res://assets/shaders/shelf_linear_shadow.gdshader"
+const FLOOR_CORNER_SHADER_PATH := "res://assets/shaders/shelf_corner_shadow.gdshader"
 const EXPECTED_INTERIOR_HEIGHT := Shelf.ORIGINAL_INTERIOR_HEIGHT * Shelf.INTERIOR_HEIGHT_SCALE
 const EXPECTED_FLOOR_TOP := 16.0
 const EXPECTED_SLOT_POSITIONS := [Vector2(-60, 15), Vector2(0, 15), Vector2(60, 15)]
@@ -38,9 +40,11 @@ const LEGACY_GRAIN_PATHS := [
 	"FloorGrainKnot",
 	"FloorGrainFront",
 ]
-const NON_COMPOUNDING_SHADOW_PATHS := [
+const SOFT_CAST_SHADOW_PATHS := [
 	"Shadow",
 	"RightColumnShadow",
+]
+const EDGE_AMBIENT_OCCLUSION_PATHS := [
 	"PlacementVisuals/Left/LeftShadowEdge",
 	"PlacementVisuals/Middle/LeftShadowEdge",
 	"PlacementVisuals/Middle/RightShadowEdge",
@@ -113,12 +117,20 @@ func _run() -> void:
 		var grain := shelf.get_node_or_null(node_path) as CanvasItem
 		_check(grain != null and not grain.visible, "%s should stay hidden behind image grain." % node_path)
 
-	for node_path in NON_COMPOUNDING_SHADOW_PATHS:
+	for node_path in SOFT_CAST_SHADOW_PATHS + EDGE_AMBIENT_OCCLUSION_PATHS:
 		var shadow := shelf.get_node_or_null(node_path) as Polygon2D
-		_check(shadow != null, "%s should remain a shelf shadow polygon." % node_path)
+		var material := shadow.material as ShaderMaterial if shadow != null else null
 		_check(
-			shadow != null and is_equal_approx(shadow.color.a, 1.0),
-			"%s should stay opaque so overlapping shelves cannot compound." % node_path
+			material != null
+				and material.shader != null
+				and material.shader.resource_path == LINEAR_SHADOW_SHADER_PATH,
+			"%s should use the background-independent linear shadow shader." % node_path
+		)
+		_check(shadow != null and shadow.uv.size() == shadow.polygon.size(),
+			"%s should map its soft falloff across every polygon vertex." % node_path)
+		_check(
+			shadow != null and shadow.antialiased,
+			"%s should antialias its soft outer edge." % node_path
 		)
 
 	for node_path in SOFT_BACK_WALL_SHADOW_PATHS:
@@ -130,11 +142,15 @@ func _run() -> void:
 				and material.shader.resource_path == BACK_WALL_SHADOW_SHADER_PATH,
 			"%s should use the procedural soft-shadow shader." % node_path
 		)
-		_check(
-			shadow != null and shadow.antialiased,
-			"%s should antialias its soft outer edge." % node_path
-		)
 
+	var floor_corner := shelf.get_node_or_null("FloorSurface/Shade") as Polygon2D
+	var floor_corner_material := floor_corner.material as ShaderMaterial if floor_corner != null else null
+	_check(
+		floor_corner_material != null
+			and floor_corner_material.shader != null
+			and floor_corner_material.shader.resource_path == FLOOR_CORNER_SHADER_PATH,
+		"The floor corner should use a feathered two-axis occlusion shader."
+	)
 	_check_taller_frame_geometry(shelf)
 	_check_item_shadow_layers_over_shelf_shadows(shelf)
 

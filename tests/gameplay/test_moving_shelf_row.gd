@@ -6,6 +6,7 @@ const SHELF_SCENE_PATH := "res://scenes/shelf.tscn"
 const MOVING_SHELF_SCENE_PATH := "res://scenes/moving_shelf.tscn"
 const LEVEL_SCENE_PATH := "res://level.tscn"
 const BACK_WALL_SHADOW_SHADER_PATH := "res://assets/shaders/shelf_back_wall_shadow.gdshader"
+const LINEAR_SHADOW_SHADER_PATH := "res://assets/shaders/shelf_linear_shadow.gdshader"
 const PREVIEW_ARGUMENT := "--moving-shelf-motion-preview"
 const LAYOUT_DIRECTORY := "res://scenes/layouts"
 const CELL_SIZE := Vector2(237.44, 143.1)
@@ -52,11 +53,23 @@ func _run() -> void:
 	row.add_shelf(shelf)
 	_check(
 		shelf.get_visual_variant() == Shelf.VISUAL_VARIANT_FLOOR_ONLY
-		and not shelf.get_node("BackWall").visible,
+		and not shelf.get_node("BackWall").visible
+		and shelf.get_node(Shelf.FLOOR_CONTACT_SHADOW_NODE).visible,
 		"The independent moving shelf should open with its floor-only appearance."
 	)
+	var floor_contact_shadow := shelf.get_node(Shelf.FLOOR_CONTACT_SHADOW_NODE) as Polygon2D
+	var floor_contact_material := floor_contact_shadow.material as ShaderMaterial
+	_check(
+		floor_contact_material != null
+			and floor_contact_material.shader != null
+			and floor_contact_material.shader.resource_path == LINEAR_SHADOW_SHADER_PATH,
+		"The floor-only moving shelf should use a soft background-independent contact shadow."
+	)
 	shelf.set_visual_variant(Shelf.VISUAL_VARIANT_FULL)
-	_check(shelf.get_node("BackWall").visible, "Moving shelves must preserve the optional full variant.")
+	_check(
+		shelf.get_node("BackWall").visible and not floor_contact_shadow.visible,
+		"The optional full frame should replace the floor-only contact shadow."
+	)
 	_verify_soft_back_wall_shadows(shelf)
 	shelf.set_visual_variant(Shelf.VISUAL_VARIANT_FLOOR_ONLY)
 

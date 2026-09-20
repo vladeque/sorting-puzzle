@@ -2577,7 +2577,8 @@ Key methods:
   edges, and preserves item, slot, and input proportions.
 - `get_row_placement()`: returns the active shelf row placement.
 - `set_collapsing_visuals_enabled(should_enable)`: toggles the collapsing-only cabinet treatment
-  without changing shelf geometry, slots, input, or the shared light-oak art used by basic levels.
+  without changing shelf geometry, slots, input, or the shared light-oak art used by basic levels;
+  it also suppresses each cell's exterior casts because the board owns one combined cast.
 - `set_top_ceiling_cap_visible(should_show)`: applies layout-derived visibility to every placement-specific `TopCeilingCap`, gated by the active shelf visual variant.
 - `add_back_layer(layer_index, front_slots)`: creates a generated back-layer container and slot nodes aligned to the shelf front slots.
 - `get_back_layer(layer_index)`: returns a generated back-layer container by index.
@@ -2598,7 +2599,8 @@ Class: `MovingShelf`, extending `Shelf`.
 
 Attached to `scenes/moving_shelf.tscn`, the standalone visual scene for one shelf on a moving belt.
 It starts with the `floor_only` variant and restores the scene's optional hidden frame/cast shadows
-when a row explicitly requests `full`. Art and slots are authored in the scene; shared three-slot
+when a row explicitly requests `full`. The floor-only variant shows its dedicated soft contact
+shadow, while the full variant hides that shadow beneath the restored frame. Art and slots are authored in the scene; shared three-slot
 gameplay capabilities, generated back layers, and visual scaling are inherited from `Shelf`.
 The script does not move itself: `MovingShelfRow` still owns belt motion and clipping.
 
@@ -2719,6 +2721,9 @@ Purpose:
   runs. Hidden shelves are also invisible, but visibility is never the rule the level relies on.
 - Applies left/middle/right shelf art from the column's board position at registration, never from
   how many shelves survive in a row.
+- Fits one bottom and one right exterior cast shadow to the resolved board footprint. Individual
+  collapsing shelf cells retain inset occlusion but hide their exterior casts, preventing repeated
+  translucent layers as rows collapse through the same screen space.
 - Reports completion as "no shelf survives anywhere" through `is_cleared()`, which is false while a
   collapse is still running.
 

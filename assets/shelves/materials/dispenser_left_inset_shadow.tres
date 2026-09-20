@@ -1,0 +1,10 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://assets/shaders/shelf_back_wall_shadow.gdshader" id="1_shader"]
+
+[resource]
+shader = ExtResource("1_shader")
+shader_parameter/shadow_color = Color(0.18, 0.11, 0.065, 0.38)
+shader_parameter/shadow_origin = Vector2(-34, 0)
+shader_parameter/shadow_axis = Vector2(1, 0)
+shader_parameter/fade_distance = 12.0

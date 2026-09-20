@@ -80,7 +80,7 @@ With the preview fixture and with campaign level 9, the window resolves to 6 row
 | Generation | `scripts/tools/generate_level_shelves.py` (`--gameplay-mode collapsing_columns`) |
 | Materialization contract check | `scripts/tools/level_item_progression.py` (`validate_board_contract()`) |
 | Runtime contract check | `scripts/collapsing_column_rules.gd` |
-| Columns, clip window, visible count, batched collapse | `scenes/collapsing_shelf_board.tscn`, `scripts/collapsing_shelf_board.gd` |
+| Columns, clip window, visible count, board-level cast shadows, batched collapse | `scenes/collapsing_shelf_board.tscn`, `scripts/collapsing_shelf_board.gd` |
 | One column's order and movement | `scenes/collapsing_shelf_column.tscn`, `scripts/collapsing_shelf_column.gd` |
 | Empty-shelf break visuals | `scenes/effects/shelf_destruction_effect.tscn`, `scripts/shelf_destruction_effect.gd` |
 | Construction, availability, resolution, abilities, completion | `scripts/level.gd` |
@@ -100,6 +100,9 @@ With the preview fixture and with campaign level 9, the window resolves to 6 row
   overlapping the opening of the accelerated column fall. Survivors pass their destination by a
   few pixels and settle with a restrained rebound. Newly revealed shelves remain opaque and enter
   physically through the board's clip edge instead of fading in as ghosted content.
+- Each shelf keeps soft top/left inset occlusion, while the board draws one exterior bottom/right
+  cast for the full footprint. Per-cell exterior casts are hidden so stacked translucent shadows do
+  not accumulate into dark bands during collapse.
 - Retry rebuilds the board from config. No live column state is saved.
 
 ## Verification

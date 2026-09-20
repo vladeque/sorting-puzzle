@@ -33,6 +33,7 @@ const TOP_CEILING_CAP_NODE := "TopCeilingCap"
 const COLLAPSING_VISUALS_NODE := "CollapsingVisuals"
 const FLOOR_SURFACE_NODE := "FloorSurface"
 const FLOOR_FRONT_LIP_NODE := "FloorFrontLip"
+const FLOOR_CONTACT_SHADOW_NODE := "FloorContactShadow"
 const HORIZONTAL_VISUAL_SCALE_NODES := [
 	"Shadow",
 	"RightColumnShadow",
@@ -40,6 +41,7 @@ const HORIZONTAL_VISUAL_SCALE_NODES := [
 	"BackWallTopShade",
 	"PlacementVisuals",
 	"Ceiling",
+	FLOOR_CONTACT_SHADOW_NODE,
 	"FloorSurface",
 	"FloorFrontLip",
 	"FloorGrainBack",
@@ -281,9 +283,16 @@ func _apply_top_ceiling_cap_visibility() -> void:
 
 
 func _apply_collapsing_visuals() -> void:
-	_set_node_visible(
-		COLLAPSING_VISUALS_NODE,
+	var show_collapsing_visuals := (
 		_collapsing_visuals_enabled and _visual_variant == VISUAL_VARIANT_FULL
+	)
+	_set_node_visible(COLLAPSING_VISUALS_NODE, show_collapsing_visuals)
+	# A collapsing board owns one exterior cast shadow for the complete cabinet. Leaving every
+	# tightly packed shelf's cast polygons enabled would stack transparent shadows at cell seams.
+	_set_node_visible("Shadow", not show_collapsing_visuals and _visual_variant == VISUAL_VARIANT_FULL)
+	_set_node_visible(
+		"RightColumnShadow",
+		not show_collapsing_visuals and _visual_variant == VISUAL_VARIANT_FULL
 	)
 	_apply_top_ceiling_cap_visibility()
 

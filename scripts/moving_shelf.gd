@@ -15,4 +15,5 @@ func _apply_visual_variant() -> void:
 	var show_frame := _visual_variant == VISUAL_VARIANT_FULL
 	for node_name in ["Shadow", "RightColumnShadow", "BackWall", "BackWallTopShade", "Ceiling"]:
 		_set_node_visible(node_name, show_frame)
+	_set_node_visible(FLOOR_CONTACT_SHADOW_NODE, not show_frame)
 	super._apply_visual_variant()

@@ -3,6 +3,8 @@ extends SceneTree
 const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
 const BOARD_SCENE_PATH := "res://scenes/collapsing_shelf_board.tscn"
 const SHELF_SCENE_PATH := "res://scenes/shelf.tscn"
+const LINEAR_SHADOW_SHADER_PATH := "res://assets/shaders/shelf_linear_shadow.gdshader"
+const BACK_WALL_SHADOW_SHADER_PATH := "res://assets/shaders/shelf_back_wall_shadow.gdshader"
 const CELL_SCALE := 1.06
 const CELL_SIZE := Vector2(224, 135) * CELL_SCALE
 const CELL_STEP := Vector2(228.96, 144.902)
@@ -123,6 +125,16 @@ func _verify_cap_geometry_constant() -> void:
 
 func _verify_construction_and_window() -> void:
 	var board := _make_board([4, 2, 3], 3)
+	for shadow_name in ["BoardBottomShadow", "BoardRightShadow"]:
+		var board_shadow := board.get_node_or_null(shadow_name) as Polygon2D
+		var material := board_shadow.material as ShaderMaterial if board_shadow != null else null
+		_check(
+			material != null
+				and material.shader != null
+				and material.shader.resource_path == LINEAR_SHADOW_SHADER_PATH
+				and board_shadow.polygon.size() == 4,
+			"The collapsing cabinet should own one laid-out soft %s." % shadow_name
+		)
 	_check(board.get_column_count() == 3, "The board should build one column per shelf count.")
 	_check(_ids(board, 0) == [0, 1, 2, 3], "Column 1 should hold shelves 1-4 bottom to top.")
 	_check(_ids(board, 1) == [4, 5], "Column 2 should hold shelves 5-6 bottom to top.")
@@ -148,6 +160,21 @@ func _verify_construction_and_window() -> void:
 	_check(_shelf_by_id(board, 0).get_row_placement() == Shelf.ROW_PLACEMENT_LEFT, "Column 1 uses left art.")
 	_check(_shelf_by_id(board, 4).get_row_placement() == Shelf.ROW_PLACEMENT_MIDDLE, "Column 2 uses middle art.")
 	_check(_shelf_by_id(board, 6).get_row_placement() == Shelf.ROW_PLACEMENT_RIGHT, "Column 3 uses right art.")
+	var first_shelf := _shelf_by_id(board, 0)
+	_check(
+		not first_shelf.get_node("Shadow").visible
+			and not first_shelf.get_node("RightColumnShadow").visible,
+		"Collapsing cells should suppress per-shelf exterior casts in favor of the board shadow."
+	)
+	for shade_path in ["CollapsingVisuals/BackPanelTopShade", "CollapsingVisuals/BackPanelLeftShade"]:
+		var inset := first_shelf.get_node_or_null(shade_path) as Polygon2D
+		var inset_material := inset.material as ShaderMaterial if inset != null else null
+		_check(
+			inset_material != null
+				and inset_material.shader != null
+				and inset_material.shader.resource_path == BACK_WALL_SHADOW_SHADER_PATH,
+			"%s should use procedural inset ambient occlusion." % shade_path
+		)
 
 	_check(not _cap_visible(_shelf_by_id(board, 2)), "The window's top shelf drops its cap once a shelf peeks over it.")
 	_check(_cap_visible(peeking), "The peeking shelf carries the cap, past the clip edge where it cannot cover the shelf below.")
@@ -233,7 +260,8 @@ func _verify_removing_the_top_visible_shelf_reveals_the_next() -> void:
 	_check(revealed.size() == 1 and revealed[0] == _shelf_by_id(board, 2), "Emptying the top visible shelf reveals shelf 3.")
 	_check(_shelf_by_id(board, 2).visible and board.is_shelf_active(_shelf_by_id(board, 2)), "Shelf 3 is playable after settling.")
 	_check(is_equal_approx(_shelf_by_id(board, 0).position.y, _row_y(0)), "The bottom shelf does not move.")
-	_check(_cap_visible(_shelf_by_id(board, 2)), "The revealed shelf now carries the top cap.")
+	_check(not _cap_visible(_shelf_by_id(board, 2)), "The revealed shelf stays uncapped while the next shelf peeks above it.")
+	_check(_cap_visible(_shelf_by_id(board, 3)), "The shelf in the peek strip carries the top cap.")
 	_check(not _cap_visible(_shelf_by_id(board, 0)), "The shelf under it no longer does.")
 	board.free()
 
@@ -516,7 +544,7 @@ func _verify_level_builds_columns_in_authored_order() -> void:
 	_check(_shelf_by_id(board, 1).name == "Shelf02", "Shelves keep the standard naming.")
 	_check(board.get_visible_count() == 2, "The pinned window is the authored minimum.")
 	_check(board.get_active_shelves().size() == 6, "Two active shelves per column.")
-	_check(not _shelf_by_id(board, 2).visible and not board.is_shelf_active(_shelf_by_id(board, 2)), "Shelf 3 starts hidden.")
+	_check(_shelf_by_id(board, 2).visible and not board.is_shelf_active(_shelf_by_id(board, 2)), "Shelf 3 starts visible only in the peek strip.")
 	var bounds: Rect2 = level.call("_get_shelves_local_bounds")
 	_check(is_equal_approx(bounds.size.y, CELL_STEP.y + CAP_RISE + CELL_SIZE.y * 0.5), "Responsive fitting uses the two-row window and its cap, not the stack.")
 	await _dispose(level)
