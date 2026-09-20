@@ -30,6 +30,8 @@ const LEFT_PLACEMENT_NODE := "PlacementVisuals/Left"
 const MIDDLE_PLACEMENT_NODE := "PlacementVisuals/Middle"
 const RIGHT_PLACEMENT_NODE := "PlacementVisuals/Right"
 const TOP_CEILING_CAP_NODE := "TopCeilingCap"
+const COLLAPSING_VISUALS_NODE := "CollapsingVisuals"
+const COLLAPSING_TOP_CAP_NODE := "CollapsingVisuals/TopCap"
 const FLOOR_SURFACE_NODE := "FloorSurface"
 const FLOOR_FRONT_LIP_NODE := "FloorFrontLip"
 const HORIZONTAL_VISUAL_SCALE_NODES := [
@@ -64,11 +66,13 @@ const FLOOR_ONLY_HIDDEN_NODES := [
 var _visual_variant := VISUAL_VARIANT_FULL
 var _row_placement := ROW_PLACEMENT_MIDDLE
 var _should_show_top_ceiling_cap := false
+var _collapsing_visuals_enabled := false
 
 
 func _ready() -> void:
 	_apply_visual_variant()
 	_apply_row_placement()
+	_apply_collapsing_visuals()
 
 
 ## Shelf-type capabilities. `scripts/level.gd` branches on these instead of on the shelf's class, so
@@ -128,6 +132,7 @@ func set_visual_variant(visual_variant: String) -> void:
 	_apply_visual_variant()
 	_apply_row_placement()
 	_apply_top_ceiling_cap_visibility()
+	_apply_collapsing_visuals()
 
 
 func get_visual_variant() -> String:
@@ -149,6 +154,14 @@ func set_row_placement(row_placement: String) -> void:
 
 func get_row_placement() -> String:
 	return _row_placement
+
+
+## Collapsing-column levels reuse the standard shelf interaction geometry but give each cell a
+## darker cabinet back, stronger side posts, and restrained metal joinery. Basic shelves leave this
+## scene-authored layer hidden.
+func set_collapsing_visuals_enabled(should_enable: bool) -> void:
+	_collapsing_visuals_enabled = should_enable
+	_apply_collapsing_visuals()
 
 
 ## Moving rows can shorten the shelf body without squeezing item art, slot positions, or hit areas.
@@ -266,6 +279,18 @@ func _apply_top_ceiling_cap_visibility() -> void:
 	_set_node_visible(TOP_CEILING_CAP_NODE, should_show)
 	for placement_node in [LEFT_PLACEMENT_NODE, MIDDLE_PLACEMENT_NODE, RIGHT_PLACEMENT_NODE]:
 		_set_node_visible("%s/%s" % [placement_node, TOP_CEILING_CAP_NODE], should_show)
+	_set_node_visible(
+		COLLAPSING_TOP_CAP_NODE,
+		should_show and _collapsing_visuals_enabled
+	)
+
+
+func _apply_collapsing_visuals() -> void:
+	_set_node_visible(
+		COLLAPSING_VISUALS_NODE,
+		_collapsing_visuals_enabled and _visual_variant == VISUAL_VARIANT_FULL
+	)
+	_apply_top_ceiling_cap_visibility()
 
 
 func _set_node_visible(node_name: String, should_show: bool) -> void:

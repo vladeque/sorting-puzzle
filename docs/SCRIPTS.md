@@ -2542,6 +2542,9 @@ Purpose:
 - Owns reusable shelf-cell runtime helpers and back-layer preview presentation.
 - Owns shelf visual switching for `full` versus `floor_only` variants.
 - Owns row-placement visual switching for `left`, `middle`, and `right` shelf cells by toggling scene-authored `PlacementVisuals` containers.
+- Owns the optional scene-authored `CollapsingVisuals` layer. Collapsing boards enable its
+  darker vertical-grain back panel, stronger cabinet posts, warm top/front caps, and small metal
+  corner brackets; standard shelves keep the complete layer hidden.
 - Creates generated back-layer slot nodes for one shelf.
 - Applies back-layer preview item scale, tint, visibility, z-index, and disabled collision state.
 
@@ -2573,6 +2576,8 @@ Key methods:
   static shelf lip overhang to the floor-surface width, enables antialiasing on its moving polygon
   edges, and preserves item, slot, and input proportions.
 - `get_row_placement()`: returns the active shelf row placement.
+- `set_collapsing_visuals_enabled(should_enable)`: toggles the collapsing-only cabinet treatment
+  without changing shelf geometry, slots, input, or the shared light-oak art used by basic levels.
 - `set_top_ceiling_cap_visible(should_show)`: applies layout-derived visibility to every placement-specific `TopCeilingCap`, gated by the active shelf visual variant.
 - `add_back_layer(layer_index, front_slots)`: creates a generated back-layer container and slot nodes aligned to the shelf front slots.
 - `get_back_layer(layer_index)`: returns a generated back-layer container by index.

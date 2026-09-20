@@ -105,6 +105,7 @@ func register_shelf(column_index: int, authored_shelf_id: int, shelf: Shelf) -> 
 
 	column.add_shelf(shelf, authored_shelf_id)
 	shelf.set_row_placement(_get_column_row_placement(column_index))
+	shelf.set_collapsing_visuals_enabled(true)
 
 
 func get_authored_visible_count() -> int:
