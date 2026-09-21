@@ -1940,9 +1940,13 @@ def wrap_level(
     }
 
 
-def parse_args() -> argparse.Namespace:
+## The parser is built separately from parsing so wrappers such as
+## `scripts/tools/regenerate_level.py` can reuse every generator flag as an argparse parent instead
+## of restating the contract and drifting from it.
+def build_parser(add_help: bool = True) -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Generate the shelves array for a Sorting Puzzle level JSON file."
+        description="Generate the shelves array for a Sorting Puzzle level JSON file.",
+        add_help=add_help,
     )
     parser.add_argument(
         "--gameplay-mode",
@@ -2048,7 +2052,12 @@ def parse_args() -> argparse.Namespace:
             "Each shelf unlocks after that many cleared triples."
         ),
     )
-    args = parser.parse_args()
+    return parser
+
+
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = build_parser()
+    args = parser.parse_args(argv)
     validate_mode_arguments(parser, args)
     return args
 
@@ -2119,8 +2128,7 @@ def validate_mode_arguments(parser: argparse.ArgumentParser, args: argparse.Name
         )
 
 
-def main() -> int:
-    args = parse_args()
+def run(args: argparse.Namespace) -> int:
     is_collapsing = args.gameplay_mode == GAMEPLAY_MODE_COLLAPSING_COLUMNS
     layer_count = COLLAPSING_LAYER_COUNT if is_collapsing else args.layer_count
     filled_layer_count = args.filled_layer_count
@@ -2203,6 +2211,10 @@ def main() -> int:
         return 2
 
     return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    return run(parse_args(argv))
 
 
 if __name__ == "__main__":

@@ -354,6 +354,28 @@ py scripts\tools\generate_level_shelves.py --shelf-count 9 --layer-count 2 --ite
 py scripts\tools\materialize_level_templates.py
 ```
 
+`scripts\tools\regenerate_level.py` runs both steps for a single level. It takes every
+`generate_level_shelves.py` argument, derives the template path from `--level-number`, and writes
+`configs\level_templates\level_NNN.json` plus `configs\levels\level_NNN.json` only when generation
+and materialization both succeed:
+
+```powershell
+py scripts\tools\regenerate_level.py --level-number 2 --shelf-count 9 --layer-count 2 --item-type-count 7 --difficulty medium --seed 123 --stats
+```
+
+Differences from calling the two tools by hand:
+
+- `--level-number` is required and `--output` is rejected, because the level number selects which
+  shipped template is replaced.
+- `--require-solvable` is on unless `--allow-unsolvable` is passed.
+- Only the regenerated level is materialized, so other stale runtime levels are left alone; run
+  `materialize_level_templates.py` for a full sweep.
+- Top-level template differences, such as a hand-edited `layout_preset` or `time_seconds`, are
+  printed before the file is replaced. Generation does not preserve post-generation hand edits.
+- `--dry-run` reports those differences without writing.
+- Both written files are hashed in `configs/backend/content_provenance.json`, so regeneration makes
+  the published content digest stale.
+
 `--item-type-count` creates `item_01` through the requested count. When it is omitted, the generator
 uses `ceil(target_filled_slots / preferred_copies_per_type)` to infer the logical type count.
 `--preferred-copies-per-type` accepts integers or fractions of at least `3` and defaults to `3`.

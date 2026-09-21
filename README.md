@@ -36,6 +36,14 @@ item art.
 py scripts\tools\generate_level_shelves.py --shelf-count 9 --layer-count 2 --item-type-count 7 --difficulty medium --seed 123 --full-level --level-number 2 --output configs\level_templates\level_002.json --require-solvable --stats
 ```
 
+To regenerate an existing campaign level in place, use `scripts/tools/regenerate_level.py`. It takes
+the same generator arguments, derives the template path from `--level-number`, and materializes the
+runtime level in the same run:
+
+```powershell
+py scripts\tools\regenerate_level.py --level-number 2 --shelf-count 9 --layer-count 2 --item-type-count 7 --difficulty medium --seed 123 --stats
+```
+
 By default the tool prints only the abstract JSON array that belongs in a template's `shelves`
 field. `--item-type-count` explicitly controls how many distinct logical types the board uses.
 When it is omitted, the generator infers the count as
