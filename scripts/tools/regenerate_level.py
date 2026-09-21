@@ -13,8 +13,10 @@ The template path comes from `--level-number`, so `--output` is not accepted her
 from __future__ import annotations
 
 import argparse
+import hashlib
 import sys
 import tempfile
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -33,6 +35,30 @@ from level_item_progression import (
 DEFAULT_TEMPLATES_DIRECTORY = Path("configs/level_templates")
 DEFAULT_LEVELS_DIRECTORY = Path("configs/levels")
 PROVENANCE_PATH = Path("configs/backend/content_provenance.json")
+
+## The manifest sits beside the templates it describes. `materialize_level_templates.py` globs
+## `level_*.json`, so this name is not picked up as a template.
+MANIFEST_FILE_NAME = "generation_manifest.json"
+MANIFEST_SCHEMA_VERSION = 1
+
+## Wrapper plumbing and output switches say nothing about the board, so they stay out of the
+## record. Everything else the generator accepts is recorded, defaults included: a later change to
+## a generator default must not silently change what a replay of this entry produces.
+NON_GENERATION_ARGUMENTS = frozenset(
+    {
+        "allow_unsolvable",
+        "chapters_config",
+        "dry_run",
+        "full_level",
+        "item_config",
+        "levels_directory",
+        "no_record",
+        "output",
+        "progression_config",
+        "stats",
+        "templates_directory",
+    }
+)
 
 
 def build_wrapper_parser() -> argparse.ArgumentParser:
@@ -64,6 +90,11 @@ def build_wrapper_parser() -> argparse.ArgumentParser:
         "--dry-run",
         action="store_true",
         help="Generate and materialize, report what would change, but write nothing.",
+    )
+    parser.add_argument(
+        "--no-record",
+        action="store_true",
+        help=f"Skip updating {MANIFEST_FILE_NAME} with the arguments this run used.",
     )
     return parser
 
@@ -124,11 +155,114 @@ def describe_metadata_changes(
     return changes
 
 
+def argument_flag(argument_name: str) -> str:
+    return "--" + argument_name.replace("_", "-")
+
+
+## The recorded arguments are the replay contract, so they are stored structurally. A shell string
+## would be quoting-specific and would invite replaying a config file through a shell; the command
+## below is derived from these values for reading, not for being the source of truth.
+def resolved_seed(template: dict[str, Any]) -> int | None:
+    seed = template.get("seed")
+    return seed if isinstance(seed, int) else None
+
+
+## Values are recorded as the generator resolved them, not as they were requested: replaying an
+## entry has to rebuild this board even after a generator default moves.
+def build_recorded_arguments(
+    args: argparse.Namespace,
+    template: dict[str, Any],
+) -> dict[str, Any]:
+    recorded = {
+        argument_flag(name): value
+        for name, value in sorted(vars(args).items())
+        if name not in NON_GENERATION_ARGUMENTS
+    }
+    ## The generator draws a fresh seed when none is given and advances it on every retry, so the
+    ## board came from this seed rather than from whatever was requested.
+    recorded["--seed"] = resolved_seed(template)
+    ## A classic board falls back to the default preset when none is requested. A collapsing board
+    ## has no preset at all and must not be replayed with one.
+    if "layout_preset" in template:
+        recorded["--layout-preset"] = template["layout_preset"]
+    return recorded
+
+
+def format_command(recorded_arguments: dict[str, Any]) -> str:
+    parts = ["py", "scripts/tools/regenerate_level.py"]
+    for flag, value in recorded_arguments.items():
+        if value is None or value is False:
+            continue
+        parts.append(flag)
+        if value is not True:
+            parts.append(str(value))
+    return " ".join(parts)
+
+
+def sha256_text(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def load_manifest(manifest_path: Path) -> dict[str, Any]:
+    if not manifest_path.is_file():
+        return {"schema_version": MANIFEST_SCHEMA_VERSION, "entries": {}}
+
+    manifest = load_json_object(manifest_path)
+    schema_version = manifest.get("schema_version")
+    if schema_version != MANIFEST_SCHEMA_VERSION:
+        raise ValueError(
+            f"{manifest_path} schema_version must be {MANIFEST_SCHEMA_VERSION}, "
+            f"found {schema_version!r}"
+        )
+    if not isinstance(manifest.get("entries"), dict):
+        raise ValueError(f"{manifest_path} must contain an entries object")
+    return manifest
+
+
+def build_manifest_entry(
+    args: argparse.Namespace,
+    template: dict[str, Any],
+    template_text: str,
+) -> dict[str, Any]:
+    recorded_arguments = build_recorded_arguments(args, template)
+    return {
+        "command": format_command(recorded_arguments),
+        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "resolved_seed": resolved_seed(template),
+        "template_sha256": sha256_text(template_text),
+        "arguments": recorded_arguments,
+    }
+
+
+def write_manifest(
+    manifest_path: Path,
+    manifest: dict[str, Any],
+    file_name: str,
+    entry: dict[str, Any],
+) -> None:
+    manifest["entries"][file_name] = entry
+    manifest["entries"] = dict(sorted(manifest["entries"].items()))
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(format_json(manifest), encoding="utf-8")
+
+
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     file_name = level_file_name(args.level_number)
     template_path = args.templates_directory / file_name
     runtime_path = args.levels_directory / file_name
+    manifest_path = args.templates_directory / MANIFEST_FILE_NAME
+
+    ## An unreadable manifest is resolved before generation rather than after the level files have
+    ## already been replaced, so the run either records itself or changes nothing.
+    manifest: dict[str, Any] | None = None
+    if not args.no_record:
+        try:
+            manifest = load_manifest(manifest_path)
+        except (OSError, ValueError) as error:
+            print(f"error: {error}", file=sys.stderr)
+            print(f"error: {template_path} was not modified", file=sys.stderr)
+            return 1
 
     previous_template: dict[str, Any] | None = None
     if template_path.is_file():
@@ -180,7 +314,8 @@ def main(argv: list[str] | None = None) -> int:
         print("\n".join(changes))
 
     if args.dry_run:
-        print(f"dry run: would write {template_path} and {runtime_path}")
+        recorded = "" if manifest is None else f", and record it in {manifest_path}"
+        print(f"dry run: would write {template_path} and {runtime_path}{recorded}")
         return 0
 
     try:
@@ -188,12 +323,21 @@ def main(argv: list[str] | None = None) -> int:
         template_path.write_text(template_text, encoding="utf-8")
         runtime_path.parent.mkdir(parents=True, exist_ok=True)
         runtime_path.write_text(format_json(materialized), encoding="utf-8")
+        if manifest is not None:
+            write_manifest(
+                manifest_path,
+                manifest,
+                file_name,
+                build_manifest_entry(args, template, template_text),
+            )
     except OSError as error:
         print(f"error: {error}", file=sys.stderr)
         return 1
 
     print(f"wrote {template_path}")
     print(f"wrote {runtime_path}")
+    if manifest is not None:
+        print(f"recorded the generation arguments in {manifest_path}")
     print(
         f"note: {PROVENANCE_PATH} hashes both files and is now stale; republish content "
         "provenance before shipping this level."

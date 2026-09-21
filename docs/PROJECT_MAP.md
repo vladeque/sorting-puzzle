@@ -1080,6 +1080,7 @@ Files:
 - `configs/chapters.json`
 - `configs/item_progression.json`
 - `configs/level_templates/level_*.json`
+- `configs/level_templates/generation_manifest.json`
 - `configs/levels/level_*.json`
 - `scenes/layouts/layout_*.tscn`
 - `scripts/tools/generate_level_shelves.py`

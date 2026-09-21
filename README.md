@@ -37,8 +37,9 @@ py scripts\tools\generate_level_shelves.py --shelf-count 9 --layer-count 2 --ite
 ```
 
 To regenerate an existing campaign level in place, use `scripts/tools/regenerate_level.py`. It takes
-the same generator arguments, derives the template path from `--level-number`, and materializes the
-runtime level in the same run:
+the same generator arguments, derives the template path from `--level-number`, materializes the
+runtime level in the same run, and records the arguments it used in
+`configs/level_templates/generation_manifest.json` so the level can be rebuilt later:
 
 ```powershell
 py scripts\tools\regenerate_level.py --level-number 2 --shelf-count 9 --layer-count 2 --item-type-count 7 --difficulty medium --seed 123 --stats

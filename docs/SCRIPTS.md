@@ -3544,7 +3544,15 @@ Key behavior:
   as level 5's `layout_preset` or level 3's `time_seconds`, which regeneration reverts.
 - Warns when a runtime level exists with no template behind it, as level 10 does.
 - Materializes only the regenerated level; `materialize_level_templates.py` remains the full sweep.
-- `--dry-run` reports the same differences without writing.
+- Records every successful run in `configs/level_templates/generation_manifest.json`, keyed by
+  level file name, unless `--no-record` is passed. The manifest name does not match the
+  materializer's `level_*.json` glob.
+- Records arguments structurally, defaults included, and derives the readable `command` from them;
+  a shell string is not the replay contract. Values are the resolved ones, so `--seed` is the seed
+  the board came from after any retry and `--layout-preset` is the preset the template carries.
+  `template_sha256` lets a later run detect a template that was hand-edited after generation.
+- Reads the manifest before generating, so an unusable one stops the run before any file changes.
+- `--dry-run` reports the same differences without writing or recording.
 - Propagates the generator's exit codes (`2` invalid item counts, `3` no solvable layout) and
   returns `1` for materialization failures.
 

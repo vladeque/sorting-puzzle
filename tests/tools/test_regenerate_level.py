@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import contextlib
+import hashlib
 import io
 import json
+import shlex
 import sys
 import tempfile
 import unittest
@@ -15,6 +17,8 @@ sys.path.insert(0, str(TOOLS_PATH))
 
 from generate_level_shelves import main as generate_main  # noqa: E402
 from regenerate_level import (  # noqa: E402
+    MANIFEST_FILE_NAME,
+    MANIFEST_SCHEMA_VERSION,
     describe_metadata_changes,
     level_file_name,
     parse_args,
@@ -275,6 +279,194 @@ class RegenerationTests(unittest.TestCase):
 
             self.assertEqual(exit_code, 0)
             self.assertIn("authored by hand", stderr)
+
+
+class GenerationManifestTests(unittest.TestCase):
+    def regenerate(
+        self,
+        directory: Path,
+        arguments: list[str],
+    ) -> tuple[int, str, str, Path, Path]:
+        templates_directory = directory / "templates"
+        levels_directory = directory / "levels"
+        exit_code, stdout, stderr = run_regenerate(
+            [
+                *arguments,
+                "--templates-directory",
+                str(templates_directory),
+                "--levels-directory",
+                str(levels_directory),
+            ]
+        )
+        return exit_code, stdout, stderr, templates_directory, levels_directory
+
+    def read_manifest(self, templates_directory: Path) -> dict:
+        return json.loads(
+            (templates_directory / MANIFEST_FILE_NAME).read_text(encoding="utf-8")
+        )
+
+    def test_records_the_arguments_the_run_used(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            exit_code, stdout, _stderr, templates_directory, _levels = self.regenerate(
+                Path(directory), [*BASE_ARGUMENTS, "--level-number", "2"]
+            )
+
+            self.assertEqual(exit_code, 0)
+            self.assertIn("recorded the generation arguments", stdout)
+            manifest = self.read_manifest(templates_directory)
+            self.assertEqual(manifest["schema_version"], MANIFEST_SCHEMA_VERSION)
+            entry = manifest["entries"][level_file_name(2)]
+            self.assertEqual(entry["resolved_seed"], 123)
+            self.assertEqual(entry["arguments"]["--shelf-count"], 9)
+            self.assertEqual(entry["arguments"]["--difficulty"], "easy")
+            self.assertTrue(entry["arguments"]["--require-solvable"])
+            self.assertTrue(entry["command"].startswith("py scripts/tools/regenerate_level.py"))
+            self.assertIn("--seed 123", entry["command"])
+
+            template_text = (templates_directory / level_file_name(2)).read_text(
+                encoding="utf-8"
+            )
+            self.assertEqual(
+                entry["template_sha256"],
+                hashlib.sha256(template_text.encode("utf-8")).hexdigest(),
+            )
+
+    ## Recording the requested seed would lose the board whenever one was not given or a retry
+    ## advanced it, which is exactly when the record matters most.
+    def test_records_the_seed_the_generator_resolved(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            arguments = [argument for argument in BASE_ARGUMENTS if argument not in ("--seed", "123")]
+            _exit_code, _stdout, _stderr, templates_directory, _levels = self.regenerate(
+                Path(directory), [*arguments, "--level-number", "2"]
+            )
+
+            entry = self.read_manifest(templates_directory)["entries"][level_file_name(2)]
+            template = json.loads(
+                (templates_directory / level_file_name(2)).read_text(encoding="utf-8")
+            )
+            self.assertIsInstance(entry["resolved_seed"], int)
+            self.assertEqual(entry["resolved_seed"], template["seed"])
+            self.assertIn(f"--seed {template['seed']}", entry["command"])
+
+    def test_records_the_resolved_layout_preset(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            _exit_code, _stdout, _stderr, templates_directory, _levels = self.regenerate(
+                Path(directory), [*BASE_ARGUMENTS, "--level-number", "2"]
+            )
+
+            entry = self.read_manifest(templates_directory)["entries"][level_file_name(2)]
+            self.assertEqual(entry["arguments"]["--layout-preset"], "grid_3x3")
+
+    ## A collapsing board is rejected when it is replayed with a layout preset, so the record must
+    ## not invent one.
+    def test_omits_the_layout_preset_for_collapsing_columns(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            exit_code, _stdout, _stderr, templates_directory, _levels = self.regenerate(
+                Path(directory),
+                [
+                    "--level-number",
+                    "9",
+                    "--gameplay-mode",
+                    "collapsing_columns",
+                    "--column-heights",
+                    "9,9,9",
+                    "--visible-shelves-per-column",
+                    "4",
+                    "--item-type-count",
+                    "14",
+                    "--difficulty",
+                    "medium",
+                    "--seed",
+                    "9009",
+                ],
+            )
+
+            self.assertEqual(exit_code, 0)
+            entry = self.read_manifest(templates_directory)["entries"][level_file_name(9)]
+            self.assertIsNone(entry["arguments"]["--layout-preset"])
+            self.assertNotIn("--layout-preset", entry["command"])
+            self.assertEqual(entry["arguments"]["--column-heights"], "9,9,9")
+
+    ## The record is only worth keeping if replaying it rebuilds the same board.
+    def test_the_recorded_command_reproduces_the_level(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            _exit_code, _stdout, _stderr, templates_directory, levels_directory = self.regenerate(
+                root / "first", [*BASE_ARGUMENTS, "--level-number", "2"]
+            )
+            entry = self.read_manifest(templates_directory)["entries"][level_file_name(2)]
+
+            replay_arguments = shlex.split(entry["command"])[2:]
+            _replay_code, _out, _err, replay_templates, replay_levels = self.regenerate(
+                root / "replay", replay_arguments
+            )
+
+            self.assertEqual(
+                (templates_directory / level_file_name(2)).read_text(encoding="utf-8"),
+                (replay_templates / level_file_name(2)).read_text(encoding="utf-8"),
+            )
+            self.assertEqual(
+                (levels_directory / level_file_name(2)).read_text(encoding="utf-8"),
+                (replay_levels / level_file_name(2)).read_text(encoding="utf-8"),
+            )
+
+    def test_keeps_existing_entries_sorted(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.regenerate(root, [*BASE_ARGUMENTS, "--level-number", "3"])
+            _exit_code, _stdout, _stderr, templates_directory, _levels = self.regenerate(
+                root, [*BASE_ARGUMENTS, "--level-number", "2"]
+            )
+
+            entries = self.read_manifest(templates_directory)["entries"]
+            self.assertEqual(list(entries), [level_file_name(2), level_file_name(3)])
+
+    def test_no_record_leaves_no_manifest(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            exit_code, stdout, _stderr, templates_directory, _levels = self.regenerate(
+                Path(directory), [*BASE_ARGUMENTS, "--level-number", "2", "--no-record"]
+            )
+
+            self.assertEqual(exit_code, 0)
+            self.assertNotIn("recorded", stdout)
+            self.assertFalse((templates_directory / MANIFEST_FILE_NAME).exists())
+
+    def test_dry_run_records_nothing(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            exit_code, stdout, _stderr, templates_directory, _levels = self.regenerate(
+                Path(directory), [*BASE_ARGUMENTS, "--level-number", "2", "--dry-run"]
+            )
+
+            self.assertEqual(exit_code, 0)
+            self.assertIn("would write", stdout)
+            self.assertFalse((templates_directory / MANIFEST_FILE_NAME).exists())
+
+    ## An unusable manifest has to stop the run before the level files are replaced, so the run
+    ## never half-applies.
+    def test_an_unreadable_manifest_stops_the_run_before_writing(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            templates_directory = Path(directory) / "templates"
+            templates_directory.mkdir()
+            (templates_directory / MANIFEST_FILE_NAME).write_text(
+                json.dumps({"schema_version": 99, "entries": {}}), encoding="utf-8"
+            )
+
+            exit_code, _stdout, stderr = run_regenerate(
+                [
+                    *BASE_ARGUMENTS,
+                    "--level-number",
+                    "2",
+                    "--templates-directory",
+                    str(templates_directory),
+                    "--levels-directory",
+                    str(Path(directory) / "levels"),
+                ]
+            )
+
+            self.assertEqual(exit_code, 1)
+            self.assertIn("schema_version must be", stderr)
+            self.assertIn("was not modified", stderr)
+            self.assertFalse((templates_directory / level_file_name(2)).exists())
 
 
 if __name__ == "__main__":

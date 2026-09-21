@@ -376,6 +376,41 @@ Differences from calling the two tools by hand:
 - Both written files are hashed in `configs/backend/content_provenance.json`, so regeneration makes
   the published content digest stale.
 
+### Generation manifest
+
+Every successful run records itself in `configs/level_templates/generation_manifest.json`, so a
+level can be rebuilt later without recovering its arguments from git history. Pass `--no-record` to
+skip the update. The file is ignored by `materialize_level_templates.py`, whose glob only matches
+`level_*.json`.
+
+```json
+{
+  "schema_version": 1,
+  "entries": {
+    "level_002.json": {
+      "command": "py scripts/tools/regenerate_level.py --difficulty easy ... --seed 484481165",
+      "generated_at": "2026-09-21T00:25:41Z",
+      "resolved_seed": 484481165,
+      "template_sha256": "8a024000378039ff...",
+      "arguments": { "--shelf-count": 9, "--difficulty": "easy", "...": "..." }
+    }
+  }
+}
+```
+
+- `arguments` is the replay contract and holds every generator argument, defaults included, so a
+  later change to a generator default cannot silently change what a replay produces. `command` is
+  derived from it for reading and pasting; the structured values are what a future batch
+  regeneration should consume.
+- Values are recorded as the generator resolved them, not as they were requested. `--seed` is the
+  seed the board actually came from, which matters when none was given or a `--require-solvable`
+  retry advanced it, and `--layout-preset` is the preset the template was wrapped with. Collapsing
+  levels record no preset, because replaying one with a preset is rejected.
+- `template_sha256` is the template as generated. A later mismatch against the file on disk means
+  the template was hand-edited after generation, and regenerating it will revert that edit.
+- Entries stay sorted by file name, and an unreadable or unsupported manifest stops the run before
+  any level file is replaced.
+
 `--item-type-count` creates `item_01` through the requested count. When it is omitted, the generator
 uses `ceil(target_filled_slots / preferred_copies_per_type)` to infer the logical type count.
 `--preferred-copies-per-type` accepts integers or fractions of at least `3` and defaults to `3`.
