@@ -45,6 +45,7 @@ const SHELF_TYPE_DISPENSER := "dispenser"
 const DISPENSER_LOWER_CLEARANCE := 32.0
 const MOVING_SHELF_ROW_SCENE := preload("res://scenes/moving_shelf_row.tscn")
 const COLLAPSING_SHELF_BOARD_SCENE := preload("res://scenes/collapsing_shelf_board.tscn")
+const ShelfOuterShadowGroupScript := preload("res://scripts/shelf_outer_shadow_group.gd")
 const ITEM_SCENE := preload("res://scenes/item.tscn")
 const HAMMER_IMPACT_EFFECT_SCENE := preload("res://scenes/abilities/hammer_impact_effect.tscn")
 const ITEM_SPRITES_CONFIG := "res://configs/item_sprites.json"
@@ -72,8 +73,6 @@ const SHELF_CONFIG_ID_META := &"config_shelf_id"
 const LOCKED_OVERLAY_NAME := "LockedOverlay"
 const SHELF_VISUAL_VARIANT_META := &"visual_variant"
 const SHELF_TOP_CEILING_CAP_NAME := "TopCeilingCap"
-const SHELF_BOTTOM_SHADOW_NAME := "Shadow"
-const SHELF_RIGHT_COLUMN_SHADOW_NAME := "RightColumnShadow"
 const ROW_LAYOUTS_KEY := "row_layouts"
 const ROW_MOTION_HORIZONTAL_WRAP := "horizontal_wrap"
 const ROW_MOTION_VERTICAL_WRAP := "vertical_wrap"
@@ -185,6 +184,7 @@ var _drag_layer: Node2D
 var _background: Control
 var _chapter_artwork: TextureRect
 var _shelves_root: Node2D
+var _shelf_outer_shadow_group
 var _top_hud: LevelTopHud
 var _star_reward_effect_layer: Control
 var _failure_screen: LevelFailureScreen
@@ -1072,6 +1072,7 @@ func _apply_level_config(config: Dictionary) -> void:
 	_layout_preset = str(config.get("layout_preset", DEFAULT_LAYOUT_PRESET))
 	var shelves := get_node("Shelves") as Node2D
 	_clear_shelves(shelves)
+	_setup_shelf_outer_shadow_group()
 
 	var row_layouts := config.get(ROW_LAYOUTS_KEY, []) as Array
 	if CollapsingRules.is_collapsing(config):
@@ -1107,9 +1108,21 @@ func activate_after_loading_transition() -> void:
 
 
 func _clear_shelves(shelves: Node) -> void:
+	_shelf_outer_shadow_group = null
 	for child in shelves.get_children():
 		shelves.remove_child(child)
 		child.free()
+
+
+func _setup_shelf_outer_shadow_group() -> void:
+	if _shelves_root == null:
+		return
+
+	var shadow_group := ShelfOuterShadowGroupScript.new()
+	shadow_group.name = "OuterShadowComposite"
+	_shelves_root.add_child(shadow_group)
+	_shelves_root.move_child(shadow_group, 0)
+	_shelf_outer_shadow_group = shadow_group
 
 
 func _add_preset_layout_shelves(shelves: Node2D, shelves_config: Array) -> void:
@@ -1785,13 +1798,6 @@ func _apply_shelf_row_placement(shelf: Node2D, row_placement: String) -> void:
 
 func _update_shelf_perspective_edges() -> void:
 	var shelves := _get_all_shelves()
-	# Restore the authored exterior cast bounds before measuring intersections. This keeps repeated
-	# responsive relayouts deterministic after a previous pass partitioned shared shadow strips.
-	for shelf_node in shelves:
-		var shelf_cell := shelf_node as Shelf
-		if shelf_cell != null:
-			shelf_cell.set_exterior_shadow_connections(false, false, false, false)
-
 	for shelf_node in shelves:
 		var shelf := shelf_node as Node2D
 		if shelf == null:
@@ -1801,66 +1807,10 @@ func _update_shelf_perspective_edges() -> void:
 		if _collapsing_board != null and _collapsing_board.owns_shelf(shelf):
 			continue
 
-		_apply_shelf_exterior_shadow_connections(shelf, shelves)
 		_set_shelf_top_ceiling_cap_visible(shelf, not _has_stacked_shelf_above(shelf, shelves))
-		_set_shelf_bottom_shadow_visible(shelf)
-		_set_shelf_right_column_shadow_visible(shelf)
 
-
-func _apply_shelf_exterior_shadow_connections(shelf: Node2D, shelves: Array[Node]) -> void:
-	var shelf_cell := shelf as Shelf
-	if shelf_cell == null:
-		return
-
-	var shelf_position := _get_shelf_root_local_position(shelf)
-	var bottom_bounds := _get_shelf_shadow_bounds(shelf, SHELF_BOTTOM_SHADOW_NAME)
-	var right_bounds := _get_shelf_shadow_bounds(shelf, SHELF_RIGHT_COLUMN_SHADOW_NAME)
-	var has_left_neighbor := false
-	var has_right_neighbor := false
-	var has_above_neighbor := false
-	var has_below_neighbor := false
-	for other_node in shelves:
-		var other_shelf := other_node as Node2D
-		if other_shelf == null or other_shelf == shelf:
-			continue
-		if str(other_shelf.get_meta(SHELF_VISUAL_VARIANT_META, SHELF_VISUAL_VARIANT_FULL)) != SHELF_VISUAL_VARIANT_FULL:
-			continue
-
-		var other_position := _get_shelf_root_local_position(other_shelf)
-		if absf(other_position.y - shelf_position.y) <= LAYOUT_ROW_VERTICAL_EPSILON:
-			var other_bottom_bounds := _get_shelf_shadow_bounds(other_shelf, SHELF_BOTTOM_SHADOW_NAME)
-			if bottom_bounds.intersects(other_bottom_bounds):
-				if other_position.x < shelf_position.x:
-					has_left_neighbor = true
-				elif other_position.x > shelf_position.x:
-					has_right_neighbor = true
-
-		if absf(other_position.x - shelf_position.x) <= LAYOUT_ROW_VERTICAL_EPSILON:
-			var other_right_bounds := _get_shelf_shadow_bounds(other_shelf, SHELF_RIGHT_COLUMN_SHADOW_NAME)
-			if right_bounds.intersects(other_right_bounds):
-				if other_position.y < shelf_position.y:
-					has_above_neighbor = true
-				elif other_position.y > shelf_position.y:
-					has_below_neighbor = true
-
-	shelf_cell.set_exterior_shadow_connections(
-		has_left_neighbor,
-		has_right_neighbor,
-		has_above_neighbor,
-		has_below_neighbor
-	)
-
-
-func _get_shelf_shadow_bounds(shelf: Node2D, shadow_name: String) -> Rect2:
-	var shadow := shelf.get_node_or_null(shadow_name) as Polygon2D
-	if shadow == null or shadow.polygon.is_empty():
-		return Rect2()
-
-	var first_point := _shelves_root.to_local(shadow.to_global(shadow.polygon[0]))
-	var bounds := Rect2(first_point, Vector2.ZERO)
-	for point in shadow.polygon:
-		bounds = bounds.expand(_shelves_root.to_local(shadow.to_global(point)))
-	return bounds
+	if _shelf_outer_shadow_group != null:
+		_shelf_outer_shadow_group.rebuild(shelves)
 
 
 func _has_stacked_shelf_above(shelf: Node2D, shelves: Array[Node]) -> bool:
@@ -1931,24 +1881,6 @@ func _set_shelf_top_ceiling_cap_visible(shelf: Node2D, should_show: bool) -> voi
 
 	var visual_variant := str(shelf.get_meta(SHELF_VISUAL_VARIANT_META, SHELF_VISUAL_VARIANT_FULL))
 	cap.visible = should_show and visual_variant == SHELF_VISUAL_VARIANT_FULL
-
-
-func _set_shelf_bottom_shadow_visible(shelf: Node2D) -> void:
-	var shadow := shelf.get_node_or_null(SHELF_BOTTOM_SHADOW_NAME) as CanvasItem
-	if shadow == null:
-		return
-
-	var visual_variant := str(shelf.get_meta(SHELF_VISUAL_VARIANT_META, SHELF_VISUAL_VARIANT_FULL))
-	shadow.visible = visual_variant == SHELF_VISUAL_VARIANT_FULL
-
-
-func _set_shelf_right_column_shadow_visible(shelf: Node2D) -> void:
-	var shadow := shelf.get_node_or_null(SHELF_RIGHT_COLUMN_SHADOW_NAME) as CanvasItem
-	if shadow == null:
-		return
-
-	var visual_variant := str(shelf.get_meta(SHELF_VISUAL_VARIANT_META, SHELF_VISUAL_VARIANT_FULL))
-	shadow.visible = visual_variant == SHELF_VISUAL_VARIANT_FULL
 
 
 func _get_grid_layout_positions(columns: int, shelf_count: int) -> Array[Vector2]:

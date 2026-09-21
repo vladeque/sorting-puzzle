@@ -4,8 +4,8 @@
 [ext_resource type="PackedScene" uid="uid://drsqf13pi65oc" path="res://scenes/shelf_layer_indicator.tscn" id="2_layer_indicator"]
 [ext_resource type="PackedScene" uid="uid://5oa3wa7li56n" path="res://scenes/ui/shelf_lock_overlay.tscn" id="3_lock_overlay"]
 [ext_resource type="Texture2D" uid="uid://c40e6qjm2qu7a" path="res://assets/shelves/standard_shelf_light_oak.png" id="4_wood_texture"]
-[ext_resource type="Material" path="res://assets/shelves/materials/shelf_soft_cast_shadow.tres" id="5_bottom_cast_shadow"]
-[ext_resource type="Material" path="res://assets/shelves/materials/shelf_soft_cast_shadow_right.tres" id="6_right_cast_shadow"]
+[ext_resource type="Material" uid="uid://d4nc18edttckq" path="res://assets/shelves/materials/shelf_soft_cast_shadow.tres" id="5_bottom_cast_shadow"]
+[ext_resource type="Material" uid="uid://dt0sr4bosocx2" path="res://assets/shelves/materials/shelf_soft_cast_shadow_right.tres" id="6_right_cast_shadow"]
 [ext_resource type="Material" path="res://assets/shelves/materials/dispenser_left_inset_shadow.tres" id="7_left_inset_shadow"]
 [ext_resource type="Material" path="res://assets/shelves/materials/dispenser_right_inset_shadow.tres" id="8_right_inset_shadow"]
 
@@ -16,13 +16,13 @@ script = ExtResource("1_dispenser_script")
 [node name="FrameShadow" type="Polygon2D" parent="." unique_id=524841963]
 material = ExtResource("5_bottom_cast_shadow")
 antialiased = true
-polygon = PackedVector2Array(-44, 48, 44, 48, 56, 62, -32, 62)
+polygon = PackedVector2Array(-44, 48, 44, 48, 62, 62, -32, 62)
 uv = PackedVector2Array(0, 0, 1, 0, 1, 1, 0, 1)
 
-[node name="FrameRightShadow" type="Polygon2D" parent="."]
+[node name="FrameRightShadow" type="Polygon2D" parent="." unique_id=575040907]
 material = ExtResource("6_right_cast_shadow")
 antialiased = true
-polygon = PackedVector2Array(44, -44, 44, 48, 62, 62, 62, -28)
+polygon = PackedVector2Array(37, -44, 44, 48, 62, 62, 62, -28, 43, -44)
 uv = PackedVector2Array(0, 0, 0, 1, 1, 1, 1, 0)
 
 [node name="BackWall" type="Polygon2D" parent="." unique_id=946599686]
@@ -39,7 +39,7 @@ material = ExtResource("7_left_inset_shadow")
 antialiased = true
 polygon = PackedVector2Array(-34, -44, -22, -44, -22, 16, -34, 16)
 
-[node name="BackWallRightShade" type="Polygon2D" parent="."]
+[node name="BackWallRightShade" type="Polygon2D" parent="." unique_id=1656602762]
 z_index = 2
 material = ExtResource("8_right_inset_shadow")
 antialiased = true
@@ -108,6 +108,7 @@ z_index = 8
 position = Vector2(0, 44)
 
 [node name="LockedOverlay" parent="." unique_id=1773331882 instance=ExtResource("3_lock_overlay")]
+visible = false
 overlay_half_width = 34.0
 overlay_top = -70.0
 wall_cover_top = -40.0

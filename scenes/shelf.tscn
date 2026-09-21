@@ -5,8 +5,8 @@
 [ext_resource type="Texture2D" uid="uid://c40e6qjm2qu7a" path="res://assets/shelves/standard_shelf_light_oak.png" id="3_wood_texture"]
 [ext_resource type="Material" path="res://assets/shelves/materials/shelf_top_inset_shadow.tres" id="4_top_inset_shadow"]
 [ext_resource type="Material" path="res://assets/shelves/materials/shelf_left_inset_shadow.tres" id="5_left_inset_shadow"]
-[ext_resource type="Material" path="res://assets/shelves/materials/shelf_soft_cast_shadow.tres" id="6_bottom_cast_shadow"]
-[ext_resource type="Material" path="res://assets/shelves/materials/shelf_soft_cast_shadow_right.tres" id="7_right_cast_shadow"]
+[ext_resource type="Material" uid="uid://d4nc18edttckq" path="res://assets/shelves/materials/shelf_soft_cast_shadow.tres" id="6_bottom_cast_shadow"]
+[ext_resource type="Material" uid="uid://dt0sr4bosocx2" path="res://assets/shelves/materials/shelf_soft_cast_shadow_right.tres" id="7_right_cast_shadow"]
 [ext_resource type="Material" uid="uid://cmgiqw5v31s4f" path="res://assets/shelves/materials/shelf_floor_corner_shadow.tres" id="9_floor_corner_shadow"]
 [ext_resource type="Material" path="res://assets/shelves/materials/collapsing_top_inset_shadow.tres" id="10_collapsing_top_shadow"]
 [ext_resource type="Material" path="res://assets/shelves/materials/collapsing_left_inset_shadow.tres" id="11_collapsing_left_shadow"]
@@ -22,6 +22,8 @@ uv = PackedVector2Array(0, 0, 1, 0, 1, 1, 0, 1)
 
 [node name="RightColumnShadow" type="Polygon2D" parent="." unique_id=356530628]
 material = ExtResource("7_right_cast_shadow")
+position = Vector2(0, 9.863838)
+scale = Vector2(1, 1.0899165)
 antialiased = true
 polygon = PackedVector2Array(109, -109.7, 109, 46, 137, 46, 137, -98.7)
 uv = PackedVector2Array(0, 0, 0, 1, 1, 1, 1, 0)
@@ -34,6 +36,8 @@ polygon = PackedVector2Array(-104, -90.7, 104, -90.7, 104, 16, -104, 16)
 [node name="BackWallTopShade" type="Polygon2D" parent="." unique_id=2086175922]
 z_index = 2
 material = ExtResource("4_top_inset_shadow")
+position = Vector2(0, 2.8858948)
+scale = Vector2(1, 1.031818)
 antialiased = true
 polygon = PackedVector2Array(-104, -90.7, 104, -90.7, 104, -68.7, -104, -68.7)
 
@@ -128,6 +132,8 @@ uv = PackedVector2Array(128, 760, 128, 792, 668, 792, 668, 760)
 [node name="BackWallLeftShade" type="Polygon2D" parent="PlacementVisuals/Middle" unique_id=1865343099]
 z_index = 1
 material = ExtResource("5_left_inset_shadow")
+position = Vector2(43.333344, 0)
+scale = Vector2(1.4166666, 1)
 antialiased = true
 polygon = PackedVector2Array(-104, -90.7, -80, -90.7, -80, 16, -104, 16)
 

@@ -848,6 +848,9 @@ Verification:
 Files:
 - `scenes/shelf.tscn`
 - `scripts/shelf.gd`
+- `scripts/shelf_outer_shadow_group.gd`
+- `assets/shelves/materials/shelf_composite_cast_shadow.tres`
+- `assets/shelves/materials/shelf_composite_cast_shadow_right.tres`
 - `assets/shelves/standard_shelf_light_oak.png`
 - `scripts/tools/captures/standard_shelf_setup.gd`
 - `tests/gameplay/test_standard_shelf_wood_texture.gd`
@@ -862,9 +865,10 @@ Responsibility:
   light-oak floor/frame/lip, and hidden top edge details shown by `scripts/level.gd` for shelves with
   no stacked neighbor above. One shared material image is sampled horizontally for broad faces and
   with rotated UVs for vertical supports; the former line-only grain nodes remain hidden. Shelf cast
-  shadows draw below generated back-layer item previews and remain enabled for full shelves so
-  neighboring shelf bodies and items cover them. Runtime partitions the casts at shared horizontal
-  and vertical boundaries so adjacent translucent polygons meet without darkening their overlap.
+  shadows draw below generated back-layer item previews. In levels, full standard/moving shelf casts
+  are mirrored into one level-owned `CanvasGroup`: normalized coverage overlaps inside the group,
+  then the final shadow opacity is applied once. Complete authored polygons therefore work for both
+  regular and staggered templates without neighbor-specific midpoint cuts or doubled dark seams.
 - Instances the reusable hidden lock overlay used by triple-gated shelves; the shelf owns only its
   placement, while `ShelfLockOverlay` owns chains, lock, badge, labels, and motion.
 - Keeps the shelf width and slot positions aligned with the level grid constants so a three-shelf
@@ -1081,6 +1085,7 @@ Files:
 - `scripts/tools/generate_level_shelves.py`
 - `scripts/tools/level_item_progression.py`
 - `scripts/tools/materialize_level_templates.py`
+- `scripts/tools/regenerate_level.py`
 - `scripts/tools/validate_level_solvable.py`
 
 Responsibility:

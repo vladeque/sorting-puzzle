@@ -2062,9 +2062,10 @@ Key responsibilities:
   left/middle/right row placement visuals for static shelves, and ask `Shelf` to add generated back
   layers. `scenes/dispenser_shelf.tscn` uses this offset to sit 10px higher than standard shelves.
 - Ask each shelf scene to show or hide its placement-specific `TopCeilingCap` when it has no stacked
-  neighbor above. Show each full shelf's bottom `Shadow` and `RightColumnShadow`, detect neighboring
-  cast bounds, and partition their shared horizontal/vertical strips at the midpoint so translucent
-  shadows meet without alpha-compounding while exposed wall/background areas still receive them.
+  neighbor above. Full-shelf bottom/right casts are handed to one level-owned
+  `ShelfOuterShadowGroup`: it mirrors complete authored polygons into a shared coverage layer and
+  applies the final translucency once, so staggered or irregular layouts do not need pairwise
+  midpoint cuts and overlapping casts cannot double the final shadow strength.
 - Load `layout_preset` scene templates from `scenes/layouts/`, group authored `ShelfXX` markers into
   rows by position, expand their logical row distances by the taller-frame allowance around the
   layout center (including proportional half-row expansion for staggered columns), and place
@@ -2533,6 +2534,28 @@ Verification:
 Do not use for:
 - Ability inventory, target selection, item deletion, score/star rules, or shelf resolution.
 
+## `scripts/shelf_outer_shadow_group.gd`
+
+Class: `ShelfOuterShadowGroup`, extending `CanvasGroup`.
+
+Purpose:
+- Owns the level-wide composite for standard/moving shelves' exterior `Shadow` and
+  `RightColumnShadow` polygons.
+- `rebuild(shelves)` creates lightweight polygon mirrors beneath the shelf bodies, switches each
+  source shelf to composited exterior-shadow visibility, and retains the complete authored cast
+  geometry instead of editing it around inferred neighbors.
+- Normalizes bottom and right falloff coverage through
+  `shelf_composite_cast_shadow*.tres`; the group's `0.16` alpha is then applied once to the merged
+  draw. Right casts retain their previous `0.14` standalone maximum through `0.875` mask coverage.
+- Tracks source global transforms, modulation, shelf visibility, and destruction fades every frame,
+  so moving rows and animated shelf removal keep their cast proxies attached.
+- `clear()` restores standalone source visibility before discarding the mirrors. Collapsing shelf
+  cells do not register because their board already owns one footprint-wide cast.
+
+Depends on:
+- `scripts/shelf.gd` for exterior-shadow eligibility and local/composited visibility.
+- `assets/shaders/shelf_linear_shadow.gdshader` through the two normalized mask materials.
+
 ## `scripts/shelf.gd`
 
 Class:
@@ -2575,9 +2598,10 @@ Key methods:
 - `set_visual_variant(visual_variant)`: applies `full` or `floor_only` shelf presentation and records the active variant as metadata for `scripts/level.gd` shelf edge and cast-shadow visibility checks.
 - `get_visual_variant()`: returns the active shelf visual variant.
 - `set_row_placement(row_placement)`: toggles the matching `PlacementVisuals/Left`, `PlacementVisuals/Middle`, or `PlacementVisuals/Right` container and records the active placement as metadata.
-- `set_exterior_shadow_connections(left, right, above, below)`: trims only the shared portions of
-  the bottom and right exterior cast polygons. The union of the original silhouettes is preserved,
-  but adjacent shelves no longer draw two translucent layers into the same pixels.
+- `set_exterior_shadows_composited(should_composite)`: suppresses or restores the shelf-local bottom
+  and right casts while `ShelfOuterShadowGroup` mirrors them at level scope.
+- `should_show_exterior_shadows()`: reports whether this shelf variant owns exterior casts at all;
+  floor-only moving shelves and collapsing cells return false.
 - `set_horizontal_visual_scale(horizontal_scale)`: narrows shelf artwork for a moving row, trims the
   static shelf lip overhang to the floor-surface width, enables antialiasing on its moving polygon
   edges, and preserves item, slot, and input proportions.
@@ -3459,6 +3483,11 @@ Depends on:
 - `scripts/tools/level_item_progression.py` for canonical logical item IDs.
 - `scripts/tools/validate_level_solvable.py` for validation and optional solvability checks.
 
+Composition:
+- `build_parser()` returns the CLI contract, `parse_args(argv)` validates mode conflicts, and
+  `run(args)` performs the generation. `scripts/tools/regenerate_level.py` reuses all three rather
+  than restating the flags or shelling out.
+
 Use when:
 - Creating or regenerating level shelf layouts.
 
@@ -3495,6 +3524,40 @@ Purpose:
 
 Use when:
 - A template, item milestone, mapping salt, or item catalog changes.
+
+## `scripts/tools/regenerate_level.py`
+
+Purpose:
+- Regenerates one campaign level end to end: generates the template with
+  `generate_level_shelves.py`, materializes it, and writes both files.
+
+Key behavior:
+- Reuses every generator flag through `generate_level_shelves.build_parser()` as an argparse parent,
+  so the two tools cannot drift apart.
+- `--level-number` is required and `--output` is rejected; the template path is
+  `configs/level_templates/level_NNN.json` and the runtime path is `configs/levels/level_NNN.json`.
+- Forces `--full-level`, and forces `--require-solvable` unless `--allow-unsolvable` is given.
+- Generates into a temporary file and writes nothing until materialization succeeds, so a rejected
+  board contract or an exhausted chapter item pool cannot strand a replaced template against a
+  runtime level that was never rewritten.
+- Prints every top-level template difference before replacing the file, including hand edits such
+  as level 5's `layout_preset` or level 3's `time_seconds`, which regeneration reverts.
+- Warns when a runtime level exists with no template behind it, as level 10 does.
+- Materializes only the regenerated level; `materialize_level_templates.py` remains the full sweep.
+- `--dry-run` reports the same differences without writing.
+- Propagates the generator's exit codes (`2` invalid item counts, `3` no solvable layout) and
+  returns `1` for materialization failures.
+
+Depends on:
+- `scripts/tools/generate_level_shelves.py` (`build_parser`, `run`, `validate_mode_arguments`).
+- `scripts/tools/level_item_progression.py` for progression loading and materialization.
+
+Verification:
+- `tests/tools/test_regenerate_level.py`.
+
+Do not use for:
+- Regenerating every level at once, or for refreshing `configs/backend/content_provenance.json`,
+  which hashes both written files and goes stale on every regeneration.
 
 ## `scripts/tools/validate_level_solvable.py`
 

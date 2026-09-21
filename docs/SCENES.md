@@ -2352,8 +2352,10 @@ Important nodes:
   faces use the same light-oak material and are shown at runtime only for top shelves.
 - `Shadow` and `RightColumnShadow`: soft translucent perspective cast shadows, shown at runtime for
   full shelf visuals and drawn below shelf bodies, items, and generated back-layer item previews.
-  Their UV-driven fade is independent of the level background color. `scripts/level.gd` detects
-  neighboring cast bounds and asks `scripts/shelf.gd` to partition only their overlapping strips.
+  Their UV-driven fade is independent of the level background color. In a gameplay level the
+  authored nodes remain stable effect targets but are visually mirrored by the level-owned
+  `ShelfOuterShadowGroup`; the shared `CanvasGroup` applies final opacity once, preventing overlap
+  darkening in regular and staggered templates without changing these polygons per neighbor.
 - `FloorCornerShade`: two-axis procedural corner occlusion where the back, side, and floor meet.
 - `FloorSurface` and `FloorFrontLip`: image-textured wooden floor where items visually rest.
 - `FloorGrain*`: retained hidden as legacy editable guides; the image texture now supplies visible

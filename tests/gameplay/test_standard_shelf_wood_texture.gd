@@ -7,6 +7,7 @@ extends SceneTree
 const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
 const SHELF_SCENE_PATH := "res://scenes/shelf.tscn"
 const ITEM_SCENE_PATH := "res://scenes/item.tscn"
+const ShelfOuterShadowGroupScript := preload("res://scripts/shelf_outer_shadow_group.gd")
 const WOOD_TEXTURE_PATH := "res://assets/shelves/standard_shelf_light_oak.png"
 const BACK_WALL_SHADOW_SHADER_PATH := "res://assets/shaders/shelf_back_wall_shadow.gdshader"
 const LINEAR_SHADOW_SHADER_PATH := "res://assets/shaders/shelf_linear_shadow.gdshader"
@@ -158,43 +159,61 @@ func _run() -> void:
 		"The floor corner should use a feathered two-axis occlusion shader."
 	)
 	_check_taller_frame_geometry(shelf)
-	_check_exterior_shadow_partitioning(shelf)
+	_check_exterior_shadow_geometry(shelf)
+	_check_exterior_shadow_composite(packed_scene)
 	_check_item_shadow_layers_over_shelf_shadows(shelf)
 
 	shelf.free()
 	_finish()
 
 
-func _check_exterior_shadow_partitioning(shelf: Shelf) -> void:
+func _check_exterior_shadow_geometry(shelf: Shelf) -> void:
 	var bottom_shadow := shelf.get_node_or_null("Shadow") as Polygon2D
 	var right_shadow := shelf.get_node_or_null("RightColumnShadow") as Polygon2D
-	shelf.set_exterior_shadow_connections(false, true, false, true)
 	_check(
 		bottom_shadow != null
-			and is_equal_approx(bottom_shadow.polygon[1].x, 108.0)
-			and is_equal_approx(bottom_shadow.polygon[2].x, 114.0),
-		"A bottom cast should end at the midpoint of its shared strip on the right."
+			and bottom_shadow.polygon == PackedVector2Array([
+				Vector2(-112, 46), Vector2(112, 46), Vector2(118, 60), Vector2(-106, 60),
+			]),
+		"The bottom cast should keep its complete authored polygon; the level composite owns overlap."
 	)
 	_check(
 		right_shadow != null
-			and is_equal_approx(right_shadow.polygon[1].y, 36.5)
-			and is_equal_approx(right_shadow.polygon[2].y, 42.0),
-		"A right cast should end at the midpoint of its shared strip below."
+			and right_shadow.polygon == PackedVector2Array([
+				Vector2(109, -109.7), Vector2(109, 46), Vector2(137, 46), Vector2(137, -98.7),
+			]),
+		"The right cast should keep its complete authored polygon; the level composite owns overlap."
 	)
-	shelf.set_exterior_shadow_connections(true, false, true, false)
+
+
+func _check_exterior_shadow_composite(packed_scene: PackedScene) -> void:
+	var harness := Node2D.new()
+	root.add_child(harness)
+	var group := ShelfOuterShadowGroupScript.new()
+	harness.add_child(group)
+	var shelf := packed_scene.instantiate() as Shelf
+	harness.add_child(shelf)
+	group.rebuild([shelf])
+
 	_check(
-		bottom_shadow != null
-			and is_equal_approx(bottom_shadow.polygon[0].x, -108.0)
-			and is_equal_approx(bottom_shadow.polygon[3].x, -102.0),
-		"A bottom cast should begin at the midpoint of its shared strip on the left."
+		group is CanvasGroup and is_equal_approx(group.self_modulate.a, 0.16),
+		"Exterior casts should receive opacity once from a shared CanvasGroup."
 	)
 	_check(
-		right_shadow != null
-			and is_equal_approx(right_shadow.polygon[0].y, -100.2)
-			and is_equal_approx(right_shadow.polygon[3].y, -94.7),
-		"A right cast should begin at the midpoint of its shared strip above."
+		group.get_child_count() == 2,
+		"The shared group should mirror both authored exterior casts."
 	)
-	shelf.set_exterior_shadow_connections(false, false, false, false)
+	_check(
+		not shelf.get_node("Shadow").visible
+			and not shelf.get_node("RightColumnShadow").visible,
+		"A composited shelf should suppress its local exterior casts."
+	)
+	group.clear()
+	_check(
+		shelf.get_node("Shadow").visible and shelf.get_node("RightColumnShadow").visible,
+		"Clearing the composite should restore standalone shelf casts."
+	)
+	harness.free()
 
 
 func _check_taller_frame_geometry(shelf: Node) -> void:

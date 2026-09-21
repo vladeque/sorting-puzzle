@@ -1,8 +1,8 @@
-[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+[gd_resource type="ShaderMaterial" format=3 uid="uid://dt0sr4bosocx2"]
 
-[ext_resource type="Shader" path="res://assets/shaders/shelf_linear_shadow.gdshader" id="1_shader"]
+[ext_resource type="Shader" uid="uid://bsuflmpwm6yrc" path="res://assets/shaders/shelf_linear_shadow.gdshader" id="1_shader"]
 
 [resource]
 shader = ExtResource("1_shader")
-shader_parameter/shadow_color = Color(0.16, 0.1, 0.06, 0.14)
+shader_parameter/shadow_color = Color(0.16078432, 0.101960786, 0.05882353, 0.1764706)
 shader_parameter/fade_axis = Vector2(1, 0)
