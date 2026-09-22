@@ -2,6 +2,7 @@ extends Control
 
 const PROFILE_MENU_SCENE := preload("res://scenes/ui/profile_menu.tscn")
 const SETTINGS_MENU_SCENE := preload("res://scenes/ui/settings_menu.tscn")
+const LANGUAGE_SELECTION_MODAL_SCENE := preload("res://scenes/ui/language_selection_modal.tscn")
 const SUPPORT_SCREEN_SCENE := preload("res://scenes/ui/support_screen.tscn")
 const REWARD_CHEST_MENU_SCENE := preload("res://scenes/ui/reward_chest_menu.tscn")
 const CHAPTER_SELECTION_SCENE := preload("res://scenes/ui/chapter_selection_screen.tscn")
@@ -55,6 +56,7 @@ const AD_PRIVACY_POLICY_SETTING := "application/config/ad_privacy_policy_url"
 var _life_status_refresh_time := 0.0
 var _profile_menu: Control
 var _settings_menu: Control
+var _language_selection_modal: Control
 var _support_screen: Control
 var _reward_chest_menu: Control
 var _chapter_selection_screen: Control
@@ -158,6 +160,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	if is_instance_valid(_chapter_selection_screen):
 		return
 	if is_instance_valid(_support_screen):
+		return
+	if is_instance_valid(_language_selection_modal):
 		return
 
 	if _out_of_lives_menu.visible:
@@ -548,6 +552,7 @@ func _open_settings_menu() -> void:
 	_settings_menu = SETTINGS_MENU_SCENE.instantiate() as Control
 	_add_main_menu_overlay(_settings_menu)
 	_settings_menu.connect("support_requested", Callable(self, "_open_support_screen"))
+	_settings_menu.connect("language_requested", Callable(self, "_open_language_selection_modal"))
 	_settings_menu.connect("ad_privacy_requested", Callable(self, "_on_ad_privacy_requested"))
 	_refresh_ad_compliance_actions()
 
@@ -561,6 +566,15 @@ func _open_settings_menu() -> void:
 func _close_settings_menu() -> void:
 	if is_instance_valid(_settings_menu):
 		UIMotionScript.close_with_fade(_settings_menu, _settings_menu.queue_free)
+
+
+func _open_language_selection_modal() -> void:
+	if is_instance_valid(_language_selection_modal):
+		return
+	_language_selection_modal = LANGUAGE_SELECTION_MODAL_SCENE.instantiate() as Control
+	_language_selection_modal.z_index = MAIN_MENU_OVERLAY_Z_INDEX + 1
+	add_child(_language_selection_modal)
+	_language_selection_modal.tree_exited.connect(_clear_language_selection_modal_reference)
 
 
 func _refresh_ad_compliance_actions() -> void:
@@ -669,6 +683,10 @@ func _clear_profile_menu_reference() -> void:
 
 func _clear_settings_menu_reference() -> void:
 	_settings_menu = null
+
+
+func _clear_language_selection_modal_reference() -> void:
+	_language_selection_modal = null
 
 
 func _clear_support_screen_reference() -> void:

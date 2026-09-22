@@ -1140,7 +1140,7 @@ Purpose:
 - Centered pause-style settings window opened from the production main menu over a dimmed modal background.
 - Reuses the pause menu visual treatment for the warm outer panel, cream inner panel, `Settings` title, protruding red close button, and saved music / sound-effects / vibration icon toggles.
 - Restores the wide `Support` and `Language` actions under the settings toggles. `Support` opens the
-  native FAQ screen; `Language` remains the existing placeholder until localization is implemented.
+  native FAQ screen; `Language` opens the focused locale-selection modal above Settings.
 - Keeps a separate policy-driven privacy action labeled `Privacy Choices` when UMP requires its
   form or `Privacy Policy` when backed by a configured HTTPS URL. It stays hidden when neither
   route is available.
@@ -1155,7 +1155,8 @@ Important nodes:
 - `PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption/SoundEffectsButton`: square sound effects toggle button with shadow-only button styling, held-press scaling, and a plain red diagonal marker when disabled.
 - `PauseMenuPanel/InnerPanel/IconRow/VibrationOption/VibrationButton`: square phone vibration toggle button with shadow-only button styling, held-press scaling, and a plain red diagonal marker when disabled.
 - `PauseMenuPanel/InnerPanel/ActionColumn/SupportButton`: opens `scenes/ui/support_screen.tscn`.
-- `PauseMenuPanel/InnerPanel/ActionColumn/LanguageButton`: restored localization placeholder.
+- `PauseMenuPanel/InnerPanel/ActionColumn/LanguageButton`: opens
+  `scenes/ui/language_selection_modal.tscn` above the still-open Settings modal.
 - `PauseMenuPanel/InnerPanel/ActionColumn/AdPrivacyButton`: optional policy-driven privacy
   choices/policy action. All three actions use `assets/ui/level_button_blank_light_blue_new.png`.
 - `PauseMenuPanel/InnerPanel/DiagnosticsLabel`: non-interactive build/platform/user diagnostics.
@@ -1171,6 +1172,31 @@ Do not use for:
 - Applying actual music or ad compliance policy. Sound effects and vibration are applied by their
   global runtime managers through `scripts/pause_menu.gd`; `scripts/production_main_menu.gd` owns
   the HTTPS/UMP routes and action visibility.
+
+## `scenes/ui/language_selection_modal.tscn`
+
+Root:
+- `LanguageSelectionModal` (`Control`)
+
+Script:
+- `scripts/language_selection_modal.gd`
+
+Purpose:
+- Presents the eleven approved release locales in a vertically scrollable list.
+- Keeps row selection pending until Confirm; X or `ui_cancel` discards it.
+- Confirms through the `LocaleManager` autoload, immediately updates `TranslationServer`, persists
+  the local preference, and closes back to the still-open Settings modal.
+- Uses English development labels only. No translation resources are authored by this feature.
+
+Important nodes:
+- `%Shell`: shared safe-area-aware gameplay modal shell.
+- `%LanguageScroll` / `%LanguageList`: scrollable language-row owner.
+- `%ConfirmButton`: applies only the pending supported locale.
+
+Depends on:
+- `scenes/ui/language_option_row.tscn` for reusable selected/unselected rows.
+- `scripts/localization/locale_catalog.gd` and the `LocaleManager` autoload.
+- `PlayerProgress` local preferences for restart persistence.
 
 ## `scenes/ui/support_screen.tscn`
 

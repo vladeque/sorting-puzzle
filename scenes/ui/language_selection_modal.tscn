@@ -1,0 +1,65 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/gameplay_modal_shell.tscn" id="1_shell"]
+[ext_resource type="Script" path="res://scripts/language_selection_modal.gd" id="2_script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/level_button.tscn" id="3_button"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_scroll"]
+
+[node name="LanguageSelectionModal" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+script = ExtResource("2_script")
+
+[node name="Shell" parent="." instance=ExtResource("1_shell")]
+unique_name_in_owner = true
+layout_mode = 1
+
+[node name="LanguageContent" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ContentMargin" type="MarginContainer" parent="LanguageContent"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="LanguageScroll" type="ScrollContainer" parent="LanguageContent/ContentMargin"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxEmpty_scroll")
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 1
+
+[node name="LanguageList" type="VBoxContainer" parent="LanguageContent/ContentMargin/LanguageScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="ConfirmButton" parent="." instance=ExtResource("3_button")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 78)
+layout_mode = 1
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 31
+text = "CONFIRM"

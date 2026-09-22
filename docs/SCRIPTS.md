@@ -2975,9 +2975,9 @@ Purpose:
 - Settings buttons are located by name (`find_child(name, true, false)`) rather than a fixed
   NodePath, so this one script keeps working for both `scenes/pause_menu.tscn`'s shell-composed
   layout and `scenes/ui/settings_menu.tscn`'s own unrelated `PauseMenuPanel/InnerPanel/IconRow` layout.
-- On the Main Menu variant, emits `support_requested` for the restored Support button and
-  `ad_privacy_requested` for the optional privacy action. Reporting an ad is owned by the support
-  FAQ instead of consuming another Settings slot.
+- On the Main Menu variant, emits `support_requested`, `language_requested`, and
+  `ad_privacy_requested` for the focused overlay/policy owners. Reporting an ad is owned by the
+  support FAQ instead of consuming another Settings slot.
 - Initializes every pause-menu and main-menu settings instance from the saved disabled-state dictionary so matching buttons stay visually synchronized after game restarts.
 - Populates the Main Menu Settings `DiagnosticsLabel`, when present, from the configured app
   version/build, `OS.get_name()`, and a shortened active player or installation identifier.
@@ -3006,6 +3006,26 @@ Depends on:
 Do not use for:
 - Applying actual music settings until that runtime system exists.
 - Level pause, continue, or leave flow. Those stay in `scripts/level.gd`.
+
+## `scripts/language_selection_modal.gd`
+
+Attached to:
+- `scenes/ui/language_selection_modal.tscn`
+
+Purpose:
+- Builds the scrollable release-language list from `LocaleManager`.
+- Owns pending selection and selected-row visuals without mutating runtime locale on row press.
+- Applies and persists the pending locale only on Confirm, while X/Back discard it.
+- Fits the shared modal shell inside mobile safe areas and scrolls the active locale into view.
+
+## `scripts/localization/locale_catalog.gd` and `locale_manager.gd`
+
+Purpose:
+- Catalog owns the exact eleven-locale allowlist, English development labels, validation, and
+  supported first-run device-locale mapping.
+- Manager applies the saved locale during autoload startup and coordinates atomic local preference
+  persistence with `TranslationServer.set_locale()`.
+- Neither owner creates translations or emits backend operations.
 
 ## `scripts/support_screen.gd`
 

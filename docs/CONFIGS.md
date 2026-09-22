@@ -760,8 +760,8 @@ Runtime files:
 
 The gameplay snapshot schema is version 9. It retains campaign completion maps, account-scoped
 offer claims, reward-chest cycles, moderation state, the four-ability inventory, and the
-authoritative public `avatar_frame_id`; it intentionally excludes `settings_disabled`, which
-belongs to `preferences`.
+authoritative public `avatar_frame_id`; it intentionally excludes `settings_disabled` and
+`locale`, which belong to local `preferences`.
 
 Runtime behavior:
 - Fresh saves start at level 1 with five lives, 300 gold coins, three uses for each ability, `avatar_cat` selected as the profile avatar, a generated `player_` name with a five-character random suffix, and all settings buttons enabled.
@@ -780,6 +780,8 @@ Runtime behavior:
   current attempt only. It adds no cleared triples, stars, or combo, and leaves every other shelf's
   `unlock_after_triples` countdown unchanged.
 - Settings button disabled states are saved immediately when toggled and restored by the main-menu settings popup and in-level pause menu on later game starts.
+- The approved locale is stored beside those local preferences, applied through `LocaleManager` on
+  startup, and excluded from backend snapshots and journal operations.
 - Failed or abandoned levels do not refund ability uses.
 - Completing the current campaign level advances `current_level` by one and adds the run's earned stars to the reward chest.
 - The same completion adds stars to `total_earned_stars` and `weekly_earned_stars`; neither is reduced by reward chest rollover.

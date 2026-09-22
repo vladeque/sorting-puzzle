@@ -17,6 +17,7 @@ signal setting_toggled(setting_id: StringName, is_disabled: bool)
 signal leave_pressed
 signal continue_pressed
 signal support_requested
+signal language_requested
 signal ad_privacy_requested
 
 const SETTING_MUSIC := &"music"
@@ -83,6 +84,9 @@ func _ready() -> void:
 	var support_button := find_child("SupportButton", true, false) as Button
 	if support_button != null:
 		support_button.pressed.connect(func() -> void: support_requested.emit())
+	var language_button := find_child("LanguageButton", true, false) as Button
+	if language_button != null:
+		language_button.pressed.connect(func() -> void: language_requested.emit())
 	var ad_privacy_button := find_child("AdPrivacyButton", true, false) as Button
 	if ad_privacy_button != null:
 		ad_privacy_button.pressed.connect(func() -> void: ad_privacy_requested.emit())

@@ -11,6 +11,7 @@ const ContentProvenanceManifestScript := preload(
 	"res://scripts/save/content_provenance_manifest.gd"
 )
 const AdPacingStateScript := preload("res://scripts/ads/ad_pacing_state.gd")
+const LocaleCatalogScript := preload("res://scripts/localization/locale_catalog.gd")
 const SAVE_PATH := "user://player_progress.json"
 const SAVE_VERSION := 9
 const MIN_LEVEL := 1
@@ -115,6 +116,7 @@ func load_progress() -> void:
 	var initial_data := _sanitize_data(legacy_data if not legacy_data.is_empty() else _default_data())
 	var initial_preferences := {
 		"settings_disabled": initial_data.get("settings_disabled", DEFAULT_DISABLED_SETTINGS).duplicate(true),
+		"locale": initial_data.get("locale", _default_locale()),
 		"selected_chapter_id": initial_data.get("selected_chapter_id", _default_chapter_id()),
 		"ad_pacing_state": initial_data.get(
 			"ad_pacing_state",
@@ -122,6 +124,7 @@ func load_progress() -> void:
 		).duplicate(true),
 	}
 	initial_data.erase("settings_disabled")
+	initial_data.erase("locale")
 	initial_data.erase("selected_chapter_id")
 	initial_data.erase("ad_pacing_state")
 	if _account_coordinator == null:
@@ -515,6 +518,21 @@ func get_disabled_settings() -> Dictionary:
 	return disabled_settings.duplicate()
 
 
+func get_locale() -> String:
+	return LocaleCatalogScript.sanitize_saved_locale(str(_data.get("locale", _default_locale())))
+
+
+func set_locale(locale: String) -> bool:
+	if not LocaleCatalogScript.is_supported(locale):
+		return false
+	var sanitized := LocaleCatalogScript.sanitize_saved_locale(locale)
+	if get_locale() == sanitized:
+		return true
+	var previous_data := _data.duplicate(true)
+	_data["locale"] = sanitized
+	return _commit_or_restore(previous_data)
+
+
 ## Local-only ad pacing is a preference partition: it controls presentation frequency but cannot
 ## grant economy or gameplay state and is never emitted as a backend journal operation.
 func get_ad_pacing_state() -> Dictionary:
@@ -818,6 +836,9 @@ func _sanitize_data(raw_data: Dictionary) -> Dictionary:
 	sanitized["player_name"] = _sanitize_player_name(str(raw_data.get("player_name", sanitized["player_name"])), sanitized["player_name"])
 	sanitized["moderation_state"] = str(raw_data.get("moderation_state", "active"))
 	sanitized["settings_disabled"] = _sanitize_disabled_settings(raw_data.get("settings_disabled", {}))
+	sanitized["locale"] = LocaleCatalogScript.sanitize_saved_locale(str(
+		raw_data.get("locale", _default_locale())
+	))
 	sanitized["ad_pacing_state"] = AdPacingStateScript.sanitize(
 		raw_data.get("ad_pacing_state", {})
 	)
@@ -885,6 +906,7 @@ func _default_data() -> Dictionary:
 		"player_name": _generate_player_name(),
 		"moderation_state": "active",
 		"settings_disabled": DEFAULT_DISABLED_SETTINGS.duplicate(),
+		"locale": _default_locale(),
 		"ad_pacing_state": AdPacingStateScript.create_default(),
 		"selected_chapter_id": _default_chapter_id(),
 		"total_earned_stars": 0,
@@ -946,6 +968,10 @@ func _sanitize_disabled_settings(raw_settings) -> Dictionary:
 		sanitized[setting_key] = bool(raw_dictionary.get(setting_key, sanitized[setting_key]))
 
 	return sanitized
+
+
+func _default_locale() -> String:
+	return LocaleCatalogScript.resolve_device_locale(OS.get_locale())
 
 
 func _get_processed_shop_purchase_ids() -> Array:
@@ -1387,6 +1413,7 @@ func _apply_loaded_partitions(snapshot: Dictionary, preferences: Dictionary) -> 
 		"settings_disabled",
 		DEFAULT_DISABLED_SETTINGS
 	)
+	combined["locale"] = preferences.get("locale", _default_locale())
 	combined["selected_chapter_id"] = preferences.get(
 		"selected_chapter_id",
 		_default_chapter_id()
@@ -1405,6 +1432,7 @@ func _snapshot_for_storage() -> Dictionary:
 func _snapshot_without_preferences(source: Dictionary) -> Dictionary:
 	var snapshot := source.duplicate(true)
 	snapshot.erase("settings_disabled")
+	snapshot.erase("locale")
 	snapshot.erase("selected_chapter_id")
 	snapshot.erase("ad_pacing_state")
 	return snapshot
@@ -1413,6 +1441,7 @@ func _snapshot_without_preferences(source: Dictionary) -> Dictionary:
 func _preferences_for_storage() -> Dictionary:
 	return {
 		"settings_disabled": get_disabled_settings(),
+		"locale": get_locale(),
 		"selected_chapter_id": get_selected_chapter_id(),
 		"ad_pacing_state": get_ad_pacing_state(),
 	}

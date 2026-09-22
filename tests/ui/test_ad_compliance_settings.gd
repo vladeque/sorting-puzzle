@@ -40,14 +40,18 @@ func _run() -> void:
 			privacy_button.visible and privacy_button.text == "Privacy Choices",
 			"The owner can expose consent choices without rebuilding the scene."
 		)
-		var emitted := {"privacy": false, "support": false}
+		var emitted := {"privacy": false, "support": false, "language": false}
 		menu.connect("support_requested", func() -> void: emitted["support"] = true)
+		menu.connect("language_requested", func() -> void: emitted["language"] = true)
 		menu.connect("ad_privacy_requested", func() -> void: emitted["privacy"] = true)
 		support_button.pressed.emit()
+		language_button.pressed.emit()
 		privacy_button.pressed.emit()
 		_check(
-			bool(emitted.get("privacy", false)) and bool(emitted.get("support", false)),
-			"Settings emits focused support and privacy requests."
+			bool(emitted.get("privacy", false))
+			and bool(emitted.get("support", false))
+			and bool(emitted.get("language", false)),
+			"Settings emits focused support, language, and privacy requests."
 		)
 	_check(diagnostics_label != null, "Settings owns a diagnostics footer.")
 	if diagnostics_label != null:
