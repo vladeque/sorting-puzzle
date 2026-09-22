@@ -296,8 +296,9 @@ func _layout_immediately() -> void:
 
 ## The window and the board's peek rows render; everything deeper in the stack stays hidden. The
 ## topmost rendered shelf carries the ceiling cap, so a column that really ends here visibly ends,
-## while one that continues keeps its cap above the clip edge instead of drawing it over the shelf
-## peeking in -- the cap sits on a higher z index than the floor that should cover it.
+## while one that continues keeps its cap above the clip edge, out of sight. The cap draws beneath
+## every shelf wall and floor, so a column shorter than its neighbors tucks its cap under their
+## shared walls instead of painting over them.
 func _apply_window_state() -> void:
 	var render_count := get_render_count()
 	for stack_index in range(_shelves.size()):

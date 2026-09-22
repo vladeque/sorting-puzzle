@@ -138,7 +138,12 @@ $env:SORTING_PUZZLE_CAPTURE_COLLAPSE_LEVEL = '9'
     -Setup scripts/tools/captures/collapsing_columns_motion_setup.gd
 & .\scripts\tools\capture_ui.ps1 -Scene level.tscn -Name collapsing_columns_destruction -Position '0,0' -Settle 120 `
     -Setup scripts/tools/captures/collapsing_columns_destruction_setup.gd
+& .\scripts\tools\capture_ui.ps1 -Scene level.tscn -Name collapsing_columns_uneven -Position '0,0' -Settle 30 `
+    -Setup scripts/tools/captures/collapsing_columns_uneven_setup.gd
 ```
+
+The uneven setup collapses the fixture's middle column below both neighbors, so its top shelf's
+ceiling cap meets their shared walls. The cap must stop at those walls rather than paint across them.
 
 The capture setups rebuild the board on every resize, because the level resolves its window only
 when a board is built. The progress and motion setups replay the fixture's recorded solution

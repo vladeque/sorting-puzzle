@@ -36,6 +36,7 @@ func _run() -> void:
 
 	_verify_cap_geometry_constant()
 	_verify_construction_and_window()
+	_verify_short_column_cap_tucks_under_neighbor_walls()
 	await _verify_removing_the_lowest_shelf()
 	await _verify_removing_a_middle_shelf()
 	await _verify_removing_the_top_visible_shelf_reveals_the_next()
@@ -136,6 +137,51 @@ func _verify_cap_geometry_constant() -> void:
 		"Shelf.TOP_CEILING_CAP_TOP_Y must match the cap art in scenes/shelf.tscn (found %s)." % top
 	)
 	shelf.free()
+
+
+## A column that ends below both neighbors caps its top shelf right where their shared walls run past
+## it. The cap spans the full frame width, so its ends overlap those walls and must draw beneath them.
+func _verify_short_column_cap_tucks_under_neighbor_walls() -> void:
+	var board := _make_board([3, 1, 3], 3)
+	var middle_top := _shelf_by_id(board, 3)
+	var cap := middle_top.get_node("PlacementVisuals/Middle/TopCeilingCap/BackBoard") as Polygon2D
+	_check(_cap_visible(middle_top), "The short middle column's only shelf carries the ceiling cap.")
+	var neighbor_walls := {
+		"left column's right wall": _shelf_by_id(board, 1).get_node("PlacementVisuals/Left/RightWall"),
+		"right column's left wall": _shelf_by_id(board, 5).get_node("PlacementVisuals/Right/LeftWall"),
+	}
+	for wall_name in neighbor_walls:
+		var wall := neighbor_walls[wall_name] as Polygon2D
+		_check(
+			_global_polygon_rect(cap).intersection(_global_polygon_rect(wall)).get_area() > 1.0,
+			"The middle cap should reach under the %s, or this check proves nothing." % wall_name
+		)
+		_check(
+			_effective_z(cap) < _effective_z(wall),
+			"The middle cap must draw beneath the %s (cap z %s, wall z %s)."
+				% [wall_name, _effective_z(cap), _effective_z(wall)]
+		)
+	board.free()
+
+
+func _effective_z(item: CanvasItem) -> int:
+	var z := 0
+	var node: Node = item
+	while node is CanvasItem:
+		var canvas_item := node as CanvasItem
+		z += canvas_item.z_index
+		if not canvas_item.z_as_relative:
+			break
+		node = node.get_parent()
+	return z
+
+
+func _global_polygon_rect(polygon: Polygon2D) -> Rect2:
+	var transform := polygon.get_global_transform()
+	var rect := Rect2(transform * polygon.polygon[0], Vector2.ZERO)
+	for point in polygon.polygon:
+		rect = rect.expand(transform * point)
+	return rect
 
 
 func _verify_construction_and_window() -> void:

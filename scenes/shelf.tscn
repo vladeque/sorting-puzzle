@@ -94,7 +94,7 @@ polygon = PackedVector2Array(104, -98.7, 112, -98.7, 112, 46, 104, 46)
 uv = PackedVector2Array(416, 720, 416, 752, 956, 752, 956, 720)
 
 [node name="TopCeilingCap" type="Node2D" parent="PlacementVisuals/Left" unique_id=38665874]
-z_index = 7
+z_index = 3
 
 [node name="BackBoard" type="Polygon2D" parent="PlacementVisuals/Left/TopCeilingCap" unique_id=1551102547]
 color = Color(0.6784314, 0.57254905, 0.45882353, 1)
@@ -141,7 +141,7 @@ antialiased = true
 polygon = PackedVector2Array(-104, -90.7, -80, -90.7, -80, 16, -104, 16)
 
 [node name="TopCeilingCap" type="Node2D" parent="PlacementVisuals/Middle" unique_id=1909899807]
-z_index = 7
+z_index = 3
 
 [node name="BackBoard" type="Polygon2D" parent="PlacementVisuals/Middle/TopCeilingCap" unique_id=74705353]
 color = Color(0.6784314, 0.57254905, 0.45882353, 1)
@@ -194,7 +194,7 @@ polygon = PackedVector2Array(-112, -98.7, -104, -98.7, -104, 46, -112, 46)
 uv = PackedVector2Array(224, 840, 224, 872, 764, 872, 764, 840)
 
 [node name="TopCeilingCap" type="Node2D" parent="PlacementVisuals/Right" unique_id=1886034244]
-z_index = 7
+z_index = 3
 
 [node name="BackBoard" type="Polygon2D" parent="PlacementVisuals/Right/TopCeilingCap" unique_id=1203583019]
 color = Color(0.6779363, 0.5734225, 0.45722067, 1)

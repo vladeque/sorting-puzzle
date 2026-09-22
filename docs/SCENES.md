@@ -2426,7 +2426,11 @@ Important nodes:
 - `PlacementVisuals/Middle`: middle shelf role visuals. Contains row divider art and the middle-specific `TopCeilingCap`.
 - `PlacementVisuals/Right`: right shelf role visuals. Contains right edge art and the right-specific `TopCeilingCap`.
 - `Ceiling`: shared image-textured wooden top frame. Placement-specific `TopCeilingCap/BackBoard`
-  faces use the same light-oak material and are shown at runtime only for top shelves.
+  faces use the same light-oak material and are shown at runtime only for top shelves. Every
+  `TopCeilingCap` sits at `z_index` 3, the `Ceiling`'s layer and beneath all walls (4 and 8) and
+  floors (5). A cap spans the full frame width, so when a neighboring shelf rises past it (a
+  staggered or hollow template, or a collapsing column that has fallen below its neighbors) the
+  cap's ends tuck under that neighbor's shared wall instead of painting across it.
 - `Shadow` and `RightColumnShadow`: soft translucent perspective cast shadows, shown at runtime for
   full shelf visuals and drawn below shelf bodies, items, and generated back-layer item previews.
   Their UV-driven fade is independent of the level background color. In a gameplay level the
