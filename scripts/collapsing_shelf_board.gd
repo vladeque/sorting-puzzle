@@ -22,11 +22,10 @@ const COLUMN_SCENE := preload("res://scenes/collapsing_shelf_column.tscn")
 ## deepest window this board is built to draw, and the ceiling on any authored minimum.
 const MAX_VISIBLE_SHELVES_PER_COLUMN := 8
 const WINDOW_NODE := "Window"
-const BOTTOM_SHADOW_NODE := "BoardBottomShadow"
-const RIGHT_SHADOW_NODE := "BoardRightShadow"
-const FRAME_BOTTOM_Y := 46.0
-const CAST_SHADOW_DEPTH := 16.0
-const CAST_SHADOW_SKEW := 14.0
+## Every cell casts the same exterior shadows a classic shelf does, merged into one mask so stacked
+## rows cannot compound at their seams. It lives inside the clip window, drawn before the columns,
+## so a shelf waiting above the board is cut off together with its casts.
+const OUTER_SHADOW_NODE := "Window/OuterShadowComposite"
 
 ## Only the window's top edge clips anything: that is where shelves wait before they drop in. The
 ## other three edges sit this far out so items travelling between columns, or gathered by the
@@ -127,6 +126,7 @@ func register_shelf(column_index: int, authored_shelf_id: int, shelf: Shelf) -> 
 	column.add_shelf(shelf, authored_shelf_id)
 	shelf.set_row_placement(_get_column_row_placement(column_index))
 	shelf.set_collapsing_visuals_enabled(true)
+	_get_outer_shadow_group().add_shelf(shelf)
 
 
 func get_authored_visible_count() -> int:
@@ -414,7 +414,6 @@ func _get_tallest_authored_column() -> int:
 func _layout_window() -> void:
 	var window := _get_window()
 	var footprint := get_layout_bounds_for_visible_count(_visible_count)
-	_layout_board_shadows(footprint)
 	var top_row := clampi(_visible_count, 1, maxi(_get_tallest_authored_column(), 1)) - 1
 	var window_top := -float(top_row) * _shelf_step.y - _get_cap_rise() - get_peek_height()
 	var window_rect := Rect2(
@@ -439,41 +438,6 @@ func _layout_window() -> void:
 		column.set_peek_row_count(peek_rows)
 
 
-## The dense cabinet gets one background-independent exterior cast instead of allowing every
-## shelf cell to stack its own translucent polygons at internal seams.
-func _layout_board_shadows(footprint: Rect2) -> void:
-	var bottom_shadow := get_node_or_null(BOTTOM_SHADOW_NODE) as Polygon2D
-	var right_shadow := get_node_or_null(RIGHT_SHADOW_NODE) as Polygon2D
-	if bottom_shadow == null or right_shadow == null or footprint.size == Vector2.ZERO:
-		return
-
-	var contact_bottom := FRAME_BOTTOM_Y * _shelf_scale
-	var depth := CAST_SHADOW_DEPTH * _shelf_scale
-	var skew := CAST_SHADOW_SKEW * _shelf_scale
-	var left := footprint.position.x
-	var right := footprint.end.x
-	var top := footprint.position.y
-
-	bottom_shadow.polygon = PackedVector2Array([
-		Vector2(left, contact_bottom),
-		Vector2(right, contact_bottom),
-		Vector2(right + skew, contact_bottom + depth),
-		Vector2(left + skew, contact_bottom + depth),
-	])
-	bottom_shadow.uv = PackedVector2Array([
-		Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(0, 1),
-	])
-	right_shadow.polygon = PackedVector2Array([
-		Vector2(right, top),
-		Vector2(right, contact_bottom),
-		Vector2(right + depth, contact_bottom + skew),
-		Vector2(right + depth, top + skew),
-	])
-	right_shadow.uv = PackedVector2Array([
-		Vector2(0, 0), Vector2(0, 1), Vector2(1, 1), Vector2(1, 0),
-	])
-
-
 func _apply_column_durations() -> void:
 	for column in _columns:
 		column.destroy_duration_seconds = destroy_duration_seconds
@@ -482,6 +446,7 @@ func _apply_column_durations() -> void:
 
 
 func _clear_columns() -> void:
+	_get_outer_shadow_group().clear()
 	for column in _columns:
 		if column != null and is_instance_valid(column):
 			column.get_parent().remove_child(column)
@@ -493,3 +458,7 @@ func _clear_columns() -> void:
 
 func _get_window() -> Control:
 	return get_node(WINDOW_NODE) as Control
+
+
+func _get_outer_shadow_group() -> ShelfOuterShadowGroup:
+	return get_node(OUTER_SHADOW_NODE) as ShelfOuterShadowGroup

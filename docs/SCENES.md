@@ -1995,9 +1995,12 @@ Children:
   top visible row's ceiling cap (`Shelf.TOP_CEILING_CAP_TOP_Y`), so shelves waiting above the window
   are clipped while they slide in. The other three edges are pushed out by `window_outer_margin`, so
   an item travelling between columns or gathered by the hammer is never cut off.
-- `BoardBottomShadow` and `BoardRightShadow`: procedural translucent cast shadows fitted to the
-  board footprint. Collapsing shelf cells suppress their individual exterior casts, so the moving
-  stack reads as one cabinet and overlapping rows cannot compound into dark seams.
+- `Window/OuterShadowComposite`: a `ShelfOuterShadowGroup` (`scripts/shelf_outer_shadow_group.gd`)
+  authored as the window's first child, so it draws beneath every column. Each registered cell's
+  standard `Shadow` and `RightColumnShadow` are mirrored into it, exactly as a classic level
+  composites them, so the cabinet casts the same exterior shadows as common shelves without rows
+  compounding into dark seams. Living inside the window, the casts of a shelf waiting above it are
+  clipped at the same edge as the shelf.
 
 Runtime-created nodes:
 - `ColumnXX`: `scenes/collapsing_shelf_column.tscn` instances under `Window`, one per
@@ -2429,6 +2432,7 @@ Important nodes:
   authored nodes remain stable effect targets but are visually mirrored by the level-owned
   `ShelfOuterShadowGroup`; the shared `CanvasGroup` applies final opacity once, preventing overlap
   darkening in regular and staggered templates without changing these polygons per neighbor.
+  Collapsing-column cells keep these casts too, mirrored instead by their board's own group.
 - `FloorCornerShade`: two-axis procedural corner occlusion where the back, side, and floor meet.
 - `FloorSurface` and `FloorFrontLip`: image-textured wooden floor where items visually rest.
 - `FloorGrain*`: retained hidden as legacy editable guides; the image texture now supplies visible

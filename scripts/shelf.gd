@@ -170,7 +170,7 @@ func set_exterior_shadows_composited(should_composite: bool) -> void:
 
 
 func should_show_exterior_shadows() -> bool:
-	return _visual_variant == VISUAL_VARIANT_FULL and not _collapsing_visuals_enabled
+	return _visual_variant == VISUAL_VARIANT_FULL
 
 
 ## Collapsing-column levels reuse the standard shelf interaction geometry but give each cell a
@@ -331,8 +331,6 @@ func _apply_collapsing_visuals() -> void:
 		_collapsing_visuals_enabled and _visual_variant == VISUAL_VARIANT_FULL
 	)
 	_set_node_visible(COLLAPSING_VISUALS_NODE, show_collapsing_visuals)
-	# A collapsing board owns one exterior cast shadow for the complete cabinet.
-	_apply_exterior_shadow_visibility()
 	_apply_top_ceiling_cap_visibility()
 
 

@@ -2068,7 +2068,8 @@ Key responsibilities:
   neighbor above. Full-shelf bottom/right casts are handed to one level-owned
   `ShelfOuterShadowGroup`: it mirrors complete authored polygons into a shared coverage layer and
   applies the final translucency once, so staggered or irregular layouts do not need pairwise
-  midpoint cuts and overlapping casts cannot double the final shadow strength.
+  midpoint cuts and overlapping casts cannot double the final shadow strength. Shelves owned by a
+  `CollapsingShelfBoard` are left out of it, because the board composites them inside its clip window.
 - Load `layout_preset` scene templates from `scenes/layouts/`, group authored `ShelfXX` markers into
   rows by position, expand their logical row distances by the taller-frame allowance around the
   layout center (including proportional half-row expansion for staggered columns), and place
@@ -2542,18 +2543,22 @@ Do not use for:
 Class: `ShelfOuterShadowGroup`, extending `CanvasGroup`.
 
 Purpose:
-- Owns the level-wide composite for standard/moving shelves' exterior `Shadow` and
-  `RightColumnShadow` polygons.
+- Composites standard/moving shelves' exterior `Shadow` and `RightColumnShadow` polygons. One
+  instance is created by `scripts/level.gd` under `Shelves` for classic boards; another is authored
+  as `Window/OuterShadowComposite` in `scenes/collapsing_shelf_board.tscn` for that board's cells.
 - `rebuild(shelves)` creates lightweight polygon mirrors beneath the shelf bodies, switches each
   source shelf to composited exterior-shadow visibility, and retains the complete authored cast
-  geometry instead of editing it around inferred neighbors.
+  geometry instead of editing it around inferred neighbors. `add_shelf(shelf)` does the same for
+  one shelf without rebuilding the rest, and ignores a shelf it already mirrors.
 - Normalizes bottom and right falloff coverage through
   `shelf_composite_cast_shadow*.tres`; the group's `0.16` alpha is then applied once to the merged
   draw. Right casts retain their previous `0.14` standalone maximum through `0.875` mask coverage.
 - Tracks source global transforms, modulation, shelf visibility, and destruction fades every frame,
   so moving rows and animated shelf removal keep their cast proxies attached.
-- `clear()` restores standalone source visibility before discarding the mirrors. Collapsing shelf
-  cells do not register because their board already owns one footprint-wide cast.
+- `clear()` restores standalone source visibility before discarding the mirrors.
+- Mirrors are drawn wherever the group sits in the tree, so a group placed inside a clipping
+  `Control` clips its casts with it. The collapsing board relies on this to cut a peeking shelf's
+  right cast at the window's top edge.
 
 Depends on:
 - `scripts/shelf.gd` for exterior-shadow eligibility and local/composited visibility.
@@ -2604,7 +2609,7 @@ Key methods:
 - `set_exterior_shadows_composited(should_composite)`: suppresses or restores the shelf-local bottom
   and right casts while `ShelfOuterShadowGroup` mirrors them at level scope.
 - `should_show_exterior_shadows()`: reports whether this shelf variant owns exterior casts at all;
-  floor-only moving shelves and collapsing cells return false.
+  floor-only moving shelves return false. Collapsing cells return true.
 - `set_horizontal_visual_scale(horizontal_scale)`: narrows shelf artwork for a moving row, trims the
   static shelf lip overhang to the floor-surface width, enables antialiasing on its moving polygon
   edges, and preserves item, slot, and input proportions.
@@ -2612,8 +2617,8 @@ Key methods:
   `single`). The `single` state reuses the middle cabinet art and tapers both ends of its exposed top
   backboard.
 - `set_collapsing_visuals_enabled(should_enable)`: toggles the collapsing-only cabinet treatment
-  without changing shelf geometry, slots, input, or the shared light-oak art used by basic levels;
-  it also suppresses each cell's exterior casts because the board owns one combined cast.
+  without changing shelf geometry, slots, input, exterior casts, or the shared light-oak art used by
+  basic levels.
 - `set_top_ceiling_cap_visible(should_show)`: applies layout-derived visibility to every placement-specific `TopCeilingCap`, gated by the active shelf visual variant.
 - `add_back_layer(layer_index, front_slots)`: creates a generated back-layer container and slot nodes aligned to the shelf front slots.
 - `get_back_layer(layer_index)`: returns a generated back-layer container by index.
@@ -2756,9 +2761,13 @@ Purpose:
   runs. Hidden shelves are also invisible, but visibility is never the rule the level relies on.
 - Applies left/middle/right shelf art from the column's board position at registration, never from
   how many shelves survive in a row.
-- Fits one bottom and one right exterior cast shadow to the resolved board footprint. Individual
-  collapsing shelf cells retain inset occlusion but hide their exterior casts, preventing repeated
-  translucent layers as rows collapse through the same screen space.
+- Adds every registered cell to `Window/OuterShadowComposite`, a `ShelfOuterShadowGroup` drawn
+  beneath the columns, so the cells cast the same exterior bottom/right shadows as classic shelves.
+  The group merges overlapping casts, so rows collapsing through the same screen space never stack
+  translucent layers. It tracks each shelf's transform, visibility, and destruction fade, so casts
+  fall with survivors and vanish with destroyed or fully emptied columns. Being inside the clip
+  window, it cuts a peeking shelf's casts at the same edge as the shelf. `configure()` clears it
+  along with the old columns.
 - Reports completion as "no shelf survives anywhere" through `is_cleared()`, which is false while a
   collapse is still running.
 

@@ -1872,19 +1872,22 @@ func _apply_shelf_row_placement(shelf: Node2D, row_placement: String) -> void:
 
 func _update_shelf_perspective_edges() -> void:
 	var shelves := _get_all_shelves()
+	var level_shadow_shelves: Array[Node] = []
 	for shelf_node in shelves:
 		var shelf := shelf_node as Node2D
 		if shelf == null:
 			continue
 		# A collapsing column decides caps from its logical window, not from nearby positions: a
-		# hidden shelf parked above the window must never hide the top shelf's cap.
+		# hidden shelf parked above the window must never hide the top shelf's cap. Its board also
+		# composites the cells' exterior casts inside its own clip window.
 		if _collapsing_board != null and _collapsing_board.owns_shelf(shelf):
 			continue
 
+		level_shadow_shelves.append(shelf)
 		_set_shelf_top_ceiling_cap_visible(shelf, not _has_stacked_shelf_above(shelf, shelves))
 
 	if _shelf_outer_shadow_group != null:
-		_shelf_outer_shadow_group.rebuild(shelves)
+		_shelf_outer_shadow_group.rebuild(level_shadow_shelves)
 
 
 func _has_stacked_shelf_above(shelf: Node2D, shelves: Array[Node]) -> bool:

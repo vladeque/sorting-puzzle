@@ -1,12 +1,16 @@
 class_name ShelfOuterShadowGroup
 extends CanvasGroup
 
-## Level-owned composite for the two exterior casts authored by standard shelves.
+## Composite for the two exterior casts authored by standard shelves.
 ##
 ## Every shelf keeps its real Shadow and RightColumnShadow nodes so standalone previews and shelf
 ## effects still have stable targets. During gameplay this group mirrors those polygons, normalizes
 ## their opacity into one mask, and applies the final translucency once to the complete group. The
 ## mask can overlap freely without stacking the final shadow color at shelf seams.
+##
+## `scripts/level.gd` owns one under `Shelves` for classic boards. `scenes/collapsing_shelf_board.tscn`
+## authors its own inside the clip window, so casts of shelves waiting above the board are cut off
+## at the same edge as the shelves themselves.
 
 const BOTTOM_SHADOW_NODE := "Shadow"
 const RIGHT_SHADOW_NODE := "RightColumnShadow"
@@ -23,23 +27,42 @@ var _entries: Array[Dictionary] = []
 
 func _ready() -> void:
 	self_modulate = Color(1.0, 1.0, 1.0, COMPOSITE_OPACITY)
-	set_process(false)
+	# An owner may have registered shelves before this group entered the tree.
+	set_process(not _entries.is_empty())
 
 
 func rebuild(shelves: Array[Node]) -> void:
 	clear()
 
 	for shelf_node in shelves:
-		var shelf := shelf_node as Shelf
-		if shelf == null or not shelf.should_show_exterior_shadows():
-			continue
-
-		_add_shadow(shelf, BOTTOM_SHADOW_NODE, BOTTOM_MASK_MATERIAL)
-		_add_shadow(shelf, RIGHT_SHADOW_NODE, RIGHT_MASK_MATERIAL)
-		shelf.set_exterior_shadows_composited(true)
+		_add_shelf_shadows(shelf_node as Shelf)
 
 	_sync_entries()
-	set_process(not _entries.is_empty())
+
+
+## Adds one shelf without rebuilding the others, for owners that register shelves one at a time.
+func add_shelf(shelf: Shelf) -> void:
+	if _add_shelf_shadows(shelf):
+		_sync_entries()
+
+
+func _add_shelf_shadows(shelf: Shelf) -> bool:
+	if shelf == null or not shelf.should_show_exterior_shadows() or _has_shelf(shelf):
+		return false
+
+	_add_shadow(shelf, BOTTOM_SHADOW_NODE, BOTTOM_MASK_MATERIAL)
+	_add_shadow(shelf, RIGHT_SHADOW_NODE, RIGHT_MASK_MATERIAL)
+	shelf.set_exterior_shadows_composited(true)
+	return true
+
+
+func _has_shelf(shelf: Shelf) -> bool:
+	for entry in _entries:
+		var shelf_ref := entry.get("shelf") as WeakRef
+		if shelf_ref != null and shelf_ref.get_ref() == shelf:
+			return true
+
+	return false
 
 
 func clear() -> void:

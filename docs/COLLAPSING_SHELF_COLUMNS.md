@@ -100,9 +100,10 @@ With the preview fixture and with campaign level 9, the window resolves to 6 row
   overlapping the opening of the accelerated column fall. Survivors pass their destination by a
   few pixels and settle with a restrained rebound. Newly revealed shelves remain opaque and enter
   physically through the board's clip edge instead of fading in as ghosted content.
-- Each shelf keeps soft top/left inset occlusion, while the board draws one exterior bottom/right
-  cast for the full footprint. Per-cell exterior casts are hidden so stacked translucent shadows do
-  not accumulate into dark bands during collapse.
+- Each shelf keeps soft top/left inset occlusion and casts the same bottom/right exterior shadows a
+  classic shelf does. The board merges them in its own `ShelfOuterShadowGroup` inside the clip
+  window, so stacked rows cannot accumulate into dark bands, the casts fall and fade with their
+  shelves during a collapse, and a shelf peeking over the window is cut off together with its casts.
 - Retry rebuilds the board from config. No live column state is saved.
 
 ## Verification

@@ -86,6 +86,21 @@ func _make_board(column_heights: Array[int], visible_count: int) -> CollapsingSh
 	return board
 
 
+func _get_shadow_group(board: CollapsingShelfBoard) -> ShelfOuterShadowGroup:
+	return board.get_node_or_null(CollapsingShelfBoard.OUTER_SHADOW_NODE) as ShelfOuterShadowGroup
+
+
+func _live_shadow_proxy_count(shadow_group: ShelfOuterShadowGroup) -> int:
+	if shadow_group == null:
+		return -1
+
+	var count := 0
+	for proxy in shadow_group.get_children():
+		if not proxy.is_queued_for_deletion():
+			count += 1
+	return count
+
+
 func _ids(board: CollapsingShelfBoard, column_index: int) -> Array[int]:
 	var ids: Array[int] = []
 	for shelf in board.get_column(column_index).get_shelves():
@@ -125,16 +140,24 @@ func _verify_cap_geometry_constant() -> void:
 
 func _verify_construction_and_window() -> void:
 	var board := _make_board([4, 2, 3], 3)
-	for shadow_name in ["BoardBottomShadow", "BoardRightShadow"]:
-		var board_shadow := board.get_node_or_null(shadow_name) as Polygon2D
-		var material := board_shadow.material as ShaderMaterial if board_shadow != null else null
-		_check(
-			material != null
-				and material.shader != null
-				and material.shader.resource_path == LINEAR_SHADOW_SHADER_PATH
-				and board_shadow.polygon.size() == 4,
-			"The collapsing cabinet should own one laid-out soft %s." % shadow_name
-		)
+	var shadow_group := _get_shadow_group(board)
+	_check(
+		shadow_group != null and shadow_group.get_index() == 0,
+		"The board should composite exterior casts inside its clip window, drawn before every column."
+	)
+	_check(
+		shadow_group != null and _live_shadow_proxy_count(shadow_group) == 18,
+		"Every cell should mirror both standard exterior casts into the board composite."
+	)
+	if shadow_group != null:
+		for proxy in shadow_group.get_children():
+			var material := (proxy as Polygon2D).material as ShaderMaterial
+			_check(
+				material != null
+					and material.shader != null
+					and material.shader.resource_path == LINEAR_SHADOW_SHADER_PATH,
+				"Composited cast %s should keep the soft linear falloff." % proxy.name
+			)
 	_check(board.get_column_count() == 3, "The board should build one column per shelf count.")
 	_check(_ids(board, 0) == [0, 1, 2, 3], "Column 1 should hold shelves 1-4 bottom to top.")
 	_check(_ids(board, 1) == [4, 5], "Column 2 should hold shelves 5-6 bottom to top.")
@@ -162,9 +185,10 @@ func _verify_construction_and_window() -> void:
 	_check(_shelf_by_id(board, 6).get_row_placement() == Shelf.ROW_PLACEMENT_RIGHT, "Column 3 uses right art.")
 	var first_shelf := _shelf_by_id(board, 0)
 	_check(
-		not first_shelf.get_node("Shadow").visible
+		first_shelf.should_show_exterior_shadows()
+			and not first_shelf.get_node("Shadow").visible
 			and not first_shelf.get_node("RightColumnShadow").visible,
-		"Collapsing cells should suppress per-shelf exterior casts in favor of the board shadow."
+		"Collapsing cells should cast standard exterior shadows through the board composite, not locally."
 	)
 	for shade_path in ["CollapsingVisuals/BackPanelTopShade", "CollapsingVisuals/BackPanelLeftShade"]:
 		var inset := first_shelf.get_node_or_null(shade_path) as Polygon2D
@@ -235,6 +259,13 @@ func _verify_removing_the_lowest_shelf() -> void:
 	_check(revealed.size() == 1 and revealed[0] == _shelf_by_id(board, 3), "Shelf 4 enters the window.")
 	_check(board.is_shelf_active(_shelf_by_id(board, 3)), "A revealed shelf is active once settled.")
 	_check(not board.is_shelf_active(_shelf_by_id(board, 4)), "Shelf 5 is still above the window.")
+	# The destroyed shelf is freed at the end of its frame; the composite drops its casts on the next.
+	for _frame in range(2):
+		await process_frame
+	_check(
+		_live_shadow_proxy_count(_get_shadow_group(board)) == 8,
+		"A destroyed shelf's exterior casts should leave the board composite with it."
+	)
 	board.free()
 
 
@@ -464,6 +495,16 @@ func _level_board(level: Node) -> CollapsingShelfBoard:
 	return level.get_node_or_null("Shelves/CollapsingShelfBoard") as CollapsingShelfBoard
 
 
+## Children of `Shelves` that hold shelves. The level's own exterior-shadow composite sits beside
+## the board on every level and holds none.
+func _board_node_count(level: Node) -> int:
+	var count := 0
+	for child in level.get_node("Shelves").get_children():
+		if not child is ShelfOuterShadowGroup:
+			count += 1
+	return count
+
+
 func _is_level_busy(level: Node) -> bool:
 	return (
 		bool(level.get("_is_resolving_shelves"))
@@ -537,7 +578,7 @@ func _verify_level_builds_columns_in_authored_order() -> void:
 	if board == null:
 		await _dispose(level)
 		return
-	_check(level.get_node("Shelves").get_child_count() == 1, "The board is the only board node; no grid fallback.")
+	_check(_board_node_count(level) == 1, "The board is the only board node; no grid fallback.")
 	_check(board.get_column_count() == 3, "One column per shelf_counts entry.")
 	_check(_ids(board, 0) == [0, 1, 2] and _ids(board, 1) == [3, 4] and _ids(board, 2) == [5, 6], "Flat shelves are consumed column by column, bottom to top.")
 	_check(_shelf_item_ids(level, _shelf_by_id(board, 1))[0] == ITEM_IDS["b"], "Shelf 2 carries its authored items.")
@@ -793,7 +834,7 @@ func _verify_retry_rebuilds_the_authored_board() -> void:
 	level.call("_collect_slots")
 	await _settle(level)
 	board = _level_board(level)
-	_check(level.get_node("Shelves").get_child_count() == 1, "A rebuild leaves exactly one board.")
+	_check(_board_node_count(level) == 1, "A rebuild leaves exactly one board.")
 	_check(_ids(board, 0) == [0, 1, 2] and _ids(board, 1) == [3, 4, 5] and _ids(board, 2) == [6, 7], "The authored columns come back.")
 	_check((level.call("_get_shelf_items", _shelf_by_id(board, 2)) as Array).size() == 3, "Hidden authored content comes back.")
 	_check(not board.is_shelf_active(_shelf_by_id(board, 2)), "Hidden shelves start hidden again.")

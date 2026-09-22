@@ -1,23 +1,15 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/collapsing_shelf_board.gd" id="1_board_script"]
-[ext_resource type="Material" path="res://assets/shelves/materials/shelf_soft_cast_shadow.tres" id="2_bottom_cast_shadow"]
-[ext_resource type="Material" path="res://assets/shelves/materials/shelf_soft_cast_shadow_right.tres" id="3_right_cast_shadow"]
+[ext_resource type="Script" path="res://scripts/shelf_outer_shadow_group.gd" id="2_outer_shadow_group"]
 
 [node name="CollapsingShelfBoard" type="Node2D"]
 script = ExtResource("1_board_script")
-
-[node name="BoardBottomShadow" type="Polygon2D" parent="."]
-z_index = -2
-material = ExtResource("2_bottom_cast_shadow")
-antialiased = true
-
-[node name="BoardRightShadow" type="Polygon2D" parent="."]
-z_index = -2
-material = ExtResource("3_right_cast_shadow")
-antialiased = true
 
 [node name="Window" type="Control" parent="."]
 anchors_preset = 0
 mouse_filter = 2
 clip_contents = true
+
+[node name="OuterShadowComposite" type="CanvasGroup" parent="Window"]
+script = ExtResource("2_outer_shadow_group")
