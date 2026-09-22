@@ -1183,15 +1183,15 @@ Script:
 
 Purpose:
 - Presents the eleven approved release locales in a vertically scrollable list.
-- Keeps row selection pending until Confirm; X or `ui_cancel` discards it.
-- Confirms through the `LocaleManager` autoload, immediately updates `TranslationServer`, persists
+- Keeps row selection pending until Save; X or `ui_cancel` discards it.
+- Saves through the `LocaleManager` autoload, immediately updates `TranslationServer`, persists
   the local preference, and closes back to the still-open Settings modal.
 - Uses English development labels only. No translation resources are authored by this feature.
 
 Important nodes:
 - `%Shell`: shared safe-area-aware gameplay modal shell.
-- `%LanguageScroll` / `%LanguageList`: scrollable language-row owner.
-- `%ConfirmButton`: applies only the pending supported locale.
+- `%LanguageScroll` / `%LanguageList`: touch-scrollable language-row owner with its visual scrollbar hidden.
+- `%SaveButton`: applies only the pending supported locale.
 
 Depends on:
 - `scenes/ui/language_option_row.tscn` for reusable selected/unselected rows.

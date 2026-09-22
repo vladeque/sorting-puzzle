@@ -9,7 +9,8 @@
 - `PlayerProgress` stores `locale` in the local `preferences` partition. It is excluded from the
   authoritative gameplay snapshot and backend journal operations.
 - `scenes/ui/language_selection_modal.tscn` owns pending selection, scrolling, confirmation, and
-  cancellation. Selecting a row does not change runtime state until Confirm is pressed.
+  cancellation. Selecting a row does not change runtime state until Save is pressed. Touch and
+  wheel scrolling remain enabled without showing a scrollbar.
 
 ## Release locale allowlist
 

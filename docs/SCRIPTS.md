@@ -3024,7 +3024,7 @@ Attached to:
 Purpose:
 - Builds the scrollable release-language list from `LocaleManager`.
 - Owns pending selection and selected-row visuals without mutating runtime locale on row press.
-- Applies and persists the pending locale only on Confirm, while X/Back discard it.
+- Applies and persists the pending locale only on Save, while X/Back discard it.
 - Fits the shared modal shell inside mobile safe areas and scrolls the active locale into view.
 
 ## `scripts/localization/locale_catalog.gd` and `locale_manager.gd`

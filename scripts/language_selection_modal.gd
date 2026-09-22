@@ -13,7 +13,7 @@ const CONTENT_HEIGHT := 510.0
 @onready var _language_content := %LanguageContent as Control
 @onready var _language_scroll := %LanguageScroll as ScrollContainer
 @onready var _language_list := %LanguageList as VBoxContainer
-@onready var _confirm_button := %ConfirmButton as Button
+@onready var _save_button := %SaveButton as Button
 
 var _pending_locale := ""
 var _rows: Dictionary = {}
@@ -25,9 +25,9 @@ func _ready() -> void:
 	_shell.set_preferred_size(PREFERRED_SIZE)
 	_shell.set_content_region_height(CONTENT_HEIGHT)
 	_language_content.reparent(_shell.get_content_region(), false)
-	_confirm_button.reparent(_shell.get_action_row(), false)
+	_save_button.reparent(_shell.get_action_row(), false)
 	_shell.close_requested.connect(close)
-	_confirm_button.pressed.connect(_confirm_selection)
+	_save_button.pressed.connect(_save_selection)
 	_pending_locale = LocaleManager.get_current_locale()
 	_build_language_rows()
 	get_viewport().size_changed.connect(_apply_responsive_layout)
@@ -84,7 +84,7 @@ func _select_locale(locale: String) -> void:
 		(_rows[row_locale] as Button).call("set_locale_selected", row_locale == locale)
 
 
-func _confirm_selection() -> void:
+func _save_selection() -> void:
 	if _is_closing:
 		return
 	if not LocaleManager.set_locale(_pending_locale):
@@ -113,6 +113,6 @@ func _apply_responsive_layout() -> void:
 		- GameplayUIThemeScript.MODAL_MIN_EDGE_GAP * 2.0,
 		1.0
 	)
-	var confirm_minimum := _confirm_button.custom_minimum_size
-	confirm_minimum.x = minf(300.0, available_width)
-	_confirm_button.custom_minimum_size = confirm_minimum
+	var save_minimum := _save_button.custom_minimum_size
+	save_minimum.x = minf(300.0, available_width)
+	_save_button.custom_minimum_size = save_minimum

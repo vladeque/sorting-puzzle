@@ -46,23 +46,24 @@ func _run() -> void:
 	var modal_scene := load(LANGUAGE_MODAL_SCENE_PATH) as PackedScene
 	var modal := modal_scene.instantiate() as Control
 	root.add_child(modal)
-	await create_timer(0.25).timeout
+	await create_timer(0.35).timeout
 	var list := modal.get_node("%LanguageList") as VBoxContainer
 	var scroll := modal.get_node("%LanguageScroll") as ScrollContainer
 	_check(list.get_child_count() == 11, "The language modal renders all eleven release locales.")
 	_check(modal.call("get_pending_locale") == "en", "The active locale is selected on open.")
 	_check(
-		scroll.vertical_scroll_mode == ScrollContainer.SCROLL_MODE_AUTO,
-		"The language list exposes an automatic vertical scrollbar."
+		scroll.vertical_scroll_mode == ScrollContainer.SCROLL_MODE_SHOW_NEVER,
+		"The language list remains scrollable without showing a mobile scrollbar."
 	)
+	_check(modal.get_node("%SaveButton").text == "SAVE", "The modal uses the Profile-style Save action.")
 
 	modal.call("_select_locale", "ru")
 	_check(modal.call("get_pending_locale") == "ru", "Tapping a row changes the pending locale.")
 	_check(_progress.call("get_locale") == "en", "Pending selection does not change saved locale.")
 	_check(TranslationServer.get_locale() == "en", "Pending selection does not change runtime locale.")
-	modal.call("_confirm_selection")
-	_check(_progress.call("get_locale") == "ru", "Confirm persists the selected locale.")
-	_check(TranslationServer.get_locale() == "ru", "Confirm updates TranslationServer immediately.")
+	modal.call("_save_selection")
+	_check(_progress.call("get_locale") == "ru", "Save persists the selected locale.")
+	_check(TranslationServer.get_locale() == "ru", "Save updates TranslationServer immediately.")
 	var snapshot := _progress.call("_snapshot_for_storage") as Dictionary
 	var preferences := _progress.call("_preferences_for_storage") as Dictionary
 	_check(not snapshot.has("locale"), "Locale is excluded from the synchronized gameplay snapshot.")
@@ -73,7 +74,7 @@ func _run() -> void:
 
 	var discard_modal := modal_scene.instantiate() as Control
 	root.add_child(discard_modal)
-	await create_timer(0.25).timeout
+	await create_timer(0.35).timeout
 	_check(discard_modal.call("get_pending_locale") == "ru", "A reopened modal restores saved locale.")
 	discard_modal.call("_select_locale", "ja")
 	discard_modal.call("close")
