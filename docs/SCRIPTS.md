@@ -2979,6 +2979,8 @@ Purpose:
   `ad_privacy_requested` for the optional privacy action. Reporting an ad is owned by the support
   FAQ instead of consuming another Settings slot.
 - Initializes every pause-menu and main-menu settings instance from the saved disabled-state dictionary so matching buttons stay visually synchronized after game restarts.
+- Populates the Main Menu Settings `DiagnosticsLabel`, when present, from the configured app
+  version/build, `OS.get_name()`, and a shortened active player or installation identifier.
 - Owns the deliberate sound-effects toggle audio (AUDIO-001). `SoundEffectsButton` is marked
   `sfx_click_suppressed` so the generic click policy leaves it alone, and
   `_on_setting_button_pressed()` calls `SfxManager.acknowledge_sound_effects_toggle()` after

@@ -1144,6 +1144,9 @@ Purpose:
 - Keeps a separate policy-driven privacy action labeled `Privacy Choices` when UMP requires its
   form or `Privacy Policy` when backed by a configured HTTPS URL. It stays hidden when neither
   route is available.
+- Shows a subdued two-line diagnostics footer at the bottom of the panel with app version/build,
+  runtime platform, and a shortened active player or installation identifier. The footer exposes
+  no full account identifier or hardware fingerprint and has no copy action.
 
 Important nodes:
 - `PauseMenuPanel`: centered popup panel kept named for reuse with `scripts/pause_menu.gd`.
@@ -1155,6 +1158,7 @@ Important nodes:
 - `PauseMenuPanel/InnerPanel/ActionColumn/LanguageButton`: restored localization placeholder.
 - `PauseMenuPanel/InnerPanel/ActionColumn/AdPrivacyButton`: optional policy-driven privacy
   choices/policy action. All three actions use `assets/ui/level_button_blank_light_blue_new.png`.
+- `PauseMenuPanel/InnerPanel/DiagnosticsLabel`: non-interactive build/platform/user diagnostics.
 
 Depends on:
 - `scripts/pause_menu.gd` for the same crossed-out toggle visuals and shared disabled state used by the in-level pause menu.

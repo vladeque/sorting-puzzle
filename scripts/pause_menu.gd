@@ -29,6 +29,8 @@ const SETTINGS_BUTTONS: Array[Dictionary] = [
 ]
 const CROSS_OUT_NAME := "CrossOut"
 const CONTENT_REGION_HEIGHT := 234.0
+const APP_VERSION_SETTING := "application/config/version"
+const APP_BUILD_SETTING := "application/config/build_number"
 const GameplayUIThemeScript := preload("res://scripts/gameplay_ui_theme.gd")
 
 static var _disabled_settings: Dictionary = {}
@@ -84,6 +86,7 @@ func _ready() -> void:
 	var ad_privacy_button := find_child("AdPrivacyButton", true, false) as Button
 	if ad_privacy_button != null:
 		ad_privacy_button.pressed.connect(func() -> void: ad_privacy_requested.emit())
+	_update_diagnostics_label()
 
 
 func is_setting_disabled(setting_id: StringName) -> bool:
@@ -111,6 +114,35 @@ func set_ad_compliance_actions(
 	if ad_privacy_button != null:
 		ad_privacy_button.text = privacy_label
 		ad_privacy_button.visible = privacy_visible
+
+
+func _update_diagnostics_label() -> void:
+	var diagnostics_label := find_child("DiagnosticsLabel", true, false) as Label
+	if diagnostics_label == null:
+		return
+
+	var version := str(ProjectSettings.get_setting(APP_VERSION_SETTING, "0.0.0"))
+	var build := maxi(int(ProjectSettings.get_setting(APP_BUILD_SETTING, 1)), 1)
+	var save_namespace := PlayerProgress.get_active_save_namespace()
+	var user_id := str(save_namespace.get(
+		"player_id" if str(save_namespace.get("kind", "")) == "player" else "installation_id",
+		""
+	))
+	diagnostics_label.text = "Version %s • Build %d\nPlatform: %s • User: %s" % [
+		version,
+		build,
+		OS.get_name(),
+		_short_identifier(user_id),
+	]
+
+
+func _short_identifier(identifier: String) -> String:
+	var normalized := identifier.strip_edges()
+	if normalized.is_empty():
+		return "local"
+	if normalized.length() <= 12:
+		return normalized
+	return "%s…%s" % [normalized.left(6), normalized.right(4)]
 
 
 ## Shows this overlay's root immediately (so the shell's own fade-in is actually visible), then

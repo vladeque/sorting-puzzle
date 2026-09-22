@@ -29,6 +29,7 @@ func _run() -> void:
 	var support_button := menu.find_child("SupportButton", true, false) as Button
 	var language_button := menu.find_child("LanguageButton", true, false) as Button
 	var privacy_button := menu.find_child("AdPrivacyButton", true, false) as Button
+	var diagnostics_label := menu.find_child("DiagnosticsLabel", true, false) as Label
 	_check(
 		support_button != null and language_button != null and privacy_button != null,
 		"Settings retains Support and Language alongside the policy-driven privacy action."
@@ -47,6 +48,19 @@ func _run() -> void:
 		_check(
 			bool(emitted.get("privacy", false)) and bool(emitted.get("support", false)),
 			"Settings emits focused support and privacy requests."
+		)
+	_check(diagnostics_label != null, "Settings owns a diagnostics footer.")
+	if diagnostics_label != null:
+		var expected_version := str(ProjectSettings.get_setting("application/config/version", "0.0.0"))
+		var expected_build := maxi(int(ProjectSettings.get_setting("application/config/build_number", 1)), 1)
+		_check(
+			diagnostics_label.text.contains("Version %s • Build %d" % [expected_version, expected_build]),
+			"The diagnostics footer reports the configured version and build."
+		)
+		_check(
+			diagnostics_label.text.contains("Platform: %s" % OS.get_name())
+				and diagnostics_label.text.contains("User: "),
+			"The diagnostics footer reports the platform and a user identifier."
 		)
 
 	menu.queue_free()
