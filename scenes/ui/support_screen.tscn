@@ -1,0 +1,170 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/support_screen.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/destination_screen_shell.tscn" id="2_shell"]
+[ext_resource type="PackedScene" path="res://scenes/ui/support_faq_item.tscn" id="3_faq_item"]
+[ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="4_press_scale"]
+[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_warm_icon_normal.tres" id="5_back_normal"]
+[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_warm_icon_pressed.tres" id="6_back_pressed"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_faq_panel"]
+bg_color = Color(0.2, 0.065, 0.08, 0.88)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(1, 0.68, 0.28, 0.64)
+corner_radius_top_left = 26
+corner_radius_top_right = 26
+corner_radius_bottom_right = 26
+corner_radius_bottom_left = 26
+content_margin_left = 14.0
+content_margin_top = 14.0
+content_margin_right = 14.0
+content_margin_bottom = 14.0
+shadow_color = Color(0.08, 0.015, 0.02, 0.5)
+shadow_size = 10
+shadow_offset = Vector2(0, 5)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_scroll"]
+
+[node name="SupportScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+script = ExtResource("1_script")
+
+[node name="DestinationShell" parent="." instance=ExtResource("2_shell")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ContentMargin" type="MarginContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 18.0
+offset_right = -16.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ContentStack" type="VBoxContainer" parent="ContentMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="ContentMargin/ContentStack"]
+custom_minimum_size = Vector2(0, 70)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BackButton" type="Button" parent="ContentMargin/ContentStack/Header"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(72, 64)
+layout_mode = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.29, 0.11, 0.04, 1)
+theme_override_font_sizes/font_size = 34
+theme_override_styles/normal = ExtResource("5_back_normal")
+theme_override_styles/pressed = ExtResource("6_back_pressed")
+theme_override_styles/hover = ExtResource("5_back_normal")
+text = "<"
+script = ExtResource("4_press_scale")
+
+[node name="TitleLabel" type="Label" parent="ContentMargin/ContentStack/Header"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"GameTitleLabel"
+theme_override_colors/font_color = Color(1, 0.95, 0.73, 1)
+theme_override_colors/font_outline_color = Color(0.12, 0.02, 0.02, 0.95)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 48
+text = "SUPPORT"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TrailingSpacer" type="Control" parent="ContentMargin/ContentStack/Header"]
+custom_minimum_size = Vector2(72, 0)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="FaqPanel" type="PanelContainer" parent="ContentMargin/ContentStack"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_faq_panel")
+
+[node name="FaqScroll" type="ScrollContainer" parent="ContentMargin/ContentStack/FaqPanel"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+theme_override_styles/panel = SubResource("StyleBoxEmpty_scroll")
+
+[node name="FaqList" type="VBoxContainer" parent="ContentMargin/ContentStack/FaqPanel/FaqScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="SectionLabel" type="Label" parent="ContentMargin/ContentStack/FaqPanel/FaqScroll/FaqList"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+mouse_filter = 2
+theme_type_variation = &"GameBodyLabel"
+theme_override_colors/font_color = Color(1, 0.84, 0.57, 1)
+theme_override_colors/font_outline_color = Color(0.16, 0.03, 0.025, 0.94)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 22
+text = "Frequently Asked Questions"
+vertical_alignment = 1
+
+[node name="HowToPlayItem" parent="ContentMargin/ContentStack/FaqPanel/FaqScroll/FaqList" instance=ExtResource("3_faq_item")]
+question = "How do I play?"
+answer = "Move matching goods onto the same shelf. When three identical items are visible together, they clear. Complete the board before time runs out."
+
+[node name="ContactSupportItem" parent="ContentMargin/ContentStack/FaqPanel/FaqScroll/FaqList" instance=ExtResource("3_faq_item")]
+unique_name_in_owner = true
+question = "How do I contact support?"
+answer = "Email our support team with a description of the problem."
+action_text = "Email Support"
+action_id = &"contact_support"
+
+[node name="CrashItem" parent="ContentMargin/ContentStack/FaqPanel/FaqScroll/FaqList" instance=ExtResource("3_faq_item")]
+question = "What if the game freezes or crashes?"
+answer = "Close and reopen the game first. If it happens again, restart the device and make sure the game is updated. Contact support with the device model, platform version, and what you were doing before the problem."
+
+[node name="SyncItem" parent="ContentMargin/ContentStack/FaqPanel/FaqScroll/FaqList" instance=ExtResource("3_faq_item")]
+question = "How do I sync progress between devices?"
+answer = "Use the same signed-in platform account on both devices and allow synchronization to finish before playing. If the progress differs, avoid playing on both devices and contact support."
+
+[node name="ReportAdItem" parent="ContentMargin/ContentStack/FaqPanel/FaqScroll/FaqList" instance=ExtResource("3_faq_item")]
+unique_name_in_owner = true
+question = "How do I report a bad ad?"
+answer = "Collect a screenshot and details, then contact support."
+action_text = "Email Ad Report"
+action_id = &"report_ad"
+
+[node name="FooterLabel" type="Label" parent="ContentMargin/ContentStack"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+mouse_filter = 2
+theme_type_variation = &"GameSmallLabel"
+theme_override_colors/font_color = Color(1, 0.84, 0.57, 1)
+theme_override_colors/font_outline_color = Color(0.16, 0.03, 0.025, 0.94)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 16
+text = "Please never send passwords or payment information."
+horizontal_alignment = 1
+vertical_alignment = 1

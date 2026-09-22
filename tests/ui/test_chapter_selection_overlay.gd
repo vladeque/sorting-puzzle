@@ -62,6 +62,19 @@ func _run() -> void:
 	_check(settings_menu != null, "The settings button opens the settings modal.")
 	if settings_menu != null:
 		_check_overlay_above_actions(settings_menu, level_button, chapter_button, "Settings modal")
+		var support_button := settings_menu.find_child("SupportButton", true, false) as Button
+		_check(support_button != null, "Settings retains its Support action.")
+		if support_button != null:
+			support_button.pressed.emit()
+			await process_frame
+			var support_screen := menu.get_node_or_null("SupportScreen") as Control
+			_check(support_screen != null, "Support opens the native FAQ screen.")
+			if support_screen != null:
+				_check_overlay_above_actions(
+					support_screen, level_button, chapter_button, "Support screen"
+				)
+				support_screen.queue_free()
+				await process_frame
 		settings_menu.queue_free()
 		await process_frame
 

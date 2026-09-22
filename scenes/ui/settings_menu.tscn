@@ -332,16 +332,16 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 38.0
-offset_top = -178.0
+offset_top = -286.0
 offset_right = -38.0
-offset_bottom = -34.0
+offset_bottom = -24.0
 grow_horizontal = 2
 grow_vertical = 0
-theme_override_constants/separation = 18
+theme_override_constants/separation = 12
 alignment = 1
 
-[node name="AdPrivacyButton" type="Button" parent="PauseMenuPanel/InnerPanel/ActionColumn" unique_id=327399141]
-custom_minimum_size = Vector2(344, 90)
+[node name="SupportButton" type="Button" parent="PauseMenuPanel/InnerPanel/ActionColumn" unique_id=327399141]
+custom_minimum_size = Vector2(344, 72)
 layout_mode = 2
 size_flags_horizontal = 4
 focus_mode = 0
@@ -350,15 +350,15 @@ theme_override_colors/font_pressed_color = Color(0.92, 1, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 3
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 28
 theme_override_styles/normal = SubResource("StyleBoxTexture_blank_button")
 theme_override_styles/pressed = SubResource("StyleBoxTexture_blank_button")
 theme_override_styles/hover = SubResource("StyleBoxTexture_blank_button")
-text = "Ad Privacy"
+text = "Support"
 script = ExtResource("6_press_scale_button")
 
-[node name="ReportAdButton" type="Button" parent="PauseMenuPanel/InnerPanel/ActionColumn" unique_id=1935723182]
-custom_minimum_size = Vector2(344, 90)
+[node name="LanguageButton" type="Button" parent="PauseMenuPanel/InnerPanel/ActionColumn" unique_id=1935723182]
+custom_minimum_size = Vector2(344, 72)
 layout_mode = 2
 size_flags_horizontal = 4
 focus_mode = 0
@@ -367,9 +367,27 @@ theme_override_colors/font_pressed_color = Color(0.92, 1, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.03, 0.25, 0.04, 0.95)
 theme_override_constants/outline_size = 3
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 28
 theme_override_styles/normal = SubResource("StyleBoxTexture_blank_button")
 theme_override_styles/pressed = SubResource("StyleBoxTexture_blank_button")
 theme_override_styles/hover = SubResource("StyleBoxTexture_blank_button")
-text = "Report Ad"
+text = "Language"
+script = ExtResource("6_press_scale_button")
+
+[node name="AdPrivacyButton" type="Button" parent="PauseMenuPanel/InnerPanel/ActionColumn"]
+visible = false
+custom_minimum_size = Vector2(344, 72)
+layout_mode = 2
+size_flags_horizontal = 4
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.92, 1, 0.9, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxTexture_blank_button")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_blank_button")
+theme_override_styles/hover = SubResource("StyleBoxTexture_blank_button")
+text = "Privacy Policy"
 script = ExtResource("6_press_scale_button")

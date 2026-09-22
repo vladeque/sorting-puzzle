@@ -26,23 +26,27 @@ func _run() -> void:
 	var menu := settings_scene.instantiate() as Control
 	root.add_child(menu)
 	await process_frame
+	var support_button := menu.find_child("SupportButton", true, false) as Button
+	var language_button := menu.find_child("LanguageButton", true, false) as Button
 	var privacy_button := menu.find_child("AdPrivacyButton", true, false) as Button
-	var report_button := menu.find_child("ReportAdButton", true, false) as Button
-	_check(privacy_button != null and report_button != null, "Settings owns both ad compliance actions.")
-	if privacy_button != null and report_button != null:
-		menu.call("set_ad_compliance_actions", "Privacy Choices", true, true)
+	_check(
+		support_button != null and language_button != null and privacy_button != null,
+		"Settings retains Support and Language alongside the policy-driven privacy action."
+	)
+	if support_button != null and language_button != null and privacy_button != null:
+		menu.call("set_ad_compliance_actions", "Privacy Choices", true)
 		_check(
-			privacy_button.visible and privacy_button.text == "Privacy Choices" and report_button.visible,
-			"The owner can expose consent choices and ad reporting without rebuilding the scene."
+			privacy_button.visible and privacy_button.text == "Privacy Choices",
+			"The owner can expose consent choices without rebuilding the scene."
 		)
-		var emitted := {"privacy": false, "report": false}
+		var emitted := {"privacy": false, "support": false}
+		menu.connect("support_requested", func() -> void: emitted["support"] = true)
 		menu.connect("ad_privacy_requested", func() -> void: emitted["privacy"] = true)
-		menu.connect("ad_report_requested", func() -> void: emitted["report"] = true)
+		support_button.pressed.emit()
 		privacy_button.pressed.emit()
-		report_button.pressed.emit()
 		_check(
-			bool(emitted.get("privacy", false)) and bool(emitted.get("report", false)),
-			"Compliance buttons emit focused owner-level requests."
+			bool(emitted.get("privacy", false)) and bool(emitted.get("support", false)),
+			"Settings emits focused support and privacy requests."
 		)
 
 	menu.queue_free()

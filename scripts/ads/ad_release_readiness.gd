@@ -70,8 +70,8 @@ static func evaluate(evidence: Variant, runtime: Dictionary, policy: Variant) ->
 		blockers.append("Native ad integration is disabled.")
 	if not _is_https_url(str(runtime.get("privacy_policy_url", ""))):
 		blockers.append("A valid HTTPS in-app privacy-policy URL is required.")
-	if not _is_https_url(str(runtime.get("ad_report_url", ""))):
-		blockers.append("A valid HTTPS inappropriate-ad reporting URL is required.")
+	if not _is_release_support_email(str(runtime.get("support_email", ""))):
+		blockers.append("A non-placeholder support email is required for inappropriate-ad reports.")
 	for setting_id in [
 		"android_application_id",
 		"ios_application_id",
@@ -95,6 +95,21 @@ static func evaluate(evidence: Variant, runtime: Dictionary, policy: Variant) ->
 static func _is_https_url(value: String) -> bool:
 	var url := value.strip_edges()
 	return url.begins_with("https://") and url.length() <= 2048
+
+
+static func _is_release_support_email(value: String) -> bool:
+	var email := value.strip_edges().to_lower()
+	if email.is_empty() or email.length() > 254 or email.contains(" ") or email.count("@") != 1:
+		return false
+	var parts := email.split("@", false, 1)
+	if parts.size() != 2 or parts[0].is_empty() or not parts[1].contains("."):
+		return false
+	return not (
+		parts[1].ends_with(".example")
+		or parts[1].ends_with(".invalid")
+		or parts[1].ends_with(".test")
+		or parts[1] == "example.com"
+	)
 
 
 static func _result(blockers: Array[String]) -> Dictionary:

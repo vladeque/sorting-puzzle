@@ -203,10 +203,12 @@ Responsibility:
   one authoritative public `profile_edit` through `PlayerProgress`; a frame-only change produces a
   frame-only edit.
 - Opens `scenes/ui/settings_menu.tscn` from the settings widget, with pause-menu-style music,
-  sound-effects, and vibration toggles plus policy-driven Privacy Choices/Privacy Policy and
-  inappropriate-ad reporting actions.
+  sound-effects, and vibration toggles, restored Support/Language actions, and an optional
+  policy-driven Privacy Choices/Privacy Policy action. Support opens the native, offline
+  `scenes/ui/support_screen.tscn` FAQ; inappropriate-ad reporting instructions and the prefilled
+  email route live there instead of replacing a Settings action.
 - Disables campaign launch when saved lives are zero; the lives widget shows current lives and the `MM:SS` countdown until the next hourly restore.
-- Uses `scenes/ui/level_button.tscn` and `assets/ui/level_button_blank_new.png` for the reusable glossy green level button visuals while keeping the label dynamic (also the shared `assets/themes/style_box_green_primary_button.tres` "regular" tier used by Shop purchase buttons); red, light-blue, and yellow-orange variants remain available beside the source texture for alternate states or future UI variants -- yellow-orange is the intentional Main Menu Chapter-button and in-level `Watch ad` secondary/alternative-action role (see `docs/SCENES.md` "Shared UI Style Tokens"), while light-blue is currently unused by any scene. The Chapter cover CTA instead uses a scene-local flat treatment sampled from the glossy green palette and matching the neutral disabled style's geometry.
+- Uses `scenes/ui/level_button.tscn` and `assets/ui/level_button_blank_new.png` for the reusable glossy green level button visuals while keeping the label dynamic (also the shared `assets/themes/style_box_green_primary_button.tres` "regular" tier used by Shop purchase buttons); red, light-blue, and yellow-orange variants remain available beside the source texture for alternate roles -- yellow-orange is the intentional Main Menu Chapter-button and in-level `Watch ad` secondary/alternative-action role, while light-blue is the Settings Support/Language/Privacy navigation role (see `docs/SCENES.md` "Shared UI Style Tokens"). The Chapter cover CTA instead uses a scene-local flat treatment sampled from the glossy green palette and matching the neutral disabled style's geometry.
 - Uses `scripts/press_scale_button.gd` as the default held-press behavior for visible game UI buttons so they shrink slightly while a click or touch is held.
 - Keeps free level selection out of the production menu.
 - Preserves the old testing menu in `scenes/main_menu_testing.tscn`.

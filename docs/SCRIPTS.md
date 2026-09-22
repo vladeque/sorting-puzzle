@@ -75,8 +75,8 @@ Purpose:
   reconciliation (`_update_reward_chest_status()`, `_prepare_pending_reward_animation()`) plays
   nothing.
 - Opens the reward chest detail modal when the reward chest widget emits `chest_pressed`.
-- Opens the main-menu settings popup from the top status bar and routes its policy-driven privacy
-  choices/privacy-policy and inappropriate-ad reporting actions.
+- Opens the main-menu settings popup from the top status bar, routes its policy-driven privacy
+  choices/privacy-policy action, and presents the native support FAQ above Settings when requested.
 - Adds every main-menu modal through a shared overlay helper so no menu action can render or receive
   input above an open modal; each overlay fades in on open and out before it closes.
 - Launches the first incomplete level in the selected unlocked chapter.
@@ -99,6 +99,7 @@ Purpose:
 Key constants:
 - `PROFILE_MENU_SCENE`: preloads `res://scenes/ui/profile_menu.tscn`.
 - `SETTINGS_MENU_SCENE`: preloads `res://scenes/ui/settings_menu.tscn`.
+- `SUPPORT_SCREEN_SCENE`: preloads `res://scenes/ui/support_screen.tscn`.
 - `REWARD_CHEST_MENU_SCENE`: preloads `res://scenes/ui/reward_chest_menu.tscn`.
 - `MenuBackgroundResolverScript`: preloads `res://scripts/chapters/menu_background_resolver.gd`,
   the same chapter-background policy Shop/Leaderboard use through their shared destination shell.
@@ -172,6 +173,8 @@ Key methods:
 - `_open_profile_menu()`: creates the centered profile menu window and listens for saved avatar changes.
 - `_open_settings_menu()`: creates the centered settings popup and wires its close button.
 - `_close_settings_menu()`: fades the settings popup out, then frees it.
+- `_open_support_screen()`: creates the full-screen native FAQ overlay above the still-open Settings
+  modal so Back returns to the same Settings context.
 - `_open_reward_chest_menu()`: creates the centered reward chest detail modal; the modal reads its own progress and wires its own close button.
 - `_add_main_menu_overlay(overlay)`: places a runtime modal on the shared overlay z-index, adds it
   to the production menu, and fades it in.
@@ -2972,6 +2975,9 @@ Purpose:
 - Settings buttons are located by name (`find_child(name, true, false)`) rather than a fixed
   NodePath, so this one script keeps working for both `scenes/pause_menu.tscn`'s shell-composed
   layout and `scenes/ui/settings_menu.tscn`'s own unrelated `PauseMenuPanel/InnerPanel/IconRow` layout.
+- On the Main Menu variant, emits `support_requested` for the restored Support button and
+  `ad_privacy_requested` for the optional privacy action. Reporting an ad is owned by the support
+  FAQ instead of consuming another Settings slot.
 - Initializes every pause-menu and main-menu settings instance from the saved disabled-state dictionary so matching buttons stay visually synchronized after game restarts.
 - Owns the deliberate sound-effects toggle audio (AUDIO-001). `SoundEffectsButton` is marked
   `sfx_click_suppressed` so the generic click policy leaves it alone, and
@@ -2998,6 +3004,32 @@ Depends on:
 Do not use for:
 - Applying actual music settings until that runtime system exists.
 - Level pause, continue, or leave flow. Those stay in `scripts/level.gd`.
+
+## `scripts/support_screen.gd`
+
+Class:
+- `SupportScreen`
+
+Attached to:
+- `scenes/ui/support_screen.tscn`
+
+Purpose:
+- Owns support-screen responsive layout, Back behavior, single-open accordion coordination, and
+  contact/ad-report `mailto:` construction.
+- Reads the replaceable `application/config/support_email` value and rejects malformed addresses
+  before asking the OS to open an email app.
+
+## `scripts/support_faq_item.gd`
+
+Class:
+- `SupportFaqItem`
+
+Attached to:
+- `scenes/ui/support_faq_item.tscn`
+
+Purpose:
+- Owns one question's expand/collapse state, answer text, chevron state, and optional action signal.
+- Contains no navigation or external-contact policy; those stay in `scripts/support_screen.gd`.
 
 ## `scripts/gameplay_ui_theme.gd`
 

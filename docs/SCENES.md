@@ -1139,10 +1139,11 @@ Script:
 Purpose:
 - Centered pause-style settings window opened from the production main menu over a dimmed modal background.
 - Reuses the pause menu visual treatment for the warm outer panel, cream inner panel, `Settings` title, protruding red close button, and saved music / sound-effects / vibration icon toggles.
-- Adds two policy-driven wide blue actions under the settings toggles. The first is labeled
-  `Privacy Choices` when UMP requires its form or `Privacy Policy` when backed by a configured HTTPS
-  URL. The second is `Report Ad`, backed by the configured inappropriate-ad reporting HTTPS URL.
-  URL-backed actions stay hidden when unconfigured.
+- Restores the wide `Support` and `Language` actions under the settings toggles. `Support` opens the
+  native FAQ screen; `Language` remains the existing placeholder until localization is implemented.
+- Keeps a separate policy-driven privacy action labeled `Privacy Choices` when UMP requires its
+  form or `Privacy Policy` when backed by a configured HTTPS URL. It stays hidden when neither
+  route is available.
 
 Important nodes:
 - `PauseMenuPanel`: centered popup panel kept named for reuse with `scripts/pause_menu.gd`.
@@ -1150,10 +1151,10 @@ Important nodes:
 - `PauseMenuPanel/InnerPanel/IconRow/MusicOption/MusicButton`: square music toggle button with shadow-only button styling, held-press scaling, and a plain red diagonal marker when disabled.
 - `PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption/SoundEffectsButton`: square sound effects toggle button with shadow-only button styling, held-press scaling, and a plain red diagonal marker when disabled.
 - `PauseMenuPanel/InnerPanel/IconRow/VibrationOption/VibrationButton`: square phone vibration toggle button with shadow-only button styling, held-press scaling, and a plain red diagonal marker when disabled.
-- `PauseMenuPanel/InnerPanel/ActionColumn/AdPrivacyButton`: policy-driven privacy choices/policy
-  action using `assets/ui/level_button_blank_light_blue_new.png`.
-- `PauseMenuPanel/InnerPanel/ActionColumn/ReportAdButton`: inappropriate-ad reporting action using
-  `assets/ui/level_button_blank_light_blue_new.png`.
+- `PauseMenuPanel/InnerPanel/ActionColumn/SupportButton`: opens `scenes/ui/support_screen.tscn`.
+- `PauseMenuPanel/InnerPanel/ActionColumn/LanguageButton`: restored localization placeholder.
+- `PauseMenuPanel/InnerPanel/ActionColumn/AdPrivacyButton`: optional policy-driven privacy
+  choices/policy action. All three actions use `assets/ui/level_button_blank_light_blue_new.png`.
 
 Depends on:
 - `scripts/pause_menu.gd` for the same crossed-out toggle visuals and shared disabled state used by the in-level pause menu.
@@ -1166,6 +1167,48 @@ Do not use for:
 - Applying actual music or ad compliance policy. Sound effects and vibration are applied by their
   global runtime managers through `scripts/pause_menu.gd`; `scripts/production_main_menu.gd` owns
   the HTTPS/UMP routes and action visibility.
+
+## `scenes/ui/support_screen.tscn`
+
+Root:
+- `SupportScreen` (`Control`)
+
+Script:
+- `scripts/support_screen.gd`
+
+Purpose:
+- Full-screen native support overlay opened above the Main Menu Settings modal.
+- Presents five offline FAQ topics: how to play, contact support, crash recovery, progress sync,
+  and reporting an offensive, misleading, or fraudulent ad.
+- Keeps one accordion article expanded at a time. Contact and ad-report articles open the device's
+  email app through a prefilled `mailto:` route using `application/config/support_email`.
+- The ad-report article asks for a screenshot, approximate time, in-game placement, advertiser/app
+  name, and reason for review, while explicitly warning against sending passwords or payment data.
+
+Important nodes:
+- `%BackButton`: fades and closes only the support overlay, revealing Settings underneath.
+- `%FaqList`: safe-area-aware scrollable accordion list.
+- `%ContactSupportItem`: contact instructions plus the general support email action.
+- `%ReportAdItem`: inappropriate-ad evidence checklist plus a prefilled ad-report email action.
+
+Depends on:
+- `scenes/ui/destination_screen_shell.tscn` for the chapter-aware background treatment.
+- `scenes/ui/support_faq_item.tscn` for each reusable expandable article.
+- `scripts/destination_screen_layout.gd` for safe-area-aware responsive placement.
+
+## `scenes/ui/support_faq_item.tscn`
+
+Root:
+- `SupportFaqItem` (`VBoxContainer`)
+
+Script:
+- `scripts/support_faq_item.gd`
+
+Purpose:
+- Reusable FAQ accordion row with a touch-sized question button, expandable answer panel, and
+  optional focused action button.
+- Emits expansion and action requests; the owning support screen coordinates single-item expansion
+  and owns external email behavior.
 
 ## `scenes/ui/profile_menu.tscn`
 

@@ -2,6 +2,7 @@ extends Control
 
 const PROFILE_MENU_SCENE := preload("res://scenes/ui/profile_menu.tscn")
 const SETTINGS_MENU_SCENE := preload("res://scenes/ui/settings_menu.tscn")
+const SUPPORT_SCREEN_SCENE := preload("res://scenes/ui/support_screen.tscn")
 const REWARD_CHEST_MENU_SCENE := preload("res://scenes/ui/reward_chest_menu.tscn")
 const CHAPTER_SELECTION_SCENE := preload("res://scenes/ui/chapter_selection_screen.tscn")
 const SfxCatalogScript := preload("res://scripts/audio/sfx_catalog.gd")
@@ -30,7 +31,6 @@ const BOTTOM_NAVIGATION_HEIGHT := 96.0
 const LIFE_STATUS_REFRESH_SECONDS := 1.0
 const MAIN_MENU_OVERLAY_Z_INDEX := 100
 const AD_PRIVACY_POLICY_SETTING := "application/config/ad_privacy_policy_url"
-const AD_REPORT_SETTING := "application/config/ad_report_url"
 
 @onready var _background := %Background as TextureRect
 @onready var _top_status_bar := %TopStatusBar as MarginContainer
@@ -55,6 +55,7 @@ const AD_REPORT_SETTING := "application/config/ad_report_url"
 var _life_status_refresh_time := 0.0
 var _profile_menu: Control
 var _settings_menu: Control
+var _support_screen: Control
 var _reward_chest_menu: Control
 var _chapter_selection_screen: Control
 var _animated_reward_stars := 0
@@ -146,16 +147,17 @@ func _process(delta: float) -> void:
 	_update_chapter_button()
 
 
-## Closes whichever scoped overlay is currently open (Chapter Selection first, then the profile,
-## settings, or reward-chest modal, then the leaderboard reward dialog), one per press. With no
-## overlay open, `ui_cancel` intentionally does nothing -- Main Menu must not quit or navigate
-## unexpectedly without a separately approved exit flow (see docs/SCENES.md's "Back/ui_cancel
-## Behavior"). Chapter Selection owns its own `ui_cancel` handling (scripts/chapters/
-## chapter_selection_screen.gd), so this only skips past it rather than also closing it here.
+## Closes whichever scoped overlay is currently open, one per press. Chapter Selection and Support
+## own their own `ui_cancel` handling, so this skips them rather than also closing Settings beneath
+## Support. With no overlay open, `ui_cancel` intentionally does nothing -- Main Menu must not quit
+## or navigate unexpectedly without a separately approved exit flow (see docs/SCENES.md's
+## "Back/ui_cancel Behavior").
 func _unhandled_input(event: InputEvent) -> void:
 	if not event.is_action_pressed("ui_cancel"):
 		return
 	if is_instance_valid(_chapter_selection_screen):
+		return
+	if is_instance_valid(_support_screen):
 		return
 
 	if _out_of_lives_menu.visible:
@@ -545,8 +547,8 @@ func _open_settings_menu() -> void:
 
 	_settings_menu = SETTINGS_MENU_SCENE.instantiate() as Control
 	_add_main_menu_overlay(_settings_menu)
+	_settings_menu.connect("support_requested", Callable(self, "_open_support_screen"))
 	_settings_menu.connect("ad_privacy_requested", Callable(self, "_on_ad_privacy_requested"))
-	_settings_menu.connect("ad_report_requested", Callable(self, "_on_ad_report_requested"))
 	_refresh_ad_compliance_actions()
 
 	var close_button := _settings_menu.get_node_or_null("PauseMenuPanel/CloseButton") as Button
@@ -569,12 +571,10 @@ func _refresh_ad_compliance_actions() -> void:
 		ad_service != null and bool(ad_service.call("is_privacy_options_required"))
 	)
 	var privacy_url := str(ProjectSettings.get_setting(AD_PRIVACY_POLICY_SETTING, "")).strip_edges()
-	var report_url := str(ProjectSettings.get_setting(AD_REPORT_SETTING, "")).strip_edges()
 	_settings_menu.call(
 		"set_ad_compliance_actions",
 		"Privacy Choices" if privacy_options_required else "Privacy Policy",
-		privacy_options_required or _is_safe_external_url(privacy_url),
-		_is_safe_external_url(report_url)
+		privacy_options_required or _is_safe_external_url(privacy_url)
 	)
 
 
@@ -589,10 +589,6 @@ func _on_ad_privacy_requested() -> void:
 		_refresh_ad_compliance_actions()
 		return
 	_open_ad_compliance_url(AD_PRIVACY_POLICY_SETTING)
-
-
-func _on_ad_report_requested() -> void:
-	_open_ad_compliance_url(AD_REPORT_SETTING)
 
 
 func _open_ad_compliance_url(setting: String) -> void:
@@ -611,6 +607,14 @@ func _is_safe_external_url(url: String) -> bool:
 
 func _get_ad_service() -> Node:
 	return get_tree().root.get_node_or_null(^"AdService") as Node
+
+
+func _open_support_screen() -> void:
+	if is_instance_valid(_support_screen):
+		return
+	_support_screen = SUPPORT_SCREEN_SCENE.instantiate() as Control
+	_add_main_menu_overlay(_support_screen)
+	_support_screen.tree_exited.connect(_clear_support_screen_reference)
 
 
 func _open_reward_chest_menu() -> void:
@@ -665,6 +669,10 @@ func _clear_profile_menu_reference() -> void:
 
 func _clear_settings_menu_reference() -> void:
 	_settings_menu = null
+
+
+func _clear_support_screen_reference() -> void:
+	_support_screen = null
 
 
 ## Retapping the already-active Home tab is a no-op (see docs/SCENES.md's "Active-Tab Reselection

@@ -16,7 +16,9 @@ func _init() -> void:
 		"privacy_policy_url": str(ProjectSettings.get_setting(
 			"application/config/ad_privacy_policy_url", ""
 		)),
-		"ad_report_url": str(ProjectSettings.get_setting("application/config/ad_report_url", "")),
+		"support_email": str(ProjectSettings.get_setting(
+			"application/config/support_email", ""
+		)),
 		"android_application_id": str(ProjectSettings.get_setting(
 			"admob/general/android/app_id", ""
 		)),

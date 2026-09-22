@@ -2,6 +2,14 @@
 
 This file describes data files that drive gameplay and tooling.
 
+## Support contact project setting
+
+- `application/config/support_email` supplies the address shown by the native support FAQ and used
+  for its prefilled general-support and inappropriate-ad-report `mailto:` actions.
+- The committed `support@sortingpuzzle.example` value is intentionally a development placeholder.
+  ADS-008 release readiness rejects reserved placeholder domains, so a deliverable owner-approved
+  address must be injected before an ads-enabled release can pass.
+
 ## `configs/ads.json`
 
 Purpose:

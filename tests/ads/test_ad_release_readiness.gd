@@ -30,6 +30,15 @@ func _run() -> void:
 
 	var ready := Readiness.evaluate(_complete_evidence(), _complete_runtime(), _initial_policy())
 	_check(bool(ready.get("ready", false)), "A complete initial-release evidence set passes.")
+	var placeholder_contact := _complete_runtime()
+	placeholder_contact["support_email"] = "support@sortingpuzzle.example"
+	var placeholder_result := Readiness.evaluate(
+		_complete_evidence(), placeholder_contact, _initial_policy()
+	)
+	_check(
+		not bool(placeholder_result.get("ready", true)),
+		"Release readiness rejects the committed placeholder support email."
+	)
 	var unsafe_policy := _initial_policy()
 	(unsafe_policy["interstitial"] as Dictionary)["enabled"] = true
 	(unsafe_policy["interstitial"] as Dictionary)["rollout_percent"] = 5
@@ -67,7 +76,7 @@ func _complete_runtime() -> Dictionary:
 		"provider": "admob",
 		"native_integration_enabled": true,
 		"privacy_policy_url": "https://example.invalid/privacy",
-		"ad_report_url": "https://example.invalid/report-ad",
+		"support_email": "support@sortingpuzzle.com",
 	}
 	for setting_id in [
 		"android_application_id", "ios_application_id",

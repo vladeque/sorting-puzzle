@@ -4,22 +4,24 @@ Status: **client safeguards implemented; external approvals remain intentionally
 
 ## Player-facing privacy and reporting
 
-The main-menu Settings modal now owns two focused actions:
+The main-menu Settings modal retains the product-owned **Support** and **Language** actions and owns
+one focused ad privacy action:
 
 - **Privacy Choices** opens the provider's UMP privacy-options form when UMP reports that an entry
   point is required. Otherwise the action is labeled **Privacy Policy** and opens the configured
   HTTPS privacy-policy URL.
-- **Report Ad** opens the configured HTTPS inappropriate-ad reporting URL.
+- **Support** opens a native offline FAQ. Its **How do I report a bad ad?** article tells the player
+  to collect a screenshot, approximate time, placement, advertiser/app name, and reason for review,
+  then opens a prefilled message to the configured support email.
 
-Both URL-backed actions remain hidden until a valid `https://` URL is configured. The privacy-
-choices action can still appear independently when UMP requires it. This keeps placeholder/dead
-routes out of release UI and provides the interactive privacy entry point required by the selected
-consent state.
+The privacy action remains hidden until a valid `https://` URL is configured, but can appear
+independently when UMP requires it. Support remains available offline; only its email handoff
+depends on an installed device email app.
 
 Project settings:
 
 - `application/config/ad_privacy_policy_url`
-- `application/config/ad_report_url`
+- `application/config/support_email`
 
 ## Fail-closed release audit
 
@@ -35,7 +37,7 @@ review result before it can pass.
 - all four rewarded placements enabled;
 - interstitials disabled with zero rollout;
 - AdMob and native integration explicitly enabled for the release environment;
-- HTTPS privacy/report URLs; and
+- an HTTPS privacy-policy URL and a non-placeholder support email; and
 - injected Android/iOS application IDs plus per-placement rewarded and future interstitial unit IDs.
 
 Run the audit with:
@@ -54,8 +56,11 @@ release approval.
 ```powershell
 & .\scripts\tools\run_isolated_godot_test.ps1 -Script tests/ads/test_ad_release_readiness.gd
 & .\scripts\tools\run_isolated_godot_test.ps1 -Script tests/ui/test_ad_compliance_settings.gd
+& .\scripts\tools\run_isolated_godot_test.ps1 -Script tests/ui/test_support_screen.gd
 & .\scripts\tools\capture_ui.ps1 -Scene scenes/main_menu.tscn -Name ad_compliance_settings `
     -Setup scripts/tools/captures/ad_compliance_settings_setup.gd
+& .\scripts\tools\capture_ui.ps1 -Scene scenes/ui/support_screen.tscn -Name support_screen_report `
+    -Setup scripts/tools/captures/support_screen_report_setup.gd
 ```
 
 The responsive capture covers 540x960, 720x1280, 1080x1920, 1080x2400, and the available
