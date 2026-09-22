@@ -2008,7 +2008,7 @@ Important constants:
 - `DISPENSER_LOWER_CLEARANCE`: per-dispenser upward offset used when another row follows, leaving
   room for the attached stock meter without moving standard neighbours out of the interlocked grid;
   this 32px conditional clearance is additional to the dispenser scene's authored 10px root lift.
-- `LAYOUT_ROW_VERTICAL_EPSILON`: tolerance used to group authored layout-template shelf markers into horizontal rows before assigning left/middle/right shelf visuals.
+- `LAYOUT_ROW_VERTICAL_EPSILON`: tolerance used to group authored layout-template shelf markers into horizontal rows before assigning left/middle/right/single shelf visuals. Dispenser markers are excluded from the standard-shelf edge ordering because dispensers carry complete independent frames.
 - `ABILITY_BAR_*`, `SHELVES_*`: responsive layout constants for positioning the ability bar and
   generated shelf root across portrait viewport sizes, including the back-wall bottom boundary and
   minimum/maximum shelf layout scale. `SHELVES_BACK_WALL_BOTTOM_MARGIN` is 224 design pixels,
@@ -2605,7 +2605,9 @@ Key methods:
 - `set_horizontal_visual_scale(horizontal_scale)`: narrows shelf artwork for a moving row, trims the
   static shelf lip overhang to the floor-surface width, enables antialiasing on its moving polygon
   edges, and preserves item, slot, and input proportions.
-- `get_row_placement()`: returns the active shelf row placement.
+- `get_row_placement()`: returns the active shelf row placement (`left`, `middle`, `right`, or
+  `single`). The `single` state reuses the middle cabinet art and tapers both ends of its exposed top
+  backboard.
 - `set_collapsing_visuals_enabled(should_enable)`: toggles the collapsing-only cabinet treatment
   without changing shelf geometry, slots, input, or the shared light-oak art used by basic levels;
   it also suppresses each cell's exterior casts because the board owns one combined cast.

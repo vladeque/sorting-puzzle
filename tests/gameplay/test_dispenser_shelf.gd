@@ -453,6 +453,24 @@ func _test_preset_layout_offsets_only_dispensers() -> void:
 			"A dispenser should keep its 10px lift plus 32px rail clearance above the row below."
 		)
 
+		var center_standard := all_shelves[1] as Shelf
+		var center_backboard := center_standard.get_node(
+			"PlacementVisuals/Middle/TopCeilingCap/BackBoard"
+		) as Polygon2D
+		_check(
+			center_standard.get_row_placement() == Shelf.ROW_PLACEMENT_SINGLE,
+			"Level 5's lone standard top shelf should be both ends of its standard-shelf run."
+		)
+		_check(
+			center_backboard.polygon == PackedVector2Array([
+				Vector2(-108, -112.7),
+				Vector2(108, -112.7),
+				Vector2(112, -98.7),
+				Vector2(-112, -98.7),
+			]),
+			"A lone standard shelf's top backboard should taper inward on both sides."
+		)
+
 		var second_row_left_cap := (
 			(all_shelves[3] as Node).get_node("PlacementVisuals/Left/TopCeilingCap")
 			as CanvasItem

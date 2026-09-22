@@ -322,7 +322,10 @@ Runtime behavior:
   cap on shelves visible at runtime. After fitting, horizontal belts span the full safe background
   width and vertical belts span the playable wall from below the HUD to the back-wall bottom
   boundary. Taller screens can show more of the same configured shelves; none are duplicated.
-- Static shelf left/middle/right visuals are derived from authored shelf positions or `row_layouts` order at runtime; there is no per-shelf config field for row placement.
+- Static shelf left/middle/right visuals are derived from authored shelf positions or `row_layouts`
+  order at runtime; there is no per-shelf config field for row placement. Dispensers carry their own
+  complete frame and are excluded from that ordering, so a lone standard shelf among dispensers uses
+  the `single` presentation with both exposed backboard ends tapered.
 - If `row_layouts` is present, `scripts/level.gd` creates shelves row by row instead. Moving rows are clipped to their visible window and wrap shelves horizontally or vertically according to their motion type.
 - `scripts/level.gd` uses `time_seconds` as the active timer.
 - Locked shelves show a runtime lock overlay with the remaining triple count on the lock and cannot be used as move sources, move targets, match clears, promotions, or ability targets until unlocked.

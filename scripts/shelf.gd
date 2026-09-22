@@ -25,10 +25,12 @@ const VISUAL_VARIANT_FLOOR_ONLY := "floor_only"
 const ROW_PLACEMENT_LEFT := "left"
 const ROW_PLACEMENT_MIDDLE := "middle"
 const ROW_PLACEMENT_RIGHT := "right"
+const ROW_PLACEMENT_SINGLE := "single"
 const PLACEMENT_VISUALS_NODE := "PlacementVisuals"
 const LEFT_PLACEMENT_NODE := "PlacementVisuals/Left"
 const MIDDLE_PLACEMENT_NODE := "PlacementVisuals/Middle"
 const RIGHT_PLACEMENT_NODE := "PlacementVisuals/Right"
+const MIDDLE_TOP_BACKBOARD_NODE := "PlacementVisuals/Middle/TopCeilingCap/BackBoard"
 const TOP_CEILING_CAP_NODE := "TopCeilingCap"
 const COLLAPSING_VISUALS_NODE := "CollapsingVisuals"
 const FLOOR_SURFACE_NODE := "FloorSurface"
@@ -145,7 +147,7 @@ func get_visual_variant() -> String:
 
 func set_row_placement(row_placement: String) -> void:
 	match row_placement:
-		ROW_PLACEMENT_LEFT, ROW_PLACEMENT_MIDDLE, ROW_PLACEMENT_RIGHT:
+		ROW_PLACEMENT_LEFT, ROW_PLACEMENT_MIDDLE, ROW_PLACEMENT_RIGHT, ROW_PLACEMENT_SINGLE:
 			_row_placement = row_placement
 		_:
 			_row_placement = ROW_PLACEMENT_MIDDLE
@@ -286,8 +288,35 @@ func _apply_row_placement() -> void:
 
 	_set_node_visible(PLACEMENT_VISUALS_NODE, true)
 	_set_node_visible(LEFT_PLACEMENT_NODE, _row_placement == ROW_PLACEMENT_LEFT)
-	_set_node_visible(MIDDLE_PLACEMENT_NODE, _row_placement == ROW_PLACEMENT_MIDDLE)
+	_set_node_visible(
+		MIDDLE_PLACEMENT_NODE,
+		_row_placement == ROW_PLACEMENT_MIDDLE or _row_placement == ROW_PLACEMENT_SINGLE
+	)
 	_set_node_visible(RIGHT_PLACEMENT_NODE, _row_placement == ROW_PLACEMENT_RIGHT)
+	_apply_middle_top_backboard_shape()
+
+
+## A lone standard shelf is both ends of its standard-shelf run. It reuses the middle cabinet art,
+## but its exposed cap tapers inward on both ends instead of staying square or tapering only one.
+func _apply_middle_top_backboard_shape() -> void:
+	var backboard := get_node_or_null(MIDDLE_TOP_BACKBOARD_NODE) as Polygon2D
+	if backboard == null:
+		return
+
+	if _row_placement == ROW_PLACEMENT_SINGLE:
+		backboard.polygon = PackedVector2Array([
+			Vector2(-108, -112.7),
+			Vector2(108, -112.7),
+			Vector2(112, -98.7),
+			Vector2(-112, -98.7),
+		])
+	else:
+		backboard.polygon = PackedVector2Array([
+			Vector2(-112, -112.7),
+			Vector2(112, -112.7),
+			Vector2(112, -98.7),
+			Vector2(-112, -98.7),
+		])
 
 
 func _apply_top_ceiling_cap_visibility() -> void:
