@@ -386,6 +386,31 @@ Differences from calling the two tools by hand:
 - `--dry-run` reports those differences without writing.
 - Both written files are hashed in `configs/backend/content_provenance.json`, so regeneration makes
   the published content digest stale.
+- Every file is written with LF line endings, matching `.gitattributes`, so working-tree bytes
+  equal the committed bytes on Windows too.
+
+### Adding a new campaign level
+
+A level must belong to a chapter before it can be materialized, because its item art comes from
+that chapter's pool. It cannot be added to `configs/chapters.json` by hand first either: the runtime
+chapter catalog rejects a chapter that lists a level whose `configs/levels/` file does not exist.
+Pass `--chapter` for a level that no chapter lists yet:
+
+```powershell
+py scripts\tools\regenerate_level.py --level-number 11 --chapter chapter_01 --shelf-count 9 --layer-count 2 --item-type-count 7 --difficulty medium --seed 11011 --stats
+```
+
+- The level ID is appended to that chapter's `level_ids`, and the chapters config is written in the
+  same step as the template and runtime level, only after materialization succeeds. The change is
+  one line, because `level_ids` arrays keep their inline formatting.
+- Without `--chapter`, an unassigned level fails with the list of chapters and their levels.
+- A level a chapter already lists needs no `--chapter`. Naming a different chapter is rejected:
+  moving a level changes its item pool and campaign position, so that is a hand edit.
+- A level ID that skips unassigned campaign IDs, such as `14` after `10`, is reported as a warning.
+- `--chapter` is not recorded in the generation manifest. Chapter membership is catalog state owned
+  by `configs/chapters.json`, and replaying an existing level does not need it.
+- A new level is also absent from `supported_campaign_levels` in
+  `configs/backend/content_provenance.json`, which the run reports.
 
 ### Generation manifest
 

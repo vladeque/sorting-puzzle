@@ -3617,6 +3617,14 @@ Key behavior:
   the board came from after any retry and `--layout-preset` is the preset the template carries.
   `template_sha256` lets a later run detect a template that was hand-edited after generation.
 - Reads the manifest before generating, so an unusable one stops the run before any file changes.
+- `--chapter` appends a level that no chapter lists to that chapter's `level_ids`. Materialization
+  runs against the updated catalog in a temporary copy, and `configs/chapters.json` is written with
+  the level files only after it succeeds, because the runtime chapter catalog rejects a chapter that
+  references a missing level file. Formatting is preserved so the change is one line.
+- Rejects an unassigned level without `--chapter`, listing each chapter's levels, and rejects
+  moving an assigned level to another chapter. Warns when a new level skips campaign IDs.
+- Writes every file with LF line endings through `write_lf_text`, matching `.gitattributes`;
+  `Path.write_text` would otherwise produce CRLF on Windows and break `template_sha256`.
 - `--dry-run` reports the same differences without writing or recording.
 - Propagates the generator's exit codes (`2` invalid item counts, `3` no solvable layout) and
   returns `1` for materialization failures.

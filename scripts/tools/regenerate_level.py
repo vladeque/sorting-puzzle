@@ -14,6 +14,8 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
+import re
 import sys
 import tempfile
 from datetime import datetime, timezone
@@ -44,9 +46,12 @@ MANIFEST_SCHEMA_VERSION = 1
 ## Wrapper plumbing and output switches say nothing about the board, so they stay out of the
 ## record. Everything else the generator accepts is recorded, defaults included: a later change to
 ## a generator default must not silently change what a replay of this entry produces.
+## `--chapter` is excluded as well: chapter membership is catalog state owned by
+## `configs/chapters.json`, and the generator never sees it.
 NON_GENERATION_ARGUMENTS = frozenset(
     {
         "allow_unsolvable",
+        "chapter",
         "chapters_config",
         "dry_run",
         "full_level",
@@ -59,6 +64,11 @@ NON_GENERATION_ARGUMENTS = frozenset(
         "templates_directory",
     }
 )
+
+## `level_ids` arrays stay on one line in `configs/chapters.json`. Every other value already matches
+## `json.dumps(indent=2)`, so collapsing integer arrays back reproduces the file byte for byte and a
+## new level shows up as a one-line diff.
+INTEGER_ARRAY_PATTERN = re.compile(r"\[\s*((?:-?\d+,\s*)*-?\d+)\s*\]")
 
 
 def build_wrapper_parser() -> argparse.ArgumentParser:
@@ -96,6 +106,13 @@ def build_wrapper_parser() -> argparse.ArgumentParser:
         action="store_true",
         help=f"Skip updating {MANIFEST_FILE_NAME} with the arguments this run used.",
     )
+    parser.add_argument(
+        "--chapter",
+        help=(
+            "Chapter ID, such as chapter_01, to append a new level to in the chapters config. "
+            "Required only for a level no chapter lists yet."
+        ),
+    )
     return parser
 
 
@@ -117,6 +134,13 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         args.require_solvable = True
     validate_mode_arguments(parser, args)
     return args
+
+
+## `Path.write_text` translates `\n` to `\r\n` on Windows. The repo normalizes to LF
+## (`.gitattributes`), so without this every rewritten file differs from its committed bytes on
+## disk, and `template_sha256`, which hashes the LF text, would not match the written file.
+def write_lf_text(path: Path, text: str) -> None:
+    path.write_text(text, encoding="utf-8", newline="\n")
 
 
 def level_file_name(level_number: int) -> str:
@@ -159,16 +183,16 @@ def argument_flag(argument_name: str) -> str:
     return "--" + argument_name.replace("_", "-")
 
 
-## The recorded arguments are the replay contract, so they are stored structurally. A shell string
-## would be quoting-specific and would invite replaying a config file through a shell; the command
-## below is derived from these values for reading, not for being the source of truth.
 def resolved_seed(template: dict[str, Any]) -> int | None:
     seed = template.get("seed")
     return seed if isinstance(seed, int) else None
 
 
-## Values are recorded as the generator resolved them, not as they were requested: replaying an
-## entry has to rebuild this board even after a generator default moves.
+## The recorded arguments are the replay contract, so they are stored structurally. A shell string
+## would be quoting-specific and would invite replaying a config file through a shell; the command
+## is derived from these values for reading, not for being the source of truth. Values are recorded
+## as the generator resolved them, not as they were requested: replaying an entry has to rebuild
+## this board even after a generator default moves.
 def build_recorded_arguments(
     args: argparse.Namespace,
     template: dict[str, Any],
@@ -243,7 +267,90 @@ def write_manifest(
     manifest["entries"][file_name] = entry
     manifest["entries"] = dict(sorted(manifest["entries"].items()))
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
-    manifest_path.write_text(format_json(manifest), encoding="utf-8")
+    write_lf_text(manifest_path, format_json(manifest))
+
+
+def format_chapters_json(chapters_document: dict[str, Any]) -> str:
+    text = json.dumps(chapters_document, indent=2, ensure_ascii=False) + "\n"
+    return INTEGER_ARRAY_PATTERN.sub(
+        lambda match: "[" + ", ".join(value.strip() for value in match.group(1).split(",")) + "]",
+        text,
+    )
+
+
+def describe_level_ids(level_ids: list[int]) -> str:
+    if not level_ids:
+        return "no levels"
+    if level_ids == list(range(level_ids[0], level_ids[-1] + 1)):
+        return f"levels {level_ids[0]}-{level_ids[-1]}"
+    return "levels " + ", ".join(str(level_id) for level_id in level_ids)
+
+
+## Materialization picks item art from the level's chapter pool, so a level no chapter lists cannot
+## be materialized at all. Adding it by hand first does not work either: the runtime chapter catalog
+## rejects a chapter that references a missing level file. The assignment therefore happens here,
+## in memory, and is written together with the level files.
+def assign_level_to_chapter(
+    chapters_document: dict[str, Any],
+    level_number: int,
+    requested_chapter_id: str | None,
+) -> str | None:
+    """Return the chapter a new level was appended to, or None when a chapter already lists it."""
+    chapters = chapters_document.get("chapters")
+    if not isinstance(chapters, list) or not all(isinstance(chapter, dict) for chapter in chapters):
+        raise ValueError("chapters config must define a chapters array")
+
+    for chapter in chapters:
+        if level_number in chapter.get("level_ids", []):
+            chapter_id = chapter.get("id")
+            if requested_chapter_id is not None and requested_chapter_id != chapter_id:
+                raise ValueError(
+                    f"level {level_number} already belongs to {chapter_id}; moving it to "
+                    f"{requested_chapter_id} changes its item pool and campaign position, so "
+                    "edit the chapters config by hand"
+                )
+            return None
+
+    chapter_summary = "; ".join(
+        f"{chapter.get('id')} has {describe_level_ids(list(chapter.get('level_ids', [])))}"
+        for chapter in chapters
+    )
+    if requested_chapter_id is None:
+        raise ValueError(
+            f"level {level_number} is not assigned to a chapter; pass --chapter to append it to "
+            f"one ({chapter_summary})"
+        )
+
+    for chapter in chapters:
+        if chapter.get("id") == requested_chapter_id:
+            level_ids = chapter.get("level_ids")
+            if not isinstance(level_ids, list):
+                raise ValueError(f"chapter '{requested_chapter_id}' has no level_ids array")
+            level_ids.append(level_number)
+            return requested_chapter_id
+
+    raise ValueError(f"unknown chapter '{requested_chapter_id}' ({chapter_summary})")
+
+
+def find_unassigned_gap(chapters_document: dict[str, Any], level_number: int) -> range:
+    assigned = [
+        level_id
+        for chapter in chapters_document["chapters"]
+        for level_id in chapter.get("level_ids", [])
+        if level_id != level_number
+    ]
+    return range(max(assigned, default=0) + 1, level_number)
+
+
+def provenance_supports_level(level_number: int) -> bool | None:
+    try:
+        provenance = load_json_object(PROVENANCE_PATH)
+    except (OSError, ValueError):
+        return None
+    supported = provenance.get("supported_campaign_levels")
+    if not isinstance(supported, list):
+        return None
+    return level_number in supported
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -263,6 +370,29 @@ def main(argv: list[str] | None = None) -> int:
             print(f"error: {error}", file=sys.stderr)
             print(f"error: {template_path} was not modified", file=sys.stderr)
             return 1
+
+    try:
+        chapters_document = load_json_object(args.chapters_config)
+        assigned_chapter_id = assign_level_to_chapter(
+            chapters_document,
+            args.level_number,
+            args.chapter,
+        )
+    except (OSError, ValueError) as error:
+        print(f"error: {error}", file=sys.stderr)
+        print(f"error: {template_path} was not modified", file=sys.stderr)
+        return 1
+
+    chapters_text: str | None = None
+    if assigned_chapter_id is not None:
+        chapters_text = format_chapters_json(chapters_document)
+        gap = find_unassigned_gap(chapters_document, args.level_number)
+        if gap:
+            print(
+                f"warning: level {args.level_number} leaves campaign levels "
+                f"{gap.start}-{gap.stop - 1} unassigned",
+                file=sys.stderr,
+            )
 
     previous_template: dict[str, Any] | None = None
     if template_path.is_file():
@@ -296,33 +426,51 @@ def main(argv: list[str] | None = None) -> int:
         template_text = args.output.read_text(encoding="utf-8")
         template = load_json_object(args.output)
 
-    try:
-        progression = load_item_progression(
-            args.progression_config,
-            args.item_config,
-            args.chapters_config,
-        )
-        materialized, _mapping = materialize_level(template, progression)
-    except (OSError, ValueError) as error:
-        print(f"error: {error}", file=sys.stderr)
-        print(f"error: {template_path} was not modified", file=sys.stderr)
-        return 1
+        ## A new level is materialized against the chapters config it will ship with, which only
+        ## exists in memory until every other step has succeeded.
+        chapters_config = args.chapters_config
+        if chapters_text is not None:
+            chapters_config = Path(temporary_directory) / args.chapters_config.name
+            write_lf_text(chapters_config, chapters_text)
+
+        try:
+            progression = load_item_progression(
+                args.progression_config,
+                args.item_config,
+                chapters_config,
+            )
+            materialized, _mapping = materialize_level(template, progression)
+        except (OSError, ValueError) as error:
+            print(f"error: {error}", file=sys.stderr)
+            print(f"error: {template_path} was not modified", file=sys.stderr)
+            return 1
 
     changes = describe_metadata_changes(previous_template, template)
     if changes:
         print(f"{template_path} metadata changes:")
         print("\n".join(changes))
 
+    chapter_change = (
+        ""
+        if assigned_chapter_id is None
+        else f"level {args.level_number} to {assigned_chapter_id} in {args.chapters_config}"
+    )
+
     if args.dry_run:
-        recorded = "" if manifest is None else f", and record it in {manifest_path}"
-        print(f"dry run: would write {template_path} and {runtime_path}{recorded}")
+        print(f"dry run: would write {template_path} and {runtime_path}")
+        if chapter_change:
+            print(f"dry run: would add {chapter_change}")
+        if manifest is not None:
+            print(f"dry run: would record the generation arguments in {manifest_path}")
         return 0
 
     try:
         template_path.parent.mkdir(parents=True, exist_ok=True)
-        template_path.write_text(template_text, encoding="utf-8")
+        write_lf_text(template_path, template_text)
         runtime_path.parent.mkdir(parents=True, exist_ok=True)
-        runtime_path.write_text(format_json(materialized), encoding="utf-8")
+        write_lf_text(runtime_path, format_json(materialized))
+        if chapters_text is not None:
+            write_lf_text(args.chapters_config, chapters_text)
         if manifest is not None:
             write_manifest(
                 manifest_path,
@@ -336,12 +484,20 @@ def main(argv: list[str] | None = None) -> int:
 
     print(f"wrote {template_path}")
     print(f"wrote {runtime_path}")
+    if chapter_change:
+        print(f"added {chapter_change}")
     if manifest is not None:
         print(f"recorded the generation arguments in {manifest_path}")
+    hashed_files = "these files" if chapter_change else "both level files"
     print(
-        f"note: {PROVENANCE_PATH} hashes both files and is now stale; republish content "
+        f"note: {PROVENANCE_PATH} hashes {hashed_files} and is now stale; republish content "
         "provenance before shipping this level."
     )
+    if chapter_change and provenance_supports_level(args.level_number) is False:
+        print(
+            f"note: level {args.level_number} is not yet in the supported_campaign_levels of "
+            f"{PROVENANCE_PATH}."
+        )
     return 0
 
 

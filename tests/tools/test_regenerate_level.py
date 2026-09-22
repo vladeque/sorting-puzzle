@@ -20,6 +20,7 @@ from regenerate_level import (  # noqa: E402
     MANIFEST_FILE_NAME,
     MANIFEST_SCHEMA_VERSION,
     describe_metadata_changes,
+    format_chapters_json,
     level_file_name,
     parse_args,
 )
@@ -467,6 +468,244 @@ class GenerationManifestTests(unittest.TestCase):
             self.assertIn("schema_version must be", stderr)
             self.assertIn("was not modified", stderr)
             self.assertFalse((templates_directory / level_file_name(2)).exists())
+
+
+CHAPTERS_PATH = REPOSITORY_ROOT / "configs" / "chapters.json"
+
+
+## Derived from the committed catalog so these tests keep exercising a genuinely unassigned level
+## after the campaign grows.
+def next_unassigned_level() -> int:
+    chapters = json.loads(CHAPTERS_PATH.read_text(encoding="utf-8"))["chapters"]
+    return max(level_id for chapter in chapters for level_id in chapter["level_ids"]) + 1
+
+
+class NewLevelChapterTests(unittest.TestCase):
+    ## Every test runs against a copy: the default chapters config is the shipped campaign catalog.
+    def regenerate(
+        self,
+        directory: Path,
+        arguments: list[str],
+    ) -> tuple[int, str, str, Path, Path, Path]:
+        chapters_path = directory / "chapters.json"
+        if not chapters_path.exists():
+            chapters_path.write_bytes(CHAPTERS_PATH.read_bytes())
+        templates_directory = directory / "templates"
+        levels_directory = directory / "levels"
+        exit_code, stdout, stderr = run_regenerate(
+            [
+                *arguments,
+                "--templates-directory",
+                str(templates_directory),
+                "--levels-directory",
+                str(levels_directory),
+                "--chapters-config",
+                str(chapters_path),
+            ]
+        )
+        return exit_code, stdout, stderr, templates_directory, levels_directory, chapters_path
+
+    def chapter_level_ids(self, chapters_path: Path, chapter_id: str) -> list[int]:
+        chapters = json.loads(chapters_path.read_text(encoding="utf-8"))["chapters"]
+        return next(chapter["level_ids"] for chapter in chapters if chapter["id"] == chapter_id)
+
+    def test_formatting_round_trips_the_committed_chapters_config(self) -> None:
+        raw = CHAPTERS_PATH.read_bytes().decode("utf-8")
+
+        self.assertEqual(format_chapters_json(json.loads(raw)), raw)
+
+    def test_an_unassigned_level_without_a_chapter_explains_how_to_add_one(self) -> None:
+        level = next_unassigned_level()
+        with tempfile.TemporaryDirectory() as directory:
+            exit_code, _stdout, stderr, templates, _levels, chapters_path = self.regenerate(
+                Path(directory), [*BASE_ARGUMENTS, "--level-number", str(level)]
+            )
+
+            self.assertEqual(exit_code, 1)
+            self.assertIn(f"level {level} is not assigned to a chapter", stderr)
+            self.assertIn("pass --chapter", stderr)
+            self.assertIn("chapter_01 has levels", stderr)
+            self.assertFalse((templates / level_file_name(level)).exists())
+            self.assertEqual(chapters_path.read_bytes(), CHAPTERS_PATH.read_bytes())
+
+    def test_chapter_appends_the_level_and_writes_all_files_together(self) -> None:
+        level = next_unassigned_level()
+        with tempfile.TemporaryDirectory() as directory:
+            original_ids = self.chapter_level_ids(CHAPTERS_PATH, "chapter_01")
+            exit_code, stdout, _stderr, templates, levels, chapters_path = self.regenerate(
+                Path(directory),
+                [*BASE_ARGUMENTS, "--level-number", str(level), "--chapter", "chapter_01"],
+            )
+
+            self.assertEqual(exit_code, 0)
+            self.assertIn(f"added level {level} to chapter_01", stdout)
+            self.assertEqual(
+                self.chapter_level_ids(chapters_path, "chapter_01"), [*original_ids, level]
+            )
+            self.assertTrue((templates / level_file_name(level)).is_file())
+            runtime = json.loads((levels / level_file_name(level)).read_text(encoding="utf-8"))
+            self.assertEqual(runtime["level"], level)
+
+    ## A new level must read as a one-line change to the chapters config, not a reformat.
+    def test_only_the_assigned_chapter_line_changes(self) -> None:
+        level = next_unassigned_level()
+        with tempfile.TemporaryDirectory() as directory:
+            _code, _out, _err, _templates, _levels, chapters_path = self.regenerate(
+                Path(directory),
+                [*BASE_ARGUMENTS, "--level-number", str(level), "--chapter", "chapter_01"],
+            )
+
+            before = CHAPTERS_PATH.read_bytes().decode("utf-8").split("\n")
+            after = chapters_path.read_bytes().decode("utf-8").split("\n")
+            changed = [index for index, (old, new) in enumerate(zip(before, after)) if old != new]
+            self.assertEqual(len(before), len(after))
+            self.assertEqual(len(changed), 1)
+            self.assertIn(f", {level}]", after[changed[0]])
+
+    def test_an_assigned_level_leaves_the_chapters_config_alone(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            exit_code, stdout, _stderr, _templates, _levels, chapters_path = self.regenerate(
+                Path(directory), [*BASE_ARGUMENTS, "--level-number", "2"]
+            )
+
+            self.assertEqual(exit_code, 0)
+            self.assertNotIn("added level", stdout)
+            self.assertEqual(chapters_path.read_bytes(), CHAPTERS_PATH.read_bytes())
+
+    def test_naming_the_chapter_that_already_lists_the_level_is_accepted(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            exit_code, _stdout, _stderr, _templates, _levels, chapters_path = self.regenerate(
+                Path(directory), [*BASE_ARGUMENTS, "--level-number", "2", "--chapter", "chapter_01"]
+            )
+
+            self.assertEqual(exit_code, 0)
+            self.assertEqual(chapters_path.read_bytes(), CHAPTERS_PATH.read_bytes())
+
+    ## Moving a level changes its item pool and campaign position, which is not a regeneration.
+    def test_refuses_to_move_a_level_to_another_chapter(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            exit_code, _stdout, stderr, templates, _levels, chapters_path = self.regenerate(
+                Path(directory), [*BASE_ARGUMENTS, "--level-number", "2", "--chapter", "chapter_02"]
+            )
+
+            self.assertEqual(exit_code, 1)
+            self.assertIn("level 2 already belongs to chapter_01", stderr)
+            self.assertFalse((templates / level_file_name(2)).exists())
+            self.assertEqual(chapters_path.read_bytes(), CHAPTERS_PATH.read_bytes())
+
+    def test_rejects_an_unknown_chapter(self) -> None:
+        level = next_unassigned_level()
+        with tempfile.TemporaryDirectory() as directory:
+            exit_code, _stdout, stderr, _templates, _levels, _chapters = self.regenerate(
+                Path(directory),
+                [*BASE_ARGUMENTS, "--level-number", str(level), "--chapter", "chapter_99"],
+            )
+
+            self.assertEqual(exit_code, 1)
+            self.assertIn("unknown chapter 'chapter_99'", stderr)
+
+    def test_warns_when_a_new_level_skips_campaign_ids(self) -> None:
+        level = next_unassigned_level() + 2
+        with tempfile.TemporaryDirectory() as directory:
+            exit_code, _stdout, stderr, _templates, _levels, _chapters = self.regenerate(
+                Path(directory),
+                [*BASE_ARGUMENTS, "--level-number", str(level), "--chapter", "chapter_01"],
+            )
+
+            self.assertEqual(exit_code, 0)
+            self.assertIn(f"leaves campaign levels {level - 2}-{level - 1} unassigned", stderr)
+
+    def test_dry_run_leaves_the_chapters_config_alone(self) -> None:
+        level = next_unassigned_level()
+        with tempfile.TemporaryDirectory() as directory:
+            exit_code, stdout, _stderr, _templates, _levels, chapters_path = self.regenerate(
+                Path(directory),
+                [
+                    *BASE_ARGUMENTS,
+                    "--level-number",
+                    str(level),
+                    "--chapter",
+                    "chapter_01",
+                    "--dry-run",
+                ],
+            )
+
+            self.assertEqual(exit_code, 0)
+            self.assertIn(f"would add level {level} to chapter_01", stdout)
+            self.assertEqual(chapters_path.read_bytes(), CHAPTERS_PATH.read_bytes())
+
+    ## The chapter assignment belongs to the same publication step as the level files: a board the
+    ## pool cannot satisfy must not leave the catalog referencing a level that was never written,
+    ## because the runtime chapter catalog rejects exactly that.
+    def test_failed_materialization_leaves_the_chapters_config_alone(self) -> None:
+        level = next_unassigned_level()
+        with tempfile.TemporaryDirectory() as directory:
+            exit_code, _stdout, stderr, templates, levels, chapters_path = self.regenerate(
+                Path(directory),
+                [
+                    "--level-number",
+                    str(level),
+                    "--chapter",
+                    "chapter_01",
+                    "--shelf-count",
+                    "6",
+                    "--layer-count",
+                    "2",
+                    "--item-type-count",
+                    "30",
+                    "--seed",
+                    "7",
+                    "--allow-unsolvable",
+                ],
+            )
+
+            self.assertEqual(exit_code, 1)
+            self.assertIn("was not modified", stderr)
+            self.assertEqual(chapters_path.read_bytes(), CHAPTERS_PATH.read_bytes())
+            self.assertFalse((templates / level_file_name(level)).exists())
+            self.assertFalse((levels / level_file_name(level)).exists())
+
+    ## Chapter membership is catalog state, not a board parameter, so it stays out of the replay.
+    def test_chapter_is_not_recorded_as_a_generation_argument(self) -> None:
+        level = next_unassigned_level()
+        with tempfile.TemporaryDirectory() as directory:
+            _code, _out, _err, templates, _levels, _chapters = self.regenerate(
+                Path(directory),
+                [*BASE_ARGUMENTS, "--level-number", str(level), "--chapter", "chapter_01"],
+            )
+
+            manifest = json.loads((templates / MANIFEST_FILE_NAME).read_text(encoding="utf-8"))
+            entry = manifest["entries"][level_file_name(level)]
+            self.assertNotIn("--chapter", entry["arguments"])
+            self.assertNotIn("--chapter", entry["command"])
+
+    ## The repo normalizes to LF, and `template_sha256` hashes LF text, so written bytes must be LF
+    ## on every platform rather than whatever the host's text mode produces.
+    def test_writes_lf_line_endings_and_a_matching_template_hash(self) -> None:
+        level = next_unassigned_level()
+        with tempfile.TemporaryDirectory() as directory:
+            _code, _out, _err, templates, levels, chapters_path = self.regenerate(
+                Path(directory),
+                [*BASE_ARGUMENTS, "--level-number", str(level), "--chapter", "chapter_01"],
+            )
+
+            written = [
+                templates / level_file_name(level),
+                levels / level_file_name(level),
+                templates / MANIFEST_FILE_NAME,
+                chapters_path,
+            ]
+            for path in written:
+                with self.subTest(path=path.name):
+                    self.assertNotIn(b"\r\n", path.read_bytes())
+
+            entry = json.loads((templates / MANIFEST_FILE_NAME).read_text(encoding="utf-8"))[
+                "entries"
+            ][level_file_name(level)]
+            self.assertEqual(
+                entry["template_sha256"],
+                hashlib.sha256((templates / level_file_name(level)).read_bytes()).hexdigest(),
+            )
 
 
 if __name__ == "__main__":
