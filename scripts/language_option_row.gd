@@ -13,9 +13,9 @@ func _ready() -> void:
 	pressed.connect(_emit_locale_selected)
 
 
-func setup(code: String, development_label: String, is_selected: bool) -> void:
+func setup(code: String, display_label: String, is_selected: bool) -> void:
 	locale_code = code
-	text = development_label
+	text = display_label
 	set_locale_selected(is_selected)
 
 

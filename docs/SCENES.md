@@ -1186,7 +1186,8 @@ Purpose:
 - Keeps row selection pending until Save; X or `ui_cancel` discards it.
 - Saves through the `LocaleManager` autoload, immediately updates `TranslationServer`, persists
   the local preference, and closes back to the still-open Settings modal.
-- Uses English development labels only. No translation resources are authored by this feature.
+- Uses native language names so every option is recognizable before full interface translations
+  are added. No translation resources are authored by this feature.
 
 Important nodes:
 - `%Shell`: shared safe-area-aware gameplay modal shell.

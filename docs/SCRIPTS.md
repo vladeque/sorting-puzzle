@@ -3030,7 +3030,7 @@ Purpose:
 ## `scripts/localization/locale_catalog.gd` and `locale_manager.gd`
 
 Purpose:
-- Catalog owns the exact eleven-locale allowlist, English development labels, validation, and
+- Catalog owns the exact eleven-locale allowlist, native language labels, validation, and
   supported first-run device-locale mapping.
 - Manager applies the saved locale during autoload startup and coordinates atomic local preference
   persistence with `TranslationServer.set_locale()`.

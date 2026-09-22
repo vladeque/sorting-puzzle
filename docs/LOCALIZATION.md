@@ -2,7 +2,7 @@
 
 ## Runtime ownership
 
-- `scripts/localization/locale_catalog.gd` owns the release-language allowlist, English development
+- `scripts/localization/locale_catalog.gd` owns the release-language allowlist, native language
   labels, locale validation, and first-run device-locale mapping.
 - `LocaleManager` (`scripts/localization/locale_manager.gd`) applies the saved choice through
   `TranslationServer` and is the only runtime entry point for changing locale.
@@ -14,19 +14,19 @@
 
 ## Release locale allowlist
 
-| Development label | Godot locale |
+| Language-list label | Godot locale |
 | --- | --- |
 | English | `en` |
-| Spanish | `es` |
-| Brazilian Portuguese | `pt_BR` |
-| German | `de` |
-| French | `fr` |
-| Japanese | `ja` |
-| Korean | `ko` |
-| Traditional Chinese | `zh_Hant` |
-| Indonesian | `id` |
-| Turkish | `tr` |
-| Russian | `ru` |
+| Español | `es` |
+| Português (Brasil) | `pt_BR` |
+| Deutsch | `de` |
+| Français | `fr` |
+| 日本語 | `ja` |
+| 한국어 | `ko` |
+| 繁體中文 | `zh_Hant` |
+| Bahasa Indonesia | `id` |
+| Türkçe | `tr` |
+| Русский | `ru` |
 
 On a fresh save, a supported device language is selected; unsupported and Simplified Chinese
 device locales fall back to English. Any explicit player selection is persisted and wins on later
@@ -34,10 +34,10 @@ starts.
 
 ## Current boundary
 
-No translation catalogs or translated strings exist yet. Changing locale updates Godot's active
-`TranslationServer` locale and persists the choice, but the current English UI remains visually
-unchanged. Future localization work must add reviewed translation resources, make dynamic strings
-translation-aware, and verify Cyrillic/CJK font fallbacks before release.
+No translation catalogs or translated interface strings exist yet; only language names use native
+labels. Changing locale updates Godot's active `TranslationServer` locale and persists the choice,
+but the rest of the current English UI remains visually unchanged. Future localization work must
+add reviewed translation resources and make dynamic strings translation-aware.
 
 ## Verification
 

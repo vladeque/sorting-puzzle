@@ -1,22 +1,22 @@
 class_name LocaleCatalog
 extends RefCounted
 
-## Stable release-language allowlist. Labels are English development copy only; translation
-## resources and localized/native language names are intentionally owned by later localization work.
+## Stable release-language allowlist. Each label is the language's native display name so players
+## can identify it before the rest of the interface has been translated.
 
 const DEFAULT_LOCALE := "en"
 const SUPPORTED_LOCALES: Array[Dictionary] = [
 	{"locale": "en", "label": "English"},
-	{"locale": "es", "label": "Spanish"},
-	{"locale": "pt_BR", "label": "Brazilian Portuguese"},
-	{"locale": "de", "label": "German"},
-	{"locale": "fr", "label": "French"},
-	{"locale": "ja", "label": "Japanese"},
-	{"locale": "ko", "label": "Korean"},
-	{"locale": "zh_Hant", "label": "Traditional Chinese"},
-	{"locale": "id", "label": "Indonesian"},
-	{"locale": "tr", "label": "Turkish"},
-	{"locale": "ru", "label": "Russian"},
+	{"locale": "es", "label": "Español"},
+	{"locale": "pt_BR", "label": "Português (Brasil)"},
+	{"locale": "de", "label": "Deutsch"},
+	{"locale": "fr", "label": "Français"},
+	{"locale": "ja", "label": "日本語"},
+	{"locale": "ko", "label": "한국어"},
+	{"locale": "zh_Hant", "label": "繁體中文"},
+	{"locale": "id", "label": "Bahasa Indonesia"},
+	{"locale": "tr", "label": "Türkçe"},
+	{"locale": "ru", "label": "Русский"},
 ]
 
 

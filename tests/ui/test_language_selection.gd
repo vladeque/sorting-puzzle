@@ -35,6 +35,25 @@ func _run() -> void:
 		LocaleCatalogScript.get_entries().size() == 11,
 		"The release catalog exposes exactly eleven approved locales."
 	)
+	var expected_labels := {
+		"en": "English",
+		"es": "Español",
+		"pt_BR": "Português (Brasil)",
+		"de": "Deutsch",
+		"fr": "Français",
+		"ja": "日本語",
+		"ko": "한국어",
+		"zh_Hant": "繁體中文",
+		"id": "Bahasa Indonesia",
+		"tr": "Türkçe",
+		"ru": "Русский",
+	}
+	for entry in LocaleCatalogScript.get_entries():
+		var entry_locale := str(entry.get("locale", ""))
+		_check(
+			str(entry.get("label", "")) == str(expected_labels.get(entry_locale, "")),
+			"%s uses its approved native language label." % entry_locale
+		)
 	_check(LocaleCatalogScript.resolve_device_locale("pt-PT") == "pt_BR", "Portuguese maps to pt_BR.")
 	_check(LocaleCatalogScript.resolve_device_locale("zh-TW") == "zh_Hant", "Taiwan maps to zh_Hant.")
 	_check(LocaleCatalogScript.resolve_device_locale("zh-CN") == "en", "Simplified Chinese falls back to English.")
