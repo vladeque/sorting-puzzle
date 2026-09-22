@@ -50,6 +50,11 @@ COLLAPSING_LAYERS_PER_SHELF = 1
 # guaranteed minimum window every device reveals; the runtime may reveal more when the fitted board
 # has room, but never more than this, so an authored value above it could never be honoured.
 MAX_VISIBLE_SHELVES_PER_COLUMN = 8
+# Shelves every collapsing column keeps once its emptied shelves would take it lower, capped at the
+# authored window so a kept shelf can never be stranded above it. They stay on the board as ordinary
+# shelves, so the endgame always has room to sort instead of shrinking into a deadlock. Mirrored by
+# `KEPT_SHELVES_PER_COLUMN` in `scripts/collapsing_column_rules.gd`.
+KEPT_SHELVES_PER_COLUMN = 3
 
 
 def moving_row(
@@ -883,19 +888,28 @@ class ClassicRules(SortingRules):
 
 
 class CollapsingColumnsRules(SortingRules):
-    """Columns of one-layer shelves. An emptied shelf is destroyed and the shelves above it fall.
+    """Columns of one-layer shelves. An emptied shelf is destroyed and the shelves above it fall,
+    until its column is down to `kept_count` shelves; from then on emptied shelves stay as ordinary
+    empty shelves. The level is cleared once no item is left.
 
     `visible_count` is the authored guaranteed minimum window, not a device measurement. The runtime
     may reveal more shelves per column when the fitted board has room, and proving the minimum also
     proves those larger windows: every move legal in a smaller window stays legal in a larger one,
     and the only extra forced event a larger window can trigger is an automatic triple clear, which
-    destroys a shelf and therefore only advances the objective.
+    only removes items. Whether the shelf it empties is then destroyed depends only on how many
+    shelves its column has left, so both windows hold the same shelf contents afterwards; at most
+    they keep a different empty shelf.
+
+    `kept_shelves_per_column` defaults to the shipped rule. Tests pass 0 to exercise destruction on
+    fixtures too small for the floor.
     """
 
     mode = GAMEPLAY_MODE_COLLAPSING_COLUMNS
 
-    def __init__(self, visible_count: int) -> None:
+    def __init__(self, visible_count: int, kept_shelves_per_column: int | None = None) -> None:
         self.visible_count = max(1, int(visible_count))
+        requested = KEPT_SHELVES_PER_COLUMN if kept_shelves_per_column is None else kept_shelves_per_column
+        self.kept_count = max(0, min(int(requested), self.visible_count))
 
     def iter_shelf_states(self, state: CollapsingState) -> list[ShelfState]:
         return [entry.state for column in state[1] for entry in column]
@@ -909,7 +923,9 @@ class CollapsingColumnsRules(SortingRules):
 
     ## Clearing and destroying reveal the next shelf, which can itself be an authored triple, so this
     ## repeats until nothing changes. A shelf outside the window is never touched: offscreen content
-    ## must not resolve before the player can see it.
+    ## must not resolve before the player can see it. The scan runs bottom to top, so when a column
+    ## may lose only some of its emptied shelves, the lowest go first -- the order
+    ## `CollapsingShelfColumn.get_removable_shelves()` uses at runtime.
     def settle(self, state: CollapsingState) -> CollapsingState:
         triples_cleared, columns = state
         working = [list(column) for column in columns]
@@ -928,12 +944,18 @@ class CollapsingColumnsRules(SortingRules):
                     if is_matching_layer(shelf, front):
                         triples_cleared += 1
                         changed = True
-                        continue
-                    if is_empty_layer(front):
-                        changed = True
+                        entry = ColumnShelf(entry.shelf_id, shelf._replace(layers=((None,) * shelf.slot_count,)))
+                    elif not is_empty_layer(front):
+                        survivors.append(entry)
                         continue
 
-                    survivors.append(entry)
+                    # Empty now. Destroying it must leave the column at least `kept_count` tall.
+                    shelves_left_without_it = len(survivors) + len(column) - stack_index - 1
+                    if shelves_left_without_it < self.kept_count:
+                        survivors.append(entry)
+                        continue
+
+                    changed = True
 
                 working[column_index] = survivors
 
@@ -1020,9 +1042,13 @@ class CollapsingColumnsRules(SortingRules):
 
         return (triples_cleared, tuple(tuple(column) for column in working))
 
-    ## Shelf destruction is the objective, so an item-free board is not the terminal condition.
+    ## Kept shelves outlive the last item, so the objective is an item-free board. A hidden shelf is
+    ## never empty -- every authored shelf starts with an item and nothing reaches it off-window --
+    ## so an item-free board also means nothing is left waiting above the window.
     def is_cleared(self, state: CollapsingState) -> bool:
-        return all(not column for column in state[1])
+        return all(
+            is_empty_layer(layer) for column in state[1] for entry in column for layer in entry.state.layers
+        )
 
     def _active_location(self, state: CollapsingState, shelf_id: int) -> tuple[int, int] | None:
         for column_index, column in enumerate(state[1]):

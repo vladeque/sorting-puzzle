@@ -172,6 +172,11 @@ const SHOP_RETURN_TIME_EXTENSION := &"time_extension"
 ## `visible_shelves_per_column`, so it cannot change which levels are solvable. Tests and captures
 ## use it to pin the window.
 @export_range(0, 8) var max_collapsing_visible_shelves := 0
+## Overrides how many shelves each `collapsing_columns` column keeps once emptied shelves would take
+## it lower. -1 applies the rule (`CollapsingColumnRules.get_kept_shelf_count()`), which is what the
+## solver proves; tests set 0 to exercise destruction on fixtures too small for that floor. Never
+## ship a level with anything but -1.
+@export_range(-1, 8) var collapsing_kept_shelves_override := -1
 @export_file("*.tscn") var return_menu_scene_path := MAIN_MENU_SCENE
 
 var _slots: Array[Node2D] = []
@@ -726,10 +731,9 @@ func _input(event: InputEvent) -> void:
 	if _is_ability_effect_active():
 		return
 
-	# Nothing may be dropped on a shelf that is moving or about to be destroyed.
-	if _is_collapse_in_progress():
-		return
-
+	# A collapse does not pause play. Shelves it destroys have already left the board's active set,
+	# shelves still sliding into the window join it once they land, and every surviving shelf takes
+	# and receives items while it falls; resolving what those moves complete waits for the collapse.
 	if event is InputEventMouseButton:
 		var mouse_event := event as InputEventMouseButton
 		if mouse_event.button_index != MOUSE_BUTTON_LEFT:
@@ -1162,7 +1166,12 @@ func _add_collapsing_column_shelves(shelves: Node2D, shelves_config: Array, conf
 		CollapsingRules.get_visible_count(config),
 		SHELF_GRID_STEP,
 		SHELF_CELL_SIZE,
-		SHELF_CELL_VISUAL_SCALE
+		SHELF_CELL_VISUAL_SCALE,
+		(
+			CollapsingRules.get_kept_shelf_count(config)
+			if collapsing_kept_shelves_override < 0
+			else collapsing_kept_shelves_override
+		)
 	)
 
 	var shelf_index := 0
@@ -2604,11 +2613,11 @@ func _check_level_completed() -> void:
 	if _level_failed or _level_completed:
 		return
 
-	# Destroying shelves is the objective, so an empty-looking board is not enough: every shelf must
-	# be gone, and nothing may still be resolving or collapsing -- the last shelf plays its
-	# destruction before the celebration starts.
+	# Every column keeps its last shelves, so the objective is an item-free board. Hidden shelves
+	# still hold their items, so an empty window is not enough; and nothing may still be resolving
+	# or collapsing, so a final destruction plays out before the celebration starts.
 	if _collapsing_board != null:
-		if not _is_resolving_shelves and not _is_collapse_in_progress() and _collapsing_board.is_cleared():
+		if not _is_resolving_shelves and not _is_collapse_in_progress() and _get_all_items().is_empty():
 			_complete_level()
 		return
 
@@ -4239,21 +4248,16 @@ func _collapse_emptied_shelves() -> void:
 		_finish_shelf_resolution()
 		return
 
-	var emptied := _find_emptied_collapsing_shelves()
+	# Columns at their kept floor leave emptied shelves in place as ordinary empty shelves.
+	var emptied := _collapsing_board.get_destroyable_shelves(_find_emptied_collapsing_shelves())
 	if emptied.is_empty():
 		_finish_shelf_resolution()
 		return
 
+	# An active drag or selection carries on through the collapse. A drag's origin never counts as
+	# emptied and a selected item keeps its shelf occupied, so neither shelf is destroyed; each only
+	# falls, and a dropped or returning item follows its slot down.
 	_collapse_phase_active = true
-	# An active drag or selection must not outlive the layout it was started on. Cancelling puts a
-	# lifted item back home, so emptiness is measured again afterwards.
-	_cancel_active_interaction()
-	emptied = _find_emptied_collapsing_shelves()
-	if emptied.is_empty():
-		_collapse_phase_active = false
-		_finish_shelf_resolution()
-		return
-
 	_release_collapsing_shelf_references(emptied)
 	_update_ability_buttons()
 	var result: Dictionary = await _collapsing_board.collapse_shelves(emptied)

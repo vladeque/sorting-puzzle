@@ -828,7 +828,8 @@ Files:
 
 Responsibility:
 - `gameplay_mode: "collapsing_columns"` arranges one-layer shelves in tall columns. An emptied shelf
-  is destroyed, the shelves above it fall one row, and the level ends when no shelf is left.
+  is destroyed and the shelves above it fall one row, until a column is down to its last three
+  shelves, which stay. The level ends when no item is left. Play continues while columns fall.
 - The board owns placement, the clipped window, the resolved visible count, and the single batched
   collapse; each column owns its bottom-to-top order and movement. `scripts/level.gd` builds shelves
   through its usual factory, decides which are empty, and asks the board which are playable.

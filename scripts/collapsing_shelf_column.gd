@@ -30,6 +30,8 @@ const DESTRUCTION_EFFECT_SCENE := preload("res://scenes/effects/shelf_destructio
 
 var column_index := 0
 var _visible_count := 1
+## Shelves this column never drops below; see `CollapsingColumnRules.KEPT_SHELVES_PER_COLUMN`.
+var _kept_count := 0
 ## Shelves rendered above the window, cut off by the board's clip edge. Presentation only.
 var _peek_row_count := 0
 var _shelf_step := Vector2.ZERO
@@ -44,11 +46,16 @@ var _is_collapsing := false
 var _destruction_effects: Array[Node] = []
 
 
-func configure(index: int, visible_count: int, shelf_step: Vector2) -> void:
+func configure(index: int, visible_count: int, shelf_step: Vector2, kept_count := 0) -> void:
 	column_index = index
 	_visible_count = maxi(visible_count, 1)
 	_shelf_step = shelf_step
+	_kept_count = maxi(kept_count, 0)
 	_layout_immediately()
+
+
+func get_kept_count() -> int:
+	return _kept_count
 
 
 func set_visible_count(visible_count: int) -> void:
@@ -133,15 +140,28 @@ func is_collapsing() -> bool:
 	return _is_collapsing
 
 
+## The candidates this column may actually destroy: those it holds, lowest first, for as long as it
+## stays at least `_kept_count` tall. The rest stay as ordinary empty shelves. Bottom-up matches the
+## scan `CollapsingColumnsRules.settle()` in `scripts/tools/validate_level_solvable.py` uses.
+func get_removable_shelves(candidates: Array) -> Array[Shelf]:
+	var removable: Array[Shelf] = []
+	var may_remove := maxi(_shelves.size() - _kept_count, 0)
+	for shelf in _shelves:
+		if removable.size() >= may_remove:
+			break
+		if candidates.has(shelf):
+			removable.append(shelf)
+
+	return removable
+
+
 ## Commits the new bottom-to-top order and reports which shelves it reveals. Shelves this column
 ## does not hold -- including ones already removed -- are ignored, so no shelf is destroyed twice,
-## and the result does not depend on the order `shelves_to_remove` lists them in.
+## and the result does not depend on the order `shelves_to_remove` lists them in. A column never
+## drops below its kept count; see `get_removable_shelves()`.
 func remove_shelves(shelves_to_remove: Array) -> Dictionary:
-	var removed: Array[Shelf] = []
+	var removed := get_removable_shelves(shelves_to_remove)
 	var revealed: Array[Shelf] = []
-	for shelf in _shelves:
-		if shelves_to_remove.has(shelf):
-			removed.append(shelf)
 
 	if removed.is_empty():
 		return {"removed": removed, "revealed": revealed}

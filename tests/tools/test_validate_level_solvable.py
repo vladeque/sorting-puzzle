@@ -11,16 +11,19 @@ TOOLS_PATH = REPOSITORY_ROOT / "scripts" / "tools"
 sys.path.insert(0, str(TOOLS_PATH))
 
 from validate_level_solvable import (  # noqa: E402
+    KEPT_SHELVES_PER_COLUMN,
     MAX_VISIBLE_SHELVES_PER_COLUMN,
     CollapsingColumnsRules,
     build_search_inputs,
     collapsing_shelves_to_state,
+    is_empty_layer,
     legal_moves,
     normalize_state,
     shelves_to_state,
     solve_level,
     validate_gameplay_mode_shape,
     validate_shelves_shape,
+    visible_layer,
 )
 
 
@@ -336,7 +339,7 @@ class CollapsingColumnSearchTests(unittest.TestCase):
             standard_shelf(["b", "b", None]),
             standard_shelf(["b", None, None]),
         ]
-        rules = CollapsingColumnsRules(4)
+        rules = CollapsingColumnsRules(4, kept_shelves_per_column=0)
         state = rules.settle(collapsing_shelves_to_state(shelves, [4]))
         self.assertEqual(column_shelf_ids(state), [[0, 1, 2, 3]])
 
@@ -361,7 +364,7 @@ class CollapsingColumnSearchTests(unittest.TestCase):
             standard_shelf(["c", "c", None]),
             standard_shelf(["c", None, None]),
         ]
-        rules = CollapsingColumnsRules(4)
+        rules = CollapsingColumnsRules(4, kept_shelves_per_column=0)
         settled = rules.settle(collapsing_shelves_to_state(shelves, [4]))
         self.assertEqual(settled[0], 2)
         self.assertEqual(column_shelf_ids(settled), [[2, 3]])
@@ -376,7 +379,7 @@ class CollapsingColumnSearchTests(unittest.TestCase):
             standard_shelf(["e", None, None]),
             standard_shelf(["c", "c", "c"]),
         ]
-        rules = CollapsingColumnsRules(5)
+        rules = CollapsingColumnsRules(5, kept_shelves_per_column=0)
         settled = rules.settle(collapsing_shelves_to_state(shelves, [5]))
         self.assertEqual(column_shelf_ids(settled), [[1, 3]])
         self.assertEqual(settled[0], 3)
@@ -407,13 +410,58 @@ class CollapsingColumnSearchTests(unittest.TestCase):
             self.assertIn(move.to_shelf, authored_ids)
         self.assertTrue(rules.is_cleared(replay(rules, state, result.solution)))
 
-    def test_completion_requires_destroying_every_shelf(self) -> None:
+    def test_completion_requires_an_item_free_board_not_an_empty_one(self) -> None:
         rules = CollapsingColumnsRules(2)
         state = collapsing_shelves_to_state(
             [standard_shelf(["a", "a", "a"]), standard_shelf(["b", "b", "b"])], [2]
         )
         self.assertFalse(rules.is_cleared(state))
-        self.assertTrue(rules.is_cleared(rules.settle(state)))
+        settled = rules.settle(state)
+        self.assertTrue(rules.is_cleared(settled))
+        # Both shelves are within the kept floor, so the cleared board still has them.
+        self.assertEqual(column_shelf_ids(settled), [[0, 1]])
+
+
+class CollapsingColumnKeptShelfTests(unittest.TestCase):
+    def test_the_floor_is_the_shipped_count_capped_at_the_window(self) -> None:
+        self.assertEqual(CollapsingColumnsRules(4).kept_count, KEPT_SHELVES_PER_COLUMN)
+        self.assertEqual(CollapsingColumnsRules(2).kept_count, 2)
+        self.assertEqual(CollapsingColumnsRules(4, kept_shelves_per_column=0).kept_count, 0)
+
+    ## Two shelves are emptied at once but the column may lose only one: the lowest goes, and the
+    ## other stays as an empty, reusable shelf.
+    def test_a_column_stops_collapsing_at_the_floor_and_destroys_its_lowest_shelves_first(self) -> None:
+        shelves = [
+            standard_shelf(["a", "a", "a"]),
+            standard_shelf(["b", "b", "b"]),
+            standard_shelf(["c", None, None]),
+            standard_shelf(["c", "c", None]),
+        ]
+        rules = CollapsingColumnsRules(4)
+        settled = rules.settle(collapsing_shelves_to_state(shelves, [4]))
+        self.assertEqual(settled[0], 2)
+        self.assertEqual(column_shelf_ids(settled), [[1, 2, 3]])
+        kept = settled[1][0][0].state
+        self.assertTrue(is_empty_layer(visible_layer(kept)))
+        self.assertTrue(any(move.to_shelf == 1 for move in rules.legal_moves(settled)))
+
+    ## The deadlock the floor exists for: once the third shelf clears, `aab` and `bba` fill every
+    ## remaining slot. Destroying that shelf leaves no move at all; keeping it leaves room to sort.
+    def test_kept_shelves_keep_room_to_sort_at_the_end(self) -> None:
+        shelves = [
+            standard_shelf(["a", "a", "b"]),
+            standard_shelf(["b", "b", "a"]),
+            standard_shelf(["c", "c", "c"]),
+        ]
+        state = collapsing_shelves_to_state(shelves, [3])
+        destroying = CollapsingColumnsRules(3, kept_shelves_per_column=0)
+        result = solve_level(state, max_states=20000, max_depth=200, keep_solution=False, rules=destroying)
+        self.assertFalse(result.solvable, result.reason)
+
+        keeping = CollapsingColumnsRules(3)
+        result = solve_level(state, max_states=20000, max_depth=200, keep_solution=True, rules=keeping)
+        self.assertTrue(result.solvable, result.reason)
+        self.assertTrue(keeping.is_cleared(replay(keeping, state, result.solution)))
 
 
 ## The campaign guard: a shipped collapsing level must stay provably finishable. Classic levels are

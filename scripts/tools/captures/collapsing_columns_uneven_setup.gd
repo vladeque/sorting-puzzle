@@ -10,8 +10,9 @@ extends RefCounted
 ## ```
 
 const Support := preload("res://scripts/tools/captures/collapsing_columns_capture_support.gd")
-## Fewer than the authored window, so the middle column visibly ends below its neighbors.
-const MIDDLE_COLUMN_SHELVES_LEFT := 2
+## The kept floor (`CollapsingColumnRules.KEPT_SHELVES_PER_COLUMN`), which is below the authored
+## window, so the middle column visibly ends below its neighbors. The board never goes lower.
+const MIDDLE_COLUMN_SHELVES_LEFT := CollapsingColumnRules.KEPT_SHELVES_PER_COLUMN
 
 var _level: Node
 var _tree: SceneTree

@@ -574,10 +574,14 @@ Runtime behavior:
   drop targets, automatic-match candidates, or Hammer, Shuffle, or Highlight targets.
 - A shelf is destroyed once a committed move, a triple clear, or Hammer leaves it with no items.
   Lifting an item into a drag never empties its shelf.
-- All shelves emptied in one resolution pass collapse together; columns animate in parallel, and
-  input and abilities stay blocked until every column settles. The countdown keeps running, as it
-  does through match-clear animations, and Freezer does not stop the movement.
-- The level completes after the last shelf has been destroyed and its collapse has settled.
+- Every column keeps its last three shelves (capped at `visible_shelves_per_column`): once a column
+  is down to them, an emptied shelf stays as an ordinary empty shelf, so the board ends as a full
+  grid with room to sort. It is a fixed rule, not a config field.
+- All shelves emptied in one resolution pass collapse together, and columns animate in parallel.
+  Play continues on every surviving shelf while they fall; abilities wait until every column
+  settles. The countdown keeps running, as it does through match-clear animations, and Freezer does
+  not stop the movement.
+- The level completes once no item is left and nothing is resolving or collapsing.
 - No remaining-shelf count is shown.
 
 Development fixture: `configs/test_levels/collapsing_columns_preview.json` is three columns of ten

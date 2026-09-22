@@ -13,6 +13,10 @@ const COLUMN_LAYOUT_KEY := "column_layout"
 const SHELF_COUNTS_KEY := "shelf_counts"
 const VISIBLE_SHELVES_KEY := "visible_shelves_per_column"
 const SLOTS_PER_SHELF := 3
+## Mirrors `KEPT_SHELVES_PER_COLUMN` in `scripts/tools/validate_level_solvable.py`: once a column is
+## down to this many shelves, an emptied shelf stays as an ordinary empty shelf instead of being
+## destroyed, so the endgame keeps room to sort.
+const KEPT_SHELVES_PER_COLUMN := 3
 
 
 static func get_gameplay_mode(config: Dictionary) -> String:
@@ -47,6 +51,12 @@ static func get_visible_count(config: Dictionary) -> int:
 		return 1
 
 	return int(column_layout.get(VISIBLE_SHELVES_KEY, 1))
+
+
+## Shelves each column keeps, capped at the authored window: a kept shelf above the window could
+## never be revealed, because nothing below it would be destroyed any more.
+static func get_kept_shelf_count(config: Dictionary) -> int:
+	return mini(KEPT_SHELVES_PER_COLUMN, get_visible_count(config))
 
 
 static func validate_config(config: Dictionary) -> PackedStringArray:

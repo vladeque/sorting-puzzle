@@ -1946,6 +1946,8 @@ Collapsing columns (`gameplay_mode: "collapsing_columns"`):
   `_layout_shelves()` fits into (`_get_shelves_play_rect()`), capped by
   `max_collapsing_visible_shelves` when that is non-zero. `_get_shelves_root_child_bounds()` fits
   the board's fixed footprint, never its hidden depth.
+- The board is configured with `CollapsingColumnRules.get_kept_shelf_count()` shelves to keep per
+  column, unless `collapsing_kept_shelves_override` is 0 or more (tests only).
 - `_is_shelf_gameplay_available()` is the one availability rule for input, matching, promotion,
   and abilities. On a classic board it is exactly "not locked", so classic behavior is unchanged; on
   a collapsing board it also requires `CollapsingShelfBoard.is_shelf_active()`. Every former lock
@@ -1954,21 +1956,26 @@ Collapsing columns (`gameplay_mode: "collapsing_columns"`):
   `_find_immediate_triple_items()`, and the `_get_unlocked_items()` / `_get_visible_items()` /
   `_get_first_back_layer_items()` enumerators goes through it. Moving-row window reachability stays
   in the input helpers, because abilities deliberately still reach off-window moving shelves.
+  Surviving shelves stay available while a collapse runs, so moves and selections continue; a move
+  animation reparents into its target slot first, so the item follows a falling shelf down.
 - `_resolve_shelves()` registers a whole request before starting any resolver, so a resolver that
   finishes synchronously can never declare resolution drained while the rest of its request -- for
   example the target of the move that emptied it -- has not started.
 - When every resolver has drained, `_on_shelf_resolution_drained()` runs
   `_collapse_emptied_shelves()` on a collapsing board: it finds active shelves with no committed
-  items (a drag origin is never empty), cancels any active drag or selection, releases every
-  reference to the shelves, and awaits one `CollapsingShelfBoard.collapse_shelves()` batch. Revealed
+  items (a drag origin is never empty), narrows them to what `CollapsingShelfBoard.get_destroyable_shelves()`
+  allows above each column's kept floor, releases every reference to those shelves, and awaits one
+  `CollapsingShelfBoard.collapse_shelves()` batch. An active drag or selection is left alone. Revealed
   shelves, plus any resolution requested while the collapse ran, go back through `_resolve_shelves()`,
   whose drain returns here, so the loop repeats until nothing is left empty. It skips while Shuffle
   has items parked in the drag layer; Shuffle re-resolves the whole board when it ends.
-- `_is_collapse_in_progress()` blocks `_input()`, ability buttons, `_can_apply_ability()` (before any
-  use is spent), and completion. It is not an ability effect, so the countdown keeps running exactly
-  as it does through match-clear animations, and Freezer does not stop column movement.
-- `_check_level_completed()` completes a collapsing level only when the board reports no surviving
-  shelf and nothing is resolving or collapsing, so the last shelf's destruction plays first.
+- `_is_collapse_in_progress()` blocks ability buttons, `_can_apply_ability()` (before any use is
+  spent), shelf resolution (requests wait in `_shelves_awaiting_collapse`), and completion. It does
+  not block input. It is not an ability effect, so the countdown keeps running exactly as it does
+  through match-clear animations, and Freezer does not stop column movement.
+- `_check_level_completed()` completes a collapsing level once `_get_all_items()` is empty (hidden
+  shelves count) and nothing is resolving or collapsing, so any final destruction plays first. The
+  kept shelves are still on the board when it does.
 - Pause and backgrounding follow the existing policy for gameplay animations: the collapse keeps
   running under the pause menu. The new order is committed before any tween starts, so every
   interruption point leaves a consistent board. Retry rebuilds the board from config.
@@ -1992,6 +1999,9 @@ Important exports:
 - `max_collapsing_visible_shelves`: caps how many shelves per column a collapsing board may reveal
   when the screen has room for more; `0` lets the screen decide. It never lowers a level below its
   authored `visible_shelves_per_column`. Tests and captures use it to pin the window.
+- `collapsing_kept_shelves_override`: `-1` (the default) applies the kept-shelf rule the solver
+  proves; `0` or more replaces it. Tests set `0` to exercise destruction on fixtures too small for
+  the floor. Shipped levels always use `-1`.
 - `launched_from_dev_mode`: makes a level use isolated temporary ability counts and return to the menu instead of saving campaign progress.
 - `return_menu_scene_path`: menu scene path used by Leave and dev/test completion returns.
 
@@ -2757,8 +2767,12 @@ Purpose:
 - Owns the columns of a `collapsing_columns` level, the clip window they draw through, the resolved
   visible count, and the single coordinated collapse that removes emptied shelves.
 - Is the authority on shelf availability for this mode: `is_shelf_active()` is true only for a shelf
-  inside its column's window that has finished arriving, and false for every shelf while a collapse
-  runs. Hidden shelves are also invisible, but visibility is never the rule the level relies on.
+  inside its column's window that has finished arriving. A running collapse does not change that for
+  survivors -- the shelves it destroys have already left their columns -- so play continues while
+  they fall. Hidden shelves are also invisible, but visibility is never the rule the level relies on.
+- Holds the kept-shelf floor: `configure()` takes `kept_count` (capped at the authored window) and
+  hands it to every column. `get_destroyable_shelves(candidates)` reports which emptied shelves the
+  columns may actually lose, and `collapse_shelves()` never destroys more.
 - Applies left/middle/right shelf art from the column's board position at registration, never from
   how many shelves survive in a row.
 - Adds every registered cell to `Window/OuterShadowComposite`, a `ShelfOuterShadowGroup` drawn
@@ -2768,8 +2782,6 @@ Purpose:
   fall with survivors and vanish with destroyed or fully emptied columns. Being inside the clip
   window, it cuts a peeking shelf's casts at the same edge as the shelf. `configure()` clears it
   along with the old columns.
-- Reports completion as "no shelf survives anywhere" through `is_cleared()`, which is false while a
-  collapse is still running.
 
 Visible count:
 - `configure()` takes the authored `visible_shelves_per_column`, the guaranteed minimum.
@@ -2780,15 +2792,17 @@ Visible count:
   `MAX_VISIBLE_SHELVES_PER_COLUMN` (`8`, mirrored from `scripts/tools/validate_level_solvable.py`).
 
 Key methods:
-- `configure(column_heights, visible_count, shelf_step, cell_size, shelf_scale)`: builds the columns.
+- `configure(column_heights, visible_count, shelf_step, cell_size, shelf_scale, kept_count)`: builds
+  the columns. `kept_count` defaults to `0`, no floor, which the board unit tests use.
 - `get_column_parent()` / `register_shelf(column_index, authored_shelf_id, shelf)`: construction.
 - `get_layout_bounds()`: fixed footprint for responsive fitting; hidden depth never contributes.
 - `is_shelf_active()`, `get_active_shelves()`, `get_all_shelves()`, `owns_shelf()`.
 - `get_column_index()`, `get_stack_index()`, `get_authored_shelf_id()`.
-- `collapse_shelves(shelves)`: coroutine. Removes the given shelves in one batch and returns
-  `removed_ids`, `removed_count`, and `revealed` once every affected column has settled.
+- `get_kept_count()`, `get_destroyable_shelves(candidates)`.
+- `collapse_shelves(shelves)`: coroutine. Removes the given shelves its columns may lose in one batch
+  and returns `removed_ids`, `removed_count`, and `revealed` once every affected column has settled.
 - `settle_immediately()`: deterministic, animation-free completion of any running collapse.
-- `get_remaining_shelf_count()`, `get_remaining_shelf_counts()`, `is_cleared()`, `is_collapsing()`.
+- `get_remaining_shelf_count()`, `get_remaining_shelf_counts()`, `is_collapsing()`.
 
 Exports:
 - `window_outer_margin`: how far the non-top window edges sit outside the footprint.
@@ -2838,6 +2852,9 @@ Class:
 Purpose:
 - Runtime reading of the `gameplay_mode` / `column_layout` contract: `validate_config()`,
   `is_collapsing()`, `get_column_heights()`, and `get_visible_count()`.
+- `KEPT_SHELVES_PER_COLUMN` (`3`) mirrors the solver's constant of the same name, and
+  `get_kept_shelf_count(config)` caps it at the authored window, because a kept shelf above the
+  window could never be revealed.
 - Mirrors the shape rules of `scripts/tools/validate_level_solvable.py`, which stays the
   authoritative validator, so a malformed level fails closed at runtime instead of being guessed at.
 - Accepts whole-number floats, because Godot's JSON parser returns every number as a float.
@@ -2857,6 +2874,9 @@ Purpose:
   immediately, ignoring shelves it no longer holds, so no shelf is destroyed twice and the result does
   not depend on discovery order. `start_collapse()` then only moves visuals toward that order, so a
   pause, backgrounding, teardown, or `settle_immediately()` can never leave a half-applied order.
+- Never drops below its kept count. `get_removable_shelves(candidates)` returns the candidates it
+  holds, lowest first, for as long as it stays that tall; `remove_shelves()` removes only those. The
+  bottom-up order matches `CollapsingColumnsRules.settle()` in `scripts/tools/validate_level_solvable.py`.
 - Destroyed shelves leave the tree as the collapse finishes, not a frame later, so recursive shelf
   discovery never finds one.
 

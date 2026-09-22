@@ -42,8 +42,9 @@ func _run() -> void:
 	await _verify_removing_the_top_visible_shelf_reveals_the_next()
 	await _verify_multiple_removals_are_order_independent()
 	await _verify_a_shelf_is_destroyed_at_most_once()
+	await _verify_columns_never_drop_below_their_kept_count()
 	await _verify_fixed_footprint_and_visible_count_resolution()
-	await _verify_animated_collapse_blocks_and_restores()
+	await _verify_animated_collapse_keeps_survivors_playable()
 	await _verify_settle_immediately_ends_a_running_collapse()
 
 	await _verify_level_builds_columns_in_authored_order()
@@ -54,9 +55,11 @@ func _run() -> void:
 	await _verify_hammer_batches_emptied_shelves()
 	await _verify_shuffle_leaves_hidden_shelves_untouched()
 	await _verify_highlight_uses_active_shelves_only()
-	await _verify_input_and_abilities_blocked_during_collapse()
+	await _verify_play_continues_while_abilities_wait_during_collapse()
+	await _verify_a_drag_survives_a_collapse_elsewhere()
 	await _verify_freezer_does_not_stop_collapse()
 	await _verify_completion_waits_for_the_last_shelf()
+	await _verify_kept_shelves_leave_room_to_finish()
 	await _verify_retry_rebuilds_the_authored_board()
 	await _verify_interruptions_during_collapse()
 	await _verify_invalid_collapsing_configs_fail_closed()
@@ -67,13 +70,14 @@ func _run() -> void:
 
 
 ## Board fixture: columns of the given heights, every shelf registered bottom to top with its
-## flat authored index as ID, exactly as `scripts/level.gd` consumes a `column_layout`.
-func _make_board(column_heights: Array[int], visible_count: int) -> CollapsingShelfBoard:
+## flat authored index as ID, exactly as `scripts/level.gd` consumes a `column_layout`. No kept floor
+## unless asked for, so the collapse mechanics are tested on their own.
+func _make_board(column_heights: Array[int], visible_count: int, kept_count := 0) -> CollapsingShelfBoard:
 	var board := (load(BOARD_SCENE_PATH) as PackedScene).instantiate() as CollapsingShelfBoard
 	root.add_child(board)
 	board.destroy_duration_seconds = 0.0
 	board.shift_duration_seconds = 0.0
-	board.configure(column_heights, visible_count, CELL_STEP, CELL_SIZE, CELL_SCALE)
+	board.configure(column_heights, visible_count, CELL_STEP, CELL_SIZE, CELL_SCALE, kept_count)
 	var authored_id := 0
 	for column_index in range(column_heights.size()):
 		for _stack_index in range(column_heights[column_index]):
@@ -369,8 +373,31 @@ func _verify_a_shelf_is_destroyed_at_most_once() -> void:
 	_check(second["removed_count"] == 0, "A destroyed shelf cannot be destroyed again.")
 	_check(board.get_remaining_shelf_count() == 2, "Only one shelf is gone.")
 	await _collapse_now(board, board.get_all_shelves())
-	_check(board.is_cleared(), "The board is cleared once no shelf survives.")
+	_check(board.get_remaining_shelf_count() == 0, "Without a kept floor, every shelf can be destroyed.")
 	board.free()
+
+
+## The endgame floor: a column gives up its lowest emptied shelves only while it stays at least the
+## kept count tall, and a column already at or below it gives up nothing.
+func _verify_columns_never_drop_below_their_kept_count() -> void:
+	var board := _make_board([5, 2], 4, 3)
+	_check(board.get_kept_count() == 3, "The board keeps the count it was configured with.")
+	var candidates := board.get_all_shelves()
+	var destroyable := board.get_destroyable_shelves(candidates)
+	_check(
+		destroyable == [_shelf_by_id(board, 0), _shelf_by_id(board, 1)],
+		"Only the lowest shelves a column can spare are destroyable."
+	)
+	var result := await _collapse_now(board, candidates)
+	_check(result["removed_ids"] == [0, 1], "A collapse destroys only what the floor allows.")
+	_check(_ids(board, 0) == [2, 3, 4], "The tall column stops at three shelves.")
+	_check(_ids(board, 1) == [5, 6], "A column already below the floor keeps every shelf.")
+	_check((await _collapse_now(board, board.get_all_shelves()))["removed_count"] == 0, "A board at its floor destroys nothing more.")
+	board.free()
+
+	var narrow := _make_board([5], 2, 3)
+	_check(narrow.get_kept_count() == 2, "The floor is capped at the authored window, so no kept shelf waits above it.")
+	narrow.free()
 
 
 func _verify_fixed_footprint_and_visible_count_resolution() -> void:
@@ -407,7 +434,7 @@ func _verify_fixed_footprint_and_visible_count_resolution() -> void:
 	short.free()
 
 
-func _verify_animated_collapse_blocks_and_restores() -> void:
+func _verify_animated_collapse_keeps_survivors_playable() -> void:
 	var board := _make_board([4, 4], 2)
 	board.destroy_duration_seconds = 0.05
 	board.shift_duration_seconds = 0.08
@@ -417,9 +444,12 @@ func _verify_animated_collapse_blocks_and_restores() -> void:
 	var removed := _shelf_by_id(board, 0)
 	board.collapse_shelves([removed, _shelf_by_id(board, 4)])
 	_check(board.is_collapsing(), "The board reports a running collapse.")
-	_check(board.get_active_shelves().is_empty(), "No shelf is playable while columns move.")
-	_check(not board.is_shelf_active(_shelf_by_id(board, 1)), "Even an unaffected-looking survivor is blocked.")
-	_check(not board.is_cleared(), "A running collapse is never read as a cleared board.")
+	_check(
+		board.get_active_shelves() == [_shelf_by_id(board, 1), _shelf_by_id(board, 5)],
+		"Survivors already inside the window stay playable while they fall."
+	)
+	_check(not board.is_shelf_active(entering), "A shelf still sliding into the window is not playable yet.")
+	_check(not board.is_shelf_active(removed), "A shelf being destroyed is not playable.")
 	_check(
 		entering.visible and is_equal_approx(entering.modulate.a, 1.0),
 		"The revealed shelf stays opaque and enters physically through the clip window."
@@ -508,8 +538,10 @@ func _collapsing_config(heights: Array, visible_count: int, shelves: Array) -> D
 
 
 ## Builds `level.tscn` on a config. The window is pinned to the authored minimum so a fixture's
-## hidden shelves stay hidden whatever size the headless viewport is.
-func _make_level(config: Dictionary, animated := false, settle := true) -> Node:
+## hidden shelves stay hidden whatever size the headless viewport is. Fixtures are far smaller than a
+## campaign board, so the kept floor is off unless `kept_override` asks for it (-1 applies the rule);
+## `_verify_kept_shelves_leave_room_to_finish()` covers the floor itself.
+func _make_level(config: Dictionary, animated := false, settle := true, kept_override := 0) -> Node:
 	var level := (load(LEVEL_SCENE_PATH) as PackedScene).instantiate()
 	level.set("launched_from_dev_mode", true)
 	level.set("selected_level", 1)
@@ -520,6 +552,7 @@ func _make_level(config: Dictionary, animated := false, settle := true) -> Node:
 	level.set("match_shrink_duration_seconds", 0.0)
 	var column_layout: Dictionary = config.get("column_layout", {})
 	level.set("max_collapsing_visible_shelves", int(column_layout.get("visible_shelves_per_column", 0)))
+	level.set("collapsing_kept_shelves_override", kept_override)
 	root.add_child(level)
 	await process_frame
 	level.call("_apply_level_config", config)
@@ -735,16 +768,33 @@ func _verify_drags_never_destroy_their_origin() -> void:
 	_check(_front_item(level, origin, 0) == item and board.get_remaining_shelf_count() == 4, "A cancelled drop restores the origin without destroying it.")
 	_check(not bool(level.call("_move_item_to_slot", item, _slot(origin, 0), null)), "A rejected drop is refused.")
 	_check(board.get_remaining_shelf_count() == 4, "A rejected drop destroys nothing.")
+	await _dispose(level)
 
-	# A collapse elsewhere mid-drag cancels the drag first, then destroys only the empty shelf.
+
+## A triple clear elsewhere must not snatch an item out of the player's hand. The drag keeps going
+## through the destruction and the fall, and a release mid-collapse lands where it was aimed. The
+## item is its shelf's only one, so the lifted shelf also proves a drag origin is never destroyed.
+func _verify_a_drag_survives_a_collapse_elsewhere() -> void:
+	var level := await _make_level(_collapsing_config([3, 1], 2, ["a__", "x__", "y__", "aa_"]), true)
+	var board := _level_board(level)
+	var origin := _shelf_by_id(board, 1)
+	var item := _front_item(level, origin, 0)
 	level.call("_begin_drag", item, item.global_position)
-	var other := _shelf_by_id(board, 3)
-	_front_item(level, other, 0).queue_free()
-	await process_frame
-	level.call("_on_shelf_resolution_drained")
+	_move(level, _shelf_by_id(board, 0), 0, _shelf_by_id(board, 3), 2)
+	_check(await _wait_for_collapse_start(level), "The move's triple starts a collapse.")
+	_check(level.get("_dragged_item") == item, "The drag survives the collapse starting.")
+	var target := _slot(origin, 2).get_node("ItemSlot03") as Node2D
+	level.call("_handle_motion_at", target.global_position)
+	_check(
+		item.global_position.distance_to(target.global_position) < 1.0,
+		"The held item keeps following the pointer mid-collapse."
+	)
+	level.call("_handle_release_at", target.global_position)
+	_check(bool(level.call("_is_collapse_in_progress")), "The release happens while columns are still moving.")
+	_check(level.get("_dragged_item") == null, "A release mid-collapse finishes the drag.")
 	await _settle(level)
-	_check(level.get("_dragged_item") == null, "A collapse cancels an active drag.")
-	_check(_front_item(level, origin, 0) == item and board.get_remaining_shelf_count() == 3, "Only the genuinely empty shelf is destroyed.")
+	_check(_ids(board, 0) == [1, 2], "The emptied shelf is destroyed and the drag origin survives.")
+	_check(_front_item(level, origin, 2) == item, "The drop lands in the slot it was released over, on a shelf that fell.")
 	await _dispose(level)
 
 
@@ -803,7 +853,7 @@ func _verify_highlight_uses_active_shelves_only() -> void:
 	await _dispose(level)
 
 
-func _verify_input_and_abilities_blocked_during_collapse() -> void:
+func _verify_play_continues_while_abilities_wait_during_collapse() -> void:
 	var level := await _make_level(_collapsing_config([3, 1], 2, ["a__", "x__", "y__", "aa_"]), true)
 	var board := _level_board(level)
 	var finished := [0]
@@ -817,19 +867,23 @@ func _verify_input_and_abilities_blocked_during_collapse() -> void:
 	_check(int((level.get("_ability_uses") as Dictionary).get(&"freezer", 0)) == freezer_uses and not bool(level.call("_is_freezer_active")), "A blocked ability spends nothing.")
 	var buttons := (level.get("_ability_bar") as Node).get("_buttons") as Dictionary
 	_check((buttons[&"freezer"] as Button).disabled, "Ability buttons are disabled during a collapse.")
+	var entering_item := _front_item(level, _shelf_by_id(board, 2), 0)
+	level.call("_handle_press_at", entering_item.global_position)
+	_check(level.get("_pressed_item") == null, "An item on a shelf still sliding into the window cannot be picked.")
 	var touch := InputEventScreenTouch.new()
 	touch.pressed = true
-	touch.position = bystander.global_position
+	touch.position = level.get_canvas_transform() * bystander.global_position
 	level.call("_input", touch)
-	_check(level.get("_pressed_item") == null, "A press during a collapse is ignored.")
-	level.call("_handle_press_at", bystander.global_position)
-	_check(level.get("_pressed_item") == null, "Even a direct press cannot pick an item while columns move.")
+	_check(level.get("_pressed_item") == bystander, "A press on a surviving shelf registers mid-collapse.")
+	var lift := touch.duplicate() as InputEventScreenTouch
+	lift.pressed = false
+	level.call("_input", lift)
+	_check(level.get("_selected_item") == bystander, "A tap mid-collapse selects the item.")
+	_check(bool(level.call("_is_collapse_in_progress")), "All of that happened while columns were moving.")
 	await _settle(level)
 	_check(finished[0] == 1, "The collapse finishes exactly once.")
 	_check(bool(level.call("_can_apply_ability", &"freezer")) and not (buttons[&"freezer"] as Button).disabled, "Abilities come back after the collapse.")
-	level.call("_handle_press_at", bystander.global_position)
-	level.call("_handle_release_at", bystander.global_position)
-	_check(level.get("_selected_item") == bystander, "Input comes back after the collapse.")
+	_check(level.get("_selected_item") == bystander, "A selection made mid-collapse survives it.")
 	await _dispose(level)
 
 
@@ -868,6 +922,41 @@ func _verify_completion_waits_for_the_last_shelf() -> void:
 	_check(bool(level.get("_level_completed")), "Destroying the last shelf completes the level.")
 	_check(completed_cleanly, "Completion begins only after the final shelf's collapse has settled.")
 	await _dispose(level)
+
+
+## The endgame the floor exists for. Once the authored `ccc` clears, `aab` and `bba` fill every slot
+## left, so destroying that shelf would leave no move at all. Kept, it is room to finish -- and the
+## level completes on its last item with all three shelves still standing.
+func _verify_kept_shelves_leave_room_to_finish() -> void:
+	var level := await _make_level(_collapsing_config([3], 3, ["aab", "bba", "ccc"]), false, true, -1)
+	var board := _level_board(level)
+	var workspace := _shelf_by_id(board, 2)
+	_check(board.get_kept_count() == 3, "A level applies the shipped kept count.")
+	_check(
+		int(level.get("_triples_cleared")) == 1 and board.get_remaining_shelf_count() == 3,
+		"The authored triple clears, but its shelf is kept."
+	)
+	_check(
+		board.is_shelf_active(workspace) and _shelf_item_ids(level, workspace) == ["", "", ""],
+		"The kept shelf is an ordinary, playable empty shelf."
+	)
+	_check(_move(level, _shelf_by_id(board, 0), 2, workspace, 0), "The kept shelf takes a drop.")
+	await _settle(level)
+	_check(_move(level, _shelf_by_id(board, 1), 2, _shelf_by_id(board, 0), 2), "The freed slot completes a triple.")
+	await _settle(level)
+	_check(
+		board.get_remaining_shelf_count() == 3 and not bool(level.get("_level_completed")),
+		"A kept shelf emptied by its triple stays, and the level goes on while items remain."
+	)
+	_check(_move(level, workspace, 0, _shelf_by_id(board, 1), 2), "The last triple is completed.")
+	await _settle(level)
+	_check(bool(level.get("_level_completed")), "Clearing the last item completes the level.")
+	_check(board.get_remaining_shelf_count() == 3, "The kept shelves are still standing at completion.")
+	await _dispose(level)
+
+	var narrow := await _make_level(_collapsing_config([3, 1], 2, ["a__", "x__", "y__", "aa_"]), false, true, -1)
+	_check(_level_board(narrow).get_kept_count() == 2, "The kept count is capped at the authored window.")
+	await _dispose(narrow)
 
 
 func _verify_retry_rebuilds_the_authored_board() -> void:

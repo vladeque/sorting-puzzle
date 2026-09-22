@@ -49,10 +49,20 @@ timer is gone, because a 27-shelf collapsing board cannot be finished in 35 seco
   a drop target, an automatic-match candidate, or a Hammer, Shuffle, or Highlight target.
 - A shelf is destroyed once a committed move, a triple clear, or Hammer leaves it with no items.
   Lifting an item into a drag never counts as emptying its shelf.
+- Every column keeps its last three shelves (`KEPT_SHELVES_PER_COLUMN`, capped at the authored
+  window). Once a column is down to them, an emptied shelf stays as an ordinary empty shelf, so a
+  three-column board always ends as a full 3x3 grid with room to sort. Without the floor the board
+  shrank into endings with no free slot at all, such as `aab` and `bba` alone. When one batch
+  empties more shelves than a column may lose, its lowest emptied shelves go first.
 - The shelves above a destroyed shelf drop one row; shelves below it never move. A shelf entering
   the window becomes playable after the drop settles, and an authored triple on it clears
   automatically, which can collapse the column again.
-- The level completes after the last shelf is destroyed and its collapse has settled.
+- A collapse does not pause play. Items can be picked up, carried, dropped, and selected on every
+  surviving shelf while columns break and fall; a drag or selection in progress when a collapse
+  starts carries straight on, and a drop lands on its shelf as it falls. Only a shelf still sliding
+  into the window waits until it lands. Abilities wait for the collapse to finish, and so does
+  resolving any triple a mid-collapse move completes.
+- The level completes once no item is left and nothing is resolving or collapsing.
 - All four abilities stay available. No remaining-shelf count is shown.
 - Dispensers, locks, sticky items, moving rows, and multiple layers are rejected in this mode.
 
@@ -66,8 +76,9 @@ at the scale the authored minimum already needs, so they never shrink the board 
 targets. The count is resolved once, when the level is built, and never changes during play.
 
 This is safe for solvability because a larger window only adds legal moves. The only extra forced
-event it can trigger is an automatic triple clear, which destroys a shelf and so only advances the
-objective. Proving the minimum therefore proves every larger window.
+event it can trigger is an automatic triple clear, which only removes items. Whether the shelf it
+empties is then destroyed depends only on how many shelves its column has left, which the authored
+window, not the device, decides. Proving the minimum therefore proves every larger window.
 
 With the preview fixture and with campaign level 9, the window resolves to 6 rows at 540x960,
 720x1280, 1080x1920, and 900x1600, and to 8 rows at 1080x2400.
@@ -95,7 +106,7 @@ With the preview fixture and with campaign level 9, the window resolves to 6 row
   through match-clear animations, and Freezer holds the countdown without stopping the movement.
 - The new column order is committed before any animation starts. A collapse keeps running under the
   pause menu, like every other gameplay animation, so pausing, backgrounding, failing, or tearing
-  the scene down mid-collapse always leaves a consistent board and never a stuck input lock.
+  the scene down mid-collapse always leaves a consistent board and never a stuck ability lock.
 - Empty-shelf destruction recoils and separates the wooden frame into a short oak-chip/dust burst,
   overlapping the opening of the accelerated column fall. Survivors pass their destination by a
   few pixels and settle with a restrained rebound. Newly revealed shelves remain opaque and enter
@@ -121,7 +132,8 @@ mode is valid and solvable, so level 9 cannot drift into an unfinishable state u
 
 `tests/gameplay/test_collapsing_shelf_columns.gd` covers the components in isolation and the full
 level: build order, hidden-shelf reachability, move/triple/Hammer destruction and reveal chains,
-drags, Shuffle, Highlight, Freezer, input and ability blocking, completion timing, retry, pause,
+drags and selections that carry on through a collapse, abilities blocked during one, the kept
+floor and the endgame it leaves room for, Shuffle, Highlight, Freezer, completion timing, retry, pause,
 backgrounding, failure and teardown mid-collapse, invalid configs, responsive windows, the preview
 scene, and a classic-level regression.
 

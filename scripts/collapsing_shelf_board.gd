@@ -58,6 +58,7 @@ const OUTER_SHADOW_NODE := "Window/OuterShadowComposite"
 var _columns: Array[CollapsingShelfColumn] = []
 var _authored_column_heights: Array[int] = []
 var _authored_visible_count := 1
+var _kept_count := 0
 var _visible_count := 1
 var _shelf_step := Vector2.ZERO
 var _cell_size := Vector2.ZERO
@@ -69,17 +70,21 @@ var _is_collapsing := false
 
 ## `column_heights` is the authored shelf count per column, left to right. `visible_count` is the
 ## authored guaranteed minimum window; `set_visible_count()` may later widen it for a taller screen.
+## `kept_count` is how many shelves every column keeps once emptied shelves would take it lower
+## (`CollapsingColumnRules.get_kept_shelf_count()` for a level); it is capped at the authored window.
 func configure(
 	column_heights: Array[int],
 	visible_count: int,
 	shelf_step: Vector2,
 	cell_size: Vector2,
-	shelf_scale := 1.0
+	shelf_scale := 1.0,
+	kept_count := 0
 ) -> void:
 	_clear_columns()
 	_authored_column_heights = column_heights.duplicate()
 	_authored_visible_count = clampi(visible_count, 1, MAX_VISIBLE_SHELVES_PER_COLUMN)
 	_visible_count = _authored_visible_count
+	_kept_count = clampi(kept_count, 0, _authored_visible_count)
 	_shelf_step = shelf_step
 	_cell_size = cell_size
 	_shelf_scale = shelf_scale
@@ -91,7 +96,7 @@ func configure(
 		var column := COLUMN_SCENE.instantiate() as CollapsingShelfColumn
 		column.name = "Column%02d" % (column_index + 1)
 		window.add_child(column)
-		column.configure(column_index, _visible_count, _shelf_step)
+		column.configure(column_index, _visible_count, _shelf_step, _kept_count)
 		column.collapse_settled.connect(_on_column_collapse_settled.bind(column))
 		_columns.append(column)
 
@@ -238,20 +243,17 @@ func owns_shelf(shelf: Node) -> bool:
 	return shelf != null and _columns.has(shelf.get_parent())
 
 
-## Playable right now: inside its column's window, finished arriving, and no collapse running.
+## Playable right now: inside its column's window and finished arriving. A running collapse does not
+## pause play: the shelves it destroys have already left their columns, and the survivors keep their
+## items -- and anything dropped on them -- while they fall. Shelves still sliding into the window
+## become playable once they land.
 func is_shelf_active(shelf: Node) -> bool:
-	if _is_collapsing:
-		return false
-
 	var column := _get_shelf_column(shelf)
 	return column != null and column.is_shelf_active(shelf)
 
 
 func get_active_shelves() -> Array[Node]:
 	var active: Array[Node] = []
-	if _is_collapsing:
-		return active
-
 	for column in _columns:
 		active.append_array(column.get_active_shelves())
 
@@ -300,10 +302,19 @@ func get_remaining_shelf_counts() -> Array[int]:
 	return counts
 
 
-## Shelf destruction is the objective, so the level is cleared when no shelf survives anywhere --
-## not when the visible shelves happen to be empty.
-func is_cleared() -> bool:
-	return get_remaining_shelf_count() == 0 and not _is_collapsing
+func get_kept_count() -> int:
+	return _kept_count
+
+
+## Of the emptied `candidates`, those the columns may actually destroy: each column gives up its
+## lowest emptied shelves while it stays at least `get_kept_count()` tall. The rest stay on the board
+## as ordinary empty shelves.
+func get_destroyable_shelves(candidates: Array) -> Array[Node]:
+	var destroyable: Array[Node] = []
+	for column in _columns:
+		destroyable.append_array(column.get_removable_shelves(candidates))
+
+	return destroyable
 
 
 func is_collapsing() -> bool:
@@ -311,6 +322,7 @@ func is_collapsing() -> bool:
 
 
 ## Removes `shelves_to_remove` in one batch and returns once every affected column has settled.
+## A column only gives up what `get_destroyable_shelves()` allows; the rest are left in place.
 ## Each column commits its new order before anything moves; columns then animate in parallel.
 ## Result keys: `removed_ids` (authored IDs), `removed_count`, and `revealed` (shelves that entered
 ## the window, active again by the time this returns).
