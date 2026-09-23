@@ -905,7 +905,7 @@ Contract:
 - `digest_sha256` covers every other manifest field as canonical JSON.
 - `publication` binds one content-addressed `configuration_version` to its publication digest and
   source-candidate digest.
-- `levels` maps all current Chapter 1 campaign levels 1-10 to exact opaque configuration, level,
+- `levels` maps all current Chapter 1 campaign levels 1-20 to exact opaque configuration, level,
   and rules versions.
 - `source.files` pins the authored Godot files used by that publication.
 - `configs/chapters.json` is included in the pinned source-file set so chapter membership changes

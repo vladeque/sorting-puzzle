@@ -1,0 +1,34 @@
+{
+  "level": 17,
+  "time_seconds": 300,
+  "layout_preset": "grid_3x3",
+  "shelves": [
+    {
+      "layers": [
+        [
+          "smoothie_cup_strawberry_banana",
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "smoothie_cup_strawberry_banana",
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "smoothie_cup_strawberry_banana",
+          null,
+          null
+        ]
+      ]
+    }
+  ]
+}

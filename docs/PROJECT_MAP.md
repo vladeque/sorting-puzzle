@@ -48,7 +48,7 @@ Player progression:
 - Registered in `project.godot` as the `PlayerProgress` autoload.
 - Always saves account-scoped gameplay locally with atomic generations and a signed operation
   journal; backend synchronization is a silent recovery/merge destination.
-- Campaign levels 1-10 journal the exact configuration/level/rules identities generated from the
+- Campaign levels 1-20 journal the exact configuration/level/rules identities generated from the
   active local backend publication. Future unpublished levels remain local and never receive fabricated
   protocol provenance.
 

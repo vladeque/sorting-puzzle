@@ -35,7 +35,7 @@ class LevelItemProgressionTests(unittest.TestCase):
     def test_chapter_level_pools_follow_configured_milestones(self) -> None:
         chapter_one_items = set(self.progression.chapter_item_ids("chapter_01"))
         previous_items: set[str] = set()
-        for level_number in range(1, 11):
+        for level_number in range(1, 21):
             available_items = set(self.progression.available_items(level_number))
             self.assertLessEqual(previous_items, available_items)
             self.assertLessEqual(available_items, chapter_one_items)
@@ -43,11 +43,11 @@ class LevelItemProgressionTests(unittest.TestCase):
 
     def test_chapter_catalog_maps_global_to_local_levels(self) -> None:
         chapters = load_chapter_catalog(REPOSITORY_ROOT / "configs" / "chapters.json")
-        chapter, chapter_level = chapters.chapter_for_level(10)
+        chapter, chapter_level = chapters.chapter_for_level(20)
         self.assertEqual(chapter.chapter_id, "chapter_01")
-        self.assertEqual(chapter_level, 10)
+        self.assertEqual(chapter_level, 20)
         with self.assertRaisesRegex(ValueError, "not assigned"):
-            chapters.chapter_for_level(11)
+            chapters.chapter_for_level(21)
 
     def test_chapter_catalog_applies_default_unlock_requirement(self) -> None:
         document = json.loads(

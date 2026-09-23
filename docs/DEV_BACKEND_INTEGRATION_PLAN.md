@@ -45,7 +45,7 @@ retrieval of uninstalled content remain online-only.
 - Backend Terraform exists for a control-plane project and isolated development and production
   projects, but applying infrastructure, materializing secrets, configuring GitHub environments,
   running managed migrations/bootstrap, and connecting store consoles are still outstanding.
-- Backend launch candidate and development provenance cover campaign levels 1-10.
+- Backend launch candidate and development provenance cover campaign levels 1-20.
 
 ## Environment boundary
 

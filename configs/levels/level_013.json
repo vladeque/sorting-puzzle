@@ -1,0 +1,34 @@
+{
+  "level": 13,
+  "time_seconds": 300,
+  "layout_preset": "grid_3x3",
+  "shelves": [
+    {
+      "layers": [
+        [
+          "juice_box_orange",
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "juice_box_orange",
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "juice_box_orange",
+          null,
+          null
+        ]
+      ]
+    }
+  ]
+}

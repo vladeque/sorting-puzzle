@@ -131,20 +131,20 @@ func _run() -> void:
 
 	_check(progress.get_selected_chapter_id() == "chapter_01", "Chapter 1 is initially selected")
 	_check(not progress.select_chapter("chapter_02"), "locked Chapter 2 cannot be selected")
-	for level_number in range(1, 11):
+	for level_number in range(1, 21):
 		_check(progress.complete_level(level_number, 3), "offline completion %d commits" % level_number)
 	_check(not progress.complete_level(1, 3), "completed levels cannot be replayed")
-	_check(not progress.complete_level(11, 3), "unconfigured levels cannot be completed")
-	_check(progress.get_current_level() == 11, "legacy campaign cursor follows contiguous completions")
-	_check(progress.get_total_earned_stars() == 30, "lifetime stars update immediately")
+	_check(not progress.complete_level(21, 3), "unconfigured levels cannot be completed")
+	_check(progress.get_current_level() == 21, "legacy campaign cursor follows contiguous completions")
+	_check(progress.get_total_earned_stars() == 60, "lifetime stars update immediately")
 	var chapter_one_progress := progress.get_chapter_progress("chapter_01") as Dictionary
 	var chapter_two_progress := progress.get_chapter_progress("chapter_02") as Dictionary
 	_check(bool(chapter_one_progress.get("complete", false)), "Chapter 1 is complete at current content end")
 	_check(
-		int(chapter_two_progress.get("previous_completed_levels", 0)) == 10
+		int(chapter_two_progress.get("previous_completed_levels", 0)) == 20
 		and int(chapter_two_progress.get("required_completed_levels", 0)) == 25
 		and not bool(chapter_two_progress.get("unlocked", true)),
-		"Chapter 2 remains locked at 10 of 25 required completions"
+		"Chapter 2 remains locked at 20 of 25 required completions"
 	)
 	_check(progress.get_coins() == 275, "chapter completion does not invent an early chest reward")
 	_check(progress.spend_coins(100), "saved coins remain spendable after chapter completion")

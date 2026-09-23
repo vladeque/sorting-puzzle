@@ -1,0 +1,34 @@
+{
+  "level": 18,
+  "time_seconds": 300,
+  "layout_preset": "grid_3x3",
+  "shelves": [
+    {
+      "layers": [
+        [
+          "chips_can_cheese",
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "chips_can_cheese",
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "chips_can_cheese",
+          null,
+          null
+        ]
+      ]
+    }
+  ]
+}

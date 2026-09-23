@@ -1,0 +1,34 @@
+{
+  "level": 19,
+  "time_seconds": 300,
+  "layout_preset": "grid_3x3",
+  "shelves": [
+    {
+      "layers": [
+        [
+          "yogurt_tub_vanilla",
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "yogurt_tub_vanilla",
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "yogurt_tub_vanilla",
+          null,
+          null
+        ]
+      ]
+    }
+  ]
+}

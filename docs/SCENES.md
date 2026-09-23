@@ -1901,6 +1901,7 @@ Presets with moving rows:
 - `scenes/layouts/layout_staggered_columns_5_moving_6_5.tscn` (16; a vertical 6-shelf belt between two static columns of five, 4 visible, 60 px/s down)
 - `scenes/layouts/layout_grid_2x4_moving_6_left.tscn` (14; a vertical 6-shelf belt down the left edge beside a static 2x4 block, 4 visible, 60 px/s down)
 - `scenes/layouts/layout_grid_1x4_moving_6_6_sides.tscn` (16; two vertical 6-shelf belts around a static column of four, 4 visible each, 60 px/s, left down and right up)
+- `scenes/layouts/layout_grid_3x2_moving_6_6_top_bottom.tscn` (18; two counter-running 6-shelf belts above and below a static 3x2 grid, 3 visible each, 60 px/s, right and left)
 
 Vertical belts:
 - A `vertical_wrap` row carries at least six shelves. Fewer makes the hidden part of the belt shorter

@@ -50,6 +50,7 @@ LAYOUT_PRESETS = (
     "grid_2x4_moving_8_left",
     "grid_3x2_moving_5_bottom",
     "grid_3x2_moving_4_4_center",
+    "grid_3x2_moving_6_6_top_bottom",
     "grid_3x3_moving_4_middle",
     "grid_3x3_moving_5_bottom",
     "staggered_rows_2_3_2",

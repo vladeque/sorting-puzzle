@@ -1,0 +1,34 @@
+{
+  "level": 14,
+  "time_seconds": 300,
+  "layout_preset": "grid_3x3",
+  "shelves": [
+    {
+      "layers": [
+        [
+          "gift_box",
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "gift_box",
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "gift_box",
+          null,
+          null
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "level": 16,
+  "time_seconds": 300,
+  "layout_preset": "grid_3x3",
+  "shelves": [
+    {
+      "layers": [
+        [
+          "toy_robot",
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "toy_robot",
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "toy_robot",
+          null,
+          null
+        ]
+      ]
+    }
+  ]
+}
