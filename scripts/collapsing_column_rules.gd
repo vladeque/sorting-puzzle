@@ -62,13 +62,13 @@ static func get_kept_shelf_count(config: Dictionary) -> int:
 static func validate_config(config: Dictionary) -> PackedStringArray:
 	var errors := PackedStringArray()
 	var mode = config.get(GAMEPLAY_MODE_KEY, GAMEPLAY_MODE_CLASSIC)
-	if mode != GAMEPLAY_MODE_CLASSIC and mode != GAMEPLAY_MODE_COLLAPSING_COLUMNS:
-		errors.append("%s must be '%s' or '%s'" % [
-			GAMEPLAY_MODE_KEY, GAMEPLAY_MODE_CLASSIC, GAMEPLAY_MODE_COLLAPSING_COLUMNS
-		])
+	if not GameplayModes.is_known(mode):
+		errors.append(GameplayModes.describe_unknown_mode())
 		return errors
 
-	if mode == GAMEPLAY_MODE_CLASSIC:
+	# Every level runs this guard, whatever mode it declares, so any other mode still has to be told
+	# that `column_layout` means nothing there rather than having it quietly ignored.
+	if mode != GAMEPLAY_MODE_COLLAPSING_COLUMNS:
 		if config.has(COLUMN_LAYOUT_KEY):
 			errors.append("%s is only valid when %s is '%s'" % [
 				COLUMN_LAYOUT_KEY, GAMEPLAY_MODE_KEY, GAMEPLAY_MODE_COLLAPSING_COLUMNS
