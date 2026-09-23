@@ -187,11 +187,11 @@ func _run() -> void:
 		},
 		"frame-only customization produces a frame-only profile edit"
 	)
-	_check(campaign_operations.size() == 11, "all Chapter 1 campaign mutations are journaled")
+	_check(campaign_operations.size() == 21, "all Chapter 1 campaign mutations are journaled")
 	for raw_operation in campaign_operations:
 		var payload := (raw_operation as Dictionary).get("payload", {}) as Dictionary
 		var campaign_level := int(payload.get("campaign_level", 0))
-		_check(campaign_level >= 1 and campaign_level <= 10, "campaign operation is integration-ready")
+		_check(campaign_level >= 1 and campaign_level <= 20, "campaign operation is integration-ready")
 		_check(
 			str(payload.get("configuration_version", "")).begins_with("config_"),
 			"campaign operation uses canonical configuration provenance"
@@ -210,8 +210,8 @@ func _run() -> void:
 	)
 
 	progress.load_progress()
-	_check(progress.get_current_level() == 11, "facade snapshot survives restart load")
-	_check(progress.get_completed_level_stars().size() == 10, "completion history survives restart")
+	_check(progress.get_current_level() == 21, "facade snapshot survives restart load")
+	_check(progress.get_completed_level_stars().size() == 20, "completion history survives restart")
 	_check(progress.get_player_name() == "Offline Player", "profile remains account-scoped")
 	_check(progress.get_avatar_frame_id() == "frame_ruby", "avatar frame survives restart load")
 	_check(
