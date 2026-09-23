@@ -1859,6 +1859,7 @@ Naming:
 - `grid_<columns>x<rows>` is a full rectangle of markers; a suffix such as `_hollow` names the cells it omits.
 - `staggered_rows_<a>_<b>_...` lists shelves per row, top to bottom, for layouts whose rows differ in width and interlock by half a column step.
 - `staggered_columns_<a>_<b>_<c>` lists shelves per column, left to right, for layouts whose columns differ in height and interlock by half a row step.
+- `shape_<silhouette>_<columns>x<rows>` names a static cutout silhouette and its bounding grid.
 - `_moving_<count>_<placement>` marks a preset's moving rows, as in `grid_3x3_moving_5_bottom`.
 - Row and column counts in a preset name always describe the authored markers, so a name plus the shelf count is enough to tell whether a level fits the preset.
 
@@ -1884,6 +1885,12 @@ Static presets:
 - `scenes/layouts/layout_grid_3x5.tscn` (15)
 - `scenes/layouts/layout_grid_4x3.tscn` (12)
 - `scenes/layouts/layout_grid_4x4_hollow.tscn` (12; a 4x4 field without its four inner cells)
+- `scenes/layouts/layout_shape_arch_3x5.tscn` (11; `111/101/101/101/101`)
+- `scenes/layouts/layout_shape_cup_3x5.tscn` (11; `101/101/101/101/111`)
+- `scenes/layouts/layout_shape_hourglass_3x5.tscn` (9; `111/010/010/010/111`)
+- `scenes/layouts/layout_shape_keyhole_3x5.tscn` (10; `111/101/111/010/010`)
+- `scenes/layouts/layout_shape_t_3x5.tscn` (7; `111/010/010/010/010`)
+- `scenes/layouts/layout_shape_zigzag_3x5.tscn` (10; `110/011/110/011/110`)
 - `scenes/layouts/layout_staggered_rows_2_3_2.tscn` (7)
 - `scenes/layouts/layout_staggered_rows_3_2_3.tscn` (8)
 - `scenes/layouts/layout_staggered_rows_2_3_3_2.tscn` (10)

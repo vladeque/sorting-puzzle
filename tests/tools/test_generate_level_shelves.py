@@ -5,6 +5,7 @@ import copy
 import io
 import json
 import random
+import re
 import sys
 import tempfile
 import unittest
@@ -44,6 +45,52 @@ class LayoutPresetTests(unittest.TestCase):
                     / f"layout_{layout_preset}.tscn"
                 )
                 self.assertTrue(scene_path.is_file(), msg=f"Missing {scene_path}")
+
+    def test_shape_presets_use_three_columns_and_exactly_five_rows(self) -> None:
+        expected_row_counts = {
+            "shape_arch_3x5": [3, 2, 2, 2, 2],
+            "shape_cup_3x5": [2, 2, 2, 2, 3],
+            "shape_hourglass_3x5": [3, 1, 1, 1, 3],
+            "shape_keyhole_3x5": [3, 2, 3, 1, 1],
+            "shape_t_3x5": [3, 1, 1, 1, 1],
+            "shape_zigzag_3x5": [2, 2, 2, 2, 2],
+        }
+        for layout_preset, expected_counts in expected_row_counts.items():
+            with self.subTest(layout_preset=layout_preset):
+                scene_path = (
+                    REPOSITORY_ROOT
+                    / "scenes"
+                    / "layouts"
+                    / f"layout_{layout_preset}.tscn"
+                )
+                scene_text = scene_path.read_text(encoding="utf-8")
+                marker_blocks = re.findall(
+                    r'\[node name="Shelf\d+" type="Marker2D" parent="\."\]'
+                    r'(.*?)(?=\n\[node|\Z)',
+                    scene_text,
+                    flags=re.DOTALL,
+                )
+                positions: list[tuple[float, float]] = []
+                for marker_block in marker_blocks:
+                    match = re.search(
+                        r"position = Vector2\(([-\d.]+), ([-\d.]+)\)", marker_block
+                    )
+                    positions.append(
+                        (float(match.group(1)), float(match.group(2)))
+                        if match
+                        else (0.0, 0.0)
+                    )
+
+                row_counts: dict[float, int] = {}
+                for x_position, y_position in positions:
+                    self.assertIn(x_position, {-228.96, 0.0, 228.96})
+                    row_counts[y_position] = row_counts.get(y_position, 0) + 1
+
+                self.assertEqual(len(row_counts), 5)
+                self.assertEqual(
+                    [row_counts[y_position] for y_position in sorted(row_counts)],
+                    expected_counts,
+                )
 
 
 class GenerateLevelShelvesTests(unittest.TestCase):

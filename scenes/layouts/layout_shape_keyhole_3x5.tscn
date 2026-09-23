@@ -1,0 +1,32 @@
+[gd_scene format=3]
+
+[node name="LayoutShapeKeyhole3x5" type="Node2D"]
+
+[node name="Shelf01" type="Marker2D" parent="."]
+position = Vector2(-228.96, -269.24)
+
+[node name="Shelf02" type="Marker2D" parent="."]
+position = Vector2(0, -269.24)
+
+[node name="Shelf03" type="Marker2D" parent="."]
+position = Vector2(228.96, -269.24)
+
+[node name="Shelf04" type="Marker2D" parent="."]
+position = Vector2(-228.96, -134.62)
+
+[node name="Shelf05" type="Marker2D" parent="."]
+position = Vector2(228.96, -134.62)
+
+[node name="Shelf06" type="Marker2D" parent="."]
+position = Vector2(-228.96, 0)
+
+[node name="Shelf07" type="Marker2D" parent="."]
+
+[node name="Shelf08" type="Marker2D" parent="."]
+position = Vector2(228.96, 0)
+
+[node name="Shelf09" type="Marker2D" parent="."]
+position = Vector2(0, 134.62)
+
+[node name="Shelf10" type="Marker2D" parent="."]
+position = Vector2(0, 269.24)

@@ -179,6 +179,7 @@ Preset naming:
 - `grid_<columns>x<rows>` is a full rectangle; a suffix such as `_hollow` names the cells it omits.
 - `staggered_rows_<a>_<b>_...` counts shelves per row, top to bottom.
 - `staggered_columns_<a>_<b>_<c>` counts shelves per column, left to right.
+- `shape_<silhouette>_<columns>x<rows>` is a static cutout silhouette inside the named bounding grid.
 - `_moving_<count>_<placement>` marks moving rows.
 - A level must declare exactly as many shelves as its preset has markers; a mismatch warns and falls
   back to `grid_3x3`.
@@ -191,6 +192,12 @@ Supported static layout presets:
 - `grid_3x5`: 15 shelves.
 - `grid_4x3`: 12 shelves arranged as four columns across three rows.
 - `grid_4x4_hollow`: 12 shelves arranged as a 4x4 field without its four inner cells.
+- `shape_arch_3x5`: 11 shelves with occupancy `111/101/101/101/101` from top to bottom.
+- `shape_cup_3x5`: 11 shelves with occupancy `101/101/101/101/111`.
+- `shape_hourglass_3x5`: 9 shelves with occupancy `111/010/010/010/111`.
+- `shape_keyhole_3x5`: 10 shelves with occupancy `111/101/111/010/010`.
+- `shape_t_3x5`: 7 shelves with occupancy `111/010/010/010/010`.
+- `shape_zigzag_3x5`: 10 shelves with occupancy `110/011/110/011/110`.
 - `staggered_rows_2_3_2`: 7 shelves arranged as centered rows of two, three, and two shelves.
 - `staggered_rows_3_2_3`: 8 shelves arranged as centered rows of three, two, and three shelves.
 - `staggered_rows_2_3_3_2`: 10 shelves arranged as centered rows of two, three, three, and two shelves.
