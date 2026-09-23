@@ -5,6 +5,7 @@ extends Node2D
 const SLOT_COUNT := 3
 const StickyRules := preload("res://scripts/sticky_item_rules.gd")
 const CollapsingRules := preload("res://scripts/collapsing_column_rules.gd")
+const ThrowingRules := preload("res://scripts/throwing_dispenser_rules.gd")
 const SLOT_ITEM_POSITION := Vector2(0, -32)
 const SHELF_CELL_VISUAL_SCALE := 1.06
 const SHELF_BASE_CELL_SIZE := Shelf.BASE_CELL_SIZE
@@ -34,6 +35,10 @@ const COMPLETION_REVEAL_SECONDS := 1.35
 const HAMMER_ITEM_COMPRESSION_SECONDS := 0.08
 const HAMMER_MERGE_POP_SECONDS := 0.12
 const HAMMER_REWARD_DELAY_SECONDS := 0.14
+## Thrown items are parented into their slot immediately and only look airborne, so this tunes the
+## flight alone and can never change where an item lands.
+const THROWN_ITEM_MAX_STAGGER_SECONDS := 0.22
+const THROWN_ITEM_LAUNCH_SCALE := Vector2(0.55, 0.55)
 const SHELF_SCENE := preload("res://scenes/shelf.tscn")
 const MOVING_SHELF_SCENE := preload("res://scenes/moving_shelf.tscn")
 const DISPENSER_SHELF_SCENE := preload("res://scenes/dispenser_shelf.tscn")
@@ -45,6 +50,7 @@ const SHELF_TYPE_DISPENSER := "dispenser"
 const DISPENSER_LOWER_CLEARANCE := 32.0
 const MOVING_SHELF_ROW_SCENE := preload("res://scenes/moving_shelf_row.tscn")
 const COLLAPSING_SHELF_BOARD_SCENE := preload("res://scenes/collapsing_shelf_board.tscn")
+const THROWING_DISPENSER_RACK_SCENE := preload("res://scenes/throwing_dispenser_rack.tscn")
 const ShelfOuterShadowGroupScript := preload("res://scripts/shelf_outer_shadow_group.gd")
 const ITEM_SCENE := preload("res://scenes/item.tscn")
 const HAMMER_IMPACT_EFFECT_SCENE := preload("res://scenes/abilities/hammer_impact_effect.tscn")
@@ -155,6 +161,11 @@ const SHOP_RETURN_TIME_EXTENSION := &"time_extension"
 @export var drag_start_distance := 12.0
 @export var layer_promotion_duration_seconds := 0.22
 @export var item_move_duration_seconds := 0.16
+## Exported beside the other item-motion durations so tests and captures can zero the flight. A
+## headless frame is far shorter than a real one, so a test that waited out a real duration in frames
+## would be reading a board whose scatter has not landed yet.
+@export var thrown_item_flight_seconds := 0.26
+@export var thrown_item_stagger_seconds := 0.05
 @export var highlight_outline_color := Color(1.0, 0.86, 0.18, 1.0)
 @export var selected_outline_color := Color.WHITE
 @export_range(0.0, 8.0, 0.25) var highlight_outline_width := 6.0
@@ -296,6 +307,17 @@ var _collapsing_board: CollapsingShelfBoard
 var _collapse_phase_active := false
 ## Shelves whose resolution was requested while a collapse ran; resolved as soon as it settles.
 var _shelves_awaiting_collapse: Array[Node] = []
+## Set only for `gameplay_mode: "throwing_dispensers"`; every other mode leaves it null and skips
+## the dispenser branches below.
+var _dispenser_rack: ThrowingDispenserRack
+## The authored scatter stream, kept apart from `_rng` on purpose. `_rng` drives cosmetic jitter --
+## star spread, shuffle wobble -- which runs a different number of times depending on what the player
+## did and what the screen showed, so sharing it would make the scatter depend on animation history
+## instead of on the level's seed.
+var _throw_rng := RandomNumberGenerator.new()
+## True while thrown items are still in the air. Taps, abilities, and completion wait on it, so a
+## second throw cannot start before the first has landed and been resolved.
+var _throw_in_progress := false
 var _loading_transition_pending := false
 
 
@@ -620,6 +642,12 @@ func _get_shelves_root_child_bounds(child: Node) -> Rect2:
 	if collapsing_board != null:
 		return collapsing_board.get_layout_bounds()
 
+	# The rack hangs above the shelves, so without this the fit would size the level to the board
+	# alone and push the dispensers off the top of a short viewport.
+	var dispenser_rack := child as ThrowingDispenserRack
+	if dispenser_rack != null:
+		return dispenser_rack.get_layout_bounds()
+
 	# Visual bounds, not the grid cell: a dispenser's indicator hangs below its shelf body, and the
 	# responsive fit has to keep that on screen even though row packing ignores it.
 	var shelf_cell := child as Shelf
@@ -654,6 +682,7 @@ func _stop_sound_effects() -> void:
 
 
 func _process(delta: float) -> void:
+	_refresh_dispenser_availability()
 	if _loading_transition_pending:
 		return
 	_refresh_sticky_feedback_availability()
@@ -1002,6 +1031,7 @@ func _apply_level_config(config: Dictionary) -> void:
 		push_error("Invalid sticky level configuration: " + _level_config_error)
 		return
 	var mode_errors := CollapsingRules.validate_config(config)
+	mode_errors.append_array(ThrowingRules.validate_config(config))
 	if not mode_errors.is_empty():
 		_level_config_error = "; ".join(mode_errors)
 		_cancel_active_interaction()
@@ -1067,6 +1097,8 @@ func _apply_level_config(config: Dictionary) -> void:
 	_collapsing_board = null
 	_collapse_phase_active = false
 	_shelves_awaiting_collapse.clear()
+	_dispenser_rack = null
+	_throw_in_progress = false
 
 	_clear_ability_highlights(true)
 	_clear_freezer(true)
@@ -1085,6 +1117,9 @@ func _apply_level_config(config: Dictionary) -> void:
 		_add_row_layout_shelves(shelves, shelves_config, row_layouts)
 	else:
 		_add_preset_layout_shelves(shelves, shelves_config)
+
+	if ThrowingRules.is_throwing_dispensers(config):
+		_add_dispenser_rack(shelves, config)
 
 	_update_shelf_perspective_edges()
 	_resolve_collapsing_visible_count()
@@ -1185,6 +1220,45 @@ func _add_collapsing_column_shelves(shelves: Node2D, shelves_config: Array, conf
 
 	board.settle_immediately()
 	_collapsing_board = board
+
+
+## The board itself is built by the ordinary preset path -- this mode authors an empty `grid_*`
+## layout, which needs no new construction -- so all that is left is to hang the dispensers above it.
+##
+## The rack is added after the shelves so it can be placed against their finished bounds, and it is
+## a sibling of them under `Shelves` so it scales and centers with the board on every screen.
+func _add_dispenser_rack(shelves: Node2D, config: Dictionary) -> void:
+	var rack := THROWING_DISPENSER_RACK_SCENE.instantiate() as ThrowingDispenserRack
+	rack.name = "ThrowingDispenserRack"
+	shelves.add_child(rack)
+	rack.configure(ThrowingRules.get_dispenser_configs(config), _get_shelf_cells_bounds())
+	rack.throw_requested.connect(_on_dispenser_throw_requested)
+	# Seeding once per build is what makes a retry replay the same scatter: `_apply_level_config()`
+	# runs again on retry, so the stream restarts from the same authored value.
+	_throw_rng.seed = ThrowingRules.get_throw_seed(config)
+	_dispenser_rack = rack
+
+
+## The shelf cells' own bounds, without the rack. `_get_shelves_local_bounds()` includes every child
+## of `Shelves`, so calling it here would place the rack against a rect that already contains the
+## rack's previous position.
+func _get_shelf_cells_bounds() -> Rect2:
+	var bounds := Rect2()
+	var has_bounds := false
+	for shelf in _get_all_shelves():
+		var shelf_cell := shelf as Shelf
+		if shelf_cell == null:
+			continue
+
+		var visual_bounds := shelf_cell.get_visual_bounds()
+		var shelf_rect := Rect2(
+			shelf_cell.position + visual_bounds.position * SHELF_CELL_VISUAL_SCALE,
+			visual_bounds.size * SHELF_CELL_VISUAL_SCALE
+		)
+		bounds = bounds.merge(shelf_rect) if has_bounds else shelf_rect
+		has_bounds = true
+
+	return bounds if has_bounds else Rect2()
 
 
 ## "As many shelves as the screen allows": decided once per level from the play area the board is
@@ -2618,6 +2692,19 @@ func _check_level_completed() -> void:
 	# or collapsing, so a final destruction plays out before the celebration starts.
 	if _collapsing_board != null:
 		if not _is_resolving_shelves and not _is_collapse_in_progress() and _get_all_items().is_empty():
+			_complete_level()
+		return
+
+	# Undispensed stock is data rather than `ShelfItem` nodes, so `_get_all_items()` cannot see it.
+	# An empty board with a dispenser still holding items is the middle of a level, not the end of
+	# one, and without this check the celebration would start on the first cleared triple.
+	if _dispenser_rack != null:
+		if (
+			not _is_resolving_shelves
+			and not _throw_in_progress
+			and _dispenser_rack.is_empty()
+			and _get_all_items().is_empty()
+		):
 			_complete_level()
 		return
 
@@ -4165,6 +4252,167 @@ func _add_shelf_to_check(shelves_to_check: Array[Node], slot: Node2D) -> void:
 	var shelf := _get_owning_shelf(slot)
 	if shelf != null and not shelves_to_check.has(shelf):
 		shelves_to_check.append(shelf)
+
+
+## A tap on a dispenser. The dispenser itself only reports intent -- it cannot see the board -- so
+## everything that decides whether a throw may happen lives here.
+func _on_dispenser_throw_requested(dispenser: ThrowingDispenser) -> void:
+	if _dispenser_rack == null or dispenser == null or not _is_throw_allowed():
+		return
+
+	var free_slots := _get_throwable_free_slots()
+	var throw_size := mini(
+		mini(dispenser.get_throw_count(), dispenser.get_remaining_count()),
+		free_slots.size() - ThrowingRules.RESERVED_FREE_SLOTS
+	)
+	# Refusing silently reads as a broken button, so a tap that cannot throw still answers.
+	if throw_size <= 0:
+		dispenser.play_refused()
+		return
+
+	_start_level_timer_from_player_action()
+	await _throw_items(dispenser, _draw_throw_destinations(free_slots, throw_size), throw_size)
+
+
+## Taps wait for everything that already stops board input, plus a throw that is still in the air:
+## two overlapping throws would draw their destinations from the same free-slot list and could aim
+## two items at one slot.
+func _is_throw_allowed() -> bool:
+	return (
+		_level_config_error.is_empty()
+		and not _level_paused
+		and not _level_failed
+		and not _level_completed
+		and not _app_interrupted
+		and not _loading_transition_pending
+		and not _throw_in_progress
+		and not _is_resolving_shelves
+		and not _is_ability_effect_active()
+	)
+
+
+## Refreshed every frame rather than at each state change. A dispenser marks its tap handled, and
+## `_input()` runs ahead of GUI input, so a dispenser left enabled under a modal would swallow
+## presses meant for the buttons drawn on top of it. `_level_paused` is set from far too many places
+## to keep a one-off call in step with all of them.
+func _refresh_dispenser_availability() -> void:
+	if _dispenser_rack == null:
+		return
+
+	_dispenser_rack.set_input_enabled(_is_throw_allowed())
+
+
+## Every empty slot a thrown item may land in, in a stable order: by the shelf's authored position in
+## the level definition, then by slot. Node iteration order is not part of the level contract, so
+## sorting here is what keeps a seeded scatter reproducible.
+func _get_throwable_free_slots() -> Array[Node2D]:
+	var entries: Array[Dictionary] = []
+	for shelf in _get_all_shelves():
+		if not _is_shelf_drop_target_eligible(shelf):
+			continue
+
+		var shelf_id := int(shelf.get_meta(SHELF_CONFIG_ID_META, 0))
+		var slots := _get_front_slots(shelf)
+		for slot_index in range(slots.size()):
+			var slot := slots[slot_index]
+			if _get_slot_item(slot) != null or not _is_slot_drop_target_eligible(slot):
+				continue
+
+			entries.append({"shelf_id": shelf_id, "slot_index": slot_index, "slot": slot})
+
+	entries.sort_custom(func(left: Dictionary, right: Dictionary) -> bool:
+		if left.shelf_id != right.shelf_id:
+			return left.shelf_id < right.shelf_id
+		return left.slot_index < right.slot_index
+	)
+
+	var free_slots: Array[Node2D] = []
+	for entry in entries:
+		free_slots.append(entry.slot as Node2D)
+
+	return free_slots
+
+
+## Picks distinct destinations from the sorted free-slot list. A partial Fisher-Yates over a working
+## copy draws without replacement, so two items in one throw can never be aimed at the same slot.
+func _draw_throw_destinations(free_slots: Array[Node2D], throw_size: int) -> Array[Node2D]:
+	var pool := free_slots.duplicate()
+	var destinations: Array[Node2D] = []
+	for draw_index in range(mini(throw_size, pool.size())):
+		var pick := _throw_rng.randi_range(draw_index, pool.size() - 1)
+		var chosen: Node2D = pool[pick]
+		pool[pick] = pool[draw_index]
+		pool[draw_index] = chosen
+		destinations.append(chosen)
+
+	return destinations
+
+
+## Items are parented into their destination slots straight away and only *look* like they are still
+## in the air. The flight is a tween over an already-placed item, so pausing, failing, or tearing the
+## level down mid-throw always leaves a consistent board -- the same reason a committed move updates
+## its slot before its animation runs.
+func _throw_items(
+	dispenser: ThrowingDispenser, destinations: Array[Node2D], throw_size: int
+) -> void:
+	var item_ids := dispenser.take(throw_size)
+	if item_ids.is_empty():
+		return
+
+	_throw_in_progress = true
+	dispenser.play_throw()
+
+	var mouth_global_position := dispenser.get_mouth_global_position()
+	var shelves_to_check: Array[Node] = []
+	var tween := create_tween()
+	tween.set_parallel(true)
+	var thrown_ids: Array[int] = []
+	var did_add_tween := false
+
+	for throw_index in range(destinations.size()):
+		var slot := destinations[throw_index]
+		if slot == null or not is_instance_valid(slot):
+			continue
+
+		_add_configured_item(slot, item_ids[throw_index], 0, throw_index)
+		var item := _get_slot_item(slot)
+		if item == null:
+			continue
+
+		_add_shelf_to_check(shelves_to_check, slot)
+		# Busy for the length of the flight, so an item cannot be picked up out of mid-air.
+		var instance_id := item.get_instance_id()
+		thrown_ids.append(instance_id)
+		_mark_item_transitioning_by_id(instance_id)
+
+		item.position = slot.to_local(mouth_global_position)
+		item.scale = THROWN_ITEM_LAUNCH_SCALE
+		var delay := minf(
+			float(throw_index) * thrown_item_stagger_seconds, THROWN_ITEM_MAX_STAGGER_SECONDS
+		)
+		tween.tween_property(item, "position", SLOT_ITEM_POSITION, thrown_item_flight_seconds) \
+			.set_delay(delay).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		tween.tween_property(item, "scale", Vector2.ONE, thrown_item_flight_seconds) \
+			.set_delay(delay).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		did_add_tween = true
+
+	# An empty tween never emits `finished`. A throw whose destinations all went stale would
+	# otherwise leave `_throw_in_progress` true for the rest of the level and refuse every later tap.
+	if did_add_tween:
+		await tween.finished
+	else:
+		tween.kill()
+
+	for instance_id in thrown_ids:
+		_unmark_item_transitioning_by_id(instance_id)
+
+	_throw_in_progress = false
+	if not shelves_to_check.is_empty():
+		_play_sfx(SfxCatalogScript.EVENT_ITEM_PLACE_VALID)
+		_play_haptic(HapticsCatalogScript.EVENT_ITEM_PLACE_VALID)
+		_resolve_shelves(shelves_to_check)
+
+	_check_level_completed()
 
 
 func _resolve_shelves(shelves_to_check: Array[Node]) -> void:
