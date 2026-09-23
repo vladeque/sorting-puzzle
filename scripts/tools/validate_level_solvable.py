@@ -621,6 +621,19 @@ def shelf_sort_key(shelf: ShelfState) -> tuple:
 ## position. Which shelf is which does carry meaning in collapsing columns, so shelf-level ordering
 ## stays with the mode that owns it rather than living here.
 def canonicalize_shelf(shelf: ShelfState) -> ShelfState:
+    ## Without a sticky anchor the order is decided by `slot_sort_key` alone, which puts the items
+    ## first and the empty slots last. Sorting the items directly reaches that same layout without
+    ## a keyed sort over slot indices, and the search canonicalizes every state it generates, so
+    ## this path carries most of a solvability run.
+    if not shelf.sticky_items:
+        canonical_layers = []
+        for layer in shelf.layers:
+            items: list[Item] = sorted(item for item in layer if item is not None)
+            items.extend([None] * (len(layer) - len(items)))
+            canonical_layers.append(tuple(items))
+
+        return shelf._replace(layers=tuple(canonical_layers))
+
     canonical_layers = []
     sticky_items = []
     for layer_index, layer in enumerate(shelf.layers):
@@ -666,6 +679,18 @@ def is_shelf_unlocked(shelf: ShelfState, triples_cleared: int) -> bool:
 
 def settle_state(state: State) -> State:
     triples_cleared, state_shelves = state
+    ## Most moves the search tries settle nothing, and a shelf that cannot settle now cannot be
+    ## reached by a cascade either: only a cleared triple raises `triples_cleared`, and nothing
+    ## clears if nothing settles. Recognizing that leaves the state untouched instead of rebuilding
+    ## every shelf to arrive back at the same board.
+    if not any(
+        shelf.layers
+        and is_shelf_unlocked(shelf, triples_cleared)
+        and (is_empty_layer(shelf.layers[0]) or is_matching_layer(shelf, shelf.layers[0]))
+        for shelf in state_shelves
+    ):
+        return state
+
     shelves = [list(shelf.layers) for shelf in state_shelves]
     changed = True
 
@@ -782,24 +807,24 @@ def apply_move(state: State, move: Move) -> State:
             or visible_layer(source)[move.from_slot] != move.item_id
             or visible_layer(target)[move.to_slot] is not None):
         raise ValueError("illegal move (source, sticky item, target, or lock)")
-    shelves = [[list(layer) for layer in shelf.layers] for shelf in state_shelves]
+    ## A move rewrites one slot on each of two shelves, so only those two are rebuilt. The checks
+    ## above already rejected `from_shelf == to_shelf`, which is what makes the two edits
+    ## independent.
+    moved_shelves = list(state_shelves)
 
-    if not shelves[move.to_shelf]:
-        shelves[move.to_shelf].append([None] * state_shelves[move.to_shelf].slot_count)
+    source_front = source.layers[0]
+    moved_shelves[move.from_shelf] = source._replace(
+        layers=((*source_front[:move.from_slot], None, *source_front[move.from_slot + 1:]),
+                *source.layers[1:]),
+    )
 
-    shelves[move.from_shelf][0][move.from_slot] = None
-    shelves[move.to_shelf][0][move.to_slot] = move.item_id
-
-    moved_shelves = []
-    for shelf_index, shelf in enumerate(shelves):
-        moved_shelves.append(
-            ShelfState(
-                unlock_after_triples=state_shelves[shelf_index].unlock_after_triples,
-                layers=tuple(tuple(layer) for layer in shelf),
-                kind=state_shelves[shelf_index].kind,
-                sticky_items=state_shelves[shelf_index].sticky_items,
-            )
-        )
+    ## A shelf emptied earlier has no layer left to drop onto, so it grows one back.
+    target_layers = target.layers or ((None,) * target.slot_count,)
+    target_front = target_layers[0]
+    moved_shelves[move.to_shelf] = target._replace(
+        layers=((*target_front[:move.to_slot], move.item_id, *target_front[move.to_slot + 1:]),
+                *target_layers[1:]),
+    )
 
     return (triples_cleared, tuple(moved_shelves))
 

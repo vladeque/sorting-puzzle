@@ -14,11 +14,16 @@ from validate_level_solvable import (  # noqa: E402
     KEPT_SHELVES_PER_COLUMN,
     MAX_VISIBLE_SHELVES_PER_COLUMN,
     CollapsingColumnsRules,
+    Move,
+    apply_move,
     build_search_inputs,
+    canonicalize_shelf,
+    canonicalize_state,
     collapsing_shelves_to_state,
     is_empty_layer,
     legal_moves,
     normalize_state,
+    settle_state,
     shelves_to_state,
     solve_level,
     validate_gameplay_mode_shape,
@@ -125,6 +130,89 @@ class DispenserSearchTests(unittest.TestCase):
             keep_solution=False,
         )
         self.assertFalse(result.solvable)
+
+
+def sticky_shelf(layer: list[str | None], *sticky: tuple[int, int]) -> dict[str, object]:
+    return {
+        "layers": [list(layer)],
+        "sticky_items": [{"layer": layer_index, "slot": slot} for layer_index, slot in sticky],
+    }
+
+
+## The search canonicalizes, settles and applies a move for every successor it generates, so these
+## three carry a solvability run. Each has a fast path for the common shape, and each fast path has
+## to land on exactly the board the general one would have produced.
+class HotPathEquivalenceTests(unittest.TestCase):
+    def test_a_shelf_without_sticky_items_sorts_its_items_ahead_of_its_empty_slots(self) -> None:
+        shelf = shelves_to_state([standard_shelf(["b", None, "a"])])[1][0]
+        self.assertEqual(canonicalize_shelf(shelf).layers, (("a", "b", None),))
+
+    def test_slot_order_alone_does_not_distinguish_two_boards(self) -> None:
+        left = canonicalize_state(shelves_to_state([standard_shelf([None, "a", "b"])]))
+        right = canonicalize_state(shelves_to_state([standard_shelf(["b", "a", None])]))
+        self.assertEqual(left, right)
+
+    ## A sticky item is pinned to its slot, so it cannot be reordered into the item run the way a
+    ## loose copy of the same id can.
+    def test_a_sticky_anchor_keeps_its_shelf_distinct_from_a_loose_one(self) -> None:
+        sticky = canonicalize_state(shelves_to_state([sticky_shelf(["a", "b", None], (0, 0))]))
+        loose = canonicalize_state(shelves_to_state([standard_shelf(["a", "b", None])]))
+        self.assertNotEqual(sticky, loose)
+
+    def test_canonicalization_is_stable_across_equivalent_sticky_boards(self) -> None:
+        left = canonicalize_state(shelves_to_state([sticky_shelf(["a", None, "b"], (0, 2))]))
+        right = canonicalize_state(shelves_to_state([sticky_shelf([None, "a", "b"], (0, 2))]))
+        self.assertEqual(left, right)
+
+    def test_a_board_with_nothing_to_settle_is_left_alone(self) -> None:
+        state = shelves_to_state([standard_shelf(["a", "b", None]), standard_shelf(["c", "a", "b"])])
+        self.assertEqual(settle_state(state), state)
+
+    def test_settling_clears_a_finished_triple_and_cascades_into_an_unlocked_shelf(self) -> None:
+        shelves = [
+            standard_shelf(["a", "a", "a"], ["b", "b", "b"]),
+            {"layers": [["c", "c", "c"]], "unlock_after_triples": 2},
+        ]
+        triples_cleared, settled = settle_state(shelves_to_state(shelves))
+        self.assertEqual(triples_cleared, 3)
+        self.assertEqual([shelf.layers for shelf in settled], [(), ()])
+
+    ## A locked shelf holds its contents until its triple count is reached, even when its front
+    ## layer already matches.
+    def test_settling_leaves_a_locked_shelf_untouched(self) -> None:
+        shelves = [{"layers": [["a", "a", "a"]], "unlock_after_triples": 5}]
+        state = shelves_to_state(shelves)
+        self.assertEqual(settle_state(state), state)
+
+    def test_a_move_changes_only_the_two_shelves_it_touches(self) -> None:
+        shelves = [
+            standard_shelf(["a", "b", None]),
+            standard_shelf(["c", None, None]),
+            standard_shelf(["d", "e", "f"], ["g", "h", "i"]),
+        ]
+        _cleared, before = shelves_to_state(shelves)
+        _cleared, after = apply_move((0, before), Move("a", 0, 0, 1, 1))
+        self.assertEqual(after[0].layers, ((None, "b", None),))
+        self.assertEqual(after[1].layers, (("c", "a", None),))
+        self.assertIs(after[2], before[2])
+
+    ## A shelf the player emptied earlier is still a drop target, so it has to grow a layer back.
+    def test_a_move_onto_an_emptied_shelf_grows_a_layer_back(self) -> None:
+        state = settle_state(
+            shelves_to_state([standard_shelf(["a", "b", None]), standard_shelf([None, None, None])])
+        )
+        _cleared, shelves = state
+        self.assertEqual(shelves[1].layers, ())
+        _cleared, moved = apply_move(state, Move("a", 0, 0, 1, 0))
+        self.assertEqual(moved[1].layers, (("a", None, None),))
+        self.assertEqual(moved[0].layers, ((None, "b", None),))
+
+    def test_a_move_keeps_the_layers_behind_the_front_one(self) -> None:
+        shelves = [standard_shelf(["a", None, None], ["x", "y", "z"]), standard_shelf([None] * 3)]
+        state = shelves_to_state(shelves)
+        _cleared, moved = apply_move(state, Move("a", 0, 0, 1, 2))
+        self.assertEqual(moved[0].layers, ((None, None, None), ("x", "y", "z")))
+        self.assertEqual(moved[1].layers, ((None, None, "a"),))
 
 
 def collapsing_level(
