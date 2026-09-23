@@ -16,6 +16,8 @@ from validate_level_solvable import (  # noqa: E402
     MAX_VISIBLE_SHELVES_PER_COLUMN,
     CollapsingColumnsRules,
     Move,
+    ThrowingBoard,
+    ThrowingDispensersRules,
     apply_move,
     build_search_inputs,
     canonicalize_shelf,
@@ -633,6 +635,209 @@ class CollapsingColumnCanonicalizationTests(unittest.TestCase):
         left_first = [standard_shelf(["a", None, None]), standard_shelf(["b", None, None])]
         right_first = [standard_shelf(["b", None, None]), standard_shelf(["a", None, None])]
         self.assertNotEqual(self.canonical(left_first, [1, 1]), self.canonical(right_first, [1, 1]))
+
+
+def empty_shelf() -> dict[str, object]:
+    return {"layers": [[None, None, None]]}
+
+
+def throwing_level(**overrides: object) -> dict[str, object]:
+    level: dict[str, object] = {
+        "level": 21,
+        "time_seconds": 300,
+        "gameplay_mode": "throwing_dispensers",
+        "layout_preset": "grid_3x4",
+        "throw_seed": "00000000000052ad",
+        "dispensers": [{"throw_count": 3, "contents": ["a", "b", "a", "a", "b", "b"]}],
+        "shelves": [empty_shelf() for _ in range(4)],
+    }
+    level.update(overrides)
+    return level
+
+
+class ThrowingDispenserContractTests(unittest.TestCase):
+    def errors(self, level: dict[str, object]) -> list[str]:
+        return validate_gameplay_mode_shape(level, level["shelves"])
+
+    def test_a_valid_level_passes(self) -> None:
+        self.assertEqual(self.errors(throwing_level()), [])
+
+    def test_shelves_must_start_empty(self) -> None:
+        level = throwing_level(shelves=[{"layers": [["a", None, None]]}])
+        self.assertIn("shelf 1 must start empty; every item begins in a dispenser", self.errors(level))
+
+    def test_a_second_layer_is_rejected(self) -> None:
+        level = throwing_level(shelves=[{"layers": [[None] * 3, [None] * 3]}])
+        self.assertIn("shelf 1 must have exactly one layer", self.errors(level))
+
+    def test_locked_sticky_and_dispenser_shelves_are_rejected(self) -> None:
+        locked = throwing_level(shelves=[{"unlock_after_triples": 2, "layers": [[None] * 3]}])
+        self.assertIn("shelf 1 is locked; locked shelves are not supported", self.errors(locked))
+
+        sticky = throwing_level(
+            shelves=[{"layers": [[None] * 3], "sticky_items": [{"layer": 0, "slot": 1}]}]
+        )
+        self.assertIn(
+            "shelf 1 has sticky items; sticky items are not supported", self.errors(sticky)
+        )
+
+        # The source-only *shelf* type is a different object that happens to share the word.
+        source_shelf = throwing_level(shelves=[dispenser_shelf("a", "b")])
+        self.assertIn("shelf 1 must be a standard shelf", self.errors(source_shelf))
+
+    def test_exclusive_layout_keys_are_rejected(self) -> None:
+        self.assertIn(
+            "row_layouts cannot be combined with gameplay_mode 'throwing_dispensers'",
+            self.errors(throwing_level(row_layouts=[{"shelf_count": 4}])),
+        )
+        self.assertIn(
+            "column_layout cannot be combined with gameplay_mode 'throwing_dispensers'",
+            self.errors(throwing_level(column_layout={"shelf_counts": [4]})),
+        )
+
+    ## Every one of these silently changes the scatter the level was tuned against.
+    def test_malformed_seeds_are_rejected(self) -> None:
+        for bad_seed in ("", "52ad", "00000000000052AD", "0x0000000000052a", "zzzzzzzzzzzzzzzz"):
+            with self.subTest(seed=bad_seed):
+                self.assertIn(
+                    "throw_seed must be a 16-digit lowercase hex string",
+                    self.errors(throwing_level(throw_seed=bad_seed)),
+                )
+
+    def test_dispenser_shape_is_enforced(self) -> None:
+        self.assertIn(
+            "dispensers must be a non-empty array when gameplay_mode is 'throwing_dispensers'",
+            self.errors(throwing_level(dispensers=[])),
+        )
+        self.assertIn(
+            "dispenser 1 throw_count must be a positive integer",
+            self.errors(throwing_level(dispensers=[{"throw_count": 0, "contents": ["a"] * 3}])),
+        )
+        # A hole has nothing to throw, and unlike a shelf slot nothing can ever move into it.
+        self.assertIn(
+            "dispenser 1 contents entry 2 must be an item ID string",
+            self.errors(
+                throwing_level(dispensers=[{"throw_count": 3, "contents": ["a", None, "a"]}])
+            ),
+        )
+
+    def test_item_totals_are_counted_across_dispensers(self) -> None:
+        self.assertIn(
+            "item 'a' appears 2 times across dispensers, expected a multiple of 3",
+            self.errors(throwing_level(dispensers=[{"throw_count": 3, "contents": ["a", "a"]}])),
+        )
+        split = throwing_level(
+            dispensers=[
+                {"throw_count": 3, "contents": ["a", "a"]},
+                {"throw_count": 3, "contents": ["a"]},
+            ]
+        )
+        self.assertEqual(self.errors(split), [])
+
+    ## A throw is clamped to the room the board has, so this is not unsafe -- but a level authored to
+    ## throw more than the board can ever hold is not the level its author described.
+    def test_a_throw_larger_than_the_board_is_reported(self) -> None:
+        level = throwing_level(
+            shelves=[empty_shelf()],
+            dispensers=[{"throw_count": 3, "contents": ["a"] * 3}],
+        )
+        self.assertIn(
+            "dispenser 1 throw_count is 3, more than the 2 slots a throw may ever fill",
+            self.errors(level),
+        )
+
+    ## The guard runs on every level, so another mode carrying these fields has to be told they mean
+    ## nothing there rather than having them quietly ignored.
+    def test_other_modes_reject_dispenser_fields(self) -> None:
+        classic = {
+            "shelves": [standard_shelf(["a", "a", "a"])],
+            "dispensers": [{"throw_count": 3, "contents": ["a"] * 3}],
+        }
+        self.assertIn(
+            "dispensers is only valid when gameplay_mode is 'throwing_dispensers'",
+            validate_gameplay_mode_shape(classic, classic["shelves"]),
+        )
+
+        seeded = {"shelves": [standard_shelf(["a", "a", "a"])], "throw_seed": "00000000000052ad"}
+        self.assertIn(
+            "throw_seed is only valid when gameplay_mode is 'throwing_dispensers'",
+            validate_gameplay_mode_shape(seeded, seeded["shelves"]),
+        )
+
+        plain = {"shelves": [standard_shelf(["a", "a", "a"])]}
+        self.assertEqual(validate_gameplay_mode_shape(plain, plain["shelves"]), [])
+
+
+class ThrowingDispenserPlayabilityTests(unittest.TestCase):
+    ## The mode is sampled rather than proven, so what matters is that the estimate separates a board
+    ## a player can finish from one nobody could.
+    def test_a_roomy_board_is_playable(self) -> None:
+        rules = ThrowingDispensersRules(
+            [{"throw_count": 3, "contents": ["a", "b", "a", "b", "a", "b"]}],
+            6,
+            "00000000000052ad",
+        )
+        result, stats = rules.estimate_playability(trials=25)
+        self.assertTrue(result.solvable)
+        self.assertEqual(stats["completion_rate"], 1.0)
+        self.assertEqual(stats["failure_reasons"], {})
+
+    ## One shelf holds two items once the reserved slot is kept, so a triple can never be assembled.
+    def test_a_board_too_small_to_hold_a_triple_is_not_playable(self) -> None:
+        rules = ThrowingDispensersRules(
+            [{"throw_count": 3, "contents": ["a", "a", "a"]}], 1, "00000000000052ad"
+        )
+        result, stats = rules.estimate_playability(trials=25)
+        self.assertFalse(result.solvable)
+        self.assertEqual(stats["completion_rate"], 0.0)
+        self.assertEqual(stats["failure_reasons"], {"stuck": 25})
+
+    ## A throw never takes the last free slot. Without that rule the board can reach zero free slots,
+    ## and a move needs somewhere to land, so the level would be over with items still on the shelves.
+    def test_a_throw_never_takes_the_last_free_slot(self) -> None:
+        board = ThrowingBoard(1, [{"throw_count": 9, "contents": ["a"] * 9}])
+        self.assertEqual(board.throw_size(0, len(board.free_slots())), 2)
+        board.shelves[0][0] = "b"
+        self.assertEqual(board.throw_size(0, len(board.free_slots())), 1)
+        board.shelves[0][1] = "b"
+        self.assertEqual(board.throw_size(0, len(board.free_slots())), 0)
+
+    ## The level is over when nothing is left anywhere -- an empty board with stock still waiting is
+    ## the middle of a level, not the end of one.
+    def test_stock_still_held_is_not_a_cleared_level(self) -> None:
+        board = ThrowingBoard(2, [{"throw_count": 3, "contents": ["a", "a", "a"]}])
+        self.assertFalse(board.is_cleared())
+        board.stocks[0].clear()
+        self.assertTrue(board.is_cleared())
+
+    def test_three_matching_items_on_one_shelf_clear(self) -> None:
+        board = ThrowingBoard(2, [{"throw_count": 3, "contents": []}])
+        board.shelves[0] = ["a", "a", "a"]
+        board.resolve()
+        self.assertEqual(board.shelves[0], [None, None, None])
+        self.assertEqual(board.triples_cleared, 1)
+
+    ## The mode has no search state, so it must not be handed to `solve_level()` by accident.
+    def test_build_search_inputs_returns_no_search_state(self) -> None:
+        level = throwing_level()
+        rules, initial_state = build_search_inputs(level, level["shelves"])
+        self.assertIsInstance(rules, ThrowingDispensersRules)
+        self.assertIsNone(initial_state)
+        with self.assertRaises(NotImplementedError):
+            rules.legal_moves(None)
+
+
+class CommittedThrowingLevelTests(unittest.TestCase):
+    ## Guards the shipped fixture the same way the collapsing levels are guarded, so it cannot drift
+    ## into an unplayable state unnoticed.
+    def test_the_preview_fixture_is_valid_and_playable(self) -> None:
+        fixture = REPOSITORY_ROOT / "configs" / "test_levels" / "throwing_dispensers_preview.json"
+        level = json.loads(fixture.read_text(encoding="utf-8"))
+        self.assertEqual(validate_gameplay_mode_shape(level, level["shelves"]), [])
+
+        rules, _ = build_search_inputs(level, level["shelves"])
+        result, stats = rules.estimate_playability(trials=50)
+        self.assertTrue(result.solvable, stats)
 
 
 if __name__ == "__main__":

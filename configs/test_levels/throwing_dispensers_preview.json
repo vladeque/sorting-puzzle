@@ -1,0 +1,159 @@
+{
+  "level": 0,
+  "time_seconds": 300,
+  "gameplay_mode": "throwing_dispensers",
+  "layout_preset": "grid_3x4",
+  "throw_seed": "00000000000052ad",
+  "dispensers": [
+    {
+      "throw_count": 3,
+      "contents": [
+        "soda_bottle_orange",
+        "soda_bottle",
+        "soda_can_orange",
+        "soda_bottle_grape",
+        "juice_box_orange",
+        "juice_box_grape_tall",
+        "juice_box_grape_tall",
+        "soda_can_lime",
+        "soda_can_grape",
+        "milk_carton",
+        "soda_bottle_orange",
+        "soda_can_orange",
+        "soda_can_orange",
+        "soda_bottle_grape",
+        "milk_carton"
+      ]
+    },
+    {
+      "throw_count": 3,
+      "contents": [
+        "soda_can_strawberry",
+        "soda_can_strawberry",
+        "juice_box_orange",
+        "soda_can_grape",
+        "soda_can_grape",
+        "soda_bottle",
+        "soda_bottle_orange",
+        "soda_bottle_grape",
+        "juice_box_orange",
+        "soda_can_lime",
+        "soda_can_strawberry",
+        "milk_carton",
+        "soda_bottle",
+        "soda_can_lime",
+        "juice_box_grape_tall"
+      ]
+    }
+  ],
+  "shelves": [
+    {
+      "layers": [
+        [
+          null,
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          null,
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          null,
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          null,
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          null,
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          null,
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          null,
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          null,
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          null,
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          null,
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          null,
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          null,
+          null,
+          null
+        ]
+      ]
+    }
+  ]
+}

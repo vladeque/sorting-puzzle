@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import random
+import statistics
 import sys
 from collections import Counter
 from pathlib import Path
@@ -49,7 +51,27 @@ LAYOUT_PRESET_KEY = "layout_preset"
 GAMEPLAY_MODE_KEY = "gameplay_mode"
 GAMEPLAY_MODE_CLASSIC = "classic"
 GAMEPLAY_MODE_COLLAPSING_COLUMNS = "collapsing_columns"
-GAMEPLAY_MODES = {GAMEPLAY_MODE_CLASSIC, GAMEPLAY_MODE_COLLAPSING_COLUMNS}
+GAMEPLAY_MODE_THROWING_DISPENSERS = "throwing_dispensers"
+GAMEPLAY_MODES = {
+    GAMEPLAY_MODE_CLASSIC,
+    GAMEPLAY_MODE_COLLAPSING_COLUMNS,
+    GAMEPLAY_MODE_THROWING_DISPENSERS,
+}
+DISPENSERS_KEY = "dispensers"
+DISPENSER_CONTENTS_KEY = "contents"
+DISPENSER_THROW_COUNT_KEY = "throw_count"
+THROW_SEED_KEY = "throw_seed"
+THROW_SEED_HEX_DIGITS = 16
+# A throw always leaves this many slots open board-wide. Mirrors `RESERVED_FREE_SLOTS` in
+# `scripts/throwing_dispenser_rules.gd`; see that file for why the board cannot survive without it.
+RESERVED_FREE_SLOTS = 1
+# How many sampled runs `estimate_playability()` plays, and how many of them must finish, when the
+# caller does not say. See `ThrowingDispensersRules` for why this mode is sampled rather than proven.
+DEFAULT_PLAYABILITY_TRIALS = 200
+DEFAULT_PLAYABILITY_THRESHOLD = 0.95
+# Actions one sampled run may take before it is abandoned as not making progress. A run needs one
+# action per item thrown plus the moves to sort them, so this is generous for any authored board.
+PLAYABILITY_ACTION_LIMIT = 4000
 COLUMN_LAYOUT_KEY = "column_layout"
 COLUMN_SHELF_COUNTS_KEY = "shelf_counts"
 COLUMN_VISIBLE_SHELVES_KEY = "visible_shelves_per_column"
@@ -266,15 +288,28 @@ def validate_gameplay_mode_shape(level_data: Any, shelves: list[dict[str, Any]])
     if mode not in GAMEPLAY_MODES:
         return [f"{GAMEPLAY_MODE_KEY} must be one of {sorted(GAMEPLAY_MODES)}"]
 
-    if mode == GAMEPLAY_MODE_CLASSIC:
-        if COLUMN_LAYOUT_KEY in level_data:
-            return [
-                f"{COLUMN_LAYOUT_KEY} is only valid when {GAMEPLAY_MODE_KEY} is "
-                f"'{GAMEPLAY_MODE_COLLAPSING_COLUMNS}'"
-            ]
-        return []
+    if mode == GAMEPLAY_MODE_COLLAPSING_COLUMNS:
+        return validate_column_layout_shape(level_data, shelves)
 
-    return validate_column_layout_shape(level_data, shelves)
+    if mode == GAMEPLAY_MODE_THROWING_DISPENSERS:
+        return validate_throwing_dispensers_shape(level_data, shelves)
+
+    errors = []
+    # Fields another mode owns mean nothing on a classic level, so they are reported rather than
+    # quietly ignored -- an author who set one expects it to do something.
+    if COLUMN_LAYOUT_KEY in level_data:
+        errors.append(
+            f"{COLUMN_LAYOUT_KEY} is only valid when {GAMEPLAY_MODE_KEY} is "
+            f"'{GAMEPLAY_MODE_COLLAPSING_COLUMNS}'"
+        )
+    for dispenser_key in (DISPENSERS_KEY, THROW_SEED_KEY):
+        if dispenser_key in level_data:
+            errors.append(
+                f"{dispenser_key} is only valid when {GAMEPLAY_MODE_KEY} is "
+                f"'{GAMEPLAY_MODE_THROWING_DISPENSERS}'"
+            )
+
+    return errors
 
 
 def validate_column_layout_shape(level_data: dict[str, Any], shelves: list[dict[str, Any]]) -> list[str]:
@@ -390,6 +425,154 @@ def validate_collapsing_shelf_contract(shelves: list[dict[str, Any]]) -> list[st
             errors.append(
                 f"shelf {shelf_number} is empty; an authored collapsing shelf must contain at "
                 "least one item"
+            )
+
+    return errors
+
+
+## The board opens empty and every item starts inside a dispenser, so this mode inverts where the
+## level's contents live. `validate_shelves_shape()` counts items on shelves and finds none here,
+## which is why the multiple-of-three rule is re-applied below over dispenser contents instead.
+def validate_throwing_dispensers_shape(
+    level_data: dict[str, Any], shelves: list[dict[str, Any]]
+) -> list[str]:
+    errors = []
+    for exclusive_key in (ROW_LAYOUTS_KEY, COLUMN_LAYOUT_KEY):
+        if exclusive_key in level_data:
+            errors.append(
+                f"{exclusive_key} cannot be combined with {GAMEPLAY_MODE_KEY} "
+                f"'{GAMEPLAY_MODE_THROWING_DISPENSERS}'"
+            )
+
+    errors.extend(validate_throw_seed_shape(level_data))
+    errors.extend(validate_throwing_dispensers_shelf_contract(shelves))
+
+    dispensers = level_data.get(DISPENSERS_KEY)
+    if not isinstance(dispensers, list) or not dispensers:
+        errors.append(
+            f"{DISPENSERS_KEY} must be a non-empty array when {GAMEPLAY_MODE_KEY} is "
+            f"'{GAMEPLAY_MODE_THROWING_DISPENSERS}'"
+        )
+        return errors
+
+    item_counts: Counter[str] = Counter()
+    for dispenser_index, dispenser in enumerate(dispensers):
+        errors.extend(validate_dispenser_shape(dispenser, dispenser_index + 1, item_counts))
+
+    for item_id, count in sorted(item_counts.items()):
+        if count % TRIPLE_SIZE != 0:
+            errors.append(
+                f"item '{item_id}' appears {count} times across dispensers, expected a multiple "
+                f"of {TRIPLE_SIZE}"
+            )
+
+    errors.extend(validate_throw_capacity(dispensers, shelves))
+
+    return errors
+
+
+## A hand-edited seed is easy to get subtly wrong -- wrong length, uppercase, an `0x` prefix -- and
+## every one of those silently changes the scatter the level was tuned against.
+def validate_throw_seed_shape(level_data: dict[str, Any]) -> list[str]:
+    throw_seed = level_data.get(THROW_SEED_KEY)
+    message = (
+        f"{THROW_SEED_KEY} must be a {THROW_SEED_HEX_DIGITS}-digit lowercase hex string"
+    )
+    if not isinstance(throw_seed, str) or len(throw_seed) != THROW_SEED_HEX_DIGITS:
+        return [message]
+    if any(digit not in "0123456789abcdef" for digit in throw_seed):
+        return [message]
+
+    return []
+
+
+def validate_throwing_dispensers_shelf_contract(shelves: list[dict[str, Any]]) -> list[str]:
+    errors = []
+    for shelf_index, shelf in enumerate(shelves):
+        shelf_number = shelf_index + 1
+        if not isinstance(shelf, dict):
+            continue
+
+        if shelf_kind(shelf) != SHELF_KIND_STANDARD:
+            errors.append(f"shelf {shelf_number} must be a standard shelf")
+
+        if int(shelf.get("unlock_after_triples", 0) or 0) > 0:
+            errors.append(f"shelf {shelf_number} is locked; locked shelves are not supported")
+
+        if shelf.get("sticky_items"):
+            errors.append(f"shelf {shelf_number} has sticky items; sticky items are not supported")
+
+        layers = shelf.get("layers")
+        if not isinstance(layers, list) or len(layers) != 1:
+            errors.append(f"shelf {shelf_number} must have exactly one layer")
+            continue
+
+        layer = layers[0]
+        if not isinstance(layer, list) or len(layer) != SLOTS_PER_SHELF:
+            errors.append(f"shelf {shelf_number} layer must contain {SLOTS_PER_SHELF} slots")
+            continue
+
+        # An item authored onto the board is an item the playability estimate never accounted for.
+        if any(item_id is not None for item_id in layer):
+            errors.append(
+                f"shelf {shelf_number} must start empty; every item begins in a dispenser"
+            )
+
+    return errors
+
+
+def validate_dispenser_shape(
+    dispenser: Any, dispenser_number: int, item_counts: Counter[str]
+) -> list[str]:
+    errors = []
+    if not isinstance(dispenser, dict):
+        return [f"dispenser {dispenser_number} must be an object"]
+
+    throw_count = dispenser.get(DISPENSER_THROW_COUNT_KEY)
+    if type(throw_count) is not int or throw_count <= 0:
+        errors.append(
+            f"dispenser {dispenser_number} {DISPENSER_THROW_COUNT_KEY} must be a positive integer"
+        )
+
+    contents = dispenser.get(DISPENSER_CONTENTS_KEY)
+    if not isinstance(contents, list) or not contents:
+        errors.append(
+            f"dispenser {dispenser_number} {DISPENSER_CONTENTS_KEY} must be a non-empty array"
+        )
+        return errors
+
+    for content_index, item_id in enumerate(contents):
+        # A hole in a dispenser's contents has no meaning: there is nothing for it to throw, and
+        # unlike a shelf slot nothing can ever move into it.
+        if not isinstance(item_id, str) or not item_id:
+            errors.append(
+                f"dispenser {dispenser_number} {DISPENSER_CONTENTS_KEY} entry "
+                f"{content_index + 1} must be an item ID string"
+            )
+            continue
+
+        item_counts[item_id] += 1
+
+    return errors
+
+
+## A throw is clamped to the room the board has, so an oversized `throw_count` is not itself unsafe:
+## it simply never fires at full size. It is still reported, because a level authored to throw more
+## than the board can ever hold is not the level its author described.
+def validate_throw_capacity(
+    dispensers: list[Any], shelves: list[dict[str, Any]]
+) -> list[str]:
+    errors = []
+    throwable_slots = len(shelves) * SLOTS_PER_SHELF - RESERVED_FREE_SLOTS
+    for dispenser_index, dispenser in enumerate(dispensers):
+        if not isinstance(dispenser, dict):
+            continue
+
+        throw_count = dispenser.get(DISPENSER_THROW_COUNT_KEY)
+        if type(throw_count) is int and throw_count > throwable_slots:
+            errors.append(
+                f"dispenser {dispenser_index + 1} {DISPENSER_THROW_COUNT_KEY} is {throw_count}, "
+                f"more than the {throwable_slots} slots a throw may ever fill"
             )
 
     return errors
@@ -1111,6 +1294,319 @@ class CollapsingColumnsRules(SortingRules):
         return None
 
 
+class ThrowingBoard:
+    """One sampled run's mutable board: fixed shelves that never disappear, plus what each dispenser
+    still holds. Unlike the two search modes this is a simulation, not a search, so it stays mutable
+    and unhashable -- nothing ever needs to look a position up again."""
+
+    def __init__(self, shelf_count: int, dispensers: list[dict[str, Any]]) -> None:
+        self.shelves: list[list[Item]] = [[None] * SLOTS_PER_SHELF for _ in range(shelf_count)]
+        self.stocks: list[list[str]] = [
+            list(dispenser[DISPENSER_CONTENTS_KEY]) for dispenser in dispensers
+        ]
+        self.throw_counts: list[int] = [
+            int(dispenser[DISPENSER_THROW_COUNT_KEY]) for dispenser in dispensers
+        ]
+        self.triples_cleared = 0
+
+    def free_slots(self) -> list[tuple[int, int]]:
+        """Every empty slot, in a stable order. The runtime sorts the same way before drawing, so a
+        throw's destinations never depend on node iteration order."""
+        return [
+            (shelf_index, slot_index)
+            for shelf_index, shelf in enumerate(self.shelves)
+            for slot_index, item_id in enumerate(shelf)
+            if item_id is None
+        ]
+
+    def remaining_stock(self) -> int:
+        return sum(len(stock) for stock in self.stocks)
+
+    def board_item_count(self) -> int:
+        return sum(1 for shelf in self.shelves for item_id in shelf if item_id is not None)
+
+    def is_cleared(self) -> bool:
+        return self.board_item_count() == 0 and self.remaining_stock() == 0
+
+    ## Three identical items on one shelf clear. Nothing falls into their place, so a clear cannot
+    ## cascade; the loop still runs to a fixed point so this reads the same as the runtime's repeated
+    ## resolution pass.
+    def resolve(self) -> None:
+        changed = True
+        while changed:
+            changed = False
+            for shelf in self.shelves:
+                first = shelf[0]
+                if first is not None and all(item_id == first for item_id in shelf):
+                    shelf[:] = [None] * SLOTS_PER_SHELF
+                    self.triples_cleared += 1
+                    changed = True
+
+    def throw_size(self, dispenser_index: int, free_slot_count: int) -> int:
+        """How many items this dispenser would hand out right now. The `- RESERVED_FREE_SLOTS` is
+        the rule that keeps the board playable: a move needs somewhere to land, and a board with no
+        free slot has no legal move and no way to regain one."""
+        return min(
+            self.throw_counts[dispenser_index],
+            len(self.stocks[dispenser_index]),
+            free_slot_count - RESERVED_FREE_SLOTS,
+        )
+
+
+class ThrowingDispensersRules(SortingRules):
+    """An empty board filled by the player, one dispenser tap at a time.
+
+    This mode is **sampled, not proven**, and that is a deliberate limit rather than a gap to close
+    later. In the two search modes the whole board is authored, so one exhaustive search decides the
+    level for good. Here the board's contents arrive over time and land in slots chosen at random,
+    and which slots are free depends on the order the player happens to play in. There is no single
+    line of play to prove.
+
+    `estimate_playability()` therefore plays the level many times with a greedy player and reports
+    how often it finishes. What keeps a sampled level safe in the hand is not the estimate but
+    `RESERVED_FREE_SLOTS`: a throw never takes the last free slot, so the board can always be moved
+    even when it cannot be matched, and a board that stops making progress runs out the clock
+    through the ordinary failure flow rather than locking up.
+
+    The sampled scatter is *not* the scatter the Godot runtime produces. Python's RNG and Godot's are
+    different generators, and this estimate deliberately varies the player as well, so it answers
+    "does a reasonable player finish this board" rather than "what happens on attempt one". The
+    authored `throw_seed` is what makes a real attempt reproducible; see
+    `docs/THROWING_DISPENSERS.md`.
+    """
+
+    mode = GAMEPLAY_MODE_THROWING_DISPENSERS
+
+    def __init__(
+        self, dispensers: list[dict[str, Any]], shelf_count: int, throw_seed: str
+    ) -> None:
+        self.dispensers = dispensers
+        self.shelf_count = shelf_count
+        self.throw_seed = throw_seed
+
+    ## The BFS entry points below exist because `SortingRules` declares them. Nothing calls them in
+    ## this mode -- `main()` routes it to `estimate_playability()` instead -- and answering them with
+    ## a plausible-looking classic board would quietly report a proof this mode cannot give.
+    def _unsupported(self) -> NotImplementedError:
+        return NotImplementedError(
+            f"{GAMEPLAY_MODE_THROWING_DISPENSERS} is sampled by estimate_playability(), not searched"
+        )
+
+    def iter_shelf_states(self, state) -> list[ShelfState]:
+        raise self._unsupported()
+
+    def settle(self, state):
+        raise self._unsupported()
+
+    def canonicalize(self, state):
+        raise self._unsupported()
+
+    def legal_moves(self, state) -> list[Move]:
+        raise self._unsupported()
+
+    def apply_move(self, state, move: Move):
+        raise self._unsupported()
+
+    def is_cleared(self, state) -> bool:
+        raise self._unsupported()
+
+    def estimate_playability(
+        self,
+        trials: int = DEFAULT_PLAYABILITY_TRIALS,
+        threshold: float = DEFAULT_PLAYABILITY_THRESHOLD,
+    ) -> tuple[SearchResult, dict[str, Any]]:
+        """Play the level `trials` times and report whether enough runs finished."""
+        completed_moves: list[int] = []
+        failures: Counter[str] = Counter()
+        for trial_index in range(trials):
+            actions, reason = self._play_one(trial_index)
+            if reason == "cleared":
+                completed_moves.append(actions)
+            else:
+                failures[reason] += 1
+
+        completion_rate = len(completed_moves) / trials if trials else 0.0
+        playable = completion_rate >= threshold
+        stats = {
+            "trials": trials,
+            "threshold": threshold,
+            "completion_rate": round(completion_rate, 4),
+            "completed_runs": len(completed_moves),
+            "median_actions": (
+                int(statistics.median(completed_moves)) if completed_moves else None
+            ),
+            "worst_actions": max(completed_moves) if completed_moves else None,
+            "failure_reasons": dict(sorted(failures.items())),
+        }
+        result = SearchResult(
+            playable,
+            "playability_estimate" if playable else "playability_below_threshold",
+            stats["median_actions"],
+            trials,
+            0,
+            [],
+        )
+
+        return result, stats
+
+    ## One sampled run. The scatter stream always restarts from the authored seed, so every trial
+    ## draws the same numbers; what varies is the player, and therefore which slots those numbers
+    ## land on. That is the real source of variation between attempts at this mode.
+    def _play_one(self, trial_index: int) -> tuple[int, str]:
+        scatter_rng = random.Random(self.throw_seed)
+        player_rng = random.Random(trial_index)
+        board = ThrowingBoard(self.shelf_count, self.dispensers)
+        board.resolve()
+
+        for actions in range(PLAYABILITY_ACTION_LIMIT):
+            if board.is_cleared():
+                return actions, "cleared"
+            if not self._take_one_action(board, scatter_rng, player_rng):
+                return actions, "stuck"
+            board.resolve()
+
+        return PLAYABILITY_ACTION_LIMIT, "action_limit"
+
+    ## A plausible greedy player: finish a triple when one is within reach, keep the board flowing
+    ## while there is room to throw, and only shuffle items around when neither is available.
+    def _take_one_action(
+        self, board: ThrowingBoard, scatter_rng: random.Random, player_rng: random.Random
+    ) -> bool:
+        if self._play_move(board, required_matches=2):
+            return True
+        if self._unblock_pair(board):
+            return True
+        if self._throw(board, scatter_rng, player_rng, require_full_throw=True):
+            return True
+        if self._play_move(board, required_matches=1):
+            return True
+        if self._throw(board, scatter_rng, player_rng, require_full_throw=False):
+            return True
+
+        return self._play_move(board, required_matches=0)
+
+    ## Moves an item onto a shelf that already holds `required_matches` copies of it. At 2 that
+    ## completes a triple, at 1 it builds toward one, and at 0 it is the last resort that packs a
+    ## clogged board down onto fewer shelves.
+    ##
+    ## Every branch must strictly make progress, or a sampled run spends its whole action budget
+    ## passing one item back and forth between two equally useless shelves and is reported as a
+    ## failure the level did not earn.
+    def _play_move(self, board: ThrowingBoard, required_matches: int) -> bool:
+        for source_index, source in enumerate(board.shelves):
+            source_items = sum(1 for slot_item in source if slot_item is not None)
+            for source_slot, item_id in enumerate(source):
+                if item_id is None:
+                    continue
+
+                # Never break up a pair to build another one somewhere else: that trades one
+                # half-built triple for another and can oscillate forever.
+                if required_matches == 1 and sum(
+                    1 for slot_item in source if slot_item == item_id
+                ) != 1:
+                    continue
+                # The last resort only fires when it strictly reduces how many shelves hold items:
+                # the source must be emptied by the move, and the target must already be in use.
+                if required_matches == 0 and source_items != 1:
+                    continue
+
+                for target_index, target in enumerate(board.shelves):
+                    if target_index == source_index or None not in target:
+                        continue
+                    if required_matches == 0 and all(
+                        slot_item is None for slot_item in target
+                    ):
+                        continue
+
+                    matches = sum(1 for slot_item in target if slot_item == item_id)
+                    if matches != required_matches:
+                        continue
+
+                    source[source_slot] = None
+                    target[target.index(None)] = item_id
+                    return True
+
+        return False
+
+    ## A shelf holding two copies of an item and one unrelated blocker is the single most common
+    ## position in this mode, and the triple cannot be finished until the blocker leaves. Without
+    ## this a sampled player stalls on boards a real player walks through, and the estimate reports
+    ## levels as unplayable for a reason that is the model's fault rather than the level's.
+    def _unblock_pair(self, board: ThrowingBoard) -> bool:
+        for source_index, source in enumerate(board.shelves):
+            if None in source:
+                continue
+
+            counts = Counter(source)
+            paired = [item_id for item_id, count in counts.items() if count == 2]
+            if not paired:
+                continue
+
+            pair_id = paired[0]
+            # Only worth unblocking if the third copy is actually on the board to bring over.
+            elsewhere = sum(
+                1
+                for other_index, other in enumerate(board.shelves)
+                if other_index != source_index
+                for slot_item in other
+                if slot_item == pair_id
+            )
+            if elsewhere == 0:
+                continue
+
+            blocker_slot = next(
+                slot for slot, slot_item in enumerate(source) if slot_item != pair_id
+            )
+            blocker_id = source[blocker_slot]
+            targets = [
+                (sum(1 for slot_item in target if slot_item == blocker_id), target_index)
+                for target_index, target in enumerate(board.shelves)
+                if target_index != source_index and None in target
+            ]
+            if not targets:
+                continue
+
+            # Park the blocker where it does the most good: beside its own kind when possible.
+            targets.sort(reverse=True)
+            target = board.shelves[targets[0][1]]
+            source[blocker_slot] = None
+            target[target.index(None)] = blocker_id
+            return True
+
+        return False
+
+    def _throw(
+        self,
+        board: ThrowingBoard,
+        scatter_rng: random.Random,
+        player_rng: random.Random,
+        require_full_throw: bool,
+    ) -> bool:
+        free = board.free_slots()
+        candidates = []
+        for dispenser_index in range(len(board.stocks)):
+            size = board.throw_size(dispenser_index, len(free))
+            if size <= 0:
+                continue
+            if require_full_throw and size < board.throw_counts[dispenser_index]:
+                continue
+            candidates.append(dispenser_index)
+
+        if not candidates:
+            return False
+
+        # Drain the fullest dispenser first so no single one is left holding most of the level.
+        most_stock = max(len(board.stocks[index]) for index in candidates)
+        fullest = [index for index in candidates if len(board.stocks[index]) == most_stock]
+        dispenser_index = player_rng.choice(fullest)
+
+        size = board.throw_size(dispenser_index, len(free))
+        for shelf_index, slot_index in scatter_rng.sample(free, size):
+            board.shelves[shelf_index][slot_index] = board.stocks[dispenser_index].pop(0)
+
+        return True
+
+
 CLASSIC_RULES = ClassicRules()
 
 
@@ -1135,8 +1631,19 @@ def collapsing_shelves_to_state(
 
 
 def build_search_inputs(level_data: Any, shelves: list[dict[str, Any]]) -> tuple[SortingRules, Any]:
-    """Rules object and initial state for an already validated level."""
-    if get_gameplay_mode(level_data) != GAMEPLAY_MODE_COLLAPSING_COLUMNS:
+    """Rules object and initial state for an already validated level.
+
+    The throwing mode has no initial search state: its board starts empty and is filled during play,
+    so it returns `None` and is routed to `ThrowingDispensersRules.estimate_playability()` instead
+    of `solve_level()`."""
+    mode = get_gameplay_mode(level_data)
+    if mode == GAMEPLAY_MODE_THROWING_DISPENSERS:
+        rules = ThrowingDispensersRules(
+            level_data[DISPENSERS_KEY], len(shelves), str(level_data[THROW_SEED_KEY])
+        )
+        return rules, None
+
+    if mode != GAMEPLAY_MODE_COLLAPSING_COLUMNS:
         return CLASSIC_RULES, shelves_to_state(shelves)
 
     column_layout = level_data[COLUMN_LAYOUT_KEY]
@@ -1278,6 +1785,25 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-states", type=int, default=100_000)
     parser.add_argument("--max-depth", type=int, default=200)
     parser.add_argument("--show-solution", action="store_true")
+    parser.add_argument(
+        "--playability-trials",
+        type=int,
+        default=DEFAULT_PLAYABILITY_TRIALS,
+        help=(
+            f"Sampled runs for {GAMEPLAY_MODE_THROWING_DISPENSERS} levels "
+            f"(default {DEFAULT_PLAYABILITY_TRIALS}). Ignored in the other modes, which are proven."
+        ),
+    )
+    parser.add_argument(
+        "--playability-threshold",
+        type=float,
+        default=DEFAULT_PLAYABILITY_THRESHOLD,
+        help=(
+            "Fraction of sampled runs that must finish for a "
+            f"{GAMEPLAY_MODE_THROWING_DISPENSERS} level to pass "
+            f"(default {DEFAULT_PLAYABILITY_THRESHOLD})."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -1316,14 +1842,24 @@ def main() -> int:
         return 1
 
     rules, initial_state = build_search_inputs(None if args.shelves_only else level_data, shelves)
-    search_result = solve_level(
-        initial_state=initial_state,
-        max_states=args.max_states,
-        max_depth=args.max_depth,
-        keep_solution=args.show_solution,
-        rules=rules,
-    )
+    playability: dict[str, Any] | None = None
+    if isinstance(rules, ThrowingDispensersRules):
+        search_result, playability = rules.estimate_playability(
+            trials=args.playability_trials, threshold=args.playability_threshold
+        )
+    else:
+        search_result = solve_level(
+            initial_state=initial_state,
+            max_states=args.max_states,
+            max_depth=args.max_depth,
+            keep_solution=args.show_solution,
+            rules=rules,
+        )
     result = result_to_json(args.level, True, [], item_counts, search_result, rules.mode)
+    if playability is not None:
+        # Named apart from `solvable` on purpose: this mode is sampled, not proven, and a reader
+        # comparing two levels' reports should not have to guess which one they are looking at.
+        result["playability"] = playability
     print(json.dumps(result, indent=2))
 
     if search_result.solvable is True:
