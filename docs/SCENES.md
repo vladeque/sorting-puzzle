@@ -1346,22 +1346,75 @@ Purpose:
 - Preserves the previous testing menu layout.
 - Displays title and campaign progress.
 - Provides a campaign play button.
-- Provides a `%LevelGrid` container that the script fills with isolated dev/test level buttons when dev selection is enabled.
+- Hosts `scenes/testing/dev_level_picker.tscn`, which the script fills with the whole chapter when
+  dev selection is enabled.
 
 Important nodes:
 - `Background`: fullscreen menu background.
-- `ShelfBackdrop` and `ShelfLip`: static decorative shelf art.
-- `Content`: centered menu layout container.
+- `Content`: top-anchored menu layout container that fills the screen, so the level picker keeps the
+  remaining vertical space on short and tall viewports alike.
 - `Content/SelectorLabel`: campaign current-level label in normal flow, or dev selector label in dev/test mode.
 - `Content/PlayButton`: unique-name button that launches the saved campaign level from the testing menu.
-- `Content/LevelGrid`: unique-name `GridContainer` used by the script for dev/test level selection.
+- `Content/LevelPicker`: unique-name `scenes/testing/dev_level_picker.tscn` instance used for
+  dev/test level selection. It replaced the previous fixed `%LevelGrid`, and the decorative
+  `ShelfBackdrop`/`ShelfLip` polygons were dropped with it because their fixed 720x1280 placement
+  sat inside the picker panel.
 
 Depends on:
+- `scenes/testing/dev_level_picker.tscn` for dev/test level selection.
 - `level.tscn` through the `LevelTransition` autoload.
 - `PlayerProgress` autoload for the saved campaign level and lives gate.
 
 Do not use for:
 - Runtime puzzle rules or shelf state. Put those in `level.tscn` and `scripts/level.gd`.
+
+## `scenes/testing/dev_level_picker.tscn`
+
+Root:
+- `DevLevelPicker` (`VBoxContainer`)
+
+Script:
+- `scripts/testing/dev_level_picker.gd`
+
+Purpose:
+- Lists every level of one chapter as a scrolling grid of buttons and emits `level_selected` for the
+  tapped level.
+- Accepts a typed level number, because tapping stops being practical once Chapter 1 reaches the
+  planned few hundred levels.
+- Scrolls a requested level into view, so the saved campaign level is visible on open.
+
+Important nodes:
+- `JumpRow/%LevelInput`: digits-only `LineEdit` for the typed level number.
+- `JumpRow/%JumpButton`: submits the typed level; `Enter` in the field does the same.
+- `%StatusLabel`: selection hint, or the reason a typed level was rejected.
+- `LevelPanel`: opaque panel that keeps a long grid readable over the menu background.
+- `%LevelScroll`: vertical-only `ScrollContainer` that owns the scrolling and the focus reveal.
+- `%LevelGrid`: `GridContainer` of generated level buttons; its column count follows the visible
+  scroll width.
+
+Depends on:
+- The caller for the level list. The scene reads no progress or catalog state itself.
+
+Do not use for:
+- Production level selection. The production menu intentionally offers only the next level; see
+  `scenes/main_menu.tscn`.
+
+Verification:
+- `tests/ui/test_dev_level_picker.gd` checks that the testing menu lists exactly the Chapter 1
+  catalog levels and that a 500-level chapter still scrolls, reveals a late level, and accepts a
+  typed one:
+
+```powershell
+& .\scripts\tools\run_isolated_godot_test.ps1 -Script tests/ui/test_dev_level_picker.gd
+```
+
+- `scripts/tools/captures/dev_level_picker_large_chapter_setup.gd` renders that 500-level state for
+  visual review:
+
+```powershell
+& .\scripts\tools\capture_ui.ps1 -Scene scenes/main_menu_testing.tscn -Name testing_menu_picker_500 `
+    -Setup scripts/tools/captures/dev_level_picker_large_chapter_setup.gd
+```
 
 ## `level.tscn`
 

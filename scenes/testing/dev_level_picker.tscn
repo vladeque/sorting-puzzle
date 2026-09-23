@@ -1,0 +1,81 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/testing/dev_level_picker.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_level_panel"]
+bg_color = Color(0.06, 0.08, 0.11, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.29, 0.38, 0.47, 0.85)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[node name="DevLevelPicker" type="VBoxContainer"]
+theme_override_constants/separation = 12
+script = ExtResource("1_script")
+
+[node name="JumpRow" type="HBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="JumpLabel" type="Label" parent="JumpRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.78, 0.9, 0.93, 1)
+theme_override_font_sizes/font_size = 24
+text = "Go to level"
+
+[node name="LevelInput" type="LineEdit" parent="JumpRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 56)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+placeholder_text = "1"
+alignment = 1
+max_length = 4
+virtual_keyboard_type = 2
+
+[node name="JumpButton" type="Button" parent="JumpRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(110, 56)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "Play"
+
+[node name="StatusLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.8, 0.86, 1)
+theme_override_font_sizes/font_size = 22
+text = "Tap a level, or type a number."
+horizontal_alignment = 1
+
+[node name="LevelPanel" type="PanelContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBox_level_panel")
+
+[node name="LevelMargins" type="MarginContainer" parent="LevelPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="LevelScroll" type="ScrollContainer" parent="LevelPanel/LevelMargins"]
+unique_name_in_owner = true
+layout_mode = 2
+follow_focus = true
+horizontal_scroll_mode = 0
+
+[node name="LevelGrid" type="GridContainer" parent="LevelPanel/LevelMargins/LevelScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
+columns = 5

@@ -16,6 +16,9 @@ Main scene:
 Testing menu:
 - `scenes/main_menu_testing.tscn`
 - Preserves the previous main menu with campaign play and developer/test level selection.
+- Developer/test selection lists every level of Chapter 1 through the scrolling
+  `scenes/testing/dev_level_picker.tscn`, which also accepts a typed level number and stays usable
+  as the chapter grows toward several hundred levels.
 - `scenes/testing/reward_chest_fill_preview.tscn` can be run directly with F6 to replay a full
   reward-star flight into the production chest widget without changing saved progress.
 
@@ -169,6 +172,7 @@ Files:
 - `scripts/profile_choice_tile.gd`
 - `scripts/profile_frame_catalog.gd`
 - `scripts/main_menu.gd`
+- `scenes/testing/dev_level_picker.tscn`, `scripts/testing/dev_level_picker.gd`
 - `scripts/level_transition.gd`
 - `scenes/ui/level_loading_screen.tscn`
 - `scripts/player_progress.gd`
@@ -215,7 +219,8 @@ Responsibility:
 - Keeps free level selection out of the production menu.
 - Preserves the old testing menu in `scenes/main_menu_testing.tscn`.
 - Keeps Shop, Home, and Leaderboard entry points in the reusable full-width `scenes/ui/main_menu_bottom_navigation.tscn`; all three route between dedicated screens.
-- Builds testing level buttons for levels 1 through 10 only when dev/test level selection is enabled.
+- Builds the testing menu's level picker from the Chapter 1 catalog entry, not from a hardcoded
+  level count, and only when dev/test level selection is enabled.
 - Instantiates `level.tscn`, assigns `selected_level`, `launched_from_dev_mode`, and `return_menu_scene_path`, swaps it into `SceneTree.current_scene`, and removes the menu.
 
 Change here when:
@@ -295,7 +300,8 @@ Files:
   `rewarded_shelf_unlock_setup.gd` (whose CTA state comes from
   `SORTING_PUZZLE_CAPTURE_SHELF_UNLOCK_STATE`), and the
   `lives_menu_full_setup.gd`/`lives_menu_offer_setup.gd` pair that opens each lives-modal state over
-  the real Main Menu)
+  the real Main Menu, and `dev_level_picker_large_chapter_setup.gd`, which fills the testing menu's
+  level picker with the 500-level chapter Chapter 1 is planned to grow into)
 - `tmp/.gdignore`
 
 Responsibility:

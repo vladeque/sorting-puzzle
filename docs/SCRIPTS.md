@@ -904,6 +904,40 @@ Do not use for:
 - Backend allowlisting or synchronization. That boundary is tracked in
   `docs/BACKEND_PROFILE_FRAMES_TICKET.md`.
 
+## `scripts/testing/dev_level_picker.gd`
+
+Class:
+- `DevLevelPicker`
+
+Attached to:
+- `scenes/testing/dev_level_picker.tscn` root `DevLevelPicker`.
+
+Purpose:
+- Generates one button per listed level and emits `level_selected(level_number)`.
+- Accepts a typed level number as a second route to the same signal, which keeps selection practical
+  once a chapter holds several hundred levels.
+- Keeps the grid readable by fitting the column count to the visible scroll width, and scrolls a
+  requested level into view after the grid has been laid out.
+
+Key constants:
+- `BUTTON_MIN_SIZE`, `GRID_SEPARATION`, `MIN_COLUMNS`, `MAX_COLUMNS`: grid geometry used to derive
+  the column count.
+- `SCROLL_INTO_VIEW_ATTEMPTS`: repeats of the focus reveal, because the scroll range only grows
+  after the container has taken the sorted grid's height.
+
+Key methods:
+- `set_levels(level_numbers, focus_level)`: replaces the listed levels and requests the reveal.
+- `get_level_numbers()`: the listed levels, for callers and verification.
+- `get_level_button(level_number)`: the generated button for one level, or null.
+- `_submit_typed_level()`: validates the typed number against the listed levels and either selects it
+  or reports why it was rejected.
+
+Depends on:
+- The caller for the level list. It reads no catalog, config, or save state.
+
+Do not use for:
+- Campaign progression rules or level launching. Those stay with the owning menu script.
+
 ## `scripts/main_menu.gd`
 
 Attached to:
@@ -911,29 +945,38 @@ Attached to:
 
 Purpose:
 - Shows the testing-menu campaign play entry point for the saved current level.
-- Builds the developer/test level selection grid when dev level select is enabled.
+- Feeds the developer/test level picker the whole first chapter when dev level select is enabled.
 - Launches campaign or isolated dev/test levels.
 
 Key constants:
 - `MIN_LEVEL`: first selectable level number.
-- `MAX_LEVEL`: last selectable level number.
+- `MAX_SCANNED_LEVEL`: upper bound of the fallback level-config scan.
+- `LEVEL_CONFIG_PATH_TEMPLATE`: `configs/levels/level_%03d.json` lookup used by both the fallback
+  scan and the campaign gate.
 - `DEV_LEVEL_SELECT_SETTING`: optional project setting that overrides debug-build dev level selection.
 - `TESTING_MENU_SCENE`: return path assigned to levels launched from the testing menu.
 
 Important nodes:
 - `%PlayButton`: starts the saved campaign level.
-- `%LevelGrid`: `GridContainer` filled with generated `Button` nodes.
+- `%LevelPicker`: `scenes/testing/dev_level_picker.tscn` instance that lists the chapter.
 
 Key methods:
-- `_ready()`: loads progress, wires the play button, updates campaign progress text, and populates the dev selector when enabled.
+- `_ready()`: loads progress, collects the chapter's levels, wires the play button and picker, updates campaign progress text, and populates the dev selector when enabled.
 - `_update_campaign_progress()`: displays the saved current level, no-lives state, or all-complete state.
-- `_populate_level_selector()`: clears old buttons and creates one isolated dev/test button per level when dev selection is enabled.
+- `_populate_level_selector()`: hands the collected level numbers and the saved current level to the picker when dev selection is enabled.
+- `_collect_campaign_level_numbers()`: reads the first chapter's level IDs from `ChapterCatalog`, so
+  the menu carries no level count of its own.
+- `_scan_level_configs()`: fallback level list walked from the shipped configs when the catalog is
+  missing or invalid.
 - `_launch_campaign_level()`: launches `PlayerProgress.current_level`.
+- `_launch_dev_level(level_number)`: launches a level chosen in the picker as a dev/test run.
 - `_launch_level(level_number, launched_from_dev_mode)`: sends the accepted request, return route,
   and dev-mode metadata to `LevelTransition`.
 
 Depends on:
 - `LevelTransition` autoload
+- `ChapterCatalog` autoload for the chapter's level list
+- `scripts/testing/dev_level_picker.gd` for the selection UI
 - `scripts/level.gd` export `selected_level`
 - `scripts/level.gd` export `launched_from_dev_mode`
 - `scripts/level.gd` export `return_menu_scene_path`

@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://c4gcx2mx7ct4"]
 
 [ext_resource type="Script" uid="uid://cjt13h6ok5cai" path="res://scripts/main_menu.gd" id="1_main_menu_script"]
+[ext_resource type="PackedScene" path="res://scenes/testing/dev_level_picker.tscn" id="2_level_picker"]
 
 [node name="MainMenu" type="Control" unique_id=433165931]
 layout_mode = 3
@@ -20,31 +21,18 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.09, 0.12, 0.16, 1)
 
-[node name="ShelfBackdrop" type="Polygon2D" parent="." unique_id=1089402986]
-position = Vector2(360, 465)
-color = Color(0.31, 0.2, 0.14, 1)
-polygon = PackedVector2Array(-258, -42, 258, -42, 220, 36, -220, 36)
-
-[node name="ShelfLip" type="Polygon2D" parent="." unique_id=259426119]
-position = Vector2(360, 514)
-color = Color(0.61, 0.38, 0.22, 1)
-polygon = PackedVector2Array(-242, -20, 242, -20, 270, 34, -270, 34)
-
 [node name="Content" type="VBoxContainer" parent="." unique_id=1183342925]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -280.0
-offset_top = -368.0
-offset_right = 280.0
-offset_bottom = 348.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 24.0
+offset_right = -20.0
+offset_bottom = -24.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 34
-alignment = 1
+theme_override_constants/separation = 18
 
 [node name="Title" type="Label" parent="Content" unique_id=1899527967]
 layout_mode = 2
@@ -73,13 +61,10 @@ size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 34
 text = "Play"
 
-[node name="LevelGrid" type="GridContainer" parent="Content" unique_id=23040247]
+[node name="LevelPicker" parent="Content" instance=ExtResource("2_level_picker")]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 4
-theme_override_constants/h_separation = 16
-theme_override_constants/v_separation = 16
-columns = 5
+size_flags_vertical = 3
 
 [node name="StickyPreviewButton" type="Button" parent="Content"]
 unique_name_in_owner = true
