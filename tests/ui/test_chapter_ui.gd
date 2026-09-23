@@ -24,9 +24,12 @@ func _init() -> void:
 
 func _run() -> void:
 	await process_frame
+	ProjectSettings.set_setting("application/config/chapter_selection_enabled", true)
 	var progress = root.get_node_or_null("PlayerProgress")
+	var chapter_catalog = root.get_node_or_null("ChapterCatalog")
 	_check(progress != null, "PlayerProgress autoload is available.")
-	if progress == null:
+	_check(chapter_catalog != null, "ChapterCatalog autoload is available.")
+	if progress == null or chapter_catalog == null:
 		quit(1)
 		return
 	progress.reset_progress()
@@ -191,13 +194,15 @@ func _run() -> void:
 				"Chapter 1 should reuse the main-menu background."
 			)
 			var current_progress := current_card.get_node("%ProgressBar") as ProgressBar
+			var chapter_one_level_count: int = chapter_catalog.get_level_ids("chapter_01").size()
 			_check(
 				is_equal_approx(current_progress.value, 0.0)
-				and is_equal_approx(current_progress.max_value, 10.0),
+					and is_equal_approx(current_progress.max_value, chapter_one_level_count),
 				"Chapter 1 should expose its exact current progress in the bottom panel."
 			)
 			_check(
-				str(current_card.get_node("%ProgressValueLabel").text) == "0 / 10",
+				str(current_card.get_node("%ProgressValueLabel").text)
+					== "0 / %d" % chapter_one_level_count,
 				"Chapter 1's progress value should be readable beside the bar."
 			)
 

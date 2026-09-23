@@ -32,6 +32,7 @@ const BOTTOM_NAVIGATION_HEIGHT := 96.0
 const LIFE_STATUS_REFRESH_SECONDS := 1.0
 const MAIN_MENU_OVERLAY_Z_INDEX := 100
 const AD_PRIVACY_POLICY_SETTING := "application/config/ad_privacy_policy_url"
+const CHAPTER_SELECTION_ENABLED_SETTING := "application/config/chapter_selection_enabled"
 
 @onready var _background := %Background as TextureRect
 @onready var _top_status_bar := %TopStatusBar as MarginContainer
@@ -71,6 +72,7 @@ var _rewarded_life_prepare_in_progress := false
 ## lives widget opens the same modal informationally, and that entry point must never resume a
 ## launch or be dismissed out from under the player when a countdown restores a life.
 var _out_of_lives_launch_pending := false
+var _chapter_selection_enabled := false
 
 
 func _ready() -> void:
@@ -79,8 +81,15 @@ func _ready() -> void:
 	PlayerProgress.refresh_lives()
 	var pending_reward_animation := PlayerProgress.consume_pending_reward_chest_animation()
 	var pending_leaderboard_reward := PlayerProgress.consume_pending_leaderboard_reward()
+	_chapter_selection_enabled = bool(ProjectSettings.get_setting(
+		CHAPTER_SELECTION_ENABLED_SETTING,
+		false
+	))
+	_chapter_button.visible = _chapter_selection_enabled
+	_chapter_button.disabled = not _chapter_selection_enabled
 	_level_button.pressed.connect(_launch_campaign_level)
-	_chapter_button.pressed.connect(_open_chapter_selection)
+	if _chapter_selection_enabled:
+		_chapter_button.pressed.connect(_open_chapter_selection)
 	_profile_button.pressed.connect(_open_profile_menu)
 	_settings_button.pressed.connect(_open_settings_menu)
 	_coin_shortcut.pressed.connect(_open_shop)
@@ -337,7 +346,11 @@ func _update_level_button() -> void:
 		_level_button.disabled = false
 	else:
 		var progress := PlayerProgress.get_chapter_progress(chapter_id)
-		_level_button.text = "CHAPTER COMPLETE" if bool(progress.get("complete", false)) else "COMING SOON"
+		_level_button.text = (
+			"MORE LEVELS COMING SOON"
+			if bool(progress.get("complete", false))
+			else "COMING SOON"
+		)
 		_level_button.disabled = true
 
 
@@ -641,7 +654,7 @@ func _open_reward_chest_menu() -> void:
 
 
 func _open_chapter_selection() -> void:
-	if is_instance_valid(_chapter_selection_screen):
+	if not _chapter_selection_enabled or is_instance_valid(_chapter_selection_screen):
 		return
 	_chapter_selection_screen = CHAPTER_SELECTION_SCENE.instantiate() as Control
 	_add_main_menu_overlay(_chapter_selection_screen)

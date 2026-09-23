@@ -384,9 +384,10 @@ Purpose:
   "Reward-Progress Semantics" above -- this used to fly clover-coin art).
 - Provides a bottom `%LevelButton` labeled with the selected chapter's next local level, such as
   `Level 1`; zero lives keeps it enabled and opens Out of Lives, while completed/unavailable
-  chapters remain disabled as `Chapter Complete` or `Coming Soon`.
-- Places a small yellow-orange `%ChapterButton` directly against the level button and opens the
-  dedicated chapter selection screen.
+  chapters remain disabled as `More Levels Coming Soon` or `Coming Soon`.
+- Keeps a small yellow-orange `%ChapterButton` directly against the level button for future chapter
+  releases. It is hidden and disabled while `application/config/chapter_selection_enabled` is
+  `false`, and opens the dedicated chapter selection screen when the flag is enabled.
 - Opens the player profile menu when the profile widget is pressed.
 - Opens the lives modal when the top status bar's lives widget is pressed, at any life count. This
   entry point only reports and sells lives: unlike the zero-lives launch case it never resumes a
@@ -418,7 +419,8 @@ Important nodes:
   `scenes/ui/main_menu_chapter_button.tscn`; see "Shared UI Style Tokens" above for why
   yellow-orange is the intentional secondary/alternative-action role here, with the same
   white/warm-brown text treatment as the in-level `Watch ad` button, not drift. `FOCUS_NONE`
-  (was `FOCUS_CLICK` before UI-002's focus-policy normalization; see "Focus Policy" above).
+  (was `FOCUS_CLICK` before UI-002's focus-policy normalization; see "Focus Policy" above). The
+  release-default chapter-selection flag hides and disables this retained node.
 - `LeaderboardRewardDialog`: `scenes/ui/leaderboard_reward_dialog.tscn` instance, hidden until a
   weekly reward is pending.
 - `%OutOfLivesMenu`: hidden `scenes/ui/out_of_lives_menu.tscn` instance on the shared modal z-index.

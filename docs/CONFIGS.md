@@ -10,6 +10,13 @@ This file describes data files that drive gameplay and tooling.
   ADS-008 release readiness rejects reserved placeholder domains, so a deliverable owner-approved
   address must be injected before an ads-enabled release can pass.
 
+## Chapter-selection project setting
+
+- `application/config/chapter_selection_enabled` controls whether Main Menu exposes the chapter
+  picker. It defaults to `false` for the Chapter 1-only release.
+- The chapter catalog remains active while selection is hidden because campaign numbering, item
+  progression, backgrounds, and saved progress still depend on the selected Chapter 1 identity.
+
 ## `configs/ads.json`
 
 Purpose:

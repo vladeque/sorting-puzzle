@@ -17,6 +17,7 @@ func _init() -> void:
 
 func _run() -> void:
 	await process_frame
+	ProjectSettings.set_setting("application/config/chapter_selection_enabled", true)
 	var progress = root.get_node_or_null("PlayerProgress")
 	_check(progress != null, "PlayerProgress autoload is available.")
 	if progress == null:

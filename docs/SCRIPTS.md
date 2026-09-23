@@ -80,8 +80,9 @@ Purpose:
 - Adds every main-menu modal through a shared overlay helper so no menu action can render or receive
   input above an open modal; each overlay fades in on open and out before it closes.
 - Launches the first incomplete level in the selected unlocked chapter.
-- Opens the chapter selection screen and refreshes the level/chapter actions and fullscreen
-  background after selection.
+- Reads `application/config/chapter_selection_enabled`, hiding and disabling the retained chapter
+  button when false. When enabled, opens the chapter selection screen and refreshes the
+  level/chapter actions and fullscreen background after selection.
 - Opens the dedicated leaderboard scene from the bottom navigation trophy signal.
 - Opens the dedicated Shop scene when the top-status coin balance shortcut is pressed (in addition
   to the bottom navigation cart).
@@ -109,6 +110,8 @@ Key constants:
 - `LIFE_STATUS_REFRESH_SECONDS`: cadence for refreshing the lives countdown while the menu is visible.
 - `MAIN_MENU_OVERLAY_Z_INDEX`: shared layer for runtime modals and the embedded leaderboard reward
   dialog, above every production-menu action.
+- `CHAPTER_SELECTION_ENABLED_SETTING`: release-facing project setting that exposes the chapter
+  picker only when explicitly enabled.
 - `TOP_MARGIN`: preferred distance from the physical top edge for the status row.
 - `CAMERA_CUTOUT_PADDING`: empty space reserved around each reported display cutout.
 - `BOTTOM_BAR_*`, `SIDE_MARGIN`, `LEVEL_BUTTON_MAX_WIDTH`, and `CHAPTER_BUTTON_MAX_WIDTH`:
@@ -136,8 +139,9 @@ Important nodes:
 - `%OutOfLivesMenu`: persistent hidden `scenes/ui/out_of_lives_menu.tscn` instance shown when a
   launch request finds zero lives, or when the top-status lives widget is pressed.
 - `%ChapterButton`: compact yellow-orange selected-chapter button that opens
-  `chapter_selection_screen.tscn`; see `docs/SCENES.md` "Shared UI Style Tokens" for why
-  yellow-orange is the intentional secondary/alternative-action role here.
+  `chapter_selection_screen.tscn` when chapter selection is enabled; otherwise it stays hidden and
+  disabled. See `docs/SCENES.md` "Shared UI Style Tokens" for why yellow-orange is the intentional
+  secondary/alternative-action role here.
 - `%BottomNavigation`: full-width `scenes/ui/main_menu_bottom_navigation.tscn` instance aligned to the viewport bottom and extended through the device safe area.
 
 Key methods:
