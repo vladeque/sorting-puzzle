@@ -641,6 +641,109 @@ active shelves alike from the flat `shelves` array, and never infers item identi
 position. `materialize_level()` validates the board contract first, so a malformed column layout
 fails before a stale runtime level can be written.
 
+### Throwing dispensers
+
+`gameplay_mode: "throwing_dispensers"` opens an **empty** shelf layout with one or more dispensers
+mounted above it. Every item in the level starts inside a dispenser; tapping one throws the next
+`throw_count` items into random free slots. The level is finished when no item is left on the board
+and every dispenser is empty. `gameplay_mode` is optional and defaults to `classic`; every existing
+level loads unchanged.
+
+The **dispensers** here are a different object from the `"type": "dispenser"` **dispenser shelf**
+above, which is a narrow source-only shelf the player drags items off. The two never appear in the
+same level.
+
+```json
+{
+  "level": 21,
+  "time_seconds": 300,
+  "gameplay_mode": "throwing_dispensers",
+  "layout_preset": "grid_3x4",
+  "throw_seed": "00000000000052ad",
+  "dispensers": [
+    { "throw_count": 3, "contents": ["item_01", "item_02", "item_01"] },
+    { "throw_count": 3, "contents": ["item_02", "item_01", "item_02"] }
+  ],
+  "shelves": [
+    { "layers": [[null, null, null]] }
+  ]
+}
+```
+
+Contract rules:
+- `dispensers` is a non-empty array, ordered left to right. That order is the contract, and it is
+  the order they are placed above the board in.
+- `contents` is a non-empty array of item ID strings in the order they are handed out. `null` is
+  rejected: a hole has nothing to throw and, unlike a shelf slot, nothing can ever move into it.
+- `throw_count` is a positive integer. A value larger than the board could ever hold is reported,
+  because a throw clamped to the board is not the throw its author described.
+- `throw_seed` is a 16-digit lowercase hex string. The shape is checked rather than coerced: a wrong
+  length, uppercase, or an `0x` prefix all silently change the scatter the level was tuned against.
+- Every shelf must be `standard`, must have exactly one layer, and that layer must hold exactly three
+  `null` slots. An item authored onto the board is an item the playability estimate never accounted
+  for.
+- Each item ID must appear a multiple of three times **across dispensers**, which is where a level's
+  items now live.
+- `row_layouts`, `column_layout`, `type: dispenser`, a positive `unlock_after_triples`, and non-empty
+  `sticky_items` are all rejected. `layout_preset` is expected, not exclusive: it is how this mode
+  places its empty board.
+- The runtime fails closed on an invalid level. It never falls back to `grid_3x3`, because a level in
+  this mode authors an empty board and a fallback would open a board that cannot be filled.
+
+The reserved free slot:
+- A throw lands `min(throw_count, remaining stock, free slots - 1)` items and keeps the rest. The
+  `- 1` is a fixed rule, not a config field.
+- Without it a board can reach zero free slots. A move needs a free slot to land in, so such a board
+  has no legal move and, with every item already thrown, no way to regain one.
+- A consequence worth knowing when authoring: a throw can never fill the board's *last* slot, so a
+  board too small to hold a spare slot beside a triple can never be completed. A one-shelf level is
+  the degenerate case and the playability estimate reports it as unplayable.
+
+Validation and playability:
+
+```powershell
+py scripts\tools\validate_level_solvable.py configs\test_levels\throwing_dispensers_preview.json
+```
+
+This mode is **sampled, not proven**, and the report says `playability` rather than `solvable`. The
+contents arrive over time and land in random slots, and which slots are free depends on the player's
+move order, so there is no single line of play to prove. `ThrowingDispensersRules` plays the level
+`--playability-trials` times (default 200) with a greedy player and requires a
+`--playability-threshold` completion rate (default 0.95). See
+[THROWING_DISPENSERS.md](THROWING_DISPENSERS.md#solvability-sampled-not-proven).
+
+Development fixture: `configs/test_levels/throwing_dispensers_preview.json` is a `grid_3x4` board of
+twelve empty shelves and two dispensers holding fifteen items each, played by
+`scenes/testing/throwing_dispensers_preview.tscn`.
+
+Generation:
+
+```powershell
+py scripts\tools\generate_level_shelves.py --gameplay-mode throwing_dispensers --shelf-count 12 `
+    --layout-preset grid_3x4 --dispenser-count 2 --throw-count 3 --item-type-count 10 `
+    --difficulty medium --seed 4242 --full-level --level-number 21 --time-seconds 300 `
+    --require-solvable --stats
+py scripts\tools\materialize_level_templates.py
+```
+
+- `--dispenser-count`, `--throw-count`, and `--item-type-count` are required; `--throw-seed` is
+  derived from `--seed` when omitted, so regenerating a level reproduces its scatter as well as its
+  contents.
+- `--layer-count` and `--filled-layer-count` default to `1` and may not be anything else.
+- `--dispenser-shelves`, `--locked-shelves`, and `--sticky-items-percent` are rejected with an
+  argparse error: the board is authored empty, so a flag that shapes a shelf's contents has nothing
+  to act on.
+- The three throwing flags are likewise rejected outside this mode.
+- Under `--require-solvable` the generator reshuffles up to `--max-generation-attempts` times and
+  writes nothing unless a candidate reaches the playability threshold.
+- `--stats` reports `gameplay_mode`, `dispenser_count`, `throw_count`, `board_slots`, `total_items`,
+  `throw_seed`, and the full `playability` block.
+
+Materialization keeps `gameplay_mode`, `throw_seed`, and every `throw_count` unchanged, and maps the
+logical `item_NN` tokens inside each dispenser's `contents` in place, so the authored hand-out order
+survives. Logical identities are collected from dispensers as well as shelves; reading only the
+shelves would report a level in this mode as having no items at all.
+
 ### Sticky items
 
 Each standard shelf may include `sticky_items: [{"layer": 0, "slot": 1}]`, using zero-based

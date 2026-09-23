@@ -973,6 +973,46 @@ Change here when:
 - Adding shelf types, changing dispenser capacity/indicator presentation, changing which abilities
   may touch which shelf types, or changing mixed-width row packing.
 
+### Throwing Dispensers
+
+Files:
+- `scripts/gameplay_modes.gd`, `scripts/throwing_dispenser_rules.gd`
+- `scenes/throwing_dispenser.tscn`, `scripts/throwing_dispenser.gd`
+- `scenes/throwing_dispenser_rack.tscn`, `scripts/throwing_dispenser_rack.gd`
+- `scenes/testing/throwing_dispensers_preview.tscn`, `scripts/throwing_dispensers_preview.gd`
+- `configs/test_levels/throwing_dispensers_preview.json`
+- `scripts/level.gd`
+- `scripts/tools/validate_level_solvable.py`, `scripts/tools/generate_level_shelves.py`,
+  `scripts/tools/level_item_progression.py`
+- `scripts/tools/captures/throwing_dispensers_setup.gd`
+- `tests/gameplay/test_throwing_dispensers.gd`, `tests/tools/test_validate_level_solvable.py`
+
+Responsibility:
+- A third gameplay mode, `gameplay_mode: "throwing_dispensers"`. The board opens **empty** and every
+  item starts inside a dispenser mounted above it; tapping one throws items into random free slots.
+  The level finishes when nothing is left on the shelves or in a dispenser.
+- Distinct from the **Dispenser Shelf** above, which is a source-only shelf the player drags items
+  off. The two never appear in the same level.
+- Shelves need no new construction: this mode authors an empty `layout_preset` board, which the
+  existing preset path already builds. `ThrowingDispenserRack` adds only the row above it and the
+  bounds the responsive fit needs.
+- A throw never takes the last free slot (`ThrowingDispenserRules.RESERVED_FREE_SLOTS`). A move needs
+  a free slot to land in, so a board with none has no legal move and no way to regain one.
+- Thrown items are parented into their slot immediately and only look airborne, so a pause, failure,
+  or teardown mid-throw always leaves a consistent board.
+- Undispensed stock is data rather than `ShelfItem` nodes, which is what keeps `_get_all_items()`,
+  Hammer, and Shuffle out of a dispenser without any of them knowing it exists. Completion therefore
+  checks the rack as well as the board.
+- Both mode guards run on every level, because each rejects its own fields on levels that did not
+  declare it; `scripts/gameplay_modes.gd` holds the shared list of known modes.
+- The mode is **sampled, not proven**: random placement leaves no single line of play to search, so
+  the validator reports a `playability` estimate rather than `solvable`. See
+  [THROWING_DISPENSERS.md](THROWING_DISPENSERS.md).
+
+Change here when:
+- Changing the throw lifecycle, the reserved-slot rule, dispenser placement or presentation, the
+  completion condition, or the playability model.
+
 ### Item Runtime
 
 Files:
@@ -1112,7 +1152,9 @@ Responsibility:
 - Generates shelf configs from difficulty, logical-item-count, shelf, and layer settings.
 - Validates shelf shape, known item IDs, row layout shape, item counts, and bounded solvability.
 - Supports the additive `gameplay_mode` field; `collapsing_columns` levels carry a `column_layout`
-  and are validated, generated, and solved with column-aware rules.
+  and are validated, generated, and solved with column-aware rules, while `throwing_dispensers`
+  levels carry `dispensers` and a `throw_seed` and are judged by a sampled playability estimate
+  rather than an exhaustive proof.
 
 Change here when:
 - Creating levels, adjusting level schema, adding layout presets, or improving validation/generation rules.
@@ -1252,5 +1294,6 @@ Change the shared destination-screen shell, status panel, or layout math:
 - `docs/SCENES.md`: scene and node ownership inventory.
 - `docs/SCRIPTS.md`: script responsibilities, exports, and dependencies.
 - `docs/CONFIGS.md`: config file schema and data contracts.
+- `docs/THROWING_DISPENSERS.md`: the empty-board mode whose items are thrown onto the shelves.
 - `docs/CLOUD_SAVE.md`: platform cloud-save setup and bridge contract.
 - `docs/TYPOGRAPHY.md`: global font assets, semantic theme roles, casing, numeric style, and responsive typography checks.

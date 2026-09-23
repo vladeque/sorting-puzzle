@@ -2104,6 +2104,74 @@ Behavior:
   in dev mode, titled `COLUMNS PREVIEW`. Retry reloads the preview; leaving returns to the testing
   menu. The window resolves from the device, so the preview doubles as the touch-device check.
 
+## `scenes/throwing_dispenser.tscn`
+
+One tappable dispenser mounted above a `throwing_dispensers` board. Not the same object as
+`scenes/dispenser_shelf.tscn`, which is a source-only *shelf*; the two never appear in one level.
+
+Root:
+- `ThrowingDispenser` (`Node2D`)
+
+Script:
+- `scripts/throwing_dispenser.gd`
+
+Nodes:
+- `Body`: the hopper art, a procedural placeholder in the shared light-oak palette. Its own node so
+  the throw squash and the refusal shake can move it without disturbing the badge or the mouth.
+- `Body/HopperBack`, `HopperLeftFace`, `HopperRightFace`, `HopperRim`, `HopperOpening`, `ChuteMouth`,
+  `ChuteLip`, `CastShadow`: the cradle faces, sampling `standard_shelf_light_oak.png` with per-face
+  UVs the way `scenes/dispenser_shelf.tscn` does.
+- `CountBadge/RemainingLabel`: the exact remaining count, in the shared
+  `style_box_gameplay_count_badge.tres` role. `ShelfLayerIndicator`'s segmented rail is deliberately
+  not reused: it is built for 2-4 segments and a dispenser holds many more.
+- `Mouth` (`Marker2D`): where thrown items appear to launch from.
+
+Behavior:
+- Owns its own `_input()` and reports a completed tap as `throw_requested`, exactly as
+  `ShelfLockOverlay`'s `AD` plate reports intent. It never decides whether a throw may happen;
+  `scripts/level.gd` answers the signal and calls `take()` if it does.
+- The tap target is the whole body rather than a small button, and `scripts/level.gd` disables input
+  whenever a throw would be refused anyway.
+
+## `scenes/throwing_dispenser_rack.tscn`
+
+The row of dispensers above a `throwing_dispensers` board, and the bounds the level's responsive fit
+reads for them.
+
+Root:
+- `ThrowingDispenserRack` (`Node2D`)
+
+Script:
+- `scripts/throwing_dispenser_rack.gd`
+
+Runtime-created nodes:
+- `DispenserXX`: one `scenes/throwing_dispenser.tscn` per authored dispenser, left to right.
+
+Behavior:
+- A child of `Shelves`, like `CollapsingShelfBoard`, so it scales and centers with the board instead
+  of drifting away from it on a different screen.
+- Each dispenser is centered over an equal share of the board's width and drawn at
+  `DISPENSER_VISUAL_SCALE`. Spreading them to the board's full width put two on its outermost
+  corners, where the left one reached the screen edge at 540x960.
+- Positions come from the shelves' finished bounds rather than from authored markers, so the mode
+  works with any `layout_preset` without a new layout scene per preset and dispenser count.
+
+## `scenes/testing/throwing_dispensers_preview.tscn`
+
+Debug-build preview of the throwing-dispensers mode, opened from `scenes/main_menu_testing.tscn`
+(**Throwing dispensers preview**, shown only where developer level select is enabled).
+
+Root:
+- `ThrowingDispensersPreview`, an instance of `level.tscn` with `scripts/throwing_dispensers_preview.gd`.
+
+Behavior:
+- Plays `configs/test_levels/throwing_dispensers_preview.json` through the ordinary level runtime, in
+  dev mode, titled `THROW PREVIEW` — short because the HUD's level slot runs into the timer at
+  `DISPENSERS PREVIEW` on a 720px-wide screen. Retry reloads the preview; leaving returns to the
+  testing menu.
+- This is the touch-device check for the mode: how a dispenser tap feels under a thumb, and whether
+  taps near the top of a tall screen are comfortable, is not something a capture can answer.
+
 ## `scenes/collapsing_shelf_column.tscn`
 
 One bottom-to-top pile of shelves inside a collapsing board.

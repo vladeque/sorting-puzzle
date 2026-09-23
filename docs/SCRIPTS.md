@@ -2027,12 +2027,46 @@ Collapsing columns (`gameplay_mode: "collapsing_columns"`):
   running under the pause menu. The new order is committed before any tween starts, so every
   interruption point leaves a consistent board. Retry rebuilds the board from config.
 
+Throwing dispensers (`gameplay_mode: "throwing_dispensers"`):
+- `_apply_level_config()` runs `ThrowingRules.validate_config()` beside the collapsing guard, before
+  any state is reset, and fails closed the same way. Both guards run on every level, because each
+  also rejects its own fields on levels that did not declare it.
+- The board itself goes through the ordinary `_add_preset_layout_shelves()` path: this mode authors
+  an empty `layout_preset` board, which needs no new construction. `_add_dispenser_rack()` then adds
+  `scenes/throwing_dispenser_rack.tscn` against `_get_shelf_cells_bounds()` — the shelves' own bounds,
+  not `_get_shelves_local_bounds()`, which would already include the rack — and seeds `_throw_rng`
+  from the authored `throw_seed`. `_dispenser_rack` is null in every other mode.
+- `_throw_rng` is kept apart from `_rng` on purpose. `_rng` drives cosmetic jitter, which runs a
+  different number of times depending on what the player did and what the screen showed, so sharing
+  it would make the scatter depend on animation history instead of on the level's seed.
+- `_on_dispenser_throw_requested()` owns the lifecycle: `_is_throw_allowed()` gates it,
+  `_get_throwable_free_slots()` builds the destinations in a stable authored order (node iteration
+  order is not part of the level contract), `_draw_throw_destinations()` draws distinct slots through
+  a partial Fisher-Yates, and `_throw_items()` spawns and animates them.
+- `_throw_items()` parents each item into its destination slot immediately and only animates it from
+  the dispenser mouth, so pausing, failing, or tearing the level down mid-throw always leaves a
+  consistent board — the same reason a committed move updates its slot before its animation runs. It
+  guards `await tween.finished` behind a `did_add_tween` flag, because an empty tween never emits
+  `finished` and would leave `_throw_in_progress` true for the rest of the level.
+- `_refresh_dispenser_availability()` runs every frame from `_process()`, before its early returns. A
+  dispenser marks its tap handled and `_input()` runs ahead of GUI input, so one left enabled under a
+  modal would swallow presses meant for the buttons on top of it, and `_level_paused` is set from too
+  many places to keep a one-off call in step with all of them.
+- `_check_level_completed()` additionally requires `ThrowingDispenserRack.is_empty()` and no throw in
+  flight. Undispensed stock is data rather than `ShelfItem` nodes, so `_get_all_items()` cannot see
+  it and the level would otherwise complete on its first frame.
+
 Important exports:
 - `slot_snap_distance`: maximum snap distance for drag or tap placement, sized for the wider shelf spacing.
 - `item_pick_size`: rectangle used to detect clicked or touched visible items at the default item scale.
 - `drag_start_distance`: pointer movement required to convert a press into a drag.
 - `layer_promotion_duration_seconds`: duration for back-layer items to slide forward into active front slots.
 - `item_move_duration_seconds`: duration for moved items to slide into destination slots after tap or drag placement, including invalid drag returns.
+- `thrown_item_flight_seconds`, `thrown_item_stagger_seconds`: how long a thrown item appears to
+  travel from the dispenser mouth, and the delay between items in one throw. Exported rather than
+  constants so tests and captures can zero them: a headless frame is far shorter than a real one, so
+  a frame-counted wait would read a board whose scatter has not landed yet. They tune the flight
+  alone and can never change where an item lands.
 - `highlight_outline_color`: border color used by the highlight ability.
 - `selected_outline_color`: white silhouette-border color used by ordinary tap selection; it takes visual priority if Lantern also highlights the selected item.
 - `highlight_outline_width`: screen-pixel thickness of the item outline border, kept even around the item silhouette by the outline shader's dilation.
@@ -2876,6 +2910,18 @@ Purpose:
   title the HUD `COLUMNS PREVIEW`, and route retry back into the preview and Leave to
   `scenes/main_menu_testing.tscn`. Gameplay is the unmodified level runtime.
 
+## Throwing-dispensers capture setup
+
+- `scripts/tools/captures/throwing_dispensers_setup.gd`: the fixture as first opened, or after
+  `SORTING_PUZZLE_CAPTURE_THROW_TAPS` taps on each dispenser. It rebuilds on every resize, because
+  the rack is placed against the shelves' bounds when the level is built, and a generation counter
+  stops a superseded rebuild from throwing into the board the new one just reset.
+- It zeroes `thrown_item_flight_seconds`. A capture that raced the flight showed items still drawn at
+  the dispenser mouth with one badge not yet decremented, which reads as a layout bug rather than the
+  half-finished animation it was.
+- Capture `level.tscn` with this setup, not the preview scene: capturing a preview scene directly
+  renders the board offset against a grey field, the same way the collapsing preview does.
+
 ## Collapsing-columns capture setups
 
 - `scripts/tools/captures/collapsing_columns_initial_setup.gd`: the fixture as first opened, with
@@ -2905,6 +2951,96 @@ Purpose:
 - Mirrors the shape rules of `scripts/tools/validate_level_solvable.py`, which stays the
   authoritative validator, so a malformed level fails closed at runtime instead of being guessed at.
 - Accepts whole-number floats, because Godot's JSON parser returns every number as a float.
+
+## `scripts/gameplay_modes.gd`
+
+Class:
+- `GameplayModes` (static helpers).
+
+Purpose:
+- The canonical list of board behaviors a level may declare (`classic`, `collapsing_columns`,
+  `throwing_dispensers`), and the one place that decides whether a `gameplay_mode` string is a mode
+  at all: `get_mode()`, `is_known()`, `describe_unknown_mode()`.
+- It exists because both mode guards run on every level: each is also responsible for rejecting *its
+  own* fields on a level that did not declare it, so without a shared list each would report the
+  other's valid levels as an unknown mode.
+- Mirrors `GAMEPLAY_MODES` in `scripts/tools/validate_level_solvable.py`.
+
+## `scripts/throwing_dispenser_rules.gd`
+
+Class:
+- `ThrowingDispenserRules` (static helpers, preloaded by `scripts/level.gd` as `ThrowingRules`).
+
+Purpose:
+- Runtime reading of the `gameplay_mode: "throwing_dispensers"` contract: `validate_config()`,
+  `is_throwing_dispensers()`, `get_dispenser_configs()`, `get_contents()`, `get_throw_count()`, and
+  `get_throw_seed()`.
+- `RESERVED_FREE_SLOTS` (`1`) is the rule a throw is clamped by. It is a constant rather than a
+  config field because it is what keeps the board playable at all: a move needs a free slot to land
+  in, and a board with none has no legal move and no way to regain one.
+- `get_throw_seed()` accumulates hex digits by hand rather than calling `String.hex_to_int()`, which
+  refuses seeds above the signed 64-bit maximum instead of wrapping. The wrap is deterministic, which
+  is all the contract asks for.
+- Mirrors the shape rules of `scripts/tools/validate_level_solvable.py`, so a malformed level fails
+  closed at runtime rather than opening an empty board that cannot be filled. It never falls back to
+  a classic board.
+- Accepts whole-number floats, because Godot's JSON parser returns every number as a float.
+
+## `scripts/throwing_dispenser.gd`
+
+Class:
+- `ThrowingDispenser`
+
+Attached to:
+- `scenes/throwing_dispenser.tscn` root `ThrowingDispenser`.
+
+Purpose:
+- Holds one dispenser's authored, ordered contents and hands them out: `configure()`, `peek()`,
+  `take()`, `get_remaining_count()`, `get_throw_count()`, `is_empty()`.
+- Stock is data, not nodes, until it is thrown. That is what keeps `_get_all_items()`, Hammer, and
+  Shuffle from reaching undispensed items without any of them needing to know a dispenser exists.
+- Owns its own `_input()` and emits `throw_requested` — intent only, like `ShelfLockOverlay`'s `AD`
+  plate. `set_input_enabled()` lets the level switch taps off; marking the press handled is why that
+  matters, since `_input()` runs ahead of GUI input and would otherwise swallow presses meant for a
+  modal drawn on top.
+- Presentation: `play_throw()` squashes on a committed throw and `play_refused()` shakes on a tap
+  that can throw nothing. Both are fire-and-forget; the level never waits on them.
+- `get_tap_global_rect()` and `get_visual_bounds()` report through the node's global transform, so
+  the board's layout scale is already accounted for.
+
+## `scripts/throwing_dispenser_rack.gd`
+
+Class:
+- `ThrowingDispenserRack`
+
+Attached to:
+- `scenes/throwing_dispenser_rack.tscn` root `ThrowingDispenserRack`.
+
+Purpose:
+- Builds one `ThrowingDispenser` per authored config and places them above the board:
+  `configure(dispenser_configs, board_bounds)`, `get_dispensers()`, `get_remaining_count()`,
+  `is_empty()`, `get_layout_bounds()`, `set_input_enabled()`.
+- Re-emits each dispenser's tap as `throw_requested(dispenser)`, so `scripts/level.gd` connects once
+  rather than per dispenser.
+- `get_layout_bounds()` is what `scripts/level.gd`'s `_get_shelves_root_child_bounds()` reads. Without
+  it the responsive fit would size the level to the shelves alone and push the rack off the top of a
+  short viewport.
+- `set_input_enabled()` returns immediately when unchanged, because the level refreshes it every
+  frame.
+- Placement is computed rather than authored — see `docs/SCENES.md` for why, and for the two
+  decisions the rendered captures forced.
+
+## `scripts/throwing_dispensers_preview.gd`
+
+Extends:
+- `scripts/level.gd`.
+
+Attached to:
+- `scenes/testing/throwing_dispensers_preview.tscn`.
+
+Purpose:
+- Plays `configs/test_levels/throwing_dispensers_preview.json` through the ordinary level runtime.
+  Only the config source, the HUD title, and retry/return routing differ.
 
 ## `scripts/collapsing_shelf_column.gd`
 
