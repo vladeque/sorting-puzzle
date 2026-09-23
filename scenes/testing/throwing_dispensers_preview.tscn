@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://level.tscn" id="1"]
+[ext_resource type="Script" path="res://scripts/throwing_dispensers_preview.gd" id="2"]
+
+[node name="ThrowingDispensersPreview" instance=ExtResource("1")]
+script = ExtResource("2")
+launched_from_dev_mode = true

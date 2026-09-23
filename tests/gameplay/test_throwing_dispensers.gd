@@ -43,6 +43,7 @@ func _run() -> void:
 	await _verify_the_rack_is_inside_the_fitted_board()
 	await _verify_the_preview_fixture_builds()
 	await _verify_a_classic_level_is_unaffected()
+	await _verify_the_preview_scene_builds_the_fixture()
 	_finish()
 
 
@@ -226,6 +227,24 @@ func _verify_a_classic_level_is_unaffected() -> void:
 	_check(String(level.get("_level_config_error")).is_empty(), "A classic level still passes both guards.")
 	_check(_level_rack(level) == null, "A classic level builds no dispenser rack.")
 	await _dispose(level)
+
+
+## The preview scene is how this mode is played by hand, so it is worth proving it still loads its
+## fixture through the ordinary runtime rather than only in theory.
+func _verify_the_preview_scene_builds_the_fixture() -> void:
+	var preview := (load("res://scenes/testing/throwing_dispensers_preview.tscn") as PackedScene).instantiate()
+	preview.set("_sound_effects_enabled", false)
+	root.add_child(preview)
+	await process_frame
+	await process_frame
+	var rack := _level_rack(preview)
+	_check(
+		String(preview.get("_level_config_error")).is_empty(),
+		"The preview scene passes runtime validation."
+	)
+	_check(rack != null and rack.get_remaining_count() == 30, "The preview opens with all 30 items in stock.")
+	_check(_board_item_count(preview) == 0, "The preview opens on an empty board.")
+	await _dispose(preview)
 
 
 func _runtime_config() -> Dictionary:

@@ -29,6 +29,9 @@ func _ready() -> void:
 	%CollapsingColumnsPreviewButton.visible = _is_dev_level_select_enabled()
 	%CollapsingColumnsPreviewButton.pressed.connect(func() -> void:
 		get_tree().change_scene_to_file("res://scenes/testing/collapsing_columns_preview.tscn"))
+	%ThrowingDispensersPreviewButton.visible = _is_dev_level_select_enabled()
+	%ThrowingDispensersPreviewButton.pressed.connect(func() -> void:
+		get_tree().change_scene_to_file("res://scenes/testing/throwing_dispensers_preview.tscn"))
 
 
 func _update_campaign_progress() -> void:

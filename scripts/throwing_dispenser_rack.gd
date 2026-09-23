@@ -21,9 +21,9 @@ const DISPENSER_SCENE := preload("res://scenes/throwing_dispenser.tscn")
 ## reads as pouring onto the shelves rather than resting on them.
 const BOARD_CLEARANCE := 26.0
 
-## Minimum horizontal gap between two dispensers, so a level with several does not read as one wide
-## fixture. Spacing above this is spare width and gets shared out evenly.
-const MIN_DISPENSER_GAP := 24.0
+## Tapping a dispenser is the whole mode, so it is drawn larger than its authored art: at 1.0 it read
+## as a small ornament above the board rather than as the thing the player came here to press.
+const DISPENSER_VISUAL_SCALE := 1.35
 
 var _dispensers: Array[ThrowingDispenser] = []
 var _layout_bounds := Rect2()
@@ -92,25 +92,31 @@ func _place_dispensers(board_bounds: Rect2) -> void:
 	if _dispensers.is_empty():
 		return
 
-	var bounds := ThrowingDispenser.VISUAL_BOUNDS
+	var bounds := _get_scaled_visual_bounds()
 	var count := _dispensers.size()
-	# Spread across the board's width where there is room, and fall back to the minimum gap when
-	# there is not, so a wide rack keeps its dispensers over the shelves they feed.
-	var step := maxf(bounds.size.x + MIN_DISPENSER_GAP, 0.0)
-	if count > 1:
-		step = maxf(step, (board_bounds.size.x - bounds.size.x) / float(count - 1))
-
-	var row_width := step * float(count - 1)
-	var first_x := board_bounds.position.x + board_bounds.size.x * 0.5 - row_width * 0.5
+	# Each dispenser is centered over its own equal share of the board's width. Spreading them to the
+	# board's full width instead put two dispensers on its outermost corners, where the left one
+	# reached the screen edge at 540x960 and neither sat over the shelves it feeds.
+	var share := board_bounds.size.x / float(count)
 	# `bounds.end.y` is the lowest drawn point, so this hangs the whole rack above the board rather
 	# than aligning origins and letting the chute overlap the top row.
 	var row_y := board_bounds.position.y - BOARD_CLEARANCE - bounds.end.y
 
 	for dispenser_index in range(count):
 		var dispenser := _dispensers[dispenser_index]
-		dispenser.position = Vector2(first_x + step * float(dispenser_index), row_y)
+		dispenser.scale = Vector2.ONE * DISPENSER_VISUAL_SCALE
+		dispenser.position = Vector2(
+			board_bounds.position.x + share * (float(dispenser_index) + 0.5), row_y
+		)
 		var dispenser_rect := Rect2(dispenser.position + bounds.position, bounds.size)
 		_layout_bounds = dispenser_rect if dispenser_index == 0 else _layout_bounds.merge(dispenser_rect)
+
+
+## The drawn size, not the authored one. Layout and the level's responsive fit both have to read the
+## dispenser at the scale it is actually drawn at, or a taller rack would be fitted as a shorter one.
+func _get_scaled_visual_bounds() -> Rect2:
+	var bounds := ThrowingDispenser.VISUAL_BOUNDS
+	return Rect2(bounds.position * DISPENSER_VISUAL_SCALE, bounds.size * DISPENSER_VISUAL_SCALE)
 
 
 func _on_dispenser_throw_requested(dispenser: ThrowingDispenser) -> void:
