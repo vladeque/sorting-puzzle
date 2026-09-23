@@ -29,13 +29,21 @@ ROW_VISUAL_VARIANTS = {"full", "floor_only"}
 LAYOUT_GRID_3X3_MOVING_5_BOTTOM = "grid_3x3_moving_5_bottom"
 LAYOUT_GRID_3X2_MOVING_4_BOTTOM = "grid_3x2_moving_4_bottom"
 LAYOUT_GRID_3X3_MOVING_4_MIDDLE = "grid_3x3_moving_4_middle"
-LAYOUT_GRID_3X2_MOVING_4_4_CENTER = "grid_3x2_moving_4_4_center"
+LAYOUT_GRID_3X2_MOVING_6_6_CENTER = "grid_3x2_moving_6_6_center"
 LAYOUT_STAGGERED_COLUMNS_4_MOVING_6_4 = "staggered_columns_4_moving_6_4"
 LAYOUT_STAGGERED_COLUMNS_5_MOVING_6_5 = "staggered_columns_5_moving_6_5"
 LAYOUT_GRID_2X4_MOVING_6_LEFT = "grid_2x4_moving_6_left"
 LAYOUT_GRID_2X4_MOVING_8_LEFT = "grid_2x4_moving_8_left"
 LAYOUT_GRID_3X2_MOVING_5_BOTTOM = "grid_3x2_moving_5_bottom"
 LAYOUT_GRID_1X4_MOVING_6_6_SIDES = "grid_1x4_moving_6_6_sides"
+LAYOUT_SHAPE_ARCH_3X5_MOVING_6_BOTTOM = "shape_arch_3x5_moving_6_bottom"
+LAYOUT_SHAPE_ALTERNATING_ALCOVES_3X5_MOVING_6_CENTER = (
+    "shape_alternating_alcoves_3x5_moving_6_center"
+)
+LAYOUT_SHAPE_HOURGLASS_3X5_MOVING_6_WAIST = "shape_hourglass_3x5_moving_6_waist"
+LAYOUT_SHAPE_SIDE_ELEVATOR_STEPS_3X5_MOVING_8_LEFT = (
+    "shape_side_elevator_steps_3x5_moving_8_left"
+)
 ROW_LAYOUTS_KEY = "row_layouts"
 LAYOUT_PRESET_KEY = "layout_preset"
 GAMEPLAY_MODE_KEY = "gameplay_mode"
@@ -106,10 +114,10 @@ LAYOUT_PRESET_ROW_LAYOUTS: dict[str, list[dict[str, Any]]] = {
         {"shelf_count": 3},
         {"shelf_count": 3},
     ],
-    LAYOUT_GRID_3X2_MOVING_4_4_CENTER: [
+    LAYOUT_GRID_3X2_MOVING_6_6_CENTER: [
         {"shelf_count": 3},
-        moving_row(4, 60, "right"),
-        moving_row(4, 60, "left"),
+        moving_row(6, 60, "right"),
+        moving_row(6, 60, "left"),
         {"shelf_count": 3},
     ],
     # Columns, not rows: the two static entries are the left and right columns of four shelves and
@@ -133,6 +141,25 @@ LAYOUT_PRESET_ROW_LAYOUTS: dict[str, list[dict[str, Any]]] = {
         moving_row(6, 55, "down", motion_type=ROW_MOTION_VERTICAL_WRAP, visible_count=4),
         moving_row(6, 55, "up", motion_type=ROW_MOTION_VERTICAL_WRAP, visible_count=4),
         {"shelf_count": 4},
+    ],
+    LAYOUT_SHAPE_ARCH_3X5_MOVING_6_BOTTOM: [
+        {"shelf_count": 9},
+        moving_row(6, 60, "left"),
+    ],
+    LAYOUT_SHAPE_ALTERNATING_ALCOVES_3X5_MOVING_6_CENTER: [
+        moving_row(6, 60, "down", motion_type=ROW_MOTION_VERTICAL_WRAP, visible_count=4),
+        {"shelf_count": 5},
+    ],
+    LAYOUT_SHAPE_HOURGLASS_3X5_MOVING_6_WAIST: [
+        {"shelf_count": 3},
+        {"shelf_count": 1},
+        moving_row(6, 60, "right"),
+        {"shelf_count": 1},
+        {"shelf_count": 3},
+    ],
+    LAYOUT_SHAPE_SIDE_ELEVATOR_STEPS_3X5_MOVING_8_LEFT: [
+        moving_row(8, 60, "down", motion_type=ROW_MOTION_VERTICAL_WRAP, visible_count=4),
+        {"shelf_count": 7},
     ],
 }
 

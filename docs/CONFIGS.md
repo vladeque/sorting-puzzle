@@ -220,8 +220,8 @@ playable background along the motion axis, so additional configured shelves can 
   five moving shelves, three visible at 60 px/s to the right.
 - `grid_3x3_moving_4_middle`: 13 shelves arranged as a static row of three, a row of four moving
   shelves, and two more static rows of three. Three moving shelves are visible at 60 px/s to the right.
-- `grid_3x2_moving_4_4_center`: 14 shelves arranged as a static row of three, two counter-running
-  rows of four moving shelves, and a static row of three. Three moving shelves per row are visible at
+- `grid_3x2_moving_6_6_center`: 18 shelves arranged as a static row of three, two counter-running
+  rows of six moving shelves, and a static row of three. Three moving shelves per row are visible at
   60 px/s, the upper row to the right and the lower row to the left.
 - `grid_3x3_moving_5_bottom`: 14 shelves arranged as a 3x3 static grid plus a bottom row of five
   moving shelves, three visible at 70 px/s to the right.
@@ -236,8 +236,18 @@ playable background along the motion axis, so additional configured shelves can 
 - `grid_1x4_moving_6_6_sides`: 16 shelves arranged as two vertical belts of six moving shelves around
   a static column of four. Four moving shelves per belt are visible at 55 px/s, the left belt
   downward and the right belt upward.
+- `shape_arch_3x5_moving_6_bottom`: 15 shelves arranged as a nine-shelf static Arch over a
+  six-shelf horizontal belt. Three belt shelves are visible at 60 px/s to the left.
+- `shape_hourglass_3x5_moving_6_waist`: 14 shelves arranged as the two static halves of an
+  Hourglass around a six-shelf horizontal belt. Three belt shelves are visible at 60 px/s to the
+  right.
+- `shape_alternating_alcoves_3x5_moving_6_center`: 11 shelves arranged as a central six-shelf
+  vertical belt with five static shelves alternating left and right. Four belt shelves are visible
+  at 60 px/s downward.
+- `shape_side_elevator_steps_3x5_moving_8_left`: 15 shelves arranged as an eight-shelf vertical
+  belt beside seven static staircase shelves. Four belt shelves are visible at 60 px/s downward.
 
-The four `vertical_wrap` presets above cannot be combined with horizontal moving rows in the same
+The `vertical_wrap` presets above cannot be combined with horizontal moving rows in the same
 level.
 
 Row layout shape:

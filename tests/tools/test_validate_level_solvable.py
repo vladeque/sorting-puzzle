@@ -12,6 +12,7 @@ sys.path.insert(0, str(TOOLS_PATH))
 
 from validate_level_solvable import (  # noqa: E402
     KEPT_SHELVES_PER_COLUMN,
+    LAYOUT_PRESET_ROW_LAYOUTS,
     MAX_VISIBLE_SHELVES_PER_COLUMN,
     CollapsingColumnsRules,
     Move,
@@ -38,6 +39,31 @@ def standard_shelf(*layers: list[str | None]) -> dict[str, object]:
 
 def dispenser_shelf(*items: str) -> dict[str, object]:
     return {"type": "dispenser", "layers": [[item] for item in items]}
+
+
+class MovingLayoutPresetMetadataTests(unittest.TestCase):
+    def test_shape_moving_presets_match_their_scene_shelf_groups(self) -> None:
+        expected = {
+            "shape_arch_3x5_moving_6_bottom": ([9, 6], "horizontal_wrap", "left", 3),
+            "shape_alternating_alcoves_3x5_moving_6_center": (
+                [6, 5], "vertical_wrap", "down", 4
+            ),
+            "shape_hourglass_3x5_moving_6_waist": (
+                [3, 1, 6, 1, 3], "horizontal_wrap", "right", 3
+            ),
+            "shape_side_elevator_steps_3x5_moving_8_left": (
+                [8, 7], "vertical_wrap", "down", 4
+            ),
+        }
+        for preset, (shelf_counts, motion_type, direction, visible_count) in expected.items():
+            with self.subTest(preset=preset):
+                row_layouts = LAYOUT_PRESET_ROW_LAYOUTS[preset]
+                self.assertEqual([row["shelf_count"] for row in row_layouts], shelf_counts)
+                moving_layouts = [row for row in row_layouts if "motion" in row]
+                self.assertEqual(len(moving_layouts), 1)
+                self.assertEqual(moving_layouts[0]["motion"]["type"], motion_type)
+                self.assertEqual(moving_layouts[0]["motion"]["direction"], direction)
+                self.assertEqual(moving_layouts[0]["visible_count"], visible_count)
 
 
 class DispenserShelfShapeTests(unittest.TestCase):

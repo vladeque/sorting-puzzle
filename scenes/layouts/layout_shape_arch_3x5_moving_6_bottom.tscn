@@ -1,0 +1,40 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/shelf_layout_row.gd" id="1_layout_row"]
+
+[node name="LayoutShapeArch3x5Moving6Bottom" type="Node2D"]
+
+[node name="Shelf01" type="Marker2D" parent="."]
+position = Vector2(-228.96, -269.24)
+
+[node name="Shelf02" type="Marker2D" parent="."]
+position = Vector2(0, -269.24)
+
+[node name="Shelf03" type="Marker2D" parent="."]
+position = Vector2(228.96, -269.24)
+
+[node name="Shelf04" type="Marker2D" parent="."]
+position = Vector2(-228.96, -134.62)
+
+[node name="Shelf05" type="Marker2D" parent="."]
+position = Vector2(228.96, -134.62)
+
+[node name="Shelf06" type="Marker2D" parent="."]
+position = Vector2(-228.96, 0)
+
+[node name="Shelf07" type="Marker2D" parent="."]
+position = Vector2(228.96, 0)
+
+[node name="Shelf08" type="Marker2D" parent="."]
+position = Vector2(-228.96, 134.62)
+
+[node name="Shelf09" type="Marker2D" parent="."]
+position = Vector2(228.96, 134.62)
+
+[node name="MovingRow10" type="Node2D" parent="."]
+position = Vector2(0, 311.11)
+script = ExtResource("1_layout_row")
+shelf_count = 6
+visible_count = 3
+speed_pixels_per_second = 60.0
+direction = "left"

@@ -1,0 +1,35 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/shelf_layout_row.gd" id="1_layout_row"]
+
+[node name="LayoutShapeSideElevatorSteps3x5Moving8Left" type="Node2D"]
+
+[node name="MovingRow01" type="Node2D" parent="."]
+position = Vector2(-228.96, 0)
+script = ExtResource("1_layout_row")
+shelf_count = 8
+visible_count = 4
+motion_type = "vertical_wrap"
+speed_pixels_per_second = 60.0
+direction = "down"
+
+[node name="Shelf09" type="Marker2D" parent="."]
+position = Vector2(0, -269.24)
+
+[node name="Shelf10" type="Marker2D" parent="."]
+position = Vector2(0, -134.62)
+
+[node name="Shelf11" type="Marker2D" parent="."]
+position = Vector2(228.96, -134.62)
+
+[node name="Shelf12" type="Marker2D" parent="."]
+position = Vector2(228.96, 0)
+
+[node name="Shelf13" type="Marker2D" parent="."]
+position = Vector2(0, 134.62)
+
+[node name="Shelf14" type="Marker2D" parent="."]
+position = Vector2(228.96, 134.62)
+
+[node name="Shelf15" type="Marker2D" parent="."]
+position = Vector2(0, 269.24)
