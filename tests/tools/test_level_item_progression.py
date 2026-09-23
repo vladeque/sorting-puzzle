@@ -392,6 +392,65 @@ class CollapsingColumnMaterializationTests(unittest.TestCase):
         self.assertEqual(len(mapping), 1)
 
 
+class ThrowingDispenserMaterializationTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.progression = load_item_progression(
+            REPOSITORY_ROOT / "configs" / "item_progression.json",
+            REPOSITORY_ROOT / "configs" / "item_sprites.json",
+            REPOSITORY_ROOT / "configs" / "chapters.json",
+        )
+
+    def template(self, **overrides: object) -> dict:
+        level = {
+            "level": 5,
+            "time_seconds": 300,
+            "gameplay_mode": "throwing_dispensers",
+            "layout_preset": "grid_3x4",
+            "throw_seed": "00000000000052ad",
+            "dispensers": [
+                {"throw_count": 3, "contents": ["item_01", "item_02", "item_01"]},
+                {"throw_count": 3, "contents": ["item_02", "item_01", "item_02"]},
+            ],
+            "shelves": [{"layers": [[None, None, None]]} for _ in range(12)],
+        }
+        level.update(overrides)
+        return level
+
+    ## The board is authored empty, so a level's logical identities live in its dispensers. Reading
+    ## only the shelves would report this level as having no items at all.
+    def test_logical_ids_are_collected_from_dispensers(self) -> None:
+        self.assertEqual(collect_logical_item_ids(self.template()), ("item_01", "item_02"))
+
+    def test_dispenser_contents_are_materialized(self) -> None:
+        materialized, mapping = materialize_level(self.template(), self.progression)
+        self.assertEqual(len(mapping), 2)
+        for dispenser in materialized["dispensers"]:
+            for item_id in dispenser["contents"]:
+                self.assertIn(item_id, mapping.values())
+        # Order is the contract: it decides which items a tap hands out.
+        self.assertEqual(
+            materialized["dispensers"][0]["contents"],
+            [mapping["item_01"], mapping["item_02"], mapping["item_01"]],
+        )
+
+    def test_the_board_stays_empty_through_materialization(self) -> None:
+        materialized, _ = materialize_level(self.template(), self.progression)
+        self.assertTrue(
+            all(shelf["layers"] == [[None, None, None]] for shelf in materialized["shelves"])
+        )
+
+    def test_a_malformed_board_is_rejected_before_it_is_written(self) -> None:
+        with self.assertRaises(ValueError):
+            validate_board_contract(self.template(throw_seed="nope"))
+
+    def test_a_concrete_item_id_in_contents_is_rejected(self) -> None:
+        template = self.template()
+        template["dispensers"][0]["contents"][0] = "milk_carton"
+        with self.assertRaises(ValueError):
+            collect_logical_item_ids(template)
+
+
 def _item_counts(level: dict) -> Counter[str]:
     return Counter(
         item_id

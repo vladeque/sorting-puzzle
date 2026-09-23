@@ -27,6 +27,8 @@ from generate_level_shelves import (  # noqa: E402
     infer_item_type_count,
     parse_column_heights,
     parse_dispenser_shelves,
+    generate_throwing_level,
+    split_evenly,
     split_shelves_into_columns,
     wrap_level,
 )
@@ -584,6 +586,129 @@ class ClassicGenerationRegressionTests(unittest.TestCase):
         self.assertEqual(level["layout_preset"], "grid_3x3")
         self.assertNotIn("gameplay_mode", level)
         self.assertNotIn("column_layout", level)
+
+
+class ThrowingDispenserGenerationTests(unittest.TestCase):
+    def generate(self, **overrides: object):
+        arguments = {
+            "shelf_count": 12,
+            "dispenser_count": 2,
+            "throw_count": 3,
+            "item_type_count": 10,
+            "seed": 4242,
+            "throw_seed": None,
+            "require_playable": True,
+            "max_attempts": 4,
+            "playability_trials": 40,
+        }
+        arguments.update(overrides)
+        return generate_throwing_level(**arguments)
+
+    def test_the_board_is_authored_empty(self) -> None:
+        shelves, _, _, stats, _ = self.generate()
+        self.assertEqual(len(shelves), 12)
+        self.assertTrue(all(shelf["layers"] == [[None, None, None]] for shelf in shelves))
+        self.assertEqual(stats["total_items"], 30)
+
+    ## Every item in the level lives in a dispenser, so the copy counts that make the level
+    ## completable have to hold across the dispensers rather than across the board.
+    def test_every_item_has_a_multiple_of_three_copies(self) -> None:
+        _, dispensers, _, _, _ = self.generate()
+        counts = Counter(
+            item_id for dispenser in dispensers for item_id in dispenser["contents"]
+        )
+        self.assertEqual(sorted(counts), logical_item_ids(10))
+        self.assertTrue(all(count == 3 for count in counts.values()))
+
+    def test_contents_are_split_across_the_requested_dispensers(self) -> None:
+        _, dispensers, _, _, _ = self.generate(dispenser_count=3)
+        self.assertEqual(len(dispensers), 3)
+        self.assertEqual(sum(len(d["contents"]) for d in dispensers), 30)
+        self.assertTrue(all(d["throw_count"] == 3 for d in dispensers))
+
+    ## Regenerating a level with the same `--seed` has to reproduce its scatter too, or the level
+    ## would be retuned every time it was rebuilt.
+    def test_the_same_seed_reproduces_the_same_scatter_seed(self) -> None:
+        _, first_dispensers, first_scatter, _, _ = self.generate()
+        _, second_dispensers, second_scatter, _, _ = self.generate()
+        self.assertEqual(first_scatter, second_scatter)
+        self.assertEqual(first_dispensers, second_dispensers)
+        self.assertRegex(first_scatter, r"^[0-9a-f]{16}$")
+
+    def test_an_authored_scatter_seed_is_kept(self) -> None:
+        _, _, scatter_seed, _, _ = self.generate(throw_seed="00000000000052ad")
+        self.assertEqual(scatter_seed, "00000000000052ad")
+
+    def test_generation_reports_its_playability_estimate(self) -> None:
+        _, _, _, stats, _ = self.generate()
+        self.assertEqual(stats["gameplay_mode"], "throwing_dispensers")
+        self.assertEqual(stats["playability"]["completion_rate"], 1.0)
+        self.assertEqual(stats["board_slots"], 36)
+
+    ## A board with no room to assemble a triple cannot be rescued by another shuffle, so the
+    ## generator has to report it rather than spend every attempt and claim success.
+    def test_an_unplayable_board_is_reported(self) -> None:
+        _, _, _, stats, _ = self.generate(shelf_count=1, throw_count=1, item_type_count=1)
+        self.assertLess(stats["playability"]["completion_rate"], 0.95)
+
+    def test_split_evenly_keeps_every_item_and_balances_the_parts(self) -> None:
+        chunks = split_evenly(list("abcdefg"), 3)
+        self.assertEqual([len(chunk) for chunk in chunks], [3, 2, 2])
+        self.assertEqual("".join("".join(chunk) for chunk in chunks), "abcdefg")
+        self.assertEqual(split_evenly(["a"], 3), [["a"], [], []])
+
+
+class ThrowingDispenserArgumentTests(unittest.TestCase):
+    def error_for(self, *arguments: str) -> str:
+        stderr = io.StringIO()
+        with contextlib.redirect_stderr(stderr), self.assertRaises(SystemExit):
+            generate_main(list(arguments))
+        return stderr.getvalue()
+
+    def base_arguments(self) -> list[str]:
+        return [
+            "--gameplay-mode", "throwing_dispensers",
+            "--shelf-count", "12",
+            "--dispenser-count", "2",
+            "--throw-count", "3",
+            "--item-type-count", "10",
+        ]
+
+    ## Rejected rather than silently ignored: a flag that shapes a shelf's contents has nothing to
+    ## act on when the board is authored empty.
+    def test_shelf_content_flags_are_rejected(self) -> None:
+        for flag, value in (
+            ("--dispenser-shelves", "1"),
+            ("--locked-shelves", "1:3"),
+            ("--sticky-items-percent", "10"),
+            ("--layer-count", "2"),
+        ):
+            with self.subTest(flag=flag):
+                message = self.error_for(*self.base_arguments(), flag, value)
+                self.assertIn("throwing_dispensers", message)
+
+    def test_throwing_flags_require_the_mode(self) -> None:
+        for flag, value in (("--dispenser-count", "2"), ("--throw-count", "3"),
+                            ("--throw-seed", "00000000000052ad")):
+            with self.subTest(flag=flag):
+                message = self.error_for(
+                    "--shelf-count", "9", "--layer-count", "1", flag, value
+                )
+                self.assertIn("requires --gameplay-mode throwing_dispensers", message)
+
+    def test_a_throw_larger_than_the_board_is_rejected(self) -> None:
+        message = self.error_for(
+            "--gameplay-mode", "throwing_dispensers",
+            "--shelf-count", "1",
+            "--dispenser-count", "1",
+            "--throw-count", "3",
+            "--item-type-count", "1",
+        )
+        self.assertIn("slots a throw may ever fill", message)
+
+    def test_a_malformed_scatter_seed_is_rejected(self) -> None:
+        message = self.error_for(*self.base_arguments(), "--throw-seed", "52AD")
+        self.assertIn("16-digit lowercase hex string", message)
 
 
 if __name__ == "__main__":

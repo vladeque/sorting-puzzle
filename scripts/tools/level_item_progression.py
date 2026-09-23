@@ -3,7 +3,13 @@
 from __future__ import annotations
 
 from sticky_items import validate_sticky_items
-from validate_level_solvable import validate_gameplay_mode_shape
+from validate_level_solvable import (
+    DISPENSER_CONTENTS_KEY,
+    DISPENSERS_KEY,
+    GAMEPLAY_MODE_THROWING_DISPENSERS,
+    get_gameplay_mode,
+    validate_gameplay_mode_shape,
+)
 
 import argparse
 import copy
@@ -347,6 +353,23 @@ def collect_logical_item_ids(level: dict[str, Any]) -> tuple[str, ...]:
                     )
                 item_counts[item_id] += 1
 
+    # In `throwing_dispensers` every item starts inside a dispenser and the authored shelves are
+    # empty, so the level's contents live here rather than in the loop above.
+    for dispenser_index, dispenser in enumerate(iter_dispenser_configs(level)):
+        contents = dispenser.get(DISPENSER_CONTENTS_KEY)
+        if not isinstance(contents, list) or not contents:
+            raise ValueError(
+                f"dispenser {dispenser_index + 1} must contain a non-empty "
+                f"{DISPENSER_CONTENTS_KEY} array"
+            )
+        for content_index, item_id in enumerate(contents):
+            if not isinstance(item_id, str) or LOGICAL_ITEM_PATTERN.fullmatch(item_id) is None:
+                raise ValueError(
+                    f"dispenser {dispenser_index + 1} {DISPENSER_CONTENTS_KEY} entry "
+                    f"{content_index + 1} must contain item_NN"
+                )
+            item_counts[item_id] += 1
+
     if not item_counts:
         raise ValueError("level must contain at least one logical item")
     logical_ids = tuple(sorted(item_counts, key=_logical_item_sort_key))
@@ -361,6 +384,19 @@ def collect_logical_item_ids(level: dict[str, Any]) -> tuple[str, ...]:
                 f"logical item '{item_id}' appears {count} times; expected a multiple of 3"
             )
     return logical_ids
+
+
+## Empty for every other mode, so callers can walk dispensers without first asking what mode a level
+## is in. Shape errors are left to `validate_board_contract()`, which runs before any of this.
+def iter_dispenser_configs(level: dict[str, Any]) -> list[dict[str, Any]]:
+    if get_gameplay_mode(level) != GAMEPLAY_MODE_THROWING_DISPENSERS:
+        return []
+
+    dispensers = level.get(DISPENSERS_KEY)
+    if not isinstance(dispensers, list):
+        return []
+
+    return [dispenser for dispenser in dispensers if isinstance(dispenser, dict)]
 
 
 def build_item_mapping(
@@ -427,6 +463,12 @@ def materialize_level(
             for slot_index, item_id in enumerate(layer):
                 if item_id is not None:
                     layer[slot_index] = mapping[item_id]
+
+    for dispenser in iter_dispenser_configs(materialized):
+        contents = dispenser[DISPENSER_CONTENTS_KEY]
+        for content_index, item_id in enumerate(contents):
+            contents[content_index] = mapping[item_id]
+
     return materialized, mapping
 
 

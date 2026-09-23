@@ -20,8 +20,13 @@ from validate_level_solvable import (
     COLUMN_VISIBLE_SHELVES_KEY,
     GAMEPLAY_MODE_CLASSIC,
     GAMEPLAY_MODE_COLLAPSING_COLUMNS,
+    DEFAULT_PLAYABILITY_THRESHOLD,
+    DEFAULT_PLAYABILITY_TRIALS,
+    GAMEPLAY_MODE_THROWING_DISPENSERS,
     MAX_VISIBLE_SHELVES_PER_COLUMN,
+    RESERVED_FREE_SLOTS,
     CollapsingColumnsRules,
+    ThrowingDispensersRules,
     collapsing_shelves_to_state,
     solve_level,
     shelves_to_state,
@@ -33,6 +38,8 @@ from validate_level_solvable import (
 SLOTS_PER_SHELF = 3
 SHELF_KIND_DISPENSER = "dispenser"
 COLLAPSING_LAYER_COUNT = 1
+THROWING_LAYER_COUNT = 1
+TRIPLE_SIZE = 3
 DEFAULT_LAYOUT_PRESET = "grid_3x3"
 DISPENSER_MIN_LAYERS = 2
 DISPENSER_MAX_LAYERS = 4
@@ -1961,8 +1968,32 @@ def build_parser(add_help: bool = True) -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--gameplay-mode",
-        choices=sorted((GAMEPLAY_MODE_CLASSIC, GAMEPLAY_MODE_COLLAPSING_COLUMNS)),
+        choices=sorted((
+            GAMEPLAY_MODE_CLASSIC,
+            GAMEPLAY_MODE_COLLAPSING_COLUMNS,
+            GAMEPLAY_MODE_THROWING_DISPENSERS,
+        )),
         default=GAMEPLAY_MODE_CLASSIC,
+    )
+    parser.add_argument(
+        "--dispenser-count",
+        type=int,
+        help=(
+            f"Dispensers mounted above a {GAMEPLAY_MODE_THROWING_DISPENSERS} board. Their contents "
+            "are the level's entire item set; the shelves are authored empty."
+        ),
+    )
+    parser.add_argument(
+        "--throw-count",
+        type=int,
+        help="Items each dispenser hands out per tap, before the board's free slots clamp it.",
+    )
+    parser.add_argument(
+        "--throw-seed",
+        help=(
+            "16-digit lowercase hex scatter seed. Derived from --seed when omitted, so a level "
+            "regenerated with the same seed also keeps the same scatter."
+        ),
     )
     parser.add_argument(
         "--column-heights",
@@ -2073,9 +2104,73 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     return args
 
 
+## The throwing board is authored empty and every item starts in a dispenser, so the flags that shape
+## a shelf's contents have nothing to act on here and are rejected rather than silently ignored.
+def validate_throwing_arguments(parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
+    if args.dispenser_count is None or args.dispenser_count < 1:
+        parser.error(
+            f"--gameplay-mode {GAMEPLAY_MODE_THROWING_DISPENSERS} requires a positive "
+            "--dispenser-count"
+        )
+    if args.throw_count is None or args.throw_count < 1:
+        parser.error(
+            f"--gameplay-mode {GAMEPLAY_MODE_THROWING_DISPENSERS} requires a positive "
+            "--throw-count"
+        )
+    if args.item_type_count is None or args.item_type_count < 1:
+        parser.error(
+            f"--gameplay-mode {GAMEPLAY_MODE_THROWING_DISPENSERS} requires a positive "
+            "--item-type-count"
+        )
+    # A throw is clamped to the room the board has, so an oversized count never fires at full size.
+    throwable_slots = args.shelf_count * SLOTS_PER_SHELF - RESERVED_FREE_SLOTS
+    if args.throw_count > throwable_slots:
+        parser.error(
+            f"--throw-count {args.throw_count} is more than the {throwable_slots} slots a throw "
+            "may ever fill on this board"
+        )
+    if args.throw_seed is not None and (
+        len(args.throw_seed) != 16 or any(digit not in "0123456789abcdef" for digit in args.throw_seed)
+    ):
+        parser.error("--throw-seed must be a 16-digit lowercase hex string")
+
+    for layer_argument, value in (
+        ("--layer-count", args.layer_count),
+        ("--filled-layer-count", args.filled_layer_count),
+    ):
+        if value is not None and value != THROWING_LAYER_COUNT:
+            parser.error(
+                f"{layer_argument} must be {THROWING_LAYER_COUNT} for --gameplay-mode "
+                f"{GAMEPLAY_MODE_THROWING_DISPENSERS}"
+            )
+    for unsupported, value in (
+        ("--dispenser-shelves", args.dispenser_shelves),
+        ("--locked-shelves", args.locked_shelves),
+        ("--sticky-items-percent", args.sticky_items_percent),
+    ):
+        if value:
+            parser.error(
+                f"{unsupported} is not supported by --gameplay-mode "
+                f"{GAMEPLAY_MODE_THROWING_DISPENSERS}"
+            )
+
+
 ## Mode conflicts are rejected here rather than being quietly reconciled. Silently accepting, say, a
 ## dispenser request under collapsing columns would produce content the solver cannot prove.
 def validate_mode_arguments(parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
+    is_throwing = args.gameplay_mode == GAMEPLAY_MODE_THROWING_DISPENSERS
+    if not is_throwing:
+        for throwing_argument, value in (
+            ("--dispenser-count", args.dispenser_count),
+            ("--throw-count", args.throw_count),
+            ("--throw-seed", args.throw_seed),
+        ):
+            if value is not None:
+                parser.error(
+                    f"{throwing_argument} requires --gameplay-mode "
+                    f"{GAMEPLAY_MODE_THROWING_DISPENSERS}"
+                )
+
     if args.gameplay_mode != GAMEPLAY_MODE_COLLAPSING_COLUMNS:
         if args.column_heights is not None:
             parser.error(
@@ -2088,6 +2183,9 @@ def validate_mode_arguments(parser: argparse.ArgumentParser, args: argparse.Name
             )
         if args.shelf_count is None:
             parser.error("--shelf-count is required")
+        if is_throwing:
+            validate_throwing_arguments(parser, args)
+            return
         if args.layer_count is None:
             parser.error("--layer-count is required")
         return
@@ -2139,7 +2237,86 @@ def validate_mode_arguments(parser: argparse.ArgumentParser, args: argparse.Name
         )
 
 
+## Generation for this mode is a different job from the other two. There is no board to fill and no
+## placement to search: the shelves are authored empty, so all that is generated is the order the
+## dispensers hand their items out in. The hard part is not building a candidate but judging it, and
+## that is `ThrowingDispensersRules.estimate_playability()`'s job.
+def generate_throwing_level(
+    shelf_count: int,
+    dispenser_count: int,
+    throw_count: int,
+    item_type_count: int,
+    seed: int | None,
+    throw_seed: str | None,
+    require_playable: bool,
+    max_attempts: int,
+    playability_trials: int,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], str, dict[str, Any], int]:
+    base_seed = random.Random().randrange(1 << 30) if seed is None else seed
+    shelves = [{"layers": [[None] * SLOTS_PER_SHELF]} for _ in range(shelf_count)]
+    item_types = logical_item_ids(item_type_count)
+
+    attempts = 0
+    best: tuple[list[dict[str, Any]], str, dict[str, Any], int] | None = None
+    for attempt in range(max(1, max_attempts)):
+        attempts = attempt + 1
+        used_seed = base_seed + attempt
+        rng = random.Random(used_seed)
+        # Derived from the generation seed unless authored, so regenerating a level with the same
+        # `--seed` reproduces its scatter as well as its contents.
+        scatter_seed = throw_seed or f"{rng.getrandbits(64):016x}"
+
+        pool = [item_id for item_id in item_types for _ in range(TRIPLE_SIZE)]
+        rng.shuffle(pool)
+        dispensers = [
+            {"throw_count": throw_count, "contents": contents}
+            for contents in split_evenly(pool, dispenser_count)
+        ]
+
+        rules = ThrowingDispensersRules(dispensers, shelf_count, scatter_seed)
+        _, playability = rules.estimate_playability(trials=playability_trials)
+        if best is None or playability["completion_rate"] > best[2]["completion_rate"]:
+            best = (dispensers, scatter_seed, playability, used_seed)
+        if not require_playable or playability["completion_rate"] >= DEFAULT_PLAYABILITY_THRESHOLD:
+            break
+
+    dispensers, scatter_seed, playability, used_seed = best
+    stats = {
+        "gameplay_mode": GAMEPLAY_MODE_THROWING_DISPENSERS,
+        "attempts": attempts,
+        "shelf_count": shelf_count,
+        "board_slots": shelf_count * SLOTS_PER_SHELF,
+        "dispenser_count": dispenser_count,
+        "throw_count": throw_count,
+        "item_type_count": item_type_count,
+        "total_items": item_type_count * TRIPLE_SIZE,
+        "throw_seed": scatter_seed,
+        "playability": playability,
+        # Kept for the shared exit path in `run()`, which reports a nonzero status on bad counts.
+        "invalid_item_counts": {},
+    }
+    return shelves, dispensers, scatter_seed, stats, used_seed
+
+
+## Contiguous slices, so a dispenser hands its items out in the order the shuffle produced rather
+## than interleaving with its neighbours.
+def split_evenly(pool: list[str], parts: int) -> list[list[str]]:
+    parts = max(1, parts)
+    base, remainder = divmod(len(pool), parts)
+    chunks: list[list[str]] = []
+    cursor = 0
+    for index in range(parts):
+        size = base + (1 if index < remainder else 0)
+        chunks.append(pool[cursor:cursor + size])
+        cursor += size
+
+    return chunks
+
+
 def run(args: argparse.Namespace) -> int:
+    if args.gameplay_mode == GAMEPLAY_MODE_THROWING_DISPENSERS:
+        return run_throwing(args)
+
     is_collapsing = args.gameplay_mode == GAMEPLAY_MODE_COLLAPSING_COLUMNS
     layer_count = COLLAPSING_LAYER_COUNT if is_collapsing else args.layer_count
     filled_layer_count = args.filled_layer_count
@@ -2220,6 +2397,61 @@ def run(args: argparse.Namespace) -> int:
 
     if stats["invalid_item_counts"]:
         return 2
+
+    return 0
+
+
+def run_throwing(args: argparse.Namespace) -> int:
+    try:
+        shelves, dispensers, scatter_seed, stats, used_seed = generate_throwing_level(
+            shelf_count=args.shelf_count,
+            dispenser_count=args.dispenser_count,
+            throw_count=args.throw_count,
+            item_type_count=args.item_type_count,
+            seed=args.seed,
+            throw_seed=args.throw_seed,
+            require_playable=args.require_solvable,
+            max_attempts=args.max_generation_attempts,
+            playability_trials=DEFAULT_PLAYABILITY_TRIALS,
+        )
+    except (OSError, ValueError, KeyError) as error:
+        print(f"error: {error}", file=sys.stderr)
+        return 1
+
+    completion_rate = stats["playability"]["completion_rate"]
+    if args.require_solvable and completion_rate < DEFAULT_PLAYABILITY_THRESHOLD:
+        if args.stats:
+            print(json.dumps(stats, indent=2), file=sys.stderr)
+        print(
+            f"error: best sampled completion rate was {completion_rate}, below the "
+            f"{DEFAULT_PLAYABILITY_THRESHOLD} threshold",
+            file=sys.stderr,
+        )
+        return 3
+
+    output_data: Any = shelves
+    if args.full_level:
+        output_data = {
+            "level": args.level_number,
+            "time_seconds": args.time_seconds,
+            "gameplay_mode": GAMEPLAY_MODE_THROWING_DISPENSERS,
+            "layout_preset": args.layout_preset or DEFAULT_LAYOUT_PRESET,
+            "throw_seed": scatter_seed,
+            "seed": used_seed,
+            "difficulty": args.difficulty,
+            "dispensers": dispensers,
+            "shelves": shelves,
+        }
+
+    output_text = json.dumps(output_data, indent=2)
+    if args.output:
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        args.output.write_text(output_text + "\n", encoding="utf-8")
+    else:
+        print(output_text)
+
+    if args.stats:
+        print(json.dumps(stats, indent=2), file=sys.stderr)
 
     return 0
 
