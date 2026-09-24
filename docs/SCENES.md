@@ -2116,11 +2116,11 @@ Script:
 - `scripts/throwing_dispenser.gd`
 
 Nodes:
-- `Body`: the hopper art, a procedural placeholder in the shared light-oak palette. Its own node so
-  the throw squash and the refusal shake can move it without disturbing the badge or the mouth.
-- `Body/HopperBack`, `HopperLeftFace`, `HopperRightFace`, `HopperRim`, `HopperOpening`, `ChuteMouth`,
-  `ChuteLip`, `CastShadow`: the cradle faces, sampling `standard_shelf_light_oak.png` with per-face
-  UVs the way `scenes/dispenser_shelf.tscn` does.
+- `Body`: owns the selected stocked light-oak dispenser sprite and its cast shadow. Its own node lets
+  the throw squash and refusal shake move the art without disturbing the badge or mouth marker.
+- `Body/DispenserArt`: `assets/dispensers/throwing_dispenser_stocked.png`, with subdued fixture items
+  visible behind smoked glass. The scene scales the cropped source into the original authored bounds.
+- `Body/CastShadow`: the shared soft shelf shadow under the sprite.
 - `CountBadge/RemainingLabel`: the exact remaining count, in the shared
   `style_box_gameplay_count_badge.tres` role. `ShelfLayerIndicator`'s segmented rail is deliberately
   not reused: it is built for 2-4 segments and a dispenser holds many more.

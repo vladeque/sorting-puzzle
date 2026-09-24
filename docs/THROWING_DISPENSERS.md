@@ -159,11 +159,16 @@ caught by reading the scene: dispensers are centered over an equal share of the 
 screen edge at 540x960), and they are drawn at 1.35x (at authored size they read as a small ornament
 rather than the thing the player came here to press).
 
+## Art
+
+`assets/dispensers/throwing_dispenser_stocked.png` is the selected production sprite. It keeps the
+light-oak shelf palette, shows a subdued mix of fixture items behind smoked glass, and leaves the
+count badge as a separate live UI layer. `scenes/throwing_dispenser.tscn` scales the cropped 448px
+sprite to the existing authored bounds, so the rack layout, tap target, throw origin, and responsive
+fit stay unchanged.
+
 ## Not yet done
 
-- **Final dispenser art.** The current hopper is a procedural placeholder in the existing light-oak
-  palette and reads more like a plant pot than a dispenser. Replacing it goes through the
-  `AGENTS.md` art-direction process: 2-4 directions, then 2-3 candidates, then a selection.
 - **A dedicated throw sound.** Landing currently reuses `item_place_valid`. A new cue needs a recipe
   in `scripts/tools/core_sfx_synthesis.gd`, a `GENERATOR_VERSION` bump, and regeneration.
 - **Campaign content.** No campaign level uses this mode. Publishing one is blocked on the backend
