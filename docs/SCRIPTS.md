@@ -3721,7 +3721,7 @@ Key inputs:
   `--item-type-count`, and optional solvability requirements.
 - When `--item-type-count` is omitted, the generator infers it as
   `ceil(target_filled_slots / preferred_copies_per_type)`. `--preferred-copies-per-type` accepts
-  fractional values of at least `3` and defaults to `6`; an explicit type count takes precedence.
+  fractional values of at least `3` and defaults to `3`; an explicit type count takes precedence.
 - Layout preset values mirror the runtime layout template names in `scenes/layouts/`; `LAYOUT_PRESETS` is the accepted set and `docs/SCENES.md` lists every preset with its shelf count. A preset only accepts a level whose shelf count matches its authored markers.
 
 Generation constraints:
@@ -3738,18 +3738,45 @@ Generation constraints:
 - `--max-items-per-type` adds an explicit global cap for special levels that need less overall
   repetition. Without it, the target filled-slot count is not reduced merely because a progression
   pool is small.
-- `--min-front-visible-triples` defaults to `1` and guarantees at least that many item types have three visible front-layer copies somewhere across shelves, which gives generated levels an intuitive starting move without requiring a completed shelf match. Use `0` to disable the guarantee.
+- `--min-front-visible-triples` defaults to `1` and guarantees at least that many item types the
+  player can actually complete a triple with on the opening board. It counts only types whose copies
+  can be gathered onto one shelf, because three copies scattered across full shelves is not a move.
+- `--pair-ratio` defaults to `0.5` and seeds that share of each layer's pair-capable shelves with two
+  copies of one item beside a free slot, a one-move match. Swaps stay inside one layer depth, so the
+  per-depth composition the distribution engine solved for is unchanged and only the shelf a copy
+  sits on moves. `0` disables the pass.
+- `--min-average-options` and `--max-scarce-option-ratio` reject a board whose simulated playthrough
+  does not give the player enough to do. Both are off by default; see the flow gate below.
 - `--locked-shelves` can add per-shelf `unlock_after_triples` requirements using 1-based shelf numbers such as `7:3,8:5`.
 - When the logical item set cannot satisfy the target filled-slot count within an explicit
   per-type cap, the generator adds extra empty slots instead of exceeding the cap.
-- `--stats` includes each layer's filled count, triple-ready count and ratio, plus any item types whose
-  copies ended up on non-adjacent layers.
+- `--stats` includes each layer's filled count, triple-ready count and ratio, any item types whose
+  copies ended up on non-adjacent layers, `collectible_front_types`, `layers_with_pairs`, and a
+  `flow` block from `level_flow.py`.
 - Generated layouts preserve adaptive per-layer same-item limits so constrained levels remain possible.
 - Expert difficulty avoids shelves that start with a complete front-layer match.
+
+Flow gate:
+- Every attempt is walked by `scripts/tools/level_flow.py` before the solvability search runs, and
+  the report lands in `stats["flow"]`. Walking costs milliseconds and the search costs seconds, so a
+  board that would play badly is thrown back before anything is spent proving it can be finished.
+- `--min-average-options` sets the floor for the average number of item types the player can complete
+  a triple with per move. `--max-scarce-option-ratio` caps the share of moves that offer at most one
+  such type, which is the "only one possible match on the whole field" stretch; it catches boards an
+  average hides, such as one that averages four options and still spends its last quarter at one.
+- Both are off by default (`0.0` and `1.0`). Pair them with `--require-solvable` so a rejected board
+  is retried on the next seed instead of failing the run, because retries only happen under that flag.
+- Boards with fewer than `GATE_MIN_TRIPLES` (`4`) triples are never judged: a tutorial with one
+  triple spends every move at one option because that is the whole level.
+- `front_visible_triple_candidates` counts types with three copies anywhere in a front layer and is
+  reported beside `collectible_front_types`, which counts only the ones that can actually be brought
+  together. The gap between them is the thing to watch; raising the raw count by pulling copies
+  forward consumes the free slots a gather needs and lowers the real one.
 
 Depends on:
 - `scripts/tools/level_item_progression.py` for canonical logical item IDs.
 - `scripts/tools/validate_level_solvable.py` for validation and optional solvability checks.
+- `scripts/tools/level_flow.py` for the playthrough walk behind the flow gate and stats.
 
 Composition:
 - `build_parser()` returns the CLI contract, `parse_args(argv)` validates mode conflicts, and
@@ -3761,6 +3788,56 @@ Use when:
 
 Do not use for:
 - Runtime game logic.
+
+## `scripts/tools/level_flow.py`
+
+Purpose:
+- Measures how much a board gives the player to do, move by move. Solvability asks whether a board
+  *can* be finished; this asks whether finishing it feels like playing. A board can be provably
+  solvable and still sit at one possible match for most of its length.
+
+Key behavior:
+- `completion_costs(accessible)` returns the cheapest number of moves that would finish each item
+  type's triple right now. Two copies already sharing a shelf beside a free slot is one move; the
+  same three copies scattered behind two blockers is four. Anything that only asks whether three
+  copies are visible scores those the same, which is how a frozen board gets called a rich one.
+- `collectible_front_types(accessible, max_moves=None)` is the set view of that, optionally bounded
+  by cost. `generate_level_shelves.py` uses the unbounded form for its opening guarantee.
+- `simulate_flow(rules, state)` walks the board with a deterministic greedy player and returns a
+  `FlowReport`: `average_options`, `scarce_option_ratio`, `zero_option_ratio`, `longest_drought`,
+  `filler_move_ratio`, `cleared_triples`, `total_triples`, `moves`, and `completed`. Options are
+  counted at `AVAILABLE_WITHIN_MOVES` (`2`) moves of preparation or fewer.
+- The player prefers a move that clears a triple, then one that carries a copy to its partners, then
+  one that digs a layer out while the board can still spare the room. Digging is ranked last on
+  purpose: emptying a front layer to reveal a full one *costs* free slots, and a player that ranks
+  it higher fills every slot on the board and jams itself solid.
+- Counts start after the opening settle, so an authored layer that is already three of a kind
+  appears in neither total.
+- Mode-agnostic: it drives the board through `SortingRules`, so it never builds a move itself and
+  cannot propose one the mode would reject. `flow_for_level()` returns `None` for
+  `throwing_dispensers`, which starts with an empty board and is sampled by the validator instead.
+
+CLI:
+
+```powershell
+py scripts\tools\level_flow.py configs\levels\level_012.json
+py scripts\tools\level_flow.py configs\levels\level_012.json --json
+```
+
+Caveats:
+- The walk is a heuristic, not a proof. Its numbers rank boards against each other reliably; read an
+  absolute value as an indication rather than as a measurement of a real player.
+- The greedy player is more consistent than a person, so a board it handles well can still feel
+  worse in a playtest. A board it does badly on is the reliable signal.
+
+Depends on:
+- `scripts/tools/validate_level_solvable.py` for the rules, board state, and move ordering.
+
+Use when:
+- Judging whether a generated or shipped level gives the player enough to do.
+
+Do not use for:
+- Deciding whether a level can be completed. That is `validate_level_solvable.py`.
 
 ## `scripts/tools/level_item_progression.py`
 

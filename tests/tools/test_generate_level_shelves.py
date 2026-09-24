@@ -18,8 +18,14 @@ TOOLS_PATH = REPOSITORY_ROOT / "scripts" / "tools"
 sys.path.insert(0, str(TOOLS_PATH))
 
 from generate_level_shelves import (  # noqa: E402
+    GATE_MIN_TRIPLES,
     LAYOUT_PRESETS,
     active_collapsing_shelves,
+    count_collectible_front_types,
+    count_layers_with_pairs,
+    describe_flow_shortfall,
+    measure_board_flow,
+    seed_colocated_pairs,
     apply_dispenser_shelves,
     fill_empty_collapsing_shelves,
     generate_shelves,
@@ -93,6 +99,132 @@ class LayoutPresetTests(unittest.TestCase):
                     [row_counts[y_position] for y_position in sorted(row_counts)],
                     expected_counts,
                 )
+
+
+def layer_index_counts(shelves: list[dict]) -> list[Counter]:
+    """Items per type at each layer depth -- what the distribution engine solved for."""
+    depth = max(len(shelf["layers"]) for shelf in shelves)
+    counts = [Counter() for _ in range(depth)]
+    for shelf in shelves:
+        for layer_index, layer in enumerate(shelf["layers"]):
+            counts[layer_index].update(item for item in layer if item is not None)
+    return counts
+
+
+class SeedColocatedPairsTests(unittest.TestCase):
+    def build_board(self, **overrides) -> list[dict]:
+        arguments = dict(
+            shelf_count=12,
+            layer_count=3,
+            filled_layer_count=3,
+            item_types=logical_item_ids(24),
+            difficulty="medium",
+            seed=4242,
+            max_items_per_type_override=None,
+            min_front_visible_triples=1,
+            pair_ratio=0.0,
+        )
+        arguments.update(overrides)
+        return generate_shelves(**arguments)[0]
+
+    def test_pairing_keeps_every_item_count_identical(self) -> None:
+        board = self.build_board()
+        before = Counter(item for shelf in board for layer in shelf["layers"]
+                         for item in layer if item is not None)
+        seed_colocated_pairs(board, 0.6, random.Random(7))
+        after = Counter(item for shelf in board for layer in shelf["layers"]
+                        for item in layer if item is not None)
+        self.assertEqual(before, after)
+
+    ## The point of swapping inside one layer depth: the distribution engine's per-depth solution,
+    ## and so layer readiness and each item's layer range, survive the pass untouched.
+    def test_pairing_keeps_every_layer_depth_composition_identical(self) -> None:
+        board = self.build_board()
+        before = layer_index_counts(board)
+        seed_colocated_pairs(board, 0.6, random.Random(7))
+        self.assertEqual(layer_index_counts(board), before)
+
+    def test_pairing_never_completes_a_layer(self) -> None:
+        board = self.build_board()
+        seed_colocated_pairs(board, 1.0, random.Random(7))
+        for shelf in board:
+            for layer in shelf["layers"]:
+                with self.subTest(layer=layer):
+                    self.assertFalse(None not in layer and len(set(layer)) == 1)
+
+    def test_pairing_adds_pairs(self) -> None:
+        board = self.build_board()
+        before = count_layers_with_pairs(board)
+        seed_colocated_pairs(board, 0.75, random.Random(7))
+        self.assertGreater(count_layers_with_pairs(board), before)
+
+    def test_a_zero_ratio_changes_nothing(self) -> None:
+        board = self.build_board()
+        untouched = copy.deepcopy(board)
+        self.assertEqual(seed_colocated_pairs(board, 0.0, random.Random(7)), 0)
+        self.assertEqual(board, untouched)
+
+    def test_the_generator_rejects_a_ratio_outside_the_unit_range(self) -> None:
+        with self.assertRaises(ValueError):
+            self.build_board(pair_ratio=1.5)
+
+
+class FlowGateTests(unittest.TestCase):
+    def board(self, **overrides) -> list[dict]:
+        arguments = dict(
+            shelf_count=12,
+            layer_count=3,
+            filled_layer_count=3,
+            item_types=logical_item_ids(12),
+            difficulty="medium",
+            seed=4242,
+            max_items_per_type_override=None,
+            min_front_visible_triples=1,
+        )
+        arguments.update(overrides)
+        return generate_shelves(**arguments)[0]
+
+    def test_a_board_is_measured_and_reports_its_flow(self) -> None:
+        report = measure_board_flow(self.board(), None, None)
+        self.assertIsNotNone(report)
+        self.assertGreaterEqual(report.total_triples, GATE_MIN_TRIPLES)
+        self.assertIn("average_options", report.as_dict())
+        self.assertIn("scarce_option_ratio", report.as_dict())
+
+    def test_an_unreachable_bar_is_reported_as_a_shortfall(self) -> None:
+        report = measure_board_flow(self.board(), None, None)
+        message = describe_flow_shortfall(report, min_average_options=99.0,
+                                          max_scarce_option_ratio=1.0)
+        self.assertIsNotNone(message)
+        self.assertIn("--min-average-options", message)
+
+    def test_a_met_bar_reports_nothing(self) -> None:
+        report = measure_board_flow(self.board(), None, None)
+        self.assertIsNone(
+            describe_flow_shortfall(report, min_average_options=0.0,
+                                    max_scarce_option_ratio=1.0)
+        )
+
+    ## A tutorial board has one option because one triple is the whole level. Failing it would say
+    ## nothing about how it plays, so the gate leaves boards that small alone.
+    def test_a_board_too_small_to_have_a_mid_game_is_never_failed(self) -> None:
+        tiny = [{"layers": [["item_01", "item_01", None]]},
+                {"layers": [["item_01", None, None]]}]
+        report = measure_board_flow(tiny, None, None)
+        self.assertLess(report.total_triples, GATE_MIN_TRIPLES)
+        self.assertIsNone(
+            describe_flow_shortfall(report, min_average_options=99.0,
+                                    max_scarce_option_ratio=0.0)
+        )
+
+    def test_the_opening_check_counts_only_what_can_be_gathered(self) -> None:
+        # Three copies are visible, but every shelf is full so none of them can be brought together.
+        jammed = [
+            {"layers": [["item_01", "item_02", "item_03"]]},
+            {"layers": [["item_01", "item_02", "item_03"]]},
+            {"layers": [["item_01", "item_02", "item_03"]]},
+        ]
+        self.assertEqual(count_collectible_front_types(jammed), 0)
 
 
 class GenerateLevelShelvesTests(unittest.TestCase):

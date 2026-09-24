@@ -1084,6 +1084,13 @@ class SortingRules:
     def is_cleared(self, state) -> bool:
         raise NotImplementedError
 
+    ## Shelves the player can act on right now, each tagged with the address a `Move` addresses it
+    ## by: a shelf index in the classic mode, an authored shelf ID in a collapsing column. Locked
+    ## and off-window shelves are left out, so a caller reading this sees the board as the player
+    ## sees it rather than as the level file wrote it.
+    def accessible_shelves(self, state) -> list[tuple[int, ShelfState]]:
+        raise NotImplementedError
+
     ## A sticky item never leaves its slot, so its own shelf has to complete the triple around it.
     ## More sticky copies of an item than the board has triples of it is decidable up front, in both
     ## modes, without spending any search budget.
@@ -1120,6 +1127,11 @@ class ClassicRules(SortingRules):
 
     def is_cleared(self, state: State) -> bool:
         return is_cleared(state)
+
+    def accessible_shelves(self, state: State) -> list[tuple[int, ShelfState]]:
+        triples_cleared, shelves = state
+        return [(shelf_index, shelf) for shelf_index, shelf in enumerate(shelves)
+                if is_shelf_unlocked(shelf, triples_cleared)]
 
 
 class CollapsingColumnsRules(SortingRules):
@@ -1285,6 +1297,11 @@ class CollapsingColumnsRules(SortingRules):
             is_empty_layer(layer) for column in state[1] for entry in column for layer in entry.state.layers
         )
 
+    def accessible_shelves(self, state: CollapsingState) -> list[tuple[int, ShelfState]]:
+        triples_cleared = state[0]
+        return [(entry.shelf_id, entry.state) for entry in self.active_entries(state)
+                if is_shelf_unlocked(entry.state, triples_cleared)]
+
     def _active_location(self, state: CollapsingState, shelf_id: int) -> tuple[int, int] | None:
         for column_index, column in enumerate(state[1]):
             for stack_index, entry in enumerate(column[: self.visible_count]):
@@ -1408,6 +1425,9 @@ class ThrowingDispensersRules(SortingRules):
         raise self._unsupported()
 
     def is_cleared(self, state) -> bool:
+        raise self._unsupported()
+
+    def accessible_shelves(self, state) -> list[tuple[int, ShelfState]]:
         raise self._unsupported()
 
     def estimate_playability(

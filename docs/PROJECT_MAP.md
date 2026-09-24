@@ -1135,6 +1135,7 @@ Files:
 - `configs/levels/level_*.json`
 - `scenes/layouts/layout_*.tscn`
 - `scripts/tools/generate_level_shelves.py`
+- `scripts/tools/level_flow.py`
 - `scripts/tools/level_item_progression.py`
 - `scripts/tools/materialize_level_templates.py`
 - `scripts/tools/regenerate_level.py`
@@ -1151,6 +1152,8 @@ Responsibility:
 - Supports optional per-shelf triple-clear unlock requirements.
 - Generates shelf configs from difficulty, logical-item-count, shelf, and layer settings.
 - Validates shelf shape, known item IDs, row layout shape, item counts, and bounded solvability.
+- Measures board flow — how many triples the player can actually complete at each move — and can
+  reject a generated board that plays badly even though it is solvable.
 - Supports the additive `gameplay_mode` field; `collapsing_columns` levels carry a `column_layout`
   and are validated, generated, and solved with column-aware rules, while `throwing_dispensers`
   levels carry `dispensers` and a `throw_seed` and are judged by a sampled playability estimate

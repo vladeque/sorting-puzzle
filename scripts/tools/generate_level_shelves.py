@@ -14,10 +14,13 @@ from pathlib import Path
 from typing import Any
 
 from level_item_progression import logical_item_ids
+from level_flow import collectible_front_types, flow_for_level
 from validate_level_solvable import (
     CLASSIC_RULES,
+    COLUMN_LAYOUT_KEY,
     COLUMN_SHELF_COUNTS_KEY,
     COLUMN_VISIBLE_SHELVES_KEY,
+    GAMEPLAY_MODE_KEY,
     GAMEPLAY_MODE_CLASSIC,
     GAMEPLAY_MODE_COLLAPSING_COLUMNS,
     DEFAULT_PLAYABILITY_THRESHOLD,
@@ -44,6 +47,13 @@ DEFAULT_LAYOUT_PRESET = "grid_3x3"
 DISPENSER_MIN_LAYERS = 2
 DISPENSER_MAX_LAYERS = 4
 DEFAULT_PREFERRED_COPIES_PER_TYPE = 3.0
+# Share of each layer's pair-capable shelves that should hold two copies of one item beside a free
+# slot. Placement alone lands very few of these, and they are what a board offers the player as a
+# one-move match, so the default seeds them rather than leaving it to chance.
+DEFAULT_PAIR_RATIO = 0.5
+# Triples a board needs before its flow is worth judging. A tutorial with one or two spends every
+# move at a single option because that is the whole level, not because it plays badly.
+GATE_MIN_TRIPLES = 4
 LAYER_TRIPLE_RATIO_TOLERANCE = 0.05
 LAYOUT_PRESETS = (
     "grid_2x3",
@@ -489,6 +499,7 @@ def generate_shelves(
     max_items_per_type_override: int | None,
     min_front_visible_triples: int,
     preferred_copies_per_type: float = DEFAULT_PREFERRED_COPIES_PER_TYPE,
+    pair_ratio: float = DEFAULT_PAIR_RATIO,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     if shelf_count <= 0:
         raise ValueError("--shelf-count must be greater than 0")
@@ -498,6 +509,8 @@ def generate_shelves(
         raise ValueError("--filled-layer-count must be between 1 and --layer-count")
     if min_front_visible_triples < 0:
         raise ValueError("--min-front-visible-triples must be zero or greater")
+    if not math.isfinite(pair_ratio) or not 0.0 <= pair_ratio <= 1.0:
+        raise ValueError("--pair-ratio must be between 0 and 1")
 
     preset = DIFFICULTIES[difficulty]
     rng = random.Random(seed)
@@ -574,6 +587,7 @@ def generate_shelves(
         rng=rng,
         max_attempts=250,
     )
+    seed_colocated_pairs(shelves, pair_ratio, rng)
 
     stats = build_stats(
         shelves=shelves,
@@ -590,6 +604,8 @@ def generate_shelves(
         item_type_count_source=item_type_count_source,
         preferred_copies_per_type=preferred_copies_per_type,
     )
+    stats["pair_ratio"] = pair_ratio
+    stats["layers_with_pairs"] = count_layers_with_pairs(shelves)
     return shelves, stats
 
 
@@ -710,33 +726,64 @@ def apply_sticky_items(shelves: list[dict[str, Any]], percent: float, seed: int)
 def count_collectible_front_types(shelves: list[dict[str, Any]]) -> int:
     """Conservative opening check: park blockers in free slots, then gather ordinary partners.
 
-    No hidden layer, locked shelf, or second sticky anchor is treated as an available partner.
-    This witnesses a gathering sequence without assuming that three visible copies suffice.
+    No hidden layer, locked shelf, or second sticky anchor is treated as an available partner. This
+    witnesses a gathering sequence without assuming that three visible copies suffice, and it is the
+    same test `level_flow` applies at every later move, so an opening the generator accepts and a
+    board the simulation calls playable mean the same thing.
     """
-    state = shelves_to_state(shelves)[1]
-    reachable = [(si, shelf) for si, shelf in enumerate(state) if shelf.unlock_after_triples == 0]
-    movable = Counter(item for _, shelf in reachable for slot, item in enumerate(shelf.layers[0])
-                      if item is not None and (0, slot) not in shelf.sticky_items)
-    available_empty = sum(shelf.layers[0].count(None) for _, shelf in reachable if shelf.accepts_dropped_items)
-    collectible: set[str] = set()
-    for _, shelf in reachable:
-        if not shelf.forms_triples:
-            continue
-        front = shelf.layers[0]
-        sticky = next((front[slot] for layer, slot in shelf.sticky_items if layer == 0), None)
-        for item in set(movable) | ({sticky} if sticky else set()):
-            if sticky is not None and sticky != item:
-                continue
-            blockers = sum(value is not None and value != item for value in front)
-            # Outside matching copies must be movable. Slots freed by them can also park blockers,
-            # but requiring initial buffer slots here deliberately gives a conservative witness.
-            if available_empty - front.count(None) < blockers:
-                continue
-            existing = front.count(item)
-            outside = movable[item] - existing + int(sticky == item)
-            if outside >= 3 - existing:
-                collectible.add(item)
-    return len(collectible)
+    return len(collectible_front_types(CLASSIC_RULES.accessible_shelves(shelves_to_state(shelves))))
+
+
+def measure_board_flow(
+    shelves: list[dict[str, Any]],
+    column_heights: list[int] | None,
+    visible_shelves_per_column: int | None,
+):
+    """`FlowReport` for a generated board, or `None` for a mode with no board to walk."""
+    level_data: dict[str, Any] = {"shelves": shelves}
+    if column_heights:
+        level_data[GAMEPLAY_MODE_KEY] = GAMEPLAY_MODE_COLLAPSING_COLUMNS
+        level_data[COLUMN_LAYOUT_KEY] = {
+            COLUMN_SHELF_COUNTS_KEY: list(column_heights),
+            COLUMN_VISIBLE_SHELVES_KEY: int(visible_shelves_per_column or 1),
+        }
+
+    return flow_for_level(level_data, shelves)
+
+
+def describe_flow_shortfall(
+    flow_report,
+    min_average_options: float,
+    max_scarce_option_ratio: float,
+) -> str | None:
+    """Why this board fails the requested flow bar, or `None` when it meets it.
+
+    A board too small to have a mid-game is never judged: a tutorial holding one or two triples
+    spends every move at one option because that is all it has, and failing it would say nothing
+    about the board.
+    """
+    if flow_report.total_triples < GATE_MIN_TRIPLES:
+        return None
+
+    failures = []
+    if flow_report.average_options < min_average_options:
+        failures.append(
+            f"average options {flow_report.average_options:.2f} "
+            f"below --min-average-options {min_average_options:g}"
+        )
+    if flow_report.scarce_option_ratio > max_scarce_option_ratio:
+        failures.append(
+            f"{flow_report.scarce_option_ratio * 100:.1f}% of moves offered at most one match, "
+            f"above --max-scarce-option-ratio {max_scarce_option_ratio:g}"
+        )
+    if not failures:
+        return None
+
+    return (
+        "Generated board does not play smoothly enough: "
+        + "; ".join(failures)
+        + ". Try another seed, more attempts, fewer item types, or a higher --pair-ratio."
+    )
 
 
 def generate_with_optional_validation(
@@ -754,6 +801,9 @@ def generate_with_optional_validation(
     max_states: int,
     max_depth: int,
     preferred_copies_per_type: float = DEFAULT_PREFERRED_COPIES_PER_TYPE,
+    pair_ratio: float = DEFAULT_PAIR_RATIO,
+    min_average_options: float = 0.0,
+    max_scarce_option_ratio: float = 1.0,
     locked_shelves: dict[int, int] | None = None,
     dispenser_shelves: dict[int, int] | None = None,
     sticky_items_percent: float = 0.0,
@@ -787,6 +837,7 @@ def generate_with_optional_validation(
             max_items_per_type_override=max_items_per_type_override,
             min_front_visible_triples=min_front_visible_triples,
             preferred_copies_per_type=preferred_copies_per_type,
+            pair_ratio=pair_ratio,
         )
         apply_dispenser_shelves(shelves, dispenser_shelves, random.Random(attempt_seed))
         apply_locked_shelves(shelves, locked_shelves)
@@ -837,6 +888,8 @@ def generate_with_optional_validation(
                 "empty_slots": final_values.count(None),
                 "item_counts": dict(sorted(final_counts.items())),
                 "front_visible_triple_candidates": count_front_visible_triple_candidates(shelves),
+                "collectible_front_types": count_collectible_front_types(shelves),
+                "layers_with_pairs": count_layers_with_pairs(shelves),
                 "layer_item_counts": [dict(sorted(c.items())) for c in build_layer_item_counts(shelves, final_depth)],
                 "layer_triple_readiness": build_layer_triple_readiness(shelves, final_depth),
                 "non_adjacent_item_spreads": find_non_adjacent_item_spreads(shelves, final_depth),
@@ -858,6 +911,36 @@ def generate_with_optional_validation(
         stats.update(
             build_collapsing_stats(shelves, column_heights, visible_shelves_per_column)
         )
+
+        ## An opening is judged by what the player can act on, not by how many copies happen to sit
+        ## in a front layer. Pulling copies forward to satisfy a raw count eats the free slots a
+        ## gather needs, so the raw count can rise while the board gets less playable.
+        opening_ready = count_collectible_front_types(shelves)
+        stats["collectible_front_types"] = opening_ready
+        if opening_ready < min_front_visible_triples:
+            last_placement_error = ValueError(
+                f"Generated board opens with {opening_ready} collectible front triples, "
+                f"below --min-front-visible-triples={min_front_visible_triples}; "
+                "try another seed, more attempts, or fewer item types."
+            )
+            if require_solvable:
+                continue
+            raise last_placement_error
+
+        ## Flow is judged before solvability on purpose. Walking the board costs milliseconds and
+        ## the search costs seconds, so a board that would be no fun to play is thrown back before
+        ## anything expensive is spent proving it can be finished at all.
+        flow_report = measure_board_flow(shelves, column_heights, visible_shelves_per_column)
+        if flow_report is not None:
+            stats["flow"] = flow_report.as_dict()
+            shortfall = describe_flow_shortfall(
+                flow_report, min_average_options, max_scarce_option_ratio
+            )
+            if shortfall is not None:
+                last_placement_error = ValueError(shortfall)
+                if require_solvable:
+                    continue
+                raise last_placement_error
 
         validation = None
         if should_validate or require_solvable:
@@ -1474,6 +1557,10 @@ def spread_values_across_layers(
     )
 
 
+## Raw copy count: how many item types have three copies somewhere in a front layer. It says nothing
+## about whether the player could bring those copies together, because a triple clears only on one
+## shelf and a scattered three may have no shelf with room to host it. `count_collectible_front_types`
+## is the number to judge an opening by; this one is kept beside it so the gap between the two shows.
 def count_front_visible_triple_candidates(shelves: list[dict[str, Any]]) -> int:
     front_counts: Counter[str] = Counter()
     for shelf in shelves:
@@ -1757,6 +1844,121 @@ def score_layer_item_spread(
     return total_overage, largest_overage, largest_layer_count
 
 
+## A triple clears only when all three copies sit on one shelf's front layer, but placement spreads a
+## layer's copies across every shelf in it, so a "ready" layer routinely offers no match a player can
+## actually make. Pairing fixes that where it counts: two copies on one shelf beside a free slot is a
+## one-move match, and scattering those through every depth is what keeps something available as the
+## board is dug out.
+##
+## Swaps stay inside one layer index, which is what makes this safe to run after placement: the
+## per-layer item counts the distribution engine solved for are untouched, so layer readiness, the
+## per-layer repetition cap and each item's layer range all come out unchanged. Only which shelf a
+## copy sits on moves.
+def seed_colocated_pairs(
+    shelves: list[dict[str, Any]],
+    pair_ratio: float,
+    rng: random.Random,
+) -> int:
+    """Co-locate two copies of an item beside a free slot on the same shelf layer.
+
+    Returns how many layers ended up holding a pair. A layer already holding one counts, because the
+    ratio describes the board the player meets rather than the work this did.
+    """
+    if pair_ratio <= 0:
+        return 0
+
+    depth = max((len(shelf["layers"]) for shelf in shelves), default=0)
+    seeded_total = 0
+    for layer_index in range(depth):
+        positions = [shelf_index for shelf_index, shelf in enumerate(shelves)
+                     if layer_index < len(shelf["layers"])]
+        hostable = [shelf_index for shelf_index in positions
+                    if _can_host_pair(shelves[shelf_index]["layers"][layer_index])]
+        already = [shelf_index for shelf_index in positions
+                   if _layer_pair_item(shelves[shelf_index]["layers"][layer_index]) is not None]
+        target_count = int(round(len(hostable) * pair_ratio))
+        seeded = len(already)
+
+        candidates = [shelf_index for shelf_index in hostable if shelf_index not in set(already)]
+        rng.shuffle(candidates)
+        for shelf_index in candidates:
+            if seeded >= target_count:
+                break
+            if _pair_up_layer(shelves, shelf_index, layer_index, positions, rng):
+                seeded += 1
+
+        seeded_total += seeded
+
+    return seeded_total
+
+
+def _can_host_pair(layer: list[str | None]) -> bool:
+    """A layer can become a one-move match when it has a free slot and something to duplicate."""
+    return None in layer and any(value is not None for value in layer)
+
+
+def _layer_pair_item(layer: list[str | None]) -> str | None:
+    counts = Counter(value for value in layer if value is not None)
+    for item_id, count in counts.items():
+        if count >= 2:
+            return item_id
+
+    return None
+
+
+def _pair_up_layer(
+    shelves: list[dict[str, Any]],
+    shelf_index: int,
+    layer_index: int,
+    positions: list[int],
+    rng: random.Random,
+) -> bool:
+    layer = shelves[shelf_index]["layers"][layer_index]
+    wanted_slots = [slot for slot, value in enumerate(layer) if value is not None]
+    rng.shuffle(wanted_slots)
+
+    for keep_slot in wanted_slots:
+        wanted_item = layer[keep_slot]
+        victim_slots = [slot for slot, value in enumerate(layer)
+                        if value is not None and value != wanted_item]
+        if not victim_slots:
+            continue
+
+        donors = [(donor_index, slot)
+                  for donor_index in positions
+                  if donor_index != shelf_index
+                  for slot, value in enumerate(shelves[donor_index]["layers"][layer_index])
+                  if value == wanted_item]
+        rng.shuffle(donors)
+        for donor_index, donor_slot in donors:
+            donor_layer = shelves[donor_index]["layers"][layer_index]
+            # Taking this copy must not cost the donor a pair it already has.
+            if _layer_pair_item(donor_layer) == wanted_item:
+                continue
+
+            victim_slot = victim_slots[0]
+            victim_item = layer[victim_slot]
+            layer[victim_slot], donor_layer[donor_slot] = wanted_item, victim_item
+            # A layer that is already all one item clears itself the moment it surfaces, which is a
+            # free triple rather than a move, so neither side is allowed to become one.
+            if _is_complete_layer(layer) or _is_complete_layer(donor_layer):
+                layer[victim_slot], donor_layer[donor_slot] = victim_item, wanted_item
+                continue
+
+            return True
+
+    return False
+
+
+def _is_complete_layer(layer: list[str | None]) -> bool:
+    return None not in layer and len(set(layer)) == 1
+
+
+def count_layers_with_pairs(shelves: list[dict[str, Any]]) -> int:
+    return sum(1 for shelf in shelves for layer in shelf["layers"]
+               if _layer_pair_item(layer) is not None)
+
+
 def score_layout_constraints(
     shelves: list[dict[str, Any]],
     filled_layer_count: int,
@@ -1873,6 +2075,8 @@ def build_stats(
         "effective_max_items_per_type": effective_max_items_per_type,
         "min_front_visible_triples": min_front_visible_triples,
         "front_visible_triple_candidates": count_front_visible_triple_candidates(shelves),
+        "collectible_front_types": count_collectible_front_types(shelves),
+        "layers_with_pairs": count_layers_with_pairs(shelves),
         "layer_item_counts": [
             dict(sorted(layer_counts.items()))
             for layer_counts in build_layer_item_counts(shelves, filled_layer_count)
@@ -2076,8 +2280,40 @@ def build_parser(add_help: bool = True) -> argparse.ArgumentParser:
         type=int,
         default=1,
         help=(
-            "Minimum number of item types with at least three visible front-layer copies. "
+            "Minimum number of item types the player can actually complete a triple with on the "
+            "opening board, counting only types whose copies can be gathered onto one shelf. "
             "Use 0 to disable this starter-progress guarantee."
+        ),
+    )
+    parser.add_argument(
+        "--pair-ratio",
+        type=float,
+        default=DEFAULT_PAIR_RATIO,
+        help=(
+            "Share of each layer's pair-capable shelves seeded with two copies of one item beside "
+            "a free slot, giving one-move matches at every depth. 0 disables the pass; defaults to "
+            f"{DEFAULT_PAIR_RATIO:g}."
+        ),
+    )
+    parser.add_argument(
+        "--min-average-options",
+        type=float,
+        default=0.0,
+        help=(
+            "Reject a board whose simulated playthrough averages fewer than this many completable "
+            "item types per move. 0 disables the check; pair it with --require-solvable so a "
+            "rejected board is retried rather than failing the run."
+        ),
+    )
+    parser.add_argument(
+        "--max-scarce-option-ratio",
+        type=float,
+        default=1.0,
+        help=(
+            "Reject a board whose simulated playthrough spends more than this fraction of its "
+            "moves with at most one completable triple on the whole field. 1 disables the check. "
+            "Boards with fewer than "
+            f"{GATE_MIN_TRIPLES} triples are never judged."
         ),
     )
     parser.add_argument(
@@ -2346,6 +2582,9 @@ def run(args: argparse.Namespace) -> int:
             max_states=args.validator_max_states,
             max_depth=args.validator_max_depth,
             preferred_copies_per_type=args.preferred_copies_per_type,
+            pair_ratio=args.pair_ratio,
+            min_average_options=args.min_average_options,
+            max_scarce_option_ratio=args.max_scarce_option_ratio,
             locked_shelves=locked_shelves,
             dispenser_shelves=dispenser_shelves,
             sticky_items_percent=args.sticky_items_percent,

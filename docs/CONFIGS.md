@@ -487,7 +487,62 @@ otherwise valid constrained boards. Copies that are not part of a preferred loca
 adjacent layers before more distant layers, so each item normally occupies one compact layer range.
 `--stats` reports the target, actual readiness for every layer, and any non-adjacent item spreads.
 
-Generated levels default to `--min-front-visible-triples 1`, so at least one item type starts with three visible front-layer copies across shelves. Use `--min-front-visible-triples 0` for layouts that should not force a starter visible triple candidate.
+Read those readiness ratios for what they are: a per-layer-depth count of copies, not a count of
+matches the player can make. A triple clears only when all three copies sit on **one shelf's** front
+layer, and placement spreads a layer's copies across every shelf in it, so a layer reported as
+triple-ready routinely offers no match anyone can act on. Judge a board by `collectible_front_types`
+and the `flow` block instead, both of which count only what can actually be gathered.
+
+Generated levels default to `--min-front-visible-triples 1`: at least one item type must be one the
+player can genuinely complete a triple with on the opening board, counting only types whose copies
+can be brought onto a single shelf. Use `0` for layouts that should not force a starter match.
+Raising it well above what a board reaches naturally is counterproductive — copies pulled forward to
+satisfy it occupy the free slots a gather needs, so the count rises while the board gets less
+playable.
+
+### Board flow
+
+`--pair-ratio` (default `0.5`) seeds that share of each layer's pair-capable shelves with two copies
+of one item beside a free slot, which is a one-move match. Placement alone lands very few of these.
+Swaps stay inside one layer depth, so the per-depth composition the distribution engine solved for is
+untouched and only the shelf a copy sits on changes; item counts, layer readiness, the per-layer
+repetition cap and each item's layer range all come out unchanged. `0` disables the pass.
+
+Measured on 18x3 medium boards, comparing `0.5` against `0.0` on the same seed, 20 seeds each:
+
+| item types | scarce-ratio change | average-options change | seeds better / tied / worse |
+| --- | --- | --- | --- |
+| 30 | -4.9pp (median -4.5) | +0.07 | 10 / 4 / 6 |
+| 22 | -2.4pp (median -2.7) | +0.09 | 10 / 4 / 6 |
+
+So it is a mild but consistent gain on the metric worth caring about, not a fix on its own; its
+practical value is that fewer attempts get rejected by the flow gate. The best ratio varies by board
+— on some shapes `1.0` measured better and on others worse — so treat `0.5` as a starting point and
+read `--stats` rather than assuming it is optimal for a given level.
+
+`--min-average-options` and `--max-scarce-option-ratio` reject a generated board that does not give
+the player enough to do:
+
+```powershell
+py scripts\tools\regenerate_level.py --level-number 12 --shelf-count 18 --layer-count 3 `
+    --item-type-count 44 --difficulty medium --seed 1035551170 `
+    --min-average-options 2.0 --max-scarce-option-ratio 0.35 --stats
+```
+
+- `scripts/tools/level_flow.py` walks every attempt before the solvability search, so a board that
+  would play badly is thrown back before anything expensive is spent proving it can be finished.
+- `--max-scarce-option-ratio` caps the share of moves offering at most one completable type. That is
+  the metric to gate on: a level can average four options and still spend its last quarter at one,
+  which an average hides and this does not.
+- Retries only happen under `--require-solvable`, which `regenerate_level.py` turns on by default.
+  With a bare `generate_level_shelves.py` run a board below the bar fails the run instead.
+- Boards with fewer than four triples are never judged; a tutorial has one option because one triple
+  is the whole level.
+- Inspect any level, shipped or generated, with `py scripts\tools\level_flow.py <level.json>`.
+
+The walk is a heuristic, not a proof. It ranks boards against each other reliably, but its greedy
+player is more consistent than a person: a board it handles well can still feel worse in a playtest,
+while a board it does badly on is the reliable signal.
 
 Current authored generation parameters:
 
