@@ -1240,6 +1240,8 @@ Script:
 Purpose:
 - Reusable FAQ accordion row with a touch-sized question button, expandable answer panel, and
   optional focused action button.
+- Question text is inset 22 px from the left edge (`content_margin_left` on the question normal and
+  pressed styles) so it lines up with the answer text in the panel below it.
 - Question text uses the `GameBodyButton` theme variation and answer text uses `GameBodyRichText`,
   so FAQ copy renders in the Nunito reading face instead of DynaPuff; the action button keeps the
   standard bold DynaPuff button font. See `docs/TYPOGRAPHY.md`.
