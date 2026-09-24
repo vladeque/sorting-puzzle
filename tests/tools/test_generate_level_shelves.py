@@ -192,11 +192,58 @@ class FlowGateTests(unittest.TestCase):
         self.assertIn("scarce_option_ratio", report.as_dict())
 
     def test_an_unreachable_bar_is_reported_as_a_shortfall(self) -> None:
-        report = measure_board_flow(self.board(), None, None)
-        message = describe_flow_shortfall(report, min_average_options=99.0,
+        class FinishedReport:
+            average_options = 1.5
+            scarce_option_ratio = 0.1
+            cleared_triples = 29
+            total_triples = 29
+            completed = True
+
+        message = describe_flow_shortfall(FinishedReport(), min_average_options=99.0,
                                           max_scarce_option_ratio=1.0)
         self.assertIsNotNone(message)
         self.assertIn("--min-average-options", message)
+
+    def test_a_scarce_board_is_reported_against_the_right_flag(self) -> None:
+        class ScarceReport:
+            average_options = 1.0
+            scarce_option_ratio = 0.9
+            cleared_triples = 29
+            total_triples = 29
+            completed = True
+
+        message = describe_flow_shortfall(ScarceReport(), min_average_options=0.0,
+                                          max_scarce_option_ratio=0.3)
+        self.assertIsNotNone(message)
+        self.assertIn("--max-scarce-option-ratio", message)
+
+    ## The regression this guards: a walk that stalls early still posts the option counts of the
+    ## healthy opening it did play, so a board can look good precisely because it went wrong.
+    def test_a_walk_that_stalls_fails_however_good_its_sampled_moves_look(self) -> None:
+        class StalledReport:
+            average_options = 9.0
+            scarce_option_ratio = 0.0
+            cleared_triples = 11
+            total_triples = 31
+            completed = False
+
+        message = describe_flow_shortfall(StalledReport(), min_average_options=2.0,
+                                          max_scarce_option_ratio=0.3)
+        self.assertIsNotNone(message)
+        self.assertIn("stalled after 11 of 31", message)
+
+    def test_an_unfinished_walk_is_ignored_when_no_bar_is_set(self) -> None:
+        class StalledReport:
+            average_options = 0.1
+            scarce_option_ratio = 1.0
+            cleared_triples = 1
+            total_triples = 31
+            completed = False
+
+        self.assertIsNone(
+            describe_flow_shortfall(StalledReport(), min_average_options=0.0,
+                                    max_scarce_option_ratio=1.0)
+        )
 
     def test_a_met_bar_reports_nothing(self) -> None:
         report = measure_board_flow(self.board(), None, None)

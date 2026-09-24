@@ -30,7 +30,6 @@ from typing import Any, NamedTuple
 
 from validate_level_solvable import (
     GAMEPLAY_MODE_THROWING_DISPENSERS,
-    Move,
     ShelfState,
     SortingRules,
     TRIPLE_SIZE,
@@ -201,11 +200,11 @@ def simulate_flow(
 ) -> FlowReport:
     """Play the board greedily and report what the player had to choose from along the way.
 
-    The player is deliberately ordinary rather than optimal: it takes the best move it can see one
-    ply ahead, preferring one that clears a triple, then one that carries a copy to its partners,
-    and only then one that digs a layer out while the board can still spare the room. An optimal
-    line would understate how stuck a board feels, because a perfect player never wanders into the
-    positions a person does.
+    The player is deliberately ordinary rather than optimal: it takes the best move it can see from
+    the two shelves in front of it, preferring one that clears a triple, then one that carries a copy
+    to its partners, and only then one that digs a layer out while the board can still spare the
+    room. It never searches ahead for a line, because a player who does would understate how stuck a
+    board feels -- a perfect line never wanders into the positions a person does.
 
     A move counts as filler when it neither clears a triple nor puts a copy beside one of its
     partners -- pure rearranging to make room, which is the part that reads as busywork.

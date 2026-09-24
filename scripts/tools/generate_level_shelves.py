@@ -765,7 +765,23 @@ def describe_flow_shortfall(
     if flow_report.total_triples < GATE_MIN_TRIPLES:
         return None
 
+    gate_is_active = min_average_options > 0.0 or max_scarce_option_ratio < 1.0
+    if not gate_is_active:
+        return None
+
     failures = []
+    ## Checked first, and on its own, because the other two numbers describe only the moves the walk
+    ## actually took. A walk that stalls half way through samples the healthy opening and never sees
+    ## the part the player gets stuck in, so a board can post a fine average precisely *because* it
+    ## went wrong early. An unfinished walk means those numbers describe a fragment, not the level.
+    if not flow_report.completed:
+        return (
+            "Generated board does not play smoothly enough: a plain greedy player stalled after "
+            f"{flow_report.cleared_triples} of {flow_report.total_triples} triples, so its "
+            "remaining flow numbers describe only the part it played. Try another seed, more "
+            "attempts, or a higher --pair-ratio."
+        )
+
     if flow_report.average_options < min_average_options:
         failures.append(
             f"average options {flow_report.average_options:.2f} "
