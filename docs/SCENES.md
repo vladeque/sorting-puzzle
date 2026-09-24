@@ -1240,6 +1240,9 @@ Script:
 Purpose:
 - Reusable FAQ accordion row with a touch-sized question button, expandable answer panel, and
   optional focused action button.
+- Question text uses the `GameBodyButton` theme variation and answer text uses `GameBodyRichText`,
+  so FAQ copy renders in the Nunito reading face instead of DynaPuff; the action button keeps the
+  standard bold DynaPuff button font. See `docs/TYPOGRAPHY.md`.
 - Emits expansion and action requests; the owning support screen coordinates single-item expansion
   and owns external email behavior.
 

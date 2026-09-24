@@ -32,9 +32,13 @@ scenes.
 | `GameNumberLabel` | `Label` | Timers, counters, prices, ranks, scores, and progress |
 | `GameBodyLabel` | `Label` | Instructions, status text, and player names |
 | `GameSmallLabel` | `Label` | Navigation and compact option captions |
+| `GameBodyButton` | `Button` | Buttons whose text is a readable sentence or question rather than a short action, such as the Support FAQ question rows (bold Nunito) |
+| `GameBodyRichText` | `RichTextLabel` | Multi-line reading text, such as the Support FAQ answers (semibold Nunito, bold Nunito for `[b]`) |
 
 Ordinary `Button` text uses bold DynaPuff. `LineEdit` and `TextEdit` use semibold
-Nunito. Labels without a variation inherit medium DynaPuff. Title and section
+Nunito. Labels without a variation inherit medium DynaPuff. A `RichTextLabel`
+without a variation also inherits medium DynaPuff, so long-form text should set
+`GameBodyRichText`. Title and section
 roles use DynaPuff's 92% width axis so long uppercase headings retain comfortable
 side margins without scene-specific font substitutions. Other DynaPuff roles use
 the natural 100% width.

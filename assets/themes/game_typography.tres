@@ -112,8 +112,13 @@ variation_opentype = {
 [resource]
 default_font = SubResource("FontVariation_dynapuff_medium")
 Button/fonts/font = SubResource("FontVariation_dynapuff_bold")
+GameBodyButton/base_type = &"Button"
+GameBodyButton/fonts/font = SubResource("FontVariation_nunito_bold")
 GameBodyLabel/base_type = &"Label"
 GameBodyLabel/fonts/font = SubResource("FontVariation_nunito_semibold")
+GameBodyRichText/base_type = &"RichTextLabel"
+GameBodyRichText/fonts/bold_font = SubResource("FontVariation_nunito_bold")
+GameBodyRichText/fonts/normal_font = SubResource("FontVariation_nunito_semibold")
 GameHudLabel/base_type = &"Label"
 GameHudLabel/fonts/font = SubResource("FontVariation_dynapuff_semibold")
 GameNumberLabel/base_type = &"Label"
