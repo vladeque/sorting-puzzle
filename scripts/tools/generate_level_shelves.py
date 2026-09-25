@@ -61,6 +61,7 @@ LAYOUT_PRESETS = (
     "grid_3x3",
     "grid_3x4",
     "grid_3x5",
+    "grid_3x6",
     "grid_4x3",
     "grid_4x4_hollow",
     "shape_arch_3x5",

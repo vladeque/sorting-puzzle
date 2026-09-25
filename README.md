@@ -63,7 +63,7 @@ Add `--dispenser-shelves 10:3,11:2` for source-only dispenser shelves at 1-based
 that many items each (`2` to `4`). They count against `--shelf-count`, and their queues are stocked
 by relocating items out of the generated board, so pair the flag with `--require-solvable`.
 
-Available layout presets are `grid_2x3`, `grid_3x3`, `grid_3x4`, `grid_3x5`, and `grid_4x3`.
+Available layout presets are `grid_2x3`, `grid_3x3`, `grid_3x4`, `grid_3x5`, `grid_3x6`, and `grid_4x3`.
 
 Materialize every template through the campaign item progression after generation:
 

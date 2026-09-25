@@ -190,6 +190,7 @@ Supported static layout presets:
 - `grid_3x3`: 9 shelves.
 - `grid_3x4`: 12 shelves.
 - `grid_3x5`: 15 shelves.
+- `grid_3x6`: 18 shelves arranged as three columns across six rows.
 - `grid_4x3`: 12 shelves arranged as four columns across three rows.
 - `grid_4x4_hollow`: 12 shelves arranged as a 4x4 field without its four inner cells.
 - `shape_arch_3x5`: 11 shelves with occupancy `111/101/101/101/101` from top to bottom.

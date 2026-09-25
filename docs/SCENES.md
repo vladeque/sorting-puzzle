@@ -1941,6 +1941,7 @@ Static presets:
 - `scenes/layouts/layout_grid_3x3.tscn` (9)
 - `scenes/layouts/layout_grid_3x4.tscn` (12)
 - `scenes/layouts/layout_grid_3x5.tscn` (15)
+- `scenes/layouts/layout_grid_3x6.tscn` (18; three columns across six rows, scaled to fit between the HUD and the ability bar)
 - `scenes/layouts/layout_grid_4x3.tscn` (12)
 - `scenes/layouts/layout_grid_4x4_hollow.tscn` (12; a 4x4 field without its four inner cells)
 - `scenes/layouts/layout_shape_arch_3x5.tscn` (11; `111/101/101/101/101`)
