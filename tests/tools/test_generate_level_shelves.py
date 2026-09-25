@@ -20,7 +20,14 @@ sys.path.insert(0, str(TOOLS_PATH))
 from generate_level_shelves import (  # noqa: E402
     GATE_MIN_TRIPLES,
     LAYOUT_PRESETS,
+    LOCK_PLACEMENT_AS_GENERATED,
+    LOCK_PLACEMENT_PLAYABLE,
     active_collapsing_shelves,
+    apply_locked_shelves,
+    build_parser,
+    parse_locked_shelves,
+    place_locked_shelves,
+    validate_generated_shelves,
     count_collectible_front_types,
     count_layers_with_pairs,
     describe_flow_shortfall,
@@ -519,6 +526,206 @@ class DispenserShelfGenerationTests(unittest.TestCase):
         expected = copy.deepcopy(shelves)
         apply_dispenser_shelves(shelves, {}, random.Random(1))
         self.assertEqual(shelves, expected)
+
+
+def shelf_contents(shelves: list[dict]) -> list[tuple]:
+    """Every shelf's layers, ignoring position and lock, so a permutation compares equal."""
+    return sorted(
+        (shelf.get("type", "standard"), tuple(tuple(str(item) for item in layer) for layer in shelf["layers"]))
+        for shelf in shelves
+    )
+
+
+class LockPlacementTests(unittest.TestCase):
+    ## Locking shelf 1 as generated freezes all three types, because it holds one copy of each: no
+    ## triple can be made, so the first lock never opens. Any pair shelf behind the lock instead
+    ## leaves two types completable.
+    @staticmethod
+    def _starved_board() -> list[dict]:
+        return [
+            {"layers": [["item_01", "item_02", "item_03"]]},
+            {"layers": [["item_01", "item_01", None]]},
+            {"layers": [["item_02", "item_02", None]]},
+            {"layers": [["item_03", "item_03", None]]},
+        ]
+
+    def test_as_generated_locks_leave_the_board_without_a_first_triple(self) -> None:
+        board = self._starved_board()
+        apply_locked_shelves(board, {1: 1})
+        self.assertEqual(count_collectible_front_types(board), 0)
+        self.assertFalse(measure_board_flow(board, None, None).completed)
+
+    def test_moves_the_blocking_shelf_out_from_behind_the_lock(self) -> None:
+        board = self._starved_board()
+        stats = place_locked_shelves(board, {1: 1}, random.Random(1))
+
+        self.assertEqual(board[0]["unlock_after_triples"], 1)
+        self.assertNotEqual(board[0]["layers"], [["item_01", "item_02", "item_03"]])
+        self.assertNotEqual(stats["locked_sources"]["1"], 1)
+        self.assertTrue(measure_board_flow(board, None, None).completed)
+
+    def test_the_lock_stays_where_it_was_requested(self) -> None:
+        board = self._starved_board()
+        place_locked_shelves(board, {1: 1}, random.Random(1))
+        self.assertEqual(
+            [shelf.get("unlock_after_triples", 0) for shelf in board],
+            [1, 0, 0, 0],
+        )
+
+    ## Whole shelves move, never items, so everything the distribution engine solved for -- every
+    ## item count, every layer, every pair -- is still on the board, shelf for shelf.
+    def test_every_shelf_keeps_its_exact_contents(self) -> None:
+        board, _stats = generate_shelves(
+            shelf_count=12, layer_count=3, filled_layer_count=3, item_types=None,
+            difficulty="hard", seed=4242, max_items_per_type_override=3,
+            min_front_visible_triples=1,
+        )
+        apply_dispenser_shelves(board, {4: 3}, random.Random(4242))
+        before = shelf_contents(board)
+        dispenser = copy.deepcopy(board[3])
+
+        place_locked_shelves(board, parse_locked_shelves("1:3,7:6,13:9"), random.Random(1))
+
+        self.assertEqual(shelf_contents(board), before)
+        self.assertEqual(board[3], dispenser)
+        self.assertEqual(
+            {index + 1: shelf["unlock_after_triples"]
+             for index, shelf in enumerate(board) if "unlock_after_triples" in shelf},
+            {1: 3, 7: 6, 13: 9},
+        )
+
+    ## A board only changes when another placement is better, so an already good lock stays put.
+    def test_a_lock_already_on_a_good_shelf_is_left_alone(self) -> None:
+        board = self._starved_board()
+        expected = copy.deepcopy(board)
+        apply_locked_shelves(expected, {4: 1})
+
+        stats = place_locked_shelves(board, {4: 1}, random.Random(1))
+
+        self.assertEqual(board, expected)
+        self.assertEqual(stats["locked_sources"], {"4": 4})
+
+    def test_a_board_with_every_standard_shelf_locked_has_nothing_to_choose(self) -> None:
+        board = self._starved_board()
+        expected = copy.deepcopy(board)
+        locks = {1: 1, 2: 1, 3: 1, 4: 1}
+        apply_locked_shelves(expected, locks)
+
+        place_locked_shelves(board, locks, random.Random(1))
+
+        self.assertEqual(board, expected)
+
+    def test_rejects_a_position_beyond_the_board(self) -> None:
+        with self.assertRaises(ValueError):
+            place_locked_shelves(self._starved_board(), {9: 1}, random.Random(1))
+
+    ## Level 18's request, the case the flag exists for: four locks up to 16 triples on a 16-shelf hard
+    ## board. Locked as generated, the board cannot be proven; placed, the walk clears it.
+    def test_a_lock_heavy_level_is_proven_only_with_playable_placement(self) -> None:
+        arguments = dict(
+            shelf_count=16, layer_count=3, filled_layer_count=3, item_types=None,
+            difficulty="hard", seed=18001, should_validate=False, require_solvable=True,
+            max_attempts=1, max_items_per_type_override=3, min_front_visible_triples=1,
+            max_states=400, max_depth=200,
+            locked_shelves=parse_locked_shelves("1:4,5:8,12:12,16:16"),
+            dispenser_shelves=parse_dispenser_shelves("6:3,11:3"),
+        )
+        _shelves, _stats, as_generated, _seed = generate_with_optional_validation(**arguments)
+        _shelves, stats, playable, _seed = generate_with_optional_validation(
+            **arguments, lock_placement=LOCK_PLACEMENT_PLAYABLE
+        )
+
+        self.assertIsNot(as_generated["solvable"], True)
+        self.assertIs(playable["solvable"], True)
+        self.assertEqual(playable["reason"], "flow_walk")
+        self.assertTrue(stats["flow"]["completed"])
+        self.assertEqual(set(stats["lock_placement"]["locked_sources"]), {"1", "5", "12", "16"})
+
+    ## Recorded commands predate the flag, so its default has to rebuild the board they recorded:
+    ## the engine's own shelves, locked where they landed.
+    def test_the_default_placement_locks_the_shelves_where_the_engine_left_them(self) -> None:
+        locks = parse_locked_shelves("1:2,6:4")
+        shelves, stats, _validation, _seed = generate_with_optional_validation(
+            shelf_count=9, layer_count=2, filled_layer_count=2, item_types=None,
+            difficulty="medium", seed=321, should_validate=False, require_solvable=False,
+            max_attempts=1, max_items_per_type_override=None, min_front_visible_triples=0,
+            max_states=400, max_depth=200, locked_shelves=locks,
+        )
+        expected, _ = generate_shelves(
+            shelf_count=9, layer_count=2, filled_layer_count=2, item_types=None,
+            difficulty="medium", seed=321, max_items_per_type_override=None,
+            min_front_visible_triples=0,
+        )
+        apply_locked_shelves(expected, locks)
+
+        self.assertEqual(shelves, expected)
+        self.assertNotIn("lock_placement", stats)
+
+    def test_the_flag_defaults_to_as_generated_and_rejects_unknown_values(self) -> None:
+        parser = build_parser()
+        base = ["--shelf-count", "9", "--layer-count", "2"]
+        self.assertEqual(parser.parse_args(base).lock_placement, LOCK_PLACEMENT_AS_GENERATED)
+        self.assertEqual(
+            parser.parse_args([*base, "--lock-placement", "playable"]).lock_placement,
+            LOCK_PLACEMENT_PLAYABLE,
+        )
+        with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+            parser.parse_args([*base, "--lock-placement", "anywhere"])
+        with self.assertRaises(ValueError):
+            generate_with_optional_validation(
+                shelf_count=9, layer_count=2, filled_layer_count=2, item_types=None,
+                difficulty="medium", seed=1, should_validate=False, require_solvable=False,
+                max_attempts=1, max_items_per_type_override=None, min_front_visible_triples=0,
+                max_states=400, max_depth=200, lock_placement="anywhere",
+            )
+
+
+class WalkProofTests(unittest.TestCase):
+    """A completed flow walk is a solution already played, so it proves solvability on its own."""
+
+    @staticmethod
+    def _board() -> list[dict]:
+        return [
+            {"layers": [["item_01", "item_01", None]]},
+            {"layers": [["item_01", "item_02", None]]},
+            {"layers": [["item_02", "item_02", None]]},
+        ]
+
+    ## A zero state budget stops the search before it proves anything, which isolates the walk.
+    def test_a_completed_walk_proves_a_board_the_search_could_not(self) -> None:
+        board = self._board()
+        report = measure_board_flow(board, None, None)
+        self.assertTrue(report.completed)
+
+        searched = validate_generated_shelves(board, max_states=0, max_depth=200)
+        walked = validate_generated_shelves(board, max_states=0, max_depth=200, flow_report=report)
+
+        self.assertEqual(searched["reason"], "state_limit")
+        self.assertIsNone(searched["solvable"])
+        self.assertIs(walked["solvable"], True)
+        self.assertEqual(walked["reason"], "flow_walk")
+        self.assertEqual(walked["moves"], report.moves)
+        self.assertEqual(walked["states_checked"], 0)
+
+    def test_an_unfinished_walk_leaves_the_proof_to_the_search(self) -> None:
+        board = self._board()
+        stalled = measure_board_flow(board, None, None)._replace(completed=False)
+
+        result = validate_generated_shelves(board, max_states=400, max_depth=200, flow_report=stalled)
+
+        self.assertIs(result["solvable"], True)
+        self.assertEqual(result["reason"], "solved")
+        self.assertGreater(result["states_checked"], 0)
+
+    def test_a_walk_never_excuses_an_invalid_board(self) -> None:
+        board = self._board()
+        report = measure_board_flow(board, None, None)
+        board[0]["layers"][0][2] = "item_03"
+
+        result = validate_generated_shelves(board, max_states=400, max_depth=200, flow_report=report)
+
+        self.assertFalse(result["valid"])
+        self.assertEqual(result["reason"], "invalid")
 
 
 COLLAPSING_ARGUMENTS = [

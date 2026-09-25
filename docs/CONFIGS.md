@@ -551,9 +551,12 @@ py scripts\tools\regenerate_level.py --level-number 12 --shelf-count 18 --layer-
   is the whole level.
 - Inspect any level, shipped or generated, with `py scripts\tools\level_flow.py <level.json>`.
 
-The walk is a heuristic, not a proof. It ranks boards against each other reliably, but its greedy
-player is more consistent than a person: a board it handles well can still feel worse in a playtest,
-while a board it does badly on is the reliable signal.
+The walk's option counts are a heuristic, not a proof. They rank boards against each other reliably,
+but its greedy player is more consistent than a person: a board it handles well can still feel worse
+in a playtest, while a board it does badly on is the reliable signal. Whether the walk *finished* is
+different: it plays legal moves through the solver's own rules, so a walk that clears the board is a
+solvability proof, and the generator accepts it as one without running the search
+(`validation.reason: "flow_walk"`).
 
 Current authored generation parameters:
 
@@ -610,6 +613,29 @@ Use `--locked-shelves` to add unlock requirements to generated shelves. Entries 
 ```powershell
 py scripts\tools\generate_level_shelves.py --shelf-count 9 --layer-count 2 --difficulty medium --locked-shelves 7:3,8:5 --validate
 ```
+
+By default the lock goes on whatever the generator put at that position, and the generator never
+considered the locks. That works for one or two low locks, but not for several or high ones. With
+three copies per type, one locked copy freezes its whole type, so the open shelves start with pairs
+whose third copy is locked and too few free slots to dig for anything else. Add
+`--lock-placement playable` to choose which generated shelves go behind the locks instead:
+
+```powershell
+py scripts\tools\regenerate_level.py --chapter chapter_01 --level-number 18 `
+    --layout-preset staggered_columns_5_6_5 --shelf-count 16 --layer-count 3 --difficulty hard `
+    --max-items-per-type 3 --validator-max-states 400 --dispenser-shelves 6:3,11:3 `
+    --locked-shelves 1:4,5:8,12:12,16:16 --lock-placement playable --stats
+```
+
+- Whole shelves are permuted, never items, so every shelf's contents, pairs and layer readiness stay
+  exactly as generated. The requested positions stay locked and dispensers never move.
+- Measured on that command over seeds 18000-18019: `as-generated` accepted 0 of 20 attempts, where
+  a plain greedy player cleared at most 9 of 35 triples, often only 1-2 before the first lock at 4.
+  With `playable`, 5 of the first 10 attempts were accepted, each proven by the flow walk, averaging
+  1.7-2.7 options per move. An attempt costs about 5 s when accepted and 12-15 s when rejected.
+- Raising `--validator-max-states` does not rescue these boards (400, 5,000 and 30,000 all fail),
+  and neither does an easier `--difficulty`.
+- The flag is opt-in so manifest entries recorded before it existed still replay to the same board.
 
 Use `--dispenser-shelves` to add source-only dispenser shelves. Entries are 1-based positions and
 layer counts (`2` to `4`), and they count against `--shelf-count`:

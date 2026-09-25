@@ -3748,6 +3748,16 @@ Generation constraints:
 - `--min-average-options` and `--max-scarce-option-ratio` reject a board whose simulated playthrough
   does not give the player enough to do. Both are off by default; see the flow gate below.
 - `--locked-shelves` can add per-shelf `unlock_after_triples` requirements using 1-based shelf numbers such as `7:3,8:5`.
+- `--lock-placement` decides which contents sit behind those locks. `as-generated` (the default)
+  locks whatever the distribution engine left at each position, which never considered the locks.
+  `playable` runs `place_locked_shelves()`: it permutes whole standard shelves so the locked
+  positions hold the ones that least block play before each unlock. It scores every shelf set by its
+  opening (types the player can gather, open pairs whose third copy is not locked, free front slots),
+  picks each set's threshold order by the headroom it leaves before every unlock, and walks the best
+  `LOCK_PLACEMENT_WALKS` (`12`) candidates with `level_flow.py`, keeping the first that clears.
+  Contents never change, dispensers never move, and the chosen sources land in
+  `stats["lock_placement"]`. The default stays `as-generated` so recorded manifest commands replay
+  to the same board.
 - When the logical item set cannot satisfy the target filled-slot count within an explicit
   per-type cap, the generator adds extra empty slots instead of exceeding the cap.
 - `--stats` includes each layer's filled count, triple-ready count and ratio, any item types whose
@@ -3760,6 +3770,11 @@ Flow gate:
 - Every attempt is walked by `scripts/tools/level_flow.py` before the solvability search runs, and
   the report lands in `stats["flow"]`. Walking costs milliseconds and the search costs seconds, so a
   board that would play badly is thrown back before anything is spent proving it can be finished.
+- A walk that clears the board is accepted as its solvability proof, and the search is skipped
+  (`validation.reason` is `flow_walk`). The walk plays legal moves through the same rules object and
+  starting state as the search, so a cleared walk is a found solution. The depth-first search would
+  otherwise reject some of those same boards: on tight boards with locks and dispensers its move
+  ordering commits early to lines that fail, and no state budget recovers them.
 - `--min-average-options` sets the floor for the average number of item types the player can complete
   a triple with per move. `--max-scarce-option-ratio` caps the share of moves that offer at most one
   such type, which is the "only one possible match on the whole field" stretch; it catches boards an

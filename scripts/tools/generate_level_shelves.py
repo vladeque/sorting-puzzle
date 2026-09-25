@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import itertools
 import json
 import math
 import random
@@ -55,6 +56,20 @@ DEFAULT_PAIR_RATIO = 0.5
 # move at a single option because that is the whole level, not because it plays badly.
 GATE_MIN_TRIPLES = 4
 LAYER_TRIPLE_RATIO_TOLERANCE = 0.05
+# How locked shelves get their contents. `as-generated` locks whatever the distribution engine left at
+# each requested position. `playable` chooses which generated shelves sit behind the locks, and is
+# opt-in so a recorded command that predates it still replays to the same board.
+LOCK_PLACEMENT_AS_GENERATED = "as-generated"
+LOCK_PLACEMENT_PLAYABLE = "playable"
+LOCK_PLACEMENTS = (LOCK_PLACEMENT_AS_GENERATED, LOCK_PLACEMENT_PLAYABLE)
+# Shelf sets `playable` scores by their opening. Past this many it samples instead of enumerating;
+# four locks among fourteen shelves is 1001 sets, so real boards are searched exhaustively.
+LOCK_PLACEMENT_MAX_SETS = 2000
+# Threshold orders tried per shelf set: every order up to five locks, a sample beyond that.
+LOCK_PLACEMENT_MAX_ORDERS = 120
+# Best-opening candidates that are then played through with the flow walk, the only measure here that
+# sees past the first unlock. The walks are most of what placement costs.
+LOCK_PLACEMENT_WALKS = 12
 LAYOUT_PRESETS = (
     "grid_2x3",
     "grid_3x2",
@@ -290,6 +305,182 @@ def apply_locked_shelves(shelves: list[dict[str, Any]], locked_shelves: dict[int
             shelves[shelf_number - 1]["unlock_after_triples"] = unlock_after_triples
         else:
             shelves[shelf_number - 1].pop("unlock_after_triples", None)
+
+
+def place_locked_shelves(
+    shelves: list[dict[str, Any]],
+    locked_shelves: dict[int, int],
+    rng: random.Random,
+) -> dict[str, Any]:
+    """Choose which generated standard shelves sit behind the requested locks, then lock them.
+
+    `apply_locked_shelves` locks whatever the distribution engine left at each position, and the
+    engine never saw the locks. With three copies per type, one locked copy freezes its whole type,
+    so a board locked that way routinely opens with pairs whose third copy is locked and too few free
+    slots to dig for anything else, and no line reaches the first unlock.
+
+    A shelf's position means nothing to the classic rules, so whole standard shelves are permuted
+    instead. The requested positions stay locked, every shelf's contents stay exactly as generated --
+    layer readiness, pairs, and item variety included -- and only which contents the player starts
+    without changes. Dispensers never move.
+    """
+    stats: dict[str, Any] = {"mode": LOCK_PLACEMENT_PLAYABLE, "candidate_sets": 0, "walked": 0}
+    for shelf_number in locked_shelves:
+        if shelf_number > len(shelves):
+            raise ValueError(
+                f"--locked-shelves references shelf {shelf_number}, but only {len(shelves)} shelves exist"
+            )
+
+    standard_positions = [
+        position for position, shelf in enumerate(shelves)
+        if shelf.get("type", "standard") != SHELF_KIND_DISPENSER
+    ]
+    lock_slots = [
+        position for position in standard_positions
+        if locked_shelves.get(position + 1, 0) > 0
+    ]
+    lock_count = len(lock_slots)
+    if lock_count == 0 or lock_count == len(standard_positions):
+        apply_locked_shelves(shelves, locked_shelves)
+        return stats
+
+    # Candidates are addressed by their index in `standard_positions`, so a shelf set is a tuple of
+    # the generated shelves it would lock.
+    contents = [shelves[position] for position in standard_positions]
+    content_states = [
+        shelf_state._replace(unlock_after_triples=0)
+        for shelf_state in (shelves_to_state([content])[1][0] for content in contents)
+    ]
+    content_types = [
+        {item_id for layer in content["layers"] for item_id in layer if item_id is not None}
+        for content in contents
+    ]
+    # Dispensers are part of every candidate board: open ones in the opening, locked ones in the
+    # stage they block.
+    dispensers = [
+        (position, shelf) for position, shelf in enumerate(shelves)
+        if shelf.get("type", "standard") == SHELF_KIND_DISPENSER
+    ]
+    open_dispenser_states = [
+        (position, shelves_to_state([shelf])[1][0])
+        for position, shelf in dispensers
+        if locked_shelves.get(position + 1, 0) <= 0
+    ]
+    locked_dispenser_types = [
+        (locked_shelves[position + 1],
+         {item_id for layer in shelf["layers"] for item_id in layer if item_id is not None})
+        for position, shelf in dispensers
+        if locked_shelves.get(position + 1, 0) > 0
+    ]
+    total_counts = Counter(
+        item_id for shelf in shelves for layer in shelf["layers"] for item_id in layer
+        if item_id is not None
+    )
+
+    def opening_score(shelf_set: tuple[int, ...]) -> tuple[int, int]:
+        """What the player can do before the first unlock, from the shelves this set leaves open.
+
+        Counts the item types the player could gather right away, plus open pairs beside a free slot
+        whose third copy is not locked -- the pairs pair seeding meant as one-move matches -- then
+        the free front slots the open shelves have to dig with.
+        """
+        locked_set = set(shelf_set)
+        open_indices = [index for index in range(len(contents)) if index not in locked_set]
+        accessible = [(index, content_states[index]) for index in open_indices]
+        accessible.extend(open_dispenser_states)
+        gatherable = len(collectible_front_types(accessible))
+
+        open_counts: Counter[str] = Counter()
+        for _address, shelf_state in accessible:
+            for layer in shelf_state.layers:
+                open_counts.update(item_id for item_id in layer if item_id is not None)
+        released_pairs = 0
+        free_slots = 0
+        for index in open_indices:
+            front = contents[index]["layers"][0] if contents[index]["layers"] else []
+            free_slots += front.count(None)
+            if None not in front:
+                continue
+            front_counts = Counter(item_id for item_id in front if item_id is not None)
+            if any(count == 2 and open_counts[item_id] == total_counts[item_id]
+                   for item_id, count in front_counts.items()):
+                released_pairs += 1
+
+        return gatherable + released_pairs, free_slots
+
+    def order_score(assignment: tuple[int, ...]) -> tuple[int, int]:
+        """Headroom before each unlock: types not frozen by a still-locked shelf, minus the triples
+        that unlock needs. `assignment[i]` is the shelf placed at `lock_slots[i]`."""
+        thresholds = [locked_shelves[slot + 1] for slot in lock_slots]
+        margins = []
+        for threshold in sorted(set(thresholds) | {t for t, _types in locked_dispenser_types}):
+            frozen: set[str] = set()
+            for slot_threshold, index in zip(thresholds, assignment):
+                if slot_threshold >= threshold:
+                    frozen |= content_types[index]
+            for dispenser_threshold, types in locked_dispenser_types:
+                if dispenser_threshold >= threshold:
+                    frozen |= types
+            margins.append(len(total_counts) - len(frozen) - threshold)
+        return min(margins), sum(margins)
+
+    as_generated = tuple(standard_positions.index(slot) for slot in lock_slots)
+    if math.comb(len(contents), lock_count) <= LOCK_PLACEMENT_MAX_SETS:
+        candidate_sets = list(itertools.combinations(range(len(contents)), lock_count))
+    else:
+        candidate_sets = [tuple(sorted(as_generated))]
+        seen = set(candidate_sets)
+        while len(candidate_sets) < LOCK_PLACEMENT_MAX_SETS:
+            shelf_set = tuple(sorted(rng.sample(range(len(contents)), lock_count)))
+            if shelf_set not in seen:
+                seen.add(shelf_set)
+                candidate_sets.append(shelf_set)
+    stats["candidate_sets"] = len(candidate_sets)
+
+    ## The as-generated set wins every tie, so a board only changes when another set is better.
+    scores = {shelf_set: opening_score(shelf_set) for shelf_set in candidate_sets}
+    finalists = sorted(
+        candidate_sets,
+        key=lambda shelf_set: (scores[shelf_set], shelf_set == tuple(sorted(as_generated))),
+        reverse=True,
+    )[:LOCK_PLACEMENT_WALKS]
+
+    def build_board(assignment: tuple[int, ...]) -> list[dict[str, Any]]:
+        placed = dict(zip(lock_slots, assignment))
+        remaining = iter(index for index in range(len(contents)) if index not in set(assignment))
+        board = list(shelves)
+        for position in standard_positions:
+            index = placed[position] if position in placed else next(remaining)
+            board[position] = dict(contents[index])
+            board[position].pop("unlock_after_triples", None)
+        apply_locked_shelves(board, locked_shelves)
+        return board
+
+    best: tuple[tuple[bool, int, float], tuple[int, ...], list[dict[str, Any]]] | None = None
+    for shelf_set in finalists:
+        orders = list(itertools.permutations(shelf_set))
+        if len(orders) > LOCK_PLACEMENT_MAX_ORDERS:
+            orders = [shelf_set] + rng.sample(orders, LOCK_PLACEMENT_MAX_ORDERS - 1)
+        # `max` keeps the first of equals, so the as-generated order wins a tie on its own set.
+        if shelf_set == tuple(sorted(as_generated)):
+            orders.insert(0, as_generated)
+        assignment = max(orders, key=order_score)
+        board = build_board(assignment)
+        report = measure_board_flow(board, None, None)
+        stats["walked"] += 1
+        key = (report.completed, report.cleared_triples, report.average_options)
+        if best is None or key > best[0]:
+            best = (key, assignment, board)
+        ## A walk that clears the board is already a solvability proof; nothing can outrank it.
+        if report.completed:
+            break
+
+    _key, assignment, board = best
+    shelves[:] = board
+    stats["locked_sources"] = {
+        str(slot + 1): standard_positions[index] + 1 for slot, index in zip(lock_slots, assignment)
+    }
+    return stats
 
 
 def calculate_filled_slots(total_slots: int, preset: DifficultyPreset, rng: random.Random) -> int:
@@ -616,7 +807,9 @@ def validate_generated_shelves(
     max_depth: int,
     column_heights: list[int] | None = None,
     visible_shelves_per_column: int | None = None,
+    flow_report=None,
 ) -> dict[str, Any]:
+    """Shape check, then a solvability proof: a completed `flow_report` if given, else the search."""
     errors, item_counts = validate_shelves_shape(
         shelves=shelves,
         known_item_ids=set(),
@@ -636,6 +829,24 @@ def validate_generated_shelves(
             "solvable": None,
             "reason": "invalid",
             "moves": None,
+            "states_checked": 0,
+            "max_queue_size": 0,
+        }
+
+    ## The flow walk plays the board through the same rules object and starting state the search
+    ## uses, one legal move at a time, so a walk that clears the board has already found a solution.
+    ## Searching again can only agree with it, or run out of budget first: the depth-first search
+    ## rejects tight boards, locks and dispensers especially, whose winning line starts with a move
+    ## its ordering ranks low, and no state budget fixes that.
+    if flow_report is not None and flow_report.completed:
+        return {
+            "valid": True,
+            "gameplay_mode": rules.mode,
+            "errors": [],
+            "item_counts": dict(sorted(item_counts.items())),
+            "solvable": True,
+            "reason": "flow_walk",
+            "moves": flow_report.moves,
             "states_checked": 0,
             "max_queue_size": 0,
         }
@@ -826,9 +1037,12 @@ def generate_with_optional_validation(
     sticky_items_percent: float = 0.0,
     column_heights: list[int] | None = None,
     visible_shelves_per_column: int | None = None,
+    lock_placement: str = LOCK_PLACEMENT_AS_GENERATED,
 ) -> tuple[list[dict[str, Any]], dict[str, Any], dict[str, Any] | None, int | None]:
     if not math.isfinite(sticky_items_percent) or not 0 <= sticky_items_percent <= 100:
         raise ValueError("--sticky-items-percent must be finite and between 0 and 100")
+    if lock_placement not in LOCK_PLACEMENTS:
+        raise ValueError(f"--lock-placement must be one of {', '.join(LOCK_PLACEMENTS)}")
     attempts = max(1, max_attempts if require_solvable else 1)
     random_seed_source = random.SystemRandom()
     last_result = None
@@ -857,7 +1071,12 @@ def generate_with_optional_validation(
             pair_ratio=pair_ratio,
         )
         apply_dispenser_shelves(shelves, dispenser_shelves, random.Random(attempt_seed))
-        apply_locked_shelves(shelves, locked_shelves)
+        if lock_placement == LOCK_PLACEMENT_PLAYABLE and locked_shelves:
+            stats["lock_placement"] = place_locked_shelves(
+                shelves, locked_shelves, random.Random(f"locks:{attempt_seed}")
+            )
+        else:
+            apply_locked_shelves(shelves, locked_shelves)
         if column_heights:
             visible_count = int(visible_shelves_per_column or 1)
             stats["rescued_empty_shelves"] = fill_empty_collapsing_shelves(
@@ -967,6 +1186,7 @@ def generate_with_optional_validation(
                 max_depth=max_depth,
                 column_heights=column_heights,
                 visible_shelves_per_column=visible_shelves_per_column,
+                flow_report=flow_report,
             )
             stats["validation"] = validation
 
@@ -2347,6 +2567,18 @@ def build_parser(add_help: bool = True) -> argparse.ArgumentParser:
             "Each shelf unlocks after that many cleared triples."
         ),
     )
+    parser.add_argument(
+        "--lock-placement",
+        choices=LOCK_PLACEMENTS,
+        default=LOCK_PLACEMENT_AS_GENERATED,
+        help=(
+            f"{LOCK_PLACEMENT_AS_GENERATED} locks whatever the generator placed at each "
+            f"--locked-shelves position. {LOCK_PLACEMENT_PLAYABLE} moves whole generated shelves "
+            "so the locked positions hold the ones that least block play before each unlock; use "
+            f"it for levels with several or high locks. Defaults to {LOCK_PLACEMENT_AS_GENERATED} "
+            "so recorded commands keep replaying to the same board."
+        ),
+    )
     return parser
 
 
@@ -2607,6 +2839,7 @@ def run(args: argparse.Namespace) -> int:
             sticky_items_percent=args.sticky_items_percent,
             column_heights=column_heights,
             visible_shelves_per_column=args.visible_shelves_per_column,
+            lock_placement=args.lock_placement,
         )
     except (OSError, ValueError, KeyError) as error:
         print(f"error: {error}", file=sys.stderr)
