@@ -451,11 +451,11 @@ skip the update. The file is ignored by `materialize_level_templates.py`, whose 
   "schema_version": 1,
   "entries": {
     "level_002.json": {
-      "command": "py scripts/tools/regenerate_level.py --difficulty easy ... --seed 484481165",
-      "generated_at": "2026-09-21T00:25:41Z",
-      "resolved_seed": 484481165,
-      "template_sha256": "8a024000378039ff...",
-      "arguments": { "--shelf-count": 9, "--difficulty": "easy", "...": "..." }
+      "command": "py scripts/tools/regenerate_level.py --difficulty medium ... --seed 2034 ...",
+      "generated_at": "2026-09-25T01:11:51Z",
+      "resolved_seed": 2034,
+      "template_sha256": "e1c9fd0419c57c4d...",
+      "arguments": { "--shelf-count": 9, "--difficulty": "medium", "...": "..." }
     }
   }
 }
@@ -470,7 +470,11 @@ skip the update. The file is ignored by `materialize_level_templates.py`, whose 
   retry advanced it, and `--layout-preset` is the preset the template was wrapped with. Collapsing
   levels record no preset, because replaying one with a preset is rejected.
 - `template_sha256` is the template as generated. A later mismatch against the file on disk means
-  the template was hand-edited after generation, and regenerating it will revert that edit.
+  the template was hand-edited after generation, and regenerating it will revert that edit. The hash
+  covers whitespace, so a tool that only re-indents the file trips it too: levels 2-8 were rewritten
+  in a mixed tab and two-space style minutes after they were generated, with identical parsed JSON.
+  Compare parsed JSON to tell a re-indent from a real edit, and replaying the entry's `command`
+  with `--no-record` restores the exact bytes.
 - Entries stay sorted by file name, and an unreadable or unsupported manifest stops the run before
   any level file is replaced.
 
@@ -549,9 +553,49 @@ while a board it does badly on is the reliable signal.
 
 Current authored generation parameters:
 
-- Level 2 uses 9 shelves, 2 filled layers, 7 logical item types, easy difficulty, and a maximum of 6 copies per logical item type.
-- Level 3 uses 12 shelves, 2 filled layers, 7 logical item types, medium difficulty, and a maximum of 6 copies per logical item type.
-- Level 4 uses 15 shelves, 3 filled layers, 19 logical item types, medium difficulty, and seed 4004.
+Levels 2-8 have manifest entries as of 2026-09-25 and were regenerated together against the flow
+gate. `generation_manifest.json` is the source of truth for their exact arguments; this list is the
+readable summary. Every level below also records `--pair-ratio 0.5`, `--max-generation-attempts 100`
+and `--validator-max-states 400`. Each keeps the shelf count, layer count, layout, timer, locks and
+dispensers the level shipped with, and none carries fewer items than the board it replaced, so the
+regeneration did not thin out item variety.
+
+- Level 2: 9 shelves, 2 layers, `grid_3x3`, medium, 300 s, 16 item types of three copies, seed 2034.
+- Level 3: 12 shelves, 2 layers, `grid_3x4`, medium, 180 s, shelf 3 locked behind 5 triples, 21 item
+  types of three copies, seed 3014.
+- Level 4: 13 shelves, 2 layers, `staggered_columns_4_5_4`, medium, 360 s, shelves 5 and 9 locked
+  behind 5 and 10 triples, 22 item types of three copies, seed 4025.
+- Level 5: 12 shelves, 3 layers, `grid_3x4`, hard, 420 s, dispenser shelves at positions 1 and 3
+  holding three items each, `--item-type-count 17` (nine types of three copies, eight of six),
+  seed 5036.
+- Level 6: 11 shelves, 3 layers, `grid_3x2_moving_5_bottom`, medium, 420 s, 28 item types of three
+  copies, seed 6007.
+- Level 7: 16 shelves, 2 layers, `grid_2x4_moving_8_left`, hard, 300 s, 27 item types of three
+  copies, seed 7035.
+- Level 8: 14 shelves, 3 layers, `grid_3x3_moving_5_bottom`, hard, 300 s, `--item-type-count 15`
+  (nine types of six copies, six of nine), seed 8012.
+
+The flow bar (`--min-average-options` / `--max-scarce-option-ratio`) is 2.5 / 0.30 for levels 2, 3,
+4, 6 and 8, whose previous boards all failed it. Levels 5 and 7 already played well (2.72 average
+options with 5.3% scarce moves, and 3.51 with 9.9%), so their bars, 2.7 / 0.08 and 3.0 / 0.15, sit
+at what the old boards measured instead of at the looser floor. Before this pass a plain greedy
+player stalled partway through levels 4, 6 and 8; all seven now finish.
+
+Item counts are not a generator input: unless `--item-type-count` is passed they follow from the
+filled-slot count, which is drawn from the difficulty's empty-ratio range per seed. Levels 2, 3, 4
+and 8 shipped at the densest end of that range, so a random seed usually returns fewer items. The
+seeds above were chosen by scanning for a board that keeps the shipped count, passes the flow bar
+and solves, so a plain `--seed` replay reproduces each one.
+
+How these were recovered: before the manifest, a level's arguments survived only in its template's
+`seed` and `difficulty` fields, and those went stale. Level 6 changed from 13 shelves and 15 types
+to 11 shelves and 27 types while its `seed` stayed 6007, and level 5's 5005 predates the dispenser
+board beside it. Levels 2 and 3 never recorded a seed. Structure was read back from the shipped
+templates, and replaying the recorded seeds against 15 historical generator versions reproduced only
+level 8, exactly, under the generator at commit `82b198a` with `--shelf-count 14 --layer-count 3
+--difficulty hard --seed 8008 --item-type-count 15`. The previous boards for levels 2-7 cannot be
+regenerated, so these are new boards with the same shape.
+
 - Level 9 is the campaign's first `collapsing_columns` board: three columns of nine one-layer
   shelves, an authored window of four, 14 logical item types, medium difficulty, and seed 9009.
   Columns are deliberately taller than `MAX_VISIBLE_SHELVES_PER_COLUMN`, so shelves still wait

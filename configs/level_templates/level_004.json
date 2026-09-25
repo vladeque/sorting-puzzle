@@ -1,195 +1,193 @@
 {
-	"level":  4,
-	"time_seconds":  360,
-	"layout_preset":  "staggered_columns_4_5_4",
-	"seed":  4004,
-	"difficulty":  "medium",
-	"shelves": [
-  {
-	"layers": [
-	  [
-		"item_07",
-		null,
-        "item_05"
-	  ],
-	  [
-		"item_06",
-		"item_03",
-		null
-	  ]
-	]
-  },
-  {
-	"layers": [
-	  [
-		null,
-		null,
-        "item_19"
-	  ],
-	  [
-		"item_13",
-		"item_17",
-        "item_10"
-	  ]
-	]
-  },
-  {
-	"layers": [
-	  [
-		"item_17",
-		null,
-        "item_06"
-	  ],
-	  [
-		"item_16",
-		"item_20",
-        "item_21"
-	  ]
-	]
-  },
-  {
-	"layers": [
-	  [
-		"item_08",
-		"item_07",
-        "item_09"
-	  ],
-	  [
-		"item_18",
-		"item_04",
-        "item_02"
-	  ]
-	]
-  },
-  {
-	"layers": [
-	  [
-		null,
-		"item_12",
-        "item_12"
-	  ],
-	  [
-		"item_13",
-		"item_09",
-        "item_01"
-	  ]
-	],
-	"unlock_after_triples": 5
-  },
-  {
-	"layers": [
-	  [
-		"item_17",
-		"item_19",
-        "item_04"
-	  ],
-	  [
-		"item_22",
-		"item_18",
-        "item_14"
-	  ]
-	]
-  },
-  {
-	"layers": [
-	  [
-		"item_15",
-		"item_11",
-        "item_01"
-	  ],
-	  [
-		null,
-		"item_03",
-		null
-	  ]
-	]
-  },
-  {
-	"layers": [
-	  [
-		"item_21",
-		"item_03",
-		null
-	  ],
-	  [
-		"item_20",
-		"item_16",
-		null
-	  ]
-	]
-  },
-  {
-	"layers": [
-	  [
-		"item_02",
-		"item_21",
-        "item_08"
-	  ],
-	  [
-		"item_10",
-		"item_09",
-        "item_19"
-	  ]
-	],
-	"unlock_after_triples": 10
-  },
-  {
-	"layers": [
-	  [
-		"item_10",
-		"item_05",
-		null
-	  ],
-	  [
-		"item_22",
-		"item_15",
-        "item_18"
-	  ]
-	]
-  },
-  {
-	"layers": [
-	  [
-		"item_14",
-		"item_05",
-        "item_02"
-	  ],
-	  [
-		"item_16",
-		"item_01",
-        "item_13"
-	  ]
-	]
-  },
-  {
-	"layers": [
-	  [
-		"item_06",
-		"item_12",
-        "item_14"
-	  ],
-	  [
-		null,
-		"item_22",
-        "item_20"
-	  ]
-	]
-  },
-  {
-	"layers": [
-	  [
-		"item_07",
-		"item_11",
-        "item_11"
-	  ],
-	  [
-		"item_08",
-		"item_04",
-        "item_15"
-	  ]
-	]
-  }
-]
-
-
+  "level": 4,
+  "time_seconds": 360,
+  "layout_preset": "staggered_columns_4_5_4",
+  "seed": 4025,
+  "difficulty": "medium",
+  "shelves": [
+    {
+      "layers": [
+        [
+          "item_17",
+          "item_05",
+          "item_10"
+        ],
+        [
+          "item_08",
+          "item_05",
+          "item_21"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          null,
+          "item_14",
+          "item_09"
+        ],
+        [
+          "item_03",
+          "item_09",
+          "item_15"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          null,
+          "item_06",
+          "item_21"
+        ],
+        [
+          "item_07",
+          "item_13",
+          "item_05"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "item_19",
+          "item_06",
+          "item_04"
+        ],
+        [
+          "item_12",
+          "item_20",
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          null,
+          "item_16",
+          "item_14"
+        ],
+        [
+          null,
+          "item_08",
+          "item_08"
+        ]
+      ],
+      "unlock_after_triples": 5
+    },
+    {
+      "layers": [
+        [
+          null,
+          "item_20",
+          "item_10"
+        ],
+        [
+          "item_16",
+          "item_03",
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "item_13",
+          "item_09",
+          "item_06"
+        ],
+        [
+          "item_02",
+          "item_02",
+          "item_07"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "item_18",
+          "item_18",
+          null
+        ],
+        [
+          "item_07",
+          null,
+          "item_19"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "item_21",
+          "item_16",
+          "item_10"
+        ],
+        [
+          "item_15",
+          "item_12",
+          "item_04"
+        ]
+      ],
+      "unlock_after_triples": 10
+    },
+    {
+      "layers": [
+        [
+          "item_11",
+          "item_19",
+          "item_22"
+        ],
+        [
+          null,
+          "item_12",
+          "item_01"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "item_02",
+          null,
+          "item_14"
+        ],
+        [
+          "item_20",
+          "item_17",
+          "item_04"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "item_17",
+          "item_11",
+          "item_11"
+        ],
+        [
+          "item_01",
+          null,
+          "item_01"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "item_22",
+          "item_22",
+          "item_13"
+        ],
+        [
+          "item_03",
+          "item_18",
+          "item_15"
+        ]
+      ]
+    }
+  ]
 }

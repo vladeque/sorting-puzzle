@@ -3886,7 +3886,9 @@ Key behavior:
   board contract or an exhausted chapter item pool cannot strand a replaced template against a
   runtime level that was never rewritten.
 - Prints every top-level template difference before replacing the file, including hand edits such
-  as level 5's `layout_preset` or level 3's `time_seconds`, which regeneration reverts.
+  as a hand-set `layout_preset` or `time_seconds`, which regeneration reverts unless the same value
+  is passed as an argument. Levels 3 and 5 were regenerated that way, so their timer and preset are
+  recorded arguments now rather than hand edits.
 - Warns when a runtime level exists with no template behind it, as level 10 does.
 - Materializes only the regenerated level; `materialize_level_templates.py` remains the full sweep.
 - Records every successful run in `configs/level_templates/generation_manifest.json`, keyed by
