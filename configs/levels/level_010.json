@@ -1,61 +1,191 @@
 {
   "level": 10,
   "time_seconds": 300,
-  "layout_preset": "grid_3x3",
+  "gameplay_mode": "throwing_dispensers",
+  "layout_preset": "grid_3x4",
+  "throw_seed": "02b3bc1371c8bcd6",
+  "seed": 438182785,
+  "difficulty": "hard",
+  "dispensers": [
+    {
+      "throw_count": 20,
+      "contents": [
+        "juice_box_apple",
+        "chips_can_classic",
+        "cookie_box_blue",
+        "water_bottle",
+        "yogurt_tub_peach",
+        "chocolate_bar_white_vanilla",
+        "vegetable_can_peas",
+        "juice_box_apple",
+        "ketchup_bottle",
+        "soap_pump",
+        "vegetable_can_peas",
+        "water_bottle",
+        "smoothie_cup_strawberry_banana",
+        "milk_carton",
+        "lollipop_rainbow",
+        "smoothie_cup_strawberry_banana",
+        "soda_can_orange",
+        "chocolate_bar_classic",
+        "cookie_box_blue",
+        "lollipop_rainbow",
+        "popcorn_box",
+        "ice_cream_tub_pink",
+        "chocolate_bar_white_vanilla",
+        "juice_box_apple",
+        "smoothie_cup_strawberry_banana",
+        "yogurt_cup_strawberry",
+        "lollipop_rainbow",
+        "ice_cream_tub_pink",
+        "chocolate_bar_classic",
+        "chips_can_classic"
+      ]
+    },
+    {
+      "throw_count": 20,
+      "contents": [
+        "ketchup_bottle",
+        "soda_bottle_orange",
+        "yogurt_tub_peach",
+        "milk_carton",
+        "yogurt_tub_peach",
+        "yogurt_cup_peach",
+        "yogurt_cup_peach",
+        "cookie_box_blue",
+        "ice_cream_tub_pink",
+        "yogurt_cup_peach",
+        "soap_pump",
+        "popcorn_box",
+        "ketchup_bottle",
+        "vegetable_can_peas",
+        "yogurt_cup_strawberry",
+        "yogurt_cup_strawberry",
+        "chocolate_bar_white_vanilla",
+        "soap_pump",
+        "milk_carton",
+        "popcorn_box",
+        "chocolate_bar_classic",
+        "soda_bottle_orange",
+        "chocolate_bar_hazelnut",
+        "soda_can_orange",
+        "chips_can_classic",
+        "soda_bottle_orange",
+        "chocolate_bar_hazelnut",
+        "chocolate_bar_hazelnut",
+        "water_bottle",
+        "soda_can_orange"
+      ]
+    }
+  ],
   "shelves": [
-	{
-	  "layers": [
-		["milk_carton", "chips_can_classic", null],
-		["milk_carton", "chips_can_classic", "toy_robot"]
-	  ]
-	},
-	{
-	  "layers": [
-		["toy_robot", "soda_bottle", null],
-		["soda_bottle", "plant_pot", "cookie_box_blue"]
-	  ]
-	},
-	{
-	  "layers": [
-		["plant_pot", "cookie_box_blue", "ketchup_bottle"],
-		["ketchup_bottle", "milk_carton", "chips_can_classic"]
-	  ]
-	},
-	{
-	  "layers": [
-		["chips_can_classic", "toy_robot", "milk_carton"],
-		["toy_robot", "soda_bottle", "plant_pot"]
-	  ]
-	},
-	{
-	  "layers": [
-		[null, null, "soda_bottle"],
-		["cookie_box_blue", "ketchup_bottle", "milk_carton"]
-	  ]
-	},
-	{
-	  "layers": [
-		["cookie_box_blue", "plant_pot", "ketchup_bottle"],
-		["chips_can_classic", "toy_robot", "soda_bottle"]
-	  ]
-	},
-	{
-	  "layers": [
-		["toy_robot", "chips_can_classic", null],
-		["plant_pot", "cookie_box_blue", "ketchup_bottle"]
-	  ]
-	},
-	{
-	  "layers": [
-		["soda_bottle", null, "cookie_box_blue"],
-		[null, null, null]
-	  ]
-	},
-	{
-	  "layers": [
-		["ketchup_bottle", "milk_carton", "plant_pot"],
-		[null, null, null]
-	  ]
-	}
+    {
+      "layers": [
+        [
+          null,
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          null,
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          null,
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          null,
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          null,
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          null,
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          null,
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          null,
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          null,
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          null,
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          null,
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          null,
+          null,
+          null
+        ]
+      ]
+    }
   ]
 }

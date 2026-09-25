@@ -3,8 +3,8 @@
   "time_seconds": 300,
   "layout_preset": "grid_3x3",
   "shelves": [
-    { "layers": [["item_01", null, null]] },
-    { "layers": [["item_01", null, null]] },
-    { "layers": [["item_01", null, null]] }
+	{ "layers": [["item_01", null, null]] },
+	{ "layers": [["item_01", null, null]] },
+	{ "layers": [["item_01", null, null]] }
   ]
 }

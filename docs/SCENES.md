@@ -1418,7 +1418,7 @@ Verification:
 
 ```powershell
 & .\scripts\tools\capture_ui.ps1 -Scene scenes/main_menu_testing.tscn -Name testing_menu_picker_500 `
-    -Setup scripts/tools/captures/dev_level_picker_large_chapter_setup.gd
+	-Setup scripts/tools/captures/dev_level_picker_large_chapter_setup.gd
 ```
 
 ## `level.tscn`
