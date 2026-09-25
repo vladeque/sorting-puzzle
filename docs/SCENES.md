@@ -1958,21 +1958,22 @@ Static presets:
 - `scenes/layouts/layout_staggered_columns_5_4_5.tscn` (14)
 
 Presets with moving rows:
-- `scenes/layouts/layout_grid_3x2_moving_4_bottom.tscn` (10; two static rows over one 4-shelf belt, 3 visible, 60 px/s right)
-- `scenes/layouts/layout_grid_3x3_moving_4_middle.tscn` (13; a 4-shelf belt between the top static row and the two below it, 3 visible, 60 px/s right)
-- `scenes/layouts/layout_grid_3x2_moving_6_6_center.tscn` (18; two counter-running 6-shelf belts between two static rows, 3 visible each, 60 px/s)
+- `scenes/layouts/layout_grid_3x2_moving_5_bottom.tscn` (11; two static rows over one 5-shelf belt, 3 visible, 60 px/s right)
+- `scenes/layouts/layout_grid_3x3_moving_5_middle.tscn` (14; a 5-shelf belt between the top static row and the two below it, 3 visible, 60 px/s right)
+- `scenes/layouts/layout_grid_3x2_moving_5_5_center.tscn` (16; two counter-running 5-shelf belts between two static rows, 3 visible each, 60 px/s)
 - `scenes/layouts/layout_grid_3x3_moving_5_bottom.tscn` (14; a 3x3 static grid over one 5-shelf belt, 3 visible, 60 px/s right)
-- `scenes/layouts/layout_staggered_columns_4_moving_6_4.tscn` (14; a vertical 6-shelf belt between two static columns of four, 3 visible, 60 px/s down)
-- `scenes/layouts/layout_staggered_columns_5_moving_6_5.tscn` (16; a vertical 6-shelf belt between two static columns of five, 4 visible, 60 px/s down)
-- `scenes/layouts/layout_grid_2x4_moving_6_left.tscn` (14; a vertical 6-shelf belt down the left edge beside a static 2x4 block, 4 visible, 60 px/s down)
-- `scenes/layouts/layout_grid_1x4_moving_6_6_sides.tscn` (16; two vertical 6-shelf belts around a static column of four, 4 visible each, 60 px/s, left down and right up)
+- `scenes/layouts/layout_staggered_columns_4_moving_8_4.tscn` (16; a vertical 8-shelf belt between two static columns of four, 3 visible, 60 px/s down)
+- `scenes/layouts/layout_staggered_columns_5_moving_8_5.tscn` (18; a vertical 8-shelf belt between two static columns of five, 4 visible, 60 px/s down)
+- `scenes/layouts/layout_grid_2x4_moving_8_left.tscn` (16; a vertical 8-shelf belt down the left edge beside a static 2x4 block, 4 visible, 60 px/s down)
+- `scenes/layouts/layout_grid_1x4_moving_8_8_sides.tscn` (20; two vertical 8-shelf belts around a static column of four, 4 visible each, 60 px/s, left down and right up)
 - `scenes/layouts/layout_grid_3x2_moving_5_5_top_bottom.tscn` (16; two counter-running 5-shelf belts above and below a static 3x2 grid, 3 visible each, 60 px/s, right and left)
-- `scenes/layouts/layout_shape_arch_3x5_moving_6_bottom.tscn` (15; nine-shelf static Arch over a 6-shelf belt, 3 visible, 60 px/s left)
-- `scenes/layouts/layout_shape_hourglass_3x5_moving_6_waist.tscn` (14; static Hourglass halves around a 6-shelf belt, 3 visible, 60 px/s right)
-- `scenes/layouts/layout_shape_alternating_alcoves_3x5_moving_6_center.tscn` (11; 6-shelf center vertical belt with five alternating static alcoves, 4 visible, 60 px/s down)
+- `scenes/layouts/layout_shape_arch_3x5_moving_5_bottom.tscn` (14; nine-shelf static Arch over a 5-shelf belt, 3 visible, 60 px/s left)
+- `scenes/layouts/layout_shape_hourglass_3x5_moving_5_waist.tscn` (13; static Hourglass halves around a 5-shelf belt, 3 visible, 60 px/s right)
+- `scenes/layouts/layout_shape_alternating_alcoves_3x5_moving_8_center.tscn` (13; 8-shelf center vertical belt with five alternating static alcoves, 4 visible, 60 px/s down)
 - `scenes/layouts/layout_shape_side_elevator_steps_3x5_moving_8_left.tscn` (15; 8-shelf left vertical belt beside seven static steps, 4 visible, 60 px/s down)
 
 Vertical belts:
+- Built-in horizontal belts carry five shelves and built-in vertical belts eight.
 - A `vertical_wrap` row carries at least six shelves. Fewer makes the hidden part of the belt shorter
   than the window it wraps around, so a shelf leaving the bottom is still on screen as it re-enters
   at the top.

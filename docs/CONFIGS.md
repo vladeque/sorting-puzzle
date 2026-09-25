@@ -218,37 +218,40 @@ playable background along the motion axis, so additional configured shelves can 
 
 - `grid_3x2_moving_5_bottom`: 11 shelves arranged as two static rows of three plus a bottom row of
   five moving shelves, three visible at 60 px/s to the right.
-- `grid_3x3_moving_4_middle`: 13 shelves arranged as a static row of three, a row of four moving
+- `grid_3x3_moving_5_middle`: 14 shelves arranged as a static row of three, a row of five moving
   shelves, and two more static rows of three. Three moving shelves are visible at 60 px/s to the right.
-- `grid_3x2_moving_6_6_center`: 18 shelves arranged as a static row of three, two counter-running
-  rows of six moving shelves, and a static row of three. Three moving shelves per row are visible at
+- `grid_3x2_moving_5_5_center`: 16 shelves arranged as a static row of three, two counter-running
+  rows of five moving shelves, and a static row of three. Three moving shelves per row are visible at
   60 px/s, the upper row to the right and the lower row to the left.
 - `grid_3x2_moving_5_5_top_bottom`: 16 shelves arranged as a static 3x2 grid between two
   counter-running rows of five moving shelves. Three moving shelves per row are visible at 60 px/s,
   the upper row to the right and the lower row to the left. Level 12 uses it.
 - `grid_3x3_moving_5_bottom`: 14 shelves arranged as a 3x3 static grid plus a bottom row of five
   moving shelves, three visible at 70 px/s to the right.
-- `staggered_columns_4_moving_6_4`: 14 shelves arranged as a static column of four, a vertical belt
-  of six moving shelves, and a static column of four. Three moving shelves are visible at 55 px/s
+- `staggered_columns_4_moving_8_4`: 16 shelves arranged as a static column of four, a vertical belt
+  of eight moving shelves, and a static column of four. Three moving shelves are visible at 55 px/s
   downward.
-- `staggered_columns_5_moving_6_5`: 16 shelves arranged as a static column of five, a vertical belt
-  of six moving shelves, and a static column of five. Four moving shelves are visible at 55 px/s
+- `staggered_columns_5_moving_8_5`: 18 shelves arranged as a static column of five, a vertical belt
+  of eight moving shelves, and a static column of five. Four moving shelves are visible at 55 px/s
   downward. This is the tallest board that fits the play area.
 - `grid_2x4_moving_8_left`: 16 shelves arranged as a vertical belt of eight moving shelves down the
   left edge and a static 2x4 block beside it. Four moving shelves are visible at 60 px/s downward.
-- `grid_1x4_moving_6_6_sides`: 16 shelves arranged as two vertical belts of six moving shelves around
+- `grid_1x4_moving_8_8_sides`: 20 shelves arranged as two vertical belts of eight moving shelves around
   a static column of four. Four moving shelves per belt are visible at 55 px/s, the left belt
   downward and the right belt upward.
-- `shape_arch_3x5_moving_6_bottom`: 15 shelves arranged as a nine-shelf static Arch over a
-  six-shelf horizontal belt. Three belt shelves are visible at 60 px/s to the left.
-- `shape_hourglass_3x5_moving_6_waist`: 14 shelves arranged as the two static halves of an
-  Hourglass around a six-shelf horizontal belt. Three belt shelves are visible at 60 px/s to the
+- `shape_arch_3x5_moving_5_bottom`: 14 shelves arranged as a nine-shelf static Arch over a
+  five-shelf horizontal belt. Three belt shelves are visible at 60 px/s to the left.
+- `shape_hourglass_3x5_moving_5_waist`: 13 shelves arranged as the two static halves of an
+  Hourglass around a five-shelf horizontal belt. Three belt shelves are visible at 60 px/s to the
   right.
-- `shape_alternating_alcoves_3x5_moving_6_center`: 11 shelves arranged as a central six-shelf
+- `shape_alternating_alcoves_3x5_moving_8_center`: 13 shelves arranged as a central eight-shelf
   vertical belt with five static shelves alternating left and right. Four belt shelves are visible
   at 60 px/s downward.
 - `shape_side_elevator_steps_3x5_moving_8_left`: 15 shelves arranged as an eight-shelf vertical
   belt beside seven static staircase shelves. Four belt shelves are visible at 60 px/s downward.
+
+Every built-in horizontal belt carries five shelves and every built-in vertical belt carries eight;
+`tests/tools/test_generate_level_shelves.py` checks this against every layout scene.
 
 The `vertical_wrap` presets above cannot be combined with horizontal moving rows in the same
 level.
@@ -284,7 +287,7 @@ Row layout rules:
   common 60 Hz displays. Use `0` for a row that is structured as a moving row but currently stopped.
 - `motion.direction` supports `right` and `left` for `horizontal_wrap`, and `down` and `up` for `vertical_wrap`. Vertical rows default to `down`, moving shelves from top to bottom.
 - A level may use horizontal moving shelves or vertical moving shelves, but not both at the same time.
-- The built-in `vertical_wrap` presets carry six shelves per belt. Runtime wrapping also handles
+- The built-in `vertical_wrap` presets carry eight shelves per belt. Runtime wrapping also handles
   shorter belts or taller windows by extending the empty portion of the loop until a shelf can fully
   exit before re-entering on the other side.
 - `visual_variant` supports `full` and `floor_only`. Moving rows default to `floor_only`; static rows default to `full`.

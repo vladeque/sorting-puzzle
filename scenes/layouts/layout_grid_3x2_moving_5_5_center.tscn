@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://c7ucxk6s8a2nl" path="res://scripts/shelf_layout_row.gd" id="1_y1dc2"]
 
-[node name="LayoutGrid3x2Moving6x6Center" type="Node2D" unique_id=1286806216]
+[node name="LayoutGrid3x2Moving5x5Center" type="Node2D" unique_id=1286806216]
 
 [node name="Shelf01" type="Marker2D" parent="." unique_id=1506502823]
 position = Vector2(-228.96, -269.24)
@@ -16,19 +16,19 @@ position = Vector2(228.96, -269.24)
 [node name="MovingRow04" type="Node2D" parent="." unique_id=672668328]
 position = Vector2(0, -92.75)
 script = ExtResource("1_y1dc2")
-shelf_count = 6
+shelf_count = 5
 
-[node name="MovingRow08" type="Node2D" parent="." unique_id=1720366353]
+[node name="MovingRow09" type="Node2D" parent="." unique_id=1720366353]
 position = Vector2(0, 92.75)
 script = ExtResource("1_y1dc2")
-shelf_count = 6
+shelf_count = 5
 direction = "left"
 
-[node name="Shelf12" type="Marker2D" parent="." unique_id=1695420059]
+[node name="Shelf14" type="Marker2D" parent="." unique_id=1695420059]
 position = Vector2(-228.96, 269.24)
 
-[node name="Shelf13" type="Marker2D" parent="." unique_id=299895366]
+[node name="Shelf15" type="Marker2D" parent="." unique_id=299895366]
 position = Vector2(0, 269.24)
 
-[node name="Shelf14" type="Marker2D" parent="." unique_id=1259580441]
+[node name="Shelf16" type="Marker2D" parent="." unique_id=1259580441]
 position = Vector2(228.96, 269.24)

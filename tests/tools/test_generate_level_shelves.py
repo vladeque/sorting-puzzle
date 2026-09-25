@@ -54,6 +54,20 @@ class LayoutPresetTests(unittest.TestCase):
                 )
                 self.assertTrue(scene_path.is_file(), msg=f"Missing {scene_path}")
 
+    def test_moving_belts_carry_five_shelves_horizontally_and_eight_vertically(self) -> None:
+        belts_found = 0
+        for scene_path in sorted((REPOSITORY_ROOT / "scenes" / "layouts").glob("layout_*.tscn")):
+            scene_text = scene_path.read_text(encoding="utf-8")
+            for node_block in re.split(r"\n(?=\[node )", scene_text):
+                if not re.search(r"^script = ExtResource", node_block, flags=re.MULTILINE):
+                    continue
+                belts_found += 1
+                shelf_count = int(re.search(r"^shelf_count = (\d+)", node_block, flags=re.MULTILINE).group(1))
+                is_vertical = 'motion_type = "vertical_wrap"' in node_block
+                with self.subTest(scene=scene_path.name, vertical=is_vertical):
+                    self.assertEqual(shelf_count, 8 if is_vertical else 5)
+        self.assertGreater(belts_found, 0)
+
     def test_shape_presets_use_three_columns_and_exactly_five_rows(self) -> None:
         expected_row_counts = {
             "shape_arch_3x5": [3, 2, 2, 2, 2],
