@@ -223,6 +223,9 @@ playable background along the motion axis, so additional configured shelves can 
 - `grid_3x2_moving_6_6_center`: 18 shelves arranged as a static row of three, two counter-running
   rows of six moving shelves, and a static row of three. Three moving shelves per row are visible at
   60 px/s, the upper row to the right and the lower row to the left.
+- `grid_3x2_moving_5_5_top_bottom`: 16 shelves arranged as a static 3x2 grid between two
+  counter-running rows of five moving shelves. Three moving shelves per row are visible at 60 px/s,
+  the upper row to the right and the lower row to the left. Level 12 uses it.
 - `grid_3x3_moving_5_bottom`: 14 shelves arranged as a 3x3 static grid plus a bottom row of five
   moving shelves, three visible at 70 px/s to the right.
 - `staggered_columns_4_moving_6_4`: 14 shelves arranged as a static column of four, a vertical belt

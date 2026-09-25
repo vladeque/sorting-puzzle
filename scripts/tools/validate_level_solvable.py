@@ -32,6 +32,7 @@ LAYOUT_GRID_3X3_MOVING_5_BOTTOM = "grid_3x3_moving_5_bottom"
 LAYOUT_GRID_3X2_MOVING_4_BOTTOM = "grid_3x2_moving_4_bottom"
 LAYOUT_GRID_3X3_MOVING_4_MIDDLE = "grid_3x3_moving_4_middle"
 LAYOUT_GRID_3X2_MOVING_6_6_CENTER = "grid_3x2_moving_6_6_center"
+LAYOUT_GRID_3X2_MOVING_5_5_TOP_BOTTOM = "grid_3x2_moving_5_5_top_bottom"
 LAYOUT_STAGGERED_COLUMNS_4_MOVING_6_4 = "staggered_columns_4_moving_6_4"
 LAYOUT_STAGGERED_COLUMNS_5_MOVING_6_5 = "staggered_columns_5_moving_6_5"
 LAYOUT_GRID_2X4_MOVING_6_LEFT = "grid_2x4_moving_6_left"
@@ -141,6 +142,12 @@ LAYOUT_PRESET_ROW_LAYOUTS: dict[str, list[dict[str, Any]]] = {
         moving_row(6, 60, "right"),
         moving_row(6, 60, "left"),
         {"shelf_count": 3},
+    ],
+    LAYOUT_GRID_3X2_MOVING_5_5_TOP_BOTTOM: [
+        moving_row(5, 60, "right"),
+        {"shelf_count": 3},
+        {"shelf_count": 3},
+        moving_row(5, 60, "left"),
     ],
     # Columns, not rows: the two static entries are the left and right columns of four shelves and
     # the moving entry is the vertical belt between them. Only the shelf-order grouping and the

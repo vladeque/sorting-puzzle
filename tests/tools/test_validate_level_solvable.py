@@ -67,6 +67,14 @@ class MovingLayoutPresetMetadataTests(unittest.TestCase):
                 self.assertEqual(moving_layouts[0]["motion"]["direction"], direction)
                 self.assertEqual(moving_layouts[0]["visible_count"], visible_count)
 
+    def test_top_bottom_belt_preset_matches_its_scene_shelf_groups(self) -> None:
+        row_layouts = LAYOUT_PRESET_ROW_LAYOUTS["grid_3x2_moving_5_5_top_bottom"]
+        self.assertEqual([row["shelf_count"] for row in row_layouts], [5, 3, 3, 5])
+        moving_layouts = [row for row in row_layouts if "motion" in row]
+        self.assertEqual(
+            [row["motion"]["direction"] for row in moving_layouts], ["right", "left"]
+        )
+
 
 class DispenserShelfShapeTests(unittest.TestCase):
     def test_accepts_a_well_formed_dispenser(self) -> None:
