@@ -2162,6 +2162,9 @@ Behavior:
   corners, where the left one reached the screen edge at 540x960.
 - Positions come from the shelves' finished bounds rather than from authored markers, so the mode
   works with any `layout_preset` without a new layout scene per preset and dispenser count.
+- The lowest drawn point of each dispenser hangs `BOARD_CLEARANCE` (56px, in the board's local units)
+  above the top of the shelves. The rack's bounds feed the level's responsive fit, so widening the
+  gap grows the fitted group and the board re-centers slightly lower rather than staying put.
 
 ## `scenes/testing/throwing_dispensers_preview.tscn`
 

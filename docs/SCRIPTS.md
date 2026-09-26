@@ -3031,6 +3031,8 @@ Purpose:
   frame.
 - Placement is computed rather than authored — see `docs/SCENES.md` for why, and for the two
   decisions the rendered captures forced.
+- Constants: `BOARD_CLEARANCE` (56) is the gap between a dispenser's lowest drawn point and the top of
+  the board; `DISPENSER_VISUAL_SCALE` (1.35) is the drawn scale.
 
 ## `scripts/throwing_dispensers_preview.gd`
 

@@ -18,8 +18,9 @@ signal throw_requested(dispenser: ThrowingDispenser)
 const DISPENSER_SCENE := preload("res://scenes/throwing_dispenser.tscn")
 
 ## Clearance between the lowest point of a dispenser and the top of the board. Enough that the chute
-## reads as pouring onto the shelves rather than resting on them.
-const BOARD_CLEARANCE := 26.0
+## reads as pouring onto the shelves rather than resting on them. Raised from 26 to 56 so the rack
+## sits 30px higher above the board than it first did.
+const BOARD_CLEARANCE := 56.0
 
 ## Tapping a dispenser is the whole mode, so it is drawn larger than its authored art: at 1.0 it read
 ## as a small ornament above the board rather than as the thing the player came here to press.
