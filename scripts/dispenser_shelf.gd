@@ -21,12 +21,16 @@ const MAX_LAYER_COUNT := 4
 ## These drawing bounds stay separate from the 96px packing cell so mixed rows do not become wider.
 const VISUAL_BOUNDS := Rect2(-52.0, -70.0, 104.0, 134.0)
 
-## Scale of an item resting in the cradle. The cradle is packed directly under the row above, and a
-## locked shelf there hangs its padlock to the bottom of that shelf, so a standard-size item's tip
-## (a pump nozzle, a unicorn horn) reached up under the lock and was covered by it. 0.8 lowers the
-## tallest item's top by about 14px, clear of the padlock. `Slot01` in `scenes/dispenser_shelf.tscn`
-## sits 7px lower than a standard shelf's to keep the smaller item's base on the floor.
-const ITEM_VISUAL_SCALE := 0.8
+## The item stands tall in a cradle packed directly under the row above, and a locked shelf there
+## hangs its padlock to the bottom of that shelf, so the item's tip (a pump nozzle, a unicorn horn)
+## reached up under the padlock and was covered by it. Lifting the item's body draws it over that
+## lock overlay (`scenes/ui/shelf_lock_overlay.tscn` reaches z 52) instead of shrinking the item.
+##
+## Everything that has to stay in front of the body lifts by the same amount in
+## `scenes/dispenser_shelf.tscn`: `LayerIndicator` is authored at z 8 + this, so the stock badge still
+## sits over the item's base, and `LockedOverlay` at 75 so a locked dispenser still covers its own
+## item. `tests/gameplay/test_dispenser_item_clears_lock_above.gd` holds the three together.
+const ITEM_BODY_Z_LIFT := 50
 
 const LAYER_INDICATOR_NODE := "LayerIndicator"
 
@@ -70,8 +74,8 @@ func shows_back_layer_preview() -> bool:
 	return false
 
 
-func get_item_visual_scale() -> float:
-	return ITEM_VISUAL_SCALE
+func get_item_body_z_lift() -> int:
+	return ITEM_BODY_Z_LIFT
 
 
 ## Row placement paints the shared left/middle/right edges that let neighbouring cells butt against

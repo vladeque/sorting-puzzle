@@ -104,11 +104,12 @@ width = 2.0
 default_color = Color(0.86, 0.61, 0.36, 0.72)
 
 [node name="LayerIndicator" parent="." unique_id=453614481 instance=ExtResource("2_layer_indicator")]
-z_index = 8
+z_index = 58
 position = Vector2(0, 44)
 
 [node name="LockedOverlay" parent="." unique_id=1773331882 instance=ExtResource("3_lock_overlay")]
 visible = false
+z_index = 75
 overlay_half_width = 34.0
 overlay_top = -70.0
 wall_cover_top = -40.0
@@ -116,7 +117,7 @@ wall_cover_bottom = 48.0
 compact_layout = true
 
 [node name="Slot01" type="Node2D" parent="." unique_id=53524035]
-position = Vector2(0, 22)
+position = Vector2(0, 15)
 
 [node name="SlotGuide" type="Polygon2D" parent="Slot01" unique_id=424100697]
 visible = false

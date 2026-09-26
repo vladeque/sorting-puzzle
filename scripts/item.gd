@@ -44,9 +44,6 @@ const SHADOW_CARRY_OFFSET := Vector2(30.0, 12.0)
 const SHADOW_LIFT_SECONDS := 0.12
 const SHADOW_LIFT_TWEEN_META := &"_shelf_item_shadow_lift_tween"
 
-const VISUAL_SCALE_SECONDS := 0.12
-const VISUAL_SCALE_TWEEN_META := &"_shelf_item_visual_scale_tween"
-
 ## Local-space y the landing bounce pivots on, so the item's feet stay planted on the shelf; scaling
 ## a centered sprite about its own middle would visibly lift it off the board instead. Tuned by eye
 ## against the art, and deliberately left alone by the shadow rework -- the shadow anchors on
@@ -146,6 +143,13 @@ var sticky_feedback_suppressed := false:
 		if value:
 			reset_sticky_blocked_feedback()
 
+func _notification(what: int) -> void:
+	# Every move between a slot, the drag layer, and another slot reparents the item, so asking the
+	# shelf it now rests on here keeps the lift right without any caller having to remember it.
+	if what == NOTIFICATION_PARENTED:
+		_refresh_body_z_lift()
+
+
 func _ready() -> void:
 	var feedback := get_node_or_null("StickyBlockedFeedback")
 	if feedback != null and not Engine.is_editor_hint():
@@ -153,6 +157,7 @@ func _ready() -> void:
 	_prepare_outline_material()
 	_apply_texture()
 	_apply_visual_scale()
+	_refresh_body_z_lift()
 
 
 func set_outline(enabled: bool, color: Color, width: float) -> void:
@@ -205,22 +210,6 @@ func set_drag_lifted(lifted: bool) -> void:
 
 	var tween := UIMotionScript.retween(self, SHADOW_LIFT_TWEEN_META)
 	tween.tween_property(self, "shadow_lift", target, SHADOW_LIFT_SECONDS).set_trans(
-		Tween.TRANS_QUAD
-	).set_ease(Tween.EASE_OUT)
-
-
-## Resizes the item to `target_scale`, the size the shelf it rests on gives it (see
-## `Shelf.get_item_visual_scale()`), or the standard size while the player carries it. A zero
-## `duration`, or an item outside the tree, applies it immediately. Any resize already running is
-## replaced, so a quick drop after a pick-up never leaves two tweens fighting over the scale.
-func set_visual_scale_animated(target_scale: float, duration := VISUAL_SCALE_SECONDS) -> void:
-	UIMotionScript.stop_tween(self, VISUAL_SCALE_TWEEN_META)
-	if duration <= 0.0 or not is_inside_tree() or is_equal_approx(visual_scale, target_scale):
-		visual_scale = target_scale
-		return
-
-	var tween := UIMotionScript.retween(self, VISUAL_SCALE_TWEEN_META)
-	tween.tween_property(self, "visual_scale", target_scale, duration).set_trans(
 		Tween.TRANS_QUAD
 	).set_ease(Tween.EASE_OUT)
 
@@ -346,6 +335,26 @@ func _set_sticky_feedback_pose(lean: float, stretch: float, pressure: float) -> 
 
 ## Rotate/stretch the body around its actual artwork ground line. Root, hitbox and shadow stay put.
 ## Apply after landing's own pivot correction, so outline/highlight refreshes cannot erase the pose.
+## Draws the item's body sprites above the item's own z-index by whatever the shelf it rests on asks
+## for (`Shelf.get_item_body_z_lift()`); an item with no shelf ancestor, such as one the player is
+## carrying, is not lifted. Only the body moves. The ground shadow keeps its own depth so the shelf's
+## walls still cover it, and the item's own z-index still orders it against other items.
+func _refresh_body_z_lift() -> void:
+	var lift := 0
+	var current := get_parent()
+	while current != null:
+		if current.has_method("get_item_body_z_lift"):
+			lift = int(current.call("get_item_body_z_lift"))
+			break
+
+		current = current.get_parent()
+
+	for sprite_name in ["Sprite2D", "OutlineSprite"]:
+		var sprite := get_node_or_null(sprite_name) as Sprite2D
+		if sprite != null:
+			sprite.z_index = lift
+
+
 func _apply_body_pose(sprite: Sprite2D) -> void:
 	var base_scale := _get_sprite_scale()
 	var foot := Vector2(0.0, SHADOW_GROUND_TEXELS * base_scale.y)

@@ -126,11 +126,10 @@ func shows_back_layer_preview() -> bool:
 	return true
 
 
-## Visual scale an item takes while it rests on this shelf. A shelf type that cannot fit a standard
-## item overrides this; `scripts/level.gd` resizes an item to its resting shelf's answer whenever it
-## is placed, and back to the standard size while the player carries it.
-func get_item_visual_scale() -> float:
-	return ShelfItem.DEFAULT_VISUAL_SCALE
+## Extra z-index the body of an item resting on this shelf draws at above the item's own. Zero for
+## every shelf that keeps its items inside its own frame; see `DispenserShelf` for one that does not.
+func get_item_body_z_lift() -> int:
+	return 0
 
 
 func set_visual_variant(visual_variant: String) -> void:

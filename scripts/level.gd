@@ -144,10 +144,11 @@ const SHUFFLE_ITEM_FLY_IN_Z_INDEX := 28
 const SHUFFLE_ITEM_FLY_OUT_Z_INDEX := 32
 const SHUFFLE_BOX_Z_INDEX := 30
 ## An item sliding into a slot after a drop. It must clear `ShelfLockOverlay`, whose root is authored
-## at z 40 with children reaching 52, or an item released over a locked shelf -- and a rejected drop
-## rewinding home across one -- slides underneath the chains and padlock. It stays below `DragLayer`
-## (z 100) so an item the player is holding still wins over one that is landing.
-const ITEM_MOVE_FLIGHT_Z_INDEX := 60
+## at z 40 with children reaching 52 (75 and 87 on a dispenser), or an item released over a locked
+## shelf -- and a rejected drop rewinding home across one -- slides underneath the chains and
+## padlock. It stays below `DragLayer` (z 100) so an item the player is holding still wins over one
+## that is landing.
+const ITEM_MOVE_FLIGHT_Z_INDEX := 90
 const SHUFFLE_ITEM_INSIDE_SCALE := Vector2(0.25, 0.25)
 const DEFAULT_ABILITY_PURCHASE_PRICES := {
 	ABILITY_HAMMER: 100,
@@ -2367,7 +2368,6 @@ func _add_configured_item(slot: Node2D, item_value, layer_index: int, slot_index
 		push_warning("No texture configured for item '%s'." % item_id)
 
 	item.position = SLOT_ITEM_POSITION
-	item.visual_scale = _get_slot_item_visual_scale(slot)
 	slot.add_child(item)
 
 	if layer_index > 0:
@@ -3948,9 +3948,6 @@ func _begin_drag(item: ShelfItem, pointer_global_position: Vector2) -> void:
 	# The shadow stays on and stays parented to the item, so it travels with the finger; lifting it
 	# is what separates "held above the board" from "resting in a slot".
 	item.set_drag_lifted(true)
-	# A shelf that seats items smaller than standard, such as a dispenser, hands the item over at the
-	# standard size the moment it is picked up.
-	item.set_visual_scale_animated(ShelfItem.DEFAULT_VISUAL_SCALE)
 	item.global_position = pointer_global_position + _drag_offset
 	_play_haptic(HapticsCatalogScript.EVENT_ITEM_PICKUP)
 
@@ -4169,13 +4166,6 @@ func _get_slot_marker(slot: Node2D) -> Marker2D:
 	return slot.get_node_or_null("ItemSlot%s" % slot.name.trim_prefix("Slot")) as Marker2D
 
 
-## The size an item takes while it rests in `slot`, which is the standard size on every shelf type
-## except one that cannot fit a standard item, such as a dispenser.
-func _get_slot_item_visual_scale(slot: Node) -> float:
-	var shelf := _get_owning_shelf(slot) as Shelf
-	return ShelfItem.DEFAULT_VISUAL_SCALE if shelf == null else shelf.get_item_visual_scale()
-
-
 func _get_slot_item(slot: Node2D) -> ShelfItem:
 	for child in slot.get_children():
 		var item := child as ShelfItem
@@ -4196,7 +4186,6 @@ func _place_item_in_slot(
 	item.reparent(slot, true)
 	item.position = SLOT_ITEM_POSITION
 	item.z_index = 10
-	item.set_visual_scale_animated(_get_slot_item_visual_scale(slot), 0.0)
 	# Safety net for every path that lands an item without going through _finish_active_drag: an
 	# item back in a slot must never keep a carried item's lifted shadow.
 	item.set_drag_lifted(false)
@@ -4232,8 +4221,6 @@ func _play_item_move_animation(
 	item.reparent(target_slot, true)
 	item.z_index = ITEM_MOVE_FLIGHT_Z_INDEX
 	item.input_pickable = false
-	var resting_visual_scale := _get_slot_item_visual_scale(target_slot)
-	item.set_visual_scale_animated(resting_visual_scale, duration)
 	_mark_item_transitioning_by_id(item.get_instance_id())
 
 	var collision := item.get_node_or_null("CollisionShape2D") as CollisionShape2D
@@ -4255,7 +4242,6 @@ func _play_item_move_animation(
 
 	item.position = SLOT_ITEM_POSITION
 	item.z_index = 10
-	item.set_visual_scale_animated(resting_visual_scale, 0.0)
 	item.input_pickable = true
 	_unmark_item_transitioning_by_id(item.get_instance_id())
 

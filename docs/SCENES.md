@@ -2644,13 +2644,14 @@ Important nodes:
   lip inside the 96-wide packing cell. There is intentionally no `Ceiling` or `TopCeilingCap`.
 - `LayerIndicator`: `scenes/shelf_layer_indicator.tscn` instance overlapping the front lip; its
   compact circular badge shows the exact count and its wide, thin-outlined rail shows one cell per
-  authored item with narrow straight seams like one continuous segmented strip.
+  authored item with narrow straight seams like one continuous segmented strip. Authored at z 58: an
+  item's body draws `DispenserShelf.ITEM_BODY_Z_LIFT` (50) above its own z-index, and the readout has
+  to keep the same order against it that it had at z 8 against an unlifted item.
 - `LockedOverlay`: compact-layout instance of `scenes/ui/shelf_lock_overlay.tscn`, with a narrower
-  shade and scaled chain/lock/badge rig for the one-slot cell.
-- `Slot01`/`Slot01/ItemSlot01`: the single front slot and its snap marker. Its origin sits 7px below a
-  standard shelf's because a dispenser seats items at 0.8 scale (`DispenserShelf.ITEM_VISUAL_SCALE`),
-  which keeps the smaller item's base on the floor while its tip stays clear of the padlock of a locked
-  shelf in the row above.
+  shade and scaled chain/lock/badge rig for the one-slot cell. Authored at z 75, above the lifted item
+  body and the readout, so a locked dispenser still covers its own item.
+- `Slot01`/`Slot01/ItemSlot01`: the single front slot and its snap marker, at the same vertical
+  position as a standard shelf's so items rest identically.
 
 Depends on:
 - `assets/shelves/standard_shelf_light_oak.png`.
