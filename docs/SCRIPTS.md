@@ -2105,7 +2105,9 @@ Important constants:
 - `LAYOUT_ROW_VERTICAL_EPSILON`: tolerance used to group authored layout-template shelf markers into horizontal rows before assigning left/middle/right/single shelf visuals. Dispenser markers are excluded from the standard-shelf edge ordering because dispensers carry complete independent frames.
 - `ABILITY_BAR_*`, `SHELVES_*`: responsive layout constants for positioning the ability bar and
   generated shelf root across portrait viewport sizes, including the back-wall bottom boundary and
-  minimum/maximum shelf layout scale. `SHELVES_BACK_WALL_BOTTOM_MARGIN` is 224 design pixels,
+  minimum/maximum shelf layout scale. `ABILITY_BAR_DESIGN_BOTTOM_MARGIN` is 76 design pixels (the
+  bar was lowered 20 px from 96); on devices with a bottom safe inset the bar still clears it by
+  `ABILITY_BAR_SAFE_BOTTOM_PADDING`. `SHELVES_BACK_WALL_BOTTOM_MARGIN` is 224 design pixels,
   matching the top of the doubled-height (68 px) baseboard in `level.tscn`; the playable area loses
   34 pixels vertically without moving the floor or ability bar. Shelf boards center against the visible back wall instead of
   being pulled upward by the floor-level ability overlay. The top HUD, gameplay modals, and terminal result screens now own their own responsive
