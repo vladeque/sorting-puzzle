@@ -1934,6 +1934,11 @@ Authored geometry:
 - A moving row is `50.88` taller than a static one (`MovingShelfRow.ROW_HEIGHT_PADDING`). After the
   runtime height extension, a static row and an adjacent moving row are placed about `186.77` apart
   and two adjacent moving rows about `195.78` apart. Both keep the intended visual gap.
+- Static rows that form one block must be `134.62` apart to interlock into a single cabinet. The
+  `185.5` (`±92.75`) pitch belongs to two adjacent *belts* only; using it for static rows leaves a
+  `50.88` px seam between them, because `scripts/level.gd` clamps the per-row height extension at one
+  full step. `grid_3x2_moving_5_5_top_bottom` therefore places its static rows at `±67.31` and each
+  belt `176.49` beyond them (`±243.8`), matching `grid_3x3_moving_4_middle`.
 
 Static presets:
 - `scenes/layouts/layout_grid_2x3.tscn` (6 shelves)
