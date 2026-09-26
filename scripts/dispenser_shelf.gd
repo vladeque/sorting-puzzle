@@ -21,6 +21,13 @@ const MAX_LAYER_COUNT := 4
 ## These drawing bounds stay separate from the 96px packing cell so mixed rows do not become wider.
 const VISUAL_BOUNDS := Rect2(-52.0, -70.0, 104.0, 134.0)
 
+## Scale of an item resting in the cradle. The cradle is packed directly under the row above, and a
+## locked shelf there hangs its padlock to the bottom of that shelf, so a standard-size item's tip
+## (a pump nozzle, a unicorn horn) reached up under the lock and was covered by it. 0.8 lowers the
+## tallest item's top by about 14px, clear of the padlock. `Slot01` in `scenes/dispenser_shelf.tscn`
+## sits 7px lower than a standard shelf's to keep the smaller item's base on the floor.
+const ITEM_VISUAL_SCALE := 0.8
+
 const LAYER_INDICATOR_NODE := "LayerIndicator"
 
 var _capacity := 0
@@ -61,6 +68,10 @@ func allows_ability_modification() -> bool:
 ## this narrow it also spills past the frame onto the neighbouring shelf.
 func shows_back_layer_preview() -> bool:
 	return false
+
+
+func get_item_visual_scale() -> float:
+	return ITEM_VISUAL_SCALE
 
 
 ## Row placement paints the shared left/middle/right edges that let neighbouring cells butt against

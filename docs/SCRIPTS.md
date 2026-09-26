@@ -2177,6 +2177,7 @@ Key responsibilities:
 - Draw an item sliding into a slot at `ITEM_MOVE_FLIGHT_Z_INDEX` (60) inside `_play_item_move_animation()`, then drop it back to the resting z-index of 10 when it lands. The flight value has to clear `scenes/ui/shelf_lock_overlay.tscn`, whose root is authored at z 40 with descendants reaching 52, and stay below `DragLayer` (z 100) so a held item still wins. A dispenser usually has locked shelves directly above and below it, so releasing its item over one is an invalid drop, and the item rewinds home from where it was released; at the old flight z-index of 13 it slid underneath the chains and padlock. `tests/gameplay/test_item_flight_over_locked_shelf.gd` guards this.
 - Finish every player-visible drop with `ShelfItem.play_land_impact()`, the landing squash-and-stretch owned by `scripts/item.gd`. It fires from `_play_item_move_animation()` after the eased travel settles and from `_place_item_in_slot()` when `should_play_landing` is set. The call is never awaited, so a landing does not delay `_resolve_shelves()` and its match clears. Silent forced restores (level failure, ability interrupt) pass `should_play_landing = false` and stay unanimated. Back-layer promotion is deliberately excluded: `_play_layer_promotion_animation()` already lands with its own `TRANS_BACK` overshoot on `visual_scale`.
 - Cancel a pending bounce with `ShelfItem.reset_land_impact()` before re-grabbing an item in `_begin_drag()` and before the gather in `_play_match_clear_animation()`, so the next animation never starts from a deformed pose.
+- Size an item to the shelf it rests on with `_get_slot_item_visual_scale()`, which asks the owning shelf for `Shelf.get_item_visual_scale()`. `_add_configured_item()` builds each item at that size, `_begin_drag()` grows it to `ShelfItem.DEFAULT_VISUAL_SCALE` while it is carried, `_play_item_move_animation()` resizes it to the target shelf over the flight, and `_place_item_in_slot()` snaps it. Only a dispenser differs from the standard size today.
 - Lift the active item's ground shadow with `ShelfItem.set_drag_lifted(true)` while the player is dragging it, and settle it again when the drag releases, cancels, fails, or completes. The shadow stays parented to the item so it travels with the finger; the lift separates the silhouette farther down-right and blends in a source-alpha core so the carried shadow keeps the item's recognizable outline. `_place_item_in_slot()` also clears the lift as a safety net for paths that land an item without going through `_finish_active_drag()`.
 - The level only switches an item's shadow between its resting and carried readings through
   `ShelfItem.shadow_lift`; compare the resting, mid-grab, and carried states together in
@@ -2695,6 +2696,8 @@ new shelf type only overrides what actually differs:
 - `allows_ability_modification()`: whether hammer may destroy or shuffle may rewrite these items.
   Read-only abilities such as highlight ignore it.
 - `shows_back_layer_preview()`: whether the first back layer is previewed as dimmed art.
+- `get_item_visual_scale()`: the `ShelfItem.visual_scale` an item takes while it rests on this shelf;
+  `ShelfItem.DEFAULT_VISUAL_SCALE` unless a shelf type cannot fit a standard item.
 
 Key methods:
 - `set_visual_variant(visual_variant)`: applies `full` or `floor_only` shelf presentation and records the active variant as metadata for `scripts/level.gd` shelf edge and cast-shadow visibility checks.
@@ -2765,6 +2768,13 @@ Capability overrides:
 - `get_visual_bounds()` -> `VISUAL_BOUNDS`, spanning the shorter open cradle and attached meter.
 - `get_slot_count()` -> `1`; `accepts_dropped_items()`, `forms_triples()`,
   `allows_ability_modification()`, and `shows_back_layer_preview()` all return `false`.
+- `get_item_visual_scale()` -> `ITEM_VISUAL_SCALE` (0.8, against 0.92 on a standard shelf). The cradle is
+  packed directly under the row above and lifted to clear the row below, so a full-size item's tip (a
+  pump nozzle, a unicorn horn) reached up under the padlock a locked shelf there hangs to its bottom
+  edge and was covered by it. 0.8 drops the tallest item's top about 14px, clear of the padlock;
+  `Slot01` in `scenes/dispenser_shelf.tscn` sits 7px lower than a standard slot to keep the smaller
+  item's base on the floor. `tests/gameplay/test_dispenser_item_clears_lock_above.gd` measures every
+  item texture against the padlock.
 - `set_row_placement()` and `set_top_ceiling_cap_visible()` are pinned: the frame is self-contained
   rather than sharing edges with neighbours, and the open cradle never grows a ceiling cap.
 - Constants are named `DISPENSER_BASE_CELL_SIZE`/`DISPENSER_SLOT_COUNT` because GDScript does not
@@ -3689,6 +3699,7 @@ Key methods:
 - `_apply_visual_scale()`: updates `Sprite2D` and `OutlineSprite` scale from `visual_scale * highlight scale multiplier * land_squash`, applies the contact pivot offset, then refreshes the shadow and outline.
 - `_apply_shadow()`: draws the item's own silhouette as its shadow. Anchors the shadow sprite on the art's ground line (`SHADOW_GROUND_TEXELS`, the 120-64 texel drop every item texture shares per `docs/ITEM_ASSET_REQUIREMENTS.md`), then blends by `shadow_lift` between two readings: **resting**, a full-size, unsheared silhouette displaced slightly up-right by `SHADOW_REST_OFFSET`, softened inside the source-alpha envelope by `SHADOW_REST_BLUR_PX` and the broad `SHADOW_REST_MASK_LOW` transition, and reduced to `SHADOW_REST_ALPHA_SCALE` opacity so neighboring shelf items remain readable; and **carried**, the same-size silhouette displaced farther down-right by `SHADOW_CARRY_OFFSET` and rendered with a compact filtered fill plus `SHADOW_CARRY_SILHOUETTE_WEIGHT` of the original alpha mask. Clipping the filtered mask to the source envelope prevents either state from rendering larger than the item. Both shadow axes follow the landing squash so the silhouette continues to match the item during impact.
 - `set_drag_lifted(lifted)`: tweens `shadow_lift`, moving the shadow between its resting and carried shapes instead of hiding it while carried. Node-bound through `UIMotion.retween`, so it dies with the item.
+- `set_visual_scale_animated(target_scale, duration)`: tweens `visual_scale` to the size the resting shelf gives the item (`Shelf.get_item_visual_scale()`), or to `DEFAULT_VISUAL_SCALE` while carried. A zero duration applies it immediately. Replaces any resize already running, so a quick drop after a pick-up never leaves two tweens fighting over the scale.
 
 ## `scripts/shadow_style_preview.gd`
 
@@ -3721,6 +3732,7 @@ Do not use for:
 Verified by:
 - `tests/gameplay/test_item_landing_impact.gd` (run through `scripts/tools/run_isolated_godot_test.ps1`).
 - `tests/gameplay/test_item_flight_over_locked_shelf.gd` for a dropped item's flight z-index clearing a locked shelf's `ShelfLockOverlay`.
+- `tests/gameplay/test_dispenser_item_clears_lock_above.gd` for every item texture standing clear of the padlock of a locked shelf above a dispenser, and for items resizing between the dispenser and standard shelves.
 - `tests/gameplay/test_item_contact_shadow.gd` for the item-sized silhouette-derived ground shadow: the soft upright resting silhouette, carried source-alpha core and compact filtered fill, ground-line anchor, and drag lift travelling with the item.
 - `tests/gameplay/test_item_selection_visual.gd` for the white selection outline, shared Lantern shelf-edge offset without enlargement, hit-area alignment, and selection/Lantern visual priority.
 - `scripts/tools/captures/item_selection_setup.gd` for responsive rendered selection review on `level.tscn`.

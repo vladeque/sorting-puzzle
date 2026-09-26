@@ -938,6 +938,8 @@ Files:
 - `tests/gameplay/test_dispenser_shelf.gd`, `tests/tools/test_validate_level_solvable.py`
 - `tests/gameplay/test_item_flight_over_locked_shelf.gd` (a dispenser item released over a locked
   neighbour must fly home above the lock overlay)
+- `tests/gameplay/test_dispenser_item_clears_lock_above.gd` (a dispenser item is never covered by the
+  padlock of a locked shelf above it, and resizes between dispenser and standard shelves)
 
 Responsibility:
 - A second shelf type: a narrow one-slot open wooden cradle holding 2-4 stacked layers that the

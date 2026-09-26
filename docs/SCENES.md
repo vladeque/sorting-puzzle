@@ -2647,8 +2647,10 @@ Important nodes:
   authored item with narrow straight seams like one continuous segmented strip.
 - `LockedOverlay`: compact-layout instance of `scenes/ui/shelf_lock_overlay.tscn`, with a narrower
   shade and scaled chain/lock/badge rig for the one-slot cell.
-- `Slot01`/`Slot01/ItemSlot01`: the single front slot and its snap marker, at the same vertical
-  position as a standard shelf's so items rest identically.
+- `Slot01`/`Slot01/ItemSlot01`: the single front slot and its snap marker. Its origin sits 7px below a
+  standard shelf's because a dispenser seats items at 0.8 scale (`DispenserShelf.ITEM_VISUAL_SCALE`),
+  which keeps the smaller item's base on the floor while its tip stays clear of the padlock of a locked
+  shelf in the row above.
 
 Depends on:
 - `assets/shelves/standard_shelf_light_oak.png`.

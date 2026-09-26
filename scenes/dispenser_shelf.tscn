@@ -116,7 +116,7 @@ wall_cover_bottom = 48.0
 compact_layout = true
 
 [node name="Slot01" type="Node2D" parent="." unique_id=53524035]
-position = Vector2(0, 15)
+position = Vector2(0, 22)
 
 [node name="SlotGuide" type="Polygon2D" parent="Slot01" unique_id=424100697]
 visible = false

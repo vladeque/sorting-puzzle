@@ -44,6 +44,9 @@ const SHADOW_CARRY_OFFSET := Vector2(30.0, 12.0)
 const SHADOW_LIFT_SECONDS := 0.12
 const SHADOW_LIFT_TWEEN_META := &"_shelf_item_shadow_lift_tween"
 
+const VISUAL_SCALE_SECONDS := 0.12
+const VISUAL_SCALE_TWEEN_META := &"_shelf_item_visual_scale_tween"
+
 ## Local-space y the landing bounce pivots on, so the item's feet stay planted on the shelf; scaling
 ## a centered sprite about its own middle would visibly lift it off the board instead. Tuned by eye
 ## against the art, and deliberately left alone by the shadow rework -- the shadow anchors on
@@ -202,6 +205,22 @@ func set_drag_lifted(lifted: bool) -> void:
 
 	var tween := UIMotionScript.retween(self, SHADOW_LIFT_TWEEN_META)
 	tween.tween_property(self, "shadow_lift", target, SHADOW_LIFT_SECONDS).set_trans(
+		Tween.TRANS_QUAD
+	).set_ease(Tween.EASE_OUT)
+
+
+## Resizes the item to `target_scale`, the size the shelf it rests on gives it (see
+## `Shelf.get_item_visual_scale()`), or the standard size while the player carries it. A zero
+## `duration`, or an item outside the tree, applies it immediately. Any resize already running is
+## replaced, so a quick drop after a pick-up never leaves two tweens fighting over the scale.
+func set_visual_scale_animated(target_scale: float, duration := VISUAL_SCALE_SECONDS) -> void:
+	UIMotionScript.stop_tween(self, VISUAL_SCALE_TWEEN_META)
+	if duration <= 0.0 or not is_inside_tree() or is_equal_approx(visual_scale, target_scale):
+		visual_scale = target_scale
+		return
+
+	var tween := UIMotionScript.retween(self, VISUAL_SCALE_TWEEN_META)
+	tween.tween_property(self, "visual_scale", target_scale, duration).set_trans(
 		Tween.TRANS_QUAD
 	).set_ease(Tween.EASE_OUT)
 

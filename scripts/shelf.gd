@@ -126,6 +126,13 @@ func shows_back_layer_preview() -> bool:
 	return true
 
 
+## Visual scale an item takes while it rests on this shelf. A shelf type that cannot fit a standard
+## item overrides this; `scripts/level.gd` resizes an item to its resting shelf's answer whenever it
+## is placed, and back to the standard size while the player carries it.
+func get_item_visual_scale() -> float:
+	return ShelfItem.DEFAULT_VISUAL_SCALE
+
+
 func set_visual_variant(visual_variant: String) -> void:
 	match visual_variant:
 		VISUAL_VARIANT_FULL, VISUAL_VARIANT_FLOOR_ONLY:
