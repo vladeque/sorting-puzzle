@@ -1059,6 +1059,15 @@ func _verify_responsive_windows() -> void:
 		_check(scale >= minimum_scale - 0.001, "%s: revealing more rows never shrinks the board." % viewport)
 		var fitted := shelves_root.get_transform() * board.get_layout_bounds()
 		_check(play_rect.grow(1.0).encloses(fitted), "%s: the window fits between the HUD and the ability bar." % viewport)
+		# The clip edge is where the pile is cut off. Left in the clearance under the HUD it slices the
+		# pile in front of bare wall, so the strip must reach the HUD's bottom edge or open fully.
+		var hud := level.get("_top_hud") as Control
+		var clip_edge := fitted.position.y - board.get_peek_height() * scale
+		_check(
+			clip_edge <= hud.position.y + hud.size.y + 0.5
+				or is_equal_approx(board.get_peek_height(), board.get_max_peek_height()),
+			"%s: the peek strip reaches the HUD's bottom edge instead of stopping short in the wall." % viewport
+		)
 	await _dispose(level)
 
 

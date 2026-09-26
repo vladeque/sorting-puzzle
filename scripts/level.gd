@@ -561,7 +561,7 @@ func _layout_shelves(viewport_size: Vector2, safe_margins: Vector4) -> void:
 			root_position.y = min_root_y
 
 	_shelves_root.position = root_position
-	_layout_collapsing_peek_strip(play_top)
+	_layout_collapsing_peek_strip(minf(_top_hud.position.y + _top_hud.size.y, play_top))
 	# Belts use the full safe background width (without the static board's side inset) and the
 	# playable back-wall height. Convert after fitting so shelf art and static placement stay fixed.
 	var moving_play_area := Rect2(
@@ -574,11 +574,15 @@ func _layout_shelves(viewport_size: Vector2, safe_margins: Vector4) -> void:
 
 
 ## A collapsing board shows the next shelf of every column cut off above its window. The strip that
-## shelf is drawn through opens into the room left between the fitted board and the HUD clearance, so
-## the peek is spare height and nothing else: it never costs board scale, a playable row, or a pixel
-## of the HUD's space. Where a screen has no room to spare the strip closes and the shelf above still
+## shelf is drawn through opens into the room left between the fitted board and `strip_top`, so the
+## peek is spare height and nothing else: it never costs board scale, a playable row, or a pixel of
+## the HUD's space. Where a screen has no room to spare the strip closes and the shelf above still
 ## shows through the overlap stacked shelf art already has.
-func _layout_collapsing_peek_strip(play_top: float) -> void:
+##
+## `strip_top` is the HUD's bottom edge, not the play rect's top. The clearance between the two is
+## bare back wall that static boards keep clear, and a clip edge left in it slices the pile in
+## mid-air; at the HUD's edge the pile reads as continuing behind the HUD instead.
+func _layout_collapsing_peek_strip(strip_top: float) -> void:
 	if _collapsing_board == null or _shelves_root == null:
 		return
 
@@ -588,7 +592,7 @@ func _layout_collapsing_peek_strip(play_top: float) -> void:
 		return
 
 	var board_top := _shelves_root.position.y + bounds.position.y * _shelves_layout_scale
-	_collapsing_board.set_peek_height(maxf(board_top - play_top, 0.0) / _shelves_layout_scale)
+	_collapsing_board.set_peek_height(maxf(board_top - strip_top, 0.0) / _shelves_layout_scale)
 
 
 func _get_shelves_layout_scale(

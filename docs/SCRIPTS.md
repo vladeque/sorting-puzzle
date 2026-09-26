@@ -2874,6 +2874,15 @@ Visible count:
   `set_visible_count()`, which clamps to the authored minimum, the tallest column, and
   `MAX_VISIBLE_SHELVES_PER_COLUMN` (`8`, mirrored from `scripts/tools/validate_level_solvable.py`).
 
+Peek strip:
+- The next shelf of every column draws above the window, cut off by the clip edge; it is never
+  playable. `set_peek_height(available_height)` opens the strip, clamped to `get_max_peek_height()`
+  (`peek_reveal_ratio` of one shelf row, zero once the window holds the tallest column).
+- `scripts/level.gd` `_layout_collapsing_peek_strip(strip_top)` passes the room between the fitted
+  board and the HUD's bottom edge, not the play rect's top, so the pile tucks behind the HUD instead
+  of being sliced in the bare wall under it. See
+  [COLLAPSING_SHELF_COLUMNS.md](COLLAPSING_SHELF_COLUMNS.md#peek-strip).
+
 Key methods:
 - `configure(column_heights, visible_count, shelf_step, cell_size, shelf_scale, kept_count)`: builds
   the columns. `kept_count` defaults to `0`, no floor, which the board unit tests use.

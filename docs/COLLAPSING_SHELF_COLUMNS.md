@@ -83,6 +83,22 @@ window, not the device, decides. Proving the minimum therefore proves every larg
 With the preview fixture and with campaign level 9, the window resolves to 6 rows at 540x960,
 720x1280, 1080x1920, and 900x1600, and to 8 rows at 1080x2400.
 
+## Peek strip
+
+While a column still has shelves above its window, the next shelf of every column draws just above
+the top row, cut off by the board's clip edge, so the pile reads as continuing instead of ending.
+That shelf is never playable; `is_shelf_active()` decides that from the window alone.
+
+The strip is spare height and nothing else. `scripts/level.gd` (`_layout_collapsing_peek_strip()`)
+opens it into the room between the fitted board and the **HUD's bottom edge**, up to
+`peek_reveal_ratio` of one shelf row (`0.3`), so it never costs board scale, a playable row, or HUD
+space. The clip edge deliberately reaches the HUD, not the top of the play rect
+(`SHELVES_TOP_CLEARANCE`): the clearance between the two is bare back wall, and a clip edge left in
+it slices the pile in front of that wall instead of tucking it behind the HUD. Where a screen has no
+room to spare the strip closes, and the shelf above still shows through the overlap stacked shelf
+art already has. `tests/gameplay/test_collapsing_shelf_columns.gd` (`_verify_responsive_windows()`)
+checks the clip edge at every responsive viewport.
+
 ## Ownership
 
 | Concern | Owner |
