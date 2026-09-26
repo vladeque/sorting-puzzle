@@ -936,6 +936,8 @@ Files:
 - `scripts/level.gd`
 - `scripts/tools/validate_level_solvable.py`, `scripts/tools/generate_level_shelves.py`
 - `tests/gameplay/test_dispenser_shelf.gd`, `tests/tools/test_validate_level_solvable.py`
+- `tests/gameplay/test_item_flight_over_locked_shelf.gd` (a dispenser item released over a locked
+  neighbour must fly home above the lock overlay)
 
 Responsibility:
 - A second shelf type: a narrow one-slot open wooden cradle holding 2-4 stacked layers that the

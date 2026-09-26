@@ -143,6 +143,11 @@ const SHUFFLE_ITEM_MAX_STAGGER_SECONDS := 0.18
 const SHUFFLE_ITEM_FLY_IN_Z_INDEX := 28
 const SHUFFLE_ITEM_FLY_OUT_Z_INDEX := 32
 const SHUFFLE_BOX_Z_INDEX := 30
+## An item sliding into a slot after a drop. It must clear `ShelfLockOverlay`, whose root is authored
+## at z 40 with children reaching 52, or an item released over a locked shelf -- and a rejected drop
+## rewinding home across one -- slides underneath the chains and padlock. It stays below `DragLayer`
+## (z 100) so an item the player is holding still wins over one that is landing.
+const ITEM_MOVE_FLIGHT_Z_INDEX := 60
 const SHUFFLE_ITEM_INSIDE_SCALE := Vector2(0.25, 0.25)
 const DEFAULT_ABILITY_PURCHASE_PRICES := {
 	ABILITY_HAMMER: 100,
@@ -4213,7 +4218,7 @@ func _play_item_move_animation(
 
 	var duration := maxf(item_move_duration_seconds, 0.0)
 	item.reparent(target_slot, true)
-	item.z_index = 13
+	item.z_index = ITEM_MOVE_FLIGHT_Z_INDEX
 	item.input_pickable = false
 	_mark_item_transitioning_by_id(item.get_instance_id())
 
