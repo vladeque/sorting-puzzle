@@ -379,6 +379,9 @@ Purpose:
   closes (`_add_main_menu_overlay()`/each overlay's own `close()`/`_close()`).
 - Provides a top status row for profile, saved gold coins, saved campaign lives, and settings.
 - Shows a left-side reward chest widget under the profile icon with saved star progress toward the active configured chest goal.
+- Shows `%StarterBundleBadge` to the right of the reward chest only after a live/local priced
+  `starter_bundle` catalog result confirms eligibility. Its circular button opens the dedicated
+  `%StarterBundleOfferModal`; cached backend results never advertise a potentially stale offer.
 - After a completed level returns here, launches one reward star per earned star from the
   background house into the reward chest and advances the visible chest count on impact (see
   "Reward-Progress Semantics" above -- this used to fly clover-coin art).
@@ -424,6 +427,10 @@ Important nodes:
 - `LeaderboardRewardDialog`: `scenes/ui/leaderboard_reward_dialog.tscn` instance, hidden until a
   weekly reward is pending.
 - `%OutOfLivesMenu`: hidden `scenes/ui/out_of_lives_menu.tscn` instance on the shared modal z-index.
+- `%StarterBundleBadge`: hidden `scenes/ui/main_menu_starter_bundle_badge.tscn` instance,
+  positioned against the right safe edge below the top status row.
+- `%StarterBundleOfferModal`: hidden `scenes/ui/starter_bundle_offer_modal.tscn` instance above
+  the shared menu overlay z-index. System Back closes it first unless a purchase is in progress.
 - Runtime child `scenes/ui/profile_menu.tscn`: centered pause-style profile editor window created when `ProfileWidget` is pressed.
 - Runtime child `scenes/ui/settings_menu.tscn`: centered pause-style settings window created when `SettingsWidget/SettingsButton` is pressed.
 - Runtime child `scenes/ui/reward_chest_menu.tscn`: centered pause-style reward chest detail modal created when the `RewardChest` widget emits `chest_pressed`.
@@ -446,10 +453,25 @@ Depends on:
   `scenes/ui/chapter_cover_card.tscn`, and `scenes/ui/horizontal_pager.tscn` for chapter navigation.
 - `scenes/ui/leaderboard_reward_dialog.tscn` for the weekly reward notification.
 - `scenes/ui/leaderboard_screen.tscn` for the dedicated ranking destination.
+- `StoreService` for priced Starter Bundle eligibility and `ShopPurchaseFlow` for the same
+  provider/grant sequence used by the Shop.
 
 Do not use for:
 - Dev/test level selection. Use `scenes/main_menu_testing.tscn`.
 - Runtime puzzle rules or shelf state. Put those in `level.tscn` and `scripts/level.gd`.
+
+## `scenes/ui/main_menu_starter_bundle_badge.tscn`
+
+- Owns the circular gold-rimmed coral Starter Bundle button, existing coin art, and short label.
+- Emits `pressed`; the production menu owns eligibility, safe-area placement, and opening the offer.
+
+## `scenes/ui/starter_bundle_offer_modal.tscn`
+
+- Composes `gameplay_modal_shell.tscn` for shade, title, close action, and safe-area fitting.
+- Binds the current offer's coin and positive-count ability rewards, formatted price, optional
+  discount and compare price. Zero-count abilities and absent promotional fields stay hidden.
+- Emits Buy/Close intent and owns checking, purchasing, failure, and success presentation. The
+  Main Menu rechecks live eligibility before executing the purchase and passes the result back.
 
 ## `scenes/ui/chapter_selection_screen.tscn`
 
@@ -760,6 +782,8 @@ Purpose:
   and coin-offer sections, loading/error states, and purchase result dialog. Destination mode shows
   shared bottom navigation; in-level overlay mode hides it and shows `%OverlayCloseButton`.
 - Builds offer views from `StoreService.load_catalog()`, which sources offers from `configs/shop_catalog.json` by default or from the authenticated backend development catalog when `application/config/shop_catalog_source` is `backend` (GAME-008), and always attaches the mock provider's formatted regional prices.
+- Uses `scripts/store/shop_purchase_flow.gd` for the provider purchase and idempotent
+  `PlayerProgress.apply_shop_purchase()` grant sequence shared with the Main Menu Starter Bundle.
 - Centers content to a 720-pixel maximum logical width, compacts offers below 1100 logical pixels high, and applies mobile safe-area margins through `scripts/destination_screen_layout.gd` (shared with Leaderboard).
 - Follows the selected chapter's background through `%DestinationShell` (`scenes/ui/destination_screen_shell.tscn`) instead of a fixed Chapter 1 image.
 - Fades in on `_ready()`; retapping the already-active Shop bottom-navigation tab is a no-op

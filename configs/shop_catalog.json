@@ -5,6 +5,8 @@
       "product_id": "sorting_puzzle.starter_bundle",
       "type": "bundle",
       "title": "Starter Bundle",
+      "purchase_limit": 1,
+      "limit_period": "lifetime",
       "rewards": {
         "coins": 1000,
         "abilities": {

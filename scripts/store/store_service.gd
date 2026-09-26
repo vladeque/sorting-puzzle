@@ -10,6 +10,7 @@ const CATALOG_SOURCE_SETTING := "application/config/shop_catalog_source"
 const PROVIDER_MOCK := "mock"
 const CATALOG_SOURCE_LOCAL := "local"
 const CATALOG_SOURCE_BACKEND := "backend"
+const STARTER_BUNDLE_ID := "starter_bundle"
 
 var _provider: RefCounted
 var _catalog_source: RefCounted
@@ -40,7 +41,7 @@ func load_catalog() -> Dictionary:
 		if not (raw_offer is Dictionary):
 			continue
 		var offer := raw_offer as Dictionary
-		if _catalog_source == null and not _is_local_offer_available(offer):
+		if not _is_offer_available(offer):
 			continue
 		_offers_by_id[str(offer.get("id", ""))] = offer
 		available_offers.append(offer)
@@ -93,7 +94,7 @@ func purchase_offer(offer_id: StringName) -> Dictionary:
 		return {"ok": false, "error": "This shop offer is unavailable."}
 
 	var offer_dictionary := offer as Dictionary
-	if _catalog_source == null and not _is_local_offer_available(offer_dictionary):
+	if not _is_offer_available(offer_dictionary):
 		_offers_by_id.erase(String(offer_id))
 		return {"ok": false, "error": "This one-time shop offer has already been purchased."}
 	var purchase_result: Dictionary = await _provider.purchase(str(offer_dictionary.get("product_id", "")))
@@ -168,8 +169,11 @@ func _sanitize_offer(raw_offer) -> Dictionary:
 	return sanitized
 
 
-func _is_local_offer_available(offer: Dictionary) -> bool:
-	if not _is_lifetime_single_purchase_offer(offer):
+func _is_offer_available(offer: Dictionary) -> bool:
+	# Backend catalog eligibility is authoritative, but the development mock purchase never
+	# creates a backend claim. The saved mock grant may narrow a returned starter offer so it
+	# cannot be bought twice on this account before real billing integration exists.
+	if not _is_lifetime_single_purchase_offer(offer) and str(offer.get("id", "")) != STARTER_BUNDLE_ID:
 		return true
 	var player_progress = _find_player_progress()
 	return (

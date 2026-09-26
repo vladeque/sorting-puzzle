@@ -13,6 +13,22 @@ contract, CLI, tests, and release boundary.
 
 This file documents what each script owns. Keep script docs focused on responsibilities, exports, dependencies, and boundaries.
 
+## Starter Bundle promotion
+
+- `scripts/production_main_menu.gd` loads priced Starter Bundle eligibility, positions the badge,
+  opens the offer modal, rechecks the live catalog before Buy, and updates the menu after purchase.
+- `scripts/main_menu_starter_bundle_badge.gd` forwards the badge button press.
+- `scripts/starter_bundle_offer_modal.gd` binds rewards/prices and owns modal states and intent
+  signals; it does not grant rewards.
+- `scripts/store/shop_purchase_flow.gd` runs the provider purchase and idempotent progress grant
+  for both Shop and Main Menu, and plays feedback only for a newly applied grant.
+- `scripts/store/store_service.gd` enforces local lifetime limits and narrows backend mock Starter
+  Bundle visibility when the account already has a saved mock claim.
+
+See [STARTER_BUNDLE_MAIN_MENU_PLAN.md](STARTER_BUNDLE_MAIN_MENU_PLAN.md) for the UI and release
+boundary. Current purchase execution remains mock-only; platform billing and backend verified
+lifetime claims are required for a released cross-device one-time purchase.
+
 ## `scripts/ads/*.gd`
 
 - `ad_service.gd`: `AdService` autoload and sole gameplay-facing API. It coordinates lifecycle,
@@ -487,9 +503,9 @@ Depends on:
 - `ShopScreen` supports destination and in-level-overlay presentation modes without duplicating
   catalog or purchase logic.
 - Owns Shop loading/error states, creates reusable offer scenes, coordinates one purchase at a time, and routes the shared navigation.
-- Passes purchase results and their offer ids to `PlayerProgress.apply_shop_purchase()`, refreshes
-  the visible balance after a grant, and reloads the catalog so a claimed one-time offer disappears.
-- `_play_purchase_success_feedback(grant_result)` ties audio and haptics to rewards actually
+- Uses `ShopPurchaseFlow` for the provider result and `PlayerProgress.apply_shop_purchase()` grant,
+  refreshes the visible balance, and reloads the catalog so a claimed one-time offer disappears.
+- `ShopPurchaseFlow.play_success_feedback(grant_result)` ties audio and haptics to rewards actually
   landing rather than to the button or the dialog (AUDIO-001): it plays `shop_purchase_success`
   only when the grant reports `applied`, layers one `coin_gain` when the grant included coins,
   and stays silent for a duplicate transaction (`ok` with `applied` false) or a failed grant.

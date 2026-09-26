@@ -1006,6 +1006,10 @@ Rules:
   once-per-account purchase. Its offer id is saved with the purchase grant, the offer is removed
   from later catalog loads, and purchase execution rechecks the claim before contacting the mock
   provider. Backend-sourced eligibility remains server-authoritative.
+- `starter_bundle` now uses that lifetime limit in the local catalog. The backend development
+  catalog already defines the Starter Bundle with the same limit. Since backend-sourced purchases
+  still use the mock provider, `StoreService` also hides a locally claimed Starter Bundle returned
+  by the backend until real verified billing and backend claims replace the mock path.
 - `mock_prices` is keyed by mock country code and contains the complete `formatted_price` plus ISO currency code. Missing regions fall back to `US` in the development provider.
 - Real providers must ignore `mock_prices` and display the formatted string returned by Google Play or the App Store.
 - `discount_percent` (optional, integer) and `compare_at_prices` (optional, same per-region

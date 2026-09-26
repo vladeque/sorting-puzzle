@@ -11,6 +11,8 @@ const HapticsCatalogScript := preload("res://scripts/haptics/haptics_catalog.gd"
 const MenuBackgroundResolverScript := preload("res://scripts/chapters/menu_background_resolver.gd")
 const UIMotionScript := preload("res://scripts/ui_motion.gd")
 const RewardedLifeClientScript := preload("res://scripts/ads/rewarded_life_client.gd")
+const StoreServiceScript := preload("res://scripts/store/store_service.gd")
+const ShopPurchaseFlowScript := preload("res://scripts/store/shop_purchase_flow.gd")
 const PRODUCTION_MENU_SCENE := "res://scenes/main_menu.tscn"
 const SHOP_SCENE := "res://scenes/ui/shop_screen.tscn"
 const LEADERBOARD_SCENE := "res://scenes/ui/leaderboard_screen.tscn"
@@ -23,6 +25,9 @@ const CUTOUT_LAYOUT_TOLERANCE := 0.5
 const PROFILE_WIDGET_WIDTH := 76.0
 const REWARD_CHEST_SIZE := Vector2(116.0, 136.0)
 const REWARD_CHEST_TOP_GAP := 72.0
+const STARTER_BADGE_SIZE := 116.0
+const STARTER_BADGE_GAP := 16.0
+const STARTER_BUNDLE_ID := "starter_bundle"
 const BOTTOM_BAR_HEIGHT := 245.0
 const BOTTOM_MARGIN := 112.0
 const SIDE_MARGIN := 48.0
@@ -37,6 +42,8 @@ const CHAPTER_SELECTION_ENABLED_SETTING := "application/config/chapter_selection
 @onready var _background := %Background as TextureRect
 @onready var _top_status_bar := %TopStatusBar as MarginContainer
 @onready var _reward_chest := %RewardChest as Control
+@onready var _starter_badge = %StarterBundleBadge
+@onready var _starter_modal = %StarterBundleOfferModal
 @onready var _house_reward_origin := %HouseRewardOrigin as Control
 @onready var _reward_star_flyer := %RewardStarFlyer as Control
 @onready var _bottom_bar := %BottomBar as MarginContainer
@@ -73,6 +80,10 @@ var _rewarded_life_prepare_in_progress := false
 ## launch or be dismissed out from under the player when a countdown restores a life.
 var _out_of_lives_launch_pending := false
 var _chapter_selection_enabled := false
+var _starter_store_service = StoreServiceScript.new()
+var _starter_offer := {}
+var _starter_catalog_serial := 0
+var _starter_purchase_in_progress := false
 
 
 func _ready() -> void:
@@ -110,6 +121,9 @@ func _ready() -> void:
 		ad_service.connect("privacy_options_requirement_changed", privacy_requirement_callback)
 	if _reward_chest.has_signal("chest_pressed"):
 		_reward_chest.connect("chest_pressed", Callable(self, "_open_reward_chest_menu"))
+	_starter_badge.pressed.connect(_open_starter_bundle_offer)
+	_starter_modal.buy_requested.connect(_buy_starter_bundle)
+	_starter_modal.close_requested.connect(_close_starter_bundle_offer)
 	_bottom_navigation.connect("shop_pressed", Callable(self, "_open_shop"))
 	_bottom_navigation.connect("leaderboard_pressed", Callable(self, "_open_leaderboard"))
 	_bottom_navigation.connect("home_pressed", Callable(self, "_on_home_tab_reselected"))
@@ -128,6 +142,7 @@ func _ready() -> void:
 	_update_chapter_background(PlayerProgress.get_selected_chapter_id())
 	_leaderboard_reward_dialog.z_index = MAIN_MENU_OVERLAY_Z_INDEX
 	_out_of_lives_menu.z_index = MAIN_MENU_OVERLAY_Z_INDEX
+	_starter_modal.z_index = MAIN_MENU_OVERLAY_Z_INDEX + 1
 	_apply_responsive_layout()
 	if not pending_reward_animation.is_empty():
 		_play_pending_reward_animation.call_deferred(pending_reward_animation)
@@ -144,6 +159,7 @@ func _ready() -> void:
 			SfxManager.play(SfxCatalogScript.EVENT_COIN_GAIN)
 			HapticsManager.play(HapticsCatalogScript.EVENT_LEADERBOARD_REWARD)
 	call_deferred("_prepare_rewarded_life")
+	call_deferred("_refresh_starter_bundle_offer")
 
 
 func _process(delta: float) -> void:
@@ -165,6 +181,10 @@ func _process(delta: float) -> void:
 ## "Back/ui_cancel Behavior").
 func _unhandled_input(event: InputEvent) -> void:
 	if not event.is_action_pressed("ui_cancel"):
+		return
+	if _starter_modal.visible:
+		get_viewport().set_input_as_handled()
+		_starter_modal.request_close()
 		return
 	if is_instance_valid(_chapter_selection_screen):
 		return
@@ -200,8 +220,10 @@ func _apply_responsive_layout() -> void:
 	var display_cutouts := _get_display_cutouts(viewport_size)
 	_layout_top_status_bar(safe_margins, viewport_size, display_cutouts)
 	_layout_reward_chest(safe_margins)
+	_layout_starter_bundle_badge(safe_margins, viewport_size)
 	_layout_bottom_navigation(safe_margins)
 	_out_of_lives_menu.apply_safe_layout(safe_margins, viewport_size)
+	_starter_modal.apply_safe_layout(safe_margins, viewport_size)
 	_bottom_bar.anchor_left = 0.0
 	_bottom_bar.anchor_top = 1.0
 	_bottom_bar.anchor_right = 1.0
@@ -305,6 +327,21 @@ func _layout_reward_chest(safe_margins: Vector4) -> void:
 	_reward_chest.offset_top = top
 	_reward_chest.offset_right = left + REWARD_CHEST_SIZE.x
 	_reward_chest.offset_bottom = top + REWARD_CHEST_SIZE.y
+
+
+func _layout_starter_bundle_badge(safe_margins: Vector4, viewport_size: Vector2) -> void:
+	var left := viewport_size.x - safe_margins.z - TOP_SIDE_MARGIN - STARTER_BADGE_SIZE
+	var top := _reward_chest.offset_top
+	if left < _reward_chest.offset_right + STARTER_BADGE_GAP:
+		top = _reward_chest.offset_bottom + STARTER_BADGE_GAP
+	_starter_badge.anchor_left = 0.0
+	_starter_badge.anchor_top = 0.0
+	_starter_badge.anchor_right = 0.0
+	_starter_badge.anchor_bottom = 0.0
+	_starter_badge.offset_left = maxf(left, safe_margins.x + TOP_SIDE_MARGIN)
+	_starter_badge.offset_top = top
+	_starter_badge.offset_right = _starter_badge.offset_left + STARTER_BADGE_SIZE
+	_starter_badge.offset_bottom = top + STARTER_BADGE_SIZE
 
 
 func _get_safe_area_margins(viewport_size: Vector2) -> Vector4:
@@ -720,13 +757,99 @@ func _open_shop() -> void:
 	_begin_navigation(SHOP_SCENE)
 
 
+func _refresh_starter_bundle_offer() -> Dictionary:
+	_starter_catalog_serial += 1
+	var request_serial := _starter_catalog_serial
+	_starter_badge.hide()
+	_starter_offer = {}
+	# Keep the RefCounted service alive across the await even if the menu is replaced.
+	var service = _starter_store_service
+	var result: Dictionary = await service.load_catalog()
+	if not is_inside_tree() or request_serial != _starter_catalog_serial:
+		return {}
+	if not bool(result.get("ok", false)) or str(result.get("source", "local")) not in ["local", "live"]:
+		return {}
+	for raw_offer in result.get("offers", []) as Array:
+		if not (raw_offer is Dictionary):
+			continue
+		var offer := raw_offer as Dictionary
+		if str(offer.get("id", "")) != STARTER_BUNDLE_ID or str(offer.get("type", "")) != "bundle":
+			continue
+		if PlayerProgress.has_purchased_shop_offer(&"starter_bundle"):
+			return {}
+		var store := offer.get("store", {}) as Dictionary
+		if str(store.get("formatted_price", "")).strip_edges().is_empty():
+			return {}
+		_starter_offer = offer.duplicate(true)
+		_starter_badge.show()
+		return _starter_offer
+	return {}
+
+
+func _open_starter_bundle_offer() -> void:
+	if _is_navigating or _starter_offer.is_empty() or _starter_modal.visible:
+		return
+	_starter_modal.set_offer(_starter_offer)
+	_starter_modal.apply_safe_layout(_get_safe_area_margins(get_viewport_rect().size), get_viewport_rect().size)
+	_starter_modal.open()
+	_starter_modal.set_busy("Checking offer…")
+	var refreshed_offer: Dictionary = await _refresh_starter_bundle_offer()
+	if not is_inside_tree() or not _starter_modal.visible:
+		return
+	if refreshed_offer.is_empty():
+		_starter_modal.show_error("This offer is no longer available.", false)
+	else:
+		_starter_modal.set_offer(refreshed_offer)
+
+
+func _close_starter_bundle_offer() -> void:
+	if _starter_purchase_in_progress:
+		return
+	_starter_modal.close()
+
+
+func _buy_starter_bundle() -> void:
+	if _starter_purchase_in_progress or not _starter_modal.visible:
+		return
+	_starter_purchase_in_progress = true
+	_starter_modal.set_busy("Checking offer…")
+	var refreshed_offer: Dictionary = await _refresh_starter_bundle_offer()
+	if not is_inside_tree():
+		return
+	if refreshed_offer.is_empty():
+		_starter_modal.show_error("This offer is no longer available.", false)
+		_starter_purchase_in_progress = false
+		return
+
+	_starter_modal.set_offer(refreshed_offer)
+	_starter_modal.set_busy("Purchasing…")
+	var flow := ShopPurchaseFlowScript.new(_starter_store_service, PlayerProgress)
+	var result: Dictionary = await flow.execute(&"starter_bundle")
+	if not is_inside_tree():
+		return
+	_starter_purchase_in_progress = false
+	if not bool(result.get("ok", false)):
+		_starter_modal.show_error(
+			str(result.get("error", "The purchase could not be completed.")),
+			str(result.get("stage", "")) == "purchase"
+		)
+		return
+
+	_update_coin_balance()
+	ShopPurchaseFlowScript.play_success_feedback(result.get("grant", {}) as Dictionary)
+	_starter_catalog_serial += 1
+	_starter_offer = {}
+	_starter_badge.hide()
+	_starter_modal.show_success()
+
+
 ## Ignores a duplicate cross-destination press while a scene transition is already underway, so a
 ## rapid double-tap on Shop/Leaderboard (including via the top-status coin shortcut) can never call
 ## change_scene_to_file() twice, and stops this whole screen (every descendant's mouse/touch/
 ## keyboard input, not just navigation) from accepting further input for the brief window before
 ## the deferred scene swap resolves.
 func _begin_navigation(scene_path: String) -> void:
-	if _is_navigating:
+	if _is_navigating or _starter_modal.visible:
 		return
 
 	_is_navigating = true

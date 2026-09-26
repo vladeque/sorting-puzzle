@@ -1,5 +1,8 @@
 # Starter Bundle main-menu promotion plan
 
+Status: **Implemented for the current mock purchase provider (2026-09-26).** Platform billing and
+backend-verified purchase claims remain the production release gate described below.
+
 ## Goal and product rule
 
 When the Starter Bundle is currently eligible and has a display price, show a circular promotion on

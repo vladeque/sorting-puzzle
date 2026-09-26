@@ -10,6 +10,8 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/leaderboard_reward_dialog.tscn" id="8_leaderboard_reward_dialog"]
 [ext_resource type="PackedScene" path="res://scenes/ui/main_menu_chapter_button.tscn" id="9_chapter_button"]
 [ext_resource type="PackedScene" path="res://scenes/ui/out_of_lives_menu.tscn" id="10_out_of_lives"]
+[ext_resource type="PackedScene" path="res://scenes/ui/main_menu_starter_bundle_badge.tscn" id="11_starter_badge"]
+[ext_resource type="PackedScene" path="res://scenes/ui/starter_bundle_offer_modal.tscn" id="12_starter_modal"]
 
 [node name="ProductionMainMenu" type="Control" unique_id=1235428546]
 layout_mode = 3
@@ -54,6 +56,10 @@ offset_left = 11.0
 offset_top = 176.0
 offset_right = 127.0
 offset_bottom = 312.0
+
+[node name="StarterBundleBadge" parent="." instance=ExtResource("11_starter_badge")]
+unique_name_in_owner = true
+layout_mode = 1
 
 [node name="BottomBar" type="MarginContainer" parent="." unique_id=1938053235]
 unique_name_in_owner = true
@@ -112,6 +118,11 @@ unique_name_in_owner = true
 layout_mode = 1
 
 [node name="OutOfLivesMenu" parent="." instance=ExtResource("10_out_of_lives")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="StarterBundleOfferModal" parent="." instance=ExtResource("12_starter_modal")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1

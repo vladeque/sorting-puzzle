@@ -1,0 +1,92 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/main_menu_starter_bundle_badge.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/ui/shop_coin_offers/shop_coin_offer_tier_06.png" id="2_coins"]
+[ext_resource type="Script" path="res://scripts/press_scale_button.gd" id="3_press"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_badge"]
+bg_color = Color(0.76, 0.17, 0.2, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(1, 0.82, 0.29, 1)
+corner_radius_top_left = 58
+corner_radius_top_right = 58
+corner_radius_bottom_right = 58
+corner_radius_bottom_left = 58
+shadow_color = Color(0.19, 0.06, 0.03, 0.55)
+shadow_size = 6
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_badge_pressed"]
+bg_color = Color(0.62, 0.11, 0.15, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(1, 0.9, 0.48, 1)
+corner_radius_top_left = 58
+corner_radius_top_right = 58
+corner_radius_bottom_right = 58
+corner_radius_bottom_left = 58
+
+[node name="MainMenuStarterBundleBadge" type="Control"]
+visible = false
+custom_minimum_size = Vector2(116, 116)
+layout_mode = 3
+offset_right = 116.0
+offset_bottom = 116.0
+script = ExtResource("1_script")
+
+[node name="BadgeButton" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_badge")
+theme_override_styles/hover = SubResource("StyleBoxFlat_badge")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_badge_pressed")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_badge")
+script = ExtResource("3_press")
+held_scale = 0.94
+
+[node name="CoinArt" type="TextureRect" parent="BadgeButton"]
+layout_mode = 1
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -38.0
+offset_top = 9.0
+offset_right = 38.0
+offset_bottom = 76.0
+mouse_filter = 2
+texture = ExtResource("2_coins")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="BadgeLabel" type="Label" parent="BadgeButton"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 7.0
+offset_top = -37.0
+offset_right = -7.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_type_variation = &"GameSectionLabel"
+theme_override_colors/font_color = Color(1, 0.97, 0.78, 1)
+theme_override_colors/font_shadow_color = Color(0.28, 0.03, 0.03, 0.95)
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 20
+text = "STARTER"
+horizontal_alignment = 1
+vertical_alignment = 1

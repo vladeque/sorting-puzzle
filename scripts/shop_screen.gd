@@ -9,9 +9,8 @@ enum PresentationMode {
 	IN_LEVEL_OVERLAY,
 }
 
-const SfxCatalogScript := preload("res://scripts/audio/sfx_catalog.gd")
-const HapticsCatalogScript := preload("res://scripts/haptics/haptics_catalog.gd")
 const StoreServiceScript := preload("res://scripts/store/store_service.gd")
+const ShopPurchaseFlowScript := preload("res://scripts/store/shop_purchase_flow.gd")
 const DestinationScreenLayoutScript := preload("res://scripts/destination_screen_layout.gd")
 const UIMotionScript := preload("res://scripts/ui_motion.gd")
 const BUNDLE_CARD_SCENE := preload("res://scenes/ui/shop_bundle_card.tscn")
@@ -210,58 +209,31 @@ func _purchase_offer(offer_id: StringName) -> void:
 	_purchase_in_progress = true
 	_set_overlay_close_locked(true)
 	_set_offers_locked(true, offer_id)
-	var purchase_result: Dictionary = await _store_service.purchase_offer(offer_id)
-	if not bool(purchase_result.get("ok", false)):
+	var flow := ShopPurchaseFlowScript.new(_store_service, PlayerProgress)
+	var result: Dictionary = await flow.execute(offer_id)
+	if not bool(result.get("ok", false)):
 		_purchase_dialog.call(
 			"show_result",
-			"Purchase unavailable",
-			str(purchase_result.get("error", "The mock purchase could not be completed."))
+			"Reward error" if str(result.get("stage", "")) == "grant" else "Purchase unavailable",
+			str(result.get("error", "The purchase could not be completed."))
 		)
 		_purchase_in_progress = false
 		_set_overlay_close_locked(false)
 		_set_offers_locked(false)
 		return
 
-	var grant_result := PlayerProgress.apply_shop_purchase(
-		str(purchase_result.get("transaction_id", "")),
-		purchase_result.get("rewards", {}) as Dictionary,
-		str(purchase_result.get("offer_id", ""))
+	var grant_result := result.get("grant", {}) as Dictionary
+	_update_coin_balance()
+	ShopPurchaseFlowScript.play_success_feedback(grant_result)
+	_purchase_dialog.call(
+		"show_result",
+		"Purchase complete",
+		_format_reward_message(result.get("rewards", {}) as Dictionary)
 	)
-	if not bool(grant_result.get("ok", false)):
-		_purchase_dialog.call(
-			"show_result",
-			"Reward error",
-			str(grant_result.get("error", "The purchased rewards could not be granted."))
-		)
-	else:
-		_update_coin_balance()
-		_play_purchase_success_feedback(grant_result)
-		_purchase_dialog.call(
-			"show_result",
-			"Purchase complete",
-			_format_reward_message(purchase_result.get("rewards", {}) as Dictionary)
-		)
 
 	_purchase_in_progress = false
 	_set_overlay_close_locked(false)
-	if bool(grant_result.get("ok", false)):
-		await _load_shop()
-	else:
-		_set_offers_locked(false)
-
-
-## Confirmation feedback is tied to rewards actually landing, not to the button or the dialog: a
-## duplicate transaction resolves `ok` with `applied` false and grants nothing, so it stays silent.
-## A grant that includes coins layers one audio `coin_gain` with the shared confirmation; an
-## ability-only bundle gets the confirmation alone (AUDIO-001 section 5).
-func _play_purchase_success_feedback(grant_result: Dictionary) -> void:
-	if not bool(grant_result.get("applied", false)):
-		return
-
-	SfxManager.play(SfxCatalogScript.EVENT_SHOP_PURCHASE_SUCCESS)
-	HapticsManager.play(HapticsCatalogScript.EVENT_SHOP_PURCHASE_SUCCESS)
-	if maxi(int(grant_result.get("coins", 0)), 0) > 0:
-		SfxManager.play(SfxCatalogScript.EVENT_COIN_GAIN)
+	await _load_shop()
 
 
 func _format_reward_message(rewards: Dictionary) -> String:

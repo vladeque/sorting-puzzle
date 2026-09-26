@@ -194,6 +194,10 @@ Responsibility:
   `scenes/ui/main_menu_coin_shortcut.tscn`, which also opens the Shop when pressed), saved lives,
   and a warm rounded settings button styled like the chapter selection back button.
 - Shows a separate side reward chest widget under the profile icon with saved stars versus the active configured goal; tapping it opens `scenes/ui/reward_chest_menu.tscn`, a read-only centered modal showing the same progress at a larger size, the dedicated `assets/ui/reward_chest_menu_illustration.png` artwork, and the coin payout waiting at the next goal.
+- Advertises an eligible, priced Starter Bundle with `scenes/ui/main_menu_starter_bundle_badge.tscn`
+  beside the reward chest. Its dedicated `starter_bundle_offer_modal.tscn` binds the catalog's
+  actual rewards and regional price, then rechecks eligibility before the shared Shop purchase
+  flow. Backend cached catalogs never show this purchase prompt.
 - Uses one shared interaction/motion system across Main Menu, Shop, Leaderboard, and Chapter
   Selection (UI-002): `scripts/press_scale_button.gd` (now tween-based, with an optional
   `visual_target_path` so art-only/full-cell hit targets can animate without shrinking their touch
@@ -580,7 +584,10 @@ Responsibility:
 - Applies mock purchase rewards atomically through `PlayerProgress.apply_shop_purchase()`, retains
   processed transaction ids so callbacks are idempotent, and persists offer ids so local/mock
   lifetime offers disappear after their first account purchase.
-- GAME-008: `application/config/shop_catalog_source` independently selects where the *offer list* comes from. `local` (default) reads `configs/shop_catalog.json` unchanged. `backend` sources eligibility, rewards, and product IDs from the authenticated backend development catalog (`GET /v1/catalog`, via the shared `BackendTransport`/`BackendReadOperations` from GAME-007) through `scripts/store/backend_catalog_source.gd`, joins each eligible offer to `configs/backend/shop_catalog_prices.json` by `platform_product_id` for its display title and mock regional price, and still prices/purchases through the local `mock` provider. `scripts/store/backend_catalog_cache.gd` persists the last successful backend catalog to `user://shop_catalog_backend_cache.json` so an unavailable, unauthorized, or malformed later read falls back to an offline cached view instead of failing outright.
+- `scripts/store/shop_purchase_flow.gd` owns the provider purchase, progress grant, and success
+  feedback shared by Shop and Main Menu. The local Starter Bundle is lifetime-limited; a saved
+  mock claim also suppresses a backend-returned Starter Bundle until real billing is integrated.
+- GAME-008: `application/config/shop_catalog_source` independently selects where the *offer list* comes from. `local` (default) reads `configs/shop_catalog.json`. `backend` sources eligibility, rewards, and product IDs from the authenticated backend development catalog (`GET /v1/catalog`, via the shared `BackendTransport`/`BackendReadOperations` from GAME-007) through `scripts/store/backend_catalog_source.gd`, joins each eligible offer to `configs/backend/shop_catalog_prices.json` by `platform_product_id` for its display title and mock regional price, and still prices/purchases through the local `mock` provider. `scripts/store/backend_catalog_cache.gd` persists the last successful backend catalog to `user://shop_catalog_backend_cache.json` so an unavailable, unauthorized, or malformed later read falls back to an offline cached view instead of failing outright.
 - Uses the "Shared Destination-Screen UI" system above for its background, content-rect/title
   sizing, bottom-navigation placement, and loading/error presentation; bundle/coin-offer purchase
   buttons use the shared glossy "regular" green style; the Chapter cover CTA shares their 58 px
@@ -733,7 +740,8 @@ Assets:
 Event owners:
 - `scripts/level.gd`: `item_select`, `item_place_valid`, `match_clear`, `star_hud_arrival`,
   `timer_critical_tick` (driven by `LevelTopHud.critical_second_pulsed`), `time_up`, `coin_spend`.
-- `scripts/shop_screen.gd`: `shop_purchase_success` and the layered `coin_gain` for granted coins.
+- `scripts/store/shop_purchase_flow.gd`: `shop_purchase_success` and the layered `coin_gain` for
+  granted coins, shared by Shop and Main Menu Starter Bundle.
 - `scripts/production_main_menu.gd`: `reward_chest_star_arrival`, the goal-rollover and weekly
   leaderboard `coin_gain`, and the life-purchase `coin_spend`.
 - `scripts/pause_menu.gd`: the sound-effects toggle acknowledgement.

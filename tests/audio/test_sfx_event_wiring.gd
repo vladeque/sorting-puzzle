@@ -16,7 +16,7 @@ const HapticsCatalogScript := preload("res://scripts/haptics/haptics_catalog.gd"
 
 const LEVEL_SCENE_PATH := "res://level.tscn"
 const MAIN_MENU_SCENE_PATH := "res://scenes/main_menu.tscn"
-const SHOP_SCREEN_SCRIPT_PATH := "res://scripts/shop_screen.gd"
+const SHOP_PURCHASE_FLOW_SCRIPT_PATH := "res://scripts/store/shop_purchase_flow.gd"
 const TEST_LEVEL := 2
 const SOUND_EFFECTS_SETTING := &"sound_effects"
 
@@ -28,7 +28,7 @@ var _recorded: Array[Dictionary] = []
 var _recorded_haptics: Array[Dictionary] = []
 var _level_scene: PackedScene
 var _main_menu_scene: PackedScene
-var _shop_screen_script: GDScript
+var _shop_purchase_flow_script: GDScript
 
 
 func _init() -> void:
@@ -61,7 +61,7 @@ func _run() -> void:
 	# preloaded at class level (matching tests/ui/test_interaction_motion.gd).
 	_level_scene = load(LEVEL_SCENE_PATH) as PackedScene
 	_main_menu_scene = load(MAIN_MENU_SCENE_PATH) as PackedScene
-	_shop_screen_script = load(SHOP_SCREEN_SCRIPT_PATH) as GDScript
+	_shop_purchase_flow_script = load(SHOP_PURCHASE_FLOW_SCRIPT_PATH) as GDScript
 
 	await _test_placement_routing()
 	await _test_item_selection()
@@ -488,13 +488,11 @@ func _test_level_coin_spending() -> void:
 	_progress.call("reset_progress")
 
 
-## The Shop's decision point, isolated from the store provider: the confirmation and the layered
-## coin cue follow what was actually granted, not what was pressed.
+## The shared Shop/Main Menu purchase flow plays confirmation and the layered coin cue only for
+## rewards actually granted, not for the button press or a duplicate transaction.
 func _test_shop_purchase_routing() -> void:
-	var shop = _shop_screen_script.new()
-
 	_begin_recording()
-	shop.call("_play_purchase_success_feedback", {"ok": true, "applied": true, "coins": 500})
+	_shop_purchase_flow_script.call("play_success_feedback", {"ok": true, "applied": true, "coins": 500})
 	_check(
 		_played(SfxCatalogScript.EVENT_SHOP_PURCHASE_SUCCESS) == 1
 			and _played(SfxCatalogScript.EVENT_COIN_GAIN) == 1,
@@ -506,7 +504,7 @@ func _test_shop_purchase_routing() -> void:
 	)
 
 	_begin_recording()
-	shop.call("_play_purchase_success_feedback", {"ok": true, "applied": true, "coins": 0})
+	_shop_purchase_flow_script.call("play_success_feedback", {"ok": true, "applied": true, "coins": 0})
 	_check(
 		_played(SfxCatalogScript.EVENT_SHOP_PURCHASE_SUCCESS) == 1
 			and _played(SfxCatalogScript.EVENT_COIN_GAIN) == 0,
@@ -514,7 +512,7 @@ func _test_shop_purchase_routing() -> void:
 	)
 
 	_begin_recording()
-	shop.call("_play_purchase_success_feedback", {"ok": true, "applied": false})
+	_shop_purchase_flow_script.call("play_success_feedback", {"ok": true, "applied": false})
 	_check(
 		_played(SfxCatalogScript.EVENT_SHOP_PURCHASE_SUCCESS) == 0
 			and _played(SfxCatalogScript.EVENT_COIN_GAIN) == 0,
@@ -524,9 +522,6 @@ func _test_shop_purchase_routing() -> void:
 		_haptic_played(HapticsCatalogScript.EVENT_SHOP_PURCHASE_SUCCESS) == 0,
 		"A duplicate transaction that grants nothing does not vibrate."
 	)
-
-	shop.free()
-
 
 func _test_reward_chest_arrivals() -> void:
 	_progress.call("reset_progress")
