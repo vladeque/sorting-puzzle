@@ -1,0 +1,19 @@
+{
+  "tips": [
+    {
+      "id": "level_1_move_to_triple",
+      "level": 1,
+      "type": "move_to_triple",
+      "start_delay_seconds": 0.6,
+      "reshow_delay_seconds": 1.5
+    },
+    {
+      "id": "level_10_tap_dispenser",
+      "level": 10,
+      "type": "tap_dispenser",
+      "message": "Tap a dispenser to throw items onto the shelves!",
+      "start_delay_seconds": 0.6,
+      "reshow_delay_seconds": 1.5
+    }
+  ]
+}

@@ -32,6 +32,11 @@ func _ready() -> void:
 	%ThrowingDispensersPreviewButton.visible = _is_dev_level_select_enabled()
 	%ThrowingDispensersPreviewButton.pressed.connect(func() -> void:
 		get_tree().change_scene_to_file("res://scenes/testing/throwing_dispensers_preview.tscn"))
+	# Replays the first-time tips on levels 1 and 10 when they are launched from the level picker.
+	%ResetGameplayTipsButton.visible = _is_dev_level_select_enabled()
+	%ResetGameplayTipsButton.pressed.connect(func() -> void:
+		PlayerProgress.reset_seen_gameplay_tips()
+		%ResetGameplayTipsButton.text = "Gameplay tips reset")
 
 
 func _update_campaign_progress() -> void:

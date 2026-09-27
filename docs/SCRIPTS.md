@@ -29,6 +29,26 @@ See [STARTER_BUNDLE_MAIN_MENU_PLAN.md](STARTER_BUNDLE_MAIN_MENU_PLAN.md) for the
 boundary. Current purchase execution remains mock-only; platform billing and backend verified
 lifetime claims are required for a released cross-device one-time purchase.
 
+## Gameplay tips
+
+First-time tips on levels 1 and 10; see [GAMEPLAY_TIPS.md](GAMEPLAY_TIPS.md).
+
+- `scripts/gameplay_tip_catalog.gd` (`RefCounted`, preloaded by `level.gd`): loads and validates
+  `configs/gameplay_tips.json` and serves `get_tip_for_level()`. It fails closed, so any error means
+  no tips. `TYPE_MOVE_TO_TRIPLE` and `TYPE_TAP_DISPENSER` are the tip types.
+- `scripts/gameplay_tip_overlay.gd` (`GameplayTipOverlay`): the screen-space view. The API is
+  `begin(start_delay, reshow_delay, message)`, `update_move(from, to, ghost_texture, ghost_scale,
+  hand_scale)`, `update_tap(target, hand_scale, bubble_center_x, bubble_bounds)`,
+  `set_suspended()`, `finish()`, `clear()`, `is_active()`, `is_showing()`, and `hold_at(seconds)`
+  for captures. It restarts the loop only when an anchor moves more than 3 px or the hand scale
+  changes by more than 2%.
+- `scripts/tutorial_hand.gd` (`TutorialHand`): `play_tap_loop()`, `play_drag_loop()`, `stop()`,
+  `fade_away()`, `hold_at()`, and `get_artwork_rect()`. It exports the fingertip and artwork
+  texel geometry, press scale, ripple look, and every timing.
+- `scripts/gameplay_tip_bubble.gd` (`GameplayTipBubble`): `set_message()` translates the text,
+  `place(tail_tip, center_x, bounds)` measures it with the label's font and lays out panel, label,
+  and tail on that frame, and `show_bubble()` / `hide_bubble()` fade it.
+
 ## `scripts/ads/*.gd`
 
 - `ad_service.gd`: `AdService` autoload and sole gameplay-facing API. It coordinates lifecycle,
@@ -975,6 +995,8 @@ Key constants:
 Important nodes:
 - `%PlayButton`: starts the saved campaign level.
 - `%LevelPicker`: `scenes/testing/dev_level_picker.tscn` instance that lists the chapter.
+- `%ResetGameplayTipsButton`: dev-only; calls `PlayerProgress.reset_seen_gameplay_tips()` so the
+  level 1 and 10 tips replay when launched from the picker.
 
 Key methods:
 - `_ready()`: loads progress, collects the chapter's levels, wires the play button and picker, updates campaign progress text, and populates the dev selector when enabled.
@@ -1447,6 +1469,10 @@ Saved fields:
   `profile_edit`.
 - `player_name`: saved profile display name. Fresh and legacy saves without a valid value receive a generated `player_` name with a five-character random suffix, such as `player_g26f3`.
 - `settings_disabled`: disabled-state map for `music`, `sound_effects`, and `vibration` settings buttons.
+- `seen_gameplay_tips`: ids of first-time gameplay tips the player has acted on, stored with device
+  preferences and never in the snapshot or journal. The API is `has_seen_gameplay_tip()`,
+  `mark_gameplay_tip_seen()`, and the debug-menu `reset_seen_gameplay_tips()`
+  ([GAMEPLAY_TIPS.md](GAMEPLAY_TIPS.md)).
 - `reward_chest_stars`: stars accumulated toward the active reward chest goal.
 - `reward_chest_goal_index`: index into `configs/reward_chest_goals.json` for the active goal; the final configured goal repeats after it is reached.
 - `reward_chest_completed_cycles`: completed goal count represented in recovery checkpoints.
@@ -1963,6 +1989,18 @@ Purpose:
 - Exposes the `prepare_for_loading_transition()` / `activate_after_loading_transition()` gate used by
   `LevelTransition`; while pending it blocks input and frame updates, pauses moving shelf rows, and
   postpones the initial shelf resolution until the board is fully revealed.
+
+First-time tips ([GAMEPLAY_TIPS.md](GAMEPLAY_TIPS.md)):
+- `activate_after_loading_transition()` calls `_arm_gameplay_tip()`, which applies the seen,
+  completed-level, and dispenser guards. `_apply_level_config()` calls `_clear_gameplay_tip()` first,
+  so a rebuilt board never keeps a tip.
+- `_refresh_gameplay_tip()` runs at the top of `_process()`, before its early returns. It suspends
+  the overlay through `_is_gameplay_tip_suspended()`, or feeds it screen-space anchors from
+  `_update_gameplay_tip_move()` (`_find_gameplay_tip_move()`) or `_update_gameplay_tip_tap()`.
+- `_finish_gameplay_tip(type)` is called from `_clear_matching_shelves()` and `_throw_items()` and
+  marks the tip seen. The Hammer's path never calls it.
+- Exports: `gameplay_tip_hand_scale` (0.68, relative to the shelves' drawn scale) and
+  `force_gameplay_tips` for tests and captures.
 
 Audio (AUDIO-001):
 - Plays no audio itself. `_play_sfx(event_id, context)` is the level's only route to sound and

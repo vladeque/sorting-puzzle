@@ -89,3 +89,11 @@ layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 26
 text = "Throwing dispensers preview"
+
+[node name="ResetGameplayTipsButton" type="Button" parent="Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 60)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 26
+text = "Reset gameplay tips"

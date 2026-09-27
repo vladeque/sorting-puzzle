@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/tutorial_hand.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://b7cr8fuw4dn56" path="res://assets/ui/tips/tutorial_hand.png" id="2_hand"]
+
+[node name="TutorialHand" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="Ghost" type="Sprite2D" parent="."]
+visible = false
+
+[node name="Hand" type="Node2D" parent="."]
+
+[node name="Sprite" type="Sprite2D" parent="Hand"]
+position = Vector2(-75, -44)
+texture = ExtResource("2_hand")
+centered = false

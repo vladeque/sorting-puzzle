@@ -1025,6 +1025,27 @@ Change here when:
 - Changing the throw lifecycle, the reserved-slot rule, dispenser placement or presentation, the
   completion condition, or the playability model.
 
+### Gameplay Tips
+
+Files:
+- `configs/gameplay_tips.json`, `scripts/gameplay_tip_catalog.gd`
+- `scenes/ui/gameplay_tip_overlay.tscn`, `scripts/gameplay_tip_overlay.gd`
+- `scenes/ui/tutorial_hand.tscn`, `scripts/tutorial_hand.gd`, `assets/ui/tips/tutorial_hand.png`
+- `scenes/ui/gameplay_tip_bubble.tscn`, `scripts/gameplay_tip_bubble.gd`,
+  `assets/themes/style_box_gameplay_tip_bubble.tres`
+- `scripts/level.gd` (arming, anchors, suspension, finishing), `scripts/player_progress.gd` (seen set)
+- `scripts/tools/captures/gameplay_tips_setup.gd`, `tests/gameplay/test_gameplay_tips.gd`
+
+Responsibility:
+- First-time tips: on level 1 a hand demonstrates dragging an item to form a triple, and on level 10
+  a hand taps a throwing dispenser under a short explanation bubble.
+- Each tip shows until the player performs the taught action, once per device, and never on a
+  campaign launch of an already completed level. It is non-blocking, costs no time, and steps aside
+  while any modal or player interaction owns the screen. See [GAMEPLAY_TIPS.md](GAMEPLAY_TIPS.md).
+
+Change here when:
+- Adding a tip, changing when tips appear or finish, or changing the hand or bubble presentation.
+
 ### Item Runtime
 
 Files:
@@ -1310,5 +1331,6 @@ Change the shared destination-screen shell, status panel, or layout math:
 - `docs/SCRIPTS.md`: script responsibilities, exports, and dependencies.
 - `docs/CONFIGS.md`: config file schema and data contracts.
 - `docs/THROWING_DISPENSERS.md`: the empty-board mode whose items are thrown onto the shelves.
+- `docs/GAMEPLAY_TIPS.md`: the first-time hand tips on levels 1 and 10.
 - `docs/CLOUD_SAVE.md`: platform cloud-save setup and bridge contract.
 - `docs/TYPOGRAPHY.md`: global font assets, semantic theme roles, casing, numeric style, and responsive typography checks.

@@ -888,6 +888,46 @@ standard layers. Use `--require-solvable` to validate the final sticky board; fa
 overwrites output. See [STICKY_ITEMS.md](STICKY_ITEMS.md) for schema, rounding, statistics, and
 publication constraints. The isolated comparison board is `configs/test_levels/sticky_items_preview.json`.
 
+## `configs/gameplay_tips.json`
+
+Purpose:
+- Chooses which campaign level shows which first-time gameplay tip. See
+  [GAMEPLAY_TIPS.md](GAMEPLAY_TIPS.md).
+- Loaded by `scripts/gameplay_tip_catalog.gd` when `scripts/level.gd` arms a tip after the loading
+  reveal.
+- Presentation only. It is deliberately separate from `configs/levels/level_*.json`, whose bytes are
+  hashed into `configs/backend/content_provenance.json`, and it is not in that manifest's file list.
+
+Shape:
+
+```json
+{
+  "tips": [
+    {
+      "id": "level_10_tap_dispenser",
+      "level": 10,
+      "type": "tap_dispenser",
+      "message": "Tap a dispenser to throw items onto the shelves!",
+      "start_delay_seconds": 0.6,
+      "reshow_delay_seconds": 1.5
+    }
+  ]
+}
+```
+
+Rules:
+- `id`: non-empty string of at most 64 characters, unique. It is the key saved in
+  `PlayerProgress`'s `seen_gameplay_tips` preference, so renaming an id shows that tip again to
+  players who already saw it.
+- `level`: positive whole-number campaign level. At most one tip per level.
+- `type`: `move_to_triple` (a hand drags an item onto the shelf holding most of its type) or
+  `tap_dispenser` (a hand taps the first stocked throwing dispenser). A `tap_dispenser` tip on a level
+  without dispensers is skipped with a warning.
+- `message`: optional English source text for a bubble under the hand, shown through `tr()`.
+- `start_delay_seconds` / `reshow_delay_seconds`: optional, 0-10, default 0.6 and 1.5. The first is
+  the wait after the loading reveal; the second is the wait after the tip was suspended.
+- Any error fails closed: every error is reported and no tip is served at all.
+
 ## `configs/reward_chest_goals.json`
 
 Purpose:
@@ -1054,8 +1094,8 @@ Runtime files:
 
 The gameplay snapshot schema is version 9. It retains campaign completion maps, account-scoped
 offer claims, reward-chest cycles, moderation state, the four-ability inventory, and the
-authoritative public `avatar_frame_id`; it intentionally excludes `settings_disabled` and
-`locale`, which belong to local `preferences`.
+authoritative public `avatar_frame_id`; it intentionally excludes `settings_disabled`,
+`locale`, and `seen_gameplay_tips`, which belong to local `preferences`.
 
 Runtime behavior:
 - Fresh saves start at level 1 with five lives, 300 gold coins, three uses for each ability, `avatar_cat` selected as the profile avatar, a generated `player_` name with a five-character random suffix, and all settings buttons enabled.

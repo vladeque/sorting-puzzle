@@ -69,6 +69,9 @@ const AVAILABLE_AVATAR_IDS := [
 const AVATAR_TEXTURE_PATH_FORMAT := "res://assets/ui/avatars/%s.png"
 const MAX_LIVES := 5
 const LIFE_RESTORE_SECONDS := 3600
+## Bounds for the device-local set of gameplay tips the player has already acted on.
+const MAX_SEEN_GAMEPLAY_TIPS := 64
+const MAX_GAMEPLAY_TIP_ID_LENGTH := 64
 const DEFAULT_ABILITY_USES := {
 	ABILITY_HAMMER: 3,
 	ABILITY_SHUFFLE: 3,
@@ -122,11 +125,13 @@ func load_progress() -> void:
 			"ad_pacing_state",
 			AdPacingStateScript.create_default()
 		).duplicate(true),
+		"seen_gameplay_tips": (initial_data.get("seen_gameplay_tips", []) as Array).duplicate(),
 	}
 	initial_data.erase("settings_disabled")
 	initial_data.erase("locale")
 	initial_data.erase("selected_chapter_id")
 	initial_data.erase("ad_pacing_state")
+	initial_data.erase("seen_gameplay_tips")
 	if _account_coordinator == null:
 		_account_coordinator = AccountSaveCoordinatorScript.new(_session_store)
 	var open_result: Dictionary = _account_coordinator.initialize(
@@ -548,6 +553,35 @@ func set_ad_pacing_state(raw_state: Dictionary) -> bool:
 	return _commit_or_restore(previous_data)
 
 
+## Gameplay tips the player has already acted on (docs/GAMEPLAY_TIPS.md). Like the locale, this
+## is a device-local preference: it only decides whether a tip is shown, so it never enters the
+## authoritative snapshot or a backend journal operation.
+func has_seen_gameplay_tip(tip_id: String) -> bool:
+	return (_data.get("seen_gameplay_tips", []) as Array).has(tip_id)
+
+
+func mark_gameplay_tip_seen(tip_id: String) -> bool:
+	if has_seen_gameplay_tip(tip_id):
+		return true
+	var seen := _sanitize_seen_gameplay_tips(
+		(_data.get("seen_gameplay_tips", []) as Array) + [tip_id]
+	)
+	if not seen.has(tip_id):
+		return false
+	var previous_data := _data.duplicate(true)
+	_data["seen_gameplay_tips"] = seen
+	return _commit_or_restore(previous_data)
+
+
+## Debug-menu reset so the first-time flow can be replayed on a device that has already seen it.
+func reset_seen_gameplay_tips() -> bool:
+	if (_data.get("seen_gameplay_tips", []) as Array).is_empty():
+		return true
+	var previous_data := _data.duplicate(true)
+	_data["seen_gameplay_tips"] = []
+	return _commit_or_restore(previous_data)
+
+
 func is_setting_disabled(setting_id: StringName) -> bool:
 	var disabled_settings := get_disabled_settings()
 	return bool(disabled_settings.get(String(setting_id), false))
@@ -842,6 +876,9 @@ func _sanitize_data(raw_data: Dictionary) -> Dictionary:
 	sanitized["ad_pacing_state"] = AdPacingStateScript.sanitize(
 		raw_data.get("ad_pacing_state", {})
 	)
+	sanitized["seen_gameplay_tips"] = _sanitize_seen_gameplay_tips(
+		raw_data.get("seen_gameplay_tips", [])
+	)
 	sanitized["selected_chapter_id"] = _sanitize_selected_chapter_id(
 		str(raw_data.get("selected_chapter_id", _default_chapter_id())),
 		sanitized["completion_stars_by_level"] as Dictionary
@@ -908,6 +945,7 @@ func _default_data() -> Dictionary:
 		"settings_disabled": DEFAULT_DISABLED_SETTINGS.duplicate(),
 		"locale": _default_locale(),
 		"ad_pacing_state": AdPacingStateScript.create_default(),
+		"seen_gameplay_tips": [],
 		"selected_chapter_id": _default_chapter_id(),
 		"total_earned_stars": 0,
 		"leaderboard_week_start_unix": get_current_leaderboard_week_start_unix(),
@@ -966,6 +1004,26 @@ func _sanitize_disabled_settings(raw_settings) -> Dictionary:
 	var raw_dictionary := raw_settings as Dictionary
 	for setting_key in DEFAULT_DISABLED_SETTINGS.keys():
 		sanitized[setting_key] = bool(raw_dictionary.get(setting_key, sanitized[setting_key]))
+
+	return sanitized
+
+
+## Unique, non-empty, bounded ids in first-seen order. Anything else is dropped rather than
+## rejecting the save: at worst a tip is shown once more.
+func _sanitize_seen_gameplay_tips(raw_tips) -> Array:
+	var sanitized: Array = []
+	if not (raw_tips is Array):
+		return sanitized
+
+	for raw_tip in raw_tips as Array:
+		if not (raw_tip is String or raw_tip is StringName):
+			continue
+		var tip_id := str(raw_tip)
+		if tip_id.is_empty() or tip_id.length() > MAX_GAMEPLAY_TIP_ID_LENGTH or sanitized.has(tip_id):
+			continue
+		sanitized.append(tip_id)
+		if sanitized.size() >= MAX_SEEN_GAMEPLAY_TIPS:
+			break
 
 	return sanitized
 
@@ -1422,6 +1480,7 @@ func _apply_loaded_partitions(snapshot: Dictionary, preferences: Dictionary) -> 
 		"ad_pacing_state",
 		AdPacingStateScript.create_default()
 	)
+	combined["seen_gameplay_tips"] = preferences.get("seen_gameplay_tips", [])
 	_data = _sanitize_data(combined)
 
 
@@ -1435,6 +1494,7 @@ func _snapshot_without_preferences(source: Dictionary) -> Dictionary:
 	snapshot.erase("locale")
 	snapshot.erase("selected_chapter_id")
 	snapshot.erase("ad_pacing_state")
+	snapshot.erase("seen_gameplay_tips")
 	return snapshot
 
 
@@ -1444,6 +1504,7 @@ func _preferences_for_storage() -> Dictionary:
 		"locale": get_locale(),
 		"selected_chapter_id": get_selected_chapter_id(),
 		"ad_pacing_state": get_ad_pacing_state(),
+		"seen_gameplay_tips": (_data.get("seen_gameplay_tips", []) as Array).duplicate(),
 	}
 
 

@@ -1388,6 +1388,8 @@ Important nodes:
   dev/test level selection. It replaced the previous fixed `%LevelGrid`, and the decorative
   `ShelfBackdrop`/`ShelfLip` polygons were dropped with it because their fixed 720x1280 placement
   sat inside the picker panel.
+- `Content/ResetGameplayTipsButton`: dev-only button that clears the saved seen set, so the
+  first-time tips on levels 1 and 10 play again when those levels are launched from the picker.
 
 Depends on:
 - `scenes/testing/dev_level_picker.tscn` for dev/test level selection.
@@ -1486,6 +1488,9 @@ Important nodes:
 - `UI/PauseMenuButton`: circular top-right button that pauses the active level and opens the pause menu overlay.
 - `UI/AbilityBar`: `scenes/ui/ability_bar.tscn` instance; its focused owner script owns all four
   buttons, use badges, timed badges, touch-target sizing, and the `ability_pressed` signal.
+- `UI/GameplayTipOverlay`: `scenes/ui/gameplay_tip_overlay.tscn` instance for the first-time tips on
+  levels 1 and 10 ([GAMEPLAY_TIPS.md](GAMEPLAY_TIPS.md)). It sits after `AbilityBar` so every modal
+  and result screen draws above it, and it ignores the pointer.
 - `UI/TimeUpTransition`: `scenes/ui/time_up_transition.tscn` instance; blocks input and owns the
   timer-origin alarm ring/dark-red shade between an eligible `00:00` and the extension offer.
 - `UI/TimeUpExtensionOverlay`: `scenes/ui/time_up_extension_modal.tscn` instance opened after that
@@ -1527,8 +1532,10 @@ Depends on:
 - `scenes/ui/time_up_transition.tscn`
 - `scenes/ui/time_up_extension_modal.tscn`
 - `scenes/ui/shelf_unlock_menu.tscn`
+- `scenes/ui/gameplay_tip_overlay.tscn`
 - `assets/audio/<event>/*.{wav,mp3}`
 - `configs/item_sprites.json`
+- `configs/gameplay_tips.json`
 - `configs/ability_purchase_prices.json`
 - `configs/levels/level_*.json`
 - `assets/abilities/*.png`
@@ -1538,6 +1545,55 @@ Depends on:
 
 Do not use for:
 - Static shelf cell visuals. Put those in `scenes/shelf.tscn`.
+
+## `scenes/ui/gameplay_tip_overlay.tscn`
+
+Root:
+- `GameplayTipOverlay` (`Control`, full rect, `mouse_filter = IGNORE`)
+
+Script:
+- `scripts/gameplay_tip_overlay.gd`
+
+Purpose:
+- Screen-space view for one first-time tip ([GAMEPLAY_TIPS.md](GAMEPLAY_TIPS.md)): start and reshow
+  delays, suspend and resume, restarting the loop when its anchors move, bubble placement, and the
+  finishing fade. It knows nothing about shelves; `scripts/level.gd` supplies screen points.
+
+Important nodes:
+- `Bubble`: `scenes/ui/gameplay_tip_bubble.tscn` instance, drawn under the hand.
+- `Hand`: `scenes/ui/tutorial_hand.tscn` instance.
+
+## `scenes/ui/tutorial_hand.tscn`
+
+Root:
+- `TutorialHand` (`Node2D`); its origin is the fingertip, so the press scales around the point it
+  touches.
+
+Script:
+- `scripts/tutorial_hand.gd`
+
+Important nodes:
+- `Ghost` (`Sprite2D`): translucent copy of the item a drag demonstration carries, drawn under the
+  hand at the item's on-board scale.
+- `Hand/Sprite` (`Sprite2D`): `assets/ui/tips/tutorial_hand.png`, offset by the exported
+  `fingertip_texel` (75, 44).
+- The root's own `_draw()` paints the tap ripple under both.
+
+## `scenes/ui/gameplay_tip_bubble.tscn`
+
+Root:
+- `GameplayTipBubble` (`Control`, `mouse_filter = IGNORE`)
+
+Script:
+- `scripts/gameplay_tip_bubble.gd`
+
+Important nodes:
+- `Panel`: `assets/themes/style_box_gameplay_tip_bubble.tres`.
+- `Label`: `GameBodyLabel`, 28 px dark brown, word-wrapped and centred. `auto_translate_mode` is off
+  because the script translates the text itself, so its measured size matches what is shown.
+- `TailBorder` / `TailFill` (`Polygon2D`): the tail. The border triangle sits under the panel and the
+  fill triangle over it, covering the panel's top border where they meet so the outline reads as one
+  shape.
 
 ## `scenes/ui/ability_bar.tscn`
 

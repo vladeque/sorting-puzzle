@@ -60,6 +60,9 @@ const TIME_EXTENSION_CONFIG := "res://configs/time_extension.json"
 const RewardedTimeExtensionClientScript := preload("res://scripts/ads/rewarded_time_extension_client.gd")
 const RewardedLifeClientScript := preload("res://scripts/ads/rewarded_life_client.gd")
 const InterstitialCompletionGateScript := preload("res://scripts/ads/interstitial_completion_gate.gd")
+const GameplayTipCatalogScript := preload("res://scripts/gameplay_tip_catalog.gd")
+## Keeps the level-10 tip's bubble off the screen edges, matching the responsive UI gutter.
+const GAMEPLAY_TIP_BUBBLE_GUTTER := 16.0
 const LEVEL_CONFIG_TEMPLATE := "res://configs/levels/level_%03d.json"
 const DEFAULT_LEVEL_CONFIG := "res://configs/levels/level_001.json"
 const LAYOUT_SCENE_TEMPLATE := "res://scenes/layouts/layout_%s.tscn"
@@ -195,6 +198,11 @@ const SHOP_RETURN_TIME_EXTENSION := &"time_extension"
 ## ship a level with anything but -1.
 @export_range(-1, 8) var collapsing_kept_shelves_override := -1
 @export_file("*.tscn") var return_menu_scene_path := MAIN_MENU_SCENE
+## The tip hand's size relative to the scale the shelves and their items are drawn at.
+@export_range(0.1, 2.0, 0.01) var gameplay_tip_hand_scale := 0.68
+## Shows the level's tip even when it was already seen or the level is complete. Tests and captures
+## only; finishing a forced tip still marks it seen.
+@export var force_gameplay_tips := false
 
 var _slots: Array[Node2D] = []
 var _item_textures: Dictionary = {}
@@ -325,6 +333,9 @@ var _throw_rng := RandomNumberGenerator.new()
 ## second throw cannot start before the first has landed and been resolved.
 var _throw_in_progress := false
 var _loading_transition_pending := false
+var _gameplay_tip_overlay: GameplayTipOverlay
+## The active first-time tip from `configs/gameplay_tips.json`, or empty. See docs/GAMEPLAY_TIPS.md.
+var _gameplay_tip: Dictionary = {}
 
 
 func _ready() -> void:
@@ -347,6 +358,7 @@ func _ready() -> void:
 	_ability_bar = get_node("UI/AbilityBar") as AbilityBar
 	_lantern_screen_effect = get_node("LanternScreenEffect") as LanternScreenEffectClass
 	_freezer_screen_effect = get_node("FreezerScreenEffect") as FreezerScreenEffect
+	_gameplay_tip_overlay = get_node_or_null("UI/GameplayTipOverlay") as GameplayTipOverlay
 	_failure_screen.visible = false
 	_completion_screen.visible = false
 	_pause_menu_overlay.visible = false
@@ -693,6 +705,7 @@ func _stop_sound_effects() -> void:
 
 func _process(delta: float) -> void:
 	_refresh_dispenser_availability()
+	_refresh_gameplay_tip()
 	if _loading_transition_pending:
 		return
 	_refresh_sticky_feedback_availability()
@@ -1032,6 +1045,7 @@ func _load_json_file(path: String) -> Dictionary:
 
 
 func _apply_level_config(config: Dictionary) -> void:
+	_clear_gameplay_tip()
 	var sticky_errors := StickyRules.validate_config(config)
 	_level_config_error = "; ".join(sticky_errors)
 	if not sticky_errors.is_empty():
@@ -1154,6 +1168,7 @@ func activate_after_loading_transition() -> void:
 	_resolve_shelves(_get_all_shelves())
 	_check_level_completed()
 	_update_pause_menu_button()
+	_arm_gameplay_tip()
 
 
 func _clear_shelves(shelves: Node) -> void:
@@ -4312,6 +4327,247 @@ func _refresh_dispenser_availability() -> void:
 	_dispenser_rack.set_input_enabled(_is_throw_allowed())
 
 
+## First-time tips (docs/GAMEPLAY_TIPS.md). A real launch arms its level's tip once the loading
+## reveal is done. Only `LevelTransition` activates a level, so a board that a test or capture rebuilds
+## with `_apply_level_config()` never picks up a campaign tip unless it arms one itself.
+func _arm_gameplay_tip() -> void:
+	_clear_gameplay_tip()
+	if _gameplay_tip_overlay == null or not _level_config_error.is_empty():
+		return
+
+	var catalog := GameplayTipCatalogScript.new()
+	if not catalog.load_catalog():
+		push_error("Gameplay tips are disabled: " + "; ".join(catalog.get_errors()))
+		return
+
+	var tip := catalog.get_tip_for_level(selected_level)
+	if tip.is_empty():
+		return
+
+	# A completed level means the player already knows the mechanic, even on a new device whose
+	# seen set is empty. Developer-picker launches skip that guard so a reset can replay the tip.
+	if not force_gameplay_tips and (
+		PlayerProgress.has_seen_gameplay_tip(str(tip.id))
+		or (not launched_from_dev_mode and PlayerProgress.is_level_completed(selected_level))
+	):
+		return
+
+	if tip.type == GameplayTipCatalogScript.TYPE_TAP_DISPENSER and _dispenser_rack == null:
+		push_warning("Gameplay tip %s needs throwing dispensers; level %d has none." % [tip.id, selected_level])
+		return
+
+	_gameplay_tip = tip
+	_gameplay_tip_overlay.begin(
+		float(tip.start_delay_seconds), float(tip.reshow_delay_seconds), str(tip.message)
+	)
+
+
+func _clear_gameplay_tip() -> void:
+	_gameplay_tip = {}
+	if _gameplay_tip_overlay != null:
+		_gameplay_tip_overlay.clear()
+
+
+## The player did what the tip teaches: fade it out and remember it on this device.
+func _finish_gameplay_tip(tip_type: String) -> void:
+	if _gameplay_tip.is_empty() or str(_gameplay_tip.type) != tip_type:
+		return
+
+	var tip_id := str(_gameplay_tip.id)
+	_gameplay_tip = {}
+	if _gameplay_tip_overlay != null:
+		_gameplay_tip_overlay.finish()
+	PlayerProgress.mark_gameplay_tip_seen(tip_id)
+
+
+## Refreshed every frame, like `_refresh_dispenser_availability()`: the states that should hide a
+## tip are set from too many places to notify it from each one, and anchors follow resizes for free.
+func _refresh_gameplay_tip() -> void:
+	if _gameplay_tip.is_empty() or _gameplay_tip_overlay == null:
+		return
+
+	if _is_gameplay_tip_suspended():
+		_gameplay_tip_overlay.set_suspended(true)
+		return
+
+	var has_anchor := false
+	match str(_gameplay_tip.type):
+		GameplayTipCatalogScript.TYPE_MOVE_TO_TRIPLE:
+			has_anchor = _update_gameplay_tip_move()
+		GameplayTipCatalogScript.TYPE_TAP_DISPENSER:
+			has_anchor = _update_gameplay_tip_tap()
+
+	_gameplay_tip_overlay.set_suspended(not has_anchor)
+
+
+## A tip steps aside, without finishing, while anything else owns the screen or the player is already
+## in the middle of a move.
+func _is_gameplay_tip_suspended() -> bool:
+	return (
+		_loading_transition_pending
+		or not _level_config_error.is_empty()
+		or _level_paused
+		or _level_failed
+		or _level_completed
+		or _completion_celebration_active
+		or _app_interrupted
+		or _is_ability_effect_active()
+		or _throw_in_progress
+		or _is_resolving_shelves
+		or _is_collapse_in_progress()
+		or _dragged_item != null
+		or _pressed_item != null
+		or _selected_item != null
+		or _blocked_pointer_id != -2
+		or not _transitioning_item_ids.is_empty()
+		or not _clearing_item_ids.is_empty()
+		or _is_gameplay_modal_visible()
+	)
+
+
+func _is_gameplay_modal_visible() -> bool:
+	for overlay: CanvasItem in [
+		_failure_screen, _completion_screen, _pause_menu_overlay, _leave_confirmation_overlay,
+		_ability_purchase_overlay, _time_up_extension_overlay, _in_level_shop_overlay,
+		_out_of_lives_overlay, _shelf_unlock_overlay,
+	]:
+		if overlay != null and overlay.visible:
+			return true
+
+	return false
+
+
+func _update_gameplay_tip_move() -> bool:
+	var move := _find_gameplay_tip_move()
+	if move.is_empty():
+		return false
+
+	var source := move.source as ShelfItem
+	var target_slot := move.target_slot as Node2D
+	var source_transform := source.get_global_transform_with_canvas()
+	_gameplay_tip_overlay.update_move(
+		source_transform.origin,
+		target_slot.get_global_transform_with_canvas() * SLOT_ITEM_POSITION,
+		source.texture,
+		source_transform.get_scale() * source.visual_scale,
+		_get_gameplay_tip_hand_scale()
+	)
+	return true
+
+
+## The move the level-1 tip demonstrates, derived from the live board so it follows whatever the
+## player actually did: bring one more item of a type onto the shelf already holding the most of it
+## (ties go to the first authored shelf), from the nearest other shelf. Returns {} when there is no
+## such move, which hides the tip without marking it seen.
+func _find_gameplay_tip_move() -> Dictionary:
+	var items_by_id := {}
+	for shelf in _get_all_shelves():
+		if not _is_shelf_move_source_eligible(shelf):
+			continue
+
+		for item in _get_shelf_items(shelf):
+			if (
+				item.item_id == &""
+				or item.is_sticky
+				or item.is_in_back_layer
+				or _is_item_busy(item)
+				or not _is_slot_move_source_eligible(item.get_parent())
+			):
+				continue
+
+			var group: Array = items_by_id.get(item.item_id, [])
+			group.append(item)
+			items_by_id[item.item_id] = group
+
+	var best := {}
+	var best_count := 0
+	var best_shelf_id := 0
+	for shelf in _get_all_shelves():
+		if not _is_shelf_drop_target_eligible(shelf) or not _shelf_forms_triples(shelf):
+			continue
+
+		var shelf_items := _get_shelf_items(shelf)
+		if shelf_items.is_empty():
+			continue
+
+		var item_id := shelf_items[0].item_id
+		if item_id == &"" or not shelf_items.all(func(item: ShelfItem) -> bool: return item.item_id == item_id):
+			continue
+
+		var group: Array = items_by_id.get(item_id, [])
+		if group.size() < SLOT_COUNT:
+			continue
+
+		var free_slot := _get_first_free_drop_slot(shelf)
+		if free_slot == null:
+			continue
+
+		var shelf_id := int(shelf.get_meta(SHELF_CONFIG_ID_META, 0))
+		var count := shelf_items.size()
+		if not best.is_empty() and (count < best_count or (count == best_count and shelf_id >= best_shelf_id)):
+			continue
+
+		var donor: ShelfItem
+		for candidate: ShelfItem in group:
+			if _get_owning_shelf(candidate) == shelf:
+				continue
+			if donor == null or (
+				candidate.global_position.distance_squared_to(free_slot.global_position)
+				< donor.global_position.distance_squared_to(free_slot.global_position)
+			):
+				donor = candidate
+
+		if donor == null:
+			continue
+
+		best = {"source": donor, "target_slot": free_slot}
+		best_count = count
+		best_shelf_id = shelf_id
+
+	return best
+
+
+func _get_first_free_drop_slot(shelf: Node) -> Node2D:
+	for slot in _get_front_slots(shelf):
+		if _get_slot_item(slot) == null and _is_slot_drop_target_eligible(slot):
+			return slot
+
+	return null
+
+
+func _update_gameplay_tip_tap() -> bool:
+	if _dispenser_rack == null:
+		return false
+
+	for dispenser in _dispenser_rack.get_dispensers():
+		if dispenser.get_remaining_count() <= 0:
+			continue
+
+		var canvas_transform := get_canvas_transform()
+		var board := _shelves_root.get_global_transform_with_canvas() * _get_shelf_cells_bounds()
+		var viewport_size := get_viewport_rect().size
+		var safe_margins := _get_safe_area_margins(viewport_size)
+		var bounds := Rect2(
+			Vector2(safe_margins.x, safe_margins.y) + Vector2.ONE * GAMEPLAY_TIP_BUBBLE_GUTTER,
+			viewport_size
+			- Vector2(safe_margins.x + safe_margins.z, safe_margins.y + safe_margins.w)
+			- Vector2.ONE * GAMEPLAY_TIP_BUBBLE_GUTTER * 2.0
+		)
+		_gameplay_tip_overlay.update_tap(
+			canvas_transform * dispenser.get_tap_global_rect().get_center(),
+			_get_gameplay_tip_hand_scale(),
+			board.get_center().x,
+			bounds
+		)
+		return true
+
+	return false
+
+
+func _get_gameplay_tip_hand_scale() -> float:
+	return _shelves_root.get_global_transform_with_canvas().get_scale().x * gameplay_tip_hand_scale
+
+
 ## Every empty slot a thrown item may land in, in a stable order: by the shelf's authored position in
 ## the level definition, then by slot. Node iteration order is not part of the level contract, so
 ## sorting here is what keeps a seeded scatter reproducible.
@@ -4369,6 +4625,7 @@ func _throw_items(
 	if item_ids.is_empty():
 		return
 
+	_finish_gameplay_tip(GameplayTipCatalogScript.TYPE_TAP_DISPENSER)
 	_throw_in_progress = true
 	dispenser.play_throw()
 
@@ -4597,6 +4854,9 @@ func _clear_matching_shelves(shelves_to_check: Array[Node]) -> bool:
 
 		if shelf_items.all(func(item: ShelfItem) -> bool: return item.item_id == item_id):
 			cleared_any = true
+			# Only a matched triple teaches the move. The Hammer destroys triples elsewhere and
+			# deliberately does not finish the tip.
+			_finish_gameplay_tip(GameplayTipCatalogScript.TYPE_MOVE_TO_TRIPLE)
 
 			if shelf_items.has(_selected_item):
 				_clear_selected_item()

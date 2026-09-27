@@ -159,6 +159,12 @@ caught by reading the scene: dispensers are centered over an equal share of the 
 screen edge at 540x960), and they are drawn at 1.35x (at authored size they read as a small ornament
 rather than the thing the player came here to press).
 
+## First-time tip
+
+On level 10, a player's first level in this mode, a hand taps the first stocked dispenser under a
+`Tap a dispenser to throw items onto the shelves!` bubble until their first throw that lands items.
+A refused tap does not count. See [GAMEPLAY_TIPS.md](GAMEPLAY_TIPS.md).
+
 ## Art
 
 `assets/dispensers/throwing_dispenser_stocked.png` is the selected production sprite. It keeps the
