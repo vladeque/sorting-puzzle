@@ -608,9 +608,9 @@ Examples:
   viewports; the five-reward starter layout (coins first), its loaded discount badge texture, and
   compare-at price; offer population; the `coins_3500` best-value tag (and that untagged offers
   stay untagged); the ability info dialog opening with the right title when a reward icon is
-  tapped; coin and bundle purchases including the 2,500-coin New Player Bundle; lifetime
-  one-time visibility across a reload; three Freezers per bundle; and duplicate transaction
-  protection.
+  tapped; coin and bundle purchases including the repeatable 2,500-coin Basic Bundle; Starter
+  Bundle lifetime visibility and Basic Bundle availability across a reload; three Freezers per
+  bundle; and duplicate transaction protection.
 - Also verifies the shared `%DestinationShell`'s background actually changes when the selected
   chapter id changes (proving Shop no longer silently stays on the Chapter 1 image), and that
   `%StatusPanel`'s Retry button resolves to the same `style_box_orange_utility_normal.tres`

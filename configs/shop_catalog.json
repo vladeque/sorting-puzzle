@@ -34,9 +34,7 @@
       "id": "new_player_bundle",
       "product_id": "sorting_puzzle.new_player_bundle",
       "type": "bundle",
-      "title": "New Player Bundle",
-      "purchase_limit": 1,
-      "limit_period": "lifetime",
+      "title": "Basic Bundle",
       "rewards": {
         "coins": 2500,
         "abilities": {

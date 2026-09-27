@@ -1021,7 +1021,7 @@ Rules:
 - `tag` (optional, string, e.g. `"BEST VALUE"`) shows a small banner on `shop_coin_offer_row.tscn`.
   Also presentation-only; omit it for offers that shouldn't call out a tag.
 - Current mock catalog: the existing 3-hammer, 3-shuffle, 3-lantern, 3-freezer, 1,000-coin starter
-  bundle (67% off its authored `compare_at_prices`); a once-per-account New Player Bundle with
+  bundle (67% off its authored `compare_at_prices`); an always-available Basic Bundle with
   2,500 coins and three of every ability for US `$7.99`; and five coin-only offers, with
   `coins_3500` tagged `BEST VALUE` as the best coins-per-dollar pack. Historic backend catalog
   versions without `freezer`, `discount_percent`, `compare_at_prices`, or `tag` remain valid; the

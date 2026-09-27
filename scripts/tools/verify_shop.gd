@@ -106,9 +106,9 @@ func _run() -> void:
 				)
 	_verify_high_tier_coin_offer_icons()
 	var bundle_card := _find_bundle_card(bundles, &"starter_bundle")
-	var new_player_bundle_card := _find_bundle_card(bundles, &"new_player_bundle")
+	var basic_bundle_card := _find_bundle_card(bundles, &"new_player_bundle")
 	_check(bundle_card != null, "Could not find the starter bundle card.")
-	_check(new_player_bundle_card != null, "Could not find the new-player bundle card.")
+	_check(basic_bundle_card != null, "Could not find the Basic Bundle card.")
 	if bundle_card != null:
 		var bundle_purchase := bundle_card.get_node("%PurchaseButton") as Button
 		_check(
@@ -126,19 +126,23 @@ func _run() -> void:
 				and reward_style.corner_radius_bottom_left == 20,
 			"Shop reward cells should use the shared 20 px cell-radius role."
 		)
-	if new_player_bundle_card != null:
+	if basic_bundle_card != null:
 		_check(
-			(new_player_bundle_card.get_node("%CoinCount") as Label).text == "2,500",
-			"New-player bundle card does not show 2,500 coins."
+			(basic_bundle_card.get_node("%TitleLabel") as Label).text == "BASIC BUNDLE",
+			"Basic Bundle card shows the wrong title."
 		)
 		_check(
-			(new_player_bundle_card.get_node("%PurchaseButton") as Button).text == "$7.99",
-			"New-player bundle card does not show the requested US price."
+			(basic_bundle_card.get_node("%CoinCount") as Label).text == "2,500",
+			"Basic Bundle card does not show 2,500 coins."
+		)
+		_check(
+			(basic_bundle_card.get_node("%PurchaseButton") as Button).text == "$7.99",
+			"Basic Bundle card does not show the requested US price."
 		)
 		for ability_count_name in ["HammerCount", "ShuffleCount", "LanternCount", "FreezerCount"]:
 			_check(
-				(new_player_bundle_card.get_node("%%%s" % ability_count_name) as Label).text.ends_with("3"),
-				"New-player bundle card does not show three uses in %s." % ability_count_name
+				(basic_bundle_card.get_node("%%%s" % ability_count_name) as Label).text.ends_with("3"),
+				"Basic Bundle card does not show three uses in %s." % ability_count_name
 			)
 	_check(
 		(bundle_card.get_node("%FreezerCount") as Label).text == "×3",
@@ -245,38 +249,48 @@ func _run() -> void:
 			"Mock bundle did not grant three %s uses." % ability_id
 		)
 
-	var new_player_starting_coins := PlayerProgress.get_coins()
-	var new_player_starting_abilities := PlayerProgress.get_ability_uses()
+	var basic_starting_coins := PlayerProgress.get_coins()
+	var basic_starting_abilities := PlayerProgress.get_ability_uses()
 	shop.call("_purchase_offer", &"new_player_bundle")
 	await get_tree().create_timer(0.4).timeout
 	_check(
-		PlayerProgress.get_coins() == new_player_starting_coins + 2500,
-		"Mock new-player bundle did not grant 2,500 coins."
+		PlayerProgress.get_coins() == basic_starting_coins + 2500,
+		"Mock Basic Bundle did not grant 2,500 coins."
 	)
-	var new_player_abilities := PlayerProgress.get_ability_uses()
+	var basic_abilities := PlayerProgress.get_ability_uses()
 	for ability_id in ["hammer", "shuffle", "highlight", "freezer"]:
 		_check(
-			int(new_player_abilities.get(ability_id, 0))
-			== int(new_player_starting_abilities.get(ability_id, 0)) + 3,
-			"Mock new-player bundle did not grant three %s uses." % ability_id
+			int(basic_abilities.get(ability_id, 0))
+			== int(basic_starting_abilities.get(ability_id, 0)) + 3,
+			"Mock Basic Bundle did not grant three %s uses." % ability_id
 		)
 	_check(
-		_find_bundle_card(bundles, &"new_player_bundle") == null,
-		"Purchased new-player bundle remained visible after its lifetime claim."
+		_find_bundle_card(bundles, &"new_player_bundle") != null,
+		"Basic Bundle disappeared after purchase."
 	)
 	var repeat_purchase_coins := PlayerProgress.get_coins()
 	shop.call("_purchase_offer", &"new_player_bundle")
-	await get_tree().create_timer(0.05).timeout
+	await get_tree().create_timer(0.4).timeout
 	_check(
-		PlayerProgress.get_coins() == repeat_purchase_coins,
-		"Purchased new-player bundle granted rewards a second time."
+		PlayerProgress.get_coins() == repeat_purchase_coins + 2500,
+		"Repeat Basic Bundle purchase did not grant 2,500 coins."
 	)
+	var repeat_abilities := PlayerProgress.get_ability_uses()
+	for ability_id in ["hammer", "shuffle", "highlight", "freezer"]:
+		_check(
+			int(repeat_abilities.get(ability_id, 0)) == int(basic_abilities.get(ability_id, 0)) + 3,
+			"Repeat Basic Bundle purchase did not grant three %s uses." % ability_id
+		)
 	PlayerProgress.load_progress()
 	var reloaded_service = StoreServiceScript.new()
 	var reloaded_catalog: Dictionary = await reloaded_service.load_catalog()
 	_check(
-		_find_offer(reloaded_catalog.get("offers", []) as Array, "new_player_bundle").is_empty(),
-		"Purchased new-player bundle returned after progress reload."
+		not _find_offer(reloaded_catalog.get("offers", []) as Array, "new_player_bundle").is_empty(),
+		"Basic Bundle disappeared after progress reload."
+	)
+	_check(
+		_find_offer(reloaded_catalog.get("offers", []) as Array, "starter_bundle").is_empty(),
+		"Purchased Starter Bundle returned after progress reload."
 	)
 
 	var duplicate_start := PlayerProgress.get_coins()
