@@ -1,6 +1,7 @@
 # In-game tips plan
 
-Status: **Planned (2026-09-27).** Nothing described here is implemented yet.
+Status: **Planned (2026-09-27).** The hand art is in the project; the tips themselves are not
+implemented yet.
 
 ## Goal
 
@@ -136,20 +137,29 @@ before `TimeUpTransition`, so every modal and result screen draws above it.
 
 ## Hand art
 
-No hand or pointer art exists in `assets/`. The chosen direction is a **cartoon white glove**:
-pointing index finger, thick dark outline, soft shading, matching the item art and readable on the
-beige wall, light oak, and dispenser glass.
+**Selected (2026-09-27): `assets/ui/tips/tutorial_hand.png`**, supplied by the user. It is a cartoon
+white glove with a navy outline (about `rgb(22,32,76)`) and cool grey-blue shading, drawn on a
+256x256 transparent canvas.
 
-1. Generate 2-3 candidates in that direction and let the user choose one (AGENTS.md, Generated
-   Assets). Do not wire art in before a candidate is selected.
-2. Output a transparent PNG, about 256 px on the long side, with the fingertip close to the top
-   edge. Clean the alpha with ImageMagick. Store it as `assets/ui/tips/tutorial_hand.png`.
-3. The fingertip position is an exported anchor on `tutorial_hand.tscn`, not a script constant, so
-   replacing the art does not change code.
+- **Pose.** The hand is tilted: the index finger points up and to the left, and the hand hangs down
+  and to the right of whatever it points at. Tip placement and the level 10 bubble must leave room
+  below and to the right of the target.
+- **Fingertip anchor: texture pixel (75, 44)**, the centre of the rounded tip just inside its
+  outline. The visible artwork's bounding box (alpha above 5%) is 162x180 at (47, 38). The anchor
+  is an exported property on `tutorial_hand.tscn`, not a script constant, so replacing the art does
+  not change code.
+- **Display size.** About 0.6x at the level 1 board's layout scale, which makes the hand about 108
+  logical px tall against a 77 px jar at 720x1280. Scale it with `_shelves_layout_scale` from
+  there. A 256 px source is never enlarged on the target resolutions.
+- **Cleanup already applied.** The supplied file's antialiased edge still carried chroma-key green:
+  399 of its 761 semi-transparent pixels were green-dominant, which showed as a thin green line on
+  the beige wall. ImageMagick recoloured every pixel below 98% alpha to the outline navy while
+  leaving alpha untouched (0 alpha pixels differ from the supplied file). Opaque pixels are
+  unchanged. Godot import settings are the UI defaults: lossless, no mipmaps, `fix_alpha_border`.
 
 ## Implementation sequence
 
-1. Hand art candidates, then the user's selection (above).
+1. Hand art: **done**, `assets/ui/tips/tutorial_hand.png` (above).
 2. `PlayerProgress` seen set, with persistence tests in `tests/save/test_player_progress_facade.gd`.
 3. `configs/gameplay_tips.json` and `gameplay_tip_catalog.gd`, with validation tests.
 4. `tutorial_hand`, `gameplay_tip_bubble`, and `gameplay_tip_overlay` scenes and scripts, plus a
