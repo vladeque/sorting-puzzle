@@ -48,6 +48,23 @@ stars, gems, crowns, leaves, wings, flames, other attached objects, symbols, and
 opaque RGB PNGs. Their centers remain backdrop-colored until a selected design receives a production
 transparency and aperture-alignment pass.
 
+Five further shape-only candidates use the same opaque backdrop and object-free brief:
+
+| Candidate | Distinguishing prompt |
+| --- | --- |
+| `premium_shape_04.png` | Ivory pearl and champagne gold, with twelve broad flutes forming a soft scalloped outer edge. |
+| `premium_shape_05.png` | Emerald lacquer and platinum, with six smooth waves and a continuous concave channel. |
+| `premium_shape_06.png` | Burgundy lacquer and rose gold, with a rounded-square outer silhouette and circular opening. |
+| `premium_shape_07.png` | Graphite titanium and electric cyan, with a sixteen-facet outer contour and bright inner channel. |
+| `premium_shape_08.png` | Smoky plum and antique bronze, with three broad swelling arcs forming a soft triangular contour. |
+
+`shape_only_04_08_contact_sheet.png` compares these five at 220 pixels, and
+`shape_only_04_08_thumbnail_sheet.png` compares them at 92 pixels. Each source file is a 1254x1254
+opaque RGB PNG.
+
+`shape_only_all_contact_sheet.png` and `shape_only_all_thumbnail_sheet.png` compare all eight
+shape-only candidates in numeric order, at 220 and 92 pixels respectively.
+
 After a design is selected, its production pass needs a transparent 256x256 canvas, an inner aperture
 aligned with the existing frames, and visual verification in the profile editor and other profile
 views. Achievement criteria and unlock flow are separate design decisions.
