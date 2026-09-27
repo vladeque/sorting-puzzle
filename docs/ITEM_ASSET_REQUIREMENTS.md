@@ -33,7 +33,10 @@ approximately `5%`. Low-alpha antialiasing fringe outside this box is acceptable
 The visible artwork must:
 
 - Fit within a maximum box of approximately `66x110` pixels.
-- Preserve its original aspect ratio. Never stretch width and height independently.
+- Be at least `85` pixels tall. Shorter items read as too small beside the full-height catalog.
+- Preserve its original aspect ratio. Never stretch width and height independently, except to meet
+  the `85` pixel minimum height: scale uniformly until the width reaches `66`, then stretch only
+  vertically for the remaining height (see [Short Items](#short-items)).
 - Be centered horizontally around canvas X=`64`, with a tolerance of about `1` pixel.
 - End at canvas Y=`120`, with a tolerance of about `1` pixel. With the top-left coordinate system,
   this means `visible_y + visible_height = 120`. The runtime ground shadow anchors on this line
@@ -134,6 +137,26 @@ Lanczos is the preferred filter for proportional resizing of these raster assets
 Compose the processed silhouette onto a new transparent canvas using the calculated `x` and `y`
 instead of vertically centering it.
 
+### Short Items
+
+If step 3 leaves the silhouette shorter than `85` pixels, resize the trimmed source again instead:
+proportionally to `85` pixels tall when that keeps the width at `66` or less, otherwise to exactly
+`66x85`. The extra height is then a vertical-only stretch. A uniform scale would push the width past
+`66`, and adjacent slots sit only `60` shelf units apart, so neighboring items would overlap. Squat
+tubs, jars, cups, and boxes tolerate the stretch well. The largest stretch in the catalog is about
+`21%` (the yogurt tubs).
+
+```powershell
+& $magick input.png -alpha on -trim +repage -filter Lanczos -resize '66x85!' trimmed.png
+```
+
+Resampling spreads the 5% alpha edge by about a pixel, so recheck the visible box and nudge the
+resize dimensions until it measures exactly `85` tall and no more than `66` wide.
+
+Rework existing catalog items from their `256x256` originals, which are in Git history before the
+switch to the `128x128` set: `git show bd673ad^:assets/items/item_<item_id>.png`. Do not upscale the
+committed `128x128` files.
+
 ## Validation
 
 Check canvas size, channels, and alpha with ImageMagick:
@@ -158,7 +181,7 @@ Check the meaningful alpha bounds:
 Confirm that:
 
 - Visible width is at most about `66`.
-- Visible height is at most about `110`.
+- Visible height is at most about `110` and at least `85`.
 - The horizontal center is approximately X=`64`.
 - `offset_y + visible_height` is approximately `120`.
 
