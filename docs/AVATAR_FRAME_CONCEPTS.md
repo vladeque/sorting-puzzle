@@ -31,6 +31,23 @@ the same order at 92 pixels, matching the minimum size of `ProfileAvatarView` in
 Rows are Champion Laurel, Starfall, Crystal Collector, and Flame Mastery; columns are variants 01,
 02, and 03.
 
+## Shape-only premium exploration
+
+These three additional opaque concepts were prompted to signal premium status entirely through the
+continuous ring's silhouette, materials, color, and highlights. The prompt explicitly excluded
+stars, gems, crowns, leaves, wings, flames, other attached objects, symbols, and text.
+
+| Candidate | Distinguishing prompt |
+| --- | --- |
+| `premium_shape_01.png` | Rounded twelve-sided onyx silhouette, broad lacquered band, stepped champagne-gold bevels. |
+| `premium_shape_02.png` | Flowing, softly undulating ribbon band in iridescent violet, indigo, and teal with a platinum edge. |
+| `premium_shape_03.png` | Broad scalloped platinum contour, cobalt-blue inset band, satin and glossy metal surfaces. |
+
+`shape_only_contact_sheet.png` compares them at 240 pixels, and
+`shape_only_thumbnail_sheet.png` compares them at 92 pixels. All three source files are 1254x1254
+opaque RGB PNGs. Their centers remain backdrop-colored until a selected design receives a production
+transparency and aperture-alignment pass.
+
 After a design is selected, its production pass needs a transparent 256x256 canvas, an inner aperture
 aligned with the existing frames, and visual verification in the profile editor and other profile
 views. Achievement criteria and unlock flow are separate design decisions.
