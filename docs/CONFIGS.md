@@ -63,6 +63,8 @@ Contract:
   edge than `frame_classic`; the inner aperture is unchanged.
 - The client currently stores the selection locally and does not send it in backend profile-edit
   operations. See `docs/BACKEND_PROFILE_FRAMES_TICKET.md`.
+- Opaque premium-frame review art lives in `assets/ui/avatar_frames/candidates/`; see
+  `docs/AVATAR_FRAME_CONCEPTS.md`. These concepts are not catalog entries.
 
 ## `configs/chapters.json`
 
