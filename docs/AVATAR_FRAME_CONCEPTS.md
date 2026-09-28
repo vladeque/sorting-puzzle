@@ -65,6 +65,21 @@ opaque RGB PNG.
 `shape_only_all_contact_sheet.png` and `shape_only_all_thumbnail_sheet.png` compare all eight
 shape-only candidates in numeric order, at 220 and 92 pixels respectively.
 
+## Champion Laurel metal variants
+
+`champion_laurel_01.png` was used as the edit reference for two additional variants. The prompt kept
+the same centered ring, five-point star, leaf placement, clear circular opening, and opaque charcoal
+backdrop while changing the metal color and lighting response:
+
+| Candidate | Material prompt |
+| --- | --- |
+| `champion_laurel_silver.png` | Cool polished silver and platinum highlights with steel-gray shadows. |
+| `champion_laurel_bronze.png` | Warm burnished bronze, copper highlights, and deeper chestnut shadows. |
+
+Both are 1254x1254 opaque RGB PNGs. `champion_laurel_metals_contact_sheet.png` compares gold,
+silver, and bronze at 240 pixels; `champion_laurel_metals_thumbnail_sheet.png` compares them at
+92 pixels. These remain review concepts outside the runtime frame catalog.
+
 After a design is selected, its production pass needs a transparent 256x256 canvas, an inner aperture
 aligned with the existing frames, and visual verification in the profile editor and other profile
 views. Achievement criteria and unlock flow are separate design decisions.
