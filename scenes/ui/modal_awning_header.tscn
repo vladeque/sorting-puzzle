@@ -1,0 +1,105 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/modal_awning_header.gd" id="1_header_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rail"]
+bg_color = Color(0.54, 0.29, 0.13, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(0.29, 0.125, 0.047, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_color = Color(0.16, 0.05, 0.02, 0.35)
+shadow_size = 3
+shadow_offset = Vector2(0, 2)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rail_highlight"]
+bg_color = Color(1, 1, 1, 0.22)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_title_plate"]
+content_margin_left = 34.0
+content_margin_top = 2.0
+content_margin_right = 34.0
+content_margin_bottom = 8.0
+bg_color = Color(0.992, 0.945, 0.84, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 8
+border_color = Color(0.42, 0.165, 0.086, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+shadow_color = Color(0, 0, 0, 0.32)
+shadow_size = 8
+shadow_offset = Vector2(0, 5)
+
+[node name="ModalAwningHeader" type="Control"]
+layout_mode = 3
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = -16.0
+offset_top = -52.0
+offset_right = 16.0
+offset_bottom = 48.0
+grow_horizontal = 2
+mouse_filter = 2
+script = ExtResource("1_header_script")
+
+[node name="Rail" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 20.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_rail")
+
+[node name="Highlight" type="Panel" parent="Rail"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 9.0
+offset_top = 5.0
+offset_right = -9.0
+offset_bottom = 9.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_rail_highlight")
+
+[node name="TitlePlate" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(230, 64)
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -115.0
+offset_top = 70.0
+offset_right = 115.0
+offset_bottom = 134.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_title_plate")
+
+[node name="PlateLabel" type="Label" parent="TitlePlate"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"GameTitleLabel"
+theme_override_colors/font_color = Color(0.64, 0.21, 0.12, 1)
+theme_override_colors/font_shadow_color = Color(1, 1, 1, 0.8)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 42
+text = "TITLE"
+horizontal_alignment = 1
+vertical_alignment = 1

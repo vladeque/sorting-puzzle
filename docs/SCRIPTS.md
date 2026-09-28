@@ -3406,9 +3406,16 @@ Purpose:
   owning scene's own script owns its content, signals, and gameplay data --
   `scripts/level.gd` only sets data, calls `open()`/`close()`, and listens for signals.
 
+Exported properties:
+- `header_style` (`HeaderStyle.TITLE` default, or `HeaderStyle.AWNING`): owners override it on
+  their `Shell` instance. `_ready()` shows either `%TitleLabel` or the `%AwningHeader`
+  (`scripts/modal_awning_header.gd`) and, for the awning, moves `%CloseButton` to
+  `AWNING_CLOSE_BUTTON_OFFSET` (`-46, 4` from the top-right anchor) on the right-hand scallops.
+  Pause is the only owner on `AWNING` so far.
+
 Key methods:
 - `configure(title, is_long_title = false)`: sets the title text and selects the regular/long
-  modal-title typography role.
+  modal-title typography role on both the plain label and the awning plate.
 - `set_preferred_size(size)`: the panel's preferred (unclamped) size; `apply_safe_layout()` fits it.
 - `set_content_region_height(height)`: fixes the cream panel to a content-specific authored height
   rather than stretching it with the outer shell; safe fitting still uniformly scales both.
@@ -3427,9 +3434,36 @@ Key methods:
   stale close superseded by `open()` cannot hide the reopened modal.
 
 Depends on:
-- `scripts/ui_motion.gd`, `scripts/gameplay_ui_theme.gd`, `scripts/press_scale_button.gd`.
+- `scripts/ui_motion.gd`, `scripts/gameplay_ui_theme.gd`, `scripts/press_scale_button.gd`,
+  `scripts/modal_awning_header.gd` (preloaded, not referenced by class name).
 - `assets/themes/style_box_gameplay_modal_shade.tres`, `style_box_gameplay_modal_outer_panel.tres`,
   `style_box_gameplay_modal_inner_panel.tres`, `style_box_gameplay_close_button_{normal,pressed,hover}.tres`.
+
+## `scripts/modal_awning_header.gd`
+
+Class:
+- `ModalAwningHeader` (`@tool`, so the canopy also draws in the editor)
+
+Attached to:
+- `scenes/ui/modal_awning_header.tscn` root `ModalAwningHeader`.
+
+Purpose:
+- Draws the shop-awning canopy in `_draw()`: alternating stripes between a narrower top edge and a
+  wider valance line (perspective), a thin antialiased line on each stripe seam (Godot does not
+  antialias filled polygons), a vertical shade that fades out by the canopy's middle, one lower
+  half-disc scallop per stripe with an outline arc, and the canopy's side outlines. Redraws on
+  `resized` and whenever an exported value changes, so it follows the panel width.
+- Owns the plate title: `set_title(title, is_long_title = false)` sets `%PlateLabel` and picks
+  `title_regular_font_size` (42) or `title_long_font_size` (36). `get_title()` returns it.
+
+Exported properties:
+- `stripe_count` (10), `stripe_color`, `alternate_stripe_color`, `outline_color`, `outline_width`,
+  `canopy_shade_color`, `canopy_top` / `canopy_bottom` (16 / 62, header-local y), `canopy_top_inset`
+  / `canopy_bottom_inset` (16 / 2), `scallop_segments`, `title_regular_font_size`,
+  `title_long_font_size`.
+
+Do not use for:
+- Close-button placement or visibility. `scripts/gameplay_modal_shell.gd` owns both.
 
 ## `scripts/gameplay_result_shell.gd`
 

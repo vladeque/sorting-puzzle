@@ -2,8 +2,8 @@ extends Control
 class_name GameplayModalShell
 
 ## Shared gameplay modal shell (UI-003): fullscreen shade + input blocker, safe-area-fitted
-## centered outer panel, title region (regular/long variant), true-circular close action, cream
-## content region, and a bottom action row. Pause, Leave Confirmation, and Ability Purchase each
+## centered outer panel, title region (regular/long variant, or the opt-in shop-awning header),
+## true-circular close action, cream content region, and a bottom action row. Pause, Leave Confirmation, and Ability Purchase each
 ## instance this as their first child and compose their own content/actions into the slots below
 ## instead of repeating shade/panel/close-button styling locally. See docs/SCENES.md's "Shared
 ## Gameplay UI Roles" section.
@@ -17,16 +17,28 @@ signal close_requested
 signal opened
 signal closed
 
+## Title treatment. TITLE is the plain title label on the panel. AWNING swaps in the striped
+## shop-awning header (scenes/ui/modal_awning_header.tscn) and moves the close button onto the
+## awning's right scallops. Owning scenes pick a style by overriding this on their Shell instance.
+enum HeaderStyle { TITLE, AWNING }
+
 const UIMotionScript := preload("res://scripts/ui_motion.gd")
 const GameplayUIThemeScript := preload("res://scripts/gameplay_ui_theme.gd")
+const ModalAwningHeaderScript := preload("res://scripts/modal_awning_header.gd")
 const CONTENT_REGION_TOP := 116.0
 const POP_START_SCALE := 0.90
 const POP_OVERSHOOT_SCALE := 1.02
 const POP_RISE_SECONDS := 0.22
 const POP_SETTLE_SECONDS := 0.12
+## Close-button offsets from the panel's top-right corner under the awning header: the button sits
+## on the right-hand scallops instead of overhanging the panel corner.
+const AWNING_CLOSE_BUTTON_OFFSET := Vector2(-46.0, 4.0)
+
+@export var header_style := HeaderStyle.TITLE
 
 @onready var _outer_panel := %OuterPanel as Control
 @onready var _title_label := %TitleLabel as Label
+@onready var _awning_header := %AwningHeader as ModalAwningHeaderScript
 @onready var _close_button := %CloseButton as Button
 @onready var _content_region := %ContentRegion as Control
 @onready var _action_row := %ActionRow as Control
@@ -40,6 +52,7 @@ var _is_transitioning := false
 
 func _ready() -> void:
 	_close_button.pressed.connect(func() -> void: close_requested.emit())
+	_apply_header_style()
 
 
 ## Sets the title text and selects the regular/long modal-title typography role.
@@ -49,6 +62,20 @@ func configure(title: String, is_long_title: bool = false) -> void:
 		"font_size",
 		GameplayUIThemeScript.MODAL_TITLE_LONG_SIZE if is_long_title else GameplayUIThemeScript.MODAL_TITLE_REGULAR_SIZE
 	)
+	_awning_header.set_title(title, is_long_title)
+
+
+func _apply_header_style() -> void:
+	var uses_awning := header_style == HeaderStyle.AWNING
+	_title_label.visible = not uses_awning
+	_awning_header.visible = uses_awning
+	if not uses_awning:
+		return
+
+	_close_button.offset_left = AWNING_CLOSE_BUTTON_OFFSET.x
+	_close_button.offset_top = AWNING_CLOSE_BUTTON_OFFSET.y
+	_close_button.offset_right = AWNING_CLOSE_BUTTON_OFFSET.x + GameplayUIThemeScript.CLOSE_BUTTON_SIZE.x
+	_close_button.offset_bottom = AWNING_CLOSE_BUTTON_OFFSET.y + GameplayUIThemeScript.CLOSE_BUTTON_SIZE.y
 
 
 ## Sets the panel's preferred (unclamped) size; apply_safe_layout() fits it within safe bounds.

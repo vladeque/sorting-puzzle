@@ -2333,13 +2333,22 @@ Purpose:
 - `open(with_pop = true)` adds a fitted 90% -> 102% -> 100% panel settle without changing any
   owner's authored panel size. The Time Up offer uses this variant after its dedicated lead-in;
   ordinary modal opens keep the standard fade.
+- Header style: owners override the exported `header_style` on their `Shell` instance. `TITLE`
+  (default) is the plain title label; `AWNING` is the striped shop-awning header. Pause is the
+  first owner on the awning; the other modals stay on `TITLE` until it is rolled out to them.
 
 Important nodes:
 - `Shade`: full-rect `Panel`, `style_box_gameplay_modal_shade.tres`.
 - `%OuterPanel`: centered `Panel`, `style_box_gameplay_modal_outer_panel.tres`; sized/positioned by
   `apply_safe_layout()`.
-- `%TitleLabel`: `GameTitleLabel`, regular (44) or long (40) size via `configure()`.
+- `%TitleLabel`: `GameTitleLabel`, regular (44) or long (40) size via `configure()`. Hidden when the
+  owner selects the awning header.
+- `%AwningHeader`: hidden `scenes/ui/modal_awning_header.tscn` instance, shown instead of
+  `%TitleLabel` when the owner sets the shell's `header_style` to `AWNING`. `configure()` titles
+  both, so owners never reach into either.
 - `%CloseButton`: true-circular red close (72px, radius 36), `press_scale_button.gd` (0.97 held scale).
+  Overhangs the panel's top-right corner by default; under the awning it moves onto the right-hand
+  scallops (offset `-46, 4` from the top-right anchor) and still draws above the header.
 - `%ContentRegion`: cream `Panel`, `style_box_gameplay_modal_inner_panel.tres`; owning scenes
   reparent their own content here.
 - `%ActionRow`: `HBoxContainer`; owning scenes reparent their own action buttons here.
@@ -2348,9 +2357,52 @@ Depends on:
 - `assets/themes/style_box_gameplay_modal_shade.tres`, `style_box_gameplay_modal_outer_panel.tres`,
   `style_box_gameplay_modal_inner_panel.tres`, `style_box_gameplay_close_button_{normal,pressed,hover}.tres`.
 - `scripts/ui_motion.gd`, `scripts/gameplay_ui_theme.gd`, `scripts/press_scale_button.gd`.
+- `scenes/ui/modal_awning_header.tscn`.
 
 Do not use for:
 - Modal content, gameplay data, or signal ownership. Those stay in the owning scene's own script.
+
+## `scenes/ui/modal_awning_header.tscn`
+
+Root:
+- `ModalAwningHeader` (`Control`)
+
+Script:
+- `scripts/modal_awning_header.gd`
+
+Purpose:
+- Shop-awning modal header: a wooden rail, a perspective canopy of alternating red/cream stripes
+  with a scalloped valance, and a cream title plate that hangs over the scallops. Chosen from the
+  header concepts in the "Modal Header Concepts" design canvas (option D) to tie modal titles to
+  the game's shop theme.
+- Instanced once, hidden, inside `scenes/ui/gameplay_modal_shell.tscn` (`%AwningHeader`). The shell
+  shows it for owners whose `header_style` is `AWNING`; Pause is currently the only one.
+- Top-wide anchored to the outer panel: 16px wider than the panel on each side and 52px above its
+  top edge, so it follows the panel's width and the shell's uniform safe-area scale. The plate's
+  top sits 18px below the panel's top edge, above the 116px content region.
+- No new raster art. The canopy is drawn in `_draw()` so it stays crisp at every scale; the rail,
+  rail highlight, and title plate are scene-local `StyleBoxFlat` sub-resources owned only by this
+  scene.
+
+Important nodes:
+- Root (`_draw()`): stripes, the under-rail shade, scallops, and canopy side outlines. Stripe
+  count, colors, outline, canopy edges, and perspective insets are exported on the script.
+- `Rail` / `Rail/Highlight`: the wooden rail drawn over the canopy's top edge.
+- `%TitlePlate`: centered `PanelContainer` (minimum 230x64) that grows in both directions with the
+  title; cream fill, dark-brown border with a thicker 8px bottom lip, soft drop shadow.
+- `%PlateLabel`: `GameTitleLabel` in deep terracotta with a white 2px highlight; 42px regular, 36px
+  long.
+
+Every node uses `MOUSE_FILTER_IGNORE` so the header never takes taps meant for the close button.
+
+Verification:
+- `tests/ui/test_modal_awning_header.gd`.
+- In-level capture: `scripts/tools/captures/pause_menu_setup.gd` opens Pause over level 5.
+
+```powershell
+& .\scripts\tools\capture_ui.ps1 -Scene level.tscn -Name pause_awning -Position '0,0' -Settle 30 `
+    -Setup scripts/tools/captures/pause_menu_setup.gd
+```
 
 ## `scenes/ui/gameplay_result_shell.tscn`
 
@@ -2481,12 +2533,14 @@ Purpose:
 - Composes `scenes/ui/gameplay_modal_shell.tscn` (`Shell`) for the shared shade, outer panel, title
   (`PAUSE`), close button, content region, and action row (UI-003; see "Shared Gameplay UI Roles"
   above), instead of owning local shade/panel/close-button styling.
+- Sets `header_style = AWNING` on `Shell`, so the title appears on the shop-awning header
+  (`scenes/ui/modal_awning_header.tscn`) with the close button on the awning's right scallops.
 - Owns music / sound-effects / vibration square icon buttons, their crossed-out toggle visuals
   (now scene-authored `CrossOut` children, not only created at runtime -- see "Important nodes"),
   and `Leave` / `Continue` buttons.
 
 Important nodes:
-- `Shell`: the shared modal shell instance.
+- `Shell`: the shared modal shell instance, with `header_style = AWNING`.
 - `SettingsContent`: reparented into `Shell`'s compact 224px content region at `_ready()`; holds
   `InnerTitleLabel` (`SETTINGS`) and `IconRow`; the row starts at y=64 to keep the icons close to
   the inner title.

@@ -8,6 +8,7 @@
 [ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_gameplay_close_button_pressed.tres" id="6_close_pressed"]
 [ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_gameplay_close_button_hover.tres" id="7_close_hover"]
 [ext_resource type="Script" path="res://scripts/press_scale_button.gd" id="8_press_scale_button"]
+[ext_resource type="PackedScene" path="res://scenes/ui/modal_awning_header.tscn" id="9_awning_header"]
 
 [node name="GameplayModalShell" type="Control"]
 layout_mode = 3
@@ -62,6 +63,11 @@ theme_override_font_sizes/font_size = 44
 text = "TITLE"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="AwningHeader" parent="OuterPanel" instance=ExtResource("9_awning_header")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
 
 [node name="CloseButton" type="Button" parent="OuterPanel"]
 unique_name_in_owner = true

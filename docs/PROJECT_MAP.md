@@ -482,6 +482,7 @@ Change here when:
 
 Files:
 - `scenes/ui/gameplay_modal_shell.tscn`, `scripts/gameplay_modal_shell.gd`
+- `scenes/ui/modal_awning_header.tscn`, `scripts/modal_awning_header.gd`
 - `scenes/ui/gameplay_result_shell.tscn`, `scripts/gameplay_result_shell.gd`
 - `scenes/ui/level_top_hud.tscn`, `scripts/level_top_hud.gd`
 - `scripts/gameplay_ui_theme.gd`
@@ -497,6 +498,10 @@ Responsibility:
   Confirmation, Ability Purchase, Out of Lives, and Failure -- each composes it and keeps only its
   own content and signals. Standard owners use a 520x500 authored shell with compact cream-panel
   heights; Failure uses the same shell resources in a taller 520x620 composition for its heart art.
+- The shell's exported `header_style` selects the plain title or the striped shop-awning header
+  (`modal_awning_header.tscn`, canopy drawn in code, no raster art). Pause uses the awning; the
+  rest stay on the plain title until it is rolled out. Verified by
+  `tests/ui/test_modal_awning_header.gd` and the `scripts/tools/captures/pause_menu_setup.gd` capture.
 - `gameplay_result_shell.tscn` owns Completion's terminal shade, hero title role, action placement,
   and safe-area layout. Failure now uses the centered gameplay modal shell.
 - `level_top_hud.tscn` owns the top strip background, combo slot, timer, level label, star pill,
