@@ -1,7 +1,8 @@
 extends SceneTree
 
 ## Verifies the opt-in shop-awning modal header: Pause selects it, other shell modals keep the plain
-## title, the plate follows configure(), and long titles stay clear of the close button.
+## title, the canopy covers the plate by node order, the plate follows configure(), and long titles
+## stay clear of the close button.
 
 const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
 const PAUSE_SCENE_PATH := "res://scenes/pause_menu.tscn"
@@ -62,14 +63,34 @@ func _test_pause_uses_awning() -> void:
 		close_button.get_index() > awning.get_index(),
 		"The close button draws above the awning."
 	)
-	for node in [awning, awning.find_child("Rail", true, false), plate]:
+	var canopy := awning.find_child("Canopy", true, false) as Control
+	var rail := awning.find_child("Rail", true, false) as Control
+	_check(
+		plate.get_index() < canopy.get_index() and canopy.get_index() < rail.get_index(),
+		"The canopy's scallops cover the plate's top edge and the rail covers the canopy."
+	)
+	_check(
+		awning.z_index == 0 and plate.z_index == 0 and plate.z_as_relative,
+		"Header layering comes from node order, not z_index, so later overlays still cover it."
+	)
+	_check(
+		plate.get_global_rect().position.y < canopy.get_global_rect().position.y + 89.0,
+		"The plate's top edge tucks behind the scallops."
+	)
+	for node in [awning, rail, canopy, plate]:
 		_check(
 			(node as Control).mouse_filter == Control.MOUSE_FILTER_IGNORE,
 			"%s must not swallow taps meant for the close button." % node.name
 		)
 	_check(
-		is_equal_approx(close_button.offset_left, -46.0) and is_equal_approx(close_button.offset_top, 4.0),
-		"The close button moves onto the awning's right scallops."
+		is_zero_approx(close_button.anchor_left)
+			and is_equal_approx(close_button.offset_left, -44.0)
+			and is_equal_approx(close_button.offset_top, -76.0),
+		"The close button moves up onto the left end of the rail."
+	)
+	_check(
+		close_button.get_global_rect().intersects(rail.get_global_rect()),
+		"The close button sits on the rail."
 	)
 
 	shell.call("configure", LONG_TITLE, true)
@@ -77,9 +98,8 @@ func _test_pause_uses_awning() -> void:
 	var plate_rect := plate.get_global_rect()
 	_check(plate_label.text == LONG_TITLE, "configure() updates the awning plate.")
 	_check(
-		plate_rect.end.x <= close_button.get_global_rect().position.x,
-		"A long title's plate stays clear of the close button (plate ends at %.1f, close starts at %.1f)."
-			% [plate_rect.end.x, close_button.get_global_rect().position.x]
+		not plate_rect.intersects(close_button.get_global_rect()),
+		"A long title's plate stays clear of the close button."
 	)
 	_check(
 		outer_panel.get_global_rect().encloses(plate_rect),

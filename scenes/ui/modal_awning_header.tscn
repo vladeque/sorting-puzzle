@@ -1,6 +1,6 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://yeagixqgwwfq"]
 
-[ext_resource type="Script" path="res://scripts/modal_awning_header.gd" id="1_header_script"]
+[ext_resource type="Script" uid="uid://ceugknvuukdqx" path="res://scripts/modal_awning_header.gd" id="1_header_script"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rail"]
 bg_color = Color(0.54, 0.29, 0.13, 1)
@@ -43,7 +43,7 @@ shadow_color = Color(0, 0, 0, 0.32)
 shadow_size = 8
 shadow_offset = Vector2(0, 5)
 
-[node name="ModalAwningHeader" type="Control"]
+[node name="ModalAwningHeader" type="Control" unique_id=1415016966]
 layout_mode = 3
 anchors_preset = 10
 anchor_right = 1.0
@@ -55,28 +55,7 @@ grow_horizontal = 2
 mouse_filter = 2
 script = ExtResource("1_header_script")
 
-[node name="Rail" type="Panel" parent="."]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_bottom = 20.0
-grow_horizontal = 2
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_rail")
-
-[node name="Highlight" type="Panel" parent="Rail"]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_left = 9.0
-offset_top = 5.0
-offset_right = -9.0
-offset_bottom = 9.0
-grow_horizontal = 2
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_rail_highlight")
-
-[node name="TitlePlate" type="PanelContainer" parent="."]
+[node name="TitlePlate" type="PanelContainer" parent="." unique_id=2093302174]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(230, 64)
 layout_mode = 1
@@ -84,14 +63,14 @@ anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -115.0
-offset_top = 70.0
+offset_top = 78.0
 offset_right = 115.0
-offset_bottom = 134.0
+offset_bottom = 142.0
 grow_horizontal = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_title_plate")
 
-[node name="PlateLabel" type="Label" parent="TitlePlate"]
+[node name="PlateLabel" type="Label" parent="TitlePlate" unique_id=49928617]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"GameTitleLabel"
@@ -103,3 +82,33 @@ theme_override_font_sizes/font_size = 42
 text = "TITLE"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="Canopy" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Rail" type="Panel" parent="." unique_id=456452841]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 20.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_rail")
+
+[node name="Highlight" type="Panel" parent="Rail" unique_id=839309994]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 9.0
+offset_top = 5.0
+offset_right = -9.0
+offset_bottom = 9.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_rail_highlight")

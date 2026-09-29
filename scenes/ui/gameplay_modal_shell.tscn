@@ -1,16 +1,16 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://djprqwrgngdyd"]
 
-[ext_resource type="Script" path="res://scripts/gameplay_modal_shell.gd" id="1_shell_script"]
-[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_gameplay_modal_shade.tres" id="2_shade"]
-[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_gameplay_modal_outer_panel.tres" id="3_outer_panel"]
-[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_gameplay_modal_inner_panel.tres" id="4_inner_panel"]
-[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_gameplay_close_button_normal.tres" id="5_close_normal"]
-[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_gameplay_close_button_pressed.tres" id="6_close_pressed"]
-[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_gameplay_close_button_hover.tres" id="7_close_hover"]
-[ext_resource type="Script" path="res://scripts/press_scale_button.gd" id="8_press_scale_button"]
-[ext_resource type="PackedScene" path="res://scenes/ui/modal_awning_header.tscn" id="9_awning_header"]
+[ext_resource type="Script" uid="uid://dwhti1ygosu7w" path="res://scripts/gameplay_modal_shell.gd" id="1_shell_script"]
+[ext_resource type="StyleBox" path="res://assets/themes/style_box_gameplay_modal_shade.tres" id="2_shade"]
+[ext_resource type="StyleBox" path="res://assets/themes/style_box_gameplay_modal_outer_panel.tres" id="3_outer_panel"]
+[ext_resource type="StyleBox" path="res://assets/themes/style_box_gameplay_modal_inner_panel.tres" id="4_inner_panel"]
+[ext_resource type="StyleBox" path="res://assets/themes/style_box_gameplay_close_button_normal.tres" id="5_close_normal"]
+[ext_resource type="StyleBox" path="res://assets/themes/style_box_gameplay_close_button_pressed.tres" id="6_close_pressed"]
+[ext_resource type="StyleBox" path="res://assets/themes/style_box_gameplay_close_button_hover.tres" id="7_close_hover"]
+[ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="8_press_scale_button"]
+[ext_resource type="PackedScene" uid="uid://yeagixqgwwfq" path="res://scenes/ui/modal_awning_header.tscn" id="9_awning_header"]
 
-[node name="GameplayModalShell" type="Control"]
+[node name="GameplayModalShell" type="Control" unique_id=1515445178]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -19,7 +19,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_shell_script")
 
-[node name="Shade" type="Panel" parent="."]
+[node name="Shade" type="Panel" parent="." unique_id=1826646279]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -28,7 +28,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = ExtResource("2_shade")
 
-[node name="OuterPanel" type="Panel" parent="."]
+[node name="OuterPanel" type="Panel" parent="." unique_id=645435479]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 8
@@ -44,9 +44,8 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = ExtResource("3_outer_panel")
 
-[node name="TitleLabel" type="Label" parent="OuterPanel"]
+[node name="TitleLabel" type="Label" parent="OuterPanel" unique_id=782819138]
 unique_name_in_owner = true
-theme_type_variation = &"GameTitleLabel"
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -55,6 +54,7 @@ offset_top = 25.0
 offset_right = -46.0
 offset_bottom = 86.0
 grow_horizontal = 2
+theme_type_variation = &"GameTitleLabel"
 theme_override_colors/font_color = Color(1, 0.95, 0.78, 1)
 theme_override_colors/font_shadow_color = Color(0.16, 0.04, 0.02, 0.92)
 theme_override_constants/shadow_offset_x = 0
@@ -64,12 +64,12 @@ text = "TITLE"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="AwningHeader" parent="OuterPanel" instance=ExtResource("9_awning_header")]
+[node name="AwningHeader" parent="OuterPanel" unique_id=1335015500 instance=ExtResource("9_awning_header")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
 
-[node name="CloseButton" type="Button" parent="OuterPanel"]
+[node name="CloseButton" type="Button" parent="OuterPanel" unique_id=1428411212]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 1
@@ -95,7 +95,7 @@ text = "X"
 script = ExtResource("8_press_scale_button")
 held_scale = 0.97
 
-[node name="ContentRegion" type="Panel" parent="OuterPanel"]
+[node name="ContentRegion" type="Panel" parent="OuterPanel" unique_id=761355435]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -109,7 +109,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = ExtResource("4_inner_panel")
 
-[node name="ActionRow" type="HBoxContainer" parent="OuterPanel"]
+[node name="ActionRow" type="HBoxContainer" parent="OuterPanel" unique_id=1655740744]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 12

@@ -3409,8 +3409,8 @@ Purpose:
 Exported properties:
 - `header_style` (`HeaderStyle.TITLE` default, or `HeaderStyle.AWNING`): owners override it on
   their `Shell` instance. `_ready()` shows either `%TitleLabel` or the `%AwningHeader`
-  (`scripts/modal_awning_header.gd`) and, for the awning, moves `%CloseButton` to
-  `AWNING_CLOSE_BUTTON_OFFSET` (`-46, 4` from the top-right anchor) on the right-hand scallops.
+  (`scripts/modal_awning_header.gd`) and, for the awning, re-anchors `%CloseButton` to the panel's
+  top-left and places it at `AWNING_CLOSE_BUTTON_OFFSET` (`-44, -76`), on the left end of the rail.
   Pause is the only owner on `AWNING` so far.
 
 Key methods:
@@ -3448,11 +3448,13 @@ Attached to:
 - `scenes/ui/modal_awning_header.tscn` root `ModalAwningHeader`.
 
 Purpose:
-- Draws the shop-awning canopy in `_draw()`: alternating stripes between a narrower top edge and a
+- Draws the shop-awning canopy onto its `Canopy` child through that child's `draw` signal, so node
+  order alone puts the canopy over the title plate and under the rail. The drawing: alternating
+  stripes between a narrower top edge and a
   wider valance line (perspective), a thin antialiased line on each stripe seam (Godot does not
   antialias filled polygons), a vertical shade that fades out by the canopy's middle, one lower
-  half-disc scallop per stripe with an outline arc, and the canopy's side outlines. Redraws on
-  `resized` and whenever an exported value changes, so it follows the panel width.
+  half-disc scallop per stripe with an outline arc, and the canopy's side outlines. Redraws when
+  `Canopy` resizes and whenever an exported value changes, so it follows the panel width.
 - Owns the plate title: `set_title(title, is_long_title = false)` sets `%PlateLabel` and picks
   `title_regular_font_size` (42) or `title_long_font_size` (36). `get_title()` returns it.
 

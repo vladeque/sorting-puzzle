@@ -2347,8 +2347,9 @@ Important nodes:
   `%TitleLabel` when the owner sets the shell's `header_style` to `AWNING`. `configure()` titles
   both, so owners never reach into either.
 - `%CloseButton`: true-circular red close (72px, radius 36), `press_scale_button.gd` (0.97 held scale).
-  Overhangs the panel's top-right corner by default; under the awning it moves onto the right-hand
-  scallops (offset `-46, 4` from the top-right anchor) and still draws above the header.
+  Overhangs the panel's top-right corner by default; under the awning it re-anchors to the top-left
+  and sits on the left end of the rail (top-left offset `-44, -76`), still drawing above the
+  header.
 - `%ContentRegion`: cream `Panel`, `style_box_gameplay_modal_inner_panel.tres`; owning scenes
   reparent their own content here.
 - `%ActionRow`: `HBoxContainer`; owning scenes reparent their own action buttons here.
@@ -2372,24 +2373,29 @@ Script:
 
 Purpose:
 - Shop-awning modal header: a wooden rail, a perspective canopy of alternating red/cream stripes
-  with a scalloped valance, and a cream title plate that hangs over the scallops. Chosen from the
+  with a scalloped valance, and a cream title plate tucked behind the scallops. Chosen from the
   header concepts in the "Modal Header Concepts" design canvas (option D) to tie modal titles to
   the game's shop theme.
 - Instanced once, hidden, inside `scenes/ui/gameplay_modal_shell.tscn` (`%AwningHeader`). The shell
   shows it for owners whose `header_style` is `AWNING`; Pause is currently the only one.
 - Top-wide anchored to the outer panel: 16px wider than the panel on each side and 52px above its
   top edge, so it follows the panel's width and the shell's uniform safe-area scale. The plate's
-  top sits 18px below the panel's top edge, above the 116px content region.
-- No new raster art. The canopy is drawn in `_draw()` so it stays crisp at every scale; the rail,
+  top sits 26px below the panel's top edge (header-local y 78), about 10px above the scallops'
+  lowest points, and above the 116px content region.
+- Layering is node order only, with no `z_index`: `TitlePlate`, then `Canopy` (so the scallops cover
+  the plate's top edge), then `Rail`. A `z_index` here would lift the awning above any modal opened
+  over Pause.
+- No new raster art. The canopy is drawn code-side so it stays crisp at every scale; the rail,
   rail highlight, and title plate are scene-local `StyleBoxFlat` sub-resources owned only by this
   scene.
 
 Important nodes:
-- Root (`_draw()`): stripes, the under-rail shade, scallops, and canopy side outlines. Stripe
-  count, colors, outline, canopy edges, and perspective insets are exported on the script.
-- `Rail` / `Rail/Highlight`: the wooden rail drawn over the canopy's top edge.
 - `%TitlePlate`: centered `PanelContainer` (minimum 230x64) that grows in both directions with the
   title; cream fill, dark-brown border with a thicker 8px bottom lip, soft drop shadow.
+- `Canopy`: full-rect `Control` the root script draws onto through its `draw` signal: stripes, the
+  under-rail shade, scallops, and canopy side outlines. Stripe count, colors, outline, canopy
+  edges, and perspective insets are exported on the root script.
+- `Rail` / `Rail/Highlight`: the wooden rail drawn over the canopy's top edge.
 - `%PlateLabel`: `GameTitleLabel` in deep terracotta with a white 2px highlight; 42px regular, 36px
   long.
 
@@ -2534,7 +2540,7 @@ Purpose:
   (`PAUSE`), close button, content region, and action row (UI-003; see "Shared Gameplay UI Roles"
   above), instead of owning local shade/panel/close-button styling.
 - Sets `header_style = AWNING` on `Shell`, so the title appears on the shop-awning header
-  (`scenes/ui/modal_awning_header.tscn`) with the close button on the awning's right scallops.
+  (`scenes/ui/modal_awning_header.tscn`) with the close button on the left end of its rail.
 - Owns music / sound-effects / vibration square icon buttons, their crossed-out toggle visuals
   (now scene-authored `CrossOut` children, not only created at runtime -- see "Important nodes"),
   and `Leave` / `Continue` buttons.
