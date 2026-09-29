@@ -87,6 +87,11 @@ and applied it to each metal variant. These production-size textures are not yet
 `configs/profile_frames.json`; ownership and selection must be enforced by the authoritative
 weekly-leaderboard award contract before they become selectable.
 
+`scripts/tools/captures/profile_weekly_frame_art_setup.gd` previews the three prepared textures in
+the profile editor without registering them as selectable frames. Windowed captures showed readable
+avatar faces and distinct metals at 540x960, 720x1280, 1080x1920, and 1080x2400. A requested
+900x1200 tablet capture rendered at 675x1200 instead and is not a faithful tablet-layout check.
+
 After a design is selected, its production pass needs a transparent 256x256 canvas, an inner aperture
 aligned with the existing frames, and visual verification in the profile editor and other profile
 views. Achievement criteria and unlock flow are separate design decisions.
