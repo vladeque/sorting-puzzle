@@ -80,6 +80,13 @@ Both are 1254x1254 opaque RGB PNGs. `champion_laurel_metals_contact_sheet.png` c
 silver, and bronze at 240 pixels; `champion_laurel_metals_thumbnail_sheet.png` compares them at
 92 pixels. These remain review concepts outside the runtime frame catalog.
 
+The selected gold, silver, and bronze art has also been prepared as transparent 256x256 textures at
+`assets/ui/avatar_frames/frame_weekly_gold.png`, `frame_weekly_silver.png`, and
+`frame_weekly_bronze.png`. ImageMagick derived a shared alpha silhouette from the gold reference
+and applied it to each metal variant. These production-size textures are not yet listed in
+`configs/profile_frames.json`; ownership and selection must be enforced by the authoritative
+weekly-leaderboard award contract before they become selectable.
+
 After a design is selected, its production pass needs a transparent 256x256 canvas, an inner aperture
 aligned with the existing frames, and visual verification in the profile editor and other profile
 views. Achievement criteria and unlock flow are separate design decisions.
