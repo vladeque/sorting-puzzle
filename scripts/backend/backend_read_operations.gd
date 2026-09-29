@@ -22,6 +22,7 @@ const AVATAR_IDS := [
 const AVATAR_FRAME_IDS := [
 	"frame_classic", "frame_gold", "frame_leaf", "frame_rose", "frame_coral",
 	"frame_sky", "frame_plum", "frame_ruby", "frame_aqua",
+	"frame_weekly_bronze", "frame_weekly_silver", "frame_weekly_gold",
 ]
 const DEVICE_PLATFORMS := ["android", "ios"]
 const OFFER_TYPES := ["starter", "timed_bundle", "evergreen_bundle", "coin_pack"]
@@ -350,13 +351,19 @@ static func _parse_leaderboard_summary(value: Variant) -> Dictionary:
 		or not LocalSaveCodecScript.is_timestamp(summary.get("weekly_period_end"))
 	):
 		return _error("leaderboards summary has a malformed field.")
-	return _success({"leaderboards": {
+	var parsed_summary := {
 		"lifetime_stars": int(lifetime_stars),
 		"weekly_stars": int(weekly_stars),
 		"weekly_period_id": str(summary.get("weekly_period_id", "")),
 		"weekly_period_start": str(summary.get("weekly_period_start", "")),
 		"weekly_period_end": str(summary.get("weekly_period_end", "")),
-	}})
+	}
+	if summary.has("weekly_frame_best_rank"):
+		var best_rank = summary.get("weekly_frame_best_rank")
+		if not _is_integer(best_rank) or int(best_rank) < 0 or int(best_rank) > 3:
+			return _error("leaderboards summary has an invalid weekly frame award.")
+		parsed_summary["weekly_frame_best_rank"] = int(best_rank)
+	return _success({"leaderboards": parsed_summary})
 
 
 static func _parse_player_profile(value: Variant) -> Dictionary:
@@ -455,7 +462,8 @@ static func _parse_reward_grant(value: Variant) -> Dictionary:
 	var hammer = asset_data.get("hammer")
 	var shuffle = asset_data.get("shuffle")
 	var highlight = asset_data.get("highlight")
-	if not _is_integer(coins) or not _is_integer(hammer) or not _is_integer(shuffle) or not _is_integer(highlight):
+	var freezer = asset_data.get("freezer", 0)
+	if not _is_integer(coins) or not _is_integer(hammer) or not _is_integer(shuffle) or not _is_integer(highlight) or not _is_integer(freezer):
 		return _error("Response has malformed grant assets.")
 	return _success({"grant": {
 		"grant_id": str(grant.get("grant_id", "")),
@@ -465,6 +473,7 @@ static func _parse_reward_grant(value: Variant) -> Dictionary:
 			"hammer": int(hammer),
 			"shuffle": int(shuffle),
 			"highlight": int(highlight),
+			"freezer": int(freezer),
 		},
 	}})
 

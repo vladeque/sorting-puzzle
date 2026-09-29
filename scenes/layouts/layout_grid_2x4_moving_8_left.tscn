@@ -5,7 +5,7 @@
 [node name="LayoutGrid2x4Moving8Left" type="Node2D" unique_id=1807099505]
 
 [node name="MovingRow01" type="Node2D" parent="." unique_id=286330238]
-position = Vector2(-228.96, 0)
+position = Vector2(-258.96, 0)
 script = ExtResource("1_6hogf")
 shelf_count = 8
 visible_count = 4

@@ -67,6 +67,18 @@ Revisit this once the backend leaderboard score model (see the Known Gap below) 
 authoritative server-computed final rank, delivered through a real payout endpoint, should replace
 this client-side observation-based approximation.
 
+### Weekly avatar frames
+
+The gold, silver, and bronze avatar frames use a separate backend-owned award. On a completed
+Weekly world period, competition rank 1 unlocks all three, rank 2 unlocks silver and bronze, and
+rank 3 unlocks bronze. The best award is permanent and crosses account merges. The optional
+`leaderboards.weekly_frame_best_rank` field in an authoritative v2 checkpoint is cached in
+`PlayerProgress`; a missing field means no new award. The profile frame picker and local save guard
+use this rank. The backend checks it again on both v1 profile updates and v2 profile edits. The
+local observed-rank coin reward above does not unlock premium frames.
+`BackendReadOperations` recognizes the three premium frame IDs on public leaderboard rows and
+preserves the optional award rank in player-state reads.
+
 ## Provider contract
 
 `LeaderboardProvider.fetch_leaderboard(scope, current_player, limit)` is asynchronous and returns:

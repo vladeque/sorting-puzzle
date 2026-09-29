@@ -1,0 +1,34 @@
+[gd_scene format=3 uid="uid://dlo1r6hpw77mw"]
+
+[ext_resource type="Script" uid="uid://c7ucxk6s8a2nl" path="res://scripts/shelf_layout_row.gd" id="1_layout_row"]
+
+[node name="LayoutGrid3x2Moving6x6TopBottom" type="Node2D" unique_id=171230003]
+
+[node name="MovingRow01" type="Node2D" parent="." unique_id=1390423653]
+position = Vector2(0, -269.24)
+script = ExtResource("1_layout_row")
+shelf_count = 6
+
+[node name="Shelf07" type="Marker2D" parent="." unique_id=916709752]
+position = Vector2(-228.96, -92.75)
+
+[node name="Shelf08" type="Marker2D" parent="." unique_id=532450847]
+position = Vector2(0, -92.75)
+
+[node name="Shelf09" type="Marker2D" parent="." unique_id=42395632]
+position = Vector2(228.96, -92.75)
+
+[node name="Shelf10" type="Marker2D" parent="." unique_id=793601777]
+position = Vector2(-228.96, 92.75)
+
+[node name="Shelf11" type="Marker2D" parent="." unique_id=387445955]
+position = Vector2(0, 92.75)
+
+[node name="Shelf12" type="Marker2D" parent="." unique_id=447838588]
+position = Vector2(228.96, 92.75)
+
+[node name="MovingRow13" type="Node2D" parent="." unique_id=222705260]
+position = Vector2(0, 269.24)
+script = ExtResource("1_layout_row")
+shelf_count = 6
+direction = "left"

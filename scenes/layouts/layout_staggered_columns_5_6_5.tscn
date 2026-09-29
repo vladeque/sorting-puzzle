@@ -1,0 +1,51 @@
+[gd_scene format=3 uid="uid://becu5rch7587v"]
+
+[node name="LayoutStaggeredColumns5x4x5" type="Node2D" unique_id=829874672]
+
+[node name="Shelf01" type="Marker2D" parent="." unique_id=520499735]
+position = Vector2(-228.96, -269.24)
+
+[node name="Shelf02" type="Marker2D" parent="." unique_id=667514357]
+position = Vector2(-228.96, -134.62)
+
+[node name="Shelf03" type="Marker2D" parent="." unique_id=2051196302]
+position = Vector2(-228.96, 0)
+
+[node name="Shelf04" type="Marker2D" parent="." unique_id=1559013269]
+position = Vector2(-228.96, 134.62)
+
+[node name="Shelf05" type="Marker2D" parent="." unique_id=465781150]
+position = Vector2(-228.96, 269.24)
+
+[node name="Shelf06" type="Marker2D" parent="." unique_id=1234841308]
+position = Vector2(0, -336.55)
+
+[node name="Shelf07" type="Marker2D" parent="." unique_id=932990808]
+position = Vector2(0, -201.93)
+
+[node name="Shelf08" type="Marker2D" parent="." unique_id=1183877554]
+position = Vector2(0, -67.31)
+
+[node name="Shelf09" type="Marker2D" parent="." unique_id=378445842]
+position = Vector2(0, 67.31)
+
+[node name="Shelf10" type="Marker2D" parent="." unique_id=1601838288]
+position = Vector2(0, 201.93)
+
+[node name="Shelf11" type="Marker2D" parent="." unique_id=1793386527]
+position = Vector2(0, 336.55)
+
+[node name="Shelf12" type="Marker2D" parent="." unique_id=2013465911]
+position = Vector2(228.96, -269.24)
+
+[node name="Shelf13" type="Marker2D" parent="." unique_id=257531379]
+position = Vector2(228.96, -134.62)
+
+[node name="Shelf14" type="Marker2D" parent="." unique_id=120476372]
+position = Vector2(228.96, 0)
+
+[node name="Shelf15" type="Marker2D" parent="." unique_id=105873900]
+position = Vector2(228.96, 134.62)
+
+[node name="Shelf16" type="Marker2D" parent="." unique_id=1717121054]
+position = Vector2(228.96, 269.24)

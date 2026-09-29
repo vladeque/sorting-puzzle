@@ -1,10 +1,287 @@
 {
   "level": 14,
   "time_seconds": 300,
-  "layout_preset": "grid_3x3",
+  "layout_preset": "grid_3x5",
+  "seed": 131504815,
+  "difficulty": "medium",
   "shelves": [
-    { "layers": [["item_01", null, null]] },
-    { "layers": [["item_01", null, null]] },
-    { "layers": [["item_01", null, null]] }
+    {
+      "layers": [
+        [
+          "item_09",
+          "item_09",
+          "item_17"
+        ],
+        [
+          "item_26",
+          null,
+          "item_26"
+        ],
+        [
+          "item_02",
+          "item_04",
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "item_13",
+          "item_27",
+          "item_15"
+        ],
+        [
+          "item_20",
+          "item_20",
+          null
+        ],
+        [
+          "item_30",
+          "item_31",
+          "item_25"
+        ]
+      ],
+      "unlock_after_triples": 5
+    },
+    {
+      "layers": [
+        [
+          "item_32",
+          "item_27",
+          null
+        ],
+        [
+          "item_22",
+          "item_20",
+          "item_21"
+        ],
+        [
+          null,
+          "item_03",
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          null,
+          "item_11",
+          "item_28"
+        ],
+        [
+          null,
+          "item_06",
+          "item_08"
+        ],
+        [
+          "item_02",
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "type": "dispenser",
+      "layers": [
+        [
+          "item_23"
+        ],
+        [
+          "item_30"
+        ],
+        [
+          "item_19"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "item_15",
+          "item_17",
+          "item_08"
+        ],
+        [
+          "item_07",
+          "item_15",
+          "item_03"
+        ],
+        [
+          "item_25",
+          "item_23",
+          "item_29"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "item_32",
+          "item_28",
+          null
+        ],
+        [
+          "item_24",
+          "item_16",
+          "item_24"
+        ],
+        [
+          null,
+          null,
+          null
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "item_16",
+          "item_16",
+          "item_05"
+        ],
+        [
+          "item_10",
+          "item_12",
+          null
+        ],
+        [
+          "item_25",
+          null,
+          "item_12"
+        ]
+      ],
+      "unlock_after_triples": 10
+    },
+    {
+      "layers": [
+        [
+          "item_21",
+          "item_11",
+          null
+        ],
+        [
+          "item_26",
+          "item_29",
+          "item_06"
+        ],
+        [
+          null,
+          null,
+          "item_22"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "item_05",
+          "item_11",
+          null
+        ],
+        [
+          "item_06",
+          "item_24",
+          "item_07"
+        ],
+        [
+          "item_03",
+          null,
+          "item_14"
+        ]
+      ]
+    },
+    {
+      "type": "dispenser",
+      "layers": [
+        [
+          "item_30"
+        ],
+        [
+          "item_12"
+        ],
+        [
+          "item_23"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          "item_21",
+          null,
+          "item_09"
+        ],
+        [
+          "item_27",
+          "item_18",
+          null
+        ],
+        [
+          "item_31",
+          "item_04",
+          "item_01"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          null,
+          "item_10",
+          "item_10"
+        ],
+        [
+          null,
+          "item_01",
+          "item_01"
+        ],
+        [
+          "item_02",
+          "item_22",
+          "item_18"
+        ]
+      ]
+    },
+    {
+      "layers": [
+        [
+          null,
+          "item_13",
+          "item_13"
+        ],
+        [
+          "item_31",
+          "item_07",
+          "item_04"
+        ],
+        [
+          "item_14",
+          "item_18",
+          "item_14"
+        ]
+      ],
+      "unlock_after_triples": 15
+    },
+    {
+      "layers": [
+        [
+          "item_08",
+          "item_17",
+          "item_05"
+        ],
+        [
+          "item_32",
+          "item_28",
+          null
+        ],
+        [
+          "item_19",
+          "item_19",
+          "item_29"
+        ]
+      ]
+    }
   ]
 }

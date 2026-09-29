@@ -100,6 +100,21 @@ func _run() -> void:
 	menu.call("_switch_tab", &"frame")
 	await process_frame
 	_check(grid.get_child_count() == 9, "Frame tab shows all configured frames.")
+	_check(not _progress.get_available_avatar_frame_ids().has("frame_weekly_bronze"),
+		"Weekly frames stay locked before an authoritative award.")
+	_check(not _progress.set_profile_customization(
+		_progress.get_avatar_id(), "frame_weekly_gold", _progress.get_player_name()
+	), "A locked gold frame cannot be saved.")
+	var save_data := _progress.get("_data") as Dictionary
+	for best_rank in [3, 2, 1]:
+		save_data["weekly_frame_best_rank"] = best_rank
+		var unlocked: Array[String] = _progress.get_available_avatar_frame_ids()
+		_check(unlocked.has("frame_weekly_bronze"), "Third place unlocks bronze.")
+		_check(unlocked.has("frame_weekly_silver") == (best_rank <= 2),
+			"Second place unlocks silver and bronze.")
+		_check(unlocked.has("frame_weekly_gold") == (best_rank == 1),
+			"First place unlocks all three frames.")
+	save_data["weekly_frame_best_rank"] = 0
 	menu.call("_select_choice", "frame_plum")
 	_check(
 		preview_frame_texture.texture.resource_path.ends_with("frame_plum.png"),

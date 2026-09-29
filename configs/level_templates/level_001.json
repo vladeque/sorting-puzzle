@@ -8,7 +8,7 @@
 									   [
 										   "item_01",
 										   null,
-										   null
+										   "item_01"
 									   ]
 								   ]
 					},
@@ -24,7 +24,7 @@
 					{
 						"layers":  [
 									   [
-										   "item_01",
+										   null,
 										   null,
 										   null
 									   ]

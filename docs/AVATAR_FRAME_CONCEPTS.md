@@ -83,15 +83,18 @@ silver, and bronze at 240 pixels; `champion_laurel_metals_thumbnail_sheet.png` c
 The selected gold, silver, and bronze art has also been prepared as transparent 256x256 textures at
 `assets/ui/avatar_frames/frame_weekly_gold.png`, `frame_weekly_silver.png`, and
 `frame_weekly_bronze.png`. ImageMagick derived a shared alpha silhouette from the gold reference
-and applied it to each metal variant. These production-size textures are not yet listed in
-`configs/profile_frames.json`; ownership and selection must be enforced by the authoritative
-weekly-leaderboard award contract before they become selectable.
+and applied it to each metal variant. These production-size textures are registered in
+`configs/profile_frames.json` with a minimum earned Weekly competition rank. The backend persists
+completed-week awards and rejects unearned selections through both profile update paths.
 
 `scripts/tools/captures/profile_weekly_frame_art_setup.gd` previews the three prepared textures in
-the profile editor without registering them as selectable frames. Windowed captures showed readable
+the profile editor. Windowed captures showed readable
 avatar faces and distinct metals at 540x960, 720x1280, 1080x1920, and 1080x2400. A requested
 900x1200 tablet capture rendered at 675x1200 instead and is not a faithful tablet-layout check.
 
-After a design is selected, its production pass needs a transparent 256x256 canvas, an inner aperture
-aligned with the existing frames, and visual verification in the profile editor and other profile
-views. Achievement criteria and unlock flow are separate design decisions.
+The frame picker shows bronze for a best finish of third, silver and bronze for second, and all
+three for first. Without a server-awarded rank, it shows only the nine standard frames.
+`scripts/tools/captures/profile_weekly_frame_unlocked_setup.gd` captures the real first-place
+picker state. The three metals are distinct and the selected gold frame remains legible at
+540x960, 720x1280, 1080x1920, and 1080x2400. The requested 900x1200 tablet render again came
+back as 675x1200, so that viewport remains unverified.

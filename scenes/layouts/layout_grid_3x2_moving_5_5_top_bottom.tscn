@@ -1,36 +1,34 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://dg55uisa32vnl"]
 
-[ext_resource type="Script" path="res://scripts/shelf_layout_row.gd" id="1_layout_row"]
+[ext_resource type="Script" uid="uid://c7ucxk6s8a2nl" path="res://scripts/shelf_layout_row.gd" id="1_layout_row"]
 
-[node name="LayoutGrid3x2Moving5x5TopBottom" type="Node2D"]
+[node name="LayoutGrid3x2Moving5x5TopBottom" type="Node2D" unique_id=1667818519]
 
-[node name="MovingRow01" type="Node2D" parent="."]
-position = Vector2(0, -243.8)
+[node name="MovingRow01" type="Node2D" parent="." unique_id=1772317864]
+position = Vector2(0, -273.8)
 script = ExtResource("1_layout_row")
 shelf_count = 5
-speed_pixels_per_second = 60.0
 
-[node name="Shelf06" type="Marker2D" parent="."]
+[node name="Shelf06" type="Marker2D" parent="." unique_id=1923615208]
 position = Vector2(-228.96, -67.31)
 
-[node name="Shelf07" type="Marker2D" parent="."]
+[node name="Shelf07" type="Marker2D" parent="." unique_id=1019059694]
 position = Vector2(0, -67.31)
 
-[node name="Shelf08" type="Marker2D" parent="."]
+[node name="Shelf08" type="Marker2D" parent="." unique_id=911143863]
 position = Vector2(228.96, -67.31)
 
-[node name="Shelf09" type="Marker2D" parent="."]
+[node name="Shelf09" type="Marker2D" parent="." unique_id=1098941314]
 position = Vector2(-228.96, 67.31)
 
-[node name="Shelf10" type="Marker2D" parent="."]
+[node name="Shelf10" type="Marker2D" parent="." unique_id=128634828]
 position = Vector2(0, 67.31)
 
-[node name="Shelf11" type="Marker2D" parent="."]
+[node name="Shelf11" type="Marker2D" parent="." unique_id=43002446]
 position = Vector2(228.96, 67.31)
 
-[node name="MovingRow12" type="Node2D" parent="."]
+[node name="MovingRow12" type="Node2D" parent="." unique_id=1096966594]
 position = Vector2(0, 243.8)
 script = ExtResource("1_layout_row")
 shelf_count = 5
-speed_pixels_per_second = 60.0
 direction = "left"

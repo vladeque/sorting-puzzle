@@ -5,223 +5,223 @@
   "seed": 5036,
   "difficulty": "hard",
   "shelves": [
-    {
-      "type": "dispenser",
-      "layers": [
-        [
+	{
+	  "type": "dispenser",
+	  "layers": [
+		[
           "item_02"
-        ],
-        [
+		],
+		[
           "item_08"
-        ],
-        [
+		],
+		[
           "item_06"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "item_03",
-          "item_06",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "item_03",
+		  "item_06",
           "item_03"
-        ],
-        [
-          "item_15",
-          "item_02",
+		],
+		[
+		  "item_15",
+		  "item_02",
           "item_14"
-        ],
-        [
-          "item_11",
-          "item_09",
+		],
+		[
+		  "item_11",
+		  "item_09",
           "item_05"
-        ]
-      ]
-    },
-    {
-      "type": "dispenser",
-      "layers": [
-        [
+		]
+	  ]
+	},
+	{
+	  "type": "dispenser",
+	  "layers": [
+		[
           "item_17"
-        ],
-        [
+		],
+		[
           "item_06"
-        ],
-        [
+		],
+		[
           "item_15"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "item_16",
-          "item_06",
-          null
-        ],
-        [
-          "item_14",
-          "item_10",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "item_16",
+		  "item_06",
+		  null
+		],
+		[
+		  "item_14",
+		  "item_10",
           "item_10"
-        ],
-        [
-          "item_12",
-          null,
+		],
+		[
+		  "item_12",
+		  null,
           "item_05"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "item_02",
-          "item_10",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "item_02",
+		  "item_10",
           "item_16"
-        ],
-        [
-          "item_01",
-          "item_12",
+		],
+		[
+		  "item_01",
+		  "item_12",
           "item_08"
-        ],
-        [
-          "item_13",
-          "item_01",
+		],
+		[
+		  "item_13",
+		  "item_01",
           "item_14"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "item_14",
-          "item_04",
-          null
-        ],
-        [
-          "item_13",
-          "item_12",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "item_14",
+		  "item_04",
+		  null
+		],
+		[
+		  "item_13",
+		  "item_12",
           "item_17"
-        ],
-        [
-          "item_10",
-          "item_10",
-          null
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          null,
-          "item_02",
-          null
-        ],
-        [
-          "item_06",
-          "item_02",
+		],
+		[
+		  "item_10",
+		  "item_10",
+		  null
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  null,
+		  "item_02",
+		  null
+		],
+		[
+		  "item_06",
+		  "item_02",
           "item_06"
-        ],
-        [
-          null,
-          "item_07",
+		],
+		[
+		  null,
+		  "item_07",
           "item_07"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "item_13",
-          "item_04",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "item_13",
+		  "item_04",
           "item_16"
-        ],
-        [
-          "item_13",
-          "item_17",
+		],
+		[
+		  "item_13",
+		  "item_17",
           "item_15"
-        ],
-        [
-          null,
-          "item_08",
-          null
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          null,
-          "item_08",
+		],
+		[
+		  null,
+		  "item_08",
+		  null
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  null,
+		  "item_08",
           "item_08"
-        ],
-        [
-          null,
-          "item_07",
+		],
+		[
+		  null,
+		  "item_07",
           "item_14"
-        ],
-        [
-          null,
-          null,
-          null
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "item_04",
-          "item_15",
+		],
+		[
+		  null,
+		  null,
+		  null
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "item_04",
+		  "item_15",
           "item_14"
-        ],
-        [
-          "item_09",
-          "item_01",
+		],
+		[
+		  "item_09",
+		  "item_01",
           "item_07"
-        ],
-        [
-          null,
-          "item_11",
+		],
+		[
+		  null,
+		  "item_11",
           "item_07"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          null,
-          "item_15",
-          null
-        ],
-        [
-          "item_15",
-          "item_02",
-          null
-        ],
-        [
-          "item_13",
-          "item_11",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  null,
+		  "item_15",
+		  null
+		],
+		[
+		  "item_15",
+		  "item_02",
+		  null
+		],
+		[
+		  "item_13",
+		  "item_11",
           "item_05"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "item_10",
-          "item_03",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "item_10",
+		  "item_03",
           "item_13"
-        ],
-        [
-          "item_07",
-          null,
+		],
+		[
+		  "item_07",
+		  null,
           "item_08"
-        ],
-        [
-          null,
-          null,
+		],
+		[
+		  null,
+		  null,
           "item_09"
-        ]
-      ]
-    }
+		]
+	  ]
+	}
   ]
 }

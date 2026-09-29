@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://q56yytl2s8pg"]
+
+[ext_resource type="Script" uid="uid://c7ucxk6s8a2nl" path="res://scripts/shelf_layout_row.gd" id="1_layout_row"]
+
+[node name="LayoutShapeAlternatingAlcoves3x5Moving6Center" type="Node2D" unique_id=229484462]
+
+[node name="MovingRow01" type="Node2D" parent="." unique_id=911063135]
+script = ExtResource("1_layout_row")
+shelf_count = 6
+visible_count = 4
+motion_type = "vertical_wrap"
+direction = "down"
+
+[node name="Shelf07" type="Marker2D" parent="." unique_id=1556811912]
+position = Vector2(-228.96, -269.24)
+
+[node name="Shelf08" type="Marker2D" parent="." unique_id=866495728]
+position = Vector2(228.96, -134.62)
+
+[node name="Shelf09" type="Marker2D" parent="." unique_id=79857539]
+position = Vector2(-228.96, 0)
+
+[node name="Shelf10" type="Marker2D" parent="." unique_id=225132758]
+position = Vector2(228.96, 134.62)
+
+[node name="Shelf11" type="Marker2D" parent="." unique_id=1689147970]
+position = Vector2(-228.96, 269.24)

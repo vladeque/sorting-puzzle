@@ -93,7 +93,7 @@ const SHELF_TOP_STACK_MIN_HORIZONTAL_OVERLAP := 0.35
 const ABILITY_BAR_HEIGHT := 151.2
 const ABILITY_BAR_DESIGN_BOTTOM_MARGIN := 76.0
 const ABILITY_BAR_SAFE_BOTTOM_PADDING := 24.0
-const SHELVES_TOP_CLEARANCE := 128.0
+const SHELVES_TOP_CLEARANCE := 148.0
 ## Matches Background/Baseboard's 224 design-pixel top offset from the bottom of level.tscn. Shelf
 ## boards center against the visible back wall, while the ability buttons remain an overlay near the
 ## floor instead of pulling the whole board upward.

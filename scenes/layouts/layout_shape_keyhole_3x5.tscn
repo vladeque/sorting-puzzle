@@ -1,32 +1,35 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://72y8n7bntnu1"]
 
-[node name="LayoutShapeKeyhole3x5" type="Node2D"]
+[node name="LayoutShapeKeyhole3x5" type="Node2D" unique_id=308234871]
 
-[node name="Shelf01" type="Marker2D" parent="."]
+[node name="Shelf01" type="Marker2D" parent="." unique_id=1505523697]
 position = Vector2(-228.96, -269.24)
 
-[node name="Shelf02" type="Marker2D" parent="."]
+[node name="Shelf02" type="Marker2D" parent="." unique_id=79091901]
 position = Vector2(0, -269.24)
 
-[node name="Shelf03" type="Marker2D" parent="."]
+[node name="Shelf03" type="Marker2D" parent="." unique_id=1468358435]
 position = Vector2(228.96, -269.24)
 
-[node name="Shelf04" type="Marker2D" parent="."]
+[node name="Shelf04" type="Marker2D" parent="." unique_id=222920354]
 position = Vector2(-228.96, -134.62)
 
-[node name="Shelf05" type="Marker2D" parent="."]
+[node name="Shelf05" type="Marker2D" parent="." unique_id=1984741238]
+position = Vector2(0, -134.62)
+
+[node name="Shelf06" type="Marker2D" parent="." unique_id=1056758005]
 position = Vector2(228.96, -134.62)
 
-[node name="Shelf06" type="Marker2D" parent="."]
+[node name="Shelf07" type="Marker2D" parent="." unique_id=1506332123]
 position = Vector2(-228.96, 0)
 
-[node name="Shelf07" type="Marker2D" parent="."]
+[node name="Shelf08" type="Marker2D" parent="." unique_id=438458325]
 
-[node name="Shelf08" type="Marker2D" parent="."]
+[node name="Shelf09" type="Marker2D" parent="." unique_id=1222948807]
 position = Vector2(228.96, 0)
 
-[node name="Shelf09" type="Marker2D" parent="."]
+[node name="Shelf10" type="Marker2D" parent="." unique_id=905748183]
 position = Vector2(0, 134.62)
 
-[node name="Shelf10" type="Marker2D" parent="."]
+[node name="Shelf11" type="Marker2D" parent="." unique_id=396075868]
 position = Vector2(0, 269.24)

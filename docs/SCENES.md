@@ -2433,7 +2433,7 @@ Verification:
 
 ```powershell
 & .\scripts\tools\capture_ui.ps1 -Scene level.tscn -Name pause_awning -Position '0,0' -Settle 30 `
-    -Setup scripts/tools/captures/pause_menu_setup.gd
+	-Setup scripts/tools/captures/pause_menu_setup.gd
 ```
 
 ## `scenes/ui/gameplay_result_shell.tscn`

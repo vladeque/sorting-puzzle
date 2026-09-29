@@ -103,6 +103,7 @@ LAYOUT_PRESETS = (
     "staggered_columns_4_3_4",
     "staggered_columns_4_5_4",
     "staggered_columns_5_4_5",
+    "staggered_columns_5_6_5",
     "staggered_columns_4_moving_8_4",
     "staggered_columns_5_moving_8_5",
 )

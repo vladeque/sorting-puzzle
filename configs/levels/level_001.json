@@ -8,7 +8,7 @@
 		[
 		  "jam_jar_raspberry",
 		  null,
-		  null
+		  "jam_jar_raspberry"
 		]
 	  ]
 	},
@@ -24,7 +24,7 @@
 	{
 	  "layers": [
 		[
-		  "jam_jar_raspberry",
+		  null,
 		  null,
 		  null
 		]

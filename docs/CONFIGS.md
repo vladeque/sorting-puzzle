@@ -939,8 +939,8 @@ Shape:
 ```json
 {
   "goals": [
-    { "stars": 500, "coin_reward": 100 },
-    { "stars": 1000, "coin_reward": 225 }
+    { "stars": 500, "coin_reward": 100, "ability_rewards": { "hammer": 1, "shuffle": 1, "highlight": 1, "freezer": 1 } },
+    { "stars": 1000, "coin_reward": 225, "ability_rewards": { "hammer": 1, "shuffle": 1, "highlight": 1, "freezer": 1 } }
   ]
 }
 ```
@@ -948,10 +948,12 @@ Shape:
 Rules:
 - `goals` must be an ordered list of objects with a positive `stars` target.
 - `coin_reward` is the number of gold coins granted when that goal is reached.
+- `ability_rewards` grants the configured number of Hammer, Shuffle, Highlight, and Freezer uses on each crossing. Omitted values default to zero for older configurations.
 - Legacy numeric entries such as `500` are still accepted as star goals with `0` coin reward.
 - The saved `reward_chest_goal_index` selects the active goal.
-- When saved chest stars reach the active goal, the configured coin reward is added to the player's saved coins, the goal starts over with remaining stars carried forward, and the next configured goal becomes active.
+- When saved chest stars reach the active goal, the configured coins and ability uses are added to the player's saved inventory, the goal starts over with remaining stars carried forward, and the next configured goal becomes active. Each crossed goal grants its rewards once, including multiple crossings in one completion.
 - After the final configured goal is reached, the final goal value repeats.
+- Publishing this change requires a new immutable backend chest configuration. Existing players keep their chest stars and goal; ability rewards start with crossings under the new version, without retroactive grants.
 
 ## `configs/leaderboard_reward_tiers.json`
 
@@ -1125,7 +1127,7 @@ Runtime behavior:
   the Freezer grant; schema 7 defaults the new frame to `frame_classic`, and schema 8 preserves a
   non-default local frame by appending one signed `profile_edit` during the schema-9 migration.
 - Weekly stars reset when the saved Monday-UTC boundary no longer matches the current week.
-- Reward chest stars roll over when a configured goal is reached, grant that goal's `coin_reward`, then the next configured goal starts.
+- Reward chest stars roll over when a configured goal is reached, grant that goal's `coin_reward` and `ability_rewards`, then the next configured goal starts.
 - Developer/test level selection is isolated from this save data.
 - Local persistence remains active in all builds; there is no cloud-only mode.
 

@@ -36,6 +36,21 @@
     {
       "id": "frame_aqua",
       "texture": "res://assets/ui/avatar_frames/frame_aqua.png"
+    },
+    {
+      "id": "frame_weekly_bronze",
+      "texture": "res://assets/ui/avatar_frames/frame_weekly_bronze.png",
+      "weekly_rank_required": 3
+    },
+    {
+      "id": "frame_weekly_silver",
+      "texture": "res://assets/ui/avatar_frames/frame_weekly_silver.png",
+      "weekly_rank_required": 2
+    },
+    {
+      "id": "frame_weekly_gold",
+      "texture": "res://assets/ui/avatar_frames/frame_weekly_gold.png",
+      "weekly_rank_required": 1
     }
   ]
 }

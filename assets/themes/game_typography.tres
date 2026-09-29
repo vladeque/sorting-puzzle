@@ -13,6 +13,12 @@ opentype_features = {
 1667329140: 0
 }
 
+[sub_resource type="FontVariation" id="FontVariation_nunito_bold"]
+base_font = ExtResource("2_nunito")
+variation_opentype = {
+2003265652: 700.0
+}
+
 [sub_resource type="FontVariation" id="FontVariation_nunito_semibold"]
 base_font = ExtResource("2_nunito")
 variation_opentype = {
@@ -48,12 +54,6 @@ variation_opentype = {
 }
 opentype_features = {
 1667329140: 0
-}
-
-[sub_resource type="FontVariation" id="FontVariation_nunito_bold"]
-base_font = ExtResource("2_nunito")
-variation_opentype = {
-2003265652: 700.0
 }
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_scrollbar_icon"]

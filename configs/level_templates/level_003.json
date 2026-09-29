@@ -5,174 +5,174 @@
   "seed": 3014,
   "difficulty": "medium",
   "shelves": [
-    {
-      "layers": [
-        [
-          "item_18",
-          "item_05",
+	{
+	  "layers": [
+		[
+		  "item_18",
+		  "item_05",
           "item_11"
-        ],
-        [
-          null,
-          "item_14",
+		],
+		[
+		  null,
+		  "item_14",
           "item_14"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "item_07",
-          "item_19",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "item_07",
+		  "item_19",
           "item_08"
-        ],
-        [
-          "item_20",
-          null,
+		],
+		[
+		  "item_20",
+		  null,
           "item_06"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "item_03",
-          "item_09",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "item_03",
+		  "item_09",
           "item_10"
-        ],
-        [
-          "item_01",
-          "item_01",
+		],
+		[
+		  "item_01",
+		  "item_01",
           "item_21"
-        ]
-      ],
-      "unlock_after_triples": 5
-    },
-    {
-      "layers": [
-        [
-          "item_17",
-          "item_08",
+		]
+	  ],
+	  "unlock_after_triples": 5
+	},
+	{
+	  "layers": [
+		[
+		  "item_17",
+		  "item_08",
           "item_20"
-        ],
-        [
-          "item_21",
-          "item_16",
+		],
+		[
+		  "item_21",
+		  "item_16",
           "item_04"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "item_17",
-          "item_17",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "item_17",
+		  "item_17",
           "item_04"
-        ],
-        [
-          "item_16",
-          "item_03",
-          null
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "item_15",
-          null,
+		],
+		[
+		  "item_16",
+		  "item_03",
+		  null
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "item_15",
+		  null,
           "item_15"
-        ],
-        [
-          "item_15",
-          "item_19",
+		],
+		[
+		  "item_15",
+		  "item_19",
           "item_09"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "item_05",
-          "item_10",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "item_05",
+		  "item_10",
           "item_12"
-        ],
-        [
-          "item_19",
-          "item_20",
+		],
+		[
+		  "item_19",
+		  "item_20",
           "item_06"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "item_04",
-          "item_11",
-          null
-        ],
-        [
-          "item_12",
-          "item_18",
-          null
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "item_13",
-          "item_02",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "item_04",
+		  "item_11",
+		  null
+		],
+		[
+		  "item_12",
+		  "item_18",
+		  null
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "item_13",
+		  "item_02",
           "item_18"
-        ],
-        [
-          "item_10",
-          "item_16",
+		],
+		[
+		  "item_10",
+		  "item_16",
           "item_21"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "item_13",
-          null,
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "item_13",
+		  null,
           "item_08"
-        ],
-        [
-          "item_09",
-          "item_02",
+		],
+		[
+		  "item_09",
+		  "item_02",
           "item_01"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "item_12",
-          "item_11",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "item_12",
+		  "item_11",
           "item_07"
-        ],
-        [
-          "item_02",
-          "item_14",
+		],
+		[
+		  "item_02",
+		  "item_14",
           "item_06"
-        ]
-      ]
-    },
-    {
-      "layers": [
-        [
-          "item_05",
-          "item_07",
+		]
+	  ]
+	},
+	{
+	  "layers": [
+		[
+		  "item_05",
+		  "item_07",
           "item_13"
-        ],
-        [
-          null,
-          "item_03",
-          null
-        ]
-      ]
-    }
+		],
+		[
+		  null,
+		  "item_03",
+		  null
+		]
+	  ]
+	}
   ]
 }

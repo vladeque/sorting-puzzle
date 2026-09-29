@@ -126,7 +126,7 @@ offset_bottom = -96.0
 
 [node name="GameplayTipOverlay" parent="UI" instance=ExtResource("24_gameplay_tip_overlay")]
 
-[node name="TimeUpTransition" parent="UI" instance=ExtResource("22_time_up_transition")]
+[node name="TimeUpTransition" parent="UI" unique_id=810740996 instance=ExtResource("22_time_up_transition")]
 
 [node name="FailureScreen" parent="UI" unique_id=784630851 instance=ExtResource("13_failure_screen")]
 visible = false
@@ -157,7 +157,7 @@ visible = false
 visible = false
 layout_mode = 3
 
-[node name="ShelfUnlockOverlay" parent="UI" instance=ExtResource("23_shelf_unlock")]
+[node name="ShelfUnlockOverlay" parent="UI" unique_id=1988754655 instance=ExtResource("23_shelf_unlock")]
 visible = false
 layout_mode = 3
 

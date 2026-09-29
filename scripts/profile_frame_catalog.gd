@@ -15,6 +15,17 @@ static func get_available_frame_ids() -> Array[String]:
 	return _ordered_ids.duplicate()
 
 
+static func get_unlocked_frame_ids(best_weekly_rank: int) -> Array[String]:
+	_ensure_loaded()
+	var unlocked: Array[String] = []
+	for frame_id in _ordered_ids:
+		var definition := _frames[frame_id] as Dictionary
+		var required_rank := int(definition.get("weekly_rank_required", 0))
+		if required_rank == 0 or (best_weekly_rank >= 1 and best_weekly_rank <= required_rank):
+			unlocked.append(frame_id)
+	return unlocked
+
+
 static func get_default_frame_id() -> String:
 	_ensure_loaded()
 	return _default_frame_id

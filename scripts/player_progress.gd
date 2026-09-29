@@ -30,12 +30,18 @@ const DEFAULT_COINS := 300
 const DEFAULT_LIFE_PURCHASE_COIN_PRICE := 500
 const LEADERBOARD_WEEK_SECONDS := 7 * 24 * 60 * 60
 const UNIX_EPOCH_MONDAY_OFFSET_DAYS := 3
+const DEFAULT_CHEST_ABILITY_REWARDS := {
+	ABILITY_HAMMER: 1,
+	ABILITY_SHUFFLE: 1,
+	ABILITY_HIGHLIGHT: 1,
+	ABILITY_FREEZER: 1,
+}
 const DEFAULT_REWARD_CHEST_GOALS := [
-	{"stars": 500, "coin_reward": 100},
-	{"stars": 1000, "coin_reward": 225},
-	{"stars": 1500, "coin_reward": 375},
-	{"stars": 2000, "coin_reward": 550},
-	{"stars": 3000, "coin_reward": 900},
+	{"stars": 500, "coin_reward": 100, "ability_rewards": DEFAULT_CHEST_ABILITY_REWARDS},
+	{"stars": 1000, "coin_reward": 225, "ability_rewards": DEFAULT_CHEST_ABILITY_REWARDS},
+	{"stars": 1500, "coin_reward": 375, "ability_rewards": DEFAULT_CHEST_ABILITY_REWARDS},
+	{"stars": 2000, "coin_reward": 550, "ability_rewards": DEFAULT_CHEST_ABILITY_REWARDS},
+	{"stars": 3000, "coin_reward": 900, "ability_rewards": DEFAULT_CHEST_ABILITY_REWARDS},
 ]
 ## Weekly leaderboard placement rewards. Ranks are local-observation-based (see
 ## `record_weekly_leaderboard_rank()`), not a backend-authoritative final standing -- see
@@ -414,6 +420,7 @@ func get_reward_chest_progress() -> Dictionary:
 		"goal": int(active_goal.get("stars", 1)),
 		"goal_index": goal_index,
 		"coin_reward": int(active_goal.get("coin_reward", 0)),
+		"ability_rewards": (active_goal.get("ability_rewards", {}) as Dictionary).duplicate(),
 	}
 
 
@@ -493,7 +500,9 @@ func get_available_avatar_ids() -> Array:
 
 
 func get_available_avatar_frame_ids() -> Array[String]:
-	return ProfileFrameCatalogScript.get_available_frame_ids()
+	return ProfileFrameCatalogScript.get_unlocked_frame_ids(
+		int(_data.get("weekly_frame_best_rank", 0))
+	)
 
 
 func get_avatar_id() -> String:
@@ -637,7 +646,7 @@ func set_profile(avatar_id: String, player_name: String) -> bool:
 func set_profile_customization(avatar_id: String, avatar_frame_id: String, player_name: String) -> bool:
 	if not AVAILABLE_AVATAR_IDS.has(avatar_id):
 		return false
-	if not ProfileFrameCatalogScript.get_available_frame_ids().has(avatar_frame_id):
+	if not get_available_avatar_frame_ids().has(avatar_frame_id):
 		return false
 
 	var sanitized_player_name := _sanitize_player_name(player_name, get_player_name())
@@ -867,6 +876,9 @@ func _sanitize_data(raw_data: Dictionary) -> Dictionary:
 		"avatar_frame_id",
 		ProfileFrameCatalogScript.get_default_frame_id()
 	)))
+	sanitized["weekly_frame_best_rank"] = clampi(
+		int(raw_data.get("weekly_frame_best_rank", 0)), 0, 3
+	)
 	sanitized["player_name"] = _sanitize_player_name(str(raw_data.get("player_name", sanitized["player_name"])), sanitized["player_name"])
 	sanitized["moderation_state"] = str(raw_data.get("moderation_state", "active"))
 	sanitized["settings_disabled"] = _sanitize_disabled_settings(raw_data.get("settings_disabled", {}))
@@ -940,6 +952,7 @@ func _default_data() -> Dictionary:
 		"ability_uses": DEFAULT_ABILITY_USES.duplicate(),
 		"avatar_id": DEFAULT_AVATAR_ID,
 		"avatar_frame_id": ProfileFrameCatalogScript.get_default_frame_id(),
+		"weekly_frame_best_rank": 0,
 		"player_name": _generate_player_name(),
 		"moderation_state": "active",
 		"settings_disabled": DEFAULT_DISABLED_SETTINGS.duplicate(),
@@ -1080,6 +1093,13 @@ func _apply_reward_chest_stars(star_count: int) -> bool:
 		_data.get("reward_chest_completed_cycles", 0)
 	) + int(normalized.get("completed_cycles", 0))
 	_data["coins"] = get_coins() + int(normalized.get("coin_reward", 0))
+	var ability_uses := get_ability_uses()
+	var granted_abilities := normalized.get("ability_rewards", {}) as Dictionary
+	for ability_id in DEFAULT_ABILITY_USES.keys():
+		ability_uses[ability_id] = int(ability_uses.get(ability_id, 0)) + int(
+			granted_abilities.get(ability_id, 0)
+		)
+	_data["ability_uses"] = ability_uses
 	return true
 
 
@@ -1088,11 +1108,22 @@ func _normalize_reward_chest_progress(stars: int, goal_index: int) -> Dictionary
 	var safe_goal_index := clampi(goal_index, 0, goals.size() - 1)
 	var safe_stars := maxi(stars, 0)
 	var coin_reward := 0
+	var ability_rewards := {
+		ABILITY_HAMMER: 0,
+		ABILITY_SHUFFLE: 0,
+		ABILITY_HIGHLIGHT: 0,
+		ABILITY_FREEZER: 0,
+	}
 	var completed_cycles := 0
 
 	while safe_stars >= _get_reward_chest_goal_stars(goals, safe_goal_index):
 		safe_stars -= _get_reward_chest_goal_stars(goals, safe_goal_index)
 		coin_reward += _get_reward_chest_goal_coin_reward(goals, safe_goal_index)
+		var goal_abilities := (goals[safe_goal_index] as Dictionary).get(
+			"ability_rewards", {}
+		) as Dictionary
+		for ability_id in ability_rewards.keys():
+			ability_rewards[ability_id] += int(goal_abilities.get(ability_id, 0))
 		completed_cycles += 1
 		if safe_goal_index < goals.size() - 1:
 			safe_goal_index += 1
@@ -1101,6 +1132,7 @@ func _normalize_reward_chest_progress(stars: int, goal_index: int) -> Dictionary
 		"stars": safe_stars,
 		"goal_index": safe_goal_index,
 		"coin_reward": coin_reward,
+		"ability_rewards": ability_rewards,
 		"completed_cycles": completed_cycles,
 	}
 
@@ -1166,10 +1198,17 @@ func _parse_reward_chest_goal(raw_goal) -> Dictionary:
 		var coin_reward := maxi(int(goal_dictionary.get("coin_reward", 0)), 0)
 		if stars <= 0:
 			return {}
+		var ability_rewards := {}
+		var raw_abilities = goal_dictionary.get("ability_rewards", {})
+		if not (raw_abilities is Dictionary):
+			return {}
+		for ability_id in DEFAULT_ABILITY_USES.keys():
+			ability_rewards[ability_id] = maxi(int((raw_abilities as Dictionary).get(ability_id, 0)), 0)
 
 		return {
 			"stars": stars,
 			"coin_reward": coin_reward,
+			"ability_rewards": ability_rewards,
 		}
 
 	var legacy_stars := maxi(int(raw_goal), 0)
@@ -1179,6 +1218,7 @@ func _parse_reward_chest_goal(raw_goal) -> Dictionary:
 	return {
 		"stars": legacy_stars,
 		"coin_reward": 0,
+		"ability_rewards": {},
 	}
 
 
@@ -1692,6 +1732,9 @@ func _map_checkpoint_to_snapshot(
 	mapped["reward_chest_completed_cycles"] = int(chest.get("completed_cycles", 0))
 	mapped["total_earned_stars"] = int(leaderboards.get("lifetime_stars", 0))
 	mapped["weekly_earned_stars"] = int(leaderboards.get("weekly_stars", 0))
+	mapped["weekly_frame_best_rank"] = clampi(int(leaderboards.get(
+		"weekly_frame_best_rank", current_snapshot.get("weekly_frame_best_rank", 0)
+	)), 0, 3)
 	mapped["leaderboard_week_start_unix"] = LocalSaveCodecScript.unix_from_timestamp(
 		leaderboards.get("weekly_period_start")
 	)
@@ -1732,6 +1775,18 @@ func _apply_unacknowledged_operation(snapshot: Dictionary, operation: Dictionary
 					result.get("reward_chest_completed_cycles", 0)
 				) + int(normalized.get("completed_cycles", 0))
 				result["coins"] = int(result.get("coins", 0)) + int(normalized.get("coin_reward", 0))
+				var ability_uses := result.get("ability_uses", {}) as Dictionary
+				var granted_abilities := normalized.get("ability_rewards", {}) as Dictionary
+				var current_version := str(_campaign_provenance(MIN_LEVEL).get(
+					"configuration_version", ""
+				))
+				if current_version.is_empty() or str(payload.get("configuration_version", "")) != current_version:
+					granted_abilities = {}
+				for ability_id in DEFAULT_ABILITY_USES.keys():
+					ability_uses[ability_id] = int(ability_uses.get(ability_id, 0)) + int(
+						granted_abilities.get(ability_id, 0)
+					)
+				result["ability_uses"] = ability_uses
 				result["total_earned_stars"] = int(result.get("total_earned_stars", 0)) + stars
 				result["weekly_earned_stars"] = int(result.get("weekly_earned_stars", 0)) + stars
 		"resource_spend":
