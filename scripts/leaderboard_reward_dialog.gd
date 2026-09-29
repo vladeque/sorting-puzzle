@@ -2,8 +2,9 @@ extends Control
 class_name LeaderboardRewardDialog
 
 const UIMotionScript := preload("res://scripts/ui_motion.gd")
+const ModalAwningHeaderScript := preload("res://scripts/modal_awning_header.gd")
 
-@onready var _title_label := %TitleLabel as Label
+@onready var _header := %AwningHeader as ModalAwningHeaderScript
 @onready var _message_label := %MessageLabel as Label
 @onready var _close_button := %CloseButton as Button
 
@@ -13,7 +14,7 @@ func _ready() -> void:
 
 
 func show_reward(rank: int, coin_reward: int) -> void:
-	_title_label.text = "WEEKLY REWARD!"
+	_header.set_title("WEEKLY REWARD!")
 	_message_label.text = "You finished #%d last week and earned %d coins!" % [rank, coin_reward]
 	UIMotionScript.fade_in(self)
 

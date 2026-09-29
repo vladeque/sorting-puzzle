@@ -197,7 +197,7 @@ func _run() -> void:
 	(bundle_card.get_node("%HammerInfoButton") as Button).emit_signal("pressed")
 	_check(dialog.visible, "Tapping the Hammer icon did not open the info dialog.")
 	_check(
-		(dialog.get_node("%TitleLabel") as Label).text == "HAMMER",
+		str(dialog.get_node("%AwningHeader").call("get_title")) == "HAMMER",
 		"Hammer info dialog title is wrong."
 	)
 	dialog.hide()

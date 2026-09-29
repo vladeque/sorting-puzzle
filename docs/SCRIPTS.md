@@ -578,7 +578,9 @@ Depends on:
   differs between the two screens.
 - `scripts/shop_purchase_dialog.gd`: shows and dismisses a focused result modal; `show_result()`
   takes an optional `button_text` (defaults to "Continue") so the same dialog reads correctly for
-  both purchase results and ability info lookups ("Got it"). `%CloseButton` uses the shared orange
+  both purchase results and ability info lookups ("Got it"). The upper-cased title goes onto the
+  shared shop-awning header (`%AwningHeader`) through `set_title()`, which shrinks long titles to
+  fit the plate. `%CloseButton` uses the shared orange
   utility style plus `press_scale_button.gd` for press feedback (it had none before UI-002).
   `show_result()` fades in; `close()` fades out then hides (never frees -- the same instance is
   reused for every purchase result).
@@ -710,11 +712,13 @@ Purpose:
 - Generic titled-message modal shown once per granted weekly reward, mirroring
   `shop_purchase_dialog.gd`'s structure. `show_reward(rank, coin_reward)` builds the message from
   the actual granted values; `scripts/production_main_menu.gd` is the only caller.
+- Titles the shared shop-awning header (`%AwningHeader`) with `set_title()`.
 - `%CloseButton` uses `press_scale_button.gd` for press feedback (it had none before UI-002).
   `show_reward()` fades in; `close()` fades out then hides.
 
 Depends on:
-- `scripts/ui_motion.gd`, `scripts/press_scale_button.gd`.
+- `scripts/ui_motion.gd`, `scripts/press_scale_button.gd`, `scripts/modal_awning_header.gd`
+  (preloaded).
 
 ## `scripts/leaderboards/leaderboard_provider.gd`
 
@@ -3407,11 +3411,11 @@ Purpose:
   `scripts/level.gd` only sets data, calls `open()`/`close()`, and listens for signals.
 
 Exported properties:
-- `header_style` (`HeaderStyle.TITLE` default, or `HeaderStyle.AWNING`): owners override it on
-  their `Shell` instance. `_ready()` shows either `%TitleLabel` or the `%AwningHeader`
+- `header_style` (`HeaderStyle.AWNING` default, or `HeaderStyle.TITLE` as an opt-out): owners can
+  override it on their `Shell` instance. `_ready()` shows either `%TitleLabel` or the `%AwningHeader`
   (`scripts/modal_awning_header.gd`) and, for the awning, moves `%CloseButton` to
   `AWNING_CLOSE_BUTTON_OFFSET` (`-28, -76` from the top-right anchor), on the right end of the rail.
-  Pause is the only owner on `AWNING` so far.
+  Every current shell modal uses `AWNING`; `configure()` still titles the hidden plain label too.
 
 Key methods:
 - `configure(title, is_long_title = false)`: sets the title text and selects the regular/long
@@ -3455,8 +3459,13 @@ Purpose:
   antialias filled polygons), a vertical shade that fades out by the canopy's middle, one lower
   half-disc scallop per stripe with an outline arc, and the canopy's side outlines. Redraws when
   `Canopy` resizes and whenever an exported value changes, so it follows the panel width.
-- Owns the plate title: `set_title(title, is_long_title = false)` sets `%PlateLabel` and picks
-  `title_regular_font_size` (42) or `title_long_font_size` (36). `get_title()` returns it.
+- Owns the plate title through the exported `title_text` and `use_long_title_size`, so scenes that
+  instance the header directly author their title in the scene. `set_title(title, is_long_title =
+  false)` sets both from code; `get_title()` returns the title. The plate starts at
+  `title_regular_font_size` (42) or `title_long_font_size` (36), then shrinks one size at a time,
+  down to `title_min_font_size` (28), until the text plus the plate's side margins fits within the
+  header width minus `plate_side_margin` (40) on each side. The fit reruns when the header resizes,
+  so translations and long product names never push the plate past the awning.
 
 Exported properties:
 - `stripe_count` (10), `stripe_color`, `alternate_stripe_color`, `outline_color`, `outline_width`,

@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://djayncoacexvl" path="res://scripts/pause_menu.gd" id="4_pause_menu_script"]
 [ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="6_press_scale_button"]
 [ext_resource type="Texture2D" uid="uid://c16rnlemnr47n" path="res://assets/ui/level_button_blank_light_blue_new.png" id="6_ywggk"]
+[ext_resource type="PackedScene" uid="uid://yeagixqgwwfq" path="res://scenes/ui/modal_awning_header.tscn" id="90_awning_header"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_outer_panel"]
 bg_color = Color(0.67, 0.32, 0.22, 1)
@@ -136,38 +137,20 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_outer_panel")
 
-[node name="TitleLabel" type="Label" parent="PauseMenuPanel" unique_id=315603422]
-theme_type_variation = &"GameTitleLabel"
+[node name="AwningHeader" parent="PauseMenuPanel" instance=ExtResource("90_awning_header")]
 layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_left = 46.0
-offset_top = 25.0
-offset_right = -46.0
-offset_bottom = 86.0
-grow_horizontal = 2
-theme_override_colors/font_color = Color(1, 0.95, 0.78, 1)
-theme_override_colors/font_shadow_color = Color(0.16, 0.04, 0.02, 0.92)
-theme_override_constants/shadow_offset_x = 0
-theme_override_constants/shadow_offset_y = 3
-theme_override_font_sizes/font_size = 44
-text = "SETTINGS"
-horizontal_alignment = 1
-vertical_alignment = 1
+title_text = "SETTINGS"
 
 [node name="CloseButton" type="Button" parent="PauseMenuPanel" unique_id=36798194]
 layout_mode = 1
-anchors_preset = 3
+anchors_preset = 1
 anchor_left = 1.0
-anchor_top = 1.0
 anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -54.0
-offset_top = -708.0
-offset_right = 18.0
-offset_bottom = -636.0
+offset_left = -28.0
+offset_top = -76.0
+offset_right = 44.0
+offset_bottom = -4.0
 grow_horizontal = 0
-grow_vertical = 0
 focus_mode = 0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)

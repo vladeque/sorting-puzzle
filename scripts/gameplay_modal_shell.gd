@@ -17,10 +17,10 @@ signal close_requested
 signal opened
 signal closed
 
-## Title treatment. TITLE is the plain title label on the panel. AWNING swaps in the striped
-## shop-awning header (scenes/ui/modal_awning_header.tscn) and moves the close button up onto the
-## right end of the awning's rail. Owning scenes pick a style by overriding this on their Shell
-## instance.
+## Title treatment. AWNING (the default, used by every gameplay modal) shows the striped shop-awning
+## header (scenes/ui/modal_awning_header.tscn) and moves the close button up onto the right end of
+## the awning's rail. TITLE keeps the older plain title label on the panel; an owner can still opt
+## back into it by overriding this on its Shell instance.
 enum HeaderStyle { TITLE, AWNING }
 
 const UIMotionScript := preload("res://scripts/ui_motion.gd")
@@ -35,7 +35,7 @@ const POP_SETTLE_SECONDS := 0.12
 ## button sits on the right end of the rail.
 const AWNING_CLOSE_BUTTON_OFFSET := Vector2(-28.0, -76.0)
 
-@export var header_style := HeaderStyle.TITLE
+@export var header_style := HeaderStyle.AWNING
 
 @onready var _outer_panel := %OuterPanel as Control
 @onready var _title_label := %TitleLabel as Label

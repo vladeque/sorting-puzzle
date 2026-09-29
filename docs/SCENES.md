@@ -761,13 +761,18 @@ Purpose:
   to `scenes/ui/shop_purchase_dialog.tscn` (title/message/close) but kept as its own scene since
   it lives on the main menu, not the Shop.
 - Instantiated once as `main_menu.tscn`'s `%LeaderboardRewardDialog`.
+- Its title sits on the shared shop-awning header: `Stack/HeaderSlot` (a 70px-tall plain `Control`)
+  holds `%AwningHeader`, offset by the panel's 28/24px content margins so the awning lines up with
+  the panel edges like every other modal. The panel is 520px wide, matching the gameplay modals.
+  `show_reward()` titles the plate through `set_title()`. The dialog has no corner close button.
 - `show_reward()` fades in; `close()` (the Close button, or Main Menu's `ui_cancel` handling) fades
   out then hides, like `shop_purchase_dialog.tscn`. `%CloseButton` uses `press_scale_button.gd`
   (0.94 held scale) for press feedback and the same shared orange utility normal/pressed resources
   as the Shop purchase-result dialog and destination Retry action.
 
 Depends on:
-- `scripts/ui_motion.gd`, `scripts/press_scale_button.gd`.
+- `scripts/ui_motion.gd`, `scripts/press_scale_button.gd`, `scenes/ui/modal_awning_header.tscn`.
+- Capture: `scripts/tools/captures/leaderboard_reward_dialog_setup.gd`.
 
 ## `scenes/ui/shop_screen.tscn`
 
@@ -936,6 +941,9 @@ Depends on:
 - Dedicated modal overlay for mock purchase success/error results and ability info lookups (a
   titled message with a configurable close-button label).
 - Keeps dialog hierarchy and button wiring out of `shop_screen.gd`.
+- Its title sits on the shared shop-awning header in `Stack/HeaderSlot`, laid out like
+  `leaderboard_reward_dialog.tscn`'s. Product names and error titles vary in length (the longest
+  production title is `PURCHASE UNAVAILABLE`), so the plate shrinks its font until it fits.
 - `%CloseButton` uses the shared `style_box_orange_utility_normal/pressed.tres` (see "Shared UI
   Style Tokens") plus `press_scale_button.gd` (0.94 held scale) for press feedback -- it had none
   before UI-002.
@@ -944,7 +952,9 @@ Depends on:
   purchase result.
 
 Depends on:
-- `scripts/ui_motion.gd`, `scripts/press_scale_button.gd`.
+- `scripts/ui_motion.gd`, `scripts/press_scale_button.gd`, `scenes/ui/modal_awning_header.tscn`.
+- Capture: `scripts/tools/captures/shop_purchase_dialog_setup.gd` (longest title by default;
+  `SORTING_PUZZLE_CAPTURE_PURCHASE_TITLE` overrides it).
 
 ## `scenes/shop_verification.tscn`
 
@@ -1073,8 +1083,15 @@ Purpose:
   goal, and a large `Continue` button.
 - Purely informational: coins are still granted automatically on goal rollover in
   `scripts/player_progress.gd`, so `Continue` only closes the modal and does not claim anything.
-- The 640x900 logical-pixel outer panel occupies most of the 720-wide design viewport while still
+- The 600x916 logical-pixel outer panel occupies most of the 720-wide design viewport while still
   fitting the shorter tablet-like logical viewport produced by the project's `keep_width` stretch.
+  It grew 16px at the top for the awning header, and `InnerPanel` starts at y=110 so the hanging
+  title plate keeps a gap above it. It narrowed from 640 to 600px, matching Edit Profile, because
+  the close button on the awning's rail end reaches 44px past the panel's right edge and would
+  otherwise run off a 720-wide screen.
+  Its title sits on the shared shop-awning header (`scenes/ui/modal_awning_header.tscn`,
+  `AwningHeader`, `title_text` set in the scene), and the red close button sits on the right end of
+  the awning's rail (top-right anchor, offset `-28, -76`), after the header so it draws above it.
 - The `ChestStage` uses `assets/ui/Treasure_chest_with_game_items_202607280535.jpeg`. The small
   main-menu reward chest remains a separate icon and also marks the goal end of the progress row.
 
@@ -1164,7 +1181,10 @@ Script:
 
 Purpose:
 - Centered pause-style settings window opened from the production main menu over a dimmed modal background.
-- Reuses the pause menu visual treatment for the warm outer panel, cream inner panel, `Settings` title, protruding red close button, and saved music / sound-effects / vibration icon toggles.
+- Reuses the pause menu visual treatment for the warm outer panel, cream inner panel, shop-awning `SETTINGS` header, red close button on the awning's rail, and saved music / sound-effects / vibration icon toggles.
+  Its title sits on the shared shop-awning header (`scenes/ui/modal_awning_header.tscn`,
+  `AwningHeader`, `title_text` set in the scene), and the red close button sits on the right end of
+  the awning's rail (top-right anchor, offset `-28, -76`), after the header so it draws above it.
 - Restores the wide `Support` and `Language` actions under the settings toggles. `Support` opens the
   native FAQ screen; `Language` opens the focused locale-selection modal above Settings.
 - Keeps a separate policy-driven privacy action labeled `Privacy Choices` when UMP requires its
@@ -1176,7 +1196,8 @@ Purpose:
 
 Important nodes:
 - `PauseMenuPanel`: centered popup panel kept named for reuse with `scripts/pause_menu.gd`.
-- `PauseMenuPanel/CloseButton`: protruding red close button wired by `scripts/production_main_menu.gd` to dismiss the settings popup.
+- `PauseMenuPanel/AwningHeader`: the shared shop-awning header titled `SETTINGS`.
+- `PauseMenuPanel/CloseButton`: red close button on the awning's rail, wired by `scripts/production_main_menu.gd` (by this path) to dismiss the settings popup.
 - `PauseMenuPanel/InnerPanel/IconRow/MusicOption/MusicButton`: square music toggle button with shadow-only button styling, held-press scaling, and a plain red diagonal marker when disabled.
 - `PauseMenuPanel/InnerPanel/IconRow/SoundEffectsOption/SoundEffectsButton`: square sound effects toggle button with shadow-only button styling, held-press scaling, and a plain red diagonal marker when disabled.
 - `PauseMenuPanel/InnerPanel/IconRow/VibrationOption/VibrationButton`: square phone vibration toggle button with shadow-only button styling, held-press scaling, and a plain red diagonal marker when disabled.
@@ -1292,7 +1313,10 @@ Purpose:
 
 Important nodes:
 - `ProfileMenuPanel`: centered rounded panel using the pause-menu visual treatment.
-- `CloseButton`: protruding red close button that dismisses without saving.
+- `AwningHeader`: the shared shop-awning header titled `EDIT PROFILE`. `ProfileSummary` starts at
+  y=112 and `SelectorPanel` at y=288 so the hanging title plate keeps a gap above the content.
+- `CloseButton`: red close button on the right end of the awning's rail that dismisses without
+  saving.
 - `ProfileSummary/ProfilePreview`: reusable avatar/frame view that updates before saving.
 - `ProfileSummary/NameDisplayRow`: an always-visible, input-styled `%NameLineEdit` plus the compact
   pencil button; `%PencilIcon` displays the generated transparent `assets/ui/pencil_icon.png`
@@ -2333,9 +2357,10 @@ Purpose:
 - `open(with_pop = true)` adds a fitted 90% -> 102% -> 100% panel settle without changing any
   owner's authored panel size. The Time Up offer uses this variant after its dedicated lead-in;
   ordinary modal opens keep the standard fade.
-- Header style: owners override the exported `header_style` on their `Shell` instance. `TITLE`
-  (default) is the plain title label; `AWNING` is the striped shop-awning header. Pause is the
-  first owner on the awning; the other modals stay on `TITLE` until it is rolled out to them.
+- Header style: the exported `header_style` defaults to `AWNING`, the striped shop-awning header,
+  so every shell modal (Pause, Leave Confirmation, Ability Purchase, Language, Failure, Out of
+  Lives, Shelf Unlock, Starter Bundle, Time Up) shows it. `TITLE`, the older plain title label, is
+  kept as an opt-out an owner can set on its `Shell` instance; nothing uses it today.
 
 Important nodes:
 - `Shade`: full-rect `Panel`, `style_box_gameplay_modal_shade.tres`.
@@ -2376,7 +2401,9 @@ Purpose:
   header concepts in the "Modal Header Concepts" design canvas (option D) to tie modal titles to
   the game's shop theme.
 - Instanced once, hidden, inside `scenes/ui/gameplay_modal_shell.tscn` (`%AwningHeader`). The shell
-  shows it for owners whose `header_style` is `AWNING`; Pause is currently the only one.
+  shows it for every owner whose `header_style` is `AWNING` (the default). The main-menu Settings,
+  Edit Profile, and Chest Rewards popups instance it directly in their panels, and the Shop
+  purchase-result and weekly leaderboard reward dialogs instance it inside a `HeaderSlot`.
 - Top-wide anchored to the outer panel: 16px wider than the panel on each side and 52px above its
   top edge, so it follows the panel's width and the shell's uniform safe-area scale. The plate's
   top sits 26px below the panel's top edge (header-local y 78), about 10px above the scallops'
@@ -2538,14 +2565,14 @@ Purpose:
 - Composes `scenes/ui/gameplay_modal_shell.tscn` (`Shell`) for the shared shade, outer panel, title
   (`PAUSE`), close button, content region, and action row (UI-003; see "Shared Gameplay UI Roles"
   above), instead of owning local shade/panel/close-button styling.
-- Sets `header_style = AWNING` on `Shell`, so the title appears on the shop-awning header
-  (`scenes/ui/modal_awning_header.tscn`) with the close button on the right end of its rail.
+- Its `Shell` uses the default `AWNING` header style, so the title appears on the shop-awning
+  header (`scenes/ui/modal_awning_header.tscn`) with the close button on the right end of its rail.
 - Owns music / sound-effects / vibration square icon buttons, their crossed-out toggle visuals
   (now scene-authored `CrossOut` children, not only created at runtime -- see "Important nodes"),
   and `Leave` / `Continue` buttons.
 
 Important nodes:
-- `Shell`: the shared modal shell instance, with `header_style = AWNING`.
+- `Shell`: the shared modal shell instance (default `AWNING` header style).
 - `SettingsContent`: reparented into `Shell`'s compact 224px content region at `_ready()`; holds
   `InnerTitleLabel` (`SETTINGS`) and `IconRow`; the row starts at y=64 to keep the icons close to
   the inner title.

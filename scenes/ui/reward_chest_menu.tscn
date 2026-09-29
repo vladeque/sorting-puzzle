@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://borxe8m7bwoqf" path="res://assets/ui/level_button_blank_new.png" id="6_continue_button"]
 [ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="7_press_scale_button"]
 [ext_resource type="Shader" uid="uid://c71yjdn13xeka" path="res://assets/ui/rounded_texture_clip.gdshader" id="8_rounded_texture"]
+[ext_resource type="PackedScene" uid="uid://yeagixqgwwfq" path="res://scenes/ui/modal_awning_header.tscn" id="90_awning_header"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_outer_panel"]
 bg_color = Color(0.67, 0.32, 0.22, 1)
@@ -167,45 +168,29 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -320.0
-offset_top = -430.0
-offset_right = 320.0
+offset_left = -300.0
+offset_top = -446.0
+offset_right = 300.0
 offset_bottom = 470.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_outer_panel")
 
-[node name="TitleLabel" type="Label" parent="RewardChestPanel" unique_id=1178061668]
+[node name="AwningHeader" parent="RewardChestPanel" instance=ExtResource("90_awning_header")]
 layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_left = 46.0
-offset_top = 20.0
-offset_right = -46.0
-offset_bottom = 82.0
-grow_horizontal = 2
-theme_type_variation = &"GameTitleLabel"
-theme_override_colors/font_color = Color(1, 0.95, 0.78, 1)
-theme_override_colors/font_shadow_color = Color(0.16, 0.04, 0.02, 0.92)
-theme_override_constants/shadow_offset_x = 0
-theme_override_constants/shadow_offset_y = 3
-theme_override_font_sizes/font_size = 42
-text = "CHEST REWARDS"
-horizontal_alignment = 1
-vertical_alignment = 1
+title_text = "CHEST REWARDS"
 
 [node name="CloseButton" type="Button" parent="RewardChestPanel" unique_id=2103606342]
-unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -54.0
-offset_top = -18.0
-offset_right = 18.0
-offset_bottom = 54.0
+offset_left = -28.0
+offset_top = -76.0
+offset_right = 44.0
+offset_bottom = -4.0
 grow_horizontal = 0
-grow_vertical = 0
+unique_name_in_owner = true
 focus_mode = 0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
@@ -224,7 +209,7 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 28.0
-offset_top = 94.0
+offset_top = 110.0
 offset_right = -28.0
 offset_bottom = -120.0
 grow_horizontal = 2

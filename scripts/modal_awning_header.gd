@@ -61,6 +61,20 @@ class_name ModalAwningHeader
 		_redraw_canopy()
 @export var title_regular_font_size := 42
 @export var title_long_font_size := 36
+## Plate title for scenes that author it directly; GameplayModalShell sets it through set_title().
+@export var title_text := "TITLE":
+	set(value):
+		title_text = value
+		_apply_title()
+## Selects the smaller long-title size so wide titles keep the plate inside the awning.
+@export var use_long_title_size := false:
+	set(value):
+		use_long_title_size = value
+		_apply_title()
+## Titles that still overflow (translations, product names) shrink toward this size until the plate
+## fits within the header width minus `plate_side_margin` on each side.
+@export var title_min_font_size := 28
+@export var plate_side_margin := 40.0
 
 @onready var _canopy := $Canopy as Control
 @onready var _title_label := %PlateLabel as Label
@@ -69,19 +83,39 @@ class_name ModalAwningHeader
 func _ready() -> void:
 	_canopy.draw.connect(_draw_canopy)
 	_canopy.resized.connect(_canopy.queue_redraw)
+	# The fit depends on the header width, which is only known once the owner lays it out.
+	resized.connect(_apply_title)
+	_apply_title()
 
 
 ## Sets the plate's title; long titles use the smaller size so the plate stays inside the awning.
 func set_title(title: String, is_long_title: bool = false) -> void:
-	_title_label.text = title
-	_title_label.add_theme_font_size_override(
-		"font_size",
-		title_long_font_size if is_long_title else title_regular_font_size
-	)
+	title_text = title
+	use_long_title_size = is_long_title
 
 
 func get_title() -> String:
-	return _title_label.text
+	return title_text
+
+
+## Exported setters also run while the scene loads, before `_title_label` is resolved.
+func _apply_title() -> void:
+	if _title_label == null:
+		return
+	_title_label.text = title_text
+	var font_size := title_long_font_size if use_long_title_size else title_regular_font_size
+	var font := _title_label.get_theme_font("font")
+	var plate_style := (%TitlePlate as Control).get_theme_stylebox("panel")
+	var chrome_width := plate_style.get_margin(SIDE_LEFT) + plate_style.get_margin(SIDE_RIGHT)
+	var max_text_width := size.x - plate_side_margin * 2.0 - chrome_width
+	if font != null and max_text_width > 0.0:
+		while (
+			font_size > title_min_font_size
+			and font.get_string_size(_title_label.atr(title_text), HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
+				> max_text_width
+		):
+			font_size -= 1
+	_title_label.add_theme_font_size_override("font_size", font_size)
 
 
 ## Exported setters also run while the scene loads, before `_canopy` is resolved.

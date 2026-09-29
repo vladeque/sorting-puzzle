@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/level_button.tscn" id="2_level_button"]
 [ext_resource type="PackedScene" path="res://scenes/ui/profile_avatar_view.tscn" id="3_avatar_view"]
 [ext_resource type="Texture2D" path="res://assets/ui/pencil_icon.png" id="4_pencil_icon"]
+[ext_resource type="PackedScene" uid="uid://yeagixqgwwfq" path="res://scenes/ui/modal_awning_header.tscn" id="90_awning_header"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_outer_panel"]
 bg_color = Color(0.67, 0.32, 0.22, 1)
@@ -169,36 +170,21 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_outer_panel")
 
-[node name="TitleLabel" type="Label" parent="ProfileMenuPanel"]
-theme_type_variation = &"GameTitleLabel"
+[node name="AwningHeader" parent="ProfileMenuPanel" instance=ExtResource("90_awning_header")]
 layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_left = 56.0
-offset_top = 18.0
-offset_right = -56.0
-offset_bottom = 82.0
-grow_horizontal = 2
-theme_override_colors/font_color = Color(1, 0.95, 0.78, 1)
-theme_override_colors/font_shadow_color = Color(0.16, 0.04, 0.02, 0.92)
-theme_override_constants/shadow_offset_y = 3
-theme_override_font_sizes/font_size = 40
-text = "EDIT PROFILE"
-horizontal_alignment = 1
-vertical_alignment = 1
+title_text = "EDIT PROFILE"
 
 [node name="CloseButton" type="Button" parent="ProfileMenuPanel"]
-unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -54.0
-offset_top = -18.0
-offset_right = 18.0
-offset_bottom = 54.0
+offset_left = -28.0
+offset_top = -76.0
+offset_right = 44.0
+offset_bottom = -4.0
 grow_horizontal = 0
-grow_vertical = 0
+unique_name_in_owner = true
 focus_mode = 0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.32, 0.02, 0.02, 1)
@@ -214,9 +200,9 @@ layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
 offset_left = 36.0
-offset_top = 96.0
+offset_top = 112.0
 offset_right = -36.0
-offset_bottom = 252.0
+offset_bottom = 268.0
 grow_horizontal = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_card")
 
@@ -324,7 +310,7 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 36.0
-offset_top = 272.0
+offset_top = 288.0
 offset_right = -36.0
 offset_bottom = -126.0
 grow_horizontal = 2

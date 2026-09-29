@@ -2,8 +2,9 @@ extends Control
 class_name ShopPurchaseDialog
 
 const UIMotionScript := preload("res://scripts/ui_motion.gd")
+const ModalAwningHeaderScript := preload("res://scripts/modal_awning_header.gd")
 
-@onready var _title_label := %TitleLabel as Label
+@onready var _header := %AwningHeader as ModalAwningHeaderScript
 @onready var _message_label := %MessageLabel as Label
 @onready var _close_button := %CloseButton as Button
 
@@ -13,7 +14,7 @@ func _ready() -> void:
 
 
 func show_result(title: String, message: String, button_text: String = "Continue") -> void:
-	_title_label.text = title.to_upper()
+	_header.set_title(title.to_upper())
 	_message_label.text = message
 	_close_button.text = button_text
 	UIMotionScript.fade_in(self)
