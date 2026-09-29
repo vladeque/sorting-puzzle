@@ -28,20 +28,20 @@ corner_radius_bottom_left = 2
 content_margin_left = 34.0
 content_margin_top = 2.0
 content_margin_right = 34.0
-content_margin_bottom = 8.0
+content_margin_bottom = 5.0
 bg_color = Color(0.992, 0.945, 0.84, 1)
 border_width_left = 4
 border_width_top = 4
 border_width_right = 4
-border_width_bottom = 8
+border_width_bottom = 5
 border_color = Color(0.42, 0.165, 0.086, 1)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
-shadow_color = Color(0, 0, 0, 0.32)
-shadow_size = 8
-shadow_offset = Vector2(0, 5)
+shadow_color = Color(0, 0, 0, 0.24)
+shadow_size = 4
+shadow_offset = Vector2(0, 3)
 
 [node name="ModalAwningHeader" type="Control" unique_id=1415016966]
 layout_mode = 3

@@ -2390,7 +2390,7 @@ Purpose:
 
 Important nodes:
 - `%TitlePlate`: centered `PanelContainer` (minimum 230x64) that grows in both directions with the
-  title; cream fill, dark-brown border with a thicker 8px bottom lip, soft drop shadow.
+  title; cream fill, dark-brown border with a slightly thicker 5px bottom lip, light 3px drop shadow.
 - `Canopy`: full-rect `Control` the root script draws onto through its `draw` signal: stripes, the
   under-rail shade, scallops, and canopy side outlines. Stripe count, colors, outline, canopy
   edges, and perspective insets are exported on the root script.
