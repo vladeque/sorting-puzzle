@@ -2347,9 +2347,8 @@ Important nodes:
   `%TitleLabel` when the owner sets the shell's `header_style` to `AWNING`. `configure()` titles
   both, so owners never reach into either.
 - `%CloseButton`: true-circular red close (72px, radius 36), `press_scale_button.gd` (0.97 held scale).
-  Overhangs the panel's top-right corner by default; under the awning it re-anchors to the top-left
-  and sits on the left end of the rail (top-left offset `-44, -76`), still drawing above the
-  header.
+  Overhangs the panel's top-right corner by default; under the awning it moves up onto the right
+  end of the rail (offset `-28, -76` from the top-right anchor), still drawing above the header.
 - `%ContentRegion`: cream `Panel`, `style_box_gameplay_modal_inner_panel.tres`; owning scenes
   reparent their own content here.
 - `%ActionRow`: `HBoxContainer`; owning scenes reparent their own action buttons here.
@@ -2540,7 +2539,7 @@ Purpose:
   (`PAUSE`), close button, content region, and action row (UI-003; see "Shared Gameplay UI Roles"
   above), instead of owning local shade/panel/close-button styling.
 - Sets `header_style = AWNING` on `Shell`, so the title appears on the shop-awning header
-  (`scenes/ui/modal_awning_header.tscn`) with the close button on the left end of its rail.
+  (`scenes/ui/modal_awning_header.tscn`) with the close button on the right end of its rail.
 - Owns music / sound-effects / vibration square icon buttons, their crossed-out toggle visuals
   (now scene-authored `CrossOut` children, not only created at runtime -- see "Important nodes"),
   and `Leave` / `Continue` buttons.

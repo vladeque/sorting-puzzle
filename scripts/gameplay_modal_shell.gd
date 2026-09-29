@@ -19,7 +19,7 @@ signal closed
 
 ## Title treatment. TITLE is the plain title label on the panel. AWNING swaps in the striped
 ## shop-awning header (scenes/ui/modal_awning_header.tscn) and moves the close button up onto the
-## left end of the awning's rail. Owning scenes pick a style by overriding this on their Shell
+## right end of the awning's rail. Owning scenes pick a style by overriding this on their Shell
 ## instance.
 enum HeaderStyle { TITLE, AWNING }
 
@@ -31,9 +31,9 @@ const POP_START_SCALE := 0.90
 const POP_OVERSHOOT_SCALE := 1.02
 const POP_RISE_SECONDS := 0.22
 const POP_SETTLE_SECONDS := 0.12
-## Close-button top-left offset from the panel's top-left corner under the awning header: the
-## button sits on the left end of the rail, where the awning starts.
-const AWNING_CLOSE_BUTTON_OFFSET := Vector2(-44.0, -76.0)
+## Close-button top-left offset from the panel's top-right corner under the awning header: the
+## button sits on the right end of the rail.
+const AWNING_CLOSE_BUTTON_OFFSET := Vector2(-28.0, -76.0)
 
 @export var header_style := HeaderStyle.TITLE
 
@@ -73,8 +73,8 @@ func _apply_header_style() -> void:
 	if not uses_awning:
 		return
 
-	_close_button.anchor_left = 0.0
-	_close_button.anchor_right = 0.0
+	_close_button.anchor_left = 1.0
+	_close_button.anchor_right = 1.0
 	_close_button.offset_left = AWNING_CLOSE_BUTTON_OFFSET.x
 	_close_button.offset_top = AWNING_CLOSE_BUTTON_OFFSET.y
 	_close_button.offset_right = AWNING_CLOSE_BUTTON_OFFSET.x + GameplayUIThemeScript.CLOSE_BUTTON_SIZE.x

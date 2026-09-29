@@ -3409,8 +3409,8 @@ Purpose:
 Exported properties:
 - `header_style` (`HeaderStyle.TITLE` default, or `HeaderStyle.AWNING`): owners override it on
   their `Shell` instance. `_ready()` shows either `%TitleLabel` or the `%AwningHeader`
-  (`scripts/modal_awning_header.gd`) and, for the awning, re-anchors `%CloseButton` to the panel's
-  top-left and places it at `AWNING_CLOSE_BUTTON_OFFSET` (`-44, -76`), on the left end of the rail.
+  (`scripts/modal_awning_header.gd`) and, for the awning, moves `%CloseButton` to
+  `AWNING_CLOSE_BUTTON_OFFSET` (`-28, -76` from the top-right anchor), on the right end of the rail.
   Pause is the only owner on `AWNING` so far.
 
 Key methods:

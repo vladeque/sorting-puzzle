@@ -83,10 +83,14 @@ func _test_pause_uses_awning() -> void:
 			"%s must not swallow taps meant for the close button." % node.name
 		)
 	_check(
-		is_zero_approx(close_button.anchor_left)
-			and is_equal_approx(close_button.offset_left, -44.0)
+		is_equal_approx(close_button.anchor_left, 1.0)
+			and is_equal_approx(close_button.offset_left, -28.0)
 			and is_equal_approx(close_button.offset_top, -76.0),
-		"The close button moves up onto the left end of the rail."
+		"The close button moves up onto the right end of the rail."
+	)
+	_check(
+		close_button.get_global_rect().get_center().x > outer_panel.get_global_rect().end.x - 36.0,
+		"The close button sits at the panel's top-right corner."
 	)
 	_check(
 		close_button.get_global_rect().intersects(rail.get_global_rect()),
