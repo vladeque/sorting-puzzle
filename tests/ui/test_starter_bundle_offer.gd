@@ -92,11 +92,22 @@ func _test_availability_states() -> void:
 	var modal := menu.get_node("%StarterBundleOfferModal") as Control
 	modal.call("set_offer", priced_offer)
 	_check(not (modal.get_node("%FreezerReward") as Control).visible, "Zero-count ability is omitted.")
-	_check(not (modal.get_node("%DiscountLabel") as Control).visible, "Absent discount is omitted.")
+	_check((modal.get_node("%LanternReward") as Control).visible, "Positive-count ability is shown.")
+	_check(not (modal.get_node("%DiscountBadge") as Control).visible, "Absent discount is omitted.")
 	_check(
-		(modal.get_node("%BuyButton") as Button).text == "Buy for $4.99",
+		not (modal.get_node("%CompareAtPriceLabel") as Control).visible,
+		"Absent compare price is omitted from the Buy button."
+	)
+	_check(
+		(modal.get_node("%BuyPriceLabel") as Label).text == "Buy for $4.99",
 		"Modal binds the formatted catalog price."
 	)
+	_check(
+		str(modal.get_node("%CoinRibbon").call("get_text")) == "1,000 COINS",
+		"The hero ribbon carries the offer's coin amount."
+	)
+	_check((modal.get_node("%OneTimeBadge") as Control).visible, "The one-time offer badge is shown.")
+	await _test_modal_states(modal, priced_offer)
 	current_scene = null
 	menu.queue_free()
 	await process_frame
@@ -152,7 +163,23 @@ func _test_one_time_purchase(progress: Node) -> void:
 			"Offer modal stays horizontally inside %s." % resolution
 		)
 	root.size = Vector2i(720, 1280)
-	await process_frame
+	for _frame in range(2):
+		await process_frame
+	var discount_badge := modal.get_node("%DiscountBadge") as Control
+	_check(discount_badge.visible, "The local discounted offer pins its discount tag.")
+	_check(
+		discount_badge.get_global_rect().end.x <= outer.get_global_rect().end.x,
+		"The discount tag stays inside the panel's right edge."
+	)
+	_check(
+		(modal.get_node("%CompareAtPriceLabel") as Control).visible,
+		"The local offer's compare price is shown on the Buy button."
+	)
+	var ability_row := modal.get_node("%AbilityRow") as Control
+	_check(
+		absf(ability_row.get_global_rect().get_center().x - outer.get_global_rect().get_center().x) < 2.0,
+		"Booster chips are centered in the panel."
+	)
 	var buy_button := modal.get_node("%BuyButton") as Button
 	buy_button.pressed.emit()
 	buy_button.pressed.emit()
@@ -160,7 +187,20 @@ func _test_one_time_purchase(progress: Node) -> void:
 	_check(progress.has_purchased_shop_offer(&"starter_bundle"), "Purchase records the lifetime claim.")
 	_check(progress.get_coins() == starting_coins + 1000, "Duplicate Buy taps grant shown coins once.")
 	_check(not badge.visible, "Badge disappears immediately after purchase.")
-	_check((modal.get_node("%ContinueButton") as Button).visible, "Modal shows purchase success.")
+	var continue_button := modal.get_node("%ContinueButton") as Button
+	_check(continue_button.visible, "Modal shows purchase success.")
+	await process_frame
+	var status_pill := modal.get_node("%StatusPill") as Control
+	_check(status_pill.visible, "Purchase success shows the status pill.")
+	_check(
+		status_pill.get_global_rect().end.y <= continue_button.get_global_rect().position.y + 1.0,
+		"The status pill sits above the Continue button."
+	)
+	var chip_row_bottom := (modal.get_node("%AbilityRow") as Control).get_global_rect().end.y
+	_check(
+		chip_row_bottom <= status_pill.get_global_rect().position.y + 1.0,
+		"The status pill does not cover the booster names."
+	)
 
 	var store := STORE_SERVICE_SCRIPT.new()
 	_check(
@@ -178,6 +218,58 @@ func _test_one_time_purchase(progress: Node) -> void:
 	_check(progress.get_coins() == starting_coins + 1000, "Refused repeat adds no coins.")
 	current_scene = null
 	menu.queue_free()
+	await process_frame
+
+
+func _test_modal_states(modal: Control, offer: Dictionary) -> void:
+	var buy_button := modal.get_node("%BuyButton") as Button
+	var buy_label := modal.get_node("%BuyPriceLabel") as Label
+	var compare_label := modal.get_node("%CompareAtPriceLabel") as Label
+	var status_pill := modal.get_node("%StatusPill") as Control
+	var status_label := modal.get_node("%StatusLabel") as Label
+	var close_button := modal.get_node("%Shell").get_node("%CloseButton") as Button
+	var ribbon := modal.get_node("%CoinRibbon")
+	var hammer := modal.get_node("%HammerReward")
+	var freezer := modal.get_node("%FreezerReward")
+
+	var discounted := offer.duplicate(true)
+	discounted["discount_percent"] = 67
+	(discounted["store"] as Dictionary)["compare_at_formatted_price"] = "$14.99"
+	modal.call("set_offer", discounted)
+	_check((modal.get_node("%DiscountBadge") as Control).visible, "A loaded discount pins the tag.")
+	_check((modal.get_node("%PercentLabel") as Label).text == "67%", "The tag shows the loaded percent.")
+	_check(
+		compare_label.visible and compare_label.text == "$14.99",
+		"The Buy button shows the loaded compare price."
+	)
+	_check(not status_pill.visible, "A fresh offer shows no status.")
+
+	modal.call("set_busy", "Purchasing…")
+	_check(buy_button.disabled and buy_label.text == "Purchasing…", "Purchasing disables Buy.")
+	_check(not compare_label.visible, "The compare price steps aside while purchasing.")
+	_check(close_button.disabled, "Close is disabled while purchasing.")
+	_check(status_pill.visible and status_label.text == "Purchasing…", "Purchasing shows its status.")
+
+	modal.call("show_error", "The purchase could not be completed.", true)
+	_check(not buy_button.disabled and buy_label.text == "Try Again", "A retryable failure offers retry.")
+	_check(not close_button.disabled, "Close is available again after a failure.")
+	_check(
+		status_pill.visible and status_label.text == "The purchase could not be completed.",
+		"The failure message is shown in the status pill."
+	)
+
+	modal.call("show_success")
+	_check(str(ribbon.call("get_text")) == "+1,000 COINS", "Success restates the granted coins.")
+	_check(int(ribbon.get("tone")) == 1, "Success turns the ribbon green.")
+	_check(bool(hammer.call("is_claimed")), "Granted boosters show as claimed.")
+	_check(not freezer.visible and not bool(freezer.call("is_claimed")), "Absent boosters stay hidden.")
+	_check(not (modal.get_node("%DiscountBadge") as Control).visible, "Success removes the discount tag.")
+	_check(not (modal.get_node("%OneTimeBadge") as Control).visible, "Success removes the offer badge.")
+	_check((modal.get_node("%ContinueButton") as Control).visible, "Success offers Continue.")
+
+	modal.call("set_offer", offer)
+	_check(not bool(hammer.call("is_claimed")), "Reloading the offer clears the claimed state.")
+	_check(str(ribbon.call("get_text")) == "1,000 COINS", "Reloading the offer restores the ribbon.")
 	await process_frame
 
 

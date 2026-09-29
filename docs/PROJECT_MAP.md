@@ -197,7 +197,9 @@ Responsibility:
 - Advertises an eligible, priced Starter Bundle with `scenes/ui/main_menu_starter_bundle_badge.tscn`
   beside the reward chest. Its dedicated `starter_bundle_offer_modal.tscn` binds the catalog's
   actual rewards and regional price, then rechecks eligibility before the shared Shop purchase
-  flow. Backend cached catalogs never show this purchase prompt.
+  flow. Backend cached catalogs never show this purchase prompt. The modal's "shop window" layout
+  puts the coin pile on a sunburst stage (`assets/shaders/offer_sunburst.gdshader`) with an
+  `offer_ribbon_banner.tscn` amount ribbon and shows boosters as `offer_booster_chip.tscn` sockets.
 - Uses one shared interaction/motion system across Main Menu, Shop, Leaderboard, and Chapter
   Selection (UI-002): `scripts/press_scale_button.gd` (now tween-based, with an optional
   `visual_target_path` so art-only/full-cell hit targets can animate without shrinking their touch

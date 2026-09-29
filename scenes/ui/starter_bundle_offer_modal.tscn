@@ -2,25 +2,109 @@
 
 [ext_resource type="Script" path="res://scripts/starter_bundle_offer_modal.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/ui/gameplay_modal_shell.tscn" id="2_shell"]
-[ext_resource type="Texture2D" path="res://assets/ui/shop_coin_offers/shop_coin_offer_tier_06.png" id="3_coins"]
+[ext_resource type="Texture2D" path="res://assets/ui/shop_coin_offers/shop_coin_offer_tier_07.png" id="3_coins"]
 [ext_resource type="Texture2D" path="res://assets/abilities/ability_hammer.png" id="4_hammer"]
 [ext_resource type="Texture2D" path="res://assets/abilities/ability_shuffle.png" id="5_shuffle"]
 [ext_resource type="Texture2D" path="res://assets/abilities/ability_lantern.png" id="6_lantern"]
 [ext_resource type="Texture2D" path="res://assets/abilities/ice_clock_icon_256x256.png" id="7_freezer"]
 [ext_resource type="StyleBoxTexture" path="res://assets/themes/style_box_green_primary_button.tres" id="8_buy_style"]
 [ext_resource type="Script" path="res://scripts/press_scale_button.gd" id="9_press"]
+[ext_resource type="Shader" path="res://assets/shaders/offer_sunburst.gdshader" id="10_sunburst"]
+[ext_resource type="PackedScene" path="res://scenes/ui/offer_ribbon_banner.tscn" id="11_ribbon"]
+[ext_resource type="PackedScene" path="res://scenes/ui/offer_booster_chip.tscn" id="12_chip"]
+[ext_resource type="Texture2D" path="res://assets/ui/discount_badge_pinned.png" id="13_discount"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_reward"]
-bg_color = Color(1, 0.88, 0.62, 0.44)
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_sunburst"]
+shader = ExtResource("10_sunburst")
+shader_parameter/ray_speed = 0.06
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stage_frame"]
+draw_center = false
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.761, 0.478, 0.133, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_one_time"]
+content_margin_left = 12.0
+content_margin_top = 5.0
+content_margin_right = 12.0
+content_margin_bottom = 4.0
+bg_color = Color(0.478, 0.141, 0.063, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.73, 0.42, 0.15, 0.7)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
+border_color = Color(1, 0.824, 0.478, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0.275, 0.078, 0.02, 0.35)
+shadow_size = 1
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_status_busy"]
+content_margin_left = 16.0
+content_margin_top = 3.0
+content_margin_right = 16.0
+content_margin_bottom = 4.0
+bg_color = Color(1, 0.961, 0.863, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.788, 0.655, 0.478, 1)
+corner_radius_top_left = 17
+corner_radius_top_right = 17
+corner_radius_bottom_right = 17
+corner_radius_bottom_left = 17
+shadow_color = Color(0.353, 0.157, 0.078, 0.25)
+shadow_size = 1
+shadow_offset = Vector2(0, 2)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_status_error"]
+content_margin_left = 16.0
+content_margin_top = 3.0
+content_margin_right = 16.0
+content_margin_bottom = 4.0
+bg_color = Color(0.988, 0.89, 0.863, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.753, 0.157, 0.11, 1)
+corner_radius_top_left = 17
+corner_radius_top_right = 17
+corner_radius_bottom_right = 17
+corner_radius_bottom_left = 17
+shadow_color = Color(0.353, 0.078, 0.039, 0.3)
+shadow_size = 1
+shadow_offset = Vector2(0, 2)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_status_success"]
+content_margin_left = 16.0
+content_margin_top = 3.0
+content_margin_right = 16.0
+content_margin_bottom = 4.0
+bg_color = Color(0.89, 0.965, 0.855, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.239, 0.647, 0.208, 1)
+corner_radius_top_left = 17
+corner_radius_top_right = 17
+corner_radius_bottom_right = 17
+corner_radius_bottom_left = 17
+shadow_color = Color(0.078, 0.275, 0.059, 0.3)
+shadow_size = 1
+shadow_offset = Vector2(0, 2)
 
 [node name="StarterBundleOfferModal" type="Control"]
 visible = false
@@ -31,6 +115,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_script")
+status_busy_style = SubResource("StyleBoxFlat_status_busy")
+status_error_style = SubResource("StyleBoxFlat_status_error")
+status_success_style = SubResource("StyleBoxFlat_status_success")
 
 [node name="Shell" parent="." instance=ExtResource("2_shell")]
 unique_name_in_owner = true
@@ -42,232 +129,323 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 14.0
+offset_left = 10.0
 offset_top = 10.0
-offset_right = -14.0
-offset_bottom = -8.0
+offset_right = -10.0
+offset_bottom = -10.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 8
-
-[node name="CoinReward" type="PanelContainer" parent="OfferContent"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 100)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_reward")
-
-[node name="CoinRow" type="HBoxContainer" parent="OfferContent/CoinReward"]
-layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 10
-alignment = 1
 
-[node name="CoinArt" type="TextureRect" parent="OfferContent/CoinReward/CoinRow"]
-custom_minimum_size = Vector2(92, 86)
+[node name="HeroStage" type="Control" parent="OfferContent"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(408, 262)
 layout_mode = 2
+mouse_filter = 2
+
+[node name="Sunburst" type="ColorRect" parent="OfferContent/HeroStage"]
+material = SubResource("ShaderMaterial_sunburst")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="StageFrame" type="Panel" parent="OfferContent/HeroStage"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_stage_frame")
+
+[node name="CoinArt" type="TextureRect" parent="OfferContent/HeroStage"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 92.0
+offset_top = 4.0
+offset_right = 316.0
+offset_bottom = 228.0
 mouse_filter = 2
 texture = ExtResource("3_coins")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="CoinCount" type="Label" parent="OfferContent/CoinReward/CoinRow"]
+[node name="OneTimeBadge" type="PanelContainer" parent="OfferContent/HeroStage"]
 unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_type_variation = &"GameNumberLabel"
-theme_override_colors/font_color = Color(0.44, 0.13, 0.09, 1)
-theme_override_font_sizes/font_size = 32
-text = "1,000 COINS"
-vertical_alignment = 1
+layout_mode = 0
+offset_left = 10.0
+offset_top = 14.0
+offset_right = 150.0
+offset_bottom = 44.0
+rotation = -0.10471976
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_one_time")
 
-[node name="AbilityHeader" type="Label" parent="OfferContent"]
+[node name="OneTimeLabel" type="Label" parent="OfferContent/HeroStage/OneTimeBadge"]
 layout_mode = 2
 theme_type_variation = &"GameSectionLabel"
-theme_override_colors/font_color = Color(0.47, 0.15, 0.09, 1)
-theme_override_font_sizes/font_size = 25
-text = "BOOSTERS INCLUDED"
+theme_override_colors/font_color = Color(1, 0.878, 0.541, 1)
+theme_override_font_sizes/font_size = 16
+text = "ONE-TIME OFFER"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CoinRibbon" parent="OfferContent/HeroStage" instance=ExtResource("11_ribbon")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 26.0
+offset_top = 228.0
+offset_right = 382.0
+offset_bottom = 298.0
+
+[node name="DiscountBadge" type="Control" parent="OfferContent/HeroStage"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 338.0
+offset_top = -28.0
+offset_right = 442.0
+offset_bottom = 114.0
+rotation = 0.17453292
+pivot_offset = Vector2(52, 71)
+mouse_filter = 2
+
+[node name="BadgeTexture" type="TextureRect" parent="OfferContent/HeroStage/DiscountBadge"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("13_discount")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TextStack" type="VBoxContainer" parent="OfferContent/HeroStage/DiscountBadge"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 46.0
+offset_right = -8.0
+offset_bottom = -14.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = -6
+alignment = 1
+
+[node name="PercentLabel" type="Label" parent="OfferContent/HeroStage/DiscountBadge/TextStack"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"GameNumberLabel"
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.431, 0.055, 0.024, 1)
+theme_override_colors/font_shadow_color = Color(0.431, 0.055, 0.024, 1)
+theme_override_constants/outline_size = 6
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 3
+theme_override_constants/shadow_outline_size = 6
+theme_override_font_sizes/font_size = 32
+text = "67%"
 horizontal_alignment = 1
 
-[node name="AbilityGrid" type="GridContainer" parent="OfferContent"]
+[node name="OffLabel" type="Label" parent="OfferContent/HeroStage/DiscountBadge/TextStack"]
 layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/h_separation = 8
-theme_override_constants/v_separation = 7
-columns = 2
-
-[node name="HammerReward" type="PanelContainer" parent="OfferContent/AbilityGrid"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(188, 63)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_reward")
-
-[node name="Row" type="HBoxContainer" parent="OfferContent/AbilityGrid/HammerReward"]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="Icon" type="TextureRect" parent="OfferContent/AbilityGrid/HammerReward/Row"]
-custom_minimum_size = Vector2(56, 56)
-layout_mode = 2
-mouse_filter = 2
-texture = ExtResource("4_hammer")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="HammerCount" type="Label" parent="OfferContent/AbilityGrid/HammerReward/Row"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.43, 0.13, 0.08, 1)
-theme_override_font_sizes/font_size = 23
-text = "×3 Hammer"
-vertical_alignment = 1
-
-[node name="ShuffleReward" type="PanelContainer" parent="OfferContent/AbilityGrid"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(188, 63)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_reward")
-
-[node name="Row" type="HBoxContainer" parent="OfferContent/AbilityGrid/ShuffleReward"]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="Icon" type="TextureRect" parent="OfferContent/AbilityGrid/ShuffleReward/Row"]
-custom_minimum_size = Vector2(56, 56)
-layout_mode = 2
-mouse_filter = 2
-texture = ExtResource("5_shuffle")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="ShuffleCount" type="Label" parent="OfferContent/AbilityGrid/ShuffleReward/Row"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.43, 0.13, 0.08, 1)
-theme_override_font_sizes/font_size = 23
-text = "×3 Shuffle"
-vertical_alignment = 1
-
-[node name="LanternReward" type="PanelContainer" parent="OfferContent/AbilityGrid"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(188, 63)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_reward")
-
-[node name="Row" type="HBoxContainer" parent="OfferContent/AbilityGrid/LanternReward"]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="Icon" type="TextureRect" parent="OfferContent/AbilityGrid/LanternReward/Row"]
-custom_minimum_size = Vector2(56, 56)
-layout_mode = 2
-mouse_filter = 2
-texture = ExtResource("6_lantern")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="LanternCount" type="Label" parent="OfferContent/AbilityGrid/LanternReward/Row"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.43, 0.13, 0.08, 1)
-theme_override_font_sizes/font_size = 23
-text = "×3 Lantern"
-vertical_alignment = 1
-
-[node name="FreezerReward" type="PanelContainer" parent="OfferContent/AbilityGrid"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(188, 63)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_reward")
-
-[node name="Row" type="HBoxContainer" parent="OfferContent/AbilityGrid/FreezerReward"]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="Icon" type="TextureRect" parent="OfferContent/AbilityGrid/FreezerReward/Row"]
-custom_minimum_size = Vector2(56, 56)
-layout_mode = 2
-mouse_filter = 2
-texture = ExtResource("7_freezer")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="FreezerCount" type="Label" parent="OfferContent/AbilityGrid/FreezerReward/Row"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.43, 0.13, 0.08, 1)
-theme_override_font_sizes/font_size = 23
-text = "×3 Freezer"
-vertical_alignment = 1
-
-[node name="PriceDetails" type="HBoxContainer" parent="OfferContent"]
-layout_mode = 2
-alignment = 1
-theme_override_constants/separation = 8
-
-[node name="DiscountLabel" type="Label" parent="OfferContent/PriceDetails"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-theme_override_colors/font_color = Color(0.68, 0.12, 0.1, 1)
+theme_type_variation = &"GameSectionLabel"
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.431, 0.055, 0.024, 1)
+theme_override_colors/font_shadow_color = Color(0.431, 0.055, 0.024, 1)
+theme_override_constants/outline_size = 6
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 3
+theme_override_constants/shadow_outline_size = 6
 theme_override_font_sizes/font_size = 22
-text = "67% OFF"
+text = "OFF"
+horizontal_alignment = 1
 
-[node name="CompareAtPriceLabel" type="RichTextLabel" parent="OfferContent/PriceDetails"]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(120, 29)
+[node name="HeaderSpacer" type="Control" parent="OfferContent"]
+custom_minimum_size = Vector2(0, 16)
 layout_mode = 2
 mouse_filter = 2
-theme_override_colors/default_color = Color(0.44, 0.2, 0.16, 1)
-theme_override_font_sizes/normal_font_size = 20
-bbcode_enabled = true
-text = "[s]$14.99[/s]"
-fit_content = true
-scroll_active = false
 
-[node name="StatusLabel" type="Label" parent="OfferContent"]
+[node name="AbilityHeader" type="HBoxContainer" parent="OfferContent"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 42)
+custom_minimum_size = Vector2(0, 26)
 layout_mode = 2
-size_flags_vertical = 3
-theme_override_colors/font_color = Color(0.63, 0.12, 0.09, 1)
-theme_override_font_sizes/font_size = 19
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="LeftRule" type="ColorRect" parent="OfferContent/AbilityHeader"]
+custom_minimum_size = Vector2(0, 3)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+color = Color(0.478, 0.165, 0.078, 0.25)
+
+[node name="AbilityHeaderLabel" type="Label" parent="OfferContent/AbilityHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"GameSectionLabel"
+theme_override_colors/font_color = Color(0.478, 0.165, 0.078, 1)
+theme_override_font_sizes/font_size = 20
+text = "BOOSTERS INCLUDED"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RightRule" type="ColorRect" parent="OfferContent/AbilityHeader"]
+custom_minimum_size = Vector2(0, 3)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+color = Color(0.478, 0.165, 0.078, 0.25)
+
+[node name="AbilityRow" type="HBoxContainer" parent="OfferContent"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="HammerReward" parent="OfferContent/AbilityRow" instance=ExtResource("12_chip")]
+unique_name_in_owner = true
+layout_mode = 2
+icon = ExtResource("4_hammer")
+title = "Hammer"
+
+[node name="ShuffleReward" parent="OfferContent/AbilityRow" instance=ExtResource("12_chip")]
+unique_name_in_owner = true
+layout_mode = 2
+icon = ExtResource("5_shuffle")
+title = "Shuffle"
+
+[node name="LanternReward" parent="OfferContent/AbilityRow" instance=ExtResource("12_chip")]
+unique_name_in_owner = true
+layout_mode = 2
+icon = ExtResource("6_lantern")
+title = "Lantern"
+
+[node name="FreezerReward" parent="OfferContent/AbilityRow" instance=ExtResource("12_chip")]
+unique_name_in_owner = true
+layout_mode = 2
+icon = ExtResource("7_freezer")
+title = "Freezer"
+
+[node name="StatusPill" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -170.0
+offset_top = -20.0
+offset_right = 170.0
+offset_bottom = 14.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_status_busy")
+
+[node name="StatusLabel" type="Label" parent="StatusPill"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"GameSmallLabel"
+theme_override_colors/font_color = Color(0.42, 0.29, 0.188, 1)
+theme_override_font_sizes/font_size = 16
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 
 [node name="BuyButton" type="Button" parent="."]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(310, 76)
+custom_minimum_size = Vector2(360, 84)
 layout_mode = 2
 focus_mode = 0
 mouse_default_cursor_shape = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_outline_color = Color(0.03, 0.25, 0.04, 0.95)
-theme_override_constants/outline_size = 3
-theme_override_font_sizes/font_size = 28
 theme_override_styles/normal = ExtResource("8_buy_style")
 theme_override_styles/pressed = ExtResource("8_buy_style")
 theme_override_styles/hover = ExtResource("8_buy_style")
 theme_override_styles/disabled = ExtResource("8_buy_style")
-text = "Buy"
 script = ExtResource("9_press")
 held_scale = 0.94
+
+[node name="BuyText" type="VBoxContainer" parent="BuyButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = -8
+alignment = 1
+
+[node name="CompareAtPriceLabel" type="Label" parent="BuyButton/BuyText"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+theme_type_variation = &"GameNumberLabel"
+theme_override_colors/font_color = Color(0.9, 1, 0.86, 1)
+theme_override_colors/font_outline_color = Color(0.03, 0.25, 0.04, 0.95)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 21
+text = "$14.99"
+horizontal_alignment = 1
+
+[node name="StrikeLine" type="ColorRect" parent="BuyButton/BuyText/CompareAtPriceLabel"]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -4.0
+offset_top = -2.0
+offset_right = 4.0
+offset_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.722, 0.114, 0.071, 1)
+
+[node name="BuyPriceLabel" type="Label" parent="BuyButton/BuyText"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"GameNumberLabel"
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.03, 0.25, 0.04, 0.95)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 30
+text = "Buy"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="ContinueButton" type="Button" parent="."]
 unique_name_in_owner = true
 visible = false
-custom_minimum_size = Vector2(310, 76)
+custom_minimum_size = Vector2(360, 84)
 layout_mode = 2
 focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.03, 0.25, 0.04, 0.95)
-theme_override_constants/outline_size = 3
-theme_override_font_sizes/font_size = 28
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 30
 theme_override_styles/normal = ExtResource("8_buy_style")
 theme_override_styles/pressed = ExtResource("8_buy_style")
 theme_override_styles/hover = ExtResource("8_buy_style")

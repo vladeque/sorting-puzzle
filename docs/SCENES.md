@@ -467,11 +467,43 @@ Do not use for:
 
 ## `scenes/ui/starter_bundle_offer_modal.tscn`
 
-- Composes `gameplay_modal_shell.tscn` for shade, title, close action, and safe-area fitting.
+- Composes `gameplay_modal_shell.tscn` for shade, title, close action, and safe-area fitting, at a
+  734px panel with a 484px content region (the "shop window" layout, direction B of the 2026-09-29
+  redesign study).
+- `%HeroStage`: a 408x262 sunburst stage (`Sunburst` `ColorRect` with
+  `assets/shaders/offer_sunburst.gdshader`, slowly turning rays; `StageFrame` gold border) holding
+  the large `shop_coin_offer_tier_07.png` coin pile, the `%OneTimeBadge` pill, the `%CoinRibbon`
+  (`offer_ribbon_banner.tscn`) with the coin amount across the stage's bottom edge, and the
+  `%DiscountBadge` tag pinned over the stage's top-right corner.
+- `%AbilityHeader` and `%AbilityRow`: one `offer_booster_chip.tscn` per booster
+  (`%HammerReward`, `%ShuffleReward`, `%LanternReward`, `%FreezerReward`). The row is centered, so
+  the backend's three-booster bundle stays balanced.
+- `%BuyButton` has an empty text; its `BuyText` stack shows `%CompareAtPriceLabel` (crossed out by
+  a `StrikeLine`) above `%BuyPriceLabel`. `%StatusPill` is reparented onto the content region's
+  bottom edge, just above the action row, and appears only for checking/purchasing, failure, and
+  success messages, so no empty space is reserved for status text.
 - Binds the current offer's coin and positive-count ability rewards, formatted price, optional
   discount and compare price. Zero-count abilities and absent promotional fields stay hidden.
-- Emits Buy/Close intent and owns checking, purchasing, failure, and success presentation. The
-  Main Menu rechecks live eligibility before executing the purchase and passes the result back.
+- Emits Buy/Close intent and owns checking, purchasing, failure, and success presentation. Success
+  turns the ribbon green (`+1,000 COINS`), marks the granted chips claimed, and removes the tag and
+  one-time badge. The Main Menu rechecks live eligibility before executing the purchase and passes
+  the result back.
+- Capture setups: `scripts/tools/captures/starter_bundle_offer_setup.gd` (default) plus
+  `starter_bundle_offer_{purchasing,error,success,backend}_setup.gd` for each state and the
+  backend-shaped three-booster bundle with a long regional price.
+
+## `scenes/ui/offer_ribbon_banner.tscn`
+
+- Folded ribbon behind `%RibbonLabel`: a rounded band with notched tails that hang lower and tuck
+  behind it. `scripts/offer_ribbon_banner.gd` draws the shape to the node's size, switches between
+  the red `OFFER` and green `SUCCESS` tones, and shrinks long text to fit the band.
+
+## `scenes/ui/offer_booster_chip.tscn`
+
+- One offer booster reward: the ability icon in a dark round `Socket` like the level's ability bar,
+  a `%CountBadge` (`×3`) on the socket's corner, and `%NameLabel` beneath. Each instance authors its
+  `icon` and `title`; `set_count()` hides zero counts and `set_claimed()` swaps the badge for a
+  drawn green check and the name for `+3 Hammer`.
 
 ## `scenes/ui/chapter_selection_screen.tscn`
 
@@ -2372,6 +2404,8 @@ Important nodes:
   `%TitleLabel` when the owner sets the shell's `header_style` to `AWNING`. `configure()` titles
   both, so owners never reach into either.
 - `%CloseButton`: true-circular red close (72px, radius 36), `press_scale_button.gd` (0.97 held scale).
+  Its disabled state keeps the normal red style and white glyph, so an owner that disables it (the
+  Starter Bundle offer while purchasing) dims it with `modulate` instead of the theme's grey box.
   Overhangs the panel's top-right corner by default; under the awning it moves up onto the right
   end of the rail (offset `-28, -76` from the top-right anchor), still drawing above the header.
 - `%ContentRegion`: cream `Panel`, `style_box_gameplay_modal_inner_panel.tres`; owning scenes

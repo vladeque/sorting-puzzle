@@ -19,7 +19,16 @@ This file documents what each script owns. Keep script docs focused on responsib
   opens the offer modal, rechecks the live catalog before Buy, and updates the menu after purchase.
 - `scripts/main_menu_starter_bundle_badge.gd` forwards the badge button press.
 - `scripts/starter_bundle_offer_modal.gd` binds rewards/prices and owns modal states and intent
-  signals; it does not grant rewards.
+  signals; it does not grant rewards. It drives the hero ribbon tone, booster chips, discount tag,
+  one-time badge, the Buy button's compare/price lines, and the status pill's busy/error/success
+  styles (exported `status_*_style` StyleBoxes).
+- `scripts/offer_ribbon_banner.gd` (`OfferRibbonBanner`, `@tool`) draws the folded ribbon to its
+  size, owns the red offer and green success tones, and fits long ribbon text.
+- `scripts/offer_booster_chip.gd` (`OfferBoosterChip`) binds one booster's count, hides zero
+  counts, and draws the claimed check for the success state.
+- `assets/shaders/offer_sunburst.gdshader` paints the hero stage: radial base, rays (optional
+  `ray_speed` rotation), centre glow, twinkling sparkles, and a bottom lip, masked to the stage's
+  rounded corners using UV derivatives so it keeps its proportions at every panel scale.
 - `scripts/store/shop_purchase_flow.gd` runs the provider purchase and idempotent progress grant
   for both Shop and Main Menu, and plays feedback only for a newly applied grant.
 - `scripts/store/store_service.gd` enforces local lifetime limits and narrows backend mock Starter
