@@ -1208,6 +1208,9 @@ Contract:
 - `levels` maps all current Chapter 1 campaign levels 1-20 to exact opaque configuration, level,
   and rules versions.
 - `source.files` pins the authored Godot files used by that publication.
+- The generated development publication now includes the one-of-each chest ability rewards and
+  level 10's `throwing_dispensers` definition. Regenerate the candidate and this manifest together
+  after changing either source.
 - `configs/chapters.json` is included in the pinned source-file set so chapter membership changes
   invalidate stale provenance before export.
 - Runtime validates the packaged manifest's closed schema, self-digest, publication identity, and

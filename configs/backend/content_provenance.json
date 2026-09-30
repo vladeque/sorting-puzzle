@@ -2,15 +2,15 @@
   "schema_version": "1.0.0",
   "environment": "development",
   "publication": {
-    "configuration_version": "config_20c9f4ebb3a8ddb3337815b61295ac96c1e1ee2d5c2f7af050f0b6a308ddb131",
-    "digest_sha256": "20c9f4ebb3a8ddb3337815b61295ac96c1e1ee2d5c2f7af050f0b6a308ddb131",
-    "source_candidate_sha256": "c5b222bd12cb387e6cbcddba229f22abb220c2eb3bf94d47d5fdc7714a8728ea"
+    "configuration_version": "config_231beb828a95ce785678187e0056db128fd7e95ae85cf79dd13d46bf37bd9fbb",
+    "digest_sha256": "231beb828a95ce785678187e0056db128fd7e95ae85cf79dd13d46bf37bd9fbb",
+    "source_candidate_sha256": "5db022b595c4977a404138cb962ff4c8932ffe140efb8757c94c2ef937aa29a9"
   },
   "supported_campaign_levels": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
   "excluded_campaign_levels": [],
   "source": {
     "repository": "sorting-puzzle",
-    "commit": "4718f8754dc8f3a702c620b29e0964c4446ac03d",
+    "commit": "5e2970ec9a17eea404f435c517c7293c8af3704e",
     "files": [
       {
         "path": "configs/item_sprites.json",
@@ -34,79 +34,79 @@
       },
       {
         "path": "configs/reward_chest_goals.json",
-        "sha256": "deed7a9132d8ad0018915c8c31e643ee568d4b4bf83f601cb9dfc82bd548c0e2"
+        "sha256": "9d24d18a868934fe295c8b26716277af7681750d77cf99b3c2103f50539951b6"
       },
       {
         "path": "configs/level_templates/level_001.json",
-        "sha256": "eb093d41f675d96efe861da8bae7b7d85a6978845fcac6955dca8e53858d5501"
+        "sha256": "0821c1e18125a101438d6d4ac97c8db69d65988cf8373cd314e393005040ce18"
       },
       {
         "path": "configs/level_templates/level_002.json",
-        "sha256": "04ef35f64f6c05065e9a04088ec6a074170d6157619c4910eacded5e42168522"
+        "sha256": "c94971db357a1efeb2e7f3db66a9aa334836f69336830bbe9e00a5b0171ec839"
       },
       {
         "path": "configs/level_templates/level_003.json",
-        "sha256": "0198d1378f3c97ea0960e3a8aabcc6632bba8df2cb2df6ba41bb14dbe06cd353"
+        "sha256": "0c8ba19f467ca2d361d72ebec4992df92a44c5a13f141dd7c93394fe4084d2b4"
       },
       {
         "path": "configs/level_templates/level_004.json",
-        "sha256": "83a066eb62fcb6bd4c5e836a8ac30605830abe018ef71e74dc6a6df8ce058d88"
+        "sha256": "b5438c8f7069c0f76c848acfefaefb39a1152cf98722fc1c29ad4aeeaf15431f"
       },
       {
         "path": "configs/level_templates/level_005.json",
-        "sha256": "a3371b5d1713e1132c971e0a23f37b33a3f434b7f079f0717f50c4acf5dee03d"
+        "sha256": "e994ea4aebbbcff198a75b7e4763b9e4198efcd6e3197285dbe23e03ca66c829"
       },
       {
         "path": "configs/level_templates/level_006.json",
-        "sha256": "ca7945e6f94525090bd4d1cf0b063efb7720bce20c0d132dda1e7f61571b8045"
+        "sha256": "cf440b1c638b0fa667003546062fde451fa78329a10bef2345a9cbba10133bb3"
       },
       {
         "path": "configs/level_templates/level_007.json",
-        "sha256": "e522c8739f191643ea97f1b6f5f8a12dc66629f8a78d1b06d73d6378cf93535a"
+        "sha256": "71bd307c35ff8eb46f7559eaa0b4e7169f3e8d1a0958c709dd047d2d3cf4872e"
       },
       {
         "path": "configs/level_templates/level_008.json",
-        "sha256": "29a80dfb94c067e65d20261220a7e9391b2106acec951f011451cef5e9e577c4"
+        "sha256": "a77d2f6878b06fd73358d08f980ae22e6a1b119fdfd8c9310768deb655ba94fd"
       },
       {
         "path": "configs/level_templates/level_009.json",
-        "sha256": "ab7af9efd1d4d075271d67fa603dd925c8070c9f2c0efcc1fa48b4cbeb447846"
+        "sha256": "4366c890faad9074d17a3a85baad74946163f3b5247ee2cc274d32d70c60c2a0"
       },
       {
         "path": "configs/level_templates/level_011.json",
-        "sha256": "8b839b2bd330dae6c2145410789a8737ad66f54b4aaf4714c717556f9b208d0e"
+        "sha256": "12d8c061b59babc95e60a814555aa20cfb8db2366cf9dfa78c47c1937b8694b5"
       },
       {
         "path": "configs/level_templates/level_012.json",
-        "sha256": "ea02b4e0471c0d901ae9f756dc4af2218dd32bf20c16be6722f3873b2df3d97c"
+        "sha256": "b30d962c32a2307c41ca77701b7b89966eddc84f9fefa1a0306f1a4436f649e5"
       },
       {
         "path": "configs/level_templates/level_013.json",
-        "sha256": "f733dcca54049ca969d7644d94ba19533d2e5e8e4da2edaf11875349d962fe17"
+        "sha256": "51ac37903a3a24e8f1118227e6671220751c88e2c3a7fe5a2db90c07078d3b9f"
       },
       {
         "path": "configs/level_templates/level_014.json",
-        "sha256": "18d9cace9bd621d49ca77d9643f1a26460a0dcc92ff422bef4cab02942017254"
+        "sha256": "4686fe182cefd0503959ae038a93a4a85a2891f3b5d3b851f7eb0ea77674e14e"
       },
       {
         "path": "configs/level_templates/level_015.json",
-        "sha256": "d75173950b8851b9f067633842071a49c3b720c08f8d14de7b673c5f9c60b4e3"
+        "sha256": "a489900d37222ff180a4b5467bd5158e5eee90f6a8651c79b483bf96001ab6b7"
       },
       {
         "path": "configs/level_templates/level_016.json",
-        "sha256": "6eb60648bc0d5fd39104cdedaf626f74ec53df7a5f66790a4bbb3b44660cd72d"
+        "sha256": "c31e7b0f288a4433b47c85de920b7d53daa0cf101a85a313a8e89ac163713948"
       },
       {
         "path": "configs/level_templates/level_017.json",
-        "sha256": "d828091a6d4f379ad1656289c751cf5be390944918065f3a2323c94182e079fb"
+        "sha256": "4884655b6e613069ffdb1f8b0e5b010221d208e5b4a951806fae343ce76333fb"
       },
       {
         "path": "configs/level_templates/level_018.json",
-        "sha256": "a216ad31077ae0c0d9d68c4e84d27b56237083632bb5b9d4de73dfa099ef4030"
+        "sha256": "c57e16c7847bddd8f24b358452ed60d972c210e50658c850ed383b26cc82d6c0"
       },
       {
         "path": "configs/level_templates/level_019.json",
-        "sha256": "1d05dce660b38baf3253b0a558d44499008c66f4c89d98ce60fbe3462eb05605"
+        "sha256": "3ec1577bcd1a845a594cb54b352a9ded6a578bdb5a05c47486b4ea528f1991a9"
       },
       {
         "path": "configs/level_templates/level_020.json",
@@ -114,79 +114,79 @@
       },
       {
         "path": "configs/levels/level_001.json",
-        "sha256": "203247340c4e8927988c13f56ac22160e588bd6b6d19ea5004f3dd54364c2cdd"
+        "sha256": "e0fff3230eb7f4b57403815bcaa7702e56d80dc2730bf456093e4871c13f8f18"
       },
       {
         "path": "configs/levels/level_002.json",
-        "sha256": "6babdfa10e18a91dbac65bd97ba0df7b1c5977285bce45b45e68f9f71f67eb8b"
+        "sha256": "f182a9e350fdb5abac640fd63bded7185c57da680be373a8c0ebdfae01867c5d"
       },
       {
         "path": "configs/levels/level_003.json",
-        "sha256": "862cb4969f20b35fb01901297d8515b0e4f761c063d464d2121f828f6b7e6b3f"
+        "sha256": "908c6076ce7fb65ec48432fcd9d462e891dbd741b84569b0c3e3f9d5cf1fe10e"
       },
       {
         "path": "configs/levels/level_004.json",
-        "sha256": "a9e65cb35438273d9b606e2cb6a5441d14ac40b391f8b0bf2155f0834a2424bf"
+        "sha256": "54581147cbe39823724ae2058e077bca488809a446199d07ee3dae4fbe9d9d6e"
       },
       {
         "path": "configs/levels/level_005.json",
-        "sha256": "551b64bc2704e59d790417567e51155aa5eacc25feb8cd20c24446861f8481f3"
+        "sha256": "eb6a4fa8a95766075243f9c63b5f2140298734aa5106c650509a783e736a8ea5"
       },
       {
         "path": "configs/levels/level_006.json",
-        "sha256": "7504b8fa727d9c058a48d11155f99fa6e3e417f69976c3b80d037d1516d7d6f0"
+        "sha256": "091afa83236f40727a93c49514a663afe6f9cb1c34ae18395a217b94bd3c67e3"
       },
       {
         "path": "configs/levels/level_007.json",
-        "sha256": "0a404a97cbc9e72045a8c13cecdd8cfb3a9137b2cecf85fd11adcb940bfcd857"
+        "sha256": "d9806aedac8e0a07ab842996e4b0087b6f07f6c4a59de595c9610a29a1471523"
       },
       {
         "path": "configs/levels/level_008.json",
-        "sha256": "d83498ed02ec626a23cf2064eaac27f11f8a9c380de70cd313eaad9a4f48b6cb"
+        "sha256": "e8e9e0f7a45b0eb679ec6697d0ff161641361bec17ddcb607f5c838f32fa7004"
       },
       {
         "path": "configs/levels/level_009.json",
-        "sha256": "06bf0d4ac4c454e74e71e52ba6125d6e7ed6b564a2e33249a5fa926c995683d2"
+        "sha256": "a869a513f3ffec66432883c675e896f3e8ea11022d1780bf944e1426efae91cd"
       },
       {
         "path": "configs/levels/level_010.json",
-        "sha256": "b6a97e80d43a801d4855b796bff067bd417c05d5c73f5bbf7bcc9b0fdf48c545"
+        "sha256": "5009c39a5a3f0c35bc04acc9f4a79ce125cf6a663dc86bb61248bccd01df74cd"
       },
       {
         "path": "configs/levels/level_011.json",
-        "sha256": "a62150e28608e8d2db791f92f34bc0ebc16c4d430e6df4dddf40f2498cbbc562"
+        "sha256": "5fb67f3ba7206773f3084ea9d90842dee76bb11f0566dc6d9583be8927bb8f09"
       },
       {
         "path": "configs/levels/level_012.json",
-        "sha256": "43de637248f1c0799299bf79e82a0edf48798e260c988385fa3154a5d8646336"
+        "sha256": "1218ae6da64512118a3a66ae346c18a1f6758042d7e79d029a4d245f9ad0ccf8"
       },
       {
         "path": "configs/levels/level_013.json",
-        "sha256": "95f3cf5cecc6f99eb4f004610bd7424326d0c97fd59f44612a2313696b99b91f"
+        "sha256": "21998ec46ce5d24c193671c81fc880ca66fa1533e8850cca8ded3bf2b578d67a"
       },
       {
         "path": "configs/levels/level_014.json",
-        "sha256": "cc5db707c1d70e7d5c08c39ca11b65b8e1f83d27b4d3b4e767029036a39e2f71"
+        "sha256": "8b202975281e9b616829408fb9734e9cfdeb52df1c718de7b73427c224656cb7"
       },
       {
         "path": "configs/levels/level_015.json",
-        "sha256": "fb363ad9dc58e37dd6942fe58052095dc7d4c33e6c3926fc58b46262018c0546"
+        "sha256": "26bf160acba1255b2e99d672d4f4a63e22814a828eca6c1788d4c6d70406723b"
       },
       {
         "path": "configs/levels/level_016.json",
-        "sha256": "1cb6e63475df19d1c861f4c17f14506f6f627207f2b4383c2fd533ed680f0c0e"
+        "sha256": "cd28c1041d5c6fffe4f0ac8d964da4e94a0022dd6b94bade1c24cfd7dc052d81"
       },
       {
         "path": "configs/levels/level_017.json",
-        "sha256": "efc2ce1b2c9e2c97a6f4f236bd45c32abd39ae2a6ded2a9d4ef78cc25a1d0518"
+        "sha256": "a15b8f10d87ff89c407a20db4af536f8fbdeeaf4e2d11ff9de331ca22762fea1"
       },
       {
         "path": "configs/levels/level_018.json",
-        "sha256": "d3f454e06800d372bb92cf5c74b4df6f3fd80c7981fa5fa34bfda8551b88a806"
+        "sha256": "33d14c71766f763a4fd038bd7d14bd2ab1107917d239bbcc48e20915a32825f2"
       },
       {
         "path": "configs/levels/level_019.json",
-        "sha256": "f744c7de858f216d4bab7bbe3bf6f3430315cdddc9becf8f4fb193baa335ffa0"
+        "sha256": "0720ef0f7f5a97a87c9a4948e260e9419805bf13371f7e646b6eed724adb69ad"
       },
       {
         "path": "configs/levels/level_020.json",
@@ -194,11 +194,11 @@
       },
       {
         "path": "scripts/tools/generate_level_shelves.py",
-        "sha256": "ab751f72f59d8eb2d5032f8d804de348549b555dcf2cab1b6bff068d8ad008c7"
+        "sha256": "a93595a6907962bb00864fe6f13437642c1dc7e05d4d6c760c7f22c0db635b4e"
       },
       {
         "path": "scripts/tools/level_item_progression.py",
-        "sha256": "608e87c171b15b42b17705557048cca93ff1acdf6708f387afd88c0cfb3f9c44"
+        "sha256": "0a3aee84a88785d3be67201b948a928d758188e847b0268e9f8fb1f36126bc19"
       },
       {
         "path": "scripts/tools/materialize_level_templates.py",
@@ -206,7 +206,7 @@
       },
       {
         "path": "scripts/level.gd",
-        "sha256": "539938f4d0f41eae1c0b9e78c4bb0ac466261246c8b1694add918deb300189e1"
+        "sha256": "dced4b67527540164e9b848d4844ceccd60fd752f363213665fc15f2f47e4508"
       },
       {
         "path": "scripts/shelf_layout_row.gd",
@@ -214,135 +214,135 @@
       },
       {
         "path": "scenes/layouts/layout_grid_3x3_moving_5_bottom.tscn",
-        "sha256": "5e51e29ceaeeae656fab2a8917fecdfaf3c0a19535de83ec1593201589c93483"
+        "sha256": "b320dc3a245d1f5085398fd555df8d4e3c5c75ef3d739055197d614f4db210b7"
       },
       {
         "path": "scenes/layouts/layout_grid_3x2_moving_6_6_top_bottom.tscn",
-        "sha256": "e7b26235efc5eede69bfe25fead89445a94eca110718ed6ded619adc0dbdd81c"
+        "sha256": "c7bb4f45d5ca8fd563783cc0dded11e758b07cc4c2777845c943f570f67bd169"
       }
     ]
   },
   "levels": [
     {
       "campaign_level": 1,
-      "configuration_version": "config_20c9f4ebb3a8ddb3337815b61295ac96c1e1ee2d5c2f7af050f0b6a308ddb131",
-      "level_version": "level_feab8dc8497cc53bf7b3ed5efe622621e9149f1dff547afe815077aae65eb8bb",
-      "rules_version": "rules_d0a73a419e849582b5ff76344a28dc429e300e1dbe827ba535b9b7bf2bf669fe"
+      "configuration_version": "config_231beb828a95ce785678187e0056db128fd7e95ae85cf79dd13d46bf37bd9fbb",
+      "level_version": "level_39248564b70726212ace72c3a82ade05a4a99483f7b6a366f227627d837bd65f",
+      "rules_version": "rules_449b8359ba07ee204f72ab03de1e0278493f2c708aea0882f5f46ae63f27a3ab"
     },
     {
       "campaign_level": 2,
-      "configuration_version": "config_20c9f4ebb3a8ddb3337815b61295ac96c1e1ee2d5c2f7af050f0b6a308ddb131",
-      "level_version": "level_827eec8d33d92533347787d309080b52f73e30dbfbd980aec83d75c16da87afa",
-      "rules_version": "rules_d0a73a419e849582b5ff76344a28dc429e300e1dbe827ba535b9b7bf2bf669fe"
+      "configuration_version": "config_231beb828a95ce785678187e0056db128fd7e95ae85cf79dd13d46bf37bd9fbb",
+      "level_version": "level_cfe32363852b7df9b2a823dd0d554fee4f033f7e87af91e8ab1088d80d1d1810",
+      "rules_version": "rules_449b8359ba07ee204f72ab03de1e0278493f2c708aea0882f5f46ae63f27a3ab"
     },
     {
       "campaign_level": 3,
-      "configuration_version": "config_20c9f4ebb3a8ddb3337815b61295ac96c1e1ee2d5c2f7af050f0b6a308ddb131",
-      "level_version": "level_b31696a2108fc8976440e93cb1bc1400691a20d9bf441688090a5ade479bb5fb",
-      "rules_version": "rules_d0a73a419e849582b5ff76344a28dc429e300e1dbe827ba535b9b7bf2bf669fe"
+      "configuration_version": "config_231beb828a95ce785678187e0056db128fd7e95ae85cf79dd13d46bf37bd9fbb",
+      "level_version": "level_82222ce453f6bd99cd02566300ebf048ee7f722623ba0f2d771db5208b2c722d",
+      "rules_version": "rules_449b8359ba07ee204f72ab03de1e0278493f2c708aea0882f5f46ae63f27a3ab"
     },
     {
       "campaign_level": 4,
-      "configuration_version": "config_20c9f4ebb3a8ddb3337815b61295ac96c1e1ee2d5c2f7af050f0b6a308ddb131",
-      "level_version": "level_bd2ea463bf74d316e0671b4db5b4d73cf84cfa094561a524708ea7aa730738ed",
-      "rules_version": "rules_d0a73a419e849582b5ff76344a28dc429e300e1dbe827ba535b9b7bf2bf669fe"
+      "configuration_version": "config_231beb828a95ce785678187e0056db128fd7e95ae85cf79dd13d46bf37bd9fbb",
+      "level_version": "level_f8b05a66385b0f2a0d52611e3ea5812d2f2ff00382441a8e10c2734aa5f39c25",
+      "rules_version": "rules_449b8359ba07ee204f72ab03de1e0278493f2c708aea0882f5f46ae63f27a3ab"
     },
     {
       "campaign_level": 5,
-      "configuration_version": "config_20c9f4ebb3a8ddb3337815b61295ac96c1e1ee2d5c2f7af050f0b6a308ddb131",
-      "level_version": "level_e06dab5e93e08e151514db3fe2d3b07bd8f0e886a1c38974788db513a6a17b0d",
-      "rules_version": "rules_d0a73a419e849582b5ff76344a28dc429e300e1dbe827ba535b9b7bf2bf669fe"
+      "configuration_version": "config_231beb828a95ce785678187e0056db128fd7e95ae85cf79dd13d46bf37bd9fbb",
+      "level_version": "level_8af31fae487a22822319e116e294cc1751fa83b20474f76451a372d7bd4c4920",
+      "rules_version": "rules_449b8359ba07ee204f72ab03de1e0278493f2c708aea0882f5f46ae63f27a3ab"
     },
     {
       "campaign_level": 6,
-      "configuration_version": "config_20c9f4ebb3a8ddb3337815b61295ac96c1e1ee2d5c2f7af050f0b6a308ddb131",
-      "level_version": "level_ca3983b2bc6e6020ed9cca69c2ac9bff23145ed439fb7e5693da6b81d9235de0",
-      "rules_version": "rules_d0a73a419e849582b5ff76344a28dc429e300e1dbe827ba535b9b7bf2bf669fe"
+      "configuration_version": "config_231beb828a95ce785678187e0056db128fd7e95ae85cf79dd13d46bf37bd9fbb",
+      "level_version": "level_d0ca44cdca75d272d8e5bd9c42075e574a7dbc357559a856b75a87510a900d29",
+      "rules_version": "rules_449b8359ba07ee204f72ab03de1e0278493f2c708aea0882f5f46ae63f27a3ab"
     },
     {
       "campaign_level": 7,
-      "configuration_version": "config_20c9f4ebb3a8ddb3337815b61295ac96c1e1ee2d5c2f7af050f0b6a308ddb131",
-      "level_version": "level_0a4c00cfd895ff40319856291c8d0d33386a4327c532a18118a907ec8298e4e2",
-      "rules_version": "rules_d0a73a419e849582b5ff76344a28dc429e300e1dbe827ba535b9b7bf2bf669fe"
+      "configuration_version": "config_231beb828a95ce785678187e0056db128fd7e95ae85cf79dd13d46bf37bd9fbb",
+      "level_version": "level_b949cb7f5e96baa65b31cb4c2d7210f3d42122f913be9e0ecb0993ed3a9f4d4e",
+      "rules_version": "rules_449b8359ba07ee204f72ab03de1e0278493f2c708aea0882f5f46ae63f27a3ab"
     },
     {
       "campaign_level": 8,
-      "configuration_version": "config_20c9f4ebb3a8ddb3337815b61295ac96c1e1ee2d5c2f7af050f0b6a308ddb131",
-      "level_version": "level_58cacc7de91bf31a3456bd4fe85b8d6054e6924efe00ad479b381b5b1e55b7af",
-      "rules_version": "rules_d0a73a419e849582b5ff76344a28dc429e300e1dbe827ba535b9b7bf2bf669fe"
+      "configuration_version": "config_231beb828a95ce785678187e0056db128fd7e95ae85cf79dd13d46bf37bd9fbb",
+      "level_version": "level_4404cf19f4b39c5c923b2417be18fdf59e36f0f3101a771ce0f0bd7784a16755",
+      "rules_version": "rules_449b8359ba07ee204f72ab03de1e0278493f2c708aea0882f5f46ae63f27a3ab"
     },
     {
       "campaign_level": 9,
-      "configuration_version": "config_20c9f4ebb3a8ddb3337815b61295ac96c1e1ee2d5c2f7af050f0b6a308ddb131",
-      "level_version": "level_8570decd9d0317a22b601b0638ef7d9e5c726fc4aff76b024cdcc1a44b269393",
-      "rules_version": "rules_d0a73a419e849582b5ff76344a28dc429e300e1dbe827ba535b9b7bf2bf669fe"
+      "configuration_version": "config_231beb828a95ce785678187e0056db128fd7e95ae85cf79dd13d46bf37bd9fbb",
+      "level_version": "level_e42d594bd4cf845705152932d4f2f6b8f3504b32dde72136c80c4b7db1ef23e5",
+      "rules_version": "rules_449b8359ba07ee204f72ab03de1e0278493f2c708aea0882f5f46ae63f27a3ab"
     },
     {
       "campaign_level": 10,
-      "configuration_version": "config_20c9f4ebb3a8ddb3337815b61295ac96c1e1ee2d5c2f7af050f0b6a308ddb131",
-      "level_version": "level_5af4085a0859dd56afeb9ff7ffa92a433671ca33d3b999128a9cc1db414bd053",
-      "rules_version": "rules_d0a73a419e849582b5ff76344a28dc429e300e1dbe827ba535b9b7bf2bf669fe"
+      "configuration_version": "config_231beb828a95ce785678187e0056db128fd7e95ae85cf79dd13d46bf37bd9fbb",
+      "level_version": "level_2faa0a5fa011db860ab5824ada6f7f10b97b85c214bd0680c5b50418294d0087",
+      "rules_version": "rules_449b8359ba07ee204f72ab03de1e0278493f2c708aea0882f5f46ae63f27a3ab"
     },
     {
       "campaign_level": 11,
-      "configuration_version": "config_20c9f4ebb3a8ddb3337815b61295ac96c1e1ee2d5c2f7af050f0b6a308ddb131",
-      "level_version": "level_759a41ed37eab60026c51c50f7b0419eaed6eab9bc1fb72dc3cac1a194f7995a",
-      "rules_version": "rules_d0a73a419e849582b5ff76344a28dc429e300e1dbe827ba535b9b7bf2bf669fe"
+      "configuration_version": "config_231beb828a95ce785678187e0056db128fd7e95ae85cf79dd13d46bf37bd9fbb",
+      "level_version": "level_1d426f0d65464973cd496a42d5e8302985b8127ae98b1ce9353be298301516e5",
+      "rules_version": "rules_449b8359ba07ee204f72ab03de1e0278493f2c708aea0882f5f46ae63f27a3ab"
     },
     {
       "campaign_level": 12,
-      "configuration_version": "config_20c9f4ebb3a8ddb3337815b61295ac96c1e1ee2d5c2f7af050f0b6a308ddb131",
-      "level_version": "level_b2e0d98a07ff1a2b21aa4ace15e8f1c59082b79311a7624303b7995f1978b427",
-      "rules_version": "rules_d0a73a419e849582b5ff76344a28dc429e300e1dbe827ba535b9b7bf2bf669fe"
+      "configuration_version": "config_231beb828a95ce785678187e0056db128fd7e95ae85cf79dd13d46bf37bd9fbb",
+      "level_version": "level_741f1b0841c389171bf68ed759aae1dd32a58fc975cd3c6f166dcd90715518a8",
+      "rules_version": "rules_449b8359ba07ee204f72ab03de1e0278493f2c708aea0882f5f46ae63f27a3ab"
     },
     {
       "campaign_level": 13,
-      "configuration_version": "config_20c9f4ebb3a8ddb3337815b61295ac96c1e1ee2d5c2f7af050f0b6a308ddb131",
-      "level_version": "level_b43fb9df0caf88bdc446279e0fe123443a570ecf1743ef0ede73da7a819d8fa4",
-      "rules_version": "rules_d0a73a419e849582b5ff76344a28dc429e300e1dbe827ba535b9b7bf2bf669fe"
+      "configuration_version": "config_231beb828a95ce785678187e0056db128fd7e95ae85cf79dd13d46bf37bd9fbb",
+      "level_version": "level_2471e3dd61bf9d743f4af41eccdc64ab3d8640c80f90e0f8cb5b80ad09dd0fe0",
+      "rules_version": "rules_449b8359ba07ee204f72ab03de1e0278493f2c708aea0882f5f46ae63f27a3ab"
     },
     {
       "campaign_level": 14,
-      "configuration_version": "config_20c9f4ebb3a8ddb3337815b61295ac96c1e1ee2d5c2f7af050f0b6a308ddb131",
-      "level_version": "level_b43029cf2c6e9de4a6b7244bdf996744c8c5bd237faf971b876cc993dfb84ab8",
-      "rules_version": "rules_d0a73a419e849582b5ff76344a28dc429e300e1dbe827ba535b9b7bf2bf669fe"
+      "configuration_version": "config_231beb828a95ce785678187e0056db128fd7e95ae85cf79dd13d46bf37bd9fbb",
+      "level_version": "level_460524238580004890df4071806ce7c1ec813ae1cbe0e7a74fdfbeca0dd2e92f",
+      "rules_version": "rules_449b8359ba07ee204f72ab03de1e0278493f2c708aea0882f5f46ae63f27a3ab"
     },
     {
       "campaign_level": 15,
-      "configuration_version": "config_20c9f4ebb3a8ddb3337815b61295ac96c1e1ee2d5c2f7af050f0b6a308ddb131",
-      "level_version": "level_97e9678657ea18b534ac6ed854f2a321dc64f2018a7d3ee7085646eac60e1bff",
-      "rules_version": "rules_d0a73a419e849582b5ff76344a28dc429e300e1dbe827ba535b9b7bf2bf669fe"
+      "configuration_version": "config_231beb828a95ce785678187e0056db128fd7e95ae85cf79dd13d46bf37bd9fbb",
+      "level_version": "level_ef4b8ce0073bb6f8836fd62859f2195fa98358ade72cc3dba871caa71243bb9c",
+      "rules_version": "rules_449b8359ba07ee204f72ab03de1e0278493f2c708aea0882f5f46ae63f27a3ab"
     },
     {
       "campaign_level": 16,
-      "configuration_version": "config_20c9f4ebb3a8ddb3337815b61295ac96c1e1ee2d5c2f7af050f0b6a308ddb131",
-      "level_version": "level_13cae50540b809e6dd54b6859b34a234288584c25753f7ec0fc0efa802e436d5",
-      "rules_version": "rules_d0a73a419e849582b5ff76344a28dc429e300e1dbe827ba535b9b7bf2bf669fe"
+      "configuration_version": "config_231beb828a95ce785678187e0056db128fd7e95ae85cf79dd13d46bf37bd9fbb",
+      "level_version": "level_d5c87f4e5edb5f1ae8fd25ba9c798e79ba35794bfa62be9892706336aa3f962c",
+      "rules_version": "rules_449b8359ba07ee204f72ab03de1e0278493f2c708aea0882f5f46ae63f27a3ab"
     },
     {
       "campaign_level": 17,
-      "configuration_version": "config_20c9f4ebb3a8ddb3337815b61295ac96c1e1ee2d5c2f7af050f0b6a308ddb131",
-      "level_version": "level_569353ca8123ffc3d8acd7d4d714be61d2dae358b19d76a24e457e303bb26b22",
-      "rules_version": "rules_d0a73a419e849582b5ff76344a28dc429e300e1dbe827ba535b9b7bf2bf669fe"
+      "configuration_version": "config_231beb828a95ce785678187e0056db128fd7e95ae85cf79dd13d46bf37bd9fbb",
+      "level_version": "level_6a4529e2f5a73595ca1cd14ac48e28c8901694e0c99c0d309212f0ed1506bbbd",
+      "rules_version": "rules_449b8359ba07ee204f72ab03de1e0278493f2c708aea0882f5f46ae63f27a3ab"
     },
     {
       "campaign_level": 18,
-      "configuration_version": "config_20c9f4ebb3a8ddb3337815b61295ac96c1e1ee2d5c2f7af050f0b6a308ddb131",
-      "level_version": "level_c06c8a2903fc61d97117e6eb5726823a895f91f7fcf478dd21f19788a2bf066f",
-      "rules_version": "rules_d0a73a419e849582b5ff76344a28dc429e300e1dbe827ba535b9b7bf2bf669fe"
+      "configuration_version": "config_231beb828a95ce785678187e0056db128fd7e95ae85cf79dd13d46bf37bd9fbb",
+      "level_version": "level_66195bb486fbc44ae55ba83a6f91833458ef111a3ca195bf1687ac16b15a5d89",
+      "rules_version": "rules_449b8359ba07ee204f72ab03de1e0278493f2c708aea0882f5f46ae63f27a3ab"
     },
     {
       "campaign_level": 19,
-      "configuration_version": "config_20c9f4ebb3a8ddb3337815b61295ac96c1e1ee2d5c2f7af050f0b6a308ddb131",
-      "level_version": "level_22fd9bee6637b398e323befae58e3316a4cf9c365275f52def319e0565a37f0a",
-      "rules_version": "rules_d0a73a419e849582b5ff76344a28dc429e300e1dbe827ba535b9b7bf2bf669fe"
+      "configuration_version": "config_231beb828a95ce785678187e0056db128fd7e95ae85cf79dd13d46bf37bd9fbb",
+      "level_version": "level_56d268073e8277a9d4529f26e4b3f1e9530aed083fe4f5b69fe1de9bf6142b3b",
+      "rules_version": "rules_449b8359ba07ee204f72ab03de1e0278493f2c708aea0882f5f46ae63f27a3ab"
     },
     {
       "campaign_level": 20,
-      "configuration_version": "config_20c9f4ebb3a8ddb3337815b61295ac96c1e1ee2d5c2f7af050f0b6a308ddb131",
-      "level_version": "level_87a199b02f9abb8e9e2c2fa95678303a5a45a61730fa48be63cad39b9f0c9458",
-      "rules_version": "rules_d0a73a419e849582b5ff76344a28dc429e300e1dbe827ba535b9b7bf2bf669fe"
+      "configuration_version": "config_231beb828a95ce785678187e0056db128fd7e95ae85cf79dd13d46bf37bd9fbb",
+      "level_version": "level_cdbc9548afde85584f81c730abd77cdf9f0216cfb5a1ee3defcc08292e07153b",
+      "rules_version": "rules_449b8359ba07ee204f72ab03de1e0278493f2c708aea0882f5f46ae63f27a3ab"
     }
   ],
-  "digest_sha256": "5ed957d969633d5c1c8b80faeb5c8f3fa3a1cc1ee8dca8aaf3d7cb146c3cc74c"
+  "digest_sha256": "8e6b1f834dafa0bc73389478e931ffbd3f949725b633c282026fb09ec25ed8a3"
 }
