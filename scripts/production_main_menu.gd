@@ -46,6 +46,7 @@ const CHAPTER_SELECTION_ENABLED_SETTING := "application/config/chapter_selection
 @onready var _starter_modal = %StarterBundleOfferModal
 @onready var _house_reward_origin := %HouseRewardOrigin as Control
 @onready var _reward_star_flyer := %RewardStarFlyer as Control
+@onready var _chest_ceremony := %RewardChestOpenCeremony as Control
 @onready var _bottom_bar := %BottomBar as MarginContainer
 @onready var _level_button := %LevelButton as Button
 @onready var _chapter_button := %ChapterButton as Button
@@ -70,6 +71,15 @@ var _reward_chest_menu: Control
 var _chapter_selection_screen: Control
 var _animated_reward_stars := 0
 var _animated_reward_goal_index := 0
+## While positive, the chest widget shows this filled goal instead of wrapping to the next one, until
+## the opening sequence has delivered its rewards.
+var _chest_full_hold_goal := 0
+## `{"coins": int, "abilities": {ability_id: count}}` for every goal the star flight has filled.
+var _chest_ceremony_rewards := {}
+## Coins PlayerProgress already granted for filled goals that the opening sequence has not flown
+## into the counter yet. The displayed balance subtracts them so it can count up on each landing.
+var _undisplayed_chest_coins := 0
+var _chest_ceremony_coin_holdback := 0
 var _is_navigating := false
 var _life_recovery_in_progress := false
 var _rewarded_life_client
@@ -121,6 +131,9 @@ func _ready() -> void:
 		ad_service.connect("privacy_options_requirement_changed", privacy_requirement_callback)
 	if _reward_chest.has_signal("chest_pressed"):
 		_reward_chest.connect("chest_pressed", Callable(self, "_open_reward_chest_menu"))
+	_chest_ceremony.connect("coin_arrived", Callable(self, "_on_chest_ceremony_coin_arrived"))
+	_chest_ceremony.connect("ability_arrived", Callable(self, "_on_chest_ceremony_ability_arrived"))
+	_chest_ceremony.connect("finished", Callable(self, "_on_chest_ceremony_finished"))
 	_starter_badge.pressed.connect(_open_starter_bundle_offer)
 	_starter_modal.buy_requested.connect(_buy_starter_bundle)
 	_starter_modal.close_requested.connect(_close_starter_bundle_offer)
@@ -143,6 +156,7 @@ func _ready() -> void:
 	_leaderboard_reward_dialog.z_index = MAIN_MENU_OVERLAY_Z_INDEX
 	_out_of_lives_menu.z_index = MAIN_MENU_OVERLAY_Z_INDEX
 	_starter_modal.z_index = MAIN_MENU_OVERLAY_Z_INDEX + 1
+	_chest_ceremony.z_index = MAIN_MENU_OVERLAY_Z_INDEX + 2
 	_apply_responsive_layout()
 	if not pending_reward_animation.is_empty():
 		_play_pending_reward_animation.call_deferred(pending_reward_animation)
@@ -181,6 +195,12 @@ func _process(delta: float) -> void:
 ## "Back/ui_cancel Behavior").
 func _unhandled_input(event: InputEvent) -> void:
 	if not event.is_action_pressed("ui_cancel"):
+		return
+	# Back behaves like a tap while the chest opens: it advances the sequence instead of closing
+	# whatever overlay sits underneath it.
+	if _chest_ceremony.visible:
+		get_viewport().set_input_as_handled()
+		_chest_ceremony.call("advance")
 		return
 	if _starter_modal.visible:
 		get_viewport().set_input_as_handled()
@@ -499,12 +519,21 @@ func _update_reward_chest_status() -> void:
 func _prepare_pending_reward_animation(pending: Dictionary) -> void:
 	_animated_reward_stars = maxi(int(pending.get("start_stars", 0)), 0)
 	_animated_reward_goal_index = maxi(int(pending.get("start_goal_index", 0)), 0)
+	var grant := PlayerProgress.get_reward_chest_grant_preview(
+		_animated_reward_stars,
+		_animated_reward_goal_index,
+		maxi(int(pending.get("amount", 0)), 0)
+	)
+	_undisplayed_chest_coins = maxi(int(grant.get("coin_reward", 0)), 0)
+	_update_coin_balance()
 	_set_animated_reward_chest_status()
 
 
 func _play_pending_reward_animation(pending: Dictionary) -> void:
 	var amount := maxi(int(pending.get("amount", 0)), 0)
 	if amount <= 0 or _reward_star_flyer == null or _house_reward_origin == null:
+		_undisplayed_chest_coins = 0
+		_update_coin_balance()
 		_update_reward_chest_status()
 		return
 
@@ -523,14 +552,16 @@ func _play_pending_reward_animation(pending: Dictionary) -> void:
 ## The one accepted-arrival callback: it advances the visible chest count, starts the receive
 ## pulse, and plays the arrival cue together. Silent state reconciliation goes through
 ## _update_reward_chest_status()/_prepare_pending_reward_animation() instead and stays quiet.
+##
+## The arrival that fills a goal does not pay out here: it holds the widget at full and queues the
+## goal's rewards for the opening sequence, whose own beats carry the payout sound and haptic.
 func _on_reward_star_arrived() -> void:
 	_animated_reward_stars += 1
 	var goal := PlayerProgress.get_reward_chest_goal_at_index(_animated_reward_goal_index)
-	var completed_goal_coin_reward := 0
 	if _animated_reward_stars >= goal:
-		completed_goal_coin_reward = PlayerProgress.get_reward_chest_goal_coin_reward_at_index(
-			_animated_reward_goal_index
-		)
+		_queue_chest_ceremony_rewards(_animated_reward_goal_index)
+		if _chest_full_hold_goal <= 0:
+			_chest_full_hold_goal = goal
 		_animated_reward_stars -= goal
 		_animated_reward_goal_index = mini(
 			_animated_reward_goal_index + 1,
@@ -544,12 +575,12 @@ func _on_reward_star_arrived() -> void:
 	# The catalog's variant pool, subtle pitch spread, cooldown, and polyphony budget are what keep
 	# a long staggered flight intelligible instead of turning it into one loud stack.
 	SfxManager.play(SfxCatalogScript.EVENT_REWARD_CHEST_STAR_ARRIVAL)
-	if completed_goal_coin_reward > 0:
-		SfxManager.play(SfxCatalogScript.EVENT_COIN_GAIN)
-		HapticsManager.play(HapticsCatalogScript.EVENT_REWARD_CHEST_GOAL_COMPLETE)
 
 
 func _on_reward_star_animation_finished() -> void:
+	if _chest_full_hold_goal > 0 and not _chest_ceremony_rewards.is_empty():
+		_play_chest_ceremony()
+		return
 	_update_reward_chest_status()
 
 
@@ -557,11 +588,79 @@ func _set_animated_reward_chest_status() -> void:
 	if _reward_chest == null or not _reward_chest.has_method("set_reward_progress"):
 		return
 
+	if _chest_full_hold_goal > 0:
+		_reward_chest.call("set_reward_progress", _chest_full_hold_goal, _chest_full_hold_goal)
+		return
+
 	_reward_chest.call(
 		"set_reward_progress",
 		_animated_reward_stars,
 		PlayerProgress.get_reward_chest_goal_at_index(_animated_reward_goal_index)
 	)
+
+
+## Rare long flights can fill more than one goal; they share one opening with the summed rewards.
+func _queue_chest_ceremony_rewards(goal_index: int) -> void:
+	var abilities := _chest_ceremony_rewards.get("abilities", {}) as Dictionary
+	var goal_abilities := PlayerProgress.get_reward_chest_goal_ability_rewards_at_index(goal_index)
+	for ability_id in goal_abilities.keys():
+		abilities[ability_id] = int(abilities.get(ability_id, 0)) + int(goal_abilities[ability_id])
+	_chest_ceremony_rewards = {
+		"coins": int(_chest_ceremony_rewards.get("coins", 0))
+			+ PlayerProgress.get_reward_chest_goal_coin_reward_at_index(goal_index),
+		"abilities": abilities,
+	}
+
+
+func _play_chest_ceremony() -> void:
+	_chest_ceremony_coin_holdback = _undisplayed_chest_coins
+	var chest_rect := _reward_chest.get_global_rect()
+	if _reward_chest.has_method("get_chest_icon_global_rect"):
+		chest_rect = _reward_chest.call("get_chest_icon_global_rect") as Rect2
+	if _reward_chest.has_method("set_chest_icon_hidden"):
+		_reward_chest.call("set_chest_icon_hidden", true)
+	_chest_ceremony.call(
+		"play",
+		_chest_ceremony_rewards,
+		chest_rect,
+		_coin_shortcut.call("get_coin_icon_global_center") as Vector2,
+		_level_button.get_global_rect().get_center()
+	)
+
+
+## Counts the displayed balance up in step with the coins landing, reaching the saved balance on
+## the last one.
+func _on_chest_ceremony_coin_arrived(arrived_count: int, total_count: int) -> void:
+	var remaining_share := 1.0 - float(arrived_count) / float(maxi(total_count, 1))
+	_undisplayed_chest_coins = roundi(float(_chest_ceremony_coin_holdback) * remaining_share)
+	_update_coin_balance()
+	_coin_shortcut.call("play_receive_pulse")
+
+
+func _on_chest_ceremony_ability_arrived(_ability_id: StringName) -> void:
+	_level_button.pivot_offset = _level_button.size * 0.5
+	var tween := UIMotionScript.retween(_level_button, &"_chest_reward_pulse_tween")
+	tween.tween_property(_level_button, "scale", Vector2(1.06, 1.06), 0.07) \
+		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(_level_button, "scale", Vector2.ONE, 0.14) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+
+
+func _on_chest_ceremony_finished() -> void:
+	_chest_full_hold_goal = 0
+	_chest_ceremony_rewards = {}
+	_undisplayed_chest_coins = 0
+	_chest_ceremony_coin_holdback = 0
+	_update_coin_balance()
+	if _reward_chest.has_method("set_chest_icon_hidden"):
+		_reward_chest.call("set_chest_icon_hidden", false)
+	var progress := PlayerProgress.get_reward_chest_progress()
+	if _reward_chest.has_method("play_refill"):
+		_reward_chest.call(
+			"play_refill", int(progress.get("stars", 0)), int(progress.get("goal", 1))
+		)
+	else:
+		_update_reward_chest_status()
 
 
 func _format_life_restore_time(seconds_remaining: int) -> String:
@@ -582,7 +681,9 @@ func _update_profile_customization() -> void:
 
 func _update_coin_balance() -> void:
 	if _coin_shortcut != null:
-		_coin_shortcut.call("set_amount", PlayerProgress.get_coins())
+		_coin_shortcut.call(
+			"set_amount", maxi(PlayerProgress.get_coins() - _undisplayed_chest_coins, 0)
+		)
 
 
 func _open_profile_menu() -> void:
@@ -849,7 +950,7 @@ func _buy_starter_bundle() -> void:
 ## keyboard input, not just navigation) from accepting further input for the brief window before
 ## the deferred scene swap resolves.
 func _begin_navigation(scene_path: String) -> void:
-	if _is_navigating or _starter_modal.visible:
+	if _is_navigating or _starter_modal.visible or _chest_ceremony.visible:
 		return
 
 	_is_navigating = true
@@ -858,6 +959,8 @@ func _begin_navigation(scene_path: String) -> void:
 
 
 func _launch_campaign_level() -> void:
+	if _chest_ceremony.visible:
+		return
 	PlayerProgress.refresh_lives()
 	if PlayerProgress.get_lives() <= 0:
 		_update_lives_status()

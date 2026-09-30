@@ -25,7 +25,9 @@ This file documents what each script owns. Keep script docs focused on responsib
 - `scripts/offer_ribbon_banner.gd` (`OfferRibbonBanner`, `@tool`) draws the folded ribbon to its
   size, owns the red offer and green success tones, and fits long ribbon text.
 - `scripts/offer_booster_chip.gd` (`OfferBoosterChip`) binds one booster's count, hides zero
-  counts, and draws the claimed check for the success state.
+  counts, and draws the claimed check for the success state. `name_color`/`name_outline_*` exports
+  switch the name to light outlined text for dark backdrops (the reward-chest opening), and
+  `get_icon_global_rect()` gives a flight its launch point.
 - `assets/shaders/offer_sunburst.gdshader` paints the hero stage: radial base, rays (optional
   `ray_speed` rotation), centre glow, twinkling sparkles, and a bottom lip, masked to the stage's
   rounded corners using UV derivatives so it keeps its proportions at every panel scale.
@@ -115,10 +117,22 @@ Purpose:
 - Consumes completed-level reward payloads, displays the pre-reward chest value, and advances it once for each reward star that reaches the chest.
 - `_on_reward_star_arrived()` is the one accepted-arrival callback: it advances the visible count,
   starts the chest receive pulse, and plays `reward_chest_star_arrival` together (AUDIO-001). An
-  arrival that crosses a chest goal layers exactly one `coin_gain` for the completed goal, read
-  through `PlayerProgress.get_reward_chest_goal_coin_reward_at_index()`. Silent state
+  arrival that crosses a chest goal pays nothing out itself: it sets `_chest_full_hold_goal` so the
+  widget stays full, and queues that goal's coins and abilities (read through
+  `PlayerProgress.get_reward_chest_goal_coin_reward_at_index()` and
+  `get_reward_chest_goal_ability_rewards_at_index()`) for the opening sequence. Silent state
   reconciliation (`_update_reward_chest_status()`, `_prepare_pending_reward_animation()`) plays
   nothing.
+- `_on_reward_star_animation_finished()` starts `%RewardChestOpenCeremony` when a goal was
+  filled, passing the widget's chest rect, the coin counter's icon centre, and the LEVEL button's
+  centre. The ceremony's own beats play the payout cues (`shop_purchase_success` and the
+  `reward_chest_goal_complete` haptic as it opens, `coin_gain` as coins land).
+- `_prepare_pending_reward_animation()` asks `PlayerProgress.get_reward_chest_grant_preview()`
+  what the pending stars grant and stores the coins in `_undisplayed_chest_coins`;
+  `_update_coin_balance()` always subtracts it, `_on_chest_ceremony_coin_arrived()` shrinks it as
+  coins land, and `_on_chest_ceremony_finished()` clears it and refills the chest widget. Level
+  launch and cross-destination navigation are ignored while the ceremony is visible, and
+  `ui_cancel` advances it.
 - Opens the reward chest detail modal when the reward chest widget emits `chest_pressed`.
 - Opens the main-menu settings popup from the top status bar, routes its policy-driven privacy
   choices/privacy-policy action, and presents the native support FAQ above Settings when requested.
@@ -584,7 +598,8 @@ Depends on:
   non-negative coin balance. `set_compact(bool)` selects between the Shop header's regular size
   (158x68) and the Main Menu coin shortcut's compact size (142x60); both variants reuse the exact
   same `%Pill` stylebox, `%CoinIcon` texture, and `GameNumberLabel` styling, so only geometry
-  differs between the two screens.
+  differs between the two screens. `get_coin_icon_global_center()` is the landing point for coins
+  flown into the balance.
 - `scripts/shop_purchase_dialog.gd`: shows and dismisses a focused result modal; `show_result()`
   takes an optional `button_text` (defaults to "Continue") so the same dialog reads correctly for
   both purchase results and ability info lookups ("Got it"). The upper-cased title goes onto the
@@ -603,6 +618,9 @@ Purpose:
 - Wraps a compact `coin_balance_widget.tscn` instance with the Main Menu's "+" badge inside a real
   tap target. `set_amount(amount)` forwards to the wrapped widget;
   `scripts/production_main_menu.gd` connects the native `pressed` signal to open the Shop.
+- `get_coin_icon_global_center()` and `play_receive_pulse()` serve the reward-chest opening: coins
+  fly to the icon and each landing bumps the wrapped widget (never this button's own scale, which
+  `PressScaleButton` owns).
 
 ## Store scripts
 
@@ -818,14 +836,54 @@ Key methods:
   for any reward flight, not specifically a coin concept).
 - `play_receive_pulse()`: briefly pulses the whole widget when a reward star arrives (independent
   of, and composes fine with, `%ChestButton`'s own press-scale animation on `Visual`).
+- `get_chest_icon_global_rect()` / `set_chest_icon_hidden(is_hidden)`: where the opening
+  sequence's large chest lifts from and returns to, and hiding the small icon and its shadow while
+  that copy is out.
+- `play_refill(current_stars, goal_stars)`: empties the bar and counts it up to the next goal's
+  carried-over stars over `REFILL_DURATION`; any `set_reward_progress()` call cancels it.
 
 Depends on:
-- `scenes/ui/main_menu_reward_chest.tscn` node names `Visual`, `%ProgressBar`, `%AmountLabel`, and `%ChestButton`.
+- `scenes/ui/main_menu_reward_chest.tscn` node names `Visual`, `Visual/ChestIcon`,
+  `Visual/IconShadow`, `%ProgressBar`, `%AmountLabel`, and `%ChestButton`.
 - `scripts/press_scale_button.gd`.
 
 Do not use for:
 - Saving stars, loading goal config, or awarding completion stars. Those stay in `PlayerProgress`.
 - Owning the detail modal. `scripts/reward_chest_menu.gd` reads `PlayerProgress` itself once opened.
+
+## `scripts/reward_chest_open_ceremony.gd`
+
+Attached to:
+- `scenes/ui/reward_chest_open_ceremony.tscn` root `RewardChestOpenCeremony`.
+
+Purpose:
+- Runs the filled-chest opening as a phase machine (`IDLE`, `LIFTING`, `AWAITING_TAP`, `OPENING`,
+  `REVEALING`, `COLLECTING`, `RETURNING`) driven by tweens. The lift and return depend on where the
+  side widget sits, so they are tweened from runtime positions rather than authored in an
+  `AnimationPlayer`; the stage's authored anchor offsets are restored before every run.
+- `play(rewards, chest_global_rect, coin_target_global, ability_target_global)` starts it;
+  `rewards` is `{"coins": int, "abilities": {ability_id: count}}` (String or StringName keys).
+  Ignored while already playing.
+- `advance()` is the tap/Back action: opens a waiting chest, or ends the reveal hold once every
+  reward has settled in its slot, so a flight never launches from a reward still popping out.
+- Emits `opened`, `coin_arrived(arrived_count, total_count)`, `ability_arrived(ability_id)`, and
+  `finished`; plays its own `shop_purchase_success`, `coin_gain`, and `reward_chest_star_arrival`
+  cues and the `reward_chest_goal_complete` haptic.
+- Beat durations are `@export` (Timing group) so tests and captures can compress or freeze a beat.
+- Scales `%Content` down on screens shorter than `CONTENT_REFERENCE_HEIGHT` (min
+  `MIN_CONTENT_SCALE`) around the `CONTENT_ANCHOR_Y` line, which must match the scene's anchors.
+
+Depends on:
+- `scripts/ui_motion.gd`, `scripts/offer_booster_chip.gd`, `SfxManager`, `HapticsManager`.
+
+Do not use for:
+- Reading or writing `PlayerProgress`. The owner supplies the rewards and reconciles every widget
+  to saved values on `finished`.
+
+Tests:
+- `tests/ui/test_reward_chest_open_ceremony.gd` covers tap and auto-open, flight counts (including
+  the 12-coin cap), zero-count slots, and the Main Menu's hold-at-full, coin holdback, Back
+  handling, and refill. `tests/audio/test_sfx_event_wiring.gd` covers where the payout cues fire.
 
 ## `scripts/reward_chest_menu.gd`
 
@@ -1530,6 +1588,12 @@ Key methods:
   specific goal, for owners animating past goals the player has already crossed (the Main Menu's
   staggered star flight). Read-only; the grant itself still happens once inside the chest-star
   application.
+- `get_reward_chest_goal_ability_rewards_at_index(goal_index)`: the ability uses attached to one
+  goal, read-only like the coin reward; the Main Menu's chest opening shows them.
+- `get_reward_chest_grant_preview(start_stars, start_goal_index, amount)`: runs the same
+  normalization the grant uses without touching saved data, returning the `coin_reward`,
+  `ability_rewards`, and `completed_cycles` that adding `amount` stars from that position grants.
+  The Main Menu uses it to hold back chest coins until the opening flies them in.
 - `get_reward_chest_progress()`: returns the saved reward chest stars, active goal, and goal index.
 - `get_reward_chest_goal_at_index(goal_index)`: exposes a configured goal threshold for menu animation rollover.
 - `consume_pending_reward_chest_animation()`: returns and clears the in-memory completed-level animation payload.

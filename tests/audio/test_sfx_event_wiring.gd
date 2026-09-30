@@ -556,7 +556,7 @@ func _test_reward_chest_arrivals() -> void:
 		"An arrival short of the goal does not pay out coins."
 	)
 
-	# The arrival that crosses the goal layers exactly one coin_gain for the completed goal.
+	# The arrival that crosses the goal only queues the chest opening; the payout cues belong to it.
 	var goal: int = _progress.call("get_reward_chest_goal_at_index", 0)
 	menu.set("_animated_reward_goal_index", 0)
 	menu.set("_animated_reward_stars", goal - 1)
@@ -564,16 +564,38 @@ func _test_reward_chest_arrivals() -> void:
 	menu.call("_on_reward_star_arrived")
 	_check(
 		_played(SfxCatalogScript.EVENT_REWARD_CHEST_STAR_ARRIVAL) == 1
-			and _played(SfxCatalogScript.EVENT_COIN_GAIN) == 1,
-		"A goal-crossing arrival layers one coin_gain for the completed goal."
+			and _played(SfxCatalogScript.EVENT_COIN_GAIN) == 0,
+		"A goal-crossing arrival plays its arrival cue and leaves the payout to the chest opening."
 	)
 	_check(
 		int(menu.get("_animated_reward_goal_index")) == 1,
 		"The goal-crossing arrival advanced the animated goal."
 	)
 	_check(
+		_haptic_played(HapticsCatalogScript.EVENT_REWARD_CHEST_GOAL_COMPLETE) == 0,
+		"The goal-crossing arrival itself does not vibrate."
+	)
+
+	# The opening vibrates once as the lid bursts and plays coin_gain as coins reach the counter.
+	var ceremony := menu.get_node("%RewardChestOpenCeremony") as Control
+	for property in ["lift_duration", "auto_open_delay", "reveal_pop_duration", "reveal_hold",
+			"coin_scatter_duration", "coin_flight_duration", "ability_flight_duration",
+			"return_duration"]:
+		ceremony.set(property, 0.05)
+	_begin_recording()
+	menu.call("_on_reward_star_animation_finished")
+	await ceremony.finished
+	_check(
+		_played(SfxCatalogScript.EVENT_SHOP_PURCHASE_SUCCESS) == 1,
+		"The chest opening plays one confirmation cue as it bursts open."
+	)
+	_check(
+		_played(SfxCatalogScript.EVENT_COIN_GAIN) >= 1,
+		"Coins landing on the counter play coin_gain."
+	)
+	_check(
 		_haptic_played(HapticsCatalogScript.EVENT_REWARD_CHEST_GOAL_COMPLETE) == 1,
-		"Only a goal-crossing chest arrival starts the reward haptic."
+		"Only the chest opening starts the reward haptic."
 	)
 
 	await _free_current_scene()

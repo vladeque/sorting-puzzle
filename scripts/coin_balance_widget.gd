@@ -35,6 +35,10 @@ func set_amount(amount: int) -> void:
 		_update_label()
 
 
+func get_coin_icon_global_center() -> Vector2:
+	return _coin_icon.get_global_rect().get_center()
+
+
 func set_compact(is_compact: bool) -> void:
 	if _is_compact == is_compact:
 		return

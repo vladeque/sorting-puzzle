@@ -24,6 +24,11 @@ class_name OfferBoosterChip
 @export var name_font_size := 18
 ## The claimed name carries the amount ("+3 Freezer"), so it steps down to stay within the chip.
 @export var claimed_name_font_size := 16
+## The default brown suits the Starter Bundle's light panel; the reward-chest ceremony shows chips
+## over a dimmed screen and switches to light text with an outline.
+@export var name_color := Color(0.42, 0.165, 0.086, 1)
+@export var name_outline_color := Color(0, 0, 0, 0)
+@export var name_outline_size := 0
 
 @onready var _icon_rect := %Icon as TextureRect
 @onready var _count_badge := %CountBadge as Panel
@@ -38,6 +43,9 @@ var _is_claimed := false
 func _ready() -> void:
 	_icon_rect.texture = icon
 	_check_mark.draw.connect(_draw_check_mark)
+	_name_label.add_theme_color_override("font_color", name_color)
+	_name_label.add_theme_color_override("font_outline_color", name_outline_color)
+	_name_label.add_theme_constant_override("outline_size", name_outline_size)
 	_refresh_labels()
 
 
@@ -67,6 +75,11 @@ func set_claimed(is_claimed: bool) -> void:
 
 func is_claimed() -> bool:
 	return _is_claimed
+
+
+## Where the ability icon currently sits, so a flight can launch from exactly on top of it.
+func get_icon_global_rect() -> Rect2:
+	return _icon_rect.get_global_rect()
 
 
 func _refresh_labels() -> void:

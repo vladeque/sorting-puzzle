@@ -437,6 +437,21 @@ func get_reward_chest_goal_coin_reward_at_index(goal_index: int) -> int:
 	return _get_reward_chest_goal_coin_reward(goals, clampi(goal_index, 0, goals.size() - 1))
 
 
+## The ability uses attached to one specific goal, read-only like the coin reward above -- the
+## Main Menu's chest-opening sequence shows them as they are counted.
+func get_reward_chest_goal_ability_rewards_at_index(goal_index: int) -> Dictionary:
+	var goals := _get_reward_chest_goals()
+	var goal := goals[clampi(goal_index, 0, goals.size() - 1)] as Dictionary
+	return (goal.get("ability_rewards", {}) as Dictionary).duplicate()
+
+
+## What adding `amount` stars from a given chest position grants, without changing saved progress:
+## the same normalization _apply_reward_chest_stars() uses, so presentation code (the Main Menu
+## holding back coins the chest ceremony has not delivered yet) cannot drift from the real grant.
+func get_reward_chest_grant_preview(start_stars: int, start_goal_index: int, amount: int) -> Dictionary:
+	return _normalize_reward_chest_progress(maxi(start_stars, 0) + maxi(amount, 0), start_goal_index)
+
+
 func get_reward_chest_last_goal_index() -> int:
 	return maxi(_get_reward_chest_goals().size() - 1, 0)
 

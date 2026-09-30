@@ -124,6 +124,7 @@ Files:
 - `scenes/ui/main_menu_top_status.tscn`
 - `scenes/ui/main_menu_reward_chest.tscn`
 - `scenes/ui/reward_chest_menu.tscn`
+- `scenes/ui/reward_chest_open_ceremony.tscn`
 - `scenes/ui/profile_menu.tscn`
 - `scenes/ui/profile_avatar_view.tscn`
 - `scenes/ui/profile_choice_tile.tscn`
@@ -141,8 +142,9 @@ Files:
 - `assets/ui/main_menu_lives.png`
 - `assets/ui/main_menu_reward_chest.png`
 - `assets/ui/main_menu_reward_chest_1024.png` (pixel-identical 8× enlargement of the transparent chest artwork for high-resolution use)
-- `assets/ui/main_menu_reward_chest_redraw_1024.png` (selected high-resolution redraw of the same chest artwork)
-- `assets/ui/main_menu_reward_chest_open_1024.png` (matching open pose with an empty dark interior)
+- `assets/ui/main_menu_reward_chest_redraw_1024.png` (selected high-resolution redraw of the same chest artwork; the closed chest in the opening sequence)
+- `assets/ui/main_menu_reward_chest_open_1024.png` (matching open pose with an empty dark interior; the opened chest in the opening sequence)
+- `assets/shaders/reward_chest_rays.gdshader` (rotating rays and glow behind the opening chest)
 - `assets/ui/reward_chest_menu_illustration.png`
 - `assets/abilities/ability_hammer.png`
 - `assets/abilities/ability_lantern.png`
@@ -169,6 +171,7 @@ Files:
 - `scripts/chapters/*.gd`
 - `scripts/main_menu_reward_chest.gd`
 - `scripts/main_menu_reward_star_flyer.gd`
+- `scripts/reward_chest_open_ceremony.gd`
 - `scripts/reward_chest_menu.gd`
 - `scripts/profile_menu.gd`
 - `scripts/profile_avatar_view.gd`
@@ -197,6 +200,7 @@ Responsibility:
   `scenes/ui/main_menu_coin_shortcut.tscn`, which also opens the Shop when pressed), saved lives,
   and a warm rounded settings button styled like the chapter selection back button.
 - Shows a separate side reward chest widget under the profile icon with saved stars versus the active configured goal; tapping it opens `scenes/ui/reward_chest_menu.tscn`, a read-only centered modal showing the same progress at a larger size, the dedicated `assets/ui/reward_chest_menu_illustration.png` artwork, and the coin payout waiting at the next goal.
+- When returning stars fill a chest goal, `scenes/ui/reward_chest_open_ceremony.tscn` lifts the chest to the centre, opens it on tap (or automatically), reveals the goal's coins and abilities, and flies coins into the coin counter and abilities onto the LEVEL button before the chest returns to its widget.
 - Advertises an eligible, priced Starter Bundle with `scenes/ui/main_menu_starter_bundle_badge.tscn`
   beside the reward chest. Its dedicated `starter_bundle_offer_modal.tscn` binds the catalog's
   actual rewards and regional price, then rechecks eligibility before the shared Shop purchase

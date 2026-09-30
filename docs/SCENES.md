@@ -178,7 +178,9 @@ navigate a screen away:
   skipping its own handling while Chapter Selection is open (Chapter Selection owns that press
   itself, avoiding a double-handling race regardless of the engine's `_unhandled_input` dispatch
   order between the two). With nothing open, `ui_cancel` on Main Menu intentionally does nothing --
-  it must not quit or navigate without a separately approved exit flow.
+  it must not quit or navigate without a separately approved exit flow. While the reward-chest
+  opening sequence plays, `ui_cancel` is consumed and advances it like a tap (opens a waiting
+  chest, cuts a settled reveal short) rather than closing anything beneath it.
 
 **Focus policy** -- `FOCUS_NONE`, consistently, across every interactive control in the four-screen
 scope. This project is mouse/touch-first (`project.godot`'s `config/features` includes `"Mobile"`,
@@ -385,6 +387,13 @@ Purpose:
 - After a completed level returns here, launches one reward star per earned star from the
   background house into the reward chest and advances the visible chest count on impact (see
   "Reward-Progress Semantics" above -- this used to fly clover-coin art).
+- When that flight fills a chest goal, holds the chest widget at full (`500/500`) instead of
+  wrapping to the next goal, and after the last star lands plays `%RewardChestOpenCeremony`: the
+  chest lifts to the centre, opens on tap (or on its own), reveals the goal's coins and abilities,
+  flies coins into the top coin counter and abilities onto the LEVEL button, then returns to its
+  widget, whose bar refills to the next goal's carried-over stars. The coin counter holds back the
+  goal's coins (already granted and saved by `PlayerProgress`) and counts up as each coin lands.
+  A flight that fills more than one goal plays one opening with the summed rewards.
 - Provides a bottom `%LevelButton` labeled with the selected chapter's next local level, such as
   `Level 1`; zero lives keeps it enabled and opens Out of Lives, while completed/unavailable
   chapters remain disabled as `More Levels Coming Soon` or `Coming Soon`.
@@ -431,6 +440,9 @@ Important nodes:
   positioned against the right safe edge below the top status row.
 - `%StarterBundleOfferModal`: hidden `scenes/ui/starter_bundle_offer_modal.tscn` instance above
   the shared menu overlay z-index. System Back closes it first unless a purchase is in progress.
+- `%RewardChestOpenCeremony`: hidden `scenes/ui/reward_chest_open_ceremony.tscn` instance above
+  every other overlay (shared overlay z-index + 2). While it plays, System Back advances it like a
+  tap and navigation/level launch are ignored.
 - Runtime child `scenes/ui/profile_menu.tscn`: centered pause-style profile editor window created when `ProfileWidget` is pressed.
 - Runtime child `scenes/ui/settings_menu.tscn`: centered pause-style settings window created when `SettingsWidget/SettingsButton` is pressed.
 - Runtime child `scenes/ui/reward_chest_menu.tscn`: centered pause-style reward chest detail modal created when the `RewardChest` widget emits `chest_pressed`.
@@ -445,6 +457,7 @@ Depends on:
 - `scenes/ui/main_menu_top_status.tscn` for top status icons and labels.
 - `scenes/ui/main_menu_reward_chest.tscn` for the side reward chest icon and progress bar.
 - `scenes/ui/main_menu_reward_star_flyer.tscn` for the reward-star flight effect.
+- `scenes/ui/reward_chest_open_ceremony.tscn` for the filled-chest opening sequence.
 - `scenes/ui/profile_menu.tscn` for profile name and avatar editing.
 - `scenes/ui/settings_menu.tscn` for the main-menu settings popup.
 - `scenes/ui/reward_chest_menu.tscn` for the reward chest detail modal.
@@ -1076,6 +1089,10 @@ Purpose:
 - Displays `assets/ui/main_menu_reward_chest.png` above a compact progress bar.
 - Shows the saved current star amount versus the active reward chest goal, such as `250/500`.
 - Emits `chest_pressed` when tapped so the owning menu can open `scenes/ui/reward_chest_menu.tscn`.
+- Supports the opening sequence: `get_chest_icon_global_rect()` is where the large chest lifts
+  from and returns to, `set_chest_icon_hidden()` hides the small icon (and its shadow) while the
+  large copy is out, and `play_refill()` empties the bar and counts it up to the next goal's
+  carried-over stars afterwards.
 
 Important nodes:
 - `Visual`: full-rect wrapper around `ChestIcon`/`IconShadow`/`ProgressTrack` -- `ChestButton`'s
@@ -1097,6 +1114,64 @@ Depends on:
 Do not use for:
 - Persisting reward stars or choosing the active goal. Those stay in `scripts/player_progress.gd` and `configs/reward_chest_goals.json`.
 - Owning the detail modal's layout. That is `scenes/ui/reward_chest_menu.tscn`.
+
+## `scenes/ui/reward_chest_open_ceremony.tscn`
+
+Root:
+- `RewardChestOpenCeremony` (`Control`, full rect, hidden until played)
+
+Script:
+- `scripts/reward_chest_open_ceremony.gd`
+
+Purpose:
+- Full-screen opening sequence the Main Menu plays after its star flight fills a chest goal.
+- Beats: **lift** (the chest arcs from the side widget to the centre of a dimmed screen and grows
+  to 300px), **wait** (wobbles a little harder each time with a pulsing `Tap to open` prompt;
+  opens on its own after `auto_open_delay`), **open** (squash, swap to the open art, warm flash,
+  rays, confetti, `shop_purchase_success` + `reward_chest_goal_complete` haptic), **reveal** (the
+  coin pile and one booster chip per granted ability pop out of the chest into a row above it and
+  hold for `reveal_hold`), **collect** (coins spray and fly into the top coin counter, 5-12 flying
+  coins at about one per 20 granted; abilities fly onto the LEVEL button), **return** (the closed
+  chest shrinks back into its widget).
+- A tap anywhere (or the owner forwarding `ui_cancel` to `advance()`) opens a waiting chest or cuts
+  a settled reveal short. The root swallows all taps so nothing underneath can be pressed.
+- Emits `opened`, `coin_arrived(arrived_count, total_count)`, `ability_arrived(ability_id)`, and
+  `finished`. The owner counts its balance up and pulses its targets from these.
+- Presentation only: it never reads or writes `PlayerProgress`.
+
+Important nodes:
+- `%Dim`: full-screen dim; lifts to half strength during collect so the counter and LEVEL button
+  are visible when rewards land.
+- `%Content`: holds the stage, reward row, and prompt. Screens shorter than 1200px scale it down
+  (to no less than 0.78) around the 55% line so it clears the top status bar.
+- `%Stage` (inside `%Content`): 300x300 chest stage anchored at 55% of the screen height.
+  - `%Rays`: `assets/shaders/reward_chest_rays.gdshader` rotating rays and glow, faint while
+	waiting and full after the burst.
+  - `%ClosedChest` / `%OpenChest`: `assets/ui/main_menu_reward_chest_redraw_1024.png` and
+	`assets/ui/main_menu_reward_chest_open_1024.png` (mipmapped, linear-with-mipmaps filtering).
+	The open art is drawn about 7.5% smaller and offset in its canvas, so `%OpenChest`'s anchors
+    scale and shift it to line its body up with the closed chest.
+  - `%ChestBurst` / `%ChestSparkles`: one-shot paper confetti and star particles from the mouth.
+- `%RewardPanel`: coin pile (`shop_coin_offer_tier_02.png`) with a `+N` label, above four
+  `scenes/ui/offer_booster_chip.tscn` slots in light-text mode. Zero-count rewards hide their slot.
+- `%TapHint`: prompt on a fitted dark pill so it stays legible over the dimmed LEVEL button.
+- `%Flash`: full-screen warm flash at the burst.
+- `%FlyerLayer`: unscaled layer for the flying coins and ability icons.
+
+Capture:
+- `scripts/tools/captures/reward_chest_ceremony_waiting_setup.gd` and
+  `reward_chest_ceremony_reveal_setup.gd` freeze those beats in the real Main Menu at every
+  resolution. `reward_chest_ceremony_burst_setup.gd` is time-sensitive; capture one resolution
+  with `-Settle 1`.
+
+Depends on:
+- `scripts/ui_motion.gd`, `SfxManager`, `HapticsManager`.
+- `scenes/ui/offer_booster_chip.tscn` and the ability icons in `assets/abilities/`.
+
+Do not use for:
+- Granting or saving rewards. `PlayerProgress` does that when the level completes.
+- Choosing what the chest contains. The owner passes the goal's rewards from
+  `configs/reward_chest_goals.json` through `PlayerProgress`.
 
 ## `scenes/ui/reward_chest_menu.tscn`
 
