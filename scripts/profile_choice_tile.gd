@@ -5,8 +5,10 @@ signal choice_selected(choice_id: String)
 
 @onready var _preview := %ProfileAvatarView as ProfileAvatarView
 @onready var _selected_badge := %SelectedBadge as Control
+@onready var _locked_badge := %LockedBadge as Control
 
 var choice_id := ""
+var _is_locked := false
 
 
 func _ready() -> void:
@@ -25,13 +27,22 @@ func set_choice_selected(is_selected: bool) -> void:
 	_apply_state(is_selected)
 
 
+func set_choice_locked(is_locked: bool) -> void:
+	_is_locked = is_locked
+	_preview.modulate = Color(0.52, 0.52, 0.52, 1.0) if is_locked else Color.WHITE
+	_locked_badge.visible = is_locked
+	_apply_state(button_pressed)
+
+
 func _emit_selection() -> void:
+	if _is_locked:
+		button_pressed = false
 	choice_selected.emit(choice_id)
 
 
 func _apply_state(is_selected: bool) -> void:
 	if _selected_badge != null:
-		_selected_badge.visible = is_selected
+		_selected_badge.visible = is_selected and not _is_locked
 	add_theme_stylebox_override("normal", _create_tile_style(is_selected, false))
 	add_theme_stylebox_override("hover", _create_tile_style(is_selected, true))
 	add_theme_stylebox_override("pressed", _create_tile_style(true, true))
@@ -40,8 +51,8 @@ func _apply_state(is_selected: bool) -> void:
 
 func _create_tile_style(is_selected: bool, is_hover: bool) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.84, 0.68, 0.49, 1)
-	style.border_color = Color(1.0, 0.91, 0.7, 0.9)
+	style.bg_color = Color(0.5, 0.49, 0.47, 1) if _is_locked else Color(0.84, 0.68, 0.49, 1)
+	style.border_color = Color(0.77, 0.76, 0.72, 0.9) if _is_locked else Color(1.0, 0.91, 0.7, 0.9)
 	style.border_width_left = 2
 	style.border_width_top = 2
 	style.border_width_right = 2
@@ -53,7 +64,10 @@ func _create_tile_style(is_selected: bool, is_hover: bool) -> StyleBoxFlat:
 	style.shadow_color = Color(0.3, 0.12, 0.07, 0.24)
 	style.shadow_size = 5
 	style.shadow_offset = Vector2(0, 2)
-	if is_selected:
+	if _is_locked:
+		if is_hover:
+			style.bg_color = Color(0.57, 0.56, 0.54, 1)
+	elif is_selected:
 		style.bg_color = Color(0.62, 0.25, 0.18, 1)
 		style.border_color = Color(1.0, 0.92, 0.62, 1)
 		style.border_width_left = 4

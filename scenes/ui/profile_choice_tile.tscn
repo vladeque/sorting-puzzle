@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/profile_choice_tile.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/ui/profile_avatar_view.tscn" id="2_avatar_view"]
@@ -19,6 +19,13 @@ shadow_size = 4
 shadow_offset = Vector2(0, 2)
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_button"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_locked_badge"]
+bg_color = Color(0.2, 0.2, 0.21, 0.92)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
 
 [node name="ProfileChoiceTile" type="Button"]
 custom_minimum_size = Vector2(112, 112)
@@ -72,5 +79,36 @@ theme_override_colors/font_outline_color = Color(0.05, 0.28, 0.02, 1)
 theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 26
 text = "✓"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LockedBadge" type="Panel" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -38.0
+offset_top = -28.0
+offset_right = 38.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_locked_badge")
+
+[node name="LockedLabel" type="Label" parent="LockedBadge"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.94, 0.94, 0.92, 1)
+theme_override_font_sizes/font_size = 13
+text = "LOCKED"
 horizontal_alignment = 1
 vertical_alignment = 1

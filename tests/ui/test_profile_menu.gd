@@ -33,6 +33,7 @@ func _run() -> void:
 
 	var grid := menu.get_node("%ChoiceGrid") as GridContainer
 	var choice_scroll := menu.get_node("%ChoiceScroll") as ScrollContainer
+	var unlock_hint := menu.get_node("%UnlockHint") as Label
 	var edit_name_button := menu.get_node("%EditNameButton") as Button
 	var pencil_icon := edit_name_button.get_node_or_null("%PencilIcon") as TextureRect
 	var name_input := menu.get_node("%NameLineEdit") as LineEdit
@@ -90,7 +91,7 @@ func _run() -> void:
 		preview_avatar_texture.texture.resource_path != preview_frame_texture.texture.resource_path,
 		"Avatar and frame layers use separate textures."
 	)
-	for frame_id in _progress.get_available_avatar_frame_ids():
+	for frame_id in ProfileFrameCatalogScript.get_available_frame_ids():
 		var texture_path := ProfileFrameCatalogScript.get_frame_texture_path(str(frame_id))
 		_check(ResourceLoader.exists(texture_path, "Texture2D"), "Frame texture exists: %s" % frame_id)
 	_check(
@@ -99,21 +100,43 @@ func _run() -> void:
 	)
 	menu.call("_switch_tab", &"frame")
 	await process_frame
-	_check(grid.get_child_count() == 9, "Frame tab shows all configured frames.")
+	_check(grid.get_child_count() == 12, "Frame tab shows standard and weekly frames.")
 	_check(not _progress.get_available_avatar_frame_ids().has("frame_weekly_bronze"),
 		"Weekly frames stay locked before an authoritative award.")
+	var locked_requirements := {
+		"frame_weekly_bronze": "3rd or better",
+		"frame_weekly_silver": "2nd or better",
+		"frame_weekly_gold": "1st",
+	}
+	for frame_id in locked_requirements:
+		var tile := (menu.get("_choice_tiles") as Dictionary)[frame_id] as Button
+		_check(bool(tile.get("_is_locked")), "Unearned %s tile is locked." % frame_id)
+		_check((tile.get_node("%LockedBadge") as Control).visible,
+			"Unearned %s tile shows a lock badge." % frame_id)
+		_check((tile.get_node("%ProfileAvatarView") as Control).modulate.r < 0.6,
+			"Unearned %s tile is gray." % frame_id)
+		tile.pressed.emit()
+		_check(unlock_hint.visible and unlock_hint.text.contains(str(locked_requirements[frame_id])),
+			"Tapping %s explains its Weekly finish requirement." % frame_id)
+		_check(str(menu.get("_selected_avatar_frame_id")) == "frame_classic",
+			"Tapping %s does not select an unearned frame." % frame_id)
 	_check(not _progress.set_profile_customization(
 		_progress.get_avatar_id(), "frame_weekly_gold", _progress.get_player_name()
 	), "A locked gold frame cannot be saved.")
 	var save_data := _progress.get("_data") as Dictionary
 	for best_rank in [3, 2, 1]:
 		save_data["weekly_frame_best_rank"] = best_rank
+		menu.call("_rebuild_choice_grid")
 		var unlocked: Array[String] = _progress.get_available_avatar_frame_ids()
 		_check(unlocked.has("frame_weekly_bronze"), "Third place unlocks bronze.")
 		_check(unlocked.has("frame_weekly_silver") == (best_rank <= 2),
 			"Second place unlocks silver and bronze.")
 		_check(unlocked.has("frame_weekly_gold") == (best_rank == 1),
 			"First place unlocks all three frames.")
+		for frame_id in locked_requirements:
+			var tile := (menu.get("_choice_tiles") as Dictionary)[frame_id] as Button
+			_check(bool(tile.get("_is_locked")) == not unlocked.has(frame_id),
+				"%s tile reflects the earned rank %d." % [frame_id, best_rank])
 	save_data["weekly_frame_best_rank"] = 0
 	menu.call("_select_choice", "frame_plum")
 	_check(

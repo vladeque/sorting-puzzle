@@ -1338,6 +1338,8 @@ Purpose:
 - Shows a live avatar/frame preview beside the saved player name and a compact pencil edit button.
 - Provides segmented Avatar and Frame tabs backed by one edge-filling, touch-scrollable
   three-column choice grid without a visible scrollbar.
+- Lists earned and unearned Weekly frames together. Locked tiles are gray with a badge, and
+  `%UnlockHint` explains the completed-week placement required when one is tapped.
 - Shows all 18 supplied avatar assets and all configured cosmetic frames, with a check badge on the
   pending selection.
 - Saves the entered player name, selected avatar, and local frame through `PlayerProgress` only when
@@ -1390,6 +1392,8 @@ Script:
 
 Purpose:
 - Reusable profile-editor choice button containing `ProfileAvatarView` and a green selected badge.
+- A locked frame uses a gray tile treatment and `LockedBadge` while remaining tappable for the
+  profile menu's unlock explanation.
 - Previews an avatar with the pending frame on the Avatar tab, or the pending avatar with each frame
   on the Frame tab.
 

@@ -26,6 +26,12 @@ static func get_unlocked_frame_ids(best_weekly_rank: int) -> Array[String]:
 	return unlocked
 
 
+static func get_weekly_rank_required(frame_id: String) -> int:
+	_ensure_loaded()
+	var definition := _frames.get(frame_id, {}) as Dictionary
+	return int(definition.get("weekly_rank_required", 0))
+
+
 static func get_default_frame_id() -> String:
 	_ensure_loaded()
 	return _default_frame_id

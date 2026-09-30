@@ -92,8 +92,14 @@ the profile editor. Windowed captures showed readable
 avatar faces and distinct metals at 540x960, 720x1280, 1080x1920, and 1080x2400. A requested
 900x1200 tablet capture rendered at 675x1200 instead and is not a faithful tablet-layout check.
 
-The frame picker shows bronze for a best finish of third, silver and bronze for second, and all
-three for first. Without a server-awarded rank, it shows only the nine standard frames.
+The frame picker always shows all three weekly frames after the nine standard choices. Unearned
+frames are gray with a `LOCKED` badge; tapping one leaves the selection unchanged and displays the
+required Weekly finish. A best finish of third unlocks bronze, second unlocks silver and bronze,
+and first unlocks all three.
+`scripts/tools/captures/profile_weekly_frame_locked_setup.gd` captures the unearned gold tile after
+it is tapped. The gray premium row, `LOCKED` badges, and first-place explanation are legible at
+540x960, 720x1280, 1080x1920, and 1080x2400. The requested 900x1200 tablet capture again
+rendered at 675x1200, so it does not verify that exact viewport.
 `scripts/tools/captures/profile_weekly_frame_unlocked_setup.gd` captures the real first-place
 picker state. The three metals are distinct and the selected gold frame remains legible at
 540x960, 720x1280, 1080x1920, and 1080x2400. The requested 900x1200 tablet render again came

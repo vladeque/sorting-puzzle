@@ -3,6 +3,7 @@ extends Control
 signal profile_saved(avatar_id: String, avatar_frame_id: String)
 
 const UIMotionScript := preload("res://scripts/ui_motion.gd")
+const ProfileFrameCatalogScript := preload("res://scripts/profile_frame_catalog.gd")
 const PROFILE_CHOICE_TILE_SCENE := preload("res://scenes/ui/profile_choice_tile.tscn")
 const GRID_COLUMNS := 3
 const PANEL_MAX_WIDTH := 600.0
@@ -25,6 +26,7 @@ const TAB_FRAME := &"frame"
 @onready var _frame_tab := %FrameTab as Button
 @onready var _choice_scroll := %ChoiceScroll as ScrollContainer
 @onready var _choice_grid := %ChoiceGrid as GridContainer
+@onready var _unlock_hint := %UnlockHint as Label
 @onready var _save_button := %SaveButton as Button
 @onready var _close_button := %CloseButton as Button
 
@@ -61,6 +63,7 @@ func _ready() -> void:
 
 func _switch_tab(tab_id: StringName) -> void:
 	_active_tab = tab_id if tab_id in [TAB_AVATAR, TAB_FRAME] else TAB_AVATAR
+	_unlock_hint.visible = false
 	_avatar_tab.button_pressed = _active_tab == TAB_AVATAR
 	_frame_tab.button_pressed = _active_tab == TAB_FRAME
 	_apply_tab_style(_avatar_tab, _active_tab == TAB_AVATAR, true)
@@ -76,8 +79,9 @@ func _rebuild_choice_grid() -> void:
 	var choice_ids: Array = (
 		PlayerProgress.get_available_avatar_ids()
 		if _active_tab == TAB_AVATAR
-		else PlayerProgress.get_available_avatar_frame_ids()
+		else ProfileFrameCatalogScript.get_available_frame_ids()
 	)
+	var unlocked_frame_ids := PlayerProgress.get_available_avatar_frame_ids()
 	for raw_choice_id in choice_ids:
 		var choice_id := str(raw_choice_id)
 		var tile := PROFILE_CHOICE_TILE_SCENE.instantiate() as ProfileChoiceTile
@@ -85,6 +89,7 @@ func _rebuild_choice_grid() -> void:
 		var preview_avatar_id := choice_id if _active_tab == TAB_AVATAR else _selected_avatar_id
 		var preview_frame_id := _selected_avatar_frame_id if _active_tab == TAB_AVATAR else choice_id
 		tile.setup(choice_id, preview_avatar_id, preview_frame_id)
+		tile.set_choice_locked(_active_tab == TAB_FRAME and not unlocked_frame_ids.has(choice_id))
 		tile.choice_selected.connect(_select_choice)
 		var is_selected := (
 			choice_id == _selected_avatar_id
@@ -101,9 +106,28 @@ func _select_choice(choice_id: String) -> void:
 	if _active_tab == TAB_AVATAR:
 		_selected_avatar_id = choice_id
 	else:
+		if not PlayerProgress.get_available_avatar_frame_ids().has(choice_id):
+			_show_locked_frame_hint(choice_id)
+			return
 		_selected_avatar_frame_id = choice_id
+	_unlock_hint.visible = false
 	_profile_preview.set_profile(_selected_avatar_id, _selected_avatar_frame_id)
 	_rebuild_choice_grid()
+
+
+func _show_locked_frame_hint(frame_id: String) -> void:
+	var required_rank := ProfileFrameCatalogScript.get_weekly_rank_required(frame_id)
+	match required_rank:
+		1:
+			_unlock_hint.text = "Gold unlocks when you finish 1st on a Weekly leaderboard."
+		2:
+			_unlock_hint.text = "Silver unlocks when you finish 2nd or better on a Weekly leaderboard."
+		3:
+			_unlock_hint.text = "Bronze unlocks when you finish 3rd or better on a Weekly leaderboard."
+		_:
+			return
+	_unlock_hint.text += " Awards arrive after the week ends."
+	_unlock_hint.visible = true
 
 
 func _begin_name_edit() -> void:
