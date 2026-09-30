@@ -140,6 +140,7 @@ Files:
 - `assets/ui/reward_star_84x84.png`
 - `assets/ui/main_menu_lives.png`
 - `assets/ui/main_menu_reward_chest.png`
+- `assets/ui/main_menu_reward_chest_1024.png` (pixel-identical 8× enlargement of the transparent chest artwork for high-resolution use)
 - `assets/ui/reward_chest_menu_illustration.png`
 - `assets/abilities/ability_hammer.png`
 - `assets/abilities/ability_lantern.png`
