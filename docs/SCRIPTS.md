@@ -98,6 +98,16 @@ Attached to `scenes/testing/reward_chest_fill_preview.tscn`. It drives the produ
 and star flyer in an isolated, replayable F6 preview, updates a local-only progress count, and plays
 the semantic chest-arrival event on each impact. It never touches saved progression.
 
+## `scripts/testing/main_menu_reward_chest_preview.gd`
+
+Attached to `scenes/testing/main_menu_reward_chest_preview.tscn`. `play_preview()` reads the saved
+chest position, builds a pending-reward payload that fills the active goal with `stars_per_run`
+stars (`overflow_stars` of them past the goal), and passes it to the embedded production menu's
+pending-reward methods, so the star flight and chest opening run unmodified. It listens to the
+flyer and ceremony only to update `%StatusLabel`, and on the ceremony's `finished` (after the
+menu's own handler) replaces the menu's saved-progress refill with the simulated carry-over. It
+never writes `PlayerProgress`. `is_playing()` lets tests and captures wait for a run.
+
 ## `scripts/production_main_menu.gd`
 
 Attached to:

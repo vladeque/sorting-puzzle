@@ -45,6 +45,28 @@ See [STICKY_ITEMS.md](STICKY_ITEMS.md) for ownership, rules, capture commands, a
 - `tests/ui/test_reward_chest_fill_preview.gd` runs a complete twelve-star flight and verifies the
   visible fill, per-impact semantic audio requests, and unchanged saved progress.
 
+## Main Menu reward chest preview
+
+- `scenes/testing/main_menu_reward_chest_preview.tscn` is a standalone F6 preview of the real
+  production Main Menu (`%MainMenu`, an instance of `scenes/main_menu.tscn`) filling its reward
+  chest and playing `reward_chest_open_ceremony.tscn`. Also opened from
+  `scenes/main_menu_testing.tscn` (**Reward chest opening preview**, shown only where developer
+  level select is enabled).
+- It builds a pending-reward payload from the saved chest position that fills the active goal
+  (`stars_per_run` stars, the last `overflow_stars` of them carrying into the next goal) and hands
+  it to the menu's own `_prepare_pending_reward_animation()`/`_play_pending_reward_animation()`,
+  the path a completed level takes. Autoplays once; `%ReplayButton` replays.
+- Presentation only: it never writes `PlayerProgress`. The coin counter counts back up to the
+  unchanged saved balance, and after the opening the chest widget refills to the preview's
+  simulated carry-over rather than saved progress.
+- `PreviewBar` covers the bottom navigation, so Shop/Leaderboard cannot be opened by accident, and
+  sits under the menu's overlays so the opening's dim covers it as it would any menu content. The
+  LEVEL button still launches a real level.
+- `tests/ui/test_main_menu_reward_chest_preview.gd` runs one full preview and checks every star
+  lands, the opening plays, the widget refills to the carry-over, and saved progress is unchanged.
+- Capture: `scripts/tools/captures/main_menu_reward_chest_preview_setup.gd` stops at the chest
+  waiting for a tap.
+
 All UI scenes inherit the project typography theme from
 `assets/themes/game_typography.tres`. Scene labels select semantic variations
 such as `GameTitleLabel`, `GameNumberLabel`, and `GameBodyLabel`; see

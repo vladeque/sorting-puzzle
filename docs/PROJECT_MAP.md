@@ -21,6 +21,9 @@ Testing menu:
   as the chapter grows toward several hundred levels.
 - `scenes/testing/reward_chest_fill_preview.tscn` can be run directly with F6 to replay a full
   reward-star flight into the production chest widget without changing saved progress.
+- `scenes/testing/main_menu_reward_chest_preview.tscn` (F6, or **Reward chest opening preview** in
+  the testing menu) plays the real Main Menu filling its chest and the full opening sequence
+  without changing saved progress.
 
 Playable level scene:
 - `level.tscn`
