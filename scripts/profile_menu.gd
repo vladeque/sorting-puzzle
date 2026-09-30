@@ -26,7 +26,7 @@ const TAB_FRAME := &"frame"
 @onready var _frame_tab := %FrameTab as Button
 @onready var _choice_scroll := %ChoiceScroll as ScrollContainer
 @onready var _choice_grid := %ChoiceGrid as GridContainer
-@onready var _unlock_hint := %UnlockHint as Label
+@onready var _unlock_toast := %UnlockToast as ToastMessage
 @onready var _save_button := %SaveButton as Button
 @onready var _close_button := %CloseButton as Button
 
@@ -63,7 +63,6 @@ func _ready() -> void:
 
 func _switch_tab(tab_id: StringName) -> void:
 	_active_tab = tab_id if tab_id in [TAB_AVATAR, TAB_FRAME] else TAB_AVATAR
-	_unlock_hint.visible = false
 	_avatar_tab.button_pressed = _active_tab == TAB_AVATAR
 	_frame_tab.button_pressed = _active_tab == TAB_FRAME
 	_apply_tab_style(_avatar_tab, _active_tab == TAB_AVATAR, true)
@@ -110,24 +109,16 @@ func _select_choice(choice_id: String) -> void:
 			_show_locked_frame_hint(choice_id)
 			return
 		_selected_avatar_frame_id = choice_id
-	_unlock_hint.visible = false
 	_profile_preview.set_profile(_selected_avatar_id, _selected_avatar_frame_id)
 	_rebuild_choice_grid()
 
 
 func _show_locked_frame_hint(frame_id: String) -> void:
 	var required_rank := ProfileFrameCatalogScript.get_weekly_rank_required(frame_id)
-	match required_rank:
-		1:
-			_unlock_hint.text = "Gold unlocks when you finish 1st on a Weekly leaderboard."
-		2:
-			_unlock_hint.text = "Silver unlocks when you finish 2nd or better on a Weekly leaderboard."
-		3:
-			_unlock_hint.text = "Bronze unlocks when you finish 3rd or better on a Weekly leaderboard."
-		_:
-			return
-	_unlock_hint.text += " Awards arrive after the week ends."
-	_unlock_hint.visible = true
+	if required_rank <= 0:
+		return
+	var placement := "1st" if required_rank == 1 else "top %d" % required_rank
+	_unlock_toast.show_message("Finish %s on the Weekly leaderboard to unlock" % placement)
 
 
 func _begin_name_edit() -> void:

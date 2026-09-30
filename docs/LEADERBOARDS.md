@@ -74,8 +74,8 @@ Weekly world period, competition rank 1 unlocks all three, rank 2 unlocks silver
 rank 3 unlocks bronze. The best award is permanent and crosses account merges. The optional
 `leaderboards.weekly_frame_best_rank` field in an authoritative v2 checkpoint is cached in
 `PlayerProgress`; a missing field means no new award. The profile frame picker and local save guard
-use this rank. All weekly frames remain visible in the picker; unearned ones are gray and tapping
-them shows the finish required after the week closes. The backend checks the rank again on both v1
+use this rank. All weekly frames remain visible in the picker; unearned ones show a padlock and
+tapping them briefly shows the required Weekly finish. The backend checks the rank again on both v1
 profile updates and v2 profile edits. The
 local observed-rank coin reward above does not unlock premium frames.
 `BackendReadOperations` recognizes the three premium frame IDs on public leaderboard rows and

@@ -1,10 +1,11 @@
-[gd_scene load_steps=14 format=3 uid="uid://b5yb0hlfitnqa"]
+[gd_scene load_steps=15 format=3 uid="uid://b5yb0hlfitnqa"]
 
 [ext_resource type="Script" uid="uid://cemgcq68qegb" path="res://scripts/profile_menu.gd" id="1_profile_menu"]
 [ext_resource type="PackedScene" path="res://scenes/ui/level_button.tscn" id="2_level_button"]
 [ext_resource type="PackedScene" path="res://scenes/ui/profile_avatar_view.tscn" id="3_avatar_view"]
 [ext_resource type="Texture2D" path="res://assets/ui/pencil_icon.png" id="4_pencil_icon"]
 [ext_resource type="PackedScene" uid="uid://yeagixqgwwfq" path="res://scenes/ui/modal_awning_header.tscn" id="90_awning_header"]
+[ext_resource type="PackedScene" path="res://scenes/ui/toast_message.tscn" id="5_toast"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_outer_panel"]
 bg_color = Color(0.67, 0.32, 0.22, 1)
@@ -365,19 +366,6 @@ layout_mode = 2
 mouse_filter = 2
 color = Color(0.48, 0.25, 0.17, 0.22)
 
-[node name="UnlockHint" type="Label" parent="ProfileMenuPanel/SelectorPanel/SelectorMargin/SelectorStack"]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(0, 52)
-layout_mode = 2
-size_flags_horizontal = 3
-mouse_filter = 2
-theme_override_colors/font_color = Color(0.42, 0.16, 0.1, 1)
-theme_override_font_sizes/font_size = 18
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 2
-
 [node name="ChoiceScroll" type="ScrollContainer" parent="ProfileMenuPanel/SelectorPanel/SelectorMargin/SelectorStack"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -415,3 +403,7 @@ layout_mode = 2
 theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 32
 text = "SAVE"
+
+[node name="UnlockToast" parent="." instance=ExtResource("5_toast")]
+unique_name_in_owner = true
+layout_mode = 1

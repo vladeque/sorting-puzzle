@@ -33,7 +33,7 @@ func _run() -> void:
 
 	var grid := menu.get_node("%ChoiceGrid") as GridContainer
 	var choice_scroll := menu.get_node("%ChoiceScroll") as ScrollContainer
-	var unlock_hint := menu.get_node("%UnlockHint") as Label
+	var unlock_toast := menu.get_node("%UnlockToast") as ToastMessage
 	var edit_name_button := menu.get_node("%EditNameButton") as Button
 	var pencil_icon := edit_name_button.get_node_or_null("%PencilIcon") as TextureRect
 	var name_input := menu.get_node("%NameLineEdit") as LineEdit
@@ -104,22 +104,50 @@ func _run() -> void:
 	_check(not _progress.get_available_avatar_frame_ids().has("frame_weekly_bronze"),
 		"Weekly frames stay locked before an authoritative award.")
 	var locked_requirements := {
-		"frame_weekly_bronze": "3rd or better",
-		"frame_weekly_silver": "2nd or better",
+		"frame_weekly_bronze": "top 3",
+		"frame_weekly_silver": "top 2",
 		"frame_weekly_gold": "1st",
 	}
+	_check(not unlock_toast.visible, "The unlock toast starts hidden.")
+	_check(unlock_toast.mouse_filter == Control.MOUSE_FILTER_IGNORE,
+		"The unlock toast never blocks taps on the picker.")
 	for frame_id in locked_requirements:
 		var tile := (menu.get("_choice_tiles") as Dictionary)[frame_id] as Button
+		var tile_preview := tile.get_node("%ProfileAvatarView") as Control
+		var lock_icon := tile.get_node("%LockIcon") as TextureRect
 		_check(bool(tile.get("_is_locked")), "Unearned %s tile is locked." % frame_id)
-		_check((tile.get_node("%LockedBadge") as Control).visible,
-			"Unearned %s tile shows a lock badge." % frame_id)
-		_check((tile.get_node("%ProfileAvatarView") as Control).modulate.r < 0.6,
-			"Unearned %s tile is gray." % frame_id)
+		_check(tile.get_node_or_null("%LockedBadge") == null,
+			"Unearned %s tile has no LOCKED text badge." % frame_id)
+		_check(lock_icon.visible and lock_icon.texture != null,
+			"Unearned %s tile shows a lock icon." % frame_id)
+		_check(lock_icon.get_rect().get_center().is_equal_approx(tile.size * 0.5),
+			"Unearned %s lock sits in the middle of the tile." % frame_id)
+		_check(lock_icon.size.x < tile.size.x * 0.5, "Unearned %s lock stays small." % frame_id)
+		_check((tile_preview.get_node("%AvatarTexture") as CanvasItem).self_modulate.r < 0.6,
+			"Unearned %s tile darkens the avatar under the lock." % frame_id)
+		_check((tile_preview.get_node("%FrameTexture") as CanvasItem).self_modulate == Color.WHITE
+			and tile_preview.modulate == Color.WHITE,
+			"Unearned %s tile keeps the frame art in full color." % frame_id)
 		tile.pressed.emit()
-		_check(unlock_hint.visible and unlock_hint.text.contains(str(locked_requirements[frame_id])),
+		_check(unlock_toast.visible
+			and unlock_toast.get_message().contains(str(locked_requirements[frame_id])),
 			"Tapping %s explains its Weekly finish requirement." % frame_id)
+		_check(unlock_toast.get_message().length() <= 50,
+			"The %s unlock explanation stays short." % frame_id)
 		_check(str(menu.get("_selected_avatar_frame_id")) == "frame_classic",
 			"Tapping %s does not select an unearned frame." % frame_id)
+	var unlocked_tile := (menu.get("_choice_tiles") as Dictionary)["frame_classic"] as Button
+	_check(not (unlocked_tile.get_node("%LockIcon") as Control).visible,
+		"Earned frames show no lock icon.")
+	var toast_band := unlock_toast.get_node("Band") as Control
+	_check(absf(toast_band.get_global_rect().get_center().y - menu.size.y * 0.5) < 2.0,
+		"The unlock toast appears in the middle of the screen.")
+	_check(is_equal_approx(unlock_toast.display_seconds, 2.0),
+		"The unlock toast is configured to disappear after two seconds.")
+	await create_timer(1.5).timeout
+	_check(unlock_toast.visible, "The unlock toast is still readable after 1.5 seconds.")
+	await create_timer(0.8).timeout
+	_check(not unlock_toast.visible, "The unlock toast disappears on its own after two seconds.")
 	_check(not _progress.set_profile_customization(
 		_progress.get_avatar_id(), "frame_weekly_gold", _progress.get_player_name()
 	), "A locked gold frame cannot be saved.")
