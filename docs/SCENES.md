@@ -1111,12 +1111,12 @@ Purpose:
 - Reads live progress from `PlayerProgress.get_reward_chest_progress()` itself in `_ready()`, the
   same way `scenes/ui/profile_menu.tscn` reads its own data; the opening menu does not push data in.
 - Shows the `Chest rewards` title, a star-to-chest `current/goal` progress row, explanatory copy
-  between the progress row and bordered hero illustration, the coin payout waiting at the active
-  goal, and a large `Continue` button.
+  between the progress row and bordered hero illustration, and a large `Continue` button.
 - Purely informational: coins are still granted automatically on goal rollover in
   `scripts/player_progress.gd`, so `Continue` only closes the modal and does not claim anything.
-- The 600x916 logical-pixel outer panel occupies most of the 720-wide design viewport while still
-  fitting the shorter tablet-like logical viewport produced by the project's `keep_width` stretch.
+- The 600x1000 logical-pixel outer panel occupies most of the 720-wide design viewport. Its owner
+  scales it down when the viewport is shorter or narrower so the awning and close button stay visible
+  on tablet-like screens.
   It grew 16px at the top for the awning header, and `InnerPanel` starts at y=110 so the hanging
   title plate keeps a gap above it. It narrowed from 640 to 600px, matching Edit Profile, because
   the close button on the awning's rail end reaches 44px past the panel's right edge and would
@@ -1125,23 +1125,22 @@ Purpose:
   `AwningHeader`, `title_text` set in the scene), and the red close button sits on the right end of
   the awning's rail (top-right anchor, offset `-28, -76`), after the header so it draws above it.
 - The `ChestStage` uses `assets/ui/reward_chest_current_abilities.png`, showing the current hammer,
-  shuffle, Lantern, and Freezer icons with coins around the blue-and-gold chest. The small
-  main-menu reward chest remains a separate icon and also marks the goal end of the progress row.
+  shuffle, Lantern, and Freezer icons with three coins around the blue-and-gold chest. The taller
+  panel reserves a 100-pixel heading band above the illustration so the top coin remains visible.
+  The small main-menu reward chest remains a separate icon and also marks the goal end of the
+  progress row.
 
 Important nodes:
 - `RewardChestPanel`: centered outer popup panel, styled like `scenes/ui/profile_menu.tscn`'s panel.
-- `CloseButton`: protruding red circular close button; the script wires it to `queue_free()`.
+- `CloseButton`: protruding red circular close button; the script wires it to `close()`.
 - `InnerPanel/ContentStack/ProgressRow`: star icon, progress column, and reward-chest goal icon.
 - `ProgressRow/ProgressColumn/ProgressTrack/ProgressBar` and `.../AmountLabel`: bound to the active
-  goal; `ProgressColumn/GoalCaptionLabel` shows `"<n> stars to go"`.
+  goal.
 - `InnerPanel/ContentStack/HeroBodyLabel`: centered unlock guidance between the progress row and
   hero image.
-- `InnerPanel/ContentStack/ChestStage`: bordered, aspect-covered hero image with a translucent
-  headline overlay and bottom reward badge. The image uses
-  `assets/ui/rounded_texture_clip.gdshader` with a 16-pixel image radius inside the frame's
-  8-pixel inset, keeping it concentric with the frame's 24-pixel radius.
-- `ChestStage/RewardBadge/NextRewardRow/NextRewardLabel`: `"Reward: +<n> coins"` from the active
-  goal's `coin_reward`.
+- `InnerPanel/ContentStack/ChestStage`: bordered, aspect-covered hero image below its headline
+  band. The illustration starts 100 pixels below the frame's top edge, with an 8-pixel side and
+  bottom inset. `assets/ui/rounded_texture_clip.gdshader` rounds its corners by 16 pixels.
 - `ContinueButton`: large green action in the outer panel's reserved footer area; closes the modal
   like `CloseButton`.
 

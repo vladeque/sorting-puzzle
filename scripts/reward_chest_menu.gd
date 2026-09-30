@@ -2,7 +2,12 @@ extends Control
 
 const UIMotionScript := preload("res://scripts/ui_motion.gd")
 const ILLUSTRATION_CORNER_RADIUS := 16.0
+const PANEL_TOP_OVERHANG := 80.0
+const PANEL_RIGHT_OVERHANG := 44.0
+const HORIZONTAL_MARGIN := 16.0
+const VERTICAL_MARGIN := 24.0
 
+@onready var _panel := $RewardChestPanel as Panel
 @onready var _close_button := %CloseButton as Button
 @onready var _continue_button := %ContinueButton as Button
 @onready var _illustration := %Illustration as TextureRect
@@ -13,9 +18,30 @@ const ILLUSTRATION_CORNER_RADIUS := 16.0
 func _ready() -> void:
 	_close_button.pressed.connect(close)
 	_continue_button.pressed.connect(close)
+	resized.connect(_fit_panel_to_viewport)
+	_fit_panel_to_viewport()
 	_illustration.resized.connect(_sync_illustration_corner_mask)
 	_sync_illustration_corner_mask()
 	_apply_reward_progress(PlayerProgress.get_reward_chest_progress())
+
+
+func _fit_panel_to_viewport() -> void:
+	_panel.pivot_offset = _panel.size * 0.5
+	var panel_center_y := (_panel.offset_top + _panel.offset_bottom) * 0.5
+	var top_extent := _panel.size.y * 0.5 + PANEL_TOP_OVERHANG
+	var bottom_extent := _panel.size.y * 0.5
+	var top_room := size.y * 0.5 + panel_center_y - VERTICAL_MARGIN
+	var bottom_room := size.y * 0.5 - panel_center_y - VERTICAL_MARGIN
+	var right_extent := _panel.size.x * 0.5 + PANEL_RIGHT_OVERHANG
+	var horizontal_room := size.x * 0.5 - HORIZONTAL_MARGIN
+	var fit_scale := minf(
+		1.0,
+		minf(
+			minf(top_room / top_extent, bottom_room / bottom_extent),
+			horizontal_room / right_extent
+		)
+	)
+	_panel.scale = Vector2.ONE * maxf(fit_scale, 0.01)
 
 
 ## Fades out and frees this modal. Safe to call more than once (Close pressed, Continue pressed,

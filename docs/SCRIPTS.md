@@ -844,14 +844,16 @@ Purpose:
 
 Key methods:
 - `close()`: fades this modal out via `scripts/ui_motion.gd`, then frees it.
+- `_fit_panel_to_viewport()`: scales the centered panel when the viewport cannot fit its taller
+  three-coin illustration, awning, and close button at design size.
 - `_apply_reward_progress(progress)`: writes the clamped `current/goal` values into the progress bar
-  and label, the remaining-stars caption, and the hero image's reward badge.
+  and label.
 - `_sync_illustration_corner_mask()`: updates the image shader with the illustration's actual
   runtime size and 16-pixel corner radius whenever container layout resizes it.
 
 Depends on:
 - `scenes/ui/reward_chest_menu.tscn` node names `%CloseButton`, `%ContinueButton`, `%ProgressBar`,
-  `%Illustration`, `%AmountLabel`, `%GoalCaptionLabel`, and `%NextRewardLabel`.
+  `%Illustration` and `%AmountLabel`, plus `RewardChestPanel`.
 - `PlayerProgress.get_reward_chest_progress()`.
 - `scripts/ui_motion.gd`.
 
