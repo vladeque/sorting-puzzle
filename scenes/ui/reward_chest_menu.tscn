@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://d0v7jbnr61it8"]
 
 [ext_resource type="Script" uid="uid://c6n0a2l1kd14e" path="res://scripts/reward_chest_menu.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://0mtvk246lq4q" path="res://assets/ui/Treasure_chest_with_game_items_202607280535.jpeg" id="2_tbf2t"]
+[ext_resource type="Texture2D" uid="uid://ucpjs50cb0vm" path="res://assets/ui/reward_chest_current_abilities.png" id="2_tbf2t"]
 [ext_resource type="Texture2D" uid="uid://co4g6sf3ggawc" path="res://assets/ui/reward_star_84x84.png" id="4_star"]
 [ext_resource type="Texture2D" uid="uid://brf3b72bksb8e" path="res://assets/ui/main_menu_reward_chest.png" id="5_chest"]
 [ext_resource type="Texture2D" uid="uid://borxe8m7bwoqf" path="res://assets/ui/level_button_blank_new.png" id="6_continue_button"]

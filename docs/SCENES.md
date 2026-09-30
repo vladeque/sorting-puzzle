@@ -1124,7 +1124,8 @@ Purpose:
   Its title sits on the shared shop-awning header (`scenes/ui/modal_awning_header.tscn`,
   `AwningHeader`, `title_text` set in the scene), and the red close button sits on the right end of
   the awning's rail (top-right anchor, offset `-28, -76`), after the header so it draws above it.
-- The `ChestStage` uses `assets/ui/Treasure_chest_with_game_items_202607280535.jpeg`. The small
+- The `ChestStage` uses `assets/ui/reward_chest_current_abilities.png`, showing the current hammer,
+  shuffle, Lantern, and Freezer icons with coins around the blue-and-gold chest. The small
   main-menu reward chest remains a separate icon and also marks the goal end of the progress row.
 
 Important nodes:
@@ -1145,7 +1146,7 @@ Important nodes:
   like `CloseButton`.
 
 Depends on:
-- `assets/ui/Treasure_chest_with_game_items_202607280535.jpeg`,
+- `assets/ui/reward_chest_current_abilities.png`,
   `assets/ui/reward_star_84x84.png`, `assets/ui/main_menu_reward_chest.png`,
   `assets/ui/main_menu_coin.png`, `assets/ui/level_button_blank_new.png`, and
   `assets/ui/rounded_texture_clip.gdshader`.
