@@ -142,6 +142,7 @@ Files:
 - `assets/ui/main_menu_reward_chest.png`
 - `assets/ui/main_menu_reward_chest_1024.png` (pixel-identical 8× enlargement of the transparent chest artwork for high-resolution use)
 - `assets/ui/main_menu_reward_chest_redraw_1024.png` (selected high-resolution redraw of the same chest artwork)
+- `assets/ui/main_menu_reward_chest_open_1024.png` (matching open pose with an empty dark interior)
 - `assets/ui/reward_chest_menu_illustration.png`
 - `assets/abilities/ability_hammer.png`
 - `assets/abilities/ability_lantern.png`
