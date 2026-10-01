@@ -10,6 +10,7 @@
 [ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_gameplay_close_button_pressed.tres" id="8_close_pressed"]
 [ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_gameplay_close_button_hover.tres" id="9_close_hover"]
 [ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="10_press_scale"]
+[ext_resource type="PackedScene" path="res://scenes/ui/purchase_reward_sequence.tscn" id="11_reward_sequence"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_scroll"]
 
@@ -184,5 +185,9 @@ grow_vertical = 0
 active_tab = "shop"
 
 [node name="PurchaseDialog" parent="." unique_id=913139129 instance=ExtResource("5_dialog")]
+unique_name_in_owner = true
+layout_mode = 1
+
+[node name="PurchaseRewardSequence" parent="." instance=ExtResource("11_reward_sequence")]
 unique_name_in_owner = true
 layout_mode = 1

@@ -7,9 +7,10 @@ extends SceneTree
 
 const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
 const PREVIEW_SCENE_PATH := "res://scenes/testing/main_menu_reward_chest_preview.tscn"
-const FAST_TIMINGS := [
-	"lift_duration", "auto_open_delay", "reveal_pop_duration", "reveal_hold",
-	"coin_scatter_duration", "coin_flight_duration", "ability_flight_duration", "return_duration",
+const FAST_TIMINGS := ["lift_duration", "auto_open_delay", "reveal_hold", "return_duration"]
+## Flight timings live on the ceremony's shared reveal row (`%RewardPanel`).
+const FAST_ROW_TIMINGS := [
+	"reveal_pop_duration", "coin_scatter_duration", "coin_flight_duration", "ability_flight_duration",
 ]
 const RUN_TIMEOUT_SECONDS := 10.0
 
@@ -51,6 +52,8 @@ func _run() -> void:
 	var ceremony := menu.get_node("%RewardChestOpenCeremony") as Control
 	for property in FAST_TIMINGS:
 		ceremony.set(property, 0.05)
+	for property in FAST_ROW_TIMINGS:
+		ceremony.get_node("%RewardPanel").set(property, 0.05)
 	var replay_button := preview.get_node("%ReplayButton") as Button
 	var chest_bar := menu.get_node("%RewardChest").get_node("%ProgressBar") as ProgressBar
 	menu.get_node("%RewardStarFlyer").connect("star_arrived", func() -> void: _star_arrivals += 1)

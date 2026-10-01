@@ -20,6 +20,7 @@ const ACTIVE_ICON_TOP := -76.0
 const ACTIVE_ICON_BOTTOM := 24.0
 const ICON_TWEEN_META := &"_nav_icon_tween"
 const LABEL_TWEEN_META := &"_nav_label_tween"
+const RECEIVE_PULSE_META := &"_nav_receive_pulse_tween"
 
 @export_enum("shop", "home", "leaderboard") var active_tab := "home"
 
@@ -54,6 +55,33 @@ func set_active_tab(tab_name: StringName) -> void:
 
 func set_safe_bottom_margin(margin: float) -> void:
 	add_theme_constant_override("margin_bottom", roundi(maxf(margin, 0.0)))
+
+
+## Flight target for rewards delivered to a tab (the Shop's purchase reward sequence sends boosters
+## to Home, where the LEVEL button spends them).
+func get_tab_icon_global_center(tab_name: StringName) -> Vector2:
+	return _get_tab_icon(tab_name).get_global_rect().get_center()
+
+
+## A short bump on a tab's icon as a delivered reward lands. It scales the icon, so it never fights
+## the active-tab raise, which tweens the icon's offsets.
+func play_tab_receive_pulse(tab_name: StringName) -> void:
+	var icon := _get_tab_icon(tab_name)
+	icon.pivot_offset = icon.size * 0.5
+	var tween := UIMotionScript.retween(icon, RECEIVE_PULSE_META)
+	tween.tween_property(icon, "scale", Vector2(1.16, 1.16), 0.07) \
+		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(icon, "scale", Vector2.ONE, 0.14) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+
+
+func _get_tab_icon(tab_name: StringName) -> TextureRect:
+	match String(tab_name).to_lower():
+		TAB_SHOP:
+			return _shop_icon
+		TAB_LEADERBOARD:
+			return _leaderboard_icon
+	return _home_icon
 
 
 func _apply_active_tab() -> void:

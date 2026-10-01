@@ -488,15 +488,16 @@ func _test_level_coin_spending() -> void:
 	_progress.call("reset_progress")
 
 
-## The shared Shop/Main Menu purchase flow plays confirmation and the layered coin cue only for
-## rewards actually granted, not for the button press or a duplicate transaction.
+## The shared Shop/Main Menu purchase flow plays the confirmation only for rewards actually
+## granted, not for the button press or a duplicate transaction. coin_gain is left to the purchase
+## reward sequence, which plays it as each coin lands on the counter.
 func _test_shop_purchase_routing() -> void:
 	_begin_recording()
 	_shop_purchase_flow_script.call("play_success_feedback", {"ok": true, "applied": true, "coins": 500})
 	_check(
 		_played(SfxCatalogScript.EVENT_SHOP_PURCHASE_SUCCESS) == 1
-			and _played(SfxCatalogScript.EVENT_COIN_GAIN) == 1,
-		"A granted coin pack plays the confirmation with one layered coin_gain."
+			and _played(SfxCatalogScript.EVENT_COIN_GAIN) == 0,
+		"A granted coin pack plays the confirmation and leaves coin_gain to the landing coins."
 	)
 	_check(
 		_haptic_played(HapticsCatalogScript.EVENT_SHOP_PURCHASE_SUCCESS) == 1,
@@ -578,10 +579,11 @@ func _test_reward_chest_arrivals() -> void:
 
 	# The opening vibrates once as the lid bursts and plays coin_gain as coins reach the counter.
 	var ceremony := menu.get_node("%RewardChestOpenCeremony") as Control
-	for property in ["lift_duration", "auto_open_delay", "reveal_pop_duration", "reveal_hold",
-			"coin_scatter_duration", "coin_flight_duration", "ability_flight_duration",
-			"return_duration"]:
+	for property in ["lift_duration", "auto_open_delay", "reveal_hold", "return_duration"]:
 		ceremony.set(property, 0.05)
+	for property in ["reveal_pop_duration", "coin_scatter_duration", "coin_flight_duration",
+			"ability_flight_duration"]:
+		ceremony.get_node("%RewardPanel").set(property, 0.05)
 	_begin_recording()
 	menu.call("_on_reward_star_animation_finished")
 	await ceremony.finished

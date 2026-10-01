@@ -17,6 +17,9 @@ const BUNDLE_CARD_SCENE := preload("res://scenes/ui/shop_bundle_card.tscn")
 const COIN_OFFER_ROW_SCENE := preload("res://scenes/ui/shop_coin_offer_row.tscn")
 const MAIN_MENU_SCENE := "res://scenes/main_menu.tscn"
 const LEADERBOARD_SCENE := "res://scenes/ui/leaderboard_screen.tscn"
+## The in-level overlay has no Home tab, so purchased boosters drop toward the level's ability bar,
+## which sits under the overlay this far above the safe bottom edge.
+const OVERLAY_ABILITY_TARGET_INSET := 72.0
 const ABILITY_INFO := {
 	&"hammer": {
 		"name": "Hammer",
@@ -49,6 +52,7 @@ const ABILITY_INFO := {
 @onready var _coin_offers_container := %CoinOffersContainer as VBoxContainer
 @onready var _status_panel := %StatusPanel as Control
 @onready var _purchase_dialog := %PurchaseDialog as Control
+@onready var _reward_sequence := %PurchaseRewardSequence as PurchaseRewardSequence
 @onready var _bottom_navigation := %BottomNavigation as MarginContainer
 @onready var _overlay_close_button := %OverlayCloseButton as Button
 
@@ -58,12 +62,18 @@ var _purchase_in_progress := false
 var _load_request_serial := 0
 var _is_navigating := false
 var _is_overlay_transitioning := false
+## Granted coins the header counter has not shown yet. The purchase reward sequence counts them up
+## as its coins land, from `_reward_coin_holdback` down to zero.
+var _undisplayed_reward_coins := 0
+var _reward_coin_holdback := 0
 
 
 func _ready() -> void:
 	PlayerProgress.load_progress()
 	_status_panel.connect("retry_pressed", Callable(self, "_load_shop"))
 	_overlay_close_button.pressed.connect(_request_overlay_close)
+	_reward_sequence.coin_arrived.connect(_on_reward_coin_arrived)
+	_reward_sequence.ability_arrived.connect(_on_reward_ability_arrived)
 	var is_overlay := presentation_mode == PresentationMode.IN_LEVEL_OVERLAY
 	_bottom_navigation.visible = not is_overlay
 	_overlay_close_button.visible = is_overlay
@@ -126,12 +136,16 @@ func _request_overlay_close() -> void:
 		presentation_mode != PresentationMode.IN_LEVEL_OVERLAY
 		or _is_overlay_transitioning
 		or _purchase_in_progress
+		or _reward_sequence.is_playing()
 	):
 		return
 	close_requested.emit()
 
 
 func handle_back() -> void:
+	if _reward_sequence.is_playing():
+		_reward_sequence.advance()
+		return
 	if _purchase_dialog.visible:
 		_purchase_dialog.call("close")
 		return
@@ -203,7 +217,7 @@ func _add_coin_offer(offer: Dictionary) -> void:
 
 
 func _purchase_offer(offer_id: StringName) -> void:
-	if _purchase_in_progress:
+	if _purchase_in_progress or _reward_sequence.is_playing():
 		return
 
 	_purchase_in_progress = true
@@ -223,38 +237,67 @@ func _purchase_offer(offer_id: StringName) -> void:
 		return
 
 	var grant_result := result.get("grant", {}) as Dictionary
+	if not bool(grant_result.get("applied", false)):
+		# A replayed transaction that was already granted brings nothing new, so nothing is revealed.
+		_update_coin_balance()
+		_purchase_in_progress = false
+		_set_overlay_close_locked(false)
+		await _load_shop()
+		return
+
+	# The reward sequence confirms the purchase: the granted rewards lift off the offer that sold
+	# them, coins fly into the header counter, and boosters fly to Home (or toward the level's
+	# ability bar in the in-level overlay).
+	var origin_rects := _get_offer_reward_rects(offer_id)
+	_reward_coin_holdback = maxi(int(grant_result.get("coins", 0)), 0)
+	_undisplayed_reward_coins = _reward_coin_holdback
 	_update_coin_balance()
 	ShopPurchaseFlowScript.play_success_feedback(grant_result)
-	_purchase_dialog.call(
-		"show_result",
-		"Purchase complete",
-		_format_reward_message(result.get("rewards", {}) as Dictionary)
+	_reward_sequence.play(
+		grant_result,
+		origin_rects,
+		_coin_balance.call("get_coin_icon_global_center") as Vector2,
+		_get_ability_target_global()
 	)
 
+	# The catalog reloads behind the sequence's dim; the sequence keeps every offer and the close
+	# button out of reach until it finishes.
 	_purchase_in_progress = false
+	_load_shop()
+	await _reward_sequence.finished
+	_undisplayed_reward_coins = 0
+	_reward_coin_holdback = 0
+	_update_coin_balance()
 	_set_overlay_close_locked(false)
-	await _load_shop()
 
 
-func _format_reward_message(rewards: Dictionary) -> String:
-	var reward_lines := []
-	var coins := maxi(int(rewards.get("coins", 0)), 0)
-	if coins > 0:
-		reward_lines.append("%s coins" % _format_count(coins))
+func _get_offer_reward_rects(offer_id: StringName) -> Dictionary:
+	for view in _offer_views:
+		if is_instance_valid(view) and view.call("get_offer_id") == offer_id:
+			return view.call("get_reward_icon_global_rects") as Dictionary
+	return {}
 
-	var abilities := rewards.get("abilities", {}) as Dictionary
-	var labels := {
-		"hammer": "hammers",
-		"shuffle": "shuffles",
-		"highlight": "lanterns",
-		"freezer": "freezers",
-	}
-	for ability_id in ["hammer", "shuffle", "highlight", "freezer"]:
-		var amount := maxi(int(abilities.get(ability_id, 0)), 0)
-		if amount > 0:
-			reward_lines.append("%d %s" % [amount, labels[ability_id]])
 
-	return "Mock purchase added:\n%s" % "\n".join(reward_lines)
+func _get_ability_target_global() -> Vector2:
+	if presentation_mode == PresentationMode.DESTINATION:
+		return _bottom_navigation.call("get_tab_icon_global_center", &"home") as Vector2
+	var safe_margins := DestinationScreenLayoutScript.get_safe_area_margins(get_viewport_rect().size)
+	var screen := get_global_rect()
+	return Vector2(screen.get_center().x, screen.end.y - safe_margins.w - OVERLAY_ABILITY_TARGET_INSET)
+
+
+## Counts the header balance up in step with the coins landing, reaching the saved balance on the
+## last one.
+func _on_reward_coin_arrived(arrived_count: int, total_count: int) -> void:
+	var remaining_share := 1.0 - float(arrived_count) / float(maxi(total_count, 1))
+	_undisplayed_reward_coins = roundi(float(_reward_coin_holdback) * remaining_share)
+	_update_coin_balance()
+	_coin_balance.call("play_receive_pulse")
+
+
+func _on_reward_ability_arrived(_ability_id: StringName) -> void:
+	if presentation_mode == PresentationMode.DESTINATION:
+		_bottom_navigation.call("play_tab_receive_pulse", &"home")
 
 
 func _set_offers_locked(is_locked: bool, active_offer_id: StringName = &"") -> void:
@@ -292,12 +335,13 @@ func _set_error_state(message: String) -> void:
 
 
 func _update_coin_balance() -> void:
-	_coin_balance.call("set_amount", PlayerProgress.get_coins())
+	_coin_balance.call("set_amount", maxi(PlayerProgress.get_coins() - _undisplayed_reward_coins, 0))
 
 
 ## With no overlay open, `ui_cancel` returns to Main Menu, matching Leaderboard (see
-## docs/SCENES.md's "Back/ui_cancel Behavior"). The purchase-result dialog counts as a scoped
-## overlay and is closed first if it is showing, rather than also leaving the screen.
+## docs/SCENES.md's "Back/ui_cancel Behavior"). A playing purchase reward sequence only has its
+## hold cut short, and the purchase-result dialog counts as a scoped overlay and is closed first if
+## it is showing, rather than also leaving the screen.
 func _unhandled_input(event: InputEvent) -> void:
 	if not event.is_action_pressed("ui_cancel"):
 		return
@@ -339,15 +383,6 @@ func _apply_offer_sizes() -> void:
 			view.call("set_compact", is_compact)
 
 
-func _format_count(value: int) -> String:
-	var value_text := str(maxi(value, 0))
-	var formatted := ""
-	while value_text.length() > 3:
-		formatted = ",%s%s" % [value_text.right(3), formatted]
-		value_text = value_text.substr(0, value_text.length() - 3)
-	return value_text + formatted
-
-
 ## Retapping the already-active Shop tab is a no-op (see docs/SCENES.md's "Active-Tab Reselection
 ## Rule"); catalog refresh stays available only through the status panel's explicit Retry action,
 ## not a hidden tab-retap convention.
@@ -368,7 +403,7 @@ func _open_leaderboard() -> void:
 ## whole screen (every descendant's mouse/touch/keyboard input, not just navigation) from accepting
 ## further input for the brief window before the deferred scene swap resolves.
 func _begin_navigation(scene_path: String) -> void:
-	if _is_navigating:
+	if _is_navigating or _reward_sequence.is_playing():
 		return
 
 	_is_navigating = true

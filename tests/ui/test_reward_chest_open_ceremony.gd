@@ -9,9 +9,10 @@ extends SceneTree
 const ISOLATED_TEST_PROJECT_PREFIX := "SortingPuzzleTest_"
 const CEREMONY_SCENE_PATH := "res://scenes/ui/reward_chest_open_ceremony.tscn"
 const MAIN_MENU_SCENE_PATH := "res://scenes/main_menu.tscn"
-const FAST_TIMINGS := [
-	"lift_duration", "reveal_pop_duration", "reveal_hold", "coin_scatter_duration",
-	"coin_flight_duration", "ability_flight_duration", "return_duration",
+const FAST_TIMINGS := ["lift_duration", "reveal_hold", "return_duration"]
+## Flight timings live on the shared reveal row (`%RewardPanel`).
+const FAST_ROW_TIMINGS := [
+	"reveal_pop_duration", "coin_scatter_duration", "coin_flight_duration", "ability_flight_duration",
 ]
 const ALL_ABILITIES := {"hammer": 1, "shuffle": 1, "highlight": 1, "freezer": 1}
 const FINISH_TIMEOUT_SECONDS := 6.0
@@ -119,7 +120,7 @@ func _test_auto_open_without_abilities() -> void:
 	)
 	_check(_ability_arrivals.is_empty(), "No ability flies when the goal grants none.")
 	_check(
-		not (ceremony.get_node("%HammerSlot") as Control).visible,
+		not (ceremony.get_node("%RewardPanel").get_node("%HammerSlot") as Control).visible,
 		"Absent ability rewards leave no slot in the reveal row."
 	)
 	await _free(ceremony)
@@ -210,9 +211,12 @@ func _make_ceremony(auto_open_delay: float) -> Control:
 func _speed_up(ceremony: Control, auto_open_delay: float) -> void:
 	for property in FAST_TIMINGS:
 		ceremony.set(property, 0.04)
-	ceremony.set("coin_stagger", 0.01)
-	ceremony.set("ability_stagger", 0.01)
-	ceremony.set("reveal_stagger", 0.01)
+	var row := ceremony.get_node("%RewardPanel")
+	for property in FAST_ROW_TIMINGS:
+		row.set(property, 0.04)
+	row.set("coin_stagger", 0.01)
+	row.set("ability_stagger", 0.01)
+	row.set("reveal_stagger", 0.01)
 	ceremony.set("shake_pause", 0.02)
 	ceremony.set("auto_open_delay", auto_open_delay)
 

@@ -170,6 +170,9 @@ Use semantic success points, not button presses:
   `PlayerProgress.apply_shop_purchase()` succeed, immediately before or with the success dialog.
 - If the Shop reward contains coins, layer one `coin_gain` cue with the success cue. Ability-only
   bundles receive only the success cue in this ticket.
+  - Superseded on 2026-10-01: purchases now confirm through the purchase reward sequence, which
+    plays `coin_gain` as each flying coin lands on the counter (like the chest opening), so the
+    success cue is no longer layered with a coin cue.
 - Do not add a purchase-failure sound; it is outside the approved event scope.
 
 ### 6. Wire Reward-Chest Arrivals

@@ -190,25 +190,46 @@ func _test_one_time_purchase(progress: Node) -> void:
 		"Booster chips are centered in the panel."
 	)
 	var buy_button := modal.get_node("%BuyButton") as Button
+	var sequence := menu.get_node("%PurchaseRewardSequence") as Control
+	var coin_widget := menu.get_node("%TopStatusBar").get_node(
+		"MainMenuTopStatus/CoinsWidget"
+	).get_node("%CoinBalanceWidget")
+	var sequence_finished := [false]
+	sequence.connect("finished", func() -> void: sequence_finished[0] = true)
 	buy_button.pressed.emit()
 	buy_button.pressed.emit()
-	await create_timer(0.5).timeout
-	_check(progress.has_purchased_shop_offer(&"starter_bundle"), "Purchase records the lifetime claim.")
-	_check(progress.get_coins() == starting_coins + 1000, "Duplicate Buy taps grant shown coins once.")
-	_check(not badge.visible, "Badge disappears immediately after purchase.")
-	var continue_button := modal.get_node("%ContinueButton") as Button
-	_check(continue_button.visible, "Modal shows purchase success.")
 	await process_frame
 	var status_pill := modal.get_node("%StatusPill") as Control
-	_check(status_pill.visible, "Purchase success shows the status pill.")
+	_check(status_pill.visible, "Purchasing shows the status pill.")
 	_check(
-		status_pill.get_global_rect().end.y <= continue_button.get_global_rect().position.y + 1.0,
-		"The status pill sits above the Continue button."
+		status_pill.get_global_rect().end.y <= buy_button.get_global_rect().position.y + 1.0,
+		"The status pill sits above the Buy button."
 	)
 	var chip_row_bottom := (modal.get_node("%AbilityRow") as Control).get_global_rect().end.y
 	_check(
 		chip_row_bottom <= status_pill.get_global_rect().position.y + 1.0,
 		"The status pill does not cover the booster names."
+	)
+	await create_timer(0.5).timeout
+	_check(progress.has_purchased_shop_offer(&"starter_bundle"), "Purchase records the lifetime claim.")
+	_check(progress.get_coins() == starting_coins + 1000, "Duplicate Buy taps grant shown coins once.")
+	_check(not badge.visible, "Badge disappears immediately after purchase.")
+	_check(not modal.visible, "The modal closes once the purchase completes.")
+	_check(
+		sequence.visible,
+		"The purchase reward sequence confirms the purchase in place of a success screen."
+	)
+	_check(
+		int(coin_widget.get("_amount")) == starting_coins,
+		"The counter holds back the purchased coins until they fly in."
+	)
+	var deadline := Time.get_ticks_msec() + 8000
+	while not sequence_finished[0] and Time.get_ticks_msec() < deadline:
+		await process_frame
+	_check(sequence_finished[0], "The purchase reward sequence plays through.")
+	_check(
+		int(coin_widget.get("_amount")) == starting_coins + 1000,
+		"The counter reaches the saved balance once every purchased coin lands."
 	)
 
 	var store := STORE_SERVICE_SCRIPT.new()
@@ -267,17 +288,29 @@ func _test_modal_states(modal: Control, offer: Dictionary) -> void:
 		"The failure message is shown in the status pill."
 	)
 
-	modal.call("show_success")
-	_check(str(ribbon.call("get_text")) == "+1,000 COINS", "Success restates the granted coins.")
-	_check(int(ribbon.get("tone")) == 1, "Success turns the ribbon green.")
-	_check(bool(hammer.call("is_claimed")), "Granted boosters show as claimed.")
-	_check(not freezer.visible and not bool(freezer.call("is_claimed")), "Absent boosters stay hidden.")
-	_check(not (modal.get_node("%DiscountBadge") as Control).visible, "Success removes the discount tag.")
-	_check(not (modal.get_node("%OneTimeBadge") as Control).visible, "Success removes the offer badge.")
-	_check((modal.get_node("%ContinueButton") as Control).visible, "Success offers Continue.")
+	modal.call("open")
+	await process_frame
+	var reward_rects: Dictionary = modal.call("get_reward_icon_global_rects")
+	_check(
+		reward_rects.has("coins") and reward_rects.has("hammer") and not reward_rects.has("freezer"),
+		"The reward sequence lifts only the offer's shown rewards off the modal (got %s)."
+			% [reward_rects.keys()]
+	)
+	_check(
+		(reward_rects.get("hammer", Rect2()) as Rect2).get_center().distance_to(
+			(hammer.call("get_icon_global_rect") as Rect2).get_center()
+		) < 1.0,
+		"A booster lifts off from its own chip icon."
+	)
+	_check(not freezer.visible, "Absent boosters stay hidden.")
+	modal.call("set_busy", "Purchasing…")
+	modal.call("close_after_purchase")
+	_check(not bool(modal.call("is_busy")), "A completed purchase releases the busy lock.")
+	_check(not close_button.disabled, "A completed purchase re-enables Close.")
+	await create_timer(0.4).timeout
+	_check(not modal.visible, "A completed purchase closes the modal.")
 
 	modal.call("set_offer", offer)
-	_check(not bool(hammer.call("is_claimed")), "Reloading the offer clears the claimed state.")
 	_check(str(ribbon.call("get_text")) == "1,000 COINS", "Reloading the offer restores the ribbon.")
 	await process_frame
 

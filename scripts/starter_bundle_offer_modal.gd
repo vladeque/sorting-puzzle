@@ -6,14 +6,15 @@ class_name StarterBundleOfferModal
 ## the positive-count boosters as ability-bar sockets, and a Buy button whose top line shows the
 ## crossed-out compare price. Every amount and price comes from the loaded offer.
 ##
-## Also owns the checking/purchasing, failure and success presentation: the status pill that sits on
-## the content region's bottom edge, the button states, and the green "rewards added" ribbon with
-## claimed booster chips. It never grants rewards; the Main Menu runs the purchase and reports back.
+## Also owns the checking/purchasing and failure presentation: the status pill that sits on the
+## content region's bottom edge and the button states. It never grants rewards; the Main Menu runs
+## the purchase and, on success, closes the modal and plays scenes/ui/purchase_reward_sequence.tscn
+## with the rewards lifting off this modal's coin art and booster chips.
 
 signal buy_requested
 signal close_requested
 
-enum StatusTone { BUSY, ERROR, SUCCESS }
+enum StatusTone { BUSY, ERROR }
 
 const GameplayUIThemeScript := preload("res://scripts/gameplay_ui_theme.gd")
 const MODAL_HEIGHT := 734.0
@@ -24,14 +25,10 @@ const DISABLED_CLOSE_TINT := Color(0.66, 0.62, 0.62, 1.0)
 const STATUS_TEXT_COLORS := {
 	StatusTone.BUSY: Color(0.42, 0.29, 0.188, 1.0),
 	StatusTone.ERROR: Color(0.557, 0.106, 0.071, 1.0),
-	StatusTone.SUCCESS: Color(0.118, 0.369, 0.094, 1.0),
 }
-const INCLUDED_HEADER := "BOOSTERS INCLUDED"
-const ADDED_HEADER := "BOOSTERS ADDED"
 
 @export var status_busy_style: StyleBox
 @export var status_error_style: StyleBox
-@export var status_success_style: StyleBox
 
 @onready var _shell := %Shell as GameplayModalShell
 @onready var _offer_content := %OfferContent as VBoxContainer
@@ -41,7 +38,6 @@ const ADDED_HEADER := "BOOSTERS ADDED"
 @onready var _discount_badge := %DiscountBadge as Control
 @onready var _percent_label := %PercentLabel as Label
 @onready var _ability_header := %AbilityHeader as Control
-@onready var _ability_header_label := %AbilityHeaderLabel as Label
 @onready var _ability_row := %AbilityRow as Control
 @onready var _hammer_reward := %HammerReward as OfferBoosterChip
 @onready var _shuffle_reward := %ShuffleReward as OfferBoosterChip
@@ -52,12 +48,10 @@ const ADDED_HEADER := "BOOSTERS ADDED"
 @onready var _buy_button := %BuyButton as Button
 @onready var _compare_at_price_label := %CompareAtPriceLabel as Label
 @onready var _buy_price_label := %BuyPriceLabel as Label
-@onready var _continue_button := %ContinueButton as Button
 @onready var _close_button := %Shell.get_node("OuterPanel/CloseButton") as Button
 
 var _price_text := ""
 var _compare_at_text := ""
-var _coins := 0
 var _is_busy := false
 
 
@@ -69,32 +63,27 @@ func _ready() -> void:
 	# The pill is anchored to the content region's bottom edge and straddles it, just above Buy.
 	_status_pill.reparent(_shell.get_content_region(), false)
 	_buy_button.reparent(_shell.get_action_row(), false)
-	_continue_button.reparent(_shell.get_action_row(), false)
 	_shell.close_requested.connect(request_close)
 	_buy_button.pressed.connect(buy_requested.emit)
-	_continue_button.pressed.connect(request_close)
 	_set_status("")
 
 
 func set_offer(offer: Dictionary) -> void:
 	var rewards := offer.get("rewards", {}) as Dictionary
 	var abilities := rewards.get("abilities", {}) as Dictionary
-	_coins = maxi(int(rewards.get("coins", 0)), 0)
-	_coin_art.visible = _coins > 0
-	_coin_ribbon.visible = _coins > 0
-	_coin_ribbon.tone = OfferRibbonBanner.Tone.OFFER
-	_coin_ribbon.set_text("%s COINS" % _format_count(_coins))
+	var coins := maxi(int(rewards.get("coins", 0)), 0)
+	_coin_art.visible = coins > 0
+	_coin_ribbon.visible = coins > 0
+	_coin_ribbon.set_text("%s COINS" % _format_count(coins))
 	_hammer_reward.set_count(int(abilities.get("hammer", 0)))
 	_shuffle_reward.set_count(int(abilities.get("shuffle", 0)))
 	_lantern_reward.set_count(int(abilities.get("highlight", 0)))
 	_freezer_reward.set_count(int(abilities.get("freezer", 0)))
 	var has_boosters := false
 	for chip in _booster_chips():
-		chip.set_claimed(false)
 		has_boosters = has_boosters or chip.visible
 	_ability_header.visible = has_boosters
 	_ability_row.visible = has_boosters
-	_ability_header_label.text = INCLUDED_HEADER
 	# The Starter Bundle is a lifetime one-time purchase in both catalog modes.
 	_one_time_badge.visible = true
 
@@ -111,7 +100,6 @@ func set_offer(offer: Dictionary) -> void:
 	_buy_button.visible = true
 	_buy_button.disabled = false
 	_buy_button.modulate = Color.WHITE
-	_continue_button.visible = false
 	_set_close_enabled(true)
 	_is_busy = false
 
@@ -161,20 +149,27 @@ func show_error(message: String, can_retry: bool) -> void:
 	_set_status(message, StatusTone.ERROR)
 
 
-func show_success() -> void:
+## Ends the purchase and closes the modal; the Main Menu's purchase reward sequence confirms the
+## purchase in its place.
+func close_after_purchase() -> void:
 	_is_busy = false
 	_set_close_enabled(true)
-	_set_status("Purchase complete. Rewards added!", StatusTone.SUCCESS)
-	_buy_button.visible = false
-	_continue_button.visible = true
-	_discount_badge.visible = false
-	_one_time_badge.visible = false
-	_coin_ribbon.tone = OfferRibbonBanner.Tone.SUCCESS
-	_coin_ribbon.set_text("+%s COINS" % _format_count(_coins))
-	_ability_header_label.text = ADDED_HEADER
-	for chip in _booster_chips():
-		if chip.visible:
-			chip.set_claimed(true)
+	close()
+
+
+## Where each reward's art sits in the modal, keyed "coins" or by ability id, so the purchase reward
+## sequence can lift the bought rewards straight off it.
+func get_reward_icon_global_rects() -> Dictionary:
+	var rects := {}
+	if _coin_art.is_visible_in_tree():
+		rects["coins"] = _coin_art.get_global_rect()
+	var chip_ids := {"hammer": _hammer_reward, "shuffle": _shuffle_reward,
+		"highlight": _lantern_reward, "freezer": _freezer_reward}
+	for ability_id in chip_ids.keys():
+		var chip := chip_ids[ability_id] as OfferBoosterChip
+		if chip.is_visible_in_tree():
+			rects[ability_id] = chip.get_icon_global_rect()
+	return rects
 
 
 func _booster_chips() -> Array[OfferBoosterChip]:
@@ -202,7 +197,6 @@ func _set_status(message: String, tone: StatusTone = StatusTone.BUSY) -> void:
 	var style: StyleBox = {
 		StatusTone.BUSY: status_busy_style,
 		StatusTone.ERROR: status_error_style,
-		StatusTone.SUCCESS: status_success_style,
 	}[tone]
 	_status_pill.add_theme_stylebox_override("panel", style)
 	_status_label.add_theme_color_override("font_color", STATUS_TEXT_COLORS[tone])

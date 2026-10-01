@@ -60,6 +60,7 @@ func _run() -> void:
 	var shop := SHOP_SCENE.instantiate() as Control
 	get_tree().root.add_child(shop)
 	get_tree().current_scene = shop
+	_compress_purchase_reveal(shop)
 	for _frame in range(5):
 		await get_tree().process_frame
 
@@ -231,16 +232,24 @@ func _run() -> void:
 	shop.call("_purchase_offer", &"coins_100")
 	await get_tree().create_timer(0.35).timeout
 	_check(PlayerProgress.get_coins() == starting_coins + 100, "Mock coin purchase did not grant 100 coins.")
-	_check((shop.get_node("%PurchaseDialog") as Control).visible, "Purchase result dialog did not open.")
+	_check(
+		bool(shop.get_node("%PurchaseRewardSequence").call("is_playing")),
+		"A granted purchase did not play the purchase reward sequence."
+	)
+	_check(
+		not (shop.get_node("%PurchaseDialog") as Control).visible,
+		"The purchase reward sequence should replace the purchase-complete dialog."
+	)
 	if DisplayServer.get_name() != "headless":
-		var dialog_image := get_viewport().get_texture().get_image()
-		var dialog_screenshot_error := dialog_image.save_png("res://tmp/shop_purchase_dialog_720x1280.png")
-		_check(dialog_screenshot_error == OK, "Could not save the purchase dialog verification screenshot.")
+		var reveal_image := get_viewport().get_texture().get_image()
+		var reveal_screenshot_error := reveal_image.save_png("res://tmp/shop_purchase_reward_720x1280.png")
+		_check(reveal_screenshot_error == OK, "Could not save the purchase reward verification screenshot.")
+	await _await_purchase_reveal(shop)
 
 	var bundle_starting_coins := PlayerProgress.get_coins()
 	var bundle_starting_abilities := PlayerProgress.get_ability_uses()
 	shop.call("_purchase_offer", &"starter_bundle")
-	await get_tree().create_timer(0.35).timeout
+	await _await_purchase_reveal(shop)
 	_check(PlayerProgress.get_coins() == bundle_starting_coins + 1000, "Mock bundle did not grant 1,000 coins.")
 	var bundle_abilities := PlayerProgress.get_ability_uses()
 	for ability_id in ["hammer", "shuffle", "highlight", "freezer"]:
@@ -252,7 +261,7 @@ func _run() -> void:
 	var basic_starting_coins := PlayerProgress.get_coins()
 	var basic_starting_abilities := PlayerProgress.get_ability_uses()
 	shop.call("_purchase_offer", &"new_player_bundle")
-	await get_tree().create_timer(0.4).timeout
+	await _await_purchase_reveal(shop)
 	_check(
 		PlayerProgress.get_coins() == basic_starting_coins + 2500,
 		"Mock Basic Bundle did not grant 2,500 coins."
@@ -270,7 +279,7 @@ func _run() -> void:
 	)
 	var repeat_purchase_coins := PlayerProgress.get_coins()
 	shop.call("_purchase_offer", &"new_player_bundle")
-	await get_tree().create_timer(0.4).timeout
+	await _await_purchase_reveal(shop)
 	_check(
 		PlayerProgress.get_coins() == repeat_purchase_coins + 2500,
 		"Repeat Basic Bundle purchase did not grant 2,500 coins."
@@ -397,6 +406,37 @@ func _verify_high_tier_coin_offer_icons() -> void:
 				"%d-coin test offer selected the wrong high-tier icon." % amount
 			)
 	row.queue_free()
+
+
+## Shortens the purchase reward sequence so back-to-back verification purchases stay quick. The
+## hold stays long enough for a check right after the mock purchase resolves to see it playing.
+func _compress_purchase_reveal(shop: Control) -> void:
+	var sequence := shop.get_node("%PurchaseRewardSequence")
+	sequence.set("intro_duration", 0.04)
+	sequence.set("outro_duration", 0.04)
+	sequence.set("reveal_hold", 0.6)
+	var row := sequence.get_node("%RewardRow")
+	for property in [
+		"reveal_pop_duration", "coin_scatter_duration", "coin_flight_duration",
+		"ability_flight_duration",
+	]:
+		row.set(property, 0.04)
+	for property in ["reveal_stagger", "coin_stagger", "ability_stagger"]:
+		row.set(property, 0.01)
+
+
+## Waits for a purchase to resolve and its reward sequence to play out, since the Shop ignores
+## further purchases until the sequence finishes.
+func _await_purchase_reveal(shop: Control) -> void:
+	var sequence := shop.get_node("%PurchaseRewardSequence")
+	await get_tree().create_timer(0.3).timeout
+	var deadline := Time.get_ticks_msec() + 5000
+	while (
+		(bool(shop.get("_purchase_in_progress")) or bool(sequence.call("is_playing")))
+		and Time.get_ticks_msec() < deadline
+	):
+		await get_tree().process_frame
+	_check(not bool(sequence.call("is_playing")), "The purchase reward sequence did not finish.")
 
 
 func _find_coin_offer_row(coin_offers: VBoxContainer, offer_id: StringName) -> Control:

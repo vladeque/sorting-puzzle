@@ -246,13 +246,22 @@ func _test_paid_use_and_persistence() -> void:
 		bool(level.get("_ability_purchase_overlay").visible),
 		"Ability Purchase remains beneath the in-level Shop"
 	)
+	var reward_sequence: Node = in_level_shop.get_node("%PurchaseRewardSequence")
+	reward_sequence.set("reveal_hold", 0.05)
 	in_level_shop.call("_purchase_offer", &"coins_100")
 	await create_timer(0.35).timeout
 	_check(progress.get_coins() == 150, "in-level Shop coin purchase updates the saved balance")
-	var purchase_dialog := in_level_shop.get_node("%PurchaseDialog") as Control
-	_check(purchase_dialog.visible, "in-level Shop shows the shared purchase result dialog")
-	purchase_dialog.call("close")
-	await create_timer(0.25).timeout
+	_check(
+		bool(reward_sequence.call("is_playing")),
+		"in-level Shop confirms the purchase with the shared purchase reward sequence"
+	)
+	_check(
+		not (in_level_shop.get_node("%PurchaseDialog") as Control).visible,
+		"in-level Shop shows no purchase-complete dialog"
+	)
+	var reveal_deadline := Time.get_ticks_msec() + 5000
+	while bool(reward_sequence.call("is_playing")) and Time.get_ticks_msec() < reveal_deadline:
+		await process_frame
 	level.call("_on_in_level_shop_close_requested")
 	await create_timer(0.35).timeout
 	_check(not bool(in_level_shop.visible), "closing the in-level Shop hides it")

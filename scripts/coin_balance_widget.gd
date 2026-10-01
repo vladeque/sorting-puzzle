@@ -15,6 +15,8 @@ const REGULAR_LABEL_RECT := Rect2(65.0, 14.0, 86.0, 44.0)
 const COMPACT_LABEL_RECT := Rect2(52.0, 10.0, 84.0, 40.0)
 const REGULAR_FONT_SIZES := [25, 21, 18]
 const COMPACT_FONT_SIZES := [22, 18, 15]
+const UIMotionScript := preload("res://scripts/ui_motion.gd")
+const RECEIVE_PULSE_META := &"_coin_receive_pulse_tween"
 
 @onready var _pill := %Pill as Control
 @onready var _coin_icon := %CoinIcon as Control
@@ -35,8 +37,17 @@ func set_amount(amount: int) -> void:
 		_update_label()
 
 
+## Flight target for coins delivered to the balance (reward-chest and purchase reward sequences).
 func get_coin_icon_global_center() -> Vector2:
 	return _coin_icon.get_global_rect().get_center()
+
+
+## A short bump as a delivered coin lands.
+func play_receive_pulse() -> void:
+	pivot_offset = size * 0.5
+	var tween := UIMotionScript.retween(self, RECEIVE_PULSE_META)
+	tween.tween_property(self, "scale", Vector2(1.12, 1.12), 0.07) 		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(self, "scale", Vector2.ONE, 0.12) 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 
 
 func set_compact(is_compact: bool) -> void:

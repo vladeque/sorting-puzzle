@@ -10,7 +10,9 @@ extends Control
 ## Presentation only: PlayerProgress granted and saved these rewards when the level completed. The
 ## owner (scripts/production_main_menu.gd) advances its displayed coin count from `coin_arrived`,
 ## pulses the LEVEL button from `ability_arrived`, and settles every widget to saved values on
-## `finished`. Beat durations are exported so tests can compress the whole sequence.
+## `finished`. The reveal row and the flights are scenes/ui/reward_reveal_row.tscn, shared with the
+## purchase reward sequence. Chest beat durations are exported here and flight durations on
+## `%RewardPanel`, so tests can compress the whole sequence.
 
 signal opened
 signal coin_arrived(arrived_count: int, total_count: int)
@@ -22,12 +24,6 @@ enum Phase { IDLE, LIFTING, AWAITING_TAP, OPENING, REVEALING, COLLECTING, RETURN
 const UIMotionScript := preload("res://scripts/ui_motion.gd")
 const SfxCatalogScript := preload("res://scripts/audio/sfx_catalog.gd")
 const HapticsCatalogScript := preload("res://scripts/haptics/haptics_catalog.gd")
-const COIN_TEXTURE := preload("res://assets/ui/clover_coin_transparent_96x96.png")
-const COIN_FLYER_SIZE := Vector2(54.0, 54.0)
-const ABILITY_FLYER_SIZE := Vector2(64.0, 64.0)
-const MIN_COIN_FLYERS := 5
-const MAX_COIN_FLYERS := 12
-const COINS_PER_FLYER := 20
 ## Where the open chest's mouth sits, as a fraction of the stage. Rewards pop out from here.
 const MOUTH_FRACTION := Vector2(0.49, 0.4)
 ## The chest wobbles and squashes from its base rather than its centre.
@@ -46,14 +42,7 @@ const HINT_META := &"_chest_hint_tween"
 @export var lift_duration := 0.5
 @export var auto_open_delay := 1.6
 @export var shake_pause := 0.26
-@export var reveal_stagger := 0.07
-@export var reveal_pop_duration := 0.42
 @export var reveal_hold := 1.0
-@export var coin_scatter_duration := 0.16
-@export var coin_flight_duration := 0.58
-@export var coin_stagger := 0.045
-@export var ability_flight_duration := 0.66
-@export var ability_stagger := 0.1
 @export var return_duration := 0.42
 
 @onready var _dim := %Dim as ColorRect
@@ -66,36 +55,16 @@ const HINT_META := &"_chest_hint_tween"
 @onready var _chest_burst := %ChestBurst as CPUParticles2D
 @onready var _chest_sparkles := %ChestSparkles as CPUParticles2D
 @onready var _tap_hint := %TapHint as Label
-@onready var _reward_panel := %RewardPanel as Control
-@onready var _coin_slot := %CoinSlot as Control
-@onready var _coin_visual := %CoinVisual as Control
-@onready var _coin_amount_label := %CoinAmountLabel as Label
+@onready var _reward_panel := %RewardPanel as RewardRevealRow
 @onready var _flyer_layer := %FlyerLayer as Control
-@onready var _ability_slots := {
-	&"hammer": %HammerSlot as Control,
-	&"shuffle": %ShuffleSlot as Control,
-	&"highlight": %HighlightSlot as Control,
-	&"freezer": %FreezerSlot as Control,
-}
-@onready var _ability_chips := {
-	&"hammer": %HammerReward as OfferBoosterChip,
-	&"shuffle": %ShuffleReward as OfferBoosterChip,
-	&"highlight": %HighlightReward as OfferBoosterChip,
-	&"freezer": %FreezerReward as OfferBoosterChip,
-}
 
 var _phase := Phase.IDLE
 var _play_generation := 0
-var _coin_reward := 0
-var _ability_rewards := {}
 var _source_position := Vector2.ZERO
 var _source_scale := Vector2.ONE
 var _rest_position := Vector2.ZERO
-var _coin_target := Vector2.ZERO
-var _ability_target := Vector2.ZERO
-var _coin_flyer_count := 0
-var _coins_landed := 0
-var _flights_in_progress := 0
+var _coin_target_global := Vector2.ZERO
+var _ability_target_global := Vector2.ZERO
 var _shake_count := 0
 var _reveal_settled := false
 ## The stage's authored anchor offsets. The lift and return tween its position away from them, so
@@ -110,6 +79,9 @@ func _ready() -> void:
 		_stage.offset_left, _stage.offset_top, _stage.offset_right, _stage.offset_bottom
 	)
 	resized.connect(_apply_content_scale)
+	_reward_panel.coin_arrived.connect(coin_arrived.emit)
+	_reward_panel.ability_arrived.connect(ability_arrived.emit)
+	_reward_panel.flights_finished.connect(_on_flights_finished)
 	_apply_content_scale()
 	_reset_visuals()
 
@@ -127,12 +99,10 @@ func play(
 		return
 
 	_play_generation += 1
-	_coin_reward = maxi(int(rewards.get("coins", 0)), 0)
-	_ability_rewards = (rewards.get("abilities", {}) as Dictionary).duplicate()
-	_coin_target = _to_local(coin_target_global)
-	_ability_target = _to_local(ability_target_global)
+	_coin_target_global = coin_target_global
+	_ability_target_global = ability_target_global
 	_reset_visuals()
-	_apply_reward_counts()
+	_reward_panel.set_rewards(rewards)
 	show()
 	_lift(chest_global_rect)
 
@@ -262,39 +232,19 @@ func _burst_open() -> void:
 ## can read what they got before it flies away.
 func _reveal() -> void:
 	_phase = Phase.REVEALING
-	_reward_panel.modulate.a = 1.0
 	var mouth := _stage.get_global_transform() * (_stage.size * MOUTH_FRACTION)
-	var delay := 0.0
-	for visual in _get_reward_visuals():
-		_pop_from_mouth(visual, mouth, delay)
-		delay += reveal_stagger
+	var settle_seconds := _reward_panel.pop_in(mouth)
 
 	# A tap only cuts the hold short once every reward has landed in its slot, so a flight never
 	# launches from a reward that is still popping out.
 	var generation := _play_generation
-	await get_tree().create_timer(delay + reveal_pop_duration).timeout
+	await get_tree().create_timer(settle_seconds).timeout
 	if generation != _play_generation or _phase != Phase.REVEALING:
 		return
 	_reveal_settled = true
 	await get_tree().create_timer(reveal_hold).timeout
 	if generation == _play_generation and _phase == Phase.REVEALING:
 		_collect()
-
-
-func _pop_from_mouth(visual: Control, mouth_global: Vector2, delay: float) -> void:
-	var rest := visual.position
-	var parent := visual.get_parent() as Control
-	var start := parent.get_global_transform().affine_inverse() * mouth_global - visual.size * 0.5
-	visual.pivot_offset = visual.size * 0.5
-	visual.position = start
-	visual.scale = Vector2(0.3, 0.3)
-	var tween := visual.create_tween()
-	tween.tween_interval(delay)
-	tween.tween_property(visual, "modulate:a", 1.0, 0.08)
-	tween.parallel().tween_property(visual, "position", rest, reveal_pop_duration) \
-		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	tween.parallel().tween_property(visual, "scale", Vector2.ONE, reveal_pop_duration) \
-		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
 func _collect() -> void:
@@ -304,115 +254,12 @@ func _collect() -> void:
 	tween.tween_property(_dim, "modulate:a", 0.5, 0.4)
 	tween.tween_property(_rays, "modulate:a", 0.0, 0.5)
 
-	_flights_in_progress = 0
-	_launch_coin_flights()
-	_launch_ability_flights()
-	if _flights_in_progress == 0:
+	if _reward_panel.launch_flights(_flyer_layer, _coin_target_global, _ability_target_global) == 0:
 		_return_chest()
 
 
-func _launch_coin_flights() -> void:
-	_coins_landed = 0
-	_coin_flyer_count = 0
-	if _coin_reward <= 0 or not _coin_slot.visible:
-		return
-
-	_coin_flyer_count = clampi(
-		ceili(float(_coin_reward) / float(COINS_PER_FLYER)), MIN_COIN_FLYERS, MAX_COIN_FLYERS
-	)
-	var pile_center := _to_local(_coin_visual.get_global_rect().get_center())
-	for index in range(_coin_flyer_count):
-		var angle := TAU * float(index) / float(_coin_flyer_count) + randf_range(-0.3, 0.3)
-		var scatter := pile_center + Vector2.from_angle(angle) * randf_range(46.0, 96.0)
-		var flyer := _make_flyer(COIN_TEXTURE, COIN_FLYER_SIZE, pile_center)
-		var control := scatter.lerp(_coin_target, 0.5) + Vector2(randf_range(-90.0, 90.0), 40.0)
-		var flight := flyer.create_tween()
-		flight.tween_interval(float(index) * coin_stagger)
-		flight.tween_property(flyer, "modulate:a", 1.0, 0.05)
-		flight.parallel().tween_property(flyer, "position", scatter - COIN_FLYER_SIZE * 0.5, coin_scatter_duration) \
-			.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-		flight.tween_method(
-			_move_along_curve.bind(flyer, scatter, control, _coin_target), 0.0, 1.0, coin_flight_duration
-		).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
-		flight.parallel().tween_property(flyer, "scale", Vector2(0.7, 0.7), coin_flight_duration)
-		flight.tween_callback(_on_coin_landed.bind(flyer))
-		_flights_in_progress += 1
-
-	var pile_tween := _coin_visual.create_tween()
-	pile_tween.tween_property(_coin_visual, "scale", Vector2(0.4, 0.4), 0.22 + coin_stagger * _coin_flyer_count)
-	pile_tween.parallel().tween_property(_coin_visual, "modulate:a", 0.0, 0.22 + coin_stagger * _coin_flyer_count)
-
-
-func _launch_ability_flights() -> void:
-	var index := 0
-	for ability_id in _ability_chips.keys():
-		var slot := _ability_slots[ability_id] as Control
-		if not slot.visible:
-			continue
-		var chip := _ability_chips[ability_id] as OfferBoosterChip
-		var start := _to_local(chip.get_icon_global_rect().get_center())
-		var flyer := _make_flyer(chip.icon, ABILITY_FLYER_SIZE, start)
-		flyer.modulate.a = 1.0
-		# Outer chips swing wide before dropping onto the button, which keeps the four paths apart.
-		var side := (float(index) - 1.5) / 1.5
-		var control := start.lerp(_ability_target, 0.45) + Vector2(side * 150.0, -40.0)
-		var flight := flyer.create_tween()
-		flight.tween_interval(0.12 + float(index) * ability_stagger)
-		flight.tween_callback(_hide_chip.bind(chip))
-		flight.tween_method(
-			_move_along_curve.bind(flyer, start, control, _ability_target), 0.0, 1.0, ability_flight_duration
-		).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-		flight.parallel().tween_property(flyer, "scale", Vector2(0.62, 0.62), ability_flight_duration)
-		flight.tween_callback(_on_ability_landed.bind(flyer, StringName(ability_id)))
-		_flights_in_progress += 1
-		index += 1
-
-
-func _hide_chip(chip: Control) -> void:
-	chip.modulate.a = 0.0
-
-
-func _make_flyer(texture: Texture2D, flyer_size: Vector2, center: Vector2) -> TextureRect:
-	var flyer := TextureRect.new()
-	flyer.texture = texture
-	flyer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	flyer.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	flyer.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	flyer.custom_minimum_size = flyer_size
-	flyer.size = flyer_size
-	flyer.pivot_offset = flyer_size * 0.5
-	flyer.position = center - flyer_size * 0.5
-	flyer.modulate.a = 0.0
-	_flyer_layer.add_child(flyer)
-	return flyer
-
-
-func _move_along_curve(
-	progress: float, flyer: Control, start: Vector2, control: Vector2, end: Vector2
-) -> void:
-	var inverse := 1.0 - progress
-	var point := start * inverse * inverse + control * 2.0 * inverse * progress + end * progress * progress
-	flyer.position = point - flyer.size * 0.5
-
-
-func _on_coin_landed(flyer: Control) -> void:
-	flyer.queue_free()
-	_coins_landed += 1
-	coin_arrived.emit(_coins_landed, _coin_flyer_count)
-	SfxManager.play(SfxCatalogScript.EVENT_COIN_GAIN)
-	_on_flight_finished()
-
-
-func _on_ability_landed(flyer: Control, ability_id: StringName) -> void:
-	flyer.queue_free()
-	ability_arrived.emit(ability_id)
-	SfxManager.play(SfxCatalogScript.EVENT_REWARD_CHEST_STAR_ARRIVAL)
-	_on_flight_finished()
-
-
-func _on_flight_finished() -> void:
-	_flights_in_progress -= 1
-	if _flights_in_progress <= 0 and _phase == Phase.COLLECTING:
+func _on_flights_finished() -> void:
+	if _phase == Phase.COLLECTING:
 		_return_chest()
 
 
@@ -436,25 +283,6 @@ func _return_chest() -> void:
 	_phase = Phase.IDLE
 	_reset_visuals()
 	finished.emit()
-
-
-func _apply_reward_counts() -> void:
-	_coin_amount_label.text = "+%d" % _coin_reward
-	_coin_slot.visible = _coin_reward > 0
-	for ability_id in _ability_chips.keys():
-		var count := maxi(int(_ability_rewards.get(String(ability_id), _ability_rewards.get(ability_id, 0))), 0)
-		(_ability_chips[ability_id] as OfferBoosterChip).set_count(count)
-		(_ability_slots[ability_id] as Control).visible = count > 0
-
-
-func _get_reward_visuals() -> Array[Control]:
-	var visuals: Array[Control] = []
-	if _coin_slot.visible:
-		visuals.append(_coin_visual)
-	for ability_id in _ability_chips.keys():
-		if (_ability_slots[ability_id] as Control).visible:
-			visuals.append(_ability_chips[ability_id] as Control)
-	return visuals
 
 
 func _show_tap_hint() -> void:
@@ -489,17 +317,10 @@ func _reset_visuals() -> void:
 	_stage.offset_right = _stage_rest_offsets.z
 	_stage.offset_bottom = _stage_rest_offsets.w
 	_reveal_settled = false
-	_reward_panel.modulate.a = 0.0
-	for visual in [_coin_visual] + _ability_chips.values():
-		(visual as Control).modulate.a = 0.0
-		(visual as Control).scale = Vector2.ONE
+	_reward_panel.reset()
 
 
 func _apply_content_scale() -> void:
 	var content_scale := clampf(size.y / CONTENT_REFERENCE_HEIGHT, MIN_CONTENT_SCALE, 1.0)
 	_content.pivot_offset = Vector2(size.x * 0.5, size.y * CONTENT_ANCHOR_Y)
 	_content.scale = Vector2(content_scale, content_scale)
-
-
-func _to_local(global_point: Vector2) -> Vector2:
-	return get_global_transform().affine_inverse() * global_point

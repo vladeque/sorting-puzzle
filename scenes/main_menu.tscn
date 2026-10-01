@@ -13,6 +13,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/main_menu_starter_bundle_badge.tscn" id="11_starter_badge"]
 [ext_resource type="PackedScene" path="res://scenes/ui/starter_bundle_offer_modal.tscn" id="12_starter_modal"]
 [ext_resource type="PackedScene" path="res://scenes/ui/reward_chest_open_ceremony.tscn" id="13_chest_ceremony"]
+[ext_resource type="PackedScene" path="res://scenes/ui/purchase_reward_sequence.tscn" id="14_purchase_reward"]
 
 [node name="ProductionMainMenu" type="Control" unique_id=1235428546]
 layout_mode = 3
@@ -129,6 +130,11 @@ visible = false
 layout_mode = 1
 
 [node name="RewardChestOpenCeremony" parent="." instance=ExtResource("13_chest_ceremony")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="PurchaseRewardSequence" parent="." instance=ExtResource("14_purchase_reward")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1

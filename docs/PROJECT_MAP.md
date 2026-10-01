@@ -128,6 +128,8 @@ Files:
 - `scenes/ui/main_menu_reward_chest.tscn`
 - `scenes/ui/reward_chest_menu.tscn`
 - `scenes/ui/reward_chest_open_ceremony.tscn`
+- `scenes/ui/reward_reveal_row.tscn`
+- `scenes/ui/purchase_reward_sequence.tscn`
 - `scenes/ui/profile_menu.tscn`
 - `scenes/ui/profile_avatar_view.tscn`
 - `scenes/ui/profile_choice_tile.tscn`
@@ -175,6 +177,8 @@ Files:
 - `scripts/main_menu_reward_chest.gd`
 - `scripts/main_menu_reward_star_flyer.gd`
 - `scripts/reward_chest_open_ceremony.gd`
+- `scripts/reward_reveal_row.gd`
+- `scripts/purchase_reward_sequence.gd`
 - `scripts/reward_chest_menu.gd`
 - `scripts/profile_menu.gd`
 - `scripts/profile_avatar_view.gd`
@@ -211,6 +215,10 @@ Responsibility:
   flow. Backend cached catalogs never show this purchase prompt. The modal's "shop window" layout
   puts the coin pile on a sunburst stage (`assets/shaders/offer_sunburst.gdshader`) with an
   `offer_ribbon_banner.tscn` amount ribbon and shows boosters as `offer_booster_chip.tscn` sockets.
+  A completed purchase closes the modal and plays `scenes/ui/purchase_reward_sequence.tscn`: a
+  `PURCHASE COMPLETE` reveal whose coins fly into the coin counter and boosters onto the LEVEL
+  button. The reveal row and flights (`scenes/ui/reward_reveal_row.tscn`) are shared with the chest
+  opening.
 - Uses one shared interaction/motion system across Main Menu, Shop, Leaderboard, and Chapter
   Selection (UI-002): `scripts/press_scale_button.gd` (now tween-based, with an optional
   `visual_target_path` so art-only/full-cell hit targets can animate without shrinking their touch
@@ -586,7 +594,11 @@ Files:
 - `scenes/ui/shop_coin_offer_row.tscn`
 - `scenes/ui/coin_balance_widget.tscn`
 - `scenes/ui/shop_purchase_dialog.tscn`
+- `scenes/ui/purchase_reward_sequence.tscn`
+- `scenes/ui/reward_reveal_row.tscn`
 - `scripts/shop_*.gd`
+- `scripts/purchase_reward_sequence.gd`
+- `scripts/reward_reveal_row.gd`
 - `scripts/coin_balance_widget.gd`
 - `scripts/store/*.gd`
 - `configs/shop_catalog.json`
@@ -606,6 +618,10 @@ Responsibility:
 - `scripts/store/shop_purchase_flow.gd` owns the provider purchase, progress grant, and success
   feedback shared by Shop and Main Menu. The local Starter Bundle is lifetime-limited; a saved
   mock claim also suppresses a backend-returned Starter Bundle until real billing is integrated.
+- A granted purchase plays `scenes/ui/purchase_reward_sequence.tscn` instead of a "Purchase
+  complete" dialog: the rewards lift off the purchased offer, coins fly into the header counter,
+  and boosters fly to the Home tab (or drop toward the level's ability bar in the in-level Shop).
+  `scenes/ui/shop_purchase_dialog.tscn` now shows only purchase errors and ability info.
 - GAME-008: `application/config/shop_catalog_source` independently selects where the *offer list* comes from. `local` (default) reads `configs/shop_catalog.json`. `backend` sources eligibility, rewards, and product IDs from the authenticated backend development catalog (`GET /v1/catalog`, via the shared `BackendTransport`/`BackendReadOperations` from GAME-007) through `scripts/store/backend_catalog_source.gd`, joins each eligible offer to `configs/backend/shop_catalog_prices.json` by `platform_product_id` for its display title and mock regional price, and still prices/purchases through the local `mock` provider. `scripts/store/backend_catalog_cache.gd` persists the last successful backend catalog to `user://shop_catalog_backend_cache.json` so an unavailable, unauthorized, or malformed later read falls back to an offline cached view instead of failing outright.
 - Uses the "Shared Destination-Screen UI" system above for its background, content-rect/title
   sizing, bottom-navigation placement, and loading/error presentation; bundle/coin-offer purchase
@@ -759,8 +775,10 @@ Assets:
 Event owners:
 - `scripts/level.gd`: `item_select`, `item_place_valid`, `match_clear`, `star_hud_arrival`,
   `timer_critical_tick` (driven by `LevelTopHud.critical_second_pulsed`), `time_up`, `coin_spend`.
-- `scripts/store/shop_purchase_flow.gd`: `shop_purchase_success` and the layered `coin_gain` for
-  granted coins, shared by Shop and Main Menu Starter Bundle.
+- `scripts/store/shop_purchase_flow.gd`: `shop_purchase_success` for a granted purchase, shared by
+  Shop and Main Menu Starter Bundle.
+- `scripts/reward_reveal_row.gd`: `coin_gain` and `reward_chest_star_arrival` as each coin or
+  booster lands, for both the chest opening and the purchase reward sequence.
 - `scripts/production_main_menu.gd`: `reward_chest_star_arrival`, the goal-rollover and weekly
   leaderboard `coin_gain`, and the life-purchase `coin_spend`.
 - `scripts/pause_menu.gd`: the sound-effects toggle acknowledgement.

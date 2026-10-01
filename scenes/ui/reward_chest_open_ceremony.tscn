@@ -6,12 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://f5fgjtlt2b2v" path="res://assets/ui/main_menu_reward_chest_open_1024.png" id="4_open"]
 [ext_resource type="Texture2D" uid="uid://bm74y722oq5dj" path="res://assets/effects/confetti_paper_tile.png" id="5_paper_tile"]
 [ext_resource type="Texture2D" uid="uid://bhnpht3md7bs3" path="res://assets/effects/confetti_paper_star.png" id="6_paper_star"]
-[ext_resource type="Texture2D" uid="uid://bofe6ogoaw00o" path="res://assets/ui/shop_coin_offers/shop_coin_offer_tier_02.png" id="7_coin_pile"]
-[ext_resource type="PackedScene" path="res://scenes/ui/offer_booster_chip.tscn" id="8_chip"]
-[ext_resource type="Texture2D" uid="uid://h4ru3gdl5338" path="res://assets/abilities/ability_hammer.png" id="9_hammer"]
-[ext_resource type="Texture2D" uid="uid://x0qk7pd87bfv" path="res://assets/abilities/ability_shuffle.png" id="10_shuffle"]
-[ext_resource type="Texture2D" uid="uid://dwmyah5l2r82d" path="res://assets/abilities/ability_lantern.png" id="11_lantern"]
-[ext_resource type="Texture2D" uid="uid://x6rx0xrv78dw" path="res://assets/abilities/ice_clock_icon_256x256.png" id="12_freezer"]
+[ext_resource type="PackedScene" path="res://scenes/ui/reward_reveal_row.tscn" id="7_reward_row"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_rays"]
 shader = ExtResource("2_rays")
@@ -199,7 +194,7 @@ color_ramp = SubResource("Gradient_fade")
 color_initial_ramp = SubResource("Gradient_star_colors")
 texture = ExtResource("6_paper_star")
 
-[node name="RewardPanel" type="VBoxContainer" parent="Content"]
+[node name="RewardPanel" parent="Content" instance=ExtResource("7_reward_row")]
 unique_name_in_owner = true
 layout_mode = 1
 anchor_left = 0.5
@@ -212,174 +207,6 @@ offset_right = 350.0
 offset_bottom = -178.0
 grow_horizontal = 2
 grow_vertical = 0
-mouse_filter = 2
-theme_override_constants/separation = 10
-alignment = 2
-
-[node name="CoinSlot" type="Control" parent="Content/RewardPanel"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 176)
-layout_mode = 2
-mouse_filter = 2
-
-[node name="CoinVisual" type="Control" parent="Content/RewardPanel/CoinSlot"]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -100.0
-offset_top = -88.0
-offset_right = 100.0
-offset_bottom = 88.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-
-[node name="CoinPile" type="TextureRect" parent="Content/RewardPanel/CoinSlot/CoinVisual"]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -78.0
-offset_right = 78.0
-offset_bottom = 148.0
-grow_horizontal = 2
-mouse_filter = 2
-texture = ExtResource("7_coin_pile")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="CoinAmountLabel" type="Label" parent="Content/RewardPanel/CoinSlot/CoinVisual"]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 12
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = -48.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_type_variation = &"GameNumberLabel"
-theme_override_colors/font_color = Color(1, 0.93, 0.5, 1)
-theme_override_colors/font_outline_color = Color(0.36, 0.16, 0.05, 1)
-theme_override_constants/outline_size = 10
-theme_override_font_sizes/font_size = 40
-text = "+100"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="AbilityRow" type="HBoxContainer" parent="Content/RewardPanel"]
-layout_mode = 2
-mouse_filter = 2
-theme_override_constants/separation = 8
-alignment = 1
-
-[node name="HammerSlot" type="Control" parent="Content/RewardPanel/AbilityRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(108, 122)
-layout_mode = 2
-mouse_filter = 2
-
-[node name="HammerReward" parent="Content/RewardPanel/AbilityRow/HammerSlot" instance=ExtResource("8_chip")]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -54.0
-offset_top = -61.0
-offset_right = 54.0
-offset_bottom = 61.0
-grow_horizontal = 2
-grow_vertical = 2
-icon = ExtResource("9_hammer")
-title = "Hammer"
-name_color = Color(1, 0.97, 0.9, 1)
-name_outline_color = Color(0.2, 0.09, 0.05, 1)
-name_outline_size = 6
-
-[node name="ShuffleSlot" type="Control" parent="Content/RewardPanel/AbilityRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(108, 122)
-layout_mode = 2
-mouse_filter = 2
-
-[node name="ShuffleReward" parent="Content/RewardPanel/AbilityRow/ShuffleSlot" instance=ExtResource("8_chip")]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -54.0
-offset_top = -61.0
-offset_right = 54.0
-offset_bottom = 61.0
-grow_horizontal = 2
-grow_vertical = 2
-icon = ExtResource("10_shuffle")
-title = "Shuffle"
-name_color = Color(1, 0.97, 0.9, 1)
-name_outline_color = Color(0.2, 0.09, 0.05, 1)
-name_outline_size = 6
-
-[node name="HighlightSlot" type="Control" parent="Content/RewardPanel/AbilityRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(108, 122)
-layout_mode = 2
-mouse_filter = 2
-
-[node name="HighlightReward" parent="Content/RewardPanel/AbilityRow/HighlightSlot" instance=ExtResource("8_chip")]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -54.0
-offset_top = -61.0
-offset_right = 54.0
-offset_bottom = 61.0
-grow_horizontal = 2
-grow_vertical = 2
-icon = ExtResource("11_lantern")
-title = "Lantern"
-name_color = Color(1, 0.97, 0.9, 1)
-name_outline_color = Color(0.2, 0.09, 0.05, 1)
-name_outline_size = 6
-
-[node name="FreezerSlot" type="Control" parent="Content/RewardPanel/AbilityRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(108, 122)
-layout_mode = 2
-mouse_filter = 2
-
-[node name="FreezerReward" parent="Content/RewardPanel/AbilityRow/FreezerSlot" instance=ExtResource("8_chip")]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -54.0
-offset_top = -61.0
-offset_right = 54.0
-offset_bottom = 61.0
-grow_horizontal = 2
-grow_vertical = 2
-icon = ExtResource("12_freezer")
-title = "Freezer"
-name_color = Color(1, 0.97, 0.9, 1)
-name_outline_color = Color(0.2, 0.09, 0.05, 1)
-name_outline_size = 6
 
 [node name="TapHint" type="Label" parent="Content"]
 unique_name_in_owner = true

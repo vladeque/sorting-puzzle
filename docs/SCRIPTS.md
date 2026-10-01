@@ -16,7 +16,8 @@ This file documents what each script owns. Keep script docs focused on responsib
 ## Starter Bundle promotion
 
 - `scripts/production_main_menu.gd` loads priced Starter Bundle eligibility, positions the badge,
-  opens the offer modal, rechecks the live catalog before Buy, and updates the menu after purchase.
+  opens the offer modal, rechecks the live catalog before Buy, and after a granted purchase closes
+  the modal and plays `%PurchaseRewardSequence` (see `scripts/purchase_reward_sequence.gd`).
 - `scripts/main_menu_starter_bundle_badge.gd` forwards the badge button press, shows the sign's
   discount tag for a positive catalog discount (`set_discount_percent()`), and runs the sign's idle
   swing only while the badge is visible.
@@ -27,20 +28,24 @@ This file documents what each script owns. Keep script docs focused on responsib
   node's top edge and, below `board_top`, the wood board's gradient, grain, highlight, border, and
   drop shadow, which a StyleBoxFlat cannot express.
 - `scripts/starter_bundle_offer_modal.gd` binds rewards/prices and owns modal states and intent
-  signals; it does not grant rewards. It drives the hero ribbon tone, booster chips, discount tag,
-  one-time badge, the Buy button's compare/price lines, and the status pill's busy/error/success
-  styles (exported `status_*_style` StyleBoxes).
+  signals; it does not grant rewards. It drives the hero ribbon, booster chips, discount tag,
+  one-time badge, the Buy button's compare/price lines, and the status pill's busy/error styles
+  (exported `status_*_style` StyleBoxes). It has no success state: `close_after_purchase()` releases
+  the busy lock and closes it, and `get_reward_icon_global_rects()` tells the purchase reward
+  sequence where the coin art and each shown booster chip sit.
 - `scripts/offer_ribbon_banner.gd` (`OfferRibbonBanner`, `@tool`) draws the folded ribbon to its
-  size, owns the red offer and green success tones, and fits long ribbon text.
-- `scripts/offer_booster_chip.gd` (`OfferBoosterChip`) binds one booster's count, hides zero
-  counts, and draws the claimed check for the success state. `name_color`/`name_outline_*` exports
-  switch the name to light outlined text for dark backdrops (the reward-chest opening), and
+  size, owns the red offer tone and the green success tone (the purchase reward sequence's banner),
+  and fits long ribbon text.
+- `scripts/offer_booster_chip.gd` (`OfferBoosterChip`) binds one booster's count and hides zero
+  counts. Its claimed check (`set_claimed()`) is currently unused. `name_color`/`name_outline_*`
+  exports switch the name to light outlined text for dark backdrops (the reward reveal row), and
   `get_icon_global_rect()` gives a flight its launch point.
 - `assets/shaders/offer_sunburst.gdshader` paints the hero stage: radial base, rays (optional
   `ray_speed` rotation), centre glow, twinkling sparkles, and a bottom lip, masked to the stage's
   rounded corners using UV derivatives so it keeps its proportions at every panel scale.
 - `scripts/store/shop_purchase_flow.gd` runs the provider purchase and idempotent progress grant
-  for both Shop and Main Menu, and plays feedback only for a newly applied grant.
+  for both Shop and Main Menu, and plays the confirmation cue and haptic only for a newly applied
+  grant.
 - `scripts/store/store_service.gd` enforces local lifetime limits and narrows backend mock Starter
   Bundle visibility when the account already has a saved mock claim.
 
@@ -151,6 +156,15 @@ Purpose:
   coins land, and `_on_chest_ceremony_finished()` clears it and refills the chest widget. Level
   launch and cross-destination navigation are ignored while the ceremony is visible, and
   `ui_cancel` advances it.
+- `_buy_starter_bundle()` plays `%PurchaseRewardSequence` for a granted Starter Bundle: it reads the
+  modal's reward rects, calls `close_after_purchase()`, plays the confirmation feedback, and flies
+  coins to the coin shortcut and boosters to the LEVEL button. `_undisplayed_purchase_coins` is the
+  purchase's own coin hold-back (separate from the chest's, and subtracted alongside it), shrunk by
+  `_on_purchase_reward_coin_arrived()` and cleared by `_on_purchase_reward_finished()`. If the star
+  flight fills a chest goal while the sequence plays, `_chest_ceremony_deferred` holds the chest
+  opening until it finishes. Level launch, navigation, and the badge are ignored while it is
+  visible, and `ui_cancel` advances it. A replayed, already-granted transaction just closes the
+  modal.
 - Opens the reward chest detail modal when the reward chest widget emits `chest_pressed`.
 - Opens the main-menu settings popup from the top status bar, routes its policy-driven privacy
   choices/privacy-policy action, and presents the native support FAQ above Settings when requested.
@@ -450,6 +464,9 @@ Purpose:
   (a documented no-op when it matches the screen's own destination -- see `docs/SCENES.md`'s
   "Active-Tab Reselection Rule").
 - Applies runtime bottom safe-area padding while preserving three equal-width button segments.
+- `get_tab_icon_global_center(tab_name)` and `play_tab_receive_pulse(tab_name)` make a tab icon a
+  reward flight target: the Shop's purchase reward sequence flies boosters to Home and bumps its
+  icon as each lands (a scale tween, independent of the active-tab offset tween).
 - Owns the reusable active-tab presentation: `set_active_tab(tab_name)` raises the selected icon
   beyond the bar height, shows its label, and restores the other icons to centered unlabeled
   states, animating the icon raise/lower and label fade over
@@ -566,11 +583,19 @@ Depends on:
 - Owns Shop loading/error states, creates reusable offer scenes, coordinates one purchase at a time, and routes the shared navigation.
 - Uses `ShopPurchaseFlow` for the provider result and `PlayerProgress.apply_shop_purchase()` grant,
   refreshes the visible balance, and reloads the catalog so a claimed one-time offer disappears.
+- A granted purchase plays `%PurchaseRewardSequence` instead of a result dialog. `_purchase_offer()`
+  reads the purchased view's `get_reward_icon_global_rects()` before the catalog reload frees it,
+  holds the granted coins back from `%CoinBalance` (`_undisplayed_reward_coins`, counted down by
+  `_on_reward_coin_arrived()`), and targets the Home tab icon in destination mode or the bottom
+  centre (`OVERLAY_ABILITY_TARGET_INSET` above the safe edge, over the level's ability bar) in the
+  in-level overlay. The catalog reloads behind the sequence; further purchases, the overlay's X,
+  and navigation are ignored until `finished`. A replayed transaction (`applied` false) plays no
+  sequence.
 - `ShopPurchaseFlow.play_success_feedback(grant_result)` ties audio and haptics to rewards actually
-  landing rather than to the button or the dialog (AUDIO-001): it plays `shop_purchase_success`
-  only when the grant reports `applied`, layers one `coin_gain` when the grant included coins,
-  and stays silent for a duplicate transaction (`ok` with `applied` false) or a failed grant.
-  Ability-only bundles get the confirmation alone; there is no purchase-failure cue.
+  landing rather than to the button (AUDIO-001): it plays `shop_purchase_success` and the purchase
+  haptic only when the grant reports `applied`, and stays silent for a duplicate transaction (`ok`
+  with `applied` false) or a failed grant. `coin_gain` comes from the purchase reward sequence as
+  each coin lands; there is no purchase-failure cue.
 - Applies maximum content width, compact offer sizing, fixed bottom navigation, and mobile
   safe-area margins through `scripts/destination_screen_layout.gd` (shared with Leaderboard); loading/error states go through `%StatusPanel`.
 - Follows the selected chapter's background through `%DestinationShell` in `_ready()` instead of a
@@ -579,13 +604,15 @@ Depends on:
   Freezer and shows it through `%PurchaseDialog` when a bundle card's `info_requested` signal fires.
 - Fades the whole screen in on `_ready()`; retapping the already-active Shop bottom-navigation tab
   is a documented no-op (`_on_shop_tab_reselected()`; catalog refresh stays available only through
-  `%StatusPanel`'s Retry); `ui_cancel` closes an open `%PurchaseDialog` first via its `close()`
-  method if one is showing, otherwise returns to Main Menu; `_begin_navigation()` guards
+  `%StatusPanel`'s Retry); `ui_cancel` only advances a playing `%PurchaseRewardSequence`, closes an
+  open `%PurchaseDialog` first via its `close()` method if one is showing, otherwise returns to Main
+  Menu; `_begin_navigation()` guards
   `_return_to_main_menu()`/`_open_leaderboard()` against a duplicate press while a transition is
   already in flight.
 - In overlay mode it hides `%BottomNavigation`, shows `%OverlayCloseButton`, uses the extra vertical
   content space, and exposes `open()`/`close()`/`is_transitioning()` plus
-  `close_requested`/`closed`. `handle_back()` closes `%PurchaseDialog` first, then requests return
+  `close_requested`/`closed`. `handle_back()` advances a playing reward sequence, closes
+  `%PurchaseDialog` first, then requests return
   to Ability Purchase through `scripts/level.gd`, regardless of which embedded node receives
   `ui_cancel` first.
 
@@ -606,21 +633,24 @@ Depends on:
   Chapter CTA. Each
   reward cell's info button uses `press_scale_button.gd` with `visual_target_path` set to its
   sibling `Stack` (0.97 held scale), so it visibly presses without shrinking the full-cell tap
-  target -- these had no press feedback at all before UI-002.
+  target -- these had no press feedback at all before UI-002. `get_reward_icon_global_rects()`
+  returns each reward cell icon's rect (keyed `coins` or by ability id) for the purchase reward
+  sequence to lift off.
 - `scripts/shop_coin_offer_row.gd`: binds a coin quantity, its amount-scaled seven-tier clover-coin
   pile texture, formatted price, and purchase signal. The texture ladder uses 100, 300, 750, 1,600,
   3,500, and 13,000 as upper bounds before the largest overflowing-pouch fallback. Also binds an
   optional `tag` banner (for example "BEST VALUE"). Purchase button height matches the shared
-  "regular" 58px tier (previously a locally-different 64px).
+  "regular" 58px tier (previously a locally-different 64px). `get_reward_icon_global_rects()`
+  returns the coin pile's rect for the purchase reward sequence.
 - `scripts/coin_balance_widget.gd` (`class_name CoinBalanceWidget`): formats and displays a
   non-negative coin balance. `set_compact(bool)` selects between the Shop header's regular size
   (158x68) and the Main Menu coin shortcut's compact size (142x60); both variants reuse the exact
   same `%Pill` stylebox, `%CoinIcon` texture, and `GameNumberLabel` styling, so only geometry
   differs between the two screens. `get_coin_icon_global_center()` is the landing point for coins
-  flown into the balance.
+  flown into the balance, and `play_receive_pulse()` bumps the widget as each one lands.
 - `scripts/shop_purchase_dialog.gd`: shows and dismisses a focused result modal; `show_result()`
   takes an optional `button_text` (defaults to "Continue") so the same dialog reads correctly for
-  both purchase results and ability info lookups ("Got it"). The upper-cased title goes onto the
+  both purchase errors and ability info lookups ("Got it"). The upper-cased title goes onto the
   shared shop-awning header (`%AwningHeader`) through `set_title()`, which shrinks long titles to
   fit the plate. `%CloseButton` uses the shared orange
   utility style plus `press_scale_button.gd` for press feedback (it had none before UI-002).
@@ -636,9 +666,10 @@ Purpose:
 - Wraps a compact `coin_balance_widget.tscn` instance with the Main Menu's "+" badge inside a real
   tap target. `set_amount(amount)` forwards to the wrapped widget;
   `scripts/production_main_menu.gd` connects the native `pressed` signal to open the Shop.
-- `get_coin_icon_global_center()` and `play_receive_pulse()` serve the reward-chest opening: coins
-  fly to the icon and each landing bumps the wrapped widget (never this button's own scale, which
-  `PressScaleButton` owns).
+- `get_coin_icon_global_center()` and `play_receive_pulse()` serve the reward-chest opening and the
+  Starter Bundle's purchase reward sequence: coins fly to the icon and each landing bumps the
+  wrapped widget through `CoinBalanceWidget.play_receive_pulse()` (never this button's own scale,
+  which `PressScaleButton` owns).
 
 ## Store scripts
 
@@ -885,14 +916,16 @@ Purpose:
 - `advance()` is the tap/Back action: opens a waiting chest, or ends the reveal hold once every
   reward has settled in its slot, so a flight never launches from a reward still popping out.
 - Emits `opened`, `coin_arrived(arrived_count, total_count)`, `ability_arrived(ability_id)`, and
-  `finished`; plays its own `shop_purchase_success`, `coin_gain`, and `reward_chest_star_arrival`
-  cues and the `reward_chest_goal_complete` haptic.
-- Beat durations are `@export` (Timing group) so tests and captures can compress or freeze a beat.
+  `finished`; plays its own `shop_purchase_success` cue and the `reward_chest_goal_complete`
+  haptic. The reveal row, the flights, and their `coin_gain`/`reward_chest_star_arrival` cues
+  belong to `%RewardPanel` (`scripts/reward_reveal_row.gd`), whose signals it forwards.
+- Chest beat durations are `@export` (Timing group) here and flight durations on `%RewardPanel`, so
+  tests and captures can compress or freeze a beat.
 - Scales `%Content` down on screens shorter than `CONTENT_REFERENCE_HEIGHT` (min
   `MIN_CONTENT_SCALE`) around the `CONTENT_ANCHOR_Y` line, which must match the scene's anchors.
 
 Depends on:
-- `scripts/ui_motion.gd`, `scripts/offer_booster_chip.gd`, `SfxManager`, `HapticsManager`.
+- `scripts/ui_motion.gd`, `scripts/reward_reveal_row.gd`, `SfxManager`, `HapticsManager`.
 
 Do not use for:
 - Reading or writing `PlayerProgress`. The owner supplies the rewards and reconciles every widget
@@ -902,6 +935,66 @@ Tests:
 - `tests/ui/test_reward_chest_open_ceremony.gd` covers tap and auto-open, flight counts (including
   the 12-coin cap), zero-count slots, and the Main Menu's hold-at-full, coin holdback, Back
   handling, and refill. `tests/audio/test_sfx_event_wiring.gd` covers where the payout cues fire.
+
+## `scripts/reward_reveal_row.gd`
+
+Attached to:
+- `scenes/ui/reward_reveal_row.tscn` root `RewardRevealRow` (`class_name RewardRevealRow`).
+
+Purpose:
+- The reward row and flights shared by the chest ceremony and the purchase reward sequence.
+- `set_rewards(rewards)` binds `{"coins": int, "abilities": {ability_id: count}}` (String or
+  StringName keys), hides absent slots, and resets the visuals; `has_rewards()` says whether
+  anything is shown.
+- `pop_in(fallback_origin_global, origins)` pops each shown reward into its slot from its own
+  origin (`origins` keyed `coins` or by ability id) or the fallback, staggered, and returns the
+  seconds until the last one settles. Call it a frame after `set_rewards()`, once the row is laid
+  out.
+- `launch_flights(flyer_layer, coin_target_global, ability_target_global)` flies coins (5-12, about
+  one per 20 granted) and boosters through the owner's flyer layer and returns the flight count;
+  emits `coin_arrived`, `ability_arrived`, and `flights_finished`, and plays `coin_gain` /
+  `reward_chest_star_arrival` per landing.
+- Pop and flight durations are `@export` (Timing group).
+
+Do not use for:
+- Dims, effects, beat order, or input. The owning sequence handles those.
+
+## `scripts/purchase_reward_sequence.gd`
+
+Attached to:
+- `scenes/ui/purchase_reward_sequence.tscn` root `PurchaseRewardSequence`
+  (`class_name PurchaseRewardSequence`).
+
+Purpose:
+- Plays the purchase confirmation as a phase machine (`IDLE`, `REVEALING`, `COLLECTING`,
+  `CLOSING`). Every beat after `play()` is a callback on a tween bound to the node (via `_after()`
+  and the close tween), not an `await`, so a freed sequence leaves no pending timer or coroutine.
+- `play(rewards, origin_rects, coin_target_global, ability_target_global)` starts it: `rewards` is
+  the granted `{"coins", "abilities"}`, `origin_rects` maps `coins`/ability ids to the purchased
+  offer's art rects. The reveal starts on the next frame so the row is laid out. A grant with
+  nothing to show emits `finished` on the next frame without showing. Ignored while playing.
+- `advance()` is the tap/Back action: ends the hold once every reward has settled.
+- Emits `coin_arrived(arrived_count, total_count)`, `ability_arrived(ability_id)`, and `finished`.
+  Plays no cue itself beyond the row's landing cues; owners call
+  `ShopPurchaseFlow.play_success_feedback()` as it starts.
+- `intro_duration`, `reveal_hold`, and `outro_duration` are `@export`; flight durations live on
+  `%RewardRow`.
+- Scales `%Content` down on screens shorter than `CONTENT_REFERENCE_HEIGHT` (min
+  `MIN_CONTENT_SCALE`) around `CONTENT_ANCHOR_Y`, which must match the scene's anchors.
+
+Depends on:
+- `scripts/ui_motion.gd`, `scripts/reward_reveal_row.gd`, `scripts/offer_ribbon_banner.gd`.
+
+Do not use for:
+- Running the purchase, granting rewards, or reading `PlayerProgress`.
+
+Tests:
+- `tests/ui/test_purchase_reward_sequence.gd` covers per-reward origins, the tap that waits for
+  the reveal to settle, flight counts, empty and booster-only grants, the destination Shop
+  (hold-back, Home-tab target, Back, ignored repeat purchase), the in-level overlay (locked X,
+  bottom target), and the Main Menu's deferred chest opening.
+  `tests/ui/test_starter_bundle_offer.gd` covers the Starter Bundle purchase path, and
+  `scenes/shop_verification.tscn` the Shop purchases.
 
 ## `scripts/reward_chest_menu.gd`
 

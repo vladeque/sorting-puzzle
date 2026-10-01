@@ -18,6 +18,13 @@ const DISCOUNT_BADGE_TITLE_INSET := 62.0
 @onready var _freezer_count := %FreezerCount as Label
 @onready var _coin_count := %CoinCount as Label
 @onready var _purchase_button := %PurchaseButton as Button
+@onready var _reward_icons := {
+	"coins": $CardBody/CardStack/Rewards/CoinReward/Stack/Icon as Control,
+	"hammer": $CardBody/CardStack/Rewards/HammerReward/Stack/Icon as Control,
+	"shuffle": $CardBody/CardStack/Rewards/ShuffleReward/Stack/Icon as Control,
+	"highlight": $CardBody/CardStack/Rewards/LanternReward/Stack/Icon as Control,
+	"freezer": $CardBody/CardStack/Rewards/FreezerReward/Stack/Icon as Control,
+}
 @onready var _ability_info_buttons := {
 	&"hammer": %HammerInfoButton as Button,
 	&"shuffle": %ShuffleInfoButton as Button,
@@ -65,6 +72,17 @@ func set_offer(offer: Dictionary) -> void:
 
 func get_offer_id() -> StringName:
 	return _offer_id
+
+
+## Where each reward's art sits on the card, keyed "coins" or by ability id, so the purchase reward
+## sequence can lift the bought rewards straight off it.
+func get_reward_icon_global_rects() -> Dictionary:
+	var rects := {}
+	for key in _reward_icons.keys():
+		var icon := _reward_icons[key] as Control
+		if icon.is_visible_in_tree():
+			rects[key] = icon.get_global_rect()
+	return rects
 
 
 func set_shop_locked(is_locked: bool, is_active_purchase: bool = false) -> void:

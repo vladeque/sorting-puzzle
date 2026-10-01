@@ -1,0 +1,182 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/reward_reveal_row.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://bofe6ogoaw00o" path="res://assets/ui/shop_coin_offers/shop_coin_offer_tier_02.png" id="2_coin_pile"]
+[ext_resource type="PackedScene" path="res://scenes/ui/offer_booster_chip.tscn" id="3_chip"]
+[ext_resource type="Texture2D" uid="uid://h4ru3gdl5338" path="res://assets/abilities/ability_hammer.png" id="4_hammer"]
+[ext_resource type="Texture2D" uid="uid://x0qk7pd87bfv" path="res://assets/abilities/ability_shuffle.png" id="5_shuffle"]
+[ext_resource type="Texture2D" uid="uid://dwmyah5l2r82d" path="res://assets/abilities/ability_lantern.png" id="6_lantern"]
+[ext_resource type="Texture2D" uid="uid://x6rx0xrv78dw" path="res://assets/abilities/ice_clock_icon_256x256.png" id="7_freezer"]
+
+[node name="RewardRevealRow" type="VBoxContainer"]
+offset_right = 700.0
+offset_bottom = 308.0
+mouse_filter = 2
+theme_override_constants/separation = 10
+alignment = 2
+script = ExtResource("1_script")
+
+[node name="CoinSlot" type="Control" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 176)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="CoinVisual" type="Control" parent="CoinSlot"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -88.0
+offset_right = 100.0
+offset_bottom = 88.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="CoinPile" type="TextureRect" parent="CoinSlot/CoinVisual"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -78.0
+offset_right = 78.0
+offset_bottom = 148.0
+grow_horizontal = 2
+mouse_filter = 2
+texture = ExtResource("2_coin_pile")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CoinAmountLabel" type="Label" parent="CoinSlot/CoinVisual"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -48.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_type_variation = &"GameNumberLabel"
+theme_override_colors/font_color = Color(1, 0.93, 0.5, 1)
+theme_override_colors/font_outline_color = Color(0.36, 0.16, 0.05, 1)
+theme_override_constants/outline_size = 10
+theme_override_font_sizes/font_size = 40
+text = "+100"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AbilityRow" type="HBoxContainer" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="HammerSlot" type="Control" parent="AbilityRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(108, 122)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="HammerReward" parent="AbilityRow/HammerSlot" instance=ExtResource("3_chip")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -54.0
+offset_top = -61.0
+offset_right = 54.0
+offset_bottom = 61.0
+grow_horizontal = 2
+grow_vertical = 2
+icon = ExtResource("4_hammer")
+title = "Hammer"
+name_color = Color(1, 0.97, 0.9, 1)
+name_outline_color = Color(0.2, 0.09, 0.05, 1)
+name_outline_size = 6
+
+[node name="ShuffleSlot" type="Control" parent="AbilityRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(108, 122)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="ShuffleReward" parent="AbilityRow/ShuffleSlot" instance=ExtResource("3_chip")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -54.0
+offset_top = -61.0
+offset_right = 54.0
+offset_bottom = 61.0
+grow_horizontal = 2
+grow_vertical = 2
+icon = ExtResource("5_shuffle")
+title = "Shuffle"
+name_color = Color(1, 0.97, 0.9, 1)
+name_outline_color = Color(0.2, 0.09, 0.05, 1)
+name_outline_size = 6
+
+[node name="HighlightSlot" type="Control" parent="AbilityRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(108, 122)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="HighlightReward" parent="AbilityRow/HighlightSlot" instance=ExtResource("3_chip")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -54.0
+offset_top = -61.0
+offset_right = 54.0
+offset_bottom = 61.0
+grow_horizontal = 2
+grow_vertical = 2
+icon = ExtResource("6_lantern")
+title = "Lantern"
+name_color = Color(1, 0.97, 0.9, 1)
+name_outline_color = Color(0.2, 0.09, 0.05, 1)
+name_outline_size = 6
+
+[node name="FreezerSlot" type="Control" parent="AbilityRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(108, 122)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="FreezerReward" parent="AbilityRow/FreezerSlot" instance=ExtResource("3_chip")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -54.0
+offset_top = -61.0
+offset_right = 54.0
+offset_bottom = 61.0
+grow_horizontal = 2
+grow_vertical = 2
+icon = ExtResource("7_freezer")
+title = "Freezer"
+name_color = Color(1, 0.97, 0.9, 1)
+name_outline_color = Color(0.2, 0.09, 0.05, 1)
+name_outline_size = 6

@@ -40,10 +40,10 @@ func execute(offer_id: StringName) -> Dictionary:
 	return {"ok": true, "grant": grant_result, "rewards": rewards}
 
 
+## The purchase confirmation cue and haptic, played as the purchase reward sequence bursts open. Its
+## coin flights play coin_gain as each coin lands, so no coin cue is layered here.
 static func play_success_feedback(grant_result: Dictionary) -> void:
 	if not bool(grant_result.get("applied", false)):
 		return
 	SfxManager.play(SfxCatalogScript.EVENT_SHOP_PURCHASE_SUCCESS)
 	HapticsManager.play(HapticsCatalogScript.EVENT_SHOP_PURCHASE_SUCCESS)
-	if maxi(int(grant_result.get("coins", 0)), 0) > 0:
-		SfxManager.play(SfxCatalogScript.EVENT_COIN_GAIN)

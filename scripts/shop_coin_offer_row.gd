@@ -48,6 +48,11 @@ func get_offer_id() -> StringName:
 	return _offer_id
 
 
+## Where the coin art sits on the row, so the purchase reward sequence can lift the coins off it.
+func get_reward_icon_global_rects() -> Dictionary:
+	return {"coins": _coin_icon.get_global_rect()}
+
+
 func set_shop_locked(is_locked: bool, is_active_purchase: bool = false) -> void:
 	_purchase_button.disabled = is_locked
 	_purchase_button.text = "Purchasing…" if is_locked and is_active_purchase else _formatted_price

@@ -50,6 +50,7 @@ const CHAPTER_SELECTION_ENABLED_SETTING := "application/config/chapter_selection
 @onready var _house_reward_origin := %HouseRewardOrigin as Control
 @onready var _reward_star_flyer := %RewardStarFlyer as Control
 @onready var _chest_ceremony := %RewardChestOpenCeremony as Control
+@onready var _purchase_reward_sequence := %PurchaseRewardSequence as Control
 @onready var _bottom_bar := %BottomBar as MarginContainer
 @onready var _level_button := %LevelButton as Button
 @onready var _chapter_button := %ChapterButton as Button
@@ -83,6 +84,13 @@ var _chest_ceremony_rewards := {}
 ## into the counter yet. The displayed balance subtracts them so it can count up on each landing.
 var _undisplayed_chest_coins := 0
 var _chest_ceremony_coin_holdback := 0
+## The same hold-back for a Starter Bundle purchase, counted up by the purchase reward sequence. It
+## is separate from the chest's because a purchase can land while the star flight still holds coins.
+var _undisplayed_purchase_coins := 0
+var _purchase_coin_holdback := 0
+## True when the star flight filled a goal while a purchase reward sequence was playing; the chest
+## opening then waits for that sequence to finish instead of playing over it.
+var _chest_ceremony_deferred := false
 var _is_navigating := false
 var _life_recovery_in_progress := false
 var _rewarded_life_client
@@ -137,6 +145,9 @@ func _ready() -> void:
 	_chest_ceremony.connect("coin_arrived", Callable(self, "_on_chest_ceremony_coin_arrived"))
 	_chest_ceremony.connect("ability_arrived", Callable(self, "_on_chest_ceremony_ability_arrived"))
 	_chest_ceremony.connect("finished", Callable(self, "_on_chest_ceremony_finished"))
+	_purchase_reward_sequence.connect("coin_arrived", Callable(self, "_on_purchase_reward_coin_arrived"))
+	_purchase_reward_sequence.connect("ability_arrived", Callable(self, "_on_purchase_reward_ability_arrived"))
+	_purchase_reward_sequence.connect("finished", Callable(self, "_on_purchase_reward_finished"))
 	_starter_badge.pressed.connect(_open_starter_bundle_offer)
 	_starter_modal.buy_requested.connect(_buy_starter_bundle)
 	_starter_modal.close_requested.connect(_close_starter_bundle_offer)
@@ -160,6 +171,7 @@ func _ready() -> void:
 	_out_of_lives_menu.z_index = MAIN_MENU_OVERLAY_Z_INDEX
 	_starter_modal.z_index = MAIN_MENU_OVERLAY_Z_INDEX + 1
 	_chest_ceremony.z_index = MAIN_MENU_OVERLAY_Z_INDEX + 2
+	_purchase_reward_sequence.z_index = MAIN_MENU_OVERLAY_Z_INDEX + 2
 	_apply_responsive_layout()
 	if not pending_reward_animation.is_empty():
 		_play_pending_reward_animation.call_deferred(pending_reward_animation)
@@ -199,11 +211,15 @@ func _process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if not event.is_action_pressed("ui_cancel"):
 		return
-	# Back behaves like a tap while the chest opens: it advances the sequence instead of closing
-	# whatever overlay sits underneath it.
+	# Back behaves like a tap while the chest opens or a purchase reward plays: it advances the
+	# sequence instead of closing whatever overlay sits underneath it.
 	if _chest_ceremony.visible:
 		get_viewport().set_input_as_handled()
 		_chest_ceremony.call("advance")
+		return
+	if _purchase_reward_sequence.visible:
+		get_viewport().set_input_as_handled()
+		_purchase_reward_sequence.call("advance")
 		return
 	if _starter_modal.visible:
 		get_viewport().set_input_as_handled()
@@ -583,6 +599,9 @@ func _on_reward_star_arrived() -> void:
 
 func _on_reward_star_animation_finished() -> void:
 	if _chest_full_hold_goal > 0 and not _chest_ceremony_rewards.is_empty():
+		if _purchase_reward_sequence.call("is_playing"):
+			_chest_ceremony_deferred = true
+			return
 		_play_chest_ceremony()
 		return
 	_update_reward_chest_status()
@@ -642,6 +661,10 @@ func _on_chest_ceremony_coin_arrived(arrived_count: int, total_count: int) -> vo
 
 
 func _on_chest_ceremony_ability_arrived(_ability_id: StringName) -> void:
+	_play_level_button_receive_pulse()
+
+
+func _play_level_button_receive_pulse() -> void:
 	_level_button.pivot_offset = _level_button.size * 0.5
 	var tween := UIMotionScript.retween(_level_button, &"_chest_reward_pulse_tween")
 	tween.tween_property(_level_button, "scale", Vector2(1.06, 1.06), 0.07) \
@@ -686,7 +709,8 @@ func _update_profile_customization() -> void:
 func _update_coin_balance() -> void:
 	if _coin_shortcut != null:
 		_coin_shortcut.call(
-			"set_amount", maxi(PlayerProgress.get_coins() - _undisplayed_chest_coins, 0)
+			"set_amount",
+			maxi(PlayerProgress.get_coins() - _undisplayed_chest_coins - _undisplayed_purchase_coins, 0)
 		)
 
 
@@ -893,7 +917,12 @@ func _refresh_starter_bundle_offer() -> Dictionary:
 
 
 func _open_starter_bundle_offer() -> void:
-	if _is_navigating or _starter_offer.is_empty() or _starter_modal.visible:
+	if (
+		_is_navigating
+		or _starter_offer.is_empty()
+		or _starter_modal.visible
+		or _purchase_reward_sequence.visible
+	):
 		return
 	_starter_modal.set_offer(_starter_offer)
 	_starter_modal.apply_safe_layout(_get_safe_area_margins(get_viewport_rect().size), get_viewport_rect().size)
@@ -941,12 +970,51 @@ func _buy_starter_bundle() -> void:
 		)
 		return
 
-	_update_coin_balance()
-	ShopPurchaseFlowScript.play_success_feedback(result.get("grant", {}) as Dictionary)
+	var grant_result := result.get("grant", {}) as Dictionary
 	_starter_catalog_serial += 1
 	_starter_offer = {}
 	_starter_badge.hide()
-	_starter_modal.show_success()
+	# The purchase reward sequence confirms the purchase in place of the modal: the rewards lift off
+	# the modal's coin art and booster chips as it closes, coins fly into the counter, and boosters
+	# fly to the LEVEL button. A replayed, already-granted transaction brings nothing to reveal.
+	var origin_rects: Dictionary = _starter_modal.get_reward_icon_global_rects()
+	_starter_modal.close_after_purchase()
+	if not bool(grant_result.get("applied", false)):
+		_update_coin_balance()
+		return
+	_purchase_coin_holdback = maxi(int(grant_result.get("coins", 0)), 0)
+	_undisplayed_purchase_coins = _purchase_coin_holdback
+	_update_coin_balance()
+	ShopPurchaseFlowScript.play_success_feedback(grant_result)
+	_purchase_reward_sequence.call(
+		"play",
+		grant_result,
+		origin_rects,
+		_coin_shortcut.call("get_coin_icon_global_center") as Vector2,
+		_level_button.get_global_rect().get_center()
+	)
+
+
+## Counts the displayed balance up in step with the purchased coins landing, reaching the saved
+## balance on the last one.
+func _on_purchase_reward_coin_arrived(arrived_count: int, total_count: int) -> void:
+	var remaining_share := 1.0 - float(arrived_count) / float(maxi(total_count, 1))
+	_undisplayed_purchase_coins = roundi(float(_purchase_coin_holdback) * remaining_share)
+	_update_coin_balance()
+	_coin_shortcut.call("play_receive_pulse")
+
+
+func _on_purchase_reward_ability_arrived(_ability_id: StringName) -> void:
+	_play_level_button_receive_pulse()
+
+
+func _on_purchase_reward_finished() -> void:
+	_undisplayed_purchase_coins = 0
+	_purchase_coin_holdback = 0
+	_update_coin_balance()
+	if _chest_ceremony_deferred:
+		_chest_ceremony_deferred = false
+		_play_chest_ceremony()
 
 
 ## Ignores a duplicate cross-destination press while a scene transition is already underway, so a
@@ -955,7 +1023,12 @@ func _buy_starter_bundle() -> void:
 ## keyboard input, not just navigation) from accepting further input for the brief window before
 ## the deferred scene swap resolves.
 func _begin_navigation(scene_path: String) -> void:
-	if _is_navigating or _starter_modal.visible or _chest_ceremony.visible:
+	if (
+		_is_navigating
+		or _starter_modal.visible
+		or _chest_ceremony.visible
+		or _purchase_reward_sequence.visible
+	):
 		return
 
 	_is_navigating = true
@@ -964,7 +1037,7 @@ func _begin_navigation(scene_path: String) -> void:
 
 
 func _launch_campaign_level() -> void:
-	if _chest_ceremony.visible:
+	if _chest_ceremony.visible or _purchase_reward_sequence.visible:
 		return
 	PlayerProgress.refresh_lives()
 	if PlayerProgress.get_lives() <= 0:
