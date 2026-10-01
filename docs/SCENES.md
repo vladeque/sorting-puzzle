@@ -404,7 +404,7 @@ Purpose:
 - Provides a top status row for profile, saved gold coins, saved campaign lives, and settings.
 - Shows a left-side reward chest widget under the profile icon with saved star progress toward the active configured chest goal.
 - Shows `%StarterBundleBadge` to the right of the reward chest only after a live/local priced
-  `starter_bundle` catalog result confirms eligibility. Its circular button opens the dedicated
+  `starter_bundle` catalog result confirms eligibility. The hanging shop sign opens the dedicated
   `%StarterBundleOfferModal`; cached backend results never advertise a potentially stale offer.
 - After a completed level returns here, launches one reward star per earned star from the
   background house into the reward chest and advances the visible chest count on impact (see
@@ -458,8 +458,10 @@ Important nodes:
 - `LeaderboardRewardDialog`: `scenes/ui/leaderboard_reward_dialog.tscn` instance, hidden until a
   weekly reward is pending.
 - `%OutOfLivesMenu`: hidden `scenes/ui/out_of_lives_menu.tscn` instance on the shared modal z-index.
-- `%StarterBundleBadge`: hidden `scenes/ui/main_menu_starter_bundle_badge.tscn` instance,
-  positioned against the right safe edge below the top status row.
+- `%StarterBundleBadge`: hidden `scenes/ui/main_menu_starter_bundle_badge.tscn` instance. Its
+  142x164 rect ends on the right safe edge (no side margin, so the bracket's wall plate mounts on
+  the edge) and starts `STARTER_BADGE_RAISE` (30px) above the reward chest's top, which lines the
+  hanging board up with the chest art.
 - `%StarterBundleOfferModal`: hidden `scenes/ui/starter_bundle_offer_modal.tscn` instance above
   the shared menu overlay z-index. System Back closes it first unless a purchase is in progress.
 - `%RewardChestOpenCeremony`: hidden `scenes/ui/reward_chest_open_ceremony.tscn` instance above
@@ -497,7 +499,17 @@ Do not use for:
 
 ## `scenes/ui/main_menu_starter_bundle_badge.tscn`
 
-- Owns the circular gold-rimmed coral Starter Bundle button, existing coin art, and short label.
+- Owns the Starter Bundle promotion drawn as a wooden shop sign (direction D of the 2026-09-30
+  badge study, echoing the storefront's bracket clock sign): `Bracket` (`ShopSignBracket`, a
+  wrought-iron wall bracket) and, under `Swing`, the `Sign` with `SignBoard` (`ShopSignBoard`: two
+  chains and the wood board), a `Glow`, the `shop_coin_offer_tier_07.png` `CoinArt`, the painted
+  `STARTER` label, and `%DiscountTag` (`discount_badge_pinned.png` with `%DiscountLabel`).
+- `%BadgeButton` is a full-rect transparent `PressScaleButton` whose press shrinks `Swing/Sign`
+  only, so the bracket stays mounted. `%IdleMotion` loops `idle` (3.6s): `Swing` rocks ±2.5°
+  around the bar between the chain hooks, and the tag flicks once per loop. It plays only while the
+  badge is visible.
+- `set_discount_percent()` shows the tag only for a positive catalog `discount_percent`, matching
+  the offer modal's tag.
 - Emits `pressed`; the production menu owns eligibility, safe-area placement, and opening the offer.
 
 ## `scenes/ui/starter_bundle_offer_modal.tscn`

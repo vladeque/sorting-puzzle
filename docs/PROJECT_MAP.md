@@ -204,8 +204,9 @@ Responsibility:
   and a warm rounded settings button styled like the chapter selection back button.
 - Shows a separate side reward chest widget under the profile icon with saved stars versus the active configured goal; tapping it opens `scenes/ui/reward_chest_menu.tscn`, a read-only centered modal showing the same progress at a larger size, the dedicated `assets/ui/reward_chest_menu_illustration.png` artwork, and the coin payout waiting at the next goal.
 - When returning stars fill a chest goal, `scenes/ui/reward_chest_open_ceremony.tscn` lifts the chest to the centre, opens it on tap (or automatically), reveals the goal's coins and abilities, and flies coins into the coin counter and abilities onto the LEVEL button before the chest returns to its widget.
-- Advertises an eligible, priced Starter Bundle with `scenes/ui/main_menu_starter_bundle_badge.tscn`
-  beside the reward chest. Its dedicated `starter_bundle_offer_modal.tscn` binds the catalog's
+- Advertises an eligible, priced Starter Bundle with `scenes/ui/main_menu_starter_bundle_badge.tscn`,
+  a swinging wooden shop sign on a wall bracket at the right edge, opposite the reward chest
+  (drawn by `scripts/shop_sign_bracket.gd` and `scripts/shop_sign_board.gd`). Its dedicated `starter_bundle_offer_modal.tscn` binds the catalog's
   actual rewards and regional price, then rechecks eligibility before the shared Shop purchase
   flow. Backend cached catalogs never show this purchase prompt. The modal's "shop window" layout
   puts the coin pile on a sunburst stage (`assets/shaders/offer_sunburst.gdshader`) with an

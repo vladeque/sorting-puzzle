@@ -21,15 +21,16 @@ product ids, which differ between catalog modes.
 
 | Element | Design and behavior |
 | --- | --- |
-| Menu badge | A 104-116 logical-pixel circular, gold-rimmed coral button in the open sky to the right of the reward chest, below the top status row. Compose it from existing coin/ability art and a short `STARTER` label; keep the whole circle tappable. No price text on the small badge. |
-| Placement | Anchor to the safe right edge and align its top with the reward chest. Preserve a gap from the chest and top status controls. Recompute on viewport and safe-area changes; if the chest and badge cannot sit side by side, put the badge below the chest while keeping it above the campaign button. |
+| Menu badge | A wooden shop sign (142x164 logical pixels with its bracket) hanging by two chains from a wrought-iron wall bracket, in the open sky opposite the reward chest, below the top status row. It echoes the storefront's bracket clock sign. The board shows the tier 7 coin bag and a painted `STARTER` label, and the red discount tag pinned to its corner shows `-N%` only when the offer supplies `discount_percent`. The sign rocks gently and the tag flicks once per loop while it is visible. The whole rect is tappable, and a press shrinks the sign but not the bracket. No price text on the small badge. Chosen 2026-09-30 from four studied directions; it replaced the first circular coral button, whose red coin bag blended into its red disc. |
+| Placement | The bracket's wall plate mounts on the safe right edge itself (no side margin), and the sign's top sits 30 px above the reward chest's top so the hanging board lines up with the chest art. Preserve a gap from the chest and top status controls. Recompute on viewport and safe-area changes; if the chest and badge cannot sit side by side, put the badge below the chest while keeping it above the campaign button. |
 | Modal | A separate centered scene using `gameplay_modal_shell.tscn` in the "shop window" layout (chosen 2026-09-29 from four studied directions): dimmed background, `STARTER BUNDLE` awning title, the coin pile large on a sunburst stage with a ribbon carrying the coin amount and a `ONE-TIME OFFER` pill, then a centered row of the positive-count boosters in the level ability bar's dark sockets with `×N` badges and names. Show quantities from the loaded offer, so the local four-ability bundle and the current backend three-ability bundle are both accurate. |
 | Price and discount | Put `Buy for {store.formatted_price}` in the primary button, with the crossed-out compare price as a smaller line above it. Pin the existing red discount tag with `X% OFF` to the stage's corner. Show the compare price and tag only when the loaded offer supplies those fields; neither price nor reward amounts are hardcoded in the modal. |
 | Interaction states | Close X and system Back dismiss the modal. During a purchase, disable Buy and closing (the close button dims), label the action `Purchasing…`, and ignore repeated taps. Status messages appear in a pill on the content region's bottom edge, just above the button: neutral while checking/purchasing, red for a failure with Retry/Close, and green for success, where the ribbon also turns green (`+1,000 COINS`), the booster chips show checks, and the action becomes Continue. Do not leave a second modal stacked behind it. |
 
 The visual reuses existing art (coin pile tier 7, ability icons, `discount_badge_pinned.png`, green
-button). The sunburst is a shader (`assets/shaders/offer_sunburst.gdshader`) and the ribbon is drawn
-by `offer_ribbon_banner.gd`, so no generated raster assets are needed.
+button). The sunburst is a shader (`assets/shaders/offer_sunburst.gdshader`), the ribbon is drawn
+by `offer_ribbon_banner.gd`, and the menu sign's bracket, chains, and wood board are drawn by
+`shop_sign_bracket.gd` and `shop_sign_board.gd`, so no generated raster assets are needed.
 Keep a clear tap target and readable quantities when the shell scales to a 540x960 viewport. A
 compact/scrollable content area should protect the price action on short screens.
 

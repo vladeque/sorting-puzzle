@@ -17,7 +17,15 @@ This file documents what each script owns. Keep script docs focused on responsib
 
 - `scripts/production_main_menu.gd` loads priced Starter Bundle eligibility, positions the badge,
   opens the offer modal, rechecks the live catalog before Buy, and updates the menu after purchase.
-- `scripts/main_menu_starter_bundle_badge.gd` forwards the badge button press.
+- `scripts/main_menu_starter_bundle_badge.gd` forwards the badge button press, shows the sign's
+  discount tag for a positive catalog discount (`set_discount_percent()`), and runs the sign's idle
+  swing only while the badge is visible.
+- `scripts/shop_sign_bracket.gd` (`ShopSignBracket`, `@tool`) draws the badge's wrought-iron wall
+  bracket (wall plate on the node's right edge, bar with an end ring at `bar_y`, curved brace and
+  scroll) so it stays crisp at every scale.
+- `scripts/shop_sign_board.gd` (`ShopSignBoard`, `@tool`) draws the sign's two chains from the
+  node's top edge and, below `board_top`, the wood board's gradient, grain, highlight, border, and
+  drop shadow, which a StyleBoxFlat cannot express.
 - `scripts/starter_bundle_offer_modal.gd` binds rewards/prices and owns modal states and intent
   signals; it does not grant rewards. It drives the hero ribbon tone, booster chips, discount tag,
   one-time badge, the Buy button's compare/price lines, and the status pill's busy/error/success

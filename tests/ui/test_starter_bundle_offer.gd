@@ -64,6 +64,10 @@ func _test_availability_states() -> void:
 	fake.response = {"ok": true, "source": "live", "offers": [priced_offer]}
 	await menu.call("_refresh_starter_bundle_offer")
 	_check(badge.visible, "Live eligible priced starter appears.")
+	_check(
+		not (badge.get_node("%DiscountTag") as Control).visible,
+		"The sign omits its discount tag when the offer has no discount."
+	)
 
 	fake.response = {"ok": true, "source": "cached", "offers": [priced_offer]}
 	await menu.call("_refresh_starter_bundle_offer")
@@ -127,6 +131,11 @@ func _test_one_time_purchase(progress: Node) -> void:
 	_check(not local_catalog.is_empty(), "Local Starter Bundle loads before purchase.")
 	var badge := menu.get_node("%StarterBundleBadge") as Control
 	_check(badge.visible, "Local Starter Bundle badge is visible before purchase.")
+	_check(
+		(badge.get_node("%DiscountTag") as Control).visible
+		and (badge.get_node("%DiscountLabel") as Label).text == "-67%",
+		"The sign pins the local offer's discount tag."
+	)
 	for resolution in [Vector2i(540, 960), Vector2i(720, 1280), Vector2i(1080, 2400), Vector2i(1200, 1600)]:
 		root.size = resolution
 		for _frame in range(4):

@@ -25,7 +25,10 @@ const CUTOUT_LAYOUT_TOLERANCE := 0.5
 const PROFILE_WIDGET_WIDTH := 76.0
 const REWARD_CHEST_SIZE := Vector2(116.0, 136.0)
 const REWARD_CHEST_TOP_GAP := 72.0
-const STARTER_BADGE_SIZE := 116.0
+const STARTER_BADGE_SIZE := Vector2(142.0, 164.0)
+## The shop sign's bracket sits this far above the reward chest's top, so the hanging board lines
+## up with the chest art.
+const STARTER_BADGE_RAISE := 30.0
 const STARTER_BADGE_GAP := 16.0
 const STARTER_BUNDLE_ID := "starter_bundle"
 const BOTTOM_BAR_HEIGHT := 245.0
@@ -350,8 +353,9 @@ func _layout_reward_chest(safe_margins: Vector4) -> void:
 
 
 func _layout_starter_bundle_badge(safe_margins: Vector4, viewport_size: Vector2) -> void:
-	var left := viewport_size.x - safe_margins.z - TOP_SIDE_MARGIN - STARTER_BADGE_SIZE
-	var top := _reward_chest.offset_top
+	# The bracket's wall plate mounts on the safe right edge itself, not inside the side margin.
+	var left := viewport_size.x - safe_margins.z - STARTER_BADGE_SIZE.x
+	var top := _reward_chest.offset_top - STARTER_BADGE_RAISE
 	if left < _reward_chest.offset_right + STARTER_BADGE_GAP:
 		top = _reward_chest.offset_bottom + STARTER_BADGE_GAP
 	_starter_badge.anchor_left = 0.0
@@ -360,8 +364,8 @@ func _layout_starter_bundle_badge(safe_margins: Vector4, viewport_size: Vector2)
 	_starter_badge.anchor_bottom = 0.0
 	_starter_badge.offset_left = maxf(left, safe_margins.x + TOP_SIDE_MARGIN)
 	_starter_badge.offset_top = top
-	_starter_badge.offset_right = _starter_badge.offset_left + STARTER_BADGE_SIZE
-	_starter_badge.offset_bottom = top + STARTER_BADGE_SIZE
+	_starter_badge.offset_right = _starter_badge.offset_left + STARTER_BADGE_SIZE.x
+	_starter_badge.offset_bottom = top + STARTER_BADGE_SIZE.y
 
 
 func _get_safe_area_margins(viewport_size: Vector2) -> Vector4:
@@ -882,6 +886,7 @@ func _refresh_starter_bundle_offer() -> Dictionary:
 		if str(store.get("formatted_price", "")).strip_edges().is_empty():
 			return {}
 		_starter_offer = offer.duplicate(true)
+		_starter_badge.set_discount_percent(int(offer.get("discount_percent", 0)))
 		_starter_badge.show()
 		return _starter_offer
 	return {}
