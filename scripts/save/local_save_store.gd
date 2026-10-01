@@ -13,6 +13,7 @@ const RECENT_ACKNOWLEDGED_OPERATIONS := 100
 const VALID_OPERATION_TYPES := [
 	"campaign_completion",
 	"campaign_attempt",
+	"combo_milestone",
 	"resource_spend",
 	"life_purchase",
 	"life_state",
@@ -474,6 +475,21 @@ func _validate_operation(
 
 func _validate_operation_payload(operation_type: String, payload: Dictionary) -> Dictionary:
 	match operation_type:
+		"combo_milestone":
+			if not _has_exact_keys(payload, [
+				"campaign_level",
+				"combo_count",
+				"configuration_version",
+				"level_version",
+				"rules_version",
+			]):
+				return _error("Combo milestone payload fields are invalid.")
+			if (
+				int(payload.get("campaign_level", 0)) <= 0
+				or not [20, 50].has(int(payload.get("combo_count", 0)))
+				or not _has_valid_provenance(payload)
+			):
+				return _error("Combo milestone payload values are invalid.")
 		"campaign_completion":
 			if not _has_exact_keys(payload, [
 				"campaign_level",

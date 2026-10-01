@@ -51,6 +51,16 @@
       "id": "frame_weekly_gold",
       "texture": "res://assets/ui/avatar_frames/frame_weekly_gold.png",
       "weekly_rank_required": 1
+    },
+    {
+      "id": "frame_combo_20",
+      "texture": "res://assets/ui/avatar_frames/frame_combo_20.png",
+      "combo_required": 20
+    },
+    {
+      "id": "frame_combo_50",
+      "texture": "res://assets/ui/avatar_frames/frame_combo_50.png",
+      "combo_required": 50
     }
   ]
 }

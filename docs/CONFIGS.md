@@ -61,8 +61,10 @@ Contract:
 - `frame_classic` keeps the original muted ring art. The eight color variants use the supplied
   glossy ring art, whose band is a few pixels thicker and reaches slightly closer to the canvas
   edge than `frame_classic`; the inner aperture is unchanged.
-- The client currently stores the selection locally and does not send it in backend profile-edit
-  operations. See `docs/BACKEND_PROFILE_FRAMES_TICKET.md`.
+- `weekly_rank_required` gates the three weekly metal frames. `combo_required` gates the ×20
+  fire-ring and ×50 phoenix frames; both remain visible while locked.
+- Selections are saved locally and sent through a signed `profile_edit` operation. The backend
+  validates premium frame awards before accepting the selection.
 - Opaque premium-frame review art lives in `assets/ui/avatar_frames/candidates/`; see
   `docs/AVATAR_FRAME_CONCEPTS.md`. These concepts are not catalog entries.
 

@@ -2441,6 +2441,7 @@ func _extend_combo(triple_count: int) -> int:
 	if triple_count <= 0:
 		return 0
 
+	var previous_combo := _combo_count
 	var earned_stars := 0
 	var combo_is_active := _combo_count > 0 and _combo_time_remaining > 0.0
 	for _triple_index in range(triple_count):
@@ -2454,6 +2455,11 @@ func _extend_combo(triple_count: int) -> int:
 
 	_combo_time_remaining = maxf(combo_window_seconds, 0.0)
 	_update_combo_hud()
+	if not launched_from_dev_mode:
+		for milestone in [20, 50]:
+			if previous_combo < milestone and _combo_count >= milestone:
+				if not PlayerProgress.record_combo_milestone(selected_level, milestone):
+					push_warning("Could not save the ×%d combo frame milestone." % milestone)
 	return earned_stars
 
 

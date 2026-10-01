@@ -516,8 +516,35 @@ func get_available_avatar_ids() -> Array:
 
 func get_available_avatar_frame_ids() -> Array[String]:
 	return ProfileFrameCatalogScript.get_unlocked_frame_ids(
-		int(_data.get("weekly_frame_best_rank", 0))
+		int(_data.get("weekly_frame_best_rank", 0)),
+		int(_data.get("combo_best", 0))
 	)
+
+
+func get_best_combo() -> int:
+	return maxi(int(_data.get("combo_best", 0)), 0)
+
+
+func record_combo_milestone(level_number: int, combo_count: int) -> bool:
+	if not [20, 50].has(combo_count) or level_number < MIN_LEVEL:
+		return false
+	if combo_count <= get_best_combo():
+		return true
+	var provenance := _campaign_provenance(level_number)
+	if provenance.is_empty():
+		return false
+	var previous_data := _data.duplicate(true)
+	_data["combo_best"] = combo_count
+	return _commit_or_restore(previous_data, [{
+		"operation_type": "combo_milestone",
+		"payload": {
+			"campaign_level": level_number,
+			"combo_count": combo_count,
+			"configuration_version": provenance.get("configuration_version"),
+			"level_version": provenance.get("level_version"),
+			"rules_version": provenance.get("rules_version"),
+		},
+	}])
 
 
 func get_avatar_id() -> String:
@@ -894,6 +921,7 @@ func _sanitize_data(raw_data: Dictionary) -> Dictionary:
 	sanitized["weekly_frame_best_rank"] = clampi(
 		int(raw_data.get("weekly_frame_best_rank", 0)), 0, 3
 	)
+	sanitized["combo_best"] = clampi(int(raw_data.get("combo_best", 0)), 0, 50)
 	sanitized["player_name"] = _sanitize_player_name(str(raw_data.get("player_name", sanitized["player_name"])), sanitized["player_name"])
 	sanitized["moderation_state"] = str(raw_data.get("moderation_state", "active"))
 	sanitized["settings_disabled"] = _sanitize_disabled_settings(raw_data.get("settings_disabled", {}))
@@ -968,6 +996,7 @@ func _default_data() -> Dictionary:
 		"avatar_id": DEFAULT_AVATAR_ID,
 		"avatar_frame_id": ProfileFrameCatalogScript.get_default_frame_id(),
 		"weekly_frame_best_rank": 0,
+		"combo_best": 0,
 		"player_name": _generate_player_name(),
 		"moderation_state": "active",
 		"settings_disabled": DEFAULT_DISABLED_SETTINGS.duplicate(),
@@ -1754,6 +1783,9 @@ func _map_checkpoint_to_snapshot(
 		leaderboards.get("weekly_period_start")
 	)
 	mapped["avatar_id"] = str(profile.get("avatar_id", DEFAULT_AVATAR_ID))
+	mapped["combo_best"] = clampi(int(profile.get(
+		"combo_best", current_snapshot.get("combo_best", 0)
+	)), 0, 50)
 	mapped["avatar_frame_id"] = _sanitize_avatar_frame_id(str(profile.get(
 		"avatar_frame_id",
 		current_snapshot.get(
@@ -1772,6 +1804,10 @@ func _apply_unacknowledged_operation(snapshot: Dictionary, operation: Dictionary
 	var result := snapshot.duplicate(true)
 	var payload := operation.get("payload", {}) as Dictionary
 	match str(operation.get("operation_type", "")):
+		"combo_milestone":
+			result["combo_best"] = maxi(
+				int(result.get("combo_best", 0)), int(payload.get("combo_count", 0))
+			)
 		"campaign_completion":
 			var level_number := int(payload.get("campaign_level", 0))
 			var stars := maxi(int(payload.get("stars", 0)), 0)

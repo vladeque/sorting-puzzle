@@ -222,6 +222,29 @@ func _run() -> void:
 		int(progress.get_ability_uses().get("freezer", 0)) == 2,
 		"freezer spend survives restart without refund or duplication"
 	)
+	_check(progress.record_combo_milestone(1, 20), "×20 milestone commits immediately")
+	_check(progress.get_best_combo() == 20, "×20 milestone updates the local award")
+	_check(progress.get_available_avatar_frame_ids().has("frame_combo_20"),
+		"×20 milestone unlocks the first combo frame")
+	_check(not progress.get_available_avatar_frame_ids().has("frame_combo_50"),
+		"×50 frame stays locked after only ×20")
+	_check(not progress.set_profile_customization("avatar_bear", "frame_combo_50", "Offline Player"),
+		"an unearned combo frame cannot be selected")
+	_check(progress.record_combo_milestone(1, 50), "×50 milestone commits immediately")
+	_check(progress.get_available_avatar_frame_ids().has("frame_combo_20")
+		and progress.get_available_avatar_frame_ids().has("frame_combo_50"),
+		"×50 milestone keeps both combo frames unlocked")
+	var combo_journal := progress.get("_local_store").get_journal() as Array
+	var last_combo := combo_journal[-1] as Dictionary
+	_check(str(last_combo.get("operation_type", "")) == "combo_milestone"
+		and int((last_combo.get("payload", {}) as Dictionary).get("combo_count", 0)) == 50,
+		"the higher milestone is a signed local-first operation")
+	var journal_size := combo_journal.size()
+	_check(progress.record_combo_milestone(1, 20)
+		and progress.get("_local_store").get_journal().size() == journal_size,
+		"lower milestones do not duplicate journal operations")
+	progress.load_progress()
+	_check(progress.get_best_combo() == 50, "combo award survives a restart")
 
 	if _failures.is_empty():
 		print("PlayerProgress GAME-001 facade tests passed.")

@@ -23,6 +23,7 @@ const AVATAR_FRAME_IDS := [
 	"frame_classic", "frame_gold", "frame_leaf", "frame_rose", "frame_coral",
 	"frame_sky", "frame_plum", "frame_ruby", "frame_aqua",
 	"frame_weekly_bronze", "frame_weekly_silver", "frame_weekly_gold",
+	"frame_combo_20", "frame_combo_50",
 ]
 const DEVICE_PLATFORMS := ["android", "ios"]
 const OFFER_TYPES := ["starter", "timed_bundle", "evergreen_bundle", "coin_pack"]
@@ -387,6 +388,11 @@ static func _parse_player_profile(value: Variant) -> Dictionary:
 	}
 	if profile.get("country_code") != null:
 		result["country_code"] = str(profile.get("country_code", ""))
+	if profile.has("combo_best"):
+		var combo_best = profile.get("combo_best")
+		if not _is_integer(combo_best) or int(combo_best) not in [0, 20, 50]:
+			return _error("profile has an invalid combo_best.")
+		result["combo_best"] = int(combo_best)
 	return _success({"profile": result})
 
 

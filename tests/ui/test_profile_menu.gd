@@ -100,13 +100,15 @@ func _run() -> void:
 	)
 	menu.call("_switch_tab", &"frame")
 	await process_frame
-	_check(grid.get_child_count() == 12, "Frame tab shows standard and weekly frames.")
+	_check(grid.get_child_count() == 14, "Frame tab shows standard, weekly, and combo frames.")
 	_check(not _progress.get_available_avatar_frame_ids().has("frame_weekly_bronze"),
 		"Weekly frames stay locked before an authoritative award.")
 	var locked_requirements := {
 		"frame_weekly_bronze": "top 3",
 		"frame_weekly_silver": "top 2",
 		"frame_weekly_gold": "1st",
+		"frame_combo_20": "×20",
+		"frame_combo_50": "×50",
 	}
 	_check(not unlock_toast.visible, "The unlock toast starts hidden.")
 	_check(unlock_toast.mouse_filter == Control.MOUSE_FILTER_IGNORE,
@@ -131,7 +133,7 @@ func _run() -> void:
 		tile.pressed.emit()
 		_check(unlock_toast.visible
 			and unlock_toast.get_message().contains(str(locked_requirements[frame_id])),
-			"Tapping %s explains its Weekly finish requirement." % frame_id)
+			"Tapping %s explains its unlock requirement." % frame_id)
 		_check(unlock_toast.get_message().length() <= 50,
 			"The %s unlock explanation stays short." % frame_id)
 		_check(str(menu.get("_selected_avatar_frame_id")) == "frame_classic",
@@ -166,6 +168,18 @@ func _run() -> void:
 			_check(bool(tile.get("_is_locked")) == not unlocked.has(frame_id),
 				"%s tile reflects the earned rank %d." % [frame_id, best_rank])
 	save_data["weekly_frame_best_rank"] = 0
+	for combo_best in [20, 50]:
+		save_data["combo_best"] = combo_best
+		menu.call("_rebuild_choice_grid")
+		var unlocked: Array[String] = _progress.get_available_avatar_frame_ids()
+		_check(unlocked.has("frame_combo_20"), "A ×20 combo unlocks the first combo frame.")
+		_check(unlocked.has("frame_combo_50") == (combo_best == 50),
+			"A ×50 combo also unlocks the second combo frame.")
+		for frame_id in ["frame_combo_20", "frame_combo_50"]:
+			var tile := (menu.get("_choice_tiles") as Dictionary)[frame_id] as Button
+			_check(bool(tile.get("_is_locked")) == not unlocked.has(frame_id),
+				"%s tile reflects the best earned combo %d." % [frame_id, combo_best])
+	save_data["combo_best"] = 0
 	menu.call("_select_choice", "frame_plum")
 	_check(
 		preview_frame_texture.texture.resource_path.ends_with("frame_plum.png"),

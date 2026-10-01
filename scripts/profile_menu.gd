@@ -114,6 +114,10 @@ func _select_choice(choice_id: String) -> void:
 
 
 func _show_locked_frame_hint(frame_id: String) -> void:
+	var required_combo := ProfileFrameCatalogScript.get_combo_required(frame_id)
+	if required_combo > 0:
+		_unlock_toast.show_message("Reach a combo of ×%d in any run to unlock" % required_combo)
+		return
 	var required_rank := ProfileFrameCatalogScript.get_weekly_rank_required(frame_id)
 	if required_rank <= 0:
 		return

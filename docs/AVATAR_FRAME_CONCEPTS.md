@@ -106,3 +106,20 @@ rendered at 900x1600, so it does not verify that exact viewport.
 picker state. The three metals are distinct and the selected gold frame remains legible at
 540x960, 720x1280, 1080x1920, and 1080x2400. The requested 900x1200 tablet render again came
 back as 675x1200, so that viewport remains unverified.
+
+## Combo achievement frames
+
+The selected fire-ring and phoenix images are installed as transparent 256x256 textures at
+`assets/ui/avatar_frames/frame_combo_20.png` and `frame_combo_50.png`. The profile picker always
+shows both after the weekly frames. A locked tile keeps the frame art visible, darkens the avatar,
+and explains the requirement when tapped.
+
+Reaching a ×20 combo in any normal campaign run permanently unlocks the fire ring. Reaching ×50
+also unlocks the phoenix. The milestone is saved immediately, including if the run later fails or
+the player leaves. `PlayerProgress.record_combo_milestone()` records the signed local journal entry;
+the backend verifies its device signature and published level provenance, persists the best tier,
+and rejects unearned frame selections. A development-mode level does not grant the achievement.
+Windowed captures with `profile_combo_frame_locked_setup.gd` show both tiles and a readable unlock
+toast at 540x960, 720x1280, 1080x1920, and 1080x2400. The requested 1200x1600 tablet viewport
+rendered at 900x1600, so that exact size remains unverified. The earned ×50 selection was also
+checked at 720x1280 with `profile_combo_frame_unlocked_setup.gd`; its avatar and phoenix frame align.
