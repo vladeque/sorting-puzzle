@@ -15,16 +15,20 @@ static func get_available_frame_ids() -> Array[String]:
 	return _ordered_ids.duplicate()
 
 
-static func get_unlocked_frame_ids(best_weekly_rank: int, combo_best: int = 0) -> Array[String]:
+static func get_unlocked_frame_ids(
+	best_weekly_rank: int, combo_best: int = 0, completed_levels: Dictionary = {}
+) -> Array[String]:
 	_ensure_loaded()
 	var unlocked: Array[String] = []
 	for frame_id in _ordered_ids:
 		var definition := _frames[frame_id] as Dictionary
 		var required_rank := int(definition.get("weekly_rank_required", 0))
 		var required_combo := int(definition.get("combo_required", 0))
+		var required_level := int(definition.get("completed_level_required", 0))
 		if (
 			(required_rank == 0 or (best_weekly_rank >= 1 and best_weekly_rank <= required_rank))
 			and combo_best >= required_combo
+			and (required_level == 0 or completed_levels.has(str(required_level)))
 		):
 			unlocked.append(frame_id)
 	return unlocked
@@ -40,6 +44,12 @@ static func get_combo_required(frame_id: String) -> int:
 	_ensure_loaded()
 	var definition := _frames.get(frame_id, {}) as Dictionary
 	return int(definition.get("combo_required", 0))
+
+
+static func get_completed_level_required(frame_id: String) -> int:
+	_ensure_loaded()
+	var definition := _frames.get(frame_id, {}) as Dictionary
+	return int(definition.get("completed_level_required", 0))
 
 
 static func get_default_frame_id() -> String:

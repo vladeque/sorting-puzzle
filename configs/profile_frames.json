@@ -61,6 +61,31 @@
       "id": "frame_combo_50",
       "texture": "res://assets/ui/avatar_frames/frame_combo_50.png",
       "combo_required": 50
+    },
+    {
+      "id": "frame_level_20",
+      "texture": "res://assets/ui/avatar_frames/frame_level_20.png",
+      "completed_level_required": 20
+    },
+    {
+      "id": "frame_level_50",
+      "texture": "res://assets/ui/avatar_frames/frame_level_50.png",
+      "completed_level_required": 50
+    },
+    {
+      "id": "frame_level_100",
+      "texture": "res://assets/ui/avatar_frames/frame_level_100.png",
+      "completed_level_required": 100
+    },
+    {
+      "id": "frame_level_200",
+      "texture": "res://assets/ui/avatar_frames/frame_level_200.png",
+      "completed_level_required": 200
+    },
+    {
+      "id": "frame_level_500",
+      "texture": "res://assets/ui/avatar_frames/frame_level_500.png",
+      "completed_level_required": 500
     }
   ]
 }

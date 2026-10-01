@@ -1710,8 +1710,9 @@ Key methods:
 - `consume_pending_reward_chest_animation()`: returns and clears the in-memory completed-level animation payload.
 - `add_reward_chest_stars(star_count)`: adds stars to the reward chest and rolls over reached goals.
 - `get_available_avatar_ids()`: returns the 18 valid profile avatar ids.
-- `get_available_avatar_frame_ids()`: returns the ordered frame IDs from
-  `configs/profile_frames.json`.
+- `get_available_avatar_frame_ids()`: returns the unlocked frame IDs from
+  `configs/profile_frames.json`, checking Weekly awards, best combo, and the saved per-level
+  completion map. The profile picker separately lists every catalog entry, including locked ones.
 - `get_avatar_id()`: returns the selected avatar id, sanitized to `avatar_cat` when needed.
 - `get_avatar_frame_id()`: returns the selected frame id, sanitized to the configured default.
 - `get_avatar_texture_path(avatar_id)`: returns the resource path for a valid or sanitized avatar id.

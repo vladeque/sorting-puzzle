@@ -113,7 +113,7 @@ func _run() -> void:
 	)
 	menu.call("_switch_tab", &"frame")
 	await process_frame
-	_check(grid.get_child_count() == 14, "Frame tab shows standard, weekly, and combo frames.")
+	_check(grid.get_child_count() == 19, "Frame tab shows standard and achievement frames.")
 	_check(not _progress.get_available_avatar_frame_ids().has("frame_weekly_bronze"),
 		"Weekly frames stay locked before an authoritative award.")
 	var locked_requirements := {
@@ -122,6 +122,11 @@ func _run() -> void:
 		"frame_weekly_gold": "1st",
 		"frame_combo_20": "×20",
 		"frame_combo_50": "×50",
+		"frame_level_20": "level 20",
+		"frame_level_50": "level 50",
+		"frame_level_100": "level 100",
+		"frame_level_200": "level 200",
+		"frame_level_500": "level 500",
 	}
 	_check(not unlock_toast.visible, "The unlock toast starts hidden.")
 	_check(unlock_toast.mouse_filter == Control.MOUSE_FILTER_IGNORE,
@@ -193,6 +198,20 @@ func _run() -> void:
 			_check(bool(tile.get("_is_locked")) == not unlocked.has(frame_id),
 				"%s tile reflects the best earned combo %d." % [frame_id, combo_best])
 	save_data["combo_best"] = 0
+	var level_requirements := [20, 50, 100, 200, 500]
+	var completion_stars := save_data["completion_stars_by_level"] as Dictionary
+	for level_number in level_requirements:
+		completion_stars[str(level_number)] = 1
+		menu.call("_rebuild_choice_grid")
+		var unlocked: Array[String] = _progress.get_available_avatar_frame_ids()
+		for required_level in level_requirements:
+			var frame_id := "frame_level_%d" % required_level
+			_check(unlocked.has(frame_id) == (required_level <= level_number),
+				"Completing level %d unlocks the expected milestone frame." % level_number)
+			var tile := (menu.get("_choice_tiles") as Dictionary)[frame_id] as Button
+			_check(bool(tile.get("_is_locked")) == not unlocked.has(frame_id),
+				"The level %d frame tile reflects completion progress." % required_level)
+	completion_stars.clear()
 	menu.call("_select_choice", "frame_plum")
 	_check(
 		preview_frame_texture.texture.resource_path.ends_with("frame_plum.png"),

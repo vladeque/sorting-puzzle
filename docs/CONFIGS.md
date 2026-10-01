@@ -62,7 +62,9 @@ Contract:
   glossy ring art, whose band is a few pixels thicker and reaches slightly closer to the canvas
   edge than `frame_classic`.
 - `weekly_rank_required` gates the three weekly metal frames. `combo_required` gates the ×20
-  fire-ring and ×50 phoenix frames; both remain visible while locked.
+  fire-ring and ×50 phoenix frames. `completed_level_required` gates five level milestone frames
+  at 20, 50, 100, 200, and 500. All remain visible while locked. Level milestones check the
+  corresponding key in the saved completion map, so future levels need no frame-specific code.
 - Selections are saved locally and sent through a signed `profile_edit` operation. The backend
   validates premium frame awards before accepting the selection.
 - Opaque premium-frame review art lives in `assets/ui/avatar_frames/candidates/`; see

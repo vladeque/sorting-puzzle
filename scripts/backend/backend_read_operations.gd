@@ -24,6 +24,7 @@ const AVATAR_FRAME_IDS := [
 	"frame_sky", "frame_plum", "frame_ruby", "frame_aqua",
 	"frame_weekly_bronze", "frame_weekly_silver", "frame_weekly_gold",
 	"frame_combo_20", "frame_combo_50",
+	"frame_level_20", "frame_level_50", "frame_level_100", "frame_level_200", "frame_level_500",
 ]
 const DEVICE_PLATFORMS := ["android", "ios"]
 const OFFER_TYPES := ["starter", "timed_bundle", "evergreen_bundle", "coin_pack"]

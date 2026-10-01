@@ -1541,9 +1541,9 @@ Purpose:
 - Shows a live avatar/frame preview beside the saved player name and a compact pencil edit button.
 - Provides segmented Avatar and Frame tabs backed by one edge-filling, touch-scrollable
   three-column choice grid without a visible scrollbar.
-- Lists earned and unearned Weekly and combo achievement frames together. Locked tiles show a small
+- Lists earned and unearned Weekly, combo, and level achievement frames together. Locked tiles show a small
   centered padlock over a darkened avatar. Tapping one keeps the current selection and shows
-  `%UnlockToast` with the required Weekly finish or ×20/×50 combo.
+  `%UnlockToast` with the required Weekly finish, ×20/×50 combo, or completed level.
 - Shows all 18 supplied avatar assets and all configured cosmetic frames, with a check badge on the
   pending selection.
 - Saves the entered player name, selected avatar, and local frame through `PlayerProgress` only when

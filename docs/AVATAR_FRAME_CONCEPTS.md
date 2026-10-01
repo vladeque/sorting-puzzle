@@ -126,7 +126,7 @@ checked at 720x1280 with `profile_combo_frame_unlocked_setup.gd`; its avatar and
 
 ## Shared frame opening
 
-All 14 runtime frame textures use a 256x256 canvas and a common 190 px transparent center circle.
+All 19 runtime frame textures use a 256x256 canvas and a common 190 px transparent center circle.
 The weekly and combo art is gently expanded outward before the shared opening is cleared, preserving
 the metal leaves, flames, and phoenix wings while giving avatars the same minimum visible space as
 the standard frames. This is an alpha and geometry adjustment to the existing selected art.
@@ -136,3 +136,28 @@ at 24 angles. Windowed profile captures with `profile_frame_geometry_setup.gd` s
 under all five premium frames at 540x960, 720x1280, 1080x1920, and 1080x2400; a deer with antlers
 was also checked at 720x1280. The requested 1200x1600 tablet window rendered at 900x1600 and does
 not verify that exact resolution.
+
+## Campaign level milestone frames
+
+Five selected opaque color variants of the same flowing silver-edged ring were converted with
+ImageMagick to transparent 256x256 textures. They share the 190 px clear center used by the other
+runtime frames. The attachment order sets the milestone mapping:
+
+| Completed level | Texture | Colors |
+| --- | --- | --- |
+| 20 | `frame_level_20.png` | Violet, blue, and teal |
+| 50 | `frame_level_50.png` | Emerald and gold |
+| 100 | `frame_level_100.png` | Crimson and amber |
+| 200 | `frame_level_200.png` | Sunset coral and violet |
+| 500 | `frame_level_500.png` | Obsidian and gold |
+
+The picker shows all five even before they are earned. A locked tile explains the exact level
+requirement when tapped. Unlocks use the saved per-level completion map, so frames for levels beyond
+the current campaign are ready when those levels are published. The frame ID remains stable across
+future level additions.
+
+Windowed profile captures using `profile_level_frame_locked_setup.gd` and
+`profile_level_frame_unlocked_setup.gd` show the locked level-500 hint and earned level-20 preview
+at 540x960, 720x1280, 1080x1920, and 1080x2400. The art and avatar opening align at those
+sizes. The requested 1200x1600 tablet capture rendered at 900x1600, so that exact viewport remains
+unverified.

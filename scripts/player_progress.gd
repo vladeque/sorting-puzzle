@@ -517,7 +517,8 @@ func get_available_avatar_ids() -> Array:
 func get_available_avatar_frame_ids() -> Array[String]:
 	return ProfileFrameCatalogScript.get_unlocked_frame_ids(
 		int(_data.get("weekly_frame_best_rank", 0)),
-		int(_data.get("combo_best", 0))
+		int(_data.get("combo_best", 0)),
+		_data.get("completion_stars_by_level", {}) as Dictionary
 	)
 
 
