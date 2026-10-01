@@ -1374,6 +1374,7 @@ Change the shared destination-screen shell, status panel, or layout math:
 
 ## Related Docs
 
+- `docs/LEGAL_DOCUMENTS_RESEARCH.md`: Ukraine-based international launch research, legal document/status matrix, settings gaps, and publisher/store/backend ownership.
 - `docs/ITEM_ASSET_REQUIREMENTS.md`: canonical item texture, alignment, import, and validation rules.
 - `docs/SCENES.md`: scene and node ownership inventory.
 - `docs/SCRIPTS.md`: script responsibilities, exports, and dependencies.
