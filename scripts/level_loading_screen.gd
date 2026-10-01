@@ -47,18 +47,21 @@ func _input(_event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 
-func play_cover() -> void:
+## `close_iris` false starts with the backdrop already closed, for a launch with no outgoing screen
+## to close over; the mascot entrance still plays.
+func play_cover(close_iris := true) -> void:
 	_shown_at_msec = Time.get_ticks_msec()
 	_is_animating = true
 	_screen_root.show()
-	_set_hole_radius(OPEN_HOLE_RADIUS)
+	_set_hole_radius(OPEN_HOLE_RADIUS if close_iris else CLOSED_HOLE_RADIUS)
 	_hero_holder.modulate.a = 0.0
 	_hero_holder.scale = Vector2(0.72, 0.72)
 	_loading_dots.modulate.a = 0.0
 
-	var cover_tween := create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	cover_tween.tween_method(_set_hole_radius, OPEN_HOLE_RADIUS, CLOSED_HOLE_RADIUS, COVER_SECONDS)
-	await cover_tween.finished
+	if close_iris:
+		var cover_tween := create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		cover_tween.tween_method(_set_hole_radius, OPEN_HOLE_RADIUS, CLOSED_HOLE_RADIUS, COVER_SECONDS)
+		await cover_tween.finished
 
 	var hero_tween := create_tween().set_parallel(true)
 	hero_tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)

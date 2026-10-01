@@ -5,8 +5,8 @@ This file maps scenes to their responsibilities, scripts, important nodes, and r
 ## Level loading transition
 
 - `scenes/ui/level_loading_screen.tscn` is a full-screen `CanvasLayer` that survives the swap from
-  either Main Menu or a failed level into a fresh `level.tscn` instance. Its root blocks pointer and
-  back input for the entire transition.
+  either Main Menu, the app launch router, or a failed level into a fresh `level.tscn` instance. Its
+  root blocks pointer and back input for the entire transition.
 - `%Backdrop` uses `assets/shaders/loading_iris.gdshader` for the Golden Sunset burgundy-to-plum
   gradient, warm amber glow, subtle dot pattern, and closing/opening circular mask. `%HeroHolder`
   presents the selected cat artwork from
@@ -385,6 +385,32 @@ count-pulse/unlock-animation feedback. `tests/ui/test_level_failure_screen.gd` s
 immediate Retry, the zero-life offer, decline-to-menu, successful life purchase + same-level
 restart, and an unaffordable purchase returning to the menu.
 
+## `scenes/app_launch_router.tscn`
+
+Root:
+- `AppLaunchRouter` (`Node`)
+
+Script:
+- `scripts/app_launch_router.gd`
+
+Purpose:
+- Main project entry scene (`run/main_scene`). It draws nothing; it decides where an app launch
+  lands before the first frame is rendered.
+- Until the first campaign level is beaten, and while a life remains, it starts that level through
+  `LevelTransition.launch_level_at_startup()`. The loading screen begins fully closed, so the first
+  frame after the boot splash is the loading screen, and the level returns to `scenes/main_menu.tscn`
+  like any other campaign launch.
+- Otherwise, including a player with no lives left, it swaps in `scenes/main_menu.tscn` directly
+  and frees itself.
+
+Configuration:
+- `main_menu_scene_path`: the menu it opens and the menu the first level returns to.
+- `start_unbeaten_first_level`: off makes every launch open the Main Menu.
+
+Verification:
+- `tests/ui/test_app_launch_router.gd` covers the fresh-save level start, the zero-lives and
+  beaten-level menu routes, and the export toggle.
+
 ## `scenes/main_menu.tscn`
 
 Root:
@@ -394,7 +420,8 @@ Script:
 - `scripts/production_main_menu.gd`
 
 Purpose:
-- Main project entry scene.
+- Production menu, opened by `scenes/app_launch_router.tscn` once the first campaign level is
+  beaten and by every campaign level's return to the menu.
 - Displays the selected chapter's configured `selection_preview` as a fullscreen production menu
   background; Chapter 1 defaults to `assets/backgrounds/main_menu.jpeg`. The whole screen fades in
   on `_ready()` (see "Shared Interaction Roles" above).

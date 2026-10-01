@@ -28,8 +28,22 @@ func launch_level(
 		launched_from_dev_mode,
 		return_menu_scene_path,
 		launch_properties,
-		source_scene
+		source_scene,
+		false
 	)
+
+
+## Campaign start straight from app launch. There is no outgoing screen for the iris to close over,
+## so the loading screen starts fully closed and only the mascot animates in.
+func launch_level_at_startup(
+	level_number: int,
+	return_menu_scene_path: String,
+	source_scene: Node = null
+) -> void:
+	if _is_transitioning:
+		return
+	_is_transitioning = true
+	_run_level_launch(level_number, false, return_menu_scene_path, {}, source_scene, true)
 
 
 func _run_level_launch(
@@ -37,7 +51,8 @@ func _run_level_launch(
 	launched_from_dev_mode: bool,
 	return_menu_scene_path: String,
 	launch_properties: Dictionary,
-	source_scene: Node
+	source_scene: Node,
+	start_covered: bool
 ) -> void:
 	var tree := get_tree()
 	var outgoing_scene := source_scene if is_instance_valid(source_scene) else tree.current_scene
@@ -47,7 +62,7 @@ func _run_level_launch(
 		outgoing_scene.process_mode = Node.PROCESS_MODE_DISABLED
 
 	var request_error := ResourceLoader.load_threaded_request(LEVEL_SCENE_PATH, "PackedScene", true)
-	await loading_screen.play_cover()
+	await loading_screen.play_cover(not start_covered)
 
 	var packed_level: PackedScene
 	if request_error == OK:

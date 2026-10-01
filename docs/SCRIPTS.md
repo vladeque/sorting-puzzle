@@ -121,6 +121,27 @@ flyer and ceremony only to update `%StatusLabel`, and on the ceremony's `finishe
 menu's own handler) replaces the menu's saved-progress refill with the simulated carry-over. It
 never writes `PlayerProgress`. `is_playing()` lets tests and captures wait for a run.
 
+## `scripts/app_launch_router.gd`
+
+Attached to:
+- `scenes/app_launch_router.tscn` root `AppLaunchRouter`, the project's `run/main_scene`.
+
+Purpose:
+- Decides where an app launch lands, in a deferred call that still runs before the first frame.
+- `get_first_level_to_start()`: returns the first chapter's first level while
+  `PlayerProgress.get_next_level_for_chapter()` still points at it and, after `refresh_lives()`, a
+  life remains; otherwise 0. Returns 0 when `start_unbeaten_first_level` is off or the catalog has
+  no levels.
+- Starts that level through `LevelTransition.launch_level_at_startup()` with
+  `main_menu_scene_path` as the level's return menu, as a normal campaign run that spends lives and
+  records completion.
+- Otherwise instantiates the Main Menu, makes it `current_scene`, and frees itself.
+  `change_scene_to_file()` is avoided because it adds the new scene a frame later, which would draw
+  an empty frame after the boot splash.
+
+Depends on:
+- `ChapterCatalog`, `PlayerProgress`, and `LevelTransition` autoloads.
+
 ## `scripts/production_main_menu.gd`
 
 Attached to:
@@ -308,6 +329,10 @@ Purpose:
 - Owns every normal level start and retry across scene boundaries.
 - Starts a threaded load of `level.tscn`, keeps the loading overlay alive while scenes swap, rejects
   duplicate requests, transfers launch properties, and activates gameplay after the reveal.
+- `launch_level(...)` closes the iris over the outgoing menu or level.
+  `launch_level_at_startup(level_number, return_menu_scene_path, source_scene)` is the app launch
+  router's campaign start: with no outgoing screen to close over, the loading screen starts fully
+  closed and only the mascot animates in.
 
 Depends on:
 - `scenes/ui/level_loading_screen.tscn`.
@@ -321,6 +346,8 @@ Attached to:
 Purpose:
 - Owns the iris close/reveal, mascot entrance/exit, animated loading dots, responsive shader size,
   minimum visible duration, and full-screen input interception.
+- `play_cover(close_iris := true)`: `false` skips the iris close and starts with the backdrop
+  already closed, for the startup launch.
 - Exposes `show_preview()` for the responsive capture setup.
 
 ## `scripts/chapters/*.gd`

@@ -1,7 +1,7 @@
 # Level Loading Screen
 
-The loading screen appears whenever the player starts a level from either Main Menu and whenever a
-failed level is retried. It is a persistent scene transition, so it remains visible while the old
+The loading screen appears whenever the player starts a level from either Main Menu, whenever a
+failed level is retried, and when an app launch opens straight into the first campaign level. It is a persistent scene transition, so it remains visible while the old
 scene is removed and the fresh `level.tscn` instance enters the tree.
 
 ## Ownership
@@ -16,8 +16,9 @@ scene is removed and the fresh `level.tscn` instance enters the tree.
 - `assets/shaders/loading_iris.gdshader` draws the responsive Golden Sunset burgundy-to-plum
   gradient, warm amber center glow, subtle dot pattern, and circular mask.
   `assets/ui/loading/loading_cat.png` is the selected transparent mascot artwork.
-- `scripts/production_main_menu.gd`, `scripts/main_menu.gd`, and `scripts/level.gd::_restart_level()`
-  send requests to `LevelTransition`; they do not instantiate `level.tscn` themselves.
+- `scripts/production_main_menu.gd`, `scripts/main_menu.gd`, `scripts/app_launch_router.gd`, and
+  `scripts/level.gd::_restart_level()` send requests to `LevelTransition`; they do not instantiate
+  `level.tscn` themselves.
 
 ## Gameplay boundary
 
@@ -33,6 +34,14 @@ enough hold time to reach 0.95 seconds from launch, a 0.16 second mascot exit, a
 iris reveal. A slow scene load extends the fully covered portion instead of exposing an incomplete
 board.
 
+## Startup launch
+
+Until the first campaign level is beaten, `scripts/app_launch_router.gd` (the project's main scene)
+calls `LevelTransition.launch_level_at_startup()`. There is no outgoing screen for the iris to close
+over, so `play_cover(false)` starts the backdrop fully closed and plays only the mascot entrance.
+The first frame after the boot splash is therefore the closed loading screen, never an empty scene.
+The same minimum visible time and reveal follow.
+
 ## Verification
 
 Render the static full-cover state at the required responsive resolutions:
@@ -44,9 +53,10 @@ Render the static full-cover state at the required responsive resolutions:
   -Setup scripts/tools/captures/level_loading_screen_setup.gd
 ```
 
-Exercise both retry paths and the production-menu launch path:
+Exercise both retry paths, the production-menu launch path, and the startup launch:
 
 ```powershell
 & .\scripts\tools\run_isolated_godot_test.ps1 -Script tests/ui/test_level_failure_screen.gd
 & .\scripts\tools\run_isolated_godot_test.ps1 -Script tests/ui/test_out_of_lives_menu.gd
+& .\scripts\tools\run_isolated_godot_test.ps1 -Script tests/ui/test_app_launch_router.gd
 ```

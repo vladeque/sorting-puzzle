@@ -5,9 +5,17 @@ Use this file as the first stop when you need to identify where a feature lives.
 ## Entry Points
 
 Main scene:
-- `scenes/main_menu.tscn`
+- `scenes/app_launch_router.tscn`
+- `scripts/app_launch_router.gd`
 - Configured in `project.godot` as `run/main_scene`.
 - `project.godot` keeps the 720x1280 design viewport and uses `canvas_items` stretch with `keep_width` so portrait devices share a stable logical width while gaining or losing vertical play space. The Mobile renderer uses 2x 2D MSAA to smooth runtime `Polygon2D` edges, including the dispenser shelf's short bevels, without the larger bandwidth cost of 4x sampling.
+- Routes every app launch. Until the first campaign level is beaten, and while a life remains, it
+  opens that level directly through `LevelTransition.launch_level_at_startup()`; otherwise it swaps
+  in the production Main Menu. Its `start_unbeaten_first_level` export turns the level start off.
+
+Production Main Menu:
+- `scenes/main_menu.tscn`
+- Opened by the launch router and by every level's return to the menu.
 - Owns the production campaign entry point over the selected chapter's `selection_preview`,
   launches that chapter's next level, and opens the chapter picker from the action beneath the level
   button. Chapter selection updates the menu background immediately.
@@ -27,8 +35,9 @@ Testing menu:
 
 Playable level scene:
 - `level.tscn`
-- Instantiated through the persistent `LevelTransition` autoload for production/testing menu starts
-  and failed-level retries; the current completion action returns to the Main Menu.
+- Instantiated through the persistent `LevelTransition` autoload for the launch router's first-level
+  start, production/testing menu starts, and failed-level retries; the current completion action
+  returns to the Main Menu.
 - Owns shelf layout, timer, drag and tap movement, triple matching, abilities, pause-menu wiring, failure, and completion flow.
 - Uses the original procedural gameplay background for Chapter 1 and chapter artwork for chapters
   whose catalog entry selects `artwork` mode.
@@ -43,7 +52,8 @@ Level loading transition:
 - `assets/shaders/loading_iris.gdshader`
 - `assets/ui/loading/loading_cat.png`
 - Registered in `project.godot` as the `LevelTransition` autoload.
-- Covers production/testing menu launches and retries, blocks duplicate input, and keeps the fresh
+- Covers the launch router's first-level start (beginning fully closed), production/testing menu
+  launches, and retries, blocks duplicate input, and keeps the fresh
   level frozen until its circular reveal has completed. See [LEVEL_LOADING_SCREEN.md](LEVEL_LOADING_SCREEN.md).
 
 Player progression:
