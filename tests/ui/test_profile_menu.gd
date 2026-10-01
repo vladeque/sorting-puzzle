@@ -94,6 +94,19 @@ func _run() -> void:
 	for frame_id in ProfileFrameCatalogScript.get_available_frame_ids():
 		var texture_path := ProfileFrameCatalogScript.get_frame_texture_path(str(frame_id))
 		_check(ResourceLoader.exists(texture_path, "Texture2D"), "Frame texture exists: %s" % frame_id)
+		var frame_texture := load(texture_path) as Texture2D
+		if frame_texture == null:
+			continue
+		var frame_image := frame_texture.get_image()
+		_check(frame_image.get_size() == Vector2i(256, 256),
+			"Frame %s uses the shared 256 px canvas." % frame_id)
+		if frame_image.get_size() != Vector2i(256, 256):
+			continue
+		for angle_degrees in range(0, 360, 15):
+			var angle := deg_to_rad(float(angle_degrees))
+			var point := Vector2(127.5, 127.5) + Vector2.from_angle(angle) * 92.0
+			_check(frame_image.get_pixel(roundi(point.x), roundi(point.y)).a < 0.05,
+				"Frame %s keeps the shared avatar opening clear at %d°." % [frame_id, angle_degrees])
 	_check(
 		str(menu.get("_selected_avatar_frame_id")) == "frame_classic",
 		"Existing profiles begin with the classic frame."

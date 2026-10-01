@@ -123,3 +123,16 @@ Windowed captures with `profile_combo_frame_locked_setup.gd` show both tiles and
 toast at 540x960, 720x1280, 1080x1920, and 1080x2400. The requested 1200x1600 tablet viewport
 rendered at 900x1600, so that exact size remains unverified. The earned ×50 selection was also
 checked at 720x1280 with `profile_combo_frame_unlocked_setup.gd`; its avatar and phoenix frame align.
+
+## Shared frame opening
+
+All 14 runtime frame textures use a 256x256 canvas and a common 190 px transparent center circle.
+The weekly and combo art is gently expanded outward before the shared opening is cleared, preserving
+the metal leaves, flames, and phoenix wings while giving avatars the same minimum visible space as
+the standard frames. This is an alpha and geometry adjustment to the existing selected art.
+
+`tests/ui/test_profile_menu.gd` checks every imported texture's canvas and samples the clear center
+at 24 angles. Windowed profile captures with `profile_frame_geometry_setup.gd` show a penguin avatar
+under all five premium frames at 540x960, 720x1280, 1080x1920, and 1080x2400; a deer with antlers
+was also checked at 720x1280. The requested 1200x1600 tablet window rendered at 900x1600 and does
+not verify that exact resolution.

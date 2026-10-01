@@ -56,11 +56,11 @@ Contract:
 - `default_frame_id` references one entry in `frames` and is currently `frame_classic`.
 - Frame IDs are unique, stable opaque identifiers saved as `avatar_frame_id`.
 - Each frame references one transparent PNG under `assets/ui/avatar_frames/`. Every variant is
-  normalized to the same 256x256 canvas and shares the same transparent inner aperture, so the
-  avatar layer beneath aligns identically under any frame.
+  normalized to the same 256x256 canvas and has a transparent circular opening of at least 190 px
+  diameter, so the avatar layer beneath has the same guaranteed visible area under every frame.
 - `frame_classic` keeps the original muted ring art. The eight color variants use the supplied
   glossy ring art, whose band is a few pixels thicker and reaches slightly closer to the canvas
-  edge than `frame_classic`; the inner aperture is unchanged.
+  edge than `frame_classic`.
 - `weekly_rank_required` gates the three weekly metal frames. `combo_required` gates the ×20
   fire-ring and ×50 phoenix frames; both remain visible while locked.
 - Selections are saved locally and sent through a signed `profile_edit` operation. The backend
