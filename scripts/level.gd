@@ -57,6 +57,7 @@ const HAMMER_IMPACT_EFFECT_SCENE := preload("res://scenes/abilities/hammer_impac
 const ITEM_SPRITES_CONFIG := "res://configs/item_sprites.json"
 const ABILITY_PURCHASE_PRICES_CONFIG := "res://configs/ability_purchase_prices.json"
 const TIME_EXTENSION_CONFIG := "res://configs/time_extension.json"
+const ComboScoringRulesScript := preload("res://scripts/combo_scoring_rules.gd")
 const RewardedTimeExtensionClientScript := preload("res://scripts/ads/rewarded_time_extension_client.gd")
 const RewardedLifeClientScript := preload("res://scripts/ads/rewarded_life_client.gd")
 const InterstitialCompletionGateScript := preload("res://scripts/ads/interstitial_completion_gate.gd")
@@ -181,7 +182,6 @@ const SHOP_RETURN_TIME_EXTENSION := &"time_extension"
 @export_range(0.0, 32.0, 0.5) var selected_item_forward_offset := 12.0
 @export var match_gather_duration_seconds := 0.18
 @export var match_shrink_duration_seconds := 0.16
-@export_range(0.25, 30.0, 0.25) var combo_window_seconds := 8.0
 @export var level_duration_seconds := 300.0
 @export var hammer_haptics_enabled := true
 @export var selected_level := 1
@@ -283,6 +283,7 @@ var _freezer_time_remaining := 0.0
 var _app_interrupted := false
 var _combo_count := 0
 var _combo_time_remaining := 0.0
+var _combo_scoring := ComboScoringRulesScript.load_from_config()
 var _stars := 0
 var _highlighted_items: Array[ShelfItem] = []
 var _layout_preset := DEFAULT_LAYOUT_PRESET
@@ -2451,9 +2452,9 @@ func _extend_combo(triple_count: int) -> int:
 		else:
 			_combo_count += 1
 
-		earned_stars += _combo_count
+		earned_stars += _combo_scoring.get_stars_per_triple(_combo_count)
 
-	_combo_time_remaining = maxf(combo_window_seconds, 0.0)
+	_combo_time_remaining = _combo_scoring.get_window_seconds(_combo_count)
 	_update_combo_hud()
 	if not launched_from_dev_mode:
 		for milestone in [20, 50]:
@@ -2485,11 +2486,14 @@ func _update_combo_hud() -> void:
 	_top_hud.set_combo(should_show, _combo_count, _get_combo_time_ratio())
 
 
+## The fill drains against the current tier's window, so it refills to full on each triple even
+## when reaching a new tier shortens the window.
 func _get_combo_time_ratio() -> float:
-	if combo_window_seconds <= 0.0:
+	var window_seconds := _combo_scoring.get_window_seconds(_combo_count)
+	if window_seconds <= 0.0:
 		return 0.0
 
-	return clampf(_combo_time_remaining / combo_window_seconds, 0.0, 1.0)
+	return clampf(_combo_time_remaining / window_seconds, 0.0, 1.0)
 
 
 func _start_level_timer_from_player_action() -> void:

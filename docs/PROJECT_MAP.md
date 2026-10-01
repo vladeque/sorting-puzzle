@@ -655,6 +655,7 @@ Files:
 - `assets/audio/<event>/*.{wav,mp3}`
 - `configs/levels/level_*.json`
 - `configs/item_sprites.json`
+- `configs/combo_scoring.json`, `scripts/combo_scoring_rules.gd`
 - `scenes/abilities/hammer_impact_effect.tscn`
 - `scripts/hammer_impact_effect.gd`
 - `scenes/abilities/lantern_screen_effect.tscn`
@@ -686,8 +687,8 @@ Responsibility:
 - Spawns `ShelfItem` instances from config layers.
 - Handles mouse and touch interaction.
 - Resolves matches of three identical visible items on the same shelf, including the gather-and-shrink clear animation.
-- Shows and expires the active combo count and shrinking green time strip in the top HUD's combo slot when triple clears happen within the configured combo window.
-- Shows the current run's star total in the top HUD's star pill (a true pill, UI-003) with a small `assets/ui/reward_star_34_glossy_b.png` icon; triple clears add stars equal to the combo value reached by each clear and play the same compact stars as they drop from the cleared triple, fly into the counter, and pulse it.
+- Shows and expires the active combo count and shrinking green time strip in the top HUD's combo slot when triple clears happen within the current tier's combo window (`configs/combo_scoring.json`, read by `scripts/combo_scoring_rules.gd`).
+- Shows the current run's star total in the top HUD's star pill (a true pill, UI-003) with a small `assets/ui/reward_star_34_glossy_b.png` icon; each triple clear adds the stars of the combo tier it reaches and plays the same compact stars as they drop from the cleared triple, fly into the counter, and pulse it.
 - Shows short praise words near the clear location for 2x+ combos, with unique wording through 20x and stronger colored outlines as the combo rises.
 - Starts the layered Paper A `UI/CompletionConfetti` effect immediately, keeps the cleared board
   exposed for `COMPLETION_REVEAL_SECONDS` (1.35s), then opens the reward overlay while foreground

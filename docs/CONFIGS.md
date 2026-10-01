@@ -930,6 +930,47 @@ Rules:
   the wait after the loading reveal; the second is the wait after the tip was suspended.
 - Any error fails closed: every error is reported and no tip is served at all.
 
+## `configs/combo_scoring.json`
+
+Purpose:
+- Defines the combo tiers: how long the player has to land the next triple and how many stars each
+  triple earns, by combo value.
+- Owned by `scripts/combo_scoring_rules.gd` and used by `scripts/level.gd`. A missing or invalid file
+  logs an error and falls back to the built-in `DEFAULT_TIERS`, which mirrors this file.
+
+Shape:
+
+```json
+{
+  "tiers": [
+    { "min_combo": 1, "window_seconds": 15.0, "stars_per_triple": 1 },
+    { "min_combo": 4, "window_seconds": 10.0, "stars_per_triple": 2 },
+    { "min_combo": 7, "window_seconds": 7.0, "stars_per_triple": 3 },
+    { "min_combo": 10, "window_seconds": 5.0, "stars_per_triple": 4 },
+    { "min_combo": 15, "window_seconds": 4.0, "stars_per_triple": 5 },
+    { "min_combo": 20, "window_seconds": 3.0, "stars_per_triple": 7 }
+  ]
+}
+```
+
+Rules:
+- A tier runs from its `min_combo` to the next tier's `min_combo` minus one; the last is open-ended.
+  The first tier must start at `1` and `min_combo` must strictly increase.
+- The triple that brings the combo to ×N earns ×N's `stars_per_triple`. ×N's `window_seconds` is
+  then the time allowed to land ×(N+1) before the combo resets, so the HUD fill refills to the new
+  tier's window on every triple.
+- Several triples cleared by one move each advance the combo by one and are scored by their own
+  tier. A 5-triple chain earns 1 + 1 + 1 + 2 + 2 = 7 stars.
+- Stars only count once the player has started the timer, and not after the level is failed or
+  completed.
+- `window_seconds` must be positive and `stars_per_triple` non-negative.
+- Backend: production settlement accepts the client's star claim (backend ADR 0019, capped at
+  10,000), so changing this file needs no backend release. The dormant replay validator in
+  `../sorting-puzzle-backend` still describes the old rules: one flat 8-second window, with stars
+  equal to the combo count (`createLaunchPuzzleRules` scoring and "Combo and stars" in
+  `docs/GAMEPLAY_VALIDATOR_BOUNDARY.md`). Reactivating it requires a new rules version that
+  implements these tiers.
+
 ## `configs/reward_chest_goals.json`
 
 Purpose:

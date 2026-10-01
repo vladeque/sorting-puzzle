@@ -1,0 +1,10 @@
+{
+  "tiers": [
+    { "min_combo": 1, "window_seconds": 15.0, "stars_per_triple": 1 },
+    { "min_combo": 4, "window_seconds": 10.0, "stars_per_triple": 2 },
+    { "min_combo": 7, "window_seconds": 7.0, "stars_per_triple": 3 },
+    { "min_combo": 10, "window_seconds": 5.0, "stars_per_triple": 4 },
+    { "min_combo": 15, "window_seconds": 4.0, "stars_per_triple": 5 },
+    { "min_combo": 20, "window_seconds": 3.0, "stars_per_triple": 7 }
+  ]
+}

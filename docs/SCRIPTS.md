@@ -2317,7 +2317,6 @@ Important exports:
 - `selected_item_forward_offset`: local downward offset that moves selected or Lantern-highlighted item art, outline, shadow, and hit area toward the shelf's front edge without changing its logical slot position.
 - `match_gather_duration_seconds`: duration for side items to pull into the center item when a triple clears.
 - `match_shrink_duration_seconds`: duration for the center item shrink-out after a triple gathers.
-- `combo_window_seconds`: time allowed after a triple clear to extend the active combo before the center HUD combo label and fill disappear.
 - `level_duration_seconds`: fallback duration if config does not define `time_seconds`.
 - `selected_level`: global campaign level ID loaded from `configs/levels/level_%03d.json`; the HUD
   displays its chapter-local level number.
@@ -2427,7 +2426,7 @@ Key responsibilities:
   `scenes/shadow_style_preview.tscn`.
 - Redirect moves aimed at an occupied destination slot on another shelf to the nearest free front slot on that destination shelf; same-shelf occupied targets leave the item in its original slot.
 - Clear triples with `_clear_matching_shelves()` and `_play_match_clear_animation()`.
-- Track the active triple-clear combo with `_extend_combo()`, `_update_combo_timer()`, `_reset_combo()`, and `_update_combo_hud()`, including the shrinking center-slot fill (now rendered by `scripts/level_top_hud.gd::set_combo()`). Combo value increases by 1 per cleared triple, and each cleared triple adds stars equal to the combo value reached by that triple; `_update_star_counter_label()` forwards that number to `LevelTopHud.set_star_count()`, which owns the star pill (now a true pill, `style_box_gameplay_status_pill.tres`).
+- Track the active triple-clear combo with `_extend_combo()`, `_update_combo_timer()`, `_reset_combo()`, and `_update_combo_hud()`, including the shrinking center-slot fill (now rendered by `scripts/level_top_hud.gd::set_combo()`). Combo value increases by 1 per cleared triple. The tier for the combo value reached (`_combo_scoring`, a `ComboScoringRules` loaded from `configs/combo_scoring.json`) sets both the stars that triple adds and the window for the next triple, and the fill drains against that tier's window; `_update_star_counter_label()` forwards that number to `LevelTopHud.set_star_count()`, which owns the star pill (now a true pill, `style_box_gameplay_status_pill.tres`).
 - Show combo praise words with `_show_combo_praise()` starting at 2x combo, using unique wording through 20x. Labels appear near the cleared triple or hammer impact for two seconds, then fade out; lower combos use thinner calmer outlines, while 10x+ combos use larger gold, violet, and red outlines.
 - Play combo reward feedback with `_play_combo_star_reward_animation()`: after the matched items finish `_play_match_clear_animation()`, small `reward_star_34_glossy_b.png` stars drop from the cleared triple, fly into `UI/StarCounterLabel`, and pulse the counter. The number of visual stars matches the combo-earned star amount returned by `_record_triples_cleared()`.
 - Track cleared triples and locked shelf accessibility with `_record_triples_cleared()`, `_update_locked_shelves()`, and shelf metadata from `unlock_after_triples`.
@@ -3215,6 +3214,21 @@ Purpose:
 - Mirrors the shape rules of `scripts/tools/validate_level_solvable.py`, which stays the
   authoritative validator, so a malformed level fails closed at runtime instead of being guessed at.
 - Accepts whole-number floats, because Godot's JSON parser returns every number as a float.
+
+## `scripts/combo_scoring_rules.gd`
+
+Class:
+- `ComboScoringRules` (`RefCounted`, preloaded by `scripts/level.gd` as `ComboScoringRulesScript`).
+
+Purpose:
+- Reads the tier table in `configs/combo_scoring.json` and answers `get_window_seconds(combo)` and
+  `get_stars_per_triple(combo)`. `scripts/level.gd` owns combo state and calls it from
+  `_extend_combo()` and `_get_combo_time_ratio()`.
+- A tier covers combos from its `min_combo` up to the next tier's `min_combo` minus one; the last
+  tier is open-ended.
+- `set_tiers()` validates a table (starts at ×1, strictly increasing `min_combo`, positive windows,
+  non-negative stars) and returns its errors. `load_from_config()` logs them and falls back to
+  `DEFAULT_TIERS`, which mirrors the shipped config.
 
 ## `scripts/gameplay_modes.gd`
 
