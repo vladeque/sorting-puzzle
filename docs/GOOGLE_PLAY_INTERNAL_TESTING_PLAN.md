@@ -8,6 +8,8 @@ Owner-confirmed first release: **gameplay plus deployed save sync**. Real Google
 
 Read the [abstract](GOOGLE_PLAY_INTERNAL_TESTING_ABSTRACT.md) for the short version.
 
+Execute the plan through the [release ticket backlog](GOOGLE_PLAY_INTERNAL_TESTING_TICKETS.md): 28 first-release work packages and 5 deferred milestones, mapped to the steps and existing feature/setup tickets below.
+
 ## 1. Scope, evidence, and boundaries
 
 The owner confirmed that only one billed Google Cloud project exists. Terraform has never been applied and nothing is running in Google Cloud. No existing Play account/app or public policy/domain was reported.

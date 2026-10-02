@@ -13,6 +13,11 @@ and project-owner console/setup work remain unambiguous:
 - [`DEV_BACKEND_CODE_TICKETS.md`](DEV_BACKEND_CODE_TICKETS.md)
 - [`DEV_BACKEND_OWNER_TICKETS.md`](DEV_BACKEND_OWNER_TICKETS.md)
 
+The gameplay + deployed guest-sync release to Google Play internal testing is split into
+28 first-release work packages and 5 later milestones in
+[`GOOGLE_PLAY_INTERNAL_TESTING_TICKETS.md`](GOOGLE_PLAY_INTERNAL_TESTING_TICKETS.md).
+These packages reference the existing feature/setup tickets rather than replacing their specifications.
+
 Focused client UX implementation tickets:
 
 - [`AUDIO-001 — Implement Godot-Authored Core Sound Effects`](AUDIO_001_GODOT_ONLY_SFX_TICKET.md)

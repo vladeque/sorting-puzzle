@@ -4,6 +4,8 @@ Reviewed: **2026-10-02**. Owner-confirmed scope: **gameplay and deployed save sy
 
 Full audit, owners, dependencies, and acceptance criteria: [Detailed deployment and publication plan](GOOGLE_PLAY_INTERNAL_TESTING_PLAN.md).
 
+Execution backlog: [28 first-release tickets and 5 deferred milestones](GOOGLE_PLAY_INTERNAL_TESTING_TICKETS.md), with owners, dependencies, and acceptance/verification criteria.
+
 ## Current position
 
 The game has substantial gameplay, menus, rewards, and local-save infrastructure. The backend implements most core services, including guest identity, sessions, save sync, economy/progression records, platform verification, and privacy APIs. Terraform and a container deployment pipeline exist.
