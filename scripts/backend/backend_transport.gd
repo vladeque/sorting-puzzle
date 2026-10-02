@@ -5,7 +5,9 @@ class_name BackendTransport
 ## (GAME-004/005/006 own POST /v2/saves/* and guest bootstrap separately under scripts/save/).
 ## Owns bearer headers, envelopes, timeouts, response validation, retry classification, and one
 ## refresh/replay. Bodyless reads follow PROTOCOL_BOUNDARY.md's GET exception; ADS-003 protocol
-## POSTs retain stable request/idempotency identities. SaveSyncService behavior stays untouched.
+## POSTs retain stable request/idempotency identities. GAME-012's account-deletion DELETE never
+## refreshes and reports whether it may have been applied (see delete_json()). SaveSyncService
+## behavior stays untouched.
 
 const LocalSaveCodecScript := preload("res://scripts/save/local_save_codec.gd")
 
@@ -27,6 +29,19 @@ const KNOWN_ERROR_CATEGORIES := [
 	"authentication", "authorization", "validation", "conflict",
 	"rate_limit", "dependency", "version", "internal", "unknown",
 ]
+
+# Transport failures that end before any request byte is written. Every other failure (timeout,
+# dropped connection, unreadable body) may follow a request the server already committed.
+const PRE_SEND_TRANSPORT_FAILURES := [
+	HTTPRequest.RESULT_CANT_RESOLVE,
+	HTTPRequest.RESULT_CANT_CONNECT,
+	HTTPRequest.RESULT_TLS_HANDSHAKE_ERROR,
+]
+const DELETE_ACCEPTED_STATUS := 202
+const OUTCOME_ACCEPTED := "accepted"
+const OUTCOME_REJECTED := "rejected"
+const OUTCOME_NOT_APPLIED := "not_applied"
+const OUTCOME_UNCONFIRMED := "unconfirmed"
 
 var _session_store
 var _active_player_id_provider: Callable
@@ -101,6 +116,78 @@ func post_json(
 		retry_transient,
 		player_id,
 		session
+	)
+
+
+## GAME-012 account deletion (`DELETE /v1/player/account`; docs/ACCOUNT_DELETION_PLAN.md). Unlike
+## post_json() this never refreshes: acceptance revokes the sending session, and only an exact
+## replay under the original access token can still read the stored 202. `operation` is the
+## caller's persisted identity: `request_id`, `idempotency_key`, `expected_state_version`, the
+## `player_id`/`device_id`/`session_id` it is bound to, and `possibly_applied` from earlier calls.
+## Nothing is sent when the active player, device, or stored session no longer matches the binding,
+## because the original credential is then gone.
+##
+## Adds `outcome` and `possibly_applied` to the usual result. `outcome` is "accepted" (validated
+## 202 envelope; the caller still validates `data`), "rejected" (a response that settles this
+## operation as not applied, such as a version conflict), "not_applied" (no attempt in this or an
+## earlier call can have been applied), or "unconfirmed" (an attempt may have been applied and
+## nothing settled it).
+## Retries follow the mutation policy: network failures, 429, and 500/502/503/504.
+func delete_json(
+	path: String,
+	protocol_version: String,
+	data: Dictionary,
+	operation: Dictionary
+) -> Dictionary:
+	var possibly_applied := bool(operation.get("possibly_applied", false))
+	if not can_use_backend():
+		return _settle_delete(
+			_local_error("backend.unavailable", "dependency", false), "", possibly_applied
+		)
+	if protocol_version.is_empty():
+		return _settle_delete(
+			_local_error("request.protocol_version_missing", "validation", false),
+			"",
+			possibly_applied
+		)
+	var expected_state_version = operation.get("expected_state_version")
+	if (
+		not LocalSaveCodecScript.is_uuid(operation.get("request_id"))
+		or not LocalSaveCodecScript.is_uuid(operation.get("idempotency_key"))
+		or not _is_integer(expected_state_version)
+		or int(expected_state_version) < 0
+	):
+		return _settle_delete(
+			_local_error("request.operation_invalid", "validation", false), "", possibly_applied
+		)
+	var player_id := _active_player_id()
+	if (
+		player_id != str(operation.get("player_id", ""))
+		or _session_store.get_device_id() != str(operation.get("device_id", ""))
+	):
+		return _settle_delete(
+			_local_error("auth.binding_changed", "authentication", false), "", possibly_applied
+		)
+	var session_result: Dictionary = _session_store.load_session(player_id)
+	var session := session_result.get("session", {}) as Dictionary
+	if (
+		not bool(session_result.get("ok", false))
+		or str(session.get("access_token", "")).is_empty()
+	):
+		return _settle_delete(
+			_local_error("auth.session_missing", "authentication", false), "", possibly_applied
+		)
+	if str(session.get("session_id", "")) != str(operation.get("session_id", "")):
+		return _settle_delete(
+			_local_error("auth.binding_changed", "authentication", false), "", possibly_applied
+		)
+	return await _perform_delete(
+		path,
+		protocol_version,
+		data,
+		operation,
+		session,
+		possibly_applied
 	)
 
 
@@ -194,6 +281,133 @@ func _post_envelope(
 	if expected_state_version >= 0:
 		meta["expected_state_version"] = expected_state_version
 	return {"meta": meta, "data": data.duplicate(true)}
+
+
+func _perform_delete(
+	path: String,
+	protocol_version: String,
+	data: Dictionary,
+	operation: Dictionary,
+	session: Dictionary,
+	possibly_applied: bool
+) -> Dictionary:
+	var base_url := str(ProjectSettings.get_setting(SERVER_URL_SETTING, "")).trim_suffix("/")
+	var request_id := str(operation.get("request_id", ""))
+	var attempt := 0
+	var start_msec := Time.get_ticks_msec()
+	while true:
+		attempt += 1
+		var envelope := _post_envelope(
+			protocol_version,
+			request_id,
+			session,
+			data,
+			int(operation.get("expected_state_version", 0))
+		)
+		var headers := PackedStringArray([
+			"Authorization: Bearer %s" % str(session.get("access_token", "")),
+			"Content-Type: application/json",
+			"X-Correlation-ID: %s" % LocalSaveCodecScript.create_uuid(),
+			"Idempotency-Key: %s" % str(operation.get("idempotency_key", "")),
+		])
+		var raw_response: Array = await _send_delete(
+			"%s%s" % [base_url, path],
+			headers,
+			JSON.stringify(envelope)
+		)
+		var classification := _classify_delete_response(raw_response, protocol_version, request_id)
+		var result := classification.get("result", {}) as Dictionary
+		match str(classification.get("kind", "")):
+			"accepted":
+				return _settle_delete(result, OUTCOME_ACCEPTED, true)
+			"settled":
+				return _settle_delete(result, OUTCOME_REJECTED, false)
+			"rejected":
+				# Only a stored per-key outcome settles a replay. Any other rejection after an attempt
+				# that may have been applied (a 401 once the original token expires, for example)
+				# cannot show that the earlier attempt failed.
+				return _settle_delete(
+					result,
+					OUTCOME_UNCONFIRMED if possibly_applied else OUTCOME_REJECTED,
+					possibly_applied
+				)
+			"unsettled":
+				return _settle_delete(result, "", true)
+			"retryable":
+				possibly_applied = possibly_applied or bool(classification.get("possibly_applied", false))
+				var elapsed_seconds := float(Time.get_ticks_msec() - start_msec) / 1000.0
+				if attempt >= MAX_READ_ATTEMPTS or elapsed_seconds >= RETRY_WALL_CLOCK_CAP_SECONDS:
+					return _settle_delete(result, "", possibly_applied)
+				await _wait_before_retry(attempt, int(classification.get("retry_after_seconds", -1)))
+	return _settle_delete(_local_error("internal.unexpected", "internal", false), "", possibly_applied)
+
+
+## Classifies one DELETE attempt. "settled" is `409 state.version_conflict`: the backend stores the
+## conflict against the idempotency key, and a replay of an applied key returns its stored 202, so
+## the conflict proves no attempt under this key was applied. `409 idempotency.key_reused` means a
+## different request owns the key, which settles nothing. "rejected" is any other terminal
+## response, which proves only that this attempt was not applied.
+func _classify_delete_response(
+	raw_response: Array,
+	protocol_version: String,
+	request_id: String
+) -> Dictionary:
+	var transport_result := int(raw_response[0]) if raw_response.size() > 0 else HTTPRequest.RESULT_CANT_CONNECT
+	if transport_result != HTTPRequest.RESULT_SUCCESS:
+		return {
+			"kind": "retryable",
+			"result": _local_error("network.transport_failed", "dependency", true),
+			"retry_after_seconds": -1,
+			"possibly_applied": not PRE_SEND_TRANSPORT_FAILURES.has(transport_result),
+		}
+	var response_code := int(raw_response[1]) if raw_response.size() > 1 else 0
+	var response_headers := raw_response[2] as PackedStringArray if raw_response.size() > 2 else PackedStringArray()
+	var body := raw_response[3] as PackedByteArray if raw_response.size() > 3 else PackedByteArray()
+	var parsed = JSON.parse_string(body.get_string_from_utf8())
+	if response_code == DELETE_ACCEPTED_STATUS:
+		var validated := _validate_post_success_envelope(parsed, protocol_version, request_id)
+		return {
+			"kind": "accepted" if bool(validated.get("ok", false)) else "unsettled",
+			"result": validated,
+		}
+	if response_code >= 200 and response_code < 300:
+		return {
+			"kind": "unsettled",
+			"result": _local_error("transport.malformed_response", "internal", false, response_code),
+		}
+	if response_code == 429:
+		return {
+			"kind": "retryable",
+			"result": _envelope_error(parsed, response_code),
+			"retry_after_seconds": _retry_after_seconds(response_headers),
+			"possibly_applied": false,
+		}
+	if response_code == 500 or response_code == 502 or response_code == 503 or response_code == 504:
+		return {
+			"kind": "retryable",
+			"result": _envelope_error(parsed, response_code),
+			"retry_after_seconds": -1,
+			"possibly_applied": true,
+		}
+	if response_code == 409:
+		var conflict := _envelope_error(parsed, response_code)
+		var conflict_code := str((conflict.get("error", {}) as Dictionary).get("code", ""))
+		return {
+			"kind": "settled" if conflict_code == "state.version_conflict" else "unsettled",
+			"result": conflict,
+		}
+	return {"kind": "rejected", "result": _envelope_error(parsed, response_code)}
+
+
+## An empty `outcome` means nothing settled the operation, which is "unconfirmed" when an attempt may
+## have been applied and "not_applied" otherwise.
+func _settle_delete(result: Dictionary, outcome: String, possibly_applied: bool) -> Dictionary:
+	var settled := result.duplicate(true)
+	if outcome.is_empty():
+		outcome = OUTCOME_UNCONFIRMED if possibly_applied else OUTCOME_NOT_APPLIED
+	settled["outcome"] = outcome
+	settled["possibly_applied"] = possibly_applied
+	return settled
 
 
 func _classify_post_response(
@@ -565,10 +779,25 @@ func _send_get(url: String, headers: PackedStringArray) -> Array:
 
 
 func _send_post(url: String, headers: PackedStringArray, body: String) -> Array:
+	return await _send_with_body(HTTPClient.METHOD_POST, url, headers, body)
+
+
+func _send_delete(url: String, headers: PackedStringArray, body: String) -> Array:
+	return await _send_with_body(HTTPClient.METHOD_DELETE, url, headers, body)
+
+
+func _send_with_body(
+	method: HTTPClient.Method,
+	url: String,
+	headers: PackedStringArray,
+	body: String
+) -> Array:
 	var http := HTTPRequest.new()
 	http.timeout = REQUEST_TIMEOUT_SECONDS
 	add_child(http)
-	var request_error := http.request(url, headers, HTTPClient.METHOD_POST, body)
+	# A failed request() call returns before any byte is written, so it reports CANT_CONNECT, which
+	# delete_json() treats as never sent.
+	var request_error := http.request(url, headers, method, body)
 	if request_error != OK:
 		http.queue_free()
 		return [HTTPRequest.RESULT_CANT_CONNECT, 0, PackedStringArray(), PackedByteArray()]

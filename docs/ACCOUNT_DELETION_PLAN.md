@@ -1,6 +1,7 @@
 # In-game account deletion implementation plan
 
-Status: **Planned; implementation has not started**
+Status: **In progress.** Batch 1 (transport and contract adapter) is implemented; batches 2-5
+are not started.
 
 Date: 2026-10-02
 
@@ -239,6 +240,12 @@ must route unresolved/accepted phases to their dedicated result flow before its 
    GET/POST consumers. The isolated test runner copies the project into `%TEMP%`, where
    `res://../sorting-puzzle-backend` does not resolve, so keep client copies of the two goldens
    under `tests/fixtures/` and compare them with the sibling repository whenever it is reachable.
+   *Implemented 2026-10-03:* `BackendTransport.delete_json()`,
+   `scripts/backend/account_deletion_operations.gd`, and
+   `tests/backend/test_account_deletion_transport.gd` (pass the backend root as the single user
+   argument to compare the copies in `tests/fixtures/account_deletion_v1_3/`). The GAME-007,
+   GAME-008, GAME-009, and rewarded-ad suites still pass, apart from GAME-007's pre-existing
+   sibling-fixture lookups in the isolated runner.
 2. **Durable service and cleanup.** Implement preflight exclusion, phase persistence, startup
    recovery, scoped save/cache deletion, native key removal, and explicit fresh-game activation.
    Cover acceptance, definite rejection, conflict/new-key behavior, transient failures, response

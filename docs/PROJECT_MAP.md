@@ -450,8 +450,11 @@ Change here when:
 Files:
 - `scripts/backend/backend_transport.gd`
 - `scripts/backend/backend_read_operations.gd`
+- `scripts/backend/account_deletion_operations.gd`
 - `scripts/player_progress.gd`
 - `tests/backend/test_game_007.gd`
+- `tests/backend/test_account_deletion_transport.gd`
+- `tests/fixtures/account_deletion_v1_3/`
 
 Responsibility:
 - Provides one reusable authenticated read transport for bodyless authenticated v1 `GET` reads
@@ -471,10 +474,25 @@ Responsibility:
 - `PlayerProgress.get_backend_transport()` exposes one configured instance wired to the existing
   `SecureSessionStore` and active player id; it does not read or write save state itself.
 - Does not touch `scripts/save/save_sync_service.gd`'s mutation idempotency/retry behavior.
+- GAME-012's `delete_json()` sends the protocol-1.3 `DELETE /v1/player/account` for a persisted
+  operation (request ID, idempotency key, expected state version, player/device/session binding).
+  It accepts only `202`, never refreshes, refuses to send when the binding no longer matches, and
+  reports `outcome` (`accepted`, `rejected`, `not_applied`, `unconfirmed`) plus `possibly_applied`.
+  Failures before any byte is sent (`CANT_RESOLVE`, `CANT_CONNECT`, TLS handshake) and `429` cannot
+  have been applied; other transport failures, `500`/`502`/`503`/`504`, and malformed `2xx` might
+  have been. Only `409 state.version_conflict` settles an operation after a possibly applied attempt.
+- `scripts/backend/account_deletion_operations.gd` creates those operations, rebuilds one with a
+  new key after a version conflict, validates the accepted `PrivacyRequestStatus` receipt, and maps
+  failures to coarse UI reasons. The durable service and UI that use it are planned in
+  [`ACCOUNT_DELETION_PLAN.md`](ACCOUNT_DELETION_PLAN.md). Its tests read client copies of the
+  backend's v1.3 goldens from `tests/fixtures/account_deletion_v1_3/` and compare them with the
+  sibling repository when it is reachable.
 
 Change here when:
 - Adding a new authenticated backend read/protocol POST, changing retry/refresh policy, or building the
   catalog (`GAME-008`) or leaderboard (`GAME-009`) providers that consume this transport.
+- Changing the account-deletion request, its outcome classification, or the v1.3 goldens (refresh
+  the client copies from `../sorting-puzzle-backend/contracts/fixtures/v1.3/`).
 
 ### Shared Destination-Screen UI
 

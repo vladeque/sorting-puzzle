@@ -805,7 +805,8 @@ client v2.1 goldens while retaining the sibling backend's v2.0 compatibility man
 ## GAME-012 — Add in-game account deletion through Support
 
 **Type:** Product/Privacy
-**Status:** Planned on 2026-10-02 — no runtime implementation yet
+**Status:** In progress — batch 1 (DELETE transport and v1.3 adapter) implemented 2026-10-03;
+durable service, cleanup, native key destruction, and UI not started
 **Plan:** [`ACCOUNT_DELETION_PLAN.md`](ACCOUNT_DELETION_PLAN.md)
 **Backend dependency:** [`BE-607`](../../sorting-puzzle-backend/docs/ACCOUNT_DELETION.md),
 implemented in sibling commit `24e18d6`.
