@@ -151,13 +151,73 @@ func load_session(player_id: String) -> Dictionary:
 
 
 func clear_session(player_id: String) -> Dictionary:
-	if _bridge != null:
+	var bridge := _resolved_bridge()
+	if bridge != null:
 		return _normalize_bridge_result(
-			_bridge.call("clear_player_session", player_id),
+			bridge.call("clear_player_session", player_id),
 			"Secure session removal failed."
 		)
 	_development_sessions.erase(player_id)
 	return _success()
+
+
+## GAME-012: whether this build can destroy the installation signing key after an account
+## deletion. Desktop development builds keep no key, so they qualify without a bridge.
+func supports_installation_destruction() -> bool:
+	var bridge := _resolved_bridge()
+	if bridge != null:
+		return bridge.has_method("destroy_installation_key")
+	return OS.get_name() != "Android" and OS.get_name() != "iOS"
+
+
+## GAME-012: destroys the signing key and native installation binding for `installation_id`, then
+## removes the public identity files that name it. Idempotent, and it never creates a replacement:
+## initialize() does that when the player explicitly starts a new game. A file naming a different
+## valid installation is left alone. Works without initialize(), so restart recovery can finish a
+## cleanup without first generating a new identity.
+func destroy_installation_identity(installation_id: String) -> Dictionary:
+	if not LocalSaveCodecScript.is_uuid(installation_id):
+		return _error("Installation id is invalid.")
+	var bridge := _resolved_bridge()
+	if bridge != null:
+		if not bridge.has_method("destroy_installation_key"):
+			return _error("This build cannot remove the secure installation key.")
+		var result := _normalize_bridge_result(
+			bridge.call("destroy_installation_key", installation_id),
+			"Secure installation key removal failed."
+		)
+		if not bool(result.get("ok", false)):
+			return result
+	elif OS.get_name() == "Android" or OS.get_name() == "iOS":
+		return _error("A secure storage bridge is required on mobile.")
+	for path in [IDENTITY_PATH, IDENTITY_TEMP_PATH, IDENTITY_PREVIOUS_PATH]:
+		if not FileAccess.file_exists(path):
+			continue
+		var named_installation := _installation_id_in_file(path)
+		if not named_installation.is_empty() and named_installation != installation_id:
+			continue
+		if DirAccess.remove_absolute(ProjectSettings.globalize_path(path)) != OK:
+			return _error("Could not remove the public installation identity.")
+	if get_installation_id() == installation_id:
+		_public_identity = {}
+	return _success()
+
+
+func _resolved_bridge() -> Object:
+	return _bridge if _bridge != null else _find_bridge()
+
+
+## The valid installation id a public identity file names, or "" for a missing, torn, or invalid
+## file.
+func _installation_id_in_file(path: String) -> String:
+	var file := FileAccess.open(path, FileAccess.READ)
+	if file == null:
+		return ""
+	var parsed = JSON.parse_string(file.get_as_text())
+	if not (parsed is Dictionary):
+		return ""
+	var installation_id = (parsed as Dictionary).get("installation_id")
+	return str(installation_id) if LocalSaveCodecScript.is_uuid(installation_id) else ""
 
 
 func _find_bridge() -> Object:

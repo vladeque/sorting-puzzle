@@ -28,6 +28,7 @@ var _state_refresh_attempted := false
 var _request_store
 var _refresh_request_id := ""
 var _content_provenance_valid := true
+var _suspended := false
 
 
 func configure(
@@ -66,8 +67,19 @@ func notify_local_mutation() -> void:
 	call_deferred("request_background_sync")
 
 
+## GAME-012: while suspended no new sync, state read, or refresh starts, including persisted retry
+## timers. A request already in flight still completes, so account deletion waits for is_busy() to
+## clear instead of cancelling a refresh whose rotation the server may already have applied.
+func set_suspended(suspended: bool) -> void:
+	_suspended = suspended
+
+
+func is_busy() -> bool:
+	return _busy
+
+
 func request_background_sync() -> void:
-	if _busy or not _can_sync():
+	if _busy or _suspended or not _can_sync():
 		return
 	var sync := _store.get_sync_metadata()
 	if not (sync.get("terminal_error", {}) as Dictionary).is_empty():

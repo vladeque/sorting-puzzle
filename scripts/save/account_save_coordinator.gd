@@ -113,6 +113,23 @@ func sign_out() -> Dictionary:
 	return switch_to_installation_guest()
 
 
+## GAME-012: drops the open store before account-deletion cleanup removes its files, so nothing
+## writes a generation back into a namespace being deleted.
+func release_store() -> void:
+	_store = null
+
+
+## GAME-012: removes the persisted active-namespace pointer. The next initialize() then opens the
+## installation guest of whatever installation identity exists at that point.
+static func clear_active_namespace() -> Dictionary:
+	for path in [ACTIVE_NAMESPACE_PATH, ACTIVE_NAMESPACE_TEMP_PATH]:
+		if not FileAccess.file_exists(path):
+			continue
+		if DirAccess.remove_absolute(ProjectSettings.globalize_path(path)) != OK:
+			return {"ok": false, "error": "Could not remove the active save namespace."}
+	return {"ok": true, "error": ""}
+
+
 func _activate(save_namespace: Dictionary, allow_legacy: bool = false) -> Dictionary:
 	if not LocalSaveCodecScript.is_namespace(save_namespace):
 		return _error("Save namespace is invalid.")

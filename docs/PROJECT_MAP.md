@@ -445,6 +445,37 @@ Change here when:
   smoke-check script. Save-sync end-to-end verification against PostgreSQL is `GAME-005`, not this
   system.
 
+### Account Deletion (GAME-012)
+
+Files:
+- `scripts/save/account_deletion_service.gd`
+- `scripts/save/account_deletion_record_store.gd`
+- `scripts/backend/account_deletion_operations.gd`
+- `scripts/player_progress.gd`
+- `scripts/save/secure_session_store.gd`, `scripts/save/local_save_store.gd`,
+  `scripts/save/account_save_coordinator.gd`
+- `platform/android/secure-store-plugin/`, `platform/ios/secure-store-plugin/`
+- `tests/save/test_account_deletion_service.gd`
+
+Responsibility:
+- Durable state machine for deleting a registered account (`DELETE /v1/player/account`) or a
+  never-registered installation's local data, owned by `PlayerProgress` so it outlives Support.
+- Preflight suspends and drains sync, registration, and backend traffic, persists the operation
+  before sending, replays only the original request, and keeps a possibly applied deletion locked
+  as `unconfirmed` once its credential stops working.
+- Persists the receipt before cleanup. Cleanup removes the deleted save namespaces, legacy save,
+  active-namespace pointer, caches, secure session, installation key, and public identity, and
+  resumes after a restart. Startup opens no save storage once cleanup has begun.
+- **Start a new game** creates a fresh identity and initial progress, keeping only language and
+  audio settings, and emits `PlayerProgress.progress_replaced`.
+- The Support entry point and modal UI are batch 3 of
+  [`ACCOUNT_DELETION_PLAN.md`](ACCOUNT_DELETION_PLAN.md); details are in
+  [`CLOUD_SAVE.md`](CLOUD_SAVE.md#account-deletion).
+
+Change here when:
+- Changing deletion phases, cleanup targets, preserved preferences, or the startup gates that keep a
+  deleted save from being reopened.
+
 ### Shared Backend Transport (GAME-007)
 
 Files:

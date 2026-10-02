@@ -20,6 +20,9 @@ func _ready() -> void:
 func get_first_level_to_start() -> int:
 	if not start_unbeaten_first_level:
 		return 0
+	# GAME-012: no gameplay while an account deletion is unsettled or awaiting a new game.
+	if PlayerProgress.is_account_deletion_blocking():
+		return 0
 	var first_chapter_id := ChapterCatalog.get_first_chapter_id()
 	var level_ids := ChapterCatalog.get_level_ids(first_chapter_id)
 	if level_ids.is_empty():

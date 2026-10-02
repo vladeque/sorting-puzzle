@@ -86,10 +86,29 @@ class SortingPuzzleSecureStorePlugin(godot: Godot) : GodotPlugin(godot) {
         String(plaintext, StandardCharsets.UTF_8)
     }.getOrDefault("")
 
+    // commit() rather than apply(): account deletion must learn about a failed write.
     @UsedByGodot
     fun clear_player_session(playerId: String): Boolean = runCatching {
-        preferences().edit().remove(sessionPreferenceKey(playerId)).apply()
-    }.isSuccess
+        preferences().edit().remove(sessionPreferenceKey(playerId)).commit()
+    }.getOrDefault(false)
+
+    // GAME-012: removes the signing key for a deleted account's installation and, when it names
+    // that installation, the stored installation id. Idempotent. The shared session-encryption
+    // key stays, because other players' sessions are encrypted with it.
+    @UsedByGodot
+    fun destroy_installation_key(installationId: String): Boolean = runCatching {
+        if (!isUuid(installationId)) return false
+        val alias = signingAlias(installationId)
+        val store = keyStore
+        if (store.containsAlias(alias)) store.deleteEntry(alias)
+        val preferences = preferences()
+        if (preferences.getString(INSTALLATION_ID_KEY, null) == installationId &&
+            !preferences.edit().remove(INSTALLATION_ID_KEY).commit()
+        ) {
+            return false
+        }
+        !keyStore.containsAlias(alias)
+    }.getOrDefault(false)
 
     @UsedByGodot
     fun set_installation_id(installationId: String): Boolean {

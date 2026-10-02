@@ -23,6 +23,7 @@ void SortingPuzzleSecureStoreBridge::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("store_player_session", "player_id", "session_json"), &SortingPuzzleSecureStoreBridge::store_player_session);
 	ClassDB::bind_method(D_METHOD("load_player_session", "player_id"), &SortingPuzzleSecureStoreBridge::load_player_session);
 	ClassDB::bind_method(D_METHOD("clear_player_session", "player_id"), &SortingPuzzleSecureStoreBridge::clear_player_session);
+	ClassDB::bind_method(D_METHOD("destroy_installation_key", "installation_id"), &SortingPuzzleSecureStoreBridge::destroy_installation_key);
 }
 
 bool SortingPuzzleSecureStoreBridge::ensure_installation_key(const String &installation_id) {
@@ -55,6 +56,10 @@ String SortingPuzzleSecureStoreBridge::load_player_session(const String &player_
 
 bool SortingPuzzleSecureStoreBridge::clear_player_session(const String &player_id) {
 	return [[SortingPuzzleSecureStore shared] clearPlayerSession:to_ns_string(player_id)];
+}
+
+bool SortingPuzzleSecureStoreBridge::destroy_installation_key(const String &installation_id) {
+	return [[SortingPuzzleSecureStore shared] destroyInstallationKey:to_ns_string(installation_id)];
 }
 
 extern "C" void init_sorting_puzzle_secure_store() {

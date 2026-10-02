@@ -39,9 +39,19 @@ func _ready() -> void:
 	_load_pacing_state()
 	_pacing_state = AdPacingStateScript.reset_session(_pacing_state)
 	_persist_pacing_state()
+	var player_progress := _find_player_progress() as Node
+	if player_progress != null and player_progress.has_signal("progress_replaced"):
+		player_progress.connect("progress_replaced", _on_progress_replaced)
 	_provider = _create_provider()
 	if _policy.is_provider_enabled():
 		call_deferred("initialize")
+
+
+## GAME-012: a new game after account deletion starts with fresh account-bound ad pacing.
+func _on_progress_replaced() -> void:
+	_load_pacing_state()
+	_pacing_state = AdPacingStateScript.reset_session(_pacing_state)
+	_persist_pacing_state()
 
 
 func _notification(what: int) -> void:

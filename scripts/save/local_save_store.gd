@@ -95,6 +95,31 @@ func get_namespace() -> Dictionary:
 	return _namespace.duplicate(true)
 
 
+## GAME-012: removes every file of one namespace (current, previous, and pending generations, the
+## migrated legacy copy, and any other file the store wrote there) and then its directory. Only the
+## directory derived from a validated namespace is touched, never the save root or a sibling
+## namespace. Idempotent: a missing directory is success.
+static func erase_namespace(save_namespace: Dictionary) -> Dictionary:
+	if not LocalSaveCodecScript.is_namespace(save_namespace):
+		return {"ok": false, "error": "Save namespace is invalid."}
+	var directory := "%s/%s" % [SAVE_ROOT, LocalSaveCodecScript.namespace_key(save_namespace)]
+	var absolute_directory := ProjectSettings.globalize_path(directory)
+	if not DirAccess.dir_exists_absolute(absolute_directory):
+		return {"ok": true, "error": ""}
+	var listing := DirAccess.open(directory)
+	if listing == null:
+		return {"ok": false, "error": "Could not open the local save namespace."}
+	listing.include_hidden = true
+	if not listing.get_directories().is_empty():
+		return {"ok": false, "error": "The local save namespace contains an unexpected directory."}
+	for file_name in listing.get_files():
+		if DirAccess.remove_absolute(absolute_directory.path_join(file_name)) != OK:
+			return {"ok": false, "error": "Could not remove a local save generation."}
+	if DirAccess.remove_absolute(absolute_directory) != OK:
+		return {"ok": false, "error": "Could not remove the local save namespace."}
+	return {"ok": true, "error": ""}
+
+
 func get_generation() -> int:
 	return int(_document.get("generation", 0))
 

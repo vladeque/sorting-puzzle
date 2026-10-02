@@ -21,6 +21,7 @@ var _retry_timer: Timer
 var _busy := false
 var _request_store
 var _content_provenance_valid := true
+var _suspended := false
 
 
 func configure(store, session_store, coordinator, content_provenance_valid: bool = true) -> void:
@@ -50,8 +51,18 @@ func replace_store(store) -> void:
 	_schedule_persisted_retry()
 
 
+## GAME-012: while suspended no registration request starts, including persisted retry timers. A
+## request already in flight still completes; account deletion waits for is_busy() to clear.
+func set_suspended(suspended: bool) -> void:
+	_suspended = suspended
+
+
+func is_busy() -> bool:
+	return _busy
+
+
 func request_registration() -> void:
-	if _busy or not _can_register():
+	if _busy or _suspended or not _can_register():
 		return
 	var sync: Dictionary = _store.get_sync_metadata()
 	var registration := sync.get("guest_registration", {}) as Dictionary
@@ -236,6 +247,13 @@ func _on_request_completed(
 
 
 func _handle_challenge_response(envelope: Dictionary, registration: Dictionary) -> void:
+	if _suspended:
+		# A challenge creates no account, so dropping it is safe. Sending the bootstrap now could
+		# create one while local game data is being deleted.
+		var suspended_sync: Dictionary = _store.get_sync_metadata()
+		suspended_sync["guest_registration"] = {}
+		_store.persist_sync_metadata(suspended_sync)
+		return
 	var meta = envelope.get("meta")
 	var data = envelope.get("data")
 	if not (meta is Dictionary and data is Dictionary):

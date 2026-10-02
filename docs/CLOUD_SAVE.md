@@ -18,6 +18,9 @@ is an asynchronous recovery/merge destination, not an alternative runtime save p
   failure handling, refresh hooks, persisted full-jitter retry, cursors, and reconciliation.
 - `scripts/save/account_save_coordinator.gd`: installation guest bootstrap, one-time guest rebind,
   player namespace switching, sign-out, and clean-install restore selection.
+- `scripts/save/account_deletion_service.gd` and `scripts/save/account_deletion_record_store.gd`:
+  GAME-012 durable account and local-data deletion, startup recovery, scoped cleanup, and the
+  explicit new game. See [Account deletion](#account-deletion).
 - `platform/android/secure-store-plugin/`: Godot Android plugin v2 source using Android Keystore.
 - `platform/ios/secure-store-plugin/`: Godot iOS `.gdip` plugin source using Keychain.
 - `addons/sorting_puzzle_secure_store_bridge/`: GAME-003 `EditorExportPlugin` that packages the
@@ -120,6 +123,9 @@ The `SortingPuzzleSecureStoreBridge` contract is:
 - `store_player_session(player_id, session_json) -> bool`
 - `load_player_session(player_id) -> String`
 - `clear_player_session(player_id) -> bool`
+- `destroy_installation_key(installation_id) -> bool` (GAME-012): idempotently removes that
+  installation's signing key and, when it names that installation, the stored installation id. The
+  shared Android session-encryption key and other players' sessions stay.
 
 Android keeps P-256/AES keys in Android Keystore and only AES-GCM ciphertext in private
 SharedPreferences. iOS keeps the P-256 key and session JSON in Keychain using
@@ -176,6 +182,52 @@ the same binding reopens the existing player generation and cannot replace newer
 Sign-out activates the installation guest namespace without deleting any player namespace. No routine sync
 path opens modal UI; a future destructive/ambiguous platform-identity merge must use a dedicated
 dialog scene.
+
+## Account deletion
+
+GAME-012 ([plan](ACCOUNT_DELETION_PLAN.md)) adds `AccountDeletionService`, a child of
+`PlayerProgress` reached through `PlayerProgress.get_account_deletion_service()`. Sign-out is not
+deletion: it keeps every namespace.
+
+`get_availability()` picks the flow. An active player namespace with a configured backend uses
+account deletion (`DELETE /v1/player/account`, protocol 1.3). An installation guest that never sent
+a guest bootstrap uses **local data** deletion with no HTTP. A guest whose bootstrap phase was
+persisted is `registration_pending`, because a sent bootstrap may have created an account, and a
+guest with a rebound marker but no active player is a signed-out account that local deletion must
+not touch. A build whose secure bridge lacks `destroy_installation_key` is unavailable.
+
+`user://account_deletion/operation*.json` is a versioned, SHA-256-checked record outside every
+namespace, written with the same temp/validate/rotate/promote pattern as save generations. It holds
+only public identifiers, the operation identity, phase, receipt, safe error codes and correlation
+IDs, and the preserved language and audio settings. Phases:
+
+| Phase | Storage at startup | Behavior |
+| --- | --- | --- |
+| `submitting`, `retry_pending` | Old save opened, writes blocked | The service replays the original request automatically. A send interrupted by process death counts as possibly applied. |
+| `unconfirmed` | Old save opened, writes blocked | Nothing is resent automatically; sync, refresh, and registration stay suspended. |
+| `cleaning`, `ready`, `activating` | Nothing opened; in-memory defaults only | Cleanup or the chosen new-game activation resumes. No identity is generated before **Start a new game**. |
+| Unreadable record | Nothing opened | Fails closed and blocks progress. |
+
+Account preflight suspends `BackendTransport`, `SaveSyncService`, and
+`GuestSessionBootstrapService` and waits for in-flight requests rather than cancelling them, since a
+cancelled refresh may already have rotated the session server-side. It then reads
+`GET /v1/player/state` for the state version, refreshes the token when under two minutes remain, and
+persists the operation before the first send. A first-attempt `401` with nothing possibly applied
+gets one refresh and resend; a settled version conflict is rebuilt with a new key at most twice.
+Any outcome proving non-application clears the record and resumes normal play.
+
+After a validated `202` the receipt is persisted before cleanup, which clears the deleted player's
+secure session, destroys the installation key and public identity files, erases the active, guest,
+and rebound-source namespaces with `LocalSaveStore.erase_namespace()`, and removes the legacy
+`user://player_progress.json`, the active-namespace pointer, and the Shop and leaderboard caches.
+Each step is idempotent and all run even when one fails; `ready` is reached only when every step
+succeeds. Unrelated namespaces are never touched. **Start a new game** creates a fresh identity and
+installation-guest save that keeps only the device language and audio/vibration switches, then
+emits `PlayerProgress.progress_replaced` (AdService reloads its pacing state).
+
+While a deletion blocks progress, `PlayerProgress._commit_current_state()`,
+`bind_registered_guest()`, `switch_to_player()`, and `sign_out()` refuse, and
+`AppLaunchRouter.get_first_level_to_start()` never auto-starts a level.
 
 ## Support and release verification
 

@@ -45,11 +45,47 @@ const OUTCOME_UNCONFIRMED := "unconfirmed"
 
 var _session_store
 var _active_player_id_provider: Callable
+var _suspended := false
+var _in_flight := 0
 
 
 func configure(session_store, active_player_id_provider: Callable) -> void:
 	_session_store = session_store
 	_active_player_id_provider = active_player_id_provider
+
+
+## GAME-012: while account deletion runs, get_json() and post_json() fail fast with
+## `account.deletion_in_progress` instead of starting a request that could refresh the session or
+## write account data. Requests already in flight still complete; deletion waits for is_busy() to
+## clear. The deletion's own state read passes `ignore_suspension`.
+func set_suspended(suspended: bool) -> void:
+	_suspended = suspended
+
+
+func is_busy() -> bool:
+	return _in_flight > 0
+
+
+## GAME-012: returns `{"ok": true, "session": Dictionary}` for the active player, refreshing first
+## when the access token expires within `min_remaining_seconds` (or `force_refresh` is set). The
+## deletion preflight uses it so an accepted request still has time for exact replays under its
+## original token. Expiry is judged by the device clock, so a skewed clock can still produce a 401.
+func prepare_session(min_remaining_seconds: int, force_refresh: bool = false) -> Dictionary:
+	if not can_use_backend():
+		return _local_error("backend.unavailable", "dependency", false)
+	var player_id := _active_player_id()
+	var session_result: Dictionary = _session_store.load_session(player_id)
+	var session := session_result.get("session", {}) as Dictionary
+	if not bool(session_result.get("ok", false)) or str(session.get("access_token", "")).is_empty():
+		return _local_error("auth.session_missing", "authentication", false)
+	var expires_unix := LocalSaveCodecScript.unix_from_timestamp(session.get("access_token_expires_at"))
+	var remaining_seconds := expires_unix - int(Time.get_unix_time_from_system())
+	if not force_refresh and expires_unix > 0 and remaining_seconds >= min_remaining_seconds:
+		return {"ok": true, "session": session.duplicate(true)}
+	_in_flight += 1
+	var refreshed: Dictionary = await _refresh_session(session, player_id)
+	_in_flight -= 1
+	return refreshed
 
 
 func can_use_backend() -> bool:
@@ -69,7 +105,9 @@ func can_use_backend() -> bool:
 ## precedence over backoff); attempts exactly one refresh-and-replay on a `401`. Every other
 ## outcome (`400`/`403`/`404`/`409`/`413`/`415`/`426`/`500`, or a malformed envelope) is terminal
 ## and not retried automatically, matching the backend's read retry policy.
-func get_json(path: String) -> Dictionary:
+func get_json(path: String, ignore_suspension: bool = false) -> Dictionary:
+	if _suspended and not ignore_suspension:
+		return _local_error("account.deletion_in_progress", "dependency", false)
 	if not can_use_backend():
 		return _local_error("backend.unavailable", "dependency", false)
 	var player_id := _active_player_id()
@@ -79,7 +117,10 @@ func get_json(path: String) -> Dictionary:
 	var session := session_result.get("session", {}) as Dictionary
 	if str(session.get("access_token", "")).is_empty():
 		return _local_error("auth.session_missing", "authentication", false)
-	return await _perform_read(path, player_id, session)
+	_in_flight += 1
+	var result: Dictionary = await _perform_read(path, player_id, session)
+	_in_flight -= 1
+	return result
 
 
 ## Issues an authenticated body-bearing POST using the standard client envelope. Mutations must
@@ -94,6 +135,8 @@ func post_json(
 	idempotency_key: String = "",
 	retry_transient: bool = true
 ) -> Dictionary:
+	if _suspended:
+		return _local_error("account.deletion_in_progress", "dependency", false)
 	if not can_use_backend():
 		return _local_error("backend.unavailable", "dependency", false)
 	if protocol_version.is_empty():
@@ -107,7 +150,8 @@ func post_json(
 	var session := session_result.get("session", {}) as Dictionary
 	if str(session.get("access_token", "")).is_empty():
 		return _local_error("auth.session_missing", "authentication", false)
-	return await _perform_post(
+	_in_flight += 1
+	var result: Dictionary = await _perform_post(
 		path,
 		protocol_version,
 		data,
@@ -117,6 +161,8 @@ func post_json(
 		player_id,
 		session
 	)
+	_in_flight -= 1
+	return result
 
 
 ## GAME-012 account deletion (`DELETE /v1/player/account`; docs/ACCOUNT_DELETION_PLAN.md). Unlike
@@ -181,7 +227,8 @@ func delete_json(
 		return _settle_delete(
 			_local_error("auth.binding_changed", "authentication", false), "", possibly_applied
 		)
-	return await _perform_delete(
+	_in_flight += 1
+	var result: Dictionary = await _perform_delete(
 		path,
 		protocol_version,
 		data,
@@ -189,6 +236,8 @@ func delete_json(
 		session,
 		possibly_applied
 	)
+	_in_flight -= 1
+	return result
 
 
 func _perform_post(

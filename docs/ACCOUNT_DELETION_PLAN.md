@@ -1,7 +1,7 @@
 # In-game account deletion implementation plan
 
-Status: **In progress.** Batch 1 (transport and contract adapter) is implemented; batches 2-5
-are not started.
+Status: **In progress.** Batches 1 (transport and contract adapter) and 2 (durable service and
+cleanup) are implemented; batches 3-5 are not started. The iOS bridge change is uncompiled.
 
 Date: 2026-10-02
 
@@ -252,6 +252,25 @@ must route unresolved/accepted phases to their dedicated result flow before its 
    loss, expired retry credentials, corrupt/partial records, cleanup failure, and process death
    before/after every destructive boundary. Verify late sync/refresh responses and migration
    cannot resurrect data, and unrelated namespaces remain untouched.
+   *Implemented 2026-10-03:* `AccountDeletionService`, `AccountDeletionRecordStore`, the
+   `PlayerProgress` startup gates, write/switch refusals, and release/activation hooks;
+   suspend/drain support in the transport, sync, and registration services;
+   `SecureSessionStore.destroy_installation_identity()`, `LocalSaveStore.erase_namespace()`, and
+   `destroy_installation_key` in both native bridges (Android AAR built and checked; iOS not
+   compiled); AdService pacing reload; and a launch-router guard. See
+   [Account deletion](CLOUD_SAVE.md#account-deletion). `tests/save/test_account_deletion_service.gd`
+   covers local deletion and restart before the new game; registration-pending and signed-out
+   availability; acceptance and scoped cleanup with an unrelated namespace kept; lost-response
+   replay after restart with the original key; 401 after ambiguity staying `unconfirmed` across a
+   restart; definite rejection; offline preflight; conflict rebuild; first-attempt 401 refresh;
+   process death during a send; cleanup failure resumed after restart; an unreadable record; an
+   interrupted activation; an unsupported bridge; and torn record generations.
+   Late responses are prevented rather than raced: preflight drains in-flight requests before
+   sending, and cleanup detaches the services from the deleted store. There is no separate identity
+   generation guard and no test that injects a late callback. Each cleanup step is idempotent and
+   all of them re-run after a restart, so death between individual steps is covered by the
+   resumed-cleanup test rather than one test per step. The save, backend, ads, UI, gameplay,
+   audio, and haptics suites show only failures that also occur without these changes.
 3. **Support and modal UI.** Add the Support action and focused scene, wire service signals,
    cancellation, back handling, disabled duplicate taps, offline/error states, receipt/deadline,
    support fallback, and new-game action. Extend `tests/ui/test_support_screen.gd`; add modal and

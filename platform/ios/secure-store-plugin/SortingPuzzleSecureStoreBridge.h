@@ -17,6 +17,7 @@ public:
 	bool store_player_session(const String &player_id, const String &session_json);
 	String load_player_session(const String &player_id);
 	bool clear_player_session(const String &player_id);
+	bool destroy_installation_key(const String &installation_id);
 };
 
 extern "C" void init_sorting_puzzle_secure_store();

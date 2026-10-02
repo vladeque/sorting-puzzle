@@ -9,6 +9,13 @@ The signing API signs the protocol-v2 domain plus the lowercase operation hash u
 `SHA256withECDSA`. `sign_installation_payload()` signs the exact UTF-8
 `guest-registration-proof/1` payload without adding that operation domain.
 
+For GAME-012 account deletion, `destroy_installation_key(installation_id)` deletes that
+installation's Keystore signing entry and, when it matches, the stored installation id. It is
+idempotent and returns `false` only when removal fails. `clear_player_session()` now writes with
+`commit()` and returns its result, so a failed removal is reported instead of assumed. The shared
+session-encryption key is kept for other players' sessions. Godot builds without this method report
+account deletion as unavailable rather than leaving the deleted account's key behind.
+
 ## Building the AAR
 
 Build on a machine with JDK 17 and Android SDK Platform 36 (`compileSdk` 36, `minSdk` 24):
@@ -97,7 +104,11 @@ opt-in; producing a signed release APK still requires the project's release keys
 
 Package `plugin/build/outputs/aar/SortingPuzzleSecureStoreBridge-release.aar` through the same
 `addons/sorting_puzzle_secure_store_bridge/` plugin for release builds; `set_installation_id()`
-must still be called before synchronization with the public installation UUID. Device verification
+must still be called before synchronization with the public installation UUID. GAME-012 adds a
+device check that `destroy_installation_key()` removes the key (a later public-key read returns an
+empty value) and survives process death between key removal and the next launch. The AAR built on
+2026-10-03 exports `destroy_installation_key` (checked with `javap`), but it has not yet run on a
+device. Device verification
 must confirm key persistence across process death/reboot, session ciphertext unreadability outside
 the app, signature verification against the registered public key, and expected loss of local keys
 after uninstall.

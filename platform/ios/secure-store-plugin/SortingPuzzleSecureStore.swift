@@ -111,6 +111,33 @@ public final class SortingPuzzleSecureStore: NSObject {
         return status == errSecSuccess || status == errSecItemNotFound
     }
 
+    /// GAME-012: removes the signing key for a deleted account's installation and, when it names
+    /// that installation, the stored installation id. Idempotent. Other players' session items stay.
+    public func destroyInstallationKey(_ installationID: String) -> Bool {
+        guard isUUID(installationID) else { return false }
+        let keyQuery: [String: Any] = [
+            kSecClass as String: kSecClassKey,
+            kSecAttrApplicationTag as String: signingTag(installationID),
+            kSecAttrKeyType as String: kSecAttrKeyTypeECSECPrimeRandom,
+        ]
+        let keyStatus = SecItemDelete(keyQuery as CFDictionary)
+        guard keyStatus == errSecSuccess || keyStatus == errSecItemNotFound else { return false }
+
+        if
+            let stored = loadSecret(account: "installation_id"),
+            String(data: stored, encoding: .utf8) == installationID
+        {
+            let idQuery: [String: Any] = [
+                kSecClass as String: kSecClassGenericPassword,
+                kSecAttrService as String: service,
+                kSecAttrAccount as String: "installation_id",
+            ]
+            let idStatus = SecItemDelete(idQuery as CFDictionary)
+            guard idStatus == errSecSuccess || idStatus == errSecItemNotFound else { return false }
+        }
+        return privateKey(installationID) == nil
+    }
+
     private func privateKey(_ installationID: String) -> SecKey? {
         let query: [String: Any] = [
             kSecClass as String: kSecClassKey,

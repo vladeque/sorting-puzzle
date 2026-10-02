@@ -1,8 +1,13 @@
 extends Node
 
+## GAME-012: emitted after the player starts a new game following an account deletion, once a fresh
+## identity and initial progress are active. Systems that cache progress in memory reload here.
+signal progress_replaced
+
 const LocalSaveCodecScript := preload("res://scripts/save/local_save_codec.gd")
 const SecureSessionStoreScript := preload("res://scripts/save/secure_session_store.gd")
 const AccountSaveCoordinatorScript := preload("res://scripts/save/account_save_coordinator.gd")
+const AccountDeletionServiceScript := preload("res://scripts/save/account_deletion_service.gd")
 const GuestSessionBootstrapServiceScript := preload("res://scripts/save/guest_session_bootstrap_service.gd")
 const SaveSyncServiceScript := preload("res://scripts/save/save_sync_service.gd")
 const BackendTransportScript := preload("res://scripts/backend/backend_transport.gd")
@@ -102,6 +107,7 @@ var _local_store
 var _guest_bootstrap_service
 var _sync_service
 var _backend_transport
+var _account_deletion_service
 var _content_provenance
 var _content_operation_diagnostic := {}
 
@@ -113,6 +119,15 @@ func _ready() -> void:
 func load_progress() -> void:
 	_load_content_provenance()
 	_load_life_purchase_configuration()
+	_ensure_account_deletion_service()
+	_account_deletion_service.load_record()
+	if _account_deletion_service.requires_released_storage():
+		# GAME-012: deletion cleanup has started, or its record is unreadable. Opening the save now
+		# could migrate the legacy file or generate a new identity, so stay on in-memory defaults
+		# while the service finishes cleanup or the new-game activation the player already chose.
+		release_progress_for_account_deletion()
+		_account_deletion_service.resume.call_deferred()
+		return
 	if _session_store == null:
 		_session_store = SecureSessionStoreScript.new()
 		var identity_result: Dictionary = _session_store.initialize()
@@ -121,7 +136,25 @@ func load_progress() -> void:
 			_data = _default_data()
 			return
 
-	var legacy_data := _load_legacy_data()
+	if not _open_progress_storage(_load_legacy_data()):
+		return
+	if _account_deletion_service.has_unsettled_request():
+		# GAME-012: a deletion request may have been applied. The old save stays intact but
+		# locked, with sync, refresh, and registration suspended, while the service replays the
+		# original request.
+		_account_deletion_service.resume.call_deferred()
+		return
+	_guest_bootstrap_service.request_registration()
+	_sync_service.request_background_sync()
+
+
+## Opens the active save namespace (creating it when missing) and configures the save, registration,
+## and backend services for it. `legacy_data` is a pre-v2 save to migrate into a new installation
+## guest. `preserved_preferences` carries language and audio settings across an account deletion.
+func _open_progress_storage(
+	legacy_data: Dictionary,
+	preserved_preferences: Dictionary = {}
+) -> bool:
 	var initial_data := _sanitize_data(legacy_data if not legacy_data.is_empty() else _default_data())
 	var initial_preferences := {
 		"settings_disabled": initial_data.get("settings_disabled", DEFAULT_DISABLED_SETTINGS).duplicate(true),
@@ -133,6 +166,7 @@ func load_progress() -> void:
 		).duplicate(true),
 		"seen_gameplay_tips": (initial_data.get("seen_gameplay_tips", []) as Array).duplicate(),
 	}
+	initial_preferences.merge(_sanitize_preserved_preferences(preserved_preferences), true)
 	initial_data.erase("settings_disabled")
 	initial_data.erase("locale")
 	initial_data.erase("selected_chapter_id")
@@ -150,7 +184,7 @@ func load_progress() -> void:
 	if not bool(open_result.get("ok", false)):
 		push_error("Could not open local-first progress: %s" % open_result.get("error", ""))
 		_data = _sanitize_data(legacy_data if not legacy_data.is_empty() else _default_data())
-		return
+		return false
 
 	_local_store = _account_coordinator.get_store()
 	var opened_snapshot := open_result.get("snapshot", {}) as Dictionary
@@ -190,10 +224,12 @@ func load_progress() -> void:
 		_backend_transport = BackendTransportScript.new()
 		add_child(_backend_transport)
 	_backend_transport.configure(_session_store, _active_player_id)
+	if _account_deletion_service.blocks_progress():
+		# Before any persisted retry timer can fire.
+		_account_deletion_service.suspend_network()
 	if _refresh_lives_state():
 		_commit_current_state([_life_state_operation()])
-	_guest_bootstrap_service.request_registration()
-	_sync_service.request_background_sync()
+	return true
 
 
 func save_progress() -> void:
@@ -1420,6 +1456,8 @@ func _sanitize_rank_observation(raw_observation) -> Dictionary:
 
 
 func bind_registered_guest(player_id: String, session: Dictionary) -> bool:
+	if is_account_deletion_blocking():
+		return false
 	var result: Dictionary = _account_coordinator.bind_registered_guest(player_id, session)
 	if not bool(result.get("ok", false)):
 		push_warning("Could not bind guest progress: %s" % result.get("error", ""))
@@ -1433,6 +1471,8 @@ func switch_to_player(
 	session: Dictionary = {},
 	remote_checkpoint: Dictionary = {}
 ) -> bool:
+	if is_account_deletion_blocking():
+		return false
 	var result: Dictionary = _account_coordinator.switch_to_player(player_id, session, remote_checkpoint)
 	if not bool(result.get("ok", false)):
 		push_warning("Could not switch player save: %s" % result.get("error", ""))
@@ -1452,12 +1492,83 @@ func switch_to_player(
 
 
 func sign_out() -> bool:
+	if is_account_deletion_blocking():
+		return false
 	var result: Dictionary = _account_coordinator.sign_out()
 	if not bool(result.get("ok", false)):
 		push_warning("Could not activate signed-out guest progress: %s" % result.get("error", ""))
 		return false
 	_activate_coordinator_result(result)
 	return true
+
+
+## GAME-012: the durable account-deletion service (scripts/save/account_deletion_service.gd).
+func get_account_deletion_service():
+	return _account_deletion_service
+
+
+## GAME-012: true from deletion preflight until a new game starts or the deletion settles as not
+## applied. Save writes, account switching, and gameplay launches are refused meanwhile.
+func is_account_deletion_blocking() -> bool:
+	return _account_deletion_service != null and _account_deletion_service.blocks_progress()
+
+
+func get_account_deletion_dependencies() -> Dictionary:
+	if _session_store == null:
+		# Restart recovery reaches cleanup without initialize(): cleanup needs the secure store's
+		# bridge, never a newly generated identity.
+		_session_store = SecureSessionStoreScript.new()
+	return {
+		"session_store": _session_store,
+		"coordinator": _account_coordinator,
+		"transport": _backend_transport,
+		"sync_service": _sync_service,
+		"bootstrap_service": _guest_bootstrap_service,
+	}
+
+
+## Only the device language and audio/vibration switches survive an account deletion.
+func get_account_deletion_preserved_preferences() -> Dictionary:
+	return {
+		"locale": get_locale(),
+		"settings_disabled": get_disabled_settings(),
+	}
+
+
+## Drops every reference to the old save before deletion cleanup removes it, and leaves only
+## in-memory defaults (with the preserved language and audio settings) for the UI to read.
+func release_progress_for_account_deletion() -> void:
+	if _account_coordinator != null:
+		_account_coordinator.release_store()
+	if _sync_service != null:
+		_sync_service.replace_store(null)
+	if _guest_bootstrap_service != null:
+		_guest_bootstrap_service.replace_store(null)
+	_local_store = null
+	_pending_reward_chest_animation.clear()
+	_pending_leaderboard_reward.clear()
+	var released := _default_data()
+	var preserved := _sanitize_preserved_preferences(
+		_account_deletion_service.get_preserved_preferences()
+		if _account_deletion_service != null
+		else {}
+	)
+	released.merge(preserved, true)
+	_data = _sanitize_data(released)
+
+
+## The player's explicit new game after a deletion: a fresh installation identity and key, then a
+## new installation-guest save with initial progress. Network services stay suspended until the
+## deletion service clears its record.
+func activate_progress_after_account_deletion(preferences: Dictionary) -> Dictionary:
+	_session_store = SecureSessionStoreScript.new()
+	var identity_result: Dictionary = _session_store.initialize()
+	if not bool(identity_result.get("ok", false)):
+		return identity_result
+	_account_coordinator = AccountSaveCoordinatorScript.new(_session_store)
+	if not _open_progress_storage({}, preferences):
+		return {"ok": false, "error": "Could not open the new game's progress."}
+	return {"ok": true, "error": ""}
 
 
 func get_active_save_namespace() -> Dictionary:
@@ -1594,6 +1705,8 @@ func _preferences_for_storage() -> Dictionary:
 
 
 func _commit_current_state(operation_specs: Array = []) -> Dictionary:
+	if is_account_deletion_blocking():
+		return {"ok": false, "error": "Account deletion is in progress."}
 	if _local_store == null:
 		return {"ok": false, "error": "Local save store is unavailable."}
 	var result: Dictionary = _local_store.commit_snapshot(
@@ -1951,3 +2064,27 @@ func _on_reconciliation_applied() -> void:
 
 func _on_guest_registered(result: Dictionary) -> void:
 	_activate_coordinator_result(result)
+
+
+func _ensure_account_deletion_service() -> void:
+	if _account_deletion_service != null:
+		return
+	_account_deletion_service = AccountDeletionServiceScript.new()
+	add_child(_account_deletion_service)
+	_account_deletion_service.configure(self)
+	_account_deletion_service.new_game_started.connect(_on_account_deletion_new_game_started)
+
+
+func _on_account_deletion_new_game_started() -> void:
+	progress_replaced.emit()
+
+
+## Language and audio/vibration switches carried across an account deletion, in the shape of the
+## save preferences partition. Anything else in `raw_preferences` is ignored.
+func _sanitize_preserved_preferences(raw_preferences: Dictionary) -> Dictionary:
+	var preserved := {}
+	if raw_preferences.has("locale"):
+		preserved["locale"] = LocaleCatalogScript.sanitize_saved_locale(str(raw_preferences.get("locale")))
+	if raw_preferences.get("settings_disabled") is Dictionary:
+		preserved["settings_disabled"] = _sanitize_disabled_settings(raw_preferences.get("settings_disabled"))
+	return preserved
