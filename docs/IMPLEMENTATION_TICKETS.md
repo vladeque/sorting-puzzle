@@ -16,6 +16,7 @@ and project-owner console/setup work remain unambiguous:
 Focused client UX implementation tickets:
 
 - [`AUDIO-001 — Implement Godot-Authored Core Sound Effects`](AUDIO_001_GODOT_ONLY_SFX_TICKET.md)
+- [`GAME-012 — Add in-game account deletion through Support`](ACCOUNT_DELETION_PLAN.md)
 
 Gameplay feature plans:
 
@@ -795,3 +796,37 @@ offline persistence/restart and promoted-generation crash recovery, v2.1
 request/reconciliation plus v2.0 checkpoint compatibility, starter-grant idempotency, and layout
 assertions at the required portrait sizes. `tests/backend/test_game_010.gd` separately loads the
 client v2.1 goldens while retaining the sibling backend's v2.0 compatibility manifest gate.
+
+## GAME-012 — Add in-game account deletion through Support
+
+**Type:** Product/Privacy
+**Status:** Planned on 2026-10-02 — no runtime implementation yet
+**Plan:** [`ACCOUNT_DELETION_PLAN.md`](ACCOUNT_DELETION_PLAN.md)
+**Backend dependency:** [`BE-607`](../../sorting-puzzle-backend/docs/ACCOUNT_DELETION.md),
+implemented in sibling commit `24e18d6`.
+
+**Description:** Add a Support action and dedicated confirmation/result modal for permanent
+account deletion. Submit the canonical protocol-1.3 DELETE mutation, erase the old save and secure
+installation identity after acceptance, then offer an explicit **Start a new game** action.
+
+**Owner-confirmed behavior:**
+
+- Confirm the accepted request and complete local cleanup before offering a fresh game.
+- Keep an ambiguously deleted account locked with **Deletion status unconfirmed** and a support
+  option after the original retry credential expires.
+- Offer separately labeled **Delete local game data** for proven never-registered installations,
+  without creating a backend account solely to delete it.
+
+**Acceptance criteria:**
+
+- Guests and platform accounts use `DELETE /v1/player/account`, `confirmed: true`, authoritative
+  state version, stable request/idempotency identities, and a validated 202 response.
+- Restart-safe request tracking, scoped cleanup, Android/iOS key destruction, and startup gates
+  prevent stale sync, refresh, legacy migration, or guest fallback from resurrecting deleted data.
+- Exact retries preserve the original credential while valid; unconfirmed outcomes never become
+  success merely because authentication fails.
+- A new game starts only after explicit input, with fresh installation/device/key identities and
+  normal initial progress. Unrelated account namespaces remain protected.
+- Local-only deletion, registration response loss, failures, conflicts, cleanup interruption,
+  restart, and responsive modal states have focused automated/device/screenshot verification.
+- Backend worker scheduling and packaged native cleanup capability remain explicit release gates.
