@@ -1,11 +1,11 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://658dc6fxymc7"]
 
-[ext_resource type="Script" path="res://scripts/main_menu_starter_bundle_badge.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/ui/shop_coin_offers/shop_coin_offer_tier_07.png" id="2_coins"]
-[ext_resource type="Script" path="res://scripts/press_scale_button.gd" id="3_press"]
-[ext_resource type="Script" path="res://scripts/shop_sign_bracket.gd" id="4_bracket"]
-[ext_resource type="Script" path="res://scripts/shop_sign_board.gd" id="5_board"]
-[ext_resource type="Texture2D" path="res://assets/ui/discount_badge_pinned.png" id="6_tag"]
+[ext_resource type="Script" uid="uid://c0rgarpg8sc41" path="res://scripts/main_menu_starter_bundle_badge.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://cpq7g25wrq08d" path="res://assets/ui/shop_coin_offers/shop_coin_offer_tier_07.png" id="2_coins"]
+[ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="3_press"]
+[ext_resource type="Script" uid="uid://50uok3vuivkr" path="res://scripts/shop_sign_bracket.gd" id="4_bracket"]
+[ext_resource type="Script" uid="uid://dltdwdslc7nis" path="res://scripts/shop_sign_board.gd" id="5_board"]
+[ext_resource type="Texture2D" uid="uid://nm6j8p75d3hn" path="res://assets/ui/discount_badge_pinned.png" id="6_tag"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hit"]
 
@@ -52,11 +52,10 @@ tracks/1/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_badge"]
 _data = {
-"idle": SubResource("Animation_idle")
+&"idle": SubResource("Animation_idle")
 }
 
-[node name="MainMenuStarterBundleBadge" type="Control"]
-visible = false
+[node name="MainMenuStarterBundleBadge" type="Control" unique_id=495180453]
 custom_minimum_size = Vector2(142, 164)
 layout_mode = 3
 anchors_preset = 0
@@ -64,7 +63,7 @@ offset_right = 142.0
 offset_bottom = 164.0
 script = ExtResource("1_script")
 
-[node name="BadgeButton" type="Button" parent="."]
+[node name="BadgeButton" type="Button" parent="." unique_id=1906828309]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -74,17 +73,16 @@ grow_horizontal = 2
 grow_vertical = 2
 focus_mode = 0
 mouse_default_cursor_shape = 2
-theme_override_styles/focus = SubResource("StyleBoxEmpty_hit")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_hit")
-theme_override_styles/hover_pressed = SubResource("StyleBoxEmpty_hit")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_hit")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_hit")
 theme_override_styles/normal = SubResource("StyleBoxEmpty_hit")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_hit")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_hit")
+theme_override_styles/hover_pressed = SubResource("StyleBoxEmpty_hit")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_hit")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_hit")
 script = ExtResource("3_press")
 visual_target_path = NodePath("Swing/Sign")
-held_scale = 0.94
 
-[node name="Bracket" type="Control" parent="BadgeButton"]
+[node name="Bracket" type="Control" parent="BadgeButton" unique_id=1104469999]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -93,7 +91,7 @@ grow_horizontal = 2
 mouse_filter = 2
 script = ExtResource("4_bracket")
 
-[node name="Swing" type="Control" parent="BadgeButton"]
+[node name="Swing" type="Control" parent="BadgeButton" unique_id=1277812118]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -103,7 +101,7 @@ grow_vertical = 2
 pivot_offset = Vector2(70, 13)
 mouse_filter = 2
 
-[node name="Sign" type="Control" parent="BadgeButton/Swing"]
+[node name="Sign" type="Control" parent="BadgeButton/Swing" unique_id=1144929627]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -112,8 +110,8 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="SignBoard" type="Control" parent="BadgeButton/Swing/Sign"]
-layout_mode = 0
+[node name="SignBoard" type="Control" parent="BadgeButton/Swing/Sign" unique_id=139262669]
+anchors_preset = 0
 offset_left = 16.0
 offset_top = 13.0
 offset_right = 124.0
@@ -121,7 +119,7 @@ offset_bottom = 150.0
 mouse_filter = 2
 script = ExtResource("5_board")
 
-[node name="Glow" type="TextureRect" parent="BadgeButton/Swing/Sign"]
+[node name="Glow" type="TextureRect" parent="BadgeButton/Swing/Sign" unique_id=771554621]
 layout_mode = 0
 offset_left = 26.0
 offset_top = 46.0
@@ -131,7 +129,7 @@ mouse_filter = 2
 texture = SubResource("GradientTexture2D_glow")
 expand_mode = 1
 
-[node name="CoinArt" type="TextureRect" parent="BadgeButton/Swing/Sign"]
+[node name="CoinArt" type="TextureRect" parent="BadgeButton/Swing/Sign" unique_id=2026509759]
 layout_mode = 0
 offset_left = 32.0
 offset_top = 42.0
@@ -142,17 +140,16 @@ texture = ExtResource("2_coins")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="BadgeLabel" type="Label" parent="BadgeButton/Swing/Sign"]
+[node name="BadgeLabel" type="Label" parent="BadgeButton/Swing/Sign" unique_id=3911156]
 layout_mode = 0
 offset_left = 16.0
 offset_top = 117.0
 offset_right = 124.0
 offset_bottom = 145.0
-mouse_filter = 2
 theme_type_variation = &"GameSectionLabel"
 theme_override_colors/font_color = Color(1, 0.945, 0.784, 1)
-theme_override_colors/font_outline_color = Color(0.29, 0.11, 0.047, 1)
 theme_override_colors/font_shadow_color = Color(0.29, 0.11, 0.047, 1)
+theme_override_colors/font_outline_color = Color(0.29, 0.11, 0.047, 1)
 theme_override_constants/shadow_offset_x = 0
 theme_override_constants/shadow_offset_y = 2
 theme_override_constants/outline_size = 5
@@ -161,9 +158,9 @@ text = "STARTER"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="DiscountTag" type="Control" parent="BadgeButton/Swing/Sign"]
+[node name="DiscountTag" type="Control" parent="BadgeButton/Swing/Sign" unique_id=330423463]
 unique_name_in_owner = true
-layout_mode = 0
+anchors_preset = 0
 offset_left = 104.0
 offset_top = 34.0
 offset_right = 138.0
@@ -172,7 +169,7 @@ rotation = 0.20944
 pivot_offset = Vector2(17, 5)
 mouse_filter = 2
 
-[node name="TagArt" type="TextureRect" parent="BadgeButton/Swing/Sign/DiscountTag"]
+[node name="TagArt" type="TextureRect" parent="BadgeButton/Swing/Sign/DiscountTag" unique_id=774932989]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -184,17 +181,16 @@ texture = ExtResource("6_tag")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="DiscountLabel" type="Label" parent="BadgeButton/Swing/Sign/DiscountTag"]
+[node name="DiscountLabel" type="Label" parent="BadgeButton/Swing/Sign/DiscountTag" unique_id=1395655546]
 unique_name_in_owner = true
 layout_mode = 0
 offset_top = 18.0
 offset_right = 34.0
 offset_bottom = 36.0
-mouse_filter = 2
 theme_type_variation = &"GameSectionLabel"
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_outline_color = Color(0.431, 0.055, 0.024, 1)
 theme_override_colors/font_shadow_color = Color(0.431, 0.055, 0.024, 1)
+theme_override_colors/font_outline_color = Color(0.431, 0.055, 0.024, 1)
 theme_override_constants/shadow_offset_x = 0
 theme_override_constants/shadow_offset_y = 1
 theme_override_constants/outline_size = 4
@@ -203,8 +199,6 @@ text = "-67%"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="IdleMotion" type="AnimationPlayer" parent="."]
+[node name="IdleMotion" type="AnimationPlayer" parent="." unique_id=8873747]
 unique_name_in_owner = true
-libraries = {
-"": SubResource("AnimationLibrary_badge")
-}
+libraries/ = SubResource("AnimationLibrary_badge")

@@ -1243,7 +1243,7 @@ Important nodes:
   - `%ClosedChest` / `%OpenChest`: `assets/ui/main_menu_reward_chest_redraw_1024.png` and
 	`assets/ui/main_menu_reward_chest_open_1024.png` (mipmapped, linear-with-mipmaps filtering).
 	The open art is drawn about 7.5% smaller and offset in its canvas, so `%OpenChest`'s anchors
-    scale and shift it to line its body up with the closed chest.
+	scale and shift it to line its body up with the closed chest.
   - `%ChestBurst` / `%ChestSparkles`: one-shot paper confetti and star particles from the mouth.
 - `%RewardPanel`: `scenes/ui/reward_reveal_row.tscn` (shared with the purchase reward sequence),
   anchored above the chest. It owns the reward visuals, their pop-in, and the coin/ability flights
