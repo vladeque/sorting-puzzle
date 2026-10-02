@@ -23,6 +23,14 @@ The owner confirmed these decisions during planning:
   data** flow. Delete its local progress without creating a backend account, then offer
   **Start a new game**.
 
+After the 2026-10-03 plan review, the owner also confirmed:
+
+- Implement the batches in the order documented below. The server deletion path comes first,
+  not a local-only slice, even though the local-only flow is the only one a committed release
+  build reaches today (see [Current reachability](#current-reachability)).
+- Implement iOS Keychain key destruction in this work, alongside Android, rather than deferring
+  it to an iOS release. Both packaged native builds remain release gates.
+
 This work is client-owned. Read the backend contracts and fixtures, but do not modify the sibling
 repository, its canonical requirements, or the game repository's requirements snapshot. Data
 export, a public deletion website, and unrelated account-management UI are separate work.
@@ -64,6 +72,15 @@ After a validated 202, discard the deleted save, its secure session, installatio
 and device identity. Reusing the old installation key before worker cleanup causes an
 `installation_binding_conflict`.
 
+The backend's mutation fingerprint covers the operation, authenticated player, protocol version,
+`expected_state_version`, and canonical `data`. Request ID, client time, correlation ID,
+credentials, and retry count are excluded
+([idempotent mutations](../../sorting-puzzle-backend/docs/IDEMPOTENT_PLAYER_MUTATIONS.md)). An
+exact replay therefore needs the same idempotency key, expected state version, and session/device
+binding; the envelope does not have to be byte-identical. The `409 state.version_conflict`
+response carries `recovery.current_state_version`
+([controller](../../sorting-puzzle-backend/apps/api/src/identity/account-deletion.controller.ts)).
+
 ## Current client gaps and ownership
 
 | Owner | Planned responsibility |
@@ -72,7 +89,7 @@ and device identity. Reusing the old installation key before worker cleanup caus
 | New `scenes/ui/account_deletion_modal.tscn`, `scripts/account_deletion_modal.gd` | Own confirmation, progress, failure, unconfirmed, cleanup-retry, and accepted result views, buttons, and signals. Reuse existing UI resources. |
 | New `scripts/save/account_deletion_service.gd` | Own the durable deletion state machine, preflight, exact request retries, outcome classification, and cleanup orchestration. It must outlive the Support screen. |
 | New `scripts/backend/account_deletion_operations.gd` | Own protocol-1.3 request construction and closed validation of the deletion response data. |
-| `scripts/backend/backend_transport.gd` | Add an explicit DELETE path, accepted success code, persisted request replay, and caller-controlled refresh policy while preserving current GET/POST defaults. |
+| `scripts/backend/backend_transport.gd` | Add an explicit DELETE path that accepts only 202, never refreshes, takes a caller-supplied request ID and idempotency key, refuses to send when the stored session is not the one bound to the operation, and reports whether any attempt may have reached the server. GET/POST behavior stays unchanged. |
 | `scripts/save/secure_session_store.gd`, Android/iOS native secure-store bridges | Destroy the old installation key/binding and deleted player's credentials, then create fresh identifiers only when the player starts again. |
 | `scripts/save/local_save_store.gd`, `scripts/save/account_save_coordinator.gd` | Perform scoped, repeatable removal of deleted-account generations and guest/legacy fallback data; create a clean namespace without migration from deleted progress. |
 | `scripts/save/save_sync_service.gd`, `scripts/save/guest_session_bootstrap_service.gd` | Suspend network activity and invalidate stale callbacks while deletion is pending or cleanup is running. |
@@ -84,6 +101,20 @@ The current transport only exposes GET/POST and treats 200 as its POST success. 
 401 refresh is unsuitable for a deletion with an uncertain outcome. The native bridges can clear
 a player session, but have no installation-key destruction API. `sign_out()` retains player saves
 and activates the old guest namespace, so it cannot implement deletion.
+
+### Current reachability
+
+The committed `project.godot` defaults leave `application/config/backend_base_url` empty and
+`application/config/save_sync_v2_enabled` false. Guest registration requires both, plus the
+secure-store bridge (`GuestSessionBootstrapService._can_register()`). A committed release build
+therefore never registers, and every player there takes the **Delete local game data** flow.
+Server deletion is reachable only through the local-backend debug target and the planned Google
+Play internal-test configuration. Its tests must not depend on the release defaults.
+
+No platform sign-in is wired yet: `switch_to_player()` and `sign_out()` have no callers outside
+`PlayerProgress`/`AccountSaveCoordinator`, and `CloudSaveProvider` is unused. In practice the only
+namespaces are the installation guest and the player namespace it is rebound to. Protection of
+unrelated account namespaces is still required, as a guard with a test, for when sign-in lands.
 
 ## Player flow and proposed copy
 
@@ -128,8 +159,9 @@ and temporarily signed-out/recoverable server accounts always use account deleti
 ## Request safety and recovery
 
 Persist an atomic, versioned deletion-operation record outside the account namespace before the
-first send. It contains only public binding IDs, the exact request envelope/idempotency key,
-phase, safe diagnostics, and accepted receipt when available. Credentials remain in secure
+first send. It contains only public binding IDs (player, device, session), the request ID,
+idempotency key, and expected state version, plus the phase, whether any attempt may have reached
+the server, safe diagnostics, and the accepted receipt when available. Credentials remain in secure
 storage. Use recoverable generations/checksums so a torn write cannot unlock a deleting account.
 
 | Phase | Behavior |
@@ -144,19 +176,21 @@ storage. Use recoverable generations/checksums so a torn write cannot unlock a d
 
 Preflight must coordinate with in-flight sync, refresh, purchase, and ad operations, suppress new
 work, and prevent old callbacks from committing. Local cancellation alone does not prove a server
-mutation stopped. Obtain `expected_state_version` from a fresh authenticated player-state read;
-do not use a local generation/journal number or replace the local snapshot with this read.
+mutation stopped. Obtain `expected_state_version` from a fresh authenticated player-state read
+(`GET /v1/player/state`, as `scripts/ads/rewarded_life_client.gd` already does); do not use a
+local generation/journal number or replace the local snapshot with this read.
 Prepare a sufficiently fresh access credential before submission under the same exclusive flow.
 The pending journal need not be uploaded before an irreversible deletion.
 
-Transient retries use the exact persisted envelope, idempotency key, and original credential,
-with the protocol's bounded jitter/Retry-After policy. Never generate a new operation after a
+Transient retries reuse the persisted request ID, idempotency key, expected state version, and
+original credential, with the protocol's bounded jitter/Retry-After policy. Never generate a new operation after a
 timeout or rotate the credential in an attempt to discover whether deletion succeeded. A
 malformed 202 also requires outcome resolution rather than silently resuming play.
 
-A definitive first-request `409 state.version_conflict` permits a fresh state read and a rebuilt
-request with a **new** idempotency key: expected state version is part of the fingerprint and
-conflict outcomes are retained. Bound this recovery; repeated conflicts return a visible retry
+A definitive first-request `409 state.version_conflict` permits a rebuilt request with a **new**
+idempotency key and the response's `recovery.current_state_version` (a fresh state read only when
+that value is missing): expected state version is part of the fingerprint and conflict outcomes
+are retained. Bound this recovery; repeated conflicts return a visible retry
 state. `idempotency.key_reused` is an implementation error, not a reason to bypass idempotency.
 Map offline, 429, temporary dependency, authentication, unsupported-client, and validation errors
 to useful UI without exposing raw tokens, payloads, or server internals.
@@ -202,7 +236,9 @@ must route unresolved/accepted phases to their dedicated result flow before its 
 
 1. **Transport and contract adapter.** Add DELETE/202 and exact replay with explicit refresh
    control. Add focused tests using the canonical v1.3 deletion goldens; regress existing shared
-   GET/POST consumers.
+   GET/POST consumers. The isolated test runner copies the project into `%TEMP%`, where
+   `res://../sorting-puzzle-backend` does not resolve, so keep client copies of the two goldens
+   under `tests/fixtures/` and compare them with the sibling repository whenever it is reachable.
 2. **Durable service and cleanup.** Implement preflight exclusion, phase persistence, startup
    recovery, scoped save/cache deletion, native key removal, and explicit fresh-game activation.
    Cover acceptance, definite rejection, conflict/new-key behavior, transient failures, response
