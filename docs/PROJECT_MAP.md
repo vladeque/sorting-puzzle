@@ -455,7 +455,13 @@ Files:
 - `scripts/save/secure_session_store.gd`, `scripts/save/local_save_store.gd`,
   `scripts/save/account_save_coordinator.gd`
 - `platform/android/secure-store-plugin/`, `platform/ios/secure-store-plugin/`
-- `tests/save/test_account_deletion_service.gd`
+- `scenes/ui/account_deletion_modal.tscn`, `scripts/account_deletion_modal.gd`
+- `scenes/ui/support_screen.tscn`, `scripts/support_screen.gd`, `scripts/support_contact.gd`
+- `scripts/production_main_menu.gd`, `scripts/app_launch_router.gd`
+- `tests/save/test_account_deletion_service.gd`, `tests/ui/test_account_deletion_modal.gd`,
+  `tests/ui/test_support_screen.gd`, `tests/ui/test_app_launch_router.gd`
+- `scripts/tools/captures/account_deletion_modal_setup.gd`,
+  `scripts/tools/captures/support_account_action_setup.gd`
 
 Responsibility:
 - Durable state machine for deleting a registered account (`DELETE /v1/player/account`) or a
@@ -468,8 +474,10 @@ Responsibility:
   resumes after a restart. Startup opens no save storage once cleanup has begun.
 - **Start a new game** creates a fresh identity and initial progress, keeping only language and
   audio settings, and emits `PlayerProgress.progress_replaced`.
-- The Support entry point and modal UI are batch 3 of
-  [`ACCOUNT_DELETION_PLAN.md`](ACCOUNT_DELETION_PLAN.md); details are in
+- Support shows an always-visible **Delete Account** / **Delete Game Data** row after its FAQs.
+  Main Menu hosts the deletion modal, from Support or at launch whenever a deletion blocks
+  progress, and restarts through the main scene after **Start New Game**. See
+  [`ACCOUNT_DELETION_PLAN.md`](ACCOUNT_DELETION_PLAN.md) and
   [`CLOUD_SAVE.md`](CLOUD_SAVE.md#account-deletion).
 
 Change here when:

@@ -1524,17 +1524,55 @@ Purpose:
   email app through a prefilled `mailto:` route using `application/config/support_email`.
 - The ad-report article asks for a screenshot, approximate time, in-game placement, advertiser/app
   name, and reason for review, while explicitly warning against sending passwords or payment data.
+- GAME-012: an **Account** section after the FAQs holds an always-visible deletion row, labeled
+  **Delete Game Data** for a never-registered installation and **Delete Account** otherwise. It only
+  emits `account_deletion_requested`; Main Menu opens `scenes/ui/account_deletion_modal.tscn`.
 
 Important nodes:
 - `%BackButton`: fades and closes only the support overlay, revealing Settings underneath.
 - `%FaqList`: safe-area-aware scrollable accordion list.
 - `%ContactSupportItem`: contact instructions plus the general support email action.
 - `%ReportAdItem`: inappropriate-ad evidence checklist plus a prefilled ad-report email action.
+- `%DeleteAccountButton`: the cream row with red text that requests the deletion modal. The section
+  label and button are kept in this scene as trivial nodes with no behavior of their own.
 
 Depends on:
 - `scenes/ui/destination_screen_shell.tscn` for the chapter-aware background treatment.
 - `scenes/ui/support_faq_item.tscn` for each reusable expandable article.
 - `scripts/destination_screen_layout.gd` for safe-area-aware responsive placement.
+- `scripts/support_contact.gd` for the validated support address and `mailto:` route.
+
+## `scenes/ui/account_deletion_modal.tscn`
+
+Root:
+- `AccountDeletionModal` (`Control`)
+
+Script:
+- `scripts/account_deletion_modal.gd`
+
+Purpose:
+- GAME-012 confirmation and result modal for deleting an account or a never-registered
+  installation's local game data ([plan](ACCOUNT_DELETION_PLAN.md)).
+- Composes `scenes/ui/gameplay_modal_shell.tscn` (awning title, close button, cream content,
+  action row) at 520x760, safe-area fitted, with scrollable headline/body text.
+- Renders every `AccountDeletionService` state: account/local confirmation (orange Cancel plus a
+  red destructive confirm), progress, a not-deleted failure, unavailable explanations, the locked
+  **Not confirmed**, **Status unconfirmed** (with a support reference), **Finishing up**, and
+  **Status unknown** views, and the result with a green **Start New Game**.
+- Only the confirmation, failure, and unavailable views can be dismissed. Every other view hides
+  the close button and consumes `ui_cancel`, so Back never returns to an unsettled or deleted
+  account. Actions are disabled while a request runs.
+- **Get Help** opens a prefilled support e-mail carrying only the deletion reference, last server
+  correlation id, and public player id.
+
+Important nodes:
+- `%MessageScroll`, `%HeadlineLabel`, `%BodyLabel`, `%ReferenceLabel`: the message content.
+- `%PrimaryButton`, `%SecondaryButton`: reparented into the shell's action row; the primary switches
+  between the destructive and green primary styles per view.
+
+Verification: `tests/ui/test_account_deletion_modal.gd`; captures through
+`scripts/tools/captures/account_deletion_modal_setup.gd` (choose the view with
+`$env:SORTING_PUZZLE_CAPTURE_DELETION_VIEW`).
 
 ## `scenes/ui/support_faq_item.tscn`
 

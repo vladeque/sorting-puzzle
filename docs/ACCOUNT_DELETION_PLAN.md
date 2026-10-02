@@ -1,7 +1,8 @@
 # In-game account deletion implementation plan
 
-Status: **In progress.** Batches 1 (transport and contract adapter) and 2 (durable service and
-cleanup) are implemented; batches 3-5 are not started. The iOS bridge change is uncompiled.
+Status: **In progress.** Batches 1 (transport and contract adapter), 2 (durable service and
+cleanup), and 3 (Support and modal UI) are implemented; batch 4 (local-backend and device
+validation) is not started. The iOS bridge change is uncompiled.
 
 Date: 2026-10-02
 
@@ -275,6 +276,19 @@ must route unresolved/accepted phases to their dedicated result flow before its 
    cancellation, back handling, disabled duplicate taps, offline/error states, receipt/deadline,
    support fallback, and new-game action. Extend `tests/ui/test_support_screen.gd`; add modal and
    launch-router coverage, including restart directly after acceptance.
+   *Implemented 2026-10-03:* Support's Account section and `scenes/ui/account_deletion_modal.tscn`
+   (`scripts/account_deletion_modal.gd`), hosted by `scripts/production_main_menu.gd` from Support
+   and at launch. **Start New Game** changes to the main scene, so the fresh progress follows the
+   first-launch route into level 1. `scripts/support_contact.gd` now holds the shared support
+   e-mail route. Button labels are title case and fit the two-button row: **Delete Account**,
+   **Delete Data**, **Start New Game**, and **Get Help** stand in for this plan's longer suggestions.
+   `tests/ui/test_account_deletion_modal.gd` covers every view and action; the Support and
+   launch-router suites cover the entry point, a launch right after deletion, and the new game
+   reaching level 1. Captures of Support and ten modal views were reviewed at 540x960, 720x1280,
+   1080x1920, and 1080x2400, plus 1200x1600, which the window manager rendered as 900x1600. The
+   first account confirmation clipped its last line; the panel grew to 520x760 and the copy was
+   shortened. Because every Main Menu open calls `PlayerProgress.load_progress()`, the service now
+   reads its record and auto-resumes only once per process.
 4. **Disposable local-backend and mobile validation.** Delete dedicated test accounts; verify
    immediate revocation, replay of a lost 202, worker anonymization, and fresh-key guest bootstrap
    before worker execution. Verify Android/iOS key destruction, process death/background/resume,

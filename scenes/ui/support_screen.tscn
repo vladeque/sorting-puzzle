@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://scripts/support_screen.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/ui/destination_screen_shell.tscn" id="2_shell"]
@@ -27,6 +27,37 @@ shadow_size = 10
 shadow_offset = Vector2(0, 5)
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_scroll"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_account_action"]
+bg_color = Color(0.96, 0.9, 0.78, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(0.62, 0.16, 0.1, 0.8)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+content_margin_left = 22.0
+content_margin_right = 22.0
+shadow_color = Color(0.12, 0.025, 0.02, 0.32)
+shadow_size = 5
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_account_action_pressed"]
+bg_color = Color(1, 0.84, 0.74, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(0.62, 0.16, 0.1, 0.95)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+content_margin_left = 22.0
+content_margin_right = 22.0
 
 [node name="SupportScreen" type="Control"]
 layout_mode = 3
@@ -155,6 +186,39 @@ question = "How do I report a bad ad?"
 answer = "Collect a screenshot and details, then contact support."
 action_text = "Email Ad Report"
 action_id = &"report_ad"
+
+[node name="AccountSectionLabel" type="Label" parent="ContentMargin/ContentStack/FaqPanel/FaqScroll/FaqList"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+mouse_filter = 2
+theme_type_variation = &"GameBodyLabel"
+theme_override_colors/font_color = Color(1, 0.84, 0.57, 1)
+theme_override_colors/font_outline_color = Color(0.16, 0.03, 0.025, 0.94)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 22
+text = "Account"
+vertical_alignment = 1
+
+[node name="DeleteAccountButton" type="Button" parent="ContentMargin/ContentStack/FaqPanel/FaqScroll/FaqList"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 74)
+layout_mode = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_type_variation = &"GameBodyButton"
+theme_override_colors/font_color = Color(0.62, 0.13, 0.07, 1)
+theme_override_colors/font_pressed_color = Color(0.5, 0.08, 0.03, 1)
+theme_override_colors/font_hover_color = Color(0.62, 0.13, 0.07, 1)
+theme_override_constants/outline_size = 0
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("StyleBoxFlat_account_action")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_account_action_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_account_action")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_scroll")
+text = "Delete Account"
+alignment = 0
+script = ExtResource("4_press_scale")
+held_scale = 0.985
 
 [node name="FooterLabel" type="Label" parent="ContentMargin/ContentStack"]
 custom_minimum_size = Vector2(0, 30)

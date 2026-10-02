@@ -109,6 +109,12 @@ func hide_content_region() -> void:
 	_content_region.visible = false
 
 
+## Shows or hides the close action. A modal that must not be dismissed in its current state (for
+## example while an account deletion is unsettled) hides it and ignores `ui_cancel` itself.
+func set_close_available(available: bool) -> void:
+	_close_button.visible = available
+
+
 ## True while an open()/close() fade is in flight. Callers (scripts/level.gd's button handlers and
 ## its ui_cancel chain) should ignore duplicate navigation input until this clears.
 func is_transitioning() -> bool:

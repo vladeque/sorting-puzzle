@@ -227,7 +227,13 @@ emits `PlayerProgress.progress_replaced` (AdService reloads its pacing state).
 
 While a deletion blocks progress, `PlayerProgress._commit_current_state()`,
 `bind_registered_guest()`, `switch_to_player()`, and `sign_out()` refuse, and
-`AppLaunchRouter.get_first_level_to_start()` never auto-starts a level.
+`AppLaunchRouter.get_first_level_to_start()` never auto-starts a level. The Main Menu then opens
+`scenes/ui/account_deletion_modal.tscn` at launch, which cannot be dismissed until the deletion
+settles or the player starts a new game.
+
+Every Main Menu open calls `PlayerProgress.load_progress()`, so the service reads its record and
+auto-resumes only once per process. Later calls report the live state; a second read could replace
+an operation that is mid-send.
 
 ## Support and release verification
 

@@ -34,6 +34,8 @@ func _run() -> void:
 	await _test_zero_lives_opens_main_menu(progress)
 	await _test_beaten_first_level_opens_main_menu(progress)
 	await _test_disabled_first_level_start_opens_main_menu(progress)
+	# Last: it deletes this run's game data and starts a new identity.
+	await _test_finished_deletion_restores_the_result_then_new_game_starts_level_one(progress)
 
 	if _failures.is_empty():
 		print("App launch router verification passed.")
@@ -101,6 +103,74 @@ func _test_disabled_first_level_start_opens_main_menu(progress) -> void:
 	await _wait_frames(5)
 	_check_main_menu_opened("Turning the first-level start off opens the Main Menu on a fresh save.")
 	await _free_current_scene()
+
+
+## GAME-012: a launch straight after a finished deletion must not auto-start level 1. The Main Menu
+## restores the locked result, and Start New Game then follows the first-launch route.
+func _test_finished_deletion_restores_the_result_then_new_game_starts_level_one(progress) -> void:
+	progress.reset_progress()
+	var service = progress.get_account_deletion_service()
+	var state: Dictionary = await service.request_local_data_deletion()
+	_check(str(state.get("phase", "")) == "ready", "Test setup finishes a local data deletion.")
+	await _open_router()
+	await _wait_frames(10)
+	_check_main_menu_opened("A finished deletion opens the Main Menu instead of level 1.")
+	var menu := current_scene
+	var modal := _find_account_deletion_modal(menu)
+	_check(modal != null, "The Main Menu restores the deletion result at launch.")
+	if modal == null:
+		await _free_current_scene()
+		return
+	await create_timer(0.5).timeout
+	_check(not bool(modal.call("is_closable")), "The restored result cannot be dismissed.")
+	_check(
+		str((modal.call("get_view") as Dictionary).get("primary_text", "")) == "Start New Game",
+		"The restored result offers Start New Game."
+	)
+	(modal.get_node("%PrimaryButton") as Button).pressed.emit()
+	await process_frame
+	_check(
+		str(service.get_state().get("phase", "")) == "idle",
+		"Start New Game finishes the deletion before leaving the Main Menu."
+	)
+	# The menu swaps to the launch router first, whose deferred route then starts level 1.
+	await _wait_for_scene(LEVEL_SCENE)
+	var level := current_scene
+	_check(
+		level != null and level.scene_file_path == LEVEL_SCENE and int(level.get("selected_level")) == 1,
+		"Start New Game follows the first-launch route into level 1."
+	)
+	_check(not bool(progress.is_account_deletion_blocking()), "The new game is no longer blocked.")
+	_check(progress.get_coins() == 300, "The new game starts from initial progress.")
+	await _free_current_scene()
+	# This case ends the run. Let the launch's loading-screen and level animations finish before
+	# quit, or their pending tweens are reported as leaked instances.
+	await create_timer(1.0).timeout
+
+
+func _wait_for_scene(scene_path: String, timeout_seconds := 6.0) -> void:
+	var transition := root.get_node_or_null("LevelTransition")
+	var deadline := Time.get_ticks_msec() + int(timeout_seconds * 1000.0)
+	while Time.get_ticks_msec() < deadline:
+		if (
+			current_scene != null
+			and current_scene.scene_file_path == scene_path
+			and transition != null
+			and not bool(transition.call("is_transitioning"))
+		):
+			break
+		await process_frame
+	await process_frame
+
+
+func _find_account_deletion_modal(menu: Node) -> Node:
+	if menu == null:
+		return null
+	for child in menu.get_children():
+		var script := child.get_script() as Script
+		if script != null and script.resource_path == "res://scripts/account_deletion_modal.gd":
+			return child
+	return null
 
 
 func _open_router(start_unbeaten_first_level := true) -> Node:

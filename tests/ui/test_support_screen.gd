@@ -66,6 +66,28 @@ func _run() -> void:
 		"Invalid support-email settings fail closed."
 	)
 
+	# GAME-012: a visible account action after the FAQs that only asks the host to open the modal.
+	var delete_button := screen.get_node("%DeleteAccountButton") as Button
+	_check(delete_button != null and delete_button.visible, "Support shows an account deletion action.")
+	if delete_button != null:
+		_check(
+			delete_button.get_index() > report_item.get_index(),
+			"The account deletion action follows the FAQs."
+		)
+		_check(
+			delete_button.text == "Delete Game Data",
+			"A never-registered installation offers game data deletion."
+		)
+		var requested := [false]
+		screen.connect("account_deletion_requested", func() -> void: requested[0] = true)
+		delete_button.pressed.emit()
+		_check(requested[0], "The account action asks the host to open the deletion modal.")
+		var service = root.get_node("PlayerProgress").call("get_account_deletion_service")
+		_check(
+			str(service.get_state().get("phase", "")) == "idle",
+			"Tapping the account action deletes nothing by itself."
+		)
+
 	screen.queue_free()
 	await process_frame
 	if _failures.is_empty():

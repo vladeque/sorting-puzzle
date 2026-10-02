@@ -1,0 +1,134 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/account_deletion_modal.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/gameplay_modal_shell.tscn" id="2_shell"]
+[ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="3_press_scale"]
+[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_orange_utility_normal.tres" id="4_secondary_normal"]
+[ext_resource type="StyleBoxFlat" path="res://assets/themes/style_box_orange_utility_pressed.tres" id="5_secondary_pressed"]
+[ext_resource type="StyleBoxTexture" path="res://assets/themes/style_box_gameplay_destructive_action.tres" id="6_primary"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_plain"]
+
+[node name="AccountDeletionModal" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Shell" parent="." instance=ExtResource("2_shell")]
+unique_name_in_owner = true
+layout_mode = 1
+
+[node name="MessageContent" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ContentMargin" type="MarginContainer" parent="MessageContent"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 18
+
+[node name="MessageScroll" type="ScrollContainer" parent="MessageContent/ContentMargin"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxEmpty_plain")
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 3
+
+[node name="MessageStack" type="VBoxContainer" parent="MessageContent/ContentMargin/MessageScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
+
+[node name="HeadlineLabel" type="Label" parent="MessageContent/ContentMargin/MessageScroll/MessageStack"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"GameSmallLabel"
+theme_override_colors/font_color = Color(0.5, 0.12, 0.06, 1)
+theme_override_font_sizes/font_size = 26
+text = "Headline"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="BodyLabel" type="Label" parent="MessageContent/ContentMargin/MessageScroll/MessageStack"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"GameBodyLabel"
+theme_override_colors/font_color = Color(0.32, 0.14, 0.09, 1)
+theme_override_font_sizes/font_size = 21
+text = "Body"
+autowrap_mode = 3
+
+[node name="ReferenceLabel" type="Label" parent="MessageContent/ContentMargin/MessageScroll/MessageStack"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_type_variation = &"GameBodyLabel"
+theme_override_colors/font_color = Color(0.45, 0.3, 0.22, 1)
+theme_override_font_sizes/font_size = 17
+text = "Reference"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="SecondaryButton" type="Button" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 76)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_disabled_color = Color(1, 1, 1, 0.55)
+theme_override_colors/font_outline_color = Color(0.4, 0.15, 0.02, 0.9)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = ExtResource("4_secondary_normal")
+theme_override_styles/hover = ExtResource("4_secondary_normal")
+theme_override_styles/pressed = ExtResource("5_secondary_pressed")
+theme_override_styles/disabled = ExtResource("4_secondary_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_plain")
+text = "Cancel"
+script = ExtResource("3_press_scale")
+held_scale = 0.94
+
+[node name="PrimaryButton" type="Button" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 76)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_disabled_color = Color(1, 1, 1, 0.55)
+theme_override_colors/font_outline_color = Color(0.34, 0.02, 0.02, 0.95)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = ExtResource("6_primary")
+theme_override_styles/hover = ExtResource("6_primary")
+theme_override_styles/pressed = ExtResource("6_primary")
+theme_override_styles/disabled = ExtResource("6_primary")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_plain")
+text = "Delete Account"
+script = ExtResource("3_press_scale")
+held_scale = 0.94

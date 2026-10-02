@@ -4,6 +4,7 @@ const PROFILE_MENU_SCENE := preload("res://scenes/ui/profile_menu.tscn")
 const SETTINGS_MENU_SCENE := preload("res://scenes/ui/settings_menu.tscn")
 const LANGUAGE_SELECTION_MODAL_SCENE := preload("res://scenes/ui/language_selection_modal.tscn")
 const SUPPORT_SCREEN_SCENE := preload("res://scenes/ui/support_screen.tscn")
+const ACCOUNT_DELETION_MODAL_SCENE := preload("res://scenes/ui/account_deletion_modal.tscn")
 const REWARD_CHEST_MENU_SCENE := preload("res://scenes/ui/reward_chest_menu.tscn")
 const CHAPTER_SELECTION_SCENE := preload("res://scenes/ui/chapter_selection_screen.tscn")
 const SfxCatalogScript := preload("res://scripts/audio/sfx_catalog.gd")
@@ -71,6 +72,7 @@ var _profile_menu: Control
 var _settings_menu: Control
 var _language_selection_modal: Control
 var _support_screen: Control
+var _account_deletion_modal: Control
 var _reward_chest_menu: Control
 var _chapter_selection_screen: Control
 var _animated_reward_stars := 0
@@ -189,6 +191,9 @@ func _ready() -> void:
 			HapticsManager.play(HapticsCatalogScript.EVENT_LEADERBOARD_REWARD)
 	call_deferred("_prepare_rewarded_life")
 	call_deferred("_refresh_starter_bundle_offer")
+	if PlayerProgress.is_account_deletion_blocking():
+		# GAME-012: an unsettled or finished deletion resumes at launch, above everything else.
+		_open_account_deletion_modal.call_deferred()
 
 
 func _process(delta: float) -> void:
@@ -210,6 +215,9 @@ func _process(delta: float) -> void:
 ## "Back/ui_cancel Behavior").
 func _unhandled_input(event: InputEvent) -> void:
 	if not event.is_action_pressed("ui_cancel"):
+		return
+	# The account-deletion modal owns `ui_cancel` and never lets it reach anything beneath.
+	if is_instance_valid(_account_deletion_modal):
 		return
 	# Back behaves like a tap while the chest opens or a purchase reward plays: it advances the
 	# sequence instead of closing whatever overlay sits underneath it.
@@ -807,7 +815,31 @@ func _open_support_screen() -> void:
 		return
 	_support_screen = SUPPORT_SCREEN_SCENE.instantiate() as Control
 	_add_main_menu_overlay(_support_screen)
+	_support_screen.connect("account_deletion_requested", Callable(self, "_open_account_deletion_modal"))
 	_support_screen.tree_exited.connect(_clear_support_screen_reference)
+
+
+## GAME-012: opened from Support's account action, or at launch while a deletion blocks progress.
+func _open_account_deletion_modal() -> void:
+	if is_instance_valid(_account_deletion_modal):
+		return
+	_account_deletion_modal = ACCOUNT_DELETION_MODAL_SCENE.instantiate() as Control
+	_account_deletion_modal.z_index = MAIN_MENU_OVERLAY_Z_INDEX + 3
+	add_child(_account_deletion_modal)
+	_account_deletion_modal.connect("new_game_started", Callable(self, "_on_account_deletion_new_game_started"))
+	_account_deletion_modal.tree_exited.connect(_clear_account_deletion_modal_reference)
+
+
+## A new game after deletion follows the first-time launch route from the main scene, which starts
+## level 1 for the fresh progress. Nothing in this menu is reused for the new identity.
+func _on_account_deletion_new_game_started() -> void:
+	get_tree().change_scene_to_file(str(ProjectSettings.get_setting("application/run/main_scene", "")))
+
+
+func _clear_account_deletion_modal_reference() -> void:
+	_account_deletion_modal = null
+	if is_instance_valid(_support_screen):
+		_support_screen.call("refresh_account_action")
 
 
 func _open_reward_chest_menu() -> void:

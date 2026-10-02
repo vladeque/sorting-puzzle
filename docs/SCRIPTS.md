@@ -291,6 +291,11 @@ Key methods:
 - `_close_settings_menu()`: fades the settings popup out, then frees it.
 - `_open_support_screen()`: creates the full-screen native FAQ overlay above the still-open Settings
   modal so Back returns to the same Settings context.
+- `_open_account_deletion_modal()`: GAME-012. Opens `scenes/ui/account_deletion_modal.tscn` above
+  every overlay, from Support's account action or from `_ready()` when
+  `PlayerProgress.is_account_deletion_blocking()`. While it is open, `_unhandled_input()` leaves
+  `ui_cancel` to the modal. `_on_account_deletion_new_game_started()` changes to the project's main
+  scene, so the fresh progress follows the first-time launch route into level 1.
 - `_open_reward_chest_menu()`: creates the centered reward chest detail modal; the modal reads its own progress and wires its own close button.
 - `_add_main_menu_overlay(overlay)`: places a runtime modal on the shared overlay z-index, adds it
   to the production menu, and fades it in.
@@ -3556,10 +3561,40 @@ Attached to:
 - `scenes/ui/support_screen.tscn`
 
 Purpose:
-- Owns support-screen responsive layout, Back behavior, single-open accordion coordination, and
-  contact/ad-report `mailto:` construction.
-- Reads the replaceable `application/config/support_email` value and rejects malformed addresses
-  before asking the OS to open an email app.
+- Owns support-screen responsive layout, Back behavior, single-open accordion coordination, and the
+  contact/ad-report e-mail actions. `build_mailto_url()` and `is_safe_email()` delegate to
+  `scripts/support_contact.gd`.
+- GAME-012: `refresh_account_action()` labels `%DeleteAccountButton` from
+  `AccountDeletionService.get_availability()`, and the button emits `account_deletion_requested`.
+
+## `scripts/support_contact.gd`
+
+Class:
+- `SupportContact` (`RefCounted`, static helpers)
+
+Purpose:
+- Reads the replaceable `application/config/support_email`, rejects malformed addresses, builds the
+  prefilled `mailto:` URL, and asks the OS to open it. Shared by Support and the account-deletion
+  modal. Callers pass only non-secret text.
+
+## `scripts/account_deletion_modal.gd`
+
+Class:
+- `AccountDeletionModal`
+
+Attached to:
+- `scenes/ui/account_deletion_modal.tscn`
+
+Purpose:
+- GAME-012 view owner. `present(state, availability)` renders one service state and
+  `describe(state, availability)` returns its title, copy, reference, closability, and actions, so
+  tests and captures can drive any view directly. `refresh()` renders the live
+  `AccountDeletionService` (from `PlayerProgress`, or one passed to `setup()`), and re-renders on
+  its `state_changed`.
+- Actions: confirm (account or local flow), retry, contact support, close, and Start New Game, which
+  emits `new_game_started` once the service reports the new game is active.
+- `format_deadline(timestamp)` formats `complete_by` as a local calendar date. Formatted strings go
+  through `tr()` so future catalogs can translate them.
 
 ## `scripts/support_faq_item.gd`
 
@@ -3653,6 +3688,8 @@ Key methods:
   rather than stretching it with the outer shell; safe fitting still uniformly scales both.
 - `get_content_region()` / `get_action_row()`: the slots owning scenes reparent their own nodes into.
 - `hide_content_region()`: for modals that only need a title and action row.
+- `set_close_available(available)`: shows or hides the close button for states that must not be
+  dismissed (GAME-012's account-deletion modal); the owner also ignores `ui_cancel` then.
 - `is_transitioning()`: true while an `open()`/`close()` fade is in flight -- callers (button
   handlers, the `ui_cancel` chain) should ignore duplicate input until this clears.
 - `apply_safe_layout(safe_margins, viewport_size)`: centers the panel in the safe content rect and

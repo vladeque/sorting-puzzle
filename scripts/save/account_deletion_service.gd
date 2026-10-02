@@ -83,6 +83,8 @@ var _phase := PHASE_IDLE
 var _busy := false
 ## The latest attempt that left the account intact: `reason`, `code`, `correlation_id`.
 var _last_failure := {}
+var _record_loaded := false
+var _resumed := false
 
 
 func configure(host: Object, record_store = null) -> void:
@@ -90,9 +92,14 @@ func configure(host: Object, record_store = null) -> void:
 	_record_store = record_store if record_store != null else AccountDeletionRecordStoreScript.new()
 
 
-## Reads the persisted record. PlayerProgress calls this before it opens any save storage, then
-## asks requires_released_storage() and has_unsettled_request() how to start.
+## Reads the persisted record once per process. PlayerProgress calls this before it opens any save
+## storage, then asks requires_released_storage() and has_unsettled_request() how to start. Every
+## Main Menu open calls PlayerProgress.load_progress() again, so later calls only report the live
+## state; re-reading could replace an operation that is mid-send.
 func load_record() -> Dictionary:
+	if _record_loaded:
+		return get_state()
+	_record_loaded = true
 	_busy = false
 	_last_failure = {}
 	_record = {}
@@ -210,9 +217,14 @@ func request_registration_resolution() -> void:
 		bootstrap_service.request_registration()
 
 
-## Continues a persisted operation after startup: replays an unsettled send, finishes cleanup, or
-## completes a new-game activation the player already chose.
+## Continues a persisted operation after startup, once per process: replays an unsettled send,
+## finishes cleanup, or completes a new-game activation the player already chose. Later calls (from
+## each Main Menu open) only report the state; the player retries explicitly from the modal.
 func resume() -> void:
+	if _resumed or _busy:
+		state_changed.emit(get_state())
+		return
+	_resumed = true
 	match _phase:
 		PHASE_SUBMITTING, PHASE_RETRY_PENDING:
 			await retry()
