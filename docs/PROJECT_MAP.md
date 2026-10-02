@@ -110,6 +110,8 @@ Reusable item scene:
 ### Backend Planning
 
 Files:
+- `docs/GOOGLE_PLAY_INTERNAL_TESTING_ABSTRACT.md`
+- `docs/GOOGLE_PLAY_INTERNAL_TESTING_PLAN.md`
 - `docs/BACKEND_REQUIREMENTS.md`
 - `docs/LOCAL_BACKEND_INTEGRATION.md`
 - `docs/DEV_BACKEND_INTEGRATION_PLAN.md`
@@ -117,6 +119,7 @@ Files:
 - `docs/DEV_BACKEND_OWNER_TICKETS.md`
 
 Responsibility:
+- Records the dated game/backend release audit and the owner-confirmed path to Google Play internal testing: gameplay and deployed guest save sync first, with platform integrations deferred.
 - Defines the approved production backend requirements for identity, authoritative progression and economy, offline synchronization, Shop offers and purchases, leaderboards, profile moderation, privacy, administration, operations, testing, and phased implementation.
 - Records confirmed product decisions and the remaining policies that must be finalized during the protocol-design phase.
 - Separates the completed/in-progress local Android integration from the planned deployed
