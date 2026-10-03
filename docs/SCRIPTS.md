@@ -1396,11 +1396,22 @@ Purpose:
   semantic ids while mapping them to device-tuned selection, impact, success, and warning effects.
 - See `docs/HAPTICS.md` for the complete event policy and physical-device verification boundary.
 
+## `scripts/testing/music_loop_preview.gd`
+
+Attached to `scenes/testing/music_loop_preview.tscn`, a standalone F6 listening preview. Plays
+`scenes/audio/level_soundtrack.tscn` from five seconds before its end or from the beginning, displays
+the decoder's actual loop count and position, and supports pause/resume/stop. The game autoload
+stays suspended; preview controls do not write preferences/progress and suppress generic clicks.
+`scripts/tools/preview_level_music.ps1` launches the scene with isolated user data.
+`tests/audio/test_music_loop_preview.gd` covers native looping and the transport/save boundary.
+See `docs/LEVEL_MUSIC.md` for listening instructions.
+
 ## `scripts/audio/music_manager.gd`
 
 Registered as the `MusicManager` scene autoload (`scenes/audio/music_manager.tscn`) after
 `PlayerProgress`. Owns one persistent soundtrack decoder, native looping, the saved Music gate,
-and application/capture suspension. Reads the current level's `is_background_music_allowed()`
+and application/capture suspension. Its `Soundtrack` child instances the shared production player
+scene, `scenes/audio/level_soundtrack.tscn`. Reads the current level's `is_background_music_allowed()`
 state, so loading, pause/modal, result, and menu screens suspend the stream. Restart and next-level
 scene replacements resume its existing position. `scripts/pause_menu.gd` refreshes the saved toggle
 immediately; the frame check also observes restored preferences. It never uses the SFX pool.

@@ -1,0 +1,226 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/testing/music_loop_preview.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/audio/level_soundtrack.tscn" id="2_soundtrack"]
+[ext_resource type="Texture2D" path="res://assets/ui/icon_music.png" id="3_music_icon"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_card"]
+content_margin_left = 28.0
+content_margin_top = 28.0
+content_margin_right = 28.0
+content_margin_bottom = 28.0
+bg_color = Color(0.105, 0.137, 0.255, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.337, 0.443, 0.729, 0.9)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_left = 24
+corner_radius_bottom_right = 24
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_primary"]
+bg_color = Color(0.24, 0.56, 0.38, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_left = 16
+corner_radius_bottom_right = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_secondary"]
+bg_color = Color(0.22, 0.267, 0.42, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_left = 14
+corner_radius_bottom_right = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_track"]
+bg_color = Color(0.05, 0.07, 0.16, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_left = 6
+corner_radius_bottom_right = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_fill"]
+bg_color = Color(1, 0.82, 0.36, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_left = 6
+corner_radius_bottom_right = 6
+
+[node name="MusicLoopPreview" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Soundtrack" parent="." instance=ExtResource("2_soundtrack")]
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.047, 0.063, 0.137, 1)
+
+[node name="SafeMargin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 24
+
+[node name="Scroll" type="ScrollContainer" parent="SafeMargin"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="Content" type="VBoxContainer" parent="SafeMargin/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Icon" type="TextureRect" parent="SafeMargin/Scroll/Content"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("3_music_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Title" type="Label" parent="SafeMargin/Scroll/Content"]
+layout_mode = 2
+theme_type_variation = &"GameTitleLabel"
+theme_override_colors/font_color = Color(1, 0.88, 0.37, 1)
+theme_override_font_sizes/font_size = 36
+text = "Music loop preview"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="TrackTitle" type="Label" parent="SafeMargin/Scroll/Content"]
+layout_mode = 2
+theme_type_variation = &"GameBodyLabel"
+theme_override_colors/font_color = Color(0.79, 0.84, 1, 1)
+theme_override_font_sizes/font_size = 22
+text = "Corner Shop Sorting Loop"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Card" type="PanelContainer" parent="SafeMargin/Scroll/Content"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBox_card")
+
+[node name="Player" type="VBoxContainer" parent="SafeMargin/Scroll/Content/Card"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="PhaseLabel" type="Label" parent="SafeMargin/Scroll/Content/Card/Player"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 74)
+layout_mode = 2
+theme_type_variation = &"GameSectionLabel"
+theme_override_font_sizes/font_size = 28
+text = "Ready to listen"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="PositionLabel" type="Label" parent="SafeMargin/Scroll/Content/Card/Player"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"GameSectionLabel"
+theme_override_font_sizes/font_size = 32
+text = "00:00.00 / 02:29.08"
+horizontal_alignment = 1
+
+[node name="Timeline" type="ProgressBar" parent="SafeMargin/Scroll/Content/Card/Player"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 12)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/background = SubResource("StyleBox_track")
+theme_override_styles/fill = SubResource("StyleBox_fill")
+show_percentage = false
+
+[node name="LoopLabel" type="Label" parent="SafeMargin/Scroll/Content/Card/Player"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"GameBodyLabel"
+theme_override_colors/font_color = Color(0.79, 0.84, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "Loop start: 00:22.32  |  Loops heard: 0"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="SeamButton" type="Button" parent="SafeMargin/Scroll/Content/Card/Player"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 76)
+layout_mode = 2
+theme_type_variation = &"GameButton"
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBox_primary")
+theme_override_styles/hover = SubResource("StyleBox_primary")
+theme_override_styles/pressed = SubResource("StyleBox_primary")
+text = "Play loop seam"
+
+[node name="Transport" type="HBoxContainer" parent="SafeMargin/Scroll/Content/Card/Player"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BeginningButton" type="Button" parent="SafeMargin/Scroll/Content/Card/Player/Transport"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"GameButton"
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("StyleBox_secondary")
+theme_override_styles/hover = SubResource("StyleBox_secondary")
+theme_override_styles/pressed = SubResource("StyleBox_secondary")
+text = "From beginning"
+
+[node name="PauseButton" type="Button" parent="SafeMargin/Scroll/Content/Card/Player/Transport"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"GameButton"
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("StyleBox_secondary")
+theme_override_styles/hover = SubResource("StyleBox_secondary")
+theme_override_styles/pressed = SubResource("StyleBox_secondary")
+text = "Pause"
+
+[node name="StopButton" type="Button" parent="SafeMargin/Scroll/Content/Card/Player/Transport"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"GameButton"
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("StyleBox_secondary")
+theme_override_styles/hover = SubResource("StyleBox_secondary")
+theme_override_styles/pressed = SubResource("StyleBox_secondary")
+text = "Stop"
+
+[node name="Instructions" type="Label" parent="SafeMargin/Scroll/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"GameBodyLabel"
+theme_override_colors/font_color = Color(0.79, 0.84, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "Play loop seam starts 5 seconds before the end. Listen as the music continues at the loop start, then replay the seam whenever you like."
+horizontal_alignment = 1
+autowrap_mode = 2

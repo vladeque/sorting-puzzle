@@ -1,8 +1,37 @@
 # Level soundtrack
 
 `MusicManager` is a scene autoload registered after `PlayerProgress` in `project.godot`.
-`scenes/audio/music_manager.tscn` owns one `AudioStreamPlayer`, its stream, its background mix trim,
-and its `Music` bus routing. `scripts/audio/music_manager.gd` owns the playback lifecycle.
+`scenes/audio/music_manager.tscn` instances one `scenes/audio/level_soundtrack.tscn` player, which
+owns the stream, background mix trim, and `Music` bus routing. `scripts/audio/music_manager.gd`
+owns the playback lifecycle. The listening preview reuses that same player scene.
+
+## Listen to the loop
+
+Open `scenes/testing/music_loop_preview.tscn` in Godot and run the current scene with **F6**.
+Or launch it from PowerShell at the repository root, with disposable user data:
+
+```powershell
+& .\scripts\tools\preview_level_music.ps1
+```
+
+Press **Play loop seam** to begin five seconds before the end. Listen through the crossfade and
+the native wrap to 00:22.32. The countdown changes to **Loop passed — music continues**, and the
+loop counter increments. Press **Play loop seam** again to repeat that listening window.
+**From beginning** includes the intro; **Pause/Resume** preserves position; **Stop** ends playback.
+The preview waits for a Play press and uses the game's actual player resource and mix gain.
+
+`scripts/testing/music_loop_preview.gd` owns only the developer preview's transport and display.
+Its independent player lets it play with the saved Music setting Off and leaves the paused game
+autoload's position unchanged. Preview buttons suppress generic clicks so the soundtrack can be
+heard alone. No preferences or progress are written by preview controls. Closing the window ends
+the isolated launcher and cleans up its disposable project/save.
+
+`tests/audio/test_music_loop_preview.gd` verifies native loop confirmation, shared stream/gain,
+pause/resume/stop, silent controls, and unchanged saved settings/progression. Capture the ready
+screen with `capture_ui.ps1 -Scene scenes/testing/music_loop_preview.tscn -Name music_loop_preview`.
+For the post-wrap state and an expanded tablet viewport, also pass
+`-Setup scripts/tools/captures/music_loop_preview_setup.gd`. The setup mutes the bus, listens through
+one actual native wrap, and freezes its display for screenshots.
 
 ## Playback behavior
 

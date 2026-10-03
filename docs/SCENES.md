@@ -232,10 +232,19 @@ navigation guard.
 ## Level soundtrack scene
 
 `scenes/audio/music_manager.tscn` is the persistent `MusicManager` autoload. Its single
-`Soundtrack` player uses the prepared Corner Shop Ogg, a scene-authored -7 dB trim, and the `Music`
-bus to Master. The scene has no visual hierarchy. `scripts/audio/music_manager.gd` reads the current
+`Soundtrack` child instances `scenes/audio/level_soundtrack.tscn`, which owns the prepared Corner
+Shop Ogg, -7 dB trim, and `Music` bus routing to Master. These audio scenes have no visual hierarchy.
+`scripts/audio/music_manager.gd` reads the current
 level's playback gate; pause, loading, results, and non-level scenes suspend the same decoder.
 Restart and next level preserve position. See `docs/LEVEL_MUSIC.md` for the native loop and mix policy.
+
+`scenes/testing/music_loop_preview.tscn` is the standalone F6 listening screen. Its responsive
+container layout owns the title, countdown, position bar, loop counter, Play loop seam, From
+beginning, Pause/Resume, and Stop controls. It instances the same soundtrack player for independent
+preview playback and never enables the game autoload on a non-level scene. The primary button
+starts five seconds before the native loop, so listeners hear its crossfade and continuation quickly.
+`scripts/testing/music_loop_preview.gd` owns transport and status; the preview's buttons are silent.
+Run `scripts/tools/preview_level_music.ps1` for a windowed session with disposable user data.
 
 ## Shared Sound-Effect Roles (AUDIO-001)
 

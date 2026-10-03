@@ -82,6 +82,10 @@ Level music:
 - The prepared `assets/audio/music/corner_shop_sorting_loop.ogg` loops natively at 22.32 seconds;
   its manifest and `scripts/tools/prepare_level_music.py` record the reviewed WAV preparation.
 - See [LEVEL_MUSIC.md](LEVEL_MUSIC.md) for the mix policy, ownership, and verification.
+- `scenes/audio/level_soundtrack.tscn` owns the shared stream, volume, and routing for production
+  and `scenes/testing/music_loop_preview.tscn`, a standalone F6 scene for hearing the native seam.
+  `scripts/testing/music_loop_preview.gd` owns its countdown, loop counter, and transport;
+  `scripts/tools/preview_level_music.ps1` launches it with isolated user data.
 
 Ad infrastructure:
 - `scripts/ads/*.gd`
