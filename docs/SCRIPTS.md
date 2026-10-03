@@ -2100,6 +2100,37 @@ Purpose:
 - Refuses to start on an occupied API port. `-ApiPort` selects another host port while Android
   continues to use `127.0.0.1:8080` through an adjusted `adb reverse` mapping.
 
+## `scripts/tools/run_local_backend_account_deletion_check.ps1`
+
+Purpose:
+- GAME-012 batch 4 runner ([plan](ACCOUNT_DELETION_PLAN.md)). Starts the backend's PostgreSQL,
+  recreates the disposable `sorting_puzzle_game010`, writes throwaway secrets under
+  `local-secrets/game012`, bootstraps the development publication, builds and starts the API, runs
+  `local_backend_account_deletion_check.mjs` before and after one worker execution, and with
+  `-Android` exports the debug APK while the regenerated client manifest is in place.
+- Restores the two provenance files `pnpm bootstrap:local` rewrites (this repo's
+  `configs/backend/content_provenance.json` and the backend's
+  `contracts/configuration/v1/development-client-provenance.json`) and any local debug config.
+- `-GameRoot` targets another checkout, such as a clean worktree at HEAD beside a backend worktree,
+  when uncommitted work in the active checkouts makes the backend's pinned launch candidate stale.
+  `-KeepRunning` leaves the API and database up for device checks; `-CleanupOnly` stops the API
+  recorded in `build/game012/api.pid`, drops the database, and removes the secrets.
+- Waits for `godot.exe` with `Start-Process -Wait`: it is a GUI-subsystem binary, so `&` returns
+  before the export finishes.
+
+## `scripts/tools/local_backend_account_deletion_check.mjs`
+
+Purpose:
+- Real-protocol GAME-012 server checks with throwaway P-256 installation keys. `before-worker`:
+  `DELETE /v1/player/account` acceptance and receipt, immediate access/refresh revocation, exact
+  replay of the stored 202, `idempotency.key_reused`, a new-key status read, refusal of the deleted
+  installation's key, and a fresh key bootstrapping a new guest. `after-worker` (database checks
+  through `docker compose exec postgres psql`): completed request, anonymized tombstone and profile,
+  anonymized devices, untouched unrelated guest, and the old key never resuming the deleted player.
+- The backend allows one new player per installation key per 24 hours, so the old key cannot start
+  a replacement player either; the client always discards it for a fresh key on a new game.
+- Never prints tokens, signatures, or private keys.
+
 ## `tests/backend/test_game_010.gd`
 
 Purpose:

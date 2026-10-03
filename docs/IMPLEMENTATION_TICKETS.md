@@ -333,6 +333,12 @@ against the real backend — exactly what this ticket exists to do.
   or a native `nc`-based reproduction) before those tickets attempt device verification.
 - `scripts/tools/android_local_backend_identity_smoke_check.ps1` automates the intended proof
   (bootstrap + kill/restart) once the above is resolved.
+- Retest on 2026-10-03 (GAME-012, API-36 emulator): the server logged `200` for a bootstrap whose
+  response never reached the client, so the request is delivered and only the response is lost.
+  Over `adb reverse` the first bootstrap was lost; over `http://10.0.2.2:8080` one bootstrap
+  succeeded and a later one was lost. A relaunch replayed the persisted bootstrap with its
+  idempotency key and bound the player, as designed. The issue is therefore not specific to
+  `adb reverse`.
 
 ## GAME-005 — Prove protocol-v2 save synchronization against PostgreSQL
 
@@ -805,9 +811,9 @@ client v2.1 goldens while retaining the sibling backend's v2.0 compatibility man
 ## GAME-012 — Add in-game account deletion through Support
 
 **Type:** Product/Privacy
-**Status:** In progress — batches 1 (DELETE transport and v1.3 adapter), 2 (durable service,
-cleanup, native key destruction), and 3 (Support action and deletion modal) implemented
-2026-10-03; iOS bridge uncompiled; local-backend and device validation not started
+**Status:** Implemented 2026-10-03 and validated against a disposable local backend and the
+Android emulator. Release gates remain: iOS bridge compile/device test, a physical Android device,
+scheduled deletion worker, real support e-mail, and a regenerated backend launch candidate
 **Plan:** [`ACCOUNT_DELETION_PLAN.md`](ACCOUNT_DELETION_PLAN.md)
 **Backend dependency:** [`BE-607`](../../sorting-puzzle-backend/docs/ACCOUNT_DELETION.md),
 implemented in sibling commit `24e18d6`.

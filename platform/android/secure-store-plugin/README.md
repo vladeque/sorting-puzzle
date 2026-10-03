@@ -107,8 +107,11 @@ Package `plugin/build/outputs/aar/SortingPuzzleSecureStoreBridge-release.aar` th
 must still be called before synchronization with the public installation UUID. GAME-012 adds a
 device check that `destroy_installation_key()` removes the key (a later public-key read returns an
 empty value) and survives process death between key removal and the next launch. The AAR built on
-2026-10-03 exports `destroy_installation_key` (checked with `javap`), but it has not yet run on a
-device. Device verification
+2026-10-03 exports `destroy_installation_key` (checked with `javap`), and on the API-36 emulator a
+deletion removed the stored installation id and session entries and a new game registered a
+different key; a physical device is still unverified. Godot's `JNISingleton` does not report
+plugin methods through `has_method()`, so callers check `has_java_method()` (see
+`SecureSessionStore._bridge_has_method()`). Device verification
 must confirm key persistence across process death/reboot, session ciphertext unreadability outside
 the app, signature verification against the registered public key, and expected loss of local keys
 after uninstall.

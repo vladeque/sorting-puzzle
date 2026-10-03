@@ -475,6 +475,8 @@ Files:
   `tests/ui/test_support_screen.gd`, `tests/ui/test_app_launch_router.gd`
 - `scripts/tools/captures/account_deletion_modal_setup.gd`,
   `scripts/tools/captures/support_account_action_setup.gd`
+- `scripts/tools/run_local_backend_account_deletion_check.ps1`,
+  `scripts/tools/local_backend_account_deletion_check.mjs` (disposable local-backend validation)
 
 Responsibility:
 - Durable state machine for deleting a registered account (`DELETE /v1/player/account`) or a

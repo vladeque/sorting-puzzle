@@ -1,8 +1,9 @@
 # In-game account deletion implementation plan
 
-Status: **In progress.** Batches 1 (transport and contract adapter), 2 (durable service and
-cleanup), and 3 (Support and modal UI) are implemented; batch 4 (local-backend and device
-validation) is not started. The iOS bridge change is uncompiled.
+Status: **Implemented; Android emulator and local-backend validation done.** Batches 1-4 are
+complete. Open release gates: compile and device-test the iOS Keychain bridge, test on a physical
+Android device, schedule the backend deletion worker, configure a real support e-mail, and commit a
+regenerated backend launch candidate (see batch 4).
 
 Date: 2026-10-02
 
@@ -295,6 +296,41 @@ must route unresolved/accepted phases to their dedicated result flow before its 
    local cleanup, fresh registration, and platform re-sign-in where those adapters are available.
    Cover proven local-only deletion without HTTP and guest-registration response loss that must
    not be misclassified as local-only data.
+   *Validated 2026-10-03* with `scripts/tools/run_local_backend_account_deletion_check.ps1` against
+   backend `0677a03` and game `e9b278f`, plus the `sorting-puzzle-api36` Android emulator:
+   - Server (`local_backend_account_deletion_check.mjs`, real P-256 guests): 202 receipt with a
+     30-day `complete_by` and a state version advanced by one; the deleted session's access and
+     refresh tokens rejected at once; an exact replay returning the stored 202; a different body
+     under the same key returning `idempotency.key_reused`; a new key reading the existing request;
+     the deleted installation's key refused (`401 auth.guest_proof_invalid`) under its own and a new
+     device id; a fresh key bootstrapping a new guest before the worker; and after one worker run a
+     completed request, an anonymized tombstone with the **Deleted Player** profile, anonymized
+     devices, an untouched unrelated guest, and an old key that never resumes the deleted player.
+   - Android account flow through the real Support UI: acceptance with the deadline shown, the
+     server player `deletion_pending` with no active sessions, `files/save_v2/` emptied, identity
+     and namespace files and the secure-store `installation_id` and session entries removed, the
+     locked result restored after force-stop and after background/resume, and **Start New Game**
+     creating a new device id, installation key, and guest that registered as a different player.
+     The worker then anonymized the deleted player and destroyed its device's key and binding.
+   - Android local flow with the API stopped: **Delete Game Data** offered for an installation
+     still at the challenge phase, deleted without any request, then a fresh identity.
+   - Registration response loss: the emulator lost a bootstrap response the server had applied.
+     Support still offered account deletion (never local data), and a relaunch replayed the same
+     bootstrap and bound the player.
+   - Device validation found that Android's `JNISingleton` hides plugin methods from
+     `has_method()`, which made every Android build report deletion as unavailable. Fixed in
+     `e9b278f` (`SecureSessionStore._bridge_has_method()` falls back to `has_java_method()`).
+   - Godot exits on Android Back by default (`application/config/quit_on_go_back`), so Back from
+     the locked modal closes the app rather than staying on the modal; the next launch restores it.
+   - The emulator's `HTTPRequest` POST-response loss (GAME-004/GAME-010) also happens over
+     `http://10.0.2.2:8080`, not only `adb reverse`, but less often; the deletion request itself
+     completed on the first try.
+   - The backend's pinned launch candidate is stale for committed game sources (`scripts/level.gd`,
+     `configs/levels/level_020.json`, `scripts/tools/generate_level_shelves.py`), so
+     `pnpm bootstrap:local` refuses to run. Validation regenerated it only inside a disposable
+     backend worktree; the backend repository needs its own regenerated, committed candidate.
+   Not covered: a physical device, iOS (the Keychain bridge is uncompiled), and platform re-sign-in
+   (no client adapter exists yet).
 5. **Documentation and commits.** Update `CLOUD_SAVE.md`, `SCENES.md`, `SCRIPTS.md`, `PROJECT_MAP.md`,
    this plan/ticket, and both native bridge READMEs. Commit each meaningful implementation batch.
 
