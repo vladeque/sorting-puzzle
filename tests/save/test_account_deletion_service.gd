@@ -92,6 +92,14 @@ class FakeBridge:
 		return true
 
 
+## Like Android's JNISingleton: has_method() never sees the plugin's Java methods.
+class JniLikeBridge:
+	extends RefCounted
+
+	func has_java_method(method_name: String) -> bool:
+		return method_name == "destroy_installation_key"
+
+
 class FakeTransport:
 	extends BackendTransportScript
 	var get_queue := []
@@ -523,6 +531,16 @@ func _check_unsupported_build_is_unavailable() -> void:
 	var store := SecureSessionStoreScript.new()
 	_check(not store.supports_installation_destruction(), "a bridge without key destruction is unsupported")
 	Engine.unregister_singleton("AccountDeletionLimitedBridge")
+
+	# The Android plugin singleton reports its Java methods only through has_java_method().
+	var jni_like := JniLikeBridge.new()
+	Engine.register_singleton("AccountDeletionJniLikeBridge", jni_like)
+	ProjectSettings.set_setting(BRIDGE_SETTING, "AccountDeletionJniLikeBridge")
+	_check(
+		SecureSessionStoreScript.new().supports_installation_destruction(),
+		"an Android-style bridge that only reports the method through has_java_method is supported"
+	)
+	Engine.unregister_singleton("AccountDeletionJniLikeBridge")
 	ProjectSettings.set_setting(BRIDGE_SETTING, BRIDGE_NAME)
 
 

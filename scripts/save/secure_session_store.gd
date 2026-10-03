@@ -166,7 +166,7 @@ func clear_session(player_id: String) -> Dictionary:
 func supports_installation_destruction() -> bool:
 	var bridge := _resolved_bridge()
 	if bridge != null:
-		return bridge.has_method("destroy_installation_key")
+		return _bridge_has_method(bridge, "destroy_installation_key")
 	return OS.get_name() != "Android" and OS.get_name() != "iOS"
 
 
@@ -180,7 +180,7 @@ func destroy_installation_identity(installation_id: String) -> Dictionary:
 		return _error("Installation id is invalid.")
 	var bridge := _resolved_bridge()
 	if bridge != null:
-		if not bridge.has_method("destroy_installation_key"):
+		if not _bridge_has_method(bridge, "destroy_installation_key"):
 			return _error("This build cannot remove the secure installation key.")
 		var result := _normalize_bridge_result(
 			bridge.call("destroy_installation_key", installation_id),
@@ -205,6 +205,15 @@ func destroy_installation_identity(installation_id: String) -> Dictionary:
 
 func _resolved_bridge() -> Object:
 	return _bridge if _bridge != null else _find_bridge()
+
+
+## Whether `bridge` exposes `method_name`. The iOS bridge binds its methods in ClassDB, so
+## has_method() sees them. The Android plugin singleton is a JNISingleton, whose Java methods
+## has_method() never reports; its script-bound has_java_method() does.
+static func _bridge_has_method(bridge: Object, method_name: String) -> bool:
+	if bridge.has_method(method_name):
+		return true
+	return bridge.has_method("has_java_method") and bool(bridge.call("has_java_method", method_name))
 
 
 ## The valid installation id a public identity file names, or "" for a missing, torn, or invalid
