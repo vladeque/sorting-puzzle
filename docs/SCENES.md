@@ -229,6 +229,14 @@ Leaderboard scope switching and Shop reloads/purchase-dialog dismissal leaving n
 state, the reward-chest flight's star art and untouched `PlayerProgress` values, and the duplicate
 navigation guard.
 
+## Level soundtrack scene
+
+`scenes/audio/music_manager.tscn` is the persistent `MusicManager` autoload. Its single
+`Soundtrack` player uses the prepared Corner Shop Ogg, a scene-authored -7 dB trim, and the `Music`
+bus to Master. The scene has no visual hierarchy. `scripts/audio/music_manager.gd` reads the current
+level's playback gate; pause, loading, results, and non-level scenes suspend the same decoder.
+Restart and next level preserve position. See `docs/LEVEL_MUSIC.md` for the native loop and mix policy.
+
 ## Shared Sound-Effect Roles (AUDIO-001)
 
 Sound effects are owned globally, not by scenes. The `SfxManager` autoload

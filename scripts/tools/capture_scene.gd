@@ -58,6 +58,9 @@ func _run() -> void:
 	var sfx_manager := root.get_node_or_null(^"SfxManager")
 	if sfx_manager != null:
 		sfx_manager.call("set_muted", true)
+	var music_manager := root.get_node_or_null(^"MusicManager")
+	if music_manager != null:
+		music_manager.call("set_muted", true)
 	var haptics_manager := root.get_node_or_null(^"HapticsManager")
 	if haptics_manager != null:
 		haptics_manager.call("set_muted", true)

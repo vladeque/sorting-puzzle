@@ -704,6 +704,20 @@ func _stop_sound_effects() -> void:
 	SfxManager.stop_all()
 
 
+## MusicManager keeps playback across scene changes and reads this gate for every gameplay pause
+## path, including loading, results, in-level modals, and application interruption.
+func is_background_music_allowed() -> bool:
+	return (
+		_level_config_error.is_empty()
+		and not _loading_transition_pending
+		and not _level_paused
+		and not _level_failed
+		and not _level_completed
+		and not _app_interrupted
+		and not _returning_to_menu
+	)
+
+
 func _process(delta: float) -> void:
 	_refresh_dispenser_availability()
 	_refresh_gameplay_tip()

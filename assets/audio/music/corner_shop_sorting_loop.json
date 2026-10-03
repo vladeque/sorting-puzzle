@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "source_file": "Corner Shop Sorting Loop.wav",
+  "source_sha256": "64baea9e2f3211a161264d0505fd6ccd42f292632065eab95a183c4e1e01be59",
+  "source_duration_seconds": 167.89333333333335,
+  "path": "res://assets/audio/music/corner_shop_sorting_loop.ogg",
+  "sha256": "ae795180186d45fee045b61c6cbdaf22688b0b5367c9623d52a6aaa1b4215fa7",
+  "file_size_bytes": 2691575,
+  "sample_rate": 48000,
+  "channels": 2,
+  "vorbis_quality": 5,
+  "duration_seconds": 149.08,
+  "loop_offset_seconds": 22.32,
+  "loop_period_seconds": 126.76,
+  "crossfade_seconds": 2.0,
+  "crossfade_curve": "raised cosine, complementary gains",
+  "highpass_hz": 20,
+  "source_gain_db": -4.0,
+  "decoded_measurements": {
+    "integrated_lufs": -19.78,
+    "true_peak_dbtp": -4.17,
+    "rms_dbfs": -20.9,
+    "sample_peak_dbfs": -4.2,
+    "max_m_lufs": -15.7
+  }
+}

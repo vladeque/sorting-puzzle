@@ -4,7 +4,9 @@
 
 This is the required authoring, measurement, cataloguing, and verification standard for every
 sound effect in `assets/audio/`. It applies to new cues, replacements, derivatives, and changes to
-catalog gain. Music and voice require their own mix policies before they are introduced.
+catalog gain. Music uses the separate background mix policy in `docs/LEVEL_MUSIC.md`; voice
+requires its own mix policy before it is introduced. The complete audio measurement inventory
+also includes music, without assigning it a semantic SFX loudness class.
 
 The machine-readable values live in `scripts/audio/sfx_loudness_standard.gd`. The human-readable
 document and that script must change together.
@@ -124,4 +126,6 @@ normal run fails when a file hash no longer matches the committed measurement sn
 
 `scripts/audio/sfx_manager.gd` is the sole runtime playback owner. All players route to the `SFX`
 bus, which sends to Master. `assets/audio/default_bus_layout.tres` owns the Master limiter;
-individual scenes must not add private limiters or bypass `SfxManager`.
+individual scenes must not add private limiters or bypass `SfxManager` for sound effects.
+`scenes/audio/music_manager.tscn` is the separate persistent music owner and routes its player
+through the `Music` bus to the same Master limiter; see `docs/LEVEL_MUSIC.md`.

@@ -1396,6 +1396,21 @@ Purpose:
   semantic ids while mapping them to device-tuned selection, impact, success, and warning effects.
 - See `docs/HAPTICS.md` for the complete event policy and physical-device verification boundary.
 
+## `scripts/audio/music_manager.gd`
+
+Registered as the `MusicManager` scene autoload (`scenes/audio/music_manager.tscn`) after
+`PlayerProgress`. Owns one persistent soundtrack decoder, native looping, the saved Music gate,
+and application/capture suspension. Reads the current level's `is_background_music_allowed()`
+state, so loading, pause/modal, result, and menu screens suspend the stream. Restart and next-level
+scene replacements resume its existing position. `scripts/pause_menu.gd` refreshes the saved toggle
+immediately; the frame check also observes restored preferences. It never uses the SFX pool.
+
+`scripts/tools/prepare_level_music.py` prepares the supplied WAV's matched-phrase crossfade and
+Vorbis derivative, recording source/output hashes and decoded measurements.
+`tests/audio/test_music_manager.gd` covers actual pause/settings/menu/level transitions, position
+preservation, independent SFX settings, native looping, and the background gain policy.
+See `docs/LEVEL_MUSIC.md` for loop boundaries, mix targets, and rebuild instructions.
+
 ## `scripts/audio/sfx_manager.gd`
 
 Registered as:

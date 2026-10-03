@@ -74,6 +74,15 @@ Sound effects:
 - The only playback owner for shared sound effects; every screen reaches it through
   `SfxManager.play(event_id, context)`.
 
+Level music:
+- `scenes/audio/music_manager.tscn` and `scripts/audio/music_manager.gd`
+- Registered as the `MusicManager` autoload after `PlayerProgress`, with one persistent player.
+- `scripts/level.gd::is_background_music_allowed()` gates active gameplay. Pauses, results,
+  loading, and menu visits suspend playback; restart and next-level scenes retain its position.
+- The prepared `assets/audio/music/corner_shop_sorting_loop.ogg` loops natively at 22.32 seconds;
+  its manifest and `scripts/tools/prepare_level_music.py` record the reviewed WAV preparation.
+- See [LEVEL_MUSIC.md](LEVEL_MUSIC.md) for the mix policy, ownership, and verification.
+
 Ad infrastructure:
 - `scripts/ads/*.gd`
 - `configs/ads.json`

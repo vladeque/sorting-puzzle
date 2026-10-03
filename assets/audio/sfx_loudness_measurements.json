@@ -163,6 +163,16 @@
       "sample_peak_dbfs": -1.5
     },
     {
+      "path": "res://assets/audio/music/corner_shop_sorting_loop.ogg",
+      "sha256": "ae795180186d45fee045b61c6cbdaf22688b0b5367c9623d52a6aaa1b4215fa7",
+      "duration_seconds": 149.08,
+      "integrated_lufs": -19.78,
+      "true_peak_dbtp": -4.17,
+      "rms_dbfs": -20.9,
+      "sample_peak_dbfs": -4.2,
+      "max_m_lufs": -15.7
+    },
+    {
       "path": "res://assets/audio/reward_chest_star_arrival/reward_chest_star_arrival_01.wav",
       "sha256": "b3bb3743befdd5b765658f3fe677cfe663bc3bc9acb594f4dd5b1b1ba977310f",
       "duration_seconds": 0.391,

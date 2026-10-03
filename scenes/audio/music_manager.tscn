@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/audio/music_manager.gd" id="1_script"]
+[ext_resource type="AudioStream" path="res://assets/audio/music/corner_shop_sorting_loop.ogg" id="2_music"]
+
+[node name="MusicManager" type="Node"]
+process_mode = 3
+script = ExtResource("1_script")
+
+[node name="Soundtrack" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_music")
+volume_db = -7.0
+bus = &"Music"
+playback_type = 1
