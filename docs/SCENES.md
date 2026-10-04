@@ -1,17 +1,22 @@
 # Scenes
 
-Russian label fitting stays with each scene owner: `level_failure_screen.gd` fits the failure
+Localized label fitting stays with each scene owner: `level_failure_screen.gd` fits the failure
 message from 36 down to 24 pixels; `PauseMenu` fits the Settings privacy button; and
-`support_faq_item.tscn` reserves a 320-pixel minimum action width. Reviewed captures and known
-resize limitations are recorded in `docs/localization/RUSSIAN_LOCALIZATION_QA.md`.
+`support_faq_item.tscn` reserves a 384-pixel minimum action width for Ukrainian captions. Reviewed
+captures and known resize limitations are recorded in `docs/localization/RUSSIAN_LOCALIZATION_QA.md`
+and `docs/localization/UKRAINIAN_LOCALIZATION_QA.md`.
 
 This file maps scenes to their responsibilities, scripts, important nodes, and runtime relationships.
 
-Russian localization keeps scene-authored English text readable and translates it through catalog
+Russian and Ukrainian localization keep scene-authored English text readable and translate it through catalog
 aliases. Formatted copy is owned by each scene's focused script; those owners refresh on a runtime
 locale change without repeating gameplay actions. `scenes/ui/offer_booster_chip.tscn` bounds its name
-label to the existing chip width and its owner fits long Russian names. Awning headers and offer
+label to the existing chip width and its owner fits localized names. Awning headers and offer
 ribbons refit the translated text. See `docs/LOCALIZATION.md` and `docs/TYPOGRAPHY.md`.
+The lives modal's `NextLifeLabel` wraps in its existing timer column so long localized captions
+do not force the heart/timer status row past the content panel.
+`reward_chest_menu.tscn` bounds `%HeroTitleLabel` to the existing banner; its focused owner fits
+the translated font rather than letting long captions expand the text stack.
 
 ## Level loading transition
 
@@ -565,7 +570,7 @@ Do not use for:
   badge study, echoing the storefront's bracket clock sign): `Bracket` (`ShopSignBracket`, a
   wrought-iron wall bracket) and, under `Swing`, the `Sign` with `SignBoard` (`ShopSignBoard`: two
   chains and the wood board), a `Glow`, the `shop_coin_offer_tier_07.png` `CoinArt`, the painted
-  `BUNDLE` label (`НАБОР` in Russian), and `%DiscountTag` (`discount_badge_pinned.png` with
+  `BUNDLE` label (`НАБОР` in Russian, `НАБІР` in Ukrainian), and `%DiscountTag` (`discount_badge_pinned.png` with
   `%DiscountLabel`).
 - `%BadgeButton` is a full-rect transparent `PressScaleButton` whose press shrinks `Swing/Sign`
   only, so the bracket stays mounted. `%IdleMotion` loops `idle` (3.6s): `Swing` rocks ±2.5°
@@ -1520,7 +1525,7 @@ Script:
 - `scripts/language_selection_modal.gd`
 
 Purpose:
-- Presents the eleven approved release locales in a vertically scrollable list.
+- Presents the twelve approved release locales, including `Українська`, in a vertically scrollable list.
 - Keeps row selection pending until Save; X or `ui_cancel` discards it.
 - Saves through the `LocaleManager` autoload, immediately updates `TranslationServer`, persists
   the local preference, and closes back to the still-open Settings modal.

@@ -7,6 +7,7 @@ extends RefCounted
 ## the longer title still clears the shell's close action.
 
 const LIVES_WIDGET_PATH := "TopStatusBar/MainMenuTopStatus/LivesWidget"
+const REWARDED_STATE_ENVIRONMENT_VARIABLE := "SORTING_PUZZLE_CAPTURE_LIVES_REWARDED_STATE"
 
 
 func setup(scene_root: Node, tree: SceneTree) -> void:
@@ -28,3 +29,10 @@ func setup(scene_root: Node, tree: SceneTree) -> void:
 	lives_widget.emit_signal("pressed")
 	# Let the open fade finish before the first resolution is captured.
 	await tree.create_timer(0.4).timeout
+	var rewarded_state := OS.get_environment(REWARDED_STATE_ENVIRONMENT_VARIABLE)
+	if not rewarded_state.is_empty():
+		# Freeze owner polling so the requested review state remains stable without a backend.
+		scene_root.set_process(false)
+		scene_root.get_node("%OutOfLivesMenu").call(
+			"set_rewarded_action_state", StringName(rewarded_state), true
+		)

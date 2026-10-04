@@ -5,14 +5,21 @@ Chapter 2's locked page, and `level_completion_setup.gd` opens the standalone co
 and reapplies safe layout on viewport resize. Verification evidence lives in
 `docs/localization/RUSSIAN_LOCALIZATION_QA.md`.
 
-## Russian localization
+## Russian and Ukrainian localization
 
 `scripts/localization/locale_manager.gd` owns saved locale application through `TranslationServer`.
 `scripts/localization/game_text.gd` owns display-only number/date formatting, counted booster names
 and reviewed purchase-error copy. Focused UI owner scripts refresh formatted text on
 `NOTIFICATION_TRANSLATION_CHANGED` without repeating gameplay or purchase actions.
-`assets/translations/en.po` / `ru.po` supply dynamic keys and static English aliases.
+`assets/translations/en.po` / `ru.po` / `uk.po` supply dynamic keys and static English aliases.
+`game_text.gd` groups Ukrainian counts with spaces and formats dates with Ukrainian genitive months
+and the catalog's `date.day_month_year` pattern. `locale_catalog.gd` maps Ukrainian devices to `uk`.
 See `docs/LOCALIZATION.md` for plural counts, approved-copy provenance and verification.
+`out_of_lives_menu.gd` fits translated rewarded-ad action captions at state/locale/size changes,
+using its exported font-size range and padding to keep the original action-row width.
+`reward_chest_menu.gd` fits its localized `HeroTitleLabel` at size/locale changes. The lives-offer
+capture setup accepts `SORTING_PUZZLE_CAPTURE_LIVES_REWARDED_STATE` to inspect reward CTA states
+without backend polling replacing them.
 
 ## Sticky item mechanic
 
@@ -3617,7 +3624,7 @@ Purpose:
 ## `scripts/localization/locale_catalog.gd` and `locale_manager.gd`
 
 Purpose:
-- Catalog owns the exact eleven-locale allowlist, native language labels, validation, and
+- Catalog owns the exact twelve-locale allowlist, native language labels, validation, and
   supported first-run device-locale mapping.
 - Manager applies the saved locale during autoload startup and coordinates atomic local preference
   persistence with `TranslationServer.set_locale()`.

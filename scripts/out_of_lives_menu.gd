@@ -26,6 +26,10 @@ const REWARDED_STATE_VERIFYING := &"verifying"
 const REWARDED_STATE_PENDING := &"pending"
 const REWARDED_STATE_ERROR := &"error"
 
+@export var rewarded_action_font_size := 24
+@export var minimum_rewarded_action_font_size := 16
+@export var rewarded_action_text_padding := 24.0
+
 @onready var _shell := %Shell as GameplayModalShell
 @onready var _life_content := %LifeContent as Control
 @onready var _purchase_button := %PurchaseButton as Button
@@ -54,6 +58,7 @@ func _ready() -> void:
 	_purchase_button.pressed.connect(func() -> void: purchase_requested.emit())
 	_rewarded_ad_button.pressed.connect(func() -> void: rewarded_ad_requested.emit())
 	_got_it_button.pressed.connect(func() -> void: close_requested.emit())
+	_rewarded_ad_button.resized.connect(_fit_rewarded_action_text)
 	set_rewarded_action_state(REWARDED_STATE_UNAVAILABLE, false)
 
 
@@ -100,6 +105,27 @@ func set_rewarded_action_state(state: StringName, is_available: bool) -> void:
 	_reward_status_label.visible = (
 		_rewarded_ad_button.visible and not _reward_status_label.text.is_empty()
 	)
+	_fit_rewarded_action_text.call_deferred()
+
+
+func _fit_rewarded_action_text() -> void:
+	var font := _rewarded_ad_button.get_theme_font("font")
+	var available_width := maxf(
+		minf(_rewarded_ad_button.size.x, _rewarded_ad_button.custom_minimum_size.x)
+		- rewarded_action_text_padding, 1.0
+	)
+	var font_size := rewarded_action_font_size
+	while font_size > minimum_rewarded_action_font_size:
+		if font.get_string_size(_rewarded_ad_button.atr(_rewarded_ad_button.text),
+			HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x <= available_width:
+			break
+		font_size -= 1
+	_rewarded_ad_button.add_theme_font_size_override("font_size", font_size)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		_fit_rewarded_action_text.call_deferred()
 
 
 func is_transitioning() -> bool:

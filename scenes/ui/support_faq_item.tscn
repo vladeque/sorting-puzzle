@@ -124,7 +124,7 @@ scroll_active = false
 [node name="ActionButton" type="Button" parent="AnswerPanel/AnswerStack"]
 unique_name_in_owner = true
 visible = false
-custom_minimum_size = Vector2(320, 68)
+custom_minimum_size = Vector2(384, 68)
 layout_mode = 2
 size_flags_horizontal = 4
 focus_mode = 0

@@ -32,8 +32,8 @@ func _run() -> void:
 	_progress.call("reset_progress")
 	_check(bool(_locale_manager.call("set_locale", "en")), "English can be selected for test setup.")
 	_check(
-		LocaleCatalogScript.get_entries().size() == 11,
-		"The release catalog exposes exactly eleven approved locales."
+		LocaleCatalogScript.get_entries().size() == 12,
+		"The release catalog exposes exactly twelve approved locales."
 	)
 	var expected_labels := {
 		"en": "English",
@@ -47,6 +47,7 @@ func _run() -> void:
 		"id": "Bahasa Indonesia",
 		"tr": "Türkçe",
 		"ru": "Русский",
+		"uk": "Українська",
 	}
 	for entry in LocaleCatalogScript.get_entries():
 		var entry_locale := str(entry.get("locale", ""))
@@ -57,6 +58,9 @@ func _run() -> void:
 	_check(LocaleCatalogScript.resolve_device_locale("pt-PT") == "pt_BR", "Portuguese maps to pt_BR.")
 	_check(LocaleCatalogScript.resolve_device_locale("zh-TW") == "zh_Hant", "Taiwan maps to zh_Hant.")
 	_check(LocaleCatalogScript.resolve_device_locale("zh-CN") == "en", "Simplified Chinese falls back to English.")
+	_check(LocaleCatalogScript.resolve_device_locale("uk-UA") == "uk", "Ukrainian devices select Ukrainian.")
+	_check(LocaleCatalogScript.sanitize_saved_locale("uk_UA") == "en",
+		"Saved choices still require an explicit release code.")
 	_check(
 		not bool(_locale_manager.call("set_locale", "unsupported")),
 		"Unsupported locale codes are rejected."
@@ -68,7 +72,7 @@ func _run() -> void:
 	await create_timer(0.35).timeout
 	var list := modal.get_node("%LanguageList") as VBoxContainer
 	var scroll := modal.get_node("%LanguageScroll") as ScrollContainer
-	_check(list.get_child_count() == 11, "The language modal renders all eleven release locales.")
+	_check(list.get_child_count() == 12, "The language modal renders all twelve release locales.")
 	_check(modal.call("get_pending_locale") == "en", "The active locale is selected on open.")
 	_check(
 		scroll.vertical_scroll_mode == ScrollContainer.SCROLL_MODE_SHOW_NEVER,
@@ -100,6 +104,17 @@ func _run() -> void:
 	await create_timer(0.5).timeout
 	_check(_progress.call("get_locale") == "ru", "Closing the modal discards a pending selection.")
 	_check(TranslationServer.get_locale() == "ru", "Closing does not change runtime locale.")
+
+	var ukrainian_modal := modal_scene.instantiate() as Control
+	root.add_child(ukrainian_modal)
+	await create_timer(0.35).timeout
+	ukrainian_modal.call("_select_locale", "uk")
+	_check(TranslationServer.get_locale() == "ru", "Pending Ukrainian selection leaves the active locale unchanged.")
+	ukrainian_modal.call("_save_selection")
+	_check(TranslationServer.get_locale() == "uk", "Saving the Ukrainian row applies its catalog.")
+	await create_timer(0.5).timeout
+	_progress.call("load_progress")
+	_check(_progress.call("get_locale") == "uk", "Reloading progress restores Ukrainian.")
 
 	var main_scene := load("res://scenes/main_menu.tscn") as PackedScene
 	var main_menu := main_scene.instantiate() as Control

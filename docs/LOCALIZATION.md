@@ -27,6 +27,7 @@
 | Bahasa Indonesia | `id` |
 | Türkçe | `tr` |
 | Русский | `ru` |
+| Українська | `uk` |
 
 On a fresh save, a supported device language is selected; unsupported and Simplified Chinese
 device locales fall back to English. Any explicit player selection is persisted and wins on later
@@ -34,11 +35,21 @@ starts.
 
 ## Translation catalogs
 
-`assets/translations/en.po` and `assets/translations/ru.po` are registered in `project.godot`.
+`assets/translations/en.po`, `assets/translations/ru.po` and `assets/translations/uk.po` are
+registered in `project.godot`.
 Russian includes all 251 reviewed keys from
 `docs/localization/RUSSIAN_TRANSLATIONS.md`, the user's corrected October 4, 2026 inventory.
 The inventory is a copy of the approved translation text, not runtime configuration.
 English remains the fallback for the other nine selectable locales until their catalogs exist.
+
+Ukrainian includes all 251 entries from the owner's reviewed October 5, 2026 document archived
+at `docs/localization/UKRAINIAN_TRANSLATIONS.md`. `uk.po` preserves the edited captions and
+support/deletion messages, the five sentence plural tables, four counted booster-name tables,
+twelve genitive month names and supplementary email labels. The archive retains the supplied
+document's pre-integration notes; this page describes the implemented runtime behavior.
+`tests/localization/ukrainian_inventory.json` records the reviewed content for engine verification.
+The Ukrainian badge reads `НАБІР`, and `Українська` is available in the native-name language picker.
+A Ukrainian device locale such as `uk_UA` maps to `uk` on a fresh save.
 
 The owner's October 5, 2026 review supersedes three rows of that original inventory:
 
@@ -71,14 +82,15 @@ Uppercase bundle aliases preserve the authored card presentation. Shop info dial
 their product/error title before uppercasing it.
 
 Formatted HUD, chapter, timer, leaderboard, profile, offer and support strings translate their
-patterns before interpolation. Russian `tr_n()` calls select from three reviewed forms using the
+patterns before interpolation. Russian and Ukrainian `tr_n()` calls select from three reviewed forms using the
 underlying integer count, including when the inserted amount is a formatted `%s`. For rows and
 weekly rewards, the plural count is the stars/coins rather than the rank. Claimed booster chips
 use gettext context `booster.counted` for the reviewed lowercase inflected product names.
 
 `scripts/localization/game_text.gd` owns presentation-only grouped numbers, localized dates,
-counted booster names and safe purchase-error copy. Russian counts use spaces and deadlines
-use genitive month names; store prices pass through unchanged. Purchase/load presentation maps
+counted booster names and safe purchase-error copy. Russian and Ukrainian counts use spaces and
+deadlines use genitive month names with the catalog's `date.day_month_year` pattern (`г.` / `р.`);
+store prices pass through unchanged. Purchase/load presentation maps
 unreviewed technical errors to the existing player-facing fallback messages. Provider errors,
 IDs, authorization, eligibility, economy and protocol values are not translated or rewritten.
 
@@ -90,20 +102,26 @@ profile placeholder is translated separately. Native language names and the app 
 unchanged.
 
 Additional catalog entries cover the four email field labels referenced without keys in the
-inventory, Russian month names and the existing empty-leaderboard status. Loading screens reuse
+inventory, localized month names and the existing empty-leaderboard status (`Поки що немає результатів`
+in Ukrainian). Loading screens reuse
 the reviewed `common.loading` wording.
 
 ## Cyrillic and layout
 
 The bundled DynaPuff font does not contain Cyrillic. Its theme variations use bundled Nunito
-fallback variations at matching 500/600/700 weights, so Russian does not depend on mobile system
+fallback variations at matching 500/600/700 weights, so Russian and Ukrainian do not depend on mobile system
 fonts. `docs/TYPOGRAPHY.md` records this ownership.
 
 Awning headers, ribbons and shared font fitting measure the translated text. Booster chips fit
 their localized name within the authored chip width, down to the exported
 `minimum_name_font_size`, rather than widening the reward row.
 The failure screen fits its result message; `PauseMenu` fits the Settings privacy button within
-its authored width. Support FAQ action buttons reserve 320 pixels for the reviewed Russian copy.
+its authored width. Support FAQ action buttons reserve 384 pixels for the reviewed Ukrainian copy.
+The lives modal's next-life caption wraps within its timer column instead of widening the status row.
+Its owner fits rewarded-action captions within the authored button width, with configurable
+24px maximum / 16px minimum sizes and 24px horizontal text padding, including after language changes.
+`reward_chest_menu.gd` fits the translated hero caption within its banner at 28px down to 16px,
+with `HeroTitleLabel` retaining the existing banner bounds instead of expanding its container.
 
 ## Verification
 
@@ -114,6 +132,9 @@ its authored width. Support FAQ action buttons reserve 320 pixels for the review
 - `tests/ui/test_russian_localization.gd` checks the 251-entry reviewed fixture, Russian/English
   resolution, untranslated-locale fallback, plural boundaries, font coverage, unchanged player
   names/prices, live screen refreshes, preserved reward states and local-only locale persistence.
+- `tests/ui/test_ukrainian_localization.gd` checks all 251 reviewed Ukrainian entries, English
+  fallback, every plural table and counted booster at integer boundaries, the Ukrainian alphabet
+  and apostrophe, all twelve dates, names/prices, static badge aliases and live screen refreshes.
 - Capture any screen in an isolated Russian session with:
 
   ```powershell
@@ -122,6 +143,8 @@ its authored width. Support FAQ action buttons reserve 320 pixels for the review
 
   `capture_ui.ps1 -Locale` passes the locale to `capture_scene.gd`, which applies it before the
   scene is instantiated. It does not change the real player's saved preference.
+  Use `-Locale uk` for Ukrainian captures.
 
 The October 4–5, 2026 test results, rendered-screen reviews and capture limitations are recorded in
 `docs/localization/RUSSIAN_LOCALIZATION_QA.md`.
+Ukrainian integration results are recorded in `docs/localization/UKRAINIAN_LOCALIZATION_QA.md`.

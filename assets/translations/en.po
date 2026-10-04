@@ -8,6 +8,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#. date.day_month_year
+msgid "date.day_month_year"
+msgstr "%d %s %d"
+
 #. common.play
 msgid "common.play"
 msgstr "Play"

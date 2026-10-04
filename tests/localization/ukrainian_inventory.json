@@ -1,0 +1,1856 @@
+{
+  "entries": [
+    {
+      "key": "common.play",
+      "en": "Play",
+      "uk": "Грати",
+      "context": "Button that starts the chapter's next level on a chapter card.",
+      "source": "`chapter_cover_card.gd`"
+    },
+    {
+      "key": "common.continue",
+      "en": "Continue",
+      "uk": "Продовжити",
+      "context": "Button that moves on: closes the level-complete screen, the purchase dialog and the reward chest menu; on a chapter card it resumes a chapter already started.",
+      "source": "`level_completion_screen.tscn`, `shop_purchase_dialog`, `reward_chest_menu.tscn`, `chapter_cover_card.gd`"
+    },
+    {
+      "key": "common.resume",
+      "en": "Continue",
+      "uk": "Продовжити",
+      "context": "Button on Pause and on the leave confirmation that returns to the running level (\"keep playing\"). Separate key: some languages use a different verb than for \"move on\".",
+      "source": "`pause_menu.tscn`, `leave_confirmation_menu.tscn`"
+    },
+    {
+      "key": "common.try_again",
+      "en": "Try Again",
+      "uk": "Спробувати ще раз",
+      "context": "Retries a failed action (ad, purchase, account deletion).",
+      "source": "ad modals, `account_deletion_modal.gd`, `starter_bundle_offer_modal.gd`"
+    },
+    {
+      "key": "common.close",
+      "en": "Close",
+      "uk": "Закрити",
+      "context": "Closes a dialog without doing anything.",
+      "source": "`account_deletion_modal.gd`"
+    },
+    {
+      "key": "common.cancel",
+      "en": "Cancel",
+      "uk": "Скасувати",
+      "context": "Backs out of account deletion; nothing is deleted.",
+      "source": "`account_deletion_modal.tscn`"
+    },
+    {
+      "key": "common.got_it",
+      "en": "Got it",
+      "uk": "Зрозуміло",
+      "context": "Acknowledges an info dialog (ability description, lives already full).",
+      "source": "`out_of_lives_menu.tscn`, `shop_screen.gd`"
+    },
+    {
+      "key": "common.get_help",
+      "en": "Get Help",
+      "uk": "Допомога",
+      "context": "Opens a pre-filled email to support.",
+      "source": "`account_deletion_modal.gd`"
+    },
+    {
+      "key": "common.save",
+      "en": "SAVE",
+      "uk": "ЗБЕРЕГТИ",
+      "context": "Confirms profile edits or the chosen language. All caps by design.",
+      "source": "`profile_menu`, `language_selection_modal.tscn`"
+    },
+    {
+      "key": "common.loading",
+      "en": "Loading…",
+      "uk": "Завантаження…",
+      "context": "Shown while the Shop or Leaderboard loads its data.",
+      "source": "`destination_status_panel.tscn`"
+    },
+    {
+      "key": "common.retry_load",
+      "en": "Retry",
+      "uk": "Оновити",
+      "context": "Reloads the Shop or Leaderboard after a load error. Not the same as replaying a level.",
+      "source": "`destination_status_panel.tscn`"
+    },
+    {
+      "key": "menu.level_button",
+      "en": "LEVEL %d",
+      "uk": "РІВЕНЬ %d",
+      "context": "Big play button on the home screen. `%d` = level number inside the current chapter.",
+      "source": "`production_main_menu.gd`"
+    },
+    {
+      "key": "menu.more_levels_coming_soon",
+      "en": "MORE LEVELS COMING SOON",
+      "uk": "НОВІ РІВНІ НЕЗАБАРОМ",
+      "context": "Home play button (disabled) after every level of the chapter is finished. Must fit the button, about 24 characters.",
+      "source": "`production_main_menu.gd`"
+    },
+    {
+      "key": "menu.coming_soon",
+      "en": "COMING SOON",
+      "uk": "НЕЗАБАРОМ",
+      "context": "Home play button (disabled) when the chapter has no levels yet.",
+      "source": "`production_main_menu.gd`"
+    },
+    {
+      "key": "menu.lives_full",
+      "en": "Full",
+      "uk": "Макс.",
+      "context": "Top bar, next to the heart, when lives are at maximum; replaces the refill timer. About 5 characters.",
+      "source": "`production_main_menu.gd`, `main_menu_top_status.tscn`"
+    },
+    {
+      "key": "menu.starter_badge",
+      "en": "BUNDLE",
+      "uk": "НАБІР",
+      "context": "Small badge on the home screen that opens the Starter Bundle offer. About 8 characters. The full offer title remains Starter Bundle / Стартовий набір.",
+      "source": "`main_menu_starter_bundle_badge.tscn`"
+    },
+    {
+      "key": "nav.shop",
+      "en": "Shop",
+      "uk": "Магазин",
+      "context": "Bottom navigation tab. About 10 characters.",
+      "source": "`main_menu_bottom_navigation.tscn`"
+    },
+    {
+      "key": "nav.home",
+      "en": "Home",
+      "uk": "Головна",
+      "context": "Bottom navigation tab.",
+      "source": "`main_menu_bottom_navigation.tscn`"
+    },
+    {
+      "key": "nav.leaderboard",
+      "en": "Leaderboard",
+      "uk": "Лідери",
+      "context": "Bottom navigation tab.",
+      "source": "`main_menu_bottom_navigation.tscn`"
+    },
+    {
+      "key": "chapter.button",
+      "en": "CHAPTER %d",
+      "uk": "РОЗДІЛ %d",
+      "context": "Home button that opens chapter selection. `%d` = chapter number.",
+      "source": "`main_menu_chapter_button.gd`"
+    },
+    {
+      "key": "chapter.button_tooltip",
+      "en": "Choose Chapter %d: %s",
+      "uk": "Вибрати розділ %d: %s",
+      "context": "Accessibility tooltip of that button. `%d` = chapter number, `%s` = chapter title.",
+      "source": "`main_menu_chapter_button.gd`"
+    },
+    {
+      "key": "chapter.screen_title",
+      "en": "CHAPTERS",
+      "uk": "РОЗДІЛИ",
+      "context": "Title of the chapter selection screen.",
+      "source": "`chapter_selection_screen.tscn`"
+    },
+    {
+      "key": "chapter.eyebrow",
+      "en": "CHAPTER %d",
+      "uk": "РОЗДІЛ %d",
+      "context": "Small label above the chapter name on its card.",
+      "source": "`chapter_cover_card.gd`"
+    },
+    {
+      "key": "chapter.title.chapter_01",
+      "en": "Grocery Town",
+      "uk": "Продуктове містечко",
+      "context": "Name of chapter 1 (a grocery-store theme).",
+      "source": "`configs/chapters.json`"
+    },
+    {
+      "key": "chapter.title.chapter_02",
+      "en": "Candy Corner",
+      "uk": "Солодкий куточок",
+      "context": "Name of chapter 2 (a candy-shop theme).",
+      "source": "`configs/chapters.json`"
+    },
+    {
+      "key": "chapter.locked_status",
+      "en": "Complete %d more %s levels to unlock",
+      "uk": "Пройдіть ще %d рівень розділу «%s», щоб відкрити цей розділ",
+      "context": "Locked chapter card. `%d` = levels still needed, `%s` = previous chapter's name. Needs plural forms.",
+      "source": "`chapter_cover_card.gd`"
+    },
+    {
+      "key": "chapter.unlock_progress",
+      "en": "Unlock progress",
+      "uk": "До відкриття",
+      "context": "Header over the progress bar on a locked chapter.",
+      "source": "`chapter_cover_card.gd`"
+    },
+    {
+      "key": "chapter.current_progress",
+      "en": "Current progress",
+      "uk": "Поточний прогрес",
+      "context": "Header over the progress bar on an unlocked chapter.",
+      "source": "`chapter_cover_card.gd`"
+    },
+    {
+      "key": "chapter.locked",
+      "en": "Locked",
+      "uk": "Закрито",
+      "context": "Disabled button on a locked chapter card.",
+      "source": "`chapter_cover_card.gd`"
+    },
+    {
+      "key": "chapter.no_levels_status",
+      "en": "New levels are coming soon",
+      "uk": "Незабаром з’являться нові рівні",
+      "context": "Card message for a chapter with no levels yet.",
+      "source": "`chapter_cover_card.gd`"
+    },
+    {
+      "key": "chapter.coming_soon",
+      "en": "Coming Soon",
+      "uk": "Незабаром",
+      "context": "Disabled button on that card.",
+      "source": "`chapter_cover_card.gd`"
+    },
+    {
+      "key": "hud.level",
+      "en": "LEVEL %d",
+      "uk": "РІВЕНЬ %d",
+      "context": "Top HUD during play. `%d` = level number inside the chapter.",
+      "source": "`level.gd`"
+    },
+    {
+      "key": "hud.combo",
+      "en": "COMBO ×%d",
+      "uk": "КОМБО ×%d",
+      "context": "HUD counter for consecutive quick matches. `%d` = combo size; keep the × sign.",
+      "source": "`level_top_hud.gd`"
+    },
+    {
+      "key": "hud.ability_tooltip.hammer",
+      "en": "Hammer -- clears a matching triple",
+      "uk": "Молоток — прибирає трійку однакових предметів",
+      "context": "Accessibility tooltip on the Hammer booster button.",
+      "source": "`ability_bar.tscn`"
+    },
+    {
+      "key": "hud.ability_tooltip.shuffle",
+      "en": "Shuffle -- reshuffles unlocked items",
+      "uk": "Перемішування — перемішує незаблоковані предмети",
+      "context": "Tooltip on the Shuffle booster button.",
+      "source": "`ability_bar.tscn`"
+    },
+    {
+      "key": "hud.ability_tooltip.lantern",
+      "en": "Lantern -- highlights a matchable triple",
+      "uk": "Ліхтар — підсвічує трійку, яку можна зібрати",
+      "context": "Tooltip on the Lantern booster button.",
+      "source": "`ability_bar.tscn`"
+    },
+    {
+      "key": "hud.ability_tooltip.freezer",
+      "en": "Freezer -- pauses the countdown timer",
+      "uk": "Замороження — зупиняє таймер",
+      "context": "Tooltip on the Freezer booster button.",
+      "source": "`ability_bar.tscn`"
+    },
+    {
+      "key": "hud.seconds_short",
+      "en": "%ds",
+      "uk": "%dс",
+      "context": "Countdown on an active Lantern or Freezer booster, e.g. \"15s\". `%d` = seconds; use the local short unit.",
+      "source": "`ability_bar.gd`"
+    },
+    {
+      "key": "tip.tap_dispenser",
+      "en": "Tap a dispenser to throw items onto the shelves!",
+      "uk": "Торкніться автомата, щоб він викинув предмети на полиці!",
+      "context": "Tutorial bubble on level 10, where dispensers (machines that throw items onto shelves) first appear.",
+      "source": "`configs/gameplay_tips.json`"
+    },
+    {
+      "key": "pause.title",
+      "en": "PAUSE",
+      "uk": "ПАУЗА",
+      "context": "Title of the in-level pause modal.",
+      "source": "`pause_menu.gd`"
+    },
+    {
+      "key": "pause.leave",
+      "en": "Leave",
+      "uk": "Вийти",
+      "context": "Pause button that quits the level (asks for confirmation next).",
+      "source": "`pause_menu.tscn`"
+    },
+    {
+      "key": "leave.title",
+      "en": "LEAVING THE LEVEL",
+      "uk": "ВИХІД ІЗ РІВНЯ",
+      "context": "Title of the leave confirmation.",
+      "source": "`leave_confirmation_menu.gd`"
+    },
+    {
+      "key": "leave.you_will_lose",
+      "en": "You will lose:",
+      "uk": "Ви втратите:",
+      "context": "Followed by icons showing the stars earned this run and one life. Keep the colon (or local equivalent).",
+      "source": "`leave_confirmation_menu.tscn`"
+    },
+    {
+      "key": "leave.confirm",
+      "en": "Leave",
+      "uk": "Вийти",
+      "context": "Confirms quitting the level and losing that progress.",
+      "source": "`leave_confirmation_menu.tscn`"
+    },
+    {
+      "key": "timeup.title",
+      "en": "TIME'S UP",
+      "uk": "ЧАС ВИЙШОВ",
+      "context": "Title when the level timer reaches zero.",
+      "source": "`time_up_extension_modal.gd`"
+    },
+    {
+      "key": "timeup.offer",
+      "en": "Add one minute and keep sorting!",
+      "uk": "Додайте хвилину й продовжуйте сортувати!",
+      "context": "Offer to extend the timer by 60 seconds for coins or an ad.",
+      "source": "`time_up_extension_modal.tscn`"
+    },
+    {
+      "key": "timeup.used",
+      "en": "Used",
+      "uk": "Використано",
+      "context": "Shown on the coin price or ad button when that extension was already used this level.",
+      "source": "`time_up_extension_modal.gd`"
+    },
+    {
+      "key": "ability_purchase.title",
+      "en": "USE ABILITY",
+      "uk": "ВИКОРИСТАТИ БУСТЕР",
+      "context": "Title of the modal that buys and immediately uses one booster when the player has none.",
+      "source": "`ability_purchase_menu.gd`"
+    },
+    {
+      "key": "shelf_unlock.title",
+      "en": "UNLOCK SHELF",
+      "uk": "ВІДКРИТИ ПОЛИЦЮ",
+      "context": "Title of the modal for a locked shelf.",
+      "source": "`shelf_unlock_menu.gd`"
+    },
+    {
+      "key": "shelf_unlock.offer",
+      "en": "Watch one ad to unlock this shelf now.",
+      "uk": "Перегляньте рекламу, щоб відкрити цю полицю зараз.",
+      "context": "Body when no other way to unlock remains.",
+      "source": "`shelf_unlock_menu.gd`"
+    },
+    {
+      "key": "shelf_unlock.offer_or_clear",
+      "en": "Watch one ad to unlock this shelf now, or clear %s more.",
+      "uk": "Перегляньте рекламу, щоб відкрити цю полицю зараз, або зберіть ще %s трійку.",
+      "context": "Body when the shelf also unlocks by itself after more matches. `%s` = matches still needed. Needs plural forms.",
+      "source": "`shelf_unlock_menu.gd`"
+    },
+    {
+      "key": "shelf_unlock.button",
+      "en": "Watch Ad · Unlock Shelf",
+      "uk": "Реклама · Відкрити полицю",
+      "context": "Ad button in that modal.",
+      "source": "`shelf_unlock_menu.gd`"
+    },
+    {
+      "key": "shelf_unlock.ad_unavailable",
+      "en": "Ad unavailable. This shelf stays locked.",
+      "uk": "Реклама недоступна. Полиця залишається закритою.",
+      "context": "Status line when no ad could be shown.",
+      "source": "`shelf_unlock_menu.gd`"
+    },
+    {
+      "key": "complete.title",
+      "en": "GREAT JOB!",
+      "uk": "ЧУДОВА РОБОТА!",
+      "context": "Title of the level-complete screen, above the stars earned.",
+      "source": "`level_completion_screen.gd`"
+    },
+    {
+      "key": "failed.title",
+      "en": "LEVEL %d",
+      "uk": "РІВЕНЬ %d",
+      "context": "Title of the level-failed screen. `%d` = level number.",
+      "source": "`level_failure_screen.gd`"
+    },
+    {
+      "key": "failed.headline",
+      "en": "LEVEL FAILED",
+      "uk": "РІВЕНЬ НЕ ПРОЙДЕНО",
+      "context": "Banner on the level-failed screen.",
+      "source": "`level_failure_screen.tscn`"
+    },
+    {
+      "key": "failed.retry",
+      "en": "Retry",
+      "uk": "Повторити",
+      "context": "Replays the same level.",
+      "source": "`level_failure_screen.tscn`"
+    },
+    {
+      "key": "combo.praise.2",
+      "en": "Cool",
+      "uk": "Круто",
+      "context": "Combo ×2",
+      "source": ""
+    },
+    {
+      "key": "combo.praise.3",
+      "en": "Great",
+      "uk": "Чудово",
+      "context": "×3",
+      "source": ""
+    },
+    {
+      "key": "combo.praise.4",
+      "en": "Awesome",
+      "uk": "Супер",
+      "context": "×4",
+      "source": ""
+    },
+    {
+      "key": "combo.praise.5",
+      "en": "Amazing",
+      "uk": "Дивовижно",
+      "context": "×5",
+      "source": ""
+    },
+    {
+      "key": "combo.praise.6",
+      "en": "Fantastic",
+      "uk": "Фантастично",
+      "context": "×6",
+      "source": ""
+    },
+    {
+      "key": "combo.praise.7",
+      "en": "Incredible",
+      "uk": "Неймовірно",
+      "context": "×7",
+      "source": ""
+    },
+    {
+      "key": "combo.praise.8",
+      "en": "Spectacular",
+      "uk": "Вражає!",
+      "context": "×8",
+      "source": ""
+    },
+    {
+      "key": "combo.praise.9",
+      "en": "Unstoppable",
+      "uk": "НЕ СПИНИТИ!",
+      "context": "×9",
+      "source": ""
+    },
+    {
+      "key": "combo.praise.10",
+      "en": "Legendary",
+      "uk": "Легендарно",
+      "context": "×10",
+      "source": ""
+    },
+    {
+      "key": "combo.praise.11",
+      "en": "Epic",
+      "uk": "Епічно",
+      "context": "×11",
+      "source": ""
+    },
+    {
+      "key": "combo.praise.12",
+      "en": "Brilliant",
+      "uk": "Блискуче",
+      "context": "×12",
+      "source": ""
+    },
+    {
+      "key": "combo.praise.13",
+      "en": "Masterful",
+      "uk": "Майстерно",
+      "context": "×13",
+      "source": ""
+    },
+    {
+      "key": "combo.praise.14",
+      "en": "Supreme",
+      "uk": "Неперевершено",
+      "context": "×14",
+      "source": ""
+    },
+    {
+      "key": "combo.praise.15",
+      "en": "Phenomenal",
+      "uk": "Феноменально",
+      "context": "×15",
+      "source": ""
+    },
+    {
+      "key": "combo.praise.16",
+      "en": "Mythic",
+      "uk": "Міфічно",
+      "context": "×16",
+      "source": ""
+    },
+    {
+      "key": "combo.praise.17",
+      "en": "Majestic",
+      "uk": "Велично",
+      "context": "×17",
+      "source": ""
+    },
+    {
+      "key": "combo.praise.18",
+      "en": "Radiant",
+      "uk": "Осяйно",
+      "context": "×18",
+      "source": ""
+    },
+    {
+      "key": "combo.praise.19",
+      "en": "Divine",
+      "uk": "Божественно",
+      "context": "×19",
+      "source": ""
+    },
+    {
+      "key": "combo.praise.20",
+      "en": "Transcendent",
+      "uk": "Позамежно",
+      "context": "×20 and above",
+      "source": ""
+    },
+    {
+      "key": "ability.hammer.name",
+      "en": "Hammer",
+      "uk": "Молоток",
+      "context": "Booster that smashes away one matching set.",
+      "source": "`reward_reveal_row.tscn`, `starter_bundle_offer_modal.tscn`, `shop_screen.gd`"
+    },
+    {
+      "key": "ability.shuffle.name",
+      "en": "Shuffle",
+      "uk": "Перемішування",
+      "context": "Booster that rearranges items.",
+      "source": "same"
+    },
+    {
+      "key": "ability.lantern.name",
+      "en": "Lantern",
+      "uk": "Ліхтар",
+      "context": "Booster that lights up a set the player can match (internal id `highlight`).",
+      "source": "same"
+    },
+    {
+      "key": "ability.freezer.name",
+      "en": "Freezer",
+      "uk": "Замороження",
+      "context": "Booster that stops the level timer.",
+      "source": "same"
+    },
+    {
+      "key": "ability.hammer.description",
+      "en": "Instantly clears one matching set of items off the shelves.",
+      "uk": "Миттєво прибирає з полиць одну трійку однакових предметів.",
+      "context": "Shop info dialog body after tapping the booster icon.",
+      "source": "`shop_screen.gd`"
+    },
+    {
+      "key": "ability.shuffle.description",
+      "en": "Shuffles shelf items into new spots to help you find a match.",
+      "uk": "Переміщує предмети на полицях у нові місця, щоб було легше знайти трійку.",
+      "context": "Same dialog.",
+      "source": "`shop_screen.gd`"
+    },
+    {
+      "key": "ability.lantern.description",
+      "en": "Highlights a matching triple you can clear for 15 seconds.",
+      "uk": "На 15 секунд підсвічує трійку однакових предметів, яку можна зібрати.",
+      "context": "Same dialog. Keep the number in sync with the game config.",
+      "source": "`shop_screen.gd`"
+    },
+    {
+      "key": "ability.freezer.description",
+      "en": "Freezes the level timer for 30 seconds.",
+      "uk": "Зупиняє таймер рівня на 30 секунд.",
+      "context": "Same dialog.",
+      "source": "`shop_screen.gd`"
+    },
+    {
+      "key": "ad.watch",
+      "en": "Watch Ad",
+      "uk": "Дивитися рекламу",
+      "context": "Button that plays a rewarded video ad.",
+      "source": "ad modals, `out_of_lives_menu`, `ability_purchase_menu.tscn`"
+    },
+    {
+      "key": "ad.loading",
+      "en": "Loading...",
+      "uk": "Завантаження...",
+      "context": "Ad button while the ad loads.",
+      "source": "ad modals"
+    },
+    {
+      "key": "ad.verifying",
+      "en": "Verifying...",
+      "uk": "Перевірка...",
+      "context": "Ad button while the server confirms the reward.",
+      "source": "ad modals"
+    },
+    {
+      "key": "ad.verify_reward",
+      "en": "Verify Reward",
+      "uk": "Перевірити винагороду",
+      "context": "Ad button to re-check a reward the server has not confirmed yet.",
+      "source": "ad modals"
+    },
+    {
+      "key": "ad.reward_pending",
+      "en": "Reward verification is still pending.",
+      "uk": "Очікуємо підтвердження винагороди.",
+      "context": "Status line under that button.",
+      "source": "`out_of_lives_menu.gd`, `shelf_unlock_menu.gd`"
+    },
+    {
+      "key": "ad.unavailable_retry",
+      "en": "Ad unavailable. Please try again.",
+      "uk": "Реклама недоступна. Спробуйте ще раз.",
+      "context": "Status line when no ad could be shown.",
+      "source": "`out_of_lives_menu`"
+    },
+    {
+      "key": "ad.watch_unavailable",
+      "en": "Watch Ad\nUnavailable",
+      "uk": "Реклама\nНедоступна",
+      "context": "Two-line disabled ad button (time-up modal). Keep the line break.",
+      "source": "`time_up_extension_modal.gd`"
+    },
+    {
+      "key": "ad.watch_coming_soon",
+      "en": "Watch Ad\nComing Soon",
+      "uk": "Реклама\nНезабаром",
+      "context": "Two-line disabled ad button before ads launch.",
+      "source": "`time_up_extension_modal.tscn`"
+    },
+    {
+      "key": "ad.badge",
+      "en": "AD",
+      "uk": "AD",
+      "context": "Tiny badge on a locked shelf that an ad can open. Do not translate: keep AD exactly in every language.",
+      "source": "`shelf_lock_overlay.tscn`, `shelf_unlock_menu.tscn`"
+    },
+    {
+      "key": "lives.title.out",
+      "en": "OUT OF LIVES",
+      "uk": "НЕМАЄ ЖИТТІВ",
+      "context": "Lives modal title at 0 lives.",
+      "source": "`out_of_lives_menu.gd`"
+    },
+    {
+      "key": "lives.title.get_more",
+      "en": "GET MORE LIVES",
+      "uk": "БІЛЬШЕ ЖИТТІВ",
+      "context": "Lives modal title with some lives left.",
+      "source": "`out_of_lives_menu.gd`"
+    },
+    {
+      "key": "lives.title.full",
+      "en": "LIVES FULL",
+      "uk": "МАКСИМУМ ЖИТТІВ",
+      "context": "Lives modal title at maximum lives.",
+      "source": "`out_of_lives_menu.gd`"
+    },
+    {
+      "key": "lives.next_in",
+      "en": "NEXT LIFE IN",
+      "uk": "НАСТУПНЕ ЖИТТЯ ЧЕРЕЗ",
+      "context": "Label above the refill countdown (mm:ss).",
+      "source": "`out_of_lives_menu.tscn`"
+    },
+    {
+      "key": "lives.full_body",
+      "en": "Your lives are full! Play a level to spend them.",
+      "uk": "У вас максимум життів! Зіграйте рівень, щоб витратити їх.",
+      "context": "Body of the lives modal at maximum.",
+      "source": "`out_of_lives_menu.tscn`"
+    },
+    {
+      "key": "chest.title",
+      "en": "CHEST REWARDS",
+      "uk": "ВИНАГОРОДИ ЗІ СКРИНІ",
+      "context": "Title of the reward chest modal.",
+      "source": "`reward_chest_menu.tscn`"
+    },
+    {
+      "key": "chest.progress_hint",
+      "en": "Collect stars to unlock a chest and claim your reward",
+      "uk": "Збирайте зірки, щоб відкрити скриню й отримати винагороду",
+      "context": "Under the star progress bar (e.g. 12/30).",
+      "source": "`reward_chest_menu.tscn`"
+    },
+    {
+      "key": "chest.ready",
+      "en": "A REWARD CHEST AWAITS!",
+      "uk": "НА ВАС ЧЕКАЄ СКРИНЯ З ВИНАГОРОДОЮ!",
+      "context": "Banner when the chest is full and can be opened.",
+      "source": "`reward_chest_menu.tscn`"
+    },
+    {
+      "key": "chest.tap_to_open",
+      "en": "Tap to open",
+      "uk": "Торкніться, щоб відкрити",
+      "context": "Prompt under the closed chest in the opening animation.",
+      "source": "`reward_chest_open_ceremony.tscn`"
+    },
+    {
+      "key": "purchase.tap_to_collect",
+      "en": "Tap to collect",
+      "uk": "Торкніться, щоб забрати",
+      "context": "Prompt to collect purchased rewards.",
+      "source": "`purchase_reward_sequence.tscn`"
+    },
+    {
+      "key": "purchase.complete",
+      "en": "PURCHASE COMPLETE",
+      "uk": "КУПІВЛЮ ЗАВЕРШЕНО",
+      "context": "Banner after a successful purchase.",
+      "source": "`purchase_reward_sequence.gd`"
+    },
+    {
+      "key": "shop.title",
+      "en": "SHOP",
+      "uk": "МАГАЗИН",
+      "context": "Shop screen title.",
+      "source": "`shop_screen.tscn`"
+    },
+    {
+      "key": "shop.section.bundles",
+      "en": "SPECIAL BUNDLES",
+      "uk": "ОСОБЛИВІ НАБОРИ",
+      "context": "Section header.",
+      "source": "`shop_screen.tscn`"
+    },
+    {
+      "key": "shop.section.coins",
+      "en": "COINS",
+      "uk": "МОНЕТИ",
+      "context": "Section header for coin packs.",
+      "source": "`shop_screen.tscn`"
+    },
+    {
+      "key": "shop.offer.starter_bundle",
+      "en": "Starter Bundle",
+      "uk": "Стартовий набір",
+      "context": "Bundle name; shown in caps on its card.",
+      "source": "`configs/shop_catalog.json`"
+    },
+    {
+      "key": "shop.offer.basic_bundle",
+      "en": "Basic Bundle",
+      "uk": "Базовий набір",
+      "context": "Bundle name; shown in caps on its card.",
+      "source": "`configs/shop_catalog.json`"
+    },
+    {
+      "key": "shop.tag.best_value",
+      "en": "BEST VALUE",
+      "uk": "НАЙКРАЩА ЦІНА",
+      "context": "Ribbon on the best coin pack.",
+      "source": "`configs/shop_catalog.json`"
+    },
+    {
+      "key": "shop.discount_off",
+      "en": "OFF",
+      "uk": "OFF",
+      "context": "Second line of the discount badge under \"67%\". Do not translate: keep the complete 67% OFF tag unchanged in every language; the numeric percentage can vary by offer.",
+      "source": "`shop_bundle_card.tscn`, `starter_bundle_offer_modal.tscn`"
+    },
+    {
+      "key": "shop.ability_hint",
+      "en": "Tap an ability to see what it does",
+      "uk": "Торкніться бустера, щоб дізнатися, що він робить",
+      "context": "Hint under a bundle's booster icons.",
+      "source": "`shop_bundle_card.tscn`"
+    },
+    {
+      "key": "shop.purchasing",
+      "en": "Purchasing…",
+      "uk": "Купівля…",
+      "context": "Buy button while a purchase is in progress.",
+      "source": "shop cards, `production_main_menu.gd`"
+    },
+    {
+      "key": "shop.no_offers",
+      "en": "No shop offers are available for this region.",
+      "uk": "Для цього регіону немає доступних пропозицій.",
+      "context": "Shop error state.",
+      "source": "`shop_screen.gd`"
+    },
+    {
+      "key": "shop.load_failed",
+      "en": "Could not load the shop.",
+      "uk": "Не вдалося завантажити магазин.",
+      "context": "Shop error state (fallback text).",
+      "source": "`shop_screen.gd`"
+    },
+    {
+      "key": "shop.error.title.purchase",
+      "en": "Purchase unavailable",
+      "uk": "Купівля недоступна",
+      "context": "Error dialog title when buying failed.",
+      "source": "`shop_screen.gd`"
+    },
+    {
+      "key": "shop.error.title.reward",
+      "en": "Reward error",
+      "uk": "Помилка винагороди",
+      "context": "Error dialog title when payment went through but rewards were not granted.",
+      "source": "`shop_screen.gd`"
+    },
+    {
+      "key": "shop.error.purchase_failed",
+      "en": "The purchase could not be completed.",
+      "uk": "Не вдалося завершити купівлю.",
+      "context": "Error dialog body (fallback).",
+      "source": "`shop_screen.gd`, `production_main_menu.gd`"
+    },
+    {
+      "key": "shop.error.grant_failed",
+      "en": "The purchased rewards could not be granted.",
+      "uk": "Не вдалося нарахувати придбані винагороди.",
+      "context": "Error dialog body.",
+      "source": "`store/shop_purchase_flow.gd`"
+    },
+    {
+      "key": "shop.error.offer_unavailable",
+      "en": "This shop offer is unavailable.",
+      "uk": "Ця пропозиція магазину недоступна.",
+      "context": "Error dialog body.",
+      "source": "`store/store_service.gd`"
+    },
+    {
+      "key": "shop.error.already_bought",
+      "en": "This one-time shop offer has already been purchased.",
+      "uk": "Цю разову пропозицію вже придбано.",
+      "context": "Error dialog body.",
+      "source": "`store/store_service.gd`"
+    },
+    {
+      "key": "starter.title",
+      "en": "STARTER BUNDLE",
+      "uk": "СТАРТОВИЙ НАБІР",
+      "context": "Starter offer modal title.",
+      "source": "`starter_bundle_offer_modal.gd`"
+    },
+    {
+      "key": "starter.one_time",
+      "en": "ONE-TIME OFFER",
+      "uk": "РАЗОВА ПРОПОЗИЦІЯ",
+      "context": "Ribbon on the starter offer.",
+      "source": "`starter_bundle_offer_modal.tscn`"
+    },
+    {
+      "key": "starter.boosters_included",
+      "en": "BOOSTERS INCLUDED",
+      "uk": "БУСТЕРИ В НАБОРІ",
+      "context": "Header over the four booster chips.",
+      "source": "`starter_bundle_offer_modal.tscn`"
+    },
+    {
+      "key": "starter.coins",
+      "en": "%s COINS",
+      "uk": "%s МОНЕТА",
+      "context": "Ribbon over the coin art. `%s` = formatted amount, e.g. \"1,000\". Needs plural forms.",
+      "source": "`starter_bundle_offer_modal.gd`"
+    },
+    {
+      "key": "starter.buy_for",
+      "en": "Buy for %s",
+      "uk": "Купити за %s",
+      "context": "Buy button. `%s` = store price, e.g. \"$4.99\".",
+      "source": "`starter_bundle_offer_modal.gd`"
+    },
+    {
+      "key": "starter.checking",
+      "en": "Checking offer…",
+      "uk": "Перевірка пропозиції…",
+      "context": "Status while the store confirms the offer.",
+      "source": "`production_main_menu.gd`"
+    },
+    {
+      "key": "starter.checking_short",
+      "en": "Checking…",
+      "uk": "Перевірка…",
+      "context": "Buy button during that check.",
+      "source": "`starter_bundle_offer_modal.gd`"
+    },
+    {
+      "key": "starter.no_longer_available",
+      "en": "This offer is no longer available.",
+      "uk": "Ця пропозиція більше недоступна.",
+      "context": "Error status in the starter modal.",
+      "source": "`production_main_menu.gd`"
+    },
+    {
+      "key": "starter.unavailable",
+      "en": "Unavailable",
+      "uk": "Недоступно",
+      "context": "Disabled buy button after a non-retryable error.",
+      "source": "`starter_bundle_offer_modal.gd`"
+    },
+    {
+      "key": "booster_chip.claimed",
+      "en": "+%d %s",
+      "uk": "+%d %s",
+      "context": "Booster chip after purchase, e.g. \"+3 Hammer\". `%d` = count, `%s` = booster name. Needs plural forms.",
+      "source": "`offer_booster_chip.gd`"
+    },
+    {
+      "key": "profile.title",
+      "en": "EDIT PROFILE",
+      "uk": "РЕДАГУВАТИ ПРОФІЛЬ",
+      "context": "Profile modal title.",
+      "source": "`profile_menu.tscn`"
+    },
+    {
+      "key": "profile.name_header",
+      "en": "PLAYER NAME",
+      "uk": "ІМ’Я ГРАВЦЯ",
+      "context": "Header over the name field.",
+      "source": "`profile_menu.tscn`"
+    },
+    {
+      "key": "profile.name_placeholder",
+      "en": "Player name",
+      "uk": "Ім’я гравця",
+      "context": "Placeholder inside the empty name field.",
+      "source": "`profile_menu.tscn`"
+    },
+    {
+      "key": "profile.edit_name_tooltip",
+      "en": "Edit player name",
+      "uk": "Змінити ім’я гравця",
+      "context": "Accessibility tooltip on the pencil button.",
+      "source": "`profile_menu.tscn`"
+    },
+    {
+      "key": "profile.avatar_tab",
+      "en": "AVATAR",
+      "uk": "АВАТАР",
+      "context": "Tab that shows avatar pictures.",
+      "source": "`profile_menu.tscn`"
+    },
+    {
+      "key": "profile.frame_tab",
+      "en": "FRAME",
+      "uk": "РАМКА",
+      "context": "Tab that shows decorative frames around the avatar.",
+      "source": "`profile_menu.tscn`"
+    },
+    {
+      "key": "profile.unlock.level",
+      "en": "Complete level %d to unlock",
+      "uk": "Пройдіть рівень %d, щоб відкрити",
+      "context": "Toast after tapping a locked frame. `%d` = level number.",
+      "source": "`profile_menu.gd`"
+    },
+    {
+      "key": "profile.unlock.combo",
+      "en": "Reach a combo of ×%d in any run to unlock",
+      "uk": "Досягніть комбо ×%d у будь-якій спробі, щоб відкрити",
+      "context": "Same toast. `%d` = combo size.",
+      "source": "`profile_menu.gd`"
+    },
+    {
+      "key": "profile.unlock.weekly_first",
+      "en": "Finish 1st on the Weekly leaderboard to unlock",
+      "uk": "Посядьте 1-ше місце в тижневому рейтингу, щоб відкрити",
+      "context": "Same toast for a first-place frame. Today built from two parts; see implementation notes.",
+      "source": "`profile_menu.gd`"
+    },
+    {
+      "key": "profile.unlock.weekly_top",
+      "en": "Finish top %d on the Weekly leaderboard to unlock",
+      "uk": "Увійдіть до топ-%d тижневого рейтингу, щоб відкрити",
+      "context": "Same toast. `%d` = rank cutoff (e.g. 10).",
+      "source": "`profile_menu.gd`"
+    },
+    {
+      "key": "leaderboard.title",
+      "en": "LEADERBOARD",
+      "uk": "РЕЙТИНГ",
+      "context": "Leaderboard screen title.",
+      "source": "`leaderboard_screen.tscn`"
+    },
+    {
+      "key": "leaderboard.tab.weekly",
+      "en": "Weekly",
+      "uk": "Тиждень",
+      "context": "Tab: this week's stars.",
+      "source": "`leaderboard_screen.tscn`"
+    },
+    {
+      "key": "leaderboard.tab.country",
+      "en": "Country",
+      "uk": "Країна",
+      "context": "Tab: all-time stars in the player's country.",
+      "source": "`leaderboard_screen.tscn`"
+    },
+    {
+      "key": "leaderboard.tab.world",
+      "en": "World",
+      "uk": "Світ",
+      "context": "Tab: all-time stars worldwide.",
+      "source": "`leaderboard_screen.tscn`"
+    },
+    {
+      "key": "leaderboard.weekly_reset",
+      "en": "Weekly reset in %s",
+      "uk": "Оновлення тижневого рейтингу через %s",
+      "context": "Under the Weekly tab. `%s` = a duration such as \"1d 4h\".",
+      "source": "`leaderboard_screen.gd`"
+    },
+    {
+      "key": "leaderboard.duration.dh",
+      "en": "%dd %dh",
+      "uk": "%d д %d год",
+      "context": "Duration: days and hours. Use local unit abbreviations.",
+      "source": "`leaderboard_screen.gd`"
+    },
+    {
+      "key": "leaderboard.duration.hm",
+      "en": "%dh %dm",
+      "uk": "%d год %d хв",
+      "context": "Duration: hours and minutes.",
+      "source": "`leaderboard_screen.gd`"
+    },
+    {
+      "key": "leaderboard.duration.m",
+      "en": "%dm",
+      "uk": "%d хв",
+      "context": "Duration: minutes.",
+      "source": "`leaderboard_screen.gd`"
+    },
+    {
+      "key": "leaderboard.country_caption",
+      "en": "Country · All-time stars",
+      "uk": "Країна · Зірки за весь час",
+      "context": "Caption under the Country tab.",
+      "source": "`leaderboard_screen.gd`"
+    },
+    {
+      "key": "leaderboard.world_caption",
+      "en": "Worldwide · All-time stars",
+      "uk": "Увесь світ · Зірки за весь час",
+      "context": "Caption under the World tab.",
+      "source": "`leaderboard_screen.gd`"
+    },
+    {
+      "key": "leaderboard.load_failed",
+      "en": "Could not load leaderboard.",
+      "uk": "Не вдалося завантажити таблицю лідерів.",
+      "context": "Error state (fallback text).",
+      "source": "`leaderboard_screen.gd`"
+    },
+    {
+      "key": "leaderboard.default_name",
+      "en": "Player",
+      "uk": "Гравець",
+      "context": "Name shown for a player without one.",
+      "source": "`leaderboard_row.gd`"
+    },
+    {
+      "key": "leaderboard.row_tooltip",
+      "en": "Rank %d, %s, %d stars",
+      "uk": "Місце %d, %s, %d зірка",
+      "context": "Accessibility text of a row. `%d` = rank, `%s` = player name, `%d` = stars. Needs plural forms.",
+      "source": "`leaderboard_row.gd`"
+    },
+    {
+      "key": "leaderboard.reward_tooltip",
+      "en": "%s coin weekly reward",
+      "uk": "Монет у тижневій винагороді: %s",
+      "context": "Accessibility text on the coin prize next to top ranks. `%s` = amount.",
+      "source": "`leaderboard_rank_reward.gd`"
+    },
+    {
+      "key": "leaderboard.reward.title",
+      "en": "WEEKLY REWARD!",
+      "uk": "ТИЖНЕВА ВИНАГОРОДА!",
+      "context": "Title of the dialog shown after a week ends.",
+      "source": "`leaderboard_reward_dialog.gd`"
+    },
+    {
+      "key": "leaderboard.reward.body",
+      "en": "You finished #%d last week and earned %d coins!",
+      "uk": "Минулого тижня ви посіли місце №%d й отримали %d монету!",
+      "context": "Body. `%d` = final rank, `%d` = coins. Needs plural forms.",
+      "source": "`leaderboard_reward_dialog.gd`"
+    },
+    {
+      "key": "leaderboard.reward.ok",
+      "en": "Nice!",
+      "uk": "Клас!",
+      "context": "Button that closes the reward dialog.",
+      "source": "`leaderboard_reward_dialog.tscn`"
+    },
+    {
+      "key": "settings.title",
+      "en": "SETTINGS",
+      "uk": "НАЛАШТУВАННЯ",
+      "context": "Settings modal title (home screen).",
+      "source": "`settings_menu.tscn`, `pause_menu.tscn`"
+    },
+    {
+      "key": "settings.music",
+      "en": "Music",
+      "uk": "Музика",
+      "context": "Toggle label under an icon. Short, about 8 characters.",
+      "source": "`settings_menu.tscn`, `pause_menu.tscn`"
+    },
+    {
+      "key": "settings.sfx",
+      "en": "SFX",
+      "uk": "Звуки",
+      "context": "Toggle for sound effects. Use a short local word for \"Sounds\".",
+      "source": "same"
+    },
+    {
+      "key": "settings.vibrate",
+      "en": "Vibrate",
+      "uk": "Вібрація",
+      "context": "Toggle for haptic feedback.",
+      "source": "same"
+    },
+    {
+      "key": "settings.support",
+      "en": "Support",
+      "uk": "Підтримка",
+      "context": "Opens the Support screen.",
+      "source": "`settings_menu.tscn`"
+    },
+    {
+      "key": "settings.language",
+      "en": "Language",
+      "uk": "Мова",
+      "context": "Opens the language picker.",
+      "source": "`settings_menu.tscn`, `language_option_row.tscn`"
+    },
+    {
+      "key": "settings.privacy_policy",
+      "en": "Privacy Policy",
+      "uk": "Політика конфіденційності",
+      "context": "Opens the privacy policy web page.",
+      "source": "`settings_menu.tscn`, `production_main_menu.gd`"
+    },
+    {
+      "key": "settings.privacy_choices",
+      "en": "Privacy Choices",
+      "uk": "Налаштування конфіденційності",
+      "context": "Same button when the ad consent form must be offered (EU/UK).",
+      "source": "`production_main_menu.gd`"
+    },
+    {
+      "key": "settings.diagnostics",
+      "en": "Version %s • Build %d\nPlatform: %s • User: %s",
+      "uk": "Версія %s • Збірка %d\nПлатформа: %s • Користувач: %s",
+      "context": "Small footer for support. Values: app version, build number, OS name, short player id. Translating the four labels is optional.",
+      "source": "`pause_menu.gd`"
+    },
+    {
+      "key": "language.title",
+      "en": "LANGUAGE",
+      "uk": "МОВА",
+      "context": "Language picker title.",
+      "source": "`language_selection_modal.gd`"
+    },
+    {
+      "key": "support.title",
+      "en": "SUPPORT",
+      "uk": "ПІДТРИМКА",
+      "context": "Support screen title.",
+      "source": "`support_screen.tscn`"
+    },
+    {
+      "key": "support.faq_header",
+      "en": "Frequently Asked Questions",
+      "uk": "Поширені запитання",
+      "context": "Section header.",
+      "source": "`support_screen.tscn`"
+    },
+    {
+      "key": "support.faq.play.q",
+      "en": "How do I play?",
+      "uk": "Як грати?",
+      "context": "FAQ question (tap to expand).",
+      "source": "`support_screen.tscn`"
+    },
+    {
+      "key": "support.faq.play.a",
+      "en": "Move matching goods onto the same shelf. When three identical items are visible together, they clear. Complete the board before time runs out.",
+      "uk": "Переміщуйте однакові предмети на одну полицю. Коли на полиці опиняються три однакові предмети, вони зникають. Очистьте поле, поки не закінчився час.",
+      "context": "FAQ answer. \"Goods\" = shop items such as snacks and toys.",
+      "source": "`support_screen.tscn`"
+    },
+    {
+      "key": "support.faq.contact.q",
+      "en": "How do I contact support?",
+      "uk": "Як зв’язатися з підтримкою?",
+      "context": "FAQ question.",
+      "source": "`support_screen.tscn`"
+    },
+    {
+      "key": "support.faq.contact.a",
+      "en": "Email us at %s. Include a short description, your device platform, and when the problem happened.",
+      "uk": "Напишіть нам на %s. Коротко опишіть проблему, вкажіть платформу пристрою та час, коли вона виникла.",
+      "context": "FAQ answer. `%s` = support email address.",
+      "source": "`support_screen.gd`"
+    },
+    {
+      "key": "support.faq.contact.action",
+      "en": "Email Support",
+      "uk": "Звернутися до підтримки",
+      "context": "Button that opens a pre-filled email.",
+      "source": "`support_screen.tscn`"
+    },
+    {
+      "key": "support.faq.crash.q",
+      "en": "What if the game freezes or crashes?",
+      "uk": "Що робити, якщо гра зависає або закривається?",
+      "context": "FAQ question.",
+      "source": "`support_screen.tscn`"
+    },
+    {
+      "key": "support.faq.crash.a",
+      "en": "Close and reopen the game first. If it happens again, restart the device and make sure the game is updated. Contact support with the device model, platform version, and what you were doing before the problem.",
+      "uk": "Спершу закрийте гру й відкрийте її знову. Якщо проблема повториться, перезапустіть пристрій і перевірте, чи встановлено останню версію гри. Зверніться до підтримки й вкажіть модель пристрою, версію платформи та що ви робили перед виникненням проблеми.",
+      "context": "FAQ answer.",
+      "source": "`support_screen.tscn`"
+    },
+    {
+      "key": "support.faq.sync.q",
+      "en": "How do I sync progress between devices?",
+      "uk": "Як синхронізувати прогрес між пристроями?",
+      "context": "FAQ question.",
+      "source": "`support_screen.tscn`"
+    },
+    {
+      "key": "support.faq.sync.a",
+      "en": "Use the same signed-in platform account on both devices and allow synchronization to finish before playing. If the progress differs, avoid playing on both devices and contact support.",
+      "uk": "Увійдіть у той самий акаунт платформи на обох пристроях і дочекайтеся завершення синхронізації перед грою. Якщо прогрес відрізняється, не грайте на обох пристроях і зверніться до підтримки.",
+      "context": "FAQ answer. \"Platform account\" = Google Play Games / Game Center.",
+      "source": "`support_screen.tscn`"
+    },
+    {
+      "key": "support.faq.bad_ad.q",
+      "en": "How do I report a bad ad?",
+      "uk": "Як повідомити про проблемну рекламу?",
+      "context": "FAQ question.",
+      "source": "`support_screen.tscn`"
+    },
+    {
+      "key": "support.faq.bad_ad.a",
+      "en": "1. Close the ad if you can do so safely.\n2. Take a screenshot of the ad and any advertiser or app name shown.\n3. Note the approximate time and where the ad appeared in the game.\n4. Describe why the ad seemed offensive, misleading, or fraudulent.\n5. Email these details to %s. Do not include passwords or payment information.",
+      "uk": "1. Закрийте рекламу, якщо це можна зробити безпечно.\n2. Зробіть знімок екрана з рекламою та видимою назвою рекламодавця чи застосунку.\n3. Запишіть приблизний час і місце появи реклами в грі.\n4. Опишіть, чому реклама здалася образливою, оманливою чи шахрайською.\n5. Надішліть ці відомості на %s. Не додавайте паролі чи платіжні дані.",
+      "context": "FAQ answer, a five-step list in one string. `%s` = support email. Keep the numbering and line breaks.",
+      "source": "`support_screen.gd`"
+    },
+    {
+      "key": "support.faq.bad_ad.action",
+      "en": "Email Ad Report",
+      "uk": "Надіслати скаргу на рекламу",
+      "context": "Button that opens a pre-filled ad-report email.",
+      "source": "`support_screen.tscn`"
+    },
+    {
+      "key": "support.account_header",
+      "en": "Account",
+      "uk": "Акаунт",
+      "context": "Section header above the delete button.",
+      "source": "`support_screen.tscn`"
+    },
+    {
+      "key": "support.delete_account",
+      "en": "Delete Account",
+      "uk": "Видалити акаунт",
+      "context": "Opens account deletion (player has an online account).",
+      "source": "`support_screen.gd`"
+    },
+    {
+      "key": "support.delete_game_data",
+      "en": "Delete Game Data",
+      "uk": "Видалити дані гри",
+      "context": "Same button when only local data exists.",
+      "source": "`support_screen.gd`"
+    },
+    {
+      "key": "support.no_secrets",
+      "en": "Please never send passwords or payment information.",
+      "uk": "Ніколи не надсилайте паролі чи платіжні дані.",
+      "context": "Warning at the bottom of the screen.",
+      "source": "`support_screen.tscn`"
+    },
+    {
+      "key": "deletion.title.delete_account",
+      "en": "DELETE ACCOUNT",
+      "uk": "ВИДАЛИТИ АКАУНТ",
+      "context": "Title: confirm, in progress and unavailable states.",
+      "source": "`account_deletion_modal.gd`"
+    },
+    {
+      "key": "deletion.title.delete_game_data",
+      "en": "DELETE GAME DATA",
+      "uk": "ВИДАЛИТИ ДАНІ ГРИ",
+      "context": "Title for a player who never had an online account.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.title.not_confirmed",
+      "en": "NOT CONFIRMED",
+      "uk": "НЕ ПІДТВЕРДЖЕНО",
+      "context": "Title: request sent, answer lost.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.title.status_unconfirmed",
+      "en": "STATUS UNCONFIRMED",
+      "uk": "СТАТУС НЕ ПІДТВЕРДЖЕНО",
+      "context": "Title: server outcome unknown.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.title.finishing_up",
+      "en": "FINISHING UP",
+      "uk": "ЗАВЕРШЕННЯ",
+      "context": "Title: local cleanup incomplete.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.title.new_game",
+      "en": "NEW GAME",
+      "uk": "НОВА ГРА",
+      "context": "Title while a fresh save is created.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.title.status_unknown",
+      "en": "STATUS UNKNOWN",
+      "uk": "СТАТУС НЕВІДОМИЙ",
+      "context": "Title: local deletion record unreadable.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.title.not_deleted",
+      "en": "NOT DELETED",
+      "uk": "НЕ ВИДАЛЕНО",
+      "context": "Title after a failed attempt.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.title.data_deleted",
+      "en": "DATA DELETED",
+      "uk": "ДАНІ ВИДАЛЕНО",
+      "context": "Title after local data is deleted.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.title.accepted",
+      "en": "DELETION ACCEPTED",
+      "uk": "ЗАПИТ ПРИЙНЯТО",
+      "context": "Title after the server accepts the request.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.confirm.headline",
+      "en": "This permanently deletes your account.",
+      "uk": "Це назавжди видалить ваш акаунт.",
+      "context": "Confirm step, online account.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.confirm.body",
+      "en": "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nIf you sign in again later, you'll start a new account.\n\nSome purchase and security records are kept without your name or profile. The rest is removed within 30 days.",
+      "uk": "Ваш прогрес, монети, предмети й профіль буде видалено. Це неможливо скасувати.\n\nЯкщо ви згодом увійдете знову, буде створено новий акаунт.\n\nДеякі записи про покупки й безпеку зберігаються без вашого імені чи профілю. Решту буде видалено протягом 30 днів.",
+      "context": "Confirm step body. Keep the three paragraphs.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.confirm.button",
+      "en": "Delete Account",
+      "uk": "Видалити акаунт",
+      "context": "Red destructive button.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.local_confirm.headline",
+      "en": "This deletes your game data on this device.",
+      "uk": "Це видалить ваші дані гри на цьому пристрої.",
+      "context": "Confirm step, local-only player.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.local_confirm.body",
+      "en": "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nThis game never created an online account for you, so nothing needs to be deleted from our servers.",
+      "uk": "Ваш прогрес, монети, предмети й профіль буде видалено. Це неможливо скасувати.\n\nДля вас ніколи не створювали онлайн-акаунт у цій грі, тому на наших серверах нічого видаляти не потрібно.",
+      "context": "Body for that step.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.local_confirm.button",
+      "en": "Delete Data",
+      "uk": "Видалити дані",
+      "context": "Red destructive button.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.pending_setup.headline",
+      "en": "Your account is still being set up.",
+      "uk": "Ваш акаунт ще створюється.",
+      "context": "Deletion blocked: first registration not finished.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.pending_setup.body",
+      "en": "Connect to the internet and try again in a moment. Nothing was deleted.",
+      "uk": "Підключіться до інтернету й спробуйте трохи згодом. Нічого не видалено.",
+      "context": "Body.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.sign_in.headline",
+      "en": "Sign in to the account you want to delete.",
+      "uk": "Увійдіть в акаунт, який хочете видалити.",
+      "context": "Deletion blocked: signed out.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.sign_in.body",
+      "en": "If you can't sign in, contact support for help.",
+      "uk": "Якщо не можете увійти, зверніться до служби підтримки.",
+      "context": "Body.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.read_failed.headline",
+      "en": "Your game data couldn't be read.",
+      "uk": "Не вдалося прочитати ваші дані гри.",
+      "context": "Deletion blocked: save unreadable.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.read_failed.body",
+      "en": "Restart the game, then try again. Nothing was deleted.",
+      "uk": "Перезапустіть гру й спробуйте ще раз. Нічого не видалено.",
+      "context": "Body.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.unavailable.headline",
+      "en": "Account deletion isn't available in this version of the game.",
+      "uk": "Видалення акаунта недоступне в цій версії гри.",
+      "context": "Deletion blocked: feature off. Also a failure headline.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.unavailable.body",
+      "en": "Update the game, or contact support for help deleting your account. Nothing was deleted.",
+      "uk": "Оновіть гру або зверніться до служби підтримки, щоб отримати допомогу з видаленням акаунта. Нічого не видалено.",
+      "context": "Body.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.in_progress.account",
+      "en": "Deleting your account...",
+      "uk": "Видалення вашого акаунта...",
+      "context": "Headline while the request runs.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.in_progress.local",
+      "en": "Deleting your game data...",
+      "uk": "Видалення ваших даних гри...",
+      "context": "Same for local-only data.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.in_progress.body",
+      "en": "Keep the game open. This only takes a moment.",
+      "uk": "Залиште гру відкритою. Це займе лише мить.",
+      "context": "Body while deleting.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.not_confirmed.headline",
+      "en": "We haven't heard back about your deletion yet.",
+      "uk": "Ми ще не отримали відповіді щодо видалення.",
+      "context": "Request sent, answer lost.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.not_confirmed.body",
+      "en": "Your request was sent, but the answer didn't arrive. Connect to the internet and try again. The game stays locked until we know the result.",
+      "uk": "Ваш запит надіслано, але відповідь не надійшла. Підключіться до інтернету й спробуйте ще раз. Гра залишатиметься заблокованою, доки ми не дізнаємося результат.",
+      "context": "Body.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.unconfirmed.headline",
+      "en": "Deletion status unconfirmed",
+      "uk": "Статус видалення не підтверджено",
+      "context": "Server outcome unknown.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.unconfirmed.body",
+      "en": "We couldn't confirm whether your account was deleted. To keep your data safe, the game stays locked. Contact support and include the reference below.",
+      "uk": "Не вдалося підтвердити, чи видалено ваш акаунт. Задля безпеки ваших даних гра залишається заблокованою. Зверніться до підтримки й додайте наведений нижче код запиту.",
+      "context": "Body; a reference code is shown under it.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.check_again",
+      "en": "Check Again",
+      "uk": "Перевірити ще раз",
+      "context": "Asks the server again.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.cleanup.headline.local",
+      "en": "Your local game data couldn't be fully deleted yet.",
+      "uk": "Поки що не вдалося повністю видалити ваші локальні дані гри.",
+      "context": "Local cleanup incomplete (local-only player).",
+      "source": "same"
+    },
+    {
+      "key": "deletion.cleanup.headline.account",
+      "en": "Account deletion accepted; finishing cleanup.",
+      "uk": "Запит на видалення акаунта прийнято; завершуємо очищення.",
+      "context": "Local cleanup incomplete after the server accepted.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.cleanup.body",
+      "en": "Some game data couldn't be removed from this device yet. Try again to finish.",
+      "uk": "Деякі дані гри ще не вдалося видалити з цього пристрою. Спробуйте ще раз, щоб завершити видалення.",
+      "context": "Body.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.new_game.headline",
+      "en": "Starting a new game...",
+      "uk": "Починаємо нову гру...",
+      "context": "While a fresh save is created.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.new_game.body",
+      "en": "This only takes a moment.",
+      "uk": "Це займе лише мить.",
+      "context": "Body.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.status_unknown.headline",
+      "en": "We couldn't read the deletion status on this device.",
+      "uk": "Не вдалося прочитати статус видалення на цьому пристрої.",
+      "context": "Local deletion record unreadable.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.status_unknown.body",
+      "en": "To keep your data safe, the game stays locked. Contact support for help.",
+      "uk": "Задля безпеки ваших даних гра залишається заблокованою. Зверніться до служби підтримки.",
+      "context": "Body.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.fail.offline",
+      "en": "Connect to the internet to delete your account.",
+      "uk": "Підключіться до інтернету, щоб видалити акаунт.",
+      "context": "Failure headline.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.fail.rate_limited",
+      "en": "Too many attempts. Wait a moment, then try again.",
+      "uk": "Забагато спроб. Зачекайте трохи й спробуйте ще раз.",
+      "context": "Failure headline.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.fail.busy",
+      "en": "Account deletion is busy right now. Try again in a moment.",
+      "uk": "Видалення акаунта тимчасово недоступне. Спробуйте трохи згодом.",
+      "context": "Failure headline (server unavailable).",
+      "source": "same"
+    },
+    {
+      "key": "deletion.fail.syncing",
+      "en": "The game is still syncing. Try again in a moment.",
+      "uk": "Гра ще синхронізується. Спробуйте трохи згодом.",
+      "context": "Failure headline.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.fail.auth",
+      "en": "We couldn't verify your account. Restart the game, then try again.",
+      "uk": "Не вдалося підтвердити ваш акаунт. Перезапустіть гру й спробуйте ще раз.",
+      "context": "Failure headline.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.fail.update",
+      "en": "Update the game to delete your account.",
+      "uk": "Оновіть гру, щоб видалити акаунт.",
+      "context": "Failure headline (client too old).",
+      "source": "same"
+    },
+    {
+      "key": "deletion.fail.changed",
+      "en": "Your account changed while we were deleting it. Try again.",
+      "uk": "Ваш акаунт змінився під час видалення. Спробуйте ще раз.",
+      "context": "Failure headline.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.fail.storage",
+      "en": "Your device couldn't save the deletion request. Try again.",
+      "uk": "Не вдалося зберегти запит на видалення на вашому пристрої. Спробуйте ще раз.",
+      "context": "Failure headline.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.fail.generic",
+      "en": "We couldn't delete your account. Try again later or contact support.",
+      "uk": "Не вдалося видалити ваш акаунт. Спробуйте згодом або зверніться до підтримки.",
+      "context": "Failure headline (fallback).",
+      "source": "same"
+    },
+    {
+      "key": "deletion.fail.local",
+      "en": "Your game data couldn't be deleted. Try again.",
+      "uk": "Не вдалося видалити ваші дані гри. Спробуйте ще раз.",
+      "context": "Failure headline, local-only player.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.fail.body",
+      "en": "Nothing was deleted, and you can keep playing.",
+      "uk": "Нічого не видалено. Ви можете продовжити гру.",
+      "context": "Body for every failure.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.done_local.headline",
+      "en": "Your local game data was deleted.",
+      "uk": "Ваші локальні дані гри видалено.",
+      "context": "Success, local-only player.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.done_local.body",
+      "en": "You can start over with a new game.",
+      "uk": "Ви можете почати нову гру з нуля.",
+      "context": "Body.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.new_game_failed",
+      "en": "The new game couldn't start. Try again.",
+      "uk": "Не вдалося почати нову гру. Спробуйте ще раз.",
+      "context": "Appended under a success body if the fresh save failed.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.accepted.headline",
+      "en": "Your account is no longer accessible.",
+      "uk": "Ваш акаунт більше недоступний.",
+      "context": "Success, online account.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.accepted.body",
+      "en": "Your deletion request was accepted.",
+      "uk": "Ваш запит на видалення прийнято.",
+      "context": "Body when no deadline is known.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.accepted.body_deadline",
+      "en": "Your deletion request was accepted. Data removal is due by %s.",
+      "uk": "Ваш запит на видалення прийнято. Дані буде видалено до %s.",
+      "context": "Body. `%s` = a date such as \"November 2, 2026\".",
+      "source": "same"
+    },
+    {
+      "key": "deletion.reference",
+      "en": "Reference: %s",
+      "uk": "Код запиту: %s",
+      "context": "Support reference code under the body. `%s` = operation id; never translated.",
+      "source": "same"
+    },
+    {
+      "key": "deletion.start_new_game",
+      "en": "Start New Game",
+      "uk": "Почати нову гру",
+      "context": "Button after a successful deletion.",
+      "source": "same"
+    },
+    {
+      "key": "app.name",
+      "en": "SortingPuzzle",
+      "uk": "SortingPuzzle",
+      "context": "App name under the home-screen icon; today the internal project name. Decide the public name per store first.",
+      "source": "`project.godot`, `export_presets.cfg`"
+    },
+    {
+      "key": "support.email.subject",
+      "en": "Sorting Puzzle support request",
+      "uk": "Sorting Puzzle: звернення до підтримки",
+      "context": "Subject of the pre-filled support email.",
+      "source": "`support_screen.gd`"
+    },
+    {
+      "key": "support.email.body",
+      "en": "Please describe the issue here.\n\nDevice/platform:\nApproximate time:\n",
+      "uk": "Опишіть проблему тут.\n\nПристрій/платформа:\nПриблизний час:\n",
+      "context": "Body template the player fills in.",
+      "source": "`support_screen.gd`"
+    },
+    {
+      "key": "support.ad_email.subject",
+      "en": "Sorting Puzzle ad report",
+      "uk": "Sorting Puzzle: скарга на рекламу",
+      "context": "Subject of the ad-report email.",
+      "source": "`support_screen.gd`"
+    },
+    {
+      "key": "support.ad_email.body",
+      "en": "Please attach a screenshot and complete the details below.\n\nApproximate time:\nAd placement in the game:\nAdvertiser or app name:\nWhy the ad should be reviewed:\n",
+      "uk": "Додайте знімок екрана й заповніть наведені нижче поля.\n\nПриблизний час:\nМісце появи реклами в грі:\nНазва рекламодавця чи застосунку:\nЧому рекламу слід перевірити:\n",
+      "context": "Body template the player fills in.",
+      "source": "`support_screen.gd`"
+    },
+    {
+      "key": "deletion.email.subject",
+      "en": "Sorting Puzzle account deletion",
+      "uk": "Sorting Puzzle: видалення акаунта",
+      "context": "Subject of the deletion help email.",
+      "source": "`account_deletion_modal.gd`"
+    },
+    {
+      "key": "deletion.email.body",
+      "en": "Please help me with my account deletion.",
+      "uk": "Допоможіть мені видалити акаунт.",
+      "context": "First line; followed by `Status:`, `Deletion reference:`, `Server reference:` and `Player ID:` lines.",
+      "source": "`account_deletion_modal.gd`"
+    }
+  ],
+  "plurals": {
+    "chapter.locked_status": {
+      "one": "Пройдіть ще %d рівень розділу «%s», щоб відкрити цей розділ",
+      "few": "Пройдіть ще %d рівні розділу «%s», щоб відкрити цей розділ",
+      "many": "Пройдіть ще %d рівнів розділу «%s», щоб відкрити цей розділ"
+    },
+    "shelf_unlock.offer_or_clear": {
+      "one": "Перегляньте рекламу, щоб відкрити цю полицю зараз, або зберіть ще %s трійку.",
+      "few": "Перегляньте рекламу, щоб відкрити цю полицю зараз, або зберіть ще %s трійки.",
+      "many": "Перегляньте рекламу, щоб відкрити цю полицю зараз, або зберіть ще %s трійок."
+    },
+    "starter.coins": {
+      "one": "%s МОНЕТА",
+      "few": "%s МОНЕТИ",
+      "many": "%s МОНЕТ"
+    },
+    "leaderboard.row_tooltip": {
+      "one": "Місце %d, %s, %d зірка",
+      "few": "Місце %d, %s, %d зірки",
+      "many": "Місце %d, %s, %d зірок"
+    },
+    "leaderboard.reward.body": {
+      "one": "Минулого тижня ви посіли місце №%d й отримали %d монету!",
+      "few": "Минулого тижня ви посіли місце №%d й отримали %d монети!",
+      "many": "Минулого тижня ви посіли місце №%d й отримали %d монет!"
+    }
+  },
+  "counted_boosters": {
+    "Hammer": [
+      "молоток",
+      "молотки",
+      "молотків"
+    ],
+    "Shuffle": [
+      "перемішування",
+      "перемішування",
+      "перемішувань"
+    ],
+    "Lantern": [
+      "ліхтар",
+      "ліхтарі",
+      "ліхтарів"
+    ],
+    "Freezer": [
+      "замороження",
+      "замороження",
+      "заморожень"
+    ]
+  },
+  "months": [
+    "січня",
+    "лютого",
+    "березня",
+    "квітня",
+    "травня",
+    "червня",
+    "липня",
+    "серпня",
+    "вересня",
+    "жовтня",
+    "листопада",
+    "грудня"
+  ],
+  "additional": [
+    {
+      "key": "support.email.status",
+      "en": "Status: %s",
+      "uk": "Статус: %s"
+    },
+    {
+      "key": "support.email.deletion_reference",
+      "en": "Deletion reference",
+      "uk": "Код запиту на видалення"
+    },
+    {
+      "key": "support.email.server_reference",
+      "en": "Server reference",
+      "uk": "Код запиту на сервері"
+    },
+    {
+      "key": "support.email.player_id",
+      "en": "Player ID",
+      "uk": "ID гравця"
+    },
+    {
+      "key": "leaderboard.empty",
+      "en": "No scores yet",
+      "uk": "Поки що немає результатів"
+    },
+    {
+      "key": "date.day_month_year",
+      "en": "%d %s %d",
+      "uk": "%d %s %d р."
+    }
+  ]
+}

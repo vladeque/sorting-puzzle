@@ -1,11 +1,15 @@
 extends Control
 
 const UIMotionScript := preload("res://scripts/ui_motion.gd")
+const GameplayUIThemeScript := preload("res://scripts/gameplay_ui_theme.gd")
 const ILLUSTRATION_CORNER_RADIUS := 16.0
 const PANEL_TOP_OVERHANG := 80.0
 const PANEL_RIGHT_OVERHANG := 44.0
 const HORIZONTAL_MARGIN := 16.0
 const VERTICAL_MARGIN := 24.0
+
+@export var hero_title_font_size := 28
+@export var minimum_hero_title_font_size := 16
 
 @onready var _panel := $RewardChestPanel as Panel
 @onready var _close_button := %CloseButton as Button
@@ -13,6 +17,7 @@ const VERTICAL_MARGIN := 24.0
 @onready var _illustration := %Illustration as TextureRect
 @onready var _progress_bar := %ProgressBar as ProgressBar
 @onready var _amount_label := %AmountLabel as Label
+@onready var _hero_title_label := %HeroTitleLabel as Label
 
 
 func _ready() -> void:
@@ -23,6 +28,19 @@ func _ready() -> void:
 	_illustration.resized.connect(_sync_illustration_corner_mask)
 	_sync_illustration_corner_mask()
 	_apply_reward_progress(PlayerProgress.get_reward_chest_progress())
+	_hero_title_label.resized.connect(_fit_hero_title)
+	_fit_hero_title.call_deferred()
+
+
+func _fit_hero_title() -> void:
+	_hero_title_label.add_theme_font_size_override("font_size", GameplayUIThemeScript.fit_label_font_size(
+		_hero_title_label, _hero_title_label.size.x, hero_title_font_size, minimum_hero_title_font_size
+	))
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		_fit_hero_title.call_deferred()
 
 
 func _fit_panel_to_viewport() -> void:

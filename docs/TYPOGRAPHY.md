@@ -20,11 +20,13 @@ replace them with system fonts: mobile system-font availability and metrics are
 not consistent across devices.
 
 The bundled DynaPuff file has no Cyrillic glyphs. Its theme variations therefore
-include Nunito fallback variations at matching 500, 600 and 700 weights. Russian
+include Nunito fallback variations at matching 500, 600 and 700 weights. Russian and Ukrainian
 titles, buttons, HUD text and counters retain the scene's sizing, color and outline
 while using bundled Cyrillic glyphs; Latin characters continue to use DynaPuff.
 The Russian localization test verifies the entire Russian alphabet against the
 effective title font, including Ё/ё.
+The Ukrainian localization test verifies its full alphabet, including Ґ/ґ, Є/є, І/і, Ї/ї,
+the typographic apostrophe and the № symbol against the same effective title font.
 
 ## Theme Roles
 

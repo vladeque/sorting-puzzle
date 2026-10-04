@@ -361,6 +361,7 @@ theme_override_constants/separation = 4
 alignment = 1
 
 [node name="HeroTitleLabel" type="Label" parent="RewardChestPanel/InnerPanel/ContentStack/ChestStage/TextOverlay/TextStack" unique_id=1203882086]
+unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"GameSectionLabel"
 theme_override_colors/font_color = Color(1, 0.95, 0.78, 1)
@@ -371,6 +372,7 @@ theme_override_font_sizes/font_size = 28
 text = "A REWARD CHEST AWAITS!"
 horizontal_alignment = 1
 vertical_alignment = 1
+clip_text = true
 
 [node name="ContinueButton" type="Button" parent="RewardChestPanel" unique_id=1725894573]
 unique_name_in_owner = true
