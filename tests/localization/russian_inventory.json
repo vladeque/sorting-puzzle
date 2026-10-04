@@ -106,7 +106,7 @@
   },
   {
     "key": "menu.starter_badge",
-    "en": "STARTER",
+    "en": "BUNDLE",
     "ru": "НАБОР",
     "context": "Small badge on the home screen that opens the Starter Bundle offer. About 8 characters.",
     "source": "`main_menu_starter_bundle_badge.tscn`"

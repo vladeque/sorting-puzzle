@@ -70,7 +70,7 @@ msgstr "Full"
 
 #. menu.starter_badge
 msgid "menu.starter_badge"
-msgstr "STARTER"
+msgstr "BUNDLE"
 
 #. nav.shop
 msgid "nav.shop"
@@ -1143,8 +1143,8 @@ msgid "Full"
 msgstr "Full"
 
 #. menu.starter_badge
-msgid "STARTER"
-msgstr "STARTER"
+msgid "BUNDLE"
+msgstr "BUNDLE"
 
 #. nav.shop
 msgid "Shop"

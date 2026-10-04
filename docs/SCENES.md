@@ -565,7 +565,8 @@ Do not use for:
   badge study, echoing the storefront's bracket clock sign): `Bracket` (`ShopSignBracket`, a
   wrought-iron wall bracket) and, under `Swing`, the `Sign` with `SignBoard` (`ShopSignBoard`: two
   chains and the wood board), a `Glow`, the `shop_coin_offer_tier_07.png` `CoinArt`, the painted
-  `STARTER` label, and `%DiscountTag` (`discount_badge_pinned.png` with `%DiscountLabel`).
+  `BUNDLE` label (`НАБОР` in Russian), and `%DiscountTag` (`discount_badge_pinned.png` with
+  `%DiscountLabel`).
 - `%BadgeButton` is a full-rect transparent `PressScaleButton` whose press shrinks `Swing/Sign`
   only, so the bracket stays mounted. `%IdleMotion` loops `idle` (3.6s): `Swing` rocks ±2.5°
   around the bar between the chain hooks, and the tag flicks once per loop. It plays only while the

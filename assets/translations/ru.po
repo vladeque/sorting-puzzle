@@ -1148,7 +1148,7 @@ msgid "Full"
 msgstr "Макс."
 
 #. menu.starter_badge
-msgid "STARTER"
+msgid "BUNDLE"
 msgstr "НАБОР"
 
 #. nav.shop

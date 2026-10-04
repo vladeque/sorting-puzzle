@@ -77,3 +77,16 @@ Other untranslated text remains limited to names and data: the app brand, actual
 native language names, platform names, addresses, references/IDs and platform prices. Regular
 gameplay text remains Russian, including booster names, `КОМБО`, `Макс.` and `Звуки`; this review
 found no additional gameplay labels that benefit from an English exception.
+
+### English badge alignment
+
+The follow-up changes the English badge scene text, catalog value and alias from `STARTER` to
+`BUNDLE`, with the Russian alias still resolving to `НАБОР`. The translation inventory's
+guidelines, affected rows and implementation notes now preserve `AD` and percentage + `OFF`
+tags in every language. Full Starter Bundle titles remain unchanged.
+
+`test_russian_localization` passed again for all 251 entries, English fallback and live switches,
+with no engine errors. The `menu_bundle_en` and `menu_bundle_ru` rendered contact sheets were
+inspected at 540x960, 720x1280, 1080x1920 and 1080x2400; every capture matched its requested size.
+Both badge captions fit. The existing menu positioning issue at 1080x1920 and 1080x2400 is
+visible in both languages.

@@ -44,19 +44,23 @@ The owner's October 5, 2026 review supersedes three rows of that original invent
 
 | Key / English alias | Current Russian display | Reason |
 | --- | --- | --- |
-| `menu.starter_badge` / `STARTER` | `НАБОР` | Names the package; `СТАРТ` suggested starting gameplay. |
+| `menu.starter_badge` / `BUNDLE` | `НАБОР` | Names the package; `СТАРТ` suggested starting gameplay. |
 | `ad.badge` / `AD` | `AD` | Preserve the compact locked-shelf marker. |
 | `shop.discount_off` / `OFF` | `OFF` | Preserve the short second line of the percentage tag. |
 
 These updates live in both the stable-key and English-alias entries of `ru.po`, and in the
 reviewed test fixture. The original inventory remains an archive of the supplied document.
 The full offer/card title remains `Стартовый набор` (uppercased where authored).
+The badge's English scene text, catalog value and alias are `BUNDLE`, matching Russian `НАБОР`.
 
 Keep the game name, actual player names, platform names, native language names, addresses,
 references/IDs and platform-formatted prices unchanged. Translate regular player-facing copy,
 including ad descriptions/actions, booster names, `КОМБО`, `Макс.` and bundle descriptions.
-`AD` and `OFF` are deliberate exceptions for compact visual markers, not a general preference
-for English labels throughout the Russian UI.
+Across locales, keep the locked-shelf `AD` marker and percentage discount tags such as `67% OFF`
+unchanged. `shop.discount_off` must remain `OFF`; the percentage comes from the offer and keeps
+its existing digits and `%` sign. These are compact visual markers; regular ad actions and
+descriptions still translate. The translator inventory records this rule in its guidelines,
+individual rows and implementation notes.
 
 The catalogs expose stable inventory keys for dynamic text and English aliases for scene-authored
 labels, buttons, tooltips, exported component titles and config-supplied chapter/bundle names.
