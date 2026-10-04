@@ -76,6 +76,8 @@ func _init() -> void:
 
 
 func _run() -> void:
+	# These assertions verify the English baseline regardless of the device locale.
+	TranslationServer.set_locale("en")
 	await process_frame
 	await _check_account_confirmation_and_cancel()
 	await _check_local_confirmation_uses_the_local_flow()

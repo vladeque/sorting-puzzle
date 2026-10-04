@@ -259,9 +259,9 @@ func _to_layer(global_point: Vector2) -> Vector2:
 
 
 func _format_count(value: int) -> String:
-	var value_text := str(maxi(value, 0))
-	var formatted := ""
-	while value_text.length() > 3:
-		formatted = ",%s%s" % [value_text.right(3), formatted]
-		value_text = value_text.substr(0, value_text.length() - 3)
-	return value_text + formatted
+	return GameText.format_number(value)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		_coin_amount_label.text = "+%s" % _format_count(_coin_reward)

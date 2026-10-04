@@ -373,6 +373,7 @@ theme_override_styles/normal = SubResource("StyleBoxTexture_blank_button")
 theme_override_styles/pressed = SubResource("StyleBoxTexture_blank_button")
 theme_override_styles/hover = SubResource("StyleBoxTexture_blank_button")
 text = "Privacy Policy"
+clip_text = true
 script = ExtResource("6_press_scale_button")
 
 [node name="DiagnosticsLabel" type="Label" parent="PauseMenuPanel/InnerPanel"]

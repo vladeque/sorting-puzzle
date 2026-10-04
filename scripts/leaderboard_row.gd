@@ -17,13 +17,20 @@ const COMPACT_AVATAR_SIZE := 54.0
 @onready var _rank_reward := %RankReward as LeaderboardRankReward
 @onready var _score_label := %ScoreLabel as Label
 
+var _entry: Dictionary = {}
+
+
+func _ready() -> void:
+	_name_label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+
 
 func set_entry(entry: Dictionary) -> void:
 	var rank := maxi(int(entry.get("rank", 0)), 0)
 	var score := maxi(int(entry.get("score", 0)), 0)
-	var display_name := str(entry.get("display_name", "Player")).strip_edges()
+	_entry = entry.duplicate(true)
+	var display_name := str(entry.get("display_name", "")).strip_edges()
 	if display_name.is_empty():
-		display_name = "Player"
+		display_name = tr("leaderboard.default_name")
 
 	_gold_circle.visible = rank == 1
 	_silver_circle.visible = rank == 2
@@ -37,7 +44,7 @@ func set_entry(entry: Dictionary) -> void:
 	)
 	_rank_reward.clear_reward()
 	_current_background.visible = bool(entry.get("is_current_player", false))
-	tooltip_text = "Rank %d, %s, %d stars" % [rank, display_name, score]
+	tooltip_text = tr_n("leaderboard.row_tooltip", "leaderboard.row_tooltip.plural", score) % [rank, display_name, score]
 
 
 func set_rank_reward(texture: Texture2D, coin_amount: int) -> void:
@@ -60,11 +67,17 @@ func set_compact(is_compact: bool) -> void:
 
 
 func _format_number(value: int) -> String:
-	var digits := str(maxi(value, 0))
-	var formatted := ""
-	for index in range(digits.length()):
-		if index > 0 and (digits.length() - index) % 3 == 0:
-			formatted += ","
-		formatted += digits[index]
+	return GameText.format_number(value)
 
-	return formatted
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		var score := maxi(int(_entry.get("score", 0)), 0)
+		var name_text := str(_entry.get("display_name", "")).strip_edges()
+		if name_text.is_empty():
+			name_text = tr("leaderboard.default_name")
+		_name_label.text = name_text
+		_score_label.text = _format_number(score)
+		tooltip_text = tr_n("leaderboard.row_tooltip", "leaderboard.row_tooltip.plural", score) % [
+			maxi(int(_entry.get("rank", 0)), 0), name_text, score
+		]

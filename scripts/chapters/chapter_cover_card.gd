@@ -26,6 +26,9 @@ const INFO_MARGIN_BASE := 30.0
 var _chapter_id := ""
 var _panel_height := DEFAULT_PANEL_HEIGHT
 var _safe_margins := Vector4.ZERO
+var _chapter: Dictionary = {}
+var _progress: Dictionary = {}
+var _is_selected := false
 
 
 func _ready() -> void:
@@ -33,8 +36,11 @@ func _ready() -> void:
 
 
 func configure(chapter: Dictionary, progress: Dictionary, is_selected: bool) -> void:
+	_chapter = chapter.duplicate(true)
+	_progress = progress.duplicate(true)
+	_is_selected = is_selected
 	_chapter_id = str(chapter.get("id", ""))
-	_eyebrow_label.text = "CHAPTER %d" % int(chapter.get("order", 0))
+	_eyebrow_label.text = tr("chapter.button") % int(chapter.get("order", 0))
 	_title_label.text = str(chapter.get("title", "Chapter"))
 	var preview_path := ChapterCatalog.get_selection_preview_path(_chapter_id)
 	_art.texture = load(preview_path) as Texture2D if not preview_path.is_empty() else null
@@ -54,8 +60,10 @@ func configure(chapter: Dictionary, progress: Dictionary, is_selected: bool) -> 
 		var remaining_levels := maxi(required_levels - completed_required_levels, 0)
 		var previous_chapter_id := ChapterCatalog.get_previous_chapter_id(_chapter_id)
 		var previous_chapter := ChapterCatalog.get_chapter(previous_chapter_id)
-		var previous_title := str(previous_chapter.get("title", "the previous chapter"))
-		_status_label.text = "Complete %d more %s levels to unlock" % [remaining_levels, previous_title]
+		var previous_title := tr(str(previous_chapter.get("title", "the previous chapter")))
+		_status_label.text = tr_n(
+			"chapter.locked_status", "chapter.locked_status.plural", remaining_levels
+		) % [remaining_levels, previous_title]
 		_progress_label.text = "Unlock progress"
 		_set_progress(completed_required_levels, required_levels)
 		_cta_button.text = "Locked"
@@ -110,3 +118,8 @@ func _apply_info_margins() -> void:
 
 func _emit_selected() -> void:
 	selected.emit(_chapter_id)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready() and not _chapter.is_empty():
+		configure(_chapter, _progress, _is_selected)

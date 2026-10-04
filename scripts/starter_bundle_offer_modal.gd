@@ -50,6 +50,8 @@ const STATUS_TEXT_COLORS := {
 @onready var _buy_price_label := %BuyPriceLabel as Label
 @onready var _close_button := %Shell.get_node("OuterPanel/CloseButton") as Button
 
+var _coin_amount := 0
+var _showing_price := false
 var _price_text := ""
 var _compare_at_text := ""
 var _is_busy := false
@@ -72,9 +74,11 @@ func set_offer(offer: Dictionary) -> void:
 	var rewards := offer.get("rewards", {}) as Dictionary
 	var abilities := rewards.get("abilities", {}) as Dictionary
 	var coins := maxi(int(rewards.get("coins", 0)), 0)
+	_coin_amount = coins
+	_showing_price = true
 	_coin_art.visible = coins > 0
 	_coin_ribbon.visible = coins > 0
-	_coin_ribbon.set_text("%s COINS" % _format_count(coins))
+	_coin_ribbon.set_text(tr_n("starter.coins", "starter.coins.plural", coins) % _format_count(coins))
 	_hammer_reward.set_count(int(abilities.get("hammer", 0)))
 	_shuffle_reward.set_count(int(abilities.get("shuffle", 0)))
 	_lantern_reward.set_count(int(abilities.get("highlight", 0)))
@@ -93,7 +97,7 @@ func set_offer(offer: Dictionary) -> void:
 	var discount := maxi(int(offer.get("discount_percent", 0)), 0)
 	_discount_badge.visible = discount > 0
 	_percent_label.text = "%d%%" % discount
-	_set_buy_label("Buy for %s" % _price_text, not _compare_at_text.is_empty())
+	_set_buy_label(tr("starter.buy_for") % _price_text, not _compare_at_text.is_empty())
 	_compare_at_price_label.text = _compare_at_text
 
 	_set_status("")
@@ -132,6 +136,7 @@ func is_busy() -> bool:
 
 
 func set_busy(status: String = "Checking offer…") -> void:
+	_showing_price = false
 	_is_busy = true
 	_set_close_enabled(false)
 	_buy_button.disabled = true
@@ -141,6 +146,7 @@ func set_busy(status: String = "Checking offer…") -> void:
 
 
 func show_error(message: String, can_retry: bool) -> void:
+	_showing_price = false
 	_is_busy = false
 	_set_close_enabled(true)
 	_buy_button.disabled = not can_retry
@@ -203,9 +209,11 @@ func _set_status(message: String, tone: StatusTone = StatusTone.BUSY) -> void:
 
 
 func _format_count(value: int) -> String:
-	var value_text := str(value)
-	var formatted := ""
-	while value_text.length() > 3:
-		formatted = ",%s%s" % [value_text.right(3), formatted]
-		value_text = value_text.substr(0, value_text.length() - 3)
-	return value_text + formatted
+	return GameText.format_number(value)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		_coin_ribbon.set_text(tr_n("starter.coins", "starter.coins.plural", _coin_amount) % _format_count(_coin_amount))
+		if _showing_price:
+			_set_buy_label(tr("starter.buy_for") % _price_text, not _compare_at_text.is_empty())

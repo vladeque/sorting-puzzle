@@ -1,0 +1,2144 @@
+# Reviewed Russian inventory; see docs/localization/RUSSIAN_TRANSLATIONS.md.
+msgid ""
+msgstr ""
+"Project-Id-Version: SortingPuzzle\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+
+#. common.play
+msgid "common.play"
+msgstr "Играть"
+
+#. common.continue
+msgid "common.continue"
+msgstr "Продолжить"
+
+#. common.resume
+msgid "common.resume"
+msgstr "Продолжить"
+
+#. common.try_again
+msgid "common.try_again"
+msgstr "Повторить"
+
+#. common.close
+msgid "common.close"
+msgstr "Закрыть"
+
+#. common.cancel
+msgid "common.cancel"
+msgstr "Отмена"
+
+#. common.got_it
+msgid "common.got_it"
+msgstr "Понятно"
+
+#. common.get_help
+msgid "common.get_help"
+msgstr "Помощь"
+
+#. common.save
+msgid "common.save"
+msgstr "СОХРАНИТЬ"
+
+#. common.loading
+msgid "common.loading"
+msgstr "Загрузка…"
+
+#. common.retry_load
+msgid "common.retry_load"
+msgstr "Обновить"
+
+#. menu.level_button
+msgid "menu.level_button"
+msgstr "УРОВЕНЬ %d"
+
+#. menu.more_levels_coming_soon
+msgid "menu.more_levels_coming_soon"
+msgstr "НОВЫЕ УРОВНИ СКОРО"
+
+#. menu.coming_soon
+msgid "menu.coming_soon"
+msgstr "СКОРО"
+
+#. menu.lives_full
+msgid "menu.lives_full"
+msgstr "Макс."
+
+#. menu.starter_badge
+msgid "menu.starter_badge"
+msgstr "СТАРТ"
+
+#. nav.shop
+msgid "nav.shop"
+msgstr "Магазин"
+
+#. nav.home
+msgid "nav.home"
+msgstr "Главная"
+
+#. nav.leaderboard
+msgid "nav.leaderboard"
+msgstr "Лидеры"
+
+#. chapter.button
+msgid "chapter.button"
+msgstr "ГЛАВА %d"
+
+#. chapter.button_tooltip
+msgid "chapter.button_tooltip"
+msgstr "Выбрать главу %d: %s"
+
+#. chapter.screen_title
+msgid "chapter.screen_title"
+msgstr "ГЛАВЫ"
+
+#. chapter.eyebrow
+msgid "chapter.eyebrow"
+msgstr "ГЛАВА %d"
+
+#. chapter.title.chapter_01
+msgid "chapter.title.chapter_01"
+msgstr "Продуктовый городок"
+
+#. chapter.title.chapter_02
+msgid "chapter.title.chapter_02"
+msgstr "Сладкий уголок"
+
+#. chapter.locked_status
+msgid "chapter.locked_status"
+msgid_plural "chapter.locked_status.plural"
+msgstr[0] "Пройдите ещё %d уровень главы «%s», чтобы открыть эту главу"
+msgstr[1] "Пройдите ещё %d уровня главы «%s», чтобы открыть эту главу"
+msgstr[2] "Пройдите ещё %d уровней главы «%s», чтобы открыть эту главу"
+
+#. chapter.unlock_progress
+msgid "chapter.unlock_progress"
+msgstr "До открытия"
+
+#. chapter.current_progress
+msgid "chapter.current_progress"
+msgstr "Текущий прогресс"
+
+#. chapter.locked
+msgid "chapter.locked"
+msgstr "Закрыто"
+
+#. chapter.no_levels_status
+msgid "chapter.no_levels_status"
+msgstr "Скоро появятся новые уровни"
+
+#. chapter.coming_soon
+msgid "chapter.coming_soon"
+msgstr "Скоро"
+
+#. hud.level
+msgid "hud.level"
+msgstr "УРОВЕНЬ %d"
+
+#. hud.combo
+msgid "hud.combo"
+msgstr "КОМБО ×%d"
+
+#. hud.ability_tooltip.hammer
+msgid "hud.ability_tooltip.hammer"
+msgstr "Молоток — убирает одну тройку одинаковых предметов"
+
+#. hud.ability_tooltip.shuffle
+msgid "hud.ability_tooltip.shuffle"
+msgstr "Перемешивание — перемешивает предметы на открытых полках"
+
+#. hud.ability_tooltip.lantern
+msgid "hud.ability_tooltip.lantern"
+msgstr "Фонарь — подсвечивает тройку, которую можно собрать"
+
+#. hud.ability_tooltip.freezer
+msgid "hud.ability_tooltip.freezer"
+msgstr "Заморозка — останавливает таймер"
+
+#. hud.seconds_short
+msgid "hud.seconds_short"
+msgstr "%dс"
+
+#. tip.tap_dispenser
+msgid "tip.tap_dispenser"
+msgstr "Нажмите на автомат, чтобы он выбросил предметы на полки!"
+
+#. pause.title
+msgid "pause.title"
+msgstr "ПАУЗА"
+
+#. pause.leave
+msgid "pause.leave"
+msgstr "Выйти"
+
+#. leave.title
+msgid "leave.title"
+msgstr "ВЫХОД ИЗ УРОВНЯ"
+
+#. leave.you_will_lose
+msgid "leave.you_will_lose"
+msgstr "Вы потеряете:"
+
+#. leave.confirm
+msgid "leave.confirm"
+msgstr "Выйти"
+
+#. timeup.title
+msgid "timeup.title"
+msgstr "ВРЕМЯ ВЫШЛО"
+
+#. timeup.offer
+msgid "timeup.offer"
+msgstr "Добавьте минуту и продолжайте сортировать!"
+
+#. timeup.used
+msgid "timeup.used"
+msgstr "Использовано"
+
+#. ability_purchase.title
+msgid "ability_purchase.title"
+msgstr "ПРИМЕНИТЬ БУСТЕР"
+
+#. shelf_unlock.title
+msgid "shelf_unlock.title"
+msgstr "ОТКРЫТЬ ПОЛКУ"
+
+#. shelf_unlock.offer
+msgid "shelf_unlock.offer"
+msgstr "Посмотрите рекламу, чтобы открыть эту полку сейчас."
+
+#. shelf_unlock.offer_or_clear
+msgid "shelf_unlock.offer_or_clear"
+msgid_plural "shelf_unlock.offer_or_clear.plural"
+msgstr[0] "Посмотрите рекламу, чтобы открыть эту полку сейчас, или соберите ещё %s тройку."
+msgstr[1] "Посмотрите рекламу, чтобы открыть эту полку сейчас, или соберите ещё %s тройки."
+msgstr[2] "Посмотрите рекламу, чтобы открыть эту полку сейчас, или соберите ещё %s троек."
+
+#. shelf_unlock.button
+msgid "shelf_unlock.button"
+msgstr "Реклама · Открыть полку"
+
+#. shelf_unlock.ad_unavailable
+msgid "shelf_unlock.ad_unavailable"
+msgstr "Реклама недоступна. Полка остаётся закрытой."
+
+#. complete.title
+msgid "complete.title"
+msgstr "ОТЛИЧНО!"
+
+#. failed.title
+msgid "failed.title"
+msgstr "УРОВЕНЬ %d"
+
+#. failed.headline
+msgid "failed.headline"
+msgstr "УРОВЕНЬ НЕ ПРОЙДЕН"
+
+#. failed.retry
+msgid "failed.retry"
+msgstr "Повторить"
+
+#. combo.praise.2
+msgid "combo.praise.2"
+msgstr "Класс"
+
+#. combo.praise.3
+msgid "combo.praise.3"
+msgstr "Здорово"
+
+#. combo.praise.4
+msgid "combo.praise.4"
+msgstr "Круто"
+
+#. combo.praise.5
+msgid "combo.praise.5"
+msgstr "Потрясающе"
+
+#. combo.praise.6
+msgid "combo.praise.6"
+msgstr "Фантастика"
+
+#. combo.praise.7
+msgid "combo.praise.7"
+msgstr "Невероятно"
+
+#. combo.praise.8
+msgid "combo.praise.8"
+msgstr "Сногсшибательно"
+
+#. combo.praise.9
+msgid "combo.praise.9"
+msgstr "Не остановить"
+
+#. combo.praise.10
+msgid "combo.praise.10"
+msgstr "Легендарно"
+
+#. combo.praise.11
+msgid "combo.praise.11"
+msgstr "Эпично"
+
+#. combo.praise.12
+msgid "combo.praise.12"
+msgstr "Блестяще"
+
+#. combo.praise.13
+msgid "combo.praise.13"
+msgstr "Мастерски"
+
+#. combo.praise.14
+msgid "combo.praise.14"
+msgstr "Непревзойдённо"
+
+#. combo.praise.15
+msgid "combo.praise.15"
+msgstr "Феноменально"
+
+#. combo.praise.16
+msgid "combo.praise.16"
+msgstr "Сказочно"
+
+#. combo.praise.17
+msgid "combo.praise.17"
+msgstr "Величественно"
+
+#. combo.praise.18
+msgid "combo.praise.18"
+msgstr "Ослепительно"
+
+#. combo.praise.19
+msgid "combo.praise.19"
+msgstr "Божественно"
+
+#. combo.praise.20
+msgid "combo.praise.20"
+msgstr "Запредельно"
+
+#. ability.hammer.name
+msgid "ability.hammer.name"
+msgstr "Молоток"
+
+#. ability.shuffle.name
+msgid "ability.shuffle.name"
+msgstr "Перемешивание"
+
+#. ability.lantern.name
+msgid "ability.lantern.name"
+msgstr "Фонарь"
+
+#. ability.freezer.name
+msgid "ability.freezer.name"
+msgstr "Заморозка"
+
+#. ability.hammer.description
+msgid "ability.hammer.description"
+msgstr "Мгновенно убирает с полок одну тройку одинаковых предметов."
+
+#. ability.shuffle.description
+msgid "ability.shuffle.description"
+msgstr "Перемешивает предметы на полках, чтобы было проще собрать тройку."
+
+#. ability.lantern.description
+msgid "ability.lantern.description"
+msgstr "На 15 секунд подсвечивает тройку одинаковых предметов, которую можно собрать."
+
+#. ability.freezer.description
+msgid "ability.freezer.description"
+msgstr "Останавливает таймер уровня на 30 секунд."
+
+#. ad.watch
+msgid "ad.watch"
+msgstr "Смотреть рекламу"
+
+#. ad.loading
+msgid "ad.loading"
+msgstr "Загрузка..."
+
+#. ad.verifying
+msgid "ad.verifying"
+msgstr "Проверка..."
+
+#. ad.verify_reward
+msgid "ad.verify_reward"
+msgstr "Проверить награду"
+
+#. ad.reward_pending
+msgid "ad.reward_pending"
+msgstr "Награда ещё не подтверждена."
+
+#. ad.unavailable_retry
+msgid "ad.unavailable_retry"
+msgstr "Реклама недоступна. Повторите попытку."
+
+#. ad.watch_unavailable
+msgid "ad.watch_unavailable"
+msgstr "Реклама\nНедоступна"
+
+#. ad.watch_coming_soon
+msgid "ad.watch_coming_soon"
+msgstr "Реклама\nСкоро"
+
+#. ad.badge
+msgid "ad.badge"
+msgstr "РЕК"
+
+#. lives.title.out
+msgid "lives.title.out"
+msgstr "ЖИЗНИ ЗАКОНЧИЛИСЬ"
+
+#. lives.title.get_more
+msgid "lives.title.get_more"
+msgstr "ПОПОЛНИТЬ ЖИЗНИ"
+
+#. lives.title.full
+msgid "lives.title.full"
+msgstr "МАКСИМУМ ЖИЗНЕЙ"
+
+#. lives.next_in
+msgid "lives.next_in"
+msgstr "НОВАЯ ЖИЗНЬ ЧЕРЕЗ"
+
+#. lives.full_body
+msgid "lives.full_body"
+msgstr "У вас максимум жизней! Начните уровень, чтобы их использовать."
+
+#. chest.title
+msgid "chest.title"
+msgstr "НАГРАДЫ ИЗ СУНДУКА"
+
+#. chest.progress_hint
+msgid "chest.progress_hint"
+msgstr "Собирайте звёзды, чтобы открыть сундук и получить награду"
+
+#. chest.ready
+msgid "chest.ready"
+msgstr "ВАС ЖДЁТ СУНДУК С НАГРАДОЙ!"
+
+#. chest.tap_to_open
+msgid "chest.tap_to_open"
+msgstr "Нажмите, чтобы открыть"
+
+#. purchase.tap_to_collect
+msgid "purchase.tap_to_collect"
+msgstr "Нажмите, чтобы забрать"
+
+#. purchase.complete
+msgid "purchase.complete"
+msgstr "ПОКУПКА ЗАВЕРШЕНА"
+
+#. shop.title
+msgid "shop.title"
+msgstr "МАГАЗИН"
+
+#. shop.section.bundles
+msgid "shop.section.bundles"
+msgstr "ОСОБЫЕ НАБОРЫ"
+
+#. shop.section.coins
+msgid "shop.section.coins"
+msgstr "МОНЕТЫ"
+
+#. shop.offer.starter_bundle
+msgid "shop.offer.starter_bundle"
+msgstr "Стартовый набор"
+
+#. shop.offer.basic_bundle
+msgid "shop.offer.basic_bundle"
+msgstr "Базовый набор"
+
+#. shop.tag.best_value
+msgid "shop.tag.best_value"
+msgstr "САМОЕ ВЫГОДНОЕ"
+
+#. shop.discount_off
+msgid "shop.discount_off"
+msgstr "СКИДКА"
+
+#. shop.ability_hint
+msgid "shop.ability_hint"
+msgstr "Нажмите на бустер, чтобы узнать, как он работает"
+
+#. shop.purchasing
+msgid "shop.purchasing"
+msgstr "Покупка…"
+
+#. shop.no_offers
+msgid "shop.no_offers"
+msgstr "В вашем регионе нет доступных предложений магазина."
+
+#. shop.load_failed
+msgid "shop.load_failed"
+msgstr "Не удалось загрузить магазин."
+
+#. shop.error.title.purchase
+msgid "shop.error.title.purchase"
+msgstr "Покупка недоступна"
+
+#. shop.error.title.reward
+msgid "shop.error.title.reward"
+msgstr "Ошибка выдачи награды"
+
+#. shop.error.purchase_failed
+msgid "shop.error.purchase_failed"
+msgstr "Не удалось завершить покупку."
+
+#. shop.error.grant_failed
+msgid "shop.error.grant_failed"
+msgstr "Не удалось выдать купленные награды."
+
+#. shop.error.offer_unavailable
+msgid "shop.error.offer_unavailable"
+msgstr "Это предложение магазина недоступно."
+
+#. shop.error.already_bought
+msgid "shop.error.already_bought"
+msgstr "Это разовое предложение уже куплено."
+
+#. starter.title
+msgid "starter.title"
+msgstr "СТАРТОВЫЙ НАБОР"
+
+#. starter.one_time
+msgid "starter.one_time"
+msgstr "РАЗОВОЕ ПРЕДЛОЖЕНИЕ"
+
+#. starter.boosters_included
+msgid "starter.boosters_included"
+msgstr "БУСТЕРЫ В НАБОРЕ"
+
+#. starter.coins
+msgid "starter.coins"
+msgid_plural "starter.coins.plural"
+msgstr[0] "%s МОНЕТА"
+msgstr[1] "%s МОНЕТЫ"
+msgstr[2] "%s МОНЕТ"
+
+#. starter.buy_for
+msgid "starter.buy_for"
+msgstr "Купить за %s"
+
+#. starter.checking
+msgid "starter.checking"
+msgstr "Проверка предложения…"
+
+#. starter.checking_short
+msgid "starter.checking_short"
+msgstr "Проверка…"
+
+#. starter.no_longer_available
+msgid "starter.no_longer_available"
+msgstr "Это предложение больше недоступно."
+
+#. starter.unavailable
+msgid "starter.unavailable"
+msgstr "Недоступно"
+
+#. booster_chip.claimed
+msgid "booster_chip.claimed"
+msgstr "+%d %s"
+
+#. profile.title
+msgid "profile.title"
+msgstr "ИЗМЕНИТЬ ПРОФИЛЬ"
+
+#. profile.name_header
+msgid "profile.name_header"
+msgstr "ИМЯ ИГРОКА"
+
+#. profile.name_placeholder
+msgid "profile.name_placeholder"
+msgstr "Имя игрока"
+
+#. profile.edit_name_tooltip
+msgid "profile.edit_name_tooltip"
+msgstr "Изменить имя игрока"
+
+#. profile.avatar_tab
+msgid "profile.avatar_tab"
+msgstr "АВАТАР"
+
+#. profile.frame_tab
+msgid "profile.frame_tab"
+msgstr "РАМКА"
+
+#. profile.unlock.level
+msgid "profile.unlock.level"
+msgstr "Пройдите уровень %d, чтобы открыть"
+
+#. profile.unlock.combo
+msgid "profile.unlock.combo"
+msgstr "Соберите комбо ×%d в любой попытке, чтобы открыть"
+
+#. profile.unlock.weekly_first
+msgid "profile.unlock.weekly_first"
+msgstr "Займите 1-е место в недельном рейтинге, чтобы открыть"
+
+#. profile.unlock.weekly_top
+msgid "profile.unlock.weekly_top"
+msgstr "Войдите в топ-%d недельного рейтинга, чтобы открыть"
+
+#. leaderboard.title
+msgid "leaderboard.title"
+msgstr "ЛИДЕРЫ"
+
+#. leaderboard.tab.weekly
+msgid "leaderboard.tab.weekly"
+msgstr "Неделя"
+
+#. leaderboard.tab.country
+msgid "leaderboard.tab.country"
+msgstr "Страна"
+
+#. leaderboard.tab.world
+msgid "leaderboard.tab.world"
+msgstr "Мир"
+
+#. leaderboard.weekly_reset
+msgid "leaderboard.weekly_reset"
+msgstr "Недельный рейтинг обновится через %s"
+
+#. leaderboard.duration.dh
+msgid "leaderboard.duration.dh"
+msgstr "%dд %dч"
+
+#. leaderboard.duration.hm
+msgid "leaderboard.duration.hm"
+msgstr "%dч %dм"
+
+#. leaderboard.duration.m
+msgid "leaderboard.duration.m"
+msgstr "%dм"
+
+#. leaderboard.country_caption
+msgid "leaderboard.country_caption"
+msgstr "Страна · Звёзды за всё время"
+
+#. leaderboard.world_caption
+msgid "leaderboard.world_caption"
+msgstr "Весь мир · Звёзды за всё время"
+
+#. leaderboard.load_failed
+msgid "leaderboard.load_failed"
+msgstr "Не удалось загрузить рейтинг."
+
+#. leaderboard.default_name
+msgid "leaderboard.default_name"
+msgstr "Игрок"
+
+#. leaderboard.row_tooltip
+msgid "leaderboard.row_tooltip"
+msgid_plural "leaderboard.row_tooltip.plural"
+msgstr[0] "Место %d, %s, %d звезда"
+msgstr[1] "Место %d, %s, %d звезды"
+msgstr[2] "Место %d, %s, %d звёзд"
+
+#. leaderboard.reward_tooltip
+msgid "leaderboard.reward_tooltip"
+msgstr "Количество монет в награду за неделю: %s"
+
+#. leaderboard.reward.title
+msgid "leaderboard.reward.title"
+msgstr "НАГРАДА ЗА НЕДЕЛЮ!"
+
+#. leaderboard.reward.body
+msgid "leaderboard.reward.body"
+msgid_plural "leaderboard.reward.body.plural"
+msgstr[0] "На прошлой неделе вы заняли %d-е место и получили %d монету!"
+msgstr[1] "На прошлой неделе вы заняли %d-е место и получили %d монеты!"
+msgstr[2] "На прошлой неделе вы заняли %d-е место и получили %d монет!"
+
+#. leaderboard.reward.ok
+msgid "leaderboard.reward.ok"
+msgstr "Здорово!"
+
+#. settings.title
+msgid "settings.title"
+msgstr "НАСТРОЙКИ"
+
+#. settings.music
+msgid "settings.music"
+msgstr "Музыка"
+
+#. settings.sfx
+msgid "settings.sfx"
+msgstr "Звуки"
+
+#. settings.vibrate
+msgid "settings.vibrate"
+msgstr "Вибрация"
+
+#. settings.support
+msgid "settings.support"
+msgstr "Поддержка"
+
+#. settings.language
+msgid "settings.language"
+msgstr "Язык"
+
+#. settings.privacy_policy
+msgid "settings.privacy_policy"
+msgstr "Политика конфиденциальности"
+
+#. settings.privacy_choices
+msgid "settings.privacy_choices"
+msgstr "Настройки конфиденциальности"
+
+#. settings.diagnostics
+msgid "settings.diagnostics"
+msgstr "Версия %s • Сборка %d\nПлатформа: %s • Игрок: %s"
+
+#. language.title
+msgid "language.title"
+msgstr "ЯЗЫК"
+
+#. support.title
+msgid "support.title"
+msgstr "ПОДДЕРЖКА"
+
+#. support.faq_header
+msgid "support.faq_header"
+msgstr "Частые вопросы"
+
+#. support.faq.play.q
+msgid "support.faq.play.q"
+msgstr "Как играть?"
+
+#. support.faq.play.a
+msgid "support.faq.play.a"
+msgstr "Перемещайте одинаковые предметы на одну полку. Когда на одной полке видны три одинаковых предмета, они исчезают. Уберите все предметы до того, как закончится время."
+
+#. support.faq.contact.q
+msgid "support.faq.contact.q"
+msgstr "Как связаться с поддержкой?"
+
+#. support.faq.contact.a
+msgid "support.faq.contact.a"
+msgstr "Напишите нам по адресу %s. Кратко опишите проблему, укажите платформу вашего устройства и время, когда возникла проблема."
+
+#. support.faq.contact.action
+msgid "support.faq.contact.action"
+msgstr "Написать в поддержку"
+
+#. support.faq.crash.q
+msgid "support.faq.crash.q"
+msgstr "Что делать, если игра зависает или вылетает?"
+
+#. support.faq.crash.a
+msgid "support.faq.crash.a"
+msgstr "Сначала закройте и снова откройте игру. Если проблема повторится, перезагрузите устройство и убедитесь, что игра обновлена. Напишите в поддержку: укажите модель устройства, версию операционной системы и что вы делали перед возникновением проблемы."
+
+#. support.faq.sync.q
+msgid "support.faq.sync.q"
+msgstr "Как синхронизировать прогресс между устройствами?"
+
+#. support.faq.sync.a
+msgid "support.faq.sync.a"
+msgstr "На обоих устройствах войдите в один и тот же аккаунт игровой платформы и дождитесь завершения синхронизации, прежде чем играть. Если прогресс различается, не играйте на обоих устройствах и обратитесь в поддержку."
+
+#. support.faq.bad_ad.q
+msgid "support.faq.bad_ad.q"
+msgstr "Как пожаловаться на рекламу?"
+
+#. support.faq.bad_ad.a
+msgid "support.faq.bad_ad.a"
+msgstr "1. Закройте рекламу, если это можно сделать безопасно.\n2. Сделайте скриншот рекламы, включая название рекламодателя или приложения, если оно показано.\n3. Запишите примерное время и место появления рекламы в игре.\n4. Опишите, почему реклама показалась вам оскорбительной, вводящей в заблуждение или мошеннической.\n5. Отправьте эти сведения на %s. Не указывайте пароли или платёжные данные."
+
+#. support.faq.bad_ad.action
+msgid "support.faq.bad_ad.action"
+msgstr "Пожаловаться на рекламу"
+
+#. support.account_header
+msgid "support.account_header"
+msgstr "Аккаунт"
+
+#. support.delete_account
+msgid "support.delete_account"
+msgstr "Удалить аккаунт"
+
+#. support.delete_game_data
+msgid "support.delete_game_data"
+msgstr "Удалить данные игры"
+
+#. support.no_secrets
+msgid "support.no_secrets"
+msgstr "Никогда не отправляйте пароли или платёжные данные."
+
+#. deletion.title.delete_account
+msgid "deletion.title.delete_account"
+msgstr "УДАЛИТЬ АККАУНТ"
+
+#. deletion.title.delete_game_data
+msgid "deletion.title.delete_game_data"
+msgstr "УДАЛИТЬ ДАННЫЕ ИГРЫ"
+
+#. deletion.title.not_confirmed
+msgid "deletion.title.not_confirmed"
+msgstr "НЕ ПОДТВЕРЖДЕНО"
+
+#. deletion.title.status_unconfirmed
+msgid "deletion.title.status_unconfirmed"
+msgstr "СТАТУС НЕ ПОДТВЕРЖДЁН"
+
+#. deletion.title.finishing_up
+msgid "deletion.title.finishing_up"
+msgstr "ЗАВЕРШЕНИЕ"
+
+#. deletion.title.new_game
+msgid "deletion.title.new_game"
+msgstr "НОВАЯ ИГРА"
+
+#. deletion.title.status_unknown
+msgid "deletion.title.status_unknown"
+msgstr "СТАТУС НЕИЗВЕСТЕН"
+
+#. deletion.title.not_deleted
+msgid "deletion.title.not_deleted"
+msgstr "НЕ УДАЛЕНО"
+
+#. deletion.title.data_deleted
+msgid "deletion.title.data_deleted"
+msgstr "ДАННЫЕ УДАЛЕНЫ"
+
+#. deletion.title.accepted
+msgid "deletion.title.accepted"
+msgstr "ЗАПРОС ПРИНЯТ"
+
+#. deletion.confirm.headline
+msgid "deletion.confirm.headline"
+msgstr "Ваш аккаунт будет удалён навсегда."
+
+#. deletion.confirm.body
+msgid "deletion.confirm.body"
+msgstr "Ваш прогресс, монеты, предметы и профиль будут удалены. Это действие нельзя отменить.\n\nЕсли позже вы снова войдёте в игру, будет создан новый аккаунт.\n\nНекоторые записи о покупках и безопасности сохраняются без вашего имени и профиля. Остальные данные будут удалены в течение 30 дней."
+
+#. deletion.confirm.button
+msgid "deletion.confirm.button"
+msgstr "Удалить аккаунт"
+
+#. deletion.local_confirm.headline
+msgid "deletion.local_confirm.headline"
+msgstr "Ваши данные игры на этом устройстве будут удалены."
+
+#. deletion.local_confirm.body
+msgid "deletion.local_confirm.body"
+msgstr "Ваш прогресс, монеты, предметы и профиль будут удалены. Это действие нельзя отменить.\n\nВ этой игре для вас не создавался онлайн-аккаунт, поэтому на наших серверах ничего удалять не нужно."
+
+#. deletion.local_confirm.button
+msgid "deletion.local_confirm.button"
+msgstr "Удалить данные"
+
+#. deletion.pending_setup.headline
+msgid "deletion.pending_setup.headline"
+msgstr "Ваш аккаунт ещё создаётся."
+
+#. deletion.pending_setup.body
+msgid "deletion.pending_setup.body"
+msgstr "Подключитесь к интернету и повторите попытку через некоторое время. Ничего не удалено."
+
+#. deletion.sign_in.headline
+msgid "deletion.sign_in.headline"
+msgstr "Войдите в аккаунт, который хотите удалить."
+
+#. deletion.sign_in.body
+msgid "deletion.sign_in.body"
+msgstr "Если не удаётся войти, обратитесь за помощью в поддержку."
+
+#. deletion.read_failed.headline
+msgid "deletion.read_failed.headline"
+msgstr "Не удалось прочитать ваши данные игры."
+
+#. deletion.read_failed.body
+msgid "deletion.read_failed.body"
+msgstr "Перезапустите игру и повторите попытку. Ничего не удалено."
+
+#. deletion.unavailable.headline
+msgid "deletion.unavailable.headline"
+msgstr "В этой версии игры удаление аккаунта недоступно."
+
+#. deletion.unavailable.body
+msgid "deletion.unavailable.body"
+msgstr "Обновите игру или обратитесь в поддержку за помощью в удалении аккаунта. Ничего не удалено."
+
+#. deletion.in_progress.account
+msgid "deletion.in_progress.account"
+msgstr "Удаляем ваш аккаунт..."
+
+#. deletion.in_progress.local
+msgid "deletion.in_progress.local"
+msgstr "Удаляем ваши данные игры..."
+
+#. deletion.in_progress.body
+msgid "deletion.in_progress.body"
+msgstr "Не закрывайте игру. Это займёт совсем немного времени."
+
+#. deletion.not_confirmed.headline
+msgid "deletion.not_confirmed.headline"
+msgstr "Ответ на запрос на удаление пока не получен."
+
+#. deletion.not_confirmed.body
+msgid "deletion.not_confirmed.body"
+msgstr "Ваш запрос отправлен, но ответ не получен. Подключитесь к интернету и повторите попытку. Игра останется заблокированной, пока результат не станет известен."
+
+#. deletion.unconfirmed.headline
+msgid "deletion.unconfirmed.headline"
+msgstr "Статус удаления не подтверждён"
+
+#. deletion.unconfirmed.body
+msgid "deletion.unconfirmed.body"
+msgstr "Не удалось подтвердить, удалён ли ваш аккаунт. Для защиты ваших данных игра остаётся заблокированной. Обратитесь в поддержку и укажите код запроса ниже."
+
+#. deletion.check_again
+msgid "deletion.check_again"
+msgstr "Проверить снова"
+
+#. deletion.cleanup.headline.local
+msgid "deletion.cleanup.headline.local"
+msgstr "Пока не удалось полностью удалить ваши локальные данные игры."
+
+#. deletion.cleanup.headline.account
+msgid "deletion.cleanup.headline.account"
+msgstr "Запрос на удаление аккаунта принят; завершаем очистку данных."
+
+#. deletion.cleanup.body
+msgid "deletion.cleanup.body"
+msgstr "Пока не удалось удалить часть данных игры с этого устройства. Повторите попытку, чтобы завершить удаление."
+
+#. deletion.new_game.headline
+msgid "deletion.new_game.headline"
+msgstr "Начинаем новую игру..."
+
+#. deletion.new_game.body
+msgid "deletion.new_game.body"
+msgstr "Это займёт совсем немного времени."
+
+#. deletion.status_unknown.headline
+msgid "deletion.status_unknown.headline"
+msgstr "Не удалось прочитать статус удаления на этом устройстве."
+
+#. deletion.status_unknown.body
+msgid "deletion.status_unknown.body"
+msgstr "Для защиты ваших данных игра остаётся заблокированной. Обратитесь за помощью в поддержку."
+
+#. deletion.fail.offline
+msgid "deletion.fail.offline"
+msgstr "Подключитесь к интернету, чтобы удалить аккаунт."
+
+#. deletion.fail.rate_limited
+msgid "deletion.fail.rate_limited"
+msgstr "Слишком много попыток. Немного подождите и повторите попытку."
+
+#. deletion.fail.busy
+msgid "deletion.fail.busy"
+msgstr "Сервис удаления аккаунта сейчас недоступен. Повторите попытку через некоторое время."
+
+#. deletion.fail.syncing
+msgid "deletion.fail.syncing"
+msgstr "Игра ещё синхронизируется. Повторите попытку через некоторое время."
+
+#. deletion.fail.auth
+msgid "deletion.fail.auth"
+msgstr "Не удалось подтвердить ваш аккаунт. Перезапустите игру и повторите попытку."
+
+#. deletion.fail.update
+msgid "deletion.fail.update"
+msgstr "Обновите игру, чтобы удалить аккаунт."
+
+#. deletion.fail.changed
+msgid "deletion.fail.changed"
+msgstr "Ваш аккаунт изменился во время удаления. Повторите попытку."
+
+#. deletion.fail.storage
+msgid "deletion.fail.storage"
+msgstr "Не удалось сохранить запрос на удаление на устройстве. Повторите попытку."
+
+#. deletion.fail.generic
+msgid "deletion.fail.generic"
+msgstr "Не удалось удалить ваш аккаунт. Повторите попытку позже или обратитесь в поддержку."
+
+#. deletion.fail.local
+msgid "deletion.fail.local"
+msgstr "Не удалось удалить ваши данные игры. Повторите попытку."
+
+#. deletion.fail.body
+msgid "deletion.fail.body"
+msgstr "Ничего не удалено. Вы можете продолжить играть."
+
+#. deletion.done_local.headline
+msgid "deletion.done_local.headline"
+msgstr "Ваши локальные данные игры удалены."
+
+#. deletion.done_local.body
+msgid "deletion.done_local.body"
+msgstr "Вы можете начать новую игру с самого начала."
+
+#. deletion.new_game_failed
+msgid "deletion.new_game_failed"
+msgstr "Не удалось начать новую игру. Повторите попытку."
+
+#. deletion.accepted.headline
+msgid "deletion.accepted.headline"
+msgstr "Ваш аккаунт больше недоступен."
+
+#. deletion.accepted.body
+msgid "deletion.accepted.body"
+msgstr "Ваш запрос на удаление принят."
+
+#. deletion.accepted.body_deadline
+msgid "deletion.accepted.body_deadline"
+msgstr "Ваш запрос на удаление принят. Данные должны быть удалены не позднее %s."
+
+#. deletion.reference
+msgid "deletion.reference"
+msgstr "Код запроса: %s"
+
+#. deletion.start_new_game
+msgid "deletion.start_new_game"
+msgstr "Начать новую игру"
+
+#. app.name
+msgid "app.name"
+msgstr "SortingPuzzle"
+
+#. support.email.subject
+msgid "support.email.subject"
+msgstr "Sorting Puzzle: обращение в поддержку"
+
+#. support.email.body
+msgid "support.email.body"
+msgstr "Опишите проблему.\n\nУстройство/платформа:\nПримерное время:\n"
+
+#. support.ad_email.subject
+msgid "support.ad_email.subject"
+msgstr "Sorting Puzzle: жалоба на рекламу"
+
+#. support.ad_email.body
+msgid "support.ad_email.body"
+msgstr "Прикрепите скриншот и заполните сведения ниже.\n\nПримерное время:\nМесто показа рекламы в игре:\nНазвание рекламодателя или приложения:\nПочему рекламу нужно проверить:\n"
+
+#. deletion.email.subject
+msgid "deletion.email.subject"
+msgstr "Sorting Puzzle: удаление аккаунта"
+
+#. deletion.email.body
+msgid "deletion.email.body"
+msgstr "Помогите мне удалить аккаунт."
+
+#. support.email.status
+msgid "support.email.status"
+msgstr "Статус: %s"
+
+#. support.email.deletion_reference
+msgid "support.email.deletion_reference"
+msgstr "Код запроса на удаление"
+
+#. support.email.server_reference
+msgid "support.email.server_reference"
+msgstr "Код сервера"
+
+#. support.email.player_id
+msgid "support.email.player_id"
+msgstr "ID игрока"
+
+#. leaderboard.empty
+msgid "leaderboard.empty"
+msgstr "Пока нет результатов"
+
+#. date.month.1
+msgid "date.month.1"
+msgstr "января"
+
+#. date.month.2
+msgid "date.month.2"
+msgstr "февраля"
+
+#. date.month.3
+msgid "date.month.3"
+msgstr "марта"
+
+#. date.month.4
+msgid "date.month.4"
+msgstr "апреля"
+
+#. date.month.5
+msgid "date.month.5"
+msgstr "мая"
+
+#. date.month.6
+msgid "date.month.6"
+msgstr "июня"
+
+#. date.month.7
+msgid "date.month.7"
+msgstr "июля"
+
+#. date.month.8
+msgid "date.month.8"
+msgstr "августа"
+
+#. date.month.9
+msgid "date.month.9"
+msgstr "сентября"
+
+#. date.month.10
+msgid "date.month.10"
+msgstr "октября"
+
+#. date.month.11
+msgid "date.month.11"
+msgstr "ноября"
+
+#. date.month.12
+msgid "date.month.12"
+msgstr "декабря"
+
+#. common.play
+msgid "Play"
+msgstr "Играть"
+
+#. common.continue
+msgid "Continue"
+msgstr "Продолжить"
+
+#. common.try_again
+msgid "Try Again"
+msgstr "Повторить"
+
+#. common.close
+msgid "Close"
+msgstr "Закрыть"
+
+#. common.cancel
+msgid "Cancel"
+msgstr "Отмена"
+
+#. common.got_it
+msgid "Got it"
+msgstr "Понятно"
+
+#. common.get_help
+msgid "Get Help"
+msgstr "Помощь"
+
+#. common.save
+msgid "SAVE"
+msgstr "СОХРАНИТЬ"
+
+#. common.loading
+msgid "Loading…"
+msgstr "Загрузка…"
+
+#. menu.level_button
+msgid "LEVEL %d"
+msgstr "УРОВЕНЬ %d"
+
+#. menu.more_levels_coming_soon
+msgid "MORE LEVELS COMING SOON"
+msgstr "НОВЫЕ УРОВНИ СКОРО"
+
+#. menu.coming_soon
+msgid "COMING SOON"
+msgstr "СКОРО"
+
+#. menu.lives_full
+msgid "Full"
+msgstr "Макс."
+
+#. menu.starter_badge
+msgid "STARTER"
+msgstr "СТАРТ"
+
+#. nav.shop
+msgid "Shop"
+msgstr "Магазин"
+
+#. nav.home
+msgid "Home"
+msgstr "Главная"
+
+#. nav.leaderboard
+msgid "Leaderboard"
+msgstr "Лидеры"
+
+#. chapter.button
+msgid "CHAPTER %d"
+msgstr "ГЛАВА %d"
+
+#. chapter.button_tooltip
+msgid "Choose Chapter %d: %s"
+msgstr "Выбрать главу %d: %s"
+
+#. chapter.screen_title
+msgid "CHAPTERS"
+msgstr "ГЛАВЫ"
+
+#. chapter.title.chapter_01
+msgid "Grocery Town"
+msgstr "Продуктовый городок"
+
+#. chapter.title.chapter_02
+msgid "Candy Corner"
+msgstr "Сладкий уголок"
+
+#. chapter.locked_status
+msgid "Complete %d more %s levels to unlock"
+msgstr "Пройдите ещё %d уровень главы «%s», чтобы открыть эту главу"
+
+#. chapter.unlock_progress
+msgid "Unlock progress"
+msgstr "До открытия"
+
+#. chapter.current_progress
+msgid "Current progress"
+msgstr "Текущий прогресс"
+
+#. chapter.locked
+msgid "Locked"
+msgstr "Закрыто"
+
+#. chapter.no_levels_status
+msgid "New levels are coming soon"
+msgstr "Скоро появятся новые уровни"
+
+#. chapter.coming_soon
+msgid "Coming Soon"
+msgstr "Скоро"
+
+#. hud.combo
+msgid "COMBO ×%d"
+msgstr "КОМБО ×%d"
+
+#. hud.ability_tooltip.hammer
+msgid "Hammer -- clears a matching triple"
+msgstr "Молоток — убирает одну тройку одинаковых предметов"
+
+#. hud.ability_tooltip.shuffle
+msgid "Shuffle -- reshuffles unlocked items"
+msgstr "Перемешивание — перемешивает предметы на открытых полках"
+
+#. hud.ability_tooltip.lantern
+msgid "Lantern -- highlights a matchable triple"
+msgstr "Фонарь — подсвечивает тройку, которую можно собрать"
+
+#. hud.ability_tooltip.freezer
+msgid "Freezer -- pauses the countdown timer"
+msgstr "Заморозка — останавливает таймер"
+
+#. hud.seconds_short
+msgid "%ds"
+msgstr "%dс"
+
+#. tip.tap_dispenser
+msgid "Tap a dispenser to throw items onto the shelves!"
+msgstr "Нажмите на автомат, чтобы он выбросил предметы на полки!"
+
+#. pause.title
+msgid "PAUSE"
+msgstr "ПАУЗА"
+
+#. pause.leave
+msgid "Leave"
+msgstr "Выйти"
+
+#. leave.title
+msgid "LEAVING THE LEVEL"
+msgstr "ВЫХОД ИЗ УРОВНЯ"
+
+#. leave.you_will_lose
+msgid "You will lose:"
+msgstr "Вы потеряете:"
+
+#. timeup.title
+msgid "TIME'S UP"
+msgstr "ВРЕМЯ ВЫШЛО"
+
+#. timeup.offer
+msgid "Add one minute and keep sorting!"
+msgstr "Добавьте минуту и продолжайте сортировать!"
+
+#. timeup.used
+msgid "Used"
+msgstr "Использовано"
+
+#. ability_purchase.title
+msgid "USE ABILITY"
+msgstr "ПРИМЕНИТЬ БУСТЕР"
+
+#. shelf_unlock.title
+msgid "UNLOCK SHELF"
+msgstr "ОТКРЫТЬ ПОЛКУ"
+
+#. shelf_unlock.offer
+msgid "Watch one ad to unlock this shelf now."
+msgstr "Посмотрите рекламу, чтобы открыть эту полку сейчас."
+
+#. shelf_unlock.offer_or_clear
+msgid "Watch one ad to unlock this shelf now, or clear %s more."
+msgstr "Посмотрите рекламу, чтобы открыть эту полку сейчас, или соберите ещё %s тройку."
+
+#. shelf_unlock.button
+msgid "Watch Ad · Unlock Shelf"
+msgstr "Реклама · Открыть полку"
+
+#. shelf_unlock.ad_unavailable
+msgid "Ad unavailable. This shelf stays locked."
+msgstr "Реклама недоступна. Полка остаётся закрытой."
+
+#. complete.title
+msgid "GREAT JOB!"
+msgstr "ОТЛИЧНО!"
+
+#. failed.headline
+msgid "LEVEL FAILED"
+msgstr "УРОВЕНЬ НЕ ПРОЙДЕН"
+
+#. failed.retry
+msgid "Retry"
+msgstr "Повторить"
+
+#. combo.praise.2
+msgid "Cool"
+msgstr "Класс"
+
+#. combo.praise.3
+msgid "Great"
+msgstr "Здорово"
+
+#. combo.praise.4
+msgid "Awesome"
+msgstr "Круто"
+
+#. combo.praise.5
+msgid "Amazing"
+msgstr "Потрясающе"
+
+#. combo.praise.6
+msgid "Fantastic"
+msgstr "Фантастика"
+
+#. combo.praise.7
+msgid "Incredible"
+msgstr "Невероятно"
+
+#. combo.praise.8
+msgid "Spectacular"
+msgstr "Сногсшибательно"
+
+#. combo.praise.9
+msgid "Unstoppable"
+msgstr "Не остановить"
+
+#. combo.praise.10
+msgid "Legendary"
+msgstr "Легендарно"
+
+#. combo.praise.11
+msgid "Epic"
+msgstr "Эпично"
+
+#. combo.praise.12
+msgid "Brilliant"
+msgstr "Блестяще"
+
+#. combo.praise.13
+msgid "Masterful"
+msgstr "Мастерски"
+
+#. combo.praise.14
+msgid "Supreme"
+msgstr "Непревзойдённо"
+
+#. combo.praise.15
+msgid "Phenomenal"
+msgstr "Феноменально"
+
+#. combo.praise.16
+msgid "Mythic"
+msgstr "Сказочно"
+
+#. combo.praise.17
+msgid "Majestic"
+msgstr "Величественно"
+
+#. combo.praise.18
+msgid "Radiant"
+msgstr "Ослепительно"
+
+#. combo.praise.19
+msgid "Divine"
+msgstr "Божественно"
+
+#. combo.praise.20
+msgid "Transcendent"
+msgstr "Запредельно"
+
+#. ability.hammer.name
+msgid "Hammer"
+msgstr "Молоток"
+
+#. ability.shuffle.name
+msgid "Shuffle"
+msgstr "Перемешивание"
+
+#. ability.lantern.name
+msgid "Lantern"
+msgstr "Фонарь"
+
+#. ability.freezer.name
+msgid "Freezer"
+msgstr "Заморозка"
+
+#. ability.hammer.description
+msgid "Instantly clears one matching set of items off the shelves."
+msgstr "Мгновенно убирает с полок одну тройку одинаковых предметов."
+
+#. ability.shuffle.description
+msgid "Shuffles shelf items into new spots to help you find a match."
+msgstr "Перемешивает предметы на полках, чтобы было проще собрать тройку."
+
+#. ability.lantern.description
+msgid "Highlights a matching triple you can clear for 15 seconds."
+msgstr "На 15 секунд подсвечивает тройку одинаковых предметов, которую можно собрать."
+
+#. ability.freezer.description
+msgid "Freezes the level timer for 30 seconds."
+msgstr "Останавливает таймер уровня на 30 секунд."
+
+#. ad.watch
+msgid "Watch Ad"
+msgstr "Смотреть рекламу"
+
+#. ad.loading
+msgid "Loading..."
+msgstr "Загрузка..."
+
+#. ad.verifying
+msgid "Verifying..."
+msgstr "Проверка..."
+
+#. ad.verify_reward
+msgid "Verify Reward"
+msgstr "Проверить награду"
+
+#. ad.reward_pending
+msgid "Reward verification is still pending."
+msgstr "Награда ещё не подтверждена."
+
+#. ad.unavailable_retry
+msgid "Ad unavailable. Please try again."
+msgstr "Реклама недоступна. Повторите попытку."
+
+#. ad.watch_unavailable
+msgid "Watch Ad\nUnavailable"
+msgstr "Реклама\nНедоступна"
+
+#. ad.watch_coming_soon
+msgid "Watch Ad\nComing Soon"
+msgstr "Реклама\nСкоро"
+
+#. ad.badge
+msgid "AD"
+msgstr "РЕК"
+
+#. lives.title.out
+msgid "OUT OF LIVES"
+msgstr "ЖИЗНИ ЗАКОНЧИЛИСЬ"
+
+#. lives.title.get_more
+msgid "GET MORE LIVES"
+msgstr "ПОПОЛНИТЬ ЖИЗНИ"
+
+#. lives.title.full
+msgid "LIVES FULL"
+msgstr "МАКСИМУМ ЖИЗНЕЙ"
+
+#. lives.next_in
+msgid "NEXT LIFE IN"
+msgstr "НОВАЯ ЖИЗНЬ ЧЕРЕЗ"
+
+#. lives.full_body
+msgid "Your lives are full! Play a level to spend them."
+msgstr "У вас максимум жизней! Начните уровень, чтобы их использовать."
+
+#. chest.title
+msgid "CHEST REWARDS"
+msgstr "НАГРАДЫ ИЗ СУНДУКА"
+
+#. chest.progress_hint
+msgid "Collect stars to unlock a chest and claim your reward"
+msgstr "Собирайте звёзды, чтобы открыть сундук и получить награду"
+
+#. chest.ready
+msgid "A REWARD CHEST AWAITS!"
+msgstr "ВАС ЖДЁТ СУНДУК С НАГРАДОЙ!"
+
+#. chest.tap_to_open
+msgid "Tap to open"
+msgstr "Нажмите, чтобы открыть"
+
+#. purchase.tap_to_collect
+msgid "Tap to collect"
+msgstr "Нажмите, чтобы забрать"
+
+#. purchase.complete
+msgid "PURCHASE COMPLETE"
+msgstr "ПОКУПКА ЗАВЕРШЕНА"
+
+#. shop.title
+msgid "SHOP"
+msgstr "МАГАЗИН"
+
+#. shop.section.bundles
+msgid "SPECIAL BUNDLES"
+msgstr "ОСОБЫЕ НАБОРЫ"
+
+#. shop.section.coins
+msgid "COINS"
+msgstr "МОНЕТЫ"
+
+#. shop.offer.starter_bundle
+msgid "Starter Bundle"
+msgstr "Стартовый набор"
+
+#. shop.offer.basic_bundle
+msgid "Basic Bundle"
+msgstr "Базовый набор"
+
+#. shop.tag.best_value
+msgid "BEST VALUE"
+msgstr "САМОЕ ВЫГОДНОЕ"
+
+#. shop.discount_off
+msgid "OFF"
+msgstr "СКИДКА"
+
+#. shop.ability_hint
+msgid "Tap an ability to see what it does"
+msgstr "Нажмите на бустер, чтобы узнать, как он работает"
+
+#. shop.purchasing
+msgid "Purchasing…"
+msgstr "Покупка…"
+
+#. shop.no_offers
+msgid "No shop offers are available for this region."
+msgstr "В вашем регионе нет доступных предложений магазина."
+
+#. shop.load_failed
+msgid "Could not load the shop."
+msgstr "Не удалось загрузить магазин."
+
+#. shop.error.title.purchase
+msgid "Purchase unavailable"
+msgstr "Покупка недоступна"
+
+#. shop.error.title.reward
+msgid "Reward error"
+msgstr "Ошибка выдачи награды"
+
+#. shop.error.purchase_failed
+msgid "The purchase could not be completed."
+msgstr "Не удалось завершить покупку."
+
+#. shop.error.grant_failed
+msgid "The purchased rewards could not be granted."
+msgstr "Не удалось выдать купленные награды."
+
+#. shop.error.offer_unavailable
+msgid "This shop offer is unavailable."
+msgstr "Это предложение магазина недоступно."
+
+#. shop.error.already_bought
+msgid "This one-time shop offer has already been purchased."
+msgstr "Это разовое предложение уже куплено."
+
+#. starter.title
+msgid "STARTER BUNDLE"
+msgstr "СТАРТОВЫЙ НАБОР"
+
+#. starter.one_time
+msgid "ONE-TIME OFFER"
+msgstr "РАЗОВОЕ ПРЕДЛОЖЕНИЕ"
+
+#. starter.boosters_included
+msgid "BOOSTERS INCLUDED"
+msgstr "БУСТЕРЫ В НАБОРЕ"
+
+#. starter.coins
+msgid "%s COINS"
+msgstr "%s МОНЕТА"
+
+#. starter.buy_for
+msgid "Buy for %s"
+msgstr "Купить за %s"
+
+#. starter.checking
+msgid "Checking offer…"
+msgstr "Проверка предложения…"
+
+#. starter.checking_short
+msgid "Checking…"
+msgstr "Проверка…"
+
+#. starter.no_longer_available
+msgid "This offer is no longer available."
+msgstr "Это предложение больше недоступно."
+
+#. starter.unavailable
+msgid "Unavailable"
+msgstr "Недоступно"
+
+#. booster_chip.claimed
+msgid "+%d %s"
+msgstr "+%d %s"
+
+#. profile.title
+msgid "EDIT PROFILE"
+msgstr "ИЗМЕНИТЬ ПРОФИЛЬ"
+
+#. profile.name_header
+msgid "PLAYER NAME"
+msgstr "ИМЯ ИГРОКА"
+
+#. profile.name_placeholder
+msgid "Player name"
+msgstr "Имя игрока"
+
+#. profile.edit_name_tooltip
+msgid "Edit player name"
+msgstr "Изменить имя игрока"
+
+#. profile.avatar_tab
+msgid "AVATAR"
+msgstr "АВАТАР"
+
+#. profile.frame_tab
+msgid "FRAME"
+msgstr "РАМКА"
+
+#. profile.unlock.level
+msgid "Complete level %d to unlock"
+msgstr "Пройдите уровень %d, чтобы открыть"
+
+#. profile.unlock.combo
+msgid "Reach a combo of ×%d in any run to unlock"
+msgstr "Соберите комбо ×%d в любой попытке, чтобы открыть"
+
+#. profile.unlock.weekly_first
+msgid "Finish 1st on the Weekly leaderboard to unlock"
+msgstr "Займите 1-е место в недельном рейтинге, чтобы открыть"
+
+#. profile.unlock.weekly_top
+msgid "Finish top %d on the Weekly leaderboard to unlock"
+msgstr "Войдите в топ-%d недельного рейтинга, чтобы открыть"
+
+#. leaderboard.title
+msgid "LEADERBOARD"
+msgstr "ЛИДЕРЫ"
+
+#. leaderboard.tab.weekly
+msgid "Weekly"
+msgstr "Неделя"
+
+#. leaderboard.tab.country
+msgid "Country"
+msgstr "Страна"
+
+#. leaderboard.tab.world
+msgid "World"
+msgstr "Мир"
+
+#. leaderboard.weekly_reset
+msgid "Weekly reset in %s"
+msgstr "Недельный рейтинг обновится через %s"
+
+#. leaderboard.duration.dh
+msgid "%dd %dh"
+msgstr "%dд %dч"
+
+#. leaderboard.duration.hm
+msgid "%dh %dm"
+msgstr "%dч %dм"
+
+#. leaderboard.duration.m
+msgid "%dm"
+msgstr "%dм"
+
+#. leaderboard.country_caption
+msgid "Country · All-time stars"
+msgstr "Страна · Звёзды за всё время"
+
+#. leaderboard.world_caption
+msgid "Worldwide · All-time stars"
+msgstr "Весь мир · Звёзды за всё время"
+
+#. leaderboard.load_failed
+msgid "Could not load leaderboard."
+msgstr "Не удалось загрузить рейтинг."
+
+#. leaderboard.default_name
+msgid "Player"
+msgstr "Игрок"
+
+#. leaderboard.row_tooltip
+msgid "Rank %d, %s, %d stars"
+msgstr "Место %d, %s, %d звезда"
+
+#. leaderboard.reward_tooltip
+msgid "%s coin weekly reward"
+msgstr "Количество монет в награду за неделю: %s"
+
+#. leaderboard.reward.title
+msgid "WEEKLY REWARD!"
+msgstr "НАГРАДА ЗА НЕДЕЛЮ!"
+
+#. leaderboard.reward.body
+msgid "You finished #%d last week and earned %d coins!"
+msgstr "На прошлой неделе вы заняли %d-е место и получили %d монету!"
+
+#. leaderboard.reward.ok
+msgid "Nice!"
+msgstr "Здорово!"
+
+#. settings.title
+msgid "SETTINGS"
+msgstr "НАСТРОЙКИ"
+
+#. settings.music
+msgid "Music"
+msgstr "Музыка"
+
+#. settings.sfx
+msgid "SFX"
+msgstr "Звуки"
+
+#. settings.vibrate
+msgid "Vibrate"
+msgstr "Вибрация"
+
+#. settings.support
+msgid "Support"
+msgstr "Поддержка"
+
+#. settings.language
+msgid "Language"
+msgstr "Язык"
+
+#. settings.privacy_policy
+msgid "Privacy Policy"
+msgstr "Политика конфиденциальности"
+
+#. settings.privacy_choices
+msgid "Privacy Choices"
+msgstr "Настройки конфиденциальности"
+
+#. settings.diagnostics
+msgid "Version %s • Build %d\nPlatform: %s • User: %s"
+msgstr "Версия %s • Сборка %d\nПлатформа: %s • Игрок: %s"
+
+#. language.title
+msgid "LANGUAGE"
+msgstr "ЯЗЫК"
+
+#. support.title
+msgid "SUPPORT"
+msgstr "ПОДДЕРЖКА"
+
+#. support.faq_header
+msgid "Frequently Asked Questions"
+msgstr "Частые вопросы"
+
+#. support.faq.play.q
+msgid "How do I play?"
+msgstr "Как играть?"
+
+#. support.faq.play.a
+msgid "Move matching goods onto the same shelf. When three identical items are visible together, they clear. Complete the board before time runs out."
+msgstr "Перемещайте одинаковые предметы на одну полку. Когда на одной полке видны три одинаковых предмета, они исчезают. Уберите все предметы до того, как закончится время."
+
+#. support.faq.contact.q
+msgid "How do I contact support?"
+msgstr "Как связаться с поддержкой?"
+
+#. support.faq.contact.a
+msgid "Email us at %s. Include a short description, your device platform, and when the problem happened."
+msgstr "Напишите нам по адресу %s. Кратко опишите проблему, укажите платформу вашего устройства и время, когда возникла проблема."
+
+#. support.faq.contact.action
+msgid "Email Support"
+msgstr "Написать в поддержку"
+
+#. support.faq.crash.q
+msgid "What if the game freezes or crashes?"
+msgstr "Что делать, если игра зависает или вылетает?"
+
+#. support.faq.crash.a
+msgid "Close and reopen the game first. If it happens again, restart the device and make sure the game is updated. Contact support with the device model, platform version, and what you were doing before the problem."
+msgstr "Сначала закройте и снова откройте игру. Если проблема повторится, перезагрузите устройство и убедитесь, что игра обновлена. Напишите в поддержку: укажите модель устройства, версию операционной системы и что вы делали перед возникновением проблемы."
+
+#. support.faq.sync.q
+msgid "How do I sync progress between devices?"
+msgstr "Как синхронизировать прогресс между устройствами?"
+
+#. support.faq.sync.a
+msgid "Use the same signed-in platform account on both devices and allow synchronization to finish before playing. If the progress differs, avoid playing on both devices and contact support."
+msgstr "На обоих устройствах войдите в один и тот же аккаунт игровой платформы и дождитесь завершения синхронизации, прежде чем играть. Если прогресс различается, не играйте на обоих устройствах и обратитесь в поддержку."
+
+#. support.faq.bad_ad.q
+msgid "How do I report a bad ad?"
+msgstr "Как пожаловаться на рекламу?"
+
+#. support.faq.bad_ad.a
+msgid "1. Close the ad if you can do so safely.\n2. Take a screenshot of the ad and any advertiser or app name shown.\n3. Note the approximate time and where the ad appeared in the game.\n4. Describe why the ad seemed offensive, misleading, or fraudulent.\n5. Email these details to %s. Do not include passwords or payment information."
+msgstr "1. Закройте рекламу, если это можно сделать безопасно.\n2. Сделайте скриншот рекламы, включая название рекламодателя или приложения, если оно показано.\n3. Запишите примерное время и место появления рекламы в игре.\n4. Опишите, почему реклама показалась вам оскорбительной, вводящей в заблуждение или мошеннической.\n5. Отправьте эти сведения на %s. Не указывайте пароли или платёжные данные."
+
+#. support.faq.bad_ad.action
+msgid "Email Ad Report"
+msgstr "Пожаловаться на рекламу"
+
+#. support.account_header
+msgid "Account"
+msgstr "Аккаунт"
+
+#. support.delete_account
+msgid "Delete Account"
+msgstr "Удалить аккаунт"
+
+#. support.delete_game_data
+msgid "Delete Game Data"
+msgstr "Удалить данные игры"
+
+#. support.no_secrets
+msgid "Please never send passwords or payment information."
+msgstr "Никогда не отправляйте пароли или платёжные данные."
+
+#. deletion.title.delete_account
+msgid "DELETE ACCOUNT"
+msgstr "УДАЛИТЬ АККАУНТ"
+
+#. deletion.title.delete_game_data
+msgid "DELETE GAME DATA"
+msgstr "УДАЛИТЬ ДАННЫЕ ИГРЫ"
+
+#. deletion.title.not_confirmed
+msgid "NOT CONFIRMED"
+msgstr "НЕ ПОДТВЕРЖДЕНО"
+
+#. deletion.title.status_unconfirmed
+msgid "STATUS UNCONFIRMED"
+msgstr "СТАТУС НЕ ПОДТВЕРЖДЁН"
+
+#. deletion.title.finishing_up
+msgid "FINISHING UP"
+msgstr "ЗАВЕРШЕНИЕ"
+
+#. deletion.title.new_game
+msgid "NEW GAME"
+msgstr "НОВАЯ ИГРА"
+
+#. deletion.title.status_unknown
+msgid "STATUS UNKNOWN"
+msgstr "СТАТУС НЕИЗВЕСТЕН"
+
+#. deletion.title.not_deleted
+msgid "NOT DELETED"
+msgstr "НЕ УДАЛЕНО"
+
+#. deletion.title.data_deleted
+msgid "DATA DELETED"
+msgstr "ДАННЫЕ УДАЛЕНЫ"
+
+#. deletion.title.accepted
+msgid "DELETION ACCEPTED"
+msgstr "ЗАПРОС ПРИНЯТ"
+
+#. deletion.confirm.headline
+msgid "This permanently deletes your account."
+msgstr "Ваш аккаунт будет удалён навсегда."
+
+#. deletion.confirm.body
+msgid "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nIf you sign in again later, you'll start a new account.\n\nSome purchase and security records are kept without your name or profile. The rest is removed within 30 days."
+msgstr "Ваш прогресс, монеты, предметы и профиль будут удалены. Это действие нельзя отменить.\n\nЕсли позже вы снова войдёте в игру, будет создан новый аккаунт.\n\nНекоторые записи о покупках и безопасности сохраняются без вашего имени и профиля. Остальные данные будут удалены в течение 30 дней."
+
+#. deletion.local_confirm.headline
+msgid "This deletes your game data on this device."
+msgstr "Ваши данные игры на этом устройстве будут удалены."
+
+#. deletion.local_confirm.body
+msgid "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nThis game never created an online account for you, so nothing needs to be deleted from our servers."
+msgstr "Ваш прогресс, монеты, предметы и профиль будут удалены. Это действие нельзя отменить.\n\nВ этой игре для вас не создавался онлайн-аккаунт, поэтому на наших серверах ничего удалять не нужно."
+
+#. deletion.local_confirm.button
+msgid "Delete Data"
+msgstr "Удалить данные"
+
+#. deletion.pending_setup.headline
+msgid "Your account is still being set up."
+msgstr "Ваш аккаунт ещё создаётся."
+
+#. deletion.pending_setup.body
+msgid "Connect to the internet and try again in a moment. Nothing was deleted."
+msgstr "Подключитесь к интернету и повторите попытку через некоторое время. Ничего не удалено."
+
+#. deletion.sign_in.headline
+msgid "Sign in to the account you want to delete."
+msgstr "Войдите в аккаунт, который хотите удалить."
+
+#. deletion.sign_in.body
+msgid "If you can't sign in, contact support for help."
+msgstr "Если не удаётся войти, обратитесь за помощью в поддержку."
+
+#. deletion.read_failed.headline
+msgid "Your game data couldn't be read."
+msgstr "Не удалось прочитать ваши данные игры."
+
+#. deletion.read_failed.body
+msgid "Restart the game, then try again. Nothing was deleted."
+msgstr "Перезапустите игру и повторите попытку. Ничего не удалено."
+
+#. deletion.unavailable.headline
+msgid "Account deletion isn't available in this version of the game."
+msgstr "В этой версии игры удаление аккаунта недоступно."
+
+#. deletion.unavailable.body
+msgid "Update the game, or contact support for help deleting your account. Nothing was deleted."
+msgstr "Обновите игру или обратитесь в поддержку за помощью в удалении аккаунта. Ничего не удалено."
+
+#. deletion.in_progress.account
+msgid "Deleting your account..."
+msgstr "Удаляем ваш аккаунт..."
+
+#. deletion.in_progress.local
+msgid "Deleting your game data..."
+msgstr "Удаляем ваши данные игры..."
+
+#. deletion.in_progress.body
+msgid "Keep the game open. This only takes a moment."
+msgstr "Не закрывайте игру. Это займёт совсем немного времени."
+
+#. deletion.not_confirmed.headline
+msgid "We haven't heard back about your deletion yet."
+msgstr "Ответ на запрос на удаление пока не получен."
+
+#. deletion.not_confirmed.body
+msgid "Your request was sent, but the answer didn't arrive. Connect to the internet and try again. The game stays locked until we know the result."
+msgstr "Ваш запрос отправлен, но ответ не получен. Подключитесь к интернету и повторите попытку. Игра останется заблокированной, пока результат не станет известен."
+
+#. deletion.unconfirmed.headline
+msgid "Deletion status unconfirmed"
+msgstr "Статус удаления не подтверждён"
+
+#. deletion.unconfirmed.body
+msgid "We couldn't confirm whether your account was deleted. To keep your data safe, the game stays locked. Contact support and include the reference below."
+msgstr "Не удалось подтвердить, удалён ли ваш аккаунт. Для защиты ваших данных игра остаётся заблокированной. Обратитесь в поддержку и укажите код запроса ниже."
+
+#. deletion.check_again
+msgid "Check Again"
+msgstr "Проверить снова"
+
+#. deletion.cleanup.headline.local
+msgid "Your local game data couldn't be fully deleted yet."
+msgstr "Пока не удалось полностью удалить ваши локальные данные игры."
+
+#. deletion.cleanup.headline.account
+msgid "Account deletion accepted; finishing cleanup."
+msgstr "Запрос на удаление аккаунта принят; завершаем очистку данных."
+
+#. deletion.cleanup.body
+msgid "Some game data couldn't be removed from this device yet. Try again to finish."
+msgstr "Пока не удалось удалить часть данных игры с этого устройства. Повторите попытку, чтобы завершить удаление."
+
+#. deletion.new_game.headline
+msgid "Starting a new game..."
+msgstr "Начинаем новую игру..."
+
+#. deletion.new_game.body
+msgid "This only takes a moment."
+msgstr "Это займёт совсем немного времени."
+
+#. deletion.status_unknown.headline
+msgid "We couldn't read the deletion status on this device."
+msgstr "Не удалось прочитать статус удаления на этом устройстве."
+
+#. deletion.status_unknown.body
+msgid "To keep your data safe, the game stays locked. Contact support for help."
+msgstr "Для защиты ваших данных игра остаётся заблокированной. Обратитесь за помощью в поддержку."
+
+#. deletion.fail.offline
+msgid "Connect to the internet to delete your account."
+msgstr "Подключитесь к интернету, чтобы удалить аккаунт."
+
+#. deletion.fail.rate_limited
+msgid "Too many attempts. Wait a moment, then try again."
+msgstr "Слишком много попыток. Немного подождите и повторите попытку."
+
+#. deletion.fail.busy
+msgid "Account deletion is busy right now. Try again in a moment."
+msgstr "Сервис удаления аккаунта сейчас недоступен. Повторите попытку через некоторое время."
+
+#. deletion.fail.syncing
+msgid "The game is still syncing. Try again in a moment."
+msgstr "Игра ещё синхронизируется. Повторите попытку через некоторое время."
+
+#. deletion.fail.auth
+msgid "We couldn't verify your account. Restart the game, then try again."
+msgstr "Не удалось подтвердить ваш аккаунт. Перезапустите игру и повторите попытку."
+
+#. deletion.fail.update
+msgid "Update the game to delete your account."
+msgstr "Обновите игру, чтобы удалить аккаунт."
+
+#. deletion.fail.changed
+msgid "Your account changed while we were deleting it. Try again."
+msgstr "Ваш аккаунт изменился во время удаления. Повторите попытку."
+
+#. deletion.fail.storage
+msgid "Your device couldn't save the deletion request. Try again."
+msgstr "Не удалось сохранить запрос на удаление на устройстве. Повторите попытку."
+
+#. deletion.fail.generic
+msgid "We couldn't delete your account. Try again later or contact support."
+msgstr "Не удалось удалить ваш аккаунт. Повторите попытку позже или обратитесь в поддержку."
+
+#. deletion.fail.local
+msgid "Your game data couldn't be deleted. Try again."
+msgstr "Не удалось удалить ваши данные игры. Повторите попытку."
+
+#. deletion.fail.body
+msgid "Nothing was deleted, and you can keep playing."
+msgstr "Ничего не удалено. Вы можете продолжить играть."
+
+#. deletion.done_local.headline
+msgid "Your local game data was deleted."
+msgstr "Ваши локальные данные игры удалены."
+
+#. deletion.done_local.body
+msgid "You can start over with a new game."
+msgstr "Вы можете начать новую игру с самого начала."
+
+#. deletion.new_game_failed
+msgid "The new game couldn't start. Try again."
+msgstr "Не удалось начать новую игру. Повторите попытку."
+
+#. deletion.accepted.headline
+msgid "Your account is no longer accessible."
+msgstr "Ваш аккаунт больше недоступен."
+
+#. deletion.accepted.body
+msgid "Your deletion request was accepted."
+msgstr "Ваш запрос на удаление принят."
+
+#. deletion.accepted.body_deadline
+msgid "Your deletion request was accepted. Data removal is due by %s."
+msgstr "Ваш запрос на удаление принят. Данные должны быть удалены не позднее %s."
+
+#. deletion.reference
+msgid "Reference: %s"
+msgstr "Код запроса: %s"
+
+#. deletion.start_new_game
+msgid "Start New Game"
+msgstr "Начать новую игру"
+
+#. app.name
+msgid "SortingPuzzle"
+msgstr "SortingPuzzle"
+
+#. support.email.subject
+msgid "Sorting Puzzle support request"
+msgstr "Sorting Puzzle: обращение в поддержку"
+
+#. support.email.body
+msgid "Please describe the issue here.\n\nDevice/platform:\nApproximate time:\n"
+msgstr "Опишите проблему.\n\nУстройство/платформа:\nПримерное время:\n"
+
+#. support.ad_email.subject
+msgid "Sorting Puzzle ad report"
+msgstr "Sorting Puzzle: жалоба на рекламу"
+
+#. support.ad_email.body
+msgid "Please attach a screenshot and complete the details below.\n\nApproximate time:\nAd placement in the game:\nAdvertiser or app name:\nWhy the ad should be reviewed:\n"
+msgstr "Прикрепите скриншот и заполните сведения ниже.\n\nПримерное время:\nМесто показа рекламы в игре:\nНазвание рекламодателя или приложения:\nПочему рекламу нужно проверить:\n"
+
+#. deletion.email.subject
+msgid "Sorting Puzzle account deletion"
+msgstr "Sorting Puzzle: удаление аккаунта"
+
+#. deletion.email.body
+msgid "Please help me with my account deletion."
+msgstr "Помогите мне удалить аккаунт."
+
+#. support.email.status
+msgid "Status: %s"
+msgstr "Статус: %s"
+
+#. support.email.deletion_reference
+msgid "Deletion reference"
+msgstr "Код запроса на удаление"
+
+#. support.email.server_reference
+msgid "Server reference"
+msgstr "Код сервера"
+
+#. support.email.player_id
+msgid "Player ID"
+msgstr "ID игрока"
+
+#. leaderboard.empty
+msgid "No scores yet"
+msgstr "Пока нет результатов"
+
+#. ability.hammer.name
+msgid "HAMMER"
+msgstr "МОЛОТОК"
+
+#. ability.shuffle.name
+msgid "SHUFFLE"
+msgstr "ПЕРЕМЕШИВАНИЕ"
+
+#. ability.lantern.name
+msgid "LANTERN"
+msgstr "ФОНАРЬ"
+
+#. ability.freezer.name
+msgid "FREEZER"
+msgstr "ЗАМОРОЗКА"
+
+#. shop.offer.basic_bundle
+msgid "BASIC BUNDLE"
+msgstr "БАЗОВЫЙ НАБОР"
+
+#. booster.counted.hammer
+msgctxt "booster.counted"
+msgid "Hammer"
+msgid_plural "Hammer.plural"
+msgstr[0] "молоток"
+msgstr[1] "молотка"
+msgstr[2] "молотков"
+
+#. booster.counted.shuffle
+msgctxt "booster.counted"
+msgid "Shuffle"
+msgid_plural "Shuffle.plural"
+msgstr[0] "перемешивание"
+msgstr[1] "перемешивания"
+msgstr[2] "перемешиваний"
+
+#. booster.counted.lantern
+msgctxt "booster.counted"
+msgid "Lantern"
+msgid_plural "Lantern.plural"
+msgstr[0] "фонарь"
+msgstr[1] "фонаря"
+msgstr[2] "фонарей"
+
+#. booster.counted.freezer
+msgctxt "booster.counted"
+msgid "Freezer"
+msgid_plural "Freezer.plural"
+msgstr[0] "заморозка"
+msgstr[1] "заморозки"
+msgstr[2] "заморозок"

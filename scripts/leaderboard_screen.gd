@@ -94,7 +94,7 @@ func _load_selected_scope() -> void:
 		return
 
 	if not bool(result.get("ok", false)):
-		_set_error_state(str(result.get("error", "Could not load leaderboard.")))
+		_set_error_state("Could not load leaderboard.")
 		return
 
 	_period_end_unix = int(result.get("period_end_unix", 0))
@@ -170,7 +170,7 @@ func _set_loading_state() -> void:
 	_list_background.visible = false
 	_leaderboard_scroll.visible = false
 	_pinned_player_row.visible = false
-	_status_panel.call("show_loading", "Loading leaderboard…")
+	_status_panel.call("show_loading", "Loading…")
 
 
 func _set_error_state(message: String) -> void:
@@ -184,7 +184,7 @@ func _update_period_label() -> void:
 	match _selected_scope:
 		SCOPE_WEEKLY:
 			var remaining := maxi(_period_end_unix - int(Time.get_unix_time_from_system()), 0)
-			_period_label.text = "Weekly reset in %s" % _format_duration(remaining)
+			_period_label.text = tr("leaderboard.weekly_reset") % _format_duration(remaining)
 		SCOPE_COUNTRY:
 			_period_label.text = "Country · All-time stars"
 		_:
@@ -220,11 +220,11 @@ func _format_duration(seconds: int) -> String:
 	var hours := floori(float(seconds % (24 * 60 * 60)) / float(60 * 60))
 	var minutes := floori(float(seconds % (60 * 60)) / 60.0)
 	if days > 0:
-		return "%dd %dh" % [days, hours]
+		return tr("leaderboard.duration.dh") % [days, hours]
 	if hours > 0:
-		return "%dh %dm" % [hours, minutes]
+		return tr("leaderboard.duration.hm") % [hours, minutes]
 
-	return "%dm" % minutes
+	return tr("leaderboard.duration.m") % minutes
 
 
 ## Leaderboard has no scoped overlay of its own, so `ui_cancel` always returns to Main Menu,
@@ -290,3 +290,8 @@ func _begin_navigation(scene_path: String) -> void:
 	_is_navigating = true
 	process_mode = Node.PROCESS_MODE_DISABLED
 	get_tree().change_scene_to_file(scene_path)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		_update_period_label()

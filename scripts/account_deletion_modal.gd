@@ -29,10 +29,6 @@ const PREFERRED_SIZE := Vector2(520.0, 760.0)
 const CONTENT_HEIGHT := 500.0
 const SINGLE_BUTTON_WIDTH := 300.0
 const LONG_TITLE_LENGTH := 15
-const MONTH_NAMES := [
-	"January", "February", "March", "April", "May", "June",
-	"July", "August", "September", "October", "November", "December",
-]
 
 const ACTION_NONE := &""
 const ACTION_CLOSE := &"close"
@@ -72,6 +68,8 @@ const SUPPORT_ONLY_REASONS := [
 @onready var _primary_button := %PrimaryButton as Button
 
 var _service
+var _presented_state: Dictionary = {}
+var _presented_availability: Dictionary = {}
 var _view := {}
 var _waiting := false
 var _is_closing := false
@@ -150,6 +148,8 @@ func refresh() -> void:
 
 ## Renders one deletion state. Captures and tests call it directly with synthetic states.
 func present(state: Dictionary, availability: Dictionary) -> void:
+	_presented_state = state.duplicate(true)
+	_presented_availability = availability.duplicate(true)
 	_view = describe(state, availability)
 	_apply_view()
 
@@ -179,8 +179,7 @@ func describe(state: Dictionary, availability: Dictionary) -> Dictionary:
 			return _view_of(
 				"NOT CONFIRMED",
 				"We haven't heard back about your deletion yet.",
-				"Your request was sent, but the answer didn't arrive. Connect to the internet and "
-				+ "try again. The game stays locked until we know the result.",
+				tr("deletion.not_confirmed.body"),
 				false, ACTION_RETRY, "Try Again", ROLE_POSITIVE, ACTION_CONTACT_SUPPORT, "Get Help",
 				_reference_text(state)
 			)
@@ -190,8 +189,7 @@ func describe(state: Dictionary, availability: Dictionary) -> Dictionary:
 			return _view_of(
 				"STATUS UNCONFIRMED",
 				"Deletion status unconfirmed",
-				"We couldn't confirm whether your account was deleted. To keep your data safe, the "
-				+ "game stays locked. Contact support and include the reference below.",
+				tr("deletion.unconfirmed.body"),
 				false, ACTION_CONTACT_SUPPORT, "Get Help", ROLE_POSITIVE, ACTION_RETRY, "Check Again",
 				_reference_text(state)
 			)
@@ -228,7 +226,7 @@ static func format_deadline(timestamp: String) -> String:
 	var unix_time := LocalSaveCodecScript.unix_from_timestamp(timestamp)
 	var bias_minutes := int(Time.get_time_zone_from_system().get("bias", 0))
 	var date := Time.get_date_dict_from_unix_time(unix_time + bias_minutes * 60)
-	return "%s %d, %d" % [MONTH_NAMES[int(date.get("month", 1)) - 1], int(date.get("day", 1)), int(date.get("year", 1970))]
+	return GameText.format_date(date)
 
 
 func _availability_view(availability: Dictionary) -> Dictionary:
@@ -240,10 +238,7 @@ func _availability_view(availability: Dictionary) -> Dictionary:
 			return _view_of(
 				"DELETE ACCOUNT",
 				"This permanently deletes your account.",
-				"Your progress, coins, items, and profile will be gone. You can't undo this.\n\n"
-				+ "If you sign in again later, you'll start a new account.\n\n"
-				+ "Some purchase and security records are kept without your name or profile. "
-				+ "The rest is removed within 30 days.",
+				tr("deletion.confirm.body"),
 				true, ACTION_CONFIRM, "Delete Account", ROLE_DESTRUCTIVE, ACTION_CLOSE, "Cancel"
 			)
 		ServiceScript.AVAILABILITY_LOCAL_DATA:
@@ -251,9 +246,7 @@ func _availability_view(availability: Dictionary) -> Dictionary:
 			return _view_of(
 				"DELETE GAME DATA",
 				"This deletes your game data on this device.",
-				"Your progress, coins, items, and profile will be gone. You can't undo this.\n\n"
-				+ "This game never created an online account for you, so nothing needs to be "
-				+ "deleted from our servers.",
+				tr("deletion.local_confirm.body"),
 				true, ACTION_CONFIRM, "Delete Data", ROLE_DESTRUCTIVE, ACTION_CLOSE, "Cancel"
 			)
 		ServiceScript.AVAILABILITY_REGISTRATION_PENDING:
@@ -317,18 +310,18 @@ func _result_view(state: Dictionary, local: bool) -> Dictionary:
 	var failure := state.get("failure", {}) as Dictionary
 	var activation_note := ""
 	if str(failure.get("reason", "")) == ServiceScript.REASON_STORAGE:
-		activation_note = "\n\n" + tr("The new game couldn't start. Try again.")
+		activation_note = "\n\n" + tr("deletion.new_game_failed")
 	if local:
 		return _view_of(
 			"DATA DELETED",
 			"Your local game data was deleted.",
-			tr("You can start over with a new game.") + activation_note,
+			tr("deletion.done_local.body") + activation_note,
 			false, ACTION_START_NEW_GAME, "Start New Game", ROLE_POSITIVE, ACTION_NONE, ""
 		)
 	var deadline := format_deadline(str((state.get("receipt", {}) as Dictionary).get("complete_by", "")))
-	var body := tr("Your deletion request was accepted.")
+	var body := tr("deletion.accepted.body")
 	if not deadline.is_empty():
-		body = tr("Your deletion request was accepted. Data removal is due by %s.") % deadline
+		body = tr("deletion.accepted.body_deadline") % deadline
 	return _view_of(
 		"DELETION ACCEPTED",
 		"Your account is no longer accessible.",
@@ -365,7 +358,7 @@ func _view_of(
 
 func _reference_text(state: Dictionary) -> String:
 	var reference := str((state.get("support_reference", {}) as Dictionary).get("operation_id", ""))
-	return tr("Reference: %s") % reference if not reference.is_empty() else ""
+	return tr("deletion.reference") % reference if not reference.is_empty() else ""
 
 
 func _apply_view() -> void:
@@ -452,19 +445,19 @@ func _open_support_email() -> void:
 	var state: Dictionary = _service.get_state() if _service != null else {}
 	var reference := state.get("support_reference", {}) as Dictionary
 	var lines := PackedStringArray([
-		"Please help me with my account deletion.",
+		tr("deletion.email.body"),
 		"",
-		"Status: %s" % str(state.get("phase", "")),
+		tr("support.email.status") % str(state.get("phase", "")),
 	])
 	for entry in [
-		["Deletion reference", "operation_id"],
-		["Server reference", "correlation_id"],
-		["Player ID", "player_id"],
+		[tr("support.email.deletion_reference"), "operation_id"],
+		[tr("support.email.server_reference"), "correlation_id"],
+		[tr("support.email.player_id"), "player_id"],
 	]:
 		var value := str(reference.get(entry[1], ""))
 		if not value.is_empty():
 			lines.append("%s: %s" % [entry[0], value])
-	SupportContactScript.open_email("Sorting Puzzle account deletion", "\n".join(lines) + "\n")
+	SupportContactScript.open_email(tr("deletion.email.subject"), "\n".join(lines) + "\n")
 
 
 func _apply_responsive_layout() -> void:
@@ -483,3 +476,9 @@ func _apply_responsive_layout() -> void:
 		(button as Button).size_flags_horizontal = (
 			Control.SIZE_SHRINK_CENTER if single else Control.SIZE_EXPAND_FILL
 		)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		if not _presented_state.is_empty():
+			present(_presented_state, _presented_availability)

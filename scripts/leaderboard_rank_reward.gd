@@ -1,6 +1,8 @@
 extends PanelContainer
 class_name LeaderboardRankReward
 
+var _coin_amount := 0
+
 const DEFAULT_SIZE := Vector2(90.0, 70.0)
 const COMPACT_SIZE := Vector2(78.0, 54.0)
 
@@ -9,6 +11,7 @@ const COMPACT_SIZE := Vector2(78.0, 54.0)
 
 
 func set_reward(texture: Texture2D, coin_amount: int) -> void:
+	_coin_amount = coin_amount
 	var amount := maxi(coin_amount, 0)
 	visible = texture != null and amount > 0
 	if not visible:
@@ -19,7 +22,7 @@ func set_reward(texture: Texture2D, coin_amount: int) -> void:
 
 	_coin_image.texture = texture
 	_amount_label.text = _format_number(amount)
-	tooltip_text = "%s coin weekly reward" % _amount_label.text
+	tooltip_text = tr("leaderboard.reward_tooltip") % _amount_label.text
 
 
 func clear_reward() -> void:
@@ -32,11 +35,9 @@ func set_compact(is_compact: bool) -> void:
 
 
 func _format_number(value: int) -> String:
-	var digits := str(maxi(value, 0))
-	var formatted := ""
-	for index in range(digits.length()):
-		if index > 0 and (digits.length() - index) % 3 == 0:
-			formatted += ","
-		formatted += digits[index]
+	return GameText.format_number(value)
 
-	return formatted
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		set_reward(_coin_image.texture, _coin_amount)

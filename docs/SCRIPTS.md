@@ -1,5 +1,19 @@
 # Scripts
 
+Russian localization review setups: `scripts/tools/captures/chapter_locked_setup.gd` selects
+Chapter 2's locked page, and `level_completion_setup.gd` opens the standalone completion screen
+and reapplies safe layout on viewport resize. Verification evidence lives in
+`docs/localization/RUSSIAN_LOCALIZATION_QA.md`.
+
+## Russian localization
+
+`scripts/localization/locale_manager.gd` owns saved locale application through `TranslationServer`.
+`scripts/localization/game_text.gd` owns display-only number/date formatting, counted booster names
+and reviewed purchase-error copy. Focused UI owner scripts refresh formatted text on
+`NOTIFICATION_TRANSLATION_CHANGED` without repeating gameplay or purchase actions.
+`assets/translations/en.po` / `ru.po` supply dynamic keys and static English aliases.
+See `docs/LOCALIZATION.md` for plural counts, approved-copy provenance and verification.
+
 ## Sticky item mechanic
 
 `scripts/sticky_item_rules.gd` validates one sticky item per shelf layer and reserves matching

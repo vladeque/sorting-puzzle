@@ -33,18 +33,7 @@ func _ready() -> void:
 			continue
 		item.connect("expansion_changed", Callable(self, "_on_faq_expansion_changed"))
 		item.connect("action_requested", Callable(self, "_on_faq_action_requested"))
-	_contact_item.call("set_answer",
-		"Email us at %s. Include a short description, your device platform, and when the problem happened."
-		% _support_email
-	)
-	_report_ad_item.call("set_answer",
-		"1. Close the ad if you can do so safely.\n"
-		+ "2. Take a screenshot of the ad and any advertiser or app name shown.\n"
-		+ "3. Note the approximate time and where the ad appeared in the game.\n"
-		+ "4. Describe why the ad seemed offensive, misleading, or fraudulent.\n"
-		+ "5. Email these details to %s. Do not include passwords or payment information."
-		% _support_email
-	)
+	_refresh_localized_answers()
 	_delete_account_button.pressed.connect(func() -> void: account_deletion_requested.emit())
 	refresh_account_action()
 	_destination_shell.call("set_background_for_chapter", PlayerProgress.get_selected_chapter_id())
@@ -109,15 +98,13 @@ func _on_faq_action_requested(action_id: StringName) -> void:
 	match action_id:
 		&"contact_support":
 			_open_support_email(
-				"Sorting Puzzle support request",
-				"Please describe the issue here.\n\nDevice/platform:\nApproximate time:\n"
+				tr("support.email.subject"),
+				tr("support.email.body")
 			)
 		&"report_ad":
 			_open_support_email(
-				"Sorting Puzzle ad report",
-				"Please attach a screenshot and complete the details below.\n\n"
-				+ "Approximate time:\nAd placement in the game:\nAdvertiser or app name:\n"
-				+ "Why the ad should be reviewed:\n"
+				tr("support.ad_email.subject"),
+				tr("support.ad_email.body")
 			)
 
 
@@ -140,3 +127,19 @@ func _close() -> void:
 func _finish_close() -> void:
 	closed.emit()
 	queue_free()
+
+
+func _refresh_localized_answers() -> void:
+	_contact_item.call("set_answer",
+		tr("support.faq.contact.a")
+		% _support_email
+	)
+	_report_ad_item.call("set_answer",
+		tr("support.faq.bad_ad.a")
+		% _support_email
+	)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		_refresh_localized_answers()

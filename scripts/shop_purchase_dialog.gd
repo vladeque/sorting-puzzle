@@ -13,8 +13,12 @@ func _ready() -> void:
 	_close_button.pressed.connect(close)
 
 
+var _result_title := ""
+
+
 func show_result(title: String, message: String, button_text: String = "Continue") -> void:
-	_header.set_title(title.to_upper())
+	_result_title = title
+	_header.set_title(tr(title).to_upper())
 	_message_label.text = message
 	_close_button.text = button_text
 	UIMotionScript.fade_in(self)
@@ -25,3 +29,8 @@ func show_result(title: String, message: String, button_text: String = "Continue
 ## while already closing -- a repeat call is ignored.
 func close() -> void:
 	UIMotionScript.close_with_fade(self, hide)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		_header.set_title(tr(_result_title).to_upper())

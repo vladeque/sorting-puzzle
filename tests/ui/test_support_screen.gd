@@ -17,6 +17,8 @@ func _init() -> void:
 
 
 func _run() -> void:
+	# These assertions verify the English baseline regardless of the device locale.
+	TranslationServer.set_locale("en")
 	await process_frame
 	var support_scene := load(SUPPORT_SCENE_PATH) as PackedScene
 	_check(support_scene != null, "The support scene loads.")

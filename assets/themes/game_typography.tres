@@ -3,7 +3,26 @@
 [ext_resource type="FontFile" uid="uid://dselji28dxa0v" path="res://assets/fonts/DynaPuff-Variable.ttf" id="1_dynapuff"]
 [ext_resource type="FontFile" uid="uid://bj1yadue3328n" path="res://assets/fonts/Nunito-Variable.ttf" id="2_nunito"]
 
+[sub_resource type="FontVariation" id="FontVariation_cyrillic_bold"]
+base_font = ExtResource("2_nunito")
+variation_opentype = {
+2003265652: 700.0
+}
+
+[sub_resource type="FontVariation" id="FontVariation_cyrillic_semibold"]
+base_font = ExtResource("2_nunito")
+variation_opentype = {
+2003265652: 600.0
+}
+
+[sub_resource type="FontVariation" id="FontVariation_cyrillic_medium"]
+base_font = ExtResource("2_nunito")
+variation_opentype = {
+2003265652: 500.0
+}
+
 [sub_resource type="FontVariation" id="FontVariation_dynapuff_bold"]
+fallbacks = Array[Font]([SubResource("FontVariation_cyrillic_bold")])
 base_font = ExtResource("1_dynapuff")
 variation_opentype = {
 2003072104: 100.0,
@@ -26,6 +45,7 @@ variation_opentype = {
 }
 
 [sub_resource type="FontVariation" id="FontVariation_dynapuff_semibold"]
+fallbacks = Array[Font]([SubResource("FontVariation_cyrillic_semibold")])
 base_font = ExtResource("1_dynapuff")
 variation_opentype = {
 2003072104: 100.0,
@@ -36,6 +56,7 @@ opentype_features = {
 }
 
 [sub_resource type="FontVariation" id="FontVariation_dynapuff_number"]
+fallbacks = Array[Font]([SubResource("FontVariation_cyrillic_bold")])
 base_font = ExtResource("1_dynapuff")
 variation_opentype = {
 2003072104: 100.0,
@@ -47,6 +68,7 @@ opentype_features = {
 }
 
 [sub_resource type="FontVariation" id="FontVariation_dynapuff_title"]
+fallbacks = Array[Font]([SubResource("FontVariation_cyrillic_bold")])
 base_font = ExtResource("1_dynapuff")
 variation_opentype = {
 2003072104: 92.0,
@@ -103,6 +125,7 @@ corner_radius_bottom_right = 5
 corner_radius_bottom_left = 5
 
 [sub_resource type="FontVariation" id="FontVariation_dynapuff_medium"]
+fallbacks = Array[Font]([SubResource("FontVariation_cyrillic_medium")])
 base_font = ExtResource("1_dynapuff")
 variation_opentype = {
 2003072104: 100.0,

@@ -99,10 +99,15 @@ func _fit_text() -> void:
 	if font != null and max_width > 0.0:
 		while (
 			font_size > min_font_size
-			and font.get_string_size(_label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x > max_width
+			and font.get_string_size(_label.atr(_label.text), HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x > max_width
 		):
 			font_size -= 1
 	_label.add_theme_font_size_override("font_size", font_size)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		_fit_text.call_deferred()
 
 
 func _tone_color(key: String) -> Color:

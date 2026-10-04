@@ -28,6 +28,7 @@ const ABILITY_IDS := [
 ## for the compact size instead of only resizing the parent button -- previously the icon and both
 ## badge types stayed at their 115.2px-authored offsets and overflowed a 98.4px compact button.
 var _reference_child_rects: Dictionary = {}
+var _active_seconds: Dictionary = {}
 
 
 func _ready() -> void:
@@ -68,6 +69,7 @@ func set_interaction_blocked(
 
 
 func set_active_seconds(ability_id: StringName, seconds_remaining: float) -> void:
+	_active_seconds[ability_id] = seconds_remaining
 	var button := _buttons.get(ability_id) as Button
 	if button == null:
 		return
@@ -76,7 +78,7 @@ func set_active_seconds(ability_id: StringName, seconds_remaining: float) -> voi
 		return
 	timer_label.visible = seconds_remaining > 0.0
 	if timer_label.visible:
-		timer_label.text = "%ds" % ceili(seconds_remaining)
+		timer_label.text = tr("hud.seconds_short") % ceili(seconds_remaining)
 
 
 func get_icon_texture(ability_id: StringName) -> Texture2D:
@@ -166,3 +168,9 @@ func _fit_uses_label(uses_label: Label) -> void:
 			GameplayUIThemeScript.COUNT_BADGE_MIN_FONT_SIZE
 		)
 	)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		for ability_id in _active_seconds:
+			set_active_seconds(ability_id, float(_active_seconds[ability_id]))

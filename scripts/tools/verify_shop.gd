@@ -53,6 +53,8 @@ func _ready() -> void:
 
 
 func _run() -> void:
+	# These assertions verify the English baseline regardless of the device locale.
+	TranslationServer.set_locale("en")
 	await _verify_regional_prices()
 	ProjectSettings.set_setting("application/config/mock_store_country", "US")
 	PlayerProgress.reset_progress()

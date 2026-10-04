@@ -150,3 +150,4 @@ theme_override_colors/font_color = Color(0.42, 0.165, 0.086, 1)
 theme_override_font_sizes/font_size = 18
 text = "Booster"
 horizontal_alignment = 1
+clip_text = true

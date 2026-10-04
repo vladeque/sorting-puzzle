@@ -10,6 +10,7 @@ extends SceneTree
 ##   --scene        res:// path of the scene to capture (required)
 ##   --out          absolute directory for the generated PNGs (required)
 ##   --name         filename prefix (defaults to the scene's base name)
+##   --locale       supported game locale applied before instantiating the captured scene
 ##   --resolutions  comma-separated `WIDTHxHEIGHT` list (defaults to DEFAULT_RESOLUTIONS)
 ##   --setup        res:// path of a setup script that prepares runtime state before capture
 ##   --settle       frames to wait after each resize before capturing (default SETTLE_FRAMES)
@@ -79,6 +80,13 @@ func _run() -> void:
 	if DirAccess.make_dir_recursive_absolute(output_directory) != OK:
 		if not DirAccess.dir_exists_absolute(output_directory):
 			_failures.append("Could not create the capture output directory: %s" % output_directory)
+			_finish()
+			return
+
+	if options.has("locale"):
+		var locale_manager := root.get_node_or_null("LocaleManager")
+		if locale_manager == null or not bool(locale_manager.call("set_locale", str(options["locale"]))):
+			_failures.append("Unsupported capture locale: %s" % str(options["locale"]))
 			_finish()
 			return
 

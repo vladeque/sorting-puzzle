@@ -23,6 +23,8 @@ param(
 
     [string]$Name,
 
+    [string]$Locale,
+
     [string[]]$Resolutions = @(),
 
     [string]$Setup,
@@ -127,6 +129,9 @@ $userArguments = @(
 )
 if ($Resolutions.Count -gt 0) {
     $userArguments += @('--resolutions', ($Resolutions -join ','))
+}
+if ($Locale) {
+    $userArguments += @('--locale', $Locale)
 }
 if ($Setup) {
     $setupRelativePath = ConvertTo-ProjectRelativePath -Path $Setup

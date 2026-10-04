@@ -94,6 +94,7 @@ var _star_pulse_tween: Tween
 var _timer_pulse_tween: Tween
 var _timer_shake_tween: Tween
 var _timer_rest_position := Vector2.ZERO
+var _displayed_combo_count := 0
 var _last_timer_seconds := -1
 var _timer_is_critical := false
 var _timer_is_frozen := false
@@ -320,6 +321,7 @@ func _stop_timer_pulse() -> void:
 
 
 func set_combo(is_combo_active: bool, combo_count: int, time_ratio: float) -> void:
+	_displayed_combo_count = combo_count
 	_combo_fill.visible = is_combo_active
 	_combo_label.visible = is_combo_active
 	_combo_fill.anchor_right = time_ratio if is_combo_active else 0.0
@@ -328,7 +330,7 @@ func set_combo(is_combo_active: bool, combo_count: int, time_ratio: float) -> vo
 	_combo_fill.offset_right = -COMBO_FILL_INSET
 	_combo_fill.offset_bottom = -COMBO_FILL_INSET
 	if is_combo_active:
-		_combo_label.text = "COMBO ×%d" % combo_count
+		_combo_label.text = tr("hud.combo") % combo_count
 
 
 func set_pause_enabled(is_enabled: bool) -> void:
@@ -456,3 +458,9 @@ func _layout_absolute(control: Control, left: float, top: float, right: float, b
 	control.offset_top = top
 	control.offset_right = right
 	control.offset_bottom = bottom
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		if _combo_label.visible:
+			_combo_label.text = tr("hud.combo") % _displayed_combo_count

@@ -17,6 +17,7 @@ const PULSE_TWEEN_META := &"_status_pulse_tween"
 
 func _ready() -> void:
 	_retry_button.pressed.connect(_on_retry_pressed)
+	_refresh_retry_text()
 
 
 ## No Retry action -- an in-progress load, not a failure. Pulses the message so a load that never
@@ -50,6 +51,8 @@ func hide_status() -> void:
 
 
 func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		_refresh_retry_text()
 	if what == NOTIFICATION_EXIT_TREE:
 		_stop_pulse()
 
@@ -74,3 +77,7 @@ func _start_pulse() -> void:
 func _stop_pulse() -> void:
 	UIMotionScript.stop_tween(_message_label, PULSE_TWEEN_META)
 	_message_label.modulate.a = 1.0
+
+
+func _refresh_retry_text() -> void:
+	_retry_button.text = tr("common.retry_load")

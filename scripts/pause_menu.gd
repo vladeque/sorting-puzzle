@@ -90,6 +90,8 @@ func _ready() -> void:
 	var ad_privacy_button := find_child("AdPrivacyButton", true, false) as Button
 	if ad_privacy_button != null:
 		ad_privacy_button.pressed.connect(func() -> void: ad_privacy_requested.emit())
+		ad_privacy_button.resized.connect(_fit_ad_privacy_label)
+		_fit_ad_privacy_label.call_deferred()
 	_update_diagnostics_label()
 
 
@@ -118,6 +120,21 @@ func set_ad_compliance_actions(
 	if ad_privacy_button != null:
 		ad_privacy_button.text = privacy_label
 		ad_privacy_button.visible = privacy_visible
+		_fit_ad_privacy_label.call_deferred()
+
+
+func _fit_ad_privacy_label() -> void:
+	var button := find_child("AdPrivacyButton", true, false) as Button
+	if button == null:
+		return
+	var font := button.get_theme_font("font")
+	var text := button.atr(button.text)
+	var font_size := 28
+	while font_size > 16:
+		if font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x <= button.size.x - 24.0:
+			break
+		font_size -= 1
+	button.add_theme_font_size_override("font_size", font_size)
 
 
 func _update_diagnostics_label() -> void:
@@ -132,7 +149,7 @@ func _update_diagnostics_label() -> void:
 		"player_id" if str(save_namespace.get("kind", "")) == "player" else "installation_id",
 		""
 	))
-	diagnostics_label.text = "Version %s • Build %d\nPlatform: %s • User: %s" % [
+	diagnostics_label.text = tr("settings.diagnostics") % [
 		version,
 		build,
 		OS.get_name(),
@@ -229,3 +246,9 @@ func _create_cross_out_marker(button: Button) -> Control:
 	cross_out.add_child(slash)
 
 	return cross_out
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		_update_diagnostics_label()
+		_fit_ad_privacy_label.call_deferred()

@@ -19,6 +19,8 @@ func _init() -> void:
 
 
 func _run() -> void:
+	# These assertions verify the English baseline regardless of the device locale.
+	TranslationServer.set_locale("en")
 	await process_frame
 	_progress = root.get_node_or_null("PlayerProgress")
 	_check(_progress != null, "PlayerProgress autoload is available.")

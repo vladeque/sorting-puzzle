@@ -89,9 +89,9 @@ func _get_font_size(character_count: int) -> int:
 
 
 func _format_amount(amount: int) -> String:
-	var amount_text := str(maxi(amount, 0))
-	var formatted := ""
-	while amount_text.length() > 3:
-		formatted = ",%s%s" % [amount_text.right(3), formatted]
-		amount_text = amount_text.substr(0, amount_text.length() - 3)
-	return amount_text + formatted
+	return GameText.format_number(amount)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		_update_label()

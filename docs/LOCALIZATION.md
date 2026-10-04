@@ -32,12 +32,56 @@ On a fresh save, a supported device language is selected; unsupported and Simpli
 device locales fall back to English. Any explicit player selection is persisted and wins on later
 starts.
 
-## Current boundary
+## Translation catalogs
 
-No translation catalogs or translated interface strings exist yet; only language names use native
-labels. Changing locale updates Godot's active `TranslationServer` locale and persists the choice,
-but the rest of the current English UI remains visually unchanged. Future localization work must
-add reviewed translation resources and make dynamic strings translation-aware.
+`assets/translations/en.po` and `assets/translations/ru.po` are registered in `project.godot`.
+Russian includes all 251 reviewed keys from
+`docs/localization/RUSSIAN_TRANSLATIONS.md`, the user's corrected October 4, 2026 inventory.
+The inventory is a copy of the approved translation text, not runtime configuration.
+English remains the fallback for the other nine selectable locales until their catalogs exist.
+
+The catalogs expose stable inventory keys for dynamic text and English aliases for scene-authored
+labels, buttons, tooltips, exported component titles and config-supplied chapter/bundle names.
+Keeping those scene values readable preserves editor previews and existing scene consumers.
+English aliases with identical wording share one translation. The destination status panel
+explicitly uses `common.retry_load` to distinguish refreshing data from replaying a failed level.
+Uppercase bundle aliases preserve the authored card presentation. Shop info dialogs translate
+their product/error title before uppercasing it.
+
+Formatted HUD, chapter, timer, leaderboard, profile, offer and support strings translate their
+patterns before interpolation. Russian `tr_n()` calls select from three reviewed forms using the
+underlying integer count, including when the inserted amount is a formatted `%s`. For rows and
+weekly rewards, the plural count is the stars/coins rather than the rank. Claimed booster chips
+use gettext context `booster.counted` for the reviewed lowercase inflected product names.
+
+`scripts/localization/game_text.gd` owns presentation-only grouped numbers, localized dates,
+counted booster names and safe purchase-error copy. Russian counts use spaces and deadlines
+use genitive month names; store prices pass through unchanged. Purchase/load presentation maps
+unreviewed technical errors to the existing player-facing fallback messages. Provider errors,
+IDs, authorization, eligibility, economy and protocol values are not translated or rewritten.
+
+Dynamic scene owners handle `NOTIFICATION_TRANSLATION_CHANGED` by refreshing displayed text from
+retained presentation inputs. Refreshing a language never replays purchases, grants, animations,
+catalog requests or reward actions. Static English scene text is retranslated by Godot itself.
+Leaderboard player-name labels and the profile name field disable automatic translation; the
+profile placeholder is translated separately. Native language names and the app brand remain
+unchanged.
+
+Additional catalog entries cover the four email field labels referenced without keys in the
+inventory, Russian month names and the existing empty-leaderboard status. Loading screens reuse
+the reviewed `common.loading` wording.
+
+## Cyrillic and layout
+
+The bundled DynaPuff font does not contain Cyrillic. Its theme variations use bundled Nunito
+fallback variations at matching 500/600/700 weights, so Russian does not depend on mobile system
+fonts. `docs/TYPOGRAPHY.md` records this ownership.
+
+Awning headers, ribbons and shared font fitting measure the translated text. Booster chips fit
+their localized name within the authored chip width, down to the exported
+`minimum_name_font_size`, rather than widening the reward row.
+The failure screen fits its result message; `PauseMenu` fits the Settings privacy button within
+its authored width. Support FAQ action buttons reserve 320 pixels for the reviewed Russian copy.
 
 ## Verification
 
@@ -45,3 +89,17 @@ add reviewed translation resources and make dynamic strings translation-aware.
   selection, persistence, snapshot exclusion, cancellation, and Main Menu stacking.
 - `scripts/tools/captures/language_selection_setup.gd` opens Settings and Language for responsive
   screenshot capture.
+- `tests/ui/test_russian_localization.gd` checks the 251-entry reviewed fixture, Russian/English
+  resolution, untranslated-locale fallback, plural boundaries, font coverage, unchanged player
+  names/prices, live screen refreshes, preserved reward states and local-only locale persistence.
+- Capture any screen in an isolated Russian session with:
+
+  ```powershell
+  & .\scripts\tools\capture_ui.ps1 -Scene scenes/ui/shop_screen.tscn -Name shop_ru -Locale ru
+  ```
+
+  `capture_ui.ps1 -Locale` passes the locale to `capture_scene.gd`, which applies it before the
+  scene is instantiated. It does not change the real player's saved preference.
+
+The October 4, 2026 test results, rendered-screen review and capture limitations are recorded in
+`docs/localization/RUSSIAN_LOCALIZATION_QA.md`.

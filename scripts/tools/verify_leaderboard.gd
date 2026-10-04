@@ -41,6 +41,8 @@ func _ready() -> void:
 
 
 func _run() -> void:
+	# These assertions verify the English baseline regardless of the device locale.
+	TranslationServer.set_locale("en")
 	## None of the five required portrait resolutions produce a sub-1100 logical height under
 	## this project's keep_width stretch mode (confirmed by the "-> logical" prints below always
 	## landing at 1280+), so the shared compact/regular title-size branch is exercised directly

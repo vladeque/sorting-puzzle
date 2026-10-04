@@ -19,6 +19,13 @@ Both font files are vendored from the official Google Fonts repository. Do not
 replace them with system fonts: mobile system-font availability and metrics are
 not consistent across devices.
 
+The bundled DynaPuff file has no Cyrillic glyphs. Its theme variations therefore
+include Nunito fallback variations at matching 500, 600 and 700 weights. Russian
+titles, buttons, HUD text and counters retain the scene's sizing, color and outline
+while using bundled Cyrillic glyphs; Latin characters continue to use DynaPuff.
+The Russian localization test verifies the entire Russian alphabet against the
+effective title font, including Ё/ё.
+
 ## Theme Roles
 
 Use the global theme instead of attaching font files directly to individual

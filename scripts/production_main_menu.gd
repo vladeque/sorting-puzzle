@@ -427,7 +427,7 @@ func _update_level_button() -> void:
 	var chapter_id := PlayerProgress.get_selected_chapter_id()
 	var next_level := PlayerProgress.get_next_level_for_chapter(chapter_id)
 	if next_level > 0:
-		_level_button.text = "LEVEL %d" % ChapterCatalog.get_local_level_number(next_level)
+		_level_button.text = tr("menu.level_button") % ChapterCatalog.get_local_level_number(next_level)
 		_level_button.disabled = false
 	else:
 		var progress := PlayerProgress.get_chapter_progress(chapter_id)
@@ -997,7 +997,7 @@ func _buy_starter_bundle() -> void:
 	_starter_purchase_in_progress = false
 	if not bool(result.get("ok", false)):
 		_starter_modal.show_error(
-			str(result.get("error", "The purchase could not be completed.")),
+			GameText.purchase_error(str(result.get("error", "")), str(result.get("stage", "")) == "grant"),
 			str(result.get("stage", "")) == "purchase"
 		)
 		return
@@ -1205,3 +1205,9 @@ func _complete_life_recovery() -> void:
 	_rewarded_life_action_state = OutOfLivesMenu.REWARDED_STATE_UNAVAILABLE
 	if should_resume_launch:
 		_launch_campaign_level()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		_update_level_button()
+		_update_chapter_button()

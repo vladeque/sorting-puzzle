@@ -765,6 +765,8 @@ func _process(delta: float) -> void:
 
 
 func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		_update_level_label()
 	if what == NOTIFICATION_APPLICATION_PAUSED:
 		_app_interrupted = true
 		_cancel_sticky_feedback()
@@ -2437,7 +2439,7 @@ func _update_timer_label() -> void:
 
 func _update_level_label() -> void:
 	var local_level := ChapterCatalog.get_local_level_number(selected_level)
-	_top_hud.set_level_text("LEVEL %d" % (local_level if local_level > 0 else selected_level))
+	_top_hud.set_level_text(tr("hud.level") % (local_level if local_level > 0 else selected_level))
 
 
 func _update_star_counter_label() -> void:
@@ -5052,7 +5054,7 @@ func _get_combo_praise_text(combo_count: int) -> String:
 		return ""
 
 	var praise_index := mini(combo_count, COMBO_PRAISE_WORDS.size() - 1)
-	return str(COMBO_PRAISE_WORDS[praise_index])
+	return tr("combo.praise.%d" % praise_index)
 
 
 func _get_combo_praise_color(combo_count: int) -> Color:

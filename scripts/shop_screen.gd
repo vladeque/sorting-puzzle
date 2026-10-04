@@ -167,7 +167,7 @@ func _load_shop() -> void:
 	if request_serial != _load_request_serial:
 		return
 	if not bool(result.get("ok", false)):
-		_set_error_state(str(result.get("error", "Could not load the shop.")))
+		_set_error_state("Could not load the shop.")
 		return
 
 	for raw_offer in result.get("offers", []) as Array:
@@ -229,7 +229,7 @@ func _purchase_offer(offer_id: StringName) -> void:
 		_purchase_dialog.call(
 			"show_result",
 			"Reward error" if str(result.get("stage", "")) == "grant" else "Purchase unavailable",
-			str(result.get("error", "The purchase could not be completed."))
+			GameText.purchase_error(str(result.get("error", "")), str(result.get("stage", "")) == "grant")
 		)
 		_purchase_in_progress = false
 		_set_overlay_close_locked(false)
@@ -326,7 +326,7 @@ func _clear_offers() -> void:
 
 func _set_loading_state() -> void:
 	_shop_scroll.visible = false
-	_status_panel.call("show_loading", "Loading regional prices…")
+	_status_panel.call("show_loading", "Loading…")
 
 
 func _set_error_state(message: String) -> void:

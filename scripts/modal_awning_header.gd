@@ -98,6 +98,11 @@ func get_title() -> String:
 	return title_text
 
 
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		_apply_title.call_deferred()
+
+
 ## Exported setters also run while the scene loads, before `_title_label` is resolved.
 func _apply_title() -> void:
 	if _title_label == null:

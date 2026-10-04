@@ -39,6 +39,8 @@ var _is_closing := false
 
 
 func _ready() -> void:
+	_name_line_edit.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	_name_line_edit.placeholder_text = tr("profile.name_placeholder")
 	_selected_avatar_id = PlayerProgress.get_avatar_id()
 	_selected_avatar_frame_id = PlayerProgress.get_avatar_frame_id()
 	_pending_player_name = PlayerProgress.get_player_name()
@@ -116,17 +118,24 @@ func _select_choice(choice_id: String) -> void:
 func _show_locked_frame_hint(frame_id: String) -> void:
 	var required_level := ProfileFrameCatalogScript.get_completed_level_required(frame_id)
 	if required_level > 0:
-		_unlock_toast.show_message("Complete level %d to unlock" % required_level)
+		_unlock_toast.show_message(tr("profile.unlock.level") % required_level)
 		return
 	var required_combo := ProfileFrameCatalogScript.get_combo_required(frame_id)
 	if required_combo > 0:
-		_unlock_toast.show_message("Reach a combo of ×%d in any run to unlock" % required_combo)
+		_unlock_toast.show_message(tr("profile.unlock.combo") % required_combo)
 		return
 	var required_rank := ProfileFrameCatalogScript.get_weekly_rank_required(frame_id)
 	if required_rank <= 0:
 		return
-	var placement := "1st" if required_rank == 1 else "top %d" % required_rank
-	_unlock_toast.show_message("Finish %s on the Weekly leaderboard to unlock" % placement)
+	_unlock_toast.show_message(
+		tr("profile.unlock.weekly_first") if required_rank == 1
+		else tr("profile.unlock.weekly_top") % required_rank
+	)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		_name_line_edit.placeholder_text = tr("profile.name_placeholder")
 
 
 func _begin_name_edit() -> void:

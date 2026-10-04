@@ -4,6 +4,10 @@ Use this file as the first stop when you need to identify where a feature lives.
 
 ## Entry Points
 
+Localization: `scripts/localization/locale_manager.gd` and `game_text.gd`,
+`assets/translations/en.po` / `ru.po`, and `docs/LOCALIZATION.md`.
+The reviewed Russian copy is retained in `docs/localization/RUSSIAN_TRANSLATIONS.md`.
+
 Main scene:
 - `scenes/app_launch_router.tscn`
 - `scripts/app_launch_router.gd`

@@ -33,6 +33,7 @@ const DISCOUNT_BADGE_TITLE_INSET := 62.0
 }
 
 var _offer_id := &""
+var _coin_amount := 0
 var _formatted_price := ""
 
 
@@ -53,7 +54,8 @@ func set_offer(offer: Dictionary) -> void:
 	_shuffle_count.text = "×%d" % maxi(int(abilities.get("shuffle", 0)), 0)
 	_lantern_count.text = "×%d" % maxi(int(abilities.get("highlight", 0)), 0)
 	_freezer_count.text = "×%d" % maxi(int(abilities.get("freezer", 0)), 0)
-	_coin_count.text = _format_count(maxi(int(rewards.get("coins", 0)), 0))
+	_coin_amount = maxi(int(rewards.get("coins", 0)), 0)
+	_coin_count.text = _format_count(_coin_amount)
 	var store := offer.get("store", {}) as Dictionary
 	_formatted_price = str(store.get("formatted_price", "Unavailable"))
 	_purchase_button.text = _formatted_price
@@ -101,9 +103,9 @@ func _emit_purchase() -> void:
 
 
 func _format_count(value: int) -> String:
-	var value_text := str(value)
-	var formatted := ""
-	while value_text.length() > 3:
-		formatted = ",%s%s" % [value_text.right(3), formatted]
-		value_text = value_text.substr(0, value_text.length() - 3)
-	return value_text + formatted
+	return GameText.format_number(value)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		_coin_count.text = _format_count(_coin_amount)

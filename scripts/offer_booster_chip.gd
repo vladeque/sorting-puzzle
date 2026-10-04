@@ -24,6 +24,7 @@ class_name OfferBoosterChip
 @export var name_font_size := 18
 ## The claimed name carries the amount ("+3 Freezer"), so it steps down to stay within the chip.
 @export var claimed_name_font_size := 16
+@export var minimum_name_font_size := 12
 ## The default brown suits the Starter Bundle's light panel; the reward-chest ceremony shows chips
 ## over a dimmed screen and switches to light text with an outline.
 @export var name_color := Color(0.42, 0.165, 0.086, 1)
@@ -47,6 +48,7 @@ func _ready() -> void:
 	_name_label.add_theme_color_override("font_outline_color", name_outline_color)
 	_name_label.add_theme_constant_override("outline_size", name_outline_size)
 	_refresh_labels()
+	_name_label.resized.connect(_fit_name)
 
 
 ## Shows the chip for a positive count and hides it otherwise, so absent rewards leave no gap.
@@ -84,7 +86,23 @@ func get_icon_global_rect() -> Rect2:
 
 func _refresh_labels() -> void:
 	_count_label.text = "×%d" % _count
-	_name_label.text = "+%d %s" % [_count, title] if _is_claimed else title
+	_name_label.text = (
+		tr("booster_chip.claimed") % [_count, GameText.counted_booster(title, _count)]
+		if _is_claimed else title
+	)
+	_fit_name.call_deferred()
+
+
+func _fit_name() -> void:
+	_name_label.add_theme_font_size_override("font_size", GameplayUITheme.fit_label_font_size(
+		_name_label, _name_label.size.x,
+		claimed_name_font_size if _is_claimed else name_font_size, minimum_name_font_size
+	))
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		_refresh_labels()
 
 
 func _draw_check_mark() -> void:

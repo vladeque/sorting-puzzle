@@ -97,7 +97,7 @@ static func fit_label_font_size(
 	var safe_width := maxf(available_width, 1.0)
 	while fitted_size > minimum_size:
 		var rendered_width := font.get_string_size(
-			label.text,
+			label.atr(label.text),
 			HORIZONTAL_ALIGNMENT_LEFT,
 			-1,
 			fitted_size

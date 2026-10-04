@@ -14,6 +14,7 @@ const CONTENT_REGION_HEIGHT := 336.0
 
 @onready var _shell := %Shell as GameplayModalShell
 @onready var _failure_content := %FailureContent as Control
+@onready var _message_label := %MessageLabel as Label
 @onready var _retry_button := %RetryButton as Button
 
 var _level_number := 1
@@ -30,6 +31,8 @@ func _ready() -> void:
 	_retry_button.reparent(_shell.get_action_row(), false)
 	_retry_button.pressed.connect(func() -> void: retry_pressed.emit())
 	_update_title()
+	_message_label.resized.connect(_fit_message)
+	_fit_message.call_deferred()
 
 
 func set_level_number(level_number: int) -> void:
@@ -59,4 +62,16 @@ func close() -> void:
 
 
 func _update_title() -> void:
-	_shell.configure("LEVEL %d" % _level_number)
+	_shell.configure(tr("failed.title") % _level_number)
+
+
+func _fit_message() -> void:
+	_message_label.add_theme_font_size_override("font_size", GameplayUIThemeScript.fit_label_font_size(
+		_message_label, _message_label.size.x, 36, 24
+	))
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		_update_title()
+		_fit_message.call_deferred()

@@ -26,7 +26,9 @@ class FakeRewardedLifeClient extends RefCounted:
 				"current": 1,
 				"maximum": 5,
 				"restore_interval_seconds": 3600,
-				"next_restore_at": "2026-09-20T12:00:00.000Z",
+				"next_restore_at": Time.get_datetime_string_from_unix_time(
+					int(Time.get_unix_time_from_system()) + 3600
+				) + ".000Z",
 			},
 		}
 
@@ -42,6 +44,8 @@ func _init() -> void:
 
 
 func _run() -> void:
+	# These assertions verify the English baseline regardless of the device locale.
+	TranslationServer.set_locale("en")
 	await process_frame
 	_progress = root.get_node_or_null("PlayerProgress")
 	_level_scene = load(LEVEL_SCENE_PATH) as PackedScene

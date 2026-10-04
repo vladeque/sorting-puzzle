@@ -35,6 +35,8 @@ func _init() -> void:
 
 
 func _run() -> void:
+	# These assertions verify the English baseline regardless of the device locale.
+	TranslationServer.set_locale("en")
 	await process_frame
 	_level_scene = load("res://level.tscn") as PackedScene
 	_pause_menu_scene = load("res://scenes/pause_menu.tscn") as PackedScene
@@ -988,7 +990,7 @@ func _test_long_value_formatting() -> void:
 func _test_locked_shelf_feedback() -> void:
 	var level := _level_scene.instantiate()
 	level.set("launched_from_dev_mode", true)
-	level.set("selected_level", 7)
+	level.set("selected_level", 3)
 	root.add_child(level)
 	await process_frame
 
@@ -999,7 +1001,7 @@ func _test_locked_shelf_feedback() -> void:
 			break
 
 	if shelf == null:
-		_failures.append("Level 7 should have at least one locked shelf to exercise this test.")
+		_failures.append("Level 3 should have at least one locked shelf to exercise this test.")
 		level.free()
 		return
 

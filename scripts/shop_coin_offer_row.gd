@@ -21,6 +21,7 @@ const COIN_ICON_TEXTURES: Array[Texture2D] = [
 @onready var _purchase_button := %PurchaseButton as Button
 
 var _offer_id := &""
+var _coin_amount := 0
 var _formatted_price := ""
 
 
@@ -32,6 +33,7 @@ func set_offer(offer: Dictionary) -> void:
 	_offer_id = StringName(str(offer.get("id", "")))
 	var rewards := offer.get("rewards", {}) as Dictionary
 	var coin_amount := maxi(int(rewards.get("coins", 0)), 0)
+	_coin_amount = coin_amount
 	_coin_icon.texture = _get_coin_icon_texture(coin_amount)
 	_amount_label.text = _format_count(coin_amount)
 	var store := offer.get("store", {}) as Dictionary
@@ -76,9 +78,9 @@ func _get_coin_icon_texture(coin_amount: int) -> Texture2D:
 
 
 func _format_count(value: int) -> String:
-	var value_text := str(value)
-	var formatted := ""
-	while value_text.length() > 3:
-		formatted = ",%s%s" % [value_text.right(3), formatted]
-		value_text = value_text.substr(0, value_text.length() - 3)
-	return value_text + formatted
+	return GameText.format_number(value)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		_amount_label.text = _format_count(_coin_amount)

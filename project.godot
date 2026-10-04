@@ -72,6 +72,10 @@ enabled=PackedStringArray("res://addons/sorting_puzzle_secure_store_bridge/plugi
 
 theme/custom="res://assets/themes/game_typography.tres"
 
+[internationalization]
+
+locale/translations=PackedStringArray("res://assets/translations/en.po", "res://assets/translations/ru.po")
+
 [physics]
 
 3d/physics_engine="Jolt Physics"

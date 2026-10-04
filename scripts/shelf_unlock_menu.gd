@@ -32,6 +32,8 @@ const READY_LABEL := "Watch Ad · Unlock Shelf"
 @onready var _offer_label := %OfferLabel as Label
 @onready var _reward_status_label := %RewardStatusLabel as Label
 
+var _remaining_clears := 0
+
 
 func _ready() -> void:
 	_shell.configure(TITLE)
@@ -75,10 +77,11 @@ func set_rewarded_action_state(state: StringName, is_enabled: bool) -> void:
 ## is a shortcut past a requirement that is still there and unchanged if the ad fails.
 func set_offer(remaining_clears: int) -> void:
 	var remaining := maxi(remaining_clears, 0)
+	_remaining_clears = remaining
 	_offer_label.text = (
 		"Watch one ad to unlock this shelf now."
 		if remaining <= 0
-		else "Watch one ad to unlock this shelf now, or clear %s more." % remaining
+		else tr_n("shelf_unlock.offer_or_clear", "shelf_unlock.offer_or_clear.plural", remaining) % remaining
 	)
 
 
@@ -100,3 +103,8 @@ func close() -> void:
 	if _shell.visible:
 		return
 	hide()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		set_offer(_remaining_clears)

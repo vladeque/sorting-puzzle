@@ -1,6 +1,17 @@
 # Scenes
 
+Russian label fitting stays with each scene owner: `level_failure_screen.gd` fits the failure
+message from 36 down to 24 pixels; `PauseMenu` fits the Settings privacy button; and
+`support_faq_item.tscn` reserves a 320-pixel minimum action width. Reviewed captures and known
+resize limitations are recorded in `docs/localization/RUSSIAN_LOCALIZATION_QA.md`.
+
 This file maps scenes to their responsibilities, scripts, important nodes, and runtime relationships.
+
+Russian localization keeps scene-authored English text readable and translates it through catalog
+aliases. Formatted copy is owned by each scene's focused script; those owners refresh on a runtime
+locale change without repeating gameplay actions. `scenes/ui/offer_booster_chip.tscn` bounds its name
+label to the existing chip width and its owner fits long Russian names. Awning headers and offer
+ribbons refit the translated text. See `docs/LOCALIZATION.md` and `docs/TYPOGRAPHY.md`.
 
 ## Level loading transition
 
