@@ -70,7 +70,7 @@ msgstr "Макс."
 
 #. menu.starter_badge
 msgid "menu.starter_badge"
-msgstr "СТАРТ"
+msgstr "НАБОР"
 
 #. nav.shop
 msgid "nav.shop"
@@ -384,7 +384,7 @@ msgstr "Реклама\nСкоро"
 
 #. ad.badge
 msgid "ad.badge"
-msgstr "РЕК"
+msgstr "AD"
 
 #. lives.title.out
 msgid "lives.title.out"
@@ -456,7 +456,7 @@ msgstr "САМОЕ ВЫГОДНОЕ"
 
 #. shop.discount_off
 msgid "shop.discount_off"
-msgstr "СКИДКА"
+msgstr "OFF"
 
 #. shop.ability_hint
 msgid "shop.ability_hint"
@@ -1149,7 +1149,7 @@ msgstr "Макс."
 
 #. menu.starter_badge
 msgid "STARTER"
-msgstr "СТАРТ"
+msgstr "НАБОР"
 
 #. nav.shop
 msgid "Shop"
@@ -1441,7 +1441,7 @@ msgstr "Реклама\nСкоро"
 
 #. ad.badge
 msgid "AD"
-msgstr "РЕК"
+msgstr "AD"
 
 #. lives.title.out
 msgid "OUT OF LIVES"
@@ -1513,7 +1513,7 @@ msgstr "САМОЕ ВЫГОДНОЕ"
 
 #. shop.discount_off
 msgid "OFF"
-msgstr "СКИДКА"
+msgstr "OFF"
 
 #. shop.ability_hint
 msgid "Tap an ability to see what it does"

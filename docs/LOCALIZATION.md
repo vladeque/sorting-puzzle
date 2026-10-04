@@ -40,6 +40,24 @@ Russian includes all 251 reviewed keys from
 The inventory is a copy of the approved translation text, not runtime configuration.
 English remains the fallback for the other nine selectable locales until their catalogs exist.
 
+The owner's October 5, 2026 review supersedes three rows of that original inventory:
+
+| Key / English alias | Current Russian display | Reason |
+| --- | --- | --- |
+| `menu.starter_badge` / `STARTER` | `НАБОР` | Names the package; `СТАРТ` suggested starting gameplay. |
+| `ad.badge` / `AD` | `AD` | Preserve the compact locked-shelf marker. |
+| `shop.discount_off` / `OFF` | `OFF` | Preserve the short second line of the percentage tag. |
+
+These updates live in both the stable-key and English-alias entries of `ru.po`, and in the
+reviewed test fixture. The original inventory remains an archive of the supplied document.
+The full offer/card title remains `Стартовый набор` (uppercased where authored).
+
+Keep the game name, actual player names, platform names, native language names, addresses,
+references/IDs and platform-formatted prices unchanged. Translate regular player-facing copy,
+including ad descriptions/actions, booster names, `КОМБО`, `Макс.` and bundle descriptions.
+`AD` and `OFF` are deliberate exceptions for compact visual markers, not a general preference
+for English labels throughout the Russian UI.
+
 The catalogs expose stable inventory keys for dynamic text and English aliases for scene-authored
 labels, buttons, tooltips, exported component titles and config-supplied chapter/bundle names.
 Keeping those scene values readable preserves editor previews and existing scene consumers.
@@ -101,5 +119,5 @@ its authored width. Support FAQ action buttons reserve 320 pixels for the review
   `capture_ui.ps1 -Locale` passes the locale to `capture_scene.gd`, which applies it before the
   scene is instantiated. It does not change the real player's saved preference.
 
-The October 4, 2026 test results, rendered-screen review and capture limitations are recorded in
+The October 4–5, 2026 test results, rendered-screen reviews and capture limitations are recorded in
 `docs/localization/RUSSIAN_LOCALIZATION_QA.md`.

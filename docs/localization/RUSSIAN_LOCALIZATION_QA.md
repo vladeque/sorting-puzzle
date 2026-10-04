@@ -59,3 +59,21 @@ Final contact-sheet prefixes include `main_menu_ru`, `shop_ru`, `settings_ru`, `
   modal text and HUD labels remain visible. These captures verify localized overlays, rather
   than establishing complete gameplay-layout correctness.
 - Existing hammer-art UID fallback and level layout/anchor warnings remain unchanged.
+
+## Copy review — October 5, 2026
+
+The owner requested compact English `AD` and `OFF` markers and chose `НАБОР` for the home-screen
+promotion. Both stable keys and scene-text aliases were updated in the Russian catalog, together
+with the reviewed test fixture. The full offer title remains `Стартовый набор`.
+
+`test_russian_localization` passed with all 251 current reviewed entries and no engine errors.
+Rendered contact sheets `menu_ru_copy_review`, `starter_ru_copy_review`, `shop_ru_copy_review`
+and `shelf_ad_ru_copy_review` were inspected at 540x960, 720x1280, 1080x1920 and 1080x2400.
+`НАБОР` fits the hanging sign, both 67% discount tags contain `OFF`, and the locked-shelf marker
+shows `AD`. The Main Menu resize positioning issue at the two larger phone sizes remains as
+documented above; these copy changes do not alter geometry.
+
+Other untranslated text remains limited to names and data: the app brand, actual player names,
+native language names, platform names, addresses, references/IDs and platform prices. Regular
+gameplay text remains Russian, including booster names, `КОМБО`, `Макс.` and `Звуки`; this review
+found no additional gameplay labels that benefit from an English exception.
