@@ -134,6 +134,9 @@ func _show_locked_frame_hint(frame_id: String) -> void:
 
 
 func _notification(what: int) -> void:
+	if what == NOTIFICATION_LAYOUT_DIRECTION_CHANGED and is_node_ready():
+		_apply_responsive_layout.call_deferred()
+		_refresh_tab_styles.call_deferred()
 	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
 		_name_line_edit.placeholder_text = tr("profile.name_placeholder")
 
@@ -191,6 +194,7 @@ func _apply_responsive_layout() -> void:
 	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
 		return
 	var safe_margins := _get_safe_area_margins(viewport_size)
+	safe_margins = DestinationScreenLayout.logical_safe_margins(_panel, safe_margins)
 	var available_width := maxf(
 		viewport_size.x - safe_margins.x - safe_margins.z - PANEL_MIN_MARGIN * 2.0,
 		1.0
@@ -201,10 +205,11 @@ func _apply_responsive_layout() -> void:
 	)
 	var panel_width := minf(PANEL_MAX_WIDTH, available_width)
 	var panel_height := minf(PANEL_MAX_HEIGHT, available_height)
-	_panel.offset_left = -panel_width * 0.5
-	_panel.offset_top = -panel_height * 0.5
-	_panel.offset_right = panel_width * 0.5
-	_panel.offset_bottom = panel_height * 0.5
+	var safe_shift := Vector2(safe_margins.x - safe_margins.z, safe_margins.y - safe_margins.w) * 0.5
+	_panel.offset_left = safe_shift.x - panel_width * 0.5
+	_panel.offset_top = safe_shift.y - panel_height * 0.5
+	_panel.offset_right = safe_shift.x + panel_width * 0.5
+	_panel.offset_bottom = safe_shift.y + panel_height * 0.5
 	var grid_width := maxf(panel_width - GRID_HORIZONTAL_PADDING, 1.0)
 	var tile_size := clampf(
 		floorf((grid_width - float(GRID_H_SEPARATION * (GRID_COLUMNS - 1))) / float(GRID_COLUMNS)),
@@ -219,6 +224,7 @@ func _apply_responsive_layout() -> void:
 
 
 func _apply_tab_style(button: Button, is_selected: bool, is_left: bool) -> void:
+	is_left = not is_left if is_layout_rtl() else is_left
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(0.66, 0.32, 0.22, 1) if is_selected else Color(0.91, 0.72, 0.46, 1)
 	style.border_color = Color(1.0, 0.88, 0.56, 1) if is_selected else Color(0.55, 0.25, 0.16, 0.72)
@@ -239,16 +245,10 @@ func _apply_tab_style(button: Button, is_selected: bool, is_left: bool) -> void:
 	button.add_theme_constant_override("outline_size", 2)
 
 
+func _refresh_tab_styles() -> void:
+	_apply_tab_style(_avatar_tab, _active_tab == TAB_AVATAR, true)
+	_apply_tab_style(_frame_tab, _active_tab == TAB_FRAME, false)
+
+
 func _get_safe_area_margins(viewport_size: Vector2) -> Vector4:
-	var window_size := Vector2(DisplayServer.window_get_size())
-	var safe_area := DisplayServer.get_display_safe_area()
-	if window_size.x <= 0.0 or window_size.y <= 0.0 or safe_area.size.x <= 0 or safe_area.size.y <= 0:
-		return Vector4.ZERO
-	var scale := Vector2(viewport_size.x / window_size.x, viewport_size.y / window_size.y)
-	var safe_end := safe_area.position + safe_area.size
-	return Vector4(
-		maxf(float(safe_area.position.x) * scale.x, 0.0),
-		maxf(float(safe_area.position.y) * scale.y, 0.0),
-		maxf(float(window_size.x - safe_end.x) * scale.x, 0.0),
-		maxf(float(window_size.y - safe_end.y) * scale.y, 0.0)
-	)
+	return DestinationScreenLayout.get_safe_area_margins(viewport_size)

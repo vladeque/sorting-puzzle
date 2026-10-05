@@ -513,6 +513,7 @@ func _get_safe_area_margins(viewport_size: Vector2) -> Vector4:
 func _layout_ability_bar(safe_margins: Vector4) -> void:
 	if _ability_bar == null:
 		return
+	safe_margins = DestinationScreenLayout.logical_safe_margins(_ability_bar, safe_margins)
 
 	var bottom_margin := _get_ability_bar_bottom_margin(safe_margins)
 	_ability_bar.anchor_left = 0.0
@@ -767,6 +768,7 @@ func _process(delta: float) -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
 		_update_level_label()
+		_apply_responsive_layout.call_deferred()
 	if what == NOTIFICATION_APPLICATION_PAUSED:
 		_app_interrupted = true
 		_cancel_sticky_feedback()

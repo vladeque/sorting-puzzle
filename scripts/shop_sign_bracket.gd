@@ -44,7 +44,15 @@ class_name ShopSignBracket
 const CURVE_STEPS := 18
 
 
+func _notification(what: int) -> void:
+	if what in [NOTIFICATION_LAYOUT_DIRECTION_CHANGED, NOTIFICATION_TRANSLATION_CHANGED, NOTIFICATION_RESIZED]:
+		queue_redraw()
+
+
 func _draw() -> void:
+	# Mirror only this node's drawn ironwork; the sign's text and children shape independently.
+	if is_layout_rtl():
+		draw_set_transform(Vector2(size.x, 0.0), 0.0, Vector2(-1.0, 1.0))
 	var right := size.x
 	var plate_left := right - plate_width
 

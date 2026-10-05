@@ -6,6 +6,11 @@
 [ext_resource type="StyleBox" path="res://assets/themes/style_box_warm_icon_normal.tres" id="4_warm_icon_normal"]
 [ext_resource type="StyleBox" path="res://assets/themes/style_box_warm_icon_pressed.tres" id="5_warm_icon_pressed"]
 [ext_resource type="Script" uid="uid://bxx8loq0o6syr" path="res://scripts/press_scale_button.gd" id="8_press_scale_button"]
+[ext_resource type="FontFile" path="res://assets/fonts/DynaPuff-Variable.ttf" id="9_pause_glyph_font"]
+
+[sub_resource type="FontVariation" id="FontVariation_pause_glyph"]
+base_font = ExtResource("9_pause_glyph_font")
+variation_opentype = {2003072104: 100.0, 2003265652: 700.0}
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_top_hud_strip"]
 bg_color = Color(0.7, 0.34, 0.24, 1)
@@ -107,6 +112,8 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="TimerLabel" type="Label" parent="." unique_id=808647940]
+grow_vertical = 2
+text_direction = 1
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 10
@@ -125,6 +132,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="LevelLabel" type="Label" parent="." unique_id=845717104]
+grow_vertical = 2
 unique_name_in_owner = true
 layout_mode = 1
 offset_left = 32.0
@@ -169,6 +177,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="StarCountLabel" type="Label" parent="StarCounter" unique_id=2018027282]
+text_direction = 1
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -189,6 +198,7 @@ horizontal_alignment = 2
 vertical_alignment = 1
 
 [node name="PauseButton" type="Button" parent="." unique_id=782040913]
+text_direction = 1
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 1
@@ -206,6 +216,7 @@ theme_override_colors/font_pressed_color = Color(0.29, 0.11, 0.04, 1)
 theme_override_colors/font_hover_color = Color(0.29, 0.11, 0.04, 1)
 theme_override_colors/font_disabled_color = Color(0.29, 0.11, 0.04, 1)
 theme_override_font_sizes/font_size = 26
+theme_override_fonts/font = SubResource("FontVariation_pause_glyph")
 theme_override_styles/normal = ExtResource("4_warm_icon_normal")
 theme_override_styles/pressed = ExtResource("5_warm_icon_pressed")
 theme_override_styles/hover = ExtResource("4_warm_icon_normal")

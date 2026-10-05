@@ -39,6 +39,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="EarnedStarsLabel" type="Label" parent="."]
+text_direction = 1
 unique_name_in_owner = true
 theme_type_variation = &"GameNumberLabel"
 z_index = 1

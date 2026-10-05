@@ -30,6 +30,21 @@ the typographic apostrophe and the № symbol against the same effective title f
 
 ## Theme Roles
 
+Arabic glyphs use bundled Baloo Bhaijaan 2 for display/button/HUD roles at matching 500/600/700
+weights and Noto Sans Arabic for reading/editing roles at 600/700 weights. The theme keeps the
+existing Latin and Cyrillic primary faces. Arabic fallbacks are always available, including when
+English is active. Keep `BalooBhaijaan2-OFL.txt` and `NotoSansArabic-OFL.txt` beside the fonts.
+Arabic joining/mark features are retained; scene font fitting measures the complete shaped text.
+
+The vendored files came from Google Fonts' `ofl/baloobhaijaan2` and `ofl/notosansarabic` directories.
+Pinned SHA-256 checksums:
+
+- `BalooBhaijaan2-Variable.ttf`: `3E9F07FBC796C0DDCB3E6E0AA26F9C86741D9F5B7F5CB72F4ED3C06E55A19336`
+- `NotoSansArabic-Variable.ttf`: `63111B5B2E074DD48CC67692E0A2726D86EE94C1C37FE8598257B7B4E87E869E`
+
+`tests/ui/test_arabic_localization.gd` checks Arabic letters and combining marks through all theme
+roles using bundled character inventories, independently of desktop system fallback.
+
 Use the global theme instead of attaching font files directly to individual
 scenes.
 

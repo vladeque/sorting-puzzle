@@ -55,6 +55,9 @@ var _showing_price := false
 var _price_text := ""
 var _compare_at_text := ""
 var _is_busy := false
+var _content_height := CONTENT_HEIGHT
+var _safe_margins := Vector4.ZERO
+var _layout_viewport := Vector2.ZERO
 
 
 func _ready() -> void:
@@ -67,7 +70,10 @@ func _ready() -> void:
 	_buy_button.reparent(_shell.get_action_row(), false)
 	_shell.close_requested.connect(request_close)
 	_buy_button.pressed.connect(buy_requested.emit)
+	_offer_content.minimum_size_changed.connect(_refresh_content_fit.call_deferred)
+	_status_pill.minimum_size_changed.connect(_refresh_content_fit.call_deferred)
 	_set_status("")
+	_refresh_content_fit.call_deferred()
 
 
 func set_offer(offer: Dictionary) -> void:
@@ -97,7 +103,7 @@ func set_offer(offer: Dictionary) -> void:
 	var discount := maxi(int(offer.get("discount_percent", 0)), 0)
 	_discount_badge.visible = discount > 0
 	_percent_label.text = "%d%%" % discount
-	_set_buy_label(tr("starter.buy_for") % _price_text, not _compare_at_text.is_empty())
+	_set_buy_label(tr("starter.buy_for") % GameText.isolate_price(_price_text), not _compare_at_text.is_empty())
 	_compare_at_price_label.text = _compare_at_text
 
 	_set_status("")
@@ -109,7 +115,26 @@ func set_offer(offer: Dictionary) -> void:
 
 
 func apply_safe_layout(safe_margins: Vector4, viewport_size: Vector2) -> void:
+	_safe_margins = safe_margins
+	_layout_viewport = viewport_size
 	_shell.apply_safe_layout(safe_margins, viewport_size)
+	_refresh_content_fit.call_deferred()
+
+
+## Reserve the status pill's real wrapped height below the booster names. Arabic fallback metrics
+## and longer purchase errors can both exceed the original fixed content height.
+func _refresh_content_fit() -> void:
+	if not is_node_ready():
+		return
+	var needed := _offer_content.get_combined_minimum_size().y + 10.0 + _status_pill.get_combined_minimum_size().y - 14.0 + 8.0
+	var height := maxf(CONTENT_HEIGHT, needed)
+	if is_equal_approx(height, _content_height):
+		return
+	_content_height = height
+	_shell.set_content_region_height(height)
+	_shell.set_preferred_size(Vector2(GameplayUIThemeScript.MODAL_MAX_WIDTH, MODAL_HEIGHT + height - CONTENT_HEIGHT))
+	if _layout_viewport != Vector2.ZERO:
+		_shell.apply_safe_layout(_safe_margins, _layout_viewport)
 
 
 func open() -> void:
@@ -216,4 +241,4 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
 		_coin_ribbon.set_text(tr_n("starter.coins", "starter.coins.plural", _coin_amount) % _format_count(_coin_amount))
 		if _showing_price:
-			_set_buy_label(tr("starter.buy_for") % _price_text, not _compare_at_text.is_empty())
+			_set_buy_label(tr("starter.buy_for") % GameText.isolate_price(_price_text), not _compare_at_text.is_empty())

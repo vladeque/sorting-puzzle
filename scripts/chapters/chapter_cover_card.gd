@@ -9,6 +9,7 @@ const LOCKED_PANEL_HEIGHT := 340.0
 ## Authored left/right/bottom inset of %InfoMargins from the card's own edges, before any
 ## additional device safe-area inset is applied.
 const INFO_MARGIN_BASE := 30.0
+const DestinationScreenLayoutScript := preload("res://scripts/destination_screen_layout.gd")
 
 @onready var _art: TextureRect = %Art
 @onready var _info_margins: MarginContainer = %InfoMargins
@@ -110,8 +111,9 @@ func _set_panel_height(height: float) -> void:
 
 
 func _apply_info_margins() -> void:
-	_info_margins.offset_left = INFO_MARGIN_BASE + _safe_margins.x
-	_info_margins.offset_right = -(INFO_MARGIN_BASE + _safe_margins.z)
+	var margins := DestinationScreenLayoutScript.logical_safe_margins(_info_margins, _safe_margins)
+	_info_margins.offset_left = INFO_MARGIN_BASE + margins.x
+	_info_margins.offset_right = -(INFO_MARGIN_BASE + margins.z)
 	_info_margins.offset_bottom = -(INFO_MARGIN_BASE + _safe_margins.w)
 	_info_margins.offset_top = _info_margins.offset_bottom - _panel_height
 
@@ -121,5 +123,7 @@ func _emit_selected() -> void:
 
 
 func _notification(what: int) -> void:
+	if what == NOTIFICATION_LAYOUT_DIRECTION_CHANGED and is_node_ready():
+		_apply_info_margins.call_deferred()
 	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready() and not _chapter.is_empty():
 		configure(_chapter, _progress, _is_selected)

@@ -81,11 +81,17 @@ func _apply_responsive_layout() -> void:
 ## button, title, page arrows/indicators, and each card's information panel actually respect a
 ## non-zero inset while the full-bleed art underneath does not move.
 func _apply_safe_margins(margins: Vector4) -> void:
-	_header_margins.offset_left = margins.x
+	var logical := DestinationScreenLayoutScript.logical_safe_margins(_header_margins, margins)
+	_header_margins.offset_left = logical.x
 	_header_margins.offset_top = margins.y
-	_header_margins.offset_right = -margins.z
+	_header_margins.offset_right = -logical.z
 	_header_margins.offset_bottom = margins.y + HEADER_HEIGHT
 	_pager.call("set_safe_margins", margins)
 	for card in _cards:
 		if is_instance_valid(card):
 			card.call("set_safe_margins", margins)
+
+
+func _notification(what: int) -> void:
+	if what in [NOTIFICATION_TRANSLATION_CHANGED, NOTIFICATION_LAYOUT_DIRECTION_CHANGED] and is_node_ready():
+		_apply_responsive_layout.call_deferred()

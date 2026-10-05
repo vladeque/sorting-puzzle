@@ -390,6 +390,11 @@ func _on_shop_tab_reselected() -> void:
 	pass
 
 
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_LAYOUT_DIRECTION_CHANGED and is_node_ready():
+		_apply_responsive_layout.call_deferred()
+
+
 func _return_to_main_menu() -> void:
 	_begin_navigation(MAIN_MENU_SCENE)
 

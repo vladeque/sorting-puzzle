@@ -255,6 +255,7 @@ layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_progress_track")
 
 [node name="ProgressBar" type="ProgressBar" parent="RewardChestPanel/InnerPanel/ContentStack/ProgressRow/ProgressColumn/ProgressTrack" unique_id=1279760478]
+localize_numeral_system = false
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -273,6 +274,7 @@ max_value = 500.0
 show_percentage = false
 
 [node name="AmountLabel" type="Label" parent="RewardChestPanel/InnerPanel/ContentStack/ProgressRow/ProgressColumn/ProgressTrack" unique_id=100753000]
+text_direction = 1
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15

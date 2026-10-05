@@ -293,5 +293,7 @@ func _begin_navigation(scene_path: String) -> void:
 
 
 func _notification(what: int) -> void:
+	if what == NOTIFICATION_LAYOUT_DIRECTION_CHANGED and is_node_ready():
+		_apply_responsive_layout.call_deferred()
 	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
 		_update_period_label()

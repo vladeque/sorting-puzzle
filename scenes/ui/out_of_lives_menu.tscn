@@ -67,6 +67,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="LifeCountLabel" type="Label" parent="LifeContent/StatusRow/HeartBox"]
+text_direction = 1
 unique_name_in_owner = true
 theme_type_variation = &"GameNumberLabel"
 layout_mode = 1
@@ -109,6 +110,7 @@ horizontal_alignment = 1
 autowrap_mode = 3
 
 [node name="CountdownLabel" type="Label" parent="LifeContent/StatusRow/TimerCenter/TimerColumn"]
+text_direction = 1
 unique_name_in_owner = true
 theme_type_variation = &"GameNumberLabel"
 custom_minimum_size = Vector2(180, 62)
@@ -162,6 +164,7 @@ vertical_alignment = 1
 autowrap_mode = 3
 
 [node name="PurchaseButton" type="Button" parent="."]
+text_direction = 0
 unique_name_in_owner = true
 custom_minimum_size = Vector2(194, 76)
 layout_mode = 2
@@ -196,6 +199,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="PriceLabel" type="Label" parent="PurchaseButton/PriceRow"]
+text_direction = 1
 unique_name_in_owner = true
 theme_type_variation = &"GameNumberLabel"
 layout_mode = 2

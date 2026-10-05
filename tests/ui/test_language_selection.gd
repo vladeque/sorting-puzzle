@@ -32,8 +32,8 @@ func _run() -> void:
 	_progress.call("reset_progress")
 	_check(bool(_locale_manager.call("set_locale", "en")), "English can be selected for test setup.")
 	_check(
-		LocaleCatalogScript.get_entries().size() == 13,
-		"The release catalog exposes exactly thirteen approved locales."
+		LocaleCatalogScript.get_entries().size() == 14,
+		"The release catalog exposes exactly fourteen approved locales."
 	)
 	var expected_labels := {
 		"en": "English",
@@ -49,6 +49,7 @@ func _run() -> void:
 		"tr": "Türkçe",
 		"ru": "Русский",
 		"uk": "Українська",
+		"ar": "العربية",
 	}
 	for entry in LocaleCatalogScript.get_entries():
 		var entry_locale := str(entry.get("locale", ""))
@@ -62,6 +63,8 @@ func _run() -> void:
 	_check(LocaleCatalogScript.resolve_device_locale("uk-UA") == "uk", "Ukrainian devices select Ukrainian.")
 	_check(LocaleCatalogScript.resolve_device_locale("it-IT") == "it", "Italian devices select Italian.")
 	_check(LocaleCatalogScript.resolve_device_locale("it_CH") == "it", "Swiss Italian devices select Italian.")
+	for device_locale in ["ar", "ar-SA", "ar_EG", "ar_AE"]:
+		_check(LocaleCatalogScript.resolve_device_locale(device_locale) == "ar", "Arabic regional device mapping.")
 	_check(LocaleCatalogScript.sanitize_saved_locale("uk_UA") == "en",
 		"Saved choices still require an explicit release code.")
 	_check(
@@ -75,7 +78,7 @@ func _run() -> void:
 	await create_timer(0.35).timeout
 	var list := modal.get_node("%LanguageList") as VBoxContainer
 	var scroll := modal.get_node("%LanguageScroll") as ScrollContainer
-	_check(list.get_child_count() == 13, "The language modal renders all thirteen release locales.")
+	_check(list.get_child_count() == 14, "The language modal renders all fourteen release locales.")
 	_check(modal.call("get_pending_locale") == "en", "The active locale is selected on open.")
 	_check(
 		scroll.vertical_scroll_mode == ScrollContainer.SCROLL_MODE_SHOW_NEVER,

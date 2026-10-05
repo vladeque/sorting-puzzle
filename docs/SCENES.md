@@ -1,5 +1,15 @@
 # Scenes
 
+Arabic scene layout inherits Godot Control mirroring. Paragraph alignment belongs to
+`support_faq_item.tscn` and its owner; player-name and store-price controls use automatic text
+direction, while standalone numeric tokens explicitly use LTR. `level_top_hud.tscn` centers the
+timer's real font minimum height and gives its decorative `II` button a Latin glyph font.
+`starter_bundle_offer_modal.tscn` reserves the wrapped status pill's actual height below its boosters.
+`time_up_extension_modal.tscn` fits its wrapped explanation by expanding the focused shell content,
+and `reward_reveal_row.tscn` pins its `+amount` label to LTR while its booster order can mirror.
+The physical shelf/slot/drag geometry stays in the level's 2D coordinates. See
+[Arabic verification](localization/ARABIC_LOCALIZATION_QA.md) for rendered results.
+
 Localized label fitting stays with each scene owner: `level_failure_screen.gd` fits the failure
 message from 36 down to 24 pixels; `PauseMenu` fits the Settings privacy button; and
 `support_faq_item.tscn` reserves a 384-pixel minimum action width for Ukrainian captions. Reviewed

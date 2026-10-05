@@ -175,6 +175,7 @@ mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_bronze")
 
 [node name="RankLabel" type="Label" parent="ContentMargin/Content/RankSlot" unique_id=1965339802]
+text_direction = 1
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -199,6 +200,7 @@ size_flags_vertical = 4
 mouse_filter = 2
 
 [node name="NameLabel" type="Label" parent="ContentMargin/Content" unique_id=427903482]
+text_direction = 0
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -230,6 +232,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="ScoreLabel" type="Label" parent="ContentMargin/Content/ScoreBox" unique_id=178552473]
+text_direction = 1
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"GameNumberLabel"

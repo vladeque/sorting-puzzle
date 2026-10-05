@@ -90,6 +90,7 @@ size_flags_vertical = 4
 theme_override_constants/separation = 0
 
 [node name="CompareAtPriceLabel" type="RichTextLabel" parent="CardBody/CardStack/Header/PriceStack" unique_id=252437926]
+text_direction = 0
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(0, 22)
@@ -103,6 +104,7 @@ fit_content = true
 scroll_active = false
 
 [node name="PurchaseButton" type="Button" parent="CardBody/CardStack/Header/PriceStack" unique_id=1852880686]
+text_direction = 0
 unique_name_in_owner = true
 custom_minimum_size = Vector2(178, 58)
 layout_mode = 2
@@ -144,6 +146,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="CoinCount" type="Label" parent="CardBody/CardStack/Rewards/CoinReward/Stack" unique_id=2066107440]
+text_direction = 1
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"GameNumberLabel"
@@ -174,6 +177,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="HammerCount" type="Label" parent="CardBody/CardStack/Rewards/HammerReward/Stack" unique_id=1629700746]
+text_direction = 1
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"GameNumberLabel"
@@ -218,6 +222,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="ShuffleCount" type="Label" parent="CardBody/CardStack/Rewards/ShuffleReward/Stack" unique_id=67903146]
+text_direction = 1
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"GameNumberLabel"
@@ -262,6 +267,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="LanternCount" type="Label" parent="CardBody/CardStack/Rewards/LanternReward/Stack" unique_id=1081869248]
+text_direction = 1
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"GameNumberLabel"
@@ -306,6 +312,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="FreezerCount" type="Label" parent="CardBody/CardStack/Rewards/FreezerReward/Stack" unique_id=1313314302]
+text_direction = 1
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"GameNumberLabel"
@@ -379,6 +386,7 @@ theme_override_constants/separation = -3
 alignment = 1
 
 [node name="PercentLabel" type="Label" parent="CardBody/DiscountBadge/TextStack" unique_id=1012362863]
+text_direction = 1
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
@@ -390,6 +398,7 @@ text = "67%"
 horizontal_alignment = 1
 
 [node name="OffLabel" type="Label" parent="CardBody/DiscountBadge/TextStack" unique_id=1116133802]
+text_direction = 1
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0.28, 0.02, 0.02, 0.95)

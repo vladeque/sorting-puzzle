@@ -49,6 +49,13 @@ var _preferred_size := Vector2(
 	GameplayUIThemeScript.MODAL_COMPACT_HEIGHT
 )
 var _is_transitioning := false
+var _physical_safe_margins := Vector4.ZERO
+var _layout_viewport := Vector2.ZERO
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_LAYOUT_DIRECTION_CHANGED and is_node_ready() and _layout_viewport != Vector2.ZERO:
+		apply_safe_layout.call_deferred(_physical_safe_margins, _layout_viewport)
 
 
 func _ready() -> void:
@@ -124,6 +131,9 @@ func is_transitioning() -> bool:
 ## Fits and centers the outer panel within the safe content rect. Safe to call every time the
 ## viewport changes size, matching every other responsive-layout owner in this project.
 func apply_safe_layout(safe_margins: Vector4, viewport_size: Vector2) -> void:
+	_physical_safe_margins = safe_margins
+	_layout_viewport = viewport_size
+	safe_margins = DestinationScreenLayout.logical_safe_margins(self, safe_margins)
 	anchor_left = 0.0
 	anchor_top = 0.0
 	anchor_right = 1.0

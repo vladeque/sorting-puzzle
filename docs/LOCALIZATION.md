@@ -29,6 +29,7 @@
 | Türkçe | `tr` |
 | Русский | `ru` |
 | Українська | `uk` |
+| العربية | `ar` |
 
 On a fresh save, a supported device language is selected; unsupported and Simplified Chinese
 device locales fall back to English. Any explicit player selection is persisted and wins on later
@@ -36,7 +37,7 @@ starts.
 
 ## Translation catalogs
 
-`assets/translations/en.po`, `assets/translations/ru.po`, `assets/translations/uk.po` and `assets/translations/it.po` are
+`assets/translations/en.po`, `assets/translations/ru.po`, `assets/translations/uk.po`, `assets/translations/it.po` and `assets/translations/ar.po` are
 registered in `project.godot`.
 Russian includes all 251 reviewed keys from
 `docs/localization/RUSSIAN_TRANSLATIONS.md`, the user's corrected October 4, 2026 inventory.
@@ -146,18 +147,38 @@ Its owner fits rewarded-action captions within the authored button width, with c
 `reward_chest_menu.gd` fits the translated hero caption within its banner at 28px down to 16px,
 with `HeroTitleLabel` retaining the existing banner bounds instead of expanding its container.
 
-## Arabic integration planning
+## Arabic
 
-Arabic runtime integration is planned in `docs/localization/ARABIC_LOCALIZATION_PLAN.md`.
-The owner's revised October 5, 2026 copy is archived verbatim at
-`docs/localization/ARABIC_TRANSLATIONS.md`. Arabic is not yet in the release allowlist or registered
-catalogs. The plan records confirmed 0–9 numerals, proposed bundled fonts, observed RTL layout
-issues, implementation ownership and the required responsive/mobile verification.
+Arabic (`ar`) is registered and selectable as العربية. Regional device locales such as `ar_SA`
+and `ar_EG` resolve to `ar`. The revised copy is archived verbatim in
+`docs/localization/ARABIC_TRANSLATIONS.md`; `tests/localization/arabic_inventory.json` retains
+all 251 reviewed strings, 42 plural variants, fixed booster names and supplementary email labels.
+The only new caption outside that source is `leaderboard.empty` (لا توجد نتائج بعد).
+
+Arabic gettext uses six forms: zero, one, two, few (integer remainder 3–10), many (11–99), other.
+Ordinary counts, ranks, timers and dates retain 0–9. `GameText.format_date()` uses numeric Gregorian
+day/month/year dates. Store prices retain provider formatting. Bundled Arabic glyph fallbacks are
+available in every locale, including the native language row and mixed player names; see
+`docs/TYPOGRAPHY.md`.
+
+`GameText.isolate_ltr()` adds display-only isolation around emails, deadline dates and operation
+references embedded in Arabic prose. Combo/claimed-booster caption helpers also protect `×count`
+and `+count` runs; the weekly dialog isolates its `#rank`. `GameText.isolate_price()` uses
+content-sensitive isolation for a store price embedded in the Starter Bundle caption.
+Use these helpers only at a UI formatting boundary: raw names, IDs,
+email templates, mailto URLs, saved preferences and protocol data retain their original content.
+
+The implementation ownership and verification scope are recorded in
+`docs/localization/ARABIC_LOCALIZATION_PLAN.md` and `docs/localization/ARABIC_LOCALIZATION_QA.md`.
 
 ## Verification
 
 - `tests/ui/test_language_selection.gd` covers the allowlist, locale mapping, pending/confirmed
   selection, persistence, snapshot exclusion, cancellation, and Main Menu stacking.
+- `tests/ui/test_arabic_localization.gd` verifies reviewed copy, six plural forms, fonts,
+  0–9/date formatting, price/name preservation, live state and purchase-status clearance.
+- `tests/ui/test_arabic_direction.gd` verifies pager gestures, asymmetric physical safe insets,
+  paragraph alignment, mixed-name selection, timeout text fitting and numeric direction.
 - `scripts/tools/captures/language_selection_setup.gd` opens Settings and Language for responsive
   screenshot capture.
 - `scripts/tools/captures/starter_bundle_claimed_boosters_setup.gd` opens the existing offer and
@@ -182,8 +203,10 @@ issues, implementation ownership and the required responsive/mobile verification
   scene is instantiated. It does not change the real player's saved preference.
   Use `-Locale uk` for Ukrainian captures.
   Use `-Locale it` for Italian captures.
+  Use `-Locale ar` for Arabic captures.
 
 The October 4–5, 2026 test results, rendered-screen reviews and capture limitations are recorded in
 `docs/localization/RUSSIAN_LOCALIZATION_QA.md`.
 Ukrainian integration results are recorded in `docs/localization/UKRAINIAN_LOCALIZATION_QA.md`.
 Italian integration results are recorded in `docs/localization/ITALIAN_LOCALIZATION_QA.md`.
+Arabic integration results are recorded in `docs/localization/ARABIC_LOCALIZATION_QA.md`.

@@ -271,6 +271,7 @@ func _apply_responsive_layout() -> void:
 	_layout_bottom_navigation(safe_margins)
 	_out_of_lives_menu.apply_safe_layout(safe_margins, viewport_size)
 	_starter_modal.apply_safe_layout(safe_margins, viewport_size)
+	safe_margins = DestinationScreenLayout.logical_safe_margins(_bottom_bar, safe_margins)
 	_bottom_bar.anchor_left = 0.0
 	_bottom_bar.anchor_top = 1.0
 	_bottom_bar.anchor_right = 1.0
@@ -311,6 +312,14 @@ func _layout_top_status_bar(
 	viewport_size: Vector2,
 	display_cutouts: Array[Rect2]
 ) -> void:
+	# Cutouts are physical; mirror them into the same authored space as the bar offsets.
+	safe_margins = DestinationScreenLayout.logical_safe_margins(_top_status_bar, safe_margins)
+	if _top_status_bar.is_layout_rtl():
+		display_cutouts = display_cutouts.duplicate()
+		for index in display_cutouts.size():
+			var cutout := display_cutouts[index]
+			cutout.position.x = viewport_size.x - cutout.end.x
+			display_cutouts[index] = cutout
 	var bar_left := safe_margins.x + TOP_SIDE_MARGIN
 	var bar_right := viewport_size.x - safe_margins.z - TOP_SIDE_MARGIN
 	var bar_width := maxf(bar_right - bar_left, 0.0)
@@ -362,6 +371,7 @@ func _layout_top_status_bar(
 func _layout_reward_chest(safe_margins: Vector4) -> void:
 	if _reward_chest == null:
 		return
+	safe_margins = DestinationScreenLayout.logical_safe_margins(_reward_chest, safe_margins)
 
 	var centered_left := safe_margins.x + TOP_SIDE_MARGIN + ((PROFILE_WIDGET_WIDTH - REWARD_CHEST_SIZE.x) * 0.5)
 	var left := maxf(centered_left, safe_margins.x + 26.0)
@@ -377,6 +387,7 @@ func _layout_reward_chest(safe_margins: Vector4) -> void:
 
 
 func _layout_starter_bundle_badge(safe_margins: Vector4, viewport_size: Vector2) -> void:
+	safe_margins = DestinationScreenLayout.logical_safe_margins(_starter_badge, safe_margins)
 	# The bracket's wall plate mounts on the safe right edge itself, not inside the side margin.
 	var left := viewport_size.x - safe_margins.z - STARTER_BADGE_SIZE.x
 	var top := _reward_chest.offset_top - STARTER_BADGE_RAISE
@@ -393,19 +404,7 @@ func _layout_starter_bundle_badge(safe_margins: Vector4, viewport_size: Vector2)
 
 
 func _get_safe_area_margins(viewport_size: Vector2) -> Vector4:
-	var window_size := Vector2(DisplayServer.window_get_size())
-	var safe_area := DisplayServer.get_display_safe_area()
-	if window_size.x <= 0.0 or window_size.y <= 0.0 or safe_area.size.x <= 0 or safe_area.size.y <= 0:
-		return Vector4.ZERO
-
-	var scale := Vector2(viewport_size.x / window_size.x, viewport_size.y / window_size.y)
-	var safe_end := safe_area.position + safe_area.size
-	return Vector4(
-		maxf(float(safe_area.position.x) * scale.x, 0.0),
-		maxf(float(safe_area.position.y) * scale.y, 0.0),
-		maxf(float(window_size.x - safe_end.x) * scale.x, 0.0),
-		maxf(float(window_size.y - safe_end.y) * scale.y, 0.0)
-	)
+	return DestinationScreenLayout.get_safe_area_margins(viewport_size)
 
 
 func _get_display_cutouts(viewport_size: Vector2) -> Array[Rect2]:
@@ -1208,6 +1207,8 @@ func _complete_life_recovery() -> void:
 
 
 func _notification(what: int) -> void:
+	if what == NOTIFICATION_LAYOUT_DIRECTION_CHANGED and is_node_ready():
+		_apply_responsive_layout.call_deferred()
 	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
 		_update_level_button()
 		_update_chapter_button()

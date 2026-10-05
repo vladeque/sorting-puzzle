@@ -19,6 +19,7 @@ const SUPPORTED_LOCALES: Array[Dictionary] = [
 	{"locale": "tr", "label": "Türkçe"},
 	{"locale": "ru", "label": "Русский"},
 	{"locale": "uk", "label": "Українська"},
+	{"locale": "ar", "label": "العربية"},
 ]
 
 
@@ -57,7 +58,7 @@ static func resolve_device_locale(locale: String) -> String:
 	match language:
 		"pt":
 			return "pt_BR"
-		"en", "es", "de", "fr", "it", "ja", "ko", "id", "tr", "ru", "uk":
+		"en", "es", "de", "fr", "it", "ja", "ko", "id", "tr", "ru", "uk", "ar":
 			return language
 		_:
 			return DEFAULT_LOCALE

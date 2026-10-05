@@ -27,6 +27,8 @@ func show_reward(rank: int, coin_reward: int) -> void:
 func _refresh_message() -> void:
 	_header.set_title("WEEKLY REWARD!")
 	_message_label.text = tr_n("leaderboard.reward.body", "leaderboard.reward.body.plural", _coin_reward) % [_rank, _coin_reward]
+	var rank_token := "#%d" % _rank
+	_message_label.text = _message_label.text.replace(rank_token, GameText.isolate_ltr(rank_token))
 
 
 ## Fades out and hides this dialog. Safe to call more than once (Close pressed, or the owning

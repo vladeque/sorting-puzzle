@@ -1,0 +1,1379 @@
+{
+  "source_sha256": "f9cf21e2d45439e63f585f86d9542a4d87c0874c4288993c01cc7178afc1b567",
+  "entries": [
+    {
+      "key": "common.play",
+      "en": "Play",
+      "ar": "العب"
+    },
+    {
+      "key": "common.continue",
+      "en": "Continue",
+      "ar": "متابعة"
+    },
+    {
+      "key": "common.resume",
+      "en": "Continue",
+      "ar": "استئناف"
+    },
+    {
+      "key": "common.try_again",
+      "en": "Try Again",
+      "ar": "حاول مجددًا"
+    },
+    {
+      "key": "common.close",
+      "en": "Close",
+      "ar": "إغلاق"
+    },
+    {
+      "key": "common.cancel",
+      "en": "Cancel",
+      "ar": "إلغاء"
+    },
+    {
+      "key": "common.got_it",
+      "en": "Got it",
+      "ar": "فهمت"
+    },
+    {
+      "key": "common.get_help",
+      "en": "Get Help",
+      "ar": "طلب المساعدة"
+    },
+    {
+      "key": "common.save",
+      "en": "SAVE",
+      "ar": "حفظ"
+    },
+    {
+      "key": "common.loading",
+      "en": "Loading…",
+      "ar": "جارٍ التحميل…"
+    },
+    {
+      "key": "common.retry_load",
+      "en": "Retry",
+      "ar": "إعادة التحميل"
+    },
+    {
+      "key": "menu.level_button",
+      "en": "LEVEL %d",
+      "ar": "المستوى %d"
+    },
+    {
+      "key": "menu.more_levels_coming_soon",
+      "en": "MORE LEVELS COMING SOON",
+      "ar": "مستويات جديدة قريبًا"
+    },
+    {
+      "key": "menu.coming_soon",
+      "en": "COMING SOON",
+      "ar": "قريبًا"
+    },
+    {
+      "key": "menu.lives_full",
+      "en": "Full",
+      "ar": "ممتلئ"
+    },
+    {
+      "key": "menu.starter_badge",
+      "en": "BUNDLE",
+      "ar": "حزمة"
+    },
+    {
+      "key": "nav.shop",
+      "en": "Shop",
+      "ar": "المتجر"
+    },
+    {
+      "key": "nav.home",
+      "en": "Home",
+      "ar": "الرئيسية"
+    },
+    {
+      "key": "nav.leaderboard",
+      "en": "Leaderboard",
+      "ar": "المتصدرون"
+    },
+    {
+      "key": "chapter.button",
+      "en": "CHAPTER %d",
+      "ar": "الفصل %d"
+    },
+    {
+      "key": "chapter.button_tooltip",
+      "en": "Choose Chapter %d: %s",
+      "ar": "اختر الفصل %d: %s"
+    },
+    {
+      "key": "chapter.screen_title",
+      "en": "CHAPTERS",
+      "ar": "الفصول"
+    },
+    {
+      "key": "chapter.eyebrow",
+      "en": "CHAPTER %d",
+      "ar": "الفصل %d"
+    },
+    {
+      "key": "chapter.title.chapter_01",
+      "en": "Grocery Town",
+      "ar": "مدينة البقالة"
+    },
+    {
+      "key": "chapter.title.chapter_02",
+      "en": "Candy Corner",
+      "ar": "ركن الحلوى"
+    },
+    {
+      "key": "chapter.locked_status",
+      "en": "Complete %d more %s levels to unlock",
+      "ar": "أكمل %d مستوى إضافيًا في «%s» لفتح الفصل"
+    },
+    {
+      "key": "chapter.unlock_progress",
+      "en": "Unlock progress",
+      "ar": "التقدم نحو الفتح"
+    },
+    {
+      "key": "chapter.current_progress",
+      "en": "Current progress",
+      "ar": "التقدم الحالي"
+    },
+    {
+      "key": "chapter.locked",
+      "en": "Locked",
+      "ar": "مقفل"
+    },
+    {
+      "key": "chapter.no_levels_status",
+      "en": "New levels are coming soon",
+      "ar": "مستويات جديدة قادمة قريبًا"
+    },
+    {
+      "key": "chapter.coming_soon",
+      "en": "Coming Soon",
+      "ar": "قريبًا"
+    },
+    {
+      "key": "hud.level",
+      "en": "LEVEL %d",
+      "ar": "المستوى %d"
+    },
+    {
+      "key": "hud.combo",
+      "en": "COMBO ×%d",
+      "ar": "تتابع ×%d"
+    },
+    {
+      "key": "hud.ability_tooltip.hammer",
+      "en": "Hammer -- clears a matching triple",
+      "ar": "المطرقة — تزيل ثلاثية متطابقة"
+    },
+    {
+      "key": "hud.ability_tooltip.shuffle",
+      "en": "Shuffle -- reshuffles unlocked items",
+      "ar": "الخلط — يعيد ترتيب العناصر غير المقفلة"
+    },
+    {
+      "key": "hud.ability_tooltip.lantern",
+      "en": "Lantern -- highlights a matchable triple",
+      "ar": "الفانوس — يبرز ثلاثية قابلة للمطابقة"
+    },
+    {
+      "key": "hud.ability_tooltip.freezer",
+      "en": "Freezer -- pauses the countdown timer",
+      "ar": "التجميد — يوقف مؤقت العد التنازلي"
+    },
+    {
+      "key": "hud.seconds_short",
+      "en": "%ds",
+      "ar": "%d ث"
+    },
+    {
+      "key": "tip.tap_dispenser",
+      "en": "Tap a dispenser to throw items onto the shelves!",
+      "ar": "اضغط على الموزّع لإلقاء العناصر على الرفوف!"
+    },
+    {
+      "key": "pause.title",
+      "en": "PAUSE",
+      "ar": "إيقاف مؤقت"
+    },
+    {
+      "key": "pause.leave",
+      "en": "Leave",
+      "ar": "مغادرة"
+    },
+    {
+      "key": "leave.title",
+      "en": "LEAVING THE LEVEL",
+      "ar": "مغادرة المستوى"
+    },
+    {
+      "key": "leave.you_will_lose",
+      "en": "You will lose:",
+      "ar": "ستفقد:"
+    },
+    {
+      "key": "leave.confirm",
+      "en": "Leave",
+      "ar": "مغادرة"
+    },
+    {
+      "key": "timeup.title",
+      "en": "TIME'S UP",
+      "ar": "انتهى الوقت"
+    },
+    {
+      "key": "timeup.offer",
+      "en": "Add one minute and keep sorting!",
+      "ar": "أضف دقيقة وواصل الفرز!"
+    },
+    {
+      "key": "timeup.used",
+      "en": "Used",
+      "ar": "تم الاستخدام"
+    },
+    {
+      "key": "ability_purchase.title",
+      "en": "USE ABILITY",
+      "ar": "استخدام معزز"
+    },
+    {
+      "key": "shelf_unlock.title",
+      "en": "UNLOCK SHELF",
+      "ar": "فتح الرف"
+    },
+    {
+      "key": "shelf_unlock.offer",
+      "en": "Watch one ad to unlock this shelf now.",
+      "ar": "شاهد إعلانًا لفتح هذا الرف الآن."
+    },
+    {
+      "key": "shelf_unlock.offer_or_clear",
+      "en": "Watch one ad to unlock this shelf now, or clear %s more.",
+      "ar": "شاهد إعلانًا لفتح هذا الرف الآن، أو أزل %s ثلاثية أخرى."
+    },
+    {
+      "key": "shelf_unlock.button",
+      "en": "Watch Ad · Unlock Shelf",
+      "ar": "شاهد إعلانًا · افتح الرف"
+    },
+    {
+      "key": "shelf_unlock.ad_unavailable",
+      "en": "Ad unavailable. This shelf stays locked.",
+      "ar": "الإعلان غير متاح. سيبقى هذا الرف مقفلًا."
+    },
+    {
+      "key": "complete.title",
+      "en": "GREAT JOB!",
+      "ar": "أحسنت!"
+    },
+    {
+      "key": "failed.title",
+      "en": "LEVEL %d",
+      "ar": "المستوى %d"
+    },
+    {
+      "key": "failed.headline",
+      "en": "LEVEL FAILED",
+      "ar": "لم تكمل المستوى"
+    },
+    {
+      "key": "failed.retry",
+      "en": "Retry",
+      "ar": "أعد المحاولة"
+    },
+    {
+      "key": "combo.praise.2",
+      "en": "Cool",
+      "ar": "جميل"
+    },
+    {
+      "key": "combo.praise.3",
+      "en": "Great",
+      "ar": "رائع"
+    },
+    {
+      "key": "combo.praise.4",
+      "en": "Awesome",
+      "ar": "مذهل"
+    },
+    {
+      "key": "combo.praise.5",
+      "en": "Amazing",
+      "ar": "مدهش"
+    },
+    {
+      "key": "combo.praise.6",
+      "en": "Fantastic",
+      "ar": "مبهر"
+    },
+    {
+      "key": "combo.praise.7",
+      "en": "Incredible",
+      "ar": "لا يصدق"
+    },
+    {
+      "key": "combo.praise.8",
+      "en": "Spectacular",
+      "ar": "خاطف للأنظار"
+    },
+    {
+      "key": "combo.praise.9",
+      "en": "Unstoppable",
+      "ar": "لا يتوقف"
+    },
+    {
+      "key": "combo.praise.10",
+      "en": "Legendary",
+      "ar": "أسطوري"
+    },
+    {
+      "key": "combo.praise.11",
+      "en": "Epic",
+      "ar": "ملحمي"
+    },
+    {
+      "key": "combo.praise.12",
+      "en": "Brilliant",
+      "ar": "عبقري"
+    },
+    {
+      "key": "combo.praise.13",
+      "en": "Masterful",
+      "ar": "احترافي"
+    },
+    {
+      "key": "combo.praise.14",
+      "en": "Supreme",
+      "ar": "لا يضاهى"
+    },
+    {
+      "key": "combo.praise.15",
+      "en": "Phenomenal",
+      "ar": "استثنائي"
+    },
+    {
+      "key": "combo.praise.16",
+      "en": "Mythic",
+      "ar": "خرافي"
+    },
+    {
+      "key": "combo.praise.17",
+      "en": "Majestic",
+      "ar": "مهيب"
+    },
+    {
+      "key": "combo.praise.18",
+      "en": "Radiant",
+      "ar": "متألق"
+    },
+    {
+      "key": "combo.praise.19",
+      "en": "Divine",
+      "ar": "ساحر"
+    },
+    {
+      "key": "combo.praise.20",
+      "en": "Transcendent",
+      "ar": "يفوق الخيال"
+    },
+    {
+      "key": "ability.hammer.name",
+      "en": "Hammer",
+      "ar": "المطرقة"
+    },
+    {
+      "key": "ability.shuffle.name",
+      "en": "Shuffle",
+      "ar": "الخلط"
+    },
+    {
+      "key": "ability.lantern.name",
+      "en": "Lantern",
+      "ar": "الفانوس"
+    },
+    {
+      "key": "ability.freezer.name",
+      "en": "Freezer",
+      "ar": "التجميد"
+    },
+    {
+      "key": "ability.hammer.description",
+      "en": "Instantly clears one matching set of items off the shelves.",
+      "ar": "تزيل فورًا ثلاثية من العناصر المتطابقة من الرفوف."
+    },
+    {
+      "key": "ability.shuffle.description",
+      "en": "Shuffles shelf items into new spots to help you find a match.",
+      "ar": "يعيد توزيع عناصر الرفوف في أماكن جديدة ليساعدك على إيجاد ثلاثية متطابقة."
+    },
+    {
+      "key": "ability.lantern.description",
+      "en": "Highlights a matching triple you can clear for 15 seconds.",
+      "ar": "يبرز لمدة 15 ثانية ثلاثية متطابقة يمكنك إزالتها."
+    },
+    {
+      "key": "ability.freezer.description",
+      "en": "Freezes the level timer for 30 seconds.",
+      "ar": "يجمد مؤقت المستوى لمدة 30 ثانية."
+    },
+    {
+      "key": "ad.watch",
+      "en": "Watch Ad",
+      "ar": "شاهد إعلانًا"
+    },
+    {
+      "key": "ad.loading",
+      "en": "Loading...",
+      "ar": "جارٍ التحميل..."
+    },
+    {
+      "key": "ad.verifying",
+      "en": "Verifying...",
+      "ar": "جارٍ التحقق..."
+    },
+    {
+      "key": "ad.verify_reward",
+      "en": "Verify Reward",
+      "ar": "التحقق من المكافأة"
+    },
+    {
+      "key": "ad.reward_pending",
+      "en": "Reward verification is still pending.",
+      "ar": "لا يزال التحقق من المكافأة معلقًا."
+    },
+    {
+      "key": "ad.unavailable_retry",
+      "en": "Ad unavailable. Please try again.",
+      "ar": "الإعلان غير متاح. حاول مجددًا."
+    },
+    {
+      "key": "ad.watch_unavailable",
+      "en": "Watch Ad\nUnavailable",
+      "ar": "شاهد إعلانًا\nغير متاح"
+    },
+    {
+      "key": "ad.watch_coming_soon",
+      "en": "Watch Ad\nComing Soon",
+      "ar": "شاهد إعلانًا\nقريبًا"
+    },
+    {
+      "key": "ad.badge",
+      "en": "AD",
+      "ar": "AD"
+    },
+    {
+      "key": "lives.title.out",
+      "en": "OUT OF LIVES",
+      "ar": "نفدت المحاولات"
+    },
+    {
+      "key": "lives.title.get_more",
+      "en": "GET MORE LIVES",
+      "ar": "المزيد من المحاولات"
+    },
+    {
+      "key": "lives.title.full",
+      "en": "LIVES FULL",
+      "ar": "كل المحاولات متاحة"
+    },
+    {
+      "key": "lives.next_in",
+      "en": "NEXT LIFE IN",
+      "ar": "المحاولة التالية بعد"
+    },
+    {
+      "key": "lives.full_body",
+      "en": "Your lives are full! Play a level to spend them.",
+      "ar": "لديك الحد الأقصى من المحاولات! العب مستوى لاستخدام محاولة."
+    },
+    {
+      "key": "chest.title",
+      "en": "CHEST REWARDS",
+      "ar": "مكافآت الصندوق"
+    },
+    {
+      "key": "chest.progress_hint",
+      "en": "Collect stars to unlock a chest and claim your reward",
+      "ar": "اجمع النجوم لفتح صندوق والحصول على مكافأتك"
+    },
+    {
+      "key": "chest.ready",
+      "en": "A REWARD CHEST AWAITS!",
+      "ar": "صندوق مكافآت ينتظرك!"
+    },
+    {
+      "key": "chest.tap_to_open",
+      "en": "Tap to open",
+      "ar": "اضغط للفتح"
+    },
+    {
+      "key": "purchase.tap_to_collect",
+      "en": "Tap to collect",
+      "ar": "اضغط للاستلام"
+    },
+    {
+      "key": "purchase.complete",
+      "en": "PURCHASE COMPLETE",
+      "ar": "اكتملت عملية الشراء"
+    },
+    {
+      "key": "shop.title",
+      "en": "SHOP",
+      "ar": "المتجر"
+    },
+    {
+      "key": "shop.section.bundles",
+      "en": "SPECIAL BUNDLES",
+      "ar": "حزم خاصة"
+    },
+    {
+      "key": "shop.section.coins",
+      "en": "COINS",
+      "ar": "عملات"
+    },
+    {
+      "key": "shop.offer.starter_bundle",
+      "en": "Starter Bundle",
+      "ar": "حزمة البداية"
+    },
+    {
+      "key": "shop.offer.basic_bundle",
+      "en": "Basic Bundle",
+      "ar": "الحزمة الأساسية"
+    },
+    {
+      "key": "shop.tag.best_value",
+      "en": "BEST VALUE",
+      "ar": "أفضل قيمة"
+    },
+    {
+      "key": "shop.discount_off",
+      "en": "OFF",
+      "ar": "OFF"
+    },
+    {
+      "key": "shop.ability_hint",
+      "en": "Tap an ability to see what it does",
+      "ar": "اضغط على معزز لمعرفة وظيفته"
+    },
+    {
+      "key": "shop.purchasing",
+      "en": "Purchasing…",
+      "ar": "جارٍ الشراء…"
+    },
+    {
+      "key": "shop.no_offers",
+      "en": "No shop offers are available for this region.",
+      "ar": "لا توجد عروض متاحة في المتجر لهذه المنطقة."
+    },
+    {
+      "key": "shop.load_failed",
+      "en": "Could not load the shop.",
+      "ar": "تعذر تحميل المتجر."
+    },
+    {
+      "key": "shop.error.title.purchase",
+      "en": "Purchase unavailable",
+      "ar": "الشراء غير متاح"
+    },
+    {
+      "key": "shop.error.title.reward",
+      "en": "Reward error",
+      "ar": "خطأ في المكافأة"
+    },
+    {
+      "key": "shop.error.purchase_failed",
+      "en": "The purchase could not be completed.",
+      "ar": "تعذر إكمال عملية الشراء."
+    },
+    {
+      "key": "shop.error.grant_failed",
+      "en": "The purchased rewards could not be granted.",
+      "ar": "تعذر منح المكافآت التي اشتريتها."
+    },
+    {
+      "key": "shop.error.offer_unavailable",
+      "en": "This shop offer is unavailable.",
+      "ar": "عرض المتجر هذا غير متاح."
+    },
+    {
+      "key": "shop.error.already_bought",
+      "en": "This one-time shop offer has already been purchased.",
+      "ar": "سبق شراء هذا العرض المتاح لمرة واحدة."
+    },
+    {
+      "key": "starter.title",
+      "en": "STARTER BUNDLE",
+      "ar": "حزمة البداية"
+    },
+    {
+      "key": "starter.one_time",
+      "en": "ONE-TIME OFFER",
+      "ar": "عرض لمرة واحدة"
+    },
+    {
+      "key": "starter.boosters_included",
+      "en": "BOOSTERS INCLUDED",
+      "ar": "معززات ضمن الحزمة"
+    },
+    {
+      "key": "starter.coins",
+      "en": "%s COINS",
+      "ar": "%s عملة"
+    },
+    {
+      "key": "starter.buy_for",
+      "en": "Buy for %s",
+      "ar": "اشترِ مقابل %s"
+    },
+    {
+      "key": "starter.checking",
+      "en": "Checking offer…",
+      "ar": "جارٍ التحقق من العرض…"
+    },
+    {
+      "key": "starter.checking_short",
+      "en": "Checking…",
+      "ar": "جارٍ التحقق…"
+    },
+    {
+      "key": "starter.no_longer_available",
+      "en": "This offer is no longer available.",
+      "ar": "لم يعد هذا العرض متاحًا."
+    },
+    {
+      "key": "starter.unavailable",
+      "en": "Unavailable",
+      "ar": "غير متاح"
+    },
+    {
+      "key": "booster_chip.claimed",
+      "en": "+%d %s",
+      "ar": "+%d %s"
+    },
+    {
+      "key": "profile.title",
+      "en": "EDIT PROFILE",
+      "ar": "تعديل الملف الشخصي"
+    },
+    {
+      "key": "profile.name_header",
+      "en": "PLAYER NAME",
+      "ar": "اسم اللاعب"
+    },
+    {
+      "key": "profile.name_placeholder",
+      "en": "Player name",
+      "ar": "اسم اللاعب"
+    },
+    {
+      "key": "profile.edit_name_tooltip",
+      "en": "Edit player name",
+      "ar": "تعديل اسم اللاعب"
+    },
+    {
+      "key": "profile.avatar_tab",
+      "en": "AVATAR",
+      "ar": "الصورة"
+    },
+    {
+      "key": "profile.frame_tab",
+      "en": "FRAME",
+      "ar": "الإطار"
+    },
+    {
+      "key": "profile.unlock.level",
+      "en": "Complete level %d to unlock",
+      "ar": "أكمل المستوى %d لفتح الإطار"
+    },
+    {
+      "key": "profile.unlock.combo",
+      "en": "Reach a combo of ×%d in any run to unlock",
+      "ar": "صل إلى تتابع ×%d في أي محاولة لفتح الإطار"
+    },
+    {
+      "key": "profile.unlock.weekly_first",
+      "en": "Finish 1st on the Weekly leaderboard to unlock",
+      "ar": "احتل المركز الأول في الترتيب الأسبوعي لفتح الإطار"
+    },
+    {
+      "key": "profile.unlock.weekly_top",
+      "en": "Finish top %d on the Weekly leaderboard to unlock",
+      "ar": "كن ضمن أفضل %d في الترتيب الأسبوعي لفتح الإطار"
+    },
+    {
+      "key": "leaderboard.title",
+      "en": "LEADERBOARD",
+      "ar": "المتصدرون"
+    },
+    {
+      "key": "leaderboard.tab.weekly",
+      "en": "Weekly",
+      "ar": "أسبوعي"
+    },
+    {
+      "key": "leaderboard.tab.country",
+      "en": "Country",
+      "ar": "البلد"
+    },
+    {
+      "key": "leaderboard.tab.world",
+      "en": "World",
+      "ar": "العالم"
+    },
+    {
+      "key": "leaderboard.weekly_reset",
+      "en": "Weekly reset in %s",
+      "ar": "إعادة تعيين الترتيب الأسبوعي بعد %s"
+    },
+    {
+      "key": "leaderboard.duration.dh",
+      "en": "%dd %dh",
+      "ar": "%d ي %d س"
+    },
+    {
+      "key": "leaderboard.duration.hm",
+      "en": "%dh %dm",
+      "ar": "%d س %d د"
+    },
+    {
+      "key": "leaderboard.duration.m",
+      "en": "%dm",
+      "ar": "%d د"
+    },
+    {
+      "key": "leaderboard.country_caption",
+      "en": "Country · All-time stars",
+      "ar": "البلد · مجموع النجوم منذ البداية"
+    },
+    {
+      "key": "leaderboard.world_caption",
+      "en": "Worldwide · All-time stars",
+      "ar": "العالم · مجموع النجوم منذ البداية"
+    },
+    {
+      "key": "leaderboard.load_failed",
+      "en": "Could not load leaderboard.",
+      "ar": "تعذر تحميل قائمة المتصدرين."
+    },
+    {
+      "key": "leaderboard.default_name",
+      "en": "Player",
+      "ar": "لاعب"
+    },
+    {
+      "key": "leaderboard.row_tooltip",
+      "en": "Rank %d, %s, %d stars",
+      "ar": "المركز %d، %s، %d نجمة"
+    },
+    {
+      "key": "leaderboard.reward_tooltip",
+      "en": "%s coin weekly reward",
+      "ar": "مكافأة أسبوعية: %s عملة"
+    },
+    {
+      "key": "leaderboard.reward.title",
+      "en": "WEEKLY REWARD!",
+      "ar": "مكافأة أسبوعية!"
+    },
+    {
+      "key": "leaderboard.reward.body",
+      "en": "You finished #%d last week and earned %d coins!",
+      "ar": "أنهيت الأسبوع الماضي في المركز #%d وربحت %d عملة!"
+    },
+    {
+      "key": "leaderboard.reward.ok",
+      "en": "Nice!",
+      "ar": "رائع!"
+    },
+    {
+      "key": "settings.title",
+      "en": "SETTINGS",
+      "ar": "الإعدادات"
+    },
+    {
+      "key": "settings.music",
+      "en": "Music",
+      "ar": "موسيقى"
+    },
+    {
+      "key": "settings.sfx",
+      "en": "SFX",
+      "ar": "أصوات"
+    },
+    {
+      "key": "settings.vibrate",
+      "en": "Vibrate",
+      "ar": "اهتزاز"
+    },
+    {
+      "key": "settings.support",
+      "en": "Support",
+      "ar": "الدعم"
+    },
+    {
+      "key": "settings.language",
+      "en": "Language",
+      "ar": "اللغة"
+    },
+    {
+      "key": "settings.privacy_policy",
+      "en": "Privacy Policy",
+      "ar": "سياسة الخصوصية"
+    },
+    {
+      "key": "settings.privacy_choices",
+      "en": "Privacy Choices",
+      "ar": "خيارات الخصوصية"
+    },
+    {
+      "key": "settings.diagnostics",
+      "en": "Version %s • Build %d\nPlatform: %s • User: %s",
+      "ar": "الإصدار %s • النسخة %d\nالمنصة: %s • المستخدم: %s"
+    },
+    {
+      "key": "language.title",
+      "en": "LANGUAGE",
+      "ar": "اللغة"
+    },
+    {
+      "key": "support.title",
+      "en": "SUPPORT",
+      "ar": "الدعم"
+    },
+    {
+      "key": "support.faq_header",
+      "en": "Frequently Asked Questions",
+      "ar": "الأسئلة الشائعة"
+    },
+    {
+      "key": "support.faq.play.q",
+      "en": "How do I play?",
+      "ar": "كيف ألعب؟"
+    },
+    {
+      "key": "support.faq.play.a",
+      "en": "Move matching goods onto the same shelf. When three identical items are visible together, they clear. Complete the board before time runs out.",
+      "ar": "انقل المنتجات المتطابقة إلى الرف نفسه. عندما تظهر ثلاثة عناصر متطابقة معًا، تختفي. أفرغ اللوحة قبل انتهاء الوقت."
+    },
+    {
+      "key": "support.faq.contact.q",
+      "en": "How do I contact support?",
+      "ar": "كيف أتواصل مع الدعم؟"
+    },
+    {
+      "key": "support.faq.contact.a",
+      "en": "Email us at %s. Include a short description, your device platform, and when the problem happened.",
+      "ar": "راسلنا عبر البريد الإلكتروني على %s. أرفق وصفًا موجزًا للمشكلة ومنصة جهازك ووقت حدوث المشكلة."
+    },
+    {
+      "key": "support.faq.contact.action",
+      "en": "Email Support",
+      "ar": "مراسلة الدعم"
+    },
+    {
+      "key": "support.faq.crash.q",
+      "en": "What if the game freezes or crashes?",
+      "ar": "ماذا أفعل إذا تجمدت اللعبة أو تعطلت؟"
+    },
+    {
+      "key": "support.faq.crash.a",
+      "en": "Close and reopen the game first. If it happens again, restart the device and make sure the game is updated. Contact support with the device model, platform version, and what you were doing before the problem.",
+      "ar": "أغلق اللعبة وافتحها مجددًا أولًا. إذا تكررت المشكلة، فأعد تشغيل الجهاز وتأكد من تحديث اللعبة. تواصل مع الدعم واذكر طراز الجهاز وإصدار نظام التشغيل وما كنت تفعله قبل حدوث المشكلة."
+    },
+    {
+      "key": "support.faq.sync.q",
+      "en": "How do I sync progress between devices?",
+      "ar": "كيف أزامن التقدم بين الأجهزة؟"
+    },
+    {
+      "key": "support.faq.sync.a",
+      "en": "Use the same signed-in platform account on both devices and allow synchronization to finish before playing. If the progress differs, avoid playing on both devices and contact support.",
+      "ar": "سجل الدخول إلى حساب المنصة نفسه على الجهازين، وانتظر اكتمال المزامنة قبل اللعب. إذا اختلف التقدم، فتجنب اللعب على الجهازين وتواصل مع الدعم."
+    },
+    {
+      "key": "support.faq.bad_ad.q",
+      "en": "How do I report a bad ad?",
+      "ar": "كيف أبلغ عن إعلان غير مناسب؟"
+    },
+    {
+      "key": "support.faq.bad_ad.a",
+      "en": "1. Close the ad if you can do so safely.\n2. Take a screenshot of the ad and any advertiser or app name shown.\n3. Note the approximate time and where the ad appeared in the game.\n4. Describe why the ad seemed offensive, misleading, or fraudulent.\n5. Email these details to %s. Do not include passwords or payment information.",
+      "ar": "1. أغلق الإعلان إذا أمكنك ذلك بأمان.\n2. التقط لقطة شاشة للإعلان وأي اسم ظاهر للمعلن أو التطبيق.\n3. دوّن الوقت التقريبي وموضع ظهور الإعلان في اللعبة.\n4. وضح سبب اعتقادك أن الإعلان مسيء أو مضلل أو احتيالي.\n5. أرسل هذه التفاصيل عبر البريد الإلكتروني إلى %s. لا ترفق كلمات مرور أو معلومات دفع."
+    },
+    {
+      "key": "support.faq.bad_ad.action",
+      "en": "Email Ad Report",
+      "ar": "إرسال بلاغ عن إعلان"
+    },
+    {
+      "key": "support.account_header",
+      "en": "Account",
+      "ar": "الحساب"
+    },
+    {
+      "key": "support.delete_account",
+      "en": "Delete Account",
+      "ar": "حذف الحساب"
+    },
+    {
+      "key": "support.delete_game_data",
+      "en": "Delete Game Data",
+      "ar": "حذف بيانات اللعبة"
+    },
+    {
+      "key": "support.no_secrets",
+      "en": "Please never send passwords or payment information.",
+      "ar": "يرجى عدم إرسال كلمات مرور أو معلومات دفع مطلقًا."
+    },
+    {
+      "key": "deletion.title.delete_account",
+      "en": "DELETE ACCOUNT",
+      "ar": "حذف الحساب"
+    },
+    {
+      "key": "deletion.title.delete_game_data",
+      "en": "DELETE GAME DATA",
+      "ar": "حذف بيانات اللعبة"
+    },
+    {
+      "key": "deletion.title.not_confirmed",
+      "en": "NOT CONFIRMED",
+      "ar": "لم يتم التأكيد"
+    },
+    {
+      "key": "deletion.title.status_unconfirmed",
+      "en": "STATUS UNCONFIRMED",
+      "ar": "الحالة غير مؤكدة"
+    },
+    {
+      "key": "deletion.title.finishing_up",
+      "en": "FINISHING UP",
+      "ar": "جارٍ الإنهاء"
+    },
+    {
+      "key": "deletion.title.new_game",
+      "en": "NEW GAME",
+      "ar": "لعبة جديدة"
+    },
+    {
+      "key": "deletion.title.status_unknown",
+      "en": "STATUS UNKNOWN",
+      "ar": "الحالة غير معروفة"
+    },
+    {
+      "key": "deletion.title.not_deleted",
+      "en": "NOT DELETED",
+      "ar": "لم يتم الحذف"
+    },
+    {
+      "key": "deletion.title.data_deleted",
+      "en": "DATA DELETED",
+      "ar": "تم حذف البيانات"
+    },
+    {
+      "key": "deletion.title.accepted",
+      "en": "DELETION ACCEPTED",
+      "ar": "تم قبول طلب الحذف"
+    },
+    {
+      "key": "deletion.confirm.headline",
+      "en": "This permanently deletes your account.",
+      "ar": "سيؤدي هذا إلى حذف حسابك نهائيًا."
+    },
+    {
+      "key": "deletion.confirm.body",
+      "en": "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nIf you sign in again later, you'll start a new account.\n\nSome purchase and security records are kept without your name or profile. The rest is removed within 30 days.",
+      "ar": "ستفقد تقدمك وعملاتك وعناصرك وملفك الشخصي. لا يمكنك التراجع عن هذا الإجراء.\n\nإذا سجلت الدخول لاحقًا، فستبدأ بحساب جديد.\n\nنحتفظ ببعض سجلات الشراء والأمان دون اسمك أو ملفك الشخصي. يُحذف الباقي خلال 30 يومًا."
+    },
+    {
+      "key": "deletion.confirm.button",
+      "en": "Delete Account",
+      "ar": "حذف الحساب"
+    },
+    {
+      "key": "deletion.local_confirm.headline",
+      "en": "This deletes your game data on this device.",
+      "ar": "سيؤدي هذا إلى حذف بيانات لعبتك على هذا الجهاز."
+    },
+    {
+      "key": "deletion.local_confirm.body",
+      "en": "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nThis game never created an online account for you, so nothing needs to be deleted from our servers.",
+      "ar": "ستفقد تقدمك وعملاتك وعناصرك وملفك الشخصي. لا يمكنك التراجع عن هذا الإجراء.\n\nلم تنشئ هذه اللعبة حسابًا لك عبر الإنترنت، لذا لا توجد بيانات يلزم حذفها من خوادمنا."
+    },
+    {
+      "key": "deletion.local_confirm.button",
+      "en": "Delete Data",
+      "ar": "حذف البيانات"
+    },
+    {
+      "key": "deletion.pending_setup.headline",
+      "en": "Your account is still being set up.",
+      "ar": "لا يزال حسابك قيد الإعداد."
+    },
+    {
+      "key": "deletion.pending_setup.body",
+      "en": "Connect to the internet and try again in a moment. Nothing was deleted.",
+      "ar": "اتصل بالإنترنت وحاول مجددًا بعد لحظات. لم يُحذف أي شيء."
+    },
+    {
+      "key": "deletion.sign_in.headline",
+      "en": "Sign in to the account you want to delete.",
+      "ar": "سجل الدخول إلى الحساب الذي تريد حذفه."
+    },
+    {
+      "key": "deletion.sign_in.body",
+      "en": "If you can't sign in, contact support for help.",
+      "ar": "إذا تعذر عليك تسجيل الدخول، فتواصل مع الدعم للمساعدة."
+    },
+    {
+      "key": "deletion.read_failed.headline",
+      "en": "Your game data couldn't be read.",
+      "ar": "تعذرت قراءة بيانات لعبتك."
+    },
+    {
+      "key": "deletion.read_failed.body",
+      "en": "Restart the game, then try again. Nothing was deleted.",
+      "ar": "أعد تشغيل اللعبة، ثم حاول مجددًا. لم يُحذف أي شيء."
+    },
+    {
+      "key": "deletion.unavailable.headline",
+      "en": "Account deletion isn't available in this version of the game.",
+      "ar": "حذف الحساب غير متاح في هذا الإصدار من اللعبة."
+    },
+    {
+      "key": "deletion.unavailable.body",
+      "en": "Update the game, or contact support for help deleting your account. Nothing was deleted.",
+      "ar": "حدّث اللعبة، أو تواصل مع الدعم للمساعدة في حذف حسابك. لم يُحذف أي شيء."
+    },
+    {
+      "key": "deletion.in_progress.account",
+      "en": "Deleting your account...",
+      "ar": "جارٍ حذف حسابك..."
+    },
+    {
+      "key": "deletion.in_progress.local",
+      "en": "Deleting your game data...",
+      "ar": "جارٍ حذف بيانات لعبتك..."
+    },
+    {
+      "key": "deletion.in_progress.body",
+      "en": "Keep the game open. This only takes a moment.",
+      "ar": "أبقِ اللعبة مفتوحة. لن يستغرق هذا سوى لحظات."
+    },
+    {
+      "key": "deletion.not_confirmed.headline",
+      "en": "We haven't heard back about your deletion yet.",
+      "ar": "لم نتلقَّ ردًا بشأن الحذف بعد."
+    },
+    {
+      "key": "deletion.not_confirmed.body",
+      "en": "Your request was sent, but the answer didn't arrive. Connect to the internet and try again. The game stays locked until we know the result.",
+      "ar": "أُرسل طلبك، لكن الرد لم يصل. اتصل بالإنترنت وحاول مجددًا. ستبقى اللعبة مقفلة حتى نعرف النتيجة."
+    },
+    {
+      "key": "deletion.unconfirmed.headline",
+      "en": "Deletion status unconfirmed",
+      "ar": "حالة الحذف غير مؤكدة"
+    },
+    {
+      "key": "deletion.unconfirmed.body",
+      "en": "We couldn't confirm whether your account was deleted. To keep your data safe, the game stays locked. Contact support and include the reference below.",
+      "ar": "تعذر التأكد مما إذا كان حسابك قد حُذف. حفاظًا على أمان بياناتك، ستبقى اللعبة مقفلة. تواصل مع الدعم وأرفق الرمز المرجعي أدناه."
+    },
+    {
+      "key": "deletion.check_again",
+      "en": "Check Again",
+      "ar": "تحقق مجددًا"
+    },
+    {
+      "key": "deletion.cleanup.headline.local",
+      "en": "Your local game data couldn't be fully deleted yet.",
+      "ar": "لم نتمكن بعد من حذف بيانات لعبتك المحلية بالكامل."
+    },
+    {
+      "key": "deletion.cleanup.headline.account",
+      "en": "Account deletion accepted; finishing cleanup.",
+      "ar": "تم قبول طلب حذف الحساب؛ جارٍ استكمال إزالة البيانات."
+    },
+    {
+      "key": "deletion.cleanup.body",
+      "en": "Some game data couldn't be removed from this device yet. Try again to finish.",
+      "ar": "لم نتمكن بعد من إزالة بعض بيانات اللعبة من هذا الجهاز. حاول مجددًا لإكمال العملية."
+    },
+    {
+      "key": "deletion.new_game.headline",
+      "en": "Starting a new game...",
+      "ar": "جارٍ بدء لعبة جديدة..."
+    },
+    {
+      "key": "deletion.new_game.body",
+      "en": "This only takes a moment.",
+      "ar": "لن يستغرق هذا سوى لحظات."
+    },
+    {
+      "key": "deletion.status_unknown.headline",
+      "en": "We couldn't read the deletion status on this device.",
+      "ar": "تعذرت قراءة حالة الحذف على هذا الجهاز."
+    },
+    {
+      "key": "deletion.status_unknown.body",
+      "en": "To keep your data safe, the game stays locked. Contact support for help.",
+      "ar": "حفاظًا على أمان بياناتك، ستبقى اللعبة مقفلة. تواصل مع الدعم للمساعدة."
+    },
+    {
+      "key": "deletion.fail.offline",
+      "en": "Connect to the internet to delete your account.",
+      "ar": "اتصل بالإنترنت لحذف حسابك."
+    },
+    {
+      "key": "deletion.fail.rate_limited",
+      "en": "Too many attempts. Wait a moment, then try again.",
+      "ar": "محاولات كثيرة جدًا. انتظر لحظات، ثم حاول مجددًا."
+    },
+    {
+      "key": "deletion.fail.busy",
+      "en": "Account deletion is busy right now. Try again in a moment.",
+      "ar": "يتعذر حذف الحساب حاليًا. حاول مجددًا بعد لحظات."
+    },
+    {
+      "key": "deletion.fail.syncing",
+      "en": "The game is still syncing. Try again in a moment.",
+      "ar": "لا تزال مزامنة اللعبة جارية. حاول مجددًا بعد لحظات."
+    },
+    {
+      "key": "deletion.fail.auth",
+      "en": "We couldn't verify your account. Restart the game, then try again.",
+      "ar": "تعذر التحقق من حسابك. أعد تشغيل اللعبة، ثم حاول مجددًا."
+    },
+    {
+      "key": "deletion.fail.update",
+      "en": "Update the game to delete your account.",
+      "ar": "حدّث اللعبة لحذف حسابك."
+    },
+    {
+      "key": "deletion.fail.changed",
+      "en": "Your account changed while we were deleting it. Try again.",
+      "ar": "طرأ تغيير على حسابك أثناء محاولة حذفه. حاول مجددًا."
+    },
+    {
+      "key": "deletion.fail.storage",
+      "en": "Your device couldn't save the deletion request. Try again.",
+      "ar": "تعذر على جهازك حفظ طلب الحذف. حاول مجددًا."
+    },
+    {
+      "key": "deletion.fail.generic",
+      "en": "We couldn't delete your account. Try again later or contact support.",
+      "ar": "تعذر حذف حسابك. حاول لاحقًا أو تواصل مع الدعم."
+    },
+    {
+      "key": "deletion.fail.local",
+      "en": "Your game data couldn't be deleted. Try again.",
+      "ar": "تعذر حذف بيانات لعبتك. حاول مجددًا."
+    },
+    {
+      "key": "deletion.fail.body",
+      "en": "Nothing was deleted, and you can keep playing.",
+      "ar": "لم يُحذف أي شيء، ويمكنك مواصلة اللعب."
+    },
+    {
+      "key": "deletion.done_local.headline",
+      "en": "Your local game data was deleted.",
+      "ar": "تم حذف بيانات لعبتك المحلية."
+    },
+    {
+      "key": "deletion.done_local.body",
+      "en": "You can start over with a new game.",
+      "ar": "يمكنك البدء من جديد بلعبة جديدة."
+    },
+    {
+      "key": "deletion.new_game_failed",
+      "en": "The new game couldn't start. Try again.",
+      "ar": "تعذر بدء اللعبة الجديدة. حاول مجددًا."
+    },
+    {
+      "key": "deletion.accepted.headline",
+      "en": "Your account is no longer accessible.",
+      "ar": "لم يعد بالإمكان الوصول إلى حسابك."
+    },
+    {
+      "key": "deletion.accepted.body",
+      "en": "Your deletion request was accepted.",
+      "ar": "تم قبول طلب الحذف."
+    },
+    {
+      "key": "deletion.accepted.body_deadline",
+      "en": "Your deletion request was accepted. Data removal is due by %s.",
+      "ar": "تم قبول طلب الحذف. ستتم إزالة البيانات بحلول %s."
+    },
+    {
+      "key": "deletion.reference",
+      "en": "Reference: %s",
+      "ar": "الرمز المرجعي: %s"
+    },
+    {
+      "key": "deletion.start_new_game",
+      "en": "Start New Game",
+      "ar": "بدء لعبة جديدة"
+    },
+    {
+      "key": "app.name",
+      "en": "SortingPuzzle",
+      "ar": "SortingPuzzle"
+    },
+    {
+      "key": "support.email.subject",
+      "en": "Sorting Puzzle support request",
+      "ar": "طلب دعم للعبة Sorting Puzzle"
+    },
+    {
+      "key": "support.email.body",
+      "en": "Please describe the issue here.\n\nDevice/platform:\nApproximate time:\n",
+      "ar": "يرجى وصف المشكلة هنا.\n\nالجهاز/المنصة:\nالوقت التقريبي:\n"
+    },
+    {
+      "key": "support.ad_email.subject",
+      "en": "Sorting Puzzle ad report",
+      "ar": "بلاغ عن إعلان في Sorting Puzzle"
+    },
+    {
+      "key": "support.ad_email.body",
+      "en": "Please attach a screenshot and complete the details below.\n\nApproximate time:\nAd placement in the game:\nAdvertiser or app name:\nWhy the ad should be reviewed:\n",
+      "ar": "يرجى إرفاق لقطة شاشة واستكمال التفاصيل أدناه.\n\nالوقت التقريبي:\nموضع الإعلان في اللعبة:\nاسم المعلن أو التطبيق:\nسبب طلب مراجعة الإعلان:\n"
+    },
+    {
+      "key": "deletion.email.subject",
+      "en": "Sorting Puzzle account deletion",
+      "ar": "حذف حساب Sorting Puzzle"
+    },
+    {
+      "key": "deletion.email.body",
+      "en": "Please help me with my account deletion.",
+      "ar": "يرجى مساعدتي في حذف حسابي."
+    }
+  ],
+  "plurals": {
+    "chapter.locked_status": {
+      "zero": "تبقى %d من المستويات في «%s» لفتح الفصل",
+      "one": "أكمل مستوى إضافيًا (%d) في «%s» لفتح الفصل",
+      "two": "أكمل مستويين إضافيين (%d) في «%s» لفتح الفصل",
+      "few": "أكمل %d مستويات إضافية في «%s» لفتح الفصل",
+      "many": "أكمل %d مستوى إضافيًا في «%s» لفتح الفصل",
+      "other": "أكمل %d مستوى إضافي في «%s» لفتح الفصل"
+    },
+    "shelf_unlock.offer_or_clear": {
+      "zero": "شاهد إعلانًا لفتح هذا الرف الآن، أو أزل %s من الثلاثيات الأخرى.",
+      "one": "شاهد إعلانًا لفتح هذا الرف الآن، أو أزل ثلاثية أخرى (%s).",
+      "two": "شاهد إعلانًا لفتح هذا الرف الآن، أو أزل ثلاثيتين أخريين (%s).",
+      "few": "شاهد إعلانًا لفتح هذا الرف الآن، أو أزل %s ثلاثيات أخرى.",
+      "many": "شاهد إعلانًا لفتح هذا الرف الآن، أو أزل %s ثلاثية أخرى.",
+      "other": "شاهد إعلانًا لفتح هذا الرف الآن، أو أزل %s ثلاثية أخرى."
+    },
+    "starter.coins": {
+      "zero": "%s عملة",
+      "one": "عملة واحدة (%s)",
+      "two": "عملتان (%s)",
+      "few": "%s عملات",
+      "many": "%s عملة",
+      "other": "%s عملة"
+    },
+    "booster_chip.claimed": {
+      "zero": "+%d %s",
+      "one": "+%d %s",
+      "two": "+%d %s",
+      "few": "+%d %s",
+      "many": "+%d %s",
+      "other": "+%d %s"
+    },
+    "leaderboard.row_tooltip": {
+      "zero": "المركز %d، %s، %d نجمة",
+      "one": "المركز %d، %s، نجمة واحدة (%d)",
+      "two": "المركز %d، %s، نجمتان (%d)",
+      "few": "المركز %d، %s، %d نجوم",
+      "many": "المركز %d، %s، %d نجمة",
+      "other": "المركز %d، %s، %d نجمة"
+    },
+    "leaderboard.reward.body": {
+      "zero": "أنهيت الأسبوع الماضي في المركز #%d وربحت %d عملة!",
+      "one": "أنهيت الأسبوع الماضي في المركز #%d وربحت عملة واحدة (%d)!",
+      "two": "أنهيت الأسبوع الماضي في المركز #%d وربحت عملتين (%d)!",
+      "few": "أنهيت الأسبوع الماضي في المركز #%d وربحت %d عملات!",
+      "many": "أنهيت الأسبوع الماضي في المركز #%d وربحت %d عملة!",
+      "other": "أنهيت الأسبوع الماضي في المركز #%d وربحت %d عملة!"
+    },
+    "leaderboard.reward_tooltip": {
+      "zero": "مكافأة أسبوعية: %s عملة",
+      "one": "مكافأة أسبوعية: عملة واحدة (%s)",
+      "two": "مكافأة أسبوعية: عملتان (%s)",
+      "few": "مكافأة أسبوعية: %s عملات",
+      "many": "مكافأة أسبوعية: %s عملة",
+      "other": "مكافأة أسبوعية: %s عملة"
+    }
+  },
+  "counted_boosters": {
+    "Hammer": [
+      "المطرقة",
+      "المطرقة",
+      "المطرقة",
+      "المطرقة",
+      "المطرقة",
+      "المطرقة"
+    ],
+    "Shuffle": [
+      "الخلط",
+      "الخلط",
+      "الخلط",
+      "الخلط",
+      "الخلط",
+      "الخلط"
+    ],
+    "Lantern": [
+      "الفانوس",
+      "الفانوس",
+      "الفانوس",
+      "الفانوس",
+      "الفانوس",
+      "الفانوس"
+    ],
+    "Freezer": [
+      "التجميد",
+      "التجميد",
+      "التجميد",
+      "التجميد",
+      "التجميد",
+      "التجميد"
+    ]
+  },
+  "additional": [
+    {
+      "key": "support.email.status",
+      "en": "Status: %s",
+      "ar": "الحالة: %s"
+    },
+    {
+      "key": "support.email.deletion_reference",
+      "en": "Deletion reference",
+      "ar": "الرمز المرجعي للحذف"
+    },
+    {
+      "key": "support.email.server_reference",
+      "en": "Server reference",
+      "ar": "الرمز المرجعي للخادم"
+    },
+    {
+      "key": "support.email.player_id",
+      "en": "Player ID",
+      "ar": "معرّف اللاعب"
+    },
+    {
+      "key": "leaderboard.empty",
+      "en": "No scores yet",
+      "ar": "لا توجد نتائج بعد"
+    }
+  ]
+}

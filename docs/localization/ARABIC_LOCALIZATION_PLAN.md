@@ -3,8 +3,9 @@
 Prepared October 5, 2026. Investigated against Godot **4.6.2** and game commit
 `10823f8` (`Add reviewed Italian localization and language selection`).
 
-This is an implementation plan. Arabic is not yet enabled in the shipping locale allowlist,
-and no Arabic runtime catalog, permanent font resources or scene changes are part of this commit.
+This document preserves the investigation and implementation sequence. Implementation was
+authorized on October 5, 2026 and now enables Arabic in the release allowlist. See
+[ARABIC_LOCALIZATION_QA.md](ARABIC_LOCALIZATION_QA.md) for verification and remaining device checks.
 
 ## Source and decisions
 
@@ -24,8 +25,8 @@ the game brand, reference values and player names keep their existing content.
 
 The proposed typography is **Baloo Bhaijaan 2 for headings and short actions**, with
 **Noto Sans Arabic for reading text and editing**. A Noto-only alternative was also previewed;
-the owner's font preference is pending. Numeric Gregorian dates in day/month/year order and
-the missing empty-leaderboard caption are proposed supplementary copy to review in phase 1.
+the proposed combination was used when the owner authorized implementation. Numeric Gregorian
+dates in day/month/year order and the empty-leaderboard caption supplement the reviewed source.
 The revised document's translator and integration notes are source context; the work scope
 comes from the owner's request to investigate and plan.
 

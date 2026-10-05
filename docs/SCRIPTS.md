@@ -1,5 +1,23 @@
 # Scripts
 
+## Arabic direction and presentation
+
+`locale_catalog.gd` enables `ar`/العربية, including regional device mappings. `game_text.gd`
+keeps 0–9 and numeric Gregorian dates, isolates technical LTR tokens and content-sensitive prices
+only for display, and composes combo/claimed-booster captions without changing catalog copy.
+`support_faq_item.gd` aligns RichText paragraphs at live direction changes. `horizontal_pager.gd`
+mirrors page placement, drag thresholds and arrow presentation while preserving logical indices.
+`destination_screen_layout.gd` converts physical safe insets to logical offsets exactly once at
+each Control layout owner; Main Menu cutouts are reflected into its authored layout space.
+`shop_sign_bracket.gd` reflects its drawing, and `profile_menu.gd` updates physical tab corners
+without rebuilding the grid or name editor. `starter_bundle_offer_modal.gd` adjusts its content
+and shell height to keep wrapped purchase status between booster names and Buy.
+`time_up_extension_modal.gd` similarly sizes its cream panel from the text column's actual minimum.
+`leaderboard_reward_dialog.gd` isolates only the embedded `#rank`, retaining reviewed plural copy.
+Arabic fonts remain fallback resources in all locales so mixed names are supported. Catalog,
+ownership and review evidence: [LOCALIZATION.md](LOCALIZATION.md),
+[Arabic verification](localization/ARABIC_LOCALIZATION_QA.md).
+
 Russian localization review setups: `scripts/tools/captures/chapter_locked_setup.gd` selects
 Chapter 2's locked page, and `level_completion_setup.gd` opens the standalone completion screen
 and reapplies safe layout on viewport resize. Verification evidence lives in

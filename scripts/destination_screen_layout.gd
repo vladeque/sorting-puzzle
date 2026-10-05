@@ -20,6 +20,12 @@ const TITLE_SIZE_REGULAR := 48
 const TITLE_SIZE_COMPACT := 40
 
 
+## Convert physical device insets to the authored logical offsets Godot mirrors for RTL.
+## Call at the offset owner, exactly once. Safe-area lookup and protocol values stay physical.
+static func logical_safe_margins(control: Control, physical: Vector4) -> Vector4:
+	return Vector4(physical.z, physical.y, physical.x, physical.w) if control.is_layout_rtl() else physical
+
+
 ## Returns (left, top, right, bottom) safe-area insets in logical pixels, or zero outside
 ## Android/iOS. Identical on every platform this project targets -- extracted verbatim from the
 ## copy that used to be duplicated in shop_screen.gd and leaderboard_screen.gd.
@@ -62,6 +68,7 @@ static func apply_content_rect(
 	safe_margins: Vector4,
 	bottom_reserved: float
 ) -> void:
+	safe_margins = logical_safe_margins(content_margin, safe_margins)
 	var available_width := maxf(
 		viewport_size.x - safe_margins.x - safe_margins.z - CONTENT_SIDE_MARGIN * 2.0,
 		1.0

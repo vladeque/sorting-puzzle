@@ -9,6 +9,7 @@ const DOT_SIZE_OFF := 6.0
 const DOT_SIZE_ON := 18.0
 const DOT_STYLE_INACTIVE := preload("res://assets/themes/style_box_pager_dot_inactive.tres")
 const DOT_STYLE_ACTIVE := preload("res://assets/themes/style_box_pager_dot_active.tres")
+const DestinationScreenLayoutScript := preload("res://scripts/destination_screen_layout.gd")
 ## Authored offsets for %PrevArrow, %NextArrow, and %Dots before any additional device safe-area
 ## inset is applied through set_safe_margins().
 const PREV_ARROW_BASE_OFFSET_LEFT := 2.0
@@ -37,6 +38,7 @@ var _drag_active := false
 var _press_position := Vector2.ZERO
 var _track_start_x := 0.0
 var _active_tween: Tween
+var _safe_margins := Vector4.ZERO
 
 
 func _ready() -> void:
@@ -77,6 +79,8 @@ func get_current_page() -> int:
 ## Vector4.ZERO, a no-op, so every other consumer of this generic pager is unaffected unless it
 ## opts in.
 func set_safe_margins(margins: Vector4) -> void:
+	_safe_margins = margins
+	margins = DestinationScreenLayoutScript.logical_safe_margins(self, margins)
 	_prev_arrow.offset_left = PREV_ARROW_BASE_OFFSET_LEFT + margins.x
 	_prev_arrow.offset_right = PREV_ARROW_BASE_OFFSET_RIGHT + margins.x
 	_next_arrow.offset_left = NEXT_ARROW_BASE_OFFSET_LEFT - margins.z
@@ -130,8 +134,9 @@ func _update_pointer_motion(position: Vector2) -> void:
 		_drag_active = true
 	var delta := position.x - _press_position.x
 	var overscroll := _page_width * MAX_OVERSCROLL_FRACTION
-	var maximum_x := peek_width + overscroll
-	var minimum_x := peek_width - float(maxi(_pages.size() - 1, 0)) * _page_width - overscroll
+	var last_x := peek_width - _direction_sign() * float(maxi(_pages.size() - 1, 0)) * _page_width
+	var maximum_x := maxf(peek_width, last_x) + overscroll
+	var minimum_x := minf(peek_width, last_x) - overscroll
 	_track.position.x = clampf(_track_start_x + delta, minimum_x, maximum_x)
 
 
@@ -143,7 +148,7 @@ func _end_press(position: Vector2) -> void:
 		return
 	_drag_active = false
 
-	var delta := position.x - _press_position.x
+	var delta := (position.x - _press_position.x) * _direction_sign()
 	var threshold := _page_width * commit_fraction
 	if delta <= -threshold and _current_index < _pages.size() - 1:
 		go_to_page(_current_index + 1)
@@ -162,16 +167,32 @@ func _go_next() -> void:
 
 
 func _apply_layout() -> void:
+	_pressed = false
+	_drag_active = false
 	_page_width = maxf(size.x - peek_width * 2.0, 1.0)
 	for page_index in _pages.size():
 		var page := _pages[page_index]
-		page.position = Vector2(float(page_index) * _page_width, 0.0)
 		page.size = Vector2(_page_width, _clip.size.y)
+		page.position = Vector2(_direction_sign() * float(page_index) * _page_width, 0.0)
 	_snap_to_current(false)
+	_prev_arrow.text_direction = Control.TEXT_DIRECTION_LTR
+	_next_arrow.text_direction = Control.TEXT_DIRECTION_LTR
+	_prev_arrow.text = ">" if is_layout_rtl() else "<"
+	_next_arrow.text = "<" if is_layout_rtl() else ">"
+	set_safe_margins(_safe_margins)
+
+
+func _direction_sign() -> float:
+	return -1.0 if is_layout_rtl() else 1.0
+
+
+func _notification(what: int) -> void:
+	if what in [NOTIFICATION_TRANSLATION_CHANGED, NOTIFICATION_LAYOUT_DIRECTION_CHANGED] and is_node_ready():
+		_apply_layout.call_deferred()
 
 
 func _snap_to_current(animate: bool) -> void:
-	var target_x := peek_width - float(_current_index) * _page_width
+	var target_x := peek_width - _direction_sign() * float(_current_index) * _page_width
 	if _active_tween and _active_tween.is_valid():
 		_active_tween.kill()
 	if not animate:

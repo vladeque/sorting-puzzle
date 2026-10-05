@@ -14,6 +14,7 @@ const CONTENT_REGION_HEIGHT := 224.0
 
 @onready var _shell := %Shell as GameplayModalShell
 @onready var _extension_content := %ExtensionContent as Control
+@onready var _extension_column := %ExtensionColumn as VBoxContainer
 @onready var _extension_label := %ExtensionLabel as Label
 @onready var _coin_button := %CoinButton as Button
 @onready var _coin_icon := %CoinIcon as TextureRect
@@ -23,6 +24,9 @@ const CONTENT_REGION_HEIGHT := 224.0
 var _coin_available := true
 var _rewarded_ad_available := false
 var _rewarded_ad_used := false
+var _content_height := CONTENT_REGION_HEIGHT
+var _safe_margins := Vector4.ZERO
+var _layout_viewport := Vector2.ZERO
 
 
 func _ready() -> void:
@@ -38,6 +42,8 @@ func _ready() -> void:
 	_watch_ad_button.reparent(_shell.get_action_row(), false)
 	_coin_button.pressed.connect(func() -> void: coin_requested.emit())
 	_watch_ad_button.pressed.connect(func() -> void: ad_requested.emit())
+	_extension_column.minimum_size_changed.connect(_refresh_content_fit.call_deferred)
+	_refresh_content_fit.call_deferred()
 
 
 func set_offer(
@@ -102,7 +108,26 @@ func is_transitioning() -> bool:
 
 
 func apply_safe_layout(safe_margins: Vector4, viewport_size: Vector2) -> void:
+	_safe_margins = safe_margins
+	_layout_viewport = viewport_size
 	_shell.apply_safe_layout(safe_margins, viewport_size)
+	_refresh_content_fit.call_deferred()
+
+
+## Keep the wrapped explanation inside the cream panel when fallback font metrics or localized
+## copy exceed the authored column height. Uniform shell scaling still fits small safe viewports.
+func _refresh_content_fit() -> void:
+	if not is_node_ready():
+		return
+	var height := maxf(CONTENT_REGION_HEIGHT, _extension_column.get_combined_minimum_size().y + 18.0)
+	if is_equal_approx(height, _content_height):
+		return
+	_content_height = height
+	_shell.set_content_region_height(height)
+	_shell.set_preferred_size(Vector2(GameplayUIThemeScript.MODAL_MAX_WIDTH,
+		GameplayUIThemeScript.MODAL_COMPACT_HEIGHT + height - CONTENT_REGION_HEIGHT))
+	if _layout_viewport != Vector2.ZERO:
+		_shell.apply_safe_layout(_safe_margins, _layout_viewport)
 
 
 func open(with_pop := false) -> void:

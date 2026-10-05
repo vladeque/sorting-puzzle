@@ -99,6 +99,8 @@ var _last_timer_seconds := -1
 var _timer_is_critical := false
 var _timer_is_frozen := false
 var _timer_is_time_up := false
+var _physical_safe_margins := Vector4.ZERO
+var _layout_viewport := Vector2.ZERO
 
 
 func _ready() -> void:
@@ -330,7 +332,7 @@ func set_combo(is_combo_active: bool, combo_count: int, time_ratio: float) -> vo
 	_combo_fill.offset_right = -COMBO_FILL_INSET
 	_combo_fill.offset_bottom = -COMBO_FILL_INSET
 	if is_combo_active:
-		_combo_label.text = tr("hud.combo") % combo_count
+		_combo_label.text = GameText.combo_caption(combo_count)
 
 
 func set_pause_enabled(is_enabled: bool) -> void:
@@ -341,6 +343,9 @@ func set_pause_enabled(is_enabled: bool) -> void:
 
 
 func apply_safe_layout(safe_margins: Vector4, viewport_size: Vector2) -> void:
+	_physical_safe_margins = safe_margins
+	_layout_viewport = viewport_size
+	safe_margins = DestinationScreenLayout.logical_safe_margins(self, safe_margins)
 	anchor_left = 0.0
 	anchor_top = 0.0
 	anchor_right = 1.0
@@ -398,16 +403,19 @@ func apply_safe_layout(safe_margins: Vector4, viewport_size: Vector2) -> void:
 	# The compact side roles above reserve a real, font-sized center region. Giving the timer a known
 	# width prevents Label minimum-size resolution from expanding a nominal 1-2px allocation into
 	# the star pill after the layout pass.
-	var timer_top_y := safe_margins.y + TIMER_TOP_MARGIN
+	# Font fallback ascent/descent can exceed the authored timer height, even for Latin digits.
+	# Allocate its actual minimum around the shared center before assigning absolute offsets.
+	var timer_height := maxf(TIMER_LABEL_HEIGHT * compact_scale, _timer_label.get_combined_minimum_size().y)
+	var timer_top_y := row_center_y - timer_height * 0.5
 	var timer_center_x := viewport_size.x * 0.5
 	_layout_absolute(
 		_timer_label,
 		timer_center_x - timer_width * 0.5,
 		timer_top_y,
 		timer_center_x + timer_width * 0.5,
-		timer_top_y + TIMER_LABEL_HEIGHT * compact_scale
+		timer_top_y + timer_height
 	)
-	_timer_label.pivot_offset = Vector2(timer_width, TIMER_LABEL_HEIGHT * compact_scale) * 0.5
+	_timer_label.pivot_offset = Vector2(timer_width, timer_height) * 0.5
 
 	_hud_center_slot.anchor_left = 0.5
 	_hud_center_slot.anchor_right = 0.5
@@ -461,6 +469,8 @@ func _layout_absolute(control: Control, left: float, top: float, right: float, b
 
 
 func _notification(what: int) -> void:
+	if what == NOTIFICATION_LAYOUT_DIRECTION_CHANGED and is_node_ready() and _layout_viewport != Vector2.ZERO:
+		apply_safe_layout.call_deferred(_physical_safe_margins, _layout_viewport)
 	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
 		if _combo_label.visible:
-			_combo_label.text = tr("hud.combo") % _displayed_combo_count
+			_combo_label.text = GameText.combo_caption(_displayed_combo_count)

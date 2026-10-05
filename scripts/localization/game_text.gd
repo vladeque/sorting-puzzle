@@ -34,6 +34,8 @@ static func format_date(date: Dictionary) -> String:
 	var day := int(date.get("day", 1))
 	var year := int(date.get("year", 1970))
 	var language := TranslationServer.get_locale().get_slice("_", 0)
+	if language == "ar":
+		return "%d/%d/%d" % [day, month, year]
 	if language in ["ru", "uk", "it"]:
 		var month_name := TranslationServer.translate("date.month.%d" % month)
 		return TranslationServer.translate("date.day_month_year") % [day, month_name, year]
@@ -42,6 +44,34 @@ static func format_date(date: Dictionary) -> String:
 
 static func counted_booster(title: String, count: int) -> String:
 	return TranslationServer.translate_plural(title, title + ".plural", count, "booster.counted")
+
+
+## Display-only isolation of technical LTR tokens embedded in Arabic prose. Never persist this
+## result or use it in URLs, email templates, player names, IDs or protocol payloads.
+static func isolate_ltr(value: String) -> String:
+	if TranslationServer.get_locale().get_slice("_", 0) == "ar" and not value.is_empty():
+		return "\u2066" + value + "\u2069"
+	return value
+
+
+## Store prices may contain Arabic currency names or provider direction marks. First-strong
+## isolation keeps their own content direction when embedded in an Arabic purchase caption.
+static func isolate_price(value: String) -> String:
+	if TranslationServer.get_locale().get_slice("_", 0) == "ar" and not value.is_empty():
+		return "\u2068" + value + "\u2069"
+	return value
+
+
+static func combo_caption(count: int) -> String:
+	var text := TranslationServer.translate("hud.combo") % count
+	var token := "×%d" % count
+	return text.replace(token, isolate_ltr(token))
+
+
+static func claimed_booster_caption(title: String, count: int) -> String:
+	var text := TranslationServer.translate("booster_chip.claimed") % [count, counted_booster(title, count)]
+	var token := "+%d" % count
+	return text.replace(token, isolate_ltr(token))
 
 
 ## Only reviewed purchase copy reaches the UI. Protocol/validation prose remains diagnostic.

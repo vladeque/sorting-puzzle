@@ -321,7 +321,7 @@ func _result_view(state: Dictionary, local: bool) -> Dictionary:
 	var deadline := format_deadline(str((state.get("receipt", {}) as Dictionary).get("complete_by", "")))
 	var body := tr("deletion.accepted.body")
 	if not deadline.is_empty():
-		body = tr("deletion.accepted.body_deadline") % deadline
+		body = tr("deletion.accepted.body_deadline") % GameText.isolate_ltr(deadline)
 	return _view_of(
 		"DELETION ACCEPTED",
 		"Your account is no longer accessible.",
@@ -358,7 +358,7 @@ func _view_of(
 
 func _reference_text(state: Dictionary) -> String:
 	var reference := str((state.get("support_reference", {}) as Dictionary).get("operation_id", ""))
-	return tr("deletion.reference") % reference if not reference.is_empty() else ""
+	return tr("deletion.reference") % GameText.isolate_ltr(reference) if not reference.is_empty() else ""
 
 
 func _apply_view() -> void:

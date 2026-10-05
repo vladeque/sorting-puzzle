@@ -61,7 +61,7 @@ LevelTransition="*res://scripts/level_transition.gd"
 window/size/viewport_width=720
 window/size/viewport_height=1280
 window/stretch/mode="canvas_items"
-window/stretch/aspect="keep_width"
+window/stretch/aspect="expand"
 window/handheld/orientation=1
 
 [editor_plugins]
@@ -74,7 +74,7 @@ theme/custom="res://assets/themes/game_typography.tres"
 
 [internationalization]
 
-locale/translations=PackedStringArray("res://assets/translations/en.po", "res://assets/translations/ru.po", "res://assets/translations/uk.po", "res://assets/translations/it.po")
+locale/translations=PackedStringArray("res://assets/translations/en.po", "res://assets/translations/ru.po", "res://assets/translations/uk.po", "res://assets/translations/it.po", "res://assets/translations/ar.po")
 
 [physics]
 

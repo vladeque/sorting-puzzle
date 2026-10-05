@@ -1,0 +1,2135 @@
+# Reviewed Arabic inventory; see docs/localization/ARABIC_TRANSLATIONS.md.
+msgid ""
+msgstr ""
+"Project-Id-Version: SortingPuzzle\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5);\n"
+
+#. common.play
+msgid "common.play"
+msgstr "العب"
+
+#. common.continue
+msgid "common.continue"
+msgstr "متابعة"
+
+#. common.resume
+msgid "common.resume"
+msgstr "استئناف"
+
+#. common.try_again
+msgid "common.try_again"
+msgstr "حاول مجددًا"
+
+#. common.close
+msgid "common.close"
+msgstr "إغلاق"
+
+#. common.cancel
+msgid "common.cancel"
+msgstr "إلغاء"
+
+#. common.got_it
+msgid "common.got_it"
+msgstr "فهمت"
+
+#. common.get_help
+msgid "common.get_help"
+msgstr "طلب المساعدة"
+
+#. common.save
+msgid "common.save"
+msgstr "حفظ"
+
+#. common.loading
+msgid "common.loading"
+msgstr "جارٍ التحميل…"
+
+#. common.retry_load
+msgid "common.retry_load"
+msgstr "إعادة التحميل"
+
+#. menu.level_button
+msgid "menu.level_button"
+msgstr "المستوى %d"
+
+#. menu.more_levels_coming_soon
+msgid "menu.more_levels_coming_soon"
+msgstr "مستويات جديدة قريبًا"
+
+#. menu.coming_soon
+msgid "menu.coming_soon"
+msgstr "قريبًا"
+
+#. menu.lives_full
+msgid "menu.lives_full"
+msgstr "ممتلئ"
+
+#. menu.starter_badge
+msgid "menu.starter_badge"
+msgstr "حزمة"
+
+#. nav.shop
+msgid "nav.shop"
+msgstr "المتجر"
+
+#. nav.home
+msgid "nav.home"
+msgstr "الرئيسية"
+
+#. nav.leaderboard
+msgid "nav.leaderboard"
+msgstr "المتصدرون"
+
+#. chapter.button
+msgid "chapter.button"
+msgstr "الفصل %d"
+
+#. chapter.button_tooltip
+msgid "chapter.button_tooltip"
+msgstr "اختر الفصل %d: %s"
+
+#. chapter.screen_title
+msgid "chapter.screen_title"
+msgstr "الفصول"
+
+#. chapter.eyebrow
+msgid "chapter.eyebrow"
+msgstr "الفصل %d"
+
+#. chapter.title.chapter_01
+msgid "chapter.title.chapter_01"
+msgstr "مدينة البقالة"
+
+#. chapter.title.chapter_02
+msgid "chapter.title.chapter_02"
+msgstr "ركن الحلوى"
+
+#. chapter.locked_status
+msgid "chapter.locked_status"
+msgid_plural "chapter.locked_status.plural"
+msgstr[0] "تبقى %d من المستويات في «%s» لفتح الفصل"
+msgstr[1] "أكمل مستوى إضافيًا (%d) في «%s» لفتح الفصل"
+msgstr[2] "أكمل مستويين إضافيين (%d) في «%s» لفتح الفصل"
+msgstr[3] "أكمل %d مستويات إضافية في «%s» لفتح الفصل"
+msgstr[4] "أكمل %d مستوى إضافيًا في «%s» لفتح الفصل"
+msgstr[5] "أكمل %d مستوى إضافي في «%s» لفتح الفصل"
+
+#. chapter.unlock_progress
+msgid "chapter.unlock_progress"
+msgstr "التقدم نحو الفتح"
+
+#. chapter.current_progress
+msgid "chapter.current_progress"
+msgstr "التقدم الحالي"
+
+#. chapter.locked
+msgid "chapter.locked"
+msgstr "مقفل"
+
+#. chapter.no_levels_status
+msgid "chapter.no_levels_status"
+msgstr "مستويات جديدة قادمة قريبًا"
+
+#. chapter.coming_soon
+msgid "chapter.coming_soon"
+msgstr "قريبًا"
+
+#. hud.level
+msgid "hud.level"
+msgstr "المستوى %d"
+
+#. hud.combo
+msgid "hud.combo"
+msgstr "تتابع ×%d"
+
+#. hud.ability_tooltip.hammer
+msgid "hud.ability_tooltip.hammer"
+msgstr "المطرقة — تزيل ثلاثية متطابقة"
+
+#. hud.ability_tooltip.shuffle
+msgid "hud.ability_tooltip.shuffle"
+msgstr "الخلط — يعيد ترتيب العناصر غير المقفلة"
+
+#. hud.ability_tooltip.lantern
+msgid "hud.ability_tooltip.lantern"
+msgstr "الفانوس — يبرز ثلاثية قابلة للمطابقة"
+
+#. hud.ability_tooltip.freezer
+msgid "hud.ability_tooltip.freezer"
+msgstr "التجميد — يوقف مؤقت العد التنازلي"
+
+#. hud.seconds_short
+msgid "hud.seconds_short"
+msgstr "%d ث"
+
+#. tip.tap_dispenser
+msgid "tip.tap_dispenser"
+msgstr "اضغط على الموزّع لإلقاء العناصر على الرفوف!"
+
+#. pause.title
+msgid "pause.title"
+msgstr "إيقاف مؤقت"
+
+#. pause.leave
+msgid "pause.leave"
+msgstr "مغادرة"
+
+#. leave.title
+msgid "leave.title"
+msgstr "مغادرة المستوى"
+
+#. leave.you_will_lose
+msgid "leave.you_will_lose"
+msgstr "ستفقد:"
+
+#. leave.confirm
+msgid "leave.confirm"
+msgstr "مغادرة"
+
+#. timeup.title
+msgid "timeup.title"
+msgstr "انتهى الوقت"
+
+#. timeup.offer
+msgid "timeup.offer"
+msgstr "أضف دقيقة وواصل الفرز!"
+
+#. timeup.used
+msgid "timeup.used"
+msgstr "تم الاستخدام"
+
+#. ability_purchase.title
+msgid "ability_purchase.title"
+msgstr "استخدام معزز"
+
+#. shelf_unlock.title
+msgid "shelf_unlock.title"
+msgstr "فتح الرف"
+
+#. shelf_unlock.offer
+msgid "shelf_unlock.offer"
+msgstr "شاهد إعلانًا لفتح هذا الرف الآن."
+
+#. shelf_unlock.offer_or_clear
+msgid "shelf_unlock.offer_or_clear"
+msgid_plural "shelf_unlock.offer_or_clear.plural"
+msgstr[0] "شاهد إعلانًا لفتح هذا الرف الآن، أو أزل %s من الثلاثيات الأخرى."
+msgstr[1] "شاهد إعلانًا لفتح هذا الرف الآن، أو أزل ثلاثية أخرى (%s)."
+msgstr[2] "شاهد إعلانًا لفتح هذا الرف الآن، أو أزل ثلاثيتين أخريين (%s)."
+msgstr[3] "شاهد إعلانًا لفتح هذا الرف الآن، أو أزل %s ثلاثيات أخرى."
+msgstr[4] "شاهد إعلانًا لفتح هذا الرف الآن، أو أزل %s ثلاثية أخرى."
+msgstr[5] "شاهد إعلانًا لفتح هذا الرف الآن، أو أزل %s ثلاثية أخرى."
+
+#. shelf_unlock.button
+msgid "shelf_unlock.button"
+msgstr "شاهد إعلانًا · افتح الرف"
+
+#. shelf_unlock.ad_unavailable
+msgid "shelf_unlock.ad_unavailable"
+msgstr "الإعلان غير متاح. سيبقى هذا الرف مقفلًا."
+
+#. complete.title
+msgid "complete.title"
+msgstr "أحسنت!"
+
+#. failed.title
+msgid "failed.title"
+msgstr "المستوى %d"
+
+#. failed.headline
+msgid "failed.headline"
+msgstr "لم تكمل المستوى"
+
+#. failed.retry
+msgid "failed.retry"
+msgstr "أعد المحاولة"
+
+#. combo.praise.2
+msgid "combo.praise.2"
+msgstr "جميل"
+
+#. combo.praise.3
+msgid "combo.praise.3"
+msgstr "رائع"
+
+#. combo.praise.4
+msgid "combo.praise.4"
+msgstr "مذهل"
+
+#. combo.praise.5
+msgid "combo.praise.5"
+msgstr "مدهش"
+
+#. combo.praise.6
+msgid "combo.praise.6"
+msgstr "مبهر"
+
+#. combo.praise.7
+msgid "combo.praise.7"
+msgstr "لا يصدق"
+
+#. combo.praise.8
+msgid "combo.praise.8"
+msgstr "خاطف للأنظار"
+
+#. combo.praise.9
+msgid "combo.praise.9"
+msgstr "لا يتوقف"
+
+#. combo.praise.10
+msgid "combo.praise.10"
+msgstr "أسطوري"
+
+#. combo.praise.11
+msgid "combo.praise.11"
+msgstr "ملحمي"
+
+#. combo.praise.12
+msgid "combo.praise.12"
+msgstr "عبقري"
+
+#. combo.praise.13
+msgid "combo.praise.13"
+msgstr "احترافي"
+
+#. combo.praise.14
+msgid "combo.praise.14"
+msgstr "لا يضاهى"
+
+#. combo.praise.15
+msgid "combo.praise.15"
+msgstr "استثنائي"
+
+#. combo.praise.16
+msgid "combo.praise.16"
+msgstr "خرافي"
+
+#. combo.praise.17
+msgid "combo.praise.17"
+msgstr "مهيب"
+
+#. combo.praise.18
+msgid "combo.praise.18"
+msgstr "متألق"
+
+#. combo.praise.19
+msgid "combo.praise.19"
+msgstr "ساحر"
+
+#. combo.praise.20
+msgid "combo.praise.20"
+msgstr "يفوق الخيال"
+
+#. ability.hammer.name
+msgid "ability.hammer.name"
+msgstr "المطرقة"
+
+#. ability.shuffle.name
+msgid "ability.shuffle.name"
+msgstr "الخلط"
+
+#. ability.lantern.name
+msgid "ability.lantern.name"
+msgstr "الفانوس"
+
+#. ability.freezer.name
+msgid "ability.freezer.name"
+msgstr "التجميد"
+
+#. ability.hammer.description
+msgid "ability.hammer.description"
+msgstr "تزيل فورًا ثلاثية من العناصر المتطابقة من الرفوف."
+
+#. ability.shuffle.description
+msgid "ability.shuffle.description"
+msgstr "يعيد توزيع عناصر الرفوف في أماكن جديدة ليساعدك على إيجاد ثلاثية متطابقة."
+
+#. ability.lantern.description
+msgid "ability.lantern.description"
+msgstr "يبرز لمدة 15 ثانية ثلاثية متطابقة يمكنك إزالتها."
+
+#. ability.freezer.description
+msgid "ability.freezer.description"
+msgstr "يجمد مؤقت المستوى لمدة 30 ثانية."
+
+#. ad.watch
+msgid "ad.watch"
+msgstr "شاهد إعلانًا"
+
+#. ad.loading
+msgid "ad.loading"
+msgstr "جارٍ التحميل..."
+
+#. ad.verifying
+msgid "ad.verifying"
+msgstr "جارٍ التحقق..."
+
+#. ad.verify_reward
+msgid "ad.verify_reward"
+msgstr "التحقق من المكافأة"
+
+#. ad.reward_pending
+msgid "ad.reward_pending"
+msgstr "لا يزال التحقق من المكافأة معلقًا."
+
+#. ad.unavailable_retry
+msgid "ad.unavailable_retry"
+msgstr "الإعلان غير متاح. حاول مجددًا."
+
+#. ad.watch_unavailable
+msgid "ad.watch_unavailable"
+msgstr "شاهد إعلانًا\nغير متاح"
+
+#. ad.watch_coming_soon
+msgid "ad.watch_coming_soon"
+msgstr "شاهد إعلانًا\nقريبًا"
+
+#. ad.badge
+msgid "ad.badge"
+msgstr "AD"
+
+#. lives.title.out
+msgid "lives.title.out"
+msgstr "نفدت المحاولات"
+
+#. lives.title.get_more
+msgid "lives.title.get_more"
+msgstr "المزيد من المحاولات"
+
+#. lives.title.full
+msgid "lives.title.full"
+msgstr "كل المحاولات متاحة"
+
+#. lives.next_in
+msgid "lives.next_in"
+msgstr "المحاولة التالية بعد"
+
+#. lives.full_body
+msgid "lives.full_body"
+msgstr "لديك الحد الأقصى من المحاولات! العب مستوى لاستخدام محاولة."
+
+#. chest.title
+msgid "chest.title"
+msgstr "مكافآت الصندوق"
+
+#. chest.progress_hint
+msgid "chest.progress_hint"
+msgstr "اجمع النجوم لفتح صندوق والحصول على مكافأتك"
+
+#. chest.ready
+msgid "chest.ready"
+msgstr "صندوق مكافآت ينتظرك!"
+
+#. chest.tap_to_open
+msgid "chest.tap_to_open"
+msgstr "اضغط للفتح"
+
+#. purchase.tap_to_collect
+msgid "purchase.tap_to_collect"
+msgstr "اضغط للاستلام"
+
+#. purchase.complete
+msgid "purchase.complete"
+msgstr "اكتملت عملية الشراء"
+
+#. shop.title
+msgid "shop.title"
+msgstr "المتجر"
+
+#. shop.section.bundles
+msgid "shop.section.bundles"
+msgstr "حزم خاصة"
+
+#. shop.section.coins
+msgid "shop.section.coins"
+msgstr "عملات"
+
+#. shop.offer.starter_bundle
+msgid "shop.offer.starter_bundle"
+msgstr "حزمة البداية"
+
+#. shop.offer.basic_bundle
+msgid "shop.offer.basic_bundle"
+msgstr "الحزمة الأساسية"
+
+#. shop.tag.best_value
+msgid "shop.tag.best_value"
+msgstr "أفضل قيمة"
+
+#. shop.discount_off
+msgid "shop.discount_off"
+msgstr "OFF"
+
+#. shop.ability_hint
+msgid "shop.ability_hint"
+msgstr "اضغط على معزز لمعرفة وظيفته"
+
+#. shop.purchasing
+msgid "shop.purchasing"
+msgstr "جارٍ الشراء…"
+
+#. shop.no_offers
+msgid "shop.no_offers"
+msgstr "لا توجد عروض متاحة في المتجر لهذه المنطقة."
+
+#. shop.load_failed
+msgid "shop.load_failed"
+msgstr "تعذر تحميل المتجر."
+
+#. shop.error.title.purchase
+msgid "shop.error.title.purchase"
+msgstr "الشراء غير متاح"
+
+#. shop.error.title.reward
+msgid "shop.error.title.reward"
+msgstr "خطأ في المكافأة"
+
+#. shop.error.purchase_failed
+msgid "shop.error.purchase_failed"
+msgstr "تعذر إكمال عملية الشراء."
+
+#. shop.error.grant_failed
+msgid "shop.error.grant_failed"
+msgstr "تعذر منح المكافآت التي اشتريتها."
+
+#. shop.error.offer_unavailable
+msgid "shop.error.offer_unavailable"
+msgstr "عرض المتجر هذا غير متاح."
+
+#. shop.error.already_bought
+msgid "shop.error.already_bought"
+msgstr "سبق شراء هذا العرض المتاح لمرة واحدة."
+
+#. starter.title
+msgid "starter.title"
+msgstr "حزمة البداية"
+
+#. starter.one_time
+msgid "starter.one_time"
+msgstr "عرض لمرة واحدة"
+
+#. starter.boosters_included
+msgid "starter.boosters_included"
+msgstr "معززات ضمن الحزمة"
+
+#. starter.coins
+msgid "starter.coins"
+msgid_plural "starter.coins.plural"
+msgstr[0] "%s عملة"
+msgstr[1] "عملة واحدة (%s)"
+msgstr[2] "عملتان (%s)"
+msgstr[3] "%s عملات"
+msgstr[4] "%s عملة"
+msgstr[5] "%s عملة"
+
+#. starter.buy_for
+msgid "starter.buy_for"
+msgstr "اشترِ مقابل %s"
+
+#. starter.checking
+msgid "starter.checking"
+msgstr "جارٍ التحقق من العرض…"
+
+#. starter.checking_short
+msgid "starter.checking_short"
+msgstr "جارٍ التحقق…"
+
+#. starter.no_longer_available
+msgid "starter.no_longer_available"
+msgstr "لم يعد هذا العرض متاحًا."
+
+#. starter.unavailable
+msgid "starter.unavailable"
+msgstr "غير متاح"
+
+#. booster_chip.claimed
+msgid "booster_chip.claimed"
+msgid_plural "booster_chip.claimed.plural"
+msgstr[0] "+%d %s"
+msgstr[1] "+%d %s"
+msgstr[2] "+%d %s"
+msgstr[3] "+%d %s"
+msgstr[4] "+%d %s"
+msgstr[5] "+%d %s"
+
+#. profile.title
+msgid "profile.title"
+msgstr "تعديل الملف الشخصي"
+
+#. profile.name_header
+msgid "profile.name_header"
+msgstr "اسم اللاعب"
+
+#. profile.name_placeholder
+msgid "profile.name_placeholder"
+msgstr "اسم اللاعب"
+
+#. profile.edit_name_tooltip
+msgid "profile.edit_name_tooltip"
+msgstr "تعديل اسم اللاعب"
+
+#. profile.avatar_tab
+msgid "profile.avatar_tab"
+msgstr "الصورة"
+
+#. profile.frame_tab
+msgid "profile.frame_tab"
+msgstr "الإطار"
+
+#. profile.unlock.level
+msgid "profile.unlock.level"
+msgstr "أكمل المستوى %d لفتح الإطار"
+
+#. profile.unlock.combo
+msgid "profile.unlock.combo"
+msgstr "صل إلى تتابع ×%d في أي محاولة لفتح الإطار"
+
+#. profile.unlock.weekly_first
+msgid "profile.unlock.weekly_first"
+msgstr "احتل المركز الأول في الترتيب الأسبوعي لفتح الإطار"
+
+#. profile.unlock.weekly_top
+msgid "profile.unlock.weekly_top"
+msgstr "كن ضمن أفضل %d في الترتيب الأسبوعي لفتح الإطار"
+
+#. leaderboard.title
+msgid "leaderboard.title"
+msgstr "المتصدرون"
+
+#. leaderboard.tab.weekly
+msgid "leaderboard.tab.weekly"
+msgstr "أسبوعي"
+
+#. leaderboard.tab.country
+msgid "leaderboard.tab.country"
+msgstr "البلد"
+
+#. leaderboard.tab.world
+msgid "leaderboard.tab.world"
+msgstr "العالم"
+
+#. leaderboard.weekly_reset
+msgid "leaderboard.weekly_reset"
+msgstr "إعادة تعيين الترتيب الأسبوعي بعد %s"
+
+#. leaderboard.duration.dh
+msgid "leaderboard.duration.dh"
+msgstr "%d ي %d س"
+
+#. leaderboard.duration.hm
+msgid "leaderboard.duration.hm"
+msgstr "%d س %d د"
+
+#. leaderboard.duration.m
+msgid "leaderboard.duration.m"
+msgstr "%d د"
+
+#. leaderboard.country_caption
+msgid "leaderboard.country_caption"
+msgstr "البلد · مجموع النجوم منذ البداية"
+
+#. leaderboard.world_caption
+msgid "leaderboard.world_caption"
+msgstr "العالم · مجموع النجوم منذ البداية"
+
+#. leaderboard.load_failed
+msgid "leaderboard.load_failed"
+msgstr "تعذر تحميل قائمة المتصدرين."
+
+#. leaderboard.default_name
+msgid "leaderboard.default_name"
+msgstr "لاعب"
+
+#. leaderboard.row_tooltip
+msgid "leaderboard.row_tooltip"
+msgid_plural "leaderboard.row_tooltip.plural"
+msgstr[0] "المركز %d، %s، %d نجمة"
+msgstr[1] "المركز %d، %s، نجمة واحدة (%d)"
+msgstr[2] "المركز %d، %s، نجمتان (%d)"
+msgstr[3] "المركز %d، %s، %d نجوم"
+msgstr[4] "المركز %d، %s، %d نجمة"
+msgstr[5] "المركز %d، %s، %d نجمة"
+
+#. leaderboard.reward_tooltip
+msgid "leaderboard.reward_tooltip"
+msgid_plural "leaderboard.reward_tooltip.plural"
+msgstr[0] "مكافأة أسبوعية: %s عملة"
+msgstr[1] "مكافأة أسبوعية: عملة واحدة (%s)"
+msgstr[2] "مكافأة أسبوعية: عملتان (%s)"
+msgstr[3] "مكافأة أسبوعية: %s عملات"
+msgstr[4] "مكافأة أسبوعية: %s عملة"
+msgstr[5] "مكافأة أسبوعية: %s عملة"
+
+#. leaderboard.reward.title
+msgid "leaderboard.reward.title"
+msgstr "مكافأة أسبوعية!"
+
+#. leaderboard.reward.body
+msgid "leaderboard.reward.body"
+msgid_plural "leaderboard.reward.body.plural"
+msgstr[0] "أنهيت الأسبوع الماضي في المركز #%d وربحت %d عملة!"
+msgstr[1] "أنهيت الأسبوع الماضي في المركز #%d وربحت عملة واحدة (%d)!"
+msgstr[2] "أنهيت الأسبوع الماضي في المركز #%d وربحت عملتين (%d)!"
+msgstr[3] "أنهيت الأسبوع الماضي في المركز #%d وربحت %d عملات!"
+msgstr[4] "أنهيت الأسبوع الماضي في المركز #%d وربحت %d عملة!"
+msgstr[5] "أنهيت الأسبوع الماضي في المركز #%d وربحت %d عملة!"
+
+#. leaderboard.reward.ok
+msgid "leaderboard.reward.ok"
+msgstr "رائع!"
+
+#. settings.title
+msgid "settings.title"
+msgstr "الإعدادات"
+
+#. settings.music
+msgid "settings.music"
+msgstr "موسيقى"
+
+#. settings.sfx
+msgid "settings.sfx"
+msgstr "أصوات"
+
+#. settings.vibrate
+msgid "settings.vibrate"
+msgstr "اهتزاز"
+
+#. settings.support
+msgid "settings.support"
+msgstr "الدعم"
+
+#. settings.language
+msgid "settings.language"
+msgstr "اللغة"
+
+#. settings.privacy_policy
+msgid "settings.privacy_policy"
+msgstr "سياسة الخصوصية"
+
+#. settings.privacy_choices
+msgid "settings.privacy_choices"
+msgstr "خيارات الخصوصية"
+
+#. settings.diagnostics
+msgid "settings.diagnostics"
+msgstr "الإصدار %s • النسخة %d\nالمنصة: %s • المستخدم: %s"
+
+#. language.title
+msgid "language.title"
+msgstr "اللغة"
+
+#. support.title
+msgid "support.title"
+msgstr "الدعم"
+
+#. support.faq_header
+msgid "support.faq_header"
+msgstr "الأسئلة الشائعة"
+
+#. support.faq.play.q
+msgid "support.faq.play.q"
+msgstr "كيف ألعب؟"
+
+#. support.faq.play.a
+msgid "support.faq.play.a"
+msgstr "انقل المنتجات المتطابقة إلى الرف نفسه. عندما تظهر ثلاثة عناصر متطابقة معًا، تختفي. أفرغ اللوحة قبل انتهاء الوقت."
+
+#. support.faq.contact.q
+msgid "support.faq.contact.q"
+msgstr "كيف أتواصل مع الدعم؟"
+
+#. support.faq.contact.a
+msgid "support.faq.contact.a"
+msgstr "راسلنا عبر البريد الإلكتروني على %s. أرفق وصفًا موجزًا للمشكلة ومنصة جهازك ووقت حدوث المشكلة."
+
+#. support.faq.contact.action
+msgid "support.faq.contact.action"
+msgstr "مراسلة الدعم"
+
+#. support.faq.crash.q
+msgid "support.faq.crash.q"
+msgstr "ماذا أفعل إذا تجمدت اللعبة أو تعطلت؟"
+
+#. support.faq.crash.a
+msgid "support.faq.crash.a"
+msgstr "أغلق اللعبة وافتحها مجددًا أولًا. إذا تكررت المشكلة، فأعد تشغيل الجهاز وتأكد من تحديث اللعبة. تواصل مع الدعم واذكر طراز الجهاز وإصدار نظام التشغيل وما كنت تفعله قبل حدوث المشكلة."
+
+#. support.faq.sync.q
+msgid "support.faq.sync.q"
+msgstr "كيف أزامن التقدم بين الأجهزة؟"
+
+#. support.faq.sync.a
+msgid "support.faq.sync.a"
+msgstr "سجل الدخول إلى حساب المنصة نفسه على الجهازين، وانتظر اكتمال المزامنة قبل اللعب. إذا اختلف التقدم، فتجنب اللعب على الجهازين وتواصل مع الدعم."
+
+#. support.faq.bad_ad.q
+msgid "support.faq.bad_ad.q"
+msgstr "كيف أبلغ عن إعلان غير مناسب؟"
+
+#. support.faq.bad_ad.a
+msgid "support.faq.bad_ad.a"
+msgstr "1. أغلق الإعلان إذا أمكنك ذلك بأمان.\n2. التقط لقطة شاشة للإعلان وأي اسم ظاهر للمعلن أو التطبيق.\n3. دوّن الوقت التقريبي وموضع ظهور الإعلان في اللعبة.\n4. وضح سبب اعتقادك أن الإعلان مسيء أو مضلل أو احتيالي.\n5. أرسل هذه التفاصيل عبر البريد الإلكتروني إلى %s. لا ترفق كلمات مرور أو معلومات دفع."
+
+#. support.faq.bad_ad.action
+msgid "support.faq.bad_ad.action"
+msgstr "إرسال بلاغ عن إعلان"
+
+#. support.account_header
+msgid "support.account_header"
+msgstr "الحساب"
+
+#. support.delete_account
+msgid "support.delete_account"
+msgstr "حذف الحساب"
+
+#. support.delete_game_data
+msgid "support.delete_game_data"
+msgstr "حذف بيانات اللعبة"
+
+#. support.no_secrets
+msgid "support.no_secrets"
+msgstr "يرجى عدم إرسال كلمات مرور أو معلومات دفع مطلقًا."
+
+#. deletion.title.delete_account
+msgid "deletion.title.delete_account"
+msgstr "حذف الحساب"
+
+#. deletion.title.delete_game_data
+msgid "deletion.title.delete_game_data"
+msgstr "حذف بيانات اللعبة"
+
+#. deletion.title.not_confirmed
+msgid "deletion.title.not_confirmed"
+msgstr "لم يتم التأكيد"
+
+#. deletion.title.status_unconfirmed
+msgid "deletion.title.status_unconfirmed"
+msgstr "الحالة غير مؤكدة"
+
+#. deletion.title.finishing_up
+msgid "deletion.title.finishing_up"
+msgstr "جارٍ الإنهاء"
+
+#. deletion.title.new_game
+msgid "deletion.title.new_game"
+msgstr "لعبة جديدة"
+
+#. deletion.title.status_unknown
+msgid "deletion.title.status_unknown"
+msgstr "الحالة غير معروفة"
+
+#. deletion.title.not_deleted
+msgid "deletion.title.not_deleted"
+msgstr "لم يتم الحذف"
+
+#. deletion.title.data_deleted
+msgid "deletion.title.data_deleted"
+msgstr "تم حذف البيانات"
+
+#. deletion.title.accepted
+msgid "deletion.title.accepted"
+msgstr "تم قبول طلب الحذف"
+
+#. deletion.confirm.headline
+msgid "deletion.confirm.headline"
+msgstr "سيؤدي هذا إلى حذف حسابك نهائيًا."
+
+#. deletion.confirm.body
+msgid "deletion.confirm.body"
+msgstr "ستفقد تقدمك وعملاتك وعناصرك وملفك الشخصي. لا يمكنك التراجع عن هذا الإجراء.\n\nإذا سجلت الدخول لاحقًا، فستبدأ بحساب جديد.\n\nنحتفظ ببعض سجلات الشراء والأمان دون اسمك أو ملفك الشخصي. يُحذف الباقي خلال 30 يومًا."
+
+#. deletion.confirm.button
+msgid "deletion.confirm.button"
+msgstr "حذف الحساب"
+
+#. deletion.local_confirm.headline
+msgid "deletion.local_confirm.headline"
+msgstr "سيؤدي هذا إلى حذف بيانات لعبتك على هذا الجهاز."
+
+#. deletion.local_confirm.body
+msgid "deletion.local_confirm.body"
+msgstr "ستفقد تقدمك وعملاتك وعناصرك وملفك الشخصي. لا يمكنك التراجع عن هذا الإجراء.\n\nلم تنشئ هذه اللعبة حسابًا لك عبر الإنترنت، لذا لا توجد بيانات يلزم حذفها من خوادمنا."
+
+#. deletion.local_confirm.button
+msgid "deletion.local_confirm.button"
+msgstr "حذف البيانات"
+
+#. deletion.pending_setup.headline
+msgid "deletion.pending_setup.headline"
+msgstr "لا يزال حسابك قيد الإعداد."
+
+#. deletion.pending_setup.body
+msgid "deletion.pending_setup.body"
+msgstr "اتصل بالإنترنت وحاول مجددًا بعد لحظات. لم يُحذف أي شيء."
+
+#. deletion.sign_in.headline
+msgid "deletion.sign_in.headline"
+msgstr "سجل الدخول إلى الحساب الذي تريد حذفه."
+
+#. deletion.sign_in.body
+msgid "deletion.sign_in.body"
+msgstr "إذا تعذر عليك تسجيل الدخول، فتواصل مع الدعم للمساعدة."
+
+#. deletion.read_failed.headline
+msgid "deletion.read_failed.headline"
+msgstr "تعذرت قراءة بيانات لعبتك."
+
+#. deletion.read_failed.body
+msgid "deletion.read_failed.body"
+msgstr "أعد تشغيل اللعبة، ثم حاول مجددًا. لم يُحذف أي شيء."
+
+#. deletion.unavailable.headline
+msgid "deletion.unavailable.headline"
+msgstr "حذف الحساب غير متاح في هذا الإصدار من اللعبة."
+
+#. deletion.unavailable.body
+msgid "deletion.unavailable.body"
+msgstr "حدّث اللعبة، أو تواصل مع الدعم للمساعدة في حذف حسابك. لم يُحذف أي شيء."
+
+#. deletion.in_progress.account
+msgid "deletion.in_progress.account"
+msgstr "جارٍ حذف حسابك..."
+
+#. deletion.in_progress.local
+msgid "deletion.in_progress.local"
+msgstr "جارٍ حذف بيانات لعبتك..."
+
+#. deletion.in_progress.body
+msgid "deletion.in_progress.body"
+msgstr "أبقِ اللعبة مفتوحة. لن يستغرق هذا سوى لحظات."
+
+#. deletion.not_confirmed.headline
+msgid "deletion.not_confirmed.headline"
+msgstr "لم نتلقَّ ردًا بشأن الحذف بعد."
+
+#. deletion.not_confirmed.body
+msgid "deletion.not_confirmed.body"
+msgstr "أُرسل طلبك، لكن الرد لم يصل. اتصل بالإنترنت وحاول مجددًا. ستبقى اللعبة مقفلة حتى نعرف النتيجة."
+
+#. deletion.unconfirmed.headline
+msgid "deletion.unconfirmed.headline"
+msgstr "حالة الحذف غير مؤكدة"
+
+#. deletion.unconfirmed.body
+msgid "deletion.unconfirmed.body"
+msgstr "تعذر التأكد مما إذا كان حسابك قد حُذف. حفاظًا على أمان بياناتك، ستبقى اللعبة مقفلة. تواصل مع الدعم وأرفق الرمز المرجعي أدناه."
+
+#. deletion.check_again
+msgid "deletion.check_again"
+msgstr "تحقق مجددًا"
+
+#. deletion.cleanup.headline.local
+msgid "deletion.cleanup.headline.local"
+msgstr "لم نتمكن بعد من حذف بيانات لعبتك المحلية بالكامل."
+
+#. deletion.cleanup.headline.account
+msgid "deletion.cleanup.headline.account"
+msgstr "تم قبول طلب حذف الحساب؛ جارٍ استكمال إزالة البيانات."
+
+#. deletion.cleanup.body
+msgid "deletion.cleanup.body"
+msgstr "لم نتمكن بعد من إزالة بعض بيانات اللعبة من هذا الجهاز. حاول مجددًا لإكمال العملية."
+
+#. deletion.new_game.headline
+msgid "deletion.new_game.headline"
+msgstr "جارٍ بدء لعبة جديدة..."
+
+#. deletion.new_game.body
+msgid "deletion.new_game.body"
+msgstr "لن يستغرق هذا سوى لحظات."
+
+#. deletion.status_unknown.headline
+msgid "deletion.status_unknown.headline"
+msgstr "تعذرت قراءة حالة الحذف على هذا الجهاز."
+
+#. deletion.status_unknown.body
+msgid "deletion.status_unknown.body"
+msgstr "حفاظًا على أمان بياناتك، ستبقى اللعبة مقفلة. تواصل مع الدعم للمساعدة."
+
+#. deletion.fail.offline
+msgid "deletion.fail.offline"
+msgstr "اتصل بالإنترنت لحذف حسابك."
+
+#. deletion.fail.rate_limited
+msgid "deletion.fail.rate_limited"
+msgstr "محاولات كثيرة جدًا. انتظر لحظات، ثم حاول مجددًا."
+
+#. deletion.fail.busy
+msgid "deletion.fail.busy"
+msgstr "يتعذر حذف الحساب حاليًا. حاول مجددًا بعد لحظات."
+
+#. deletion.fail.syncing
+msgid "deletion.fail.syncing"
+msgstr "لا تزال مزامنة اللعبة جارية. حاول مجددًا بعد لحظات."
+
+#. deletion.fail.auth
+msgid "deletion.fail.auth"
+msgstr "تعذر التحقق من حسابك. أعد تشغيل اللعبة، ثم حاول مجددًا."
+
+#. deletion.fail.update
+msgid "deletion.fail.update"
+msgstr "حدّث اللعبة لحذف حسابك."
+
+#. deletion.fail.changed
+msgid "deletion.fail.changed"
+msgstr "طرأ تغيير على حسابك أثناء محاولة حذفه. حاول مجددًا."
+
+#. deletion.fail.storage
+msgid "deletion.fail.storage"
+msgstr "تعذر على جهازك حفظ طلب الحذف. حاول مجددًا."
+
+#. deletion.fail.generic
+msgid "deletion.fail.generic"
+msgstr "تعذر حذف حسابك. حاول لاحقًا أو تواصل مع الدعم."
+
+#. deletion.fail.local
+msgid "deletion.fail.local"
+msgstr "تعذر حذف بيانات لعبتك. حاول مجددًا."
+
+#. deletion.fail.body
+msgid "deletion.fail.body"
+msgstr "لم يُحذف أي شيء، ويمكنك مواصلة اللعب."
+
+#. deletion.done_local.headline
+msgid "deletion.done_local.headline"
+msgstr "تم حذف بيانات لعبتك المحلية."
+
+#. deletion.done_local.body
+msgid "deletion.done_local.body"
+msgstr "يمكنك البدء من جديد بلعبة جديدة."
+
+#. deletion.new_game_failed
+msgid "deletion.new_game_failed"
+msgstr "تعذر بدء اللعبة الجديدة. حاول مجددًا."
+
+#. deletion.accepted.headline
+msgid "deletion.accepted.headline"
+msgstr "لم يعد بالإمكان الوصول إلى حسابك."
+
+#. deletion.accepted.body
+msgid "deletion.accepted.body"
+msgstr "تم قبول طلب الحذف."
+
+#. deletion.accepted.body_deadline
+msgid "deletion.accepted.body_deadline"
+msgstr "تم قبول طلب الحذف. ستتم إزالة البيانات بحلول %s."
+
+#. deletion.reference
+msgid "deletion.reference"
+msgstr "الرمز المرجعي: %s"
+
+#. deletion.start_new_game
+msgid "deletion.start_new_game"
+msgstr "بدء لعبة جديدة"
+
+#. app.name
+msgid "app.name"
+msgstr "SortingPuzzle"
+
+#. support.email.subject
+msgid "support.email.subject"
+msgstr "طلب دعم للعبة Sorting Puzzle"
+
+#. support.email.body
+msgid "support.email.body"
+msgstr "يرجى وصف المشكلة هنا.\n\nالجهاز/المنصة:\nالوقت التقريبي:\n"
+
+#. support.ad_email.subject
+msgid "support.ad_email.subject"
+msgstr "بلاغ عن إعلان في Sorting Puzzle"
+
+#. support.ad_email.body
+msgid "support.ad_email.body"
+msgstr "يرجى إرفاق لقطة شاشة واستكمال التفاصيل أدناه.\n\nالوقت التقريبي:\nموضع الإعلان في اللعبة:\nاسم المعلن أو التطبيق:\nسبب طلب مراجعة الإعلان:\n"
+
+#. deletion.email.subject
+msgid "deletion.email.subject"
+msgstr "حذف حساب Sorting Puzzle"
+
+#. deletion.email.body
+msgid "deletion.email.body"
+msgstr "يرجى مساعدتي في حذف حسابي."
+
+#. support.email.status
+msgid "support.email.status"
+msgstr "الحالة: %s"
+
+#. support.email.deletion_reference
+msgid "support.email.deletion_reference"
+msgstr "الرمز المرجعي للحذف"
+
+#. support.email.server_reference
+msgid "support.email.server_reference"
+msgstr "الرمز المرجعي للخادم"
+
+#. support.email.player_id
+msgid "support.email.player_id"
+msgstr "معرّف اللاعب"
+
+#. leaderboard.empty
+msgid "leaderboard.empty"
+msgstr "لا توجد نتائج بعد"
+
+#. common.play
+msgid "Play"
+msgstr "العب"
+
+#. common.continue
+msgid "Continue"
+msgstr "متابعة"
+
+#. common.try_again
+msgid "Try Again"
+msgstr "حاول مجددًا"
+
+#. common.close
+msgid "Close"
+msgstr "إغلاق"
+
+#. common.cancel
+msgid "Cancel"
+msgstr "إلغاء"
+
+#. common.got_it
+msgid "Got it"
+msgstr "فهمت"
+
+#. common.get_help
+msgid "Get Help"
+msgstr "طلب المساعدة"
+
+#. common.save
+msgid "SAVE"
+msgstr "حفظ"
+
+#. common.loading
+msgid "Loading…"
+msgstr "جارٍ التحميل…"
+
+#. failed.retry
+msgid "Retry"
+msgstr "أعد المحاولة"
+
+#. menu.level_button
+msgid "LEVEL %d"
+msgstr "المستوى %d"
+
+#. menu.more_levels_coming_soon
+msgid "MORE LEVELS COMING SOON"
+msgstr "مستويات جديدة قريبًا"
+
+#. menu.coming_soon
+msgid "COMING SOON"
+msgstr "قريبًا"
+
+#. menu.lives_full
+msgid "Full"
+msgstr "ممتلئ"
+
+#. menu.starter_badge
+msgid "BUNDLE"
+msgstr "حزمة"
+
+#. nav.shop
+msgid "Shop"
+msgstr "المتجر"
+
+#. nav.home
+msgid "Home"
+msgstr "الرئيسية"
+
+#. nav.leaderboard
+msgid "Leaderboard"
+msgstr "المتصدرون"
+
+#. chapter.button
+msgid "CHAPTER %d"
+msgstr "الفصل %d"
+
+#. chapter.button_tooltip
+msgid "Choose Chapter %d: %s"
+msgstr "اختر الفصل %d: %s"
+
+#. chapter.screen_title
+msgid "CHAPTERS"
+msgstr "الفصول"
+
+#. chapter.title.chapter_01
+msgid "Grocery Town"
+msgstr "مدينة البقالة"
+
+#. chapter.title.chapter_02
+msgid "Candy Corner"
+msgstr "ركن الحلوى"
+
+#. chapter.locked_status
+msgid "Complete %d more %s levels to unlock"
+msgstr "أكمل %d مستوى إضافيًا في «%s» لفتح الفصل"
+
+#. chapter.unlock_progress
+msgid "Unlock progress"
+msgstr "التقدم نحو الفتح"
+
+#. chapter.current_progress
+msgid "Current progress"
+msgstr "التقدم الحالي"
+
+#. chapter.locked
+msgid "Locked"
+msgstr "مقفل"
+
+#. chapter.no_levels_status
+msgid "New levels are coming soon"
+msgstr "مستويات جديدة قادمة قريبًا"
+
+#. chapter.coming_soon
+msgid "Coming Soon"
+msgstr "قريبًا"
+
+#. hud.combo
+msgid "COMBO ×%d"
+msgstr "تتابع ×%d"
+
+#. hud.ability_tooltip.hammer
+msgid "Hammer -- clears a matching triple"
+msgstr "المطرقة — تزيل ثلاثية متطابقة"
+
+#. hud.ability_tooltip.shuffle
+msgid "Shuffle -- reshuffles unlocked items"
+msgstr "الخلط — يعيد ترتيب العناصر غير المقفلة"
+
+#. hud.ability_tooltip.lantern
+msgid "Lantern -- highlights a matchable triple"
+msgstr "الفانوس — يبرز ثلاثية قابلة للمطابقة"
+
+#. hud.ability_tooltip.freezer
+msgid "Freezer -- pauses the countdown timer"
+msgstr "التجميد — يوقف مؤقت العد التنازلي"
+
+#. hud.seconds_short
+msgid "%ds"
+msgstr "%d ث"
+
+#. tip.tap_dispenser
+msgid "Tap a dispenser to throw items onto the shelves!"
+msgstr "اضغط على الموزّع لإلقاء العناصر على الرفوف!"
+
+#. pause.title
+msgid "PAUSE"
+msgstr "إيقاف مؤقت"
+
+#. pause.leave
+msgid "Leave"
+msgstr "مغادرة"
+
+#. leave.title
+msgid "LEAVING THE LEVEL"
+msgstr "مغادرة المستوى"
+
+#. leave.you_will_lose
+msgid "You will lose:"
+msgstr "ستفقد:"
+
+#. timeup.title
+msgid "TIME'S UP"
+msgstr "انتهى الوقت"
+
+#. timeup.offer
+msgid "Add one minute and keep sorting!"
+msgstr "أضف دقيقة وواصل الفرز!"
+
+#. timeup.used
+msgid "Used"
+msgstr "تم الاستخدام"
+
+#. ability_purchase.title
+msgid "USE ABILITY"
+msgstr "استخدام معزز"
+
+#. shelf_unlock.title
+msgid "UNLOCK SHELF"
+msgstr "فتح الرف"
+
+#. shelf_unlock.offer
+msgid "Watch one ad to unlock this shelf now."
+msgstr "شاهد إعلانًا لفتح هذا الرف الآن."
+
+#. shelf_unlock.offer_or_clear
+msgid "Watch one ad to unlock this shelf now, or clear %s more."
+msgstr "شاهد إعلانًا لفتح هذا الرف الآن، أو أزل %s ثلاثية أخرى."
+
+#. shelf_unlock.button
+msgid "Watch Ad · Unlock Shelf"
+msgstr "شاهد إعلانًا · افتح الرف"
+
+#. shelf_unlock.ad_unavailable
+msgid "Ad unavailable. This shelf stays locked."
+msgstr "الإعلان غير متاح. سيبقى هذا الرف مقفلًا."
+
+#. complete.title
+msgid "GREAT JOB!"
+msgstr "أحسنت!"
+
+#. failed.headline
+msgid "LEVEL FAILED"
+msgstr "لم تكمل المستوى"
+
+#. combo.praise.2
+msgid "Cool"
+msgstr "جميل"
+
+#. combo.praise.3
+msgid "Great"
+msgstr "رائع"
+
+#. combo.praise.4
+msgid "Awesome"
+msgstr "مذهل"
+
+#. combo.praise.5
+msgid "Amazing"
+msgstr "مدهش"
+
+#. combo.praise.6
+msgid "Fantastic"
+msgstr "مبهر"
+
+#. combo.praise.7
+msgid "Incredible"
+msgstr "لا يصدق"
+
+#. combo.praise.8
+msgid "Spectacular"
+msgstr "خاطف للأنظار"
+
+#. combo.praise.9
+msgid "Unstoppable"
+msgstr "لا يتوقف"
+
+#. combo.praise.10
+msgid "Legendary"
+msgstr "أسطوري"
+
+#. combo.praise.11
+msgid "Epic"
+msgstr "ملحمي"
+
+#. combo.praise.12
+msgid "Brilliant"
+msgstr "عبقري"
+
+#. combo.praise.13
+msgid "Masterful"
+msgstr "احترافي"
+
+#. combo.praise.14
+msgid "Supreme"
+msgstr "لا يضاهى"
+
+#. combo.praise.15
+msgid "Phenomenal"
+msgstr "استثنائي"
+
+#. combo.praise.16
+msgid "Mythic"
+msgstr "خرافي"
+
+#. combo.praise.17
+msgid "Majestic"
+msgstr "مهيب"
+
+#. combo.praise.18
+msgid "Radiant"
+msgstr "متألق"
+
+#. combo.praise.19
+msgid "Divine"
+msgstr "ساحر"
+
+#. combo.praise.20
+msgid "Transcendent"
+msgstr "يفوق الخيال"
+
+#. ability.hammer.name
+msgid "Hammer"
+msgstr "المطرقة"
+
+#. ability.shuffle.name
+msgid "Shuffle"
+msgstr "الخلط"
+
+#. ability.lantern.name
+msgid "Lantern"
+msgstr "الفانوس"
+
+#. ability.freezer.name
+msgid "Freezer"
+msgstr "التجميد"
+
+#. ability.hammer.description
+msgid "Instantly clears one matching set of items off the shelves."
+msgstr "تزيل فورًا ثلاثية من العناصر المتطابقة من الرفوف."
+
+#. ability.shuffle.description
+msgid "Shuffles shelf items into new spots to help you find a match."
+msgstr "يعيد توزيع عناصر الرفوف في أماكن جديدة ليساعدك على إيجاد ثلاثية متطابقة."
+
+#. ability.lantern.description
+msgid "Highlights a matching triple you can clear for 15 seconds."
+msgstr "يبرز لمدة 15 ثانية ثلاثية متطابقة يمكنك إزالتها."
+
+#. ability.freezer.description
+msgid "Freezes the level timer for 30 seconds."
+msgstr "يجمد مؤقت المستوى لمدة 30 ثانية."
+
+#. ad.watch
+msgid "Watch Ad"
+msgstr "شاهد إعلانًا"
+
+#. ad.loading
+msgid "Loading..."
+msgstr "جارٍ التحميل..."
+
+#. ad.verifying
+msgid "Verifying..."
+msgstr "جارٍ التحقق..."
+
+#. ad.verify_reward
+msgid "Verify Reward"
+msgstr "التحقق من المكافأة"
+
+#. ad.reward_pending
+msgid "Reward verification is still pending."
+msgstr "لا يزال التحقق من المكافأة معلقًا."
+
+#. ad.unavailable_retry
+msgid "Ad unavailable. Please try again."
+msgstr "الإعلان غير متاح. حاول مجددًا."
+
+#. ad.watch_unavailable
+msgid "Watch Ad\nUnavailable"
+msgstr "شاهد إعلانًا\nغير متاح"
+
+#. ad.watch_coming_soon
+msgid "Watch Ad\nComing Soon"
+msgstr "شاهد إعلانًا\nقريبًا"
+
+#. ad.badge
+msgid "AD"
+msgstr "AD"
+
+#. lives.title.out
+msgid "OUT OF LIVES"
+msgstr "نفدت المحاولات"
+
+#. lives.title.get_more
+msgid "GET MORE LIVES"
+msgstr "المزيد من المحاولات"
+
+#. lives.title.full
+msgid "LIVES FULL"
+msgstr "كل المحاولات متاحة"
+
+#. lives.next_in
+msgid "NEXT LIFE IN"
+msgstr "المحاولة التالية بعد"
+
+#. lives.full_body
+msgid "Your lives are full! Play a level to spend them."
+msgstr "لديك الحد الأقصى من المحاولات! العب مستوى لاستخدام محاولة."
+
+#. chest.title
+msgid "CHEST REWARDS"
+msgstr "مكافآت الصندوق"
+
+#. chest.progress_hint
+msgid "Collect stars to unlock a chest and claim your reward"
+msgstr "اجمع النجوم لفتح صندوق والحصول على مكافأتك"
+
+#. chest.ready
+msgid "A REWARD CHEST AWAITS!"
+msgstr "صندوق مكافآت ينتظرك!"
+
+#. chest.tap_to_open
+msgid "Tap to open"
+msgstr "اضغط للفتح"
+
+#. purchase.tap_to_collect
+msgid "Tap to collect"
+msgstr "اضغط للاستلام"
+
+#. purchase.complete
+msgid "PURCHASE COMPLETE"
+msgstr "اكتملت عملية الشراء"
+
+#. shop.title
+msgid "SHOP"
+msgstr "المتجر"
+
+#. shop.section.bundles
+msgid "SPECIAL BUNDLES"
+msgstr "حزم خاصة"
+
+#. shop.section.coins
+msgid "COINS"
+msgstr "عملات"
+
+#. shop.offer.starter_bundle
+msgid "Starter Bundle"
+msgstr "حزمة البداية"
+
+#. shop.offer.basic_bundle
+msgid "Basic Bundle"
+msgstr "الحزمة الأساسية"
+
+#. shop.tag.best_value
+msgid "BEST VALUE"
+msgstr "أفضل قيمة"
+
+#. shop.discount_off
+msgid "OFF"
+msgstr "OFF"
+
+#. shop.ability_hint
+msgid "Tap an ability to see what it does"
+msgstr "اضغط على معزز لمعرفة وظيفته"
+
+#. shop.purchasing
+msgid "Purchasing…"
+msgstr "جارٍ الشراء…"
+
+#. shop.no_offers
+msgid "No shop offers are available for this region."
+msgstr "لا توجد عروض متاحة في المتجر لهذه المنطقة."
+
+#. shop.load_failed
+msgid "Could not load the shop."
+msgstr "تعذر تحميل المتجر."
+
+#. shop.error.title.purchase
+msgid "Purchase unavailable"
+msgstr "الشراء غير متاح"
+
+#. shop.error.title.reward
+msgid "Reward error"
+msgstr "خطأ في المكافأة"
+
+#. shop.error.purchase_failed
+msgid "The purchase could not be completed."
+msgstr "تعذر إكمال عملية الشراء."
+
+#. shop.error.grant_failed
+msgid "The purchased rewards could not be granted."
+msgstr "تعذر منح المكافآت التي اشتريتها."
+
+#. shop.error.offer_unavailable
+msgid "This shop offer is unavailable."
+msgstr "عرض المتجر هذا غير متاح."
+
+#. shop.error.already_bought
+msgid "This one-time shop offer has already been purchased."
+msgstr "سبق شراء هذا العرض المتاح لمرة واحدة."
+
+#. starter.title
+msgid "STARTER BUNDLE"
+msgstr "حزمة البداية"
+
+#. starter.one_time
+msgid "ONE-TIME OFFER"
+msgstr "عرض لمرة واحدة"
+
+#. starter.boosters_included
+msgid "BOOSTERS INCLUDED"
+msgstr "معززات ضمن الحزمة"
+
+#. starter.coins
+msgid "%s COINS"
+msgstr "%s عملة"
+
+#. starter.buy_for
+msgid "Buy for %s"
+msgstr "اشترِ مقابل %s"
+
+#. starter.checking
+msgid "Checking offer…"
+msgstr "جارٍ التحقق من العرض…"
+
+#. starter.checking_short
+msgid "Checking…"
+msgstr "جارٍ التحقق…"
+
+#. starter.no_longer_available
+msgid "This offer is no longer available."
+msgstr "لم يعد هذا العرض متاحًا."
+
+#. starter.unavailable
+msgid "Unavailable"
+msgstr "غير متاح"
+
+#. booster_chip.claimed
+msgid "+%d %s"
+msgstr "+%d %s"
+
+#. profile.title
+msgid "EDIT PROFILE"
+msgstr "تعديل الملف الشخصي"
+
+#. profile.name_header
+msgid "PLAYER NAME"
+msgstr "اسم اللاعب"
+
+#. profile.name_placeholder
+msgid "Player name"
+msgstr "اسم اللاعب"
+
+#. profile.edit_name_tooltip
+msgid "Edit player name"
+msgstr "تعديل اسم اللاعب"
+
+#. profile.avatar_tab
+msgid "AVATAR"
+msgstr "الصورة"
+
+#. profile.frame_tab
+msgid "FRAME"
+msgstr "الإطار"
+
+#. profile.unlock.level
+msgid "Complete level %d to unlock"
+msgstr "أكمل المستوى %d لفتح الإطار"
+
+#. profile.unlock.combo
+msgid "Reach a combo of ×%d in any run to unlock"
+msgstr "صل إلى تتابع ×%d في أي محاولة لفتح الإطار"
+
+#. profile.unlock.weekly_first
+msgid "Finish 1st on the Weekly leaderboard to unlock"
+msgstr "احتل المركز الأول في الترتيب الأسبوعي لفتح الإطار"
+
+#. profile.unlock.weekly_top
+msgid "Finish top %d on the Weekly leaderboard to unlock"
+msgstr "كن ضمن أفضل %d في الترتيب الأسبوعي لفتح الإطار"
+
+#. leaderboard.title
+msgid "LEADERBOARD"
+msgstr "المتصدرون"
+
+#. leaderboard.tab.weekly
+msgid "Weekly"
+msgstr "أسبوعي"
+
+#. leaderboard.tab.country
+msgid "Country"
+msgstr "البلد"
+
+#. leaderboard.tab.world
+msgid "World"
+msgstr "العالم"
+
+#. leaderboard.weekly_reset
+msgid "Weekly reset in %s"
+msgstr "إعادة تعيين الترتيب الأسبوعي بعد %s"
+
+#. leaderboard.duration.dh
+msgid "%dd %dh"
+msgstr "%d ي %d س"
+
+#. leaderboard.duration.hm
+msgid "%dh %dm"
+msgstr "%d س %d د"
+
+#. leaderboard.duration.m
+msgid "%dm"
+msgstr "%d د"
+
+#. leaderboard.country_caption
+msgid "Country · All-time stars"
+msgstr "البلد · مجموع النجوم منذ البداية"
+
+#. leaderboard.world_caption
+msgid "Worldwide · All-time stars"
+msgstr "العالم · مجموع النجوم منذ البداية"
+
+#. leaderboard.load_failed
+msgid "Could not load leaderboard."
+msgstr "تعذر تحميل قائمة المتصدرين."
+
+#. leaderboard.default_name
+msgid "Player"
+msgstr "لاعب"
+
+#. leaderboard.row_tooltip
+msgid "Rank %d, %s, %d stars"
+msgstr "المركز %d، %s، %d نجمة"
+
+#. leaderboard.reward_tooltip
+msgid "%s coin weekly reward"
+msgstr "مكافأة أسبوعية: %s عملة"
+
+#. leaderboard.reward.title
+msgid "WEEKLY REWARD!"
+msgstr "مكافأة أسبوعية!"
+
+#. leaderboard.reward.body
+msgid "You finished #%d last week and earned %d coins!"
+msgstr "أنهيت الأسبوع الماضي في المركز #%d وربحت %d عملة!"
+
+#. leaderboard.reward.ok
+msgid "Nice!"
+msgstr "رائع!"
+
+#. settings.title
+msgid "SETTINGS"
+msgstr "الإعدادات"
+
+#. settings.music
+msgid "Music"
+msgstr "موسيقى"
+
+#. settings.sfx
+msgid "SFX"
+msgstr "أصوات"
+
+#. settings.vibrate
+msgid "Vibrate"
+msgstr "اهتزاز"
+
+#. settings.support
+msgid "Support"
+msgstr "الدعم"
+
+#. settings.language
+msgid "Language"
+msgstr "اللغة"
+
+#. settings.privacy_policy
+msgid "Privacy Policy"
+msgstr "سياسة الخصوصية"
+
+#. settings.privacy_choices
+msgid "Privacy Choices"
+msgstr "خيارات الخصوصية"
+
+#. settings.diagnostics
+msgid "Version %s • Build %d\nPlatform: %s • User: %s"
+msgstr "الإصدار %s • النسخة %d\nالمنصة: %s • المستخدم: %s"
+
+#. language.title
+msgid "LANGUAGE"
+msgstr "اللغة"
+
+#. support.title
+msgid "SUPPORT"
+msgstr "الدعم"
+
+#. support.faq_header
+msgid "Frequently Asked Questions"
+msgstr "الأسئلة الشائعة"
+
+#. support.faq.play.q
+msgid "How do I play?"
+msgstr "كيف ألعب؟"
+
+#. support.faq.play.a
+msgid "Move matching goods onto the same shelf. When three identical items are visible together, they clear. Complete the board before time runs out."
+msgstr "انقل المنتجات المتطابقة إلى الرف نفسه. عندما تظهر ثلاثة عناصر متطابقة معًا، تختفي. أفرغ اللوحة قبل انتهاء الوقت."
+
+#. support.faq.contact.q
+msgid "How do I contact support?"
+msgstr "كيف أتواصل مع الدعم؟"
+
+#. support.faq.contact.a
+msgid "Email us at %s. Include a short description, your device platform, and when the problem happened."
+msgstr "راسلنا عبر البريد الإلكتروني على %s. أرفق وصفًا موجزًا للمشكلة ومنصة جهازك ووقت حدوث المشكلة."
+
+#. support.faq.contact.action
+msgid "Email Support"
+msgstr "مراسلة الدعم"
+
+#. support.faq.crash.q
+msgid "What if the game freezes or crashes?"
+msgstr "ماذا أفعل إذا تجمدت اللعبة أو تعطلت؟"
+
+#. support.faq.crash.a
+msgid "Close and reopen the game first. If it happens again, restart the device and make sure the game is updated. Contact support with the device model, platform version, and what you were doing before the problem."
+msgstr "أغلق اللعبة وافتحها مجددًا أولًا. إذا تكررت المشكلة، فأعد تشغيل الجهاز وتأكد من تحديث اللعبة. تواصل مع الدعم واذكر طراز الجهاز وإصدار نظام التشغيل وما كنت تفعله قبل حدوث المشكلة."
+
+#. support.faq.sync.q
+msgid "How do I sync progress between devices?"
+msgstr "كيف أزامن التقدم بين الأجهزة؟"
+
+#. support.faq.sync.a
+msgid "Use the same signed-in platform account on both devices and allow synchronization to finish before playing. If the progress differs, avoid playing on both devices and contact support."
+msgstr "سجل الدخول إلى حساب المنصة نفسه على الجهازين، وانتظر اكتمال المزامنة قبل اللعب. إذا اختلف التقدم، فتجنب اللعب على الجهازين وتواصل مع الدعم."
+
+#. support.faq.bad_ad.q
+msgid "How do I report a bad ad?"
+msgstr "كيف أبلغ عن إعلان غير مناسب؟"
+
+#. support.faq.bad_ad.a
+msgid "1. Close the ad if you can do so safely.\n2. Take a screenshot of the ad and any advertiser or app name shown.\n3. Note the approximate time and where the ad appeared in the game.\n4. Describe why the ad seemed offensive, misleading, or fraudulent.\n5. Email these details to %s. Do not include passwords or payment information."
+msgstr "1. أغلق الإعلان إذا أمكنك ذلك بأمان.\n2. التقط لقطة شاشة للإعلان وأي اسم ظاهر للمعلن أو التطبيق.\n3. دوّن الوقت التقريبي وموضع ظهور الإعلان في اللعبة.\n4. وضح سبب اعتقادك أن الإعلان مسيء أو مضلل أو احتيالي.\n5. أرسل هذه التفاصيل عبر البريد الإلكتروني إلى %s. لا ترفق كلمات مرور أو معلومات دفع."
+
+#. support.faq.bad_ad.action
+msgid "Email Ad Report"
+msgstr "إرسال بلاغ عن إعلان"
+
+#. support.account_header
+msgid "Account"
+msgstr "الحساب"
+
+#. support.delete_account
+msgid "Delete Account"
+msgstr "حذف الحساب"
+
+#. support.delete_game_data
+msgid "Delete Game Data"
+msgstr "حذف بيانات اللعبة"
+
+#. support.no_secrets
+msgid "Please never send passwords or payment information."
+msgstr "يرجى عدم إرسال كلمات مرور أو معلومات دفع مطلقًا."
+
+#. deletion.title.delete_account
+msgid "DELETE ACCOUNT"
+msgstr "حذف الحساب"
+
+#. deletion.title.delete_game_data
+msgid "DELETE GAME DATA"
+msgstr "حذف بيانات اللعبة"
+
+#. deletion.title.not_confirmed
+msgid "NOT CONFIRMED"
+msgstr "لم يتم التأكيد"
+
+#. deletion.title.status_unconfirmed
+msgid "STATUS UNCONFIRMED"
+msgstr "الحالة غير مؤكدة"
+
+#. deletion.title.finishing_up
+msgid "FINISHING UP"
+msgstr "جارٍ الإنهاء"
+
+#. deletion.title.new_game
+msgid "NEW GAME"
+msgstr "لعبة جديدة"
+
+#. deletion.title.status_unknown
+msgid "STATUS UNKNOWN"
+msgstr "الحالة غير معروفة"
+
+#. deletion.title.not_deleted
+msgid "NOT DELETED"
+msgstr "لم يتم الحذف"
+
+#. deletion.title.data_deleted
+msgid "DATA DELETED"
+msgstr "تم حذف البيانات"
+
+#. deletion.title.accepted
+msgid "DELETION ACCEPTED"
+msgstr "تم قبول طلب الحذف"
+
+#. deletion.confirm.headline
+msgid "This permanently deletes your account."
+msgstr "سيؤدي هذا إلى حذف حسابك نهائيًا."
+
+#. deletion.confirm.body
+msgid "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nIf you sign in again later, you'll start a new account.\n\nSome purchase and security records are kept without your name or profile. The rest is removed within 30 days."
+msgstr "ستفقد تقدمك وعملاتك وعناصرك وملفك الشخصي. لا يمكنك التراجع عن هذا الإجراء.\n\nإذا سجلت الدخول لاحقًا، فستبدأ بحساب جديد.\n\nنحتفظ ببعض سجلات الشراء والأمان دون اسمك أو ملفك الشخصي. يُحذف الباقي خلال 30 يومًا."
+
+#. deletion.local_confirm.headline
+msgid "This deletes your game data on this device."
+msgstr "سيؤدي هذا إلى حذف بيانات لعبتك على هذا الجهاز."
+
+#. deletion.local_confirm.body
+msgid "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nThis game never created an online account for you, so nothing needs to be deleted from our servers."
+msgstr "ستفقد تقدمك وعملاتك وعناصرك وملفك الشخصي. لا يمكنك التراجع عن هذا الإجراء.\n\nلم تنشئ هذه اللعبة حسابًا لك عبر الإنترنت، لذا لا توجد بيانات يلزم حذفها من خوادمنا."
+
+#. deletion.local_confirm.button
+msgid "Delete Data"
+msgstr "حذف البيانات"
+
+#. deletion.pending_setup.headline
+msgid "Your account is still being set up."
+msgstr "لا يزال حسابك قيد الإعداد."
+
+#. deletion.pending_setup.body
+msgid "Connect to the internet and try again in a moment. Nothing was deleted."
+msgstr "اتصل بالإنترنت وحاول مجددًا بعد لحظات. لم يُحذف أي شيء."
+
+#. deletion.sign_in.headline
+msgid "Sign in to the account you want to delete."
+msgstr "سجل الدخول إلى الحساب الذي تريد حذفه."
+
+#. deletion.sign_in.body
+msgid "If you can't sign in, contact support for help."
+msgstr "إذا تعذر عليك تسجيل الدخول، فتواصل مع الدعم للمساعدة."
+
+#. deletion.read_failed.headline
+msgid "Your game data couldn't be read."
+msgstr "تعذرت قراءة بيانات لعبتك."
+
+#. deletion.read_failed.body
+msgid "Restart the game, then try again. Nothing was deleted."
+msgstr "أعد تشغيل اللعبة، ثم حاول مجددًا. لم يُحذف أي شيء."
+
+#. deletion.unavailable.headline
+msgid "Account deletion isn't available in this version of the game."
+msgstr "حذف الحساب غير متاح في هذا الإصدار من اللعبة."
+
+#. deletion.unavailable.body
+msgid "Update the game, or contact support for help deleting your account. Nothing was deleted."
+msgstr "حدّث اللعبة، أو تواصل مع الدعم للمساعدة في حذف حسابك. لم يُحذف أي شيء."
+
+#. deletion.in_progress.account
+msgid "Deleting your account..."
+msgstr "جارٍ حذف حسابك..."
+
+#. deletion.in_progress.local
+msgid "Deleting your game data..."
+msgstr "جارٍ حذف بيانات لعبتك..."
+
+#. deletion.in_progress.body
+msgid "Keep the game open. This only takes a moment."
+msgstr "أبقِ اللعبة مفتوحة. لن يستغرق هذا سوى لحظات."
+
+#. deletion.not_confirmed.headline
+msgid "We haven't heard back about your deletion yet."
+msgstr "لم نتلقَّ ردًا بشأن الحذف بعد."
+
+#. deletion.not_confirmed.body
+msgid "Your request was sent, but the answer didn't arrive. Connect to the internet and try again. The game stays locked until we know the result."
+msgstr "أُرسل طلبك، لكن الرد لم يصل. اتصل بالإنترنت وحاول مجددًا. ستبقى اللعبة مقفلة حتى نعرف النتيجة."
+
+#. deletion.unconfirmed.headline
+msgid "Deletion status unconfirmed"
+msgstr "حالة الحذف غير مؤكدة"
+
+#. deletion.unconfirmed.body
+msgid "We couldn't confirm whether your account was deleted. To keep your data safe, the game stays locked. Contact support and include the reference below."
+msgstr "تعذر التأكد مما إذا كان حسابك قد حُذف. حفاظًا على أمان بياناتك، ستبقى اللعبة مقفلة. تواصل مع الدعم وأرفق الرمز المرجعي أدناه."
+
+#. deletion.check_again
+msgid "Check Again"
+msgstr "تحقق مجددًا"
+
+#. deletion.cleanup.headline.local
+msgid "Your local game data couldn't be fully deleted yet."
+msgstr "لم نتمكن بعد من حذف بيانات لعبتك المحلية بالكامل."
+
+#. deletion.cleanup.headline.account
+msgid "Account deletion accepted; finishing cleanup."
+msgstr "تم قبول طلب حذف الحساب؛ جارٍ استكمال إزالة البيانات."
+
+#. deletion.cleanup.body
+msgid "Some game data couldn't be removed from this device yet. Try again to finish."
+msgstr "لم نتمكن بعد من إزالة بعض بيانات اللعبة من هذا الجهاز. حاول مجددًا لإكمال العملية."
+
+#. deletion.new_game.headline
+msgid "Starting a new game..."
+msgstr "جارٍ بدء لعبة جديدة..."
+
+#. deletion.new_game.body
+msgid "This only takes a moment."
+msgstr "لن يستغرق هذا سوى لحظات."
+
+#. deletion.status_unknown.headline
+msgid "We couldn't read the deletion status on this device."
+msgstr "تعذرت قراءة حالة الحذف على هذا الجهاز."
+
+#. deletion.status_unknown.body
+msgid "To keep your data safe, the game stays locked. Contact support for help."
+msgstr "حفاظًا على أمان بياناتك، ستبقى اللعبة مقفلة. تواصل مع الدعم للمساعدة."
+
+#. deletion.fail.offline
+msgid "Connect to the internet to delete your account."
+msgstr "اتصل بالإنترنت لحذف حسابك."
+
+#. deletion.fail.rate_limited
+msgid "Too many attempts. Wait a moment, then try again."
+msgstr "محاولات كثيرة جدًا. انتظر لحظات، ثم حاول مجددًا."
+
+#. deletion.fail.busy
+msgid "Account deletion is busy right now. Try again in a moment."
+msgstr "يتعذر حذف الحساب حاليًا. حاول مجددًا بعد لحظات."
+
+#. deletion.fail.syncing
+msgid "The game is still syncing. Try again in a moment."
+msgstr "لا تزال مزامنة اللعبة جارية. حاول مجددًا بعد لحظات."
+
+#. deletion.fail.auth
+msgid "We couldn't verify your account. Restart the game, then try again."
+msgstr "تعذر التحقق من حسابك. أعد تشغيل اللعبة، ثم حاول مجددًا."
+
+#. deletion.fail.update
+msgid "Update the game to delete your account."
+msgstr "حدّث اللعبة لحذف حسابك."
+
+#. deletion.fail.changed
+msgid "Your account changed while we were deleting it. Try again."
+msgstr "طرأ تغيير على حسابك أثناء محاولة حذفه. حاول مجددًا."
+
+#. deletion.fail.storage
+msgid "Your device couldn't save the deletion request. Try again."
+msgstr "تعذر على جهازك حفظ طلب الحذف. حاول مجددًا."
+
+#. deletion.fail.generic
+msgid "We couldn't delete your account. Try again later or contact support."
+msgstr "تعذر حذف حسابك. حاول لاحقًا أو تواصل مع الدعم."
+
+#. deletion.fail.local
+msgid "Your game data couldn't be deleted. Try again."
+msgstr "تعذر حذف بيانات لعبتك. حاول مجددًا."
+
+#. deletion.fail.body
+msgid "Nothing was deleted, and you can keep playing."
+msgstr "لم يُحذف أي شيء، ويمكنك مواصلة اللعب."
+
+#. deletion.done_local.headline
+msgid "Your local game data was deleted."
+msgstr "تم حذف بيانات لعبتك المحلية."
+
+#. deletion.done_local.body
+msgid "You can start over with a new game."
+msgstr "يمكنك البدء من جديد بلعبة جديدة."
+
+#. deletion.new_game_failed
+msgid "The new game couldn't start. Try again."
+msgstr "تعذر بدء اللعبة الجديدة. حاول مجددًا."
+
+#. deletion.accepted.headline
+msgid "Your account is no longer accessible."
+msgstr "لم يعد بالإمكان الوصول إلى حسابك."
+
+#. deletion.accepted.body
+msgid "Your deletion request was accepted."
+msgstr "تم قبول طلب الحذف."
+
+#. deletion.accepted.body_deadline
+msgid "Your deletion request was accepted. Data removal is due by %s."
+msgstr "تم قبول طلب الحذف. ستتم إزالة البيانات بحلول %s."
+
+#. deletion.reference
+msgid "Reference: %s"
+msgstr "الرمز المرجعي: %s"
+
+#. deletion.start_new_game
+msgid "Start New Game"
+msgstr "بدء لعبة جديدة"
+
+#. app.name
+msgid "SortingPuzzle"
+msgstr "SortingPuzzle"
+
+#. support.email.subject
+msgid "Sorting Puzzle support request"
+msgstr "طلب دعم للعبة Sorting Puzzle"
+
+#. support.email.body
+msgid "Please describe the issue here.\n\nDevice/platform:\nApproximate time:\n"
+msgstr "يرجى وصف المشكلة هنا.\n\nالجهاز/المنصة:\nالوقت التقريبي:\n"
+
+#. support.ad_email.subject
+msgid "Sorting Puzzle ad report"
+msgstr "بلاغ عن إعلان في Sorting Puzzle"
+
+#. support.ad_email.body
+msgid "Please attach a screenshot and complete the details below.\n\nApproximate time:\nAd placement in the game:\nAdvertiser or app name:\nWhy the ad should be reviewed:\n"
+msgstr "يرجى إرفاق لقطة شاشة واستكمال التفاصيل أدناه.\n\nالوقت التقريبي:\nموضع الإعلان في اللعبة:\nاسم المعلن أو التطبيق:\nسبب طلب مراجعة الإعلان:\n"
+
+#. deletion.email.subject
+msgid "Sorting Puzzle account deletion"
+msgstr "حذف حساب Sorting Puzzle"
+
+#. deletion.email.body
+msgid "Please help me with my account deletion."
+msgstr "يرجى مساعدتي في حذف حسابي."
+
+#. support.email.status
+msgid "Status: %s"
+msgstr "الحالة: %s"
+
+#. support.email.deletion_reference
+msgid "Deletion reference"
+msgstr "الرمز المرجعي للحذف"
+
+#. support.email.server_reference
+msgid "Server reference"
+msgstr "الرمز المرجعي للخادم"
+
+#. support.email.player_id
+msgid "Player ID"
+msgstr "معرّف اللاعب"
+
+#. leaderboard.empty
+msgid "No scores yet"
+msgstr "لا توجد نتائج بعد"
+
+#. ability.hammer.name
+msgid "HAMMER"
+msgstr "المطرقة"
+
+#. ability.shuffle.name
+msgid "SHUFFLE"
+msgstr "الخلط"
+
+#. ability.lantern.name
+msgid "LANTERN"
+msgstr "الفانوس"
+
+#. ability.freezer.name
+msgid "FREEZER"
+msgstr "التجميد"
+
+#. shop.offer.basic_bundle
+msgid "BASIC BUNDLE"
+msgstr "الحزمة الأساسية"
+
+#. Fixed Arabic booster product name
+msgctxt "booster.counted"
+msgid "Hammer"
+msgid_plural "Hammer.plural"
+msgstr[0] "المطرقة"
+msgstr[1] "المطرقة"
+msgstr[2] "المطرقة"
+msgstr[3] "المطرقة"
+msgstr[4] "المطرقة"
+msgstr[5] "المطرقة"
+
+#. Fixed Arabic booster product name
+msgctxt "booster.counted"
+msgid "Shuffle"
+msgid_plural "Shuffle.plural"
+msgstr[0] "الخلط"
+msgstr[1] "الخلط"
+msgstr[2] "الخلط"
+msgstr[3] "الخلط"
+msgstr[4] "الخلط"
+msgstr[5] "الخلط"
+
+#. Fixed Arabic booster product name
+msgctxt "booster.counted"
+msgid "Lantern"
+msgid_plural "Lantern.plural"
+msgstr[0] "الفانوس"
+msgstr[1] "الفانوس"
+msgstr[2] "الفانوس"
+msgstr[3] "الفانوس"
+msgstr[4] "الفانوس"
+msgstr[5] "الفانوس"
+
+#. Fixed Arabic booster product name
+msgctxt "booster.counted"
+msgid "Freezer"
+msgid_plural "Freezer.plural"
+msgstr[0] "التجميد"
+msgstr[1] "التجميد"
+msgstr[2] "التجميد"
+msgstr[3] "التجميد"
+msgstr[4] "التجميد"
+msgstr[5] "التجميد"

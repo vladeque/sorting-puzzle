@@ -224,6 +224,7 @@ theme_override_constants/separation = -6
 alignment = 1
 
 [node name="PercentLabel" type="Label" parent="OfferContent/HeroStage/DiscountBadge/TextStack"]
+text_direction = 1
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"GameNumberLabel"
@@ -239,6 +240,7 @@ text = "67%"
 horizontal_alignment = 1
 
 [node name="OffLabel" type="Label" parent="OfferContent/HeroStage/DiscountBadge/TextStack"]
+text_direction = 1
 layout_mode = 2
 theme_type_variation = &"GameSectionLabel"
 theme_override_colors/font_color = Color(1, 1, 1, 1)
@@ -376,6 +378,7 @@ theme_override_constants/separation = -8
 alignment = 1
 
 [node name="CompareAtPriceLabel" type="Label" parent="BuyButton/BuyText"]
+text_direction = 0
 unique_name_in_owner = true
 visible = false
 layout_mode = 2

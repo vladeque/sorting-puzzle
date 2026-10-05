@@ -5,15 +5,18 @@ Use this file as the first stop when you need to identify where a feature lives.
 ## Entry Points
 
 Localization: `scripts/localization/locale_manager.gd` and `game_text.gd`,
-`assets/translations/en.po` / `ru.po` / `uk.po` / `it.po`, and `docs/LOCALIZATION.md`.
+`assets/translations/en.po` / `ru.po` / `uk.po` / `it.po` / `ar.po`, and `docs/LOCALIZATION.md`.
 Reviewed copy is retained in `docs/localization/RUSSIAN_TRANSLATIONS.md`,
-`UKRAINIAN_TRANSLATIONS.md` and `ITALIAN_TRANSLATIONS.md` in that directory.
+`UKRAINIAN_TRANSLATIONS.md`, `ITALIAN_TRANSLATIONS.md` and `ARABIC_TRANSLATIONS.md` in that directory.
+Arabic direction, plural forms, bundled fonts and rendered review are covered by
+`ARABIC_LOCALIZATION_QA.md`; safe insets are converted by `destination_screen_layout.gd` at layout
+owners, and the chapter pager's direction behavior belongs to `horizontal_pager.gd`.
 
 Main scene:
 - `scenes/app_launch_router.tscn`
 - `scripts/app_launch_router.gd`
 - Configured in `project.godot` as `run/main_scene`.
-- `project.godot` keeps the 720x1280 design viewport and uses `canvas_items` stretch with `keep_width` so portrait devices share a stable logical width while gaining or losing vertical play space. The Mobile renderer uses 2x 2D MSAA to smooth runtime `Polygon2D` edges, including the dispenser shelf's short bevels, without the larger bandwidth cost of 4x sampling.
+- `project.godot` keeps the 720x1280 design viewport and uses `canvas_items` stretch with `expand` so tall phones gain vertical space and wider tablets gain horizontal space. Scene owners fit against the actual logical viewport. The Mobile renderer uses 2x 2D MSAA to smooth runtime `Polygon2D` edges, including the dispenser shelf's short bevels, without the larger bandwidth cost of 4x sampling.
 - Routes every app launch. Until the first campaign level is beaten, and while a life remains, it
   opens that level directly through `LevelTransition.launch_level_at_startup()`; otherwise it swaps
   in the production Main Menu. Its `start_unbeaten_first_level` export turns the level start off.

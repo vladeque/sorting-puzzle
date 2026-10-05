@@ -214,6 +214,7 @@ size_flags_horizontal = 3
 mouse_filter = 2
 
 [node name="ProgressValueLabel" type="Label" parent="InfoMargins/InfoPanel/PanelContent/Layout/ProgressHeader"]
+text_direction = 1
 unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 2
@@ -223,6 +224,7 @@ theme_override_font_sizes/font_size = 18
 text = "0 / 10"
 
 [node name="ProgressBar" type="ProgressBar" parent="InfoMargins/InfoPanel/PanelContent/Layout"]
+localize_numeral_system = false
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 14)
 layout_mode = 2

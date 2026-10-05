@@ -3,6 +3,32 @@
 [ext_resource type="FontFile" uid="uid://dselji28dxa0v" path="res://assets/fonts/DynaPuff-Variable.ttf" id="1_dynapuff"]
 [ext_resource type="FontFile" uid="uid://bj1yadue3328n" path="res://assets/fonts/Nunito-Variable.ttf" id="2_nunito"]
 
+[ext_resource type="FontFile" path="res://assets/fonts/BalooBhaijaan2-Variable.ttf" id="3_baloo"]
+[ext_resource type="FontFile" path="res://assets/fonts/NotoSansArabic-Variable.ttf" id="4_noto_arabic"]
+
+[sub_resource type="FontVariation" id="FontVariation_arabic_body_bold"]
+base_font = ExtResource("4_noto_arabic")
+variation_opentype = {2003265652: 700.0}
+
+[sub_resource type="FontVariation" id="FontVariation_arabic_body_semibold"]
+base_font = ExtResource("4_noto_arabic")
+variation_opentype = {2003265652: 600.0}
+
+[sub_resource type="FontVariation" id="FontVariation_arabic_display_bold"]
+fallbacks = Array[Font]([SubResource("FontVariation_arabic_body_bold")])
+base_font = ExtResource("3_baloo")
+variation_opentype = {2003265652: 700.0}
+
+[sub_resource type="FontVariation" id="FontVariation_arabic_display_semibold"]
+fallbacks = Array[Font]([SubResource("FontVariation_arabic_body_semibold")])
+base_font = ExtResource("3_baloo")
+variation_opentype = {2003265652: 600.0}
+
+[sub_resource type="FontVariation" id="FontVariation_arabic_display_medium"]
+fallbacks = Array[Font]([SubResource("FontVariation_arabic_body_semibold")])
+base_font = ExtResource("3_baloo")
+variation_opentype = {2003265652: 500.0}
+
 [sub_resource type="FontVariation" id="FontVariation_cyrillic_bold"]
 base_font = ExtResource("2_nunito")
 variation_opentype = {
@@ -22,7 +48,7 @@ variation_opentype = {
 }
 
 [sub_resource type="FontVariation" id="FontVariation_dynapuff_bold"]
-fallbacks = Array[Font]([SubResource("FontVariation_cyrillic_bold")])
+fallbacks = Array[Font]([SubResource("FontVariation_cyrillic_bold"), SubResource("FontVariation_arabic_display_bold")])
 base_font = ExtResource("1_dynapuff")
 variation_opentype = {
 2003072104: 100.0,
@@ -33,19 +59,21 @@ opentype_features = {
 }
 
 [sub_resource type="FontVariation" id="FontVariation_nunito_bold"]
+fallbacks = Array[Font]([SubResource("FontVariation_arabic_body_bold")])
 base_font = ExtResource("2_nunito")
 variation_opentype = {
 2003265652: 700.0
 }
 
 [sub_resource type="FontVariation" id="FontVariation_nunito_semibold"]
+fallbacks = Array[Font]([SubResource("FontVariation_arabic_body_semibold")])
 base_font = ExtResource("2_nunito")
 variation_opentype = {
 2003265652: 600.0
 }
 
 [sub_resource type="FontVariation" id="FontVariation_dynapuff_semibold"]
-fallbacks = Array[Font]([SubResource("FontVariation_cyrillic_semibold")])
+fallbacks = Array[Font]([SubResource("FontVariation_cyrillic_semibold"), SubResource("FontVariation_arabic_display_semibold")])
 base_font = ExtResource("1_dynapuff")
 variation_opentype = {
 2003072104: 100.0,
@@ -56,7 +84,7 @@ opentype_features = {
 }
 
 [sub_resource type="FontVariation" id="FontVariation_dynapuff_number"]
-fallbacks = Array[Font]([SubResource("FontVariation_cyrillic_bold")])
+fallbacks = Array[Font]([SubResource("FontVariation_cyrillic_bold"), SubResource("FontVariation_arabic_display_bold")])
 base_font = ExtResource("1_dynapuff")
 variation_opentype = {
 2003072104: 100.0,
@@ -68,7 +96,7 @@ opentype_features = {
 }
 
 [sub_resource type="FontVariation" id="FontVariation_dynapuff_title"]
-fallbacks = Array[Font]([SubResource("FontVariation_cyrillic_bold")])
+fallbacks = Array[Font]([SubResource("FontVariation_cyrillic_bold"), SubResource("FontVariation_arabic_display_bold")])
 base_font = ExtResource("1_dynapuff")
 variation_opentype = {
 2003072104: 92.0,
@@ -125,7 +153,7 @@ corner_radius_bottom_right = 5
 corner_radius_bottom_left = 5
 
 [sub_resource type="FontVariation" id="FontVariation_dynapuff_medium"]
-fallbacks = Array[Font]([SubResource("FontVariation_cyrillic_medium")])
+fallbacks = Array[Font]([SubResource("FontVariation_cyrillic_medium"), SubResource("FontVariation_arabic_display_medium")])
 base_font = ExtResource("1_dynapuff")
 variation_opentype = {
 2003072104: 100.0,

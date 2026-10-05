@@ -87,7 +87,7 @@ func get_icon_global_rect() -> Rect2:
 func _refresh_labels() -> void:
 	_count_label.text = "×%d" % _count
 	_name_label.text = (
-		tr("booster_chip.claimed") % [_count, GameText.counted_booster(title, _count)]
+		GameText.claimed_booster_caption(title, _count)
 		if _is_claimed else title
 	)
 	_fit_name.call_deferred()

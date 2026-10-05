@@ -132,14 +132,16 @@ func _finish_close() -> void:
 func _refresh_localized_answers() -> void:
 	_contact_item.call("set_answer",
 		tr("support.faq.contact.a")
-		% _support_email
+		% GameText.isolate_ltr(_support_email)
 	)
 	_report_ad_item.call("set_answer",
 		tr("support.faq.bad_ad.a")
-		% _support_email
+		% GameText.isolate_ltr(_support_email)
 	)
 
 
 func _notification(what: int) -> void:
+	if what == NOTIFICATION_LAYOUT_DIRECTION_CHANGED and is_node_ready():
+		_apply_responsive_layout.call_deferred()
 	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
 		_refresh_localized_answers()

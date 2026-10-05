@@ -26,6 +26,18 @@ func _ready() -> void:
 	_question_button.pressed.connect(_toggle_expanded)
 	_action_button.pressed.connect(func() -> void: action_requested.emit(action_id))
 	set_expanded(false, false)
+	_apply_reading_alignment()
+
+
+func _apply_reading_alignment() -> void:
+	_answer_label.horizontal_alignment = (
+		HORIZONTAL_ALIGNMENT_RIGHT if is_layout_rtl() else HORIZONTAL_ALIGNMENT_LEFT
+	)
+
+
+func _notification(what: int) -> void:
+	if what in [NOTIFICATION_TRANSLATION_CHANGED, NOTIFICATION_LAYOUT_DIRECTION_CHANGED] and is_node_ready():
+		_apply_reading_alignment.call_deferred()
 
 
 func set_answer(value: String) -> void:
