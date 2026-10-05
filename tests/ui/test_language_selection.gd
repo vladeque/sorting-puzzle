@@ -121,6 +121,25 @@ func _run() -> void:
 	await create_timer(0.5).timeout
 	_progress.call("load_progress")
 	_check(_progress.call("get_locale") == "uk", "Reloading progress restores Ukrainian.")
+	var arabic_modal := modal_scene.instantiate() as Control
+	root.add_child(arabic_modal)
+	await create_timer(0.35).timeout
+	arabic_modal.call("_select_locale", "ar")
+	_check(TranslationServer.get_locale() == "uk", "Pending Arabic selection keeps the active locale.")
+	arabic_modal.call("_save_selection")
+	_check(TranslationServer.get_locale() == "ar", "Saving the Arabic row applies its catalog and direction.")
+	await create_timer(0.5).timeout
+	_progress.call("load_progress")
+	_check(_progress.call("get_locale") == "ar", "Reloading restores the saved Arabic selection.")
+	var arabic_cancel := modal_scene.instantiate() as Control
+	root.add_child(arabic_cancel)
+	await create_timer(0.35).timeout
+	_check(arabic_cancel.is_layout_rtl(), "A reopened Arabic language picker inherits RTL.")
+	arabic_cancel.call("_select_locale", "en")
+	arabic_cancel.call("close")
+	await create_timer(0.5).timeout
+	_check(_progress.call("get_locale") == "ar" and TranslationServer.get_locale() == "ar",
+		"Cancelling from the RTL picker preserves saved and active Arabic.")
 
 	var main_scene := load("res://scenes/main_menu.tscn") as PackedScene
 	var main_menu := main_scene.instantiate() as Control
