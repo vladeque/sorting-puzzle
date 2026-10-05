@@ -146,6 +146,14 @@ Its owner fits rewarded-action captions within the authored button width, with c
 `reward_chest_menu.gd` fits the translated hero caption within its banner at 28px down to 16px,
 with `HeroTitleLabel` retaining the existing banner bounds instead of expanding its container.
 
+## Arabic integration planning
+
+Arabic runtime integration is planned in `docs/localization/ARABIC_LOCALIZATION_PLAN.md`.
+The owner's revised October 5, 2026 copy is archived verbatim at
+`docs/localization/ARABIC_TRANSLATIONS.md`. Arabic is not yet in the release allowlist or registered
+catalogs. The plan records confirmed 0–9 numerals, proposed bundled fonts, observed RTL layout
+issues, implementation ownership and the required responsive/mobile verification.
+
 ## Verification
 
 - `tests/ui/test_language_selection.gd` covers the allowlist, locale mapping, pending/confirmed
