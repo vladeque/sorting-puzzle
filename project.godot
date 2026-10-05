@@ -74,7 +74,7 @@ theme/custom="res://assets/themes/game_typography.tres"
 
 [internationalization]
 
-locale/translations=PackedStringArray("res://assets/translations/en.po", "res://assets/translations/ru.po", "res://assets/translations/uk.po")
+locale/translations=PackedStringArray("res://assets/translations/en.po", "res://assets/translations/ru.po", "res://assets/translations/uk.po", "res://assets/translations/it.po")
 
 [physics]
 

@@ -1525,7 +1525,7 @@ Script:
 - `scripts/language_selection_modal.gd`
 
 Purpose:
-- Presents the twelve approved release locales, including `Українська`, in a vertically scrollable list.
+- Presents the thirteen approved release locales, including `Українська` and `Italiano`, in a vertically scrollable list.
 - Keeps row selection pending until Save; X or `ui_cancel` discards it.
 - Saves through the `LocaleManager` autoload, immediately updates `TranslationServer`, persists
   the local preference, and closes back to the still-open Settings modal.

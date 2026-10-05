@@ -21,6 +21,7 @@
 | Português (Brasil) | `pt_BR` |
 | Deutsch | `de` |
 | Français | `fr` |
+| Italiano | `it` |
 | 日本語 | `ja` |
 | 한국어 | `ko` |
 | 繁體中文 | `zh_Hant` |
@@ -35,7 +36,7 @@ starts.
 
 ## Translation catalogs
 
-`assets/translations/en.po`, `assets/translations/ru.po` and `assets/translations/uk.po` are
+`assets/translations/en.po`, `assets/translations/ru.po`, `assets/translations/uk.po` and `assets/translations/it.po` are
 registered in `project.godot`.
 Russian includes all 251 reviewed keys from
 `docs/localization/RUSSIAN_TRANSLATIONS.md`, the user's corrected October 4, 2026 inventory.
@@ -50,6 +51,26 @@ document's pre-integration notes; this page describes the implemented runtime be
 `tests/localization/ukrainian_inventory.json` records the reviewed content for engine verification.
 The Ukrainian badge reads `НАБІР`, and `Українська` is available in the native-name language picker.
 A Ukrainian device locale such as `uk_UA` maps to `uk` on a fresh save.
+
+Italian includes all 251 entries from the owner's reviewed October 5, 2026 document archived
+verbatim at `docs/localization/ITALIAN_TRANSLATIONS.md`. `tests/localization/italian_inventory.json`
+records that reviewed wording, the six supplied plural pairs, the additional singular coin-prize
+tooltip and supplementary email labels. `it.po` registers stable keys and English scene aliases.
+The native-name language picker exposes `Italiano`, and Italian device locales such as `it_IT`
+and `it_CH` map to `it` on a fresh save. Counts use periods (`1.234.567`), and deadlines use
+lowercase Italian month names with a day/month/year pattern (`2 novembre 2026`).
+
+The reviewed Italian main tables show plural wording; gettext selects their supplied singular
+form when the numeric count is one. Counted booster context supplies `Martello` / `Martelli`,
+`Lanterna` / `Lanterne`, and `Congelatore` / `Congelatori`; the verb name `Rimescola` stays fixed.
+The coin-prize tooltip uses the coin amount to select `moneta` / `monete`; existing English,
+Russian and Ukrainian tooltip wording is unchanged across their plural forms.
+Pause and leave-confirmation owners explicitly resolve `common.resume` (`Riprendi`) on startup
+and live language changes, while the shared `Continue` scene alias uses `Continua`.
+The reviewed `Home`, `LIVELLO NON SUPERATO`, `Verifica in corso...`, `Acquista per %s` and revised
+account-deletion messages are preserved exactly. The archived document's review notes describe
+the supplied file, while this page and `docs/localization/ITALIAN_LOCALIZATION_QA.md` record
+runtime integration and verification.
 
 The owner's October 5, 2026 review supersedes three rows of that original inventory:
 
@@ -84,11 +105,13 @@ their product/error title before uppercasing it.
 Formatted HUD, chapter, timer, leaderboard, profile, offer and support strings translate their
 patterns before interpolation. Russian and Ukrainian `tr_n()` calls select from three reviewed forms using the
 underlying integer count, including when the inserted amount is a formatted `%s`. For rows and
-weekly rewards, the plural count is the stars/coins rather than the rank. Claimed booster chips
+weekly rewards, the plural count is the stars/coins rather than the rank. Italian selects its two
+forms using `n != 1`. Claimed booster chips
 use gettext context `booster.counted` for the reviewed lowercase inflected product names.
 
 `scripts/localization/game_text.gd` owns presentation-only grouped numbers, localized dates,
-counted booster names and safe purchase-error copy. Russian and Ukrainian counts use spaces and
+counted booster names and safe purchase-error copy. Italian counts use periods and localized
+month names without a year suffix. Russian and Ukrainian counts use spaces and
 deadlines use genitive month names with the catalog's `date.day_month_year` pattern (`г.` / `р.`);
 store prices pass through unchanged. Purchase/load presentation maps
 unreviewed technical errors to the existing player-facing fallback messages. Provider errors,
@@ -129,12 +152,18 @@ with `HeroTitleLabel` retaining the existing banner bounds instead of expanding 
   selection, persistence, snapshot exclusion, cancellation, and Main Menu stacking.
 - `scripts/tools/captures/language_selection_setup.gd` opens Settings and Language for responsive
   screenshot capture.
+- `scripts/tools/captures/starter_bundle_claimed_boosters_setup.gd` opens the existing offer and
+  previews claimed booster labels for count/name fitting without purchasing or granting rewards.
 - `tests/ui/test_russian_localization.gd` checks the 251-entry reviewed fixture, Russian/English
   resolution, untranslated-locale fallback, plural boundaries, font coverage, unchanged player
   names/prices, live screen refreshes, preserved reward states and local-only locale persistence.
 - `tests/ui/test_ukrainian_localization.gd` checks all 251 reviewed Ukrainian entries, English
   fallback, every plural table and counted booster at integer boundaries, the Ukrainian alphabet
   and apostrophe, all twelve dates, names/prices, static badge aliases and live screen refreshes.
+- `tests/ui/test_italian_localization.gd` checks all 251 reviewed Italian entries and English
+  scene aliases, fallback, singular/plural counts including quantities ending in one, counted
+  boosters, accented glyphs, all twelve dates, names/prices, live resume actions and screen
+  refreshes, preserved pending ad state and local-only locale persistence.
 - Capture any screen in an isolated Russian session with:
 
   ```powershell
@@ -144,7 +173,9 @@ with `HeroTitleLabel` retaining the existing banner bounds instead of expanding 
   `capture_ui.ps1 -Locale` passes the locale to `capture_scene.gd`, which applies it before the
   scene is instantiated. It does not change the real player's saved preference.
   Use `-Locale uk` for Ukrainian captures.
+  Use `-Locale it` for Italian captures.
 
 The October 4–5, 2026 test results, rendered-screen reviews and capture limitations are recorded in
 `docs/localization/RUSSIAN_LOCALIZATION_QA.md`.
 Ukrainian integration results are recorded in `docs/localization/UKRAINIAN_LOCALIZATION_QA.md`.
+Italian integration results are recorded in `docs/localization/ITALIAN_LOCALIZATION_QA.md`.

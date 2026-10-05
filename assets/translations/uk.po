@@ -638,7 +638,10 @@ msgstr[2] "Місце %d, %s, %d зірок"
 
 #. leaderboard.reward_tooltip
 msgid "leaderboard.reward_tooltip"
-msgstr "Монет у тижневій винагороді: %s"
+msgid_plural "leaderboard.reward_tooltip.plural"
+msgstr[0] "Монет у тижневій винагороді: %s"
+msgstr[1] "Монет у тижневій винагороді: %s"
+msgstr[2] "Монет у тижневій винагороді: %s"
 
 #. leaderboard.reward.title
 msgid "leaderboard.reward.title"

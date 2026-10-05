@@ -5,21 +5,26 @@ Chapter 2's locked page, and `level_completion_setup.gd` opens the standalone co
 and reapplies safe layout on viewport resize. Verification evidence lives in
 `docs/localization/RUSSIAN_LOCALIZATION_QA.md`.
 
-## Russian and Ukrainian localization
+## Russian, Ukrainian and Italian localization
 
 `scripts/localization/locale_manager.gd` owns saved locale application through `TranslationServer`.
 `scripts/localization/game_text.gd` owns display-only number/date formatting, counted booster names
 and reviewed purchase-error copy. Focused UI owner scripts refresh formatted text on
 `NOTIFICATION_TRANSLATION_CHANGED` without repeating gameplay or purchase actions.
-`assets/translations/en.po` / `ru.po` / `uk.po` supply dynamic keys and static English aliases.
+`assets/translations/en.po` / `ru.po` / `uk.po` / `it.po` supply dynamic keys and static English aliases.
 `game_text.gd` groups Ukrainian counts with spaces and formats dates with Ukrainian genitive months
 and the catalog's `date.day_month_year` pattern. `locale_catalog.gd` maps Ukrainian devices to `uk`.
+Italian uses period grouping and lowercase Italian month names; its device locales map to `it`.
+`leaderboard_rank_reward.gd` selects its tooltip by coin count. Pause and leave-confirmation owners
+resolve `common.resume` separately from the move-on `Continue` alias, including live switches.
 See `docs/LOCALIZATION.md` for plural counts, approved-copy provenance and verification.
 `out_of_lives_menu.gd` fits translated rewarded-ad action captions at state/locale/size changes,
 using its exported font-size range and padding to keep the original action-row width.
 `reward_chest_menu.gd` fits its localized `HeroTitleLabel` at size/locale changes. The lives-offer
 capture setup accepts `SORTING_PUZZLE_CAPTURE_LIVES_REWARDED_STATE` to inspect reward CTA states
 without backend polling replacing them.
+`scripts/tools/captures/starter_bundle_claimed_boosters_setup.gd` previews claimed booster names
+on the existing offer so localized count/name fitting can be reviewed without a purchase.
 
 ## Sticky item mechanic
 
@@ -3624,7 +3629,7 @@ Purpose:
 ## `scripts/localization/locale_catalog.gd` and `locale_manager.gd`
 
 Purpose:
-- Catalog owns the exact twelve-locale allowlist, native language labels, validation, and
+- Catalog owns the exact thirteen-locale allowlist, including `Italiano`, native language labels, validation, and
   supported first-run device-locale mapping.
 - Manager applies the saved locale during autoload startup and coordinates atomic local preference
   persistence with `TranslationServer.set_locale()`.

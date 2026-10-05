@@ -37,6 +37,7 @@ func _ready() -> void:
 	_loss_content.reparent(_shell.get_content_region(), false)
 	_confirm_leave_button.reparent(_shell.get_action_row(), false)
 	_continue_button.reparent(_shell.get_action_row(), false)
+	_continue_button.text = tr("common.resume")
 	_confirm_leave_button.pressed.connect(func() -> void: leave_pressed.emit())
 	_continue_button.pressed.connect(func() -> void: continue_pressed.emit())
 
@@ -81,3 +82,8 @@ func close() -> void:
 	if _shell.visible:
 		return
 	hide()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		_continue_button.text = tr("common.resume")

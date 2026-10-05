@@ -22,7 +22,9 @@ func set_reward(texture: Texture2D, coin_amount: int) -> void:
 
 	_coin_image.texture = texture
 	_amount_label.text = _format_number(amount)
-	tooltip_text = tr("leaderboard.reward_tooltip") % _amount_label.text
+	tooltip_text = tr_n(
+		"leaderboard.reward_tooltip", "leaderboard.reward_tooltip.plural", amount
+	) % _amount_label.text
 
 
 func clear_reward() -> void:

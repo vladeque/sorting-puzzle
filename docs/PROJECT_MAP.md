@@ -5,8 +5,9 @@ Use this file as the first stop when you need to identify where a feature lives.
 ## Entry Points
 
 Localization: `scripts/localization/locale_manager.gd` and `game_text.gd`,
-`assets/translations/en.po` / `ru.po`, and `docs/LOCALIZATION.md`.
-The reviewed Russian copy is retained in `docs/localization/RUSSIAN_TRANSLATIONS.md`.
+`assets/translations/en.po` / `ru.po` / `uk.po` / `it.po`, and `docs/LOCALIZATION.md`.
+Reviewed copy is retained in `docs/localization/RUSSIAN_TRANSLATIONS.md`,
+`UKRAINIAN_TRANSLATIONS.md` and `ITALIAN_TRANSLATIONS.md` in that directory.
 
 Main scene:
 - `scenes/app_launch_router.tscn`

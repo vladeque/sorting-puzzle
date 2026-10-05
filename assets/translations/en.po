@@ -638,7 +638,9 @@ msgstr[1] "Rank %d, %s, %d stars"
 
 #. leaderboard.reward_tooltip
 msgid "leaderboard.reward_tooltip"
-msgstr "%s coin weekly reward"
+msgid_plural "leaderboard.reward_tooltip.plural"
+msgstr[0] "%s coin weekly reward"
+msgstr[1] "%s coin weekly reward"
 
 #. leaderboard.reward.title
 msgid "leaderboard.reward.title"

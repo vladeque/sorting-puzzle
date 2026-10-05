@@ -80,6 +80,7 @@ func _ready() -> void:
 	if _leave_button != null:
 		_leave_button.pressed.connect(func() -> void: leave_pressed.emit())
 	if _continue_button != null:
+		_continue_button.text = tr("common.resume")
 		_continue_button.pressed.connect(func() -> void: continue_pressed.emit())
 	var support_button := find_child("SupportButton", true, false) as Button
 	if support_button != null:
@@ -250,5 +251,7 @@ func _create_cross_out_marker(button: Button) -> Control:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		if _continue_button != null:
+			_continue_button.text = tr("common.resume")
 		_update_diagnostics_label()
 		_fit_ad_privacy_label.call_deferred()
