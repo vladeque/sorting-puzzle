@@ -37,12 +37,13 @@ starts.
 
 ## Translation catalogs
 
-`assets/translations/en.po`, `assets/translations/ru.po`, `assets/translations/uk.po`, `assets/translations/it.po` and `assets/translations/ar.po` are
+`assets/translations/en.po`, `assets/translations/ru.po`, `assets/translations/uk.po`,
+`assets/translations/it.po`, `assets/translations/ar.po` and `assets/translations/es.po` are
 registered in `project.godot`.
 Russian includes all 251 reviewed keys from
 `docs/localization/RUSSIAN_TRANSLATIONS.md`, the user's corrected October 4, 2026 inventory.
 The inventory is a copy of the approved translation text, not runtime configuration.
-English remains the fallback for the other nine selectable locales until their catalogs exist.
+English remains the fallback for the other eight selectable locales until their catalogs exist.
 
 Ukrainian includes all 251 entries from the owner's reviewed October 5, 2026 document archived
 at `docs/localization/UKRAINIAN_TRANSLATIONS.md`. `uk.po` preserves the edited captions and
@@ -72,6 +73,24 @@ The reviewed `Home`, `LIVELLO NON SUPERATO`, `Verifica in corso...`, `Acquista p
 account-deletion messages are preserved exactly. The archived document's review notes describe
 the supplied file, while this page and `docs/localization/ITALIAN_LOCALIZATION_QA.md` record
 runtime integration and verification.
+
+Spanish includes all 251 entries from the owner's improved October 6, 2026 document archived
+verbatim at `docs/localization/SPANISH_TRANSLATIONS.md`. `tests/localization/spanish_inventory.json`
+retains the reviewed English/Spanish wording, six supplied plural pairs, singular coin-prize
+tooltip, counted booster names and supplementary email labels. `es.po` supplies stable keys,
+English scene aliases and uppercase product/card aliases through the existing localization hooks.
+The existing `Español` option and regional Spanish device locales such as `es_ES`, `es_MX`,
+`es_AR` and `es_CO` resolve to the neutral Spanish catalog.
+
+Spanish counts use period grouping (`1.234.567`); store prices retain their provider formatting.
+Deadlines use lowercase Spanish month names and `date.day_month_year` (`2 de noviembre de 2026`).
+Counted booster context supplies `Martillo` / `Martillos`, `Mezcla` / `Mezclas`,
+`Linterna` / `Linternas` and `Congelador` / `Congeladores`. Gameplay resume uses `Reanudar`,
+while move-on actions use `Continuar`. The reviewed `NIVEL NO SUPERADO`,
+`OFERTA DE UNA SOLA COMPRA`, `Verificando oferta…` and revised support/deletion wording are
+preserved exactly. `AD`, `OFF`, native language names and player/reference values retain their
+existing behavior. The archive retains its pre-integration notes; runtime verification is
+recorded in `docs/localization/SPANISH_LOCALIZATION_QA.md`.
 
 The owner's October 5, 2026 review supersedes three rows of that original inventory:
 
@@ -107,12 +126,13 @@ Formatted HUD, chapter, timer, leaderboard, profile, offer and support strings t
 patterns before interpolation. Russian and Ukrainian `tr_n()` calls select from three reviewed forms using the
 underlying integer count, including when the inserted amount is a formatted `%s`. For rows and
 weekly rewards, the plural count is the stars/coins rather than the rank. Italian selects its two
-forms using `n != 1`. Claimed booster chips
-use gettext context `booster.counted` for the reviewed lowercase inflected product names.
+forms using `n != 1`, as does Spanish. Claimed booster chips
+use gettext context `booster.counted` for the reviewed quantity-aware product names.
 
 `scripts/localization/game_text.gd` owns presentation-only grouped numbers, localized dates,
 counted booster names and safe purchase-error copy. Italian counts use periods and localized
-month names without a year suffix. Russian and Ukrainian counts use spaces and
+month names without a year suffix. Spanish uses period grouping and a day/month/year pattern
+with `de` between its parts. Russian and Ukrainian counts use spaces and
 deadlines use genitive month names with the catalog's `date.day_month_year` pattern (`г.` / `р.`);
 store prices pass through unchanged. Purchase/load presentation maps
 unreviewed technical errors to the existing player-facing fallback messages. Provider errors,
@@ -144,6 +164,9 @@ its authored width. Support FAQ action buttons reserve 384 pixels for the review
 The lives modal's next-life caption wraps within its timer column instead of widening the status row.
 Its owner fits rewarded-action captions within the authored button width, with configurable
 24px maximum / 16px minimum sizes and 24px horizontal text padding, including after language changes.
+`shelf_unlock_menu.gd` applies the same configurable bounds to its rewarded-action caption after
+state, size and language changes. This keeps the full reviewed Spanish
+`Ver anuncio · Desbloquear estante` inside the button padding without widening its action row.
 `reward_chest_menu.gd` fits the translated hero caption within its banner at 28px down to 16px,
 with `HeroTitleLabel` retaining the existing banner bounds instead of expanding its container.
 
@@ -193,6 +216,10 @@ The implementation ownership and verification scope are recorded in
   scene aliases, fallback, singular/plural counts including quantities ending in one, counted
   boosters, accented glyphs, all twelve dates, names/prices, live resume actions and screen
   refreshes, preserved pending ad state and local-only locale persistence.
+- `tests/ui/test_spanish_localization.gd` checks all 251 reviewed Spanish entries and English
+  scene aliases, English fallback, integer plural boundaries, counted boosters, Spanish glyphs,
+  twelve localized dates, unchanged names/prices, live screen/resume updates, preserved pending
+  ad state, regional device-locale mapping and local-only preference persistence.
 - Capture any screen in an isolated Russian session with:
 
   ```powershell
@@ -204,9 +231,11 @@ The implementation ownership and verification scope are recorded in
   Use `-Locale uk` for Ukrainian captures.
   Use `-Locale it` for Italian captures.
   Use `-Locale ar` for Arabic captures.
+  Use `-Locale es` for Spanish captures.
 
 The October 4–5, 2026 test results, rendered-screen reviews and capture limitations are recorded in
 `docs/localization/RUSSIAN_LOCALIZATION_QA.md`.
 Ukrainian integration results are recorded in `docs/localization/UKRAINIAN_LOCALIZATION_QA.md`.
 Italian integration results are recorded in `docs/localization/ITALIAN_LOCALIZATION_QA.md`.
 Arabic integration results are recorded in `docs/localization/ARABIC_LOCALIZATION_QA.md`.
+Spanish integration results are recorded in `docs/localization/SPANISH_LOCALIZATION_QA.md`.

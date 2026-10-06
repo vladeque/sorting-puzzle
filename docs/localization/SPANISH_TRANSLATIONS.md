@@ -79,7 +79,7 @@ This is a translation document. The wording has been checked against the supplie
 | `hud.ability_tooltip.hammer` | Hammer -- clears a matching triple | Martillo -- elimina un trío de objetos iguales | Accessibility tooltip on the Hammer booster button. | `ability_bar.tscn` |
 | `hud.ability_tooltip.shuffle` | Shuffle -- reshuffles unlocked items | Mezcla -- reorganiza los objetos desbloqueados | Tooltip on the Shuffle booster button. | `ability_bar.tscn` |
 | `hud.ability_tooltip.lantern` | Lantern -- highlights a matchable triple | Linterna -- resalta un trío que puedes combinar | Tooltip on the Lantern booster button. | `ability_bar.tscn` |
-| `hud.ability_tooltip.freezer` | Freezer -- pauses the countdown timer | Congelador -- pausa la cuenta atrás | Tooltip on the Freezer booster button. | `ability_bar.tscn` |
+| `hud.ability_tooltip.freezer` | Freezer -- pauses the countdown timer | Congelador -- pausa el temporizador | Tooltip on the Freezer booster button. | `ability_bar.tscn` |
 | `hud.seconds_short` | %ds | %ds | Countdown on an active Lantern or Freezer booster, e.g. "15s". `%d` = seconds; use the local short unit. | `ability_bar.gd` |
 | `tip.tap_dispenser` | Tap a dispenser to throw items onto the shelves! | ¡Toca un dispensador para lanzar objetos a los estantes! | Tutorial bubble on level 10, where dispensers (machines that throw items onto shelves) first appear. | `configs/gameplay_tips.json` |
 | `pause.title` | PAUSE | PAUSA | Title of the in-level pause modal. | `pause_menu.gd` |
@@ -98,7 +98,7 @@ This is a translation document. The wording has been checked against the supplie
 | `shelf_unlock.ad_unavailable` | Ad unavailable. This shelf stays locked. | Anuncio no disponible. Este estante sigue bloqueado. | Status line when no ad could be shown. | `shelf_unlock_menu.gd` |
 | `complete.title` | GREAT JOB! | ¡BUEN TRABAJO! | Title of the level-complete screen, above the stars earned. | `level_completion_screen.gd` |
 | `failed.title` | LEVEL %d | NIVEL %d | Title of the level-failed screen. `%d` = level number. | `level_failure_screen.gd` |
-| `failed.headline` | LEVEL FAILED | NIVEL FALLIDO | Banner on the level-failed screen. | `level_failure_screen.tscn` |
+| `failed.headline` | LEVEL FAILED | NIVEL NO SUPERADO | Banner on the level-failed screen. | `level_failure_screen.tscn` |
 | `failed.retry` | Retry | Reintentar | Replays the same level. | `level_failure_screen.tscn` |
 
 ### Combo praise
@@ -175,14 +175,14 @@ The praise refers to the combo and follows the source sequence; it does not addr
 | `shop.error.purchase_failed` | The purchase could not be completed. | No se pudo completar la compra. | Error dialog body (fallback). | `shop_screen.gd`, `production_main_menu.gd` |
 | `shop.error.grant_failed` | The purchased rewards could not be granted. | No se pudieron entregar las recompensas compradas. | Error dialog body. | `store/shop_purchase_flow.gd` |
 | `shop.error.offer_unavailable` | This shop offer is unavailable. | Esta oferta de la tienda no está disponible. | Error dialog body. | `store/store_service.gd` |
-| `shop.error.already_bought` | This one-time shop offer has already been purchased. | Ya has comprado esta oferta de compra única. | Error dialog body. | `store/store_service.gd` |
+| `shop.error.already_bought` | This one-time shop offer has already been purchased. | Ya has comprado esta oferta, disponible una sola vez. | Error dialog body. | `store/store_service.gd` |
 | `starter.title` | STARTER BUNDLE | PAQUETE INICIAL | Starter offer modal title. | `starter_bundle_offer_modal.gd` |
-| `starter.one_time` | ONE-TIME OFFER | OFERTA DE COMPRA ÚNICA | Ribbon on the starter offer. | `starter_bundle_offer_modal.tscn` |
+| `starter.one_time` | ONE-TIME OFFER | OFERTA DE UNA SOLA COMPRA | Ribbon on the starter offer. | `starter_bundle_offer_modal.tscn` |
 | `starter.boosters_included` | BOOSTERS INCLUDED | POTENCIADORES INCLUIDOS | Header over the four booster chips. | `starter_bundle_offer_modal.tscn` |
 | `starter.coins` | %s COINS | %s MONEDAS | Ribbon over the coin art. `%s` = formatted amount, e.g. "1,000". Needs plural forms. | `starter_bundle_offer_modal.gd` |
 | `starter.buy_for` | Buy for %s | Comprar por %s | Buy button. `%s` = store price, e.g. "$4.99". | `starter_bundle_offer_modal.gd` |
-| `starter.checking` | Checking offer… | Comprobando oferta… | Status while the store confirms the offer. | `production_main_menu.gd` |
-| `starter.checking_short` | Checking… | Comprobando… | Buy button during that check. | `starter_bundle_offer_modal.gd` |
+| `starter.checking` | Checking offer… | Verificando oferta… | Status while the store confirms the offer. | `production_main_menu.gd` |
+| `starter.checking_short` | Checking… | Verificando… | Buy button during that check. | `starter_bundle_offer_modal.gd` |
 | `starter.no_longer_available` | This offer is no longer available. | Esta oferta ya no está disponible. | Error status in the starter modal. | `production_main_menu.gd` |
 | `starter.unavailable` | Unavailable | No disponible | Disabled buy button after a non-retryable error. | `starter_bundle_offer_modal.gd` |
 | `booster_chip.claimed` | +%d %s | +%d %s | Booster chip after purchase, e.g. "+3 Hammer". `%d` = count, `%s` = booster name. Needs plural forms. | `offer_booster_chip.gd` |
@@ -199,7 +199,7 @@ The praise refers to the combo and follows the source sequence; it does not addr
 | `profile.frame_tab` | FRAME | MARCO | Tab that shows decorative frames around the avatar. | `profile_menu.tscn` |
 | `profile.unlock.level` | Complete level %d to unlock | Completa el nivel %d para desbloquear | Toast after tapping a locked frame. `%d` = level number. | `profile_menu.gd` |
 | `profile.unlock.combo` | Reach a combo of ×%d in any run to unlock | Consigue un combo de ×%d en cualquier partida para desbloquear | Same toast. `%d` = combo size. | `profile_menu.gd` |
-| `profile.unlock.weekly_first` | Finish 1st on the Weekly leaderboard to unlock | Queda en primer lugar en el ranking semanal para desbloquear | Same toast for a first-place frame. Today built from two parts; see implementation notes. | `profile_menu.gd` |
+| `profile.unlock.weekly_first` | Finish 1st on the Weekly leaderboard to unlock | Termina en primer lugar en el ranking semanal para desbloquear | Same toast for a first-place frame. Today built from two parts; see implementation notes. | `profile_menu.gd` |
 | `profile.unlock.weekly_top` | Finish top %d on the Weekly leaderboard to unlock | Queda entre los %d mejores del ranking semanal para desbloquear | Same toast. `%d` = rank cutoff (e.g. 10). | `profile_menu.gd` |
 | `leaderboard.title` | LEADERBOARD | RANKING | Leaderboard screen title. | `leaderboard_screen.tscn` |
 | `leaderboard.tab.weekly` | Weekly | Semanal | Tab: this week's stars. | `leaderboard_screen.tscn` |
@@ -210,7 +210,7 @@ The praise refers to the combo and follows the source sequence; it does not addr
 | `leaderboard.duration.hm` | %dh %dm | %dh %dmin | Duration: hours and minutes. | `leaderboard_screen.gd` |
 | `leaderboard.duration.m` | %dm | %dmin | Duration: minutes. | `leaderboard_screen.gd` |
 | `leaderboard.country_caption` | Country · All-time stars | País · Estrellas totales | Caption under the Country tab. | `leaderboard_screen.gd` |
-| `leaderboard.world_caption` | Worldwide · All-time stars | Mundo · Estrellas totales | Caption under the World tab. | `leaderboard_screen.gd` |
+| `leaderboard.world_caption` | Worldwide · All-time stars | Mundial · Estrellas totales | Caption under the World tab. | `leaderboard_screen.gd` |
 | `leaderboard.load_failed` | Could not load leaderboard. | No se pudo cargar el ranking. | Error state (fallback text). | `leaderboard_screen.gd` |
 | `leaderboard.default_name` | Player | Jugador | Name shown for a player without one. | `leaderboard_row.gd` |
 | `leaderboard.row_tooltip` | Rank %d, %s, %d stars | Puesto %d, %s, %d estrellas | Accessibility text of a row. `%d` = rank, `%s` = player name, `%d` = stars. Needs plural forms. | `leaderboard_row.gd` |
@@ -238,15 +238,15 @@ The praise refers to the combo and follows the source sequence; it does not addr
 | `support.title` | SUPPORT | AYUDA | Support screen title. | `support_screen.tscn` |
 | `support.faq_header` | Frequently Asked Questions | Preguntas frecuentes | Section header. | `support_screen.tscn` |
 | `support.faq.play.q` | How do I play? | ¿Cómo se juega? | FAQ question (tap to expand). | `support_screen.tscn` |
-| `support.faq.play.a` | Move matching goods onto the same shelf. When three identical items are visible together, they clear. Complete the board before time runs out. | Mueve los productos iguales al mismo estante. Cuando tres objetos iguales estén visibles juntos, desaparecerán. Despeja el tablero antes de que se agote el tiempo. | FAQ answer. "Goods" = shop items such as snacks and toys. | `support_screen.tscn` |
-| `support.faq.contact.q` | How do I contact support? | ¿Cómo contacto con el equipo de ayuda? | FAQ question. | `support_screen.tscn` |
+| `support.faq.play.a` | Move matching goods onto the same shelf. When three identical items are visible together, they clear. Complete the board before time runs out. | Mueve los productos iguales al mismo estante. Cuando haya tres objetos iguales visibles juntos, desaparecerán. Despeja el tablero antes de que se agote el tiempo. | FAQ answer. "Goods" = shop items such as snacks and toys. | `support_screen.tscn` |
+| `support.faq.contact.q` | How do I contact support? | ¿Cómo puedo contactar con el equipo de ayuda? | FAQ question. | `support_screen.tscn` |
 | `support.faq.contact.a` | Email us at %s. Include a short description, your device platform, and when the problem happened. | Escríbenos a %s. Incluye una breve descripción, la plataforma de tu dispositivo y cuándo ocurrió el problema. | FAQ answer. `%s` = support email address. | `support_screen.gd` |
 | `support.faq.contact.action` | Email Support | Contactar por correo | Button that opens a pre-filled email. | `support_screen.tscn` |
 | `support.faq.crash.q` | What if the game freezes or crashes? | ¿Qué hago si el juego se bloquea o se cierra? | FAQ question. | `support_screen.tscn` |
 | `support.faq.crash.a` | Close and reopen the game first. If it happens again, restart the device and make sure the game is updated. Contact support with the device model, platform version, and what you were doing before the problem. | Primero, cierra y vuelve a abrir el juego. Si vuelve a ocurrir, reinicia el dispositivo y comprueba que el juego esté actualizado. Contacta con el equipo de ayuda e indica el modelo del dispositivo, la versión de la plataforma y qué hacías antes del problema. | FAQ answer. | `support_screen.tscn` |
 | `support.faq.sync.q` | How do I sync progress between devices? | ¿Cómo sincronizo mi progreso entre dispositivos? | FAQ question. | `support_screen.tscn` |
 | `support.faq.sync.a` | Use the same signed-in platform account on both devices and allow synchronization to finish before playing. If the progress differs, avoid playing on both devices and contact support. | Inicia sesión con la misma cuenta de la plataforma en ambos dispositivos y espera a que termine la sincronización antes de jugar. Si el progreso es distinto, evita jugar en ambos dispositivos y contacta con el equipo de ayuda. | FAQ answer. "Platform account" = Google Play Games / Game Center. | `support_screen.tscn` |
-| `support.faq.bad_ad.q` | How do I report a bad ad? | ¿Cómo denuncio un anuncio inapropiado? | FAQ question. | `support_screen.tscn` |
+| `support.faq.bad_ad.q` | How do I report a bad ad? | ¿Cómo denuncio un anuncio problemático? | FAQ question. | `support_screen.tscn` |
 | `support.faq.bad_ad.a` | 1. Close the ad if you can do so safely.\\n2. Take a screenshot of the ad and any advertiser or app name shown.\\n3. Note the approximate time and where the ad appeared in the game.\\n4. Describe why the ad seemed offensive, misleading, or fraudulent.\\n5. Email these details to %s. Do not include passwords or payment information. | 1. Cierra el anuncio si puedes hacerlo de forma segura.\\n2. Haz una captura de pantalla del anuncio y de cualquier nombre de anunciante o aplicación que aparezca.\\n3. Anota la hora aproximada y dónde apareció el anuncio en el juego.\\n4. Explica por qué el anuncio te pareció ofensivo, engañoso o fraudulento.\\n5. Envía estos datos por correo a %s. No incluyas contraseñas ni información de pago. | FAQ answer, a five-step list in one string. `%s` = support email. Keep the numbering and line breaks. | `support_screen.gd` |
 | `support.faq.bad_ad.action` | Email Ad Report | Denunciar por correo | Button that opens a pre-filled ad-report email. | `support_screen.tscn` |
 | `support.account_header` | Account | Cuenta | Section header above the delete button. | `support_screen.tscn` |
@@ -289,7 +289,7 @@ The praise refers to the combo and follows the source sequence; it does not addr
 | `deletion.not_confirmed.body` | Your request was sent, but the answer didn't arrive. Connect to the internet and try again. The game stays locked until we know the result. | Tu solicitud se envió, pero no llegó la respuesta. Conéctate a internet y vuelve a intentarlo. El juego seguirá bloqueado hasta que sepamos el resultado. | Body. | same |
 | `deletion.unconfirmed.headline` | Deletion status unconfirmed | Estado de eliminación sin confirmar | Server outcome unknown. | same |
 | `deletion.unconfirmed.body` | We couldn't confirm whether your account was deleted. To keep your data safe, the game stays locked. Contact support and include the reference below. | No pudimos confirmar si se eliminó tu cuenta. Para proteger tus datos, el juego seguirá bloqueado. Contacta con el equipo de ayuda e incluye la referencia que aparece abajo. | Body; a reference code is shown under it. | same |
-| `deletion.check_again` | Check Again | Comprobar de nuevo | Asks the server again. | same |
+| `deletion.check_again` | Check Again | Verificar de nuevo | Asks the server again. | same |
 | `deletion.cleanup.headline.local` | Your local game data couldn't be fully deleted yet. | Todavía no se pudieron eliminar todos los datos locales del juego. | Local cleanup incomplete (local-only player). | same |
 | `deletion.cleanup.headline.account` | Account deletion accepted; finishing cleanup. | Eliminación de cuenta aceptada; finalizando la limpieza. | Local cleanup incomplete after the server accepted. | same |
 | `deletion.cleanup.body` | Some game data couldn't be removed from this device yet. Try again to finish. | Todavía no se pudieron eliminar algunos datos del juego de este dispositivo. Vuelve a intentarlo para terminar. | Body. | same |
@@ -299,11 +299,11 @@ The praise refers to the combo and follows the source sequence; it does not addr
 | `deletion.status_unknown.body` | To keep your data safe, the game stays locked. Contact support for help. | Para proteger tus datos, el juego seguirá bloqueado. Contacta con el equipo de ayuda. | Body. | same |
 | `deletion.fail.offline` | Connect to the internet to delete your account. | Conéctate a internet para eliminar tu cuenta. | Failure headline. | same |
 | `deletion.fail.rate_limited` | Too many attempts. Wait a moment, then try again. | Demasiados intentos. Espera un momento y vuelve a intentarlo. | Failure headline. | same |
-| `deletion.fail.busy` | Account deletion is busy right now. Try again in a moment. | El servicio de eliminación de cuentas está ocupado. Vuelve a intentarlo en un momento. | Failure headline (server unavailable). | same |
+| `deletion.fail.busy` | Account deletion is busy right now. Try again in a moment. | El servicio de eliminación de cuentas no está disponible en este momento. Vuelve a intentarlo en un momento. | Failure headline (server unavailable). | same |
 | `deletion.fail.syncing` | The game is still syncing. Try again in a moment. | El juego todavía se está sincronizando. Vuelve a intentarlo en un momento. | Failure headline. | same |
 | `deletion.fail.auth` | We couldn't verify your account. Restart the game, then try again. | No pudimos verificar tu cuenta. Reinicia el juego y vuelve a intentarlo. | Failure headline. | same |
 | `deletion.fail.update` | Update the game to delete your account. | Actualiza el juego para eliminar tu cuenta. | Failure headline (client too old). | same |
-| `deletion.fail.changed` | Your account changed while we were deleting it. Try again. | Tu cuenta cambió mientras la eliminábamos. Vuelve a intentarlo. | Failure headline. | same |
+| `deletion.fail.changed` | Your account changed while we were deleting it. Try again. | Tu cuenta cambió durante el proceso de eliminación. Vuelve a intentarlo. | Failure headline. | same |
 | `deletion.fail.storage` | Your device couldn't save the deletion request. Try again. | Tu dispositivo no pudo guardar la solicitud de eliminación. Vuelve a intentarlo. | Failure headline. | same |
 | `deletion.fail.generic` | We couldn't delete your account. Try again later or contact support. | No pudimos eliminar tu cuenta. Inténtalo más tarde o contacta con el equipo de ayuda. | Failure headline (fallback). | same |
 | `deletion.fail.local` | Your game data couldn't be deleted. Try again. | No se pudieron eliminar los datos del juego. Vuelve a intentarlo. | Failure headline, local-only player. | same |

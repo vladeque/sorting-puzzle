@@ -1,0 +1,2147 @@
+# Reviewed Spanish inventory; see docs/localization/SPANISH_TRANSLATIONS.md.
+msgid ""
+msgstr ""
+"Project-Id-Version: SortingPuzzle\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. common.play
+msgid "common.play"
+msgstr "Jugar"
+
+#. common.continue
+msgid "common.continue"
+msgstr "Continuar"
+
+#. common.resume
+msgid "common.resume"
+msgstr "Reanudar"
+
+#. common.try_again
+msgid "common.try_again"
+msgstr "Reintentar"
+
+#. common.close
+msgid "common.close"
+msgstr "Cerrar"
+
+#. common.cancel
+msgid "common.cancel"
+msgstr "Cancelar"
+
+#. common.got_it
+msgid "common.got_it"
+msgstr "Entendido"
+
+#. common.get_help
+msgid "common.get_help"
+msgstr "Pedir ayuda"
+
+#. common.save
+msgid "common.save"
+msgstr "GUARDAR"
+
+#. common.loading
+msgid "common.loading"
+msgstr "Cargando…"
+
+#. common.retry_load
+msgid "common.retry_load"
+msgstr "Reintentar"
+
+#. menu.level_button
+msgid "menu.level_button"
+msgstr "NIVEL %d"
+
+#. menu.more_levels_coming_soon
+msgid "menu.more_levels_coming_soon"
+msgstr "MÁS NIVELES MUY PRONTO"
+
+#. menu.coming_soon
+msgid "menu.coming_soon"
+msgstr "MUY PRONTO"
+
+#. menu.lives_full
+msgid "menu.lives_full"
+msgstr "Máx."
+
+#. menu.starter_badge
+msgid "menu.starter_badge"
+msgstr "PAQUETE"
+
+#. nav.shop
+msgid "nav.shop"
+msgstr "Tienda"
+
+#. nav.home
+msgid "nav.home"
+msgstr "Inicio"
+
+#. nav.leaderboard
+msgid "nav.leaderboard"
+msgstr "Ranking"
+
+#. chapter.button
+msgid "chapter.button"
+msgstr "CAPÍTULO %d"
+
+#. chapter.button_tooltip
+msgid "chapter.button_tooltip"
+msgstr "Elige el capítulo %d: %s"
+
+#. chapter.screen_title
+msgid "chapter.screen_title"
+msgstr "CAPÍTULOS"
+
+#. chapter.eyebrow
+msgid "chapter.eyebrow"
+msgstr "CAPÍTULO %d"
+
+#. chapter.title.chapter_01
+msgid "chapter.title.chapter_01"
+msgstr "Ciudad del Mercado"
+
+#. chapter.title.chapter_02
+msgid "chapter.title.chapter_02"
+msgstr "Rincón Dulce"
+
+#. chapter.locked_status
+msgid "chapter.locked_status"
+msgid_plural "chapter.locked_status.plural"
+msgstr[0] "Completa %d nivel más de «%s» para desbloquear"
+msgstr[1] "Completa %d niveles más de «%s» para desbloquear"
+
+#. chapter.unlock_progress
+msgid "chapter.unlock_progress"
+msgstr "Progreso de desbloqueo"
+
+#. chapter.current_progress
+msgid "chapter.current_progress"
+msgstr "Progreso actual"
+
+#. chapter.locked
+msgid "chapter.locked"
+msgstr "Bloqueado"
+
+#. chapter.no_levels_status
+msgid "chapter.no_levels_status"
+msgstr "Pronto habrá nuevos niveles"
+
+#. chapter.coming_soon
+msgid "chapter.coming_soon"
+msgstr "Muy pronto"
+
+#. hud.level
+msgid "hud.level"
+msgstr "NIVEL %d"
+
+#. hud.combo
+msgid "hud.combo"
+msgstr "COMBO ×%d"
+
+#. hud.ability_tooltip.hammer
+msgid "hud.ability_tooltip.hammer"
+msgstr "Martillo -- elimina un trío de objetos iguales"
+
+#. hud.ability_tooltip.shuffle
+msgid "hud.ability_tooltip.shuffle"
+msgstr "Mezcla -- reorganiza los objetos desbloqueados"
+
+#. hud.ability_tooltip.lantern
+msgid "hud.ability_tooltip.lantern"
+msgstr "Linterna -- resalta un trío que puedes combinar"
+
+#. hud.ability_tooltip.freezer
+msgid "hud.ability_tooltip.freezer"
+msgstr "Congelador -- pausa el temporizador"
+
+#. hud.seconds_short
+msgid "hud.seconds_short"
+msgstr "%ds"
+
+#. tip.tap_dispenser
+msgid "tip.tap_dispenser"
+msgstr "¡Toca un dispensador para lanzar objetos a los estantes!"
+
+#. pause.title
+msgid "pause.title"
+msgstr "PAUSA"
+
+#. pause.leave
+msgid "pause.leave"
+msgstr "Salir"
+
+#. leave.title
+msgid "leave.title"
+msgstr "SALIR DEL NIVEL"
+
+#. leave.you_will_lose
+msgid "leave.you_will_lose"
+msgstr "Perderás:"
+
+#. leave.confirm
+msgid "leave.confirm"
+msgstr "Salir"
+
+#. timeup.title
+msgid "timeup.title"
+msgstr "TIEMPO AGOTADO"
+
+#. timeup.offer
+msgid "timeup.offer"
+msgstr "¡Añade un minuto y sigue ordenando!"
+
+#. timeup.used
+msgid "timeup.used"
+msgstr "Usado"
+
+#. ability_purchase.title
+msgid "ability_purchase.title"
+msgstr "USAR POTENCIADOR"
+
+#. shelf_unlock.title
+msgid "shelf_unlock.title"
+msgstr "DESBLOQUEAR ESTANTE"
+
+#. shelf_unlock.offer
+msgid "shelf_unlock.offer"
+msgstr "Mira un anuncio para desbloquear este estante ahora."
+
+#. shelf_unlock.offer_or_clear
+msgid "shelf_unlock.offer_or_clear"
+msgid_plural "shelf_unlock.offer_or_clear.plural"
+msgstr[0] "Mira un anuncio para desbloquear este estante ahora o elimina %s trío más."
+msgstr[1] "Mira un anuncio para desbloquear este estante ahora o elimina %s tríos más."
+
+#. shelf_unlock.button
+msgid "shelf_unlock.button"
+msgstr "Ver anuncio · Desbloquear estante"
+
+#. shelf_unlock.ad_unavailable
+msgid "shelf_unlock.ad_unavailable"
+msgstr "Anuncio no disponible. Este estante sigue bloqueado."
+
+#. complete.title
+msgid "complete.title"
+msgstr "¡BUEN TRABAJO!"
+
+#. failed.title
+msgid "failed.title"
+msgstr "NIVEL %d"
+
+#. failed.headline
+msgid "failed.headline"
+msgstr "NIVEL NO SUPERADO"
+
+#. failed.retry
+msgid "failed.retry"
+msgstr "Reintentar"
+
+#. combo.praise.2
+msgid "combo.praise.2"
+msgstr "Genial"
+
+#. combo.praise.3
+msgid "combo.praise.3"
+msgstr "Estupendo"
+
+#. combo.praise.4
+msgid "combo.praise.4"
+msgstr "Asombroso"
+
+#. combo.praise.5
+msgid "combo.praise.5"
+msgstr "Impresionante"
+
+#. combo.praise.6
+msgid "combo.praise.6"
+msgstr "Fantástico"
+
+#. combo.praise.7
+msgid "combo.praise.7"
+msgstr "Increíble"
+
+#. combo.praise.8
+msgid "combo.praise.8"
+msgstr "Espectacular"
+
+#. combo.praise.9
+msgid "combo.praise.9"
+msgstr "Imparable"
+
+#. combo.praise.10
+msgid "combo.praise.10"
+msgstr "Legendario"
+
+#. combo.praise.11
+msgid "combo.praise.11"
+msgstr "Épico"
+
+#. combo.praise.12
+msgid "combo.praise.12"
+msgstr "Brillante"
+
+#. combo.praise.13
+msgid "combo.praise.13"
+msgstr "Magistral"
+
+#. combo.praise.14
+msgid "combo.praise.14"
+msgstr "Supremo"
+
+#. combo.praise.15
+msgid "combo.praise.15"
+msgstr "Fenomenal"
+
+#. combo.praise.16
+msgid "combo.praise.16"
+msgstr "Mítico"
+
+#. combo.praise.17
+msgid "combo.praise.17"
+msgstr "Majestuoso"
+
+#. combo.praise.18
+msgid "combo.praise.18"
+msgstr "Radiante"
+
+#. combo.praise.19
+msgid "combo.praise.19"
+msgstr "Divino"
+
+#. combo.praise.20
+msgid "combo.praise.20"
+msgstr "Trascendente"
+
+#. ability.hammer.name
+msgid "ability.hammer.name"
+msgstr "Martillo"
+
+#. ability.shuffle.name
+msgid "ability.shuffle.name"
+msgstr "Mezcla"
+
+#. ability.lantern.name
+msgid "ability.lantern.name"
+msgstr "Linterna"
+
+#. ability.freezer.name
+msgid "ability.freezer.name"
+msgstr "Congelador"
+
+#. ability.hammer.description
+msgid "ability.hammer.description"
+msgstr "Elimina al instante un trío de objetos iguales de los estantes."
+
+#. ability.shuffle.description
+msgid "ability.shuffle.description"
+msgstr "Reorganiza los objetos de los estantes para ayudarte a encontrar un trío."
+
+#. ability.lantern.description
+msgid "ability.lantern.description"
+msgstr "Resalta durante 15 segundos un trío de objetos iguales que puedes eliminar."
+
+#. ability.freezer.description
+msgid "ability.freezer.description"
+msgstr "Congela el temporizador del nivel durante 30 segundos."
+
+#. ad.watch
+msgid "ad.watch"
+msgstr "Ver anuncio"
+
+#. ad.loading
+msgid "ad.loading"
+msgstr "Cargando..."
+
+#. ad.verifying
+msgid "ad.verifying"
+msgstr "Verificando..."
+
+#. ad.verify_reward
+msgid "ad.verify_reward"
+msgstr "Verificar recompensa"
+
+#. ad.reward_pending
+msgid "ad.reward_pending"
+msgstr "La verificación de la recompensa sigue pendiente."
+
+#. ad.unavailable_retry
+msgid "ad.unavailable_retry"
+msgstr "Anuncio no disponible. Vuelve a intentarlo."
+
+#. ad.watch_unavailable
+msgid "ad.watch_unavailable"
+msgstr "Ver anuncio\nNo disponible"
+
+#. ad.watch_coming_soon
+msgid "ad.watch_coming_soon"
+msgstr "Ver anuncio\nMuy pronto"
+
+#. ad.badge
+msgid "ad.badge"
+msgstr "AD"
+
+#. lives.title.out
+msgid "lives.title.out"
+msgstr "SIN VIDAS"
+
+#. lives.title.get_more
+msgid "lives.title.get_more"
+msgstr "CONSEGUIR VIDAS"
+
+#. lives.title.full
+msgid "lives.title.full"
+msgstr "VIDAS AL MÁXIMO"
+
+#. lives.next_in
+msgid "lives.next_in"
+msgstr "PRÓXIMA VIDA EN"
+
+#. lives.full_body
+msgid "lives.full_body"
+msgstr "¡Tienes el máximo de vidas! Juega un nivel para usarlas."
+
+#. chest.title
+msgid "chest.title"
+msgstr "RECOMPENSAS DEL COFRE"
+
+#. chest.progress_hint
+msgid "chest.progress_hint"
+msgstr "Reúne estrellas para desbloquear un cofre y obtener tu recompensa"
+
+#. chest.ready
+msgid "chest.ready"
+msgstr "¡TE ESPERA UN COFRE!"
+
+#. chest.tap_to_open
+msgid "chest.tap_to_open"
+msgstr "Toca para abrir"
+
+#. purchase.tap_to_collect
+msgid "purchase.tap_to_collect"
+msgstr "Toca para recoger"
+
+#. purchase.complete
+msgid "purchase.complete"
+msgstr "COMPRA COMPLETADA"
+
+#. shop.title
+msgid "shop.title"
+msgstr "TIENDA"
+
+#. shop.section.bundles
+msgid "shop.section.bundles"
+msgstr "PAQUETES ESPECIALES"
+
+#. shop.section.coins
+msgid "shop.section.coins"
+msgstr "MONEDAS"
+
+#. shop.offer.starter_bundle
+msgid "shop.offer.starter_bundle"
+msgstr "Paquete inicial"
+
+#. shop.offer.basic_bundle
+msgid "shop.offer.basic_bundle"
+msgstr "Paquete básico"
+
+#. shop.tag.best_value
+msgid "shop.tag.best_value"
+msgstr "MEJOR OFERTA"
+
+#. shop.discount_off
+msgid "shop.discount_off"
+msgstr "OFF"
+
+#. shop.ability_hint
+msgid "shop.ability_hint"
+msgstr "Toca un potenciador para ver qué hace"
+
+#. shop.purchasing
+msgid "shop.purchasing"
+msgstr "Comprando…"
+
+#. shop.no_offers
+msgid "shop.no_offers"
+msgstr "No hay ofertas disponibles en la tienda para esta región."
+
+#. shop.load_failed
+msgid "shop.load_failed"
+msgstr "No se pudo cargar la tienda."
+
+#. shop.error.title.purchase
+msgid "shop.error.title.purchase"
+msgstr "Compra no disponible"
+
+#. shop.error.title.reward
+msgid "shop.error.title.reward"
+msgstr "Error de recompensa"
+
+#. shop.error.purchase_failed
+msgid "shop.error.purchase_failed"
+msgstr "No se pudo completar la compra."
+
+#. shop.error.grant_failed
+msgid "shop.error.grant_failed"
+msgstr "No se pudieron entregar las recompensas compradas."
+
+#. shop.error.offer_unavailable
+msgid "shop.error.offer_unavailable"
+msgstr "Esta oferta de la tienda no está disponible."
+
+#. shop.error.already_bought
+msgid "shop.error.already_bought"
+msgstr "Ya has comprado esta oferta, disponible una sola vez."
+
+#. starter.title
+msgid "starter.title"
+msgstr "PAQUETE INICIAL"
+
+#. starter.one_time
+msgid "starter.one_time"
+msgstr "OFERTA DE UNA SOLA COMPRA"
+
+#. starter.boosters_included
+msgid "starter.boosters_included"
+msgstr "POTENCIADORES INCLUIDOS"
+
+#. starter.coins
+msgid "starter.coins"
+msgid_plural "starter.coins.plural"
+msgstr[0] "%s MONEDA"
+msgstr[1] "%s MONEDAS"
+
+#. starter.buy_for
+msgid "starter.buy_for"
+msgstr "Comprar por %s"
+
+#. starter.checking
+msgid "starter.checking"
+msgstr "Verificando oferta…"
+
+#. starter.checking_short
+msgid "starter.checking_short"
+msgstr "Verificando…"
+
+#. starter.no_longer_available
+msgid "starter.no_longer_available"
+msgstr "Esta oferta ya no está disponible."
+
+#. starter.unavailable
+msgid "starter.unavailable"
+msgstr "No disponible"
+
+#. booster_chip.claimed
+msgid "booster_chip.claimed"
+msgid_plural "booster_chip.claimed.plural"
+msgstr[0] "+%d %s"
+msgstr[1] "+%d %s"
+
+#. profile.title
+msgid "profile.title"
+msgstr "EDITAR PERFIL"
+
+#. profile.name_header
+msgid "profile.name_header"
+msgstr "NOMBRE DEL JUGADOR"
+
+#. profile.name_placeholder
+msgid "profile.name_placeholder"
+msgstr "Nombre del jugador"
+
+#. profile.edit_name_tooltip
+msgid "profile.edit_name_tooltip"
+msgstr "Editar nombre del jugador"
+
+#. profile.avatar_tab
+msgid "profile.avatar_tab"
+msgstr "AVATAR"
+
+#. profile.frame_tab
+msgid "profile.frame_tab"
+msgstr "MARCO"
+
+#. profile.unlock.level
+msgid "profile.unlock.level"
+msgstr "Completa el nivel %d para desbloquear"
+
+#. profile.unlock.combo
+msgid "profile.unlock.combo"
+msgstr "Consigue un combo de ×%d en cualquier partida para desbloquear"
+
+#. profile.unlock.weekly_first
+msgid "profile.unlock.weekly_first"
+msgstr "Termina en primer lugar en el ranking semanal para desbloquear"
+
+#. profile.unlock.weekly_top
+msgid "profile.unlock.weekly_top"
+msgstr "Queda entre los %d mejores del ranking semanal para desbloquear"
+
+#. leaderboard.title
+msgid "leaderboard.title"
+msgstr "RANKING"
+
+#. leaderboard.tab.weekly
+msgid "leaderboard.tab.weekly"
+msgstr "Semanal"
+
+#. leaderboard.tab.country
+msgid "leaderboard.tab.country"
+msgstr "País"
+
+#. leaderboard.tab.world
+msgid "leaderboard.tab.world"
+msgstr "Mundo"
+
+#. leaderboard.weekly_reset
+msgid "leaderboard.weekly_reset"
+msgstr "Reinicio semanal en %s"
+
+#. leaderboard.duration.dh
+msgid "leaderboard.duration.dh"
+msgstr "%dd %dh"
+
+#. leaderboard.duration.hm
+msgid "leaderboard.duration.hm"
+msgstr "%dh %dmin"
+
+#. leaderboard.duration.m
+msgid "leaderboard.duration.m"
+msgstr "%dmin"
+
+#. leaderboard.country_caption
+msgid "leaderboard.country_caption"
+msgstr "País · Estrellas totales"
+
+#. leaderboard.world_caption
+msgid "leaderboard.world_caption"
+msgstr "Mundial · Estrellas totales"
+
+#. leaderboard.load_failed
+msgid "leaderboard.load_failed"
+msgstr "No se pudo cargar el ranking."
+
+#. leaderboard.default_name
+msgid "leaderboard.default_name"
+msgstr "Jugador"
+
+#. leaderboard.row_tooltip
+msgid "leaderboard.row_tooltip"
+msgid_plural "leaderboard.row_tooltip.plural"
+msgstr[0] "Puesto %d, %s, %d estrella"
+msgstr[1] "Puesto %d, %s, %d estrellas"
+
+#. leaderboard.reward_tooltip
+msgid "leaderboard.reward_tooltip"
+msgid_plural "leaderboard.reward_tooltip.plural"
+msgstr[0] "Recompensa semanal: %s moneda"
+msgstr[1] "Recompensa semanal: %s monedas"
+
+#. leaderboard.reward.title
+msgid "leaderboard.reward.title"
+msgstr "¡RECOMPENSA SEMANAL!"
+
+#. leaderboard.reward.body
+msgid "leaderboard.reward.body"
+msgid_plural "leaderboard.reward.body.plural"
+msgstr[0] "¡La semana pasada quedaste en el puesto #%d y ganaste %d moneda!"
+msgstr[1] "¡La semana pasada quedaste en el puesto #%d y ganaste %d monedas!"
+
+#. leaderboard.reward.ok
+msgid "leaderboard.reward.ok"
+msgstr "¡Genial!"
+
+#. settings.title
+msgid "settings.title"
+msgstr "AJUSTES"
+
+#. settings.music
+msgid "settings.music"
+msgstr "Música"
+
+#. settings.sfx
+msgid "settings.sfx"
+msgstr "Sonidos"
+
+#. settings.vibrate
+msgid "settings.vibrate"
+msgstr "Vibración"
+
+#. settings.support
+msgid "settings.support"
+msgstr "Ayuda"
+
+#. settings.language
+msgid "settings.language"
+msgstr "Idioma"
+
+#. settings.privacy_policy
+msgid "settings.privacy_policy"
+msgstr "Política de privacidad"
+
+#. settings.privacy_choices
+msgid "settings.privacy_choices"
+msgstr "Opciones de privacidad"
+
+#. settings.diagnostics
+msgid "settings.diagnostics"
+msgstr "Versión %s • Compilación %d\nPlataforma: %s • Usuario: %s"
+
+#. language.title
+msgid "language.title"
+msgstr "IDIOMA"
+
+#. support.title
+msgid "support.title"
+msgstr "AYUDA"
+
+#. support.faq_header
+msgid "support.faq_header"
+msgstr "Preguntas frecuentes"
+
+#. support.faq.play.q
+msgid "support.faq.play.q"
+msgstr "¿Cómo se juega?"
+
+#. support.faq.play.a
+msgid "support.faq.play.a"
+msgstr "Mueve los productos iguales al mismo estante. Cuando haya tres objetos iguales visibles juntos, desaparecerán. Despeja el tablero antes de que se agote el tiempo."
+
+#. support.faq.contact.q
+msgid "support.faq.contact.q"
+msgstr "¿Cómo puedo contactar con el equipo de ayuda?"
+
+#. support.faq.contact.a
+msgid "support.faq.contact.a"
+msgstr "Escríbenos a %s. Incluye una breve descripción, la plataforma de tu dispositivo y cuándo ocurrió el problema."
+
+#. support.faq.contact.action
+msgid "support.faq.contact.action"
+msgstr "Contactar por correo"
+
+#. support.faq.crash.q
+msgid "support.faq.crash.q"
+msgstr "¿Qué hago si el juego se bloquea o se cierra?"
+
+#. support.faq.crash.a
+msgid "support.faq.crash.a"
+msgstr "Primero, cierra y vuelve a abrir el juego. Si vuelve a ocurrir, reinicia el dispositivo y comprueba que el juego esté actualizado. Contacta con el equipo de ayuda e indica el modelo del dispositivo, la versión de la plataforma y qué hacías antes del problema."
+
+#. support.faq.sync.q
+msgid "support.faq.sync.q"
+msgstr "¿Cómo sincronizo mi progreso entre dispositivos?"
+
+#. support.faq.sync.a
+msgid "support.faq.sync.a"
+msgstr "Inicia sesión con la misma cuenta de la plataforma en ambos dispositivos y espera a que termine la sincronización antes de jugar. Si el progreso es distinto, evita jugar en ambos dispositivos y contacta con el equipo de ayuda."
+
+#. support.faq.bad_ad.q
+msgid "support.faq.bad_ad.q"
+msgstr "¿Cómo denuncio un anuncio problemático?"
+
+#. support.faq.bad_ad.a
+msgid "support.faq.bad_ad.a"
+msgstr "1. Cierra el anuncio si puedes hacerlo de forma segura.\n2. Haz una captura de pantalla del anuncio y de cualquier nombre de anunciante o aplicación que aparezca.\n3. Anota la hora aproximada y dónde apareció el anuncio en el juego.\n4. Explica por qué el anuncio te pareció ofensivo, engañoso o fraudulento.\n5. Envía estos datos por correo a %s. No incluyas contraseñas ni información de pago."
+
+#. support.faq.bad_ad.action
+msgid "support.faq.bad_ad.action"
+msgstr "Denunciar por correo"
+
+#. support.account_header
+msgid "support.account_header"
+msgstr "Cuenta"
+
+#. support.delete_account
+msgid "support.delete_account"
+msgstr "Eliminar cuenta"
+
+#. support.delete_game_data
+msgid "support.delete_game_data"
+msgstr "Eliminar datos del juego"
+
+#. support.no_secrets
+msgid "support.no_secrets"
+msgstr "Nunca envíes contraseñas ni información de pago."
+
+#. deletion.title.delete_account
+msgid "deletion.title.delete_account"
+msgstr "ELIMINAR CUENTA"
+
+#. deletion.title.delete_game_data
+msgid "deletion.title.delete_game_data"
+msgstr "ELIMINAR DATOS DEL JUEGO"
+
+#. deletion.title.not_confirmed
+msgid "deletion.title.not_confirmed"
+msgstr "SIN CONFIRMAR"
+
+#. deletion.title.status_unconfirmed
+msgid "deletion.title.status_unconfirmed"
+msgstr "ESTADO SIN CONFIRMAR"
+
+#. deletion.title.finishing_up
+msgid "deletion.title.finishing_up"
+msgstr "FINALIZANDO"
+
+#. deletion.title.new_game
+msgid "deletion.title.new_game"
+msgstr "NUEVA PARTIDA"
+
+#. deletion.title.status_unknown
+msgid "deletion.title.status_unknown"
+msgstr "ESTADO DESCONOCIDO"
+
+#. deletion.title.not_deleted
+msgid "deletion.title.not_deleted"
+msgstr "NO SE ELIMINÓ"
+
+#. deletion.title.data_deleted
+msgid "deletion.title.data_deleted"
+msgstr "DATOS ELIMINADOS"
+
+#. deletion.title.accepted
+msgid "deletion.title.accepted"
+msgstr "ELIMINACIÓN ACEPTADA"
+
+#. deletion.confirm.headline
+msgid "deletion.confirm.headline"
+msgstr "Esto elimina tu cuenta de forma permanente."
+
+#. deletion.confirm.body
+msgid "deletion.confirm.body"
+msgstr "Perderás tu progreso, monedas, objetos y perfil. Esta acción no se puede deshacer.\n\nSi vuelves a iniciar sesión más adelante, empezarás con una cuenta nueva.\n\nSe conservan algunos registros de compras y seguridad sin tu nombre ni perfil. El resto se elimina en un plazo de 30 días."
+
+#. deletion.confirm.button
+msgid "deletion.confirm.button"
+msgstr "Eliminar cuenta"
+
+#. deletion.local_confirm.headline
+msgid "deletion.local_confirm.headline"
+msgstr "Esto elimina los datos del juego de este dispositivo."
+
+#. deletion.local_confirm.body
+msgid "deletion.local_confirm.body"
+msgstr "Perderás tu progreso, monedas, objetos y perfil. Esta acción no se puede deshacer.\n\nEste juego nunca creó una cuenta en línea para ti, por lo que no hay nada que eliminar de nuestros servidores."
+
+#. deletion.local_confirm.button
+msgid "deletion.local_confirm.button"
+msgstr "Eliminar datos"
+
+#. deletion.pending_setup.headline
+msgid "deletion.pending_setup.headline"
+msgstr "Tu cuenta todavía se está creando."
+
+#. deletion.pending_setup.body
+msgid "deletion.pending_setup.body"
+msgstr "Conéctate a internet y vuelve a intentarlo en un momento. No se ha eliminado nada."
+
+#. deletion.sign_in.headline
+msgid "deletion.sign_in.headline"
+msgstr "Inicia sesión en la cuenta que quieres eliminar."
+
+#. deletion.sign_in.body
+msgid "deletion.sign_in.body"
+msgstr "Si no puedes iniciar sesión, contacta con el equipo de ayuda."
+
+#. deletion.read_failed.headline
+msgid "deletion.read_failed.headline"
+msgstr "No se pudieron leer los datos del juego."
+
+#. deletion.read_failed.body
+msgid "deletion.read_failed.body"
+msgstr "Reinicia el juego y vuelve a intentarlo. No se ha eliminado nada."
+
+#. deletion.unavailable.headline
+msgid "deletion.unavailable.headline"
+msgstr "La eliminación de cuentas no está disponible en esta versión del juego."
+
+#. deletion.unavailable.body
+msgid "deletion.unavailable.body"
+msgstr "Actualiza el juego o contacta con el equipo de ayuda para eliminar tu cuenta. No se ha eliminado nada."
+
+#. deletion.in_progress.account
+msgid "deletion.in_progress.account"
+msgstr "Eliminando tu cuenta..."
+
+#. deletion.in_progress.local
+msgid "deletion.in_progress.local"
+msgstr "Eliminando los datos del juego..."
+
+#. deletion.in_progress.body
+msgid "deletion.in_progress.body"
+msgstr "Mantén el juego abierto. Solo tardará un momento."
+
+#. deletion.not_confirmed.headline
+msgid "deletion.not_confirmed.headline"
+msgstr "Todavía no hemos recibido una respuesta sobre tu solicitud de eliminación."
+
+#. deletion.not_confirmed.body
+msgid "deletion.not_confirmed.body"
+msgstr "Tu solicitud se envió, pero no llegó la respuesta. Conéctate a internet y vuelve a intentarlo. El juego seguirá bloqueado hasta que sepamos el resultado."
+
+#. deletion.unconfirmed.headline
+msgid "deletion.unconfirmed.headline"
+msgstr "Estado de eliminación sin confirmar"
+
+#. deletion.unconfirmed.body
+msgid "deletion.unconfirmed.body"
+msgstr "No pudimos confirmar si se eliminó tu cuenta. Para proteger tus datos, el juego seguirá bloqueado. Contacta con el equipo de ayuda e incluye la referencia que aparece abajo."
+
+#. deletion.check_again
+msgid "deletion.check_again"
+msgstr "Verificar de nuevo"
+
+#. deletion.cleanup.headline.local
+msgid "deletion.cleanup.headline.local"
+msgstr "Todavía no se pudieron eliminar todos los datos locales del juego."
+
+#. deletion.cleanup.headline.account
+msgid "deletion.cleanup.headline.account"
+msgstr "Eliminación de cuenta aceptada; finalizando la limpieza."
+
+#. deletion.cleanup.body
+msgid "deletion.cleanup.body"
+msgstr "Todavía no se pudieron eliminar algunos datos del juego de este dispositivo. Vuelve a intentarlo para terminar."
+
+#. deletion.new_game.headline
+msgid "deletion.new_game.headline"
+msgstr "Iniciando una nueva partida..."
+
+#. deletion.new_game.body
+msgid "deletion.new_game.body"
+msgstr "Solo tardará un momento."
+
+#. deletion.status_unknown.headline
+msgid "deletion.status_unknown.headline"
+msgstr "No pudimos leer el estado de eliminación en este dispositivo."
+
+#. deletion.status_unknown.body
+msgid "deletion.status_unknown.body"
+msgstr "Para proteger tus datos, el juego seguirá bloqueado. Contacta con el equipo de ayuda."
+
+#. deletion.fail.offline
+msgid "deletion.fail.offline"
+msgstr "Conéctate a internet para eliminar tu cuenta."
+
+#. deletion.fail.rate_limited
+msgid "deletion.fail.rate_limited"
+msgstr "Demasiados intentos. Espera un momento y vuelve a intentarlo."
+
+#. deletion.fail.busy
+msgid "deletion.fail.busy"
+msgstr "El servicio de eliminación de cuentas no está disponible en este momento. Vuelve a intentarlo en un momento."
+
+#. deletion.fail.syncing
+msgid "deletion.fail.syncing"
+msgstr "El juego todavía se está sincronizando. Vuelve a intentarlo en un momento."
+
+#. deletion.fail.auth
+msgid "deletion.fail.auth"
+msgstr "No pudimos verificar tu cuenta. Reinicia el juego y vuelve a intentarlo."
+
+#. deletion.fail.update
+msgid "deletion.fail.update"
+msgstr "Actualiza el juego para eliminar tu cuenta."
+
+#. deletion.fail.changed
+msgid "deletion.fail.changed"
+msgstr "Tu cuenta cambió durante el proceso de eliminación. Vuelve a intentarlo."
+
+#. deletion.fail.storage
+msgid "deletion.fail.storage"
+msgstr "Tu dispositivo no pudo guardar la solicitud de eliminación. Vuelve a intentarlo."
+
+#. deletion.fail.generic
+msgid "deletion.fail.generic"
+msgstr "No pudimos eliminar tu cuenta. Inténtalo más tarde o contacta con el equipo de ayuda."
+
+#. deletion.fail.local
+msgid "deletion.fail.local"
+msgstr "No se pudieron eliminar los datos del juego. Vuelve a intentarlo."
+
+#. deletion.fail.body
+msgid "deletion.fail.body"
+msgstr "No se ha eliminado nada y puedes seguir jugando."
+
+#. deletion.done_local.headline
+msgid "deletion.done_local.headline"
+msgstr "Se eliminaron los datos locales del juego."
+
+#. deletion.done_local.body
+msgid "deletion.done_local.body"
+msgstr "Puedes empezar de cero con una nueva partida."
+
+#. deletion.new_game_failed
+msgid "deletion.new_game_failed"
+msgstr "No se pudo iniciar la nueva partida. Vuelve a intentarlo."
+
+#. deletion.accepted.headline
+msgid "deletion.accepted.headline"
+msgstr "Ya no puedes acceder a tu cuenta."
+
+#. deletion.accepted.body
+msgid "deletion.accepted.body"
+msgstr "Tu solicitud de eliminación ha sido aceptada."
+
+#. deletion.accepted.body_deadline
+msgid "deletion.accepted.body_deadline"
+msgstr "Tu solicitud de eliminación ha sido aceptada. Los datos se eliminarán a más tardar el %s."
+
+#. deletion.reference
+msgid "deletion.reference"
+msgstr "Referencia: %s"
+
+#. deletion.start_new_game
+msgid "deletion.start_new_game"
+msgstr "Iniciar nueva partida"
+
+#. app.name
+msgid "app.name"
+msgstr "SortingPuzzle"
+
+#. support.email.subject
+msgid "support.email.subject"
+msgstr "Solicitud de ayuda de Sorting Puzzle"
+
+#. support.email.body
+msgid "support.email.body"
+msgstr "Describe aquí el problema.\n\nDispositivo/plataforma:\nHora aproximada:\n"
+
+#. support.ad_email.subject
+msgid "support.ad_email.subject"
+msgstr "Denuncia de anuncio en Sorting Puzzle"
+
+#. support.ad_email.body
+msgid "support.ad_email.body"
+msgstr "Adjunta una captura de pantalla y completa los datos siguientes.\n\nHora aproximada:\nUbicación del anuncio en el juego:\nNombre del anunciante o de la aplicación:\nMotivo por el que se debe revisar el anuncio:\n"
+
+#. deletion.email.subject
+msgid "deletion.email.subject"
+msgstr "Eliminación de cuenta de Sorting Puzzle"
+
+#. deletion.email.body
+msgid "deletion.email.body"
+msgstr "Necesito ayuda para eliminar mi cuenta."
+
+#. support.email.status
+msgid "support.email.status"
+msgstr "Estado: %s"
+
+#. support.email.deletion_reference
+msgid "support.email.deletion_reference"
+msgstr "Referencia de eliminación"
+
+#. support.email.server_reference
+msgid "support.email.server_reference"
+msgstr "Referencia del servidor"
+
+#. support.email.player_id
+msgid "support.email.player_id"
+msgstr "ID del jugador"
+
+#. leaderboard.empty
+msgid "leaderboard.empty"
+msgstr "Aún no hay puntuaciones"
+
+#. date.day_month_year
+msgid "date.day_month_year"
+msgstr "%d de %s de %d"
+
+#. date.month.1
+msgid "date.month.1"
+msgstr "enero"
+
+#. date.month.2
+msgid "date.month.2"
+msgstr "febrero"
+
+#. date.month.3
+msgid "date.month.3"
+msgstr "marzo"
+
+#. date.month.4
+msgid "date.month.4"
+msgstr "abril"
+
+#. date.month.5
+msgid "date.month.5"
+msgstr "mayo"
+
+#. date.month.6
+msgid "date.month.6"
+msgstr "junio"
+
+#. date.month.7
+msgid "date.month.7"
+msgstr "julio"
+
+#. date.month.8
+msgid "date.month.8"
+msgstr "agosto"
+
+#. date.month.9
+msgid "date.month.9"
+msgstr "septiembre"
+
+#. date.month.10
+msgid "date.month.10"
+msgstr "octubre"
+
+#. date.month.11
+msgid "date.month.11"
+msgstr "noviembre"
+
+#. date.month.12
+msgid "date.month.12"
+msgstr "diciembre"
+
+#. common.play
+msgid "Play"
+msgstr "Jugar"
+
+#. common.continue
+msgid "Continue"
+msgstr "Continuar"
+
+#. common.try_again
+msgid "Try Again"
+msgstr "Reintentar"
+
+#. common.close
+msgid "Close"
+msgstr "Cerrar"
+
+#. common.cancel
+msgid "Cancel"
+msgstr "Cancelar"
+
+#. common.got_it
+msgid "Got it"
+msgstr "Entendido"
+
+#. common.get_help
+msgid "Get Help"
+msgstr "Pedir ayuda"
+
+#. common.save
+msgid "SAVE"
+msgstr "GUARDAR"
+
+#. common.loading
+msgid "Loading…"
+msgstr "Cargando…"
+
+#. common.retry_load
+msgid "Retry"
+msgstr "Reintentar"
+
+#. menu.level_button
+msgid "LEVEL %d"
+msgstr "NIVEL %d"
+
+#. menu.more_levels_coming_soon
+msgid "MORE LEVELS COMING SOON"
+msgstr "MÁS NIVELES MUY PRONTO"
+
+#. menu.coming_soon
+msgid "COMING SOON"
+msgstr "MUY PRONTO"
+
+#. menu.lives_full
+msgid "Full"
+msgstr "Máx."
+
+#. menu.starter_badge
+msgid "BUNDLE"
+msgstr "PAQUETE"
+
+#. nav.shop
+msgid "Shop"
+msgstr "Tienda"
+
+#. nav.home
+msgid "Home"
+msgstr "Inicio"
+
+#. nav.leaderboard
+msgid "Leaderboard"
+msgstr "Ranking"
+
+#. chapter.button
+msgid "CHAPTER %d"
+msgstr "CAPÍTULO %d"
+
+#. chapter.button_tooltip
+msgid "Choose Chapter %d: %s"
+msgstr "Elige el capítulo %d: %s"
+
+#. chapter.screen_title
+msgid "CHAPTERS"
+msgstr "CAPÍTULOS"
+
+#. chapter.title.chapter_01
+msgid "Grocery Town"
+msgstr "Ciudad del Mercado"
+
+#. chapter.title.chapter_02
+msgid "Candy Corner"
+msgstr "Rincón Dulce"
+
+#. chapter.locked_status
+msgid "Complete %d more %s levels to unlock"
+msgstr "Completa %d niveles más de «%s» para desbloquear"
+
+#. chapter.unlock_progress
+msgid "Unlock progress"
+msgstr "Progreso de desbloqueo"
+
+#. chapter.current_progress
+msgid "Current progress"
+msgstr "Progreso actual"
+
+#. chapter.locked
+msgid "Locked"
+msgstr "Bloqueado"
+
+#. chapter.no_levels_status
+msgid "New levels are coming soon"
+msgstr "Pronto habrá nuevos niveles"
+
+#. chapter.coming_soon
+msgid "Coming Soon"
+msgstr "Muy pronto"
+
+#. hud.combo
+msgid "COMBO ×%d"
+msgstr "COMBO ×%d"
+
+#. hud.ability_tooltip.hammer
+msgid "Hammer -- clears a matching triple"
+msgstr "Martillo -- elimina un trío de objetos iguales"
+
+#. hud.ability_tooltip.shuffle
+msgid "Shuffle -- reshuffles unlocked items"
+msgstr "Mezcla -- reorganiza los objetos desbloqueados"
+
+#. hud.ability_tooltip.lantern
+msgid "Lantern -- highlights a matchable triple"
+msgstr "Linterna -- resalta un trío que puedes combinar"
+
+#. hud.ability_tooltip.freezer
+msgid "Freezer -- pauses the countdown timer"
+msgstr "Congelador -- pausa el temporizador"
+
+#. hud.seconds_short
+msgid "%ds"
+msgstr "%ds"
+
+#. tip.tap_dispenser
+msgid "Tap a dispenser to throw items onto the shelves!"
+msgstr "¡Toca un dispensador para lanzar objetos a los estantes!"
+
+#. pause.title
+msgid "PAUSE"
+msgstr "PAUSA"
+
+#. pause.leave
+msgid "Leave"
+msgstr "Salir"
+
+#. leave.title
+msgid "LEAVING THE LEVEL"
+msgstr "SALIR DEL NIVEL"
+
+#. leave.you_will_lose
+msgid "You will lose:"
+msgstr "Perderás:"
+
+#. timeup.title
+msgid "TIME'S UP"
+msgstr "TIEMPO AGOTADO"
+
+#. timeup.offer
+msgid "Add one minute and keep sorting!"
+msgstr "¡Añade un minuto y sigue ordenando!"
+
+#. timeup.used
+msgid "Used"
+msgstr "Usado"
+
+#. ability_purchase.title
+msgid "USE ABILITY"
+msgstr "USAR POTENCIADOR"
+
+#. shelf_unlock.title
+msgid "UNLOCK SHELF"
+msgstr "DESBLOQUEAR ESTANTE"
+
+#. shelf_unlock.offer
+msgid "Watch one ad to unlock this shelf now."
+msgstr "Mira un anuncio para desbloquear este estante ahora."
+
+#. shelf_unlock.offer_or_clear
+msgid "Watch one ad to unlock this shelf now, or clear %s more."
+msgstr "Mira un anuncio para desbloquear este estante ahora o elimina %s tríos más."
+
+#. shelf_unlock.button
+msgid "Watch Ad · Unlock Shelf"
+msgstr "Ver anuncio · Desbloquear estante"
+
+#. shelf_unlock.ad_unavailable
+msgid "Ad unavailable. This shelf stays locked."
+msgstr "Anuncio no disponible. Este estante sigue bloqueado."
+
+#. complete.title
+msgid "GREAT JOB!"
+msgstr "¡BUEN TRABAJO!"
+
+#. failed.headline
+msgid "LEVEL FAILED"
+msgstr "NIVEL NO SUPERADO"
+
+#. combo.praise.2
+msgid "Cool"
+msgstr "Genial"
+
+#. combo.praise.3
+msgid "Great"
+msgstr "Estupendo"
+
+#. combo.praise.4
+msgid "Awesome"
+msgstr "Asombroso"
+
+#. combo.praise.5
+msgid "Amazing"
+msgstr "Impresionante"
+
+#. combo.praise.6
+msgid "Fantastic"
+msgstr "Fantástico"
+
+#. combo.praise.7
+msgid "Incredible"
+msgstr "Increíble"
+
+#. combo.praise.8
+msgid "Spectacular"
+msgstr "Espectacular"
+
+#. combo.praise.9
+msgid "Unstoppable"
+msgstr "Imparable"
+
+#. combo.praise.10
+msgid "Legendary"
+msgstr "Legendario"
+
+#. combo.praise.11
+msgid "Epic"
+msgstr "Épico"
+
+#. combo.praise.12
+msgid "Brilliant"
+msgstr "Brillante"
+
+#. combo.praise.13
+msgid "Masterful"
+msgstr "Magistral"
+
+#. combo.praise.14
+msgid "Supreme"
+msgstr "Supremo"
+
+#. combo.praise.15
+msgid "Phenomenal"
+msgstr "Fenomenal"
+
+#. combo.praise.16
+msgid "Mythic"
+msgstr "Mítico"
+
+#. combo.praise.17
+msgid "Majestic"
+msgstr "Majestuoso"
+
+#. combo.praise.18
+msgid "Radiant"
+msgstr "Radiante"
+
+#. combo.praise.19
+msgid "Divine"
+msgstr "Divino"
+
+#. combo.praise.20
+msgid "Transcendent"
+msgstr "Trascendente"
+
+#. ability.hammer.name
+msgid "Hammer"
+msgstr "Martillo"
+
+#. ability.shuffle.name
+msgid "Shuffle"
+msgstr "Mezcla"
+
+#. ability.lantern.name
+msgid "Lantern"
+msgstr "Linterna"
+
+#. ability.freezer.name
+msgid "Freezer"
+msgstr "Congelador"
+
+#. ability.hammer.description
+msgid "Instantly clears one matching set of items off the shelves."
+msgstr "Elimina al instante un trío de objetos iguales de los estantes."
+
+#. ability.shuffle.description
+msgid "Shuffles shelf items into new spots to help you find a match."
+msgstr "Reorganiza los objetos de los estantes para ayudarte a encontrar un trío."
+
+#. ability.lantern.description
+msgid "Highlights a matching triple you can clear for 15 seconds."
+msgstr "Resalta durante 15 segundos un trío de objetos iguales que puedes eliminar."
+
+#. ability.freezer.description
+msgid "Freezes the level timer for 30 seconds."
+msgstr "Congela el temporizador del nivel durante 30 segundos."
+
+#. ad.watch
+msgid "Watch Ad"
+msgstr "Ver anuncio"
+
+#. ad.loading
+msgid "Loading..."
+msgstr "Cargando..."
+
+#. ad.verifying
+msgid "Verifying..."
+msgstr "Verificando..."
+
+#. ad.verify_reward
+msgid "Verify Reward"
+msgstr "Verificar recompensa"
+
+#. ad.reward_pending
+msgid "Reward verification is still pending."
+msgstr "La verificación de la recompensa sigue pendiente."
+
+#. ad.unavailable_retry
+msgid "Ad unavailable. Please try again."
+msgstr "Anuncio no disponible. Vuelve a intentarlo."
+
+#. ad.watch_unavailable
+msgid "Watch Ad\nUnavailable"
+msgstr "Ver anuncio\nNo disponible"
+
+#. ad.watch_coming_soon
+msgid "Watch Ad\nComing Soon"
+msgstr "Ver anuncio\nMuy pronto"
+
+#. ad.badge
+msgid "AD"
+msgstr "AD"
+
+#. lives.title.out
+msgid "OUT OF LIVES"
+msgstr "SIN VIDAS"
+
+#. lives.title.get_more
+msgid "GET MORE LIVES"
+msgstr "CONSEGUIR VIDAS"
+
+#. lives.title.full
+msgid "LIVES FULL"
+msgstr "VIDAS AL MÁXIMO"
+
+#. lives.next_in
+msgid "NEXT LIFE IN"
+msgstr "PRÓXIMA VIDA EN"
+
+#. lives.full_body
+msgid "Your lives are full! Play a level to spend them."
+msgstr "¡Tienes el máximo de vidas! Juega un nivel para usarlas."
+
+#. chest.title
+msgid "CHEST REWARDS"
+msgstr "RECOMPENSAS DEL COFRE"
+
+#. chest.progress_hint
+msgid "Collect stars to unlock a chest and claim your reward"
+msgstr "Reúne estrellas para desbloquear un cofre y obtener tu recompensa"
+
+#. chest.ready
+msgid "A REWARD CHEST AWAITS!"
+msgstr "¡TE ESPERA UN COFRE!"
+
+#. chest.tap_to_open
+msgid "Tap to open"
+msgstr "Toca para abrir"
+
+#. purchase.tap_to_collect
+msgid "Tap to collect"
+msgstr "Toca para recoger"
+
+#. purchase.complete
+msgid "PURCHASE COMPLETE"
+msgstr "COMPRA COMPLETADA"
+
+#. shop.title
+msgid "SHOP"
+msgstr "TIENDA"
+
+#. shop.section.bundles
+msgid "SPECIAL BUNDLES"
+msgstr "PAQUETES ESPECIALES"
+
+#. shop.section.coins
+msgid "COINS"
+msgstr "MONEDAS"
+
+#. shop.offer.starter_bundle
+msgid "Starter Bundle"
+msgstr "Paquete inicial"
+
+#. shop.offer.basic_bundle
+msgid "Basic Bundle"
+msgstr "Paquete básico"
+
+#. shop.tag.best_value
+msgid "BEST VALUE"
+msgstr "MEJOR OFERTA"
+
+#. shop.discount_off
+msgid "OFF"
+msgstr "OFF"
+
+#. shop.ability_hint
+msgid "Tap an ability to see what it does"
+msgstr "Toca un potenciador para ver qué hace"
+
+#. shop.purchasing
+msgid "Purchasing…"
+msgstr "Comprando…"
+
+#. shop.no_offers
+msgid "No shop offers are available for this region."
+msgstr "No hay ofertas disponibles en la tienda para esta región."
+
+#. shop.load_failed
+msgid "Could not load the shop."
+msgstr "No se pudo cargar la tienda."
+
+#. shop.error.title.purchase
+msgid "Purchase unavailable"
+msgstr "Compra no disponible"
+
+#. shop.error.title.reward
+msgid "Reward error"
+msgstr "Error de recompensa"
+
+#. shop.error.purchase_failed
+msgid "The purchase could not be completed."
+msgstr "No se pudo completar la compra."
+
+#. shop.error.grant_failed
+msgid "The purchased rewards could not be granted."
+msgstr "No se pudieron entregar las recompensas compradas."
+
+#. shop.error.offer_unavailable
+msgid "This shop offer is unavailable."
+msgstr "Esta oferta de la tienda no está disponible."
+
+#. shop.error.already_bought
+msgid "This one-time shop offer has already been purchased."
+msgstr "Ya has comprado esta oferta, disponible una sola vez."
+
+#. starter.title
+msgid "STARTER BUNDLE"
+msgstr "PAQUETE INICIAL"
+
+#. starter.one_time
+msgid "ONE-TIME OFFER"
+msgstr "OFERTA DE UNA SOLA COMPRA"
+
+#. starter.boosters_included
+msgid "BOOSTERS INCLUDED"
+msgstr "POTENCIADORES INCLUIDOS"
+
+#. starter.coins
+msgid "%s COINS"
+msgstr "%s MONEDAS"
+
+#. starter.buy_for
+msgid "Buy for %s"
+msgstr "Comprar por %s"
+
+#. starter.checking
+msgid "Checking offer…"
+msgstr "Verificando oferta…"
+
+#. starter.checking_short
+msgid "Checking…"
+msgstr "Verificando…"
+
+#. starter.no_longer_available
+msgid "This offer is no longer available."
+msgstr "Esta oferta ya no está disponible."
+
+#. starter.unavailable
+msgid "Unavailable"
+msgstr "No disponible"
+
+#. booster_chip.claimed
+msgid "+%d %s"
+msgstr "+%d %s"
+
+#. profile.title
+msgid "EDIT PROFILE"
+msgstr "EDITAR PERFIL"
+
+#. profile.name_header
+msgid "PLAYER NAME"
+msgstr "NOMBRE DEL JUGADOR"
+
+#. profile.name_placeholder
+msgid "Player name"
+msgstr "Nombre del jugador"
+
+#. profile.edit_name_tooltip
+msgid "Edit player name"
+msgstr "Editar nombre del jugador"
+
+#. profile.avatar_tab
+msgid "AVATAR"
+msgstr "AVATAR"
+
+#. profile.frame_tab
+msgid "FRAME"
+msgstr "MARCO"
+
+#. profile.unlock.level
+msgid "Complete level %d to unlock"
+msgstr "Completa el nivel %d para desbloquear"
+
+#. profile.unlock.combo
+msgid "Reach a combo of ×%d in any run to unlock"
+msgstr "Consigue un combo de ×%d en cualquier partida para desbloquear"
+
+#. profile.unlock.weekly_first
+msgid "Finish 1st on the Weekly leaderboard to unlock"
+msgstr "Termina en primer lugar en el ranking semanal para desbloquear"
+
+#. profile.unlock.weekly_top
+msgid "Finish top %d on the Weekly leaderboard to unlock"
+msgstr "Queda entre los %d mejores del ranking semanal para desbloquear"
+
+#. leaderboard.title
+msgid "LEADERBOARD"
+msgstr "RANKING"
+
+#. leaderboard.tab.weekly
+msgid "Weekly"
+msgstr "Semanal"
+
+#. leaderboard.tab.country
+msgid "Country"
+msgstr "País"
+
+#. leaderboard.tab.world
+msgid "World"
+msgstr "Mundo"
+
+#. leaderboard.weekly_reset
+msgid "Weekly reset in %s"
+msgstr "Reinicio semanal en %s"
+
+#. leaderboard.duration.dh
+msgid "%dd %dh"
+msgstr "%dd %dh"
+
+#. leaderboard.duration.hm
+msgid "%dh %dm"
+msgstr "%dh %dmin"
+
+#. leaderboard.duration.m
+msgid "%dm"
+msgstr "%dmin"
+
+#. leaderboard.country_caption
+msgid "Country · All-time stars"
+msgstr "País · Estrellas totales"
+
+#. leaderboard.world_caption
+msgid "Worldwide · All-time stars"
+msgstr "Mundial · Estrellas totales"
+
+#. leaderboard.load_failed
+msgid "Could not load leaderboard."
+msgstr "No se pudo cargar el ranking."
+
+#. leaderboard.default_name
+msgid "Player"
+msgstr "Jugador"
+
+#. leaderboard.row_tooltip
+msgid "Rank %d, %s, %d stars"
+msgstr "Puesto %d, %s, %d estrellas"
+
+#. leaderboard.reward_tooltip
+msgid "%s coin weekly reward"
+msgstr "Recompensa semanal: %s monedas"
+
+#. leaderboard.reward.title
+msgid "WEEKLY REWARD!"
+msgstr "¡RECOMPENSA SEMANAL!"
+
+#. leaderboard.reward.body
+msgid "You finished #%d last week and earned %d coins!"
+msgstr "¡La semana pasada quedaste en el puesto #%d y ganaste %d monedas!"
+
+#. leaderboard.reward.ok
+msgid "Nice!"
+msgstr "¡Genial!"
+
+#. settings.title
+msgid "SETTINGS"
+msgstr "AJUSTES"
+
+#. settings.music
+msgid "Music"
+msgstr "Música"
+
+#. settings.sfx
+msgid "SFX"
+msgstr "Sonidos"
+
+#. settings.vibrate
+msgid "Vibrate"
+msgstr "Vibración"
+
+#. settings.support
+msgid "Support"
+msgstr "Ayuda"
+
+#. settings.language
+msgid "Language"
+msgstr "Idioma"
+
+#. settings.privacy_policy
+msgid "Privacy Policy"
+msgstr "Política de privacidad"
+
+#. settings.privacy_choices
+msgid "Privacy Choices"
+msgstr "Opciones de privacidad"
+
+#. settings.diagnostics
+msgid "Version %s • Build %d\nPlatform: %s • User: %s"
+msgstr "Versión %s • Compilación %d\nPlataforma: %s • Usuario: %s"
+
+#. language.title
+msgid "LANGUAGE"
+msgstr "IDIOMA"
+
+#. support.title
+msgid "SUPPORT"
+msgstr "AYUDA"
+
+#. support.faq_header
+msgid "Frequently Asked Questions"
+msgstr "Preguntas frecuentes"
+
+#. support.faq.play.q
+msgid "How do I play?"
+msgstr "¿Cómo se juega?"
+
+#. support.faq.play.a
+msgid "Move matching goods onto the same shelf. When three identical items are visible together, they clear. Complete the board before time runs out."
+msgstr "Mueve los productos iguales al mismo estante. Cuando haya tres objetos iguales visibles juntos, desaparecerán. Despeja el tablero antes de que se agote el tiempo."
+
+#. support.faq.contact.q
+msgid "How do I contact support?"
+msgstr "¿Cómo puedo contactar con el equipo de ayuda?"
+
+#. support.faq.contact.a
+msgid "Email us at %s. Include a short description, your device platform, and when the problem happened."
+msgstr "Escríbenos a %s. Incluye una breve descripción, la plataforma de tu dispositivo y cuándo ocurrió el problema."
+
+#. support.faq.contact.action
+msgid "Email Support"
+msgstr "Contactar por correo"
+
+#. support.faq.crash.q
+msgid "What if the game freezes or crashes?"
+msgstr "¿Qué hago si el juego se bloquea o se cierra?"
+
+#. support.faq.crash.a
+msgid "Close and reopen the game first. If it happens again, restart the device and make sure the game is updated. Contact support with the device model, platform version, and what you were doing before the problem."
+msgstr "Primero, cierra y vuelve a abrir el juego. Si vuelve a ocurrir, reinicia el dispositivo y comprueba que el juego esté actualizado. Contacta con el equipo de ayuda e indica el modelo del dispositivo, la versión de la plataforma y qué hacías antes del problema."
+
+#. support.faq.sync.q
+msgid "How do I sync progress between devices?"
+msgstr "¿Cómo sincronizo mi progreso entre dispositivos?"
+
+#. support.faq.sync.a
+msgid "Use the same signed-in platform account on both devices and allow synchronization to finish before playing. If the progress differs, avoid playing on both devices and contact support."
+msgstr "Inicia sesión con la misma cuenta de la plataforma en ambos dispositivos y espera a que termine la sincronización antes de jugar. Si el progreso es distinto, evita jugar en ambos dispositivos y contacta con el equipo de ayuda."
+
+#. support.faq.bad_ad.q
+msgid "How do I report a bad ad?"
+msgstr "¿Cómo denuncio un anuncio problemático?"
+
+#. support.faq.bad_ad.a
+msgid "1. Close the ad if you can do so safely.\n2. Take a screenshot of the ad and any advertiser or app name shown.\n3. Note the approximate time and where the ad appeared in the game.\n4. Describe why the ad seemed offensive, misleading, or fraudulent.\n5. Email these details to %s. Do not include passwords or payment information."
+msgstr "1. Cierra el anuncio si puedes hacerlo de forma segura.\n2. Haz una captura de pantalla del anuncio y de cualquier nombre de anunciante o aplicación que aparezca.\n3. Anota la hora aproximada y dónde apareció el anuncio en el juego.\n4. Explica por qué el anuncio te pareció ofensivo, engañoso o fraudulento.\n5. Envía estos datos por correo a %s. No incluyas contraseñas ni información de pago."
+
+#. support.faq.bad_ad.action
+msgid "Email Ad Report"
+msgstr "Denunciar por correo"
+
+#. support.account_header
+msgid "Account"
+msgstr "Cuenta"
+
+#. support.delete_account
+msgid "Delete Account"
+msgstr "Eliminar cuenta"
+
+#. support.delete_game_data
+msgid "Delete Game Data"
+msgstr "Eliminar datos del juego"
+
+#. support.no_secrets
+msgid "Please never send passwords or payment information."
+msgstr "Nunca envíes contraseñas ni información de pago."
+
+#. deletion.title.delete_account
+msgid "DELETE ACCOUNT"
+msgstr "ELIMINAR CUENTA"
+
+#. deletion.title.delete_game_data
+msgid "DELETE GAME DATA"
+msgstr "ELIMINAR DATOS DEL JUEGO"
+
+#. deletion.title.not_confirmed
+msgid "NOT CONFIRMED"
+msgstr "SIN CONFIRMAR"
+
+#. deletion.title.status_unconfirmed
+msgid "STATUS UNCONFIRMED"
+msgstr "ESTADO SIN CONFIRMAR"
+
+#. deletion.title.finishing_up
+msgid "FINISHING UP"
+msgstr "FINALIZANDO"
+
+#. deletion.title.new_game
+msgid "NEW GAME"
+msgstr "NUEVA PARTIDA"
+
+#. deletion.title.status_unknown
+msgid "STATUS UNKNOWN"
+msgstr "ESTADO DESCONOCIDO"
+
+#. deletion.title.not_deleted
+msgid "NOT DELETED"
+msgstr "NO SE ELIMINÓ"
+
+#. deletion.title.data_deleted
+msgid "DATA DELETED"
+msgstr "DATOS ELIMINADOS"
+
+#. deletion.title.accepted
+msgid "DELETION ACCEPTED"
+msgstr "ELIMINACIÓN ACEPTADA"
+
+#. deletion.confirm.headline
+msgid "This permanently deletes your account."
+msgstr "Esto elimina tu cuenta de forma permanente."
+
+#. deletion.confirm.body
+msgid "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nIf you sign in again later, you'll start a new account.\n\nSome purchase and security records are kept without your name or profile. The rest is removed within 30 days."
+msgstr "Perderás tu progreso, monedas, objetos y perfil. Esta acción no se puede deshacer.\n\nSi vuelves a iniciar sesión más adelante, empezarás con una cuenta nueva.\n\nSe conservan algunos registros de compras y seguridad sin tu nombre ni perfil. El resto se elimina en un plazo de 30 días."
+
+#. deletion.local_confirm.headline
+msgid "This deletes your game data on this device."
+msgstr "Esto elimina los datos del juego de este dispositivo."
+
+#. deletion.local_confirm.body
+msgid "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nThis game never created an online account for you, so nothing needs to be deleted from our servers."
+msgstr "Perderás tu progreso, monedas, objetos y perfil. Esta acción no se puede deshacer.\n\nEste juego nunca creó una cuenta en línea para ti, por lo que no hay nada que eliminar de nuestros servidores."
+
+#. deletion.local_confirm.button
+msgid "Delete Data"
+msgstr "Eliminar datos"
+
+#. deletion.pending_setup.headline
+msgid "Your account is still being set up."
+msgstr "Tu cuenta todavía se está creando."
+
+#. deletion.pending_setup.body
+msgid "Connect to the internet and try again in a moment. Nothing was deleted."
+msgstr "Conéctate a internet y vuelve a intentarlo en un momento. No se ha eliminado nada."
+
+#. deletion.sign_in.headline
+msgid "Sign in to the account you want to delete."
+msgstr "Inicia sesión en la cuenta que quieres eliminar."
+
+#. deletion.sign_in.body
+msgid "If you can't sign in, contact support for help."
+msgstr "Si no puedes iniciar sesión, contacta con el equipo de ayuda."
+
+#. deletion.read_failed.headline
+msgid "Your game data couldn't be read."
+msgstr "No se pudieron leer los datos del juego."
+
+#. deletion.read_failed.body
+msgid "Restart the game, then try again. Nothing was deleted."
+msgstr "Reinicia el juego y vuelve a intentarlo. No se ha eliminado nada."
+
+#. deletion.unavailable.headline
+msgid "Account deletion isn't available in this version of the game."
+msgstr "La eliminación de cuentas no está disponible en esta versión del juego."
+
+#. deletion.unavailable.body
+msgid "Update the game, or contact support for help deleting your account. Nothing was deleted."
+msgstr "Actualiza el juego o contacta con el equipo de ayuda para eliminar tu cuenta. No se ha eliminado nada."
+
+#. deletion.in_progress.account
+msgid "Deleting your account..."
+msgstr "Eliminando tu cuenta..."
+
+#. deletion.in_progress.local
+msgid "Deleting your game data..."
+msgstr "Eliminando los datos del juego..."
+
+#. deletion.in_progress.body
+msgid "Keep the game open. This only takes a moment."
+msgstr "Mantén el juego abierto. Solo tardará un momento."
+
+#. deletion.not_confirmed.headline
+msgid "We haven't heard back about your deletion yet."
+msgstr "Todavía no hemos recibido una respuesta sobre tu solicitud de eliminación."
+
+#. deletion.not_confirmed.body
+msgid "Your request was sent, but the answer didn't arrive. Connect to the internet and try again. The game stays locked until we know the result."
+msgstr "Tu solicitud se envió, pero no llegó la respuesta. Conéctate a internet y vuelve a intentarlo. El juego seguirá bloqueado hasta que sepamos el resultado."
+
+#. deletion.unconfirmed.headline
+msgid "Deletion status unconfirmed"
+msgstr "Estado de eliminación sin confirmar"
+
+#. deletion.unconfirmed.body
+msgid "We couldn't confirm whether your account was deleted. To keep your data safe, the game stays locked. Contact support and include the reference below."
+msgstr "No pudimos confirmar si se eliminó tu cuenta. Para proteger tus datos, el juego seguirá bloqueado. Contacta con el equipo de ayuda e incluye la referencia que aparece abajo."
+
+#. deletion.check_again
+msgid "Check Again"
+msgstr "Verificar de nuevo"
+
+#. deletion.cleanup.headline.local
+msgid "Your local game data couldn't be fully deleted yet."
+msgstr "Todavía no se pudieron eliminar todos los datos locales del juego."
+
+#. deletion.cleanup.headline.account
+msgid "Account deletion accepted; finishing cleanup."
+msgstr "Eliminación de cuenta aceptada; finalizando la limpieza."
+
+#. deletion.cleanup.body
+msgid "Some game data couldn't be removed from this device yet. Try again to finish."
+msgstr "Todavía no se pudieron eliminar algunos datos del juego de este dispositivo. Vuelve a intentarlo para terminar."
+
+#. deletion.new_game.headline
+msgid "Starting a new game..."
+msgstr "Iniciando una nueva partida..."
+
+#. deletion.new_game.body
+msgid "This only takes a moment."
+msgstr "Solo tardará un momento."
+
+#. deletion.status_unknown.headline
+msgid "We couldn't read the deletion status on this device."
+msgstr "No pudimos leer el estado de eliminación en este dispositivo."
+
+#. deletion.status_unknown.body
+msgid "To keep your data safe, the game stays locked. Contact support for help."
+msgstr "Para proteger tus datos, el juego seguirá bloqueado. Contacta con el equipo de ayuda."
+
+#. deletion.fail.offline
+msgid "Connect to the internet to delete your account."
+msgstr "Conéctate a internet para eliminar tu cuenta."
+
+#. deletion.fail.rate_limited
+msgid "Too many attempts. Wait a moment, then try again."
+msgstr "Demasiados intentos. Espera un momento y vuelve a intentarlo."
+
+#. deletion.fail.busy
+msgid "Account deletion is busy right now. Try again in a moment."
+msgstr "El servicio de eliminación de cuentas no está disponible en este momento. Vuelve a intentarlo en un momento."
+
+#. deletion.fail.syncing
+msgid "The game is still syncing. Try again in a moment."
+msgstr "El juego todavía se está sincronizando. Vuelve a intentarlo en un momento."
+
+#. deletion.fail.auth
+msgid "We couldn't verify your account. Restart the game, then try again."
+msgstr "No pudimos verificar tu cuenta. Reinicia el juego y vuelve a intentarlo."
+
+#. deletion.fail.update
+msgid "Update the game to delete your account."
+msgstr "Actualiza el juego para eliminar tu cuenta."
+
+#. deletion.fail.changed
+msgid "Your account changed while we were deleting it. Try again."
+msgstr "Tu cuenta cambió durante el proceso de eliminación. Vuelve a intentarlo."
+
+#. deletion.fail.storage
+msgid "Your device couldn't save the deletion request. Try again."
+msgstr "Tu dispositivo no pudo guardar la solicitud de eliminación. Vuelve a intentarlo."
+
+#. deletion.fail.generic
+msgid "We couldn't delete your account. Try again later or contact support."
+msgstr "No pudimos eliminar tu cuenta. Inténtalo más tarde o contacta con el equipo de ayuda."
+
+#. deletion.fail.local
+msgid "Your game data couldn't be deleted. Try again."
+msgstr "No se pudieron eliminar los datos del juego. Vuelve a intentarlo."
+
+#. deletion.fail.body
+msgid "Nothing was deleted, and you can keep playing."
+msgstr "No se ha eliminado nada y puedes seguir jugando."
+
+#. deletion.done_local.headline
+msgid "Your local game data was deleted."
+msgstr "Se eliminaron los datos locales del juego."
+
+#. deletion.done_local.body
+msgid "You can start over with a new game."
+msgstr "Puedes empezar de cero con una nueva partida."
+
+#. deletion.new_game_failed
+msgid "The new game couldn't start. Try again."
+msgstr "No se pudo iniciar la nueva partida. Vuelve a intentarlo."
+
+#. deletion.accepted.headline
+msgid "Your account is no longer accessible."
+msgstr "Ya no puedes acceder a tu cuenta."
+
+#. deletion.accepted.body
+msgid "Your deletion request was accepted."
+msgstr "Tu solicitud de eliminación ha sido aceptada."
+
+#. deletion.accepted.body_deadline
+msgid "Your deletion request was accepted. Data removal is due by %s."
+msgstr "Tu solicitud de eliminación ha sido aceptada. Los datos se eliminarán a más tardar el %s."
+
+#. deletion.reference
+msgid "Reference: %s"
+msgstr "Referencia: %s"
+
+#. deletion.start_new_game
+msgid "Start New Game"
+msgstr "Iniciar nueva partida"
+
+#. app.name
+msgid "SortingPuzzle"
+msgstr "SortingPuzzle"
+
+#. support.email.subject
+msgid "Sorting Puzzle support request"
+msgstr "Solicitud de ayuda de Sorting Puzzle"
+
+#. support.email.body
+msgid "Please describe the issue here.\n\nDevice/platform:\nApproximate time:\n"
+msgstr "Describe aquí el problema.\n\nDispositivo/plataforma:\nHora aproximada:\n"
+
+#. support.ad_email.subject
+msgid "Sorting Puzzle ad report"
+msgstr "Denuncia de anuncio en Sorting Puzzle"
+
+#. support.ad_email.body
+msgid "Please attach a screenshot and complete the details below.\n\nApproximate time:\nAd placement in the game:\nAdvertiser or app name:\nWhy the ad should be reviewed:\n"
+msgstr "Adjunta una captura de pantalla y completa los datos siguientes.\n\nHora aproximada:\nUbicación del anuncio en el juego:\nNombre del anunciante o de la aplicación:\nMotivo por el que se debe revisar el anuncio:\n"
+
+#. deletion.email.subject
+msgid "Sorting Puzzle account deletion"
+msgstr "Eliminación de cuenta de Sorting Puzzle"
+
+#. deletion.email.body
+msgid "Please help me with my account deletion."
+msgstr "Necesito ayuda para eliminar mi cuenta."
+
+#. support.email.status
+msgid "Status: %s"
+msgstr "Estado: %s"
+
+#. support.email.deletion_reference
+msgid "Deletion reference"
+msgstr "Referencia de eliminación"
+
+#. support.email.server_reference
+msgid "Server reference"
+msgstr "Referencia del servidor"
+
+#. support.email.player_id
+msgid "Player ID"
+msgstr "ID del jugador"
+
+#. leaderboard.empty
+msgid "No scores yet"
+msgstr "Aún no hay puntuaciones"
+
+#. date.day_month_year
+msgid "%d %s %d"
+msgstr "%d de %s de %d"
+
+#. ability.hammer.name
+msgid "HAMMER"
+msgstr "MARTILLO"
+
+#. ability.shuffle.name
+msgid "SHUFFLE"
+msgstr "MEZCLA"
+
+#. ability.lantern.name
+msgid "LANTERN"
+msgstr "LINTERNA"
+
+#. ability.freezer.name
+msgid "FREEZER"
+msgstr "CONGELADOR"
+
+#. shop.offer.basic_bundle
+msgid "BASIC BUNDLE"
+msgstr "PAQUETE BÁSICO"
+
+#. booster.counted.hammer
+msgctxt "booster.counted"
+msgid "Hammer"
+msgid_plural "Hammer.plural"
+msgstr[0] "Martillo"
+msgstr[1] "Martillos"
+
+#. booster.counted.shuffle
+msgctxt "booster.counted"
+msgid "Shuffle"
+msgid_plural "Shuffle.plural"
+msgstr[0] "Mezcla"
+msgstr[1] "Mezclas"
+
+#. booster.counted.lantern
+msgctxt "booster.counted"
+msgid "Lantern"
+msgid_plural "Lantern.plural"
+msgstr[0] "Linterna"
+msgstr[1] "Linternas"
+
+#. booster.counted.freezer
+msgctxt "booster.counted"
+msgid "Freezer"
+msgid_plural "Freezer.plural"
+msgstr[0] "Congelador"
+msgstr[1] "Congeladores"

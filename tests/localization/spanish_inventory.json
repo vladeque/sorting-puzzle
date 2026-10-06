@@ -1,0 +1,1354 @@
+{
+  "source": "Owner-reviewed Sorting_Puzzle_Spanish_Translations.md, October 6, 2026",
+  "entries": [
+    {
+      "key": "common.play",
+      "en": "Play",
+      "es": "Jugar"
+    },
+    {
+      "key": "common.continue",
+      "en": "Continue",
+      "es": "Continuar"
+    },
+    {
+      "key": "common.resume",
+      "en": "Continue",
+      "es": "Reanudar"
+    },
+    {
+      "key": "common.try_again",
+      "en": "Try Again",
+      "es": "Reintentar"
+    },
+    {
+      "key": "common.close",
+      "en": "Close",
+      "es": "Cerrar"
+    },
+    {
+      "key": "common.cancel",
+      "en": "Cancel",
+      "es": "Cancelar"
+    },
+    {
+      "key": "common.got_it",
+      "en": "Got it",
+      "es": "Entendido"
+    },
+    {
+      "key": "common.get_help",
+      "en": "Get Help",
+      "es": "Pedir ayuda"
+    },
+    {
+      "key": "common.save",
+      "en": "SAVE",
+      "es": "GUARDAR"
+    },
+    {
+      "key": "common.loading",
+      "en": "Loading…",
+      "es": "Cargando…"
+    },
+    {
+      "key": "common.retry_load",
+      "en": "Retry",
+      "es": "Reintentar"
+    },
+    {
+      "key": "menu.level_button",
+      "en": "LEVEL %d",
+      "es": "NIVEL %d"
+    },
+    {
+      "key": "menu.more_levels_coming_soon",
+      "en": "MORE LEVELS COMING SOON",
+      "es": "MÁS NIVELES MUY PRONTO"
+    },
+    {
+      "key": "menu.coming_soon",
+      "en": "COMING SOON",
+      "es": "MUY PRONTO"
+    },
+    {
+      "key": "menu.lives_full",
+      "en": "Full",
+      "es": "Máx."
+    },
+    {
+      "key": "menu.starter_badge",
+      "en": "BUNDLE",
+      "es": "PAQUETE"
+    },
+    {
+      "key": "nav.shop",
+      "en": "Shop",
+      "es": "Tienda"
+    },
+    {
+      "key": "nav.home",
+      "en": "Home",
+      "es": "Inicio"
+    },
+    {
+      "key": "nav.leaderboard",
+      "en": "Leaderboard",
+      "es": "Ranking"
+    },
+    {
+      "key": "chapter.button",
+      "en": "CHAPTER %d",
+      "es": "CAPÍTULO %d"
+    },
+    {
+      "key": "chapter.button_tooltip",
+      "en": "Choose Chapter %d: %s",
+      "es": "Elige el capítulo %d: %s"
+    },
+    {
+      "key": "chapter.screen_title",
+      "en": "CHAPTERS",
+      "es": "CAPÍTULOS"
+    },
+    {
+      "key": "chapter.eyebrow",
+      "en": "CHAPTER %d",
+      "es": "CAPÍTULO %d"
+    },
+    {
+      "key": "chapter.title.chapter_01",
+      "en": "Grocery Town",
+      "es": "Ciudad del Mercado"
+    },
+    {
+      "key": "chapter.title.chapter_02",
+      "en": "Candy Corner",
+      "es": "Rincón Dulce"
+    },
+    {
+      "key": "chapter.locked_status",
+      "en": "Complete %d more %s levels to unlock",
+      "es": "Completa %d niveles más de «%s» para desbloquear"
+    },
+    {
+      "key": "chapter.unlock_progress",
+      "en": "Unlock progress",
+      "es": "Progreso de desbloqueo"
+    },
+    {
+      "key": "chapter.current_progress",
+      "en": "Current progress",
+      "es": "Progreso actual"
+    },
+    {
+      "key": "chapter.locked",
+      "en": "Locked",
+      "es": "Bloqueado"
+    },
+    {
+      "key": "chapter.no_levels_status",
+      "en": "New levels are coming soon",
+      "es": "Pronto habrá nuevos niveles"
+    },
+    {
+      "key": "chapter.coming_soon",
+      "en": "Coming Soon",
+      "es": "Muy pronto"
+    },
+    {
+      "key": "hud.level",
+      "en": "LEVEL %d",
+      "es": "NIVEL %d"
+    },
+    {
+      "key": "hud.combo",
+      "en": "COMBO ×%d",
+      "es": "COMBO ×%d"
+    },
+    {
+      "key": "hud.ability_tooltip.hammer",
+      "en": "Hammer -- clears a matching triple",
+      "es": "Martillo -- elimina un trío de objetos iguales"
+    },
+    {
+      "key": "hud.ability_tooltip.shuffle",
+      "en": "Shuffle -- reshuffles unlocked items",
+      "es": "Mezcla -- reorganiza los objetos desbloqueados"
+    },
+    {
+      "key": "hud.ability_tooltip.lantern",
+      "en": "Lantern -- highlights a matchable triple",
+      "es": "Linterna -- resalta un trío que puedes combinar"
+    },
+    {
+      "key": "hud.ability_tooltip.freezer",
+      "en": "Freezer -- pauses the countdown timer",
+      "es": "Congelador -- pausa el temporizador"
+    },
+    {
+      "key": "hud.seconds_short",
+      "en": "%ds",
+      "es": "%ds"
+    },
+    {
+      "key": "tip.tap_dispenser",
+      "en": "Tap a dispenser to throw items onto the shelves!",
+      "es": "¡Toca un dispensador para lanzar objetos a los estantes!"
+    },
+    {
+      "key": "pause.title",
+      "en": "PAUSE",
+      "es": "PAUSA"
+    },
+    {
+      "key": "pause.leave",
+      "en": "Leave",
+      "es": "Salir"
+    },
+    {
+      "key": "leave.title",
+      "en": "LEAVING THE LEVEL",
+      "es": "SALIR DEL NIVEL"
+    },
+    {
+      "key": "leave.you_will_lose",
+      "en": "You will lose:",
+      "es": "Perderás:"
+    },
+    {
+      "key": "leave.confirm",
+      "en": "Leave",
+      "es": "Salir"
+    },
+    {
+      "key": "timeup.title",
+      "en": "TIME'S UP",
+      "es": "TIEMPO AGOTADO"
+    },
+    {
+      "key": "timeup.offer",
+      "en": "Add one minute and keep sorting!",
+      "es": "¡Añade un minuto y sigue ordenando!"
+    },
+    {
+      "key": "timeup.used",
+      "en": "Used",
+      "es": "Usado"
+    },
+    {
+      "key": "ability_purchase.title",
+      "en": "USE ABILITY",
+      "es": "USAR POTENCIADOR"
+    },
+    {
+      "key": "shelf_unlock.title",
+      "en": "UNLOCK SHELF",
+      "es": "DESBLOQUEAR ESTANTE"
+    },
+    {
+      "key": "shelf_unlock.offer",
+      "en": "Watch one ad to unlock this shelf now.",
+      "es": "Mira un anuncio para desbloquear este estante ahora."
+    },
+    {
+      "key": "shelf_unlock.offer_or_clear",
+      "en": "Watch one ad to unlock this shelf now, or clear %s more.",
+      "es": "Mira un anuncio para desbloquear este estante ahora o elimina %s tríos más."
+    },
+    {
+      "key": "shelf_unlock.button",
+      "en": "Watch Ad · Unlock Shelf",
+      "es": "Ver anuncio · Desbloquear estante"
+    },
+    {
+      "key": "shelf_unlock.ad_unavailable",
+      "en": "Ad unavailable. This shelf stays locked.",
+      "es": "Anuncio no disponible. Este estante sigue bloqueado."
+    },
+    {
+      "key": "complete.title",
+      "en": "GREAT JOB!",
+      "es": "¡BUEN TRABAJO!"
+    },
+    {
+      "key": "failed.title",
+      "en": "LEVEL %d",
+      "es": "NIVEL %d"
+    },
+    {
+      "key": "failed.headline",
+      "en": "LEVEL FAILED",
+      "es": "NIVEL NO SUPERADO"
+    },
+    {
+      "key": "failed.retry",
+      "en": "Retry",
+      "es": "Reintentar"
+    },
+    {
+      "key": "combo.praise.2",
+      "en": "Cool",
+      "es": "Genial"
+    },
+    {
+      "key": "combo.praise.3",
+      "en": "Great",
+      "es": "Estupendo"
+    },
+    {
+      "key": "combo.praise.4",
+      "en": "Awesome",
+      "es": "Asombroso"
+    },
+    {
+      "key": "combo.praise.5",
+      "en": "Amazing",
+      "es": "Impresionante"
+    },
+    {
+      "key": "combo.praise.6",
+      "en": "Fantastic",
+      "es": "Fantástico"
+    },
+    {
+      "key": "combo.praise.7",
+      "en": "Incredible",
+      "es": "Increíble"
+    },
+    {
+      "key": "combo.praise.8",
+      "en": "Spectacular",
+      "es": "Espectacular"
+    },
+    {
+      "key": "combo.praise.9",
+      "en": "Unstoppable",
+      "es": "Imparable"
+    },
+    {
+      "key": "combo.praise.10",
+      "en": "Legendary",
+      "es": "Legendario"
+    },
+    {
+      "key": "combo.praise.11",
+      "en": "Epic",
+      "es": "Épico"
+    },
+    {
+      "key": "combo.praise.12",
+      "en": "Brilliant",
+      "es": "Brillante"
+    },
+    {
+      "key": "combo.praise.13",
+      "en": "Masterful",
+      "es": "Magistral"
+    },
+    {
+      "key": "combo.praise.14",
+      "en": "Supreme",
+      "es": "Supremo"
+    },
+    {
+      "key": "combo.praise.15",
+      "en": "Phenomenal",
+      "es": "Fenomenal"
+    },
+    {
+      "key": "combo.praise.16",
+      "en": "Mythic",
+      "es": "Mítico"
+    },
+    {
+      "key": "combo.praise.17",
+      "en": "Majestic",
+      "es": "Majestuoso"
+    },
+    {
+      "key": "combo.praise.18",
+      "en": "Radiant",
+      "es": "Radiante"
+    },
+    {
+      "key": "combo.praise.19",
+      "en": "Divine",
+      "es": "Divino"
+    },
+    {
+      "key": "combo.praise.20",
+      "en": "Transcendent",
+      "es": "Trascendente"
+    },
+    {
+      "key": "ability.hammer.name",
+      "en": "Hammer",
+      "es": "Martillo"
+    },
+    {
+      "key": "ability.shuffle.name",
+      "en": "Shuffle",
+      "es": "Mezcla"
+    },
+    {
+      "key": "ability.lantern.name",
+      "en": "Lantern",
+      "es": "Linterna"
+    },
+    {
+      "key": "ability.freezer.name",
+      "en": "Freezer",
+      "es": "Congelador"
+    },
+    {
+      "key": "ability.hammer.description",
+      "en": "Instantly clears one matching set of items off the shelves.",
+      "es": "Elimina al instante un trío de objetos iguales de los estantes."
+    },
+    {
+      "key": "ability.shuffle.description",
+      "en": "Shuffles shelf items into new spots to help you find a match.",
+      "es": "Reorganiza los objetos de los estantes para ayudarte a encontrar un trío."
+    },
+    {
+      "key": "ability.lantern.description",
+      "en": "Highlights a matching triple you can clear for 15 seconds.",
+      "es": "Resalta durante 15 segundos un trío de objetos iguales que puedes eliminar."
+    },
+    {
+      "key": "ability.freezer.description",
+      "en": "Freezes the level timer for 30 seconds.",
+      "es": "Congela el temporizador del nivel durante 30 segundos."
+    },
+    {
+      "key": "ad.watch",
+      "en": "Watch Ad",
+      "es": "Ver anuncio"
+    },
+    {
+      "key": "ad.loading",
+      "en": "Loading...",
+      "es": "Cargando..."
+    },
+    {
+      "key": "ad.verifying",
+      "en": "Verifying...",
+      "es": "Verificando..."
+    },
+    {
+      "key": "ad.verify_reward",
+      "en": "Verify Reward",
+      "es": "Verificar recompensa"
+    },
+    {
+      "key": "ad.reward_pending",
+      "en": "Reward verification is still pending.",
+      "es": "La verificación de la recompensa sigue pendiente."
+    },
+    {
+      "key": "ad.unavailable_retry",
+      "en": "Ad unavailable. Please try again.",
+      "es": "Anuncio no disponible. Vuelve a intentarlo."
+    },
+    {
+      "key": "ad.watch_unavailable",
+      "en": "Watch Ad\nUnavailable",
+      "es": "Ver anuncio\nNo disponible"
+    },
+    {
+      "key": "ad.watch_coming_soon",
+      "en": "Watch Ad\nComing Soon",
+      "es": "Ver anuncio\nMuy pronto"
+    },
+    {
+      "key": "ad.badge",
+      "en": "AD",
+      "es": "AD"
+    },
+    {
+      "key": "lives.title.out",
+      "en": "OUT OF LIVES",
+      "es": "SIN VIDAS"
+    },
+    {
+      "key": "lives.title.get_more",
+      "en": "GET MORE LIVES",
+      "es": "CONSEGUIR VIDAS"
+    },
+    {
+      "key": "lives.title.full",
+      "en": "LIVES FULL",
+      "es": "VIDAS AL MÁXIMO"
+    },
+    {
+      "key": "lives.next_in",
+      "en": "NEXT LIFE IN",
+      "es": "PRÓXIMA VIDA EN"
+    },
+    {
+      "key": "lives.full_body",
+      "en": "Your lives are full! Play a level to spend them.",
+      "es": "¡Tienes el máximo de vidas! Juega un nivel para usarlas."
+    },
+    {
+      "key": "chest.title",
+      "en": "CHEST REWARDS",
+      "es": "RECOMPENSAS DEL COFRE"
+    },
+    {
+      "key": "chest.progress_hint",
+      "en": "Collect stars to unlock a chest and claim your reward",
+      "es": "Reúne estrellas para desbloquear un cofre y obtener tu recompensa"
+    },
+    {
+      "key": "chest.ready",
+      "en": "A REWARD CHEST AWAITS!",
+      "es": "¡TE ESPERA UN COFRE!"
+    },
+    {
+      "key": "chest.tap_to_open",
+      "en": "Tap to open",
+      "es": "Toca para abrir"
+    },
+    {
+      "key": "purchase.tap_to_collect",
+      "en": "Tap to collect",
+      "es": "Toca para recoger"
+    },
+    {
+      "key": "purchase.complete",
+      "en": "PURCHASE COMPLETE",
+      "es": "COMPRA COMPLETADA"
+    },
+    {
+      "key": "shop.title",
+      "en": "SHOP",
+      "es": "TIENDA"
+    },
+    {
+      "key": "shop.section.bundles",
+      "en": "SPECIAL BUNDLES",
+      "es": "PAQUETES ESPECIALES"
+    },
+    {
+      "key": "shop.section.coins",
+      "en": "COINS",
+      "es": "MONEDAS"
+    },
+    {
+      "key": "shop.offer.starter_bundle",
+      "en": "Starter Bundle",
+      "es": "Paquete inicial"
+    },
+    {
+      "key": "shop.offer.basic_bundle",
+      "en": "Basic Bundle",
+      "es": "Paquete básico"
+    },
+    {
+      "key": "shop.tag.best_value",
+      "en": "BEST VALUE",
+      "es": "MEJOR OFERTA"
+    },
+    {
+      "key": "shop.discount_off",
+      "en": "OFF",
+      "es": "OFF"
+    },
+    {
+      "key": "shop.ability_hint",
+      "en": "Tap an ability to see what it does",
+      "es": "Toca un potenciador para ver qué hace"
+    },
+    {
+      "key": "shop.purchasing",
+      "en": "Purchasing…",
+      "es": "Comprando…"
+    },
+    {
+      "key": "shop.no_offers",
+      "en": "No shop offers are available for this region.",
+      "es": "No hay ofertas disponibles en la tienda para esta región."
+    },
+    {
+      "key": "shop.load_failed",
+      "en": "Could not load the shop.",
+      "es": "No se pudo cargar la tienda."
+    },
+    {
+      "key": "shop.error.title.purchase",
+      "en": "Purchase unavailable",
+      "es": "Compra no disponible"
+    },
+    {
+      "key": "shop.error.title.reward",
+      "en": "Reward error",
+      "es": "Error de recompensa"
+    },
+    {
+      "key": "shop.error.purchase_failed",
+      "en": "The purchase could not be completed.",
+      "es": "No se pudo completar la compra."
+    },
+    {
+      "key": "shop.error.grant_failed",
+      "en": "The purchased rewards could not be granted.",
+      "es": "No se pudieron entregar las recompensas compradas."
+    },
+    {
+      "key": "shop.error.offer_unavailable",
+      "en": "This shop offer is unavailable.",
+      "es": "Esta oferta de la tienda no está disponible."
+    },
+    {
+      "key": "shop.error.already_bought",
+      "en": "This one-time shop offer has already been purchased.",
+      "es": "Ya has comprado esta oferta, disponible una sola vez."
+    },
+    {
+      "key": "starter.title",
+      "en": "STARTER BUNDLE",
+      "es": "PAQUETE INICIAL"
+    },
+    {
+      "key": "starter.one_time",
+      "en": "ONE-TIME OFFER",
+      "es": "OFERTA DE UNA SOLA COMPRA"
+    },
+    {
+      "key": "starter.boosters_included",
+      "en": "BOOSTERS INCLUDED",
+      "es": "POTENCIADORES INCLUIDOS"
+    },
+    {
+      "key": "starter.coins",
+      "en": "%s COINS",
+      "es": "%s MONEDAS"
+    },
+    {
+      "key": "starter.buy_for",
+      "en": "Buy for %s",
+      "es": "Comprar por %s"
+    },
+    {
+      "key": "starter.checking",
+      "en": "Checking offer…",
+      "es": "Verificando oferta…"
+    },
+    {
+      "key": "starter.checking_short",
+      "en": "Checking…",
+      "es": "Verificando…"
+    },
+    {
+      "key": "starter.no_longer_available",
+      "en": "This offer is no longer available.",
+      "es": "Esta oferta ya no está disponible."
+    },
+    {
+      "key": "starter.unavailable",
+      "en": "Unavailable",
+      "es": "No disponible"
+    },
+    {
+      "key": "booster_chip.claimed",
+      "en": "+%d %s",
+      "es": "+%d %s"
+    },
+    {
+      "key": "profile.title",
+      "en": "EDIT PROFILE",
+      "es": "EDITAR PERFIL"
+    },
+    {
+      "key": "profile.name_header",
+      "en": "PLAYER NAME",
+      "es": "NOMBRE DEL JUGADOR"
+    },
+    {
+      "key": "profile.name_placeholder",
+      "en": "Player name",
+      "es": "Nombre del jugador"
+    },
+    {
+      "key": "profile.edit_name_tooltip",
+      "en": "Edit player name",
+      "es": "Editar nombre del jugador"
+    },
+    {
+      "key": "profile.avatar_tab",
+      "en": "AVATAR",
+      "es": "AVATAR"
+    },
+    {
+      "key": "profile.frame_tab",
+      "en": "FRAME",
+      "es": "MARCO"
+    },
+    {
+      "key": "profile.unlock.level",
+      "en": "Complete level %d to unlock",
+      "es": "Completa el nivel %d para desbloquear"
+    },
+    {
+      "key": "profile.unlock.combo",
+      "en": "Reach a combo of ×%d in any run to unlock",
+      "es": "Consigue un combo de ×%d en cualquier partida para desbloquear"
+    },
+    {
+      "key": "profile.unlock.weekly_first",
+      "en": "Finish 1st on the Weekly leaderboard to unlock",
+      "es": "Termina en primer lugar en el ranking semanal para desbloquear"
+    },
+    {
+      "key": "profile.unlock.weekly_top",
+      "en": "Finish top %d on the Weekly leaderboard to unlock",
+      "es": "Queda entre los %d mejores del ranking semanal para desbloquear"
+    },
+    {
+      "key": "leaderboard.title",
+      "en": "LEADERBOARD",
+      "es": "RANKING"
+    },
+    {
+      "key": "leaderboard.tab.weekly",
+      "en": "Weekly",
+      "es": "Semanal"
+    },
+    {
+      "key": "leaderboard.tab.country",
+      "en": "Country",
+      "es": "País"
+    },
+    {
+      "key": "leaderboard.tab.world",
+      "en": "World",
+      "es": "Mundo"
+    },
+    {
+      "key": "leaderboard.weekly_reset",
+      "en": "Weekly reset in %s",
+      "es": "Reinicio semanal en %s"
+    },
+    {
+      "key": "leaderboard.duration.dh",
+      "en": "%dd %dh",
+      "es": "%dd %dh"
+    },
+    {
+      "key": "leaderboard.duration.hm",
+      "en": "%dh %dm",
+      "es": "%dh %dmin"
+    },
+    {
+      "key": "leaderboard.duration.m",
+      "en": "%dm",
+      "es": "%dmin"
+    },
+    {
+      "key": "leaderboard.country_caption",
+      "en": "Country · All-time stars",
+      "es": "País · Estrellas totales"
+    },
+    {
+      "key": "leaderboard.world_caption",
+      "en": "Worldwide · All-time stars",
+      "es": "Mundial · Estrellas totales"
+    },
+    {
+      "key": "leaderboard.load_failed",
+      "en": "Could not load leaderboard.",
+      "es": "No se pudo cargar el ranking."
+    },
+    {
+      "key": "leaderboard.default_name",
+      "en": "Player",
+      "es": "Jugador"
+    },
+    {
+      "key": "leaderboard.row_tooltip",
+      "en": "Rank %d, %s, %d stars",
+      "es": "Puesto %d, %s, %d estrellas"
+    },
+    {
+      "key": "leaderboard.reward_tooltip",
+      "en": "%s coin weekly reward",
+      "es": "Recompensa semanal: %s monedas"
+    },
+    {
+      "key": "leaderboard.reward.title",
+      "en": "WEEKLY REWARD!",
+      "es": "¡RECOMPENSA SEMANAL!"
+    },
+    {
+      "key": "leaderboard.reward.body",
+      "en": "You finished #%d last week and earned %d coins!",
+      "es": "¡La semana pasada quedaste en el puesto #%d y ganaste %d monedas!"
+    },
+    {
+      "key": "leaderboard.reward.ok",
+      "en": "Nice!",
+      "es": "¡Genial!"
+    },
+    {
+      "key": "settings.title",
+      "en": "SETTINGS",
+      "es": "AJUSTES"
+    },
+    {
+      "key": "settings.music",
+      "en": "Music",
+      "es": "Música"
+    },
+    {
+      "key": "settings.sfx",
+      "en": "SFX",
+      "es": "Sonidos"
+    },
+    {
+      "key": "settings.vibrate",
+      "en": "Vibrate",
+      "es": "Vibración"
+    },
+    {
+      "key": "settings.support",
+      "en": "Support",
+      "es": "Ayuda"
+    },
+    {
+      "key": "settings.language",
+      "en": "Language",
+      "es": "Idioma"
+    },
+    {
+      "key": "settings.privacy_policy",
+      "en": "Privacy Policy",
+      "es": "Política de privacidad"
+    },
+    {
+      "key": "settings.privacy_choices",
+      "en": "Privacy Choices",
+      "es": "Opciones de privacidad"
+    },
+    {
+      "key": "settings.diagnostics",
+      "en": "Version %s • Build %d\nPlatform: %s • User: %s",
+      "es": "Versión %s • Compilación %d\nPlataforma: %s • Usuario: %s"
+    },
+    {
+      "key": "language.title",
+      "en": "LANGUAGE",
+      "es": "IDIOMA"
+    },
+    {
+      "key": "support.title",
+      "en": "SUPPORT",
+      "es": "AYUDA"
+    },
+    {
+      "key": "support.faq_header",
+      "en": "Frequently Asked Questions",
+      "es": "Preguntas frecuentes"
+    },
+    {
+      "key": "support.faq.play.q",
+      "en": "How do I play?",
+      "es": "¿Cómo se juega?"
+    },
+    {
+      "key": "support.faq.play.a",
+      "en": "Move matching goods onto the same shelf. When three identical items are visible together, they clear. Complete the board before time runs out.",
+      "es": "Mueve los productos iguales al mismo estante. Cuando haya tres objetos iguales visibles juntos, desaparecerán. Despeja el tablero antes de que se agote el tiempo."
+    },
+    {
+      "key": "support.faq.contact.q",
+      "en": "How do I contact support?",
+      "es": "¿Cómo puedo contactar con el equipo de ayuda?"
+    },
+    {
+      "key": "support.faq.contact.a",
+      "en": "Email us at %s. Include a short description, your device platform, and when the problem happened.",
+      "es": "Escríbenos a %s. Incluye una breve descripción, la plataforma de tu dispositivo y cuándo ocurrió el problema."
+    },
+    {
+      "key": "support.faq.contact.action",
+      "en": "Email Support",
+      "es": "Contactar por correo"
+    },
+    {
+      "key": "support.faq.crash.q",
+      "en": "What if the game freezes or crashes?",
+      "es": "¿Qué hago si el juego se bloquea o se cierra?"
+    },
+    {
+      "key": "support.faq.crash.a",
+      "en": "Close and reopen the game first. If it happens again, restart the device and make sure the game is updated. Contact support with the device model, platform version, and what you were doing before the problem.",
+      "es": "Primero, cierra y vuelve a abrir el juego. Si vuelve a ocurrir, reinicia el dispositivo y comprueba que el juego esté actualizado. Contacta con el equipo de ayuda e indica el modelo del dispositivo, la versión de la plataforma y qué hacías antes del problema."
+    },
+    {
+      "key": "support.faq.sync.q",
+      "en": "How do I sync progress between devices?",
+      "es": "¿Cómo sincronizo mi progreso entre dispositivos?"
+    },
+    {
+      "key": "support.faq.sync.a",
+      "en": "Use the same signed-in platform account on both devices and allow synchronization to finish before playing. If the progress differs, avoid playing on both devices and contact support.",
+      "es": "Inicia sesión con la misma cuenta de la plataforma en ambos dispositivos y espera a que termine la sincronización antes de jugar. Si el progreso es distinto, evita jugar en ambos dispositivos y contacta con el equipo de ayuda."
+    },
+    {
+      "key": "support.faq.bad_ad.q",
+      "en": "How do I report a bad ad?",
+      "es": "¿Cómo denuncio un anuncio problemático?"
+    },
+    {
+      "key": "support.faq.bad_ad.a",
+      "en": "1. Close the ad if you can do so safely.\n2. Take a screenshot of the ad and any advertiser or app name shown.\n3. Note the approximate time and where the ad appeared in the game.\n4. Describe why the ad seemed offensive, misleading, or fraudulent.\n5. Email these details to %s. Do not include passwords or payment information.",
+      "es": "1. Cierra el anuncio si puedes hacerlo de forma segura.\n2. Haz una captura de pantalla del anuncio y de cualquier nombre de anunciante o aplicación que aparezca.\n3. Anota la hora aproximada y dónde apareció el anuncio en el juego.\n4. Explica por qué el anuncio te pareció ofensivo, engañoso o fraudulento.\n5. Envía estos datos por correo a %s. No incluyas contraseñas ni información de pago."
+    },
+    {
+      "key": "support.faq.bad_ad.action",
+      "en": "Email Ad Report",
+      "es": "Denunciar por correo"
+    },
+    {
+      "key": "support.account_header",
+      "en": "Account",
+      "es": "Cuenta"
+    },
+    {
+      "key": "support.delete_account",
+      "en": "Delete Account",
+      "es": "Eliminar cuenta"
+    },
+    {
+      "key": "support.delete_game_data",
+      "en": "Delete Game Data",
+      "es": "Eliminar datos del juego"
+    },
+    {
+      "key": "support.no_secrets",
+      "en": "Please never send passwords or payment information.",
+      "es": "Nunca envíes contraseñas ni información de pago."
+    },
+    {
+      "key": "deletion.title.delete_account",
+      "en": "DELETE ACCOUNT",
+      "es": "ELIMINAR CUENTA"
+    },
+    {
+      "key": "deletion.title.delete_game_data",
+      "en": "DELETE GAME DATA",
+      "es": "ELIMINAR DATOS DEL JUEGO"
+    },
+    {
+      "key": "deletion.title.not_confirmed",
+      "en": "NOT CONFIRMED",
+      "es": "SIN CONFIRMAR"
+    },
+    {
+      "key": "deletion.title.status_unconfirmed",
+      "en": "STATUS UNCONFIRMED",
+      "es": "ESTADO SIN CONFIRMAR"
+    },
+    {
+      "key": "deletion.title.finishing_up",
+      "en": "FINISHING UP",
+      "es": "FINALIZANDO"
+    },
+    {
+      "key": "deletion.title.new_game",
+      "en": "NEW GAME",
+      "es": "NUEVA PARTIDA"
+    },
+    {
+      "key": "deletion.title.status_unknown",
+      "en": "STATUS UNKNOWN",
+      "es": "ESTADO DESCONOCIDO"
+    },
+    {
+      "key": "deletion.title.not_deleted",
+      "en": "NOT DELETED",
+      "es": "NO SE ELIMINÓ"
+    },
+    {
+      "key": "deletion.title.data_deleted",
+      "en": "DATA DELETED",
+      "es": "DATOS ELIMINADOS"
+    },
+    {
+      "key": "deletion.title.accepted",
+      "en": "DELETION ACCEPTED",
+      "es": "ELIMINACIÓN ACEPTADA"
+    },
+    {
+      "key": "deletion.confirm.headline",
+      "en": "This permanently deletes your account.",
+      "es": "Esto elimina tu cuenta de forma permanente."
+    },
+    {
+      "key": "deletion.confirm.body",
+      "en": "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nIf you sign in again later, you'll start a new account.\n\nSome purchase and security records are kept without your name or profile. The rest is removed within 30 days.",
+      "es": "Perderás tu progreso, monedas, objetos y perfil. Esta acción no se puede deshacer.\n\nSi vuelves a iniciar sesión más adelante, empezarás con una cuenta nueva.\n\nSe conservan algunos registros de compras y seguridad sin tu nombre ni perfil. El resto se elimina en un plazo de 30 días."
+    },
+    {
+      "key": "deletion.confirm.button",
+      "en": "Delete Account",
+      "es": "Eliminar cuenta"
+    },
+    {
+      "key": "deletion.local_confirm.headline",
+      "en": "This deletes your game data on this device.",
+      "es": "Esto elimina los datos del juego de este dispositivo."
+    },
+    {
+      "key": "deletion.local_confirm.body",
+      "en": "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nThis game never created an online account for you, so nothing needs to be deleted from our servers.",
+      "es": "Perderás tu progreso, monedas, objetos y perfil. Esta acción no se puede deshacer.\n\nEste juego nunca creó una cuenta en línea para ti, por lo que no hay nada que eliminar de nuestros servidores."
+    },
+    {
+      "key": "deletion.local_confirm.button",
+      "en": "Delete Data",
+      "es": "Eliminar datos"
+    },
+    {
+      "key": "deletion.pending_setup.headline",
+      "en": "Your account is still being set up.",
+      "es": "Tu cuenta todavía se está creando."
+    },
+    {
+      "key": "deletion.pending_setup.body",
+      "en": "Connect to the internet and try again in a moment. Nothing was deleted.",
+      "es": "Conéctate a internet y vuelve a intentarlo en un momento. No se ha eliminado nada."
+    },
+    {
+      "key": "deletion.sign_in.headline",
+      "en": "Sign in to the account you want to delete.",
+      "es": "Inicia sesión en la cuenta que quieres eliminar."
+    },
+    {
+      "key": "deletion.sign_in.body",
+      "en": "If you can't sign in, contact support for help.",
+      "es": "Si no puedes iniciar sesión, contacta con el equipo de ayuda."
+    },
+    {
+      "key": "deletion.read_failed.headline",
+      "en": "Your game data couldn't be read.",
+      "es": "No se pudieron leer los datos del juego."
+    },
+    {
+      "key": "deletion.read_failed.body",
+      "en": "Restart the game, then try again. Nothing was deleted.",
+      "es": "Reinicia el juego y vuelve a intentarlo. No se ha eliminado nada."
+    },
+    {
+      "key": "deletion.unavailable.headline",
+      "en": "Account deletion isn't available in this version of the game.",
+      "es": "La eliminación de cuentas no está disponible en esta versión del juego."
+    },
+    {
+      "key": "deletion.unavailable.body",
+      "en": "Update the game, or contact support for help deleting your account. Nothing was deleted.",
+      "es": "Actualiza el juego o contacta con el equipo de ayuda para eliminar tu cuenta. No se ha eliminado nada."
+    },
+    {
+      "key": "deletion.in_progress.account",
+      "en": "Deleting your account...",
+      "es": "Eliminando tu cuenta..."
+    },
+    {
+      "key": "deletion.in_progress.local",
+      "en": "Deleting your game data...",
+      "es": "Eliminando los datos del juego..."
+    },
+    {
+      "key": "deletion.in_progress.body",
+      "en": "Keep the game open. This only takes a moment.",
+      "es": "Mantén el juego abierto. Solo tardará un momento."
+    },
+    {
+      "key": "deletion.not_confirmed.headline",
+      "en": "We haven't heard back about your deletion yet.",
+      "es": "Todavía no hemos recibido una respuesta sobre tu solicitud de eliminación."
+    },
+    {
+      "key": "deletion.not_confirmed.body",
+      "en": "Your request was sent, but the answer didn't arrive. Connect to the internet and try again. The game stays locked until we know the result.",
+      "es": "Tu solicitud se envió, pero no llegó la respuesta. Conéctate a internet y vuelve a intentarlo. El juego seguirá bloqueado hasta que sepamos el resultado."
+    },
+    {
+      "key": "deletion.unconfirmed.headline",
+      "en": "Deletion status unconfirmed",
+      "es": "Estado de eliminación sin confirmar"
+    },
+    {
+      "key": "deletion.unconfirmed.body",
+      "en": "We couldn't confirm whether your account was deleted. To keep your data safe, the game stays locked. Contact support and include the reference below.",
+      "es": "No pudimos confirmar si se eliminó tu cuenta. Para proteger tus datos, el juego seguirá bloqueado. Contacta con el equipo de ayuda e incluye la referencia que aparece abajo."
+    },
+    {
+      "key": "deletion.check_again",
+      "en": "Check Again",
+      "es": "Verificar de nuevo"
+    },
+    {
+      "key": "deletion.cleanup.headline.local",
+      "en": "Your local game data couldn't be fully deleted yet.",
+      "es": "Todavía no se pudieron eliminar todos los datos locales del juego."
+    },
+    {
+      "key": "deletion.cleanup.headline.account",
+      "en": "Account deletion accepted; finishing cleanup.",
+      "es": "Eliminación de cuenta aceptada; finalizando la limpieza."
+    },
+    {
+      "key": "deletion.cleanup.body",
+      "en": "Some game data couldn't be removed from this device yet. Try again to finish.",
+      "es": "Todavía no se pudieron eliminar algunos datos del juego de este dispositivo. Vuelve a intentarlo para terminar."
+    },
+    {
+      "key": "deletion.new_game.headline",
+      "en": "Starting a new game...",
+      "es": "Iniciando una nueva partida..."
+    },
+    {
+      "key": "deletion.new_game.body",
+      "en": "This only takes a moment.",
+      "es": "Solo tardará un momento."
+    },
+    {
+      "key": "deletion.status_unknown.headline",
+      "en": "We couldn't read the deletion status on this device.",
+      "es": "No pudimos leer el estado de eliminación en este dispositivo."
+    },
+    {
+      "key": "deletion.status_unknown.body",
+      "en": "To keep your data safe, the game stays locked. Contact support for help.",
+      "es": "Para proteger tus datos, el juego seguirá bloqueado. Contacta con el equipo de ayuda."
+    },
+    {
+      "key": "deletion.fail.offline",
+      "en": "Connect to the internet to delete your account.",
+      "es": "Conéctate a internet para eliminar tu cuenta."
+    },
+    {
+      "key": "deletion.fail.rate_limited",
+      "en": "Too many attempts. Wait a moment, then try again.",
+      "es": "Demasiados intentos. Espera un momento y vuelve a intentarlo."
+    },
+    {
+      "key": "deletion.fail.busy",
+      "en": "Account deletion is busy right now. Try again in a moment.",
+      "es": "El servicio de eliminación de cuentas no está disponible en este momento. Vuelve a intentarlo en un momento."
+    },
+    {
+      "key": "deletion.fail.syncing",
+      "en": "The game is still syncing. Try again in a moment.",
+      "es": "El juego todavía se está sincronizando. Vuelve a intentarlo en un momento."
+    },
+    {
+      "key": "deletion.fail.auth",
+      "en": "We couldn't verify your account. Restart the game, then try again.",
+      "es": "No pudimos verificar tu cuenta. Reinicia el juego y vuelve a intentarlo."
+    },
+    {
+      "key": "deletion.fail.update",
+      "en": "Update the game to delete your account.",
+      "es": "Actualiza el juego para eliminar tu cuenta."
+    },
+    {
+      "key": "deletion.fail.changed",
+      "en": "Your account changed while we were deleting it. Try again.",
+      "es": "Tu cuenta cambió durante el proceso de eliminación. Vuelve a intentarlo."
+    },
+    {
+      "key": "deletion.fail.storage",
+      "en": "Your device couldn't save the deletion request. Try again.",
+      "es": "Tu dispositivo no pudo guardar la solicitud de eliminación. Vuelve a intentarlo."
+    },
+    {
+      "key": "deletion.fail.generic",
+      "en": "We couldn't delete your account. Try again later or contact support.",
+      "es": "No pudimos eliminar tu cuenta. Inténtalo más tarde o contacta con el equipo de ayuda."
+    },
+    {
+      "key": "deletion.fail.local",
+      "en": "Your game data couldn't be deleted. Try again.",
+      "es": "No se pudieron eliminar los datos del juego. Vuelve a intentarlo."
+    },
+    {
+      "key": "deletion.fail.body",
+      "en": "Nothing was deleted, and you can keep playing.",
+      "es": "No se ha eliminado nada y puedes seguir jugando."
+    },
+    {
+      "key": "deletion.done_local.headline",
+      "en": "Your local game data was deleted.",
+      "es": "Se eliminaron los datos locales del juego."
+    },
+    {
+      "key": "deletion.done_local.body",
+      "en": "You can start over with a new game.",
+      "es": "Puedes empezar de cero con una nueva partida."
+    },
+    {
+      "key": "deletion.new_game_failed",
+      "en": "The new game couldn't start. Try again.",
+      "es": "No se pudo iniciar la nueva partida. Vuelve a intentarlo."
+    },
+    {
+      "key": "deletion.accepted.headline",
+      "en": "Your account is no longer accessible.",
+      "es": "Ya no puedes acceder a tu cuenta."
+    },
+    {
+      "key": "deletion.accepted.body",
+      "en": "Your deletion request was accepted.",
+      "es": "Tu solicitud de eliminación ha sido aceptada."
+    },
+    {
+      "key": "deletion.accepted.body_deadline",
+      "en": "Your deletion request was accepted. Data removal is due by %s.",
+      "es": "Tu solicitud de eliminación ha sido aceptada. Los datos se eliminarán a más tardar el %s."
+    },
+    {
+      "key": "deletion.reference",
+      "en": "Reference: %s",
+      "es": "Referencia: %s"
+    },
+    {
+      "key": "deletion.start_new_game",
+      "en": "Start New Game",
+      "es": "Iniciar nueva partida"
+    },
+    {
+      "key": "app.name",
+      "en": "SortingPuzzle",
+      "es": "SortingPuzzle"
+    },
+    {
+      "key": "support.email.subject",
+      "en": "Sorting Puzzle support request",
+      "es": "Solicitud de ayuda de Sorting Puzzle"
+    },
+    {
+      "key": "support.email.body",
+      "en": "Please describe the issue here.\n\nDevice/platform:\nApproximate time:\n",
+      "es": "Describe aquí el problema.\n\nDispositivo/plataforma:\nHora aproximada:\n"
+    },
+    {
+      "key": "support.ad_email.subject",
+      "en": "Sorting Puzzle ad report",
+      "es": "Denuncia de anuncio en Sorting Puzzle"
+    },
+    {
+      "key": "support.ad_email.body",
+      "en": "Please attach a screenshot and complete the details below.\n\nApproximate time:\nAd placement in the game:\nAdvertiser or app name:\nWhy the ad should be reviewed:\n",
+      "es": "Adjunta una captura de pantalla y completa los datos siguientes.\n\nHora aproximada:\nUbicación del anuncio en el juego:\nNombre del anunciante o de la aplicación:\nMotivo por el que se debe revisar el anuncio:\n"
+    },
+    {
+      "key": "deletion.email.subject",
+      "en": "Sorting Puzzle account deletion",
+      "es": "Eliminación de cuenta de Sorting Puzzle"
+    },
+    {
+      "key": "deletion.email.body",
+      "en": "Please help me with my account deletion.",
+      "es": "Necesito ayuda para eliminar mi cuenta."
+    }
+  ],
+  "plurals": {
+    "chapter.locked_status": {
+      "one": "Completa %d nivel más de «%s» para desbloquear",
+      "other": "Completa %d niveles más de «%s» para desbloquear"
+    },
+    "shelf_unlock.offer_or_clear": {
+      "one": "Mira un anuncio para desbloquear este estante ahora o elimina %s trío más.",
+      "other": "Mira un anuncio para desbloquear este estante ahora o elimina %s tríos más."
+    },
+    "starter.coins": {
+      "one": "%s MONEDA",
+      "other": "%s MONEDAS"
+    },
+    "booster_chip.claimed": {
+      "one": "+%d %s",
+      "other": "+%d %s"
+    },
+    "leaderboard.row_tooltip": {
+      "one": "Puesto %d, %s, %d estrella",
+      "other": "Puesto %d, %s, %d estrellas"
+    },
+    "leaderboard.reward.body": {
+      "one": "¡La semana pasada quedaste en el puesto #%d y ganaste %d moneda!",
+      "other": "¡La semana pasada quedaste en el puesto #%d y ganaste %d monedas!"
+    },
+    "leaderboard.reward_tooltip": {
+      "one": "Recompensa semanal: %s moneda",
+      "other": "Recompensa semanal: %s monedas"
+    }
+  },
+  "counted_boosters": {
+    "Hammer": [
+      "Martillo",
+      "Martillos"
+    ],
+    "Shuffle": [
+      "Mezcla",
+      "Mezclas"
+    ],
+    "Lantern": [
+      "Linterna",
+      "Linternas"
+    ],
+    "Freezer": [
+      "Congelador",
+      "Congeladores"
+    ]
+  },
+  "months": [
+    "enero",
+    "febrero",
+    "marzo",
+    "abril",
+    "mayo",
+    "junio",
+    "julio",
+    "agosto",
+    "septiembre",
+    "octubre",
+    "noviembre",
+    "diciembre"
+  ],
+  "additional": [
+    {
+      "key": "support.email.status",
+      "en": "Status: %s",
+      "es": "Estado: %s"
+    },
+    {
+      "key": "support.email.deletion_reference",
+      "en": "Deletion reference",
+      "es": "Referencia de eliminación"
+    },
+    {
+      "key": "support.email.server_reference",
+      "en": "Server reference",
+      "es": "Referencia del servidor"
+    },
+    {
+      "key": "support.email.player_id",
+      "en": "Player ID",
+      "es": "ID del jugador"
+    },
+    {
+      "key": "leaderboard.empty",
+      "en": "No scores yet",
+      "es": "Aún no hay puntuaciones"
+    },
+    {
+      "key": "date.day_month_year",
+      "en": "%d %s %d",
+      "es": "%d de %s de %d"
+    }
+  ]
+}

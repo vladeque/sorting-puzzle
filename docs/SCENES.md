@@ -2070,6 +2070,8 @@ Important nodes:
 - `%RewardedAdButton`: reparented into `Shell`'s action row; disabled by default and rendered from
   the owner's authoritative state. Its ready copy names both the ad and the reward
   (`Watch Ad · Unlock Shelf`), matching the rewarded-copy rule the other placements use.
+  `shelf_unlock_menu.gd` fits the translated caption within the authored width after state, size
+  and language changes, using exported 24px/16px font limits and 24px horizontal text padding.
 
 Depends on:
 - `scenes/ui/gameplay_modal_shell.tscn`.

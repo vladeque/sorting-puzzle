@@ -26,6 +26,10 @@ const REWARDED_STATE_ERROR := &"error"
 ## Names both the ad and the exact reward, matching the rewarded-copy rule the other placements use.
 const READY_LABEL := "Watch Ad · Unlock Shelf"
 
+@export var rewarded_action_font_size := 24
+@export var minimum_rewarded_action_font_size := 16
+@export var rewarded_action_text_padding := 24.0
+
 @onready var _shell := %Shell as GameplayModalShell
 @onready var _unlock_content := %UnlockContent as Control
 @onready var _rewarded_ad_button := %RewardedAdButton as Button
@@ -46,6 +50,7 @@ func _ready() -> void:
 	_unlock_content.reparent(_shell.get_content_region(), false)
 	_rewarded_ad_button.reparent(_shell.get_action_row(), false)
 	_rewarded_ad_button.pressed.connect(func() -> void: rewarded_ad_requested.emit())
+	_rewarded_ad_button.resized.connect(_fit_rewarded_action_text)
 	set_rewarded_action_state(REWARDED_STATE_UNAVAILABLE, false)
 
 
@@ -71,6 +76,23 @@ func set_rewarded_action_state(state: StringName, is_enabled: bool) -> void:
 		Control.CURSOR_POINTING_HAND if is_enabled else Control.CURSOR_ARROW
 	)
 	_reward_status_label.visible = not _reward_status_label.text.is_empty()
+	_fit_rewarded_action_text.call_deferred()
+
+
+## Keep the complete translated action inside the authored button rather than widening the row.
+func _fit_rewarded_action_text() -> void:
+	var font := _rewarded_ad_button.get_theme_font("font")
+	var available_width := maxf(
+		minf(_rewarded_ad_button.size.x, _rewarded_ad_button.custom_minimum_size.x)
+		- rewarded_action_text_padding, 1.0
+	)
+	var font_size := rewarded_action_font_size
+	while font_size > minimum_rewarded_action_font_size:
+		if font.get_string_size(_rewarded_ad_button.atr(_rewarded_ad_button.text),
+			HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x <= available_width:
+			break
+		font_size -= 1
+	_rewarded_ad_button.add_theme_font_size_override("font_size", font_size)
 
 
 ## The remaining clear count the shelf still shows. Stating it keeps the alternative honest: the ad
@@ -108,3 +130,4 @@ func close() -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
 		set_offer(_remaining_clears)
+		_fit_rewarded_action_text.call_deferred()
