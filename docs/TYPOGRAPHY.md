@@ -27,6 +27,8 @@ The Russian localization test verifies the entire Russian alphabet against the
 effective title font, including Ё/ё.
 The Ukrainian localization test verifies its full alphabet, including Ґ/ґ, Є/є, І/і, Ї/ї,
 the typographic apostrophe and the № symbol against the same effective title font.
+The Brazilian Portuguese localization test verifies accented vowels, Ç/ç, curly quotation marks
+and the ordinal indicator º through the bundled title font; it uses the existing Latin fonts.
 
 ## Theme Roles
 

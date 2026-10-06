@@ -19,7 +19,7 @@ static func format_number(value: int) -> String:
 	var digits := str(maxi(value, 0))
 	var language := TranslationServer.get_locale().get_slice("_", 0)
 	var separator := " " if language in ["ru", "uk"] else ","
-	if language in ["it", "es"]:
+	if language in ["it", "es", "pt"]:
 		separator = "."
 	var formatted := ""
 	for index in digits.length():
@@ -36,7 +36,7 @@ static func format_date(date: Dictionary) -> String:
 	var language := TranslationServer.get_locale().get_slice("_", 0)
 	if language == "ar":
 		return "%d/%d/%d" % [day, month, year]
-	if language in ["ru", "uk", "it", "es"]:
+	if language in ["ru", "uk", "it", "es", "pt"]:
 		var month_name := TranslationServer.translate("date.month.%d" % month)
 		return TranslationServer.translate("date.day_month_year") % [day, month_name, year]
 	return "%s %d, %d" % [MONTH_NAMES[month - 1], day, year]

@@ -11,7 +11,8 @@ The physical shelf/slot/drag geometry stays in the level's 2D coordinates. See
 [Arabic verification](localization/ARABIC_LOCALIZATION_QA.md) for rendered results.
 
 Localized label fitting stays with each scene owner: `level_failure_screen.gd` fits the failure
-message from 36 down to 24 pixels; `PauseMenu` fits the Settings privacy button; and
+message from 36 down to 24 pixels and its replay action from configurable 32 down to 20 pixels,
+retaining 32 pixels of horizontal text padding; `PauseMenu` fits the Settings privacy button; and
 `support_faq_item.tscn` reserves a 384-pixel minimum action width for Ukrainian captions. Reviewed
 captures and known resize limitations are recorded in `docs/localization/RUSSIAN_LOCALIZATION_QA.md`
 and `docs/localization/UKRAINIAN_LOCALIZATION_QA.md`.
@@ -2072,6 +2073,10 @@ Important nodes:
   (`Watch Ad · Unlock Shelf`), matching the rewarded-copy rule the other placements use.
   `shelf_unlock_menu.gd` fits the translated caption within the authored width after state, size
   and language changes, using exported 24px/16px font limits and 24px horizontal text padding.
+- The owner reserves the offer row's measured minimum height plus the row's scene-authored vertical
+  padding, including a visible pending/failure status. It grows the cream region and preferred
+  panel height, then reapplies the shared shell's safe-area scaling on content, size and locale
+  changes. Long localized descriptions retain their complete text and existing font size.
 
 Depends on:
 - `scenes/ui/gameplay_modal_shell.tscn`.
@@ -2181,6 +2186,8 @@ Purpose:
 - Shows the transparent `assets/ui/broken_heart.png` art above the `LEVEL FAILED` message.
 - Emits `retry_pressed` from its green primary Retry action and preserves `main_menu_pressed` for the
   shared X. `scripts/level.gd` owns the resulting run/economy/navigation behavior.
+- Fits localized replay captions after button resizes and language changes, using exported maximum,
+  minimum and horizontal-padding bounds so reviewed long actions remain inside the existing button.
 
 Important nodes:
 - `Shell`: the shared gameplay modal shell instance, including `%CloseButton`.

@@ -38,12 +38,13 @@ starts.
 ## Translation catalogs
 
 `assets/translations/en.po`, `assets/translations/ru.po`, `assets/translations/uk.po`,
-`assets/translations/it.po`, `assets/translations/ar.po` and `assets/translations/es.po` are
+`assets/translations/it.po`, `assets/translations/ar.po`, `assets/translations/es.po` and
+`assets/translations/pt_BR.po` are
 registered in `project.godot`.
 Russian includes all 251 reviewed keys from
 `docs/localization/RUSSIAN_TRANSLATIONS.md`, the user's corrected October 4, 2026 inventory.
 The inventory is a copy of the approved translation text, not runtime configuration.
-English remains the fallback for the other eight selectable locales until their catalogs exist.
+English remains the fallback for the other seven selectable locales until their catalogs exist.
 
 Ukrainian includes all 251 entries from the owner's reviewed October 5, 2026 document archived
 at `docs/localization/UKRAINIAN_TRANSLATIONS.md`. `uk.po` preserves the edited captions and
@@ -92,6 +93,26 @@ preserved exactly. `AD`, `OFF`, native language names and player/reference value
 existing behavior. The archive retains its pre-integration notes; runtime verification is
 recorded in `docs/localization/SPANISH_LOCALIZATION_QA.md`.
 
+Brazilian Portuguese includes all 251 entries from the owner's improved October 6, 2026 document
+archived verbatim at `docs/localization/PORTUGUESE_BRAZIL_TRANSLATIONS.md`.
+`tests/localization/portuguese_brazil_inventory.json` preserves that revised text, all seven supplied
+singular/plural pairs and supplementary email labels. `pt_BR.po` supplies stable keys, English
+scene aliases and uppercase card/product aliases through the existing localization hooks.
+The existing `Português (Brasil)` language option now resolves the catalog. Portuguese device
+locales, including `pt_BR` and `pt_PT`, continue to map to `pt_BR` on a fresh save.
+
+Brazilian Portuguese counts use periods (`1.234.567`); dates use lowercase month names with
+`date.day_month_year` (`2 de novembro de 2026`). Store-formatted prices remain unchanged.
+Gettext selects the supplied singular for one and plural for other integer counts. The reviewed
+quantity labels deliberately retain fixed product names: `Martelo`, `Embaralhar`, `Lanterna` and
+`Congelador`, including in the `booster.counted` context. The reviewed failure action uses
+`Tentar de novo` through the `Retry` scene alias; the destination status panel explicitly uses
+`common.retry_load` (`Recarregar`). Both gameplay resume and move-on actions use `Continuar`.
+The improved chest banner, `Toque para resgatar`, `Pedir ajuda`, deletion failure/cleanup messages
+and all warning paragraphs retain the supplied wording. `AD`, `OFF`, native language names and
+player/reference values retain their existing behavior. The archive keeps its pre-integration
+notes; runtime verification is recorded in `docs/localization/PORTUGUESE_BRAZIL_LOCALIZATION_QA.md`.
+
 The owner's October 5, 2026 review supersedes three rows of that original inventory:
 
 | Key / English alias | Current Russian display | Reason |
@@ -126,13 +147,14 @@ Formatted HUD, chapter, timer, leaderboard, profile, offer and support strings t
 patterns before interpolation. Russian and Ukrainian `tr_n()` calls select from three reviewed forms using the
 underlying integer count, including when the inserted amount is a formatted `%s`. For rows and
 weekly rewards, the plural count is the stars/coins rather than the rank. Italian selects its two
-forms using `n != 1`, as does Spanish. Claimed booster chips
+forms using `n != 1`, as do Spanish and Brazilian Portuguese. Claimed booster chips
 use gettext context `booster.counted` for the reviewed quantity-aware product names.
 
 `scripts/localization/game_text.gd` owns presentation-only grouped numbers, localized dates,
 counted booster names and safe purchase-error copy. Italian counts use periods and localized
 month names without a year suffix. Spanish uses period grouping and a day/month/year pattern
-with `de` between its parts. Russian and Ukrainian counts use spaces and
+with `de` between its parts. Brazilian Portuguese also uses period grouping and this date pattern,
+with its own month names. Russian and Ukrainian counts use spaces and
 deadlines use genitive month names with the catalog's `date.day_month_year` pattern (`г.` / `р.`);
 store prices pass through unchanged. Purchase/load presentation maps
 unreviewed technical errors to the existing player-facing fallback messages. Provider errors,
@@ -167,6 +189,11 @@ Its owner fits rewarded-action captions within the authored button width, with c
 `shelf_unlock_menu.gd` applies the same configurable bounds to its rewarded-action caption after
 state, size and language changes. This keeps the full reviewed Spanish
 `Ver anuncio · Desbloquear estante` inside the button padding without widening its action row.
+The shelf owner also grows the cream region and preferred modal height to the row's measured
+minimum height plus its authored vertical padding, including a visible reward-status message.
+The shared shell still scales the whole modal to the safe viewport. The failure-screen owner fits
+its replay caption at configurable 32px down to 20px with 32px horizontal padding. Both refinements
+preserve the complete reviewed Brazilian Portuguese text on resize and live language changes.
 `reward_chest_menu.gd` fits the translated hero caption within its banner at 28px down to 16px,
 with `HeroTitleLabel` retaining the existing banner bounds instead of expanding its container.
 
@@ -220,6 +247,10 @@ The implementation ownership and verification scope are recorded in
   scene aliases, English fallback, integer plural boundaries, counted boosters, Spanish glyphs,
   twelve localized dates, unchanged names/prices, live screen/resume updates, preserved pending
   ad state, regional device-locale mapping and local-only preference persistence.
+- `tests/ui/test_portuguese_brazil_localization.gd` checks all 251 reviewed Brazilian Portuguese
+  entries and English aliases, fallback, seven plural pairs, fixed counted booster names,
+  accented glyphs, all twelve dates, period grouping, unchanged names/prices/markers, reload vs
+  replay copy, live screen/resume changes, pending ad state and local-only preference persistence.
 - Capture any screen in an isolated Russian session with:
 
   ```powershell
@@ -232,6 +263,7 @@ The implementation ownership and verification scope are recorded in
   Use `-Locale it` for Italian captures.
   Use `-Locale ar` for Arabic captures.
   Use `-Locale es` for Spanish captures.
+  Use `-Locale pt_BR` for Brazilian Portuguese captures.
 
 The October 4–5, 2026 test results, rendered-screen reviews and capture limitations are recorded in
 `docs/localization/RUSSIAN_LOCALIZATION_QA.md`.
@@ -239,3 +271,4 @@ Ukrainian integration results are recorded in `docs/localization/UKRAINIAN_LOCAL
 Italian integration results are recorded in `docs/localization/ITALIAN_LOCALIZATION_QA.md`.
 Arabic integration results are recorded in `docs/localization/ARABIC_LOCALIZATION_QA.md`.
 Spanish integration results are recorded in `docs/localization/SPANISH_LOCALIZATION_QA.md`.
+Brazilian Portuguese integration results are recorded in `docs/localization/PORTUGUESE_BRAZIL_LOCALIZATION_QA.md`.

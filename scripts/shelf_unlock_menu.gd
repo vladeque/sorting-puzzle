@@ -32,11 +32,15 @@ const READY_LABEL := "Watch Ad · Unlock Shelf"
 
 @onready var _shell := %Shell as GameplayModalShell
 @onready var _unlock_content := %UnlockContent as Control
+@onready var _offer_row := $UnlockContent/OfferRow as HBoxContainer
 @onready var _rewarded_ad_button := %RewardedAdButton as Button
 @onready var _offer_label := %OfferLabel as Label
 @onready var _reward_status_label := %RewardStatusLabel as Label
 
 var _remaining_clears := 0
+var _content_height := CONTENT_REGION_HEIGHT
+var _safe_margins := Vector4.ZERO
+var _layout_viewport := Vector2.ZERO
 
 
 func _ready() -> void:
@@ -51,7 +55,9 @@ func _ready() -> void:
 	_rewarded_ad_button.reparent(_shell.get_action_row(), false)
 	_rewarded_ad_button.pressed.connect(func() -> void: rewarded_ad_requested.emit())
 	_rewarded_ad_button.resized.connect(_fit_rewarded_action_text)
+	_offer_row.minimum_size_changed.connect(_refresh_content_fit.call_deferred)
 	set_rewarded_action_state(REWARDED_STATE_UNAVAILABLE, false)
+	_refresh_content_fit.call_deferred()
 
 
 ## Renders one authoritative rewarded state. `is_enabled` stays the owner's decision so a loaded ad
@@ -77,6 +83,7 @@ func set_rewarded_action_state(state: StringName, is_enabled: bool) -> void:
 	)
 	_reward_status_label.visible = not _reward_status_label.text.is_empty()
 	_fit_rewarded_action_text.call_deferred()
+	_refresh_content_fit.call_deferred()
 
 
 ## Keep the complete translated action inside the authored button rather than widening the row.
@@ -105,6 +112,7 @@ func set_offer(remaining_clears: int) -> void:
 		if remaining <= 0
 		else tr_n("shelf_unlock.offer_or_clear", "shelf_unlock.offer_or_clear.plural", remaining) % remaining
 	)
+	_refresh_content_fit.call_deferred()
 
 
 func is_transitioning() -> bool:
@@ -112,7 +120,26 @@ func is_transitioning() -> bool:
 
 
 func apply_safe_layout(safe_margins: Vector4, viewport_size: Vector2) -> void:
+	_safe_margins = safe_margins
+	_layout_viewport = viewport_size
 	_shell.apply_safe_layout(safe_margins, viewport_size)
+	_refresh_content_fit.call_deferred()
+
+
+## Reserve the row's complete wrapped height, including a visible reward-status message.
+func _refresh_content_fit() -> void:
+	if not is_node_ready():
+		return
+	var row_padding := _offer_row.offset_top - _offer_row.offset_bottom
+	var height := maxf(CONTENT_REGION_HEIGHT, _offer_row.get_combined_minimum_size().y + row_padding)
+	if is_equal_approx(height, _content_height):
+		return
+	_content_height = height
+	_shell.set_content_region_height(height)
+	_shell.set_preferred_size(Vector2(GameplayUIThemeScript.MODAL_MAX_WIDTH,
+		GameplayUIThemeScript.MODAL_COMPACT_HEIGHT + height - CONTENT_REGION_HEIGHT))
+	if _layout_viewport != Vector2.ZERO:
+		_shell.apply_safe_layout(_safe_margins, _layout_viewport)
 
 
 func open() -> void:
@@ -131,3 +158,4 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
 		set_offer(_remaining_clears)
 		_fit_rewarded_action_text.call_deferred()
+		_refresh_content_fit.call_deferred()
