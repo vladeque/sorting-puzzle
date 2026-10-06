@@ -59,5 +59,35 @@ counts and agreement between the main table and the six plural appendices.
 
 ## Rendered review
 
-Responsive capture and visual inspection are in progress. Final results will be recorded here
-after reviewing all contact sheets at 540x960, 720x1280, 1080x1920, 1080x2400 and 1200x1600.
+All 28 French contact sheets in ignored `tmp/ui_capture/` were inspected. Each contains exact
+540x960, 720x1280, 1080x1920, 1080x2400 and 1200x1600 renders: 140 images, zero resolution
+mismatches and zero manifest failures. No additional scene, layout or font changes were needed.
+
+| Capture prefix | Reviewed content |
+| --- | --- |
+| `main_menu_fr`, `shop_fr` | Level action, navigation, `Max`, `PACK`, offer titles, grouped coin amounts and unchanged percentage/`OFF` markers. |
+| `starter_fr`, `claimed_boosters_fr`, `purchase_reward_fr` | Offer title/ribbons, four booster names, `+3 ×` claimed captions, unchanged provider prices and collection prompt. |
+| `support_fr` | All FAQ questions and expand icons, expanded five-step ad-report instructions, email action and payment/password warning. |
+| `deletion_fr`, `deletion_scrolled_fr` | Complete irreversible warning, account re-creation paragraph and reachable final retained-records/30-day paragraph. |
+| `deletion_accepted_fr`, `deletion_failure_fr`, `deletion_cleanup_fr` | French deadline, explicit nothing-deleted message, revised finalization wording and complete action captions. |
+| `language_fr`, `settings_fr`, `profile_fr` | Selected Français row, `ENREGISTRER`, `Vibrations`, privacy action, profile/frame labels and unchanged player names. |
+| `failure_fr`, `complete_fr`, `pause_fr`, `leave_fr` | `NIVEAU RATÉ` and `Rejouer`, `BRAVO !`/`Continuer`, gameplay `Reprendre`, and leave-confirmation losses. |
+| `chapter_fr` | `CHAPITRES`, `Coin des bonbons`, full unlock sentence quoting `Quartier des épiceries`, progress and locked action. |
+| `timeup_fr`, `shelf_unlock_fr`, `shelf_pending_fr`, `ability_fr` | Accented modal titles, complete wrapped descriptions, two-line disabled ad caption, ready/pending actions, status clearance and unchanged `AD` marker. |
+| `chest_fr`, `weekly_reward_fr`, `lives_fr` | Full chest title/banner, weekly title and reviewed `n°` message, life-refill caption/timer and action buttons. |
+| `gameplay_fr`, `leaderboard_fr` | French level HUD, unchanged numeric combo, native player names, weekly reset duration and full ranking tabs/navigation. |
+
+French captions remain inside their banners, buttons and panels at every inspected resolution.
+Long shelf descriptions and pending status wrap vertically while staying inside the cream
+region; the complete `Voir une pub · Débloquer` and `Vérifier la récompense` actions fit.
+Deletion confirmation intentionally scrolls: the final reviewed retention paragraph is fully
+reachable, including at 540x960. The selected language and all accented capitals render correctly.
+The Settings privacy action and all claimed booster names fit without shortening the supplied text.
+
+Final captures contain no script errors. Gameplay captures retain pre-existing hammer-art
+UID path-fallback, synthetic board-layout and anchor warnings. The isolated purchase-reward
+capture reports an ObjectDB leak and four resources still in use at shutdown, matching the
+existing German/English capture-teardown limitation documented in
+`GERMAN_LOCALIZATION_QA.md`. All five requested purchase-reward images were nevertheless saved;
+this is not a clean capture-shutdown claim. Captures use isolated temporary saves and do not
+change the real player's language or perform purchases/account deletion.
