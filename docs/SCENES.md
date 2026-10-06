@@ -24,6 +24,12 @@ aliases. Formatted copy is owned by each scene's focused script; those owners re
 locale change without repeating gameplay actions. `scenes/ui/offer_booster_chip.tscn` bounds its name
 label to the existing chip width and its owner fits localized names. Awning headers and offer
 ribbons refit the translated text. See `docs/LOCALIZATION.md` and `docs/TYPOGRAPHY.md`.
+German (`de`) reuses these owners and English aliases through `assets/translations/de.po`.
+Pause/leave actions resolve `common.resume` as `Weiterspielen`; move-on actions use `Weiter`.
+Reload uses the destination status owner's `common.retry_load` (`Neu laden`), while the failure
+screen's `Retry` alias uses `Nochmal spielen`. German counts and deadlines are formatted only
+at the presentation boundary by `GameText`; local preference and backend behavior are unchanged.
+Reviewed copy and responsive captures are documented in `docs/localization/GERMAN_LOCALIZATION_QA.md`.
 The lives modal's `NextLifeLabel` wraps in its existing timer column so long localized captions
 do not force the heart/timer status row past the content panel.
 `reward_chest_menu.tscn` bounds `%HeroTitleLabel` to the existing banner; its focused owner fits
@@ -1614,6 +1620,8 @@ Important nodes:
 - `%MessageScroll`, `%HeadlineLabel`, `%BodyLabel`, `%ReferenceLabel`: the message content.
 - `%PrimaryButton`, `%SecondaryButton`: reparented into the shell's action row; the primary switches
   between the destructive and green primary styles per view.
+  The focused owner fits translated captions from configurable 22px down to 16px, retaining
+  24px horizontal text padding on state changes, viewport changes and live locale changes.
 
 Verification: `tests/ui/test_account_deletion_modal.gd`; captures through
 `scripts/tools/captures/account_deletion_modal_setup.gd` (choose the view with
@@ -1632,6 +1640,10 @@ Purpose:
   optional focused action button.
 - Question text is inset 22 px from the left edge (`content_margin_left` on the question normal and
   pressed styles) so it lines up with the answer text in the panel below it.
+  Both styles reserve 68px at the trailing side for the expand/collapse icon. The focused owner
+  swaps their scene-local margins for RTL so the icon clearance follows the mirrored icon.
+  fits the complete translated question from configurable 22px down to 16px on resize and live
+  locale changes, without expanding the row horizontally. The touch target stays at least 74px tall.
 - Question text uses the `GameBodyButton` theme variation and answer text uses `GameBodyRichText`,
   so FAQ copy renders in the Nunito reading face instead of DynaPuff; the action button keeps the
   standard bold DynaPuff button font. See `docs/TYPOGRAPHY.md`.

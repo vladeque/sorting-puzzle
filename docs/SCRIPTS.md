@@ -3696,6 +3696,8 @@ Purpose:
   emits `new_game_started` once the service reports the new game is active.
 - `format_deadline(timestamp)` formats `complete_by` as a local calendar date. Formatted strings go
   through `tr()` so future catalogs can translate them.
+- `_fit_action_buttons()` keeps translated action text inside the existing one/two-button layouts
+  with exported font bounds and horizontal padding; it refreshes after state, size and locale changes.
 
 ## `scripts/support_faq_item.gd`
 
@@ -3707,6 +3709,11 @@ Attached to:
 
 Purpose:
 - Owns one question's expand/collapse state, answer text, chevron state, and optional action signal.
+- `_fit_question()` measures the translated caption inside the scene-authored content margins
+  so the complete question clears its expand/collapse icon. Exported font bounds apply on resize
+  and live locale/direction changes; shorter captions restore the configured maximum size.
+- `_apply_reading_alignment()` swaps the scene-local question margins for RTL so icon clearance
+  follows the mirrored chevron and question/answer reading edges stay aligned.
 - Contains no navigation or external-contact policy; those stay in `scripts/support_screen.gd`.
 
 ## `scripts/gameplay_ui_theme.gd`

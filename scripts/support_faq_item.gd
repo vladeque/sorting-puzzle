@@ -8,6 +8,8 @@ signal action_requested(action_id: StringName)
 @export_multiline var answer := "Answer"
 @export var action_text := ""
 @export var action_id := &""
+@export var question_font_size := 22
+@export var minimum_question_font_size := 16
 
 @onready var _question_button := %QuestionButton as Button
 @onready var _chevron_label := %ChevronLabel as Label
@@ -24,20 +26,46 @@ func _ready() -> void:
 	_action_button.text = action_text
 	_action_button.visible = not action_text.is_empty() and action_id != StringName()
 	_question_button.pressed.connect(_toggle_expanded)
+	_question_button.resized.connect(_fit_question)
 	_action_button.pressed.connect(func() -> void: action_requested.emit(action_id))
 	set_expanded(false, false)
 	_apply_reading_alignment()
+	_fit_question.call_deferred()
+
+
+func _fit_question() -> void:
+	var style := _question_button.get_theme_stylebox("normal")
+	var available_width := _question_button.size.x \
+		- style.get_content_margin(SIDE_LEFT) - style.get_content_margin(SIDE_RIGHT)
+	if available_width <= 0.0:
+		return
+	var font := _question_button.get_theme_font("font")
+	var caption := _question_button.atr(_question_button.text)
+	var fitted_size := question_font_size
+	while fitted_size > minimum_question_font_size and font.get_string_size(
+		caption, HORIZONTAL_ALIGNMENT_LEFT, -1, fitted_size
+	).x > available_width:
+		fitted_size -= 1
+	_question_button.add_theme_font_size_override("font_size", fitted_size)
 
 
 func _apply_reading_alignment() -> void:
+	var rtl := is_layout_rtl()
 	_answer_label.horizontal_alignment = (
-		HORIZONTAL_ALIGNMENT_RIGHT if is_layout_rtl() else HORIZONTAL_ALIGNMENT_LEFT
+		HORIZONTAL_ALIGNMENT_RIGHT if rtl else HORIZONTAL_ALIGNMENT_LEFT
 	)
+	for state in [&"normal", &"pressed"]:
+		var style := _question_button.get_theme_stylebox(state) as StyleBoxFlat
+		var leading_margin := minf(style.content_margin_left, style.content_margin_right)
+		var trailing_margin := maxf(style.content_margin_left, style.content_margin_right)
+		style.content_margin_left = trailing_margin if rtl else leading_margin
+		style.content_margin_right = leading_margin if rtl else trailing_margin
 
 
 func _notification(what: int) -> void:
 	if what in [NOTIFICATION_TRANSLATION_CHANGED, NOTIFICATION_LAYOUT_DIRECTION_CHANGED] and is_node_ready():
 		_apply_reading_alignment.call_deferred()
+		_fit_question.call_deferred()
 
 
 func set_answer(value: String) -> void:

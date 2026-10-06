@@ -29,6 +29,8 @@ The Ukrainian localization test verifies its full alphabet, including Ґ/ґ, Є/
 the typographic apostrophe and the № symbol against the same effective title font.
 The Brazilian Portuguese localization test verifies accented vowels, Ç/ç, curly quotation marks
 and the ordinal indicator º through the bundled title font; it uses the existing Latin fonts.
+The German localization test verifies Ä/ä, Ö/ö, Ü/ü, ß, German quotation marks and × through
+the bundled title font. German uses the existing Latin fonts and scene-owned text fitting.
 
 ## Theme Roles
 

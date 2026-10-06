@@ -58,6 +58,10 @@ const SUPPORT_ONLY_REASONS := [
 	OperationsScript.REASON_NOT_CONFIGURED,
 ]
 
+@export var action_font_size := 22
+@export var minimum_action_font_size := 16
+@export var action_text_padding := 24.0
+
 @onready var _shell := %Shell as GameplayModalShell
 @onready var _message_content := %MessageContent as Control
 @onready var _message_scroll := %MessageScroll as ScrollContainer
@@ -93,6 +97,8 @@ func _ready() -> void:
 	_shell.close_requested.connect(_request_close)
 	_primary_button.pressed.connect(func() -> void: _perform(_view.get("primary", ACTION_NONE)))
 	_secondary_button.pressed.connect(func() -> void: _perform(_view.get("secondary", ACTION_NONE)))
+	_primary_button.resized.connect(_fit_action_buttons)
+	_secondary_button.resized.connect(_fit_action_buttons)
 	if _service == null:
 		var player_progress := get_node_or_null(^"/root/PlayerProgress")
 		if player_progress != null:
@@ -476,6 +482,24 @@ func _apply_responsive_layout() -> void:
 		(button as Button).size_flags_horizontal = (
 			Control.SIZE_SHRINK_CENTER if single else Control.SIZE_EXPAND_FILL
 		)
+	_fit_action_buttons.call_deferred()
+
+
+func _fit_action_buttons() -> void:
+	for button: Button in [_primary_button, _secondary_button]:
+		if not button.visible:
+			continue
+		var available_width := minf(button.size.x, button.custom_minimum_size.x) - action_text_padding
+		if available_width <= 0.0:
+			continue
+		var font := button.get_theme_font("font")
+		var caption := button.atr(button.text)
+		var fitted_size := action_font_size
+		while fitted_size > minimum_action_font_size and font.get_string_size(
+			caption, HORIZONTAL_ALIGNMENT_LEFT, -1, fitted_size
+		).x > available_width:
+			fitted_size -= 1
+		button.add_theme_font_size_override("font_size", fitted_size)
 
 
 func _notification(what: int) -> void:
