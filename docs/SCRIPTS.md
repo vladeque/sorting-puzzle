@@ -1,5 +1,15 @@
 # Scripts
 
+## French localization
+
+`assets/translations/fr.po` registers the owner's 251 improved strings, English scene aliases,
+six plural pairs (`n > 1`) and fixed booster names in `booster.counted` context.
+`scripts/localization/game_text.gd` supplies French space grouping and lowercase month names
+through the catalog's day/month/year date pattern. Its existing claimed-caption helper preserves
+the reviewed `+%d × %s` pattern. UI owners reuse their existing live translation refreshes;
+`LocaleManager` remains the sole locale-changing entry point. Reviewed copy, tests and rendered
+verification are recorded in `docs/localization/FRENCH_LOCALIZATION_QA.md`.
+
 ## Arabic direction and presentation
 
 `locale_catalog.gd` enables `ar`/العربية, including regional device mappings. `game_text.gd`

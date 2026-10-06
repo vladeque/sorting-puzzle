@@ -1,5 +1,13 @@
 # Scenes
 
+French (`fr`) uses the existing scene owners and English aliases through `assets/translations/fr.po`.
+Pause and leave resume actions use `Reprendre`, move-on actions use `Continuer`, failure replay
+uses `Rejouer`, and destination reload uses the explicit `common.retry_load` key (`Réessayer`).
+The reviewed `PACK` badge, accented capitals, `NIVEAU RATÉ` banner and `+%d × %s` claimed
+booster labels retain the existing scene hierarchy, layout fitting and live locale refreshes.
+`GameText` owns only presentation formatting for French counts and deadlines.
+Reviewed copy and responsive captures are documented in `docs/localization/FRENCH_LOCALIZATION_QA.md`.
+
 Arabic scene layout inherits Godot Control mirroring. Paragraph alignment belongs to
 `support_faq_item.tscn` and its owner; player-name and store-price controls use automatic text
 direction, while standalone numeric tokens explicitly use LTR. `level_top_hud.tscn` centers the

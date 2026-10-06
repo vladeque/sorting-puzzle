@@ -39,12 +39,12 @@ starts.
 
 `assets/translations/en.po`, `assets/translations/ru.po`, `assets/translations/uk.po`,
 `assets/translations/it.po`, `assets/translations/ar.po`, `assets/translations/es.po`,
-`assets/translations/pt_BR.po` and `assets/translations/de.po` are
+`assets/translations/pt_BR.po`, `assets/translations/de.po` and `assets/translations/fr.po` are
 registered in `project.godot`.
 Russian includes all 251 reviewed keys from
 `docs/localization/RUSSIAN_TRANSLATIONS.md`, the user's corrected October 4, 2026 inventory.
 The inventory is a copy of the approved translation text, not runtime configuration.
-English remains the fallback for the other six selectable locales until their catalogs exist.
+English remains the fallback for the other five selectable locales until their catalogs exist.
 
 Ukrainian includes all 251 entries from the owner's reviewed October 5, 2026 document archived
 at `docs/localization/UKRAINIAN_TRANSLATIONS.md`. `uk.po` preserves the edited captions and
@@ -134,6 +134,29 @@ language names and player/reference values retain their existing behavior. The a
 its pre-integration notes; runtime verification is recorded in
 `docs/localization/GERMAN_LOCALIZATION_QA.md`.
 
+French includes all 251 entries from the owner's improved October 6, 2026 document archived
+verbatim at `docs/localization/FRENCH_TRANSLATIONS.md`. `tests/localization/french_inventory.json`
+retains its exact English/French wording, six supplied plural pairs, fixed booster product names,
+supplementary email labels and twelve French month names. `fr.po` supplies stable keys, English
+scene aliases and uppercase card/product aliases through the existing localization hooks.
+The existing Français option resolves this catalog; regional French device locales such as
+`fr_FR`, `fr_CA`, `fr_BE` and `fr_CH` continue to select `fr` on a fresh save.
+
+French counts use space grouping (`1 234 567`), and deadlines use lowercase month names with
+`date.day_month_year` (`2 novembre 2026`). Gettext selects singular for integer counts zero and
+one, plural for two or more (`n > 1`), using the underlying numeric quantity rather than rank or
+formatted text. The reviewed claimed-booster pattern is `+%d × %s`; `Marteau`, `Mélange`,
+`Lanterne` and `Gel` stay fixed after quantities in the `booster.counted` context.
+The invariant coin-prize tooltip names the currency before the amount. Gameplay resume uses
+`Reprendre`, move-on actions use `Continuer`, replay uses `Rejouer` through the `Retry` scene
+alias, and destination reload explicitly uses `common.retry_load` (`Réessayer`). The corrected
+`Quartier des épiceries`, `NIVEAU RATÉ`, combo sequence, `Vibrations`, typographic ellipses,
+support-email subjects and revised deletion copy are preserved exactly. Supplementary deletion
+email labels preserve the supplied space before their colon. `AD`, `OFF`, native language names,
+player/reference values and provider-formatted prices retain their existing behavior.
+The archive retains its pre-integration notes; runtime verification is recorded in
+`docs/localization/FRENCH_LOCALIZATION_QA.md`.
+
 The owner's October 5, 2026 review supersedes three rows of that original inventory:
 
 | Key / English alias | Current Russian display | Reason |
@@ -168,7 +191,8 @@ Formatted HUD, chapter, timer, leaderboard, profile, offer and support strings t
 patterns before interpolation. Russian and Ukrainian `tr_n()` calls select from three reviewed forms using the
 underlying integer count, including when the inserted amount is a formatted `%s`. For rows and
 weekly rewards, the plural count is the stars/coins rather than the rank. Italian selects its two
-forms using `n != 1`, as do Spanish, Brazilian Portuguese and German. Claimed booster chips
+forms using `n != 1`, as do Spanish, Brazilian Portuguese and German. French selects its
+reviewed singular for zero and one using `n > 1`. Claimed booster chips
 use gettext context `booster.counted` for the reviewed quantity-aware product names.
 
 `scripts/localization/game_text.gd` owns presentation-only grouped numbers, localized dates,
@@ -176,6 +200,7 @@ counted booster names and safe purchase-error copy. Italian counts use periods a
 month names without a year suffix. Spanish uses period grouping and a day/month/year pattern
 with `de` between its parts. Brazilian Portuguese also uses period grouping and this date pattern,
 with its own month names. German uses period grouping and numeric `DD.MM.YYYY` dates.
+French uses spaces for grouping and lowercase month names with a day/month/year pattern.
 Russian and Ukrainian counts use spaces and
 deadlines use genitive month names with the catalog's `date.day_month_year` pattern (`г.` / `р.`);
 store prices pass through unchanged. Purchase/load presentation maps
@@ -284,6 +309,12 @@ The implementation ownership and verification scope are recorded in
   and resume/move-on actions, live screen changes, pending ad state, regional device mapping and
   local-only preference persistence. It measures FAQ questions and deletion, shelf and replay
   actions at all five viewports.
+- `tests/ui/test_french_localization.gd` checks all 251 improved French entries and English
+  aliases, fallback, six plural pairs including French's singular zero, fixed booster names,
+  accented glyphs, twelve localized dates, space grouping, raw prices/names/references, French
+  email punctuation, contextual reload/replay and resume/move-on actions, live screen refreshes,
+  pending ad state, regional device mapping and local-only preference persistence. It measures
+  FAQ questions and deletion, shelf and replay actions at all five viewports.
 - Capture any screen in an isolated Russian session with:
 
   ```powershell
@@ -298,6 +329,7 @@ The implementation ownership and verification scope are recorded in
   Use `-Locale es` for Spanish captures.
   Use `-Locale pt_BR` for Brazilian Portuguese captures.
   Use `-Locale de` for German captures.
+  Use `-Locale fr` for French captures.
 
 The October 4–5, 2026 test results, rendered-screen reviews and capture limitations are recorded in
 `docs/localization/RUSSIAN_LOCALIZATION_QA.md`.
@@ -307,3 +339,4 @@ Arabic integration results are recorded in `docs/localization/ARABIC_LOCALIZATIO
 Spanish integration results are recorded in `docs/localization/SPANISH_LOCALIZATION_QA.md`.
 Brazilian Portuguese integration results are recorded in `docs/localization/PORTUGUESE_BRAZIL_LOCALIZATION_QA.md`.
 German integration results are recorded in `docs/localization/GERMAN_LOCALIZATION_QA.md`.
+French integration results are recorded in `docs/localization/FRENCH_LOCALIZATION_QA.md`.

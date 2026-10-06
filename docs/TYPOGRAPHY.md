@@ -31,6 +31,9 @@ The Brazilian Portuguese localization test verifies accented vowels, Ç/ç, curl
 and the ordinal indicator º through the bundled title font; it uses the existing Latin fonts.
 The German localization test verifies Ä/ä, Ö/ö, Ü/ü, ß, German quotation marks and × through
 the bundled title font. German uses the existing Latin fonts and scene-owned text fitting.
+The French localization test checks accented lower/uppercase Latin letters, French quotation
+marks, curly apostrophes, the reviewed degree sign in `n°`, and × through the bundled title font.
+French uses the existing Latin fonts and scene-owned text fitting; no new font resource is needed.
 
 ## Theme Roles
 

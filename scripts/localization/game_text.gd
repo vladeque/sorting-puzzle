@@ -18,7 +18,7 @@ const PURCHASE_MESSAGES := [
 static func format_number(value: int) -> String:
 	var digits := str(maxi(value, 0))
 	var language := TranslationServer.get_locale().get_slice("_", 0)
-	var separator := " " if language in ["ru", "uk"] else ","
+	var separator := " " if language in ["ru", "uk", "fr"] else ","
 	if language in ["it", "es", "pt", "de"]:
 		separator = "."
 	var formatted := ""
@@ -38,7 +38,7 @@ static func format_date(date: Dictionary) -> String:
 		return "%02d.%02d.%04d" % [day, month, year]
 	if language == "ar":
 		return "%d/%d/%d" % [day, month, year]
-	if language in ["ru", "uk", "it", "es", "pt"]:
+	if language in ["ru", "uk", "it", "es", "pt", "fr"]:
 		var month_name := TranslationServer.translate("date.month.%d" % month)
 		return TranslationServer.translate("date.day_month_year") % [day, month_name, year]
 	return "%s %d, %d" % [MONTH_NAMES[month - 1], day, year]
