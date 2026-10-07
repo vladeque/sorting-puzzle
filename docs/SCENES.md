@@ -1,5 +1,13 @@
 # Scenes
 
+Korean (`ko`) uses existing scene owners and English aliases through `assets/translations/ko.po`.
+Resume uses `계속하기`, move-on uses `계속`, replay uses `다시 도전`, and data reload uses
+`common.retry_load` (`다시 불러오기`). The `패키지` badge, complete supplied shelf captions,
+warning paragraphs and fixed booster names retain their existing scene hierarchy and fitting.
+The project theme provides matching-weight bundled Hangul fonts for all roles; `GameText`
+formats Korean deadline dates in year/month/day order. Source copy and responsive captures are
+documented in `docs/localization/KOREAN_LOCALIZATION_QA.md`.
+
 French (`fr`) uses the existing scene owners and English aliases through `assets/translations/fr.po`.
 Pause and leave resume actions use `Reprendre`, move-on actions use `Continuer`, failure replay
 uses `Rejouer`, and destination reload uses the explicit `common.retry_load` key (`Réessayer`).

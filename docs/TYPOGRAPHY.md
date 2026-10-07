@@ -37,6 +37,17 @@ French uses the existing Latin fonts and scene-owned text fitting; no new font r
 
 ## Theme Roles
 
+Korean glyphs use bundled `assets/fonts/NotoSansKR-Variable.ttf` fallback variations at matching
+500/600/700 weights throughout the display, button, HUD, body, rich-text and editing roles.
+They follow the existing Latin, Cyrillic and Arabic fonts in each fallback chain, supporting
+mixed player names and native language labels in every locale. Keep `NotoSansKR-OFL.txt`
+beside the font. The unmodified variable font (10,414,588 bytes) and its SIL Open Font License
+were downloaded from the official [Google Fonts Noto Sans KR directory](https://github.com/google/fonts/tree/main/ofl/notosanskr).
+Its weight axis covers 100–900; no system font is required for Hangul. Font SHA-256:
+`194018E6B2B293A7964F037B25C0249CE1418BC9AB3C971060A03AA57861E252`.
+`tests/ui/test_korean_localization.gd` checks every reviewed non-ASCII character and decomposed
+Hangul through all theme roles' bundled font inventories, independently of desktop fallbacks.
+
 Arabic glyphs use bundled Baloo Bhaijaan 2 for display/button/HUD roles at matching 500/600/700
 weights and Noto Sans Arabic for reading/editing roles at 600/700 weights. The theme keeps the
 existing Latin and Cyrillic primary faces. Arabic fallbacks are always available, including when

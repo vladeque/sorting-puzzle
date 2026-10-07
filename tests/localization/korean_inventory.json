@@ -1,0 +1,1336 @@
+{
+  "source": "Owner-reviewed Sorting Puzzle — Korean Translations.md, October 7, 2026",
+  "source_sha256": "B3AD4F4E6FEEBBE285665A27F1D8A4F10AB711DAC3AD5354D17465E54F3A9C40",
+  "entries": [
+    {
+      "key": "common.play",
+      "en": "Play",
+      "ko": "플레이"
+    },
+    {
+      "key": "common.continue",
+      "en": "Continue",
+      "ko": "계속"
+    },
+    {
+      "key": "common.resume",
+      "en": "Continue",
+      "ko": "계속하기"
+    },
+    {
+      "key": "common.try_again",
+      "en": "Try Again",
+      "ko": "다시 시도"
+    },
+    {
+      "key": "common.close",
+      "en": "Close",
+      "ko": "닫기"
+    },
+    {
+      "key": "common.cancel",
+      "en": "Cancel",
+      "ko": "취소"
+    },
+    {
+      "key": "common.got_it",
+      "en": "Got it",
+      "ko": "확인"
+    },
+    {
+      "key": "common.get_help",
+      "en": "Get Help",
+      "ko": "도움 요청"
+    },
+    {
+      "key": "common.save",
+      "en": "SAVE",
+      "ko": "저장"
+    },
+    {
+      "key": "common.loading",
+      "en": "Loading…",
+      "ko": "불러오는 중…"
+    },
+    {
+      "key": "common.retry_load",
+      "en": "Retry",
+      "ko": "다시 불러오기"
+    },
+    {
+      "key": "menu.level_button",
+      "en": "LEVEL %d",
+      "ko": "레벨 %d"
+    },
+    {
+      "key": "menu.more_levels_coming_soon",
+      "en": "MORE LEVELS COMING SOON",
+      "ko": "새 레벨이 곧 추가돼요"
+    },
+    {
+      "key": "menu.coming_soon",
+      "en": "COMING SOON",
+      "ko": "곧 공개"
+    },
+    {
+      "key": "menu.lives_full",
+      "en": "Full",
+      "ko": "가득"
+    },
+    {
+      "key": "menu.starter_badge",
+      "en": "BUNDLE",
+      "ko": "패키지"
+    },
+    {
+      "key": "nav.shop",
+      "en": "Shop",
+      "ko": "상점"
+    },
+    {
+      "key": "nav.home",
+      "en": "Home",
+      "ko": "홈"
+    },
+    {
+      "key": "nav.leaderboard",
+      "en": "Leaderboard",
+      "ko": "랭킹"
+    },
+    {
+      "key": "chapter.button",
+      "en": "CHAPTER %d",
+      "ko": "챕터 %d"
+    },
+    {
+      "key": "chapter.button_tooltip",
+      "en": "Choose Chapter %d: %s",
+      "ko": "챕터 %d, %s 선택"
+    },
+    {
+      "key": "chapter.screen_title",
+      "en": "CHAPTERS",
+      "ko": "챕터"
+    },
+    {
+      "key": "chapter.eyebrow",
+      "en": "CHAPTER %d",
+      "ko": "챕터 %d"
+    },
+    {
+      "key": "chapter.title.chapter_01",
+      "en": "Grocery Town",
+      "ko": "마트 마을"
+    },
+    {
+      "key": "chapter.title.chapter_02",
+      "en": "Candy Corner",
+      "ko": "사탕 골목"
+    },
+    {
+      "key": "chapter.locked_status",
+      "en": "Complete %d more %s levels to unlock",
+      "ko": "레벨 %d개를 '%s'에서 더 완료하면 잠금이 해제됩니다"
+    },
+    {
+      "key": "chapter.unlock_progress",
+      "en": "Unlock progress",
+      "ko": "잠금 해제 진행도"
+    },
+    {
+      "key": "chapter.current_progress",
+      "en": "Current progress",
+      "ko": "현재 진행도"
+    },
+    {
+      "key": "chapter.locked",
+      "en": "Locked",
+      "ko": "잠김"
+    },
+    {
+      "key": "chapter.no_levels_status",
+      "en": "New levels are coming soon",
+      "ko": "새 레벨이 곧 추가돼요"
+    },
+    {
+      "key": "chapter.coming_soon",
+      "en": "Coming Soon",
+      "ko": "곧 공개"
+    },
+    {
+      "key": "hud.level",
+      "en": "LEVEL %d",
+      "ko": "레벨 %d"
+    },
+    {
+      "key": "hud.combo",
+      "en": "COMBO ×%d",
+      "ko": "콤보 ×%d"
+    },
+    {
+      "key": "hud.ability_tooltip.hammer",
+      "en": "Hammer -- clears a matching triple",
+      "ko": "망치 -- 같은 아이템 3개를 제거해요"
+    },
+    {
+      "key": "hud.ability_tooltip.shuffle",
+      "en": "Shuffle -- reshuffles unlocked items",
+      "ko": "섞기 -- 잠기지 않은 아이템을 다시 섞어요"
+    },
+    {
+      "key": "hud.ability_tooltip.lantern",
+      "en": "Lantern -- highlights a matchable triple",
+      "ko": "랜턴 -- 맞출 수 있는 같은 아이템 3개를 표시해요"
+    },
+    {
+      "key": "hud.ability_tooltip.freezer",
+      "en": "Freezer -- pauses the countdown timer",
+      "ko": "얼리기 -- 카운트다운 타이머를 멈춰요"
+    },
+    {
+      "key": "hud.seconds_short",
+      "en": "%ds",
+      "ko": "%d초"
+    },
+    {
+      "key": "tip.tap_dispenser",
+      "en": "Tap a dispenser to throw items onto the shelves!",
+      "ko": "배출기를 터치하면 아이템이 선반으로 나와요!"
+    },
+    {
+      "key": "pause.title",
+      "en": "PAUSE",
+      "ko": "일시정지"
+    },
+    {
+      "key": "pause.leave",
+      "en": "Leave",
+      "ko": "나가기"
+    },
+    {
+      "key": "leave.title",
+      "en": "LEAVING THE LEVEL",
+      "ko": "레벨 나가기"
+    },
+    {
+      "key": "leave.you_will_lose",
+      "en": "You will lose:",
+      "ko": "다음을 잃게 돼요:"
+    },
+    {
+      "key": "leave.confirm",
+      "en": "Leave",
+      "ko": "나가기"
+    },
+    {
+      "key": "timeup.title",
+      "en": "TIME'S UP",
+      "ko": "시간 종료"
+    },
+    {
+      "key": "timeup.offer",
+      "en": "Add one minute and keep sorting!",
+      "ko": "1분을 추가하고 계속 정리해요!"
+    },
+    {
+      "key": "timeup.used",
+      "en": "Used",
+      "ko": "사용 완료"
+    },
+    {
+      "key": "ability_purchase.title",
+      "en": "USE ABILITY",
+      "ko": "부스터 사용"
+    },
+    {
+      "key": "shelf_unlock.title",
+      "en": "UNLOCK SHELF",
+      "ko": "선반 잠금 해제"
+    },
+    {
+      "key": "shelf_unlock.offer",
+      "en": "Watch one ad to unlock this shelf now.",
+      "ko": "광고 하나를 보고 지금 이 선반의 잠금을 해제하세요."
+    },
+    {
+      "key": "shelf_unlock.offer_or_clear",
+      "en": "Watch one ad to unlock this shelf now, or clear %s more.",
+      "ko": "광고 하나를 보고 지금 이 선반의 잠금을 해제하거나, 세트를 %s번 더 맞추세요."
+    },
+    {
+      "key": "shelf_unlock.button",
+      "en": "Watch Ad · Unlock Shelf",
+      "ko": "광고 보기 · 선반 잠금 해제"
+    },
+    {
+      "key": "shelf_unlock.ad_unavailable",
+      "en": "Ad unavailable. This shelf stays locked.",
+      "ko": "광고를 볼 수 없어요. 이 선반은 잠긴 상태로 유지돼요."
+    },
+    {
+      "key": "complete.title",
+      "en": "GREAT JOB!",
+      "ko": "잘했어요!"
+    },
+    {
+      "key": "failed.title",
+      "en": "LEVEL %d",
+      "ko": "레벨 %d"
+    },
+    {
+      "key": "failed.headline",
+      "en": "LEVEL FAILED",
+      "ko": "레벨 실패"
+    },
+    {
+      "key": "failed.retry",
+      "en": "Retry",
+      "ko": "다시 도전"
+    },
+    {
+      "key": "combo.praise.2",
+      "en": "Cool",
+      "ko": "좋아!"
+    },
+    {
+      "key": "combo.praise.3",
+      "en": "Great",
+      "ko": "잘했어!"
+    },
+    {
+      "key": "combo.praise.4",
+      "en": "Awesome",
+      "ko": "멋져!"
+    },
+    {
+      "key": "combo.praise.5",
+      "en": "Amazing",
+      "ko": "놀라워!"
+    },
+    {
+      "key": "combo.praise.6",
+      "en": "Fantastic",
+      "ko": "환상적이야!"
+    },
+    {
+      "key": "combo.praise.7",
+      "en": "Incredible",
+      "ko": "믿기지 않아!"
+    },
+    {
+      "key": "combo.praise.8",
+      "en": "Spectacular",
+      "ko": "엄청나!"
+    },
+    {
+      "key": "combo.praise.9",
+      "en": "Unstoppable",
+      "ko": "거침없어!"
+    },
+    {
+      "key": "combo.praise.10",
+      "en": "Legendary",
+      "ko": "전설적이야!"
+    },
+    {
+      "key": "combo.praise.11",
+      "en": "Epic",
+      "ko": "압도적이야!"
+    },
+    {
+      "key": "combo.praise.12",
+      "en": "Brilliant",
+      "ko": "눈부신 실력!"
+    },
+    {
+      "key": "combo.praise.13",
+      "en": "Masterful",
+      "ko": "달인의 실력!"
+    },
+    {
+      "key": "combo.praise.14",
+      "en": "Supreme",
+      "ko": "최고의 실력!"
+    },
+    {
+      "key": "combo.praise.15",
+      "en": "Phenomenal",
+      "ko": "경이로운 실력!"
+    },
+    {
+      "key": "combo.praise.16",
+      "en": "Mythic",
+      "ko": "신화급이야!"
+    },
+    {
+      "key": "combo.praise.17",
+      "en": "Majestic",
+      "ko": "독보적이야!"
+    },
+    {
+      "key": "combo.praise.18",
+      "en": "Radiant",
+      "ko": "차원이 달라!"
+    },
+    {
+      "key": "combo.praise.19",
+      "en": "Divine",
+      "ko": "신의 경지!"
+    },
+    {
+      "key": "combo.praise.20",
+      "en": "Transcendent",
+      "ko": "초월의 경지!"
+    },
+    {
+      "key": "ability.hammer.name",
+      "en": "Hammer",
+      "ko": "망치"
+    },
+    {
+      "key": "ability.shuffle.name",
+      "en": "Shuffle",
+      "ko": "섞기"
+    },
+    {
+      "key": "ability.lantern.name",
+      "en": "Lantern",
+      "ko": "랜턴"
+    },
+    {
+      "key": "ability.freezer.name",
+      "en": "Freezer",
+      "ko": "얼리기"
+    },
+    {
+      "key": "ability.hammer.description",
+      "en": "Instantly clears one matching set of items off the shelves.",
+      "ko": "선반에서 같은 아이템 3개로 이루어진 세트 하나를 즉시 제거해요."
+    },
+    {
+      "key": "ability.shuffle.description",
+      "en": "Shuffles shelf items into new spots to help you find a match.",
+      "ko": "선반 위 아이템의 위치를 섞어 맞출 세트를 찾기 쉽게 해줘요."
+    },
+    {
+      "key": "ability.lantern.description",
+      "en": "Highlights a matching triple you can clear for 15 seconds.",
+      "ko": "없앨 수 있는 같은 아이템 3개를 15초 동안 강조해요."
+    },
+    {
+      "key": "ability.freezer.description",
+      "en": "Freezes the level timer for 30 seconds.",
+      "ko": "레벨 타이머를 30초 동안 멈춰요."
+    },
+    {
+      "key": "ad.watch",
+      "en": "Watch Ad",
+      "ko": "광고 보기"
+    },
+    {
+      "key": "ad.loading",
+      "en": "Loading...",
+      "ko": "불러오는 중..."
+    },
+    {
+      "key": "ad.verifying",
+      "en": "Verifying...",
+      "ko": "확인 중..."
+    },
+    {
+      "key": "ad.verify_reward",
+      "en": "Verify Reward",
+      "ko": "보상 확인"
+    },
+    {
+      "key": "ad.reward_pending",
+      "en": "Reward verification is still pending.",
+      "ko": "아직 보상 확인이 완료되지 않았어요."
+    },
+    {
+      "key": "ad.unavailable_retry",
+      "en": "Ad unavailable. Please try again.",
+      "ko": "광고를 볼 수 없어요. 다시 시도해 주세요."
+    },
+    {
+      "key": "ad.watch_unavailable",
+      "en": "Watch Ad\nUnavailable",
+      "ko": "광고 보기\n이용 불가"
+    },
+    {
+      "key": "ad.watch_coming_soon",
+      "en": "Watch Ad\nComing Soon",
+      "ko": "광고 보기\n곧 제공"
+    },
+    {
+      "key": "ad.badge",
+      "en": "AD",
+      "ko": "AD"
+    },
+    {
+      "key": "lives.title.out",
+      "en": "OUT OF LIVES",
+      "ko": "하트 없음"
+    },
+    {
+      "key": "lives.title.get_more",
+      "en": "GET MORE LIVES",
+      "ko": "하트 충전"
+    },
+    {
+      "key": "lives.title.full",
+      "en": "LIVES FULL",
+      "ko": "하트 가득"
+    },
+    {
+      "key": "lives.next_in",
+      "en": "NEXT LIFE IN",
+      "ko": "다음 하트까지"
+    },
+    {
+      "key": "lives.full_body",
+      "en": "Your lives are full! Play a level to spend them.",
+      "ko": "하트가 가득해요! 레벨을 플레이해 하트를 사용하세요."
+    },
+    {
+      "key": "chest.title",
+      "en": "CHEST REWARDS",
+      "ko": "상자 보상"
+    },
+    {
+      "key": "chest.progress_hint",
+      "en": "Collect stars to unlock a chest and claim your reward",
+      "ko": "별을 모아 보상 상자를 열고 보상을 받으세요"
+    },
+    {
+      "key": "chest.ready",
+      "en": "A REWARD CHEST AWAITS!",
+      "ko": "보상 상자가 기다려요!"
+    },
+    {
+      "key": "chest.tap_to_open",
+      "en": "Tap to open",
+      "ko": "터치해서 열기"
+    },
+    {
+      "key": "purchase.tap_to_collect",
+      "en": "Tap to collect",
+      "ko": "터치해서 받기"
+    },
+    {
+      "key": "purchase.complete",
+      "en": "PURCHASE COMPLETE",
+      "ko": "구매 완료"
+    },
+    {
+      "key": "shop.title",
+      "en": "SHOP",
+      "ko": "상점"
+    },
+    {
+      "key": "shop.section.bundles",
+      "en": "SPECIAL BUNDLES",
+      "ko": "특별 패키지"
+    },
+    {
+      "key": "shop.section.coins",
+      "en": "COINS",
+      "ko": "코인"
+    },
+    {
+      "key": "shop.offer.starter_bundle",
+      "en": "Starter Bundle",
+      "ko": "스타터 패키지"
+    },
+    {
+      "key": "shop.offer.basic_bundle",
+      "en": "Basic Bundle",
+      "ko": "기본 패키지"
+    },
+    {
+      "key": "shop.tag.best_value",
+      "en": "BEST VALUE",
+      "ko": "최고 혜택"
+    },
+    {
+      "key": "shop.discount_off",
+      "en": "OFF",
+      "ko": "OFF"
+    },
+    {
+      "key": "shop.ability_hint",
+      "en": "Tap an ability to see what it does",
+      "ko": "부스터를 터치해 효과를 확인하세요"
+    },
+    {
+      "key": "shop.purchasing",
+      "en": "Purchasing…",
+      "ko": "구매 중…"
+    },
+    {
+      "key": "shop.no_offers",
+      "en": "No shop offers are available for this region.",
+      "ko": "이 지역에서 구매할 수 있는 상품이 없어요."
+    },
+    {
+      "key": "shop.load_failed",
+      "en": "Could not load the shop.",
+      "ko": "상점을 불러오지 못했어요."
+    },
+    {
+      "key": "shop.error.title.purchase",
+      "en": "Purchase unavailable",
+      "ko": "구매 불가"
+    },
+    {
+      "key": "shop.error.title.reward",
+      "en": "Reward error",
+      "ko": "보상 오류"
+    },
+    {
+      "key": "shop.error.purchase_failed",
+      "en": "The purchase could not be completed.",
+      "ko": "구매를 완료하지 못했어요."
+    },
+    {
+      "key": "shop.error.grant_failed",
+      "en": "The purchased rewards could not be granted.",
+      "ko": "구매한 보상을 지급하지 못했어요."
+    },
+    {
+      "key": "shop.error.offer_unavailable",
+      "en": "This shop offer is unavailable.",
+      "ko": "이 상품은 구매할 수 없어요."
+    },
+    {
+      "key": "shop.error.already_bought",
+      "en": "This one-time shop offer has already been purchased.",
+      "ko": "한 번만 구매할 수 있는 이 상품을 이미 구매했어요."
+    },
+    {
+      "key": "starter.title",
+      "en": "STARTER BUNDLE",
+      "ko": "스타터 패키지"
+    },
+    {
+      "key": "starter.one_time",
+      "en": "ONE-TIME OFFER",
+      "ko": "한 번만 구매 가능"
+    },
+    {
+      "key": "starter.boosters_included",
+      "en": "BOOSTERS INCLUDED",
+      "ko": "부스터 포함"
+    },
+    {
+      "key": "starter.coins",
+      "en": "%s COINS",
+      "ko": "코인 %s개"
+    },
+    {
+      "key": "starter.buy_for",
+      "en": "Buy for %s",
+      "ko": "%s에 구매하기"
+    },
+    {
+      "key": "starter.checking",
+      "en": "Checking offer…",
+      "ko": "상품 확인 중…"
+    },
+    {
+      "key": "starter.checking_short",
+      "en": "Checking…",
+      "ko": "확인 중…"
+    },
+    {
+      "key": "starter.no_longer_available",
+      "en": "This offer is no longer available.",
+      "ko": "이 상품은 더 이상 구매할 수 없어요."
+    },
+    {
+      "key": "starter.unavailable",
+      "en": "Unavailable",
+      "ko": "구매 불가"
+    },
+    {
+      "key": "booster_chip.claimed",
+      "en": "+%d %s",
+      "ko": "+%d %s"
+    },
+    {
+      "key": "profile.title",
+      "en": "EDIT PROFILE",
+      "ko": "프로필 수정"
+    },
+    {
+      "key": "profile.name_header",
+      "en": "PLAYER NAME",
+      "ko": "플레이어 이름"
+    },
+    {
+      "key": "profile.name_placeholder",
+      "en": "Player name",
+      "ko": "플레이어 이름"
+    },
+    {
+      "key": "profile.edit_name_tooltip",
+      "en": "Edit player name",
+      "ko": "플레이어 이름 수정"
+    },
+    {
+      "key": "profile.avatar_tab",
+      "en": "AVATAR",
+      "ko": "아바타"
+    },
+    {
+      "key": "profile.frame_tab",
+      "en": "FRAME",
+      "ko": "프레임"
+    },
+    {
+      "key": "profile.unlock.level",
+      "en": "Complete level %d to unlock",
+      "ko": "레벨 %d를 완료하면 해제됩니다"
+    },
+    {
+      "key": "profile.unlock.combo",
+      "en": "Reach a combo of ×%d in any run to unlock",
+      "ko": "한 번의 플레이에서 콤보 ×%d를 달성하면 해제됩니다"
+    },
+    {
+      "key": "profile.unlock.weekly_first",
+      "en": "Finish 1st on the Weekly leaderboard to unlock",
+      "ko": "주간 랭킹에서 1위를 차지하면 해제됩니다"
+    },
+    {
+      "key": "profile.unlock.weekly_top",
+      "en": "Finish top %d on the Weekly leaderboard to unlock",
+      "ko": "주간 랭킹에서 %d위 안에 들면 해제됩니다"
+    },
+    {
+      "key": "leaderboard.title",
+      "en": "LEADERBOARD",
+      "ko": "랭킹"
+    },
+    {
+      "key": "leaderboard.tab.weekly",
+      "en": "Weekly",
+      "ko": "주간"
+    },
+    {
+      "key": "leaderboard.tab.country",
+      "en": "Country",
+      "ko": "국가"
+    },
+    {
+      "key": "leaderboard.tab.world",
+      "en": "World",
+      "ko": "세계"
+    },
+    {
+      "key": "leaderboard.weekly_reset",
+      "en": "Weekly reset in %s",
+      "ko": "주간 초기화까지 %s"
+    },
+    {
+      "key": "leaderboard.duration.dh",
+      "en": "%dd %dh",
+      "ko": "%d일 %d시간"
+    },
+    {
+      "key": "leaderboard.duration.hm",
+      "en": "%dh %dm",
+      "ko": "%d시간 %d분"
+    },
+    {
+      "key": "leaderboard.duration.m",
+      "en": "%dm",
+      "ko": "%d분"
+    },
+    {
+      "key": "leaderboard.country_caption",
+      "en": "Country · All-time stars",
+      "ko": "국가 · 누적 별"
+    },
+    {
+      "key": "leaderboard.world_caption",
+      "en": "Worldwide · All-time stars",
+      "ko": "전 세계 · 누적 별"
+    },
+    {
+      "key": "leaderboard.load_failed",
+      "en": "Could not load leaderboard.",
+      "ko": "랭킹을 불러오지 못했어요."
+    },
+    {
+      "key": "leaderboard.default_name",
+      "en": "Player",
+      "ko": "플레이어"
+    },
+    {
+      "key": "leaderboard.row_tooltip",
+      "en": "Rank %d, %s, %d stars",
+      "ko": "%d위, %s, 별 %d개"
+    },
+    {
+      "key": "leaderboard.reward_tooltip",
+      "en": "%s coin weekly reward",
+      "ko": "주간 보상: 코인 %s개"
+    },
+    {
+      "key": "leaderboard.reward.title",
+      "en": "WEEKLY REWARD!",
+      "ko": "주간 보상!"
+    },
+    {
+      "key": "leaderboard.reward.body",
+      "en": "You finished #%d last week and earned %d coins!",
+      "ko": "지난주에 %d위를 차지해 코인 %d개를 받았어요!"
+    },
+    {
+      "key": "leaderboard.reward.ok",
+      "en": "Nice!",
+      "ko": "좋아요!"
+    },
+    {
+      "key": "settings.title",
+      "en": "SETTINGS",
+      "ko": "설정"
+    },
+    {
+      "key": "settings.music",
+      "en": "Music",
+      "ko": "음악"
+    },
+    {
+      "key": "settings.sfx",
+      "en": "SFX",
+      "ko": "효과음"
+    },
+    {
+      "key": "settings.vibrate",
+      "en": "Vibrate",
+      "ko": "진동"
+    },
+    {
+      "key": "settings.support",
+      "en": "Support",
+      "ko": "고객지원"
+    },
+    {
+      "key": "settings.language",
+      "en": "Language",
+      "ko": "언어"
+    },
+    {
+      "key": "settings.privacy_policy",
+      "en": "Privacy Policy",
+      "ko": "개인정보 처리방침"
+    },
+    {
+      "key": "settings.privacy_choices",
+      "en": "Privacy Choices",
+      "ko": "개인정보 보호 설정"
+    },
+    {
+      "key": "settings.diagnostics",
+      "en": "Version %s • Build %d\nPlatform: %s • User: %s",
+      "ko": "버전 %s • 빌드 %d\n플랫폼: %s • 사용자: %s"
+    },
+    {
+      "key": "language.title",
+      "en": "LANGUAGE",
+      "ko": "언어"
+    },
+    {
+      "key": "support.title",
+      "en": "SUPPORT",
+      "ko": "고객지원"
+    },
+    {
+      "key": "support.faq_header",
+      "en": "Frequently Asked Questions",
+      "ko": "자주 묻는 질문"
+    },
+    {
+      "key": "support.faq.play.q",
+      "en": "How do I play?",
+      "ko": "어떻게 플레이하나요?"
+    },
+    {
+      "key": "support.faq.play.a",
+      "en": "Move matching goods onto the same shelf. When three identical items are visible together, they clear. Complete the board before time runs out.",
+      "ko": "같은 아이템을 같은 선반으로 옮기세요. 동일한 아이템 3개가 함께 보이면 사라져요. 시간이 다 되기 전에 보드의 아이템을 모두 제거하세요."
+    },
+    {
+      "key": "support.faq.contact.q",
+      "en": "How do I contact support?",
+      "ko": "고객지원에 어떻게 문의하나요?"
+    },
+    {
+      "key": "support.faq.contact.a",
+      "en": "Email us at %s. Include a short description, your device platform, and when the problem happened.",
+      "ko": "%s로 이메일을 보내 주세요. 문제에 대한 간단한 설명, 기기 플랫폼, 문제가 발생한 시간을 함께 알려 주세요."
+    },
+    {
+      "key": "support.faq.contact.action",
+      "en": "Email Support",
+      "ko": "이메일 문의"
+    },
+    {
+      "key": "support.faq.crash.q",
+      "en": "What if the game freezes or crashes?",
+      "ko": "게임이 멈추거나 갑자기 종료되면 어떻게 하나요?"
+    },
+    {
+      "key": "support.faq.crash.a",
+      "en": "Close and reopen the game first. If it happens again, restart the device and make sure the game is updated. Contact support with the device model, platform version, and what you were doing before the problem.",
+      "ko": "먼저 게임을 종료한 뒤 다시 실행해 보세요. 문제가 반복되면 기기를 재시작하고 게임이 최신 버전인지 확인하세요. 기기 모델, 플랫폼 버전, 문제가 발생하기 직전에 무엇을 하고 있었는지 고객지원에 알려 주세요."
+    },
+    {
+      "key": "support.faq.sync.q",
+      "en": "How do I sync progress between devices?",
+      "ko": "기기 간에 진행 상황을 어떻게 동기화하나요?"
+    },
+    {
+      "key": "support.faq.sync.a",
+      "en": "Use the same signed-in platform account on both devices and allow synchronization to finish before playing. If the progress differs, avoid playing on both devices and contact support.",
+      "ko": "두 기기에서 같은 플랫폼 계정으로 로그인하고, 동기화가 완료된 뒤 플레이하세요. 진행 상황이 다르면 두 기기에서 플레이하지 말고 고객지원에 문의하세요."
+    },
+    {
+      "key": "support.faq.bad_ad.q",
+      "en": "How do I report a bad ad?",
+      "ko": "부적절한 광고는 어떻게 신고하나요?"
+    },
+    {
+      "key": "support.faq.bad_ad.a",
+      "en": "1. Close the ad if you can do so safely.\n2. Take a screenshot of the ad and any advertiser or app name shown.\n3. Note the approximate time and where the ad appeared in the game.\n4. Describe why the ad seemed offensive, misleading, or fraudulent.\n5. Email these details to %s. Do not include passwords or payment information.",
+      "ko": "1. 안전하게 닫을 수 있다면 광고를 닫으세요.\n2. 광고와 화면에 표시된 광고주 또는 앱 이름의 스크린샷을 찍으세요.\n3. 광고가 나타난 대략적인 시간과 게임 내 위치를 기록하세요.\n4. 광고가 불쾌하거나 오해를 유발하거나 사기성이라고 느낀 이유를 설명해 주세요.\n5. %s로 이 내용을 담은 이메일을 보내 주세요. 비밀번호나 결제 정보는 포함하지 마세요."
+    },
+    {
+      "key": "support.faq.bad_ad.action",
+      "en": "Email Ad Report",
+      "ko": "이메일로 광고 신고"
+    },
+    {
+      "key": "support.account_header",
+      "en": "Account",
+      "ko": "계정"
+    },
+    {
+      "key": "support.delete_account",
+      "en": "Delete Account",
+      "ko": "계정 삭제"
+    },
+    {
+      "key": "support.delete_game_data",
+      "en": "Delete Game Data",
+      "ko": "게임 데이터 삭제"
+    },
+    {
+      "key": "support.no_secrets",
+      "en": "Please never send passwords or payment information.",
+      "ko": "비밀번호나 결제 정보는 절대 보내지 마세요."
+    },
+    {
+      "key": "deletion.title.delete_account",
+      "en": "DELETE ACCOUNT",
+      "ko": "계정 삭제"
+    },
+    {
+      "key": "deletion.title.delete_game_data",
+      "en": "DELETE GAME DATA",
+      "ko": "게임 데이터 삭제"
+    },
+    {
+      "key": "deletion.title.not_confirmed",
+      "en": "NOT CONFIRMED",
+      "ko": "확인되지 않음"
+    },
+    {
+      "key": "deletion.title.status_unconfirmed",
+      "en": "STATUS UNCONFIRMED",
+      "ko": "상태 미확인"
+    },
+    {
+      "key": "deletion.title.finishing_up",
+      "en": "FINISHING UP",
+      "ko": "마무리 중"
+    },
+    {
+      "key": "deletion.title.new_game",
+      "en": "NEW GAME",
+      "ko": "새 게임"
+    },
+    {
+      "key": "deletion.title.status_unknown",
+      "en": "STATUS UNKNOWN",
+      "ko": "상태 알 수 없음"
+    },
+    {
+      "key": "deletion.title.not_deleted",
+      "en": "NOT DELETED",
+      "ko": "삭제되지 않음"
+    },
+    {
+      "key": "deletion.title.data_deleted",
+      "en": "DATA DELETED",
+      "ko": "데이터 삭제 완료"
+    },
+    {
+      "key": "deletion.title.accepted",
+      "en": "DELETION ACCEPTED",
+      "ko": "삭제 요청 접수"
+    },
+    {
+      "key": "deletion.confirm.headline",
+      "en": "This permanently deletes your account.",
+      "ko": "계정이 영구적으로 삭제됩니다."
+    },
+    {
+      "key": "deletion.confirm.body",
+      "en": "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nIf you sign in again later, you'll start a new account.\n\nSome purchase and security records are kept without your name or profile. The rest is removed within 30 days.",
+      "ko": "진행 상황, 코인, 아이템, 프로필이 모두 사라집니다. 이 작업은 되돌릴 수 없습니다.\n\n나중에 다시 로그인하면 새 계정으로 시작하게 됩니다.\n\n일부 구매 및 보안 기록은 이름이나 프로필 없이 보관됩니다. 나머지 데이터는 30일 이내에 삭제됩니다."
+    },
+    {
+      "key": "deletion.confirm.button",
+      "en": "Delete Account",
+      "ko": "계정 삭제"
+    },
+    {
+      "key": "deletion.local_confirm.headline",
+      "en": "This deletes your game data on this device.",
+      "ko": "이 기기의 게임 데이터가 삭제됩니다."
+    },
+    {
+      "key": "deletion.local_confirm.body",
+      "en": "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nThis game never created an online account for you, so nothing needs to be deleted from our servers.",
+      "ko": "진행 상황, 코인, 아이템, 프로필이 모두 사라집니다. 이 작업은 되돌릴 수 없습니다.\n\n이 게임은 온라인 계정을 생성하지 않았으므로 서버에서 삭제할 데이터는 없습니다."
+    },
+    {
+      "key": "deletion.local_confirm.button",
+      "en": "Delete Data",
+      "ko": "데이터 삭제"
+    },
+    {
+      "key": "deletion.pending_setup.headline",
+      "en": "Your account is still being set up.",
+      "ko": "계정 생성이 아직 완료되지 않았습니다."
+    },
+    {
+      "key": "deletion.pending_setup.body",
+      "en": "Connect to the internet and try again in a moment. Nothing was deleted.",
+      "ko": "인터넷에 연결한 뒤 잠시 후 다시 시도해 주세요. 아무것도 삭제되지 않았습니다."
+    },
+    {
+      "key": "deletion.sign_in.headline",
+      "en": "Sign in to the account you want to delete.",
+      "ko": "삭제하려는 계정으로 로그인해 주세요."
+    },
+    {
+      "key": "deletion.sign_in.body",
+      "en": "If you can't sign in, contact support for help.",
+      "ko": "로그인할 수 없다면 고객지원에 도움을 요청해 주세요."
+    },
+    {
+      "key": "deletion.read_failed.headline",
+      "en": "Your game data couldn't be read.",
+      "ko": "게임 데이터를 읽지 못했습니다."
+    },
+    {
+      "key": "deletion.read_failed.body",
+      "en": "Restart the game, then try again. Nothing was deleted.",
+      "ko": "게임을 다시 실행한 뒤 다시 시도해 주세요. 아무것도 삭제되지 않았습니다."
+    },
+    {
+      "key": "deletion.unavailable.headline",
+      "en": "Account deletion isn't available in this version of the game.",
+      "ko": "이 게임 버전에서는 계정을 삭제할 수 없습니다."
+    },
+    {
+      "key": "deletion.unavailable.body",
+      "en": "Update the game, or contact support for help deleting your account. Nothing was deleted.",
+      "ko": "게임을 업데이트하거나 고객지원에 계정 삭제를 요청해 주세요. 아무것도 삭제되지 않았습니다."
+    },
+    {
+      "key": "deletion.in_progress.account",
+      "en": "Deleting your account...",
+      "ko": "계정 삭제 중..."
+    },
+    {
+      "key": "deletion.in_progress.local",
+      "en": "Deleting your game data...",
+      "ko": "게임 데이터 삭제 중..."
+    },
+    {
+      "key": "deletion.in_progress.body",
+      "en": "Keep the game open. This only takes a moment.",
+      "ko": "게임을 종료하지 말아 주세요. 잠시만 기다리면 됩니다."
+    },
+    {
+      "key": "deletion.not_confirmed.headline",
+      "en": "We haven't heard back about your deletion yet.",
+      "ko": "삭제 요청에 대한 응답을 아직 받지 못했습니다."
+    },
+    {
+      "key": "deletion.not_confirmed.body",
+      "en": "Your request was sent, but the answer didn't arrive. Connect to the internet and try again. The game stays locked until we know the result.",
+      "ko": "요청을 보냈지만 응답을 받지 못했습니다. 인터넷에 연결한 뒤 다시 시도해 주세요. 결과가 확인될 때까지 게임이 잠긴 상태로 유지됩니다."
+    },
+    {
+      "key": "deletion.unconfirmed.headline",
+      "en": "Deletion status unconfirmed",
+      "ko": "삭제 상태 미확인"
+    },
+    {
+      "key": "deletion.unconfirmed.body",
+      "en": "We couldn't confirm whether your account was deleted. To keep your data safe, the game stays locked. Contact support and include the reference below.",
+      "ko": "계정이 삭제되었는지 확인하지 못했습니다. 데이터를 안전하게 보호하기 위해 게임이 잠긴 상태로 유지됩니다. 아래 참조 번호를 포함해 고객지원에 문의해 주세요."
+    },
+    {
+      "key": "deletion.check_again",
+      "en": "Check Again",
+      "ko": "다시 확인"
+    },
+    {
+      "key": "deletion.cleanup.headline.local",
+      "en": "Your local game data couldn't be fully deleted yet.",
+      "ko": "기기의 게임 데이터가 아직 완전히 삭제되지 않았습니다."
+    },
+    {
+      "key": "deletion.cleanup.headline.account",
+      "en": "Account deletion accepted; finishing cleanup.",
+      "ko": "계정 삭제 요청이 접수되었습니다. 기기 내 남은 데이터를 정리 중입니다."
+    },
+    {
+      "key": "deletion.cleanup.body",
+      "en": "Some game data couldn't be removed from this device yet. Try again to finish.",
+      "ko": "이 기기의 일부 게임 데이터가 아직 삭제되지 않았습니다. 다시 시도해 삭제를 마무리해 주세요."
+    },
+    {
+      "key": "deletion.new_game.headline",
+      "en": "Starting a new game...",
+      "ko": "새 게임 시작 중..."
+    },
+    {
+      "key": "deletion.new_game.body",
+      "en": "This only takes a moment.",
+      "ko": "잠시만 기다리면 됩니다."
+    },
+    {
+      "key": "deletion.status_unknown.headline",
+      "en": "We couldn't read the deletion status on this device.",
+      "ko": "이 기기에서 삭제 상태를 읽지 못했습니다."
+    },
+    {
+      "key": "deletion.status_unknown.body",
+      "en": "To keep your data safe, the game stays locked. Contact support for help.",
+      "ko": "데이터를 안전하게 보호하기 위해 게임이 잠긴 상태로 유지됩니다. 고객지원에 도움을 요청해 주세요."
+    },
+    {
+      "key": "deletion.fail.offline",
+      "en": "Connect to the internet to delete your account.",
+      "ko": "계정을 삭제하려면 인터넷에 연결해 주세요."
+    },
+    {
+      "key": "deletion.fail.rate_limited",
+      "en": "Too many attempts. Wait a moment, then try again.",
+      "ko": "시도 횟수가 너무 많습니다. 잠시 기다린 뒤 다시 시도해 주세요."
+    },
+    {
+      "key": "deletion.fail.busy",
+      "en": "Account deletion is busy right now. Try again in a moment.",
+      "ko": "현재 계정 삭제를 처리할 수 없습니다. 잠시 후 다시 시도해 주세요."
+    },
+    {
+      "key": "deletion.fail.syncing",
+      "en": "The game is still syncing. Try again in a moment.",
+      "ko": "게임이 아직 동기화 중입니다. 잠시 후 다시 시도해 주세요."
+    },
+    {
+      "key": "deletion.fail.auth",
+      "en": "We couldn't verify your account. Restart the game, then try again.",
+      "ko": "계정을 확인하지 못했습니다. 게임을 다시 실행한 뒤 다시 시도해 주세요."
+    },
+    {
+      "key": "deletion.fail.update",
+      "en": "Update the game to delete your account.",
+      "ko": "계정을 삭제하려면 게임을 업데이트해 주세요."
+    },
+    {
+      "key": "deletion.fail.changed",
+      "en": "Your account changed while we were deleting it. Try again.",
+      "ko": "삭제 처리 중 계정이 변경되었습니다. 다시 시도해 주세요."
+    },
+    {
+      "key": "deletion.fail.storage",
+      "en": "Your device couldn't save the deletion request. Try again.",
+      "ko": "기기에 삭제 요청을 저장하지 못했습니다. 다시 시도해 주세요."
+    },
+    {
+      "key": "deletion.fail.generic",
+      "en": "We couldn't delete your account. Try again later or contact support.",
+      "ko": "계정을 삭제하지 못했습니다. 나중에 다시 시도하거나 고객지원에 문의해 주세요."
+    },
+    {
+      "key": "deletion.fail.local",
+      "en": "Your game data couldn't be deleted. Try again.",
+      "ko": "게임 데이터를 삭제하지 못했습니다. 다시 시도해 주세요."
+    },
+    {
+      "key": "deletion.fail.body",
+      "en": "Nothing was deleted, and you can keep playing.",
+      "ko": "아무것도 삭제되지 않았으며, 계속 플레이할 수 있습니다."
+    },
+    {
+      "key": "deletion.done_local.headline",
+      "en": "Your local game data was deleted.",
+      "ko": "기기의 게임 데이터가 삭제되었습니다."
+    },
+    {
+      "key": "deletion.done_local.body",
+      "en": "You can start over with a new game.",
+      "ko": "새 게임으로 처음부터 시작할 수 있습니다."
+    },
+    {
+      "key": "deletion.new_game_failed",
+      "en": "The new game couldn't start. Try again.",
+      "ko": "새 게임을 시작하지 못했습니다. 다시 시도해 주세요."
+    },
+    {
+      "key": "deletion.accepted.headline",
+      "en": "Your account is no longer accessible.",
+      "ko": "계정에 더 이상 접근할 수 없습니다."
+    },
+    {
+      "key": "deletion.accepted.body",
+      "en": "Your deletion request was accepted.",
+      "ko": "삭제 요청이 접수되었습니다."
+    },
+    {
+      "key": "deletion.accepted.body_deadline",
+      "en": "Your deletion request was accepted. Data removal is due by %s.",
+      "ko": "삭제 요청이 접수되었습니다. 데이터는 %s까지 삭제됩니다."
+    },
+    {
+      "key": "deletion.reference",
+      "en": "Reference: %s",
+      "ko": "참조 번호: %s"
+    },
+    {
+      "key": "deletion.start_new_game",
+      "en": "Start New Game",
+      "ko": "새 게임 시작"
+    },
+    {
+      "key": "app.name",
+      "en": "SortingPuzzle",
+      "ko": "SortingPuzzle"
+    },
+    {
+      "key": "support.email.subject",
+      "en": "Sorting Puzzle support request",
+      "ko": "Sorting Puzzle 고객지원 문의"
+    },
+    {
+      "key": "support.email.body",
+      "en": "Please describe the issue here.\n\nDevice/platform:\nApproximate time:\n",
+      "ko": "여기에 문제를 설명해 주세요.\n\n기기/플랫폼:\n대략적인 발생 시간:\n"
+    },
+    {
+      "key": "support.ad_email.subject",
+      "en": "Sorting Puzzle ad report",
+      "ko": "Sorting Puzzle 광고 신고"
+    },
+    {
+      "key": "support.ad_email.body",
+      "en": "Please attach a screenshot and complete the details below.\n\nApproximate time:\nAd placement in the game:\nAdvertiser or app name:\nWhy the ad should be reviewed:\n",
+      "ko": "스크린샷을 첨부하고 아래 내용을 작성해 주세요.\n\n대략적인 발생 시간:\n게임 내 광고 위치:\n광고주 또는 앱 이름:\n광고 검토가 필요한 이유:\n"
+    },
+    {
+      "key": "deletion.email.subject",
+      "en": "Sorting Puzzle account deletion",
+      "ko": "Sorting Puzzle 계정 삭제"
+    },
+    {
+      "key": "deletion.email.body",
+      "en": "Please help me with my account deletion.",
+      "ko": "계정 삭제에 도움을 요청합니다."
+    }
+  ],
+  "plurals": {
+    "chapter.locked_status": {
+      "other": "레벨 %d개를 '%s'에서 더 완료하면 잠금이 해제됩니다"
+    },
+    "shelf_unlock.offer_or_clear": {
+      "other": "광고 하나를 보고 지금 이 선반의 잠금을 해제하거나, 세트를 %s번 더 맞추세요."
+    },
+    "starter.coins": {
+      "other": "코인 %s개"
+    },
+    "leaderboard.row_tooltip": {
+      "other": "%d위, %s, 별 %d개"
+    },
+    "leaderboard.reward_tooltip": {
+      "other": "주간 보상: 코인 %s개"
+    },
+    "leaderboard.reward.body": {
+      "other": "지난주에 %d위를 차지해 코인 %d개를 받았어요!"
+    }
+  },
+  "counted_boosters": {
+    "Hammer": [
+      "망치"
+    ],
+    "Shuffle": [
+      "섞기"
+    ],
+    "Lantern": [
+      "랜턴"
+    ],
+    "Freezer": [
+      "얼리기"
+    ]
+  },
+  "months": [
+    "1월",
+    "2월",
+    "3월",
+    "4월",
+    "5월",
+    "6월",
+    "7월",
+    "8월",
+    "9월",
+    "10월",
+    "11월",
+    "12월"
+  ],
+  "additional": [
+    {
+      "key": "support.email.status",
+      "en": "Status: %s",
+      "ko": "상태: %s"
+    },
+    {
+      "key": "support.email.deletion_reference",
+      "en": "Deletion reference",
+      "ko": "삭제 참조 번호"
+    },
+    {
+      "key": "support.email.server_reference",
+      "en": "Server reference",
+      "ko": "서버 참조 번호"
+    },
+    {
+      "key": "support.email.player_id",
+      "en": "Player ID",
+      "ko": "플레이어 ID"
+    },
+    {
+      "key": "leaderboard.empty",
+      "en": "No scores yet",
+      "ko": "아직 기록이 없어요"
+    }
+  ]
+}

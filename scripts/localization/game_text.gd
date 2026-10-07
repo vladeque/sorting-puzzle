@@ -34,6 +34,8 @@ static func format_date(date: Dictionary) -> String:
 	var day := int(date.get("day", 1))
 	var year := int(date.get("year", 1970))
 	var language := TranslationServer.get_locale().get_slice("_", 0)
+	if language == "ko":
+		return "%d년 %d월 %d일" % [year, month, day]
 	if language == "de":
 		return "%02d.%02d.%04d" % [day, month, year]
 	if language == "ar":

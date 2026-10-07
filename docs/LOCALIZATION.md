@@ -39,12 +39,34 @@ starts.
 
 `assets/translations/en.po`, `assets/translations/ru.po`, `assets/translations/uk.po`,
 `assets/translations/it.po`, `assets/translations/ar.po`, `assets/translations/es.po`,
-`assets/translations/pt_BR.po`, `assets/translations/de.po` and `assets/translations/fr.po` are
+`assets/translations/pt_BR.po`, `assets/translations/de.po`, `assets/translations/fr.po` and
+`assets/translations/ko.po` are
 registered in `project.godot`.
 Russian includes all 251 reviewed keys from
 `docs/localization/RUSSIAN_TRANSLATIONS.md`, the user's corrected October 4, 2026 inventory.
 The inventory is a copy of the approved translation text, not runtime configuration.
-English remains the fallback for the other five selectable locales until their catalogs exist.
+English remains the fallback for the other four selectable locales until their catalogs exist.
+
+Korean includes all 251 entries from the owner's improved October 7, 2026 document archived
+verbatim at `docs/localization/KOREAN_TRANSLATIONS.md`. `tests/localization/korean_inventory.json`
+retains the exact supplied wording, six single-form plural entries, fixed counted booster names
+and the four supplementary deletion-email labels. `ko.po` provides stable keys, English scene
+aliases and uppercase product/card aliases. The existing `한국어` option selects the catalog;
+regional device locales such as `ko_KR` continue to map to `ko` on a fresh save.
+
+Korean uses one gettext form for every integer count (`nplurals=1; plural=0`). Product names
+remain `망치`, `섞기`, `랜턴` and `얼리기` after quantities in `booster.counted` context.
+The reviewed claimed-caption pattern remains `+%d %s`. Gameplay resume uses `계속하기`,
+move-on uses `계속`, failure replay uses `다시 도전` through the `Retry` alias, and destination
+reload explicitly uses `common.retry_load` (`다시 불러오기`). The revised `선반 잠금 해제`,
+`잠금 해제 진행도`, combo praise, booster descriptions, price action, ad-report action and
+deletion messages retain the supplied text exactly. Counts use commas (`1,234,567`), and
+`GameText.format_date()` uses year/month/day Korean deadlines (`2026년 11월 2일`).
+The existing brand, native language names, prices, player names, IDs and compact `AD` / `OFF`
+markers retain their values. Only the local preference stores the language selection.
+Bundled Noto Sans KR fallbacks at 500/600/700 weights provide Hangul across all theme roles
+without depending on system fonts. The archive retains its pre-integration notes; runtime
+verification is recorded in `docs/localization/KOREAN_LOCALIZATION_QA.md`.
 
 Ukrainian includes all 251 entries from the owner's reviewed October 5, 2026 document archived
 at `docs/localization/UKRAINIAN_TRANSLATIONS.md`. `uk.po` preserves the edited captions and
@@ -192,7 +214,8 @@ patterns before interpolation. Russian and Ukrainian `tr_n()` calls select from 
 underlying integer count, including when the inserted amount is a formatted `%s`. For rows and
 weekly rewards, the plural count is the stars/coins rather than the rank. Italian selects its two
 forms using `n != 1`, as do Spanish, Brazilian Portuguese and German. French selects its
-reviewed singular for zero and one using `n > 1`. Claimed booster chips
+reviewed singular for zero and one using `n > 1`. Korean uses a single invariant form for every
+count. Claimed booster chips
 use gettext context `booster.counted` for the reviewed quantity-aware product names.
 
 `scripts/localization/game_text.gd` owns presentation-only grouped numbers, localized dates,
@@ -201,6 +224,7 @@ month names without a year suffix. Spanish uses period grouping and a day/month/
 with `de` between its parts. Brazilian Portuguese also uses period grouping and this date pattern,
 with its own month names. German uses period grouping and numeric `DD.MM.YYYY` dates.
 French uses spaces for grouping and lowercase month names with a day/month/year pattern.
+Korean uses comma grouping and year/month/day dates with `년`, `월` and `일` units.
 Russian and Ukrainian counts use spaces and
 deadlines use genitive month names with the catalog's `date.day_month_year` pattern (`г.` / `р.`);
 store prices pass through unchanged. Purchase/load presentation maps
@@ -220,6 +244,11 @@ in Ukrainian). Loading screens reuse
 the reviewed `common.loading` wording.
 
 ## Cyrillic and layout
+
+The shared theme also bundles Noto Sans KR fallback variations at matching 500/600/700 weights
+for Korean display and reading roles, including rich text and editable text. The Korean test
+checks every non-ASCII character used in the reviewed catalog through bundled font character
+inventories, plus decomposed Hangul, without counting system-font fallback as coverage.
 
 The bundled DynaPuff font does not contain Cyrillic. Its theme variations use bundled Nunito
 fallback variations at matching 500/600/700 weights, so Russian and Ukrainian do not depend on mobile system
@@ -315,6 +344,13 @@ The implementation ownership and verification scope are recorded in
   email punctuation, contextual reload/replay and resume/move-on actions, live screen refreshes,
   pending ad state, regional device mapping and local-only preference persistence. It measures
   FAQ questions and deletion, shelf and replay actions at all five viewports.
+- `tests/ui/test_korean_localization.gd` checks all 251 improved Korean entries and English
+  aliases, English/untranslated-locale fallback, six single-form plural messages at integer
+  boundaries, fixed counted boosters, all reviewed non-ASCII glyphs plus decomposed Hangul,
+  date units and the won symbol through bundled fonts in every role, twelve year/month/day
+  dates, comma grouping, prices/names/references/markers, contextual actions, regional mapping,
+  live refreshes, pending ad state and local-only locale persistence. It measures FAQ questions
+  and deletion, shelf and replay actions at all five viewports.
 - Capture any screen in an isolated Russian session with:
 
   ```powershell
@@ -330,6 +366,7 @@ The implementation ownership and verification scope are recorded in
   Use `-Locale pt_BR` for Brazilian Portuguese captures.
   Use `-Locale de` for German captures.
   Use `-Locale fr` for French captures.
+  Use `-Locale ko` for Korean captures.
 
 The October 4–5, 2026 test results, rendered-screen reviews and capture limitations are recorded in
 `docs/localization/RUSSIAN_LOCALIZATION_QA.md`.
@@ -340,3 +377,4 @@ Spanish integration results are recorded in `docs/localization/SPANISH_LOCALIZAT
 Brazilian Portuguese integration results are recorded in `docs/localization/PORTUGUESE_BRAZIL_LOCALIZATION_QA.md`.
 German integration results are recorded in `docs/localization/GERMAN_LOCALIZATION_QA.md`.
 French integration results are recorded in `docs/localization/FRENCH_LOCALIZATION_QA.md`.
+Korean integration results are recorded in `docs/localization/KOREAN_LOCALIZATION_QA.md`.

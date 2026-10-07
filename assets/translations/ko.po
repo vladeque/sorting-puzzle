@@ -1,0 +1,2131 @@
+# Reviewed Korean inventory; see docs/localization/KOREAN_TRANSLATIONS.md.
+msgid ""
+msgstr ""
+"Project-Id-Version: SortingPuzzle\n"
+"Language: ko\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#. date.day_month_year
+msgid "date.day_month_year"
+msgstr "%d일 %s %d년"
+
+#. common.play
+msgid "common.play"
+msgstr "플레이"
+
+#. common.continue
+msgid "common.continue"
+msgstr "계속"
+
+#. common.resume
+msgid "common.resume"
+msgstr "계속하기"
+
+#. common.try_again
+msgid "common.try_again"
+msgstr "다시 시도"
+
+#. common.close
+msgid "common.close"
+msgstr "닫기"
+
+#. common.cancel
+msgid "common.cancel"
+msgstr "취소"
+
+#. common.got_it
+msgid "common.got_it"
+msgstr "확인"
+
+#. common.get_help
+msgid "common.get_help"
+msgstr "도움 요청"
+
+#. common.save
+msgid "common.save"
+msgstr "저장"
+
+#. common.loading
+msgid "common.loading"
+msgstr "불러오는 중…"
+
+#. common.retry_load
+msgid "common.retry_load"
+msgstr "다시 불러오기"
+
+#. menu.level_button
+msgid "menu.level_button"
+msgstr "레벨 %d"
+
+#. menu.more_levels_coming_soon
+msgid "menu.more_levels_coming_soon"
+msgstr "새 레벨이 곧 추가돼요"
+
+#. menu.coming_soon
+msgid "menu.coming_soon"
+msgstr "곧 공개"
+
+#. menu.lives_full
+msgid "menu.lives_full"
+msgstr "가득"
+
+#. menu.starter_badge
+msgid "menu.starter_badge"
+msgstr "패키지"
+
+#. nav.shop
+msgid "nav.shop"
+msgstr "상점"
+
+#. nav.home
+msgid "nav.home"
+msgstr "홈"
+
+#. nav.leaderboard
+msgid "nav.leaderboard"
+msgstr "랭킹"
+
+#. chapter.button
+msgid "chapter.button"
+msgstr "챕터 %d"
+
+#. chapter.button_tooltip
+msgid "chapter.button_tooltip"
+msgstr "챕터 %d, %s 선택"
+
+#. chapter.screen_title
+msgid "chapter.screen_title"
+msgstr "챕터"
+
+#. chapter.eyebrow
+msgid "chapter.eyebrow"
+msgstr "챕터 %d"
+
+#. chapter.title.chapter_01
+msgid "chapter.title.chapter_01"
+msgstr "마트 마을"
+
+#. chapter.title.chapter_02
+msgid "chapter.title.chapter_02"
+msgstr "사탕 골목"
+
+#. chapter.locked_status
+msgid "chapter.locked_status"
+msgid_plural "chapter.locked_status.plural"
+msgstr[0] "레벨 %d개를 '%s'에서 더 완료하면 잠금이 해제됩니다"
+
+#. chapter.unlock_progress
+msgid "chapter.unlock_progress"
+msgstr "잠금 해제 진행도"
+
+#. chapter.current_progress
+msgid "chapter.current_progress"
+msgstr "현재 진행도"
+
+#. chapter.locked
+msgid "chapter.locked"
+msgstr "잠김"
+
+#. chapter.no_levels_status
+msgid "chapter.no_levels_status"
+msgstr "새 레벨이 곧 추가돼요"
+
+#. chapter.coming_soon
+msgid "chapter.coming_soon"
+msgstr "곧 공개"
+
+#. hud.level
+msgid "hud.level"
+msgstr "레벨 %d"
+
+#. hud.combo
+msgid "hud.combo"
+msgstr "콤보 ×%d"
+
+#. hud.ability_tooltip.hammer
+msgid "hud.ability_tooltip.hammer"
+msgstr "망치 -- 같은 아이템 3개를 제거해요"
+
+#. hud.ability_tooltip.shuffle
+msgid "hud.ability_tooltip.shuffle"
+msgstr "섞기 -- 잠기지 않은 아이템을 다시 섞어요"
+
+#. hud.ability_tooltip.lantern
+msgid "hud.ability_tooltip.lantern"
+msgstr "랜턴 -- 맞출 수 있는 같은 아이템 3개를 표시해요"
+
+#. hud.ability_tooltip.freezer
+msgid "hud.ability_tooltip.freezer"
+msgstr "얼리기 -- 카운트다운 타이머를 멈춰요"
+
+#. hud.seconds_short
+msgid "hud.seconds_short"
+msgstr "%d초"
+
+#. tip.tap_dispenser
+msgid "tip.tap_dispenser"
+msgstr "배출기를 터치하면 아이템이 선반으로 나와요!"
+
+#. pause.title
+msgid "pause.title"
+msgstr "일시정지"
+
+#. pause.leave
+msgid "pause.leave"
+msgstr "나가기"
+
+#. leave.title
+msgid "leave.title"
+msgstr "레벨 나가기"
+
+#. leave.you_will_lose
+msgid "leave.you_will_lose"
+msgstr "다음을 잃게 돼요:"
+
+#. leave.confirm
+msgid "leave.confirm"
+msgstr "나가기"
+
+#. timeup.title
+msgid "timeup.title"
+msgstr "시간 종료"
+
+#. timeup.offer
+msgid "timeup.offer"
+msgstr "1분을 추가하고 계속 정리해요!"
+
+#. timeup.used
+msgid "timeup.used"
+msgstr "사용 완료"
+
+#. ability_purchase.title
+msgid "ability_purchase.title"
+msgstr "부스터 사용"
+
+#. shelf_unlock.title
+msgid "shelf_unlock.title"
+msgstr "선반 잠금 해제"
+
+#. shelf_unlock.offer
+msgid "shelf_unlock.offer"
+msgstr "광고 하나를 보고 지금 이 선반의 잠금을 해제하세요."
+
+#. shelf_unlock.offer_or_clear
+msgid "shelf_unlock.offer_or_clear"
+msgid_plural "shelf_unlock.offer_or_clear.plural"
+msgstr[0] "광고 하나를 보고 지금 이 선반의 잠금을 해제하거나, 세트를 %s번 더 맞추세요."
+
+#. shelf_unlock.button
+msgid "shelf_unlock.button"
+msgstr "광고 보기 · 선반 잠금 해제"
+
+#. shelf_unlock.ad_unavailable
+msgid "shelf_unlock.ad_unavailable"
+msgstr "광고를 볼 수 없어요. 이 선반은 잠긴 상태로 유지돼요."
+
+#. complete.title
+msgid "complete.title"
+msgstr "잘했어요!"
+
+#. failed.title
+msgid "failed.title"
+msgstr "레벨 %d"
+
+#. failed.headline
+msgid "failed.headline"
+msgstr "레벨 실패"
+
+#. failed.retry
+msgid "failed.retry"
+msgstr "다시 도전"
+
+#. combo.praise.2
+msgid "combo.praise.2"
+msgstr "좋아!"
+
+#. combo.praise.3
+msgid "combo.praise.3"
+msgstr "잘했어!"
+
+#. combo.praise.4
+msgid "combo.praise.4"
+msgstr "멋져!"
+
+#. combo.praise.5
+msgid "combo.praise.5"
+msgstr "놀라워!"
+
+#. combo.praise.6
+msgid "combo.praise.6"
+msgstr "환상적이야!"
+
+#. combo.praise.7
+msgid "combo.praise.7"
+msgstr "믿기지 않아!"
+
+#. combo.praise.8
+msgid "combo.praise.8"
+msgstr "엄청나!"
+
+#. combo.praise.9
+msgid "combo.praise.9"
+msgstr "거침없어!"
+
+#. combo.praise.10
+msgid "combo.praise.10"
+msgstr "전설적이야!"
+
+#. combo.praise.11
+msgid "combo.praise.11"
+msgstr "압도적이야!"
+
+#. combo.praise.12
+msgid "combo.praise.12"
+msgstr "눈부신 실력!"
+
+#. combo.praise.13
+msgid "combo.praise.13"
+msgstr "달인의 실력!"
+
+#. combo.praise.14
+msgid "combo.praise.14"
+msgstr "최고의 실력!"
+
+#. combo.praise.15
+msgid "combo.praise.15"
+msgstr "경이로운 실력!"
+
+#. combo.praise.16
+msgid "combo.praise.16"
+msgstr "신화급이야!"
+
+#. combo.praise.17
+msgid "combo.praise.17"
+msgstr "독보적이야!"
+
+#. combo.praise.18
+msgid "combo.praise.18"
+msgstr "차원이 달라!"
+
+#. combo.praise.19
+msgid "combo.praise.19"
+msgstr "신의 경지!"
+
+#. combo.praise.20
+msgid "combo.praise.20"
+msgstr "초월의 경지!"
+
+#. ability.hammer.name
+msgid "ability.hammer.name"
+msgstr "망치"
+
+#. ability.shuffle.name
+msgid "ability.shuffle.name"
+msgstr "섞기"
+
+#. ability.lantern.name
+msgid "ability.lantern.name"
+msgstr "랜턴"
+
+#. ability.freezer.name
+msgid "ability.freezer.name"
+msgstr "얼리기"
+
+#. ability.hammer.description
+msgid "ability.hammer.description"
+msgstr "선반에서 같은 아이템 3개로 이루어진 세트 하나를 즉시 제거해요."
+
+#. ability.shuffle.description
+msgid "ability.shuffle.description"
+msgstr "선반 위 아이템의 위치를 섞어 맞출 세트를 찾기 쉽게 해줘요."
+
+#. ability.lantern.description
+msgid "ability.lantern.description"
+msgstr "없앨 수 있는 같은 아이템 3개를 15초 동안 강조해요."
+
+#. ability.freezer.description
+msgid "ability.freezer.description"
+msgstr "레벨 타이머를 30초 동안 멈춰요."
+
+#. ad.watch
+msgid "ad.watch"
+msgstr "광고 보기"
+
+#. ad.loading
+msgid "ad.loading"
+msgstr "불러오는 중..."
+
+#. ad.verifying
+msgid "ad.verifying"
+msgstr "확인 중..."
+
+#. ad.verify_reward
+msgid "ad.verify_reward"
+msgstr "보상 확인"
+
+#. ad.reward_pending
+msgid "ad.reward_pending"
+msgstr "아직 보상 확인이 완료되지 않았어요."
+
+#. ad.unavailable_retry
+msgid "ad.unavailable_retry"
+msgstr "광고를 볼 수 없어요. 다시 시도해 주세요."
+
+#. ad.watch_unavailable
+msgid "ad.watch_unavailable"
+msgstr "광고 보기\n이용 불가"
+
+#. ad.watch_coming_soon
+msgid "ad.watch_coming_soon"
+msgstr "광고 보기\n곧 제공"
+
+#. ad.badge
+msgid "ad.badge"
+msgstr "AD"
+
+#. lives.title.out
+msgid "lives.title.out"
+msgstr "하트 없음"
+
+#. lives.title.get_more
+msgid "lives.title.get_more"
+msgstr "하트 충전"
+
+#. lives.title.full
+msgid "lives.title.full"
+msgstr "하트 가득"
+
+#. lives.next_in
+msgid "lives.next_in"
+msgstr "다음 하트까지"
+
+#. lives.full_body
+msgid "lives.full_body"
+msgstr "하트가 가득해요! 레벨을 플레이해 하트를 사용하세요."
+
+#. chest.title
+msgid "chest.title"
+msgstr "상자 보상"
+
+#. chest.progress_hint
+msgid "chest.progress_hint"
+msgstr "별을 모아 보상 상자를 열고 보상을 받으세요"
+
+#. chest.ready
+msgid "chest.ready"
+msgstr "보상 상자가 기다려요!"
+
+#. chest.tap_to_open
+msgid "chest.tap_to_open"
+msgstr "터치해서 열기"
+
+#. purchase.tap_to_collect
+msgid "purchase.tap_to_collect"
+msgstr "터치해서 받기"
+
+#. purchase.complete
+msgid "purchase.complete"
+msgstr "구매 완료"
+
+#. shop.title
+msgid "shop.title"
+msgstr "상점"
+
+#. shop.section.bundles
+msgid "shop.section.bundles"
+msgstr "특별 패키지"
+
+#. shop.section.coins
+msgid "shop.section.coins"
+msgstr "코인"
+
+#. shop.offer.starter_bundle
+msgid "shop.offer.starter_bundle"
+msgstr "스타터 패키지"
+
+#. shop.offer.basic_bundle
+msgid "shop.offer.basic_bundle"
+msgstr "기본 패키지"
+
+#. shop.tag.best_value
+msgid "shop.tag.best_value"
+msgstr "최고 혜택"
+
+#. shop.discount_off
+msgid "shop.discount_off"
+msgstr "OFF"
+
+#. shop.ability_hint
+msgid "shop.ability_hint"
+msgstr "부스터를 터치해 효과를 확인하세요"
+
+#. shop.purchasing
+msgid "shop.purchasing"
+msgstr "구매 중…"
+
+#. shop.no_offers
+msgid "shop.no_offers"
+msgstr "이 지역에서 구매할 수 있는 상품이 없어요."
+
+#. shop.load_failed
+msgid "shop.load_failed"
+msgstr "상점을 불러오지 못했어요."
+
+#. shop.error.title.purchase
+msgid "shop.error.title.purchase"
+msgstr "구매 불가"
+
+#. shop.error.title.reward
+msgid "shop.error.title.reward"
+msgstr "보상 오류"
+
+#. shop.error.purchase_failed
+msgid "shop.error.purchase_failed"
+msgstr "구매를 완료하지 못했어요."
+
+#. shop.error.grant_failed
+msgid "shop.error.grant_failed"
+msgstr "구매한 보상을 지급하지 못했어요."
+
+#. shop.error.offer_unavailable
+msgid "shop.error.offer_unavailable"
+msgstr "이 상품은 구매할 수 없어요."
+
+#. shop.error.already_bought
+msgid "shop.error.already_bought"
+msgstr "한 번만 구매할 수 있는 이 상품을 이미 구매했어요."
+
+#. starter.title
+msgid "starter.title"
+msgstr "스타터 패키지"
+
+#. starter.one_time
+msgid "starter.one_time"
+msgstr "한 번만 구매 가능"
+
+#. starter.boosters_included
+msgid "starter.boosters_included"
+msgstr "부스터 포함"
+
+#. starter.coins
+msgid "starter.coins"
+msgid_plural "starter.coins.plural"
+msgstr[0] "코인 %s개"
+
+#. starter.buy_for
+msgid "starter.buy_for"
+msgstr "%s에 구매하기"
+
+#. starter.checking
+msgid "starter.checking"
+msgstr "상품 확인 중…"
+
+#. starter.checking_short
+msgid "starter.checking_short"
+msgstr "확인 중…"
+
+#. starter.no_longer_available
+msgid "starter.no_longer_available"
+msgstr "이 상품은 더 이상 구매할 수 없어요."
+
+#. starter.unavailable
+msgid "starter.unavailable"
+msgstr "구매 불가"
+
+#. booster_chip.claimed
+msgid "booster_chip.claimed"
+msgstr "+%d %s"
+
+#. profile.title
+msgid "profile.title"
+msgstr "프로필 수정"
+
+#. profile.name_header
+msgid "profile.name_header"
+msgstr "플레이어 이름"
+
+#. profile.name_placeholder
+msgid "profile.name_placeholder"
+msgstr "플레이어 이름"
+
+#. profile.edit_name_tooltip
+msgid "profile.edit_name_tooltip"
+msgstr "플레이어 이름 수정"
+
+#. profile.avatar_tab
+msgid "profile.avatar_tab"
+msgstr "아바타"
+
+#. profile.frame_tab
+msgid "profile.frame_tab"
+msgstr "프레임"
+
+#. profile.unlock.level
+msgid "profile.unlock.level"
+msgstr "레벨 %d를 완료하면 해제됩니다"
+
+#. profile.unlock.combo
+msgid "profile.unlock.combo"
+msgstr "한 번의 플레이에서 콤보 ×%d를 달성하면 해제됩니다"
+
+#. profile.unlock.weekly_first
+msgid "profile.unlock.weekly_first"
+msgstr "주간 랭킹에서 1위를 차지하면 해제됩니다"
+
+#. profile.unlock.weekly_top
+msgid "profile.unlock.weekly_top"
+msgstr "주간 랭킹에서 %d위 안에 들면 해제됩니다"
+
+#. leaderboard.title
+msgid "leaderboard.title"
+msgstr "랭킹"
+
+#. leaderboard.tab.weekly
+msgid "leaderboard.tab.weekly"
+msgstr "주간"
+
+#. leaderboard.tab.country
+msgid "leaderboard.tab.country"
+msgstr "국가"
+
+#. leaderboard.tab.world
+msgid "leaderboard.tab.world"
+msgstr "세계"
+
+#. leaderboard.weekly_reset
+msgid "leaderboard.weekly_reset"
+msgstr "주간 초기화까지 %s"
+
+#. leaderboard.duration.dh
+msgid "leaderboard.duration.dh"
+msgstr "%d일 %d시간"
+
+#. leaderboard.duration.hm
+msgid "leaderboard.duration.hm"
+msgstr "%d시간 %d분"
+
+#. leaderboard.duration.m
+msgid "leaderboard.duration.m"
+msgstr "%d분"
+
+#. leaderboard.country_caption
+msgid "leaderboard.country_caption"
+msgstr "국가 · 누적 별"
+
+#. leaderboard.world_caption
+msgid "leaderboard.world_caption"
+msgstr "전 세계 · 누적 별"
+
+#. leaderboard.load_failed
+msgid "leaderboard.load_failed"
+msgstr "랭킹을 불러오지 못했어요."
+
+#. leaderboard.default_name
+msgid "leaderboard.default_name"
+msgstr "플레이어"
+
+#. leaderboard.row_tooltip
+msgid "leaderboard.row_tooltip"
+msgid_plural "leaderboard.row_tooltip.plural"
+msgstr[0] "%d위, %s, 별 %d개"
+
+#. leaderboard.reward_tooltip
+msgid "leaderboard.reward_tooltip"
+msgid_plural "leaderboard.reward_tooltip.plural"
+msgstr[0] "주간 보상: 코인 %s개"
+
+#. leaderboard.reward.title
+msgid "leaderboard.reward.title"
+msgstr "주간 보상!"
+
+#. leaderboard.reward.body
+msgid "leaderboard.reward.body"
+msgid_plural "leaderboard.reward.body.plural"
+msgstr[0] "지난주에 %d위를 차지해 코인 %d개를 받았어요!"
+
+#. leaderboard.reward.ok
+msgid "leaderboard.reward.ok"
+msgstr "좋아요!"
+
+#. settings.title
+msgid "settings.title"
+msgstr "설정"
+
+#. settings.music
+msgid "settings.music"
+msgstr "음악"
+
+#. settings.sfx
+msgid "settings.sfx"
+msgstr "효과음"
+
+#. settings.vibrate
+msgid "settings.vibrate"
+msgstr "진동"
+
+#. settings.support
+msgid "settings.support"
+msgstr "고객지원"
+
+#. settings.language
+msgid "settings.language"
+msgstr "언어"
+
+#. settings.privacy_policy
+msgid "settings.privacy_policy"
+msgstr "개인정보 처리방침"
+
+#. settings.privacy_choices
+msgid "settings.privacy_choices"
+msgstr "개인정보 보호 설정"
+
+#. settings.diagnostics
+msgid "settings.diagnostics"
+msgstr "버전 %s • 빌드 %d\n플랫폼: %s • 사용자: %s"
+
+#. language.title
+msgid "language.title"
+msgstr "언어"
+
+#. support.title
+msgid "support.title"
+msgstr "고객지원"
+
+#. support.faq_header
+msgid "support.faq_header"
+msgstr "자주 묻는 질문"
+
+#. support.faq.play.q
+msgid "support.faq.play.q"
+msgstr "어떻게 플레이하나요?"
+
+#. support.faq.play.a
+msgid "support.faq.play.a"
+msgstr "같은 아이템을 같은 선반으로 옮기세요. 동일한 아이템 3개가 함께 보이면 사라져요. 시간이 다 되기 전에 보드의 아이템을 모두 제거하세요."
+
+#. support.faq.contact.q
+msgid "support.faq.contact.q"
+msgstr "고객지원에 어떻게 문의하나요?"
+
+#. support.faq.contact.a
+msgid "support.faq.contact.a"
+msgstr "%s로 이메일을 보내 주세요. 문제에 대한 간단한 설명, 기기 플랫폼, 문제가 발생한 시간을 함께 알려 주세요."
+
+#. support.faq.contact.action
+msgid "support.faq.contact.action"
+msgstr "이메일 문의"
+
+#. support.faq.crash.q
+msgid "support.faq.crash.q"
+msgstr "게임이 멈추거나 갑자기 종료되면 어떻게 하나요?"
+
+#. support.faq.crash.a
+msgid "support.faq.crash.a"
+msgstr "먼저 게임을 종료한 뒤 다시 실행해 보세요. 문제가 반복되면 기기를 재시작하고 게임이 최신 버전인지 확인하세요. 기기 모델, 플랫폼 버전, 문제가 발생하기 직전에 무엇을 하고 있었는지 고객지원에 알려 주세요."
+
+#. support.faq.sync.q
+msgid "support.faq.sync.q"
+msgstr "기기 간에 진행 상황을 어떻게 동기화하나요?"
+
+#. support.faq.sync.a
+msgid "support.faq.sync.a"
+msgstr "두 기기에서 같은 플랫폼 계정으로 로그인하고, 동기화가 완료된 뒤 플레이하세요. 진행 상황이 다르면 두 기기에서 플레이하지 말고 고객지원에 문의하세요."
+
+#. support.faq.bad_ad.q
+msgid "support.faq.bad_ad.q"
+msgstr "부적절한 광고는 어떻게 신고하나요?"
+
+#. support.faq.bad_ad.a
+msgid "support.faq.bad_ad.a"
+msgstr "1. 안전하게 닫을 수 있다면 광고를 닫으세요.\n2. 광고와 화면에 표시된 광고주 또는 앱 이름의 스크린샷을 찍으세요.\n3. 광고가 나타난 대략적인 시간과 게임 내 위치를 기록하세요.\n4. 광고가 불쾌하거나 오해를 유발하거나 사기성이라고 느낀 이유를 설명해 주세요.\n5. %s로 이 내용을 담은 이메일을 보내 주세요. 비밀번호나 결제 정보는 포함하지 마세요."
+
+#. support.faq.bad_ad.action
+msgid "support.faq.bad_ad.action"
+msgstr "이메일로 광고 신고"
+
+#. support.account_header
+msgid "support.account_header"
+msgstr "계정"
+
+#. support.delete_account
+msgid "support.delete_account"
+msgstr "계정 삭제"
+
+#. support.delete_game_data
+msgid "support.delete_game_data"
+msgstr "게임 데이터 삭제"
+
+#. support.no_secrets
+msgid "support.no_secrets"
+msgstr "비밀번호나 결제 정보는 절대 보내지 마세요."
+
+#. deletion.title.delete_account
+msgid "deletion.title.delete_account"
+msgstr "계정 삭제"
+
+#. deletion.title.delete_game_data
+msgid "deletion.title.delete_game_data"
+msgstr "게임 데이터 삭제"
+
+#. deletion.title.not_confirmed
+msgid "deletion.title.not_confirmed"
+msgstr "확인되지 않음"
+
+#. deletion.title.status_unconfirmed
+msgid "deletion.title.status_unconfirmed"
+msgstr "상태 미확인"
+
+#. deletion.title.finishing_up
+msgid "deletion.title.finishing_up"
+msgstr "마무리 중"
+
+#. deletion.title.new_game
+msgid "deletion.title.new_game"
+msgstr "새 게임"
+
+#. deletion.title.status_unknown
+msgid "deletion.title.status_unknown"
+msgstr "상태 알 수 없음"
+
+#. deletion.title.not_deleted
+msgid "deletion.title.not_deleted"
+msgstr "삭제되지 않음"
+
+#. deletion.title.data_deleted
+msgid "deletion.title.data_deleted"
+msgstr "데이터 삭제 완료"
+
+#. deletion.title.accepted
+msgid "deletion.title.accepted"
+msgstr "삭제 요청 접수"
+
+#. deletion.confirm.headline
+msgid "deletion.confirm.headline"
+msgstr "계정이 영구적으로 삭제됩니다."
+
+#. deletion.confirm.body
+msgid "deletion.confirm.body"
+msgstr "진행 상황, 코인, 아이템, 프로필이 모두 사라집니다. 이 작업은 되돌릴 수 없습니다.\n\n나중에 다시 로그인하면 새 계정으로 시작하게 됩니다.\n\n일부 구매 및 보안 기록은 이름이나 프로필 없이 보관됩니다. 나머지 데이터는 30일 이내에 삭제됩니다."
+
+#. deletion.confirm.button
+msgid "deletion.confirm.button"
+msgstr "계정 삭제"
+
+#. deletion.local_confirm.headline
+msgid "deletion.local_confirm.headline"
+msgstr "이 기기의 게임 데이터가 삭제됩니다."
+
+#. deletion.local_confirm.body
+msgid "deletion.local_confirm.body"
+msgstr "진행 상황, 코인, 아이템, 프로필이 모두 사라집니다. 이 작업은 되돌릴 수 없습니다.\n\n이 게임은 온라인 계정을 생성하지 않았으므로 서버에서 삭제할 데이터는 없습니다."
+
+#. deletion.local_confirm.button
+msgid "deletion.local_confirm.button"
+msgstr "데이터 삭제"
+
+#. deletion.pending_setup.headline
+msgid "deletion.pending_setup.headline"
+msgstr "계정 생성이 아직 완료되지 않았습니다."
+
+#. deletion.pending_setup.body
+msgid "deletion.pending_setup.body"
+msgstr "인터넷에 연결한 뒤 잠시 후 다시 시도해 주세요. 아무것도 삭제되지 않았습니다."
+
+#. deletion.sign_in.headline
+msgid "deletion.sign_in.headline"
+msgstr "삭제하려는 계정으로 로그인해 주세요."
+
+#. deletion.sign_in.body
+msgid "deletion.sign_in.body"
+msgstr "로그인할 수 없다면 고객지원에 도움을 요청해 주세요."
+
+#. deletion.read_failed.headline
+msgid "deletion.read_failed.headline"
+msgstr "게임 데이터를 읽지 못했습니다."
+
+#. deletion.read_failed.body
+msgid "deletion.read_failed.body"
+msgstr "게임을 다시 실행한 뒤 다시 시도해 주세요. 아무것도 삭제되지 않았습니다."
+
+#. deletion.unavailable.headline
+msgid "deletion.unavailable.headline"
+msgstr "이 게임 버전에서는 계정을 삭제할 수 없습니다."
+
+#. deletion.unavailable.body
+msgid "deletion.unavailable.body"
+msgstr "게임을 업데이트하거나 고객지원에 계정 삭제를 요청해 주세요. 아무것도 삭제되지 않았습니다."
+
+#. deletion.in_progress.account
+msgid "deletion.in_progress.account"
+msgstr "계정 삭제 중..."
+
+#. deletion.in_progress.local
+msgid "deletion.in_progress.local"
+msgstr "게임 데이터 삭제 중..."
+
+#. deletion.in_progress.body
+msgid "deletion.in_progress.body"
+msgstr "게임을 종료하지 말아 주세요. 잠시만 기다리면 됩니다."
+
+#. deletion.not_confirmed.headline
+msgid "deletion.not_confirmed.headline"
+msgstr "삭제 요청에 대한 응답을 아직 받지 못했습니다."
+
+#. deletion.not_confirmed.body
+msgid "deletion.not_confirmed.body"
+msgstr "요청을 보냈지만 응답을 받지 못했습니다. 인터넷에 연결한 뒤 다시 시도해 주세요. 결과가 확인될 때까지 게임이 잠긴 상태로 유지됩니다."
+
+#. deletion.unconfirmed.headline
+msgid "deletion.unconfirmed.headline"
+msgstr "삭제 상태 미확인"
+
+#. deletion.unconfirmed.body
+msgid "deletion.unconfirmed.body"
+msgstr "계정이 삭제되었는지 확인하지 못했습니다. 데이터를 안전하게 보호하기 위해 게임이 잠긴 상태로 유지됩니다. 아래 참조 번호를 포함해 고객지원에 문의해 주세요."
+
+#. deletion.check_again
+msgid "deletion.check_again"
+msgstr "다시 확인"
+
+#. deletion.cleanup.headline.local
+msgid "deletion.cleanup.headline.local"
+msgstr "기기의 게임 데이터가 아직 완전히 삭제되지 않았습니다."
+
+#. deletion.cleanup.headline.account
+msgid "deletion.cleanup.headline.account"
+msgstr "계정 삭제 요청이 접수되었습니다. 기기 내 남은 데이터를 정리 중입니다."
+
+#. deletion.cleanup.body
+msgid "deletion.cleanup.body"
+msgstr "이 기기의 일부 게임 데이터가 아직 삭제되지 않았습니다. 다시 시도해 삭제를 마무리해 주세요."
+
+#. deletion.new_game.headline
+msgid "deletion.new_game.headline"
+msgstr "새 게임 시작 중..."
+
+#. deletion.new_game.body
+msgid "deletion.new_game.body"
+msgstr "잠시만 기다리면 됩니다."
+
+#. deletion.status_unknown.headline
+msgid "deletion.status_unknown.headline"
+msgstr "이 기기에서 삭제 상태를 읽지 못했습니다."
+
+#. deletion.status_unknown.body
+msgid "deletion.status_unknown.body"
+msgstr "데이터를 안전하게 보호하기 위해 게임이 잠긴 상태로 유지됩니다. 고객지원에 도움을 요청해 주세요."
+
+#. deletion.fail.offline
+msgid "deletion.fail.offline"
+msgstr "계정을 삭제하려면 인터넷에 연결해 주세요."
+
+#. deletion.fail.rate_limited
+msgid "deletion.fail.rate_limited"
+msgstr "시도 횟수가 너무 많습니다. 잠시 기다린 뒤 다시 시도해 주세요."
+
+#. deletion.fail.busy
+msgid "deletion.fail.busy"
+msgstr "현재 계정 삭제를 처리할 수 없습니다. 잠시 후 다시 시도해 주세요."
+
+#. deletion.fail.syncing
+msgid "deletion.fail.syncing"
+msgstr "게임이 아직 동기화 중입니다. 잠시 후 다시 시도해 주세요."
+
+#. deletion.fail.auth
+msgid "deletion.fail.auth"
+msgstr "계정을 확인하지 못했습니다. 게임을 다시 실행한 뒤 다시 시도해 주세요."
+
+#. deletion.fail.update
+msgid "deletion.fail.update"
+msgstr "계정을 삭제하려면 게임을 업데이트해 주세요."
+
+#. deletion.fail.changed
+msgid "deletion.fail.changed"
+msgstr "삭제 처리 중 계정이 변경되었습니다. 다시 시도해 주세요."
+
+#. deletion.fail.storage
+msgid "deletion.fail.storage"
+msgstr "기기에 삭제 요청을 저장하지 못했습니다. 다시 시도해 주세요."
+
+#. deletion.fail.generic
+msgid "deletion.fail.generic"
+msgstr "계정을 삭제하지 못했습니다. 나중에 다시 시도하거나 고객지원에 문의해 주세요."
+
+#. deletion.fail.local
+msgid "deletion.fail.local"
+msgstr "게임 데이터를 삭제하지 못했습니다. 다시 시도해 주세요."
+
+#. deletion.fail.body
+msgid "deletion.fail.body"
+msgstr "아무것도 삭제되지 않았으며, 계속 플레이할 수 있습니다."
+
+#. deletion.done_local.headline
+msgid "deletion.done_local.headline"
+msgstr "기기의 게임 데이터가 삭제되었습니다."
+
+#. deletion.done_local.body
+msgid "deletion.done_local.body"
+msgstr "새 게임으로 처음부터 시작할 수 있습니다."
+
+#. deletion.new_game_failed
+msgid "deletion.new_game_failed"
+msgstr "새 게임을 시작하지 못했습니다. 다시 시도해 주세요."
+
+#. deletion.accepted.headline
+msgid "deletion.accepted.headline"
+msgstr "계정에 더 이상 접근할 수 없습니다."
+
+#. deletion.accepted.body
+msgid "deletion.accepted.body"
+msgstr "삭제 요청이 접수되었습니다."
+
+#. deletion.accepted.body_deadline
+msgid "deletion.accepted.body_deadline"
+msgstr "삭제 요청이 접수되었습니다. 데이터는 %s까지 삭제됩니다."
+
+#. deletion.reference
+msgid "deletion.reference"
+msgstr "참조 번호: %s"
+
+#. deletion.start_new_game
+msgid "deletion.start_new_game"
+msgstr "새 게임 시작"
+
+#. app.name
+msgid "app.name"
+msgstr "SortingPuzzle"
+
+#. support.email.subject
+msgid "support.email.subject"
+msgstr "Sorting Puzzle 고객지원 문의"
+
+#. support.email.body
+msgid "support.email.body"
+msgstr "여기에 문제를 설명해 주세요.\n\n기기/플랫폼:\n대략적인 발생 시간:\n"
+
+#. support.ad_email.subject
+msgid "support.ad_email.subject"
+msgstr "Sorting Puzzle 광고 신고"
+
+#. support.ad_email.body
+msgid "support.ad_email.body"
+msgstr "스크린샷을 첨부하고 아래 내용을 작성해 주세요.\n\n대략적인 발생 시간:\n게임 내 광고 위치:\n광고주 또는 앱 이름:\n광고 검토가 필요한 이유:\n"
+
+#. deletion.email.subject
+msgid "deletion.email.subject"
+msgstr "Sorting Puzzle 계정 삭제"
+
+#. deletion.email.body
+msgid "deletion.email.body"
+msgstr "계정 삭제에 도움을 요청합니다."
+
+#. support.email.status
+msgid "support.email.status"
+msgstr "상태: %s"
+
+#. support.email.deletion_reference
+msgid "support.email.deletion_reference"
+msgstr "삭제 참조 번호"
+
+#. support.email.server_reference
+msgid "support.email.server_reference"
+msgstr "서버 참조 번호"
+
+#. support.email.player_id
+msgid "support.email.player_id"
+msgstr "플레이어 ID"
+
+#. leaderboard.empty
+msgid "leaderboard.empty"
+msgstr "아직 기록이 없어요"
+
+#. date.month.1
+msgid "date.month.1"
+msgstr "1월"
+
+#. date.month.2
+msgid "date.month.2"
+msgstr "2월"
+
+#. date.month.3
+msgid "date.month.3"
+msgstr "3월"
+
+#. date.month.4
+msgid "date.month.4"
+msgstr "4월"
+
+#. date.month.5
+msgid "date.month.5"
+msgstr "5월"
+
+#. date.month.6
+msgid "date.month.6"
+msgstr "6월"
+
+#. date.month.7
+msgid "date.month.7"
+msgstr "7월"
+
+#. date.month.8
+msgid "date.month.8"
+msgstr "8월"
+
+#. date.month.9
+msgid "date.month.9"
+msgstr "9월"
+
+#. date.month.10
+msgid "date.month.10"
+msgstr "10월"
+
+#. date.month.11
+msgid "date.month.11"
+msgstr "11월"
+
+#. date.month.12
+msgid "date.month.12"
+msgstr "12월"
+
+#. common.play
+msgid "Play"
+msgstr "플레이"
+
+#. common.continue
+msgid "Continue"
+msgstr "계속"
+
+#. common.try_again
+msgid "Try Again"
+msgstr "다시 시도"
+
+#. common.close
+msgid "Close"
+msgstr "닫기"
+
+#. common.cancel
+msgid "Cancel"
+msgstr "취소"
+
+#. common.got_it
+msgid "Got it"
+msgstr "확인"
+
+#. common.get_help
+msgid "Get Help"
+msgstr "도움 요청"
+
+#. common.save
+msgid "SAVE"
+msgstr "저장"
+
+#. common.loading
+msgid "Loading…"
+msgstr "불러오는 중…"
+
+#. menu.level_button
+msgid "LEVEL %d"
+msgstr "레벨 %d"
+
+#. menu.more_levels_coming_soon
+msgid "MORE LEVELS COMING SOON"
+msgstr "새 레벨이 곧 추가돼요"
+
+#. menu.coming_soon
+msgid "COMING SOON"
+msgstr "곧 공개"
+
+#. menu.lives_full
+msgid "Full"
+msgstr "가득"
+
+#. menu.starter_badge
+msgid "BUNDLE"
+msgstr "패키지"
+
+#. nav.shop
+msgid "Shop"
+msgstr "상점"
+
+#. nav.home
+msgid "Home"
+msgstr "홈"
+
+#. nav.leaderboard
+msgid "Leaderboard"
+msgstr "랭킹"
+
+#. chapter.button
+msgid "CHAPTER %d"
+msgstr "챕터 %d"
+
+#. chapter.button_tooltip
+msgid "Choose Chapter %d: %s"
+msgstr "챕터 %d, %s 선택"
+
+#. chapter.screen_title
+msgid "CHAPTERS"
+msgstr "챕터"
+
+#. chapter.title.chapter_01
+msgid "Grocery Town"
+msgstr "마트 마을"
+
+#. chapter.title.chapter_02
+msgid "Candy Corner"
+msgstr "사탕 골목"
+
+#. chapter.locked_status
+msgid "Complete %d more %s levels to unlock"
+msgstr "레벨 %d개를 '%s'에서 더 완료하면 잠금이 해제됩니다"
+
+#. chapter.unlock_progress
+msgid "Unlock progress"
+msgstr "잠금 해제 진행도"
+
+#. chapter.current_progress
+msgid "Current progress"
+msgstr "현재 진행도"
+
+#. chapter.locked
+msgid "Locked"
+msgstr "잠김"
+
+#. chapter.no_levels_status
+msgid "New levels are coming soon"
+msgstr "새 레벨이 곧 추가돼요"
+
+#. chapter.coming_soon
+msgid "Coming Soon"
+msgstr "곧 공개"
+
+#. hud.combo
+msgid "COMBO ×%d"
+msgstr "콤보 ×%d"
+
+#. hud.ability_tooltip.hammer
+msgid "Hammer -- clears a matching triple"
+msgstr "망치 -- 같은 아이템 3개를 제거해요"
+
+#. hud.ability_tooltip.shuffle
+msgid "Shuffle -- reshuffles unlocked items"
+msgstr "섞기 -- 잠기지 않은 아이템을 다시 섞어요"
+
+#. hud.ability_tooltip.lantern
+msgid "Lantern -- highlights a matchable triple"
+msgstr "랜턴 -- 맞출 수 있는 같은 아이템 3개를 표시해요"
+
+#. hud.ability_tooltip.freezer
+msgid "Freezer -- pauses the countdown timer"
+msgstr "얼리기 -- 카운트다운 타이머를 멈춰요"
+
+#. hud.seconds_short
+msgid "%ds"
+msgstr "%d초"
+
+#. tip.tap_dispenser
+msgid "Tap a dispenser to throw items onto the shelves!"
+msgstr "배출기를 터치하면 아이템이 선반으로 나와요!"
+
+#. pause.title
+msgid "PAUSE"
+msgstr "일시정지"
+
+#. pause.leave
+msgid "Leave"
+msgstr "나가기"
+
+#. leave.title
+msgid "LEAVING THE LEVEL"
+msgstr "레벨 나가기"
+
+#. leave.you_will_lose
+msgid "You will lose:"
+msgstr "다음을 잃게 돼요:"
+
+#. timeup.title
+msgid "TIME'S UP"
+msgstr "시간 종료"
+
+#. timeup.offer
+msgid "Add one minute and keep sorting!"
+msgstr "1분을 추가하고 계속 정리해요!"
+
+#. timeup.used
+msgid "Used"
+msgstr "사용 완료"
+
+#. ability_purchase.title
+msgid "USE ABILITY"
+msgstr "부스터 사용"
+
+#. shelf_unlock.title
+msgid "UNLOCK SHELF"
+msgstr "선반 잠금 해제"
+
+#. shelf_unlock.offer
+msgid "Watch one ad to unlock this shelf now."
+msgstr "광고 하나를 보고 지금 이 선반의 잠금을 해제하세요."
+
+#. shelf_unlock.offer_or_clear
+msgid "Watch one ad to unlock this shelf now, or clear %s more."
+msgstr "광고 하나를 보고 지금 이 선반의 잠금을 해제하거나, 세트를 %s번 더 맞추세요."
+
+#. shelf_unlock.button
+msgid "Watch Ad · Unlock Shelf"
+msgstr "광고 보기 · 선반 잠금 해제"
+
+#. shelf_unlock.ad_unavailable
+msgid "Ad unavailable. This shelf stays locked."
+msgstr "광고를 볼 수 없어요. 이 선반은 잠긴 상태로 유지돼요."
+
+#. complete.title
+msgid "GREAT JOB!"
+msgstr "잘했어요!"
+
+#. failed.headline
+msgid "LEVEL FAILED"
+msgstr "레벨 실패"
+
+#. failed.retry
+msgid "Retry"
+msgstr "다시 도전"
+
+#. combo.praise.2
+msgid "Cool"
+msgstr "좋아!"
+
+#. combo.praise.3
+msgid "Great"
+msgstr "잘했어!"
+
+#. combo.praise.4
+msgid "Awesome"
+msgstr "멋져!"
+
+#. combo.praise.5
+msgid "Amazing"
+msgstr "놀라워!"
+
+#. combo.praise.6
+msgid "Fantastic"
+msgstr "환상적이야!"
+
+#. combo.praise.7
+msgid "Incredible"
+msgstr "믿기지 않아!"
+
+#. combo.praise.8
+msgid "Spectacular"
+msgstr "엄청나!"
+
+#. combo.praise.9
+msgid "Unstoppable"
+msgstr "거침없어!"
+
+#. combo.praise.10
+msgid "Legendary"
+msgstr "전설적이야!"
+
+#. combo.praise.11
+msgid "Epic"
+msgstr "압도적이야!"
+
+#. combo.praise.12
+msgid "Brilliant"
+msgstr "눈부신 실력!"
+
+#. combo.praise.13
+msgid "Masterful"
+msgstr "달인의 실력!"
+
+#. combo.praise.14
+msgid "Supreme"
+msgstr "최고의 실력!"
+
+#. combo.praise.15
+msgid "Phenomenal"
+msgstr "경이로운 실력!"
+
+#. combo.praise.16
+msgid "Mythic"
+msgstr "신화급이야!"
+
+#. combo.praise.17
+msgid "Majestic"
+msgstr "독보적이야!"
+
+#. combo.praise.18
+msgid "Radiant"
+msgstr "차원이 달라!"
+
+#. combo.praise.19
+msgid "Divine"
+msgstr "신의 경지!"
+
+#. combo.praise.20
+msgid "Transcendent"
+msgstr "초월의 경지!"
+
+#. ability.hammer.name
+msgid "Hammer"
+msgstr "망치"
+
+#. ability.shuffle.name
+msgid "Shuffle"
+msgstr "섞기"
+
+#. ability.lantern.name
+msgid "Lantern"
+msgstr "랜턴"
+
+#. ability.freezer.name
+msgid "Freezer"
+msgstr "얼리기"
+
+#. ability.hammer.description
+msgid "Instantly clears one matching set of items off the shelves."
+msgstr "선반에서 같은 아이템 3개로 이루어진 세트 하나를 즉시 제거해요."
+
+#. ability.shuffle.description
+msgid "Shuffles shelf items into new spots to help you find a match."
+msgstr "선반 위 아이템의 위치를 섞어 맞출 세트를 찾기 쉽게 해줘요."
+
+#. ability.lantern.description
+msgid "Highlights a matching triple you can clear for 15 seconds."
+msgstr "없앨 수 있는 같은 아이템 3개를 15초 동안 강조해요."
+
+#. ability.freezer.description
+msgid "Freezes the level timer for 30 seconds."
+msgstr "레벨 타이머를 30초 동안 멈춰요."
+
+#. ad.watch
+msgid "Watch Ad"
+msgstr "광고 보기"
+
+#. ad.loading
+msgid "Loading..."
+msgstr "불러오는 중..."
+
+#. ad.verifying
+msgid "Verifying..."
+msgstr "확인 중..."
+
+#. ad.verify_reward
+msgid "Verify Reward"
+msgstr "보상 확인"
+
+#. ad.reward_pending
+msgid "Reward verification is still pending."
+msgstr "아직 보상 확인이 완료되지 않았어요."
+
+#. ad.unavailable_retry
+msgid "Ad unavailable. Please try again."
+msgstr "광고를 볼 수 없어요. 다시 시도해 주세요."
+
+#. ad.watch_unavailable
+msgid "Watch Ad\nUnavailable"
+msgstr "광고 보기\n이용 불가"
+
+#. ad.watch_coming_soon
+msgid "Watch Ad\nComing Soon"
+msgstr "광고 보기\n곧 제공"
+
+#. ad.badge
+msgid "AD"
+msgstr "AD"
+
+#. lives.title.out
+msgid "OUT OF LIVES"
+msgstr "하트 없음"
+
+#. lives.title.get_more
+msgid "GET MORE LIVES"
+msgstr "하트 충전"
+
+#. lives.title.full
+msgid "LIVES FULL"
+msgstr "하트 가득"
+
+#. lives.next_in
+msgid "NEXT LIFE IN"
+msgstr "다음 하트까지"
+
+#. lives.full_body
+msgid "Your lives are full! Play a level to spend them."
+msgstr "하트가 가득해요! 레벨을 플레이해 하트를 사용하세요."
+
+#. chest.title
+msgid "CHEST REWARDS"
+msgstr "상자 보상"
+
+#. chest.progress_hint
+msgid "Collect stars to unlock a chest and claim your reward"
+msgstr "별을 모아 보상 상자를 열고 보상을 받으세요"
+
+#. chest.ready
+msgid "A REWARD CHEST AWAITS!"
+msgstr "보상 상자가 기다려요!"
+
+#. chest.tap_to_open
+msgid "Tap to open"
+msgstr "터치해서 열기"
+
+#. purchase.tap_to_collect
+msgid "Tap to collect"
+msgstr "터치해서 받기"
+
+#. purchase.complete
+msgid "PURCHASE COMPLETE"
+msgstr "구매 완료"
+
+#. shop.title
+msgid "SHOP"
+msgstr "상점"
+
+#. shop.section.bundles
+msgid "SPECIAL BUNDLES"
+msgstr "특별 패키지"
+
+#. shop.section.coins
+msgid "COINS"
+msgstr "코인"
+
+#. shop.offer.starter_bundle
+msgid "Starter Bundle"
+msgstr "스타터 패키지"
+
+#. shop.offer.basic_bundle
+msgid "Basic Bundle"
+msgstr "기본 패키지"
+
+#. shop.tag.best_value
+msgid "BEST VALUE"
+msgstr "최고 혜택"
+
+#. shop.discount_off
+msgid "OFF"
+msgstr "OFF"
+
+#. shop.ability_hint
+msgid "Tap an ability to see what it does"
+msgstr "부스터를 터치해 효과를 확인하세요"
+
+#. shop.purchasing
+msgid "Purchasing…"
+msgstr "구매 중…"
+
+#. shop.no_offers
+msgid "No shop offers are available for this region."
+msgstr "이 지역에서 구매할 수 있는 상품이 없어요."
+
+#. shop.load_failed
+msgid "Could not load the shop."
+msgstr "상점을 불러오지 못했어요."
+
+#. shop.error.title.purchase
+msgid "Purchase unavailable"
+msgstr "구매 불가"
+
+#. shop.error.title.reward
+msgid "Reward error"
+msgstr "보상 오류"
+
+#. shop.error.purchase_failed
+msgid "The purchase could not be completed."
+msgstr "구매를 완료하지 못했어요."
+
+#. shop.error.grant_failed
+msgid "The purchased rewards could not be granted."
+msgstr "구매한 보상을 지급하지 못했어요."
+
+#. shop.error.offer_unavailable
+msgid "This shop offer is unavailable."
+msgstr "이 상품은 구매할 수 없어요."
+
+#. shop.error.already_bought
+msgid "This one-time shop offer has already been purchased."
+msgstr "한 번만 구매할 수 있는 이 상품을 이미 구매했어요."
+
+#. starter.title
+msgid "STARTER BUNDLE"
+msgstr "스타터 패키지"
+
+#. starter.one_time
+msgid "ONE-TIME OFFER"
+msgstr "한 번만 구매 가능"
+
+#. starter.boosters_included
+msgid "BOOSTERS INCLUDED"
+msgstr "부스터 포함"
+
+#. starter.coins
+msgid "%s COINS"
+msgstr "코인 %s개"
+
+#. starter.buy_for
+msgid "Buy for %s"
+msgstr "%s에 구매하기"
+
+#. starter.checking
+msgid "Checking offer…"
+msgstr "상품 확인 중…"
+
+#. starter.checking_short
+msgid "Checking…"
+msgstr "확인 중…"
+
+#. starter.no_longer_available
+msgid "This offer is no longer available."
+msgstr "이 상품은 더 이상 구매할 수 없어요."
+
+#. starter.unavailable
+msgid "Unavailable"
+msgstr "구매 불가"
+
+#. booster_chip.claimed
+msgid "+%d %s"
+msgstr "+%d %s"
+
+#. profile.title
+msgid "EDIT PROFILE"
+msgstr "프로필 수정"
+
+#. profile.name_header
+msgid "PLAYER NAME"
+msgstr "플레이어 이름"
+
+#. profile.name_placeholder
+msgid "Player name"
+msgstr "플레이어 이름"
+
+#. profile.edit_name_tooltip
+msgid "Edit player name"
+msgstr "플레이어 이름 수정"
+
+#. profile.avatar_tab
+msgid "AVATAR"
+msgstr "아바타"
+
+#. profile.frame_tab
+msgid "FRAME"
+msgstr "프레임"
+
+#. profile.unlock.level
+msgid "Complete level %d to unlock"
+msgstr "레벨 %d를 완료하면 해제됩니다"
+
+#. profile.unlock.combo
+msgid "Reach a combo of ×%d in any run to unlock"
+msgstr "한 번의 플레이에서 콤보 ×%d를 달성하면 해제됩니다"
+
+#. profile.unlock.weekly_first
+msgid "Finish 1st on the Weekly leaderboard to unlock"
+msgstr "주간 랭킹에서 1위를 차지하면 해제됩니다"
+
+#. profile.unlock.weekly_top
+msgid "Finish top %d on the Weekly leaderboard to unlock"
+msgstr "주간 랭킹에서 %d위 안에 들면 해제됩니다"
+
+#. leaderboard.title
+msgid "LEADERBOARD"
+msgstr "랭킹"
+
+#. leaderboard.tab.weekly
+msgid "Weekly"
+msgstr "주간"
+
+#. leaderboard.tab.country
+msgid "Country"
+msgstr "국가"
+
+#. leaderboard.tab.world
+msgid "World"
+msgstr "세계"
+
+#. leaderboard.weekly_reset
+msgid "Weekly reset in %s"
+msgstr "주간 초기화까지 %s"
+
+#. leaderboard.duration.dh
+msgid "%dd %dh"
+msgstr "%d일 %d시간"
+
+#. leaderboard.duration.hm
+msgid "%dh %dm"
+msgstr "%d시간 %d분"
+
+#. leaderboard.duration.m
+msgid "%dm"
+msgstr "%d분"
+
+#. leaderboard.country_caption
+msgid "Country · All-time stars"
+msgstr "국가 · 누적 별"
+
+#. leaderboard.world_caption
+msgid "Worldwide · All-time stars"
+msgstr "전 세계 · 누적 별"
+
+#. leaderboard.load_failed
+msgid "Could not load leaderboard."
+msgstr "랭킹을 불러오지 못했어요."
+
+#. leaderboard.default_name
+msgid "Player"
+msgstr "플레이어"
+
+#. leaderboard.row_tooltip
+msgid "Rank %d, %s, %d stars"
+msgstr "%d위, %s, 별 %d개"
+
+#. leaderboard.reward_tooltip
+msgid "%s coin weekly reward"
+msgstr "주간 보상: 코인 %s개"
+
+#. leaderboard.reward.title
+msgid "WEEKLY REWARD!"
+msgstr "주간 보상!"
+
+#. leaderboard.reward.body
+msgid "You finished #%d last week and earned %d coins!"
+msgstr "지난주에 %d위를 차지해 코인 %d개를 받았어요!"
+
+#. leaderboard.reward.ok
+msgid "Nice!"
+msgstr "좋아요!"
+
+#. settings.title
+msgid "SETTINGS"
+msgstr "설정"
+
+#. settings.music
+msgid "Music"
+msgstr "음악"
+
+#. settings.sfx
+msgid "SFX"
+msgstr "효과음"
+
+#. settings.vibrate
+msgid "Vibrate"
+msgstr "진동"
+
+#. settings.support
+msgid "Support"
+msgstr "고객지원"
+
+#. settings.language
+msgid "Language"
+msgstr "언어"
+
+#. settings.privacy_policy
+msgid "Privacy Policy"
+msgstr "개인정보 처리방침"
+
+#. settings.privacy_choices
+msgid "Privacy Choices"
+msgstr "개인정보 보호 설정"
+
+#. settings.diagnostics
+msgid "Version %s • Build %d\nPlatform: %s • User: %s"
+msgstr "버전 %s • 빌드 %d\n플랫폼: %s • 사용자: %s"
+
+#. language.title
+msgid "LANGUAGE"
+msgstr "언어"
+
+#. support.title
+msgid "SUPPORT"
+msgstr "고객지원"
+
+#. support.faq_header
+msgid "Frequently Asked Questions"
+msgstr "자주 묻는 질문"
+
+#. support.faq.play.q
+msgid "How do I play?"
+msgstr "어떻게 플레이하나요?"
+
+#. support.faq.play.a
+msgid "Move matching goods onto the same shelf. When three identical items are visible together, they clear. Complete the board before time runs out."
+msgstr "같은 아이템을 같은 선반으로 옮기세요. 동일한 아이템 3개가 함께 보이면 사라져요. 시간이 다 되기 전에 보드의 아이템을 모두 제거하세요."
+
+#. support.faq.contact.q
+msgid "How do I contact support?"
+msgstr "고객지원에 어떻게 문의하나요?"
+
+#. support.faq.contact.a
+msgid "Email us at %s. Include a short description, your device platform, and when the problem happened."
+msgstr "%s로 이메일을 보내 주세요. 문제에 대한 간단한 설명, 기기 플랫폼, 문제가 발생한 시간을 함께 알려 주세요."
+
+#. support.faq.contact.action
+msgid "Email Support"
+msgstr "이메일 문의"
+
+#. support.faq.crash.q
+msgid "What if the game freezes or crashes?"
+msgstr "게임이 멈추거나 갑자기 종료되면 어떻게 하나요?"
+
+#. support.faq.crash.a
+msgid "Close and reopen the game first. If it happens again, restart the device and make sure the game is updated. Contact support with the device model, platform version, and what you were doing before the problem."
+msgstr "먼저 게임을 종료한 뒤 다시 실행해 보세요. 문제가 반복되면 기기를 재시작하고 게임이 최신 버전인지 확인하세요. 기기 모델, 플랫폼 버전, 문제가 발생하기 직전에 무엇을 하고 있었는지 고객지원에 알려 주세요."
+
+#. support.faq.sync.q
+msgid "How do I sync progress between devices?"
+msgstr "기기 간에 진행 상황을 어떻게 동기화하나요?"
+
+#. support.faq.sync.a
+msgid "Use the same signed-in platform account on both devices and allow synchronization to finish before playing. If the progress differs, avoid playing on both devices and contact support."
+msgstr "두 기기에서 같은 플랫폼 계정으로 로그인하고, 동기화가 완료된 뒤 플레이하세요. 진행 상황이 다르면 두 기기에서 플레이하지 말고 고객지원에 문의하세요."
+
+#. support.faq.bad_ad.q
+msgid "How do I report a bad ad?"
+msgstr "부적절한 광고는 어떻게 신고하나요?"
+
+#. support.faq.bad_ad.a
+msgid "1. Close the ad if you can do so safely.\n2. Take a screenshot of the ad and any advertiser or app name shown.\n3. Note the approximate time and where the ad appeared in the game.\n4. Describe why the ad seemed offensive, misleading, or fraudulent.\n5. Email these details to %s. Do not include passwords or payment information."
+msgstr "1. 안전하게 닫을 수 있다면 광고를 닫으세요.\n2. 광고와 화면에 표시된 광고주 또는 앱 이름의 스크린샷을 찍으세요.\n3. 광고가 나타난 대략적인 시간과 게임 내 위치를 기록하세요.\n4. 광고가 불쾌하거나 오해를 유발하거나 사기성이라고 느낀 이유를 설명해 주세요.\n5. %s로 이 내용을 담은 이메일을 보내 주세요. 비밀번호나 결제 정보는 포함하지 마세요."
+
+#. support.faq.bad_ad.action
+msgid "Email Ad Report"
+msgstr "이메일로 광고 신고"
+
+#. support.account_header
+msgid "Account"
+msgstr "계정"
+
+#. support.delete_account
+msgid "Delete Account"
+msgstr "계정 삭제"
+
+#. support.delete_game_data
+msgid "Delete Game Data"
+msgstr "게임 데이터 삭제"
+
+#. support.no_secrets
+msgid "Please never send passwords or payment information."
+msgstr "비밀번호나 결제 정보는 절대 보내지 마세요."
+
+#. deletion.title.delete_account
+msgid "DELETE ACCOUNT"
+msgstr "계정 삭제"
+
+#. deletion.title.delete_game_data
+msgid "DELETE GAME DATA"
+msgstr "게임 데이터 삭제"
+
+#. deletion.title.not_confirmed
+msgid "NOT CONFIRMED"
+msgstr "확인되지 않음"
+
+#. deletion.title.status_unconfirmed
+msgid "STATUS UNCONFIRMED"
+msgstr "상태 미확인"
+
+#. deletion.title.finishing_up
+msgid "FINISHING UP"
+msgstr "마무리 중"
+
+#. deletion.title.new_game
+msgid "NEW GAME"
+msgstr "새 게임"
+
+#. deletion.title.status_unknown
+msgid "STATUS UNKNOWN"
+msgstr "상태 알 수 없음"
+
+#. deletion.title.not_deleted
+msgid "NOT DELETED"
+msgstr "삭제되지 않음"
+
+#. deletion.title.data_deleted
+msgid "DATA DELETED"
+msgstr "데이터 삭제 완료"
+
+#. deletion.title.accepted
+msgid "DELETION ACCEPTED"
+msgstr "삭제 요청 접수"
+
+#. deletion.confirm.headline
+msgid "This permanently deletes your account."
+msgstr "계정이 영구적으로 삭제됩니다."
+
+#. deletion.confirm.body
+msgid "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nIf you sign in again later, you'll start a new account.\n\nSome purchase and security records are kept without your name or profile. The rest is removed within 30 days."
+msgstr "진행 상황, 코인, 아이템, 프로필이 모두 사라집니다. 이 작업은 되돌릴 수 없습니다.\n\n나중에 다시 로그인하면 새 계정으로 시작하게 됩니다.\n\n일부 구매 및 보안 기록은 이름이나 프로필 없이 보관됩니다. 나머지 데이터는 30일 이내에 삭제됩니다."
+
+#. deletion.local_confirm.headline
+msgid "This deletes your game data on this device."
+msgstr "이 기기의 게임 데이터가 삭제됩니다."
+
+#. deletion.local_confirm.body
+msgid "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nThis game never created an online account for you, so nothing needs to be deleted from our servers."
+msgstr "진행 상황, 코인, 아이템, 프로필이 모두 사라집니다. 이 작업은 되돌릴 수 없습니다.\n\n이 게임은 온라인 계정을 생성하지 않았으므로 서버에서 삭제할 데이터는 없습니다."
+
+#. deletion.local_confirm.button
+msgid "Delete Data"
+msgstr "데이터 삭제"
+
+#. deletion.pending_setup.headline
+msgid "Your account is still being set up."
+msgstr "계정 생성이 아직 완료되지 않았습니다."
+
+#. deletion.pending_setup.body
+msgid "Connect to the internet and try again in a moment. Nothing was deleted."
+msgstr "인터넷에 연결한 뒤 잠시 후 다시 시도해 주세요. 아무것도 삭제되지 않았습니다."
+
+#. deletion.sign_in.headline
+msgid "Sign in to the account you want to delete."
+msgstr "삭제하려는 계정으로 로그인해 주세요."
+
+#. deletion.sign_in.body
+msgid "If you can't sign in, contact support for help."
+msgstr "로그인할 수 없다면 고객지원에 도움을 요청해 주세요."
+
+#. deletion.read_failed.headline
+msgid "Your game data couldn't be read."
+msgstr "게임 데이터를 읽지 못했습니다."
+
+#. deletion.read_failed.body
+msgid "Restart the game, then try again. Nothing was deleted."
+msgstr "게임을 다시 실행한 뒤 다시 시도해 주세요. 아무것도 삭제되지 않았습니다."
+
+#. deletion.unavailable.headline
+msgid "Account deletion isn't available in this version of the game."
+msgstr "이 게임 버전에서는 계정을 삭제할 수 없습니다."
+
+#. deletion.unavailable.body
+msgid "Update the game, or contact support for help deleting your account. Nothing was deleted."
+msgstr "게임을 업데이트하거나 고객지원에 계정 삭제를 요청해 주세요. 아무것도 삭제되지 않았습니다."
+
+#. deletion.in_progress.account
+msgid "Deleting your account..."
+msgstr "계정 삭제 중..."
+
+#. deletion.in_progress.local
+msgid "Deleting your game data..."
+msgstr "게임 데이터 삭제 중..."
+
+#. deletion.in_progress.body
+msgid "Keep the game open. This only takes a moment."
+msgstr "게임을 종료하지 말아 주세요. 잠시만 기다리면 됩니다."
+
+#. deletion.not_confirmed.headline
+msgid "We haven't heard back about your deletion yet."
+msgstr "삭제 요청에 대한 응답을 아직 받지 못했습니다."
+
+#. deletion.not_confirmed.body
+msgid "Your request was sent, but the answer didn't arrive. Connect to the internet and try again. The game stays locked until we know the result."
+msgstr "요청을 보냈지만 응답을 받지 못했습니다. 인터넷에 연결한 뒤 다시 시도해 주세요. 결과가 확인될 때까지 게임이 잠긴 상태로 유지됩니다."
+
+#. deletion.unconfirmed.headline
+msgid "Deletion status unconfirmed"
+msgstr "삭제 상태 미확인"
+
+#. deletion.unconfirmed.body
+msgid "We couldn't confirm whether your account was deleted. To keep your data safe, the game stays locked. Contact support and include the reference below."
+msgstr "계정이 삭제되었는지 확인하지 못했습니다. 데이터를 안전하게 보호하기 위해 게임이 잠긴 상태로 유지됩니다. 아래 참조 번호를 포함해 고객지원에 문의해 주세요."
+
+#. deletion.check_again
+msgid "Check Again"
+msgstr "다시 확인"
+
+#. deletion.cleanup.headline.local
+msgid "Your local game data couldn't be fully deleted yet."
+msgstr "기기의 게임 데이터가 아직 완전히 삭제되지 않았습니다."
+
+#. deletion.cleanup.headline.account
+msgid "Account deletion accepted; finishing cleanup."
+msgstr "계정 삭제 요청이 접수되었습니다. 기기 내 남은 데이터를 정리 중입니다."
+
+#. deletion.cleanup.body
+msgid "Some game data couldn't be removed from this device yet. Try again to finish."
+msgstr "이 기기의 일부 게임 데이터가 아직 삭제되지 않았습니다. 다시 시도해 삭제를 마무리해 주세요."
+
+#. deletion.new_game.headline
+msgid "Starting a new game..."
+msgstr "새 게임 시작 중..."
+
+#. deletion.new_game.body
+msgid "This only takes a moment."
+msgstr "잠시만 기다리면 됩니다."
+
+#. deletion.status_unknown.headline
+msgid "We couldn't read the deletion status on this device."
+msgstr "이 기기에서 삭제 상태를 읽지 못했습니다."
+
+#. deletion.status_unknown.body
+msgid "To keep your data safe, the game stays locked. Contact support for help."
+msgstr "데이터를 안전하게 보호하기 위해 게임이 잠긴 상태로 유지됩니다. 고객지원에 도움을 요청해 주세요."
+
+#. deletion.fail.offline
+msgid "Connect to the internet to delete your account."
+msgstr "계정을 삭제하려면 인터넷에 연결해 주세요."
+
+#. deletion.fail.rate_limited
+msgid "Too many attempts. Wait a moment, then try again."
+msgstr "시도 횟수가 너무 많습니다. 잠시 기다린 뒤 다시 시도해 주세요."
+
+#. deletion.fail.busy
+msgid "Account deletion is busy right now. Try again in a moment."
+msgstr "현재 계정 삭제를 처리할 수 없습니다. 잠시 후 다시 시도해 주세요."
+
+#. deletion.fail.syncing
+msgid "The game is still syncing. Try again in a moment."
+msgstr "게임이 아직 동기화 중입니다. 잠시 후 다시 시도해 주세요."
+
+#. deletion.fail.auth
+msgid "We couldn't verify your account. Restart the game, then try again."
+msgstr "계정을 확인하지 못했습니다. 게임을 다시 실행한 뒤 다시 시도해 주세요."
+
+#. deletion.fail.update
+msgid "Update the game to delete your account."
+msgstr "계정을 삭제하려면 게임을 업데이트해 주세요."
+
+#. deletion.fail.changed
+msgid "Your account changed while we were deleting it. Try again."
+msgstr "삭제 처리 중 계정이 변경되었습니다. 다시 시도해 주세요."
+
+#. deletion.fail.storage
+msgid "Your device couldn't save the deletion request. Try again."
+msgstr "기기에 삭제 요청을 저장하지 못했습니다. 다시 시도해 주세요."
+
+#. deletion.fail.generic
+msgid "We couldn't delete your account. Try again later or contact support."
+msgstr "계정을 삭제하지 못했습니다. 나중에 다시 시도하거나 고객지원에 문의해 주세요."
+
+#. deletion.fail.local
+msgid "Your game data couldn't be deleted. Try again."
+msgstr "게임 데이터를 삭제하지 못했습니다. 다시 시도해 주세요."
+
+#. deletion.fail.body
+msgid "Nothing was deleted, and you can keep playing."
+msgstr "아무것도 삭제되지 않았으며, 계속 플레이할 수 있습니다."
+
+#. deletion.done_local.headline
+msgid "Your local game data was deleted."
+msgstr "기기의 게임 데이터가 삭제되었습니다."
+
+#. deletion.done_local.body
+msgid "You can start over with a new game."
+msgstr "새 게임으로 처음부터 시작할 수 있습니다."
+
+#. deletion.new_game_failed
+msgid "The new game couldn't start. Try again."
+msgstr "새 게임을 시작하지 못했습니다. 다시 시도해 주세요."
+
+#. deletion.accepted.headline
+msgid "Your account is no longer accessible."
+msgstr "계정에 더 이상 접근할 수 없습니다."
+
+#. deletion.accepted.body
+msgid "Your deletion request was accepted."
+msgstr "삭제 요청이 접수되었습니다."
+
+#. deletion.accepted.body_deadline
+msgid "Your deletion request was accepted. Data removal is due by %s."
+msgstr "삭제 요청이 접수되었습니다. 데이터는 %s까지 삭제됩니다."
+
+#. deletion.reference
+msgid "Reference: %s"
+msgstr "참조 번호: %s"
+
+#. deletion.start_new_game
+msgid "Start New Game"
+msgstr "새 게임 시작"
+
+#. app.name
+msgid "SortingPuzzle"
+msgstr "SortingPuzzle"
+
+#. support.email.subject
+msgid "Sorting Puzzle support request"
+msgstr "Sorting Puzzle 고객지원 문의"
+
+#. support.email.body
+msgid "Please describe the issue here.\n\nDevice/platform:\nApproximate time:\n"
+msgstr "여기에 문제를 설명해 주세요.\n\n기기/플랫폼:\n대략적인 발생 시간:\n"
+
+#. support.ad_email.subject
+msgid "Sorting Puzzle ad report"
+msgstr "Sorting Puzzle 광고 신고"
+
+#. support.ad_email.body
+msgid "Please attach a screenshot and complete the details below.\n\nApproximate time:\nAd placement in the game:\nAdvertiser or app name:\nWhy the ad should be reviewed:\n"
+msgstr "스크린샷을 첨부하고 아래 내용을 작성해 주세요.\n\n대략적인 발생 시간:\n게임 내 광고 위치:\n광고주 또는 앱 이름:\n광고 검토가 필요한 이유:\n"
+
+#. deletion.email.subject
+msgid "Sorting Puzzle account deletion"
+msgstr "Sorting Puzzle 계정 삭제"
+
+#. deletion.email.body
+msgid "Please help me with my account deletion."
+msgstr "계정 삭제에 도움을 요청합니다."
+
+#. support.email.status
+msgid "Status: %s"
+msgstr "상태: %s"
+
+#. support.email.deletion_reference
+msgid "Deletion reference"
+msgstr "삭제 참조 번호"
+
+#. support.email.server_reference
+msgid "Server reference"
+msgstr "서버 참조 번호"
+
+#. support.email.player_id
+msgid "Player ID"
+msgstr "플레이어 ID"
+
+#. leaderboard.empty
+msgid "No scores yet"
+msgstr "아직 기록이 없어요"
+
+#. ability.hammer.name
+msgid "HAMMER"
+msgstr "망치"
+
+#. ability.shuffle.name
+msgid "SHUFFLE"
+msgstr "섞기"
+
+#. ability.lantern.name
+msgid "LANTERN"
+msgstr "랜턴"
+
+#. ability.freezer.name
+msgid "FREEZER"
+msgstr "얼리기"
+
+#. shop.offer.basic_bundle
+msgid "BASIC BUNDLE"
+msgstr "기본 패키지"
+
+#. booster.counted.hammer
+msgctxt "booster.counted"
+msgid "Hammer"
+msgid_plural "Hammer.plural"
+msgstr[0] "망치"
+
+#. booster.counted.shuffle
+msgctxt "booster.counted"
+msgid "Shuffle"
+msgid_plural "Shuffle.plural"
+msgstr[0] "섞기"
+
+#. booster.counted.lantern
+msgctxt "booster.counted"
+msgid "Lantern"
+msgid_plural "Lantern.plural"
+msgstr[0] "랜턴"
+
+#. booster.counted.freezer
+msgctxt "booster.counted"
+msgid "Freezer"
+msgid_plural "Freezer.plural"
+msgstr[0] "얼리기"

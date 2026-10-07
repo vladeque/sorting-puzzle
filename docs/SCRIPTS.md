@@ -1,5 +1,16 @@
 # Scripts
 
+## Korean localization
+
+`assets/translations/ko.po` provides the owner's 251 improved Korean strings, English scene
+aliases, six invariant plural forms and fixed booster names in `booster.counted` context.
+`scripts/localization/game_text.gd` owns the presentation-only Korean year/month/day deadline
+format; counts retain comma grouping. Existing UI owners refresh Korean on live language
+changes through `LocaleManager`, without replaying reward or purchase actions.
+The shared typography theme supplies bundled Noto Sans KR fallbacks across display and reading
+roles. Source copy, engine checks and rendered results are recorded in
+`docs/localization/KOREAN_TRANSLATIONS.md` and `docs/localization/KOREAN_LOCALIZATION_QA.md`.
+
 ## French localization
 
 `assets/translations/fr.po` registers the owner's 251 improved strings, English scene aliases,
