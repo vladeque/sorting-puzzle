@@ -1,5 +1,14 @@
 # Localization
 
+## Indonesian translation copy
+
+`docs/localization/INDONESIAN_TRANSLATIONS.md` contains Bahasa Indonesia translations of all
+251 entries in the owner's string inventory, including its October 5, 2026 copy updates.
+It preserves the English text, keys, contexts, placeholders and line-break markers, and records
+the six invariant counted messages, fixed booster names, supplementary email labels and date
+terms. This is translation copy for review; runtime catalog integration and rendered Indonesian
+layout verification are pending. The selectable `id` locale continues to use English fallback.
+
 ## Runtime ownership
 
 - `scripts/localization/locale_catalog.gd` owns the release-language allowlist, native language
