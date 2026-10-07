@@ -12,6 +12,9 @@ signal ad_requested
 const GameplayUIThemeScript := preload("res://scripts/gameplay_ui_theme.gd")
 const CONTENT_REGION_HEIGHT := 224.0
 
+@export var price_font_size := 30
+@export var minimum_price_font_size := 14
+
 @onready var _shell := %Shell as GameplayModalShell
 @onready var _extension_content := %ExtensionContent as Control
 @onready var _extension_column := %ExtensionColumn as VBoxContainer
@@ -19,6 +22,7 @@ const CONTENT_REGION_HEIGHT := 224.0
 @onready var _coin_button := %CoinButton as Button
 @onready var _coin_icon := %CoinIcon as TextureRect
 @onready var _price_label := %PriceLabel as Label
+@onready var _price_row := _price_label.get_parent() as HBoxContainer
 @onready var _watch_ad_button := %WatchAdButton as Button
 
 var _coin_available := true
@@ -43,6 +47,7 @@ func _ready() -> void:
 	_coin_button.pressed.connect(func() -> void: coin_requested.emit())
 	_watch_ad_button.pressed.connect(func() -> void: ad_requested.emit())
 	_extension_column.minimum_size_changed.connect(_refresh_content_fit.call_deferred)
+	_coin_button.resized.connect(_fit_price_label.call_deferred)
 	_refresh_content_fit.call_deferred()
 
 
@@ -59,6 +64,7 @@ func set_offer(
 	_coin_available = coin_available
 	_coin_icon.visible = coin_available
 	_price_label.text = str(maxi(coin_price, 0)) if coin_available else "Used"
+	_fit_price_label()
 	_coin_button.disabled = not coin_available
 	_coin_button.mouse_default_cursor_shape = (
 		Control.CURSOR_POINTING_HAND if coin_available else Control.CURSOR_ARROW
@@ -119,6 +125,7 @@ func apply_safe_layout(safe_margins: Vector4, viewport_size: Vector2) -> void:
 func _refresh_content_fit() -> void:
 	if not is_node_ready():
 		return
+	_fit_price_label()
 	var height := maxf(CONTENT_REGION_HEIGHT, _extension_column.get_combined_minimum_size().y + 18.0)
 	if is_equal_approx(height, _content_height):
 		return
@@ -128,6 +135,26 @@ func _refresh_content_fit() -> void:
 		GameplayUIThemeScript.MODAL_COMPACT_HEIGHT + height - CONTENT_REGION_HEIGHT))
 	if _layout_viewport != Vector2.ZERO:
 		_shell.apply_safe_layout(_safe_margins, _layout_viewport)
+
+
+## Fit both numeric prices and translated "Used" labels inside the authored action's padding.
+## Start from the normal size each time so switching languages or restoring an offer can grow it.
+func _fit_price_label() -> void:
+	if not is_node_ready():
+		return
+	var available_width := _coin_button.custom_minimum_size.x
+	if _coin_button.size.x > 0.0:
+		available_width = minf(available_width, _coin_button.size.x)
+	available_width -= _price_row.offset_left - _price_row.offset_right
+	if _coin_icon.visible:
+		available_width -= _coin_icon.custom_minimum_size.x + _price_row.get_theme_constant("separation")
+	_price_label.add_theme_font_size_override("font_size", GameplayUIThemeScript.fit_label_font_size(
+		_price_label, available_width, price_font_size, minimum_price_font_size))
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		_refresh_content_fit.call_deferred()
 
 
 func open(with_pop := false) -> void:

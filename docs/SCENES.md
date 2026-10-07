@@ -1,5 +1,14 @@
 # Scenes
 
+Bahasa Indonesia (`id`) applies the improved attachment through `assets/translations/id.po`
+and the existing scene owners. Resume uses `Lanjut Main`, move-on uses `Lanjutkan`, failure
+replay uses `Main Lagi`, and destination reload uses `Muat Ulang`. The existing theme fonts
+cover all supplied characters. `AbilityBar` fits `%d dtk` within compact timer badges;
+`TimeUpExtensionModal` fits `Sudah Dipakai` within the price action's padding. Their focused
+scripts restore normal font sizes for shorter text without changing scene hierarchies.
+Source provenance and rendered verification are recorded in
+`docs/localization/INDONESIAN_LOCALIZATION_QA.md`.
+
 Traditional Chinese (`zh_Hant`) uses the existing scene hierarchies and the owner-refined
 Taiwan wording in `assets/translations/zh_Hant.po`. Resume uses `繼續遊戲`, move-on uses
 `繼續`, replay uses `重新挑戰`, and destination reload uses `重新載入`.

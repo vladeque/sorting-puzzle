@@ -54,7 +54,7 @@ Shared buttons appear on several screens and need one translation each, except w
 | `common.try_again` | Try Again | Coba Lagi | Retries a failed action (ad, purchase, account deletion). | ad modals, `account_deletion_modal.gd`, `starter_bundle_offer_modal.gd` |
 | `common.close` | Close | Tutup | Closes a dialog without doing anything. | `account_deletion_modal.gd` |
 | `common.cancel` | Cancel | Batal | Backs out of account deletion; nothing is deleted. | `account_deletion_modal.tscn` |
-| `common.got_it` | Got it | Paham | Acknowledges an info dialog (ability description, lives already full). | `out_of_lives_menu.tscn`, `shop_screen.gd` |
+| `common.got_it` | Got it | Mengerti | Acknowledges an info dialog (ability description, lives already full). | `out_of_lives_menu.tscn`, `shop_screen.gd` |
 | `common.get_help` | Get Help | Minta Bantuan | Opens a pre-filled email to support. | `account_deletion_modal.gd` |
 | `common.save` | SAVE | SIMPAN | Confirms profile edits or the chosen language. All caps by design. | `profile_menu`, `language_selection_modal.tscn` |
 | `common.loading` | Loading… | Memuat… | Shown while the Shop or Leaderboard loads its data. | `destination_status_panel.tscn` |
@@ -72,7 +72,7 @@ Shared buttons appear on several screens and need one translation each, except w
 | `chapter.screen_title` | CHAPTERS | BAB | Title of the chapter selection screen. | `chapter_selection_screen.tscn` |
 | `chapter.eyebrow` | CHAPTER %d | BAB %d | Small label above the chapter name on its card. | `chapter_cover_card.gd` |
 | `chapter.title.chapter_01` | Grocery Town | Kota Kelontong | Name of chapter 1 (a grocery-store theme). | `configs/chapters.json` |
-| `chapter.title.chapter_02` | Candy Corner | Sudut Permen | Name of chapter 2 (a candy-shop theme). | `configs/chapters.json` |
+| `chapter.title.chapter_02` | Candy Corner | Pojok Permen | Name of chapter 2 (a candy-shop theme). | `configs/chapters.json` |
 | `chapter.locked_status` | Complete %d more %s levels to unlock | Selesaikan %d level lagi di "%s" untuk membuka bab ini | Locked chapter card. `%d` = levels still needed, `%s` = previous chapter's name. Needs plural forms. | `chapter_cover_card.gd` |
 | `chapter.unlock_progress` | Unlock progress | Progres membuka bab | Header over the progress bar on a locked chapter. | `chapter_cover_card.gd` |
 | `chapter.current_progress` | Current progress | Progres saat ini | Header over the progress bar on an unlocked chapter. | `chapter_cover_card.gd` |
@@ -101,14 +101,14 @@ These strings show during a level, mostly in modal titles (all caps, short) and 
 | `leave.confirm` | Leave | Keluar | Confirms quitting the level and losing that progress. | `leave_confirmation_menu.tscn` |
 | `timeup.title` | TIME'S UP | WAKTU HABIS | Title when the level timer reaches zero. | `time_up_extension_modal.gd` |
 | `timeup.offer` | Add one minute and keep sorting! | Tambah satu menit dan lanjutkan menyortir! | Offer to extend the timer by 60 seconds for coins or an ad. | `time_up_extension_modal.tscn` |
-| `timeup.used` | Used | Terpakai | Shown on the coin price or ad button when that extension was already used this level. | `time_up_extension_modal.gd` |
+| `timeup.used` | Used | Sudah Dipakai | Shown on the coin price or ad button when that extension was already used this level. | `time_up_extension_modal.gd` |
 | `ability_purchase.title` | USE ABILITY | GUNAKAN BOOSTER | Title of the modal that buys and immediately uses one booster when the player has none. | `ability_purchase_menu.gd` |
 | `shelf_unlock.title` | UNLOCK SHELF | BUKA RAK | Title of the modal for a locked shelf. | `shelf_unlock_menu.gd` |
 | `shelf_unlock.offer` | Watch one ad to unlock this shelf now. | Tonton satu iklan untuk membuka rak ini sekarang. | Body when no other way to unlock remains. | `shelf_unlock_menu.gd` |
 | `shelf_unlock.offer_or_clear` | Watch one ad to unlock this shelf now, or clear %s more. | Tonton satu iklan untuk membuka rak ini sekarang, atau hapus %s set lagi. | Body when the shelf also unlocks by itself after more matches. `%s` = matches still needed. Needs plural forms. | `shelf_unlock_menu.gd` |
 | `shelf_unlock.button` | Watch Ad · Unlock Shelf | Tonton Iklan · Buka Rak | Ad button in that modal. | `shelf_unlock_menu.gd` |
 | `shelf_unlock.ad_unavailable` | Ad unavailable. This shelf stays locked. | Iklan tidak tersedia. Rak ini tetap terkunci. | Status line when no ad could be shown. | `shelf_unlock_menu.gd` |
-| `complete.title` | GREAT JOB! | KERJA BAGUS! | Title of the level-complete screen, above the stars earned. | `level_completion_screen.gd` |
+| `complete.title` | GREAT JOB! | HEBAT! | Title of the level-complete screen, above the stars earned. | `level_completion_screen.gd` |
 | `failed.title` | LEVEL %d | LEVEL %d | Title of the level-failed screen. `%d` = level number. | `level_failure_screen.gd` |
 | `failed.headline` | LEVEL FAILED | LEVEL GAGAL | Banner on the level-failed screen. | `level_failure_screen.tscn` |
 | `failed.retry` | Retry | Main Lagi | Replays the same level. | `level_failure_screen.tscn` |
@@ -128,8 +128,8 @@ Combo praise pops up above a match during a combo; each word is stronger than th
 | `combo.praise.10` | Legendary | Legendaris | ×10 |
 | `combo.praise.11` | Epic | Epik | ×11 |
 | `combo.praise.12` | Brilliant | Brilian | ×12 |
-| `combo.praise.13` | Masterful | Maestro | ×13 |
-| `combo.praise.14` | Supreme | Tak Terkalahkan | ×14 |
+| `combo.praise.13` | Masterful | Piawai | ×13 |
+| `combo.praise.14` | Supreme | Terhebat | ×14 |
 | `combo.praise.15` | Phenomenal | Fenomenal | ×15 |
 | `combo.praise.16` | Mythic | Sakti | ×16 |
 | `combo.praise.17` | Majestic | Agung | ×17 |
@@ -155,7 +155,7 @@ The four boosters (also called abilities in code) are product names: pick one tr
 | `ability.freezer.description` | Freezes the level timer for 30 seconds. | Membekukan hitung mundur level selama 30 detik. | Same dialog. | `shop_screen.gd` |
 | `ad.watch` | Watch Ad | Tonton Iklan | Button that plays a rewarded video ad. | ad modals, `out_of_lives_menu`, `ability_purchase_menu.tscn` |
 | `ad.loading` | Loading... | Memuat... | Ad button while the ad loads. | ad modals |
-| `ad.verifying` | Verifying... | Verifikasi... | Ad button while the server confirms the reward. | ad modals |
+| `ad.verifying` | Verifying... | Memverifikasi... | Ad button while the server confirms the reward. | ad modals |
 | `ad.verify_reward` | Verify Reward | Verifikasi Hadiah | Ad button to re-check a reward the server has not confirmed yet. | ad modals |
 | `ad.reward_pending` | Reward verification is still pending. | Verifikasi hadiah masih tertunda. | Status line under that button. | `out_of_lives_menu.gd`, `shelf_unlock_menu.gd` |
 | `ad.unavailable_retry` | Ad unavailable. Please try again. | Iklan tidak tersedia. Silakan coba lagi. | Status line when no ad could be shown. | `out_of_lives_menu` |
@@ -189,7 +189,7 @@ The four boosters (also called abilities in code) are product names: pick one tr
 | `shop.error.purchase_failed` | The purchase could not be completed. | Pembelian tidak dapat diselesaikan. | Error dialog body (fallback). | `shop_screen.gd`, `production_main_menu.gd` |
 | `shop.error.grant_failed` | The purchased rewards could not be granted. | Hadiah yang dibeli tidak dapat diberikan. | Error dialog body. | `store/shop_purchase_flow.gd` |
 | `shop.error.offer_unavailable` | This shop offer is unavailable. | Penawaran toko ini tidak tersedia. | Error dialog body. | `store/store_service.gd` |
-| `shop.error.already_bought` | This one-time shop offer has already been purchased. | Penawaran yang hanya bisa dibeli sekali ini sudah dibeli. | Error dialog body. | `store/store_service.gd` |
+| `shop.error.already_bought` | This one-time shop offer has already been purchased. | Penawaran sekali beli ini sudah pernah dibeli. | Error dialog body. | `store/store_service.gd` |
 | `starter.title` | STARTER BUNDLE | PAKET PEMULA | Starter offer modal title. | `starter_bundle_offer_modal.gd` |
 | `starter.one_time` | ONE-TIME OFFER | HANYA SEKALI BELI | Ribbon on the starter offer. | `starter_bundle_offer_modal.tscn` |
 | `starter.boosters_included` | BOOSTERS INCLUDED | TERMASUK BOOSTER | Header over the four booster chips. | `starter_bundle_offer_modal.tscn` |
@@ -221,12 +221,12 @@ Language names in the language picker stay in their own language (English, Espa�
 | `leaderboard.tab.weekly` | Weekly | Mingguan | Tab: this week's stars. | `leaderboard_screen.tscn` |
 | `leaderboard.tab.country` | Country | Negara | Tab: all-time stars in the player's country. | `leaderboard_screen.tscn` |
 | `leaderboard.tab.world` | World | Dunia | Tab: all-time stars worldwide. | `leaderboard_screen.tscn` |
-| `leaderboard.weekly_reset` | Weekly reset in %s | Reset mingguan dalam %s | Under the Weekly tab. `%s` = a duration such as "1d 4h". | `leaderboard_screen.gd` |
+| `leaderboard.weekly_reset` | Weekly reset in %s | Reset mingguan: %s lagi | Under the Weekly tab. `%s` = a duration such as "1d 4h". | `leaderboard_screen.gd` |
 | `leaderboard.duration.dh` | %dd %dh | %dh %dj | Duration: days and hours. Use local unit abbreviations. | `leaderboard_screen.gd` |
 | `leaderboard.duration.hm` | %dh %dm | %dj %dm | Duration: hours and minutes. | `leaderboard_screen.gd` |
 | `leaderboard.duration.m` | %dm | %dm | Duration: minutes. | `leaderboard_screen.gd` |
-| `leaderboard.country_caption` | Country · All-time stars | Negara · Total bintang sepanjang waktu | Caption under the Country tab. | `leaderboard_screen.gd` |
-| `leaderboard.world_caption` | Worldwide · All-time stars | Seluruh dunia · Total bintang sepanjang waktu | Caption under the World tab. | `leaderboard_screen.gd` |
+| `leaderboard.country_caption` | Country · All-time stars | Negara · Total bintang sepanjang masa | Caption under the Country tab. | `leaderboard_screen.gd` |
+| `leaderboard.world_caption` | Worldwide · All-time stars | Seluruh dunia · Total bintang sepanjang masa | Caption under the World tab. | `leaderboard_screen.gd` |
 | `leaderboard.load_failed` | Could not load leaderboard. | Papan peringkat tidak dapat dimuat. | Error state (fallback text). | `leaderboard_screen.gd` |
 | `leaderboard.default_name` | Player | Pemain | Name shown for a player without one. | `leaderboard_row.gd` |
 | `leaderboard.row_tooltip` | Rank %d, %s, %d stars | Peringkat %d, %s, %d bintang | Accessibility text of a row. `%d` = rank, `%s` = player name, `%d` = stars. Needs plural forms. | `leaderboard_row.gd` |
@@ -258,7 +258,7 @@ Support and deletion copy is legal-adjacent: translate meaning exactly, keep "No
 | `support.faq.play.q` | How do I play? | Bagaimana cara bermain? | FAQ question (tap to expand). | `support_screen.tscn` |
 | `support.faq.play.a` | Move matching goods onto the same shelf. When three identical items are visible together, they clear. Complete the board before time runs out. | Pindahkan barang yang cocok ke rak yang sama. Saat tiga barang identik terlihat bersama di satu rak, ketiganya akan hilang. Bersihkan papan sebelum waktu habis. | FAQ answer. "Goods" = shop items such as snacks and toys. | `support_screen.tscn` |
 | `support.faq.contact.q` | How do I contact support? | Bagaimana cara menghubungi tim bantuan? | FAQ question. | `support_screen.tscn` |
-| `support.faq.contact.a` | Email us at %s. Include a short description, your device platform, and when the problem happened. | Kirim email kepada kami di %s. Sertakan penjelasan singkat, platform perangkatmu, dan waktu terjadinya masalah. | FAQ answer. `%s` = support email address. | `support_screen.gd` |
+| `support.faq.contact.a` | Email us at %s. Include a short description, your device platform, and when the problem happened. | Hubungi kami melalui email di %s. Sertakan penjelasan singkat, platform perangkatmu, dan waktu terjadinya masalah. | FAQ answer. `%s` = support email address. | `support_screen.gd` |
 | `support.faq.contact.action` | Email Support | Email Tim Bantuan | Button that opens a pre-filled email. | `support_screen.tscn` |
 | `support.faq.crash.q` | What if the game freezes or crashes? | Bagaimana jika game macet atau tiba-tiba tertutup? | FAQ question. | `support_screen.tscn` |
 | `support.faq.crash.a` | Close and reopen the game first. If it happens again, restart the device and make sure the game is updated. Contact support with the device model, platform version, and what you were doing before the problem. | Tutup lalu buka kembali game terlebih dahulu. Jika terjadi lagi, mulai ulang perangkat dan pastikan game sudah diperbarui. Hubungi tim bantuan dengan menyertakan model perangkat, versi platform, dan apa yang kamu lakukan sebelum masalah terjadi. | FAQ answer. | `support_screen.tscn` |
@@ -282,7 +282,7 @@ One modal switches between states; each state has a title (caps), a headline, a 
 | `deletion.title.delete_game_data` | DELETE GAME DATA | HAPUS DATA GAME | Title for a player who never had an online account. | same |
 | `deletion.title.not_confirmed` | NOT CONFIRMED | BELUM DIKONFIRMASI | Title: request sent, answer lost. | same |
 | `deletion.title.status_unconfirmed` | STATUS UNCONFIRMED | STATUS BELUM DIKONFIRMASI | Title: server outcome unknown. | same |
-| `deletion.title.finishing_up` | FINISHING UP | MENYELESAIKAN | Title: local cleanup incomplete. | same |
+| `deletion.title.finishing_up` | FINISHING UP | HAMPIR SELESAI | Title: local cleanup incomplete. | same |
 | `deletion.title.new_game` | NEW GAME | GAME BARU | Title while a fresh save is created. | same |
 | `deletion.title.status_unknown` | STATUS UNKNOWN | STATUS TIDAK DIKETAHUI | Title: local deletion record unreadable. | same |
 | `deletion.title.not_deleted` | NOT DELETED | TIDAK DIHAPUS | Title after a failed attempt. | same |
@@ -294,8 +294,8 @@ One modal switches between states; each state has a title (caps), a headline, a 
 | `deletion.local_confirm.headline` | This deletes your game data on this device. | Ini akan menghapus data gamemu di perangkat ini. | Confirm step, local-only player. | same |
 | `deletion.local_confirm.body` | Your progress, coins, items, and profile will be gone. You can't undo this.\\n\\nThis game never created an online account for you, so nothing needs to be deleted from our servers. | Progres, koin, barang, dan profilmu akan hilang. Tindakan ini tidak bisa dibatalkan.\\n\\nGame ini tidak pernah membuat akun online untukmu, jadi tidak ada data yang perlu dihapus dari server kami. | Body for that step. | same |
 | `deletion.local_confirm.button` | Delete Data | Hapus Data | Red destructive button. | same |
-| `deletion.pending_setup.headline` | Your account is still being set up. | Akunmu masih sedang disiapkan. | Deletion blocked: first registration not finished. | same |
-| `deletion.pending_setup.body` | Connect to the internet and try again in a moment. Nothing was deleted. | Hubungkan ke internet, tunggu sebentar, lalu coba lagi. Tidak ada yang dihapus. | Body. | same |
+| `deletion.pending_setup.headline` | Your account is still being set up. | Akunmu masih disiapkan. | Deletion blocked: first registration not finished. | same |
+| `deletion.pending_setup.body` | Connect to the internet and try again in a moment. Nothing was deleted. | Pastikan kamu terhubung ke internet, tunggu sebentar, lalu coba lagi. Tidak ada yang dihapus. | Body. | same |
 | `deletion.sign_in.headline` | Sign in to the account you want to delete. | Masuk ke akun yang ingin kamu hapus. | Deletion blocked: signed out. | same |
 | `deletion.sign_in.body` | If you can't sign in, contact support for help. | Jika kamu tidak bisa masuk, hubungi tim bantuan. | Body. | same |
 | `deletion.read_failed.headline` | Your game data couldn't be read. | Data gamemu tidak dapat dibaca. | Deletion blocked: save unreadable. | same |
@@ -306,7 +306,7 @@ One modal switches between states; each state has a title (caps), a headline, a 
 | `deletion.in_progress.local` | Deleting your game data... | Menghapus data gamemu... | Same for local-only data. | same |
 | `deletion.in_progress.body` | Keep the game open. This only takes a moment. | Biarkan game tetap terbuka. Proses ini hanya sebentar. | Body while deleting. | same |
 | `deletion.not_confirmed.headline` | We haven't heard back about your deletion yet. | Kami belum menerima respons atas permintaan penghapusanmu. | Request sent, answer lost. | same |
-| `deletion.not_confirmed.body` | Your request was sent, but the answer didn't arrive. Connect to the internet and try again. The game stays locked until we know the result. | Permintaanmu sudah dikirim, tetapi responsnya belum diterima. Hubungkan ke internet dan coba lagi. Game tetap terkunci hingga kami mengetahui hasilnya. | Body. | same |
+| `deletion.not_confirmed.body` | Your request was sent, but the answer didn't arrive. Connect to the internet and try again. The game stays locked until we know the result. | Permintaanmu sudah dikirim, tetapi responsnya belum diterima. Pastikan kamu terhubung ke internet dan coba lagi. Game tetap terkunci hingga kami mengetahui hasilnya. | Body. | same |
 | `deletion.unconfirmed.headline` | Deletion status unconfirmed | Status penghapusan belum dikonfirmasi | Server outcome unknown. | same |
 | `deletion.unconfirmed.body` | We couldn't confirm whether your account was deleted. To keep your data safe, the game stays locked. Contact support and include the reference below. | Kami tidak dapat memastikan apakah akunmu sudah dihapus. Demi keamanan datamu, game tetap terkunci. Hubungi tim bantuan dan sertakan referensi di bawah ini. | Body; a reference code is shown under it. | same |
 | `deletion.check_again` | Check Again | Periksa Lagi | Asks the server again. | same |
@@ -317,7 +317,7 @@ One modal switches between states; each state has a title (caps), a headline, a 
 | `deletion.new_game.body` | This only takes a moment. | Proses ini hanya sebentar. | Body. | same |
 | `deletion.status_unknown.headline` | We couldn't read the deletion status on this device. | Kami tidak dapat membaca status penghapusan di perangkat ini. | Local deletion record unreadable. | same |
 | `deletion.status_unknown.body` | To keep your data safe, the game stays locked. Contact support for help. | Demi keamanan datamu, game tetap terkunci. Hubungi tim bantuan. | Body. | same |
-| `deletion.fail.offline` | Connect to the internet to delete your account. | Hubungkan ke internet untuk menghapus akunmu. | Failure headline. | same |
+| `deletion.fail.offline` | Connect to the internet to delete your account. | Pastikan kamu terhubung ke internet untuk menghapus akunmu. | Failure headline. | same |
 | `deletion.fail.rate_limited` | Too many attempts. Wait a moment, then try again. | Terlalu banyak percobaan. Tunggu sebentar, lalu coba lagi. | Failure headline. | same |
 | `deletion.fail.busy` | Account deletion is busy right now. Try again in a moment. | Layanan penghapusan akun sedang sibuk. Tunggu sebentar, lalu coba lagi. | Failure headline (server unavailable). | same |
 | `deletion.fail.syncing` | The game is still syncing. Try again in a moment. | Game masih melakukan sinkronisasi. Tunggu sebentar, lalu coba lagi. | Failure headline. | same |

@@ -15,6 +15,9 @@ const ABILITY_IDS := [
 	ABILITY_HIGHLIGHT,
 	ABILITY_FREEZER,
 ]
+@export var timer_font_size := 16
+@export var minimum_timer_font_size := 10
+@export var timer_text_padding := 8.0
 @onready var _button_row := %ButtonRow as HBoxContainer
 @onready var _buttons := {
 	ABILITY_HAMMER: %HammerButton as Button,
@@ -79,6 +82,7 @@ func set_active_seconds(ability_id: StringName, seconds_remaining: float) -> voi
 	timer_label.visible = seconds_remaining > 0.0
 	if timer_label.visible:
 		timer_label.text = tr("hud.seconds_short") % ceili(seconds_remaining)
+		_fit_timer_label(timer_label)
 
 
 func get_icon_texture(ability_id: StringName) -> Texture2D:
@@ -116,8 +120,10 @@ func apply_responsive_layout(usable_width: float) -> void:
 		_apply_scaled_rect(button.get_node_or_null("Icon") as Control, rects.get("icon"), scale)
 		var uses_label := button.get_node_or_null("UsesLabel") as Label
 		_apply_scaled_rect(uses_label, rects.get("uses_label"), scale)
-		_apply_scaled_rect(button.get_node_or_null("TimerLabel") as Control, rects.get("timer_label"), scale)
+		var timer_label := button.get_node_or_null("TimerLabel") as Label
+		_apply_scaled_rect(timer_label, rects.get("timer_label"), scale)
 		_fit_uses_label(uses_label)
+		_fit_timer_label(timer_label)
 
 
 func _capture_reference_rects(button: Button) -> Dictionary:
@@ -168,6 +174,14 @@ func _fit_uses_label(uses_label: Label) -> void:
 			GameplayUIThemeScript.COUNT_BADGE_MIN_FONT_SIZE
 		)
 	)
+
+
+func _fit_timer_label(timer_label: Label) -> void:
+	if timer_label == null:
+		return
+	var available_width := timer_label.offset_right - timer_label.offset_left - timer_text_padding
+	timer_label.add_theme_font_size_override("font_size", GameplayUIThemeScript.fit_label_font_size(
+		timer_label, available_width, timer_font_size, minimum_timer_font_size))
 
 
 func _notification(what: int) -> void:

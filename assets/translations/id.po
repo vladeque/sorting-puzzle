@@ -1,0 +1,2131 @@
+# Reviewed Indonesian inventory; see docs/localization/INDONESIAN_TRANSLATIONS.md.
+msgid ""
+msgstr ""
+"Project-Id-Version: SortingPuzzle\n"
+"Language: id\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#. date.day_month_year
+msgid "date.day_month_year"
+msgstr "%d %s %d"
+
+#. common.play
+msgid "common.play"
+msgstr "Main"
+
+#. common.continue
+msgid "common.continue"
+msgstr "Lanjutkan"
+
+#. common.resume
+msgid "common.resume"
+msgstr "Lanjut Main"
+
+#. common.try_again
+msgid "common.try_again"
+msgstr "Coba Lagi"
+
+#. common.close
+msgid "common.close"
+msgstr "Tutup"
+
+#. common.cancel
+msgid "common.cancel"
+msgstr "Batal"
+
+#. common.got_it
+msgid "common.got_it"
+msgstr "Mengerti"
+
+#. common.get_help
+msgid "common.get_help"
+msgstr "Minta Bantuan"
+
+#. common.save
+msgid "common.save"
+msgstr "SIMPAN"
+
+#. common.loading
+msgid "common.loading"
+msgstr "Memuat…"
+
+#. common.retry_load
+msgid "common.retry_load"
+msgstr "Muat Ulang"
+
+#. menu.level_button
+msgid "menu.level_button"
+msgstr "LEVEL %d"
+
+#. menu.more_levels_coming_soon
+msgid "menu.more_levels_coming_soon"
+msgstr "LEVEL BARU SEGERA HADIR"
+
+#. menu.coming_soon
+msgid "menu.coming_soon"
+msgstr "SEGERA HADIR"
+
+#. menu.lives_full
+msgid "menu.lives_full"
+msgstr "Penuh"
+
+#. menu.starter_badge
+msgid "menu.starter_badge"
+msgstr "PAKET"
+
+#. nav.shop
+msgid "nav.shop"
+msgstr "Toko"
+
+#. nav.home
+msgid "nav.home"
+msgstr "Beranda"
+
+#. nav.leaderboard
+msgid "nav.leaderboard"
+msgstr "Peringkat"
+
+#. chapter.button
+msgid "chapter.button"
+msgstr "BAB %d"
+
+#. chapter.button_tooltip
+msgid "chapter.button_tooltip"
+msgstr "Pilih Bab %d: %s"
+
+#. chapter.screen_title
+msgid "chapter.screen_title"
+msgstr "BAB"
+
+#. chapter.eyebrow
+msgid "chapter.eyebrow"
+msgstr "BAB %d"
+
+#. chapter.title.chapter_01
+msgid "chapter.title.chapter_01"
+msgstr "Kota Kelontong"
+
+#. chapter.title.chapter_02
+msgid "chapter.title.chapter_02"
+msgstr "Pojok Permen"
+
+#. chapter.locked_status
+msgid "chapter.locked_status"
+msgid_plural "chapter.locked_status.plural"
+msgstr[0] "Selesaikan %d level lagi di \"%s\" untuk membuka bab ini"
+
+#. chapter.unlock_progress
+msgid "chapter.unlock_progress"
+msgstr "Progres membuka bab"
+
+#. chapter.current_progress
+msgid "chapter.current_progress"
+msgstr "Progres saat ini"
+
+#. chapter.locked
+msgid "chapter.locked"
+msgstr "Terkunci"
+
+#. chapter.no_levels_status
+msgid "chapter.no_levels_status"
+msgstr "Level baru segera hadir"
+
+#. chapter.coming_soon
+msgid "chapter.coming_soon"
+msgstr "Segera Hadir"
+
+#. hud.level
+msgid "hud.level"
+msgstr "LEVEL %d"
+
+#. hud.combo
+msgid "hud.combo"
+msgstr "KOMBO ×%d"
+
+#. hud.ability_tooltip.hammer
+msgid "hud.ability_tooltip.hammer"
+msgstr "Palu -- menghapus satu set tiga barang identik"
+
+#. hud.ability_tooltip.shuffle
+msgid "hud.ability_tooltip.shuffle"
+msgstr "Acak -- mengacak ulang barang yang tidak terkunci"
+
+#. hud.ability_tooltip.lantern
+msgid "hud.ability_tooltip.lantern"
+msgstr "Lentera -- menyorot tiga barang identik yang bisa dicocokkan"
+
+#. hud.ability_tooltip.freezer
+msgid "hud.ability_tooltip.freezer"
+msgstr "Pembeku -- menjeda hitung mundur"
+
+#. hud.seconds_short
+msgid "hud.seconds_short"
+msgstr "%d dtk"
+
+#. tip.tap_dispenser
+msgid "tip.tap_dispenser"
+msgstr "Ketuk mesin pelontar untuk melempar barang ke rak!"
+
+#. pause.title
+msgid "pause.title"
+msgstr "JEDA"
+
+#. pause.leave
+msgid "pause.leave"
+msgstr "Keluar"
+
+#. leave.title
+msgid "leave.title"
+msgstr "KELUAR DARI LEVEL"
+
+#. leave.you_will_lose
+msgid "leave.you_will_lose"
+msgstr "Kamu akan kehilangan:"
+
+#. leave.confirm
+msgid "leave.confirm"
+msgstr "Keluar"
+
+#. timeup.title
+msgid "timeup.title"
+msgstr "WAKTU HABIS"
+
+#. timeup.offer
+msgid "timeup.offer"
+msgstr "Tambah satu menit dan lanjutkan menyortir!"
+
+#. timeup.used
+msgid "timeup.used"
+msgstr "Sudah Dipakai"
+
+#. ability_purchase.title
+msgid "ability_purchase.title"
+msgstr "GUNAKAN BOOSTER"
+
+#. shelf_unlock.title
+msgid "shelf_unlock.title"
+msgstr "BUKA RAK"
+
+#. shelf_unlock.offer
+msgid "shelf_unlock.offer"
+msgstr "Tonton satu iklan untuk membuka rak ini sekarang."
+
+#. shelf_unlock.offer_or_clear
+msgid "shelf_unlock.offer_or_clear"
+msgid_plural "shelf_unlock.offer_or_clear.plural"
+msgstr[0] "Tonton satu iklan untuk membuka rak ini sekarang, atau hapus %s set lagi."
+
+#. shelf_unlock.button
+msgid "shelf_unlock.button"
+msgstr "Tonton Iklan · Buka Rak"
+
+#. shelf_unlock.ad_unavailable
+msgid "shelf_unlock.ad_unavailable"
+msgstr "Iklan tidak tersedia. Rak ini tetap terkunci."
+
+#. complete.title
+msgid "complete.title"
+msgstr "HEBAT!"
+
+#. failed.title
+msgid "failed.title"
+msgstr "LEVEL %d"
+
+#. failed.headline
+msgid "failed.headline"
+msgstr "LEVEL GAGAL"
+
+#. failed.retry
+msgid "failed.retry"
+msgstr "Main Lagi"
+
+#. combo.praise.2
+msgid "combo.praise.2"
+msgstr "Keren"
+
+#. combo.praise.3
+msgid "combo.praise.3"
+msgstr "Hebat"
+
+#. combo.praise.4
+msgid "combo.praise.4"
+msgstr "Mantap"
+
+#. combo.praise.5
+msgid "combo.praise.5"
+msgstr "Menakjubkan"
+
+#. combo.praise.6
+msgid "combo.praise.6"
+msgstr "Fantastis"
+
+#. combo.praise.7
+msgid "combo.praise.7"
+msgstr "Luar Biasa"
+
+#. combo.praise.8
+msgid "combo.praise.8"
+msgstr "Spektakuler"
+
+#. combo.praise.9
+msgid "combo.praise.9"
+msgstr "Tak Terhentikan"
+
+#. combo.praise.10
+msgid "combo.praise.10"
+msgstr "Legendaris"
+
+#. combo.praise.11
+msgid "combo.praise.11"
+msgstr "Epik"
+
+#. combo.praise.12
+msgid "combo.praise.12"
+msgstr "Brilian"
+
+#. combo.praise.13
+msgid "combo.praise.13"
+msgstr "Piawai"
+
+#. combo.praise.14
+msgid "combo.praise.14"
+msgstr "Terhebat"
+
+#. combo.praise.15
+msgid "combo.praise.15"
+msgstr "Fenomenal"
+
+#. combo.praise.16
+msgid "combo.praise.16"
+msgstr "Sakti"
+
+#. combo.praise.17
+msgid "combo.praise.17"
+msgstr "Agung"
+
+#. combo.praise.18
+msgid "combo.praise.18"
+msgstr "Gemilang"
+
+#. combo.praise.19
+msgid "combo.praise.19"
+msgstr "Sempurna"
+
+#. combo.praise.20
+msgid "combo.praise.20"
+msgstr "Melampaui Batas"
+
+#. ability.hammer.name
+msgid "ability.hammer.name"
+msgstr "Palu"
+
+#. ability.shuffle.name
+msgid "ability.shuffle.name"
+msgstr "Acak"
+
+#. ability.lantern.name
+msgid "ability.lantern.name"
+msgstr "Lentera"
+
+#. ability.freezer.name
+msgid "ability.freezer.name"
+msgstr "Pembeku"
+
+#. ability.hammer.description
+msgid "ability.hammer.description"
+msgstr "Langsung menghapus satu set tiga barang identik dari rak."
+
+#. ability.shuffle.description
+msgid "ability.shuffle.description"
+msgstr "Mengacak posisi barang di rak untuk membantumu menemukan barang yang cocok."
+
+#. ability.lantern.description
+msgid "ability.lantern.description"
+msgstr "Menyorot tiga barang identik selama 15 detik agar bisa kamu hapus."
+
+#. ability.freezer.description
+msgid "ability.freezer.description"
+msgstr "Membekukan hitung mundur level selama 30 detik."
+
+#. ad.watch
+msgid "ad.watch"
+msgstr "Tonton Iklan"
+
+#. ad.loading
+msgid "ad.loading"
+msgstr "Memuat..."
+
+#. ad.verifying
+msgid "ad.verifying"
+msgstr "Memverifikasi..."
+
+#. ad.verify_reward
+msgid "ad.verify_reward"
+msgstr "Verifikasi Hadiah"
+
+#. ad.reward_pending
+msgid "ad.reward_pending"
+msgstr "Verifikasi hadiah masih tertunda."
+
+#. ad.unavailable_retry
+msgid "ad.unavailable_retry"
+msgstr "Iklan tidak tersedia. Silakan coba lagi."
+
+#. ad.watch_unavailable
+msgid "ad.watch_unavailable"
+msgstr "Tonton Iklan\nTidak Tersedia"
+
+#. ad.watch_coming_soon
+msgid "ad.watch_coming_soon"
+msgstr "Tonton Iklan\nSegera Hadir"
+
+#. ad.badge
+msgid "ad.badge"
+msgstr "AD"
+
+#. lives.title.out
+msgid "lives.title.out"
+msgstr "NYAWA HABIS"
+
+#. lives.title.get_more
+msgid "lives.title.get_more"
+msgstr "TAMBAH NYAWA"
+
+#. lives.title.full
+msgid "lives.title.full"
+msgstr "NYAWA PENUH"
+
+#. lives.next_in
+msgid "lives.next_in"
+msgstr "NYAWA BARU DALAM"
+
+#. lives.full_body
+msgid "lives.full_body"
+msgstr "Nyawamu penuh! Mainkan level untuk menggunakannya."
+
+#. chest.title
+msgid "chest.title"
+msgstr "HADIAH DARI PETI"
+
+#. chest.progress_hint
+msgid "chest.progress_hint"
+msgstr "Kumpulkan bintang untuk membuka peti dan mengambil hadiahmu"
+
+#. chest.ready
+msgid "chest.ready"
+msgstr "PETI HADIAH MENANTIMU!"
+
+#. chest.tap_to_open
+msgid "chest.tap_to_open"
+msgstr "Ketuk untuk membuka"
+
+#. purchase.tap_to_collect
+msgid "purchase.tap_to_collect"
+msgstr "Ketuk untuk mengambil"
+
+#. purchase.complete
+msgid "purchase.complete"
+msgstr "PEMBELIAN SELESAI"
+
+#. shop.title
+msgid "shop.title"
+msgstr "TOKO"
+
+#. shop.section.bundles
+msgid "shop.section.bundles"
+msgstr "PAKET SPESIAL"
+
+#. shop.section.coins
+msgid "shop.section.coins"
+msgstr "KOIN"
+
+#. shop.offer.starter_bundle
+msgid "shop.offer.starter_bundle"
+msgstr "Paket Pemula"
+
+#. shop.offer.basic_bundle
+msgid "shop.offer.basic_bundle"
+msgstr "Paket Dasar"
+
+#. shop.tag.best_value
+msgid "shop.tag.best_value"
+msgstr "PALING HEMAT"
+
+#. shop.discount_off
+msgid "shop.discount_off"
+msgstr "OFF"
+
+#. shop.ability_hint
+msgid "shop.ability_hint"
+msgstr "Ketuk booster untuk melihat fungsinya"
+
+#. shop.purchasing
+msgid "shop.purchasing"
+msgstr "Membeli…"
+
+#. shop.no_offers
+msgid "shop.no_offers"
+msgstr "Tidak ada penawaran toko yang tersedia untuk wilayah ini."
+
+#. shop.load_failed
+msgid "shop.load_failed"
+msgstr "Toko tidak dapat dimuat."
+
+#. shop.error.title.purchase
+msgid "shop.error.title.purchase"
+msgstr "Pembelian tidak tersedia"
+
+#. shop.error.title.reward
+msgid "shop.error.title.reward"
+msgstr "Masalah hadiah"
+
+#. shop.error.purchase_failed
+msgid "shop.error.purchase_failed"
+msgstr "Pembelian tidak dapat diselesaikan."
+
+#. shop.error.grant_failed
+msgid "shop.error.grant_failed"
+msgstr "Hadiah yang dibeli tidak dapat diberikan."
+
+#. shop.error.offer_unavailable
+msgid "shop.error.offer_unavailable"
+msgstr "Penawaran toko ini tidak tersedia."
+
+#. shop.error.already_bought
+msgid "shop.error.already_bought"
+msgstr "Penawaran sekali beli ini sudah pernah dibeli."
+
+#. starter.title
+msgid "starter.title"
+msgstr "PAKET PEMULA"
+
+#. starter.one_time
+msgid "starter.one_time"
+msgstr "HANYA SEKALI BELI"
+
+#. starter.boosters_included
+msgid "starter.boosters_included"
+msgstr "TERMASUK BOOSTER"
+
+#. starter.coins
+msgid "starter.coins"
+msgid_plural "starter.coins.plural"
+msgstr[0] "%s KOIN"
+
+#. starter.buy_for
+msgid "starter.buy_for"
+msgstr "Beli seharga %s"
+
+#. starter.checking
+msgid "starter.checking"
+msgstr "Memeriksa penawaran…"
+
+#. starter.checking_short
+msgid "starter.checking_short"
+msgstr "Memeriksa…"
+
+#. starter.no_longer_available
+msgid "starter.no_longer_available"
+msgstr "Penawaran ini tidak lagi tersedia."
+
+#. starter.unavailable
+msgid "starter.unavailable"
+msgstr "Tidak Tersedia"
+
+#. booster_chip.claimed
+msgid "booster_chip.claimed"
+msgstr "+%d %s"
+
+#. profile.title
+msgid "profile.title"
+msgstr "EDIT PROFIL"
+
+#. profile.name_header
+msgid "profile.name_header"
+msgstr "NAMA PEMAIN"
+
+#. profile.name_placeholder
+msgid "profile.name_placeholder"
+msgstr "Nama pemain"
+
+#. profile.edit_name_tooltip
+msgid "profile.edit_name_tooltip"
+msgstr "Edit nama pemain"
+
+#. profile.avatar_tab
+msgid "profile.avatar_tab"
+msgstr "AVATAR"
+
+#. profile.frame_tab
+msgid "profile.frame_tab"
+msgstr "BINGKAI"
+
+#. profile.unlock.level
+msgid "profile.unlock.level"
+msgstr "Selesaikan level %d untuk membukanya"
+
+#. profile.unlock.combo
+msgid "profile.unlock.combo"
+msgstr "Raih kombo ×%d dalam satu permainan untuk membukanya"
+
+#. profile.unlock.weekly_first
+msgid "profile.unlock.weekly_first"
+msgstr "Raih peringkat 1 di papan peringkat Mingguan untuk membukanya"
+
+#. profile.unlock.weekly_top
+msgid "profile.unlock.weekly_top"
+msgstr "Masuk %d besar di papan peringkat Mingguan untuk membukanya"
+
+#. leaderboard.title
+msgid "leaderboard.title"
+msgstr "PAPAN PERINGKAT"
+
+#. leaderboard.tab.weekly
+msgid "leaderboard.tab.weekly"
+msgstr "Mingguan"
+
+#. leaderboard.tab.country
+msgid "leaderboard.tab.country"
+msgstr "Negara"
+
+#. leaderboard.tab.world
+msgid "leaderboard.tab.world"
+msgstr "Dunia"
+
+#. leaderboard.weekly_reset
+msgid "leaderboard.weekly_reset"
+msgstr "Reset mingguan: %s lagi"
+
+#. leaderboard.duration.dh
+msgid "leaderboard.duration.dh"
+msgstr "%dh %dj"
+
+#. leaderboard.duration.hm
+msgid "leaderboard.duration.hm"
+msgstr "%dj %dm"
+
+#. leaderboard.duration.m
+msgid "leaderboard.duration.m"
+msgstr "%dm"
+
+#. leaderboard.country_caption
+msgid "leaderboard.country_caption"
+msgstr "Negara · Total bintang sepanjang masa"
+
+#. leaderboard.world_caption
+msgid "leaderboard.world_caption"
+msgstr "Seluruh dunia · Total bintang sepanjang masa"
+
+#. leaderboard.load_failed
+msgid "leaderboard.load_failed"
+msgstr "Papan peringkat tidak dapat dimuat."
+
+#. leaderboard.default_name
+msgid "leaderboard.default_name"
+msgstr "Pemain"
+
+#. leaderboard.row_tooltip
+msgid "leaderboard.row_tooltip"
+msgid_plural "leaderboard.row_tooltip.plural"
+msgstr[0] "Peringkat %d, %s, %d bintang"
+
+#. leaderboard.reward_tooltip
+msgid "leaderboard.reward_tooltip"
+msgid_plural "leaderboard.reward_tooltip.plural"
+msgstr[0] "Hadiah mingguan: %s koin"
+
+#. leaderboard.reward.title
+msgid "leaderboard.reward.title"
+msgstr "HADIAH MINGGUAN!"
+
+#. leaderboard.reward.body
+msgid "leaderboard.reward.body"
+msgid_plural "leaderboard.reward.body.plural"
+msgstr[0] "Kamu meraih peringkat #%d minggu lalu dan mendapat %d koin!"
+
+#. leaderboard.reward.ok
+msgid "leaderboard.reward.ok"
+msgstr "Asyik!"
+
+#. settings.title
+msgid "settings.title"
+msgstr "PENGATURAN"
+
+#. settings.music
+msgid "settings.music"
+msgstr "Musik"
+
+#. settings.sfx
+msgid "settings.sfx"
+msgstr "Suara"
+
+#. settings.vibrate
+msgid "settings.vibrate"
+msgstr "Getar"
+
+#. settings.support
+msgid "settings.support"
+msgstr "Bantuan"
+
+#. settings.language
+msgid "settings.language"
+msgstr "Bahasa"
+
+#. settings.privacy_policy
+msgid "settings.privacy_policy"
+msgstr "Kebijakan Privasi"
+
+#. settings.privacy_choices
+msgid "settings.privacy_choices"
+msgstr "Pilihan Privasi"
+
+#. settings.diagnostics
+msgid "settings.diagnostics"
+msgstr "Versi %s • Build %d\nPlatform: %s • Pengguna: %s"
+
+#. language.title
+msgid "language.title"
+msgstr "BAHASA"
+
+#. support.title
+msgid "support.title"
+msgstr "BANTUAN"
+
+#. support.faq_header
+msgid "support.faq_header"
+msgstr "Pertanyaan Umum"
+
+#. support.faq.play.q
+msgid "support.faq.play.q"
+msgstr "Bagaimana cara bermain?"
+
+#. support.faq.play.a
+msgid "support.faq.play.a"
+msgstr "Pindahkan barang yang cocok ke rak yang sama. Saat tiga barang identik terlihat bersama di satu rak, ketiganya akan hilang. Bersihkan papan sebelum waktu habis."
+
+#. support.faq.contact.q
+msgid "support.faq.contact.q"
+msgstr "Bagaimana cara menghubungi tim bantuan?"
+
+#. support.faq.contact.a
+msgid "support.faq.contact.a"
+msgstr "Hubungi kami melalui email di %s. Sertakan penjelasan singkat, platform perangkatmu, dan waktu terjadinya masalah."
+
+#. support.faq.contact.action
+msgid "support.faq.contact.action"
+msgstr "Email Tim Bantuan"
+
+#. support.faq.crash.q
+msgid "support.faq.crash.q"
+msgstr "Bagaimana jika game macet atau tiba-tiba tertutup?"
+
+#. support.faq.crash.a
+msgid "support.faq.crash.a"
+msgstr "Tutup lalu buka kembali game terlebih dahulu. Jika terjadi lagi, mulai ulang perangkat dan pastikan game sudah diperbarui. Hubungi tim bantuan dengan menyertakan model perangkat, versi platform, dan apa yang kamu lakukan sebelum masalah terjadi."
+
+#. support.faq.sync.q
+msgid "support.faq.sync.q"
+msgstr "Bagaimana cara menyinkronkan progres antarperangkat?"
+
+#. support.faq.sync.a
+msgid "support.faq.sync.a"
+msgstr "Masuk dengan akun platform yang sama di kedua perangkat dan tunggu hingga sinkronisasi selesai sebelum bermain. Jika progresnya berbeda, hindari bermain di kedua perangkat dan hubungi tim bantuan."
+
+#. support.faq.bad_ad.q
+msgid "support.faq.bad_ad.q"
+msgstr "Bagaimana cara melaporkan iklan bermasalah?"
+
+#. support.faq.bad_ad.a
+msgid "support.faq.bad_ad.a"
+msgstr "1. Tutup iklan jika aman untuk dilakukan.\n2. Ambil tangkapan layar iklan beserta nama pengiklan atau aplikasi yang ditampilkan.\n3. Catat perkiraan waktu dan tempat iklan muncul di dalam game.\n4. Jelaskan mengapa iklan terasa menyinggung, menyesatkan, atau mengandung penipuan.\n5. Kirim detail ini melalui email ke %s. Jangan sertakan kata sandi atau informasi pembayaran."
+
+#. support.faq.bad_ad.action
+msgid "support.faq.bad_ad.action"
+msgstr "Email Laporan Iklan"
+
+#. support.account_header
+msgid "support.account_header"
+msgstr "Akun"
+
+#. support.delete_account
+msgid "support.delete_account"
+msgstr "Hapus Akun"
+
+#. support.delete_game_data
+msgid "support.delete_game_data"
+msgstr "Hapus Data Game"
+
+#. support.no_secrets
+msgid "support.no_secrets"
+msgstr "Jangan pernah mengirim kata sandi atau informasi pembayaran."
+
+#. deletion.title.delete_account
+msgid "deletion.title.delete_account"
+msgstr "HAPUS AKUN"
+
+#. deletion.title.delete_game_data
+msgid "deletion.title.delete_game_data"
+msgstr "HAPUS DATA GAME"
+
+#. deletion.title.not_confirmed
+msgid "deletion.title.not_confirmed"
+msgstr "BELUM DIKONFIRMASI"
+
+#. deletion.title.status_unconfirmed
+msgid "deletion.title.status_unconfirmed"
+msgstr "STATUS BELUM DIKONFIRMASI"
+
+#. deletion.title.finishing_up
+msgid "deletion.title.finishing_up"
+msgstr "HAMPIR SELESAI"
+
+#. deletion.title.new_game
+msgid "deletion.title.new_game"
+msgstr "GAME BARU"
+
+#. deletion.title.status_unknown
+msgid "deletion.title.status_unknown"
+msgstr "STATUS TIDAK DIKETAHUI"
+
+#. deletion.title.not_deleted
+msgid "deletion.title.not_deleted"
+msgstr "TIDAK DIHAPUS"
+
+#. deletion.title.data_deleted
+msgid "deletion.title.data_deleted"
+msgstr "DATA DIHAPUS"
+
+#. deletion.title.accepted
+msgid "deletion.title.accepted"
+msgstr "PENGHAPUSAN DITERIMA"
+
+#. deletion.confirm.headline
+msgid "deletion.confirm.headline"
+msgstr "Ini akan menghapus akunmu secara permanen."
+
+#. deletion.confirm.body
+msgid "deletion.confirm.body"
+msgstr "Progres, koin, barang, dan profilmu akan hilang. Tindakan ini tidak bisa dibatalkan.\n\nJika masuk lagi nanti, kamu akan memulai dengan akun baru.\n\nSebagian catatan pembelian dan keamanan disimpan tanpa nama atau profilmu. Data lainnya akan dihapus dalam 30 hari."
+
+#. deletion.confirm.button
+msgid "deletion.confirm.button"
+msgstr "Hapus Akun"
+
+#. deletion.local_confirm.headline
+msgid "deletion.local_confirm.headline"
+msgstr "Ini akan menghapus data gamemu di perangkat ini."
+
+#. deletion.local_confirm.body
+msgid "deletion.local_confirm.body"
+msgstr "Progres, koin, barang, dan profilmu akan hilang. Tindakan ini tidak bisa dibatalkan.\n\nGame ini tidak pernah membuat akun online untukmu, jadi tidak ada data yang perlu dihapus dari server kami."
+
+#. deletion.local_confirm.button
+msgid "deletion.local_confirm.button"
+msgstr "Hapus Data"
+
+#. deletion.pending_setup.headline
+msgid "deletion.pending_setup.headline"
+msgstr "Akunmu masih disiapkan."
+
+#. deletion.pending_setup.body
+msgid "deletion.pending_setup.body"
+msgstr "Pastikan kamu terhubung ke internet, tunggu sebentar, lalu coba lagi. Tidak ada yang dihapus."
+
+#. deletion.sign_in.headline
+msgid "deletion.sign_in.headline"
+msgstr "Masuk ke akun yang ingin kamu hapus."
+
+#. deletion.sign_in.body
+msgid "deletion.sign_in.body"
+msgstr "Jika kamu tidak bisa masuk, hubungi tim bantuan."
+
+#. deletion.read_failed.headline
+msgid "deletion.read_failed.headline"
+msgstr "Data gamemu tidak dapat dibaca."
+
+#. deletion.read_failed.body
+msgid "deletion.read_failed.body"
+msgstr "Mulai ulang game, lalu coba lagi. Tidak ada yang dihapus."
+
+#. deletion.unavailable.headline
+msgid "deletion.unavailable.headline"
+msgstr "Penghapusan akun tidak tersedia di versi game ini."
+
+#. deletion.unavailable.body
+msgid "deletion.unavailable.body"
+msgstr "Perbarui game, atau hubungi tim bantuan untuk menghapus akunmu. Tidak ada yang dihapus."
+
+#. deletion.in_progress.account
+msgid "deletion.in_progress.account"
+msgstr "Menghapus akunmu..."
+
+#. deletion.in_progress.local
+msgid "deletion.in_progress.local"
+msgstr "Menghapus data gamemu..."
+
+#. deletion.in_progress.body
+msgid "deletion.in_progress.body"
+msgstr "Biarkan game tetap terbuka. Proses ini hanya sebentar."
+
+#. deletion.not_confirmed.headline
+msgid "deletion.not_confirmed.headline"
+msgstr "Kami belum menerima respons atas permintaan penghapusanmu."
+
+#. deletion.not_confirmed.body
+msgid "deletion.not_confirmed.body"
+msgstr "Permintaanmu sudah dikirim, tetapi responsnya belum diterima. Pastikan kamu terhubung ke internet dan coba lagi. Game tetap terkunci hingga kami mengetahui hasilnya."
+
+#. deletion.unconfirmed.headline
+msgid "deletion.unconfirmed.headline"
+msgstr "Status penghapusan belum dikonfirmasi"
+
+#. deletion.unconfirmed.body
+msgid "deletion.unconfirmed.body"
+msgstr "Kami tidak dapat memastikan apakah akunmu sudah dihapus. Demi keamanan datamu, game tetap terkunci. Hubungi tim bantuan dan sertakan referensi di bawah ini."
+
+#. deletion.check_again
+msgid "deletion.check_again"
+msgstr "Periksa Lagi"
+
+#. deletion.cleanup.headline.local
+msgid "deletion.cleanup.headline.local"
+msgstr "Data game lokalmu belum dapat dihapus sepenuhnya."
+
+#. deletion.cleanup.headline.account
+msgid "deletion.cleanup.headline.account"
+msgstr "Permintaan penghapusan akun diterima; pembersihan sedang diselesaikan."
+
+#. deletion.cleanup.body
+msgid "deletion.cleanup.body"
+msgstr "Sebagian data game belum dapat dihapus dari perangkat ini. Coba lagi untuk menyelesaikannya."
+
+#. deletion.new_game.headline
+msgid "deletion.new_game.headline"
+msgstr "Memulai game baru..."
+
+#. deletion.new_game.body
+msgid "deletion.new_game.body"
+msgstr "Proses ini hanya sebentar."
+
+#. deletion.status_unknown.headline
+msgid "deletion.status_unknown.headline"
+msgstr "Kami tidak dapat membaca status penghapusan di perangkat ini."
+
+#. deletion.status_unknown.body
+msgid "deletion.status_unknown.body"
+msgstr "Demi keamanan datamu, game tetap terkunci. Hubungi tim bantuan."
+
+#. deletion.fail.offline
+msgid "deletion.fail.offline"
+msgstr "Pastikan kamu terhubung ke internet untuk menghapus akunmu."
+
+#. deletion.fail.rate_limited
+msgid "deletion.fail.rate_limited"
+msgstr "Terlalu banyak percobaan. Tunggu sebentar, lalu coba lagi."
+
+#. deletion.fail.busy
+msgid "deletion.fail.busy"
+msgstr "Layanan penghapusan akun sedang sibuk. Tunggu sebentar, lalu coba lagi."
+
+#. deletion.fail.syncing
+msgid "deletion.fail.syncing"
+msgstr "Game masih melakukan sinkronisasi. Tunggu sebentar, lalu coba lagi."
+
+#. deletion.fail.auth
+msgid "deletion.fail.auth"
+msgstr "Kami tidak dapat memverifikasi akunmu. Mulai ulang game, lalu coba lagi."
+
+#. deletion.fail.update
+msgid "deletion.fail.update"
+msgstr "Perbarui game untuk menghapus akunmu."
+
+#. deletion.fail.changed
+msgid "deletion.fail.changed"
+msgstr "Akunmu berubah saat kami menghapusnya. Coba lagi."
+
+#. deletion.fail.storage
+msgid "deletion.fail.storage"
+msgstr "Perangkatmu tidak dapat menyimpan permintaan penghapusan. Coba lagi."
+
+#. deletion.fail.generic
+msgid "deletion.fail.generic"
+msgstr "Kami tidak dapat menghapus akunmu. Coba lagi nanti atau hubungi tim bantuan."
+
+#. deletion.fail.local
+msgid "deletion.fail.local"
+msgstr "Data gamemu tidak dapat dihapus. Coba lagi."
+
+#. deletion.fail.body
+msgid "deletion.fail.body"
+msgstr "Tidak ada yang dihapus, dan kamu bisa tetap bermain."
+
+#. deletion.done_local.headline
+msgid "deletion.done_local.headline"
+msgstr "Data game lokalmu sudah dihapus."
+
+#. deletion.done_local.body
+msgid "deletion.done_local.body"
+msgstr "Kamu bisa mulai dari awal dengan game baru."
+
+#. deletion.new_game_failed
+msgid "deletion.new_game_failed"
+msgstr "Game baru tidak dapat dimulai. Coba lagi."
+
+#. deletion.accepted.headline
+msgid "deletion.accepted.headline"
+msgstr "Akunmu tidak lagi dapat diakses."
+
+#. deletion.accepted.body
+msgid "deletion.accepted.body"
+msgstr "Permintaan penghapusanmu diterima."
+
+#. deletion.accepted.body_deadline
+msgid "deletion.accepted.body_deadline"
+msgstr "Permintaan penghapusanmu diterima. Data akan dihapus paling lambat %s."
+
+#. deletion.reference
+msgid "deletion.reference"
+msgstr "Referensi: %s"
+
+#. deletion.start_new_game
+msgid "deletion.start_new_game"
+msgstr "Mulai Game Baru"
+
+#. app.name
+msgid "app.name"
+msgstr "SortingPuzzle"
+
+#. support.email.subject
+msgid "support.email.subject"
+msgstr "Permintaan bantuan Sorting Puzzle"
+
+#. support.email.body
+msgid "support.email.body"
+msgstr "Jelaskan masalahnya di sini.\n\nPerangkat/platform:\nPerkiraan waktu:\n"
+
+#. support.ad_email.subject
+msgid "support.ad_email.subject"
+msgstr "Laporan iklan Sorting Puzzle"
+
+#. support.ad_email.body
+msgid "support.ad_email.body"
+msgstr "Lampirkan tangkapan layar dan lengkapi detail di bawah ini.\n\nPerkiraan waktu:\nPosisi iklan di dalam game:\nNama pengiklan atau aplikasi:\nAlasan iklan perlu ditinjau:\n"
+
+#. deletion.email.subject
+msgid "deletion.email.subject"
+msgstr "Penghapusan akun Sorting Puzzle"
+
+#. deletion.email.body
+msgid "deletion.email.body"
+msgstr "Mohon bantu saya menghapus akun saya."
+
+#. support.email.status
+msgid "support.email.status"
+msgstr "Status: %s"
+
+#. support.email.deletion_reference
+msgid "support.email.deletion_reference"
+msgstr "Referensi penghapusan"
+
+#. support.email.server_reference
+msgid "support.email.server_reference"
+msgstr "Referensi server"
+
+#. support.email.player_id
+msgid "support.email.player_id"
+msgstr "ID Pemain"
+
+#. leaderboard.empty
+msgid "leaderboard.empty"
+msgstr "Belum ada skor"
+
+#. date.month.1
+msgid "date.month.1"
+msgstr "Januari"
+
+#. date.month.2
+msgid "date.month.2"
+msgstr "Februari"
+
+#. date.month.3
+msgid "date.month.3"
+msgstr "Maret"
+
+#. date.month.4
+msgid "date.month.4"
+msgstr "April"
+
+#. date.month.5
+msgid "date.month.5"
+msgstr "Mei"
+
+#. date.month.6
+msgid "date.month.6"
+msgstr "Juni"
+
+#. date.month.7
+msgid "date.month.7"
+msgstr "Juli"
+
+#. date.month.8
+msgid "date.month.8"
+msgstr "Agustus"
+
+#. date.month.9
+msgid "date.month.9"
+msgstr "September"
+
+#. date.month.10
+msgid "date.month.10"
+msgstr "Oktober"
+
+#. date.month.11
+msgid "date.month.11"
+msgstr "November"
+
+#. date.month.12
+msgid "date.month.12"
+msgstr "Desember"
+
+#. common.play
+msgid "Play"
+msgstr "Main"
+
+#. common.continue
+msgid "Continue"
+msgstr "Lanjutkan"
+
+#. common.try_again
+msgid "Try Again"
+msgstr "Coba Lagi"
+
+#. common.close
+msgid "Close"
+msgstr "Tutup"
+
+#. common.cancel
+msgid "Cancel"
+msgstr "Batal"
+
+#. common.got_it
+msgid "Got it"
+msgstr "Mengerti"
+
+#. common.get_help
+msgid "Get Help"
+msgstr "Minta Bantuan"
+
+#. common.save
+msgid "SAVE"
+msgstr "SIMPAN"
+
+#. common.loading
+msgid "Loading…"
+msgstr "Memuat…"
+
+#. menu.level_button
+msgid "LEVEL %d"
+msgstr "LEVEL %d"
+
+#. menu.more_levels_coming_soon
+msgid "MORE LEVELS COMING SOON"
+msgstr "LEVEL BARU SEGERA HADIR"
+
+#. menu.coming_soon
+msgid "COMING SOON"
+msgstr "SEGERA HADIR"
+
+#. menu.lives_full
+msgid "Full"
+msgstr "Penuh"
+
+#. menu.starter_badge
+msgid "BUNDLE"
+msgstr "PAKET"
+
+#. nav.shop
+msgid "Shop"
+msgstr "Toko"
+
+#. nav.home
+msgid "Home"
+msgstr "Beranda"
+
+#. nav.leaderboard
+msgid "Leaderboard"
+msgstr "Peringkat"
+
+#. chapter.button
+msgid "CHAPTER %d"
+msgstr "BAB %d"
+
+#. chapter.button_tooltip
+msgid "Choose Chapter %d: %s"
+msgstr "Pilih Bab %d: %s"
+
+#. chapter.screen_title
+msgid "CHAPTERS"
+msgstr "BAB"
+
+#. chapter.title.chapter_01
+msgid "Grocery Town"
+msgstr "Kota Kelontong"
+
+#. chapter.title.chapter_02
+msgid "Candy Corner"
+msgstr "Pojok Permen"
+
+#. chapter.locked_status
+msgid "Complete %d more %s levels to unlock"
+msgstr "Selesaikan %d level lagi di \"%s\" untuk membuka bab ini"
+
+#. chapter.unlock_progress
+msgid "Unlock progress"
+msgstr "Progres membuka bab"
+
+#. chapter.current_progress
+msgid "Current progress"
+msgstr "Progres saat ini"
+
+#. chapter.locked
+msgid "Locked"
+msgstr "Terkunci"
+
+#. chapter.no_levels_status
+msgid "New levels are coming soon"
+msgstr "Level baru segera hadir"
+
+#. chapter.coming_soon
+msgid "Coming Soon"
+msgstr "Segera Hadir"
+
+#. hud.combo
+msgid "COMBO ×%d"
+msgstr "KOMBO ×%d"
+
+#. hud.ability_tooltip.hammer
+msgid "Hammer -- clears a matching triple"
+msgstr "Palu -- menghapus satu set tiga barang identik"
+
+#. hud.ability_tooltip.shuffle
+msgid "Shuffle -- reshuffles unlocked items"
+msgstr "Acak -- mengacak ulang barang yang tidak terkunci"
+
+#. hud.ability_tooltip.lantern
+msgid "Lantern -- highlights a matchable triple"
+msgstr "Lentera -- menyorot tiga barang identik yang bisa dicocokkan"
+
+#. hud.ability_tooltip.freezer
+msgid "Freezer -- pauses the countdown timer"
+msgstr "Pembeku -- menjeda hitung mundur"
+
+#. hud.seconds_short
+msgid "%ds"
+msgstr "%d dtk"
+
+#. tip.tap_dispenser
+msgid "Tap a dispenser to throw items onto the shelves!"
+msgstr "Ketuk mesin pelontar untuk melempar barang ke rak!"
+
+#. pause.title
+msgid "PAUSE"
+msgstr "JEDA"
+
+#. pause.leave
+msgid "Leave"
+msgstr "Keluar"
+
+#. leave.title
+msgid "LEAVING THE LEVEL"
+msgstr "KELUAR DARI LEVEL"
+
+#. leave.you_will_lose
+msgid "You will lose:"
+msgstr "Kamu akan kehilangan:"
+
+#. timeup.title
+msgid "TIME'S UP"
+msgstr "WAKTU HABIS"
+
+#. timeup.offer
+msgid "Add one minute and keep sorting!"
+msgstr "Tambah satu menit dan lanjutkan menyortir!"
+
+#. timeup.used
+msgid "Used"
+msgstr "Sudah Dipakai"
+
+#. ability_purchase.title
+msgid "USE ABILITY"
+msgstr "GUNAKAN BOOSTER"
+
+#. shelf_unlock.title
+msgid "UNLOCK SHELF"
+msgstr "BUKA RAK"
+
+#. shelf_unlock.offer
+msgid "Watch one ad to unlock this shelf now."
+msgstr "Tonton satu iklan untuk membuka rak ini sekarang."
+
+#. shelf_unlock.offer_or_clear
+msgid "Watch one ad to unlock this shelf now, or clear %s more."
+msgstr "Tonton satu iklan untuk membuka rak ini sekarang, atau hapus %s set lagi."
+
+#. shelf_unlock.button
+msgid "Watch Ad · Unlock Shelf"
+msgstr "Tonton Iklan · Buka Rak"
+
+#. shelf_unlock.ad_unavailable
+msgid "Ad unavailable. This shelf stays locked."
+msgstr "Iklan tidak tersedia. Rak ini tetap terkunci."
+
+#. complete.title
+msgid "GREAT JOB!"
+msgstr "HEBAT!"
+
+#. failed.headline
+msgid "LEVEL FAILED"
+msgstr "LEVEL GAGAL"
+
+#. failed.retry
+msgid "Retry"
+msgstr "Main Lagi"
+
+#. combo.praise.2
+msgid "Cool"
+msgstr "Keren"
+
+#. combo.praise.3
+msgid "Great"
+msgstr "Hebat"
+
+#. combo.praise.4
+msgid "Awesome"
+msgstr "Mantap"
+
+#. combo.praise.5
+msgid "Amazing"
+msgstr "Menakjubkan"
+
+#. combo.praise.6
+msgid "Fantastic"
+msgstr "Fantastis"
+
+#. combo.praise.7
+msgid "Incredible"
+msgstr "Luar Biasa"
+
+#. combo.praise.8
+msgid "Spectacular"
+msgstr "Spektakuler"
+
+#. combo.praise.9
+msgid "Unstoppable"
+msgstr "Tak Terhentikan"
+
+#. combo.praise.10
+msgid "Legendary"
+msgstr "Legendaris"
+
+#. combo.praise.11
+msgid "Epic"
+msgstr "Epik"
+
+#. combo.praise.12
+msgid "Brilliant"
+msgstr "Brilian"
+
+#. combo.praise.13
+msgid "Masterful"
+msgstr "Piawai"
+
+#. combo.praise.14
+msgid "Supreme"
+msgstr "Terhebat"
+
+#. combo.praise.15
+msgid "Phenomenal"
+msgstr "Fenomenal"
+
+#. combo.praise.16
+msgid "Mythic"
+msgstr "Sakti"
+
+#. combo.praise.17
+msgid "Majestic"
+msgstr "Agung"
+
+#. combo.praise.18
+msgid "Radiant"
+msgstr "Gemilang"
+
+#. combo.praise.19
+msgid "Divine"
+msgstr "Sempurna"
+
+#. combo.praise.20
+msgid "Transcendent"
+msgstr "Melampaui Batas"
+
+#. ability.hammer.name
+msgid "Hammer"
+msgstr "Palu"
+
+#. ability.shuffle.name
+msgid "Shuffle"
+msgstr "Acak"
+
+#. ability.lantern.name
+msgid "Lantern"
+msgstr "Lentera"
+
+#. ability.freezer.name
+msgid "Freezer"
+msgstr "Pembeku"
+
+#. ability.hammer.description
+msgid "Instantly clears one matching set of items off the shelves."
+msgstr "Langsung menghapus satu set tiga barang identik dari rak."
+
+#. ability.shuffle.description
+msgid "Shuffles shelf items into new spots to help you find a match."
+msgstr "Mengacak posisi barang di rak untuk membantumu menemukan barang yang cocok."
+
+#. ability.lantern.description
+msgid "Highlights a matching triple you can clear for 15 seconds."
+msgstr "Menyorot tiga barang identik selama 15 detik agar bisa kamu hapus."
+
+#. ability.freezer.description
+msgid "Freezes the level timer for 30 seconds."
+msgstr "Membekukan hitung mundur level selama 30 detik."
+
+#. ad.watch
+msgid "Watch Ad"
+msgstr "Tonton Iklan"
+
+#. ad.loading
+msgid "Loading..."
+msgstr "Memuat..."
+
+#. ad.verifying
+msgid "Verifying..."
+msgstr "Memverifikasi..."
+
+#. ad.verify_reward
+msgid "Verify Reward"
+msgstr "Verifikasi Hadiah"
+
+#. ad.reward_pending
+msgid "Reward verification is still pending."
+msgstr "Verifikasi hadiah masih tertunda."
+
+#. ad.unavailable_retry
+msgid "Ad unavailable. Please try again."
+msgstr "Iklan tidak tersedia. Silakan coba lagi."
+
+#. ad.watch_unavailable
+msgid "Watch Ad\nUnavailable"
+msgstr "Tonton Iklan\nTidak Tersedia"
+
+#. ad.watch_coming_soon
+msgid "Watch Ad\nComing Soon"
+msgstr "Tonton Iklan\nSegera Hadir"
+
+#. ad.badge
+msgid "AD"
+msgstr "AD"
+
+#. lives.title.out
+msgid "OUT OF LIVES"
+msgstr "NYAWA HABIS"
+
+#. lives.title.get_more
+msgid "GET MORE LIVES"
+msgstr "TAMBAH NYAWA"
+
+#. lives.title.full
+msgid "LIVES FULL"
+msgstr "NYAWA PENUH"
+
+#. lives.next_in
+msgid "NEXT LIFE IN"
+msgstr "NYAWA BARU DALAM"
+
+#. lives.full_body
+msgid "Your lives are full! Play a level to spend them."
+msgstr "Nyawamu penuh! Mainkan level untuk menggunakannya."
+
+#. chest.title
+msgid "CHEST REWARDS"
+msgstr "HADIAH DARI PETI"
+
+#. chest.progress_hint
+msgid "Collect stars to unlock a chest and claim your reward"
+msgstr "Kumpulkan bintang untuk membuka peti dan mengambil hadiahmu"
+
+#. chest.ready
+msgid "A REWARD CHEST AWAITS!"
+msgstr "PETI HADIAH MENANTIMU!"
+
+#. chest.tap_to_open
+msgid "Tap to open"
+msgstr "Ketuk untuk membuka"
+
+#. purchase.tap_to_collect
+msgid "Tap to collect"
+msgstr "Ketuk untuk mengambil"
+
+#. purchase.complete
+msgid "PURCHASE COMPLETE"
+msgstr "PEMBELIAN SELESAI"
+
+#. shop.title
+msgid "SHOP"
+msgstr "TOKO"
+
+#. shop.section.bundles
+msgid "SPECIAL BUNDLES"
+msgstr "PAKET SPESIAL"
+
+#. shop.section.coins
+msgid "COINS"
+msgstr "KOIN"
+
+#. shop.offer.starter_bundle
+msgid "Starter Bundle"
+msgstr "Paket Pemula"
+
+#. shop.offer.basic_bundle
+msgid "Basic Bundle"
+msgstr "Paket Dasar"
+
+#. shop.tag.best_value
+msgid "BEST VALUE"
+msgstr "PALING HEMAT"
+
+#. shop.discount_off
+msgid "OFF"
+msgstr "OFF"
+
+#. shop.ability_hint
+msgid "Tap an ability to see what it does"
+msgstr "Ketuk booster untuk melihat fungsinya"
+
+#. shop.purchasing
+msgid "Purchasing…"
+msgstr "Membeli…"
+
+#. shop.no_offers
+msgid "No shop offers are available for this region."
+msgstr "Tidak ada penawaran toko yang tersedia untuk wilayah ini."
+
+#. shop.load_failed
+msgid "Could not load the shop."
+msgstr "Toko tidak dapat dimuat."
+
+#. shop.error.title.purchase
+msgid "Purchase unavailable"
+msgstr "Pembelian tidak tersedia"
+
+#. shop.error.title.reward
+msgid "Reward error"
+msgstr "Masalah hadiah"
+
+#. shop.error.purchase_failed
+msgid "The purchase could not be completed."
+msgstr "Pembelian tidak dapat diselesaikan."
+
+#. shop.error.grant_failed
+msgid "The purchased rewards could not be granted."
+msgstr "Hadiah yang dibeli tidak dapat diberikan."
+
+#. shop.error.offer_unavailable
+msgid "This shop offer is unavailable."
+msgstr "Penawaran toko ini tidak tersedia."
+
+#. shop.error.already_bought
+msgid "This one-time shop offer has already been purchased."
+msgstr "Penawaran sekali beli ini sudah pernah dibeli."
+
+#. starter.title
+msgid "STARTER BUNDLE"
+msgstr "PAKET PEMULA"
+
+#. starter.one_time
+msgid "ONE-TIME OFFER"
+msgstr "HANYA SEKALI BELI"
+
+#. starter.boosters_included
+msgid "BOOSTERS INCLUDED"
+msgstr "TERMASUK BOOSTER"
+
+#. starter.coins
+msgid "%s COINS"
+msgstr "%s KOIN"
+
+#. starter.buy_for
+msgid "Buy for %s"
+msgstr "Beli seharga %s"
+
+#. starter.checking
+msgid "Checking offer…"
+msgstr "Memeriksa penawaran…"
+
+#. starter.checking_short
+msgid "Checking…"
+msgstr "Memeriksa…"
+
+#. starter.no_longer_available
+msgid "This offer is no longer available."
+msgstr "Penawaran ini tidak lagi tersedia."
+
+#. starter.unavailable
+msgid "Unavailable"
+msgstr "Tidak Tersedia"
+
+#. booster_chip.claimed
+msgid "+%d %s"
+msgstr "+%d %s"
+
+#. profile.title
+msgid "EDIT PROFILE"
+msgstr "EDIT PROFIL"
+
+#. profile.name_header
+msgid "PLAYER NAME"
+msgstr "NAMA PEMAIN"
+
+#. profile.name_placeholder
+msgid "Player name"
+msgstr "Nama pemain"
+
+#. profile.edit_name_tooltip
+msgid "Edit player name"
+msgstr "Edit nama pemain"
+
+#. profile.avatar_tab
+msgid "AVATAR"
+msgstr "AVATAR"
+
+#. profile.frame_tab
+msgid "FRAME"
+msgstr "BINGKAI"
+
+#. profile.unlock.level
+msgid "Complete level %d to unlock"
+msgstr "Selesaikan level %d untuk membukanya"
+
+#. profile.unlock.combo
+msgid "Reach a combo of ×%d in any run to unlock"
+msgstr "Raih kombo ×%d dalam satu permainan untuk membukanya"
+
+#. profile.unlock.weekly_first
+msgid "Finish 1st on the Weekly leaderboard to unlock"
+msgstr "Raih peringkat 1 di papan peringkat Mingguan untuk membukanya"
+
+#. profile.unlock.weekly_top
+msgid "Finish top %d on the Weekly leaderboard to unlock"
+msgstr "Masuk %d besar di papan peringkat Mingguan untuk membukanya"
+
+#. leaderboard.title
+msgid "LEADERBOARD"
+msgstr "PAPAN PERINGKAT"
+
+#. leaderboard.tab.weekly
+msgid "Weekly"
+msgstr "Mingguan"
+
+#. leaderboard.tab.country
+msgid "Country"
+msgstr "Negara"
+
+#. leaderboard.tab.world
+msgid "World"
+msgstr "Dunia"
+
+#. leaderboard.weekly_reset
+msgid "Weekly reset in %s"
+msgstr "Reset mingguan: %s lagi"
+
+#. leaderboard.duration.dh
+msgid "%dd %dh"
+msgstr "%dh %dj"
+
+#. leaderboard.duration.hm
+msgid "%dh %dm"
+msgstr "%dj %dm"
+
+#. leaderboard.duration.m
+msgid "%dm"
+msgstr "%dm"
+
+#. leaderboard.country_caption
+msgid "Country · All-time stars"
+msgstr "Negara · Total bintang sepanjang masa"
+
+#. leaderboard.world_caption
+msgid "Worldwide · All-time stars"
+msgstr "Seluruh dunia · Total bintang sepanjang masa"
+
+#. leaderboard.load_failed
+msgid "Could not load leaderboard."
+msgstr "Papan peringkat tidak dapat dimuat."
+
+#. leaderboard.default_name
+msgid "Player"
+msgstr "Pemain"
+
+#. leaderboard.row_tooltip
+msgid "Rank %d, %s, %d stars"
+msgstr "Peringkat %d, %s, %d bintang"
+
+#. leaderboard.reward_tooltip
+msgid "%s coin weekly reward"
+msgstr "Hadiah mingguan: %s koin"
+
+#. leaderboard.reward.title
+msgid "WEEKLY REWARD!"
+msgstr "HADIAH MINGGUAN!"
+
+#. leaderboard.reward.body
+msgid "You finished #%d last week and earned %d coins!"
+msgstr "Kamu meraih peringkat #%d minggu lalu dan mendapat %d koin!"
+
+#. leaderboard.reward.ok
+msgid "Nice!"
+msgstr "Asyik!"
+
+#. settings.title
+msgid "SETTINGS"
+msgstr "PENGATURAN"
+
+#. settings.music
+msgid "Music"
+msgstr "Musik"
+
+#. settings.sfx
+msgid "SFX"
+msgstr "Suara"
+
+#. settings.vibrate
+msgid "Vibrate"
+msgstr "Getar"
+
+#. settings.support
+msgid "Support"
+msgstr "Bantuan"
+
+#. settings.language
+msgid "Language"
+msgstr "Bahasa"
+
+#. settings.privacy_policy
+msgid "Privacy Policy"
+msgstr "Kebijakan Privasi"
+
+#. settings.privacy_choices
+msgid "Privacy Choices"
+msgstr "Pilihan Privasi"
+
+#. settings.diagnostics
+msgid "Version %s • Build %d\nPlatform: %s • User: %s"
+msgstr "Versi %s • Build %d\nPlatform: %s • Pengguna: %s"
+
+#. language.title
+msgid "LANGUAGE"
+msgstr "BAHASA"
+
+#. support.title
+msgid "SUPPORT"
+msgstr "BANTUAN"
+
+#. support.faq_header
+msgid "Frequently Asked Questions"
+msgstr "Pertanyaan Umum"
+
+#. support.faq.play.q
+msgid "How do I play?"
+msgstr "Bagaimana cara bermain?"
+
+#. support.faq.play.a
+msgid "Move matching goods onto the same shelf. When three identical items are visible together, they clear. Complete the board before time runs out."
+msgstr "Pindahkan barang yang cocok ke rak yang sama. Saat tiga barang identik terlihat bersama di satu rak, ketiganya akan hilang. Bersihkan papan sebelum waktu habis."
+
+#. support.faq.contact.q
+msgid "How do I contact support?"
+msgstr "Bagaimana cara menghubungi tim bantuan?"
+
+#. support.faq.contact.a
+msgid "Email us at %s. Include a short description, your device platform, and when the problem happened."
+msgstr "Hubungi kami melalui email di %s. Sertakan penjelasan singkat, platform perangkatmu, dan waktu terjadinya masalah."
+
+#. support.faq.contact.action
+msgid "Email Support"
+msgstr "Email Tim Bantuan"
+
+#. support.faq.crash.q
+msgid "What if the game freezes or crashes?"
+msgstr "Bagaimana jika game macet atau tiba-tiba tertutup?"
+
+#. support.faq.crash.a
+msgid "Close and reopen the game first. If it happens again, restart the device and make sure the game is updated. Contact support with the device model, platform version, and what you were doing before the problem."
+msgstr "Tutup lalu buka kembali game terlebih dahulu. Jika terjadi lagi, mulai ulang perangkat dan pastikan game sudah diperbarui. Hubungi tim bantuan dengan menyertakan model perangkat, versi platform, dan apa yang kamu lakukan sebelum masalah terjadi."
+
+#. support.faq.sync.q
+msgid "How do I sync progress between devices?"
+msgstr "Bagaimana cara menyinkronkan progres antarperangkat?"
+
+#. support.faq.sync.a
+msgid "Use the same signed-in platform account on both devices and allow synchronization to finish before playing. If the progress differs, avoid playing on both devices and contact support."
+msgstr "Masuk dengan akun platform yang sama di kedua perangkat dan tunggu hingga sinkronisasi selesai sebelum bermain. Jika progresnya berbeda, hindari bermain di kedua perangkat dan hubungi tim bantuan."
+
+#. support.faq.bad_ad.q
+msgid "How do I report a bad ad?"
+msgstr "Bagaimana cara melaporkan iklan bermasalah?"
+
+#. support.faq.bad_ad.a
+msgid "1. Close the ad if you can do so safely.\n2. Take a screenshot of the ad and any advertiser or app name shown.\n3. Note the approximate time and where the ad appeared in the game.\n4. Describe why the ad seemed offensive, misleading, or fraudulent.\n5. Email these details to %s. Do not include passwords or payment information."
+msgstr "1. Tutup iklan jika aman untuk dilakukan.\n2. Ambil tangkapan layar iklan beserta nama pengiklan atau aplikasi yang ditampilkan.\n3. Catat perkiraan waktu dan tempat iklan muncul di dalam game.\n4. Jelaskan mengapa iklan terasa menyinggung, menyesatkan, atau mengandung penipuan.\n5. Kirim detail ini melalui email ke %s. Jangan sertakan kata sandi atau informasi pembayaran."
+
+#. support.faq.bad_ad.action
+msgid "Email Ad Report"
+msgstr "Email Laporan Iklan"
+
+#. support.account_header
+msgid "Account"
+msgstr "Akun"
+
+#. support.delete_account
+msgid "Delete Account"
+msgstr "Hapus Akun"
+
+#. support.delete_game_data
+msgid "Delete Game Data"
+msgstr "Hapus Data Game"
+
+#. support.no_secrets
+msgid "Please never send passwords or payment information."
+msgstr "Jangan pernah mengirim kata sandi atau informasi pembayaran."
+
+#. deletion.title.delete_account
+msgid "DELETE ACCOUNT"
+msgstr "HAPUS AKUN"
+
+#. deletion.title.delete_game_data
+msgid "DELETE GAME DATA"
+msgstr "HAPUS DATA GAME"
+
+#. deletion.title.not_confirmed
+msgid "NOT CONFIRMED"
+msgstr "BELUM DIKONFIRMASI"
+
+#. deletion.title.status_unconfirmed
+msgid "STATUS UNCONFIRMED"
+msgstr "STATUS BELUM DIKONFIRMASI"
+
+#. deletion.title.finishing_up
+msgid "FINISHING UP"
+msgstr "HAMPIR SELESAI"
+
+#. deletion.title.new_game
+msgid "NEW GAME"
+msgstr "GAME BARU"
+
+#. deletion.title.status_unknown
+msgid "STATUS UNKNOWN"
+msgstr "STATUS TIDAK DIKETAHUI"
+
+#. deletion.title.not_deleted
+msgid "NOT DELETED"
+msgstr "TIDAK DIHAPUS"
+
+#. deletion.title.data_deleted
+msgid "DATA DELETED"
+msgstr "DATA DIHAPUS"
+
+#. deletion.title.accepted
+msgid "DELETION ACCEPTED"
+msgstr "PENGHAPUSAN DITERIMA"
+
+#. deletion.confirm.headline
+msgid "This permanently deletes your account."
+msgstr "Ini akan menghapus akunmu secara permanen."
+
+#. deletion.confirm.body
+msgid "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nIf you sign in again later, you'll start a new account.\n\nSome purchase and security records are kept without your name or profile. The rest is removed within 30 days."
+msgstr "Progres, koin, barang, dan profilmu akan hilang. Tindakan ini tidak bisa dibatalkan.\n\nJika masuk lagi nanti, kamu akan memulai dengan akun baru.\n\nSebagian catatan pembelian dan keamanan disimpan tanpa nama atau profilmu. Data lainnya akan dihapus dalam 30 hari."
+
+#. deletion.local_confirm.headline
+msgid "This deletes your game data on this device."
+msgstr "Ini akan menghapus data gamemu di perangkat ini."
+
+#. deletion.local_confirm.body
+msgid "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nThis game never created an online account for you, so nothing needs to be deleted from our servers."
+msgstr "Progres, koin, barang, dan profilmu akan hilang. Tindakan ini tidak bisa dibatalkan.\n\nGame ini tidak pernah membuat akun online untukmu, jadi tidak ada data yang perlu dihapus dari server kami."
+
+#. deletion.local_confirm.button
+msgid "Delete Data"
+msgstr "Hapus Data"
+
+#. deletion.pending_setup.headline
+msgid "Your account is still being set up."
+msgstr "Akunmu masih disiapkan."
+
+#. deletion.pending_setup.body
+msgid "Connect to the internet and try again in a moment. Nothing was deleted."
+msgstr "Pastikan kamu terhubung ke internet, tunggu sebentar, lalu coba lagi. Tidak ada yang dihapus."
+
+#. deletion.sign_in.headline
+msgid "Sign in to the account you want to delete."
+msgstr "Masuk ke akun yang ingin kamu hapus."
+
+#. deletion.sign_in.body
+msgid "If you can't sign in, contact support for help."
+msgstr "Jika kamu tidak bisa masuk, hubungi tim bantuan."
+
+#. deletion.read_failed.headline
+msgid "Your game data couldn't be read."
+msgstr "Data gamemu tidak dapat dibaca."
+
+#. deletion.read_failed.body
+msgid "Restart the game, then try again. Nothing was deleted."
+msgstr "Mulai ulang game, lalu coba lagi. Tidak ada yang dihapus."
+
+#. deletion.unavailable.headline
+msgid "Account deletion isn't available in this version of the game."
+msgstr "Penghapusan akun tidak tersedia di versi game ini."
+
+#. deletion.unavailable.body
+msgid "Update the game, or contact support for help deleting your account. Nothing was deleted."
+msgstr "Perbarui game, atau hubungi tim bantuan untuk menghapus akunmu. Tidak ada yang dihapus."
+
+#. deletion.in_progress.account
+msgid "Deleting your account..."
+msgstr "Menghapus akunmu..."
+
+#. deletion.in_progress.local
+msgid "Deleting your game data..."
+msgstr "Menghapus data gamemu..."
+
+#. deletion.in_progress.body
+msgid "Keep the game open. This only takes a moment."
+msgstr "Biarkan game tetap terbuka. Proses ini hanya sebentar."
+
+#. deletion.not_confirmed.headline
+msgid "We haven't heard back about your deletion yet."
+msgstr "Kami belum menerima respons atas permintaan penghapusanmu."
+
+#. deletion.not_confirmed.body
+msgid "Your request was sent, but the answer didn't arrive. Connect to the internet and try again. The game stays locked until we know the result."
+msgstr "Permintaanmu sudah dikirim, tetapi responsnya belum diterima. Pastikan kamu terhubung ke internet dan coba lagi. Game tetap terkunci hingga kami mengetahui hasilnya."
+
+#. deletion.unconfirmed.headline
+msgid "Deletion status unconfirmed"
+msgstr "Status penghapusan belum dikonfirmasi"
+
+#. deletion.unconfirmed.body
+msgid "We couldn't confirm whether your account was deleted. To keep your data safe, the game stays locked. Contact support and include the reference below."
+msgstr "Kami tidak dapat memastikan apakah akunmu sudah dihapus. Demi keamanan datamu, game tetap terkunci. Hubungi tim bantuan dan sertakan referensi di bawah ini."
+
+#. deletion.check_again
+msgid "Check Again"
+msgstr "Periksa Lagi"
+
+#. deletion.cleanup.headline.local
+msgid "Your local game data couldn't be fully deleted yet."
+msgstr "Data game lokalmu belum dapat dihapus sepenuhnya."
+
+#. deletion.cleanup.headline.account
+msgid "Account deletion accepted; finishing cleanup."
+msgstr "Permintaan penghapusan akun diterima; pembersihan sedang diselesaikan."
+
+#. deletion.cleanup.body
+msgid "Some game data couldn't be removed from this device yet. Try again to finish."
+msgstr "Sebagian data game belum dapat dihapus dari perangkat ini. Coba lagi untuk menyelesaikannya."
+
+#. deletion.new_game.headline
+msgid "Starting a new game..."
+msgstr "Memulai game baru..."
+
+#. deletion.new_game.body
+msgid "This only takes a moment."
+msgstr "Proses ini hanya sebentar."
+
+#. deletion.status_unknown.headline
+msgid "We couldn't read the deletion status on this device."
+msgstr "Kami tidak dapat membaca status penghapusan di perangkat ini."
+
+#. deletion.status_unknown.body
+msgid "To keep your data safe, the game stays locked. Contact support for help."
+msgstr "Demi keamanan datamu, game tetap terkunci. Hubungi tim bantuan."
+
+#. deletion.fail.offline
+msgid "Connect to the internet to delete your account."
+msgstr "Pastikan kamu terhubung ke internet untuk menghapus akunmu."
+
+#. deletion.fail.rate_limited
+msgid "Too many attempts. Wait a moment, then try again."
+msgstr "Terlalu banyak percobaan. Tunggu sebentar, lalu coba lagi."
+
+#. deletion.fail.busy
+msgid "Account deletion is busy right now. Try again in a moment."
+msgstr "Layanan penghapusan akun sedang sibuk. Tunggu sebentar, lalu coba lagi."
+
+#. deletion.fail.syncing
+msgid "The game is still syncing. Try again in a moment."
+msgstr "Game masih melakukan sinkronisasi. Tunggu sebentar, lalu coba lagi."
+
+#. deletion.fail.auth
+msgid "We couldn't verify your account. Restart the game, then try again."
+msgstr "Kami tidak dapat memverifikasi akunmu. Mulai ulang game, lalu coba lagi."
+
+#. deletion.fail.update
+msgid "Update the game to delete your account."
+msgstr "Perbarui game untuk menghapus akunmu."
+
+#. deletion.fail.changed
+msgid "Your account changed while we were deleting it. Try again."
+msgstr "Akunmu berubah saat kami menghapusnya. Coba lagi."
+
+#. deletion.fail.storage
+msgid "Your device couldn't save the deletion request. Try again."
+msgstr "Perangkatmu tidak dapat menyimpan permintaan penghapusan. Coba lagi."
+
+#. deletion.fail.generic
+msgid "We couldn't delete your account. Try again later or contact support."
+msgstr "Kami tidak dapat menghapus akunmu. Coba lagi nanti atau hubungi tim bantuan."
+
+#. deletion.fail.local
+msgid "Your game data couldn't be deleted. Try again."
+msgstr "Data gamemu tidak dapat dihapus. Coba lagi."
+
+#. deletion.fail.body
+msgid "Nothing was deleted, and you can keep playing."
+msgstr "Tidak ada yang dihapus, dan kamu bisa tetap bermain."
+
+#. deletion.done_local.headline
+msgid "Your local game data was deleted."
+msgstr "Data game lokalmu sudah dihapus."
+
+#. deletion.done_local.body
+msgid "You can start over with a new game."
+msgstr "Kamu bisa mulai dari awal dengan game baru."
+
+#. deletion.new_game_failed
+msgid "The new game couldn't start. Try again."
+msgstr "Game baru tidak dapat dimulai. Coba lagi."
+
+#. deletion.accepted.headline
+msgid "Your account is no longer accessible."
+msgstr "Akunmu tidak lagi dapat diakses."
+
+#. deletion.accepted.body
+msgid "Your deletion request was accepted."
+msgstr "Permintaan penghapusanmu diterima."
+
+#. deletion.accepted.body_deadline
+msgid "Your deletion request was accepted. Data removal is due by %s."
+msgstr "Permintaan penghapusanmu diterima. Data akan dihapus paling lambat %s."
+
+#. deletion.reference
+msgid "Reference: %s"
+msgstr "Referensi: %s"
+
+#. deletion.start_new_game
+msgid "Start New Game"
+msgstr "Mulai Game Baru"
+
+#. app.name
+msgid "SortingPuzzle"
+msgstr "SortingPuzzle"
+
+#. support.email.subject
+msgid "Sorting Puzzle support request"
+msgstr "Permintaan bantuan Sorting Puzzle"
+
+#. support.email.body
+msgid "Please describe the issue here.\n\nDevice/platform:\nApproximate time:\n"
+msgstr "Jelaskan masalahnya di sini.\n\nPerangkat/platform:\nPerkiraan waktu:\n"
+
+#. support.ad_email.subject
+msgid "Sorting Puzzle ad report"
+msgstr "Laporan iklan Sorting Puzzle"
+
+#. support.ad_email.body
+msgid "Please attach a screenshot and complete the details below.\n\nApproximate time:\nAd placement in the game:\nAdvertiser or app name:\nWhy the ad should be reviewed:\n"
+msgstr "Lampirkan tangkapan layar dan lengkapi detail di bawah ini.\n\nPerkiraan waktu:\nPosisi iklan di dalam game:\nNama pengiklan atau aplikasi:\nAlasan iklan perlu ditinjau:\n"
+
+#. deletion.email.subject
+msgid "Sorting Puzzle account deletion"
+msgstr "Penghapusan akun Sorting Puzzle"
+
+#. deletion.email.body
+msgid "Please help me with my account deletion."
+msgstr "Mohon bantu saya menghapus akun saya."
+
+#. support.email.status
+msgid "Status: %s"
+msgstr "Status: %s"
+
+#. support.email.deletion_reference
+msgid "Deletion reference"
+msgstr "Referensi penghapusan"
+
+#. support.email.server_reference
+msgid "Server reference"
+msgstr "Referensi server"
+
+#. support.email.player_id
+msgid "Player ID"
+msgstr "ID Pemain"
+
+#. leaderboard.empty
+msgid "No scores yet"
+msgstr "Belum ada skor"
+
+#. ability.hammer.name
+msgid "HAMMER"
+msgstr "PALU"
+
+#. ability.shuffle.name
+msgid "SHUFFLE"
+msgstr "ACAK"
+
+#. ability.lantern.name
+msgid "LANTERN"
+msgstr "LENTERA"
+
+#. ability.freezer.name
+msgid "FREEZER"
+msgstr "PEMBEKU"
+
+#. shop.offer.basic_bundle
+msgid "BASIC BUNDLE"
+msgstr "PAKET DASAR"
+
+#. booster.counted.hammer
+msgctxt "booster.counted"
+msgid "Hammer"
+msgid_plural "Hammer.plural"
+msgstr[0] "Palu"
+
+#. booster.counted.shuffle
+msgctxt "booster.counted"
+msgid "Shuffle"
+msgid_plural "Shuffle.plural"
+msgstr[0] "Acak"
+
+#. booster.counted.lantern
+msgctxt "booster.counted"
+msgid "Lantern"
+msgid_plural "Lantern.plural"
+msgstr[0] "Lentera"
+
+#. booster.counted.freezer
+msgctxt "booster.counted"
+msgid "Freezer"
+msgid_plural "Freezer.plural"
+msgstr[0] "Pembeku"

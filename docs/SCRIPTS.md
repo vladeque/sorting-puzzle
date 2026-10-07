@@ -1,5 +1,21 @@
 # Scripts
 
+## Indonesian localization
+
+`assets/translations/id.po` provides all 251 owner-improved Indonesian entries, English scene
+and uppercase aliases, single-form plural messages and fixed counted booster names.
+`scripts/localization/game_text.gd` owns Indonesian period grouping and day/month/year dates.
+`scripts/ability_bar.gd` fits translated countdown units within the actual badge rectangle
+after responsive changes and live switches, using exported maximum/minimum font sizes and padding.
+`scripts/time_up_extension_modal.gd` fits translated used-price captions inside the price-row
+padding, reserving the coin icon when visible and restoring normal sizing for shorter captions
+or numeric offers. Both retain their original interaction/state ownership.
+`tests/ui/test_indonesian_localization.gd` verifies reviewed copy, formatting, fonts, state
+preservation and fitting. `localization_timed_boosters_setup.gd` and
+`time_up_extension_used_setup.gd` under `scripts/tools/captures/` hold their focused review states.
+Source copy and verification are recorded in `docs/localization/INDONESIAN_TRANSLATIONS.md`
+and `docs/localization/INDONESIAN_LOCALIZATION_QA.md`.
+
 ## Traditional Chinese localization
 
 `assets/translations/zh_Hant.po` provides all 251 owner-refined Taiwan Chinese strings through
@@ -2333,7 +2349,9 @@ Key methods:
 - `set_interaction_blocked(is_blocked, lantern_active, freezer_active)`: updates disabled state,
   mutually locks the two timed abilities while either is active, and restores the arrow cursor for
   blocked actions.
-- `set_active_seconds(ability_id, seconds_remaining)`.
+- `set_active_seconds(ability_id, seconds_remaining)`: formats the translated countdown and fits
+  the complete caption inside its badge; responsive layout and live locale changes refit it.
+  Exported `timer_font_size`, `minimum_timer_font_size`, and `timer_text_padding` configure bounds.
 - `get_icon_texture(ability_id)`.
 - `get_ability_button(ability_id)`.
 - `apply_responsive_layout(usable_width)`: switches between `GameplayUITheme`'s compact (98.4px),
@@ -4172,7 +4190,9 @@ Purpose:
 Key methods:
 - `set_offer(seconds_granted, coin_price, coin_available, rewarded_ad_available,
   rewarded_ad_used)`: formats the `+MM:SS` grant, shows the canonical coin price or `Used`, and
-  selects the enabled/used/unavailable ad presentation.
+  selects the enabled/used/unavailable ad presentation. The price label fits within the authored
+  price-row padding and visible coin-icon width, with exported `price_font_size` and
+  `minimum_price_font_size` bounds. Resizing and live locale changes refresh the fit.
 - `set_coin_action_enabled(is_enabled)`: provides an in-flight purchase lock without losing the
   configured per-attempt availability state.
 - `set_ad_action_state(state)`: presents loading, verification, retry-verification, retry, ready,

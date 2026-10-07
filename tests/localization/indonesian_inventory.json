@@ -1,0 +1,1336 @@
+{
+  "source": "Owner-improved INDONESIAN_TRANSLATIONS.md, October 7, 2026",
+  "source_sha256": "BCEE2436B8006C1B97E64549FBA158A6A2DAB92A389B84E31B86831CCC3428AB",
+  "entries": [
+    {
+      "key": "common.play",
+      "en": "Play",
+      "id": "Main"
+    },
+    {
+      "key": "common.continue",
+      "en": "Continue",
+      "id": "Lanjutkan"
+    },
+    {
+      "key": "common.resume",
+      "en": "Continue",
+      "id": "Lanjut Main"
+    },
+    {
+      "key": "common.try_again",
+      "en": "Try Again",
+      "id": "Coba Lagi"
+    },
+    {
+      "key": "common.close",
+      "en": "Close",
+      "id": "Tutup"
+    },
+    {
+      "key": "common.cancel",
+      "en": "Cancel",
+      "id": "Batal"
+    },
+    {
+      "key": "common.got_it",
+      "en": "Got it",
+      "id": "Mengerti"
+    },
+    {
+      "key": "common.get_help",
+      "en": "Get Help",
+      "id": "Minta Bantuan"
+    },
+    {
+      "key": "common.save",
+      "en": "SAVE",
+      "id": "SIMPAN"
+    },
+    {
+      "key": "common.loading",
+      "en": "Loading…",
+      "id": "Memuat…"
+    },
+    {
+      "key": "common.retry_load",
+      "en": "Retry",
+      "id": "Muat Ulang"
+    },
+    {
+      "key": "menu.level_button",
+      "en": "LEVEL %d",
+      "id": "LEVEL %d"
+    },
+    {
+      "key": "menu.more_levels_coming_soon",
+      "en": "MORE LEVELS COMING SOON",
+      "id": "LEVEL BARU SEGERA HADIR"
+    },
+    {
+      "key": "menu.coming_soon",
+      "en": "COMING SOON",
+      "id": "SEGERA HADIR"
+    },
+    {
+      "key": "menu.lives_full",
+      "en": "Full",
+      "id": "Penuh"
+    },
+    {
+      "key": "menu.starter_badge",
+      "en": "BUNDLE",
+      "id": "PAKET"
+    },
+    {
+      "key": "nav.shop",
+      "en": "Shop",
+      "id": "Toko"
+    },
+    {
+      "key": "nav.home",
+      "en": "Home",
+      "id": "Beranda"
+    },
+    {
+      "key": "nav.leaderboard",
+      "en": "Leaderboard",
+      "id": "Peringkat"
+    },
+    {
+      "key": "chapter.button",
+      "en": "CHAPTER %d",
+      "id": "BAB %d"
+    },
+    {
+      "key": "chapter.button_tooltip",
+      "en": "Choose Chapter %d: %s",
+      "id": "Pilih Bab %d: %s"
+    },
+    {
+      "key": "chapter.screen_title",
+      "en": "CHAPTERS",
+      "id": "BAB"
+    },
+    {
+      "key": "chapter.eyebrow",
+      "en": "CHAPTER %d",
+      "id": "BAB %d"
+    },
+    {
+      "key": "chapter.title.chapter_01",
+      "en": "Grocery Town",
+      "id": "Kota Kelontong"
+    },
+    {
+      "key": "chapter.title.chapter_02",
+      "en": "Candy Corner",
+      "id": "Pojok Permen"
+    },
+    {
+      "key": "chapter.locked_status",
+      "en": "Complete %d more %s levels to unlock",
+      "id": "Selesaikan %d level lagi di \"%s\" untuk membuka bab ini"
+    },
+    {
+      "key": "chapter.unlock_progress",
+      "en": "Unlock progress",
+      "id": "Progres membuka bab"
+    },
+    {
+      "key": "chapter.current_progress",
+      "en": "Current progress",
+      "id": "Progres saat ini"
+    },
+    {
+      "key": "chapter.locked",
+      "en": "Locked",
+      "id": "Terkunci"
+    },
+    {
+      "key": "chapter.no_levels_status",
+      "en": "New levels are coming soon",
+      "id": "Level baru segera hadir"
+    },
+    {
+      "key": "chapter.coming_soon",
+      "en": "Coming Soon",
+      "id": "Segera Hadir"
+    },
+    {
+      "key": "hud.level",
+      "en": "LEVEL %d",
+      "id": "LEVEL %d"
+    },
+    {
+      "key": "hud.combo",
+      "en": "COMBO ×%d",
+      "id": "KOMBO ×%d"
+    },
+    {
+      "key": "hud.ability_tooltip.hammer",
+      "en": "Hammer -- clears a matching triple",
+      "id": "Palu -- menghapus satu set tiga barang identik"
+    },
+    {
+      "key": "hud.ability_tooltip.shuffle",
+      "en": "Shuffle -- reshuffles unlocked items",
+      "id": "Acak -- mengacak ulang barang yang tidak terkunci"
+    },
+    {
+      "key": "hud.ability_tooltip.lantern",
+      "en": "Lantern -- highlights a matchable triple",
+      "id": "Lentera -- menyorot tiga barang identik yang bisa dicocokkan"
+    },
+    {
+      "key": "hud.ability_tooltip.freezer",
+      "en": "Freezer -- pauses the countdown timer",
+      "id": "Pembeku -- menjeda hitung mundur"
+    },
+    {
+      "key": "hud.seconds_short",
+      "en": "%ds",
+      "id": "%d dtk"
+    },
+    {
+      "key": "tip.tap_dispenser",
+      "en": "Tap a dispenser to throw items onto the shelves!",
+      "id": "Ketuk mesin pelontar untuk melempar barang ke rak!"
+    },
+    {
+      "key": "pause.title",
+      "en": "PAUSE",
+      "id": "JEDA"
+    },
+    {
+      "key": "pause.leave",
+      "en": "Leave",
+      "id": "Keluar"
+    },
+    {
+      "key": "leave.title",
+      "en": "LEAVING THE LEVEL",
+      "id": "KELUAR DARI LEVEL"
+    },
+    {
+      "key": "leave.you_will_lose",
+      "en": "You will lose:",
+      "id": "Kamu akan kehilangan:"
+    },
+    {
+      "key": "leave.confirm",
+      "en": "Leave",
+      "id": "Keluar"
+    },
+    {
+      "key": "timeup.title",
+      "en": "TIME'S UP",
+      "id": "WAKTU HABIS"
+    },
+    {
+      "key": "timeup.offer",
+      "en": "Add one minute and keep sorting!",
+      "id": "Tambah satu menit dan lanjutkan menyortir!"
+    },
+    {
+      "key": "timeup.used",
+      "en": "Used",
+      "id": "Sudah Dipakai"
+    },
+    {
+      "key": "ability_purchase.title",
+      "en": "USE ABILITY",
+      "id": "GUNAKAN BOOSTER"
+    },
+    {
+      "key": "shelf_unlock.title",
+      "en": "UNLOCK SHELF",
+      "id": "BUKA RAK"
+    },
+    {
+      "key": "shelf_unlock.offer",
+      "en": "Watch one ad to unlock this shelf now.",
+      "id": "Tonton satu iklan untuk membuka rak ini sekarang."
+    },
+    {
+      "key": "shelf_unlock.offer_or_clear",
+      "en": "Watch one ad to unlock this shelf now, or clear %s more.",
+      "id": "Tonton satu iklan untuk membuka rak ini sekarang, atau hapus %s set lagi."
+    },
+    {
+      "key": "shelf_unlock.button",
+      "en": "Watch Ad · Unlock Shelf",
+      "id": "Tonton Iklan · Buka Rak"
+    },
+    {
+      "key": "shelf_unlock.ad_unavailable",
+      "en": "Ad unavailable. This shelf stays locked.",
+      "id": "Iklan tidak tersedia. Rak ini tetap terkunci."
+    },
+    {
+      "key": "complete.title",
+      "en": "GREAT JOB!",
+      "id": "HEBAT!"
+    },
+    {
+      "key": "failed.title",
+      "en": "LEVEL %d",
+      "id": "LEVEL %d"
+    },
+    {
+      "key": "failed.headline",
+      "en": "LEVEL FAILED",
+      "id": "LEVEL GAGAL"
+    },
+    {
+      "key": "failed.retry",
+      "en": "Retry",
+      "id": "Main Lagi"
+    },
+    {
+      "key": "combo.praise.2",
+      "en": "Cool",
+      "id": "Keren"
+    },
+    {
+      "key": "combo.praise.3",
+      "en": "Great",
+      "id": "Hebat"
+    },
+    {
+      "key": "combo.praise.4",
+      "en": "Awesome",
+      "id": "Mantap"
+    },
+    {
+      "key": "combo.praise.5",
+      "en": "Amazing",
+      "id": "Menakjubkan"
+    },
+    {
+      "key": "combo.praise.6",
+      "en": "Fantastic",
+      "id": "Fantastis"
+    },
+    {
+      "key": "combo.praise.7",
+      "en": "Incredible",
+      "id": "Luar Biasa"
+    },
+    {
+      "key": "combo.praise.8",
+      "en": "Spectacular",
+      "id": "Spektakuler"
+    },
+    {
+      "key": "combo.praise.9",
+      "en": "Unstoppable",
+      "id": "Tak Terhentikan"
+    },
+    {
+      "key": "combo.praise.10",
+      "en": "Legendary",
+      "id": "Legendaris"
+    },
+    {
+      "key": "combo.praise.11",
+      "en": "Epic",
+      "id": "Epik"
+    },
+    {
+      "key": "combo.praise.12",
+      "en": "Brilliant",
+      "id": "Brilian"
+    },
+    {
+      "key": "combo.praise.13",
+      "en": "Masterful",
+      "id": "Piawai"
+    },
+    {
+      "key": "combo.praise.14",
+      "en": "Supreme",
+      "id": "Terhebat"
+    },
+    {
+      "key": "combo.praise.15",
+      "en": "Phenomenal",
+      "id": "Fenomenal"
+    },
+    {
+      "key": "combo.praise.16",
+      "en": "Mythic",
+      "id": "Sakti"
+    },
+    {
+      "key": "combo.praise.17",
+      "en": "Majestic",
+      "id": "Agung"
+    },
+    {
+      "key": "combo.praise.18",
+      "en": "Radiant",
+      "id": "Gemilang"
+    },
+    {
+      "key": "combo.praise.19",
+      "en": "Divine",
+      "id": "Sempurna"
+    },
+    {
+      "key": "combo.praise.20",
+      "en": "Transcendent",
+      "id": "Melampaui Batas"
+    },
+    {
+      "key": "ability.hammer.name",
+      "en": "Hammer",
+      "id": "Palu"
+    },
+    {
+      "key": "ability.shuffle.name",
+      "en": "Shuffle",
+      "id": "Acak"
+    },
+    {
+      "key": "ability.lantern.name",
+      "en": "Lantern",
+      "id": "Lentera"
+    },
+    {
+      "key": "ability.freezer.name",
+      "en": "Freezer",
+      "id": "Pembeku"
+    },
+    {
+      "key": "ability.hammer.description",
+      "en": "Instantly clears one matching set of items off the shelves.",
+      "id": "Langsung menghapus satu set tiga barang identik dari rak."
+    },
+    {
+      "key": "ability.shuffle.description",
+      "en": "Shuffles shelf items into new spots to help you find a match.",
+      "id": "Mengacak posisi barang di rak untuk membantumu menemukan barang yang cocok."
+    },
+    {
+      "key": "ability.lantern.description",
+      "en": "Highlights a matching triple you can clear for 15 seconds.",
+      "id": "Menyorot tiga barang identik selama 15 detik agar bisa kamu hapus."
+    },
+    {
+      "key": "ability.freezer.description",
+      "en": "Freezes the level timer for 30 seconds.",
+      "id": "Membekukan hitung mundur level selama 30 detik."
+    },
+    {
+      "key": "ad.watch",
+      "en": "Watch Ad",
+      "id": "Tonton Iklan"
+    },
+    {
+      "key": "ad.loading",
+      "en": "Loading...",
+      "id": "Memuat..."
+    },
+    {
+      "key": "ad.verifying",
+      "en": "Verifying...",
+      "id": "Memverifikasi..."
+    },
+    {
+      "key": "ad.verify_reward",
+      "en": "Verify Reward",
+      "id": "Verifikasi Hadiah"
+    },
+    {
+      "key": "ad.reward_pending",
+      "en": "Reward verification is still pending.",
+      "id": "Verifikasi hadiah masih tertunda."
+    },
+    {
+      "key": "ad.unavailable_retry",
+      "en": "Ad unavailable. Please try again.",
+      "id": "Iklan tidak tersedia. Silakan coba lagi."
+    },
+    {
+      "key": "ad.watch_unavailable",
+      "en": "Watch Ad\nUnavailable",
+      "id": "Tonton Iklan\nTidak Tersedia"
+    },
+    {
+      "key": "ad.watch_coming_soon",
+      "en": "Watch Ad\nComing Soon",
+      "id": "Tonton Iklan\nSegera Hadir"
+    },
+    {
+      "key": "ad.badge",
+      "en": "AD",
+      "id": "AD"
+    },
+    {
+      "key": "lives.title.out",
+      "en": "OUT OF LIVES",
+      "id": "NYAWA HABIS"
+    },
+    {
+      "key": "lives.title.get_more",
+      "en": "GET MORE LIVES",
+      "id": "TAMBAH NYAWA"
+    },
+    {
+      "key": "lives.title.full",
+      "en": "LIVES FULL",
+      "id": "NYAWA PENUH"
+    },
+    {
+      "key": "lives.next_in",
+      "en": "NEXT LIFE IN",
+      "id": "NYAWA BARU DALAM"
+    },
+    {
+      "key": "lives.full_body",
+      "en": "Your lives are full! Play a level to spend them.",
+      "id": "Nyawamu penuh! Mainkan level untuk menggunakannya."
+    },
+    {
+      "key": "chest.title",
+      "en": "CHEST REWARDS",
+      "id": "HADIAH DARI PETI"
+    },
+    {
+      "key": "chest.progress_hint",
+      "en": "Collect stars to unlock a chest and claim your reward",
+      "id": "Kumpulkan bintang untuk membuka peti dan mengambil hadiahmu"
+    },
+    {
+      "key": "chest.ready",
+      "en": "A REWARD CHEST AWAITS!",
+      "id": "PETI HADIAH MENANTIMU!"
+    },
+    {
+      "key": "chest.tap_to_open",
+      "en": "Tap to open",
+      "id": "Ketuk untuk membuka"
+    },
+    {
+      "key": "purchase.tap_to_collect",
+      "en": "Tap to collect",
+      "id": "Ketuk untuk mengambil"
+    },
+    {
+      "key": "purchase.complete",
+      "en": "PURCHASE COMPLETE",
+      "id": "PEMBELIAN SELESAI"
+    },
+    {
+      "key": "shop.title",
+      "en": "SHOP",
+      "id": "TOKO"
+    },
+    {
+      "key": "shop.section.bundles",
+      "en": "SPECIAL BUNDLES",
+      "id": "PAKET SPESIAL"
+    },
+    {
+      "key": "shop.section.coins",
+      "en": "COINS",
+      "id": "KOIN"
+    },
+    {
+      "key": "shop.offer.starter_bundle",
+      "en": "Starter Bundle",
+      "id": "Paket Pemula"
+    },
+    {
+      "key": "shop.offer.basic_bundle",
+      "en": "Basic Bundle",
+      "id": "Paket Dasar"
+    },
+    {
+      "key": "shop.tag.best_value",
+      "en": "BEST VALUE",
+      "id": "PALING HEMAT"
+    },
+    {
+      "key": "shop.discount_off",
+      "en": "OFF",
+      "id": "OFF"
+    },
+    {
+      "key": "shop.ability_hint",
+      "en": "Tap an ability to see what it does",
+      "id": "Ketuk booster untuk melihat fungsinya"
+    },
+    {
+      "key": "shop.purchasing",
+      "en": "Purchasing…",
+      "id": "Membeli…"
+    },
+    {
+      "key": "shop.no_offers",
+      "en": "No shop offers are available for this region.",
+      "id": "Tidak ada penawaran toko yang tersedia untuk wilayah ini."
+    },
+    {
+      "key": "shop.load_failed",
+      "en": "Could not load the shop.",
+      "id": "Toko tidak dapat dimuat."
+    },
+    {
+      "key": "shop.error.title.purchase",
+      "en": "Purchase unavailable",
+      "id": "Pembelian tidak tersedia"
+    },
+    {
+      "key": "shop.error.title.reward",
+      "en": "Reward error",
+      "id": "Masalah hadiah"
+    },
+    {
+      "key": "shop.error.purchase_failed",
+      "en": "The purchase could not be completed.",
+      "id": "Pembelian tidak dapat diselesaikan."
+    },
+    {
+      "key": "shop.error.grant_failed",
+      "en": "The purchased rewards could not be granted.",
+      "id": "Hadiah yang dibeli tidak dapat diberikan."
+    },
+    {
+      "key": "shop.error.offer_unavailable",
+      "en": "This shop offer is unavailable.",
+      "id": "Penawaran toko ini tidak tersedia."
+    },
+    {
+      "key": "shop.error.already_bought",
+      "en": "This one-time shop offer has already been purchased.",
+      "id": "Penawaran sekali beli ini sudah pernah dibeli."
+    },
+    {
+      "key": "starter.title",
+      "en": "STARTER BUNDLE",
+      "id": "PAKET PEMULA"
+    },
+    {
+      "key": "starter.one_time",
+      "en": "ONE-TIME OFFER",
+      "id": "HANYA SEKALI BELI"
+    },
+    {
+      "key": "starter.boosters_included",
+      "en": "BOOSTERS INCLUDED",
+      "id": "TERMASUK BOOSTER"
+    },
+    {
+      "key": "starter.coins",
+      "en": "%s COINS",
+      "id": "%s KOIN"
+    },
+    {
+      "key": "starter.buy_for",
+      "en": "Buy for %s",
+      "id": "Beli seharga %s"
+    },
+    {
+      "key": "starter.checking",
+      "en": "Checking offer…",
+      "id": "Memeriksa penawaran…"
+    },
+    {
+      "key": "starter.checking_short",
+      "en": "Checking…",
+      "id": "Memeriksa…"
+    },
+    {
+      "key": "starter.no_longer_available",
+      "en": "This offer is no longer available.",
+      "id": "Penawaran ini tidak lagi tersedia."
+    },
+    {
+      "key": "starter.unavailable",
+      "en": "Unavailable",
+      "id": "Tidak Tersedia"
+    },
+    {
+      "key": "booster_chip.claimed",
+      "en": "+%d %s",
+      "id": "+%d %s"
+    },
+    {
+      "key": "profile.title",
+      "en": "EDIT PROFILE",
+      "id": "EDIT PROFIL"
+    },
+    {
+      "key": "profile.name_header",
+      "en": "PLAYER NAME",
+      "id": "NAMA PEMAIN"
+    },
+    {
+      "key": "profile.name_placeholder",
+      "en": "Player name",
+      "id": "Nama pemain"
+    },
+    {
+      "key": "profile.edit_name_tooltip",
+      "en": "Edit player name",
+      "id": "Edit nama pemain"
+    },
+    {
+      "key": "profile.avatar_tab",
+      "en": "AVATAR",
+      "id": "AVATAR"
+    },
+    {
+      "key": "profile.frame_tab",
+      "en": "FRAME",
+      "id": "BINGKAI"
+    },
+    {
+      "key": "profile.unlock.level",
+      "en": "Complete level %d to unlock",
+      "id": "Selesaikan level %d untuk membukanya"
+    },
+    {
+      "key": "profile.unlock.combo",
+      "en": "Reach a combo of ×%d in any run to unlock",
+      "id": "Raih kombo ×%d dalam satu permainan untuk membukanya"
+    },
+    {
+      "key": "profile.unlock.weekly_first",
+      "en": "Finish 1st on the Weekly leaderboard to unlock",
+      "id": "Raih peringkat 1 di papan peringkat Mingguan untuk membukanya"
+    },
+    {
+      "key": "profile.unlock.weekly_top",
+      "en": "Finish top %d on the Weekly leaderboard to unlock",
+      "id": "Masuk %d besar di papan peringkat Mingguan untuk membukanya"
+    },
+    {
+      "key": "leaderboard.title",
+      "en": "LEADERBOARD",
+      "id": "PAPAN PERINGKAT"
+    },
+    {
+      "key": "leaderboard.tab.weekly",
+      "en": "Weekly",
+      "id": "Mingguan"
+    },
+    {
+      "key": "leaderboard.tab.country",
+      "en": "Country",
+      "id": "Negara"
+    },
+    {
+      "key": "leaderboard.tab.world",
+      "en": "World",
+      "id": "Dunia"
+    },
+    {
+      "key": "leaderboard.weekly_reset",
+      "en": "Weekly reset in %s",
+      "id": "Reset mingguan: %s lagi"
+    },
+    {
+      "key": "leaderboard.duration.dh",
+      "en": "%dd %dh",
+      "id": "%dh %dj"
+    },
+    {
+      "key": "leaderboard.duration.hm",
+      "en": "%dh %dm",
+      "id": "%dj %dm"
+    },
+    {
+      "key": "leaderboard.duration.m",
+      "en": "%dm",
+      "id": "%dm"
+    },
+    {
+      "key": "leaderboard.country_caption",
+      "en": "Country · All-time stars",
+      "id": "Negara · Total bintang sepanjang masa"
+    },
+    {
+      "key": "leaderboard.world_caption",
+      "en": "Worldwide · All-time stars",
+      "id": "Seluruh dunia · Total bintang sepanjang masa"
+    },
+    {
+      "key": "leaderboard.load_failed",
+      "en": "Could not load leaderboard.",
+      "id": "Papan peringkat tidak dapat dimuat."
+    },
+    {
+      "key": "leaderboard.default_name",
+      "en": "Player",
+      "id": "Pemain"
+    },
+    {
+      "key": "leaderboard.row_tooltip",
+      "en": "Rank %d, %s, %d stars",
+      "id": "Peringkat %d, %s, %d bintang"
+    },
+    {
+      "key": "leaderboard.reward_tooltip",
+      "en": "%s coin weekly reward",
+      "id": "Hadiah mingguan: %s koin"
+    },
+    {
+      "key": "leaderboard.reward.title",
+      "en": "WEEKLY REWARD!",
+      "id": "HADIAH MINGGUAN!"
+    },
+    {
+      "key": "leaderboard.reward.body",
+      "en": "You finished #%d last week and earned %d coins!",
+      "id": "Kamu meraih peringkat #%d minggu lalu dan mendapat %d koin!"
+    },
+    {
+      "key": "leaderboard.reward.ok",
+      "en": "Nice!",
+      "id": "Asyik!"
+    },
+    {
+      "key": "settings.title",
+      "en": "SETTINGS",
+      "id": "PENGATURAN"
+    },
+    {
+      "key": "settings.music",
+      "en": "Music",
+      "id": "Musik"
+    },
+    {
+      "key": "settings.sfx",
+      "en": "SFX",
+      "id": "Suara"
+    },
+    {
+      "key": "settings.vibrate",
+      "en": "Vibrate",
+      "id": "Getar"
+    },
+    {
+      "key": "settings.support",
+      "en": "Support",
+      "id": "Bantuan"
+    },
+    {
+      "key": "settings.language",
+      "en": "Language",
+      "id": "Bahasa"
+    },
+    {
+      "key": "settings.privacy_policy",
+      "en": "Privacy Policy",
+      "id": "Kebijakan Privasi"
+    },
+    {
+      "key": "settings.privacy_choices",
+      "en": "Privacy Choices",
+      "id": "Pilihan Privasi"
+    },
+    {
+      "key": "settings.diagnostics",
+      "en": "Version %s • Build %d\nPlatform: %s • User: %s",
+      "id": "Versi %s • Build %d\nPlatform: %s • Pengguna: %s"
+    },
+    {
+      "key": "language.title",
+      "en": "LANGUAGE",
+      "id": "BAHASA"
+    },
+    {
+      "key": "support.title",
+      "en": "SUPPORT",
+      "id": "BANTUAN"
+    },
+    {
+      "key": "support.faq_header",
+      "en": "Frequently Asked Questions",
+      "id": "Pertanyaan Umum"
+    },
+    {
+      "key": "support.faq.play.q",
+      "en": "How do I play?",
+      "id": "Bagaimana cara bermain?"
+    },
+    {
+      "key": "support.faq.play.a",
+      "en": "Move matching goods onto the same shelf. When three identical items are visible together, they clear. Complete the board before time runs out.",
+      "id": "Pindahkan barang yang cocok ke rak yang sama. Saat tiga barang identik terlihat bersama di satu rak, ketiganya akan hilang. Bersihkan papan sebelum waktu habis."
+    },
+    {
+      "key": "support.faq.contact.q",
+      "en": "How do I contact support?",
+      "id": "Bagaimana cara menghubungi tim bantuan?"
+    },
+    {
+      "key": "support.faq.contact.a",
+      "en": "Email us at %s. Include a short description, your device platform, and when the problem happened.",
+      "id": "Hubungi kami melalui email di %s. Sertakan penjelasan singkat, platform perangkatmu, dan waktu terjadinya masalah."
+    },
+    {
+      "key": "support.faq.contact.action",
+      "en": "Email Support",
+      "id": "Email Tim Bantuan"
+    },
+    {
+      "key": "support.faq.crash.q",
+      "en": "What if the game freezes or crashes?",
+      "id": "Bagaimana jika game macet atau tiba-tiba tertutup?"
+    },
+    {
+      "key": "support.faq.crash.a",
+      "en": "Close and reopen the game first. If it happens again, restart the device and make sure the game is updated. Contact support with the device model, platform version, and what you were doing before the problem.",
+      "id": "Tutup lalu buka kembali game terlebih dahulu. Jika terjadi lagi, mulai ulang perangkat dan pastikan game sudah diperbarui. Hubungi tim bantuan dengan menyertakan model perangkat, versi platform, dan apa yang kamu lakukan sebelum masalah terjadi."
+    },
+    {
+      "key": "support.faq.sync.q",
+      "en": "How do I sync progress between devices?",
+      "id": "Bagaimana cara menyinkronkan progres antarperangkat?"
+    },
+    {
+      "key": "support.faq.sync.a",
+      "en": "Use the same signed-in platform account on both devices and allow synchronization to finish before playing. If the progress differs, avoid playing on both devices and contact support.",
+      "id": "Masuk dengan akun platform yang sama di kedua perangkat dan tunggu hingga sinkronisasi selesai sebelum bermain. Jika progresnya berbeda, hindari bermain di kedua perangkat dan hubungi tim bantuan."
+    },
+    {
+      "key": "support.faq.bad_ad.q",
+      "en": "How do I report a bad ad?",
+      "id": "Bagaimana cara melaporkan iklan bermasalah?"
+    },
+    {
+      "key": "support.faq.bad_ad.a",
+      "en": "1. Close the ad if you can do so safely.\n2. Take a screenshot of the ad and any advertiser or app name shown.\n3. Note the approximate time and where the ad appeared in the game.\n4. Describe why the ad seemed offensive, misleading, or fraudulent.\n5. Email these details to %s. Do not include passwords or payment information.",
+      "id": "1. Tutup iklan jika aman untuk dilakukan.\n2. Ambil tangkapan layar iklan beserta nama pengiklan atau aplikasi yang ditampilkan.\n3. Catat perkiraan waktu dan tempat iklan muncul di dalam game.\n4. Jelaskan mengapa iklan terasa menyinggung, menyesatkan, atau mengandung penipuan.\n5. Kirim detail ini melalui email ke %s. Jangan sertakan kata sandi atau informasi pembayaran."
+    },
+    {
+      "key": "support.faq.bad_ad.action",
+      "en": "Email Ad Report",
+      "id": "Email Laporan Iklan"
+    },
+    {
+      "key": "support.account_header",
+      "en": "Account",
+      "id": "Akun"
+    },
+    {
+      "key": "support.delete_account",
+      "en": "Delete Account",
+      "id": "Hapus Akun"
+    },
+    {
+      "key": "support.delete_game_data",
+      "en": "Delete Game Data",
+      "id": "Hapus Data Game"
+    },
+    {
+      "key": "support.no_secrets",
+      "en": "Please never send passwords or payment information.",
+      "id": "Jangan pernah mengirim kata sandi atau informasi pembayaran."
+    },
+    {
+      "key": "deletion.title.delete_account",
+      "en": "DELETE ACCOUNT",
+      "id": "HAPUS AKUN"
+    },
+    {
+      "key": "deletion.title.delete_game_data",
+      "en": "DELETE GAME DATA",
+      "id": "HAPUS DATA GAME"
+    },
+    {
+      "key": "deletion.title.not_confirmed",
+      "en": "NOT CONFIRMED",
+      "id": "BELUM DIKONFIRMASI"
+    },
+    {
+      "key": "deletion.title.status_unconfirmed",
+      "en": "STATUS UNCONFIRMED",
+      "id": "STATUS BELUM DIKONFIRMASI"
+    },
+    {
+      "key": "deletion.title.finishing_up",
+      "en": "FINISHING UP",
+      "id": "HAMPIR SELESAI"
+    },
+    {
+      "key": "deletion.title.new_game",
+      "en": "NEW GAME",
+      "id": "GAME BARU"
+    },
+    {
+      "key": "deletion.title.status_unknown",
+      "en": "STATUS UNKNOWN",
+      "id": "STATUS TIDAK DIKETAHUI"
+    },
+    {
+      "key": "deletion.title.not_deleted",
+      "en": "NOT DELETED",
+      "id": "TIDAK DIHAPUS"
+    },
+    {
+      "key": "deletion.title.data_deleted",
+      "en": "DATA DELETED",
+      "id": "DATA DIHAPUS"
+    },
+    {
+      "key": "deletion.title.accepted",
+      "en": "DELETION ACCEPTED",
+      "id": "PENGHAPUSAN DITERIMA"
+    },
+    {
+      "key": "deletion.confirm.headline",
+      "en": "This permanently deletes your account.",
+      "id": "Ini akan menghapus akunmu secara permanen."
+    },
+    {
+      "key": "deletion.confirm.body",
+      "en": "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nIf you sign in again later, you'll start a new account.\n\nSome purchase and security records are kept without your name or profile. The rest is removed within 30 days.",
+      "id": "Progres, koin, barang, dan profilmu akan hilang. Tindakan ini tidak bisa dibatalkan.\n\nJika masuk lagi nanti, kamu akan memulai dengan akun baru.\n\nSebagian catatan pembelian dan keamanan disimpan tanpa nama atau profilmu. Data lainnya akan dihapus dalam 30 hari."
+    },
+    {
+      "key": "deletion.confirm.button",
+      "en": "Delete Account",
+      "id": "Hapus Akun"
+    },
+    {
+      "key": "deletion.local_confirm.headline",
+      "en": "This deletes your game data on this device.",
+      "id": "Ini akan menghapus data gamemu di perangkat ini."
+    },
+    {
+      "key": "deletion.local_confirm.body",
+      "en": "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nThis game never created an online account for you, so nothing needs to be deleted from our servers.",
+      "id": "Progres, koin, barang, dan profilmu akan hilang. Tindakan ini tidak bisa dibatalkan.\n\nGame ini tidak pernah membuat akun online untukmu, jadi tidak ada data yang perlu dihapus dari server kami."
+    },
+    {
+      "key": "deletion.local_confirm.button",
+      "en": "Delete Data",
+      "id": "Hapus Data"
+    },
+    {
+      "key": "deletion.pending_setup.headline",
+      "en": "Your account is still being set up.",
+      "id": "Akunmu masih disiapkan."
+    },
+    {
+      "key": "deletion.pending_setup.body",
+      "en": "Connect to the internet and try again in a moment. Nothing was deleted.",
+      "id": "Pastikan kamu terhubung ke internet, tunggu sebentar, lalu coba lagi. Tidak ada yang dihapus."
+    },
+    {
+      "key": "deletion.sign_in.headline",
+      "en": "Sign in to the account you want to delete.",
+      "id": "Masuk ke akun yang ingin kamu hapus."
+    },
+    {
+      "key": "deletion.sign_in.body",
+      "en": "If you can't sign in, contact support for help.",
+      "id": "Jika kamu tidak bisa masuk, hubungi tim bantuan."
+    },
+    {
+      "key": "deletion.read_failed.headline",
+      "en": "Your game data couldn't be read.",
+      "id": "Data gamemu tidak dapat dibaca."
+    },
+    {
+      "key": "deletion.read_failed.body",
+      "en": "Restart the game, then try again. Nothing was deleted.",
+      "id": "Mulai ulang game, lalu coba lagi. Tidak ada yang dihapus."
+    },
+    {
+      "key": "deletion.unavailable.headline",
+      "en": "Account deletion isn't available in this version of the game.",
+      "id": "Penghapusan akun tidak tersedia di versi game ini."
+    },
+    {
+      "key": "deletion.unavailable.body",
+      "en": "Update the game, or contact support for help deleting your account. Nothing was deleted.",
+      "id": "Perbarui game, atau hubungi tim bantuan untuk menghapus akunmu. Tidak ada yang dihapus."
+    },
+    {
+      "key": "deletion.in_progress.account",
+      "en": "Deleting your account...",
+      "id": "Menghapus akunmu..."
+    },
+    {
+      "key": "deletion.in_progress.local",
+      "en": "Deleting your game data...",
+      "id": "Menghapus data gamemu..."
+    },
+    {
+      "key": "deletion.in_progress.body",
+      "en": "Keep the game open. This only takes a moment.",
+      "id": "Biarkan game tetap terbuka. Proses ini hanya sebentar."
+    },
+    {
+      "key": "deletion.not_confirmed.headline",
+      "en": "We haven't heard back about your deletion yet.",
+      "id": "Kami belum menerima respons atas permintaan penghapusanmu."
+    },
+    {
+      "key": "deletion.not_confirmed.body",
+      "en": "Your request was sent, but the answer didn't arrive. Connect to the internet and try again. The game stays locked until we know the result.",
+      "id": "Permintaanmu sudah dikirim, tetapi responsnya belum diterima. Pastikan kamu terhubung ke internet dan coba lagi. Game tetap terkunci hingga kami mengetahui hasilnya."
+    },
+    {
+      "key": "deletion.unconfirmed.headline",
+      "en": "Deletion status unconfirmed",
+      "id": "Status penghapusan belum dikonfirmasi"
+    },
+    {
+      "key": "deletion.unconfirmed.body",
+      "en": "We couldn't confirm whether your account was deleted. To keep your data safe, the game stays locked. Contact support and include the reference below.",
+      "id": "Kami tidak dapat memastikan apakah akunmu sudah dihapus. Demi keamanan datamu, game tetap terkunci. Hubungi tim bantuan dan sertakan referensi di bawah ini."
+    },
+    {
+      "key": "deletion.check_again",
+      "en": "Check Again",
+      "id": "Periksa Lagi"
+    },
+    {
+      "key": "deletion.cleanup.headline.local",
+      "en": "Your local game data couldn't be fully deleted yet.",
+      "id": "Data game lokalmu belum dapat dihapus sepenuhnya."
+    },
+    {
+      "key": "deletion.cleanup.headline.account",
+      "en": "Account deletion accepted; finishing cleanup.",
+      "id": "Permintaan penghapusan akun diterima; pembersihan sedang diselesaikan."
+    },
+    {
+      "key": "deletion.cleanup.body",
+      "en": "Some game data couldn't be removed from this device yet. Try again to finish.",
+      "id": "Sebagian data game belum dapat dihapus dari perangkat ini. Coba lagi untuk menyelesaikannya."
+    },
+    {
+      "key": "deletion.new_game.headline",
+      "en": "Starting a new game...",
+      "id": "Memulai game baru..."
+    },
+    {
+      "key": "deletion.new_game.body",
+      "en": "This only takes a moment.",
+      "id": "Proses ini hanya sebentar."
+    },
+    {
+      "key": "deletion.status_unknown.headline",
+      "en": "We couldn't read the deletion status on this device.",
+      "id": "Kami tidak dapat membaca status penghapusan di perangkat ini."
+    },
+    {
+      "key": "deletion.status_unknown.body",
+      "en": "To keep your data safe, the game stays locked. Contact support for help.",
+      "id": "Demi keamanan datamu, game tetap terkunci. Hubungi tim bantuan."
+    },
+    {
+      "key": "deletion.fail.offline",
+      "en": "Connect to the internet to delete your account.",
+      "id": "Pastikan kamu terhubung ke internet untuk menghapus akunmu."
+    },
+    {
+      "key": "deletion.fail.rate_limited",
+      "en": "Too many attempts. Wait a moment, then try again.",
+      "id": "Terlalu banyak percobaan. Tunggu sebentar, lalu coba lagi."
+    },
+    {
+      "key": "deletion.fail.busy",
+      "en": "Account deletion is busy right now. Try again in a moment.",
+      "id": "Layanan penghapusan akun sedang sibuk. Tunggu sebentar, lalu coba lagi."
+    },
+    {
+      "key": "deletion.fail.syncing",
+      "en": "The game is still syncing. Try again in a moment.",
+      "id": "Game masih melakukan sinkronisasi. Tunggu sebentar, lalu coba lagi."
+    },
+    {
+      "key": "deletion.fail.auth",
+      "en": "We couldn't verify your account. Restart the game, then try again.",
+      "id": "Kami tidak dapat memverifikasi akunmu. Mulai ulang game, lalu coba lagi."
+    },
+    {
+      "key": "deletion.fail.update",
+      "en": "Update the game to delete your account.",
+      "id": "Perbarui game untuk menghapus akunmu."
+    },
+    {
+      "key": "deletion.fail.changed",
+      "en": "Your account changed while we were deleting it. Try again.",
+      "id": "Akunmu berubah saat kami menghapusnya. Coba lagi."
+    },
+    {
+      "key": "deletion.fail.storage",
+      "en": "Your device couldn't save the deletion request. Try again.",
+      "id": "Perangkatmu tidak dapat menyimpan permintaan penghapusan. Coba lagi."
+    },
+    {
+      "key": "deletion.fail.generic",
+      "en": "We couldn't delete your account. Try again later or contact support.",
+      "id": "Kami tidak dapat menghapus akunmu. Coba lagi nanti atau hubungi tim bantuan."
+    },
+    {
+      "key": "deletion.fail.local",
+      "en": "Your game data couldn't be deleted. Try again.",
+      "id": "Data gamemu tidak dapat dihapus. Coba lagi."
+    },
+    {
+      "key": "deletion.fail.body",
+      "en": "Nothing was deleted, and you can keep playing.",
+      "id": "Tidak ada yang dihapus, dan kamu bisa tetap bermain."
+    },
+    {
+      "key": "deletion.done_local.headline",
+      "en": "Your local game data was deleted.",
+      "id": "Data game lokalmu sudah dihapus."
+    },
+    {
+      "key": "deletion.done_local.body",
+      "en": "You can start over with a new game.",
+      "id": "Kamu bisa mulai dari awal dengan game baru."
+    },
+    {
+      "key": "deletion.new_game_failed",
+      "en": "The new game couldn't start. Try again.",
+      "id": "Game baru tidak dapat dimulai. Coba lagi."
+    },
+    {
+      "key": "deletion.accepted.headline",
+      "en": "Your account is no longer accessible.",
+      "id": "Akunmu tidak lagi dapat diakses."
+    },
+    {
+      "key": "deletion.accepted.body",
+      "en": "Your deletion request was accepted.",
+      "id": "Permintaan penghapusanmu diterima."
+    },
+    {
+      "key": "deletion.accepted.body_deadline",
+      "en": "Your deletion request was accepted. Data removal is due by %s.",
+      "id": "Permintaan penghapusanmu diterima. Data akan dihapus paling lambat %s."
+    },
+    {
+      "key": "deletion.reference",
+      "en": "Reference: %s",
+      "id": "Referensi: %s"
+    },
+    {
+      "key": "deletion.start_new_game",
+      "en": "Start New Game",
+      "id": "Mulai Game Baru"
+    },
+    {
+      "key": "app.name",
+      "en": "SortingPuzzle",
+      "id": "SortingPuzzle"
+    },
+    {
+      "key": "support.email.subject",
+      "en": "Sorting Puzzle support request",
+      "id": "Permintaan bantuan Sorting Puzzle"
+    },
+    {
+      "key": "support.email.body",
+      "en": "Please describe the issue here.\n\nDevice/platform:\nApproximate time:\n",
+      "id": "Jelaskan masalahnya di sini.\n\nPerangkat/platform:\nPerkiraan waktu:\n"
+    },
+    {
+      "key": "support.ad_email.subject",
+      "en": "Sorting Puzzle ad report",
+      "id": "Laporan iklan Sorting Puzzle"
+    },
+    {
+      "key": "support.ad_email.body",
+      "en": "Please attach a screenshot and complete the details below.\n\nApproximate time:\nAd placement in the game:\nAdvertiser or app name:\nWhy the ad should be reviewed:\n",
+      "id": "Lampirkan tangkapan layar dan lengkapi detail di bawah ini.\n\nPerkiraan waktu:\nPosisi iklan di dalam game:\nNama pengiklan atau aplikasi:\nAlasan iklan perlu ditinjau:\n"
+    },
+    {
+      "key": "deletion.email.subject",
+      "en": "Sorting Puzzle account deletion",
+      "id": "Penghapusan akun Sorting Puzzle"
+    },
+    {
+      "key": "deletion.email.body",
+      "en": "Please help me with my account deletion.",
+      "id": "Mohon bantu saya menghapus akun saya."
+    }
+  ],
+  "plurals": {
+    "chapter.locked_status": {
+      "other": "Selesaikan %d level lagi di \"%s\" untuk membuka bab ini"
+    },
+    "shelf_unlock.offer_or_clear": {
+      "other": "Tonton satu iklan untuk membuka rak ini sekarang, atau hapus %s set lagi."
+    },
+    "starter.coins": {
+      "other": "%s KOIN"
+    },
+    "leaderboard.row_tooltip": {
+      "other": "Peringkat %d, %s, %d bintang"
+    },
+    "leaderboard.reward_tooltip": {
+      "other": "Hadiah mingguan: %s koin"
+    },
+    "leaderboard.reward.body": {
+      "other": "Kamu meraih peringkat #%d minggu lalu dan mendapat %d koin!"
+    }
+  },
+  "counted_boosters": {
+    "Hammer": [
+      "Palu"
+    ],
+    "Shuffle": [
+      "Acak"
+    ],
+    "Lantern": [
+      "Lentera"
+    ],
+    "Freezer": [
+      "Pembeku"
+    ]
+  },
+  "months": [
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember"
+  ],
+  "additional": [
+    {
+      "key": "support.email.status",
+      "en": "Status: %s",
+      "id": "Status: %s"
+    },
+    {
+      "key": "support.email.deletion_reference",
+      "en": "Deletion reference",
+      "id": "Referensi penghapusan"
+    },
+    {
+      "key": "support.email.server_reference",
+      "en": "Server reference",
+      "id": "Referensi server"
+    },
+    {
+      "key": "support.email.player_id",
+      "en": "Player ID",
+      "id": "ID Pemain"
+    },
+    {
+      "key": "leaderboard.empty",
+      "en": "No scores yet",
+      "id": "Belum ada skor"
+    }
+  ]
+}

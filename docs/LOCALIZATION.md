@@ -1,20 +1,33 @@
 # Localization
 
-## Indonesian translation copy
+## Indonesian localization
 
-`docs/localization/INDONESIAN_TRANSLATIONS.md` contains Bahasa Indonesia translations of all
-251 entries in the owner's string inventory, including its October 5, 2026 copy updates.
-It preserves the English text, keys, contexts, placeholders and line-break markers, and records
-the six invariant counted messages, fixed booster names, supplementary email labels and date
-terms. This is translation copy for review; runtime catalog integration and rendered Indonesian
-layout verification are pending. The selectable `id` locale continues to use English fallback.
+`assets/translations/id.po` applies all 251 entries from the owner's improved October 7, 2026
+attachment, archived byte-for-byte at `docs/localization/INDONESIAN_TRANSLATIONS.md`.
+`tests/localization/indonesian_inventory.json` retains the reviewed English/Indonesian text,
+source hash, six invariant plural messages, fixed booster names, supplementary email labels
+and twelve month names. The catalog has 527 messages/contexts, including English scene and
+uppercase card aliases. The existing Bahasa Indonesia choice now selects this catalog;
+`id_ID` and `id-ID` device locales resolve to `id`.
 
-`docs/localization/INDONESIAN_TRANSLATIONS.docx` is the editable Word version for copy review.
-It includes all 251 keys with English originals and Indonesian text, plus the terminology,
-counted-message guidance, supplementary deletion-email labels and month names. The Word layout
-uses repeating table headers and preserves the source's visible line-break notation.
-All 251 table entries were verified against the Markdown copy, and the 16-page Word export
-was rendered and visually reviewed.
+The improved `Mengerti`, `HEBAT!`, `Pojok Permen`, `Sudah Dipakai`, combo praise, leaderboard
+captions, support answer and deletion wording are preserved exactly. Gettext uses one form
+for every integer count (`nplurals=1; plural=0`). Counted boosters retain `Palu`, `Acak`,
+`Lentera` and `Pembeku`; claimed captions retain `+%d %s`. Resume uses `Lanjut Main`, move-on
+uses `Lanjutkan`, failed-level replay uses `Main Lagi`, and destination reload uses `Muat Ulang`.
+The empty leaderboard caption absent from the attachment uses supplementary `Belum ada skor`.
+
+`GameText` formats Indonesian counts with periods (`1.234.567`) and deadlines in day/month/year
+order (`2 November 2026`). Existing bundled fonts cover the supplied text. `AbilityBar` fits
+the complete `%d dtk` countdown inside compact badges, and `TimeUpExtensionModal` fits the
+complete `Sudah Dipakai` caption inside its price action. Both restore their normal font sizes
+for shorter text on live language switches. Prices, player names, references and compact
+`AD`/`OFF` markers retain their existing values; language selection remains a local preference.
+
+The archived attachment retains its pre-integration recommendations. Implemented behavior and
+verification are recorded in `docs/localization/INDONESIAN_LOCALIZATION_QA.md`.
+`docs/localization/INDONESIAN_TRANSLATIONS.docx` remains the previously rendered 16-page
+Word review draft; it predates the improved attachment and is not the runtime copy source.
 
 ## Runtime ownership
 
@@ -56,12 +69,13 @@ starts.
 `assets/translations/en.po`, `assets/translations/ru.po`, `assets/translations/uk.po`,
 `assets/translations/it.po`, `assets/translations/ar.po`, `assets/translations/es.po`,
 `assets/translations/pt_BR.po`, `assets/translations/de.po`, `assets/translations/fr.po`,
-`assets/translations/ko.po`, `assets/translations/ja.po` and `assets/translations/zh_Hant.po` are
+`assets/translations/ko.po`, `assets/translations/ja.po`, `assets/translations/zh_Hant.po` and
+`assets/translations/id.po` are
 registered in `project.godot`.
 Russian includes all 251 reviewed keys from
 `docs/localization/RUSSIAN_TRANSLATIONS.md`, the user's corrected October 4, 2026 inventory.
 The inventory is a copy of the approved translation text, not runtime configuration.
-English remains the fallback for the other two selectable locales until their catalogs exist.
+English remains the fallback for selectable Turkish (`tr`) until its catalog exists.
 
 Traditional Chinese includes all 251 entries from the owner's refined October 7, 2026 attachment
 archived verbatim at `docs/localization/TRADITIONAL_CHINESE_TRANSLATIONS.md`.
@@ -425,8 +439,16 @@ The implementation ownership and verification scope are recorded in
   fonts in every role, twelve Japanese dates, comma grouping, contextual actions and unchanged
   prices/names/references/markers. It verifies live switches, pending ad state, device-locale
   mapping, local-only preferences and FAQ/action fitting at all five viewports.
-  Existing localization tests use catalog-free `id` to check English fallback now that `ja`
+- `tests/ui/test_indonesian_localization.gd` checks all 251 improved entries and English aliases,
+  six single-form plural messages, fixed counted boosters, bundled font coverage, all twelve
+  dates, period grouping, contextual actions and unchanged prices/names/references/markers.
+  It verifies regional mapping, live refreshes, pending ad state, local-only preferences and
+  FAQ, deletion, shelf, replay, timer-badge and used-price fitting at all five viewports.
+  Existing localization tests use catalog-free `tr` to check English fallback now that `id`
   has its own catalog.
+- `scripts/tools/captures/localization_timed_boosters_setup.gd` freezes 15/30-second captions
+  for responsive locale review; `time_up_extension_used_setup.gd` holds both extension methods
+  in their used state to review the complete captions.
 - Capture any screen in an isolated Russian session with:
 
   ```powershell
@@ -445,6 +467,7 @@ The implementation ownership and verification scope are recorded in
   Use `-Locale ko` for Korean captures.
   Use `-Locale ja` for Japanese captures.
   Use `-Locale zh_Hant` for Traditional Chinese captures.
+  Use `-Locale id` for Indonesian captures.
 
 The October 4–5, 2026 test results, rendered-screen reviews and capture limitations are recorded in
 `docs/localization/RUSSIAN_LOCALIZATION_QA.md`.
@@ -458,3 +481,4 @@ French integration results are recorded in `docs/localization/FRENCH_LOCALIZATIO
 Korean integration results are recorded in `docs/localization/KOREAN_LOCALIZATION_QA.md`.
 Japanese integration results are recorded in `docs/localization/JAPANESE_LOCALIZATION_QA.md`.
 Traditional Chinese integration results are recorded in `docs/localization/TRADITIONAL_CHINESE_LOCALIZATION_QA.md`.
+Indonesian integration results are recorded in `docs/localization/INDONESIAN_LOCALIZATION_QA.md`.

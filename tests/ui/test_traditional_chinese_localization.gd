@@ -27,7 +27,7 @@ func _run() -> void:
 	_check(LocaleCatalog.resolve_device_locale("zh_Hans") == "en", "Simplified script does not select Traditional Chinese.")
 	var entries: Array = _reviewed["entries"]
 	_check(entries.size() == 251, "The fixture includes every reviewed Traditional Chinese entry.")
-	for locale in ["zh_Hant", "en", "id"]:
+	for locale in ["zh_Hant", "en", "tr"]:
 		_check(bool(_locale_manager.call("set_locale", locale)), "%s can be selected." % locale)
 		for entry: Dictionary in entries:
 			var key := str(entry["key"])
