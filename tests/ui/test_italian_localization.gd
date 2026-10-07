@@ -21,8 +21,11 @@ func _run() -> void:
 	_reviewed = JSON.parse_string(FileAccess.get_file_as_string(FIXTURE)) as Dictionary
 	var entries: Array = _reviewed["entries"]
 	_check(entries.size() == 251, "The fixture includes every reviewed Italian entry.")
-	for locale in ["it", "en", "tr"]:
-		_check(bool(_locale_manager.call("set_locale", locale)), "%s can be selected." % locale)
+	for locale in ["it", "en", "hi"]:
+		if locale == "hi":
+			TranslationServer.set_locale(locale) # Test-only catalog-free fallback.
+		else:
+			_check(bool(_locale_manager.call("set_locale", locale)), "%s can be selected." % locale)
 		for entry: Dictionary in entries:
 			var key := str(entry["key"])
 			var expected := str(entry["it" if locale == "it" else "en"])

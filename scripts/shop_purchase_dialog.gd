@@ -18,7 +18,7 @@ var _result_title := ""
 
 func show_result(title: String, message: String, button_text: String = "Continue") -> void:
 	_result_title = title
-	_header.set_title(tr(title).to_upper())
+	_header.set_title(GameText.uppercase(tr(title)))
 	_message_label.text = message
 	_close_button.text = button_text
 	UIMotionScript.fade_in(self)
@@ -33,4 +33,4 @@ func close() -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
-		_header.set_title(tr(_result_title).to_upper())
+		_header.set_title(GameText.uppercase(tr(_result_title)))

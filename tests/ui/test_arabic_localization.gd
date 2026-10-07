@@ -28,8 +28,11 @@ func _run() -> void:
 			"Forced line breaks preserved for %s." % entry["key"])
 		_check(not str(entry["ar"]).contains("\u2066") and not str(entry["ar"]).contains("\u2069"),
 			"Reviewed catalog copy has no display-only isolation controls.")
-	for locale in ["ar", "en", "tr"]:
-		_check(bool(_locale_manager.call("set_locale", locale)), "%s can be selected." % locale)
+	for locale in ["ar", "en", "hi"]:
+		if locale == "hi":
+			TranslationServer.set_locale(locale) # Test-only catalog-free fallback.
+		else:
+			_check(bool(_locale_manager.call("set_locale", locale)), "%s can be selected." % locale)
 		for entry: Dictionary in entries:
 			var key := str(entry["key"])
 			var expected := str(entry["ar" if locale == "ar" else "en"])

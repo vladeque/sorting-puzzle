@@ -24,8 +24,11 @@ func _run() -> void:
 			"Brazilian Portuguese regional device locale %s selects Português (Brasil)." % device_locale)
 	var entries: Array = _reviewed["entries"]
 	_check(entries.size() == 251, "The fixture includes every reviewed Brazilian Portuguese entry.")
-	for locale in ["pt_BR", "en", "tr"]:
-		_check(bool(_locale_manager.call("set_locale", locale)), "%s can be selected." % locale)
+	for locale in ["pt_BR", "en", "hi"]:
+		if locale == "hi":
+			TranslationServer.set_locale(locale) # Test-only catalog-free fallback.
+		else:
+			_check(bool(_locale_manager.call("set_locale", locale)), "%s can be selected." % locale)
 		for entry: Dictionary in entries:
 			var key := str(entry["key"])
 			var expected := str(entry["pt_BR" if locale == "pt_BR" else "en"])

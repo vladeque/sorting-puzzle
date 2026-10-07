@@ -1,0 +1,1346 @@
+{
+  "source": "Owner-improved Sorting Puzzle — Türkçe Translations.md, October 7, 2026",
+  "source_sha256": "CC7E97C2E67A84DAE2A219F5379B90407E70925F992C1FB2249CAC5BF3D46492",
+  "entries": [
+    {
+      "key": "common.play",
+      "en": "Play",
+      "tr": "Oyna"
+    },
+    {
+      "key": "common.continue",
+      "en": "Continue",
+      "tr": "Devam Et"
+    },
+    {
+      "key": "common.resume",
+      "en": "Continue",
+      "tr": "Oyuna Dön"
+    },
+    {
+      "key": "common.try_again",
+      "en": "Try Again",
+      "tr": "Tekrar Dene"
+    },
+    {
+      "key": "common.close",
+      "en": "Close",
+      "tr": "Kapat"
+    },
+    {
+      "key": "common.cancel",
+      "en": "Cancel",
+      "tr": "İptal"
+    },
+    {
+      "key": "common.got_it",
+      "en": "Got it",
+      "tr": "Anladım"
+    },
+    {
+      "key": "common.get_help",
+      "en": "Get Help",
+      "tr": "Yardım Al"
+    },
+    {
+      "key": "common.save",
+      "en": "SAVE",
+      "tr": "KAYDET"
+    },
+    {
+      "key": "common.loading",
+      "en": "Loading…",
+      "tr": "Yükleniyor…"
+    },
+    {
+      "key": "common.retry_load",
+      "en": "Retry",
+      "tr": "Tekrar Yükle"
+    },
+    {
+      "key": "menu.level_button",
+      "en": "LEVEL %d",
+      "tr": "SEVİYE %d"
+    },
+    {
+      "key": "menu.more_levels_coming_soon",
+      "en": "MORE LEVELS COMING SOON",
+      "tr": "YENİ SEVİYELER YAKINDA"
+    },
+    {
+      "key": "menu.coming_soon",
+      "en": "COMING SOON",
+      "tr": "YAKINDA"
+    },
+    {
+      "key": "menu.lives_full",
+      "en": "Full",
+      "tr": "Dolu"
+    },
+    {
+      "key": "menu.starter_badge",
+      "en": "BUNDLE",
+      "tr": "PAKET"
+    },
+    {
+      "key": "nav.shop",
+      "en": "Shop",
+      "tr": "Mağaza"
+    },
+    {
+      "key": "nav.home",
+      "en": "Home",
+      "tr": "Ana Sayfa"
+    },
+    {
+      "key": "nav.leaderboard",
+      "en": "Leaderboard",
+      "tr": "Sıralama"
+    },
+    {
+      "key": "chapter.button",
+      "en": "CHAPTER %d",
+      "tr": "BÖLÜM %d"
+    },
+    {
+      "key": "chapter.button_tooltip",
+      "en": "Choose Chapter %d: %s",
+      "tr": "%d. bölümü seç: %s"
+    },
+    {
+      "key": "chapter.screen_title",
+      "en": "CHAPTERS",
+      "tr": "BÖLÜMLER"
+    },
+    {
+      "key": "chapter.eyebrow",
+      "en": "CHAPTER %d",
+      "tr": "BÖLÜM %d"
+    },
+    {
+      "key": "chapter.title.chapter_01",
+      "en": "Grocery Town",
+      "tr": "Market Kasabası"
+    },
+    {
+      "key": "chapter.title.chapter_02",
+      "en": "Candy Corner",
+      "tr": "Şeker Köşesi"
+    },
+    {
+      "key": "chapter.locked_status",
+      "en": "Complete %d more %s levels to unlock",
+      "tr": "Kilidi açmak için %d “%s” seviyesi daha tamamla"
+    },
+    {
+      "key": "chapter.unlock_progress",
+      "en": "Unlock progress",
+      "tr": "Kilidi açma ilerlemesi"
+    },
+    {
+      "key": "chapter.current_progress",
+      "en": "Current progress",
+      "tr": "Mevcut ilerleme"
+    },
+    {
+      "key": "chapter.locked",
+      "en": "Locked",
+      "tr": "Kilitli"
+    },
+    {
+      "key": "chapter.no_levels_status",
+      "en": "New levels are coming soon",
+      "tr": "Yeni seviyeler yakında geliyor"
+    },
+    {
+      "key": "chapter.coming_soon",
+      "en": "Coming Soon",
+      "tr": "Yakında"
+    },
+    {
+      "key": "hud.level",
+      "en": "LEVEL %d",
+      "tr": "SEVİYE %d"
+    },
+    {
+      "key": "hud.combo",
+      "en": "COMBO ×%d",
+      "tr": "KOMBO ×%d"
+    },
+    {
+      "key": "hud.ability_tooltip.hammer",
+      "en": "Hammer -- clears a matching triple",
+      "tr": "Çekiç -- eşleşen bir üçlüyü temizler"
+    },
+    {
+      "key": "hud.ability_tooltip.shuffle",
+      "en": "Shuffle -- reshuffles unlocked items",
+      "tr": "Karıştır -- kilidi açık ürünlerin yerlerini değiştirir"
+    },
+    {
+      "key": "hud.ability_tooltip.lantern",
+      "en": "Lantern -- highlights a matchable triple",
+      "tr": "Fener -- eşleştirilebilen bir üçlüyü vurgular"
+    },
+    {
+      "key": "hud.ability_tooltip.freezer",
+      "en": "Freezer -- pauses the countdown timer",
+      "tr": "Dondurucu -- geri sayımı duraklatır"
+    },
+    {
+      "key": "hud.seconds_short",
+      "en": "%ds",
+      "tr": "%d sn"
+    },
+    {
+      "key": "tip.tap_dispenser",
+      "en": "Tap a dispenser to throw items onto the shelves!",
+      "tr": "Ürünleri raflara atmak için dağıtıcıya dokun!"
+    },
+    {
+      "key": "pause.title",
+      "en": "PAUSE",
+      "tr": "DURAKLATILDI"
+    },
+    {
+      "key": "pause.leave",
+      "en": "Leave",
+      "tr": "Çık"
+    },
+    {
+      "key": "leave.title",
+      "en": "LEAVING THE LEVEL",
+      "tr": "SEVİYEDEN ÇIKIŞ"
+    },
+    {
+      "key": "leave.you_will_lose",
+      "en": "You will lose:",
+      "tr": "Kaybedeceklerin:"
+    },
+    {
+      "key": "leave.confirm",
+      "en": "Leave",
+      "tr": "Çık"
+    },
+    {
+      "key": "timeup.title",
+      "en": "TIME'S UP",
+      "tr": "SÜRE DOLDU"
+    },
+    {
+      "key": "timeup.offer",
+      "en": "Add one minute and keep sorting!",
+      "tr": "Bir dakika ekle ve sıralamaya devam et!"
+    },
+    {
+      "key": "timeup.used",
+      "en": "Used",
+      "tr": "Kullanıldı"
+    },
+    {
+      "key": "ability_purchase.title",
+      "en": "USE ABILITY",
+      "tr": "GÜÇLENDİRİCİ KULLAN"
+    },
+    {
+      "key": "shelf_unlock.title",
+      "en": "UNLOCK SHELF",
+      "tr": "RAFIN KİLİDİNİ AÇ"
+    },
+    {
+      "key": "shelf_unlock.offer",
+      "en": "Watch one ad to unlock this shelf now.",
+      "tr": "Bu rafın kilidini hemen açmak için bir reklam izle."
+    },
+    {
+      "key": "shelf_unlock.offer_or_clear",
+      "en": "Watch one ad to unlock this shelf now, or clear %s more.",
+      "tr": "Bu rafın kilidini hemen açmak için bir reklam izle ya da %s üçlü daha temizle."
+    },
+    {
+      "key": "shelf_unlock.button",
+      "en": "Watch Ad · Unlock Shelf",
+      "tr": "Reklam İzle · Rafı Aç"
+    },
+    {
+      "key": "shelf_unlock.ad_unavailable",
+      "en": "Ad unavailable. This shelf stays locked.",
+      "tr": "Reklam kullanılamıyor. Bu raf kilitli kalacak."
+    },
+    {
+      "key": "complete.title",
+      "en": "GREAT JOB!",
+      "tr": "TEBRİKLER!"
+    },
+    {
+      "key": "failed.title",
+      "en": "LEVEL %d",
+      "tr": "SEVİYE %d"
+    },
+    {
+      "key": "failed.headline",
+      "en": "LEVEL FAILED",
+      "tr": "SEVİYE GEÇİLEMEDİ"
+    },
+    {
+      "key": "failed.retry",
+      "en": "Retry",
+      "tr": "Tekrar Oyna"
+    },
+    {
+      "key": "combo.praise.2",
+      "en": "Cool",
+      "tr": "Güzel"
+    },
+    {
+      "key": "combo.praise.3",
+      "en": "Great",
+      "tr": "Harika"
+    },
+    {
+      "key": "combo.praise.4",
+      "en": "Awesome",
+      "tr": "Süper"
+    },
+    {
+      "key": "combo.praise.5",
+      "en": "Amazing",
+      "tr": "Müthiş"
+    },
+    {
+      "key": "combo.praise.6",
+      "en": "Fantastic",
+      "tr": "Muhteşem"
+    },
+    {
+      "key": "combo.praise.7",
+      "en": "Incredible",
+      "tr": "İnanılmaz"
+    },
+    {
+      "key": "combo.praise.8",
+      "en": "Spectacular",
+      "tr": "Göz Kamaştırıcı"
+    },
+    {
+      "key": "combo.praise.9",
+      "en": "Unstoppable",
+      "tr": "Durdurulamaz"
+    },
+    {
+      "key": "combo.praise.10",
+      "en": "Legendary",
+      "tr": "Efsanevi"
+    },
+    {
+      "key": "combo.praise.11",
+      "en": "Epic",
+      "tr": "Destansı"
+    },
+    {
+      "key": "combo.praise.12",
+      "en": "Brilliant",
+      "tr": "Dahice"
+    },
+    {
+      "key": "combo.praise.13",
+      "en": "Masterful",
+      "tr": "Ustaca"
+    },
+    {
+      "key": "combo.praise.14",
+      "en": "Supreme",
+      "tr": "Rakipsiz"
+    },
+    {
+      "key": "combo.praise.15",
+      "en": "Phenomenal",
+      "tr": "Olağanüstü"
+    },
+    {
+      "key": "combo.praise.16",
+      "en": "Mythic",
+      "tr": "Efsane Ötesi"
+    },
+    {
+      "key": "combo.praise.17",
+      "en": "Majestic",
+      "tr": "Görkemli"
+    },
+    {
+      "key": "combo.praise.18",
+      "en": "Radiant",
+      "tr": "Işıl Işıl"
+    },
+    {
+      "key": "combo.praise.19",
+      "en": "Divine",
+      "tr": "Kusursuz"
+    },
+    {
+      "key": "combo.praise.20",
+      "en": "Transcendent",
+      "tr": "Sınırların Ötesinde"
+    },
+    {
+      "key": "ability.hammer.name",
+      "en": "Hammer",
+      "tr": "Çekiç"
+    },
+    {
+      "key": "ability.shuffle.name",
+      "en": "Shuffle",
+      "tr": "Karıştır"
+    },
+    {
+      "key": "ability.lantern.name",
+      "en": "Lantern",
+      "tr": "Fener"
+    },
+    {
+      "key": "ability.freezer.name",
+      "en": "Freezer",
+      "tr": "Dondurucu"
+    },
+    {
+      "key": "ability.hammer.description",
+      "en": "Instantly clears one matching set of items off the shelves.",
+      "tr": "Raflardaki eşleşen bir ürün üçlüsünü anında temizler."
+    },
+    {
+      "key": "ability.shuffle.description",
+      "en": "Shuffles shelf items into new spots to help you find a match.",
+      "tr": "Eşleşme bulmana yardımcı olmak için raflardaki ürünlerin yerlerini değiştirir."
+    },
+    {
+      "key": "ability.lantern.description",
+      "en": "Highlights a matching triple you can clear for 15 seconds.",
+      "tr": "Temizleyebileceğin eşleşen bir üçlüyü 15 saniye boyunca vurgular."
+    },
+    {
+      "key": "ability.freezer.description",
+      "en": "Freezes the level timer for 30 seconds.",
+      "tr": "Seviye süresini 30 saniye boyunca dondurur."
+    },
+    {
+      "key": "ad.watch",
+      "en": "Watch Ad",
+      "tr": "Reklam İzle"
+    },
+    {
+      "key": "ad.loading",
+      "en": "Loading...",
+      "tr": "Yükleniyor..."
+    },
+    {
+      "key": "ad.verifying",
+      "en": "Verifying...",
+      "tr": "Doğrulanıyor..."
+    },
+    {
+      "key": "ad.verify_reward",
+      "en": "Verify Reward",
+      "tr": "Ödülü Doğrula"
+    },
+    {
+      "key": "ad.reward_pending",
+      "en": "Reward verification is still pending.",
+      "tr": "Ödül doğrulaması hâlâ beklemede."
+    },
+    {
+      "key": "ad.unavailable_retry",
+      "en": "Ad unavailable. Please try again.",
+      "tr": "Reklam kullanılamıyor. Lütfen tekrar dene."
+    },
+    {
+      "key": "ad.watch_unavailable",
+      "en": "Watch Ad\nUnavailable",
+      "tr": "Reklam İzle\nKullanılamıyor"
+    },
+    {
+      "key": "ad.watch_coming_soon",
+      "en": "Watch Ad\nComing Soon",
+      "tr": "Reklam İzle\nYakında"
+    },
+    {
+      "key": "ad.badge",
+      "en": "AD",
+      "tr": "AD"
+    },
+    {
+      "key": "lives.title.out",
+      "en": "OUT OF LIVES",
+      "tr": "CAN KALMADI"
+    },
+    {
+      "key": "lives.title.get_more",
+      "en": "GET MORE LIVES",
+      "tr": "DAHA FAZLA CAN AL"
+    },
+    {
+      "key": "lives.title.full",
+      "en": "LIVES FULL",
+      "tr": "CANLAR DOLU"
+    },
+    {
+      "key": "lives.next_in",
+      "en": "NEXT LIFE IN",
+      "tr": "YENİ CANA KALAN SÜRE"
+    },
+    {
+      "key": "lives.full_body",
+      "en": "Your lives are full! Play a level to spend them.",
+      "tr": "Canların dolu! Onları kullanmak için bir seviye oyna."
+    },
+    {
+      "key": "chest.title",
+      "en": "CHEST REWARDS",
+      "tr": "SANDIK ÖDÜLLERİ"
+    },
+    {
+      "key": "chest.progress_hint",
+      "en": "Collect stars to unlock a chest and claim your reward",
+      "tr": "Sandığın kilidini açmak ve ödülünü almak için yıldız topla"
+    },
+    {
+      "key": "chest.ready",
+      "en": "A REWARD CHEST AWAITS!",
+      "tr": "ÖDÜL SANDIĞIN HAZIR!"
+    },
+    {
+      "key": "chest.tap_to_open",
+      "en": "Tap to open",
+      "tr": "Açmak için dokun"
+    },
+    {
+      "key": "purchase.tap_to_collect",
+      "en": "Tap to collect",
+      "tr": "Almak için dokun"
+    },
+    {
+      "key": "purchase.complete",
+      "en": "PURCHASE COMPLETE",
+      "tr": "SATIN ALMA TAMAMLANDI"
+    },
+    {
+      "key": "shop.title",
+      "en": "SHOP",
+      "tr": "MAĞAZA"
+    },
+    {
+      "key": "shop.section.bundles",
+      "en": "SPECIAL BUNDLES",
+      "tr": "ÖZEL PAKETLER"
+    },
+    {
+      "key": "shop.section.coins",
+      "en": "COINS",
+      "tr": "PARA"
+    },
+    {
+      "key": "shop.offer.starter_bundle",
+      "en": "Starter Bundle",
+      "tr": "Başlangıç Paketi"
+    },
+    {
+      "key": "shop.offer.basic_bundle",
+      "en": "Basic Bundle",
+      "tr": "Temel Paket"
+    },
+    {
+      "key": "shop.tag.best_value",
+      "en": "BEST VALUE",
+      "tr": "EN AVANTAJLI"
+    },
+    {
+      "key": "shop.discount_off",
+      "en": "OFF",
+      "tr": "OFF"
+    },
+    {
+      "key": "shop.ability_hint",
+      "en": "Tap an ability to see what it does",
+      "tr": "Ne yaptığını görmek için güçlendiriciye dokun"
+    },
+    {
+      "key": "shop.purchasing",
+      "en": "Purchasing…",
+      "tr": "Satın alınıyor…"
+    },
+    {
+      "key": "shop.no_offers",
+      "en": "No shop offers are available for this region.",
+      "tr": "Bu bölge için mağaza teklifi bulunmuyor."
+    },
+    {
+      "key": "shop.load_failed",
+      "en": "Could not load the shop.",
+      "tr": "Mağaza yüklenemedi."
+    },
+    {
+      "key": "shop.error.title.purchase",
+      "en": "Purchase unavailable",
+      "tr": "Satın alma yapılamıyor"
+    },
+    {
+      "key": "shop.error.title.reward",
+      "en": "Reward error",
+      "tr": "Ödül hatası"
+    },
+    {
+      "key": "shop.error.purchase_failed",
+      "en": "The purchase could not be completed.",
+      "tr": "Satın alma tamamlanamadı."
+    },
+    {
+      "key": "shop.error.grant_failed",
+      "en": "The purchased rewards could not be granted.",
+      "tr": "Satın alınan ödüller verilemedi."
+    },
+    {
+      "key": "shop.error.offer_unavailable",
+      "en": "This shop offer is unavailable.",
+      "tr": "Bu mağaza teklifi mevcut değil."
+    },
+    {
+      "key": "shop.error.already_bought",
+      "en": "This one-time shop offer has already been purchased.",
+      "tr": "Bu tek seferlik mağaza teklifi zaten satın alındı."
+    },
+    {
+      "key": "starter.title",
+      "en": "STARTER BUNDLE",
+      "tr": "BAŞLANGIÇ PAKETİ"
+    },
+    {
+      "key": "starter.one_time",
+      "en": "ONE-TIME OFFER",
+      "tr": "TEK SEFERLİK TEKLİF"
+    },
+    {
+      "key": "starter.boosters_included",
+      "en": "BOOSTERS INCLUDED",
+      "tr": "GÜÇLENDİRİCİLER DAHİL"
+    },
+    {
+      "key": "starter.coins",
+      "en": "%s COINS",
+      "tr": "%s PARA"
+    },
+    {
+      "key": "starter.buy_for",
+      "en": "Buy for %s",
+      "tr": "%s karşılığında al"
+    },
+    {
+      "key": "starter.checking",
+      "en": "Checking offer…",
+      "tr": "Teklif kontrol ediliyor…"
+    },
+    {
+      "key": "starter.checking_short",
+      "en": "Checking…",
+      "tr": "Kontrol ediliyor…"
+    },
+    {
+      "key": "starter.no_longer_available",
+      "en": "This offer is no longer available.",
+      "tr": "Bu teklif artık mevcut değil."
+    },
+    {
+      "key": "starter.unavailable",
+      "en": "Unavailable",
+      "tr": "Mevcut Değil"
+    },
+    {
+      "key": "booster_chip.claimed",
+      "en": "+%d %s",
+      "tr": "+%d %s"
+    },
+    {
+      "key": "profile.title",
+      "en": "EDIT PROFILE",
+      "tr": "PROFİLİ DÜZENLE"
+    },
+    {
+      "key": "profile.name_header",
+      "en": "PLAYER NAME",
+      "tr": "OYUNCU ADI"
+    },
+    {
+      "key": "profile.name_placeholder",
+      "en": "Player name",
+      "tr": "Oyuncu adı"
+    },
+    {
+      "key": "profile.edit_name_tooltip",
+      "en": "Edit player name",
+      "tr": "Oyuncu adını düzenle"
+    },
+    {
+      "key": "profile.avatar_tab",
+      "en": "AVATAR",
+      "tr": "AVATAR"
+    },
+    {
+      "key": "profile.frame_tab",
+      "en": "FRAME",
+      "tr": "ÇERÇEVE"
+    },
+    {
+      "key": "profile.unlock.level",
+      "en": "Complete level %d to unlock",
+      "tr": "Kilidi açmak için %d. seviyeyi tamamla"
+    },
+    {
+      "key": "profile.unlock.combo",
+      "en": "Reach a combo of ×%d in any run to unlock",
+      "tr": "Kilidi açmak için herhangi bir denemede ×%d kombo yap"
+    },
+    {
+      "key": "profile.unlock.weekly_first",
+      "en": "Finish 1st on the Weekly leaderboard to unlock",
+      "tr": "Kilidi açmak için haftalık sıralamayı 1. sırada bitir"
+    },
+    {
+      "key": "profile.unlock.weekly_top",
+      "en": "Finish top %d on the Weekly leaderboard to unlock",
+      "tr": "Kilidi açmak için haftalık sıralamayı ilk %d oyuncu arasında bitir"
+    },
+    {
+      "key": "leaderboard.title",
+      "en": "LEADERBOARD",
+      "tr": "SIRALAMA"
+    },
+    {
+      "key": "leaderboard.tab.weekly",
+      "en": "Weekly",
+      "tr": "Haftalık"
+    },
+    {
+      "key": "leaderboard.tab.country",
+      "en": "Country",
+      "tr": "Ülke"
+    },
+    {
+      "key": "leaderboard.tab.world",
+      "en": "World",
+      "tr": "Dünya"
+    },
+    {
+      "key": "leaderboard.weekly_reset",
+      "en": "Weekly reset in %s",
+      "tr": "Haftalık sıfırlamaya %s kaldı"
+    },
+    {
+      "key": "leaderboard.duration.dh",
+      "en": "%dd %dh",
+      "tr": "%dg %dsa"
+    },
+    {
+      "key": "leaderboard.duration.hm",
+      "en": "%dh %dm",
+      "tr": "%dsa %ddk"
+    },
+    {
+      "key": "leaderboard.duration.m",
+      "en": "%dm",
+      "tr": "%ddk"
+    },
+    {
+      "key": "leaderboard.country_caption",
+      "en": "Country · All-time stars",
+      "tr": "Ülke · Toplam yıldız"
+    },
+    {
+      "key": "leaderboard.world_caption",
+      "en": "Worldwide · All-time stars",
+      "tr": "Dünya · Toplam yıldız"
+    },
+    {
+      "key": "leaderboard.load_failed",
+      "en": "Could not load leaderboard.",
+      "tr": "Sıralama yüklenemedi."
+    },
+    {
+      "key": "leaderboard.default_name",
+      "en": "Player",
+      "tr": "Oyuncu"
+    },
+    {
+      "key": "leaderboard.row_tooltip",
+      "en": "Rank %d, %s, %d stars",
+      "tr": "Sıra %d, %s, %d yıldız"
+    },
+    {
+      "key": "leaderboard.reward_tooltip",
+      "en": "%s coin weekly reward",
+      "tr": "Haftalık ödül: %s para"
+    },
+    {
+      "key": "leaderboard.reward.title",
+      "en": "WEEKLY REWARD!",
+      "tr": "HAFTALIK ÖDÜL!"
+    },
+    {
+      "key": "leaderboard.reward.body",
+      "en": "You finished #%d last week and earned %d coins!",
+      "tr": "Geçen haftayı %d. sırada bitirip %d para kazandın!"
+    },
+    {
+      "key": "leaderboard.reward.ok",
+      "en": "Nice!",
+      "tr": "Süper!"
+    },
+    {
+      "key": "settings.title",
+      "en": "SETTINGS",
+      "tr": "AYARLAR"
+    },
+    {
+      "key": "settings.music",
+      "en": "Music",
+      "tr": "Müzik"
+    },
+    {
+      "key": "settings.sfx",
+      "en": "SFX",
+      "tr": "Sesler"
+    },
+    {
+      "key": "settings.vibrate",
+      "en": "Vibrate",
+      "tr": "Titreşim"
+    },
+    {
+      "key": "settings.support",
+      "en": "Support",
+      "tr": "Destek"
+    },
+    {
+      "key": "settings.language",
+      "en": "Language",
+      "tr": "Dil"
+    },
+    {
+      "key": "settings.privacy_policy",
+      "en": "Privacy Policy",
+      "tr": "Gizlilik Politikası"
+    },
+    {
+      "key": "settings.privacy_choices",
+      "en": "Privacy Choices",
+      "tr": "Gizlilik Tercihleri"
+    },
+    {
+      "key": "settings.diagnostics",
+      "en": "Version %s • Build %d\nPlatform: %s • User: %s",
+      "tr": "Sürüm %s • Derleme %d\nPlatform: %s • Kullanıcı: %s"
+    },
+    {
+      "key": "language.title",
+      "en": "LANGUAGE",
+      "tr": "DİL"
+    },
+    {
+      "key": "support.title",
+      "en": "SUPPORT",
+      "tr": "DESTEK"
+    },
+    {
+      "key": "support.faq_header",
+      "en": "Frequently Asked Questions",
+      "tr": "Sıkça Sorulan Sorular"
+    },
+    {
+      "key": "support.faq.play.q",
+      "en": "How do I play?",
+      "tr": "Nasıl oynarım?"
+    },
+    {
+      "key": "support.faq.play.a",
+      "en": "Move matching goods onto the same shelf. When three identical items are visible together, they clear. Complete the board before time runs out.",
+      "tr": "Eşleşen ürünleri aynı rafa taşı. Aynı rafta üç özdeş ürün bir araya geldiğinde temizlenir. Süre dolmadan tüm ürünleri temizle."
+    },
+    {
+      "key": "support.faq.contact.q",
+      "en": "How do I contact support?",
+      "tr": "Destekle nasıl iletişime geçerim?"
+    },
+    {
+      "key": "support.faq.contact.a",
+      "en": "Email us at %s. Include a short description, your device platform, and when the problem happened.",
+      "tr": "Bize ulaşmak için %s adresine e-posta gönder. Kısa bir açıklama, cihazının platformunu ve sorunun ne zaman yaşandığını belirt."
+    },
+    {
+      "key": "support.faq.contact.action",
+      "en": "Email Support",
+      "tr": "Desteğe Yaz"
+    },
+    {
+      "key": "support.faq.crash.q",
+      "en": "What if the game freezes or crashes?",
+      "tr": "Oyun donarsa veya çökerse ne yapmalıyım?"
+    },
+    {
+      "key": "support.faq.crash.a",
+      "en": "Close and reopen the game first. If it happens again, restart the device and make sure the game is updated. Contact support with the device model, platform version, and what you were doing before the problem.",
+      "tr": "Önce oyunu kapatıp yeniden aç. Sorun tekrarlanırsa cihazını yeniden başlat ve oyunun güncel olduğundan emin ol. Cihaz modelini, platform sürümünü ve sorun ortaya çıkmadan önce ne yaptığını belirterek destekle iletişime geç."
+    },
+    {
+      "key": "support.faq.sync.q",
+      "en": "How do I sync progress between devices?",
+      "tr": "İlerlememi cihazlar arasında nasıl senkronize ederim?"
+    },
+    {
+      "key": "support.faq.sync.a",
+      "en": "Use the same signed-in platform account on both devices and allow synchronization to finish before playing. If the progress differs, avoid playing on both devices and contact support.",
+      "tr": "Her iki cihazda da aynı platform hesabında oturum aç ve oynamadan önce senkronizasyonun tamamlanmasını bekle. İlerleme farklıysa iki cihazda birden oynamaktan kaçın ve destekle iletişime geç."
+    },
+    {
+      "key": "support.faq.bad_ad.q",
+      "en": "How do I report a bad ad?",
+      "tr": "Uygunsuz bir reklamı nasıl bildiririm?"
+    },
+    {
+      "key": "support.faq.bad_ad.a",
+      "en": "1. Close the ad if you can do so safely.\n2. Take a screenshot of the ad and any advertiser or app name shown.\n3. Note the approximate time and where the ad appeared in the game.\n4. Describe why the ad seemed offensive, misleading, or fraudulent.\n5. Email these details to %s. Do not include passwords or payment information.",
+      "tr": "1. Güvenli bir şekilde yapabiliyorsan reklamı kapat.\n2. Reklamın ve gösterilen reklamveren veya uygulama adının ekran görüntüsünü al.\n3. Yaklaşık zamanı ve reklamın oyunda nerede göründüğünü not et.\n4. Reklamın neden rahatsız edici, yanıltıcı veya dolandırıcılık amaçlı göründüğünü açıkla.\n5. Bu bilgileri %s adresine e-posta ile gönder. Şifre veya ödeme bilgisi ekleme."
+    },
+    {
+      "key": "support.faq.bad_ad.action",
+      "en": "Email Ad Report",
+      "tr": "Reklamı Bildir"
+    },
+    {
+      "key": "support.account_header",
+      "en": "Account",
+      "tr": "Hesap"
+    },
+    {
+      "key": "support.delete_account",
+      "en": "Delete Account",
+      "tr": "Hesabı Sil"
+    },
+    {
+      "key": "support.delete_game_data",
+      "en": "Delete Game Data",
+      "tr": "Oyun Verilerini Sil"
+    },
+    {
+      "key": "support.no_secrets",
+      "en": "Please never send passwords or payment information.",
+      "tr": "Lütfen asla şifre veya ödeme bilgisi gönderme."
+    },
+    {
+      "key": "deletion.title.delete_account",
+      "en": "DELETE ACCOUNT",
+      "tr": "HESABI SİL"
+    },
+    {
+      "key": "deletion.title.delete_game_data",
+      "en": "DELETE GAME DATA",
+      "tr": "OYUN VERİLERİNİ SİL"
+    },
+    {
+      "key": "deletion.title.not_confirmed",
+      "en": "NOT CONFIRMED",
+      "tr": "DOĞRULANMADI"
+    },
+    {
+      "key": "deletion.title.status_unconfirmed",
+      "en": "STATUS UNCONFIRMED",
+      "tr": "DURUM DOĞRULANMADI"
+    },
+    {
+      "key": "deletion.title.finishing_up",
+      "en": "FINISHING UP",
+      "tr": "TAMAMLANIYOR"
+    },
+    {
+      "key": "deletion.title.new_game",
+      "en": "NEW GAME",
+      "tr": "YENİ OYUN"
+    },
+    {
+      "key": "deletion.title.status_unknown",
+      "en": "STATUS UNKNOWN",
+      "tr": "DURUM BİLİNMİYOR"
+    },
+    {
+      "key": "deletion.title.not_deleted",
+      "en": "NOT DELETED",
+      "tr": "SİLİNMEDİ"
+    },
+    {
+      "key": "deletion.title.data_deleted",
+      "en": "DATA DELETED",
+      "tr": "VERİLER SİLİNDİ"
+    },
+    {
+      "key": "deletion.title.accepted",
+      "en": "DELETION ACCEPTED",
+      "tr": "SİLME İSTEĞİ KABUL EDİLDİ"
+    },
+    {
+      "key": "deletion.confirm.headline",
+      "en": "This permanently deletes your account.",
+      "tr": "Bu işlem hesabını kalıcı olarak siler."
+    },
+    {
+      "key": "deletion.confirm.body",
+      "en": "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nIf you sign in again later, you'll start a new account.\n\nSome purchase and security records are kept without your name or profile. The rest is removed within 30 days.",
+      "tr": "İlerlemen, paran, ürünlerin ve profilin silinecek. Bu işlemi geri alamazsın.\n\nDaha sonra yeniden oturum açarsan yeni bir hesapla başlayacaksın.\n\nBazı satın alma ve güvenlik kayıtları, adınla veya profilinle ilişkilendirilmeden saklanır. Diğer veriler 30 gün içinde silinir."
+    },
+    {
+      "key": "deletion.confirm.button",
+      "en": "Delete Account",
+      "tr": "Hesabı Sil"
+    },
+    {
+      "key": "deletion.local_confirm.headline",
+      "en": "This deletes your game data on this device.",
+      "tr": "Bu işlem bu cihazdaki oyun verilerini siler."
+    },
+    {
+      "key": "deletion.local_confirm.body",
+      "en": "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nThis game never created an online account for you, so nothing needs to be deleted from our servers.",
+      "tr": "İlerlemen, paran, ürünlerin ve profilin silinecek. Bu işlemi geri alamazsın.\n\nBu oyun senin için hiç çevrimiçi hesap oluşturmadı, bu yüzden sunucularımızdan silinecek bir şey yok."
+    },
+    {
+      "key": "deletion.local_confirm.button",
+      "en": "Delete Data",
+      "tr": "Verileri Sil"
+    },
+    {
+      "key": "deletion.pending_setup.headline",
+      "en": "Your account is still being set up.",
+      "tr": "Hesabın hâlâ oluşturuluyor."
+    },
+    {
+      "key": "deletion.pending_setup.body",
+      "en": "Connect to the internet and try again in a moment. Nothing was deleted.",
+      "tr": "İnternete bağlan ve biraz sonra tekrar dene. Hiçbir şey silinmedi."
+    },
+    {
+      "key": "deletion.sign_in.headline",
+      "en": "Sign in to the account you want to delete.",
+      "tr": "Silmek istediğin hesapta oturum aç."
+    },
+    {
+      "key": "deletion.sign_in.body",
+      "en": "If you can't sign in, contact support for help.",
+      "tr": "Oturum açamıyorsan yardım almak için destekle iletişime geç."
+    },
+    {
+      "key": "deletion.read_failed.headline",
+      "en": "Your game data couldn't be read.",
+      "tr": "Oyun verilerin okunamadı."
+    },
+    {
+      "key": "deletion.read_failed.body",
+      "en": "Restart the game, then try again. Nothing was deleted.",
+      "tr": "Oyunu yeniden başlat, ardından tekrar dene. Hiçbir şey silinmedi."
+    },
+    {
+      "key": "deletion.unavailable.headline",
+      "en": "Account deletion isn't available in this version of the game.",
+      "tr": "Oyunun bu sürümünde hesap silme özelliği kullanılamıyor."
+    },
+    {
+      "key": "deletion.unavailable.body",
+      "en": "Update the game, or contact support for help deleting your account. Nothing was deleted.",
+      "tr": "Oyunu güncelle veya hesabını silmek için destekten yardım al. Hiçbir şey silinmedi."
+    },
+    {
+      "key": "deletion.in_progress.account",
+      "en": "Deleting your account...",
+      "tr": "Hesabın siliniyor..."
+    },
+    {
+      "key": "deletion.in_progress.local",
+      "en": "Deleting your game data...",
+      "tr": "Oyun verilerin siliniyor..."
+    },
+    {
+      "key": "deletion.in_progress.body",
+      "en": "Keep the game open. This only takes a moment.",
+      "tr": "Oyunu açık tut. Bu işlem yalnızca kısa bir süre alır."
+    },
+    {
+      "key": "deletion.not_confirmed.headline",
+      "en": "We haven't heard back about your deletion yet.",
+      "tr": "Silme isteğinle ilgili henüz yanıt almadık."
+    },
+    {
+      "key": "deletion.not_confirmed.body",
+      "en": "Your request was sent, but the answer didn't arrive. Connect to the internet and try again. The game stays locked until we know the result.",
+      "tr": "İsteğin gönderildi, ancak yanıt ulaşmadı. İnternete bağlan ve tekrar dene. Sonucu öğrenene kadar oyun kilitli kalacak."
+    },
+    {
+      "key": "deletion.unconfirmed.headline",
+      "en": "Deletion status unconfirmed",
+      "tr": "Silme durumu doğrulanmadı"
+    },
+    {
+      "key": "deletion.unconfirmed.body",
+      "en": "We couldn't confirm whether your account was deleted. To keep your data safe, the game stays locked. Contact support and include the reference below.",
+      "tr": "Hesabının silinip silinmediğini doğrulayamadık. Verilerini güvende tutmak için oyun kilitli kalacak. Destekle iletişime geç ve aşağıdaki referansı belirt."
+    },
+    {
+      "key": "deletion.check_again",
+      "en": "Check Again",
+      "tr": "Tekrar Kontrol Et"
+    },
+    {
+      "key": "deletion.cleanup.headline.local",
+      "en": "Your local game data couldn't be fully deleted yet.",
+      "tr": "Yerel oyun verilerin henüz tamamen silinemedi."
+    },
+    {
+      "key": "deletion.cleanup.headline.account",
+      "en": "Account deletion accepted; finishing cleanup.",
+      "tr": "Hesap silme isteği kabul edildi; son işlemler tamamlanıyor."
+    },
+    {
+      "key": "deletion.cleanup.body",
+      "en": "Some game data couldn't be removed from this device yet. Try again to finish.",
+      "tr": "Bazı oyun verileri henüz bu cihazdan silinemedi. Tamamlamak için tekrar dene."
+    },
+    {
+      "key": "deletion.new_game.headline",
+      "en": "Starting a new game...",
+      "tr": "Yeni oyun başlatılıyor..."
+    },
+    {
+      "key": "deletion.new_game.body",
+      "en": "This only takes a moment.",
+      "tr": "Bu işlem yalnızca kısa bir süre alır."
+    },
+    {
+      "key": "deletion.status_unknown.headline",
+      "en": "We couldn't read the deletion status on this device.",
+      "tr": "Bu cihazdaki silme durumunu okuyamadık."
+    },
+    {
+      "key": "deletion.status_unknown.body",
+      "en": "To keep your data safe, the game stays locked. Contact support for help.",
+      "tr": "Verilerini güvende tutmak için oyun kilitli kalacak. Yardım almak için destekle iletişime geç."
+    },
+    {
+      "key": "deletion.fail.offline",
+      "en": "Connect to the internet to delete your account.",
+      "tr": "Hesabını silmek için internete bağlan."
+    },
+    {
+      "key": "deletion.fail.rate_limited",
+      "en": "Too many attempts. Wait a moment, then try again.",
+      "tr": "Çok fazla deneme yapıldı. Biraz bekle, ardından tekrar dene."
+    },
+    {
+      "key": "deletion.fail.busy",
+      "en": "Account deletion is busy right now. Try again in a moment.",
+      "tr": "Hesap silme sistemi şu anda yoğun. Biraz sonra tekrar dene."
+    },
+    {
+      "key": "deletion.fail.syncing",
+      "en": "The game is still syncing. Try again in a moment.",
+      "tr": "Oyun hâlâ senkronize ediliyor. Biraz sonra tekrar dene."
+    },
+    {
+      "key": "deletion.fail.auth",
+      "en": "We couldn't verify your account. Restart the game, then try again.",
+      "tr": "Hesabını doğrulayamadık. Oyunu yeniden başlat, ardından tekrar dene."
+    },
+    {
+      "key": "deletion.fail.update",
+      "en": "Update the game to delete your account.",
+      "tr": "Hesabını silmek için oyunu güncelle."
+    },
+    {
+      "key": "deletion.fail.changed",
+      "en": "Your account changed while we were deleting it. Try again.",
+      "tr": "Silme işlemi sırasında hesabın değişti. Tekrar dene."
+    },
+    {
+      "key": "deletion.fail.storage",
+      "en": "Your device couldn't save the deletion request. Try again.",
+      "tr": "Cihazın silme isteğini kaydedemedi. Tekrar dene."
+    },
+    {
+      "key": "deletion.fail.generic",
+      "en": "We couldn't delete your account. Try again later or contact support.",
+      "tr": "Hesabını silemedik. Daha sonra tekrar dene veya destekle iletişime geç."
+    },
+    {
+      "key": "deletion.fail.local",
+      "en": "Your game data couldn't be deleted. Try again.",
+      "tr": "Oyun verilerin silinemedi. Tekrar dene."
+    },
+    {
+      "key": "deletion.fail.body",
+      "en": "Nothing was deleted, and you can keep playing.",
+      "tr": "Hiçbir şey silinmedi ve oynamaya devam edebilirsin."
+    },
+    {
+      "key": "deletion.done_local.headline",
+      "en": "Your local game data was deleted.",
+      "tr": "Yerel oyun verilerin silindi."
+    },
+    {
+      "key": "deletion.done_local.body",
+      "en": "You can start over with a new game.",
+      "tr": "Yeni bir oyunla baştan başlayabilirsin."
+    },
+    {
+      "key": "deletion.new_game_failed",
+      "en": "The new game couldn't start. Try again.",
+      "tr": "Yeni oyun başlatılamadı. Tekrar dene."
+    },
+    {
+      "key": "deletion.accepted.headline",
+      "en": "Your account is no longer accessible.",
+      "tr": "Hesabına artık erişilemiyor."
+    },
+    {
+      "key": "deletion.accepted.body",
+      "en": "Your deletion request was accepted.",
+      "tr": "Silme isteğin kabul edildi."
+    },
+    {
+      "key": "deletion.accepted.body_deadline",
+      "en": "Your deletion request was accepted. Data removal is due by %s.",
+      "tr": "Silme isteğin kabul edildi. Verilerin silinmesi için son tarih: %s."
+    },
+    {
+      "key": "deletion.reference",
+      "en": "Reference: %s",
+      "tr": "Referans: %s"
+    },
+    {
+      "key": "deletion.start_new_game",
+      "en": "Start New Game",
+      "tr": "Yeni Oyun Başlat"
+    },
+    {
+      "key": "app.name",
+      "en": "SortingPuzzle",
+      "tr": "SortingPuzzle"
+    },
+    {
+      "key": "support.email.subject",
+      "en": "Sorting Puzzle support request",
+      "tr": "Sorting Puzzle destek talebi"
+    },
+    {
+      "key": "support.email.body",
+      "en": "Please describe the issue here.\n\nDevice/platform:\nApproximate time:\n",
+      "tr": "Lütfen sorunu burada açıkla.\n\nCihaz/platform:\nYaklaşık zaman:\n"
+    },
+    {
+      "key": "support.ad_email.subject",
+      "en": "Sorting Puzzle ad report",
+      "tr": "Sorting Puzzle reklam bildirimi"
+    },
+    {
+      "key": "support.ad_email.body",
+      "en": "Please attach a screenshot and complete the details below.\n\nApproximate time:\nAd placement in the game:\nAdvertiser or app name:\nWhy the ad should be reviewed:\n",
+      "tr": "Lütfen bir ekran görüntüsü ekle ve aşağıdaki bilgileri doldur.\n\nYaklaşık zaman:\nReklamın oyundaki yeri:\nReklamveren veya uygulama adı:\nReklamın neden incelenmesi gerektiği:\n"
+    },
+    {
+      "key": "deletion.email.subject",
+      "en": "Sorting Puzzle account deletion",
+      "tr": "Sorting Puzzle hesap silme talebi"
+    },
+    {
+      "key": "deletion.email.body",
+      "en": "Please help me with my account deletion.",
+      "tr": "Lütfen hesabımı silme konusunda bana yardımcı olun."
+    }
+  ],
+  "plurals": {
+    "chapter.locked_status": {
+      "one": "Kilidi açmak için %d “%s” seviyesi daha tamamla",
+      "other": "Kilidi açmak için %d “%s” seviyesi daha tamamla"
+    },
+    "shelf_unlock.offer_or_clear": {
+      "one": "Bu rafın kilidini hemen açmak için bir reklam izle ya da %s üçlü daha temizle.",
+      "other": "Bu rafın kilidini hemen açmak için bir reklam izle ya da %s üçlü daha temizle."
+    },
+    "starter.coins": {
+      "one": "%s PARA",
+      "other": "%s PARA"
+    },
+    "leaderboard.row_tooltip": {
+      "one": "Sıra %d, %s, %d yıldız",
+      "other": "Sıra %d, %s, %d yıldız"
+    },
+    "leaderboard.reward_tooltip": {
+      "one": "Haftalık ödül: %s para",
+      "other": "Haftalık ödül: %s para"
+    },
+    "leaderboard.reward.body": {
+      "one": "Geçen haftayı %d. sırada bitirip %d para kazandın!",
+      "other": "Geçen haftayı %d. sırada bitirip %d para kazandın!"
+    }
+  },
+  "counted_boosters": {
+    "Hammer": [
+      "Çekiç",
+      "Çekiç"
+    ],
+    "Shuffle": [
+      "Karıştır",
+      "Karıştır"
+    ],
+    "Lantern": [
+      "Fener",
+      "Fener"
+    ],
+    "Freezer": [
+      "Dondurucu",
+      "Dondurucu"
+    ]
+  },
+  "months": [
+    "Ocak",
+    "Şubat",
+    "Mart",
+    "Nisan",
+    "Mayıs",
+    "Haziran",
+    "Temmuz",
+    "Ağustos",
+    "Eylül",
+    "Ekim",
+    "Kasım",
+    "Aralık"
+  ],
+  "additional": [
+    {
+      "key": "support.email.status",
+      "en": "Status: %s",
+      "tr": "Durum: %s"
+    },
+    {
+      "key": "support.email.deletion_reference",
+      "en": "Deletion reference",
+      "tr": "Silme referansı"
+    },
+    {
+      "key": "support.email.server_reference",
+      "en": "Server reference",
+      "tr": "Sunucu referansı"
+    },
+    {
+      "key": "support.email.player_id",
+      "en": "Player ID",
+      "tr": "Oyuncu kimliği"
+    },
+    {
+      "key": "leaderboard.empty",
+      "en": "No scores yet",
+      "tr": "Henüz puan yok"
+    }
+  ]
+}

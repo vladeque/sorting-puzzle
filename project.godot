@@ -74,7 +74,7 @@ theme/custom="res://assets/themes/game_typography.tres"
 
 [internationalization]
 
-locale/translations=PackedStringArray("res://assets/translations/en.po", "res://assets/translations/ru.po", "res://assets/translations/uk.po", "res://assets/translations/it.po", "res://assets/translations/ar.po", "res://assets/translations/es.po", "res://assets/translations/pt_BR.po", "res://assets/translations/de.po", "res://assets/translations/fr.po", "res://assets/translations/ko.po", "res://assets/translations/ja.po", "res://assets/translations/zh_Hant.po", "res://assets/translations/id.po")
+locale/translations=PackedStringArray("res://assets/translations/en.po", "res://assets/translations/ru.po", "res://assets/translations/uk.po", "res://assets/translations/it.po", "res://assets/translations/ar.po", "res://assets/translations/es.po", "res://assets/translations/pt_BR.po", "res://assets/translations/de.po", "res://assets/translations/fr.po", "res://assets/translations/ko.po", "res://assets/translations/ja.po", "res://assets/translations/zh_Hant.po", "res://assets/translations/id.po", "res://assets/translations/tr.po")
 
 [physics]
 

@@ -1,0 +1,2141 @@
+# Reviewed Turkish inventory; see docs/localization/TURKISH_TRANSLATIONS.md.
+msgid ""
+msgstr ""
+"Project-Id-Version: SortingPuzzle\n"
+"Language: tr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. date.day_month_year
+msgid "date.day_month_year"
+msgstr "%d %s %d"
+
+#. common.play
+msgid "common.play"
+msgstr "Oyna"
+
+#. common.continue
+msgid "common.continue"
+msgstr "Devam Et"
+
+#. common.resume
+msgid "common.resume"
+msgstr "Oyuna Dön"
+
+#. common.try_again
+msgid "common.try_again"
+msgstr "Tekrar Dene"
+
+#. common.close
+msgid "common.close"
+msgstr "Kapat"
+
+#. common.cancel
+msgid "common.cancel"
+msgstr "İptal"
+
+#. common.got_it
+msgid "common.got_it"
+msgstr "Anladım"
+
+#. common.get_help
+msgid "common.get_help"
+msgstr "Yardım Al"
+
+#. common.save
+msgid "common.save"
+msgstr "KAYDET"
+
+#. common.loading
+msgid "common.loading"
+msgstr "Yükleniyor…"
+
+#. common.retry_load
+msgid "common.retry_load"
+msgstr "Tekrar Yükle"
+
+#. menu.level_button
+msgid "menu.level_button"
+msgstr "SEVİYE %d"
+
+#. menu.more_levels_coming_soon
+msgid "menu.more_levels_coming_soon"
+msgstr "YENİ SEVİYELER YAKINDA"
+
+#. menu.coming_soon
+msgid "menu.coming_soon"
+msgstr "YAKINDA"
+
+#. menu.lives_full
+msgid "menu.lives_full"
+msgstr "Dolu"
+
+#. menu.starter_badge
+msgid "menu.starter_badge"
+msgstr "PAKET"
+
+#. nav.shop
+msgid "nav.shop"
+msgstr "Mağaza"
+
+#. nav.home
+msgid "nav.home"
+msgstr "Ana Sayfa"
+
+#. nav.leaderboard
+msgid "nav.leaderboard"
+msgstr "Sıralama"
+
+#. chapter.button
+msgid "chapter.button"
+msgstr "BÖLÜM %d"
+
+#. chapter.button_tooltip
+msgid "chapter.button_tooltip"
+msgstr "%d. bölümü seç: %s"
+
+#. chapter.screen_title
+msgid "chapter.screen_title"
+msgstr "BÖLÜMLER"
+
+#. chapter.eyebrow
+msgid "chapter.eyebrow"
+msgstr "BÖLÜM %d"
+
+#. chapter.title.chapter_01
+msgid "chapter.title.chapter_01"
+msgstr "Market Kasabası"
+
+#. chapter.title.chapter_02
+msgid "chapter.title.chapter_02"
+msgstr "Şeker Köşesi"
+
+#. chapter.locked_status
+msgid "chapter.locked_status"
+msgid_plural "chapter.locked_status.plural"
+msgstr[0] "Kilidi açmak için %d “%s” seviyesi daha tamamla"
+msgstr[1] "Kilidi açmak için %d “%s” seviyesi daha tamamla"
+
+#. chapter.unlock_progress
+msgid "chapter.unlock_progress"
+msgstr "Kilidi açma ilerlemesi"
+
+#. chapter.current_progress
+msgid "chapter.current_progress"
+msgstr "Mevcut ilerleme"
+
+#. chapter.locked
+msgid "chapter.locked"
+msgstr "Kilitli"
+
+#. chapter.no_levels_status
+msgid "chapter.no_levels_status"
+msgstr "Yeni seviyeler yakında geliyor"
+
+#. chapter.coming_soon
+msgid "chapter.coming_soon"
+msgstr "Yakında"
+
+#. hud.level
+msgid "hud.level"
+msgstr "SEVİYE %d"
+
+#. hud.combo
+msgid "hud.combo"
+msgstr "KOMBO ×%d"
+
+#. hud.ability_tooltip.hammer
+msgid "hud.ability_tooltip.hammer"
+msgstr "Çekiç -- eşleşen bir üçlüyü temizler"
+
+#. hud.ability_tooltip.shuffle
+msgid "hud.ability_tooltip.shuffle"
+msgstr "Karıştır -- kilidi açık ürünlerin yerlerini değiştirir"
+
+#. hud.ability_tooltip.lantern
+msgid "hud.ability_tooltip.lantern"
+msgstr "Fener -- eşleştirilebilen bir üçlüyü vurgular"
+
+#. hud.ability_tooltip.freezer
+msgid "hud.ability_tooltip.freezer"
+msgstr "Dondurucu -- geri sayımı duraklatır"
+
+#. hud.seconds_short
+msgid "hud.seconds_short"
+msgstr "%d sn"
+
+#. tip.tap_dispenser
+msgid "tip.tap_dispenser"
+msgstr "Ürünleri raflara atmak için dağıtıcıya dokun!"
+
+#. pause.title
+msgid "pause.title"
+msgstr "DURAKLATILDI"
+
+#. pause.leave
+msgid "pause.leave"
+msgstr "Çık"
+
+#. leave.title
+msgid "leave.title"
+msgstr "SEVİYEDEN ÇIKIŞ"
+
+#. leave.you_will_lose
+msgid "leave.you_will_lose"
+msgstr "Kaybedeceklerin:"
+
+#. leave.confirm
+msgid "leave.confirm"
+msgstr "Çık"
+
+#. timeup.title
+msgid "timeup.title"
+msgstr "SÜRE DOLDU"
+
+#. timeup.offer
+msgid "timeup.offer"
+msgstr "Bir dakika ekle ve sıralamaya devam et!"
+
+#. timeup.used
+msgid "timeup.used"
+msgstr "Kullanıldı"
+
+#. ability_purchase.title
+msgid "ability_purchase.title"
+msgstr "GÜÇLENDİRİCİ KULLAN"
+
+#. shelf_unlock.title
+msgid "shelf_unlock.title"
+msgstr "RAFIN KİLİDİNİ AÇ"
+
+#. shelf_unlock.offer
+msgid "shelf_unlock.offer"
+msgstr "Bu rafın kilidini hemen açmak için bir reklam izle."
+
+#. shelf_unlock.offer_or_clear
+msgid "shelf_unlock.offer_or_clear"
+msgid_plural "shelf_unlock.offer_or_clear.plural"
+msgstr[0] "Bu rafın kilidini hemen açmak için bir reklam izle ya da %s üçlü daha temizle."
+msgstr[1] "Bu rafın kilidini hemen açmak için bir reklam izle ya da %s üçlü daha temizle."
+
+#. shelf_unlock.button
+msgid "shelf_unlock.button"
+msgstr "Reklam İzle · Rafı Aç"
+
+#. shelf_unlock.ad_unavailable
+msgid "shelf_unlock.ad_unavailable"
+msgstr "Reklam kullanılamıyor. Bu raf kilitli kalacak."
+
+#. complete.title
+msgid "complete.title"
+msgstr "TEBRİKLER!"
+
+#. failed.title
+msgid "failed.title"
+msgstr "SEVİYE %d"
+
+#. failed.headline
+msgid "failed.headline"
+msgstr "SEVİYE GEÇİLEMEDİ"
+
+#. failed.retry
+msgid "failed.retry"
+msgstr "Tekrar Oyna"
+
+#. combo.praise.2
+msgid "combo.praise.2"
+msgstr "Güzel"
+
+#. combo.praise.3
+msgid "combo.praise.3"
+msgstr "Harika"
+
+#. combo.praise.4
+msgid "combo.praise.4"
+msgstr "Süper"
+
+#. combo.praise.5
+msgid "combo.praise.5"
+msgstr "Müthiş"
+
+#. combo.praise.6
+msgid "combo.praise.6"
+msgstr "Muhteşem"
+
+#. combo.praise.7
+msgid "combo.praise.7"
+msgstr "İnanılmaz"
+
+#. combo.praise.8
+msgid "combo.praise.8"
+msgstr "Göz Kamaştırıcı"
+
+#. combo.praise.9
+msgid "combo.praise.9"
+msgstr "Durdurulamaz"
+
+#. combo.praise.10
+msgid "combo.praise.10"
+msgstr "Efsanevi"
+
+#. combo.praise.11
+msgid "combo.praise.11"
+msgstr "Destansı"
+
+#. combo.praise.12
+msgid "combo.praise.12"
+msgstr "Dahice"
+
+#. combo.praise.13
+msgid "combo.praise.13"
+msgstr "Ustaca"
+
+#. combo.praise.14
+msgid "combo.praise.14"
+msgstr "Rakipsiz"
+
+#. combo.praise.15
+msgid "combo.praise.15"
+msgstr "Olağanüstü"
+
+#. combo.praise.16
+msgid "combo.praise.16"
+msgstr "Efsane Ötesi"
+
+#. combo.praise.17
+msgid "combo.praise.17"
+msgstr "Görkemli"
+
+#. combo.praise.18
+msgid "combo.praise.18"
+msgstr "Işıl Işıl"
+
+#. combo.praise.19
+msgid "combo.praise.19"
+msgstr "Kusursuz"
+
+#. combo.praise.20
+msgid "combo.praise.20"
+msgstr "Sınırların Ötesinde"
+
+#. ability.hammer.name
+msgid "ability.hammer.name"
+msgstr "Çekiç"
+
+#. ability.shuffle.name
+msgid "ability.shuffle.name"
+msgstr "Karıştır"
+
+#. ability.lantern.name
+msgid "ability.lantern.name"
+msgstr "Fener"
+
+#. ability.freezer.name
+msgid "ability.freezer.name"
+msgstr "Dondurucu"
+
+#. ability.hammer.description
+msgid "ability.hammer.description"
+msgstr "Raflardaki eşleşen bir ürün üçlüsünü anında temizler."
+
+#. ability.shuffle.description
+msgid "ability.shuffle.description"
+msgstr "Eşleşme bulmana yardımcı olmak için raflardaki ürünlerin yerlerini değiştirir."
+
+#. ability.lantern.description
+msgid "ability.lantern.description"
+msgstr "Temizleyebileceğin eşleşen bir üçlüyü 15 saniye boyunca vurgular."
+
+#. ability.freezer.description
+msgid "ability.freezer.description"
+msgstr "Seviye süresini 30 saniye boyunca dondurur."
+
+#. ad.watch
+msgid "ad.watch"
+msgstr "Reklam İzle"
+
+#. ad.loading
+msgid "ad.loading"
+msgstr "Yükleniyor..."
+
+#. ad.verifying
+msgid "ad.verifying"
+msgstr "Doğrulanıyor..."
+
+#. ad.verify_reward
+msgid "ad.verify_reward"
+msgstr "Ödülü Doğrula"
+
+#. ad.reward_pending
+msgid "ad.reward_pending"
+msgstr "Ödül doğrulaması hâlâ beklemede."
+
+#. ad.unavailable_retry
+msgid "ad.unavailable_retry"
+msgstr "Reklam kullanılamıyor. Lütfen tekrar dene."
+
+#. ad.watch_unavailable
+msgid "ad.watch_unavailable"
+msgstr "Reklam İzle\nKullanılamıyor"
+
+#. ad.watch_coming_soon
+msgid "ad.watch_coming_soon"
+msgstr "Reklam İzle\nYakında"
+
+#. ad.badge
+msgid "ad.badge"
+msgstr "AD"
+
+#. lives.title.out
+msgid "lives.title.out"
+msgstr "CAN KALMADI"
+
+#. lives.title.get_more
+msgid "lives.title.get_more"
+msgstr "DAHA FAZLA CAN AL"
+
+#. lives.title.full
+msgid "lives.title.full"
+msgstr "CANLAR DOLU"
+
+#. lives.next_in
+msgid "lives.next_in"
+msgstr "YENİ CANA KALAN SÜRE"
+
+#. lives.full_body
+msgid "lives.full_body"
+msgstr "Canların dolu! Onları kullanmak için bir seviye oyna."
+
+#. chest.title
+msgid "chest.title"
+msgstr "SANDIK ÖDÜLLERİ"
+
+#. chest.progress_hint
+msgid "chest.progress_hint"
+msgstr "Sandığın kilidini açmak ve ödülünü almak için yıldız topla"
+
+#. chest.ready
+msgid "chest.ready"
+msgstr "ÖDÜL SANDIĞIN HAZIR!"
+
+#. chest.tap_to_open
+msgid "chest.tap_to_open"
+msgstr "Açmak için dokun"
+
+#. purchase.tap_to_collect
+msgid "purchase.tap_to_collect"
+msgstr "Almak için dokun"
+
+#. purchase.complete
+msgid "purchase.complete"
+msgstr "SATIN ALMA TAMAMLANDI"
+
+#. shop.title
+msgid "shop.title"
+msgstr "MAĞAZA"
+
+#. shop.section.bundles
+msgid "shop.section.bundles"
+msgstr "ÖZEL PAKETLER"
+
+#. shop.section.coins
+msgid "shop.section.coins"
+msgstr "PARA"
+
+#. shop.offer.starter_bundle
+msgid "shop.offer.starter_bundle"
+msgstr "Başlangıç Paketi"
+
+#. shop.offer.basic_bundle
+msgid "shop.offer.basic_bundle"
+msgstr "Temel Paket"
+
+#. shop.tag.best_value
+msgid "shop.tag.best_value"
+msgstr "EN AVANTAJLI"
+
+#. shop.discount_off
+msgid "shop.discount_off"
+msgstr "OFF"
+
+#. shop.ability_hint
+msgid "shop.ability_hint"
+msgstr "Ne yaptığını görmek için güçlendiriciye dokun"
+
+#. shop.purchasing
+msgid "shop.purchasing"
+msgstr "Satın alınıyor…"
+
+#. shop.no_offers
+msgid "shop.no_offers"
+msgstr "Bu bölge için mağaza teklifi bulunmuyor."
+
+#. shop.load_failed
+msgid "shop.load_failed"
+msgstr "Mağaza yüklenemedi."
+
+#. shop.error.title.purchase
+msgid "shop.error.title.purchase"
+msgstr "Satın alma yapılamıyor"
+
+#. shop.error.title.reward
+msgid "shop.error.title.reward"
+msgstr "Ödül hatası"
+
+#. shop.error.purchase_failed
+msgid "shop.error.purchase_failed"
+msgstr "Satın alma tamamlanamadı."
+
+#. shop.error.grant_failed
+msgid "shop.error.grant_failed"
+msgstr "Satın alınan ödüller verilemedi."
+
+#. shop.error.offer_unavailable
+msgid "shop.error.offer_unavailable"
+msgstr "Bu mağaza teklifi mevcut değil."
+
+#. shop.error.already_bought
+msgid "shop.error.already_bought"
+msgstr "Bu tek seferlik mağaza teklifi zaten satın alındı."
+
+#. starter.title
+msgid "starter.title"
+msgstr "BAŞLANGIÇ PAKETİ"
+
+#. starter.one_time
+msgid "starter.one_time"
+msgstr "TEK SEFERLİK TEKLİF"
+
+#. starter.boosters_included
+msgid "starter.boosters_included"
+msgstr "GÜÇLENDİRİCİLER DAHİL"
+
+#. starter.coins
+msgid "starter.coins"
+msgid_plural "starter.coins.plural"
+msgstr[0] "%s PARA"
+msgstr[1] "%s PARA"
+
+#. starter.buy_for
+msgid "starter.buy_for"
+msgstr "%s karşılığında al"
+
+#. starter.checking
+msgid "starter.checking"
+msgstr "Teklif kontrol ediliyor…"
+
+#. starter.checking_short
+msgid "starter.checking_short"
+msgstr "Kontrol ediliyor…"
+
+#. starter.no_longer_available
+msgid "starter.no_longer_available"
+msgstr "Bu teklif artık mevcut değil."
+
+#. starter.unavailable
+msgid "starter.unavailable"
+msgstr "Mevcut Değil"
+
+#. booster_chip.claimed
+msgid "booster_chip.claimed"
+msgstr "+%d %s"
+
+#. profile.title
+msgid "profile.title"
+msgstr "PROFİLİ DÜZENLE"
+
+#. profile.name_header
+msgid "profile.name_header"
+msgstr "OYUNCU ADI"
+
+#. profile.name_placeholder
+msgid "profile.name_placeholder"
+msgstr "Oyuncu adı"
+
+#. profile.edit_name_tooltip
+msgid "profile.edit_name_tooltip"
+msgstr "Oyuncu adını düzenle"
+
+#. profile.avatar_tab
+msgid "profile.avatar_tab"
+msgstr "AVATAR"
+
+#. profile.frame_tab
+msgid "profile.frame_tab"
+msgstr "ÇERÇEVE"
+
+#. profile.unlock.level
+msgid "profile.unlock.level"
+msgstr "Kilidi açmak için %d. seviyeyi tamamla"
+
+#. profile.unlock.combo
+msgid "profile.unlock.combo"
+msgstr "Kilidi açmak için herhangi bir denemede ×%d kombo yap"
+
+#. profile.unlock.weekly_first
+msgid "profile.unlock.weekly_first"
+msgstr "Kilidi açmak için haftalık sıralamayı 1. sırada bitir"
+
+#. profile.unlock.weekly_top
+msgid "profile.unlock.weekly_top"
+msgstr "Kilidi açmak için haftalık sıralamayı ilk %d oyuncu arasında bitir"
+
+#. leaderboard.title
+msgid "leaderboard.title"
+msgstr "SIRALAMA"
+
+#. leaderboard.tab.weekly
+msgid "leaderboard.tab.weekly"
+msgstr "Haftalık"
+
+#. leaderboard.tab.country
+msgid "leaderboard.tab.country"
+msgstr "Ülke"
+
+#. leaderboard.tab.world
+msgid "leaderboard.tab.world"
+msgstr "Dünya"
+
+#. leaderboard.weekly_reset
+msgid "leaderboard.weekly_reset"
+msgstr "Haftalık sıfırlamaya %s kaldı"
+
+#. leaderboard.duration.dh
+msgid "leaderboard.duration.dh"
+msgstr "%dg %dsa"
+
+#. leaderboard.duration.hm
+msgid "leaderboard.duration.hm"
+msgstr "%dsa %ddk"
+
+#. leaderboard.duration.m
+msgid "leaderboard.duration.m"
+msgstr "%ddk"
+
+#. leaderboard.country_caption
+msgid "leaderboard.country_caption"
+msgstr "Ülke · Toplam yıldız"
+
+#. leaderboard.world_caption
+msgid "leaderboard.world_caption"
+msgstr "Dünya · Toplam yıldız"
+
+#. leaderboard.load_failed
+msgid "leaderboard.load_failed"
+msgstr "Sıralama yüklenemedi."
+
+#. leaderboard.default_name
+msgid "leaderboard.default_name"
+msgstr "Oyuncu"
+
+#. leaderboard.row_tooltip
+msgid "leaderboard.row_tooltip"
+msgid_plural "leaderboard.row_tooltip.plural"
+msgstr[0] "Sıra %d, %s, %d yıldız"
+msgstr[1] "Sıra %d, %s, %d yıldız"
+
+#. leaderboard.reward_tooltip
+msgid "leaderboard.reward_tooltip"
+msgid_plural "leaderboard.reward_tooltip.plural"
+msgstr[0] "Haftalık ödül: %s para"
+msgstr[1] "Haftalık ödül: %s para"
+
+#. leaderboard.reward.title
+msgid "leaderboard.reward.title"
+msgstr "HAFTALIK ÖDÜL!"
+
+#. leaderboard.reward.body
+msgid "leaderboard.reward.body"
+msgid_plural "leaderboard.reward.body.plural"
+msgstr[0] "Geçen haftayı %d. sırada bitirip %d para kazandın!"
+msgstr[1] "Geçen haftayı %d. sırada bitirip %d para kazandın!"
+
+#. leaderboard.reward.ok
+msgid "leaderboard.reward.ok"
+msgstr "Süper!"
+
+#. settings.title
+msgid "settings.title"
+msgstr "AYARLAR"
+
+#. settings.music
+msgid "settings.music"
+msgstr "Müzik"
+
+#. settings.sfx
+msgid "settings.sfx"
+msgstr "Sesler"
+
+#. settings.vibrate
+msgid "settings.vibrate"
+msgstr "Titreşim"
+
+#. settings.support
+msgid "settings.support"
+msgstr "Destek"
+
+#. settings.language
+msgid "settings.language"
+msgstr "Dil"
+
+#. settings.privacy_policy
+msgid "settings.privacy_policy"
+msgstr "Gizlilik Politikası"
+
+#. settings.privacy_choices
+msgid "settings.privacy_choices"
+msgstr "Gizlilik Tercihleri"
+
+#. settings.diagnostics
+msgid "settings.diagnostics"
+msgstr "Sürüm %s • Derleme %d\nPlatform: %s • Kullanıcı: %s"
+
+#. language.title
+msgid "language.title"
+msgstr "DİL"
+
+#. support.title
+msgid "support.title"
+msgstr "DESTEK"
+
+#. support.faq_header
+msgid "support.faq_header"
+msgstr "Sıkça Sorulan Sorular"
+
+#. support.faq.play.q
+msgid "support.faq.play.q"
+msgstr "Nasıl oynarım?"
+
+#. support.faq.play.a
+msgid "support.faq.play.a"
+msgstr "Eşleşen ürünleri aynı rafa taşı. Aynı rafta üç özdeş ürün bir araya geldiğinde temizlenir. Süre dolmadan tüm ürünleri temizle."
+
+#. support.faq.contact.q
+msgid "support.faq.contact.q"
+msgstr "Destekle nasıl iletişime geçerim?"
+
+#. support.faq.contact.a
+msgid "support.faq.contact.a"
+msgstr "Bize ulaşmak için %s adresine e-posta gönder. Kısa bir açıklama, cihazının platformunu ve sorunun ne zaman yaşandığını belirt."
+
+#. support.faq.contact.action
+msgid "support.faq.contact.action"
+msgstr "Desteğe Yaz"
+
+#. support.faq.crash.q
+msgid "support.faq.crash.q"
+msgstr "Oyun donarsa veya çökerse ne yapmalıyım?"
+
+#. support.faq.crash.a
+msgid "support.faq.crash.a"
+msgstr "Önce oyunu kapatıp yeniden aç. Sorun tekrarlanırsa cihazını yeniden başlat ve oyunun güncel olduğundan emin ol. Cihaz modelini, platform sürümünü ve sorun ortaya çıkmadan önce ne yaptığını belirterek destekle iletişime geç."
+
+#. support.faq.sync.q
+msgid "support.faq.sync.q"
+msgstr "İlerlememi cihazlar arasında nasıl senkronize ederim?"
+
+#. support.faq.sync.a
+msgid "support.faq.sync.a"
+msgstr "Her iki cihazda da aynı platform hesabında oturum aç ve oynamadan önce senkronizasyonun tamamlanmasını bekle. İlerleme farklıysa iki cihazda birden oynamaktan kaçın ve destekle iletişime geç."
+
+#. support.faq.bad_ad.q
+msgid "support.faq.bad_ad.q"
+msgstr "Uygunsuz bir reklamı nasıl bildiririm?"
+
+#. support.faq.bad_ad.a
+msgid "support.faq.bad_ad.a"
+msgstr "1. Güvenli bir şekilde yapabiliyorsan reklamı kapat.\n2. Reklamın ve gösterilen reklamveren veya uygulama adının ekran görüntüsünü al.\n3. Yaklaşık zamanı ve reklamın oyunda nerede göründüğünü not et.\n4. Reklamın neden rahatsız edici, yanıltıcı veya dolandırıcılık amaçlı göründüğünü açıkla.\n5. Bu bilgileri %s adresine e-posta ile gönder. Şifre veya ödeme bilgisi ekleme."
+
+#. support.faq.bad_ad.action
+msgid "support.faq.bad_ad.action"
+msgstr "Reklamı Bildir"
+
+#. support.account_header
+msgid "support.account_header"
+msgstr "Hesap"
+
+#. support.delete_account
+msgid "support.delete_account"
+msgstr "Hesabı Sil"
+
+#. support.delete_game_data
+msgid "support.delete_game_data"
+msgstr "Oyun Verilerini Sil"
+
+#. support.no_secrets
+msgid "support.no_secrets"
+msgstr "Lütfen asla şifre veya ödeme bilgisi gönderme."
+
+#. deletion.title.delete_account
+msgid "deletion.title.delete_account"
+msgstr "HESABI SİL"
+
+#. deletion.title.delete_game_data
+msgid "deletion.title.delete_game_data"
+msgstr "OYUN VERİLERİNİ SİL"
+
+#. deletion.title.not_confirmed
+msgid "deletion.title.not_confirmed"
+msgstr "DOĞRULANMADI"
+
+#. deletion.title.status_unconfirmed
+msgid "deletion.title.status_unconfirmed"
+msgstr "DURUM DOĞRULANMADI"
+
+#. deletion.title.finishing_up
+msgid "deletion.title.finishing_up"
+msgstr "TAMAMLANIYOR"
+
+#. deletion.title.new_game
+msgid "deletion.title.new_game"
+msgstr "YENİ OYUN"
+
+#. deletion.title.status_unknown
+msgid "deletion.title.status_unknown"
+msgstr "DURUM BİLİNMİYOR"
+
+#. deletion.title.not_deleted
+msgid "deletion.title.not_deleted"
+msgstr "SİLİNMEDİ"
+
+#. deletion.title.data_deleted
+msgid "deletion.title.data_deleted"
+msgstr "VERİLER SİLİNDİ"
+
+#. deletion.title.accepted
+msgid "deletion.title.accepted"
+msgstr "SİLME İSTEĞİ KABUL EDİLDİ"
+
+#. deletion.confirm.headline
+msgid "deletion.confirm.headline"
+msgstr "Bu işlem hesabını kalıcı olarak siler."
+
+#. deletion.confirm.body
+msgid "deletion.confirm.body"
+msgstr "İlerlemen, paran, ürünlerin ve profilin silinecek. Bu işlemi geri alamazsın.\n\nDaha sonra yeniden oturum açarsan yeni bir hesapla başlayacaksın.\n\nBazı satın alma ve güvenlik kayıtları, adınla veya profilinle ilişkilendirilmeden saklanır. Diğer veriler 30 gün içinde silinir."
+
+#. deletion.confirm.button
+msgid "deletion.confirm.button"
+msgstr "Hesabı Sil"
+
+#. deletion.local_confirm.headline
+msgid "deletion.local_confirm.headline"
+msgstr "Bu işlem bu cihazdaki oyun verilerini siler."
+
+#. deletion.local_confirm.body
+msgid "deletion.local_confirm.body"
+msgstr "İlerlemen, paran, ürünlerin ve profilin silinecek. Bu işlemi geri alamazsın.\n\nBu oyun senin için hiç çevrimiçi hesap oluşturmadı, bu yüzden sunucularımızdan silinecek bir şey yok."
+
+#. deletion.local_confirm.button
+msgid "deletion.local_confirm.button"
+msgstr "Verileri Sil"
+
+#. deletion.pending_setup.headline
+msgid "deletion.pending_setup.headline"
+msgstr "Hesabın hâlâ oluşturuluyor."
+
+#. deletion.pending_setup.body
+msgid "deletion.pending_setup.body"
+msgstr "İnternete bağlan ve biraz sonra tekrar dene. Hiçbir şey silinmedi."
+
+#. deletion.sign_in.headline
+msgid "deletion.sign_in.headline"
+msgstr "Silmek istediğin hesapta oturum aç."
+
+#. deletion.sign_in.body
+msgid "deletion.sign_in.body"
+msgstr "Oturum açamıyorsan yardım almak için destekle iletişime geç."
+
+#. deletion.read_failed.headline
+msgid "deletion.read_failed.headline"
+msgstr "Oyun verilerin okunamadı."
+
+#. deletion.read_failed.body
+msgid "deletion.read_failed.body"
+msgstr "Oyunu yeniden başlat, ardından tekrar dene. Hiçbir şey silinmedi."
+
+#. deletion.unavailable.headline
+msgid "deletion.unavailable.headline"
+msgstr "Oyunun bu sürümünde hesap silme özelliği kullanılamıyor."
+
+#. deletion.unavailable.body
+msgid "deletion.unavailable.body"
+msgstr "Oyunu güncelle veya hesabını silmek için destekten yardım al. Hiçbir şey silinmedi."
+
+#. deletion.in_progress.account
+msgid "deletion.in_progress.account"
+msgstr "Hesabın siliniyor..."
+
+#. deletion.in_progress.local
+msgid "deletion.in_progress.local"
+msgstr "Oyun verilerin siliniyor..."
+
+#. deletion.in_progress.body
+msgid "deletion.in_progress.body"
+msgstr "Oyunu açık tut. Bu işlem yalnızca kısa bir süre alır."
+
+#. deletion.not_confirmed.headline
+msgid "deletion.not_confirmed.headline"
+msgstr "Silme isteğinle ilgili henüz yanıt almadık."
+
+#. deletion.not_confirmed.body
+msgid "deletion.not_confirmed.body"
+msgstr "İsteğin gönderildi, ancak yanıt ulaşmadı. İnternete bağlan ve tekrar dene. Sonucu öğrenene kadar oyun kilitli kalacak."
+
+#. deletion.unconfirmed.headline
+msgid "deletion.unconfirmed.headline"
+msgstr "Silme durumu doğrulanmadı"
+
+#. deletion.unconfirmed.body
+msgid "deletion.unconfirmed.body"
+msgstr "Hesabının silinip silinmediğini doğrulayamadık. Verilerini güvende tutmak için oyun kilitli kalacak. Destekle iletişime geç ve aşağıdaki referansı belirt."
+
+#. deletion.check_again
+msgid "deletion.check_again"
+msgstr "Tekrar Kontrol Et"
+
+#. deletion.cleanup.headline.local
+msgid "deletion.cleanup.headline.local"
+msgstr "Yerel oyun verilerin henüz tamamen silinemedi."
+
+#. deletion.cleanup.headline.account
+msgid "deletion.cleanup.headline.account"
+msgstr "Hesap silme isteği kabul edildi; son işlemler tamamlanıyor."
+
+#. deletion.cleanup.body
+msgid "deletion.cleanup.body"
+msgstr "Bazı oyun verileri henüz bu cihazdan silinemedi. Tamamlamak için tekrar dene."
+
+#. deletion.new_game.headline
+msgid "deletion.new_game.headline"
+msgstr "Yeni oyun başlatılıyor..."
+
+#. deletion.new_game.body
+msgid "deletion.new_game.body"
+msgstr "Bu işlem yalnızca kısa bir süre alır."
+
+#. deletion.status_unknown.headline
+msgid "deletion.status_unknown.headline"
+msgstr "Bu cihazdaki silme durumunu okuyamadık."
+
+#. deletion.status_unknown.body
+msgid "deletion.status_unknown.body"
+msgstr "Verilerini güvende tutmak için oyun kilitli kalacak. Yardım almak için destekle iletişime geç."
+
+#. deletion.fail.offline
+msgid "deletion.fail.offline"
+msgstr "Hesabını silmek için internete bağlan."
+
+#. deletion.fail.rate_limited
+msgid "deletion.fail.rate_limited"
+msgstr "Çok fazla deneme yapıldı. Biraz bekle, ardından tekrar dene."
+
+#. deletion.fail.busy
+msgid "deletion.fail.busy"
+msgstr "Hesap silme sistemi şu anda yoğun. Biraz sonra tekrar dene."
+
+#. deletion.fail.syncing
+msgid "deletion.fail.syncing"
+msgstr "Oyun hâlâ senkronize ediliyor. Biraz sonra tekrar dene."
+
+#. deletion.fail.auth
+msgid "deletion.fail.auth"
+msgstr "Hesabını doğrulayamadık. Oyunu yeniden başlat, ardından tekrar dene."
+
+#. deletion.fail.update
+msgid "deletion.fail.update"
+msgstr "Hesabını silmek için oyunu güncelle."
+
+#. deletion.fail.changed
+msgid "deletion.fail.changed"
+msgstr "Silme işlemi sırasında hesabın değişti. Tekrar dene."
+
+#. deletion.fail.storage
+msgid "deletion.fail.storage"
+msgstr "Cihazın silme isteğini kaydedemedi. Tekrar dene."
+
+#. deletion.fail.generic
+msgid "deletion.fail.generic"
+msgstr "Hesabını silemedik. Daha sonra tekrar dene veya destekle iletişime geç."
+
+#. deletion.fail.local
+msgid "deletion.fail.local"
+msgstr "Oyun verilerin silinemedi. Tekrar dene."
+
+#. deletion.fail.body
+msgid "deletion.fail.body"
+msgstr "Hiçbir şey silinmedi ve oynamaya devam edebilirsin."
+
+#. deletion.done_local.headline
+msgid "deletion.done_local.headline"
+msgstr "Yerel oyun verilerin silindi."
+
+#. deletion.done_local.body
+msgid "deletion.done_local.body"
+msgstr "Yeni bir oyunla baştan başlayabilirsin."
+
+#. deletion.new_game_failed
+msgid "deletion.new_game_failed"
+msgstr "Yeni oyun başlatılamadı. Tekrar dene."
+
+#. deletion.accepted.headline
+msgid "deletion.accepted.headline"
+msgstr "Hesabına artık erişilemiyor."
+
+#. deletion.accepted.body
+msgid "deletion.accepted.body"
+msgstr "Silme isteğin kabul edildi."
+
+#. deletion.accepted.body_deadline
+msgid "deletion.accepted.body_deadline"
+msgstr "Silme isteğin kabul edildi. Verilerin silinmesi için son tarih: %s."
+
+#. deletion.reference
+msgid "deletion.reference"
+msgstr "Referans: %s"
+
+#. deletion.start_new_game
+msgid "deletion.start_new_game"
+msgstr "Yeni Oyun Başlat"
+
+#. app.name
+msgid "app.name"
+msgstr "SortingPuzzle"
+
+#. support.email.subject
+msgid "support.email.subject"
+msgstr "Sorting Puzzle destek talebi"
+
+#. support.email.body
+msgid "support.email.body"
+msgstr "Lütfen sorunu burada açıkla.\n\nCihaz/platform:\nYaklaşık zaman:\n"
+
+#. support.ad_email.subject
+msgid "support.ad_email.subject"
+msgstr "Sorting Puzzle reklam bildirimi"
+
+#. support.ad_email.body
+msgid "support.ad_email.body"
+msgstr "Lütfen bir ekran görüntüsü ekle ve aşağıdaki bilgileri doldur.\n\nYaklaşık zaman:\nReklamın oyundaki yeri:\nReklamveren veya uygulama adı:\nReklamın neden incelenmesi gerektiği:\n"
+
+#. deletion.email.subject
+msgid "deletion.email.subject"
+msgstr "Sorting Puzzle hesap silme talebi"
+
+#. deletion.email.body
+msgid "deletion.email.body"
+msgstr "Lütfen hesabımı silme konusunda bana yardımcı olun."
+
+#. support.email.status
+msgid "support.email.status"
+msgstr "Durum: %s"
+
+#. support.email.deletion_reference
+msgid "support.email.deletion_reference"
+msgstr "Silme referansı"
+
+#. support.email.server_reference
+msgid "support.email.server_reference"
+msgstr "Sunucu referansı"
+
+#. support.email.player_id
+msgid "support.email.player_id"
+msgstr "Oyuncu kimliği"
+
+#. leaderboard.empty
+msgid "leaderboard.empty"
+msgstr "Henüz puan yok"
+
+#. date.month.1
+msgid "date.month.1"
+msgstr "Ocak"
+
+#. date.month.2
+msgid "date.month.2"
+msgstr "Şubat"
+
+#. date.month.3
+msgid "date.month.3"
+msgstr "Mart"
+
+#. date.month.4
+msgid "date.month.4"
+msgstr "Nisan"
+
+#. date.month.5
+msgid "date.month.5"
+msgstr "Mayıs"
+
+#. date.month.6
+msgid "date.month.6"
+msgstr "Haziran"
+
+#. date.month.7
+msgid "date.month.7"
+msgstr "Temmuz"
+
+#. date.month.8
+msgid "date.month.8"
+msgstr "Ağustos"
+
+#. date.month.9
+msgid "date.month.9"
+msgstr "Eylül"
+
+#. date.month.10
+msgid "date.month.10"
+msgstr "Ekim"
+
+#. date.month.11
+msgid "date.month.11"
+msgstr "Kasım"
+
+#. date.month.12
+msgid "date.month.12"
+msgstr "Aralık"
+
+#. common.play
+msgid "Play"
+msgstr "Oyna"
+
+#. common.continue
+msgid "Continue"
+msgstr "Devam Et"
+
+#. common.try_again
+msgid "Try Again"
+msgstr "Tekrar Dene"
+
+#. common.close
+msgid "Close"
+msgstr "Kapat"
+
+#. common.cancel
+msgid "Cancel"
+msgstr "İptal"
+
+#. common.got_it
+msgid "Got it"
+msgstr "Anladım"
+
+#. common.get_help
+msgid "Get Help"
+msgstr "Yardım Al"
+
+#. common.save
+msgid "SAVE"
+msgstr "KAYDET"
+
+#. common.loading
+msgid "Loading…"
+msgstr "Yükleniyor…"
+
+#. menu.level_button
+msgid "LEVEL %d"
+msgstr "SEVİYE %d"
+
+#. menu.more_levels_coming_soon
+msgid "MORE LEVELS COMING SOON"
+msgstr "YENİ SEVİYELER YAKINDA"
+
+#. menu.coming_soon
+msgid "COMING SOON"
+msgstr "YAKINDA"
+
+#. menu.lives_full
+msgid "Full"
+msgstr "Dolu"
+
+#. menu.starter_badge
+msgid "BUNDLE"
+msgstr "PAKET"
+
+#. nav.shop
+msgid "Shop"
+msgstr "Mağaza"
+
+#. nav.home
+msgid "Home"
+msgstr "Ana Sayfa"
+
+#. nav.leaderboard
+msgid "Leaderboard"
+msgstr "Sıralama"
+
+#. chapter.button
+msgid "CHAPTER %d"
+msgstr "BÖLÜM %d"
+
+#. chapter.button_tooltip
+msgid "Choose Chapter %d: %s"
+msgstr "%d. bölümü seç: %s"
+
+#. chapter.screen_title
+msgid "CHAPTERS"
+msgstr "BÖLÜMLER"
+
+#. chapter.title.chapter_01
+msgid "Grocery Town"
+msgstr "Market Kasabası"
+
+#. chapter.title.chapter_02
+msgid "Candy Corner"
+msgstr "Şeker Köşesi"
+
+#. chapter.locked_status
+msgid "Complete %d more %s levels to unlock"
+msgstr "Kilidi açmak için %d “%s” seviyesi daha tamamla"
+
+#. chapter.unlock_progress
+msgid "Unlock progress"
+msgstr "Kilidi açma ilerlemesi"
+
+#. chapter.current_progress
+msgid "Current progress"
+msgstr "Mevcut ilerleme"
+
+#. chapter.locked
+msgid "Locked"
+msgstr "Kilitli"
+
+#. chapter.no_levels_status
+msgid "New levels are coming soon"
+msgstr "Yeni seviyeler yakında geliyor"
+
+#. chapter.coming_soon
+msgid "Coming Soon"
+msgstr "Yakında"
+
+#. hud.combo
+msgid "COMBO ×%d"
+msgstr "KOMBO ×%d"
+
+#. hud.ability_tooltip.hammer
+msgid "Hammer -- clears a matching triple"
+msgstr "Çekiç -- eşleşen bir üçlüyü temizler"
+
+#. hud.ability_tooltip.shuffle
+msgid "Shuffle -- reshuffles unlocked items"
+msgstr "Karıştır -- kilidi açık ürünlerin yerlerini değiştirir"
+
+#. hud.ability_tooltip.lantern
+msgid "Lantern -- highlights a matchable triple"
+msgstr "Fener -- eşleştirilebilen bir üçlüyü vurgular"
+
+#. hud.ability_tooltip.freezer
+msgid "Freezer -- pauses the countdown timer"
+msgstr "Dondurucu -- geri sayımı duraklatır"
+
+#. hud.seconds_short
+msgid "%ds"
+msgstr "%d sn"
+
+#. tip.tap_dispenser
+msgid "Tap a dispenser to throw items onto the shelves!"
+msgstr "Ürünleri raflara atmak için dağıtıcıya dokun!"
+
+#. pause.title
+msgid "PAUSE"
+msgstr "DURAKLATILDI"
+
+#. pause.leave
+msgid "Leave"
+msgstr "Çık"
+
+#. leave.title
+msgid "LEAVING THE LEVEL"
+msgstr "SEVİYEDEN ÇIKIŞ"
+
+#. leave.you_will_lose
+msgid "You will lose:"
+msgstr "Kaybedeceklerin:"
+
+#. timeup.title
+msgid "TIME'S UP"
+msgstr "SÜRE DOLDU"
+
+#. timeup.offer
+msgid "Add one minute and keep sorting!"
+msgstr "Bir dakika ekle ve sıralamaya devam et!"
+
+#. timeup.used
+msgid "Used"
+msgstr "Kullanıldı"
+
+#. ability_purchase.title
+msgid "USE ABILITY"
+msgstr "GÜÇLENDİRİCİ KULLAN"
+
+#. shelf_unlock.title
+msgid "UNLOCK SHELF"
+msgstr "RAFIN KİLİDİNİ AÇ"
+
+#. shelf_unlock.offer
+msgid "Watch one ad to unlock this shelf now."
+msgstr "Bu rafın kilidini hemen açmak için bir reklam izle."
+
+#. shelf_unlock.offer_or_clear
+msgid "Watch one ad to unlock this shelf now, or clear %s more."
+msgstr "Bu rafın kilidini hemen açmak için bir reklam izle ya da %s üçlü daha temizle."
+
+#. shelf_unlock.button
+msgid "Watch Ad · Unlock Shelf"
+msgstr "Reklam İzle · Rafı Aç"
+
+#. shelf_unlock.ad_unavailable
+msgid "Ad unavailable. This shelf stays locked."
+msgstr "Reklam kullanılamıyor. Bu raf kilitli kalacak."
+
+#. complete.title
+msgid "GREAT JOB!"
+msgstr "TEBRİKLER!"
+
+#. failed.headline
+msgid "LEVEL FAILED"
+msgstr "SEVİYE GEÇİLEMEDİ"
+
+#. failed.retry
+msgid "Retry"
+msgstr "Tekrar Oyna"
+
+#. combo.praise.2
+msgid "Cool"
+msgstr "Güzel"
+
+#. combo.praise.3
+msgid "Great"
+msgstr "Harika"
+
+#. combo.praise.4
+msgid "Awesome"
+msgstr "Süper"
+
+#. combo.praise.5
+msgid "Amazing"
+msgstr "Müthiş"
+
+#. combo.praise.6
+msgid "Fantastic"
+msgstr "Muhteşem"
+
+#. combo.praise.7
+msgid "Incredible"
+msgstr "İnanılmaz"
+
+#. combo.praise.8
+msgid "Spectacular"
+msgstr "Göz Kamaştırıcı"
+
+#. combo.praise.9
+msgid "Unstoppable"
+msgstr "Durdurulamaz"
+
+#. combo.praise.10
+msgid "Legendary"
+msgstr "Efsanevi"
+
+#. combo.praise.11
+msgid "Epic"
+msgstr "Destansı"
+
+#. combo.praise.12
+msgid "Brilliant"
+msgstr "Dahice"
+
+#. combo.praise.13
+msgid "Masterful"
+msgstr "Ustaca"
+
+#. combo.praise.14
+msgid "Supreme"
+msgstr "Rakipsiz"
+
+#. combo.praise.15
+msgid "Phenomenal"
+msgstr "Olağanüstü"
+
+#. combo.praise.16
+msgid "Mythic"
+msgstr "Efsane Ötesi"
+
+#. combo.praise.17
+msgid "Majestic"
+msgstr "Görkemli"
+
+#. combo.praise.18
+msgid "Radiant"
+msgstr "Işıl Işıl"
+
+#. combo.praise.19
+msgid "Divine"
+msgstr "Kusursuz"
+
+#. combo.praise.20
+msgid "Transcendent"
+msgstr "Sınırların Ötesinde"
+
+#. ability.hammer.name
+msgid "Hammer"
+msgstr "Çekiç"
+
+#. ability.shuffle.name
+msgid "Shuffle"
+msgstr "Karıştır"
+
+#. ability.lantern.name
+msgid "Lantern"
+msgstr "Fener"
+
+#. ability.freezer.name
+msgid "Freezer"
+msgstr "Dondurucu"
+
+#. ability.hammer.description
+msgid "Instantly clears one matching set of items off the shelves."
+msgstr "Raflardaki eşleşen bir ürün üçlüsünü anında temizler."
+
+#. ability.shuffle.description
+msgid "Shuffles shelf items into new spots to help you find a match."
+msgstr "Eşleşme bulmana yardımcı olmak için raflardaki ürünlerin yerlerini değiştirir."
+
+#. ability.lantern.description
+msgid "Highlights a matching triple you can clear for 15 seconds."
+msgstr "Temizleyebileceğin eşleşen bir üçlüyü 15 saniye boyunca vurgular."
+
+#. ability.freezer.description
+msgid "Freezes the level timer for 30 seconds."
+msgstr "Seviye süresini 30 saniye boyunca dondurur."
+
+#. ad.watch
+msgid "Watch Ad"
+msgstr "Reklam İzle"
+
+#. ad.loading
+msgid "Loading..."
+msgstr "Yükleniyor..."
+
+#. ad.verifying
+msgid "Verifying..."
+msgstr "Doğrulanıyor..."
+
+#. ad.verify_reward
+msgid "Verify Reward"
+msgstr "Ödülü Doğrula"
+
+#. ad.reward_pending
+msgid "Reward verification is still pending."
+msgstr "Ödül doğrulaması hâlâ beklemede."
+
+#. ad.unavailable_retry
+msgid "Ad unavailable. Please try again."
+msgstr "Reklam kullanılamıyor. Lütfen tekrar dene."
+
+#. ad.watch_unavailable
+msgid "Watch Ad\nUnavailable"
+msgstr "Reklam İzle\nKullanılamıyor"
+
+#. ad.watch_coming_soon
+msgid "Watch Ad\nComing Soon"
+msgstr "Reklam İzle\nYakında"
+
+#. ad.badge
+msgid "AD"
+msgstr "AD"
+
+#. lives.title.out
+msgid "OUT OF LIVES"
+msgstr "CAN KALMADI"
+
+#. lives.title.get_more
+msgid "GET MORE LIVES"
+msgstr "DAHA FAZLA CAN AL"
+
+#. lives.title.full
+msgid "LIVES FULL"
+msgstr "CANLAR DOLU"
+
+#. lives.next_in
+msgid "NEXT LIFE IN"
+msgstr "YENİ CANA KALAN SÜRE"
+
+#. lives.full_body
+msgid "Your lives are full! Play a level to spend them."
+msgstr "Canların dolu! Onları kullanmak için bir seviye oyna."
+
+#. chest.title
+msgid "CHEST REWARDS"
+msgstr "SANDIK ÖDÜLLERİ"
+
+#. chest.progress_hint
+msgid "Collect stars to unlock a chest and claim your reward"
+msgstr "Sandığın kilidini açmak ve ödülünü almak için yıldız topla"
+
+#. chest.ready
+msgid "A REWARD CHEST AWAITS!"
+msgstr "ÖDÜL SANDIĞIN HAZIR!"
+
+#. chest.tap_to_open
+msgid "Tap to open"
+msgstr "Açmak için dokun"
+
+#. purchase.tap_to_collect
+msgid "Tap to collect"
+msgstr "Almak için dokun"
+
+#. purchase.complete
+msgid "PURCHASE COMPLETE"
+msgstr "SATIN ALMA TAMAMLANDI"
+
+#. shop.title
+msgid "SHOP"
+msgstr "MAĞAZA"
+
+#. shop.section.bundles
+msgid "SPECIAL BUNDLES"
+msgstr "ÖZEL PAKETLER"
+
+#. shop.section.coins
+msgid "COINS"
+msgstr "PARA"
+
+#. shop.offer.starter_bundle
+msgid "Starter Bundle"
+msgstr "Başlangıç Paketi"
+
+#. shop.offer.basic_bundle
+msgid "Basic Bundle"
+msgstr "Temel Paket"
+
+#. shop.tag.best_value
+msgid "BEST VALUE"
+msgstr "EN AVANTAJLI"
+
+#. shop.discount_off
+msgid "OFF"
+msgstr "OFF"
+
+#. shop.ability_hint
+msgid "Tap an ability to see what it does"
+msgstr "Ne yaptığını görmek için güçlendiriciye dokun"
+
+#. shop.purchasing
+msgid "Purchasing…"
+msgstr "Satın alınıyor…"
+
+#. shop.no_offers
+msgid "No shop offers are available for this region."
+msgstr "Bu bölge için mağaza teklifi bulunmuyor."
+
+#. shop.load_failed
+msgid "Could not load the shop."
+msgstr "Mağaza yüklenemedi."
+
+#. shop.error.title.purchase
+msgid "Purchase unavailable"
+msgstr "Satın alma yapılamıyor"
+
+#. shop.error.title.reward
+msgid "Reward error"
+msgstr "Ödül hatası"
+
+#. shop.error.purchase_failed
+msgid "The purchase could not be completed."
+msgstr "Satın alma tamamlanamadı."
+
+#. shop.error.grant_failed
+msgid "The purchased rewards could not be granted."
+msgstr "Satın alınan ödüller verilemedi."
+
+#. shop.error.offer_unavailable
+msgid "This shop offer is unavailable."
+msgstr "Bu mağaza teklifi mevcut değil."
+
+#. shop.error.already_bought
+msgid "This one-time shop offer has already been purchased."
+msgstr "Bu tek seferlik mağaza teklifi zaten satın alındı."
+
+#. starter.title
+msgid "STARTER BUNDLE"
+msgstr "BAŞLANGIÇ PAKETİ"
+
+#. starter.one_time
+msgid "ONE-TIME OFFER"
+msgstr "TEK SEFERLİK TEKLİF"
+
+#. starter.boosters_included
+msgid "BOOSTERS INCLUDED"
+msgstr "GÜÇLENDİRİCİLER DAHİL"
+
+#. starter.coins
+msgid "%s COINS"
+msgstr "%s PARA"
+
+#. starter.buy_for
+msgid "Buy for %s"
+msgstr "%s karşılığında al"
+
+#. starter.checking
+msgid "Checking offer…"
+msgstr "Teklif kontrol ediliyor…"
+
+#. starter.checking_short
+msgid "Checking…"
+msgstr "Kontrol ediliyor…"
+
+#. starter.no_longer_available
+msgid "This offer is no longer available."
+msgstr "Bu teklif artık mevcut değil."
+
+#. starter.unavailable
+msgid "Unavailable"
+msgstr "Mevcut Değil"
+
+#. booster_chip.claimed
+msgid "+%d %s"
+msgstr "+%d %s"
+
+#. profile.title
+msgid "EDIT PROFILE"
+msgstr "PROFİLİ DÜZENLE"
+
+#. profile.name_header
+msgid "PLAYER NAME"
+msgstr "OYUNCU ADI"
+
+#. profile.name_placeholder
+msgid "Player name"
+msgstr "Oyuncu adı"
+
+#. profile.edit_name_tooltip
+msgid "Edit player name"
+msgstr "Oyuncu adını düzenle"
+
+#. profile.avatar_tab
+msgid "AVATAR"
+msgstr "AVATAR"
+
+#. profile.frame_tab
+msgid "FRAME"
+msgstr "ÇERÇEVE"
+
+#. profile.unlock.level
+msgid "Complete level %d to unlock"
+msgstr "Kilidi açmak için %d. seviyeyi tamamla"
+
+#. profile.unlock.combo
+msgid "Reach a combo of ×%d in any run to unlock"
+msgstr "Kilidi açmak için herhangi bir denemede ×%d kombo yap"
+
+#. profile.unlock.weekly_first
+msgid "Finish 1st on the Weekly leaderboard to unlock"
+msgstr "Kilidi açmak için haftalık sıralamayı 1. sırada bitir"
+
+#. profile.unlock.weekly_top
+msgid "Finish top %d on the Weekly leaderboard to unlock"
+msgstr "Kilidi açmak için haftalık sıralamayı ilk %d oyuncu arasında bitir"
+
+#. leaderboard.title
+msgid "LEADERBOARD"
+msgstr "SIRALAMA"
+
+#. leaderboard.tab.weekly
+msgid "Weekly"
+msgstr "Haftalık"
+
+#. leaderboard.tab.country
+msgid "Country"
+msgstr "Ülke"
+
+#. leaderboard.tab.world
+msgid "World"
+msgstr "Dünya"
+
+#. leaderboard.weekly_reset
+msgid "Weekly reset in %s"
+msgstr "Haftalık sıfırlamaya %s kaldı"
+
+#. leaderboard.duration.dh
+msgid "%dd %dh"
+msgstr "%dg %dsa"
+
+#. leaderboard.duration.hm
+msgid "%dh %dm"
+msgstr "%dsa %ddk"
+
+#. leaderboard.duration.m
+msgid "%dm"
+msgstr "%ddk"
+
+#. leaderboard.country_caption
+msgid "Country · All-time stars"
+msgstr "Ülke · Toplam yıldız"
+
+#. leaderboard.world_caption
+msgid "Worldwide · All-time stars"
+msgstr "Dünya · Toplam yıldız"
+
+#. leaderboard.load_failed
+msgid "Could not load leaderboard."
+msgstr "Sıralama yüklenemedi."
+
+#. leaderboard.default_name
+msgid "Player"
+msgstr "Oyuncu"
+
+#. leaderboard.row_tooltip
+msgid "Rank %d, %s, %d stars"
+msgstr "Sıra %d, %s, %d yıldız"
+
+#. leaderboard.reward_tooltip
+msgid "%s coin weekly reward"
+msgstr "Haftalık ödül: %s para"
+
+#. leaderboard.reward.title
+msgid "WEEKLY REWARD!"
+msgstr "HAFTALIK ÖDÜL!"
+
+#. leaderboard.reward.body
+msgid "You finished #%d last week and earned %d coins!"
+msgstr "Geçen haftayı %d. sırada bitirip %d para kazandın!"
+
+#. leaderboard.reward.ok
+msgid "Nice!"
+msgstr "Süper!"
+
+#. settings.title
+msgid "SETTINGS"
+msgstr "AYARLAR"
+
+#. settings.music
+msgid "Music"
+msgstr "Müzik"
+
+#. settings.sfx
+msgid "SFX"
+msgstr "Sesler"
+
+#. settings.vibrate
+msgid "Vibrate"
+msgstr "Titreşim"
+
+#. settings.support
+msgid "Support"
+msgstr "Destek"
+
+#. settings.language
+msgid "Language"
+msgstr "Dil"
+
+#. settings.privacy_policy
+msgid "Privacy Policy"
+msgstr "Gizlilik Politikası"
+
+#. settings.privacy_choices
+msgid "Privacy Choices"
+msgstr "Gizlilik Tercihleri"
+
+#. settings.diagnostics
+msgid "Version %s • Build %d\nPlatform: %s • User: %s"
+msgstr "Sürüm %s • Derleme %d\nPlatform: %s • Kullanıcı: %s"
+
+#. language.title
+msgid "LANGUAGE"
+msgstr "DİL"
+
+#. support.title
+msgid "SUPPORT"
+msgstr "DESTEK"
+
+#. support.faq_header
+msgid "Frequently Asked Questions"
+msgstr "Sıkça Sorulan Sorular"
+
+#. support.faq.play.q
+msgid "How do I play?"
+msgstr "Nasıl oynarım?"
+
+#. support.faq.play.a
+msgid "Move matching goods onto the same shelf. When three identical items are visible together, they clear. Complete the board before time runs out."
+msgstr "Eşleşen ürünleri aynı rafa taşı. Aynı rafta üç özdeş ürün bir araya geldiğinde temizlenir. Süre dolmadan tüm ürünleri temizle."
+
+#. support.faq.contact.q
+msgid "How do I contact support?"
+msgstr "Destekle nasıl iletişime geçerim?"
+
+#. support.faq.contact.a
+msgid "Email us at %s. Include a short description, your device platform, and when the problem happened."
+msgstr "Bize ulaşmak için %s adresine e-posta gönder. Kısa bir açıklama, cihazının platformunu ve sorunun ne zaman yaşandığını belirt."
+
+#. support.faq.contact.action
+msgid "Email Support"
+msgstr "Desteğe Yaz"
+
+#. support.faq.crash.q
+msgid "What if the game freezes or crashes?"
+msgstr "Oyun donarsa veya çökerse ne yapmalıyım?"
+
+#. support.faq.crash.a
+msgid "Close and reopen the game first. If it happens again, restart the device and make sure the game is updated. Contact support with the device model, platform version, and what you were doing before the problem."
+msgstr "Önce oyunu kapatıp yeniden aç. Sorun tekrarlanırsa cihazını yeniden başlat ve oyunun güncel olduğundan emin ol. Cihaz modelini, platform sürümünü ve sorun ortaya çıkmadan önce ne yaptığını belirterek destekle iletişime geç."
+
+#. support.faq.sync.q
+msgid "How do I sync progress between devices?"
+msgstr "İlerlememi cihazlar arasında nasıl senkronize ederim?"
+
+#. support.faq.sync.a
+msgid "Use the same signed-in platform account on both devices and allow synchronization to finish before playing. If the progress differs, avoid playing on both devices and contact support."
+msgstr "Her iki cihazda da aynı platform hesabında oturum aç ve oynamadan önce senkronizasyonun tamamlanmasını bekle. İlerleme farklıysa iki cihazda birden oynamaktan kaçın ve destekle iletişime geç."
+
+#. support.faq.bad_ad.q
+msgid "How do I report a bad ad?"
+msgstr "Uygunsuz bir reklamı nasıl bildiririm?"
+
+#. support.faq.bad_ad.a
+msgid "1. Close the ad if you can do so safely.\n2. Take a screenshot of the ad and any advertiser or app name shown.\n3. Note the approximate time and where the ad appeared in the game.\n4. Describe why the ad seemed offensive, misleading, or fraudulent.\n5. Email these details to %s. Do not include passwords or payment information."
+msgstr "1. Güvenli bir şekilde yapabiliyorsan reklamı kapat.\n2. Reklamın ve gösterilen reklamveren veya uygulama adının ekran görüntüsünü al.\n3. Yaklaşık zamanı ve reklamın oyunda nerede göründüğünü not et.\n4. Reklamın neden rahatsız edici, yanıltıcı veya dolandırıcılık amaçlı göründüğünü açıkla.\n5. Bu bilgileri %s adresine e-posta ile gönder. Şifre veya ödeme bilgisi ekleme."
+
+#. support.faq.bad_ad.action
+msgid "Email Ad Report"
+msgstr "Reklamı Bildir"
+
+#. support.account_header
+msgid "Account"
+msgstr "Hesap"
+
+#. support.delete_account
+msgid "Delete Account"
+msgstr "Hesabı Sil"
+
+#. support.delete_game_data
+msgid "Delete Game Data"
+msgstr "Oyun Verilerini Sil"
+
+#. support.no_secrets
+msgid "Please never send passwords or payment information."
+msgstr "Lütfen asla şifre veya ödeme bilgisi gönderme."
+
+#. deletion.title.delete_account
+msgid "DELETE ACCOUNT"
+msgstr "HESABI SİL"
+
+#. deletion.title.delete_game_data
+msgid "DELETE GAME DATA"
+msgstr "OYUN VERİLERİNİ SİL"
+
+#. deletion.title.not_confirmed
+msgid "NOT CONFIRMED"
+msgstr "DOĞRULANMADI"
+
+#. deletion.title.status_unconfirmed
+msgid "STATUS UNCONFIRMED"
+msgstr "DURUM DOĞRULANMADI"
+
+#. deletion.title.finishing_up
+msgid "FINISHING UP"
+msgstr "TAMAMLANIYOR"
+
+#. deletion.title.new_game
+msgid "NEW GAME"
+msgstr "YENİ OYUN"
+
+#. deletion.title.status_unknown
+msgid "STATUS UNKNOWN"
+msgstr "DURUM BİLİNMİYOR"
+
+#. deletion.title.not_deleted
+msgid "NOT DELETED"
+msgstr "SİLİNMEDİ"
+
+#. deletion.title.data_deleted
+msgid "DATA DELETED"
+msgstr "VERİLER SİLİNDİ"
+
+#. deletion.title.accepted
+msgid "DELETION ACCEPTED"
+msgstr "SİLME İSTEĞİ KABUL EDİLDİ"
+
+#. deletion.confirm.headline
+msgid "This permanently deletes your account."
+msgstr "Bu işlem hesabını kalıcı olarak siler."
+
+#. deletion.confirm.body
+msgid "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nIf you sign in again later, you'll start a new account.\n\nSome purchase and security records are kept without your name or profile. The rest is removed within 30 days."
+msgstr "İlerlemen, paran, ürünlerin ve profilin silinecek. Bu işlemi geri alamazsın.\n\nDaha sonra yeniden oturum açarsan yeni bir hesapla başlayacaksın.\n\nBazı satın alma ve güvenlik kayıtları, adınla veya profilinle ilişkilendirilmeden saklanır. Diğer veriler 30 gün içinde silinir."
+
+#. deletion.local_confirm.headline
+msgid "This deletes your game data on this device."
+msgstr "Bu işlem bu cihazdaki oyun verilerini siler."
+
+#. deletion.local_confirm.body
+msgid "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nThis game never created an online account for you, so nothing needs to be deleted from our servers."
+msgstr "İlerlemen, paran, ürünlerin ve profilin silinecek. Bu işlemi geri alamazsın.\n\nBu oyun senin için hiç çevrimiçi hesap oluşturmadı, bu yüzden sunucularımızdan silinecek bir şey yok."
+
+#. deletion.local_confirm.button
+msgid "Delete Data"
+msgstr "Verileri Sil"
+
+#. deletion.pending_setup.headline
+msgid "Your account is still being set up."
+msgstr "Hesabın hâlâ oluşturuluyor."
+
+#. deletion.pending_setup.body
+msgid "Connect to the internet and try again in a moment. Nothing was deleted."
+msgstr "İnternete bağlan ve biraz sonra tekrar dene. Hiçbir şey silinmedi."
+
+#. deletion.sign_in.headline
+msgid "Sign in to the account you want to delete."
+msgstr "Silmek istediğin hesapta oturum aç."
+
+#. deletion.sign_in.body
+msgid "If you can't sign in, contact support for help."
+msgstr "Oturum açamıyorsan yardım almak için destekle iletişime geç."
+
+#. deletion.read_failed.headline
+msgid "Your game data couldn't be read."
+msgstr "Oyun verilerin okunamadı."
+
+#. deletion.read_failed.body
+msgid "Restart the game, then try again. Nothing was deleted."
+msgstr "Oyunu yeniden başlat, ardından tekrar dene. Hiçbir şey silinmedi."
+
+#. deletion.unavailable.headline
+msgid "Account deletion isn't available in this version of the game."
+msgstr "Oyunun bu sürümünde hesap silme özelliği kullanılamıyor."
+
+#. deletion.unavailable.body
+msgid "Update the game, or contact support for help deleting your account. Nothing was deleted."
+msgstr "Oyunu güncelle veya hesabını silmek için destekten yardım al. Hiçbir şey silinmedi."
+
+#. deletion.in_progress.account
+msgid "Deleting your account..."
+msgstr "Hesabın siliniyor..."
+
+#. deletion.in_progress.local
+msgid "Deleting your game data..."
+msgstr "Oyun verilerin siliniyor..."
+
+#. deletion.in_progress.body
+msgid "Keep the game open. This only takes a moment."
+msgstr "Oyunu açık tut. Bu işlem yalnızca kısa bir süre alır."
+
+#. deletion.not_confirmed.headline
+msgid "We haven't heard back about your deletion yet."
+msgstr "Silme isteğinle ilgili henüz yanıt almadık."
+
+#. deletion.not_confirmed.body
+msgid "Your request was sent, but the answer didn't arrive. Connect to the internet and try again. The game stays locked until we know the result."
+msgstr "İsteğin gönderildi, ancak yanıt ulaşmadı. İnternete bağlan ve tekrar dene. Sonucu öğrenene kadar oyun kilitli kalacak."
+
+#. deletion.unconfirmed.headline
+msgid "Deletion status unconfirmed"
+msgstr "Silme durumu doğrulanmadı"
+
+#. deletion.unconfirmed.body
+msgid "We couldn't confirm whether your account was deleted. To keep your data safe, the game stays locked. Contact support and include the reference below."
+msgstr "Hesabının silinip silinmediğini doğrulayamadık. Verilerini güvende tutmak için oyun kilitli kalacak. Destekle iletişime geç ve aşağıdaki referansı belirt."
+
+#. deletion.check_again
+msgid "Check Again"
+msgstr "Tekrar Kontrol Et"
+
+#. deletion.cleanup.headline.local
+msgid "Your local game data couldn't be fully deleted yet."
+msgstr "Yerel oyun verilerin henüz tamamen silinemedi."
+
+#. deletion.cleanup.headline.account
+msgid "Account deletion accepted; finishing cleanup."
+msgstr "Hesap silme isteği kabul edildi; son işlemler tamamlanıyor."
+
+#. deletion.cleanup.body
+msgid "Some game data couldn't be removed from this device yet. Try again to finish."
+msgstr "Bazı oyun verileri henüz bu cihazdan silinemedi. Tamamlamak için tekrar dene."
+
+#. deletion.new_game.headline
+msgid "Starting a new game..."
+msgstr "Yeni oyun başlatılıyor..."
+
+#. deletion.new_game.body
+msgid "This only takes a moment."
+msgstr "Bu işlem yalnızca kısa bir süre alır."
+
+#. deletion.status_unknown.headline
+msgid "We couldn't read the deletion status on this device."
+msgstr "Bu cihazdaki silme durumunu okuyamadık."
+
+#. deletion.status_unknown.body
+msgid "To keep your data safe, the game stays locked. Contact support for help."
+msgstr "Verilerini güvende tutmak için oyun kilitli kalacak. Yardım almak için destekle iletişime geç."
+
+#. deletion.fail.offline
+msgid "Connect to the internet to delete your account."
+msgstr "Hesabını silmek için internete bağlan."
+
+#. deletion.fail.rate_limited
+msgid "Too many attempts. Wait a moment, then try again."
+msgstr "Çok fazla deneme yapıldı. Biraz bekle, ardından tekrar dene."
+
+#. deletion.fail.busy
+msgid "Account deletion is busy right now. Try again in a moment."
+msgstr "Hesap silme sistemi şu anda yoğun. Biraz sonra tekrar dene."
+
+#. deletion.fail.syncing
+msgid "The game is still syncing. Try again in a moment."
+msgstr "Oyun hâlâ senkronize ediliyor. Biraz sonra tekrar dene."
+
+#. deletion.fail.auth
+msgid "We couldn't verify your account. Restart the game, then try again."
+msgstr "Hesabını doğrulayamadık. Oyunu yeniden başlat, ardından tekrar dene."
+
+#. deletion.fail.update
+msgid "Update the game to delete your account."
+msgstr "Hesabını silmek için oyunu güncelle."
+
+#. deletion.fail.changed
+msgid "Your account changed while we were deleting it. Try again."
+msgstr "Silme işlemi sırasında hesabın değişti. Tekrar dene."
+
+#. deletion.fail.storage
+msgid "Your device couldn't save the deletion request. Try again."
+msgstr "Cihazın silme isteğini kaydedemedi. Tekrar dene."
+
+#. deletion.fail.generic
+msgid "We couldn't delete your account. Try again later or contact support."
+msgstr "Hesabını silemedik. Daha sonra tekrar dene veya destekle iletişime geç."
+
+#. deletion.fail.local
+msgid "Your game data couldn't be deleted. Try again."
+msgstr "Oyun verilerin silinemedi. Tekrar dene."
+
+#. deletion.fail.body
+msgid "Nothing was deleted, and you can keep playing."
+msgstr "Hiçbir şey silinmedi ve oynamaya devam edebilirsin."
+
+#. deletion.done_local.headline
+msgid "Your local game data was deleted."
+msgstr "Yerel oyun verilerin silindi."
+
+#. deletion.done_local.body
+msgid "You can start over with a new game."
+msgstr "Yeni bir oyunla baştan başlayabilirsin."
+
+#. deletion.new_game_failed
+msgid "The new game couldn't start. Try again."
+msgstr "Yeni oyun başlatılamadı. Tekrar dene."
+
+#. deletion.accepted.headline
+msgid "Your account is no longer accessible."
+msgstr "Hesabına artık erişilemiyor."
+
+#. deletion.accepted.body
+msgid "Your deletion request was accepted."
+msgstr "Silme isteğin kabul edildi."
+
+#. deletion.accepted.body_deadline
+msgid "Your deletion request was accepted. Data removal is due by %s."
+msgstr "Silme isteğin kabul edildi. Verilerin silinmesi için son tarih: %s."
+
+#. deletion.reference
+msgid "Reference: %s"
+msgstr "Referans: %s"
+
+#. deletion.start_new_game
+msgid "Start New Game"
+msgstr "Yeni Oyun Başlat"
+
+#. app.name
+msgid "SortingPuzzle"
+msgstr "SortingPuzzle"
+
+#. support.email.subject
+msgid "Sorting Puzzle support request"
+msgstr "Sorting Puzzle destek talebi"
+
+#. support.email.body
+msgid "Please describe the issue here.\n\nDevice/platform:\nApproximate time:\n"
+msgstr "Lütfen sorunu burada açıkla.\n\nCihaz/platform:\nYaklaşık zaman:\n"
+
+#. support.ad_email.subject
+msgid "Sorting Puzzle ad report"
+msgstr "Sorting Puzzle reklam bildirimi"
+
+#. support.ad_email.body
+msgid "Please attach a screenshot and complete the details below.\n\nApproximate time:\nAd placement in the game:\nAdvertiser or app name:\nWhy the ad should be reviewed:\n"
+msgstr "Lütfen bir ekran görüntüsü ekle ve aşağıdaki bilgileri doldur.\n\nYaklaşık zaman:\nReklamın oyundaki yeri:\nReklamveren veya uygulama adı:\nReklamın neden incelenmesi gerektiği:\n"
+
+#. deletion.email.subject
+msgid "Sorting Puzzle account deletion"
+msgstr "Sorting Puzzle hesap silme talebi"
+
+#. deletion.email.body
+msgid "Please help me with my account deletion."
+msgstr "Lütfen hesabımı silme konusunda bana yardımcı olun."
+
+#. support.email.status
+msgid "Status: %s"
+msgstr "Durum: %s"
+
+#. support.email.deletion_reference
+msgid "Deletion reference"
+msgstr "Silme referansı"
+
+#. support.email.server_reference
+msgid "Server reference"
+msgstr "Sunucu referansı"
+
+#. support.email.player_id
+msgid "Player ID"
+msgstr "Oyuncu kimliği"
+
+#. leaderboard.empty
+msgid "No scores yet"
+msgstr "Henüz puan yok"
+
+#. ability.hammer.name
+msgid "HAMMER"
+msgstr "ÇEKİÇ"
+
+#. ability.shuffle.name
+msgid "SHUFFLE"
+msgstr "KARIŞTIR"
+
+#. ability.lantern.name
+msgid "LANTERN"
+msgstr "FENER"
+
+#. ability.freezer.name
+msgid "FREEZER"
+msgstr "DONDURUCU"
+
+#. shop.offer.basic_bundle
+msgid "BASIC BUNDLE"
+msgstr "TEMEL PAKET"
+
+#. booster.counted.hammer
+msgctxt "booster.counted"
+msgid "Hammer"
+msgid_plural "Hammer.plural"
+msgstr[0] "Çekiç"
+msgstr[1] "Çekiç"
+
+#. booster.counted.shuffle
+msgctxt "booster.counted"
+msgid "Shuffle"
+msgid_plural "Shuffle.plural"
+msgstr[0] "Karıştır"
+msgstr[1] "Karıştır"
+
+#. booster.counted.lantern
+msgctxt "booster.counted"
+msgid "Lantern"
+msgid_plural "Lantern.plural"
+msgstr[0] "Fener"
+msgstr[1] "Fener"
+
+#. booster.counted.freezer
+msgctxt "booster.counted"
+msgid "Freezer"
+msgid_plural "Freezer.plural"
+msgstr[0] "Dondurucu"
+msgstr[1] "Dondurucu"

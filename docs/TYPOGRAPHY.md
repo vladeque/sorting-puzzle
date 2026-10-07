@@ -34,6 +34,9 @@ the bundled title font. German uses the existing Latin fonts and scene-owned tex
 The French localization test checks accented lower/uppercase Latin letters, French quotation
 marks, curly apostrophes, the reviewed degree sign in `n°`, and × through the bundled title font.
 French uses the existing Latin fonts and scene-owned text fitting; no new font resource is needed.
+The Turkish localization test checks Ç/ç, Ğ/ğ, İ/ı, Ö/ö, Ş/ş, Ü/ü, circumflex vowels and every
+reviewed non-ASCII character across display, reading, rich-text and editing theme roles using
+bundled fonts. Uppercase Turkish copy preserves the distinction between İ and I.
 
 ## Theme Roles
 

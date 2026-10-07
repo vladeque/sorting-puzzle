@@ -1,5 +1,15 @@
 # Scripts
 
+## Turkish localization
+
+`assets/translations/tr.po` provides the owner's 251 revised entries, English scene aliases,
+Turkish uppercase card aliases, invariant counted wording and fixed counted booster names.
+`scripts/localization/game_text.gd` owns Turkish number/date formatting and uppercase
+conversion for dotted/dotless I. `scripts/shop_purchase_dialog.gd` uses that conversion after
+translation, including on live switches. Existing scene owners retain their refreshes and
+responsive text fitting. Source and verification are recorded in
+`docs/localization/TURKISH_TRANSLATIONS.md` and `docs/localization/TURKISH_LOCALIZATION_QA.md`.
+
 ## Indonesian localization
 
 `assets/translations/id.po` provides all 251 owner-improved Indonesian entries, English scene
@@ -787,7 +797,9 @@ Depends on:
   flown into the balance, and `play_receive_pulse()` bumps the widget as each one lands.
 - `scripts/shop_purchase_dialog.gd`: shows and dismisses a focused result modal; `show_result()`
   takes an optional `button_text` (defaults to "Continue") so the same dialog reads correctly for
-  both purchase errors and ability info lookups ("Got it"). The upper-cased title goes onto the
+  both purchase errors and ability info lookups ("Got it"). `GameText.uppercase()` preserves
+  Turkish dotted/dotless I after translating the title, including during live locale changes.
+  The upper-cased title goes onto the
   shared shop-awning header (`%AwningHeader`) through `set_title()`, which shrinks long titles to
   fit the plate. `%CloseButton` uses the shared orange
   utility style plus `press_scale_button.gd` for press feedback (it had none before UI-002).

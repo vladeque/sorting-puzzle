@@ -19,7 +19,7 @@ static func format_number(value: int) -> String:
 	var digits := str(maxi(value, 0))
 	var language := TranslationServer.get_locale().get_slice("_", 0)
 	var separator := " " if language in ["ru", "uk", "fr"] else ","
-	if language in ["it", "es", "pt", "de", "id"]:
+	if language in ["it", "es", "pt", "de", "id", "tr"]:
 		separator = "."
 	var formatted := ""
 	for index in digits.length():
@@ -42,10 +42,17 @@ static func format_date(date: Dictionary) -> String:
 		return "%02d.%02d.%04d" % [day, month, year]
 	if language == "ar":
 		return "%d/%d/%d" % [day, month, year]
-	if language in ["ru", "uk", "it", "es", "pt", "fr", "id"]:
+	if language in ["ru", "uk", "it", "es", "pt", "fr", "id", "tr"]:
 		var month_name := TranslationServer.translate("date.month.%d" % month)
 		return TranslationServer.translate("date.day_month_year") % [day, month_name, year]
 	return "%s %d, %d" % [MONTH_NAMES[month - 1], day, year]
+
+
+## Godot's default uppercase mapping does not distinguish Turkish dotted/dotless I.
+static func uppercase(text: String) -> String:
+	if TranslationServer.get_locale().get_slice("_", 0) == "tr":
+		text = text.replace("i", "İ").replace("ı", "I")
+	return text.to_upper()
 
 
 static func counted_booster(title: String, count: int) -> String:

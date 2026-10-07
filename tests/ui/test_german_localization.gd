@@ -24,8 +24,11 @@ func _run() -> void:
 			"German regional device locale %s selects Deutsch." % device_locale)
 	var entries: Array = _reviewed["entries"]
 	_check(entries.size() == 251, "The fixture includes every reviewed German entry.")
-	for locale in ["de", "en", "tr"]:
-		_check(bool(_locale_manager.call("set_locale", locale)), "%s can be selected." % locale)
+	for locale in ["de", "en", "hi"]:
+		if locale == "hi":
+			TranslationServer.set_locale(locale) # Test-only catalog-free fallback.
+		else:
+			_check(bool(_locale_manager.call("set_locale", locale)), "%s can be selected." % locale)
 		for entry: Dictionary in entries:
 			var key := str(entry["key"])
 			var expected := str(entry["de" if locale == "de" else "en"])

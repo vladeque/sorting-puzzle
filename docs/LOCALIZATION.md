@@ -1,5 +1,33 @@
 # Localization
 
+## Turkish localization
+
+`assets/translations/tr.po` applies all 251 entries from the owner's improved October 7, 2026
+attachment, archived byte-for-byte at `docs/localization/TURKISH_TRANSLATIONS.md`.
+`tests/localization/turkish_inventory.json` retains the exact English/Turkish wording, source
+hash, six invariant counted messages, fixed counted booster names, four supplementary email
+labels and twelve Turkish month names. The catalog has 527 messages/contexts, including English
+scene and uppercase card aliases. The existing Türkçe picker option selects it; `tr_TR` and
+`tr-TR` device locales resolve to `tr`.
+
+The revised unlock progress, reward verification, refill caption, purchase/offer errors,
+leaderboard reset/prize/top-rank wording, support guidance and deletion messages are preserved
+exactly. Gameplay resume uses `Oyuna Dön`, move-on uses `Devam Et`, failure replay uses
+`Tekrar Oyna`, and destination reload uses `Tekrar Yükle`. Both gettext plural slots retain
+the supplied wording and fixed `Çekiç`, `Karıştır`, `Fener` and `Dondurucu` product names.
+The additional empty-leaderboard caption is `Henüz puan yok`.
+
+`GameText` groups Turkish counts with periods (`1.234.567`) and presents deadlines in
+day/month/year order (`2 Kasım 2026`). `GameText.uppercase()` handles Turkish dotted and
+dotless I before the default uppercase mapping; `ShopPurchaseDialog` uses it on startup and
+live language changes. Uppercase offer aliases directly provide `BAŞLANGIÇ PAKETİ` and
+`TEMEL PAKET`. Existing bundled typography covers Turkish characters. Store prices, player
+names, IDs, references, native language names, branding and `AD`/`OFF` retain their values.
+Language selection remains a local preference outside synchronized gameplay state.
+
+The archive retains the attachment's pre-integration notes. Verification is recorded in
+`docs/localization/TURKISH_LOCALIZATION_QA.md`.
+
 ## Indonesian localization
 
 `assets/translations/id.po` applies all 251 entries from the owner's improved October 7, 2026
@@ -70,12 +98,14 @@ starts.
 `assets/translations/it.po`, `assets/translations/ar.po`, `assets/translations/es.po`,
 `assets/translations/pt_BR.po`, `assets/translations/de.po`, `assets/translations/fr.po`,
 `assets/translations/ko.po`, `assets/translations/ja.po`, `assets/translations/zh_Hant.po` and
-`assets/translations/id.po` are
+`assets/translations/id.po` and `assets/translations/tr.po` are
 registered in `project.godot`.
 Russian includes all 251 reviewed keys from
 `docs/localization/RUSSIAN_TRANSLATIONS.md`, the user's corrected October 4, 2026 inventory.
 The inventory is a copy of the approved translation text, not runtime configuration.
-English remains the fallback for selectable Turkish (`tr`) until its catalog exists.
+All fourteen selectable release locales have registered catalogs. Unsupported device languages
+continue to resolve to English. Test-only catalog-free fallback checks use `hi` directly through
+`TranslationServer`; Hindi is not added to the release-language allowlist.
 
 Traditional Chinese includes all 251 entries from the owner's refined October 7, 2026 attachment
 archived verbatim at `docs/localization/TRADITIONAL_CHINESE_TRANSLATIONS.md`.
@@ -444,8 +474,14 @@ The implementation ownership and verification scope are recorded in
   dates, period grouping, contextual actions and unchanged prices/names/references/markers.
   It verifies regional mapping, live refreshes, pending ad state, local-only preferences and
   FAQ, deletion, shelf, replay, timer-badge and used-price fitting at all five viewports.
-  Existing localization tests use catalog-free `tr` to check English fallback now that `id`
-  has its own catalog.
+  Existing localization tests use catalog-free `hi` directly through `TranslationServer` to
+  check English fallback now that every selectable locale has its own catalog.
+- `tests/ui/test_turkish_localization.gd` checks all 251 revised entries and English aliases,
+  invariant counted wording, fixed booster names, bundled Turkish glyphs across theme roles,
+  twelve Turkish dates, period grouping, dotted/dotless I in uppercase titles, regional device
+  mapping, contextual actions and live refreshes. It checks local-only preference persistence,
+  raw prices/names/references/markers and responsive FAQ, deletion, shelf, replay, timer-badge
+  and used-price fitting at all five viewports.
 - `scripts/tools/captures/localization_timed_boosters_setup.gd` freezes 15/30-second captions
   for responsive locale review; `time_up_extension_used_setup.gd` holds both extension methods
   in their used state to review the complete captions.
@@ -468,6 +504,7 @@ The implementation ownership and verification scope are recorded in
   Use `-Locale ja` for Japanese captures.
   Use `-Locale zh_Hant` for Traditional Chinese captures.
   Use `-Locale id` for Indonesian captures.
+  Use `-Locale tr` for Turkish captures.
 
 The October 4–5, 2026 test results, rendered-screen reviews and capture limitations are recorded in
 `docs/localization/RUSSIAN_LOCALIZATION_QA.md`.
@@ -482,3 +519,4 @@ Korean integration results are recorded in `docs/localization/KOREAN_LOCALIZATIO
 Japanese integration results are recorded in `docs/localization/JAPANESE_LOCALIZATION_QA.md`.
 Traditional Chinese integration results are recorded in `docs/localization/TRADITIONAL_CHINESE_LOCALIZATION_QA.md`.
 Indonesian integration results are recorded in `docs/localization/INDONESIAN_LOCALIZATION_QA.md`.
+Turkish integration results are recorded in `docs/localization/TURKISH_LOCALIZATION_QA.md`.
