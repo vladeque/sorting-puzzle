@@ -1,5 +1,16 @@
 # Scripts
 
+## Japanese localization
+
+`assets/translations/ja.po` provides the owner's 251 improved Japanese entries, English scene
+aliases, six invariant plural forms and fixed booster names in `booster.counted` context.
+`scripts/localization/game_text.gd` owns Japanese year/month/day deadline formatting;
+counts retain comma grouping. Existing scene owners refresh through `LocaleManager` on a
+live language switch, preserving pending ad states and raw prices/names/reference values.
+The shared typography theme supplies bundled Noto Sans JP fallbacks in all font roles.
+Copy provenance and engine/rendered verification are recorded in
+`docs/localization/JAPANESE_TRANSLATIONS.md` and `docs/localization/JAPANESE_LOCALIZATION_QA.md`.
+
 ## Korean localization
 
 `assets/translations/ko.po` provides the owner's 251 improved Korean strings, English scene

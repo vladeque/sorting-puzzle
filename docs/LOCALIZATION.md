@@ -39,13 +39,36 @@ starts.
 
 `assets/translations/en.po`, `assets/translations/ru.po`, `assets/translations/uk.po`,
 `assets/translations/it.po`, `assets/translations/ar.po`, `assets/translations/es.po`,
-`assets/translations/pt_BR.po`, `assets/translations/de.po`, `assets/translations/fr.po` and
-`assets/translations/ko.po` are
+`assets/translations/pt_BR.po`, `assets/translations/de.po`, `assets/translations/fr.po`,
+`assets/translations/ko.po` and `assets/translations/ja.po` are
 registered in `project.godot`.
 Russian includes all 251 reviewed keys from
 `docs/localization/RUSSIAN_TRANSLATIONS.md`, the user's corrected October 4, 2026 inventory.
 The inventory is a copy of the approved translation text, not runtime configuration.
-English remains the fallback for the other four selectable locales until their catalogs exist.
+English remains the fallback for the other three selectable locales until their catalogs exist.
+
+Japanese includes all 251 entries from the owner's improved October 7, 2026 attachment archived
+verbatim at `docs/localization/JAPANESE_TRANSLATIONS.md`. `tests/localization/japanese_inventory.json`
+retains the exact supplied wording and attachment hash, six invariant plural messages, fixed
+counted booster names and four supplementary deletion-email labels. `ja.po` provides 527
+messages/contexts, including English scene aliases and uppercase product/card aliases.
+The existing `日本語` option selects the catalog; `ja_JP` and `ja-JP` map to `ja`.
+
+Japanese gettext uses `nplurals=1; plural=0` for every integer count. Booster names remain
+`ハンマー`, `シャッフル`, `ランタン` and `フリーザー` after quantities.
+Gameplay resume uses `再開`, move-on uses `続ける`, failure replay uses `もう一度プレイ`
+through the `Retry` alias, and destination reload uses `common.retry_load` (`再読み込み`).
+The revised chapter-unlock wording, leave-loss caption, completion banner, chest readiness,
+lives-full body, combo praise and deletion warnings retain the supplied text exactly.
+Counts use commas (`1,234,567`); `GameText.format_date()` presents Japanese deadlines as
+`2026年11月2日`. Provider prices, player names, IDs, reference values, native language names,
+`SortingPuzzle`, `AD` and `OFF` remain unchanged. Selection stays in local preferences.
+
+Bundled Noto Sans JP fallbacks at 500/600/700 weights provide Japanese kana and kanji across
+all theme roles. The only supplementary screen caption absent from the attachment is the
+existing empty leaderboard, translated as `まだスコアがありません`.
+The archive retains its pre-integration notes; runtime verification is recorded in
+`docs/localization/JAPANESE_LOCALIZATION_QA.md`.
 
 Korean includes all 251 entries from the owner's improved October 7, 2026 document archived
 verbatim at `docs/localization/KOREAN_TRANSLATIONS.md`. `tests/localization/korean_inventory.json`
@@ -351,6 +374,14 @@ The implementation ownership and verification scope are recorded in
   dates, comma grouping, prices/names/references/markers, contextual actions, regional mapping,
   live refreshes, pending ad state and local-only locale persistence. It measures FAQ questions
   and deletion, shelf and replay actions at all five viewports.
+- `tests/ui/test_japanese_localization.gd` checks all 251 improved Japanese entries and English
+  aliases, English/untranslated-locale fallback, six single-form messages at integer boundaries,
+  fixed booster names, all supplied glyphs plus decomposed kana and yen symbols through bundled
+  fonts in every role, twelve Japanese dates, comma grouping, contextual actions and unchanged
+  prices/names/references/markers. It verifies live switches, pending ad state, device-locale
+  mapping, local-only preferences and FAQ/action fitting at all five viewports.
+  Existing localization tests use catalog-free `id` to check English fallback now that `ja`
+  has its own catalog.
 - Capture any screen in an isolated Russian session with:
 
   ```powershell
@@ -367,6 +398,7 @@ The implementation ownership and verification scope are recorded in
   Use `-Locale de` for German captures.
   Use `-Locale fr` for French captures.
   Use `-Locale ko` for Korean captures.
+  Use `-Locale ja` for Japanese captures.
 
 The October 4–5, 2026 test results, rendered-screen reviews and capture limitations are recorded in
 `docs/localization/RUSSIAN_LOCALIZATION_QA.md`.
@@ -378,3 +410,4 @@ Brazilian Portuguese integration results are recorded in `docs/localization/PORT
 German integration results are recorded in `docs/localization/GERMAN_LOCALIZATION_QA.md`.
 French integration results are recorded in `docs/localization/FRENCH_LOCALIZATION_QA.md`.
 Korean integration results are recorded in `docs/localization/KOREAN_LOCALIZATION_QA.md`.
+Japanese integration results are recorded in `docs/localization/JAPANESE_LOCALIZATION_QA.md`.

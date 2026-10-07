@@ -27,7 +27,7 @@ func _run() -> void:
 			"Reward owners compile before scene checks: %s" % script_path)
 	var expected := JSON.parse_string(FileAccess.get_file_as_string(EXPECTED_STRINGS)) as Array
 	_check(expected.size() == 251, "The fixture contains all reviewed strings.")
-	for locale in ["ru", "en", "ja"]:
+	for locale in ["ru", "en", "id"]:
 		_locale_manager.call("set_locale", locale)
 		for raw_entry in expected:
 			var entry := raw_entry as Dictionary

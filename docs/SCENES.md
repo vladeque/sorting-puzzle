@@ -1,5 +1,14 @@
 # Scenes
 
+Japanese (`ja`) uses the existing scene owners and English aliases in `assets/translations/ja.po`.
+Resume uses `再開`, move-on uses `続ける`, failure replay uses `もう一度プレイ`, and
+data reload uses `common.retry_load` (`再読み込み`). The `セット` badge and reviewed
+chapter, combo, result, chest, lives, support and deletion text retain their scene hierarchy.
+Matching-weight bundled Noto Sans JP fallbacks cover display, body, rich-text and editing
+roles; `GameText` formats Japanese deadlines as `2026年11月2日`.
+Source copy and responsive rendered verification are documented in
+`docs/localization/JAPANESE_LOCALIZATION_QA.md`.
+
 Korean (`ko`) uses existing scene owners and English aliases through `assets/translations/ko.po`.
 Resume uses `계속하기`, move-on uses `계속`, replay uses `다시 도전`, and data reload uses
 `common.retry_load` (`다시 불러오기`). The `패키지` badge, complete supplied shelf captions,

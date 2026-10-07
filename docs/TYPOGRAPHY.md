@@ -37,9 +37,21 @@ French uses the existing Latin fonts and scene-owned text fitting; no new font r
 
 ## Theme Roles
 
+Japanese glyphs use bundled `assets/fonts/NotoSansJP-Variable.ttf` fallback variations at
+matching 500/600/700 weights in every display, button, HUD, body, rich-text and editing role.
+They follow the existing Latin, Cyrillic and Arabic faces and precede the Korean fallbacks,
+providing Japanese regional glyph forms without relying on desktop or mobile system fonts.
+Keep `NotoSansJP-OFL.txt` beside the font. The unmodified 9,589,900-byte variable font and its
+SIL Open Font License were downloaded from the official
+[Google Fonts Noto Sans JP directory](https://github.com/google/fonts/tree/main/ofl/notosansjp).
+Its weight axis covers 100–900. Font SHA-256:
+`C2F3B4D463500A2DDCD3849CDED1FCEEB9FD6D1C32E6CBECD568453BA50FC68F`.
+`tests/ui/test_japanese_localization.gd` checks all reviewed non-ASCII characters, decomposed
+kana, date units and yen symbols through every theme role's bundled font inventory.
+
 Korean glyphs use bundled `assets/fonts/NotoSansKR-Variable.ttf` fallback variations at matching
 500/600/700 weights throughout the display, button, HUD, body, rich-text and editing roles.
-They follow the existing Latin, Cyrillic and Arabic fonts in each fallback chain, supporting
+They follow the existing Latin, Cyrillic, Arabic and Japanese fonts in each fallback chain, supporting
 mixed player names and native language labels in every locale. Keep `NotoSansKR-OFL.txt`
 beside the font. The unmodified variable font (10,414,588 bytes) and its SIL Open Font License
 were downloaded from the official [Google Fonts Noto Sans KR directory](https://github.com/google/fonts/tree/main/ofl/notosanskr).

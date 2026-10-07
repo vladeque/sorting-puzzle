@@ -1,0 +1,1336 @@
+{
+  "source": "Owner-reviewed Sorting Puzzle — Japanese Translations.md, October 7, 2026",
+  "source_sha256": "9DD50E6B84769D15CD6B0280953E09D92918746D880533E8A6E0F07469D013FA",
+  "entries": [
+    {
+      "key": "common.play",
+      "en": "Play",
+      "ja": "プレイ"
+    },
+    {
+      "key": "common.continue",
+      "en": "Continue",
+      "ja": "続ける"
+    },
+    {
+      "key": "common.resume",
+      "en": "Continue",
+      "ja": "再開"
+    },
+    {
+      "key": "common.try_again",
+      "en": "Try Again",
+      "ja": "もう一度"
+    },
+    {
+      "key": "common.close",
+      "en": "Close",
+      "ja": "閉じる"
+    },
+    {
+      "key": "common.cancel",
+      "en": "Cancel",
+      "ja": "キャンセル"
+    },
+    {
+      "key": "common.got_it",
+      "en": "Got it",
+      "ja": "OK"
+    },
+    {
+      "key": "common.get_help",
+      "en": "Get Help",
+      "ja": "サポートへ"
+    },
+    {
+      "key": "common.save",
+      "en": "SAVE",
+      "ja": "保存"
+    },
+    {
+      "key": "common.loading",
+      "en": "Loading…",
+      "ja": "読み込み中…"
+    },
+    {
+      "key": "common.retry_load",
+      "en": "Retry",
+      "ja": "再読み込み"
+    },
+    {
+      "key": "menu.level_button",
+      "en": "LEVEL %d",
+      "ja": "レベル %d"
+    },
+    {
+      "key": "menu.more_levels_coming_soon",
+      "en": "MORE LEVELS COMING SOON",
+      "ja": "新しいレベルを近日追加"
+    },
+    {
+      "key": "menu.coming_soon",
+      "en": "COMING SOON",
+      "ja": "近日公開"
+    },
+    {
+      "key": "menu.lives_full",
+      "en": "Full",
+      "ja": "満タン"
+    },
+    {
+      "key": "menu.starter_badge",
+      "en": "BUNDLE",
+      "ja": "セット"
+    },
+    {
+      "key": "nav.shop",
+      "en": "Shop",
+      "ja": "ショップ"
+    },
+    {
+      "key": "nav.home",
+      "en": "Home",
+      "ja": "ホーム"
+    },
+    {
+      "key": "nav.leaderboard",
+      "en": "Leaderboard",
+      "ja": "ランキング"
+    },
+    {
+      "key": "chapter.button",
+      "en": "CHAPTER %d",
+      "ja": "チャプター %d"
+    },
+    {
+      "key": "chapter.button_tooltip",
+      "en": "Choose Chapter %d: %s",
+      "ja": "チャプター%d「%s」を選択"
+    },
+    {
+      "key": "chapter.screen_title",
+      "en": "CHAPTERS",
+      "ja": "チャプター"
+    },
+    {
+      "key": "chapter.eyebrow",
+      "en": "CHAPTER %d",
+      "ja": "チャプター %d"
+    },
+    {
+      "key": "chapter.title.chapter_01",
+      "en": "Grocery Town",
+      "ja": "おかいものタウン"
+    },
+    {
+      "key": "chapter.title.chapter_02",
+      "en": "Candy Corner",
+      "ja": "キャンディーコーナー"
+    },
+    {
+      "key": "chapter.locked_status",
+      "en": "Complete %d more %s levels to unlock",
+      "ja": "あと%dレベルを「%s」内でクリアすると解放"
+    },
+    {
+      "key": "chapter.unlock_progress",
+      "en": "Unlock progress",
+      "ja": "解放までの進み具合"
+    },
+    {
+      "key": "chapter.current_progress",
+      "en": "Current progress",
+      "ja": "現在の進み具合"
+    },
+    {
+      "key": "chapter.locked",
+      "en": "Locked",
+      "ja": "ロック中"
+    },
+    {
+      "key": "chapter.no_levels_status",
+      "en": "New levels are coming soon",
+      "ja": "新しいレベルを近日追加します"
+    },
+    {
+      "key": "chapter.coming_soon",
+      "en": "Coming Soon",
+      "ja": "近日公開"
+    },
+    {
+      "key": "hud.level",
+      "en": "LEVEL %d",
+      "ja": "レベル %d"
+    },
+    {
+      "key": "hud.combo",
+      "en": "COMBO ×%d",
+      "ja": "コンボ ×%d"
+    },
+    {
+      "key": "hud.ability_tooltip.hammer",
+      "en": "Hammer -- clears a matching triple",
+      "ja": "ハンマー：同じアイテム3つを消します"
+    },
+    {
+      "key": "hud.ability_tooltip.shuffle",
+      "en": "Shuffle -- reshuffles unlocked items",
+      "ja": "シャッフル：ロックされていないアイテムを並べ替えます"
+    },
+    {
+      "key": "hud.ability_tooltip.lantern",
+      "en": "Lantern -- highlights a matchable triple",
+      "ja": "ランタン：そろえられる同じアイテム3つを光らせます"
+    },
+    {
+      "key": "hud.ability_tooltip.freezer",
+      "en": "Freezer -- pauses the countdown timer",
+      "ja": "フリーザー：残り時間のカウントを一時停止します"
+    },
+    {
+      "key": "hud.seconds_short",
+      "en": "%ds",
+      "ja": "%d秒"
+    },
+    {
+      "key": "tip.tap_dispenser",
+      "en": "Tap a dispenser to throw items onto the shelves!",
+      "ja": "ディスペンサーをタップして、棚にアイテムを出そう！"
+    },
+    {
+      "key": "pause.title",
+      "en": "PAUSE",
+      "ja": "一時停止"
+    },
+    {
+      "key": "pause.leave",
+      "en": "Leave",
+      "ja": "終了"
+    },
+    {
+      "key": "leave.title",
+      "en": "LEAVING THE LEVEL",
+      "ja": "レベルを終了"
+    },
+    {
+      "key": "leave.you_will_lose",
+      "en": "You will lose:",
+      "ja": "失われるもの："
+    },
+    {
+      "key": "leave.confirm",
+      "en": "Leave",
+      "ja": "終了"
+    },
+    {
+      "key": "timeup.title",
+      "en": "TIME'S UP",
+      "ja": "時間切れ"
+    },
+    {
+      "key": "timeup.offer",
+      "en": "Add one minute and keep sorting!",
+      "ja": "1分追加して、続きをプレイ！"
+    },
+    {
+      "key": "timeup.used",
+      "en": "Used",
+      "ja": "使用済み"
+    },
+    {
+      "key": "ability_purchase.title",
+      "en": "USE ABILITY",
+      "ja": "ブースターを使う"
+    },
+    {
+      "key": "shelf_unlock.title",
+      "en": "UNLOCK SHELF",
+      "ja": "棚を解放"
+    },
+    {
+      "key": "shelf_unlock.offer",
+      "en": "Watch one ad to unlock this shelf now.",
+      "ja": "広告を1回見ると、この棚を今すぐ解放できます。"
+    },
+    {
+      "key": "shelf_unlock.offer_or_clear",
+      "en": "Watch one ad to unlock this shelf now, or clear %s more.",
+      "ja": "広告を1回見るか、あと%s組そろえて消すと、この棚を解放できます。"
+    },
+    {
+      "key": "shelf_unlock.button",
+      "en": "Watch Ad · Unlock Shelf",
+      "ja": "広告を見て棚を解放"
+    },
+    {
+      "key": "shelf_unlock.ad_unavailable",
+      "en": "Ad unavailable. This shelf stays locked.",
+      "ja": "広告を表示できません。棚はロックされたままです。"
+    },
+    {
+      "key": "complete.title",
+      "en": "GREAT JOB!",
+      "ja": "お見事！"
+    },
+    {
+      "key": "failed.title",
+      "en": "LEVEL %d",
+      "ja": "レベル %d"
+    },
+    {
+      "key": "failed.headline",
+      "en": "LEVEL FAILED",
+      "ja": "クリア失敗"
+    },
+    {
+      "key": "failed.retry",
+      "en": "Retry",
+      "ja": "もう一度プレイ"
+    },
+    {
+      "key": "combo.praise.2",
+      "en": "Cool",
+      "ja": "いいね！"
+    },
+    {
+      "key": "combo.praise.3",
+      "en": "Great",
+      "ja": "やったね！"
+    },
+    {
+      "key": "combo.praise.4",
+      "en": "Awesome",
+      "ja": "すごい！"
+    },
+    {
+      "key": "combo.praise.5",
+      "en": "Amazing",
+      "ja": "お見事！"
+    },
+    {
+      "key": "combo.praise.6",
+      "en": "Fantastic",
+      "ja": "すばらしい！"
+    },
+    {
+      "key": "combo.praise.7",
+      "en": "Incredible",
+      "ja": "驚きの腕前！"
+    },
+    {
+      "key": "combo.praise.8",
+      "en": "Spectacular",
+      "ja": "圧巻！"
+    },
+    {
+      "key": "combo.praise.9",
+      "en": "Unstoppable",
+      "ja": "止まらない！"
+    },
+    {
+      "key": "combo.praise.10",
+      "en": "Legendary",
+      "ja": "伝説級！"
+    },
+    {
+      "key": "combo.praise.11",
+      "en": "Epic",
+      "ja": "すごすぎる！"
+    },
+    {
+      "key": "combo.praise.12",
+      "en": "Brilliant",
+      "ja": "天才！"
+    },
+    {
+      "key": "combo.praise.13",
+      "en": "Masterful",
+      "ja": "達人！"
+    },
+    {
+      "key": "combo.praise.14",
+      "en": "Supreme",
+      "ja": "至高！"
+    },
+    {
+      "key": "combo.praise.15",
+      "en": "Phenomenal",
+      "ja": "奇跡級！"
+    },
+    {
+      "key": "combo.praise.16",
+      "en": "Mythic",
+      "ja": "神話級！"
+    },
+    {
+      "key": "combo.praise.17",
+      "en": "Majestic",
+      "ja": "王者の風格！"
+    },
+    {
+      "key": "combo.praise.18",
+      "en": "Radiant",
+      "ja": "輝いてる！"
+    },
+    {
+      "key": "combo.praise.19",
+      "en": "Divine",
+      "ja": "神業！"
+    },
+    {
+      "key": "combo.praise.20",
+      "en": "Transcendent",
+      "ja": "限界突破！"
+    },
+    {
+      "key": "ability.hammer.name",
+      "en": "Hammer",
+      "ja": "ハンマー"
+    },
+    {
+      "key": "ability.shuffle.name",
+      "en": "Shuffle",
+      "ja": "シャッフル"
+    },
+    {
+      "key": "ability.lantern.name",
+      "en": "Lantern",
+      "ja": "ランタン"
+    },
+    {
+      "key": "ability.freezer.name",
+      "en": "Freezer",
+      "ja": "フリーザー"
+    },
+    {
+      "key": "ability.hammer.description",
+      "en": "Instantly clears one matching set of items off the shelves.",
+      "ja": "棚にある同じアイテム3つを一瞬で消します。"
+    },
+    {
+      "key": "ability.shuffle.description",
+      "en": "Shuffles shelf items into new spots to help you find a match.",
+      "ja": "棚のアイテムを並べ替えて、そろえられる組を見つけやすくします。"
+    },
+    {
+      "key": "ability.lantern.description",
+      "en": "Highlights a matching triple you can clear for 15 seconds.",
+      "ja": "そろえて消せる同じアイテム3つを15秒間光らせます。"
+    },
+    {
+      "key": "ability.freezer.description",
+      "en": "Freezes the level timer for 30 seconds.",
+      "ja": "レベルの残り時間のカウントを30秒間止めます。"
+    },
+    {
+      "key": "ad.watch",
+      "en": "Watch Ad",
+      "ja": "広告を見る"
+    },
+    {
+      "key": "ad.loading",
+      "en": "Loading...",
+      "ja": "読み込み中…"
+    },
+    {
+      "key": "ad.verifying",
+      "en": "Verifying...",
+      "ja": "確認中…"
+    },
+    {
+      "key": "ad.verify_reward",
+      "en": "Verify Reward",
+      "ja": "報酬を確認"
+    },
+    {
+      "key": "ad.reward_pending",
+      "en": "Reward verification is still pending.",
+      "ja": "報酬の確認がまだ完了していません。"
+    },
+    {
+      "key": "ad.unavailable_retry",
+      "en": "Ad unavailable. Please try again.",
+      "ja": "広告を表示できません。もう一度お試しください。"
+    },
+    {
+      "key": "ad.watch_unavailable",
+      "en": "Watch Ad\nUnavailable",
+      "ja": "広告を見る\n利用不可"
+    },
+    {
+      "key": "ad.watch_coming_soon",
+      "en": "Watch Ad\nComing Soon",
+      "ja": "広告を見る\n近日公開"
+    },
+    {
+      "key": "ad.badge",
+      "en": "AD",
+      "ja": "AD"
+    },
+    {
+      "key": "lives.title.out",
+      "en": "OUT OF LIVES",
+      "ja": "ライフ切れ"
+    },
+    {
+      "key": "lives.title.get_more",
+      "en": "GET MORE LIVES",
+      "ja": "ライフを補充"
+    },
+    {
+      "key": "lives.title.full",
+      "en": "LIVES FULL",
+      "ja": "ライフ満タン"
+    },
+    {
+      "key": "lives.next_in",
+      "en": "NEXT LIFE IN",
+      "ja": "次のライフ回復まで"
+    },
+    {
+      "key": "lives.full_body",
+      "en": "Your lives are full! Play a level to spend them.",
+      "ja": "ライフは満タンです！レベルをプレイしてライフを使いましょう。"
+    },
+    {
+      "key": "chest.title",
+      "en": "CHEST REWARDS",
+      "ja": "宝箱の報酬"
+    },
+    {
+      "key": "chest.progress_hint",
+      "en": "Collect stars to unlock a chest and claim your reward",
+      "ja": "スターを集めて宝箱を開け、報酬を受け取ろう"
+    },
+    {
+      "key": "chest.ready",
+      "en": "A REWARD CHEST AWAITS!",
+      "ja": "報酬の宝箱が開けられる！"
+    },
+    {
+      "key": "chest.tap_to_open",
+      "en": "Tap to open",
+      "ja": "タップして開ける"
+    },
+    {
+      "key": "purchase.tap_to_collect",
+      "en": "Tap to collect",
+      "ja": "タップして受け取る"
+    },
+    {
+      "key": "purchase.complete",
+      "en": "PURCHASE COMPLETE",
+      "ja": "購入完了"
+    },
+    {
+      "key": "shop.title",
+      "en": "SHOP",
+      "ja": "ショップ"
+    },
+    {
+      "key": "shop.section.bundles",
+      "en": "SPECIAL BUNDLES",
+      "ja": "スペシャルセット"
+    },
+    {
+      "key": "shop.section.coins",
+      "en": "COINS",
+      "ja": "コイン"
+    },
+    {
+      "key": "shop.offer.starter_bundle",
+      "en": "Starter Bundle",
+      "ja": "スターターセット"
+    },
+    {
+      "key": "shop.offer.basic_bundle",
+      "en": "Basic Bundle",
+      "ja": "ベーシックセット"
+    },
+    {
+      "key": "shop.tag.best_value",
+      "en": "BEST VALUE",
+      "ja": "一番お得"
+    },
+    {
+      "key": "shop.discount_off",
+      "en": "OFF",
+      "ja": "OFF"
+    },
+    {
+      "key": "shop.ability_hint",
+      "en": "Tap an ability to see what it does",
+      "ja": "ブースターをタップして効果を確認"
+    },
+    {
+      "key": "shop.purchasing",
+      "en": "Purchasing…",
+      "ja": "購入中…"
+    },
+    {
+      "key": "shop.no_offers",
+      "en": "No shop offers are available for this region.",
+      "ja": "この地域で購入できる商品はありません。"
+    },
+    {
+      "key": "shop.load_failed",
+      "en": "Could not load the shop.",
+      "ja": "ショップを読み込めませんでした。"
+    },
+    {
+      "key": "shop.error.title.purchase",
+      "en": "Purchase unavailable",
+      "ja": "購入できません"
+    },
+    {
+      "key": "shop.error.title.reward",
+      "en": "Reward error",
+      "ja": "報酬を受け取れません"
+    },
+    {
+      "key": "shop.error.purchase_failed",
+      "en": "The purchase could not be completed.",
+      "ja": "購入を完了できませんでした。"
+    },
+    {
+      "key": "shop.error.grant_failed",
+      "en": "The purchased rewards could not be granted.",
+      "ja": "購入した報酬を受け取れませんでした。"
+    },
+    {
+      "key": "shop.error.offer_unavailable",
+      "en": "This shop offer is unavailable.",
+      "ja": "この商品は購入できません。"
+    },
+    {
+      "key": "shop.error.already_bought",
+      "en": "This one-time shop offer has already been purchased.",
+      "ja": "この1回限りの商品は購入済みです。"
+    },
+    {
+      "key": "starter.title",
+      "en": "STARTER BUNDLE",
+      "ja": "スターターセット"
+    },
+    {
+      "key": "starter.one_time",
+      "en": "ONE-TIME OFFER",
+      "ja": "1回限定"
+    },
+    {
+      "key": "starter.boosters_included",
+      "en": "BOOSTERS INCLUDED",
+      "ja": "ブースター入り"
+    },
+    {
+      "key": "starter.coins",
+      "en": "%s COINS",
+      "ja": "コイン %s枚"
+    },
+    {
+      "key": "starter.buy_for",
+      "en": "Buy for %s",
+      "ja": "%sで購入"
+    },
+    {
+      "key": "starter.checking",
+      "en": "Checking offer…",
+      "ja": "商品を確認中…"
+    },
+    {
+      "key": "starter.checking_short",
+      "en": "Checking…",
+      "ja": "確認中…"
+    },
+    {
+      "key": "starter.no_longer_available",
+      "en": "This offer is no longer available.",
+      "ja": "この商品はもう購入できません。"
+    },
+    {
+      "key": "starter.unavailable",
+      "en": "Unavailable",
+      "ja": "購入不可"
+    },
+    {
+      "key": "booster_chip.claimed",
+      "en": "+%d %s",
+      "ja": "+%d %s"
+    },
+    {
+      "key": "profile.title",
+      "en": "EDIT PROFILE",
+      "ja": "プロフィール編集"
+    },
+    {
+      "key": "profile.name_header",
+      "en": "PLAYER NAME",
+      "ja": "プレイヤー名"
+    },
+    {
+      "key": "profile.name_placeholder",
+      "en": "Player name",
+      "ja": "プレイヤー名"
+    },
+    {
+      "key": "profile.edit_name_tooltip",
+      "en": "Edit player name",
+      "ja": "プレイヤー名を編集"
+    },
+    {
+      "key": "profile.avatar_tab",
+      "en": "AVATAR",
+      "ja": "アバター"
+    },
+    {
+      "key": "profile.frame_tab",
+      "en": "FRAME",
+      "ja": "フレーム"
+    },
+    {
+      "key": "profile.unlock.level",
+      "en": "Complete level %d to unlock",
+      "ja": "レベル%dをクリアすると解放"
+    },
+    {
+      "key": "profile.unlock.combo",
+      "en": "Reach a combo of ×%d in any run to unlock",
+      "ja": "いずれかのプレイでコンボ×%dを達成すると解放"
+    },
+    {
+      "key": "profile.unlock.weekly_first",
+      "en": "Finish 1st on the Weekly leaderboard to unlock",
+      "ja": "週間ランキング終了時に1位になると解放"
+    },
+    {
+      "key": "profile.unlock.weekly_top",
+      "en": "Finish top %d on the Weekly leaderboard to unlock",
+      "ja": "週間ランキング終了時に%d位以内に入ると解放"
+    },
+    {
+      "key": "leaderboard.title",
+      "en": "LEADERBOARD",
+      "ja": "ランキング"
+    },
+    {
+      "key": "leaderboard.tab.weekly",
+      "en": "Weekly",
+      "ja": "週間"
+    },
+    {
+      "key": "leaderboard.tab.country",
+      "en": "Country",
+      "ja": "国内"
+    },
+    {
+      "key": "leaderboard.tab.world",
+      "en": "World",
+      "ja": "世界"
+    },
+    {
+      "key": "leaderboard.weekly_reset",
+      "en": "Weekly reset in %s",
+      "ja": "週間ランキングのリセットまで %s"
+    },
+    {
+      "key": "leaderboard.duration.dh",
+      "en": "%dd %dh",
+      "ja": "%d日 %d時間"
+    },
+    {
+      "key": "leaderboard.duration.hm",
+      "en": "%dh %dm",
+      "ja": "%d時間 %d分"
+    },
+    {
+      "key": "leaderboard.duration.m",
+      "en": "%dm",
+      "ja": "%d分"
+    },
+    {
+      "key": "leaderboard.country_caption",
+      "en": "Country · All-time stars",
+      "ja": "国内・累計スター"
+    },
+    {
+      "key": "leaderboard.world_caption",
+      "en": "Worldwide · All-time stars",
+      "ja": "世界・累計スター"
+    },
+    {
+      "key": "leaderboard.load_failed",
+      "en": "Could not load leaderboard.",
+      "ja": "ランキングを読み込めませんでした。"
+    },
+    {
+      "key": "leaderboard.default_name",
+      "en": "Player",
+      "ja": "プレイヤー"
+    },
+    {
+      "key": "leaderboard.row_tooltip",
+      "en": "Rank %d, %s, %d stars",
+      "ja": "%d位、%s、スター%d個"
+    },
+    {
+      "key": "leaderboard.reward_tooltip",
+      "en": "%s coin weekly reward",
+      "ja": "週間報酬：コイン%s枚"
+    },
+    {
+      "key": "leaderboard.reward.title",
+      "en": "WEEKLY REWARD!",
+      "ja": "週間報酬！"
+    },
+    {
+      "key": "leaderboard.reward.body",
+      "en": "You finished #%d last week and earned %d coins!",
+      "ja": "先週は%d位！コイン%d枚を獲得しました！"
+    },
+    {
+      "key": "leaderboard.reward.ok",
+      "en": "Nice!",
+      "ja": "やった！"
+    },
+    {
+      "key": "settings.title",
+      "en": "SETTINGS",
+      "ja": "設定"
+    },
+    {
+      "key": "settings.music",
+      "en": "Music",
+      "ja": "音楽"
+    },
+    {
+      "key": "settings.sfx",
+      "en": "SFX",
+      "ja": "効果音"
+    },
+    {
+      "key": "settings.vibrate",
+      "en": "Vibrate",
+      "ja": "振動"
+    },
+    {
+      "key": "settings.support",
+      "en": "Support",
+      "ja": "サポート"
+    },
+    {
+      "key": "settings.language",
+      "en": "Language",
+      "ja": "言語"
+    },
+    {
+      "key": "settings.privacy_policy",
+      "en": "Privacy Policy",
+      "ja": "プライバシーポリシー"
+    },
+    {
+      "key": "settings.privacy_choices",
+      "en": "Privacy Choices",
+      "ja": "プライバシー設定"
+    },
+    {
+      "key": "settings.diagnostics",
+      "en": "Version %s • Build %d\nPlatform: %s • User: %s",
+      "ja": "バージョン %s • ビルド %d\nプラットフォーム：%s • ユーザー：%s"
+    },
+    {
+      "key": "language.title",
+      "en": "LANGUAGE",
+      "ja": "言語"
+    },
+    {
+      "key": "support.title",
+      "en": "SUPPORT",
+      "ja": "サポート"
+    },
+    {
+      "key": "support.faq_header",
+      "en": "Frequently Asked Questions",
+      "ja": "よくある質問"
+    },
+    {
+      "key": "support.faq.play.q",
+      "en": "How do I play?",
+      "ja": "遊び方は？"
+    },
+    {
+      "key": "support.faq.play.a",
+      "en": "Move matching goods onto the same shelf. When three identical items are visible together, they clear. Complete the board before time runs out.",
+      "ja": "同じアイテムを同じ棚に移動させましょう。同じアイテムが3つ同じ棚に見えている状態になると消えます。時間内にすべてのアイテムを消しましょう。"
+    },
+    {
+      "key": "support.faq.contact.q",
+      "en": "How do I contact support?",
+      "ja": "サポートへの問い合わせ方法は？"
+    },
+    {
+      "key": "support.faq.contact.a",
+      "en": "Email us at %s. Include a short description, your device platform, and when the problem happened.",
+      "ja": "%sにメールをお送りください。問題の簡単な説明、端末のプラットフォーム、問題が起きた日時を記載してください。"
+    },
+    {
+      "key": "support.faq.contact.action",
+      "en": "Email Support",
+      "ja": "サポートにメール"
+    },
+    {
+      "key": "support.faq.crash.q",
+      "en": "What if the game freezes or crashes?",
+      "ja": "ゲームがフリーズしたり、強制終了したら？"
+    },
+    {
+      "key": "support.faq.crash.a",
+      "en": "Close and reopen the game first. If it happens again, restart the device and make sure the game is updated. Contact support with the device model, platform version, and what you were doing before the problem.",
+      "ja": "まずゲームを閉じて、開き直してください。再び起きる場合は端末を再起動し、ゲームが最新バージョンになっているか確認してください。端末の機種、プラットフォームのバージョン、問題が起きる直前にしていたことを添えて、サポートにお問い合わせください。"
+    },
+    {
+      "key": "support.faq.sync.q",
+      "en": "How do I sync progress between devices?",
+      "ja": "端末間で進行状況を同期するには？"
+    },
+    {
+      "key": "support.faq.sync.a",
+      "en": "Use the same signed-in platform account on both devices and allow synchronization to finish before playing. If the progress differs, avoid playing on both devices and contact support.",
+      "ja": "両方の端末で同じプラットフォームアカウントにサインインし、同期が完了してからプレイしてください。進行状況が異なる場合は、どちらの端末でもプレイを控え、サポートにお問い合わせください。"
+    },
+    {
+      "key": "support.faq.bad_ad.q",
+      "en": "How do I report a bad ad?",
+      "ja": "問題のある広告を報告するには？"
+    },
+    {
+      "key": "support.faq.bad_ad.a",
+      "en": "1. Close the ad if you can do so safely.\n2. Take a screenshot of the ad and any advertiser or app name shown.\n3. Note the approximate time and where the ad appeared in the game.\n4. Describe why the ad seemed offensive, misleading, or fraudulent.\n5. Email these details to %s. Do not include passwords or payment information.",
+      "ja": "1. 安全に閉じられる場合は、広告を閉じてください。\n2. 広告と、表示されている広告主名やアプリ名のスクリーンショットを撮ってください。\n3. おおよその日時と、ゲーム内のどこに広告が表示されたかを控えてください。\n4. 不快な内容、誤解を招く内容、詐欺的な内容だと思った理由を記載してください。\n5. これらの情報を%sにメールでお送りください。パスワードや支払い情報は含めないでください。"
+    },
+    {
+      "key": "support.faq.bad_ad.action",
+      "en": "Email Ad Report",
+      "ja": "広告をメールで報告"
+    },
+    {
+      "key": "support.account_header",
+      "en": "Account",
+      "ja": "アカウント"
+    },
+    {
+      "key": "support.delete_account",
+      "en": "Delete Account",
+      "ja": "アカウントを削除"
+    },
+    {
+      "key": "support.delete_game_data",
+      "en": "Delete Game Data",
+      "ja": "ゲームデータを削除"
+    },
+    {
+      "key": "support.no_secrets",
+      "en": "Please never send passwords or payment information.",
+      "ja": "パスワードや支払い情報は絶対に送らないでください。"
+    },
+    {
+      "key": "deletion.title.delete_account",
+      "en": "DELETE ACCOUNT",
+      "ja": "アカウント削除"
+    },
+    {
+      "key": "deletion.title.delete_game_data",
+      "en": "DELETE GAME DATA",
+      "ja": "ゲームデータ削除"
+    },
+    {
+      "key": "deletion.title.not_confirmed",
+      "en": "NOT CONFIRMED",
+      "ja": "未確認"
+    },
+    {
+      "key": "deletion.title.status_unconfirmed",
+      "en": "STATUS UNCONFIRMED",
+      "ja": "削除状況は未確認"
+    },
+    {
+      "key": "deletion.title.finishing_up",
+      "en": "FINISHING UP",
+      "ja": "削除の最終処理中"
+    },
+    {
+      "key": "deletion.title.new_game",
+      "en": "NEW GAME",
+      "ja": "新しいゲーム"
+    },
+    {
+      "key": "deletion.title.status_unknown",
+      "en": "STATUS UNKNOWN",
+      "ja": "状況不明"
+    },
+    {
+      "key": "deletion.title.not_deleted",
+      "en": "NOT DELETED",
+      "ja": "削除されていません"
+    },
+    {
+      "key": "deletion.title.data_deleted",
+      "en": "DATA DELETED",
+      "ja": "データ削除完了"
+    },
+    {
+      "key": "deletion.title.accepted",
+      "en": "DELETION ACCEPTED",
+      "ja": "削除を受け付けました"
+    },
+    {
+      "key": "deletion.confirm.headline",
+      "en": "This permanently deletes your account.",
+      "ja": "アカウントを永久に削除します。"
+    },
+    {
+      "key": "deletion.confirm.body",
+      "en": "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nIf you sign in again later, you'll start a new account.\n\nSome purchase and security records are kept without your name or profile. The rest is removed within 30 days.",
+      "ja": "進行状況、コイン、アイテム、プロフィールが失われます。この操作は取り消せません。\n\n後で再びサインインした場合は、新しいアカウントで始めることになります。\n\n購入やセキュリティに関する一部の記録は、名前やプロフィールを含めずに保管されます。その他のデータは30日以内に削除されます。"
+    },
+    {
+      "key": "deletion.confirm.button",
+      "en": "Delete Account",
+      "ja": "アカウントを削除"
+    },
+    {
+      "key": "deletion.local_confirm.headline",
+      "en": "This deletes your game data on this device.",
+      "ja": "この端末のゲームデータを削除します。"
+    },
+    {
+      "key": "deletion.local_confirm.body",
+      "en": "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nThis game never created an online account for you, so nothing needs to be deleted from our servers.",
+      "ja": "進行状況、コイン、アイテム、プロフィールが失われます。この操作は取り消せません。\n\nこのゲームでは、あなたのオンラインアカウントは作成されていません。そのため、当社のサーバーから削除するデータはありません。"
+    },
+    {
+      "key": "deletion.local_confirm.button",
+      "en": "Delete Data",
+      "ja": "データを削除"
+    },
+    {
+      "key": "deletion.pending_setup.headline",
+      "en": "Your account is still being set up.",
+      "ja": "アカウントの作成処理がまだ完了していません。"
+    },
+    {
+      "key": "deletion.pending_setup.body",
+      "en": "Connect to the internet and try again in a moment. Nothing was deleted.",
+      "ja": "インターネットに接続し、少し待ってからもう一度お試しください。何も削除されていません。"
+    },
+    {
+      "key": "deletion.sign_in.headline",
+      "en": "Sign in to the account you want to delete.",
+      "ja": "削除したいアカウントにサインインしてください。"
+    },
+    {
+      "key": "deletion.sign_in.body",
+      "en": "If you can't sign in, contact support for help.",
+      "ja": "サインインできない場合は、サポートにお問い合わせください。"
+    },
+    {
+      "key": "deletion.read_failed.headline",
+      "en": "Your game data couldn't be read.",
+      "ja": "ゲームデータを読み込めませんでした。"
+    },
+    {
+      "key": "deletion.read_failed.body",
+      "en": "Restart the game, then try again. Nothing was deleted.",
+      "ja": "ゲームを再起動して、もう一度お試しください。何も削除されていません。"
+    },
+    {
+      "key": "deletion.unavailable.headline",
+      "en": "Account deletion isn't available in this version of the game.",
+      "ja": "このバージョンのゲームでは、アカウントを削除できません。"
+    },
+    {
+      "key": "deletion.unavailable.body",
+      "en": "Update the game, or contact support for help deleting your account. Nothing was deleted.",
+      "ja": "ゲームを更新するか、アカウントの削除についてサポートにお問い合わせください。何も削除されていません。"
+    },
+    {
+      "key": "deletion.in_progress.account",
+      "en": "Deleting your account...",
+      "ja": "アカウントを削除中…"
+    },
+    {
+      "key": "deletion.in_progress.local",
+      "en": "Deleting your game data...",
+      "ja": "ゲームデータを削除中…"
+    },
+    {
+      "key": "deletion.in_progress.body",
+      "en": "Keep the game open. This only takes a moment.",
+      "ja": "ゲームを開いたままお待ちください。まもなく完了します。"
+    },
+    {
+      "key": "deletion.not_confirmed.headline",
+      "en": "We haven't heard back about your deletion yet.",
+      "ja": "削除リクエストへの応答がまだ届いていません。"
+    },
+    {
+      "key": "deletion.not_confirmed.body",
+      "en": "Your request was sent, but the answer didn't arrive. Connect to the internet and try again. The game stays locked until we know the result.",
+      "ja": "リクエストは送信されましたが、応答が届きませんでした。インターネットに接続し、もう一度お試しください。結果が確認できるまで、ゲームはロックされたままになります。"
+    },
+    {
+      "key": "deletion.unconfirmed.headline",
+      "en": "Deletion status unconfirmed",
+      "ja": "削除状況は未確認です"
+    },
+    {
+      "key": "deletion.unconfirmed.body",
+      "en": "We couldn't confirm whether your account was deleted. To keep your data safe, the game stays locked. Contact support and include the reference below.",
+      "ja": "アカウントが削除されたか確認できませんでした。データを保護するため、ゲームはロックされたままになります。以下の照会番号を添えて、サポートにお問い合わせください。"
+    },
+    {
+      "key": "deletion.check_again",
+      "en": "Check Again",
+      "ja": "もう一度確認"
+    },
+    {
+      "key": "deletion.cleanup.headline.local",
+      "en": "Your local game data couldn't be fully deleted yet.",
+      "ja": "この端末のゲームデータをまだ完全に削除できていません。"
+    },
+    {
+      "key": "deletion.cleanup.headline.account",
+      "en": "Account deletion accepted; finishing cleanup.",
+      "ja": "アカウントの削除を受け付けました。残りのデータを削除中です。"
+    },
+    {
+      "key": "deletion.cleanup.body",
+      "en": "Some game data couldn't be removed from this device yet. Try again to finish.",
+      "ja": "この端末から一部のゲームデータをまだ削除できていません。もう一度試して、削除を完了してください。"
+    },
+    {
+      "key": "deletion.new_game.headline",
+      "en": "Starting a new game...",
+      "ja": "新しいゲームを開始中…"
+    },
+    {
+      "key": "deletion.new_game.body",
+      "en": "This only takes a moment.",
+      "ja": "まもなく完了します。"
+    },
+    {
+      "key": "deletion.status_unknown.headline",
+      "en": "We couldn't read the deletion status on this device.",
+      "ja": "この端末の削除状況を読み取れませんでした。"
+    },
+    {
+      "key": "deletion.status_unknown.body",
+      "en": "To keep your data safe, the game stays locked. Contact support for help.",
+      "ja": "データを保護するため、ゲームはロックされたままになります。サポートにお問い合わせください。"
+    },
+    {
+      "key": "deletion.fail.offline",
+      "en": "Connect to the internet to delete your account.",
+      "ja": "アカウントを削除するには、インターネットに接続してください。"
+    },
+    {
+      "key": "deletion.fail.rate_limited",
+      "en": "Too many attempts. Wait a moment, then try again.",
+      "ja": "試行回数が多すぎます。少し待ってから、もう一度お試しください。"
+    },
+    {
+      "key": "deletion.fail.busy",
+      "en": "Account deletion is busy right now. Try again in a moment.",
+      "ja": "現在、アカウント削除の処理が混み合っています。少し待ってから、もう一度お試しください。"
+    },
+    {
+      "key": "deletion.fail.syncing",
+      "en": "The game is still syncing. Try again in a moment.",
+      "ja": "ゲームはまだ同期中です。少し待ってから、もう一度お試しください。"
+    },
+    {
+      "key": "deletion.fail.auth",
+      "en": "We couldn't verify your account. Restart the game, then try again.",
+      "ja": "アカウントを確認できませんでした。ゲームを再起動して、もう一度お試しください。"
+    },
+    {
+      "key": "deletion.fail.update",
+      "en": "Update the game to delete your account.",
+      "ja": "アカウントを削除するには、ゲームを更新してください。"
+    },
+    {
+      "key": "deletion.fail.changed",
+      "en": "Your account changed while we were deleting it. Try again.",
+      "ja": "削除処理中にアカウントが変更されました。もう一度お試しください。"
+    },
+    {
+      "key": "deletion.fail.storage",
+      "en": "Your device couldn't save the deletion request. Try again.",
+      "ja": "この端末に削除リクエストを保存できませんでした。もう一度お試しください。"
+    },
+    {
+      "key": "deletion.fail.generic",
+      "en": "We couldn't delete your account. Try again later or contact support.",
+      "ja": "アカウントを削除できませんでした。後でもう一度試すか、サポートにお問い合わせください。"
+    },
+    {
+      "key": "deletion.fail.local",
+      "en": "Your game data couldn't be deleted. Try again.",
+      "ja": "ゲームデータを削除できませんでした。もう一度お試しください。"
+    },
+    {
+      "key": "deletion.fail.body",
+      "en": "Nothing was deleted, and you can keep playing.",
+      "ja": "何も削除されていません。そのままプレイを続けられます。"
+    },
+    {
+      "key": "deletion.done_local.headline",
+      "en": "Your local game data was deleted.",
+      "ja": "この端末のゲームデータを削除しました。"
+    },
+    {
+      "key": "deletion.done_local.body",
+      "en": "You can start over with a new game.",
+      "ja": "新しいゲームで最初からやり直せます。"
+    },
+    {
+      "key": "deletion.new_game_failed",
+      "en": "The new game couldn't start. Try again.",
+      "ja": "新しいゲームを開始できませんでした。もう一度お試しください。"
+    },
+    {
+      "key": "deletion.accepted.headline",
+      "en": "Your account is no longer accessible.",
+      "ja": "このアカウントにはもうアクセスできません。"
+    },
+    {
+      "key": "deletion.accepted.body",
+      "en": "Your deletion request was accepted.",
+      "ja": "削除リクエストが受け付けられました。"
+    },
+    {
+      "key": "deletion.accepted.body_deadline",
+      "en": "Your deletion request was accepted. Data removal is due by %s.",
+      "ja": "削除リクエストが受け付けられました。データは%sまでに削除されます。"
+    },
+    {
+      "key": "deletion.reference",
+      "en": "Reference: %s",
+      "ja": "照会番号：%s"
+    },
+    {
+      "key": "deletion.start_new_game",
+      "en": "Start New Game",
+      "ja": "新しいゲームを開始"
+    },
+    {
+      "key": "app.name",
+      "en": "SortingPuzzle",
+      "ja": "SortingPuzzle"
+    },
+    {
+      "key": "support.email.subject",
+      "en": "Sorting Puzzle support request",
+      "ja": "Sorting Puzzle サポートへのお問い合わせ"
+    },
+    {
+      "key": "support.email.body",
+      "en": "Please describe the issue here.\n\nDevice/platform:\nApproximate time:\n",
+      "ja": "こちらに問題の内容を記載してください。\n\n端末／プラットフォーム：\nおおよその日時：\n"
+    },
+    {
+      "key": "support.ad_email.subject",
+      "en": "Sorting Puzzle ad report",
+      "ja": "Sorting Puzzle 広告の報告"
+    },
+    {
+      "key": "support.ad_email.body",
+      "en": "Please attach a screenshot and complete the details below.\n\nApproximate time:\nAd placement in the game:\nAdvertiser or app name:\nWhy the ad should be reviewed:\n",
+      "ja": "スクリーンショットを添付し、以下の項目をご記入ください。\n\nおおよその日時：\nゲーム内の広告表示場所：\n広告主名またはアプリ名：\n広告を確認してほしい理由：\n"
+    },
+    {
+      "key": "deletion.email.subject",
+      "en": "Sorting Puzzle account deletion",
+      "ja": "Sorting Puzzle アカウント削除について"
+    },
+    {
+      "key": "deletion.email.body",
+      "en": "Please help me with my account deletion.",
+      "ja": "アカウントの削除についてサポートをお願いします。"
+    }
+  ],
+  "plurals": {
+    "chapter.locked_status": {
+      "other": "あと%dレベルを「%s」内でクリアすると解放"
+    },
+    "shelf_unlock.offer_or_clear": {
+      "other": "広告を1回見るか、あと%s組そろえて消すと、この棚を解放できます。"
+    },
+    "starter.coins": {
+      "other": "コイン %s枚"
+    },
+    "leaderboard.row_tooltip": {
+      "other": "%d位、%s、スター%d個"
+    },
+    "leaderboard.reward_tooltip": {
+      "other": "週間報酬：コイン%s枚"
+    },
+    "leaderboard.reward.body": {
+      "other": "先週は%d位！コイン%d枚を獲得しました！"
+    }
+  },
+  "counted_boosters": {
+    "Hammer": [
+      "ハンマー"
+    ],
+    "Shuffle": [
+      "シャッフル"
+    ],
+    "Lantern": [
+      "ランタン"
+    ],
+    "Freezer": [
+      "フリーザー"
+    ]
+  },
+  "months": [
+    "1月",
+    "2月",
+    "3月",
+    "4月",
+    "5月",
+    "6月",
+    "7月",
+    "8月",
+    "9月",
+    "10月",
+    "11月",
+    "12月"
+  ],
+  "additional": [
+    {
+      "key": "support.email.status",
+      "en": "Status: %s",
+      "ja": "状況： %s"
+    },
+    {
+      "key": "support.email.deletion_reference",
+      "en": "Deletion reference",
+      "ja": "削除の照会番号"
+    },
+    {
+      "key": "support.email.server_reference",
+      "en": "Server reference",
+      "ja": "サーバーの照会番号"
+    },
+    {
+      "key": "support.email.player_id",
+      "en": "Player ID",
+      "ja": "プレイヤーID"
+    },
+    {
+      "key": "leaderboard.empty",
+      "en": "No scores yet",
+      "ja": "まだスコアがありません"
+    }
+  ]
+}

@@ -1,0 +1,2131 @@
+# Reviewed Japanese inventory; see docs/localization/JAPANESE_TRANSLATIONS.md.
+msgid ""
+msgstr ""
+"Project-Id-Version: SortingPuzzle\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#. date.day_month_year
+msgid "date.day_month_year"
+msgstr "%d日 %s %d年"
+
+#. common.play
+msgid "common.play"
+msgstr "プレイ"
+
+#. common.continue
+msgid "common.continue"
+msgstr "続ける"
+
+#. common.resume
+msgid "common.resume"
+msgstr "再開"
+
+#. common.try_again
+msgid "common.try_again"
+msgstr "もう一度"
+
+#. common.close
+msgid "common.close"
+msgstr "閉じる"
+
+#. common.cancel
+msgid "common.cancel"
+msgstr "キャンセル"
+
+#. common.got_it
+msgid "common.got_it"
+msgstr "OK"
+
+#. common.get_help
+msgid "common.get_help"
+msgstr "サポートへ"
+
+#. common.save
+msgid "common.save"
+msgstr "保存"
+
+#. common.loading
+msgid "common.loading"
+msgstr "読み込み中…"
+
+#. common.retry_load
+msgid "common.retry_load"
+msgstr "再読み込み"
+
+#. menu.level_button
+msgid "menu.level_button"
+msgstr "レベル %d"
+
+#. menu.more_levels_coming_soon
+msgid "menu.more_levels_coming_soon"
+msgstr "新しいレベルを近日追加"
+
+#. menu.coming_soon
+msgid "menu.coming_soon"
+msgstr "近日公開"
+
+#. menu.lives_full
+msgid "menu.lives_full"
+msgstr "満タン"
+
+#. menu.starter_badge
+msgid "menu.starter_badge"
+msgstr "セット"
+
+#. nav.shop
+msgid "nav.shop"
+msgstr "ショップ"
+
+#. nav.home
+msgid "nav.home"
+msgstr "ホーム"
+
+#. nav.leaderboard
+msgid "nav.leaderboard"
+msgstr "ランキング"
+
+#. chapter.button
+msgid "chapter.button"
+msgstr "チャプター %d"
+
+#. chapter.button_tooltip
+msgid "chapter.button_tooltip"
+msgstr "チャプター%d「%s」を選択"
+
+#. chapter.screen_title
+msgid "chapter.screen_title"
+msgstr "チャプター"
+
+#. chapter.eyebrow
+msgid "chapter.eyebrow"
+msgstr "チャプター %d"
+
+#. chapter.title.chapter_01
+msgid "chapter.title.chapter_01"
+msgstr "おかいものタウン"
+
+#. chapter.title.chapter_02
+msgid "chapter.title.chapter_02"
+msgstr "キャンディーコーナー"
+
+#. chapter.locked_status
+msgid "chapter.locked_status"
+msgid_plural "chapter.locked_status.plural"
+msgstr[0] "あと%dレベルを「%s」内でクリアすると解放"
+
+#. chapter.unlock_progress
+msgid "chapter.unlock_progress"
+msgstr "解放までの進み具合"
+
+#. chapter.current_progress
+msgid "chapter.current_progress"
+msgstr "現在の進み具合"
+
+#. chapter.locked
+msgid "chapter.locked"
+msgstr "ロック中"
+
+#. chapter.no_levels_status
+msgid "chapter.no_levels_status"
+msgstr "新しいレベルを近日追加します"
+
+#. chapter.coming_soon
+msgid "chapter.coming_soon"
+msgstr "近日公開"
+
+#. hud.level
+msgid "hud.level"
+msgstr "レベル %d"
+
+#. hud.combo
+msgid "hud.combo"
+msgstr "コンボ ×%d"
+
+#. hud.ability_tooltip.hammer
+msgid "hud.ability_tooltip.hammer"
+msgstr "ハンマー：同じアイテム3つを消します"
+
+#. hud.ability_tooltip.shuffle
+msgid "hud.ability_tooltip.shuffle"
+msgstr "シャッフル：ロックされていないアイテムを並べ替えます"
+
+#. hud.ability_tooltip.lantern
+msgid "hud.ability_tooltip.lantern"
+msgstr "ランタン：そろえられる同じアイテム3つを光らせます"
+
+#. hud.ability_tooltip.freezer
+msgid "hud.ability_tooltip.freezer"
+msgstr "フリーザー：残り時間のカウントを一時停止します"
+
+#. hud.seconds_short
+msgid "hud.seconds_short"
+msgstr "%d秒"
+
+#. tip.tap_dispenser
+msgid "tip.tap_dispenser"
+msgstr "ディスペンサーをタップして、棚にアイテムを出そう！"
+
+#. pause.title
+msgid "pause.title"
+msgstr "一時停止"
+
+#. pause.leave
+msgid "pause.leave"
+msgstr "終了"
+
+#. leave.title
+msgid "leave.title"
+msgstr "レベルを終了"
+
+#. leave.you_will_lose
+msgid "leave.you_will_lose"
+msgstr "失われるもの："
+
+#. leave.confirm
+msgid "leave.confirm"
+msgstr "終了"
+
+#. timeup.title
+msgid "timeup.title"
+msgstr "時間切れ"
+
+#. timeup.offer
+msgid "timeup.offer"
+msgstr "1分追加して、続きをプレイ！"
+
+#. timeup.used
+msgid "timeup.used"
+msgstr "使用済み"
+
+#. ability_purchase.title
+msgid "ability_purchase.title"
+msgstr "ブースターを使う"
+
+#. shelf_unlock.title
+msgid "shelf_unlock.title"
+msgstr "棚を解放"
+
+#. shelf_unlock.offer
+msgid "shelf_unlock.offer"
+msgstr "広告を1回見ると、この棚を今すぐ解放できます。"
+
+#. shelf_unlock.offer_or_clear
+msgid "shelf_unlock.offer_or_clear"
+msgid_plural "shelf_unlock.offer_or_clear.plural"
+msgstr[0] "広告を1回見るか、あと%s組そろえて消すと、この棚を解放できます。"
+
+#. shelf_unlock.button
+msgid "shelf_unlock.button"
+msgstr "広告を見て棚を解放"
+
+#. shelf_unlock.ad_unavailable
+msgid "shelf_unlock.ad_unavailable"
+msgstr "広告を表示できません。棚はロックされたままです。"
+
+#. complete.title
+msgid "complete.title"
+msgstr "お見事！"
+
+#. failed.title
+msgid "failed.title"
+msgstr "レベル %d"
+
+#. failed.headline
+msgid "failed.headline"
+msgstr "クリア失敗"
+
+#. failed.retry
+msgid "failed.retry"
+msgstr "もう一度プレイ"
+
+#. combo.praise.2
+msgid "combo.praise.2"
+msgstr "いいね！"
+
+#. combo.praise.3
+msgid "combo.praise.3"
+msgstr "やったね！"
+
+#. combo.praise.4
+msgid "combo.praise.4"
+msgstr "すごい！"
+
+#. combo.praise.5
+msgid "combo.praise.5"
+msgstr "お見事！"
+
+#. combo.praise.6
+msgid "combo.praise.6"
+msgstr "すばらしい！"
+
+#. combo.praise.7
+msgid "combo.praise.7"
+msgstr "驚きの腕前！"
+
+#. combo.praise.8
+msgid "combo.praise.8"
+msgstr "圧巻！"
+
+#. combo.praise.9
+msgid "combo.praise.9"
+msgstr "止まらない！"
+
+#. combo.praise.10
+msgid "combo.praise.10"
+msgstr "伝説級！"
+
+#. combo.praise.11
+msgid "combo.praise.11"
+msgstr "すごすぎる！"
+
+#. combo.praise.12
+msgid "combo.praise.12"
+msgstr "天才！"
+
+#. combo.praise.13
+msgid "combo.praise.13"
+msgstr "達人！"
+
+#. combo.praise.14
+msgid "combo.praise.14"
+msgstr "至高！"
+
+#. combo.praise.15
+msgid "combo.praise.15"
+msgstr "奇跡級！"
+
+#. combo.praise.16
+msgid "combo.praise.16"
+msgstr "神話級！"
+
+#. combo.praise.17
+msgid "combo.praise.17"
+msgstr "王者の風格！"
+
+#. combo.praise.18
+msgid "combo.praise.18"
+msgstr "輝いてる！"
+
+#. combo.praise.19
+msgid "combo.praise.19"
+msgstr "神業！"
+
+#. combo.praise.20
+msgid "combo.praise.20"
+msgstr "限界突破！"
+
+#. ability.hammer.name
+msgid "ability.hammer.name"
+msgstr "ハンマー"
+
+#. ability.shuffle.name
+msgid "ability.shuffle.name"
+msgstr "シャッフル"
+
+#. ability.lantern.name
+msgid "ability.lantern.name"
+msgstr "ランタン"
+
+#. ability.freezer.name
+msgid "ability.freezer.name"
+msgstr "フリーザー"
+
+#. ability.hammer.description
+msgid "ability.hammer.description"
+msgstr "棚にある同じアイテム3つを一瞬で消します。"
+
+#. ability.shuffle.description
+msgid "ability.shuffle.description"
+msgstr "棚のアイテムを並べ替えて、そろえられる組を見つけやすくします。"
+
+#. ability.lantern.description
+msgid "ability.lantern.description"
+msgstr "そろえて消せる同じアイテム3つを15秒間光らせます。"
+
+#. ability.freezer.description
+msgid "ability.freezer.description"
+msgstr "レベルの残り時間のカウントを30秒間止めます。"
+
+#. ad.watch
+msgid "ad.watch"
+msgstr "広告を見る"
+
+#. ad.loading
+msgid "ad.loading"
+msgstr "読み込み中…"
+
+#. ad.verifying
+msgid "ad.verifying"
+msgstr "確認中…"
+
+#. ad.verify_reward
+msgid "ad.verify_reward"
+msgstr "報酬を確認"
+
+#. ad.reward_pending
+msgid "ad.reward_pending"
+msgstr "報酬の確認がまだ完了していません。"
+
+#. ad.unavailable_retry
+msgid "ad.unavailable_retry"
+msgstr "広告を表示できません。もう一度お試しください。"
+
+#. ad.watch_unavailable
+msgid "ad.watch_unavailable"
+msgstr "広告を見る\n利用不可"
+
+#. ad.watch_coming_soon
+msgid "ad.watch_coming_soon"
+msgstr "広告を見る\n近日公開"
+
+#. ad.badge
+msgid "ad.badge"
+msgstr "AD"
+
+#. lives.title.out
+msgid "lives.title.out"
+msgstr "ライフ切れ"
+
+#. lives.title.get_more
+msgid "lives.title.get_more"
+msgstr "ライフを補充"
+
+#. lives.title.full
+msgid "lives.title.full"
+msgstr "ライフ満タン"
+
+#. lives.next_in
+msgid "lives.next_in"
+msgstr "次のライフ回復まで"
+
+#. lives.full_body
+msgid "lives.full_body"
+msgstr "ライフは満タンです！レベルをプレイしてライフを使いましょう。"
+
+#. chest.title
+msgid "chest.title"
+msgstr "宝箱の報酬"
+
+#. chest.progress_hint
+msgid "chest.progress_hint"
+msgstr "スターを集めて宝箱を開け、報酬を受け取ろう"
+
+#. chest.ready
+msgid "chest.ready"
+msgstr "報酬の宝箱が開けられる！"
+
+#. chest.tap_to_open
+msgid "chest.tap_to_open"
+msgstr "タップして開ける"
+
+#. purchase.tap_to_collect
+msgid "purchase.tap_to_collect"
+msgstr "タップして受け取る"
+
+#. purchase.complete
+msgid "purchase.complete"
+msgstr "購入完了"
+
+#. shop.title
+msgid "shop.title"
+msgstr "ショップ"
+
+#. shop.section.bundles
+msgid "shop.section.bundles"
+msgstr "スペシャルセット"
+
+#. shop.section.coins
+msgid "shop.section.coins"
+msgstr "コイン"
+
+#. shop.offer.starter_bundle
+msgid "shop.offer.starter_bundle"
+msgstr "スターターセット"
+
+#. shop.offer.basic_bundle
+msgid "shop.offer.basic_bundle"
+msgstr "ベーシックセット"
+
+#. shop.tag.best_value
+msgid "shop.tag.best_value"
+msgstr "一番お得"
+
+#. shop.discount_off
+msgid "shop.discount_off"
+msgstr "OFF"
+
+#. shop.ability_hint
+msgid "shop.ability_hint"
+msgstr "ブースターをタップして効果を確認"
+
+#. shop.purchasing
+msgid "shop.purchasing"
+msgstr "購入中…"
+
+#. shop.no_offers
+msgid "shop.no_offers"
+msgstr "この地域で購入できる商品はありません。"
+
+#. shop.load_failed
+msgid "shop.load_failed"
+msgstr "ショップを読み込めませんでした。"
+
+#. shop.error.title.purchase
+msgid "shop.error.title.purchase"
+msgstr "購入できません"
+
+#. shop.error.title.reward
+msgid "shop.error.title.reward"
+msgstr "報酬を受け取れません"
+
+#. shop.error.purchase_failed
+msgid "shop.error.purchase_failed"
+msgstr "購入を完了できませんでした。"
+
+#. shop.error.grant_failed
+msgid "shop.error.grant_failed"
+msgstr "購入した報酬を受け取れませんでした。"
+
+#. shop.error.offer_unavailable
+msgid "shop.error.offer_unavailable"
+msgstr "この商品は購入できません。"
+
+#. shop.error.already_bought
+msgid "shop.error.already_bought"
+msgstr "この1回限りの商品は購入済みです。"
+
+#. starter.title
+msgid "starter.title"
+msgstr "スターターセット"
+
+#. starter.one_time
+msgid "starter.one_time"
+msgstr "1回限定"
+
+#. starter.boosters_included
+msgid "starter.boosters_included"
+msgstr "ブースター入り"
+
+#. starter.coins
+msgid "starter.coins"
+msgid_plural "starter.coins.plural"
+msgstr[0] "コイン %s枚"
+
+#. starter.buy_for
+msgid "starter.buy_for"
+msgstr "%sで購入"
+
+#. starter.checking
+msgid "starter.checking"
+msgstr "商品を確認中…"
+
+#. starter.checking_short
+msgid "starter.checking_short"
+msgstr "確認中…"
+
+#. starter.no_longer_available
+msgid "starter.no_longer_available"
+msgstr "この商品はもう購入できません。"
+
+#. starter.unavailable
+msgid "starter.unavailable"
+msgstr "購入不可"
+
+#. booster_chip.claimed
+msgid "booster_chip.claimed"
+msgstr "+%d %s"
+
+#. profile.title
+msgid "profile.title"
+msgstr "プロフィール編集"
+
+#. profile.name_header
+msgid "profile.name_header"
+msgstr "プレイヤー名"
+
+#. profile.name_placeholder
+msgid "profile.name_placeholder"
+msgstr "プレイヤー名"
+
+#. profile.edit_name_tooltip
+msgid "profile.edit_name_tooltip"
+msgstr "プレイヤー名を編集"
+
+#. profile.avatar_tab
+msgid "profile.avatar_tab"
+msgstr "アバター"
+
+#. profile.frame_tab
+msgid "profile.frame_tab"
+msgstr "フレーム"
+
+#. profile.unlock.level
+msgid "profile.unlock.level"
+msgstr "レベル%dをクリアすると解放"
+
+#. profile.unlock.combo
+msgid "profile.unlock.combo"
+msgstr "いずれかのプレイでコンボ×%dを達成すると解放"
+
+#. profile.unlock.weekly_first
+msgid "profile.unlock.weekly_first"
+msgstr "週間ランキング終了時に1位になると解放"
+
+#. profile.unlock.weekly_top
+msgid "profile.unlock.weekly_top"
+msgstr "週間ランキング終了時に%d位以内に入ると解放"
+
+#. leaderboard.title
+msgid "leaderboard.title"
+msgstr "ランキング"
+
+#. leaderboard.tab.weekly
+msgid "leaderboard.tab.weekly"
+msgstr "週間"
+
+#. leaderboard.tab.country
+msgid "leaderboard.tab.country"
+msgstr "国内"
+
+#. leaderboard.tab.world
+msgid "leaderboard.tab.world"
+msgstr "世界"
+
+#. leaderboard.weekly_reset
+msgid "leaderboard.weekly_reset"
+msgstr "週間ランキングのリセットまで %s"
+
+#. leaderboard.duration.dh
+msgid "leaderboard.duration.dh"
+msgstr "%d日 %d時間"
+
+#. leaderboard.duration.hm
+msgid "leaderboard.duration.hm"
+msgstr "%d時間 %d分"
+
+#. leaderboard.duration.m
+msgid "leaderboard.duration.m"
+msgstr "%d分"
+
+#. leaderboard.country_caption
+msgid "leaderboard.country_caption"
+msgstr "国内・累計スター"
+
+#. leaderboard.world_caption
+msgid "leaderboard.world_caption"
+msgstr "世界・累計スター"
+
+#. leaderboard.load_failed
+msgid "leaderboard.load_failed"
+msgstr "ランキングを読み込めませんでした。"
+
+#. leaderboard.default_name
+msgid "leaderboard.default_name"
+msgstr "プレイヤー"
+
+#. leaderboard.row_tooltip
+msgid "leaderboard.row_tooltip"
+msgid_plural "leaderboard.row_tooltip.plural"
+msgstr[0] "%d位、%s、スター%d個"
+
+#. leaderboard.reward_tooltip
+msgid "leaderboard.reward_tooltip"
+msgid_plural "leaderboard.reward_tooltip.plural"
+msgstr[0] "週間報酬：コイン%s枚"
+
+#. leaderboard.reward.title
+msgid "leaderboard.reward.title"
+msgstr "週間報酬！"
+
+#. leaderboard.reward.body
+msgid "leaderboard.reward.body"
+msgid_plural "leaderboard.reward.body.plural"
+msgstr[0] "先週は%d位！コイン%d枚を獲得しました！"
+
+#. leaderboard.reward.ok
+msgid "leaderboard.reward.ok"
+msgstr "やった！"
+
+#. settings.title
+msgid "settings.title"
+msgstr "設定"
+
+#. settings.music
+msgid "settings.music"
+msgstr "音楽"
+
+#. settings.sfx
+msgid "settings.sfx"
+msgstr "効果音"
+
+#. settings.vibrate
+msgid "settings.vibrate"
+msgstr "振動"
+
+#. settings.support
+msgid "settings.support"
+msgstr "サポート"
+
+#. settings.language
+msgid "settings.language"
+msgstr "言語"
+
+#. settings.privacy_policy
+msgid "settings.privacy_policy"
+msgstr "プライバシーポリシー"
+
+#. settings.privacy_choices
+msgid "settings.privacy_choices"
+msgstr "プライバシー設定"
+
+#. settings.diagnostics
+msgid "settings.diagnostics"
+msgstr "バージョン %s • ビルド %d\nプラットフォーム：%s • ユーザー：%s"
+
+#. language.title
+msgid "language.title"
+msgstr "言語"
+
+#. support.title
+msgid "support.title"
+msgstr "サポート"
+
+#. support.faq_header
+msgid "support.faq_header"
+msgstr "よくある質問"
+
+#. support.faq.play.q
+msgid "support.faq.play.q"
+msgstr "遊び方は？"
+
+#. support.faq.play.a
+msgid "support.faq.play.a"
+msgstr "同じアイテムを同じ棚に移動させましょう。同じアイテムが3つ同じ棚に見えている状態になると消えます。時間内にすべてのアイテムを消しましょう。"
+
+#. support.faq.contact.q
+msgid "support.faq.contact.q"
+msgstr "サポートへの問い合わせ方法は？"
+
+#. support.faq.contact.a
+msgid "support.faq.contact.a"
+msgstr "%sにメールをお送りください。問題の簡単な説明、端末のプラットフォーム、問題が起きた日時を記載してください。"
+
+#. support.faq.contact.action
+msgid "support.faq.contact.action"
+msgstr "サポートにメール"
+
+#. support.faq.crash.q
+msgid "support.faq.crash.q"
+msgstr "ゲームがフリーズしたり、強制終了したら？"
+
+#. support.faq.crash.a
+msgid "support.faq.crash.a"
+msgstr "まずゲームを閉じて、開き直してください。再び起きる場合は端末を再起動し、ゲームが最新バージョンになっているか確認してください。端末の機種、プラットフォームのバージョン、問題が起きる直前にしていたことを添えて、サポートにお問い合わせください。"
+
+#. support.faq.sync.q
+msgid "support.faq.sync.q"
+msgstr "端末間で進行状況を同期するには？"
+
+#. support.faq.sync.a
+msgid "support.faq.sync.a"
+msgstr "両方の端末で同じプラットフォームアカウントにサインインし、同期が完了してからプレイしてください。進行状況が異なる場合は、どちらの端末でもプレイを控え、サポートにお問い合わせください。"
+
+#. support.faq.bad_ad.q
+msgid "support.faq.bad_ad.q"
+msgstr "問題のある広告を報告するには？"
+
+#. support.faq.bad_ad.a
+msgid "support.faq.bad_ad.a"
+msgstr "1. 安全に閉じられる場合は、広告を閉じてください。\n2. 広告と、表示されている広告主名やアプリ名のスクリーンショットを撮ってください。\n3. おおよその日時と、ゲーム内のどこに広告が表示されたかを控えてください。\n4. 不快な内容、誤解を招く内容、詐欺的な内容だと思った理由を記載してください。\n5. これらの情報を%sにメールでお送りください。パスワードや支払い情報は含めないでください。"
+
+#. support.faq.bad_ad.action
+msgid "support.faq.bad_ad.action"
+msgstr "広告をメールで報告"
+
+#. support.account_header
+msgid "support.account_header"
+msgstr "アカウント"
+
+#. support.delete_account
+msgid "support.delete_account"
+msgstr "アカウントを削除"
+
+#. support.delete_game_data
+msgid "support.delete_game_data"
+msgstr "ゲームデータを削除"
+
+#. support.no_secrets
+msgid "support.no_secrets"
+msgstr "パスワードや支払い情報は絶対に送らないでください。"
+
+#. deletion.title.delete_account
+msgid "deletion.title.delete_account"
+msgstr "アカウント削除"
+
+#. deletion.title.delete_game_data
+msgid "deletion.title.delete_game_data"
+msgstr "ゲームデータ削除"
+
+#. deletion.title.not_confirmed
+msgid "deletion.title.not_confirmed"
+msgstr "未確認"
+
+#. deletion.title.status_unconfirmed
+msgid "deletion.title.status_unconfirmed"
+msgstr "削除状況は未確認"
+
+#. deletion.title.finishing_up
+msgid "deletion.title.finishing_up"
+msgstr "削除の最終処理中"
+
+#. deletion.title.new_game
+msgid "deletion.title.new_game"
+msgstr "新しいゲーム"
+
+#. deletion.title.status_unknown
+msgid "deletion.title.status_unknown"
+msgstr "状況不明"
+
+#. deletion.title.not_deleted
+msgid "deletion.title.not_deleted"
+msgstr "削除されていません"
+
+#. deletion.title.data_deleted
+msgid "deletion.title.data_deleted"
+msgstr "データ削除完了"
+
+#. deletion.title.accepted
+msgid "deletion.title.accepted"
+msgstr "削除を受け付けました"
+
+#. deletion.confirm.headline
+msgid "deletion.confirm.headline"
+msgstr "アカウントを永久に削除します。"
+
+#. deletion.confirm.body
+msgid "deletion.confirm.body"
+msgstr "進行状況、コイン、アイテム、プロフィールが失われます。この操作は取り消せません。\n\n後で再びサインインした場合は、新しいアカウントで始めることになります。\n\n購入やセキュリティに関する一部の記録は、名前やプロフィールを含めずに保管されます。その他のデータは30日以内に削除されます。"
+
+#. deletion.confirm.button
+msgid "deletion.confirm.button"
+msgstr "アカウントを削除"
+
+#. deletion.local_confirm.headline
+msgid "deletion.local_confirm.headline"
+msgstr "この端末のゲームデータを削除します。"
+
+#. deletion.local_confirm.body
+msgid "deletion.local_confirm.body"
+msgstr "進行状況、コイン、アイテム、プロフィールが失われます。この操作は取り消せません。\n\nこのゲームでは、あなたのオンラインアカウントは作成されていません。そのため、当社のサーバーから削除するデータはありません。"
+
+#. deletion.local_confirm.button
+msgid "deletion.local_confirm.button"
+msgstr "データを削除"
+
+#. deletion.pending_setup.headline
+msgid "deletion.pending_setup.headline"
+msgstr "アカウントの作成処理がまだ完了していません。"
+
+#. deletion.pending_setup.body
+msgid "deletion.pending_setup.body"
+msgstr "インターネットに接続し、少し待ってからもう一度お試しください。何も削除されていません。"
+
+#. deletion.sign_in.headline
+msgid "deletion.sign_in.headline"
+msgstr "削除したいアカウントにサインインしてください。"
+
+#. deletion.sign_in.body
+msgid "deletion.sign_in.body"
+msgstr "サインインできない場合は、サポートにお問い合わせください。"
+
+#. deletion.read_failed.headline
+msgid "deletion.read_failed.headline"
+msgstr "ゲームデータを読み込めませんでした。"
+
+#. deletion.read_failed.body
+msgid "deletion.read_failed.body"
+msgstr "ゲームを再起動して、もう一度お試しください。何も削除されていません。"
+
+#. deletion.unavailable.headline
+msgid "deletion.unavailable.headline"
+msgstr "このバージョンのゲームでは、アカウントを削除できません。"
+
+#. deletion.unavailable.body
+msgid "deletion.unavailable.body"
+msgstr "ゲームを更新するか、アカウントの削除についてサポートにお問い合わせください。何も削除されていません。"
+
+#. deletion.in_progress.account
+msgid "deletion.in_progress.account"
+msgstr "アカウントを削除中…"
+
+#. deletion.in_progress.local
+msgid "deletion.in_progress.local"
+msgstr "ゲームデータを削除中…"
+
+#. deletion.in_progress.body
+msgid "deletion.in_progress.body"
+msgstr "ゲームを開いたままお待ちください。まもなく完了します。"
+
+#. deletion.not_confirmed.headline
+msgid "deletion.not_confirmed.headline"
+msgstr "削除リクエストへの応答がまだ届いていません。"
+
+#. deletion.not_confirmed.body
+msgid "deletion.not_confirmed.body"
+msgstr "リクエストは送信されましたが、応答が届きませんでした。インターネットに接続し、もう一度お試しください。結果が確認できるまで、ゲームはロックされたままになります。"
+
+#. deletion.unconfirmed.headline
+msgid "deletion.unconfirmed.headline"
+msgstr "削除状況は未確認です"
+
+#. deletion.unconfirmed.body
+msgid "deletion.unconfirmed.body"
+msgstr "アカウントが削除されたか確認できませんでした。データを保護するため、ゲームはロックされたままになります。以下の照会番号を添えて、サポートにお問い合わせください。"
+
+#. deletion.check_again
+msgid "deletion.check_again"
+msgstr "もう一度確認"
+
+#. deletion.cleanup.headline.local
+msgid "deletion.cleanup.headline.local"
+msgstr "この端末のゲームデータをまだ完全に削除できていません。"
+
+#. deletion.cleanup.headline.account
+msgid "deletion.cleanup.headline.account"
+msgstr "アカウントの削除を受け付けました。残りのデータを削除中です。"
+
+#. deletion.cleanup.body
+msgid "deletion.cleanup.body"
+msgstr "この端末から一部のゲームデータをまだ削除できていません。もう一度試して、削除を完了してください。"
+
+#. deletion.new_game.headline
+msgid "deletion.new_game.headline"
+msgstr "新しいゲームを開始中…"
+
+#. deletion.new_game.body
+msgid "deletion.new_game.body"
+msgstr "まもなく完了します。"
+
+#. deletion.status_unknown.headline
+msgid "deletion.status_unknown.headline"
+msgstr "この端末の削除状況を読み取れませんでした。"
+
+#. deletion.status_unknown.body
+msgid "deletion.status_unknown.body"
+msgstr "データを保護するため、ゲームはロックされたままになります。サポートにお問い合わせください。"
+
+#. deletion.fail.offline
+msgid "deletion.fail.offline"
+msgstr "アカウントを削除するには、インターネットに接続してください。"
+
+#. deletion.fail.rate_limited
+msgid "deletion.fail.rate_limited"
+msgstr "試行回数が多すぎます。少し待ってから、もう一度お試しください。"
+
+#. deletion.fail.busy
+msgid "deletion.fail.busy"
+msgstr "現在、アカウント削除の処理が混み合っています。少し待ってから、もう一度お試しください。"
+
+#. deletion.fail.syncing
+msgid "deletion.fail.syncing"
+msgstr "ゲームはまだ同期中です。少し待ってから、もう一度お試しください。"
+
+#. deletion.fail.auth
+msgid "deletion.fail.auth"
+msgstr "アカウントを確認できませんでした。ゲームを再起動して、もう一度お試しください。"
+
+#. deletion.fail.update
+msgid "deletion.fail.update"
+msgstr "アカウントを削除するには、ゲームを更新してください。"
+
+#. deletion.fail.changed
+msgid "deletion.fail.changed"
+msgstr "削除処理中にアカウントが変更されました。もう一度お試しください。"
+
+#. deletion.fail.storage
+msgid "deletion.fail.storage"
+msgstr "この端末に削除リクエストを保存できませんでした。もう一度お試しください。"
+
+#. deletion.fail.generic
+msgid "deletion.fail.generic"
+msgstr "アカウントを削除できませんでした。後でもう一度試すか、サポートにお問い合わせください。"
+
+#. deletion.fail.local
+msgid "deletion.fail.local"
+msgstr "ゲームデータを削除できませんでした。もう一度お試しください。"
+
+#. deletion.fail.body
+msgid "deletion.fail.body"
+msgstr "何も削除されていません。そのままプレイを続けられます。"
+
+#. deletion.done_local.headline
+msgid "deletion.done_local.headline"
+msgstr "この端末のゲームデータを削除しました。"
+
+#. deletion.done_local.body
+msgid "deletion.done_local.body"
+msgstr "新しいゲームで最初からやり直せます。"
+
+#. deletion.new_game_failed
+msgid "deletion.new_game_failed"
+msgstr "新しいゲームを開始できませんでした。もう一度お試しください。"
+
+#. deletion.accepted.headline
+msgid "deletion.accepted.headline"
+msgstr "このアカウントにはもうアクセスできません。"
+
+#. deletion.accepted.body
+msgid "deletion.accepted.body"
+msgstr "削除リクエストが受け付けられました。"
+
+#. deletion.accepted.body_deadline
+msgid "deletion.accepted.body_deadline"
+msgstr "削除リクエストが受け付けられました。データは%sまでに削除されます。"
+
+#. deletion.reference
+msgid "deletion.reference"
+msgstr "照会番号：%s"
+
+#. deletion.start_new_game
+msgid "deletion.start_new_game"
+msgstr "新しいゲームを開始"
+
+#. app.name
+msgid "app.name"
+msgstr "SortingPuzzle"
+
+#. support.email.subject
+msgid "support.email.subject"
+msgstr "Sorting Puzzle サポートへのお問い合わせ"
+
+#. support.email.body
+msgid "support.email.body"
+msgstr "こちらに問題の内容を記載してください。\n\n端末／プラットフォーム：\nおおよその日時：\n"
+
+#. support.ad_email.subject
+msgid "support.ad_email.subject"
+msgstr "Sorting Puzzle 広告の報告"
+
+#. support.ad_email.body
+msgid "support.ad_email.body"
+msgstr "スクリーンショットを添付し、以下の項目をご記入ください。\n\nおおよその日時：\nゲーム内の広告表示場所：\n広告主名またはアプリ名：\n広告を確認してほしい理由：\n"
+
+#. deletion.email.subject
+msgid "deletion.email.subject"
+msgstr "Sorting Puzzle アカウント削除について"
+
+#. deletion.email.body
+msgid "deletion.email.body"
+msgstr "アカウントの削除についてサポートをお願いします。"
+
+#. support.email.status
+msgid "support.email.status"
+msgstr "状況： %s"
+
+#. support.email.deletion_reference
+msgid "support.email.deletion_reference"
+msgstr "削除の照会番号"
+
+#. support.email.server_reference
+msgid "support.email.server_reference"
+msgstr "サーバーの照会番号"
+
+#. support.email.player_id
+msgid "support.email.player_id"
+msgstr "プレイヤーID"
+
+#. leaderboard.empty
+msgid "leaderboard.empty"
+msgstr "まだスコアがありません"
+
+#. date.month.1
+msgid "date.month.1"
+msgstr "1月"
+
+#. date.month.2
+msgid "date.month.2"
+msgstr "2月"
+
+#. date.month.3
+msgid "date.month.3"
+msgstr "3月"
+
+#. date.month.4
+msgid "date.month.4"
+msgstr "4月"
+
+#. date.month.5
+msgid "date.month.5"
+msgstr "5月"
+
+#. date.month.6
+msgid "date.month.6"
+msgstr "6月"
+
+#. date.month.7
+msgid "date.month.7"
+msgstr "7月"
+
+#. date.month.8
+msgid "date.month.8"
+msgstr "8月"
+
+#. date.month.9
+msgid "date.month.9"
+msgstr "9月"
+
+#. date.month.10
+msgid "date.month.10"
+msgstr "10月"
+
+#. date.month.11
+msgid "date.month.11"
+msgstr "11月"
+
+#. date.month.12
+msgid "date.month.12"
+msgstr "12月"
+
+#. common.play
+msgid "Play"
+msgstr "プレイ"
+
+#. common.continue
+msgid "Continue"
+msgstr "続ける"
+
+#. common.try_again
+msgid "Try Again"
+msgstr "もう一度"
+
+#. common.close
+msgid "Close"
+msgstr "閉じる"
+
+#. common.cancel
+msgid "Cancel"
+msgstr "キャンセル"
+
+#. common.got_it
+msgid "Got it"
+msgstr "OK"
+
+#. common.get_help
+msgid "Get Help"
+msgstr "サポートへ"
+
+#. common.save
+msgid "SAVE"
+msgstr "保存"
+
+#. common.loading
+msgid "Loading…"
+msgstr "読み込み中…"
+
+#. menu.level_button
+msgid "LEVEL %d"
+msgstr "レベル %d"
+
+#. menu.more_levels_coming_soon
+msgid "MORE LEVELS COMING SOON"
+msgstr "新しいレベルを近日追加"
+
+#. menu.coming_soon
+msgid "COMING SOON"
+msgstr "近日公開"
+
+#. menu.lives_full
+msgid "Full"
+msgstr "満タン"
+
+#. menu.starter_badge
+msgid "BUNDLE"
+msgstr "セット"
+
+#. nav.shop
+msgid "Shop"
+msgstr "ショップ"
+
+#. nav.home
+msgid "Home"
+msgstr "ホーム"
+
+#. nav.leaderboard
+msgid "Leaderboard"
+msgstr "ランキング"
+
+#. chapter.button
+msgid "CHAPTER %d"
+msgstr "チャプター %d"
+
+#. chapter.button_tooltip
+msgid "Choose Chapter %d: %s"
+msgstr "チャプター%d「%s」を選択"
+
+#. chapter.screen_title
+msgid "CHAPTERS"
+msgstr "チャプター"
+
+#. chapter.title.chapter_01
+msgid "Grocery Town"
+msgstr "おかいものタウン"
+
+#. chapter.title.chapter_02
+msgid "Candy Corner"
+msgstr "キャンディーコーナー"
+
+#. chapter.locked_status
+msgid "Complete %d more %s levels to unlock"
+msgstr "あと%dレベルを「%s」内でクリアすると解放"
+
+#. chapter.unlock_progress
+msgid "Unlock progress"
+msgstr "解放までの進み具合"
+
+#. chapter.current_progress
+msgid "Current progress"
+msgstr "現在の進み具合"
+
+#. chapter.locked
+msgid "Locked"
+msgstr "ロック中"
+
+#. chapter.no_levels_status
+msgid "New levels are coming soon"
+msgstr "新しいレベルを近日追加します"
+
+#. chapter.coming_soon
+msgid "Coming Soon"
+msgstr "近日公開"
+
+#. hud.combo
+msgid "COMBO ×%d"
+msgstr "コンボ ×%d"
+
+#. hud.ability_tooltip.hammer
+msgid "Hammer -- clears a matching triple"
+msgstr "ハンマー：同じアイテム3つを消します"
+
+#. hud.ability_tooltip.shuffle
+msgid "Shuffle -- reshuffles unlocked items"
+msgstr "シャッフル：ロックされていないアイテムを並べ替えます"
+
+#. hud.ability_tooltip.lantern
+msgid "Lantern -- highlights a matchable triple"
+msgstr "ランタン：そろえられる同じアイテム3つを光らせます"
+
+#. hud.ability_tooltip.freezer
+msgid "Freezer -- pauses the countdown timer"
+msgstr "フリーザー：残り時間のカウントを一時停止します"
+
+#. hud.seconds_short
+msgid "%ds"
+msgstr "%d秒"
+
+#. tip.tap_dispenser
+msgid "Tap a dispenser to throw items onto the shelves!"
+msgstr "ディスペンサーをタップして、棚にアイテムを出そう！"
+
+#. pause.title
+msgid "PAUSE"
+msgstr "一時停止"
+
+#. pause.leave
+msgid "Leave"
+msgstr "終了"
+
+#. leave.title
+msgid "LEAVING THE LEVEL"
+msgstr "レベルを終了"
+
+#. leave.you_will_lose
+msgid "You will lose:"
+msgstr "失われるもの："
+
+#. timeup.title
+msgid "TIME'S UP"
+msgstr "時間切れ"
+
+#. timeup.offer
+msgid "Add one minute and keep sorting!"
+msgstr "1分追加して、続きをプレイ！"
+
+#. timeup.used
+msgid "Used"
+msgstr "使用済み"
+
+#. ability_purchase.title
+msgid "USE ABILITY"
+msgstr "ブースターを使う"
+
+#. shelf_unlock.title
+msgid "UNLOCK SHELF"
+msgstr "棚を解放"
+
+#. shelf_unlock.offer
+msgid "Watch one ad to unlock this shelf now."
+msgstr "広告を1回見ると、この棚を今すぐ解放できます。"
+
+#. shelf_unlock.offer_or_clear
+msgid "Watch one ad to unlock this shelf now, or clear %s more."
+msgstr "広告を1回見るか、あと%s組そろえて消すと、この棚を解放できます。"
+
+#. shelf_unlock.button
+msgid "Watch Ad · Unlock Shelf"
+msgstr "広告を見て棚を解放"
+
+#. shelf_unlock.ad_unavailable
+msgid "Ad unavailable. This shelf stays locked."
+msgstr "広告を表示できません。棚はロックされたままです。"
+
+#. complete.title
+msgid "GREAT JOB!"
+msgstr "お見事！"
+
+#. failed.headline
+msgid "LEVEL FAILED"
+msgstr "クリア失敗"
+
+#. failed.retry
+msgid "Retry"
+msgstr "もう一度プレイ"
+
+#. combo.praise.2
+msgid "Cool"
+msgstr "いいね！"
+
+#. combo.praise.3
+msgid "Great"
+msgstr "やったね！"
+
+#. combo.praise.4
+msgid "Awesome"
+msgstr "すごい！"
+
+#. combo.praise.5
+msgid "Amazing"
+msgstr "お見事！"
+
+#. combo.praise.6
+msgid "Fantastic"
+msgstr "すばらしい！"
+
+#. combo.praise.7
+msgid "Incredible"
+msgstr "驚きの腕前！"
+
+#. combo.praise.8
+msgid "Spectacular"
+msgstr "圧巻！"
+
+#. combo.praise.9
+msgid "Unstoppable"
+msgstr "止まらない！"
+
+#. combo.praise.10
+msgid "Legendary"
+msgstr "伝説級！"
+
+#. combo.praise.11
+msgid "Epic"
+msgstr "すごすぎる！"
+
+#. combo.praise.12
+msgid "Brilliant"
+msgstr "天才！"
+
+#. combo.praise.13
+msgid "Masterful"
+msgstr "達人！"
+
+#. combo.praise.14
+msgid "Supreme"
+msgstr "至高！"
+
+#. combo.praise.15
+msgid "Phenomenal"
+msgstr "奇跡級！"
+
+#. combo.praise.16
+msgid "Mythic"
+msgstr "神話級！"
+
+#. combo.praise.17
+msgid "Majestic"
+msgstr "王者の風格！"
+
+#. combo.praise.18
+msgid "Radiant"
+msgstr "輝いてる！"
+
+#. combo.praise.19
+msgid "Divine"
+msgstr "神業！"
+
+#. combo.praise.20
+msgid "Transcendent"
+msgstr "限界突破！"
+
+#. ability.hammer.name
+msgid "Hammer"
+msgstr "ハンマー"
+
+#. ability.shuffle.name
+msgid "Shuffle"
+msgstr "シャッフル"
+
+#. ability.lantern.name
+msgid "Lantern"
+msgstr "ランタン"
+
+#. ability.freezer.name
+msgid "Freezer"
+msgstr "フリーザー"
+
+#. ability.hammer.description
+msgid "Instantly clears one matching set of items off the shelves."
+msgstr "棚にある同じアイテム3つを一瞬で消します。"
+
+#. ability.shuffle.description
+msgid "Shuffles shelf items into new spots to help you find a match."
+msgstr "棚のアイテムを並べ替えて、そろえられる組を見つけやすくします。"
+
+#. ability.lantern.description
+msgid "Highlights a matching triple you can clear for 15 seconds."
+msgstr "そろえて消せる同じアイテム3つを15秒間光らせます。"
+
+#. ability.freezer.description
+msgid "Freezes the level timer for 30 seconds."
+msgstr "レベルの残り時間のカウントを30秒間止めます。"
+
+#. ad.watch
+msgid "Watch Ad"
+msgstr "広告を見る"
+
+#. ad.loading
+msgid "Loading..."
+msgstr "読み込み中…"
+
+#. ad.verifying
+msgid "Verifying..."
+msgstr "確認中…"
+
+#. ad.verify_reward
+msgid "Verify Reward"
+msgstr "報酬を確認"
+
+#. ad.reward_pending
+msgid "Reward verification is still pending."
+msgstr "報酬の確認がまだ完了していません。"
+
+#. ad.unavailable_retry
+msgid "Ad unavailable. Please try again."
+msgstr "広告を表示できません。もう一度お試しください。"
+
+#. ad.watch_unavailable
+msgid "Watch Ad\nUnavailable"
+msgstr "広告を見る\n利用不可"
+
+#. ad.watch_coming_soon
+msgid "Watch Ad\nComing Soon"
+msgstr "広告を見る\n近日公開"
+
+#. ad.badge
+msgid "AD"
+msgstr "AD"
+
+#. lives.title.out
+msgid "OUT OF LIVES"
+msgstr "ライフ切れ"
+
+#. lives.title.get_more
+msgid "GET MORE LIVES"
+msgstr "ライフを補充"
+
+#. lives.title.full
+msgid "LIVES FULL"
+msgstr "ライフ満タン"
+
+#. lives.next_in
+msgid "NEXT LIFE IN"
+msgstr "次のライフ回復まで"
+
+#. lives.full_body
+msgid "Your lives are full! Play a level to spend them."
+msgstr "ライフは満タンです！レベルをプレイしてライフを使いましょう。"
+
+#. chest.title
+msgid "CHEST REWARDS"
+msgstr "宝箱の報酬"
+
+#. chest.progress_hint
+msgid "Collect stars to unlock a chest and claim your reward"
+msgstr "スターを集めて宝箱を開け、報酬を受け取ろう"
+
+#. chest.ready
+msgid "A REWARD CHEST AWAITS!"
+msgstr "報酬の宝箱が開けられる！"
+
+#. chest.tap_to_open
+msgid "Tap to open"
+msgstr "タップして開ける"
+
+#. purchase.tap_to_collect
+msgid "Tap to collect"
+msgstr "タップして受け取る"
+
+#. purchase.complete
+msgid "PURCHASE COMPLETE"
+msgstr "購入完了"
+
+#. shop.title
+msgid "SHOP"
+msgstr "ショップ"
+
+#. shop.section.bundles
+msgid "SPECIAL BUNDLES"
+msgstr "スペシャルセット"
+
+#. shop.section.coins
+msgid "COINS"
+msgstr "コイン"
+
+#. shop.offer.starter_bundle
+msgid "Starter Bundle"
+msgstr "スターターセット"
+
+#. shop.offer.basic_bundle
+msgid "Basic Bundle"
+msgstr "ベーシックセット"
+
+#. shop.tag.best_value
+msgid "BEST VALUE"
+msgstr "一番お得"
+
+#. shop.discount_off
+msgid "OFF"
+msgstr "OFF"
+
+#. shop.ability_hint
+msgid "Tap an ability to see what it does"
+msgstr "ブースターをタップして効果を確認"
+
+#. shop.purchasing
+msgid "Purchasing…"
+msgstr "購入中…"
+
+#. shop.no_offers
+msgid "No shop offers are available for this region."
+msgstr "この地域で購入できる商品はありません。"
+
+#. shop.load_failed
+msgid "Could not load the shop."
+msgstr "ショップを読み込めませんでした。"
+
+#. shop.error.title.purchase
+msgid "Purchase unavailable"
+msgstr "購入できません"
+
+#. shop.error.title.reward
+msgid "Reward error"
+msgstr "報酬を受け取れません"
+
+#. shop.error.purchase_failed
+msgid "The purchase could not be completed."
+msgstr "購入を完了できませんでした。"
+
+#. shop.error.grant_failed
+msgid "The purchased rewards could not be granted."
+msgstr "購入した報酬を受け取れませんでした。"
+
+#. shop.error.offer_unavailable
+msgid "This shop offer is unavailable."
+msgstr "この商品は購入できません。"
+
+#. shop.error.already_bought
+msgid "This one-time shop offer has already been purchased."
+msgstr "この1回限りの商品は購入済みです。"
+
+#. starter.title
+msgid "STARTER BUNDLE"
+msgstr "スターターセット"
+
+#. starter.one_time
+msgid "ONE-TIME OFFER"
+msgstr "1回限定"
+
+#. starter.boosters_included
+msgid "BOOSTERS INCLUDED"
+msgstr "ブースター入り"
+
+#. starter.coins
+msgid "%s COINS"
+msgstr "コイン %s枚"
+
+#. starter.buy_for
+msgid "Buy for %s"
+msgstr "%sで購入"
+
+#. starter.checking
+msgid "Checking offer…"
+msgstr "商品を確認中…"
+
+#. starter.checking_short
+msgid "Checking…"
+msgstr "確認中…"
+
+#. starter.no_longer_available
+msgid "This offer is no longer available."
+msgstr "この商品はもう購入できません。"
+
+#. starter.unavailable
+msgid "Unavailable"
+msgstr "購入不可"
+
+#. booster_chip.claimed
+msgid "+%d %s"
+msgstr "+%d %s"
+
+#. profile.title
+msgid "EDIT PROFILE"
+msgstr "プロフィール編集"
+
+#. profile.name_header
+msgid "PLAYER NAME"
+msgstr "プレイヤー名"
+
+#. profile.name_placeholder
+msgid "Player name"
+msgstr "プレイヤー名"
+
+#. profile.edit_name_tooltip
+msgid "Edit player name"
+msgstr "プレイヤー名を編集"
+
+#. profile.avatar_tab
+msgid "AVATAR"
+msgstr "アバター"
+
+#. profile.frame_tab
+msgid "FRAME"
+msgstr "フレーム"
+
+#. profile.unlock.level
+msgid "Complete level %d to unlock"
+msgstr "レベル%dをクリアすると解放"
+
+#. profile.unlock.combo
+msgid "Reach a combo of ×%d in any run to unlock"
+msgstr "いずれかのプレイでコンボ×%dを達成すると解放"
+
+#. profile.unlock.weekly_first
+msgid "Finish 1st on the Weekly leaderboard to unlock"
+msgstr "週間ランキング終了時に1位になると解放"
+
+#. profile.unlock.weekly_top
+msgid "Finish top %d on the Weekly leaderboard to unlock"
+msgstr "週間ランキング終了時に%d位以内に入ると解放"
+
+#. leaderboard.title
+msgid "LEADERBOARD"
+msgstr "ランキング"
+
+#. leaderboard.tab.weekly
+msgid "Weekly"
+msgstr "週間"
+
+#. leaderboard.tab.country
+msgid "Country"
+msgstr "国内"
+
+#. leaderboard.tab.world
+msgid "World"
+msgstr "世界"
+
+#. leaderboard.weekly_reset
+msgid "Weekly reset in %s"
+msgstr "週間ランキングのリセットまで %s"
+
+#. leaderboard.duration.dh
+msgid "%dd %dh"
+msgstr "%d日 %d時間"
+
+#. leaderboard.duration.hm
+msgid "%dh %dm"
+msgstr "%d時間 %d分"
+
+#. leaderboard.duration.m
+msgid "%dm"
+msgstr "%d分"
+
+#. leaderboard.country_caption
+msgid "Country · All-time stars"
+msgstr "国内・累計スター"
+
+#. leaderboard.world_caption
+msgid "Worldwide · All-time stars"
+msgstr "世界・累計スター"
+
+#. leaderboard.load_failed
+msgid "Could not load leaderboard."
+msgstr "ランキングを読み込めませんでした。"
+
+#. leaderboard.default_name
+msgid "Player"
+msgstr "プレイヤー"
+
+#. leaderboard.row_tooltip
+msgid "Rank %d, %s, %d stars"
+msgstr "%d位、%s、スター%d個"
+
+#. leaderboard.reward_tooltip
+msgid "%s coin weekly reward"
+msgstr "週間報酬：コイン%s枚"
+
+#. leaderboard.reward.title
+msgid "WEEKLY REWARD!"
+msgstr "週間報酬！"
+
+#. leaderboard.reward.body
+msgid "You finished #%d last week and earned %d coins!"
+msgstr "先週は%d位！コイン%d枚を獲得しました！"
+
+#. leaderboard.reward.ok
+msgid "Nice!"
+msgstr "やった！"
+
+#. settings.title
+msgid "SETTINGS"
+msgstr "設定"
+
+#. settings.music
+msgid "Music"
+msgstr "音楽"
+
+#. settings.sfx
+msgid "SFX"
+msgstr "効果音"
+
+#. settings.vibrate
+msgid "Vibrate"
+msgstr "振動"
+
+#. settings.support
+msgid "Support"
+msgstr "サポート"
+
+#. settings.language
+msgid "Language"
+msgstr "言語"
+
+#. settings.privacy_policy
+msgid "Privacy Policy"
+msgstr "プライバシーポリシー"
+
+#. settings.privacy_choices
+msgid "Privacy Choices"
+msgstr "プライバシー設定"
+
+#. settings.diagnostics
+msgid "Version %s • Build %d\nPlatform: %s • User: %s"
+msgstr "バージョン %s • ビルド %d\nプラットフォーム：%s • ユーザー：%s"
+
+#. language.title
+msgid "LANGUAGE"
+msgstr "言語"
+
+#. support.title
+msgid "SUPPORT"
+msgstr "サポート"
+
+#. support.faq_header
+msgid "Frequently Asked Questions"
+msgstr "よくある質問"
+
+#. support.faq.play.q
+msgid "How do I play?"
+msgstr "遊び方は？"
+
+#. support.faq.play.a
+msgid "Move matching goods onto the same shelf. When three identical items are visible together, they clear. Complete the board before time runs out."
+msgstr "同じアイテムを同じ棚に移動させましょう。同じアイテムが3つ同じ棚に見えている状態になると消えます。時間内にすべてのアイテムを消しましょう。"
+
+#. support.faq.contact.q
+msgid "How do I contact support?"
+msgstr "サポートへの問い合わせ方法は？"
+
+#. support.faq.contact.a
+msgid "Email us at %s. Include a short description, your device platform, and when the problem happened."
+msgstr "%sにメールをお送りください。問題の簡単な説明、端末のプラットフォーム、問題が起きた日時を記載してください。"
+
+#. support.faq.contact.action
+msgid "Email Support"
+msgstr "サポートにメール"
+
+#. support.faq.crash.q
+msgid "What if the game freezes or crashes?"
+msgstr "ゲームがフリーズしたり、強制終了したら？"
+
+#. support.faq.crash.a
+msgid "Close and reopen the game first. If it happens again, restart the device and make sure the game is updated. Contact support with the device model, platform version, and what you were doing before the problem."
+msgstr "まずゲームを閉じて、開き直してください。再び起きる場合は端末を再起動し、ゲームが最新バージョンになっているか確認してください。端末の機種、プラットフォームのバージョン、問題が起きる直前にしていたことを添えて、サポートにお問い合わせください。"
+
+#. support.faq.sync.q
+msgid "How do I sync progress between devices?"
+msgstr "端末間で進行状況を同期するには？"
+
+#. support.faq.sync.a
+msgid "Use the same signed-in platform account on both devices and allow synchronization to finish before playing. If the progress differs, avoid playing on both devices and contact support."
+msgstr "両方の端末で同じプラットフォームアカウントにサインインし、同期が完了してからプレイしてください。進行状況が異なる場合は、どちらの端末でもプレイを控え、サポートにお問い合わせください。"
+
+#. support.faq.bad_ad.q
+msgid "How do I report a bad ad?"
+msgstr "問題のある広告を報告するには？"
+
+#. support.faq.bad_ad.a
+msgid "1. Close the ad if you can do so safely.\n2. Take a screenshot of the ad and any advertiser or app name shown.\n3. Note the approximate time and where the ad appeared in the game.\n4. Describe why the ad seemed offensive, misleading, or fraudulent.\n5. Email these details to %s. Do not include passwords or payment information."
+msgstr "1. 安全に閉じられる場合は、広告を閉じてください。\n2. 広告と、表示されている広告主名やアプリ名のスクリーンショットを撮ってください。\n3. おおよその日時と、ゲーム内のどこに広告が表示されたかを控えてください。\n4. 不快な内容、誤解を招く内容、詐欺的な内容だと思った理由を記載してください。\n5. これらの情報を%sにメールでお送りください。パスワードや支払い情報は含めないでください。"
+
+#. support.faq.bad_ad.action
+msgid "Email Ad Report"
+msgstr "広告をメールで報告"
+
+#. support.account_header
+msgid "Account"
+msgstr "アカウント"
+
+#. support.delete_account
+msgid "Delete Account"
+msgstr "アカウントを削除"
+
+#. support.delete_game_data
+msgid "Delete Game Data"
+msgstr "ゲームデータを削除"
+
+#. support.no_secrets
+msgid "Please never send passwords or payment information."
+msgstr "パスワードや支払い情報は絶対に送らないでください。"
+
+#. deletion.title.delete_account
+msgid "DELETE ACCOUNT"
+msgstr "アカウント削除"
+
+#. deletion.title.delete_game_data
+msgid "DELETE GAME DATA"
+msgstr "ゲームデータ削除"
+
+#. deletion.title.not_confirmed
+msgid "NOT CONFIRMED"
+msgstr "未確認"
+
+#. deletion.title.status_unconfirmed
+msgid "STATUS UNCONFIRMED"
+msgstr "削除状況は未確認"
+
+#. deletion.title.finishing_up
+msgid "FINISHING UP"
+msgstr "削除の最終処理中"
+
+#. deletion.title.new_game
+msgid "NEW GAME"
+msgstr "新しいゲーム"
+
+#. deletion.title.status_unknown
+msgid "STATUS UNKNOWN"
+msgstr "状況不明"
+
+#. deletion.title.not_deleted
+msgid "NOT DELETED"
+msgstr "削除されていません"
+
+#. deletion.title.data_deleted
+msgid "DATA DELETED"
+msgstr "データ削除完了"
+
+#. deletion.title.accepted
+msgid "DELETION ACCEPTED"
+msgstr "削除を受け付けました"
+
+#. deletion.confirm.headline
+msgid "This permanently deletes your account."
+msgstr "アカウントを永久に削除します。"
+
+#. deletion.confirm.body
+msgid "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nIf you sign in again later, you'll start a new account.\n\nSome purchase and security records are kept without your name or profile. The rest is removed within 30 days."
+msgstr "進行状況、コイン、アイテム、プロフィールが失われます。この操作は取り消せません。\n\n後で再びサインインした場合は、新しいアカウントで始めることになります。\n\n購入やセキュリティに関する一部の記録は、名前やプロフィールを含めずに保管されます。その他のデータは30日以内に削除されます。"
+
+#. deletion.local_confirm.headline
+msgid "This deletes your game data on this device."
+msgstr "この端末のゲームデータを削除します。"
+
+#. deletion.local_confirm.body
+msgid "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nThis game never created an online account for you, so nothing needs to be deleted from our servers."
+msgstr "進行状況、コイン、アイテム、プロフィールが失われます。この操作は取り消せません。\n\nこのゲームでは、あなたのオンラインアカウントは作成されていません。そのため、当社のサーバーから削除するデータはありません。"
+
+#. deletion.local_confirm.button
+msgid "Delete Data"
+msgstr "データを削除"
+
+#. deletion.pending_setup.headline
+msgid "Your account is still being set up."
+msgstr "アカウントの作成処理がまだ完了していません。"
+
+#. deletion.pending_setup.body
+msgid "Connect to the internet and try again in a moment. Nothing was deleted."
+msgstr "インターネットに接続し、少し待ってからもう一度お試しください。何も削除されていません。"
+
+#. deletion.sign_in.headline
+msgid "Sign in to the account you want to delete."
+msgstr "削除したいアカウントにサインインしてください。"
+
+#. deletion.sign_in.body
+msgid "If you can't sign in, contact support for help."
+msgstr "サインインできない場合は、サポートにお問い合わせください。"
+
+#. deletion.read_failed.headline
+msgid "Your game data couldn't be read."
+msgstr "ゲームデータを読み込めませんでした。"
+
+#. deletion.read_failed.body
+msgid "Restart the game, then try again. Nothing was deleted."
+msgstr "ゲームを再起動して、もう一度お試しください。何も削除されていません。"
+
+#. deletion.unavailable.headline
+msgid "Account deletion isn't available in this version of the game."
+msgstr "このバージョンのゲームでは、アカウントを削除できません。"
+
+#. deletion.unavailable.body
+msgid "Update the game, or contact support for help deleting your account. Nothing was deleted."
+msgstr "ゲームを更新するか、アカウントの削除についてサポートにお問い合わせください。何も削除されていません。"
+
+#. deletion.in_progress.account
+msgid "Deleting your account..."
+msgstr "アカウントを削除中…"
+
+#. deletion.in_progress.local
+msgid "Deleting your game data..."
+msgstr "ゲームデータを削除中…"
+
+#. deletion.in_progress.body
+msgid "Keep the game open. This only takes a moment."
+msgstr "ゲームを開いたままお待ちください。まもなく完了します。"
+
+#. deletion.not_confirmed.headline
+msgid "We haven't heard back about your deletion yet."
+msgstr "削除リクエストへの応答がまだ届いていません。"
+
+#. deletion.not_confirmed.body
+msgid "Your request was sent, but the answer didn't arrive. Connect to the internet and try again. The game stays locked until we know the result."
+msgstr "リクエストは送信されましたが、応答が届きませんでした。インターネットに接続し、もう一度お試しください。結果が確認できるまで、ゲームはロックされたままになります。"
+
+#. deletion.unconfirmed.headline
+msgid "Deletion status unconfirmed"
+msgstr "削除状況は未確認です"
+
+#. deletion.unconfirmed.body
+msgid "We couldn't confirm whether your account was deleted. To keep your data safe, the game stays locked. Contact support and include the reference below."
+msgstr "アカウントが削除されたか確認できませんでした。データを保護するため、ゲームはロックされたままになります。以下の照会番号を添えて、サポートにお問い合わせください。"
+
+#. deletion.check_again
+msgid "Check Again"
+msgstr "もう一度確認"
+
+#. deletion.cleanup.headline.local
+msgid "Your local game data couldn't be fully deleted yet."
+msgstr "この端末のゲームデータをまだ完全に削除できていません。"
+
+#. deletion.cleanup.headline.account
+msgid "Account deletion accepted; finishing cleanup."
+msgstr "アカウントの削除を受け付けました。残りのデータを削除中です。"
+
+#. deletion.cleanup.body
+msgid "Some game data couldn't be removed from this device yet. Try again to finish."
+msgstr "この端末から一部のゲームデータをまだ削除できていません。もう一度試して、削除を完了してください。"
+
+#. deletion.new_game.headline
+msgid "Starting a new game..."
+msgstr "新しいゲームを開始中…"
+
+#. deletion.new_game.body
+msgid "This only takes a moment."
+msgstr "まもなく完了します。"
+
+#. deletion.status_unknown.headline
+msgid "We couldn't read the deletion status on this device."
+msgstr "この端末の削除状況を読み取れませんでした。"
+
+#. deletion.status_unknown.body
+msgid "To keep your data safe, the game stays locked. Contact support for help."
+msgstr "データを保護するため、ゲームはロックされたままになります。サポートにお問い合わせください。"
+
+#. deletion.fail.offline
+msgid "Connect to the internet to delete your account."
+msgstr "アカウントを削除するには、インターネットに接続してください。"
+
+#. deletion.fail.rate_limited
+msgid "Too many attempts. Wait a moment, then try again."
+msgstr "試行回数が多すぎます。少し待ってから、もう一度お試しください。"
+
+#. deletion.fail.busy
+msgid "Account deletion is busy right now. Try again in a moment."
+msgstr "現在、アカウント削除の処理が混み合っています。少し待ってから、もう一度お試しください。"
+
+#. deletion.fail.syncing
+msgid "The game is still syncing. Try again in a moment."
+msgstr "ゲームはまだ同期中です。少し待ってから、もう一度お試しください。"
+
+#. deletion.fail.auth
+msgid "We couldn't verify your account. Restart the game, then try again."
+msgstr "アカウントを確認できませんでした。ゲームを再起動して、もう一度お試しください。"
+
+#. deletion.fail.update
+msgid "Update the game to delete your account."
+msgstr "アカウントを削除するには、ゲームを更新してください。"
+
+#. deletion.fail.changed
+msgid "Your account changed while we were deleting it. Try again."
+msgstr "削除処理中にアカウントが変更されました。もう一度お試しください。"
+
+#. deletion.fail.storage
+msgid "Your device couldn't save the deletion request. Try again."
+msgstr "この端末に削除リクエストを保存できませんでした。もう一度お試しください。"
+
+#. deletion.fail.generic
+msgid "We couldn't delete your account. Try again later or contact support."
+msgstr "アカウントを削除できませんでした。後でもう一度試すか、サポートにお問い合わせください。"
+
+#. deletion.fail.local
+msgid "Your game data couldn't be deleted. Try again."
+msgstr "ゲームデータを削除できませんでした。もう一度お試しください。"
+
+#. deletion.fail.body
+msgid "Nothing was deleted, and you can keep playing."
+msgstr "何も削除されていません。そのままプレイを続けられます。"
+
+#. deletion.done_local.headline
+msgid "Your local game data was deleted."
+msgstr "この端末のゲームデータを削除しました。"
+
+#. deletion.done_local.body
+msgid "You can start over with a new game."
+msgstr "新しいゲームで最初からやり直せます。"
+
+#. deletion.new_game_failed
+msgid "The new game couldn't start. Try again."
+msgstr "新しいゲームを開始できませんでした。もう一度お試しください。"
+
+#. deletion.accepted.headline
+msgid "Your account is no longer accessible."
+msgstr "このアカウントにはもうアクセスできません。"
+
+#. deletion.accepted.body
+msgid "Your deletion request was accepted."
+msgstr "削除リクエストが受け付けられました。"
+
+#. deletion.accepted.body_deadline
+msgid "Your deletion request was accepted. Data removal is due by %s."
+msgstr "削除リクエストが受け付けられました。データは%sまでに削除されます。"
+
+#. deletion.reference
+msgid "Reference: %s"
+msgstr "照会番号：%s"
+
+#. deletion.start_new_game
+msgid "Start New Game"
+msgstr "新しいゲームを開始"
+
+#. app.name
+msgid "SortingPuzzle"
+msgstr "SortingPuzzle"
+
+#. support.email.subject
+msgid "Sorting Puzzle support request"
+msgstr "Sorting Puzzle サポートへのお問い合わせ"
+
+#. support.email.body
+msgid "Please describe the issue here.\n\nDevice/platform:\nApproximate time:\n"
+msgstr "こちらに問題の内容を記載してください。\n\n端末／プラットフォーム：\nおおよその日時：\n"
+
+#. support.ad_email.subject
+msgid "Sorting Puzzle ad report"
+msgstr "Sorting Puzzle 広告の報告"
+
+#. support.ad_email.body
+msgid "Please attach a screenshot and complete the details below.\n\nApproximate time:\nAd placement in the game:\nAdvertiser or app name:\nWhy the ad should be reviewed:\n"
+msgstr "スクリーンショットを添付し、以下の項目をご記入ください。\n\nおおよその日時：\nゲーム内の広告表示場所：\n広告主名またはアプリ名：\n広告を確認してほしい理由：\n"
+
+#. deletion.email.subject
+msgid "Sorting Puzzle account deletion"
+msgstr "Sorting Puzzle アカウント削除について"
+
+#. deletion.email.body
+msgid "Please help me with my account deletion."
+msgstr "アカウントの削除についてサポートをお願いします。"
+
+#. support.email.status
+msgid "Status: %s"
+msgstr "状況： %s"
+
+#. support.email.deletion_reference
+msgid "Deletion reference"
+msgstr "削除の照会番号"
+
+#. support.email.server_reference
+msgid "Server reference"
+msgstr "サーバーの照会番号"
+
+#. support.email.player_id
+msgid "Player ID"
+msgstr "プレイヤーID"
+
+#. leaderboard.empty
+msgid "No scores yet"
+msgstr "まだスコアがありません"
+
+#. ability.hammer.name
+msgid "HAMMER"
+msgstr "ハンマー"
+
+#. ability.shuffle.name
+msgid "SHUFFLE"
+msgstr "シャッフル"
+
+#. ability.lantern.name
+msgid "LANTERN"
+msgstr "ランタン"
+
+#. ability.freezer.name
+msgid "FREEZER"
+msgstr "フリーザー"
+
+#. shop.offer.basic_bundle
+msgid "BASIC BUNDLE"
+msgstr "ベーシックセット"
+
+#. booster.counted.hammer
+msgctxt "booster.counted"
+msgid "Hammer"
+msgid_plural "Hammer.plural"
+msgstr[0] "ハンマー"
+
+#. booster.counted.shuffle
+msgctxt "booster.counted"
+msgid "Shuffle"
+msgid_plural "Shuffle.plural"
+msgstr[0] "シャッフル"
+
+#. booster.counted.lantern
+msgctxt "booster.counted"
+msgid "Lantern"
+msgid_plural "Lantern.plural"
+msgstr[0] "ランタン"
+
+#. booster.counted.freezer
+msgctxt "booster.counted"
+msgid "Freezer"
+msgid_plural "Freezer.plural"
+msgstr[0] "フリーザー"
