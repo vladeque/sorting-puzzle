@@ -37,6 +37,21 @@ French uses the existing Latin fonts and scene-owned text fitting; no new font r
 
 ## Theme Roles
 
+Traditional Chinese uses bundled `assets/fonts/NotoSansTC-Variable.ttf` fallback variations
+at matching 500/600/700 weights across all display, reading, rich-text and editing roles.
+`scripts/localization/locale_typography.gd` moves these before the Japanese fallback while
+`zh_Hant` is active, retaining Latin/Cyrillic/Arabic priority and restoring the original order
+for other locales. `LocaleManager` applies the order before translating screens on startup
+and live language changes. The font remains a fallback in every locale for mixed player names.
+
+The unmodified 11,941,968-byte variable font and its SIL Open Font License were vendored
+from the official [Google Fonts Noto Sans TC directory](https://github.com/google/fonts/tree/main/ofl/notosanstc).
+Its weight axis covers 100–900. Keep `NotoSansTC-OFL.txt` beside the font. Font SHA-256:
+`864727D210D54F2537BBE23B3A839436C3992AF72DE9322AF5270897246BD44F`.
+`tests/ui/test_traditional_chinese_localization.gd` checks all reviewed non-ASCII characters
+through bundled font inventories and verifies Taiwan priority in every theme role plus its
+restoration when switching to Japanese, independently of system fonts.
+
 Japanese glyphs use bundled `assets/fonts/NotoSansJP-Variable.ttf` fallback variations at
 matching 500/600/700 weights in every display, button, HUD, body, rich-text and editing role.
 They follow the existing Latin, Cyrillic and Arabic faces and precede the Korean fallbacks,

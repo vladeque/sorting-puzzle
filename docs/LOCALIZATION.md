@@ -49,12 +49,35 @@ starts.
 `assets/translations/en.po`, `assets/translations/ru.po`, `assets/translations/uk.po`,
 `assets/translations/it.po`, `assets/translations/ar.po`, `assets/translations/es.po`,
 `assets/translations/pt_BR.po`, `assets/translations/de.po`, `assets/translations/fr.po`,
-`assets/translations/ko.po` and `assets/translations/ja.po` are
+`assets/translations/ko.po`, `assets/translations/ja.po` and `assets/translations/zh_Hant.po` are
 registered in `project.godot`.
 Russian includes all 251 reviewed keys from
 `docs/localization/RUSSIAN_TRANSLATIONS.md`, the user's corrected October 4, 2026 inventory.
 The inventory is a copy of the approved translation text, not runtime configuration.
-English remains the fallback for the other three selectable locales until their catalogs exist.
+English remains the fallback for the other two selectable locales until their catalogs exist.
+
+Traditional Chinese includes all 251 entries from the owner's refined October 7, 2026 attachment
+archived verbatim at `docs/localization/TRADITIONAL_CHINESE_TRANSLATIONS.md`.
+`tests/localization/traditional_chinese_inventory.json` retains the exact English/Chinese wording
+and source hash. `zh_Hant.po` registers 527 messages/contexts, including English scene and
+uppercase card aliases, six invariant counted messages, and four fixed counted booster names.
+The existing `繁體中文` picker option selects Taiwan wording; `zh_TW`, `zh_HK`, `zh_MO` and
+Traditional-script device locales map to it. Simplified Chinese keeps the English fallback.
+
+Gameplay resume uses `繼續遊戲`, move-on uses `繼續`, failed-level replay uses `重新挑戰`,
+and destination reload uses `重新載入`. The refined copy is retained exactly, including the
+`禮包` badge, combo praise, `國內` leaderboard, support guidance and deletion warnings.
+Counts use commas; `GameText.format_date()` presents deadlines as `2026年11月2日`.
+Prices, player names, identifiers, references, language names, branding, `AD` and `OFF` remain raw.
+The additional empty-leaderboard caption is `尚無成績`; supplementary email labels use the
+attachment's wording within the existing email-field formatter.
+
+Bundled Noto Sans TC variations at 500/600/700 weights provide Chinese glyphs in every theme role.
+`scripts/localization/locale_typography.gd`, called by `LocaleManager` before applying the locale,
+prioritizes the Taiwan face ahead of the Japanese fallback only for `zh_Hant`. Other locales
+restore the original fallback order, including Japanese glyph forms. Existing scene owners
+retain their live refresh, fitting, wrapping and scrolling. Integration verification is recorded
+in `docs/localization/TRADITIONAL_CHINESE_LOCALIZATION_QA.md`.
 
 Japanese includes all 251 entries from the owner's improved October 7, 2026 attachment archived
 verbatim at `docs/localization/JAPANESE_TRANSLATIONS.md`. `tests/localization/japanese_inventory.json`
@@ -336,6 +359,12 @@ The implementation ownership and verification scope are recorded in
 
 ## Verification
 
+- `tests/ui/test_traditional_chinese_localization.gd` verifies all 251 refined entries and scene
+  aliases, six invariant plural messages, fixed counted boosters, placeholder values, bundled
+  glyph coverage and Taiwan font priority across every role, all twelve dates, regional mapping,
+  Simplified Chinese fallback, contextual actions, live switching, pending ad state and local-only
+  preference persistence. FAQ questions and deletion/shelf/replay actions are measured at all
+  five responsive viewports; switching to Japanese restores Japanese font priority.
 - `tests/ui/test_language_selection.gd` covers the allowlist, locale mapping, pending/confirmed
   selection, persistence, snapshot exclusion, cancellation, and Main Menu stacking.
 - `tests/ui/test_arabic_localization.gd` verifies reviewed copy, six plural forms, fonts,
@@ -408,6 +437,7 @@ The implementation ownership and verification scope are recorded in
   Use `-Locale fr` for French captures.
   Use `-Locale ko` for Korean captures.
   Use `-Locale ja` for Japanese captures.
+  Use `-Locale zh_Hant` for Traditional Chinese captures.
 
 The October 4–5, 2026 test results, rendered-screen reviews and capture limitations are recorded in
 `docs/localization/RUSSIAN_LOCALIZATION_QA.md`.
@@ -420,3 +450,4 @@ German integration results are recorded in `docs/localization/GERMAN_LOCALIZATIO
 French integration results are recorded in `docs/localization/FRENCH_LOCALIZATION_QA.md`.
 Korean integration results are recorded in `docs/localization/KOREAN_LOCALIZATION_QA.md`.
 Japanese integration results are recorded in `docs/localization/JAPANESE_LOCALIZATION_QA.md`.
+Traditional Chinese integration results are recorded in `docs/localization/TRADITIONAL_CHINESE_LOCALIZATION_QA.md`.

@@ -1,5 +1,13 @@
 # Scenes
 
+Traditional Chinese (`zh_Hant`) uses the existing scene hierarchies and the owner-refined
+Taiwan wording in `assets/translations/zh_Hant.po`. Resume uses `繼續遊戲`, move-on uses
+`繼續`, replay uses `重新挑戰`, and destination reload uses `重新載入`.
+Shared theme roles use bundled Noto Sans TC glyphs while this locale is active; scene-owned
+sizes, wrapping, fitting and scrolling remain in their existing owners.
+Copy provenance and rendered verification are recorded in
+`docs/localization/TRADITIONAL_CHINESE_LOCALIZATION_QA.md`.
+
 Japanese (`ja`) uses the existing scene owners and English aliases in `assets/translations/ja.po`.
 Resume uses `再開`, move-on uses `続ける`, failure replay uses `もう一度プレイ`, and
 data reload uses `common.retry_load` (`再読み込み`). The `セット` badge and reviewed

@@ -1,0 +1,2131 @@
+# Reviewed Traditional Chinese inventory; see docs/localization/TRADITIONAL_CHINESE_TRANSLATIONS.md.
+msgid ""
+msgstr ""
+"Project-Id-Version: SortingPuzzle\n"
+"Language: zh_Hant\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#. date.day_month_year
+msgid "date.day_month_year"
+msgstr "%d日 %s %d年"
+
+#. common.play
+msgid "common.play"
+msgstr "開始"
+
+#. common.continue
+msgid "common.continue"
+msgstr "繼續"
+
+#. common.resume
+msgid "common.resume"
+msgstr "繼續遊戲"
+
+#. common.try_again
+msgid "common.try_again"
+msgstr "再試一次"
+
+#. common.close
+msgid "common.close"
+msgstr "關閉"
+
+#. common.cancel
+msgid "common.cancel"
+msgstr "取消"
+
+#. common.got_it
+msgid "common.got_it"
+msgstr "知道了"
+
+#. common.get_help
+msgid "common.get_help"
+msgstr "尋求協助"
+
+#. common.save
+msgid "common.save"
+msgstr "儲存"
+
+#. common.loading
+msgid "common.loading"
+msgstr "載入中…"
+
+#. common.retry_load
+msgid "common.retry_load"
+msgstr "重新載入"
+
+#. menu.level_button
+msgid "menu.level_button"
+msgstr "第 %d 關"
+
+#. menu.more_levels_coming_soon
+msgid "menu.more_levels_coming_soon"
+msgstr "更多關卡即將推出"
+
+#. menu.coming_soon
+msgid "menu.coming_soon"
+msgstr "即將推出"
+
+#. menu.lives_full
+msgid "menu.lives_full"
+msgstr "已滿"
+
+#. menu.starter_badge
+msgid "menu.starter_badge"
+msgstr "禮包"
+
+#. nav.shop
+msgid "nav.shop"
+msgstr "商店"
+
+#. nav.home
+msgid "nav.home"
+msgstr "首頁"
+
+#. nav.leaderboard
+msgid "nav.leaderboard"
+msgstr "排行榜"
+
+#. chapter.button
+msgid "chapter.button"
+msgstr "第 %d 章"
+
+#. chapter.button_tooltip
+msgid "chapter.button_tooltip"
+msgstr "選擇第 %d 章：%s"
+
+#. chapter.screen_title
+msgid "chapter.screen_title"
+msgstr "章節"
+
+#. chapter.eyebrow
+msgid "chapter.eyebrow"
+msgstr "第 %d 章"
+
+#. chapter.title.chapter_01
+msgid "chapter.title.chapter_01"
+msgstr "雜貨小鎮"
+
+#. chapter.title.chapter_02
+msgid "chapter.title.chapter_02"
+msgstr "糖果街角"
+
+#. chapter.locked_status
+msgid "chapter.locked_status"
+msgid_plural "chapter.locked_status.plural"
+msgstr[0] "再完成 %d 個「%s」關卡即可解鎖"
+
+#. chapter.unlock_progress
+msgid "chapter.unlock_progress"
+msgstr "解鎖進度"
+
+#. chapter.current_progress
+msgid "chapter.current_progress"
+msgstr "目前進度"
+
+#. chapter.locked
+msgid "chapter.locked"
+msgstr "未解鎖"
+
+#. chapter.no_levels_status
+msgid "chapter.no_levels_status"
+msgstr "新關卡即將推出"
+
+#. chapter.coming_soon
+msgid "chapter.coming_soon"
+msgstr "即將推出"
+
+#. hud.level
+msgid "hud.level"
+msgstr "第 %d 關"
+
+#. hud.combo
+msgid "hud.combo"
+msgstr "連擊 ×%d"
+
+#. hud.ability_tooltip.hammer
+msgid "hud.ability_tooltip.hammer"
+msgstr "槌子——消除三個相同商品"
+
+#. hud.ability_tooltip.shuffle
+msgid "hud.ability_tooltip.shuffle"
+msgstr "重排——重新排列未鎖定的商品"
+
+#. hud.ability_tooltip.lantern
+msgid "hud.ability_tooltip.lantern"
+msgstr "提燈——標示可消除的三個相同商品"
+
+#. hud.ability_tooltip.freezer
+msgid "hud.ability_tooltip.freezer"
+msgstr "冰凍器——暫停倒數計時"
+
+#. hud.seconds_short
+msgid "hud.seconds_short"
+msgstr "%d秒"
+
+#. tip.tap_dispenser
+msgid "tip.tap_dispenser"
+msgstr "點一下出貨機，就能把商品送到貨架上！"
+
+#. pause.title
+msgid "pause.title"
+msgstr "暫停"
+
+#. pause.leave
+msgid "pause.leave"
+msgstr "離開"
+
+#. leave.title
+msgid "leave.title"
+msgstr "離開關卡"
+
+#. leave.you_will_lose
+msgid "leave.you_will_lose"
+msgstr "你將失去："
+
+#. leave.confirm
+msgid "leave.confirm"
+msgstr "離開"
+
+#. timeup.title
+msgid "timeup.title"
+msgstr "時間到！"
+
+#. timeup.offer
+msgid "timeup.offer"
+msgstr "增加一分鐘，繼續整理！"
+
+#. timeup.used
+msgid "timeup.used"
+msgstr "已使用"
+
+#. ability_purchase.title
+msgid "ability_purchase.title"
+msgstr "使用道具"
+
+#. shelf_unlock.title
+msgid "shelf_unlock.title"
+msgstr "解鎖貨架"
+
+#. shelf_unlock.offer
+msgid "shelf_unlock.offer"
+msgstr "觀看一則廣告，立即解鎖此貨架。"
+
+#. shelf_unlock.offer_or_clear
+msgid "shelf_unlock.offer_or_clear"
+msgid_plural "shelf_unlock.offer_or_clear.plural"
+msgstr[0] "觀看一則廣告立即解鎖此貨架，或再消除 %s 組商品即可解鎖。"
+
+#. shelf_unlock.button
+msgid "shelf_unlock.button"
+msgstr "觀看廣告 · 解鎖貨架"
+
+#. shelf_unlock.ad_unavailable
+msgid "shelf_unlock.ad_unavailable"
+msgstr "廣告目前無法播放，此貨架仍未解鎖。"
+
+#. complete.title
+msgid "complete.title"
+msgstr "做得好！"
+
+#. failed.title
+msgid "failed.title"
+msgstr "第 %d 關"
+
+#. failed.headline
+msgid "failed.headline"
+msgstr "闖關失敗"
+
+#. failed.retry
+msgid "failed.retry"
+msgstr "重新挑戰"
+
+#. combo.praise.2
+msgid "combo.praise.2"
+msgstr "酷喔"
+
+#. combo.praise.3
+msgid "combo.praise.3"
+msgstr "很棒"
+
+#. combo.praise.4
+msgid "combo.praise.4"
+msgstr "超讚"
+
+#. combo.praise.5
+msgid "combo.praise.5"
+msgstr "太厲害了"
+
+#. combo.praise.6
+msgid "combo.praise.6"
+msgstr "太精彩了"
+
+#. combo.praise.7
+msgid "combo.praise.7"
+msgstr "不可思議"
+
+#. combo.praise.8
+msgid "combo.praise.8"
+msgstr "震撼全場"
+
+#. combo.praise.9
+msgid "combo.praise.9"
+msgstr "勢不可擋"
+
+#. combo.praise.10
+msgid "combo.praise.10"
+msgstr "傳奇表現"
+
+#. combo.praise.11
+msgid "combo.praise.11"
+msgstr "史詩表現"
+
+#. combo.praise.12
+msgid "combo.praise.12"
+msgstr "精彩絕倫"
+
+#. combo.praise.13
+msgid "combo.praise.13"
+msgstr "大師級"
+
+#. combo.praise.14
+msgid "combo.praise.14"
+msgstr "無與倫比"
+
+#. combo.praise.15
+msgid "combo.praise.15"
+msgstr "超凡表現"
+
+#. combo.praise.16
+msgid "combo.praise.16"
+msgstr "神級"
+
+#. combo.praise.17
+msgid "combo.praise.17"
+msgstr "氣勢非凡"
+
+#. combo.praise.18
+msgid "combo.praise.18"
+msgstr "光芒四射"
+
+#. combo.praise.19
+msgid "combo.praise.19"
+msgstr "神乎其技"
+
+#. combo.praise.20
+msgid "combo.praise.20"
+msgstr "超越極限"
+
+#. ability.hammer.name
+msgid "ability.hammer.name"
+msgstr "槌子"
+
+#. ability.shuffle.name
+msgid "ability.shuffle.name"
+msgstr "重排"
+
+#. ability.lantern.name
+msgid "ability.lantern.name"
+msgstr "提燈"
+
+#. ability.freezer.name
+msgid "ability.freezer.name"
+msgstr "冰凍器"
+
+#. ability.hammer.description
+msgid "ability.hammer.description"
+msgstr "立即消除貨架上的一組相同商品。"
+
+#. ability.shuffle.description
+msgid "ability.shuffle.description"
+msgstr "重新排列貨架上的商品，幫助你找出可消除的組合。"
+
+#. ability.lantern.description
+msgid "ability.lantern.description"
+msgstr "標示一組可消除的三個相同商品，持續 15 秒。"
+
+#. ability.freezer.description
+msgid "ability.freezer.description"
+msgstr "凍結關卡計時器 30 秒。"
+
+#. ad.watch
+msgid "ad.watch"
+msgstr "觀看廣告"
+
+#. ad.loading
+msgid "ad.loading"
+msgstr "載入中…"
+
+#. ad.verifying
+msgid "ad.verifying"
+msgstr "驗證中…"
+
+#. ad.verify_reward
+msgid "ad.verify_reward"
+msgstr "驗證獎勵"
+
+#. ad.reward_pending
+msgid "ad.reward_pending"
+msgstr "獎勵驗證仍在處理中。"
+
+#. ad.unavailable_retry
+msgid "ad.unavailable_retry"
+msgstr "廣告目前無法播放，請再試一次。"
+
+#. ad.watch_unavailable
+msgid "ad.watch_unavailable"
+msgstr "觀看廣告\n暫時無法播放"
+
+#. ad.watch_coming_soon
+msgid "ad.watch_coming_soon"
+msgstr "觀看廣告\n即將推出"
+
+#. ad.badge
+msgid "ad.badge"
+msgstr "AD"
+
+#. lives.title.out
+msgid "lives.title.out"
+msgstr "生命已用完"
+
+#. lives.title.get_more
+msgid "lives.title.get_more"
+msgstr "補充生命"
+
+#. lives.title.full
+msgid "lives.title.full"
+msgstr "生命已滿"
+
+#. lives.next_in
+msgid "lives.next_in"
+msgstr "生命恢復倒數"
+
+#. lives.full_body
+msgid "lives.full_body"
+msgstr "你的生命已滿！開始闖關來使用生命吧。"
+
+#. chest.title
+msgid "chest.title"
+msgstr "寶箱獎勵"
+
+#. chest.progress_hint
+msgid "chest.progress_hint"
+msgstr "收集星星，解鎖寶箱並領取獎勵"
+
+#. chest.ready
+msgid "chest.ready"
+msgstr "獎勵寶箱等你開啟！"
+
+#. chest.tap_to_open
+msgid "chest.tap_to_open"
+msgstr "點一下開啟"
+
+#. purchase.tap_to_collect
+msgid "purchase.tap_to_collect"
+msgstr "點一下領取"
+
+#. purchase.complete
+msgid "purchase.complete"
+msgstr "購買完成"
+
+#. shop.title
+msgid "shop.title"
+msgstr "商店"
+
+#. shop.section.bundles
+msgid "shop.section.bundles"
+msgstr "特別禮包"
+
+#. shop.section.coins
+msgid "shop.section.coins"
+msgstr "金幣"
+
+#. shop.offer.starter_bundle
+msgid "shop.offer.starter_bundle"
+msgstr "新手禮包"
+
+#. shop.offer.basic_bundle
+msgid "shop.offer.basic_bundle"
+msgstr "基礎禮包"
+
+#. shop.tag.best_value
+msgid "shop.tag.best_value"
+msgstr "最划算"
+
+#. shop.discount_off
+msgid "shop.discount_off"
+msgstr "OFF"
+
+#. shop.ability_hint
+msgid "shop.ability_hint"
+msgstr "點一下道具，查看它的效果"
+
+#. shop.purchasing
+msgid "shop.purchasing"
+msgstr "購買中…"
+
+#. shop.no_offers
+msgid "shop.no_offers"
+msgstr "此地區目前沒有可購買的商品。"
+
+#. shop.load_failed
+msgid "shop.load_failed"
+msgstr "無法載入商店。"
+
+#. shop.error.title.purchase
+msgid "shop.error.title.purchase"
+msgstr "無法購買"
+
+#. shop.error.title.reward
+msgid "shop.error.title.reward"
+msgstr "獎勵錯誤"
+
+#. shop.error.purchase_failed
+msgid "shop.error.purchase_failed"
+msgstr "無法完成購買。"
+
+#. shop.error.grant_failed
+msgid "shop.error.grant_failed"
+msgstr "無法發放已購買的獎勵。"
+
+#. shop.error.offer_unavailable
+msgid "shop.error.offer_unavailable"
+msgstr "此商店優惠目前無法購買。"
+
+#. shop.error.already_bought
+msgid "shop.error.already_bought"
+msgstr "此優惠限購一次，且你已購買過。"
+
+#. starter.title
+msgid "starter.title"
+msgstr "新手禮包"
+
+#. starter.one_time
+msgid "starter.one_time"
+msgstr "限購一次"
+
+#. starter.boosters_included
+msgid "starter.boosters_included"
+msgstr "內含道具"
+
+#. starter.coins
+msgid "starter.coins"
+msgid_plural "starter.coins.plural"
+msgstr[0] "%s 枚金幣"
+
+#. starter.buy_for
+msgid "starter.buy_for"
+msgstr "用 %s 購買"
+
+#. starter.checking
+msgid "starter.checking"
+msgstr "正在確認優惠…"
+
+#. starter.checking_short
+msgid "starter.checking_short"
+msgstr "確認中…"
+
+#. starter.no_longer_available
+msgid "starter.no_longer_available"
+msgstr "此優惠已無法購買。"
+
+#. starter.unavailable
+msgid "starter.unavailable"
+msgstr "無法購買"
+
+#. booster_chip.claimed
+msgid "booster_chip.claimed"
+msgstr "+%d %s"
+
+#. profile.title
+msgid "profile.title"
+msgstr "編輯個人檔案"
+
+#. profile.name_header
+msgid "profile.name_header"
+msgstr "玩家名稱"
+
+#. profile.name_placeholder
+msgid "profile.name_placeholder"
+msgstr "玩家名稱"
+
+#. profile.edit_name_tooltip
+msgid "profile.edit_name_tooltip"
+msgstr "編輯玩家名稱"
+
+#. profile.avatar_tab
+msgid "profile.avatar_tab"
+msgstr "頭像"
+
+#. profile.frame_tab
+msgid "profile.frame_tab"
+msgstr "頭像框"
+
+#. profile.unlock.level
+msgid "profile.unlock.level"
+msgstr "完成第 %d 關即可解鎖"
+
+#. profile.unlock.combo
+msgid "profile.unlock.combo"
+msgstr "在任一場遊戲中達成 ×%d 連擊即可解鎖"
+
+#. profile.unlock.weekly_first
+msgid "profile.unlock.weekly_first"
+msgstr "在每週排行榜獲得第 1 名即可解鎖"
+
+#. profile.unlock.weekly_top
+msgid "profile.unlock.weekly_top"
+msgstr "在每週排行榜進入前 %d 名即可解鎖"
+
+#. leaderboard.title
+msgid "leaderboard.title"
+msgstr "排行榜"
+
+#. leaderboard.tab.weekly
+msgid "leaderboard.tab.weekly"
+msgstr "每週"
+
+#. leaderboard.tab.country
+msgid "leaderboard.tab.country"
+msgstr "國內"
+
+#. leaderboard.tab.world
+msgid "leaderboard.tab.world"
+msgstr "全球"
+
+#. leaderboard.weekly_reset
+msgid "leaderboard.weekly_reset"
+msgstr "每週排名將於 %s 後重置"
+
+#. leaderboard.duration.dh
+msgid "leaderboard.duration.dh"
+msgstr "%d天 %d小時"
+
+#. leaderboard.duration.hm
+msgid "leaderboard.duration.hm"
+msgstr "%d小時 %d分"
+
+#. leaderboard.duration.m
+msgid "leaderboard.duration.m"
+msgstr "%d分"
+
+#. leaderboard.country_caption
+msgid "leaderboard.country_caption"
+msgstr "國內 · 累計星星"
+
+#. leaderboard.world_caption
+msgid "leaderboard.world_caption"
+msgstr "全球 · 累計星星"
+
+#. leaderboard.load_failed
+msgid "leaderboard.load_failed"
+msgstr "無法載入排行榜。"
+
+#. leaderboard.default_name
+msgid "leaderboard.default_name"
+msgstr "玩家"
+
+#. leaderboard.row_tooltip
+msgid "leaderboard.row_tooltip"
+msgid_plural "leaderboard.row_tooltip.plural"
+msgstr[0] "第 %d 名，%s，%d 顆星星"
+
+#. leaderboard.reward_tooltip
+msgid "leaderboard.reward_tooltip"
+msgid_plural "leaderboard.reward_tooltip.plural"
+msgstr[0] "每週獎勵：%s 枚金幣"
+
+#. leaderboard.reward.title
+msgid "leaderboard.reward.title"
+msgstr "每週獎勵！"
+
+#. leaderboard.reward.body
+msgid "leaderboard.reward.body"
+msgid_plural "leaderboard.reward.body.plural"
+msgstr[0] "你上週獲得第 %d 名，贏得 %d 枚金幣！"
+
+#. leaderboard.reward.ok
+msgid "leaderboard.reward.ok"
+msgstr "太棒了！"
+
+#. settings.title
+msgid "settings.title"
+msgstr "設定"
+
+#. settings.music
+msgid "settings.music"
+msgstr "音樂"
+
+#. settings.sfx
+msgid "settings.sfx"
+msgstr "音效"
+
+#. settings.vibrate
+msgid "settings.vibrate"
+msgstr "震動"
+
+#. settings.support
+msgid "settings.support"
+msgstr "客服"
+
+#. settings.language
+msgid "settings.language"
+msgstr "語言"
+
+#. settings.privacy_policy
+msgid "settings.privacy_policy"
+msgstr "隱私權政策"
+
+#. settings.privacy_choices
+msgid "settings.privacy_choices"
+msgstr "隱私權選項"
+
+#. settings.diagnostics
+msgid "settings.diagnostics"
+msgstr "版本 %s • 組建 %d\n平台：%s • 使用者：%s"
+
+#. language.title
+msgid "language.title"
+msgstr "語言"
+
+#. support.title
+msgid "support.title"
+msgstr "客服"
+
+#. support.faq_header
+msgid "support.faq_header"
+msgstr "常見問題"
+
+#. support.faq.play.q
+msgid "support.faq.play.q"
+msgstr "要怎麼玩？"
+
+#. support.faq.play.a
+msgid "support.faq.play.a"
+msgstr "將相同商品移到同一個貨架。當三個相同商品同時出現在貨架上，就會消除。在時間用完前，清空所有商品即可過關。"
+
+#. support.faq.contact.q
+msgid "support.faq.contact.q"
+msgstr "如何聯絡客服？"
+
+#. support.faq.contact.a
+msgid "support.faq.contact.a"
+msgstr "請寄電子郵件至 %s，簡短說明問題、裝置平台及問題發生的時間。"
+
+#. support.faq.contact.action
+msgid "support.faq.contact.action"
+msgstr "寄信給客服"
+
+#. support.faq.crash.q
+msgid "support.faq.crash.q"
+msgstr "遊戲卡住或閃退時該怎麼辦？"
+
+#. support.faq.crash.a
+msgid "support.faq.crash.a"
+msgstr "請先關閉並重新開啟遊戲。如果再次發生，請重新啟動裝置，並確認遊戲已更新。聯絡客服時，請提供裝置型號、平台版本，以及問題發生前你正在進行的操作。"
+
+#. support.faq.sync.q
+msgid "support.faq.sync.q"
+msgstr "如何在不同裝置間同步進度？"
+
+#. support.faq.sync.a
+msgid "support.faq.sync.a"
+msgstr "請在兩台裝置上登入同一個平台帳號，並等同步完成後再開始遊戲。如果進度不同，請先不要在任一裝置上繼續遊玩，並聯絡客服。"
+
+#. support.faq.bad_ad.q
+msgid "support.faq.bad_ad.q"
+msgstr "如何檢舉不當廣告？"
+
+#. support.faq.bad_ad.a
+msgid "support.faq.bad_ad.a"
+msgstr "1. 如果能安全關閉廣告，請先關閉。\n2. 擷取廣告畫面，以及畫面中顯示的廣告主或應用程式名稱。\n3. 記下大約時間，以及廣告在遊戲中出現的位置。\n4. 說明你認為廣告含有冒犯、誤導或詐騙內容的原因。\n5. 將上述資訊寄至 %s。請勿附上密碼或付款資訊。"
+
+#. support.faq.bad_ad.action
+msgid "support.faq.bad_ad.action"
+msgstr "寄信檢舉廣告"
+
+#. support.account_header
+msgid "support.account_header"
+msgstr "帳號"
+
+#. support.delete_account
+msgid "support.delete_account"
+msgstr "刪除帳號"
+
+#. support.delete_game_data
+msgid "support.delete_game_data"
+msgstr "刪除遊戲資料"
+
+#. support.no_secrets
+msgid "support.no_secrets"
+msgstr "請勿提供密碼或付款資訊。"
+
+#. deletion.title.delete_account
+msgid "deletion.title.delete_account"
+msgstr "刪除帳號"
+
+#. deletion.title.delete_game_data
+msgid "deletion.title.delete_game_data"
+msgstr "刪除遊戲資料"
+
+#. deletion.title.not_confirmed
+msgid "deletion.title.not_confirmed"
+msgstr "尚未確認"
+
+#. deletion.title.status_unconfirmed
+msgid "deletion.title.status_unconfirmed"
+msgstr "狀態尚未確認"
+
+#. deletion.title.finishing_up
+msgid "deletion.title.finishing_up"
+msgstr "正在完成清除"
+
+#. deletion.title.new_game
+msgid "deletion.title.new_game"
+msgstr "新遊戲"
+
+#. deletion.title.status_unknown
+msgid "deletion.title.status_unknown"
+msgstr "狀態不明"
+
+#. deletion.title.not_deleted
+msgid "deletion.title.not_deleted"
+msgstr "未刪除"
+
+#. deletion.title.data_deleted
+msgid "deletion.title.data_deleted"
+msgstr "資料已刪除"
+
+#. deletion.title.accepted
+msgid "deletion.title.accepted"
+msgstr "刪除申請已受理"
+
+#. deletion.confirm.headline
+msgid "deletion.confirm.headline"
+msgstr "這將永久刪除你的帳號。"
+
+#. deletion.confirm.body
+msgid "deletion.confirm.body"
+msgstr "你的進度、金幣、道具及個人檔案將全部刪除。此操作無法復原。\n\n如果日後再次登入，將會建立新帳號。\n\n部分購買及安全紀錄會保留，但不含你的姓名或個人檔案。其餘資料將於 30 天內刪除。"
+
+#. deletion.confirm.button
+msgid "deletion.confirm.button"
+msgstr "刪除帳號"
+
+#. deletion.local_confirm.headline
+msgid "deletion.local_confirm.headline"
+msgstr "這將刪除此裝置上的遊戲資料。"
+
+#. deletion.local_confirm.body
+msgid "deletion.local_confirm.body"
+msgstr "你的進度、金幣、道具及個人檔案將全部刪除。此操作無法復原。\n\n本遊戲從未為你建立線上帳號，因此無須從我們的伺服器刪除任何資料。"
+
+#. deletion.local_confirm.button
+msgid "deletion.local_confirm.button"
+msgstr "刪除資料"
+
+#. deletion.pending_setup.headline
+msgid "deletion.pending_setup.headline"
+msgstr "你的帳號仍在建立中。"
+
+#. deletion.pending_setup.body
+msgid "deletion.pending_setup.body"
+msgstr "請連上網路，稍後再試。未刪除任何資料。"
+
+#. deletion.sign_in.headline
+msgid "deletion.sign_in.headline"
+msgstr "請登入你要刪除的帳號。"
+
+#. deletion.sign_in.body
+msgid "deletion.sign_in.body"
+msgstr "如果無法登入，請聯絡客服尋求協助。"
+
+#. deletion.read_failed.headline
+msgid "deletion.read_failed.headline"
+msgstr "無法讀取你的遊戲資料。"
+
+#. deletion.read_failed.body
+msgid "deletion.read_failed.body"
+msgstr "請重新啟動遊戲後再試。未刪除任何資料。"
+
+#. deletion.unavailable.headline
+msgid "deletion.unavailable.headline"
+msgstr "此遊戲版本不支援刪除帳號。"
+
+#. deletion.unavailable.body
+msgid "deletion.unavailable.body"
+msgstr "請更新遊戲，或聯絡客服協助刪除帳號。未刪除任何資料。"
+
+#. deletion.in_progress.account
+msgid "deletion.in_progress.account"
+msgstr "正在刪除你的帳號…"
+
+#. deletion.in_progress.local
+msgid "deletion.in_progress.local"
+msgstr "正在刪除你的遊戲資料…"
+
+#. deletion.in_progress.body
+msgid "deletion.in_progress.body"
+msgstr "請保持遊戲開啟，這只需要片刻。"
+
+#. deletion.not_confirmed.headline
+msgid "deletion.not_confirmed.headline"
+msgstr "我們尚未收到你的刪除申請結果。"
+
+#. deletion.not_confirmed.body
+msgid "deletion.not_confirmed.body"
+msgstr "你的申請已送出，但尚未收到回覆。請連上網路後再試。確認結果前，遊戲會保持鎖定。"
+
+#. deletion.unconfirmed.headline
+msgid "deletion.unconfirmed.headline"
+msgstr "刪除狀態尚未確認"
+
+#. deletion.unconfirmed.body
+msgid "deletion.unconfirmed.body"
+msgstr "我們無法確認你的帳號是否已刪除。為保護你的資料，遊戲會保持鎖定。請聯絡客服，並提供下方的參考編號。"
+
+#. deletion.check_again
+msgid "deletion.check_again"
+msgstr "再次確認"
+
+#. deletion.cleanup.headline.local
+msgid "deletion.cleanup.headline.local"
+msgstr "你的本機遊戲資料尚未完全刪除。"
+
+#. deletion.cleanup.headline.account
+msgid "deletion.cleanup.headline.account"
+msgstr "帳號刪除申請已受理，正在完成清除。"
+
+#. deletion.cleanup.body
+msgid "deletion.cleanup.body"
+msgstr "此裝置上的部分遊戲資料尚未移除。請再試一次以完成清除。"
+
+#. deletion.new_game.headline
+msgid "deletion.new_game.headline"
+msgstr "正在開始新遊戲…"
+
+#. deletion.new_game.body
+msgid "deletion.new_game.body"
+msgstr "這只需要片刻。"
+
+#. deletion.status_unknown.headline
+msgid "deletion.status_unknown.headline"
+msgstr "我們無法讀取此裝置上的刪除狀態。"
+
+#. deletion.status_unknown.body
+msgid "deletion.status_unknown.body"
+msgstr "為保護你的資料，遊戲會保持鎖定。請聯絡客服尋求協助。"
+
+#. deletion.fail.offline
+msgid "deletion.fail.offline"
+msgstr "請連上網路以刪除帳號。"
+
+#. deletion.fail.rate_limited
+msgid "deletion.fail.rate_limited"
+msgstr "嘗試次數過多，請稍後再試。"
+
+#. deletion.fail.busy
+msgid "deletion.fail.busy"
+msgstr "帳號刪除服務目前忙碌中，請稍後再試。"
+
+#. deletion.fail.syncing
+msgid "deletion.fail.syncing"
+msgstr "遊戲仍在同步中，請稍後再試。"
+
+#. deletion.fail.auth
+msgid "deletion.fail.auth"
+msgstr "我們無法驗證你的帳號。請重新啟動遊戲後再試。"
+
+#. deletion.fail.update
+msgid "deletion.fail.update"
+msgstr "請更新遊戲以刪除帳號。"
+
+#. deletion.fail.changed
+msgid "deletion.fail.changed"
+msgstr "刪除過程中，你的帳號發生變更。請再試一次。"
+
+#. deletion.fail.storage
+msgid "deletion.fail.storage"
+msgstr "你的裝置無法儲存刪除申請。請再試一次。"
+
+#. deletion.fail.generic
+msgid "deletion.fail.generic"
+msgstr "我們無法刪除你的帳號。請稍後再試，或聯絡客服。"
+
+#. deletion.fail.local
+msgid "deletion.fail.local"
+msgstr "無法刪除你的遊戲資料。請再試一次。"
+
+#. deletion.fail.body
+msgid "deletion.fail.body"
+msgstr "未刪除任何資料，你可以繼續遊戲。"
+
+#. deletion.done_local.headline
+msgid "deletion.done_local.headline"
+msgstr "你的本機遊戲資料已刪除。"
+
+#. deletion.done_local.body
+msgid "deletion.done_local.body"
+msgstr "你可以開始新遊戲，從頭再來。"
+
+#. deletion.new_game_failed
+msgid "deletion.new_game_failed"
+msgstr "無法開始新遊戲。請再試一次。"
+
+#. deletion.accepted.headline
+msgid "deletion.accepted.headline"
+msgstr "你已無法再存取此帳號。"
+
+#. deletion.accepted.body
+msgid "deletion.accepted.body"
+msgstr "你的刪除申請已受理。"
+
+#. deletion.accepted.body_deadline
+msgid "deletion.accepted.body_deadline"
+msgstr "你的刪除申請已受理。資料最遲將於 %s 刪除。"
+
+#. deletion.reference
+msgid "deletion.reference"
+msgstr "參考編號：%s"
+
+#. deletion.start_new_game
+msgid "deletion.start_new_game"
+msgstr "開始新遊戲"
+
+#. app.name
+msgid "app.name"
+msgstr "SortingPuzzle"
+
+#. support.email.subject
+msgid "support.email.subject"
+msgstr "Sorting Puzzle 客服支援請求"
+
+#. support.email.body
+msgid "support.email.body"
+msgstr "請在此描述問題。\n\n裝置／平台：\n大約發生時間：\n"
+
+#. support.ad_email.subject
+msgid "support.ad_email.subject"
+msgstr "Sorting Puzzle 廣告檢舉"
+
+#. support.ad_email.body
+msgid "support.ad_email.body"
+msgstr "請附上螢幕截圖，並填寫以下資訊。\n\n大約發生時間：\n廣告在遊戲中出現的位置：\n廣告主或應用程式名稱：\n需要審查此廣告的原因：\n"
+
+#. deletion.email.subject
+msgid "deletion.email.subject"
+msgstr "Sorting Puzzle 帳號刪除"
+
+#. deletion.email.body
+msgid "deletion.email.body"
+msgstr "請協助我刪除帳號。"
+
+#. support.email.status
+msgid "support.email.status"
+msgstr "狀態：%s"
+
+#. support.email.deletion_reference
+msgid "support.email.deletion_reference"
+msgstr "刪除參考編號"
+
+#. support.email.server_reference
+msgid "support.email.server_reference"
+msgstr "伺服器參考編號"
+
+#. support.email.player_id
+msgid "support.email.player_id"
+msgstr "玩家 ID"
+
+#. leaderboard.empty
+msgid "leaderboard.empty"
+msgstr "尚無成績"
+
+#. date.month.1
+msgid "date.month.1"
+msgstr "1月"
+
+#. date.month.2
+msgid "date.month.2"
+msgstr "2月"
+
+#. date.month.3
+msgid "date.month.3"
+msgstr "3月"
+
+#. date.month.4
+msgid "date.month.4"
+msgstr "4月"
+
+#. date.month.5
+msgid "date.month.5"
+msgstr "5月"
+
+#. date.month.6
+msgid "date.month.6"
+msgstr "6月"
+
+#. date.month.7
+msgid "date.month.7"
+msgstr "7月"
+
+#. date.month.8
+msgid "date.month.8"
+msgstr "8月"
+
+#. date.month.9
+msgid "date.month.9"
+msgstr "9月"
+
+#. date.month.10
+msgid "date.month.10"
+msgstr "10月"
+
+#. date.month.11
+msgid "date.month.11"
+msgstr "11月"
+
+#. date.month.12
+msgid "date.month.12"
+msgstr "12月"
+
+#. common.play
+msgid "Play"
+msgstr "開始"
+
+#. common.continue
+msgid "Continue"
+msgstr "繼續"
+
+#. common.try_again
+msgid "Try Again"
+msgstr "再試一次"
+
+#. common.close
+msgid "Close"
+msgstr "關閉"
+
+#. common.cancel
+msgid "Cancel"
+msgstr "取消"
+
+#. common.got_it
+msgid "Got it"
+msgstr "知道了"
+
+#. common.get_help
+msgid "Get Help"
+msgstr "尋求協助"
+
+#. common.save
+msgid "SAVE"
+msgstr "儲存"
+
+#. common.loading
+msgid "Loading…"
+msgstr "載入中…"
+
+#. menu.level_button
+msgid "LEVEL %d"
+msgstr "第 %d 關"
+
+#. menu.more_levels_coming_soon
+msgid "MORE LEVELS COMING SOON"
+msgstr "更多關卡即將推出"
+
+#. menu.coming_soon
+msgid "COMING SOON"
+msgstr "即將推出"
+
+#. menu.lives_full
+msgid "Full"
+msgstr "已滿"
+
+#. menu.starter_badge
+msgid "BUNDLE"
+msgstr "禮包"
+
+#. nav.shop
+msgid "Shop"
+msgstr "商店"
+
+#. nav.home
+msgid "Home"
+msgstr "首頁"
+
+#. nav.leaderboard
+msgid "Leaderboard"
+msgstr "排行榜"
+
+#. chapter.button
+msgid "CHAPTER %d"
+msgstr "第 %d 章"
+
+#. chapter.button_tooltip
+msgid "Choose Chapter %d: %s"
+msgstr "選擇第 %d 章：%s"
+
+#. chapter.screen_title
+msgid "CHAPTERS"
+msgstr "章節"
+
+#. chapter.title.chapter_01
+msgid "Grocery Town"
+msgstr "雜貨小鎮"
+
+#. chapter.title.chapter_02
+msgid "Candy Corner"
+msgstr "糖果街角"
+
+#. chapter.locked_status
+msgid "Complete %d more %s levels to unlock"
+msgstr "再完成 %d 個「%s」關卡即可解鎖"
+
+#. chapter.unlock_progress
+msgid "Unlock progress"
+msgstr "解鎖進度"
+
+#. chapter.current_progress
+msgid "Current progress"
+msgstr "目前進度"
+
+#. chapter.locked
+msgid "Locked"
+msgstr "未解鎖"
+
+#. chapter.no_levels_status
+msgid "New levels are coming soon"
+msgstr "新關卡即將推出"
+
+#. chapter.coming_soon
+msgid "Coming Soon"
+msgstr "即將推出"
+
+#. hud.combo
+msgid "COMBO ×%d"
+msgstr "連擊 ×%d"
+
+#. hud.ability_tooltip.hammer
+msgid "Hammer -- clears a matching triple"
+msgstr "槌子——消除三個相同商品"
+
+#. hud.ability_tooltip.shuffle
+msgid "Shuffle -- reshuffles unlocked items"
+msgstr "重排——重新排列未鎖定的商品"
+
+#. hud.ability_tooltip.lantern
+msgid "Lantern -- highlights a matchable triple"
+msgstr "提燈——標示可消除的三個相同商品"
+
+#. hud.ability_tooltip.freezer
+msgid "Freezer -- pauses the countdown timer"
+msgstr "冰凍器——暫停倒數計時"
+
+#. hud.seconds_short
+msgid "%ds"
+msgstr "%d秒"
+
+#. tip.tap_dispenser
+msgid "Tap a dispenser to throw items onto the shelves!"
+msgstr "點一下出貨機，就能把商品送到貨架上！"
+
+#. pause.title
+msgid "PAUSE"
+msgstr "暫停"
+
+#. pause.leave
+msgid "Leave"
+msgstr "離開"
+
+#. leave.title
+msgid "LEAVING THE LEVEL"
+msgstr "離開關卡"
+
+#. leave.you_will_lose
+msgid "You will lose:"
+msgstr "你將失去："
+
+#. timeup.title
+msgid "TIME'S UP"
+msgstr "時間到！"
+
+#. timeup.offer
+msgid "Add one minute and keep sorting!"
+msgstr "增加一分鐘，繼續整理！"
+
+#. timeup.used
+msgid "Used"
+msgstr "已使用"
+
+#. ability_purchase.title
+msgid "USE ABILITY"
+msgstr "使用道具"
+
+#. shelf_unlock.title
+msgid "UNLOCK SHELF"
+msgstr "解鎖貨架"
+
+#. shelf_unlock.offer
+msgid "Watch one ad to unlock this shelf now."
+msgstr "觀看一則廣告，立即解鎖此貨架。"
+
+#. shelf_unlock.offer_or_clear
+msgid "Watch one ad to unlock this shelf now, or clear %s more."
+msgstr "觀看一則廣告立即解鎖此貨架，或再消除 %s 組商品即可解鎖。"
+
+#. shelf_unlock.button
+msgid "Watch Ad · Unlock Shelf"
+msgstr "觀看廣告 · 解鎖貨架"
+
+#. shelf_unlock.ad_unavailable
+msgid "Ad unavailable. This shelf stays locked."
+msgstr "廣告目前無法播放，此貨架仍未解鎖。"
+
+#. complete.title
+msgid "GREAT JOB!"
+msgstr "做得好！"
+
+#. failed.headline
+msgid "LEVEL FAILED"
+msgstr "闖關失敗"
+
+#. failed.retry
+msgid "Retry"
+msgstr "重新挑戰"
+
+#. combo.praise.2
+msgid "Cool"
+msgstr "酷喔"
+
+#. combo.praise.3
+msgid "Great"
+msgstr "很棒"
+
+#. combo.praise.4
+msgid "Awesome"
+msgstr "超讚"
+
+#. combo.praise.5
+msgid "Amazing"
+msgstr "太厲害了"
+
+#. combo.praise.6
+msgid "Fantastic"
+msgstr "太精彩了"
+
+#. combo.praise.7
+msgid "Incredible"
+msgstr "不可思議"
+
+#. combo.praise.8
+msgid "Spectacular"
+msgstr "震撼全場"
+
+#. combo.praise.9
+msgid "Unstoppable"
+msgstr "勢不可擋"
+
+#. combo.praise.10
+msgid "Legendary"
+msgstr "傳奇表現"
+
+#. combo.praise.11
+msgid "Epic"
+msgstr "史詩表現"
+
+#. combo.praise.12
+msgid "Brilliant"
+msgstr "精彩絕倫"
+
+#. combo.praise.13
+msgid "Masterful"
+msgstr "大師級"
+
+#. combo.praise.14
+msgid "Supreme"
+msgstr "無與倫比"
+
+#. combo.praise.15
+msgid "Phenomenal"
+msgstr "超凡表現"
+
+#. combo.praise.16
+msgid "Mythic"
+msgstr "神級"
+
+#. combo.praise.17
+msgid "Majestic"
+msgstr "氣勢非凡"
+
+#. combo.praise.18
+msgid "Radiant"
+msgstr "光芒四射"
+
+#. combo.praise.19
+msgid "Divine"
+msgstr "神乎其技"
+
+#. combo.praise.20
+msgid "Transcendent"
+msgstr "超越極限"
+
+#. ability.hammer.name
+msgid "Hammer"
+msgstr "槌子"
+
+#. ability.shuffle.name
+msgid "Shuffle"
+msgstr "重排"
+
+#. ability.lantern.name
+msgid "Lantern"
+msgstr "提燈"
+
+#. ability.freezer.name
+msgid "Freezer"
+msgstr "冰凍器"
+
+#. ability.hammer.description
+msgid "Instantly clears one matching set of items off the shelves."
+msgstr "立即消除貨架上的一組相同商品。"
+
+#. ability.shuffle.description
+msgid "Shuffles shelf items into new spots to help you find a match."
+msgstr "重新排列貨架上的商品，幫助你找出可消除的組合。"
+
+#. ability.lantern.description
+msgid "Highlights a matching triple you can clear for 15 seconds."
+msgstr "標示一組可消除的三個相同商品，持續 15 秒。"
+
+#. ability.freezer.description
+msgid "Freezes the level timer for 30 seconds."
+msgstr "凍結關卡計時器 30 秒。"
+
+#. ad.watch
+msgid "Watch Ad"
+msgstr "觀看廣告"
+
+#. ad.loading
+msgid "Loading..."
+msgstr "載入中…"
+
+#. ad.verifying
+msgid "Verifying..."
+msgstr "驗證中…"
+
+#. ad.verify_reward
+msgid "Verify Reward"
+msgstr "驗證獎勵"
+
+#. ad.reward_pending
+msgid "Reward verification is still pending."
+msgstr "獎勵驗證仍在處理中。"
+
+#. ad.unavailable_retry
+msgid "Ad unavailable. Please try again."
+msgstr "廣告目前無法播放，請再試一次。"
+
+#. ad.watch_unavailable
+msgid "Watch Ad\nUnavailable"
+msgstr "觀看廣告\n暫時無法播放"
+
+#. ad.watch_coming_soon
+msgid "Watch Ad\nComing Soon"
+msgstr "觀看廣告\n即將推出"
+
+#. ad.badge
+msgid "AD"
+msgstr "AD"
+
+#. lives.title.out
+msgid "OUT OF LIVES"
+msgstr "生命已用完"
+
+#. lives.title.get_more
+msgid "GET MORE LIVES"
+msgstr "補充生命"
+
+#. lives.title.full
+msgid "LIVES FULL"
+msgstr "生命已滿"
+
+#. lives.next_in
+msgid "NEXT LIFE IN"
+msgstr "生命恢復倒數"
+
+#. lives.full_body
+msgid "Your lives are full! Play a level to spend them."
+msgstr "你的生命已滿！開始闖關來使用生命吧。"
+
+#. chest.title
+msgid "CHEST REWARDS"
+msgstr "寶箱獎勵"
+
+#. chest.progress_hint
+msgid "Collect stars to unlock a chest and claim your reward"
+msgstr "收集星星，解鎖寶箱並領取獎勵"
+
+#. chest.ready
+msgid "A REWARD CHEST AWAITS!"
+msgstr "獎勵寶箱等你開啟！"
+
+#. chest.tap_to_open
+msgid "Tap to open"
+msgstr "點一下開啟"
+
+#. purchase.tap_to_collect
+msgid "Tap to collect"
+msgstr "點一下領取"
+
+#. purchase.complete
+msgid "PURCHASE COMPLETE"
+msgstr "購買完成"
+
+#. shop.title
+msgid "SHOP"
+msgstr "商店"
+
+#. shop.section.bundles
+msgid "SPECIAL BUNDLES"
+msgstr "特別禮包"
+
+#. shop.section.coins
+msgid "COINS"
+msgstr "金幣"
+
+#. shop.offer.starter_bundle
+msgid "Starter Bundle"
+msgstr "新手禮包"
+
+#. shop.offer.basic_bundle
+msgid "Basic Bundle"
+msgstr "基礎禮包"
+
+#. shop.tag.best_value
+msgid "BEST VALUE"
+msgstr "最划算"
+
+#. shop.discount_off
+msgid "OFF"
+msgstr "OFF"
+
+#. shop.ability_hint
+msgid "Tap an ability to see what it does"
+msgstr "點一下道具，查看它的效果"
+
+#. shop.purchasing
+msgid "Purchasing…"
+msgstr "購買中…"
+
+#. shop.no_offers
+msgid "No shop offers are available for this region."
+msgstr "此地區目前沒有可購買的商品。"
+
+#. shop.load_failed
+msgid "Could not load the shop."
+msgstr "無法載入商店。"
+
+#. shop.error.title.purchase
+msgid "Purchase unavailable"
+msgstr "無法購買"
+
+#. shop.error.title.reward
+msgid "Reward error"
+msgstr "獎勵錯誤"
+
+#. shop.error.purchase_failed
+msgid "The purchase could not be completed."
+msgstr "無法完成購買。"
+
+#. shop.error.grant_failed
+msgid "The purchased rewards could not be granted."
+msgstr "無法發放已購買的獎勵。"
+
+#. shop.error.offer_unavailable
+msgid "This shop offer is unavailable."
+msgstr "此商店優惠目前無法購買。"
+
+#. shop.error.already_bought
+msgid "This one-time shop offer has already been purchased."
+msgstr "此優惠限購一次，且你已購買過。"
+
+#. starter.title
+msgid "STARTER BUNDLE"
+msgstr "新手禮包"
+
+#. starter.one_time
+msgid "ONE-TIME OFFER"
+msgstr "限購一次"
+
+#. starter.boosters_included
+msgid "BOOSTERS INCLUDED"
+msgstr "內含道具"
+
+#. starter.coins
+msgid "%s COINS"
+msgstr "%s 枚金幣"
+
+#. starter.buy_for
+msgid "Buy for %s"
+msgstr "用 %s 購買"
+
+#. starter.checking
+msgid "Checking offer…"
+msgstr "正在確認優惠…"
+
+#. starter.checking_short
+msgid "Checking…"
+msgstr "確認中…"
+
+#. starter.no_longer_available
+msgid "This offer is no longer available."
+msgstr "此優惠已無法購買。"
+
+#. starter.unavailable
+msgid "Unavailable"
+msgstr "無法購買"
+
+#. booster_chip.claimed
+msgid "+%d %s"
+msgstr "+%d %s"
+
+#. profile.title
+msgid "EDIT PROFILE"
+msgstr "編輯個人檔案"
+
+#. profile.name_header
+msgid "PLAYER NAME"
+msgstr "玩家名稱"
+
+#. profile.name_placeholder
+msgid "Player name"
+msgstr "玩家名稱"
+
+#. profile.edit_name_tooltip
+msgid "Edit player name"
+msgstr "編輯玩家名稱"
+
+#. profile.avatar_tab
+msgid "AVATAR"
+msgstr "頭像"
+
+#. profile.frame_tab
+msgid "FRAME"
+msgstr "頭像框"
+
+#. profile.unlock.level
+msgid "Complete level %d to unlock"
+msgstr "完成第 %d 關即可解鎖"
+
+#. profile.unlock.combo
+msgid "Reach a combo of ×%d in any run to unlock"
+msgstr "在任一場遊戲中達成 ×%d 連擊即可解鎖"
+
+#. profile.unlock.weekly_first
+msgid "Finish 1st on the Weekly leaderboard to unlock"
+msgstr "在每週排行榜獲得第 1 名即可解鎖"
+
+#. profile.unlock.weekly_top
+msgid "Finish top %d on the Weekly leaderboard to unlock"
+msgstr "在每週排行榜進入前 %d 名即可解鎖"
+
+#. leaderboard.title
+msgid "LEADERBOARD"
+msgstr "排行榜"
+
+#. leaderboard.tab.weekly
+msgid "Weekly"
+msgstr "每週"
+
+#. leaderboard.tab.country
+msgid "Country"
+msgstr "國內"
+
+#. leaderboard.tab.world
+msgid "World"
+msgstr "全球"
+
+#. leaderboard.weekly_reset
+msgid "Weekly reset in %s"
+msgstr "每週排名將於 %s 後重置"
+
+#. leaderboard.duration.dh
+msgid "%dd %dh"
+msgstr "%d天 %d小時"
+
+#. leaderboard.duration.hm
+msgid "%dh %dm"
+msgstr "%d小時 %d分"
+
+#. leaderboard.duration.m
+msgid "%dm"
+msgstr "%d分"
+
+#. leaderboard.country_caption
+msgid "Country · All-time stars"
+msgstr "國內 · 累計星星"
+
+#. leaderboard.world_caption
+msgid "Worldwide · All-time stars"
+msgstr "全球 · 累計星星"
+
+#. leaderboard.load_failed
+msgid "Could not load leaderboard."
+msgstr "無法載入排行榜。"
+
+#. leaderboard.default_name
+msgid "Player"
+msgstr "玩家"
+
+#. leaderboard.row_tooltip
+msgid "Rank %d, %s, %d stars"
+msgstr "第 %d 名，%s，%d 顆星星"
+
+#. leaderboard.reward_tooltip
+msgid "%s coin weekly reward"
+msgstr "每週獎勵：%s 枚金幣"
+
+#. leaderboard.reward.title
+msgid "WEEKLY REWARD!"
+msgstr "每週獎勵！"
+
+#. leaderboard.reward.body
+msgid "You finished #%d last week and earned %d coins!"
+msgstr "你上週獲得第 %d 名，贏得 %d 枚金幣！"
+
+#. leaderboard.reward.ok
+msgid "Nice!"
+msgstr "太棒了！"
+
+#. settings.title
+msgid "SETTINGS"
+msgstr "設定"
+
+#. settings.music
+msgid "Music"
+msgstr "音樂"
+
+#. settings.sfx
+msgid "SFX"
+msgstr "音效"
+
+#. settings.vibrate
+msgid "Vibrate"
+msgstr "震動"
+
+#. settings.support
+msgid "Support"
+msgstr "客服"
+
+#. settings.language
+msgid "Language"
+msgstr "語言"
+
+#. settings.privacy_policy
+msgid "Privacy Policy"
+msgstr "隱私權政策"
+
+#. settings.privacy_choices
+msgid "Privacy Choices"
+msgstr "隱私權選項"
+
+#. settings.diagnostics
+msgid "Version %s • Build %d\nPlatform: %s • User: %s"
+msgstr "版本 %s • 組建 %d\n平台：%s • 使用者：%s"
+
+#. language.title
+msgid "LANGUAGE"
+msgstr "語言"
+
+#. support.title
+msgid "SUPPORT"
+msgstr "客服"
+
+#. support.faq_header
+msgid "Frequently Asked Questions"
+msgstr "常見問題"
+
+#. support.faq.play.q
+msgid "How do I play?"
+msgstr "要怎麼玩？"
+
+#. support.faq.play.a
+msgid "Move matching goods onto the same shelf. When three identical items are visible together, they clear. Complete the board before time runs out."
+msgstr "將相同商品移到同一個貨架。當三個相同商品同時出現在貨架上，就會消除。在時間用完前，清空所有商品即可過關。"
+
+#. support.faq.contact.q
+msgid "How do I contact support?"
+msgstr "如何聯絡客服？"
+
+#. support.faq.contact.a
+msgid "Email us at %s. Include a short description, your device platform, and when the problem happened."
+msgstr "請寄電子郵件至 %s，簡短說明問題、裝置平台及問題發生的時間。"
+
+#. support.faq.contact.action
+msgid "Email Support"
+msgstr "寄信給客服"
+
+#. support.faq.crash.q
+msgid "What if the game freezes or crashes?"
+msgstr "遊戲卡住或閃退時該怎麼辦？"
+
+#. support.faq.crash.a
+msgid "Close and reopen the game first. If it happens again, restart the device and make sure the game is updated. Contact support with the device model, platform version, and what you were doing before the problem."
+msgstr "請先關閉並重新開啟遊戲。如果再次發生，請重新啟動裝置，並確認遊戲已更新。聯絡客服時，請提供裝置型號、平台版本，以及問題發生前你正在進行的操作。"
+
+#. support.faq.sync.q
+msgid "How do I sync progress between devices?"
+msgstr "如何在不同裝置間同步進度？"
+
+#. support.faq.sync.a
+msgid "Use the same signed-in platform account on both devices and allow synchronization to finish before playing. If the progress differs, avoid playing on both devices and contact support."
+msgstr "請在兩台裝置上登入同一個平台帳號，並等同步完成後再開始遊戲。如果進度不同，請先不要在任一裝置上繼續遊玩，並聯絡客服。"
+
+#. support.faq.bad_ad.q
+msgid "How do I report a bad ad?"
+msgstr "如何檢舉不當廣告？"
+
+#. support.faq.bad_ad.a
+msgid "1. Close the ad if you can do so safely.\n2. Take a screenshot of the ad and any advertiser or app name shown.\n3. Note the approximate time and where the ad appeared in the game.\n4. Describe why the ad seemed offensive, misleading, or fraudulent.\n5. Email these details to %s. Do not include passwords or payment information."
+msgstr "1. 如果能安全關閉廣告，請先關閉。\n2. 擷取廣告畫面，以及畫面中顯示的廣告主或應用程式名稱。\n3. 記下大約時間，以及廣告在遊戲中出現的位置。\n4. 說明你認為廣告含有冒犯、誤導或詐騙內容的原因。\n5. 將上述資訊寄至 %s。請勿附上密碼或付款資訊。"
+
+#. support.faq.bad_ad.action
+msgid "Email Ad Report"
+msgstr "寄信檢舉廣告"
+
+#. support.account_header
+msgid "Account"
+msgstr "帳號"
+
+#. support.delete_account
+msgid "Delete Account"
+msgstr "刪除帳號"
+
+#. support.delete_game_data
+msgid "Delete Game Data"
+msgstr "刪除遊戲資料"
+
+#. support.no_secrets
+msgid "Please never send passwords or payment information."
+msgstr "請勿提供密碼或付款資訊。"
+
+#. deletion.title.delete_account
+msgid "DELETE ACCOUNT"
+msgstr "刪除帳號"
+
+#. deletion.title.delete_game_data
+msgid "DELETE GAME DATA"
+msgstr "刪除遊戲資料"
+
+#. deletion.title.not_confirmed
+msgid "NOT CONFIRMED"
+msgstr "尚未確認"
+
+#. deletion.title.status_unconfirmed
+msgid "STATUS UNCONFIRMED"
+msgstr "狀態尚未確認"
+
+#. deletion.title.finishing_up
+msgid "FINISHING UP"
+msgstr "正在完成清除"
+
+#. deletion.title.new_game
+msgid "NEW GAME"
+msgstr "新遊戲"
+
+#. deletion.title.status_unknown
+msgid "STATUS UNKNOWN"
+msgstr "狀態不明"
+
+#. deletion.title.not_deleted
+msgid "NOT DELETED"
+msgstr "未刪除"
+
+#. deletion.title.data_deleted
+msgid "DATA DELETED"
+msgstr "資料已刪除"
+
+#. deletion.title.accepted
+msgid "DELETION ACCEPTED"
+msgstr "刪除申請已受理"
+
+#. deletion.confirm.headline
+msgid "This permanently deletes your account."
+msgstr "這將永久刪除你的帳號。"
+
+#. deletion.confirm.body
+msgid "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nIf you sign in again later, you'll start a new account.\n\nSome purchase and security records are kept without your name or profile. The rest is removed within 30 days."
+msgstr "你的進度、金幣、道具及個人檔案將全部刪除。此操作無法復原。\n\n如果日後再次登入，將會建立新帳號。\n\n部分購買及安全紀錄會保留，但不含你的姓名或個人檔案。其餘資料將於 30 天內刪除。"
+
+#. deletion.local_confirm.headline
+msgid "This deletes your game data on this device."
+msgstr "這將刪除此裝置上的遊戲資料。"
+
+#. deletion.local_confirm.body
+msgid "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nThis game never created an online account for you, so nothing needs to be deleted from our servers."
+msgstr "你的進度、金幣、道具及個人檔案將全部刪除。此操作無法復原。\n\n本遊戲從未為你建立線上帳號，因此無須從我們的伺服器刪除任何資料。"
+
+#. deletion.local_confirm.button
+msgid "Delete Data"
+msgstr "刪除資料"
+
+#. deletion.pending_setup.headline
+msgid "Your account is still being set up."
+msgstr "你的帳號仍在建立中。"
+
+#. deletion.pending_setup.body
+msgid "Connect to the internet and try again in a moment. Nothing was deleted."
+msgstr "請連上網路，稍後再試。未刪除任何資料。"
+
+#. deletion.sign_in.headline
+msgid "Sign in to the account you want to delete."
+msgstr "請登入你要刪除的帳號。"
+
+#. deletion.sign_in.body
+msgid "If you can't sign in, contact support for help."
+msgstr "如果無法登入，請聯絡客服尋求協助。"
+
+#. deletion.read_failed.headline
+msgid "Your game data couldn't be read."
+msgstr "無法讀取你的遊戲資料。"
+
+#. deletion.read_failed.body
+msgid "Restart the game, then try again. Nothing was deleted."
+msgstr "請重新啟動遊戲後再試。未刪除任何資料。"
+
+#. deletion.unavailable.headline
+msgid "Account deletion isn't available in this version of the game."
+msgstr "此遊戲版本不支援刪除帳號。"
+
+#. deletion.unavailable.body
+msgid "Update the game, or contact support for help deleting your account. Nothing was deleted."
+msgstr "請更新遊戲，或聯絡客服協助刪除帳號。未刪除任何資料。"
+
+#. deletion.in_progress.account
+msgid "Deleting your account..."
+msgstr "正在刪除你的帳號…"
+
+#. deletion.in_progress.local
+msgid "Deleting your game data..."
+msgstr "正在刪除你的遊戲資料…"
+
+#. deletion.in_progress.body
+msgid "Keep the game open. This only takes a moment."
+msgstr "請保持遊戲開啟，這只需要片刻。"
+
+#. deletion.not_confirmed.headline
+msgid "We haven't heard back about your deletion yet."
+msgstr "我們尚未收到你的刪除申請結果。"
+
+#. deletion.not_confirmed.body
+msgid "Your request was sent, but the answer didn't arrive. Connect to the internet and try again. The game stays locked until we know the result."
+msgstr "你的申請已送出，但尚未收到回覆。請連上網路後再試。確認結果前，遊戲會保持鎖定。"
+
+#. deletion.unconfirmed.headline
+msgid "Deletion status unconfirmed"
+msgstr "刪除狀態尚未確認"
+
+#. deletion.unconfirmed.body
+msgid "We couldn't confirm whether your account was deleted. To keep your data safe, the game stays locked. Contact support and include the reference below."
+msgstr "我們無法確認你的帳號是否已刪除。為保護你的資料，遊戲會保持鎖定。請聯絡客服，並提供下方的參考編號。"
+
+#. deletion.check_again
+msgid "Check Again"
+msgstr "再次確認"
+
+#. deletion.cleanup.headline.local
+msgid "Your local game data couldn't be fully deleted yet."
+msgstr "你的本機遊戲資料尚未完全刪除。"
+
+#. deletion.cleanup.headline.account
+msgid "Account deletion accepted; finishing cleanup."
+msgstr "帳號刪除申請已受理，正在完成清除。"
+
+#. deletion.cleanup.body
+msgid "Some game data couldn't be removed from this device yet. Try again to finish."
+msgstr "此裝置上的部分遊戲資料尚未移除。請再試一次以完成清除。"
+
+#. deletion.new_game.headline
+msgid "Starting a new game..."
+msgstr "正在開始新遊戲…"
+
+#. deletion.new_game.body
+msgid "This only takes a moment."
+msgstr "這只需要片刻。"
+
+#. deletion.status_unknown.headline
+msgid "We couldn't read the deletion status on this device."
+msgstr "我們無法讀取此裝置上的刪除狀態。"
+
+#. deletion.status_unknown.body
+msgid "To keep your data safe, the game stays locked. Contact support for help."
+msgstr "為保護你的資料，遊戲會保持鎖定。請聯絡客服尋求協助。"
+
+#. deletion.fail.offline
+msgid "Connect to the internet to delete your account."
+msgstr "請連上網路以刪除帳號。"
+
+#. deletion.fail.rate_limited
+msgid "Too many attempts. Wait a moment, then try again."
+msgstr "嘗試次數過多，請稍後再試。"
+
+#. deletion.fail.busy
+msgid "Account deletion is busy right now. Try again in a moment."
+msgstr "帳號刪除服務目前忙碌中，請稍後再試。"
+
+#. deletion.fail.syncing
+msgid "The game is still syncing. Try again in a moment."
+msgstr "遊戲仍在同步中，請稍後再試。"
+
+#. deletion.fail.auth
+msgid "We couldn't verify your account. Restart the game, then try again."
+msgstr "我們無法驗證你的帳號。請重新啟動遊戲後再試。"
+
+#. deletion.fail.update
+msgid "Update the game to delete your account."
+msgstr "請更新遊戲以刪除帳號。"
+
+#. deletion.fail.changed
+msgid "Your account changed while we were deleting it. Try again."
+msgstr "刪除過程中，你的帳號發生變更。請再試一次。"
+
+#. deletion.fail.storage
+msgid "Your device couldn't save the deletion request. Try again."
+msgstr "你的裝置無法儲存刪除申請。請再試一次。"
+
+#. deletion.fail.generic
+msgid "We couldn't delete your account. Try again later or contact support."
+msgstr "我們無法刪除你的帳號。請稍後再試，或聯絡客服。"
+
+#. deletion.fail.local
+msgid "Your game data couldn't be deleted. Try again."
+msgstr "無法刪除你的遊戲資料。請再試一次。"
+
+#. deletion.fail.body
+msgid "Nothing was deleted, and you can keep playing."
+msgstr "未刪除任何資料，你可以繼續遊戲。"
+
+#. deletion.done_local.headline
+msgid "Your local game data was deleted."
+msgstr "你的本機遊戲資料已刪除。"
+
+#. deletion.done_local.body
+msgid "You can start over with a new game."
+msgstr "你可以開始新遊戲，從頭再來。"
+
+#. deletion.new_game_failed
+msgid "The new game couldn't start. Try again."
+msgstr "無法開始新遊戲。請再試一次。"
+
+#. deletion.accepted.headline
+msgid "Your account is no longer accessible."
+msgstr "你已無法再存取此帳號。"
+
+#. deletion.accepted.body
+msgid "Your deletion request was accepted."
+msgstr "你的刪除申請已受理。"
+
+#. deletion.accepted.body_deadline
+msgid "Your deletion request was accepted. Data removal is due by %s."
+msgstr "你的刪除申請已受理。資料最遲將於 %s 刪除。"
+
+#. deletion.reference
+msgid "Reference: %s"
+msgstr "參考編號：%s"
+
+#. deletion.start_new_game
+msgid "Start New Game"
+msgstr "開始新遊戲"
+
+#. app.name
+msgid "SortingPuzzle"
+msgstr "SortingPuzzle"
+
+#. support.email.subject
+msgid "Sorting Puzzle support request"
+msgstr "Sorting Puzzle 客服支援請求"
+
+#. support.email.body
+msgid "Please describe the issue here.\n\nDevice/platform:\nApproximate time:\n"
+msgstr "請在此描述問題。\n\n裝置／平台：\n大約發生時間：\n"
+
+#. support.ad_email.subject
+msgid "Sorting Puzzle ad report"
+msgstr "Sorting Puzzle 廣告檢舉"
+
+#. support.ad_email.body
+msgid "Please attach a screenshot and complete the details below.\n\nApproximate time:\nAd placement in the game:\nAdvertiser or app name:\nWhy the ad should be reviewed:\n"
+msgstr "請附上螢幕截圖，並填寫以下資訊。\n\n大約發生時間：\n廣告在遊戲中出現的位置：\n廣告主或應用程式名稱：\n需要審查此廣告的原因：\n"
+
+#. deletion.email.subject
+msgid "Sorting Puzzle account deletion"
+msgstr "Sorting Puzzle 帳號刪除"
+
+#. deletion.email.body
+msgid "Please help me with my account deletion."
+msgstr "請協助我刪除帳號。"
+
+#. support.email.status
+msgid "Status: %s"
+msgstr "狀態：%s"
+
+#. support.email.deletion_reference
+msgid "Deletion reference"
+msgstr "刪除參考編號"
+
+#. support.email.server_reference
+msgid "Server reference"
+msgstr "伺服器參考編號"
+
+#. support.email.player_id
+msgid "Player ID"
+msgstr "玩家 ID"
+
+#. leaderboard.empty
+msgid "No scores yet"
+msgstr "尚無成績"
+
+#. ability.hammer.name
+msgid "HAMMER"
+msgstr "槌子"
+
+#. ability.shuffle.name
+msgid "SHUFFLE"
+msgstr "重排"
+
+#. ability.lantern.name
+msgid "LANTERN"
+msgstr "提燈"
+
+#. ability.freezer.name
+msgid "FREEZER"
+msgstr "冰凍器"
+
+#. shop.offer.basic_bundle
+msgid "BASIC BUNDLE"
+msgstr "基礎禮包"
+
+#. booster.counted.hammer
+msgctxt "booster.counted"
+msgid "Hammer"
+msgid_plural "Hammer.plural"
+msgstr[0] "槌子"
+
+#. booster.counted.shuffle
+msgctxt "booster.counted"
+msgid "Shuffle"
+msgid_plural "Shuffle.plural"
+msgstr[0] "重排"
+
+#. booster.counted.lantern
+msgctxt "booster.counted"
+msgid "Lantern"
+msgid_plural "Lantern.plural"
+msgstr[0] "提燈"
+
+#. booster.counted.freezer
+msgctxt "booster.counted"
+msgid "Freezer"
+msgid_plural "Freezer.plural"
+msgstr[0] "冰凍器"

@@ -7,6 +7,19 @@
 [ext_resource type="FontFile" path="res://assets/fonts/NotoSansArabic-Variable.ttf" id="4_noto_arabic"]
 [ext_resource type="FontFile" path="res://assets/fonts/NotoSansKR-Variable.ttf" id="5_noto_korean"]
 [ext_resource type="FontFile" path="res://assets/fonts/NotoSansJP-Variable.ttf" id="6_noto_japanese"]
+[ext_resource type="FontFile" path="res://assets/fonts/NotoSansTC-Variable.ttf" id="7_noto_chinese"]
+
+[sub_resource type="FontVariation" id="FontVariation_chinese_bold"]
+base_font = ExtResource("7_noto_chinese")
+variation_opentype = {2003265652: 700.0}
+
+[sub_resource type="FontVariation" id="FontVariation_chinese_semibold"]
+base_font = ExtResource("7_noto_chinese")
+variation_opentype = {2003265652: 600.0}
+
+[sub_resource type="FontVariation" id="FontVariation_chinese_medium"]
+base_font = ExtResource("7_noto_chinese")
+variation_opentype = {2003265652: 500.0}
 
 [sub_resource type="FontVariation" id="FontVariation_japanese_bold"]
 base_font = ExtResource("6_noto_japanese")
@@ -74,7 +87,7 @@ variation_opentype = {
 }
 
 [sub_resource type="FontVariation" id="FontVariation_dynapuff_bold"]
-fallbacks = Array[Font]([SubResource("FontVariation_cyrillic_bold"), SubResource("FontVariation_arabic_display_bold"), SubResource("FontVariation_japanese_bold"), SubResource("FontVariation_korean_bold")])
+fallbacks = Array[Font]([SubResource("FontVariation_cyrillic_bold"), SubResource("FontVariation_arabic_display_bold"), SubResource("FontVariation_japanese_bold"), SubResource("FontVariation_korean_bold"), SubResource("FontVariation_chinese_bold")])
 base_font = ExtResource("1_dynapuff")
 variation_opentype = {
 2003072104: 100.0,
@@ -85,21 +98,21 @@ opentype_features = {
 }
 
 [sub_resource type="FontVariation" id="FontVariation_nunito_bold"]
-fallbacks = Array[Font]([SubResource("FontVariation_arabic_body_bold"), SubResource("FontVariation_japanese_bold"), SubResource("FontVariation_korean_bold")])
+fallbacks = Array[Font]([SubResource("FontVariation_arabic_body_bold"), SubResource("FontVariation_japanese_bold"), SubResource("FontVariation_korean_bold"), SubResource("FontVariation_chinese_bold")])
 base_font = ExtResource("2_nunito")
 variation_opentype = {
 2003265652: 700.0
 }
 
 [sub_resource type="FontVariation" id="FontVariation_nunito_semibold"]
-fallbacks = Array[Font]([SubResource("FontVariation_arabic_body_semibold"), SubResource("FontVariation_japanese_semibold"), SubResource("FontVariation_korean_semibold")])
+fallbacks = Array[Font]([SubResource("FontVariation_arabic_body_semibold"), SubResource("FontVariation_japanese_semibold"), SubResource("FontVariation_korean_semibold"), SubResource("FontVariation_chinese_semibold")])
 base_font = ExtResource("2_nunito")
 variation_opentype = {
 2003265652: 600.0
 }
 
 [sub_resource type="FontVariation" id="FontVariation_dynapuff_semibold"]
-fallbacks = Array[Font]([SubResource("FontVariation_cyrillic_semibold"), SubResource("FontVariation_arabic_display_semibold"), SubResource("FontVariation_japanese_semibold"), SubResource("FontVariation_korean_semibold")])
+fallbacks = Array[Font]([SubResource("FontVariation_cyrillic_semibold"), SubResource("FontVariation_arabic_display_semibold"), SubResource("FontVariation_japanese_semibold"), SubResource("FontVariation_korean_semibold"), SubResource("FontVariation_chinese_semibold")])
 base_font = ExtResource("1_dynapuff")
 variation_opentype = {
 2003072104: 100.0,
@@ -110,7 +123,7 @@ opentype_features = {
 }
 
 [sub_resource type="FontVariation" id="FontVariation_dynapuff_number"]
-fallbacks = Array[Font]([SubResource("FontVariation_cyrillic_bold"), SubResource("FontVariation_arabic_display_bold"), SubResource("FontVariation_japanese_bold"), SubResource("FontVariation_korean_bold")])
+fallbacks = Array[Font]([SubResource("FontVariation_cyrillic_bold"), SubResource("FontVariation_arabic_display_bold"), SubResource("FontVariation_japanese_bold"), SubResource("FontVariation_korean_bold"), SubResource("FontVariation_chinese_bold")])
 base_font = ExtResource("1_dynapuff")
 variation_opentype = {
 2003072104: 100.0,
@@ -122,7 +135,7 @@ opentype_features = {
 }
 
 [sub_resource type="FontVariation" id="FontVariation_dynapuff_title"]
-fallbacks = Array[Font]([SubResource("FontVariation_cyrillic_bold"), SubResource("FontVariation_arabic_display_bold"), SubResource("FontVariation_japanese_bold"), SubResource("FontVariation_korean_bold")])
+fallbacks = Array[Font]([SubResource("FontVariation_cyrillic_bold"), SubResource("FontVariation_arabic_display_bold"), SubResource("FontVariation_japanese_bold"), SubResource("FontVariation_korean_bold"), SubResource("FontVariation_chinese_bold")])
 base_font = ExtResource("1_dynapuff")
 variation_opentype = {
 2003072104: 92.0,
@@ -179,7 +192,7 @@ corner_radius_bottom_right = 5
 corner_radius_bottom_left = 5
 
 [sub_resource type="FontVariation" id="FontVariation_dynapuff_medium"]
-fallbacks = Array[Font]([SubResource("FontVariation_cyrillic_medium"), SubResource("FontVariation_arabic_display_medium"), SubResource("FontVariation_japanese_medium"), SubResource("FontVariation_korean_medium")])
+fallbacks = Array[Font]([SubResource("FontVariation_cyrillic_medium"), SubResource("FontVariation_arabic_display_medium"), SubResource("FontVariation_japanese_medium"), SubResource("FontVariation_korean_medium"), SubResource("FontVariation_chinese_medium")])
 base_font = ExtResource("1_dynapuff")
 variation_opentype = {
 2003072104: 100.0,

@@ -1,5 +1,18 @@
 # Scripts
 
+## Traditional Chinese localization
+
+`assets/translations/zh_Hant.po` provides all 251 owner-refined Taiwan Chinese strings through
+the existing scene owners, English aliases, six invariant plural forms and fixed counted boosters.
+`scripts/localization/game_text.gd` owns Chinese year/month/day deadlines and comma grouping.
+`scripts/localization/locale_typography.gd` prioritizes bundled Noto Sans TC variations before
+the Japanese fallback in the shared theme when `zh_Hant` is active, and restores the original
+order for other locales. `LocaleManager` applies this on startup and before live locale changes.
+`tests/ui/test_traditional_chinese_localization.gd` checks reviewed copy, font priority/coverage,
+counts, dates, live refresh, contextual actions and unchanged player data.
+Copy and verification are recorded in `docs/localization/TRADITIONAL_CHINESE_TRANSLATIONS.md`
+and `docs/localization/TRADITIONAL_CHINESE_LOCALIZATION_QA.md`.
+
 ## Japanese localization
 
 `assets/translations/ja.po` provides the owner's 251 improved Japanese entries, English scene
@@ -3683,6 +3696,8 @@ Purpose:
   supported first-run device-locale mapping.
 - Manager applies the saved locale during autoload startup and coordinates atomic local preference
   persistence with `TranslationServer.set_locale()`.
+- Manager calls `locale_typography.gd` before applying a locale so Chinese glyph priority and
+  text metrics are ready when existing screens refresh.
 - Neither owner creates translations or emits backend operations.
 
 ## `scripts/support_screen.gd`

@@ -1,0 +1,1336 @@
+{
+  "source": "Owner-refined Sorting Puzzle — Traditional Chinese Translations — refined.md, October 7, 2026",
+  "source_sha256": "A16D22C3B732E81DF88A7B03E9672AA2DCA75E2BEE18BA02B40ABA19900505AF",
+  "entries": [
+    {
+      "key": "common.play",
+      "en": "Play",
+      "zh_Hant": "開始"
+    },
+    {
+      "key": "common.continue",
+      "en": "Continue",
+      "zh_Hant": "繼續"
+    },
+    {
+      "key": "common.resume",
+      "en": "Continue",
+      "zh_Hant": "繼續遊戲"
+    },
+    {
+      "key": "common.try_again",
+      "en": "Try Again",
+      "zh_Hant": "再試一次"
+    },
+    {
+      "key": "common.close",
+      "en": "Close",
+      "zh_Hant": "關閉"
+    },
+    {
+      "key": "common.cancel",
+      "en": "Cancel",
+      "zh_Hant": "取消"
+    },
+    {
+      "key": "common.got_it",
+      "en": "Got it",
+      "zh_Hant": "知道了"
+    },
+    {
+      "key": "common.get_help",
+      "en": "Get Help",
+      "zh_Hant": "尋求協助"
+    },
+    {
+      "key": "common.save",
+      "en": "SAVE",
+      "zh_Hant": "儲存"
+    },
+    {
+      "key": "common.loading",
+      "en": "Loading…",
+      "zh_Hant": "載入中…"
+    },
+    {
+      "key": "common.retry_load",
+      "en": "Retry",
+      "zh_Hant": "重新載入"
+    },
+    {
+      "key": "menu.level_button",
+      "en": "LEVEL %d",
+      "zh_Hant": "第 %d 關"
+    },
+    {
+      "key": "menu.more_levels_coming_soon",
+      "en": "MORE LEVELS COMING SOON",
+      "zh_Hant": "更多關卡即將推出"
+    },
+    {
+      "key": "menu.coming_soon",
+      "en": "COMING SOON",
+      "zh_Hant": "即將推出"
+    },
+    {
+      "key": "menu.lives_full",
+      "en": "Full",
+      "zh_Hant": "已滿"
+    },
+    {
+      "key": "menu.starter_badge",
+      "en": "BUNDLE",
+      "zh_Hant": "禮包"
+    },
+    {
+      "key": "nav.shop",
+      "en": "Shop",
+      "zh_Hant": "商店"
+    },
+    {
+      "key": "nav.home",
+      "en": "Home",
+      "zh_Hant": "首頁"
+    },
+    {
+      "key": "nav.leaderboard",
+      "en": "Leaderboard",
+      "zh_Hant": "排行榜"
+    },
+    {
+      "key": "chapter.button",
+      "en": "CHAPTER %d",
+      "zh_Hant": "第 %d 章"
+    },
+    {
+      "key": "chapter.button_tooltip",
+      "en": "Choose Chapter %d: %s",
+      "zh_Hant": "選擇第 %d 章：%s"
+    },
+    {
+      "key": "chapter.screen_title",
+      "en": "CHAPTERS",
+      "zh_Hant": "章節"
+    },
+    {
+      "key": "chapter.eyebrow",
+      "en": "CHAPTER %d",
+      "zh_Hant": "第 %d 章"
+    },
+    {
+      "key": "chapter.title.chapter_01",
+      "en": "Grocery Town",
+      "zh_Hant": "雜貨小鎮"
+    },
+    {
+      "key": "chapter.title.chapter_02",
+      "en": "Candy Corner",
+      "zh_Hant": "糖果街角"
+    },
+    {
+      "key": "chapter.locked_status",
+      "en": "Complete %d more %s levels to unlock",
+      "zh_Hant": "再完成 %d 個「%s」關卡即可解鎖"
+    },
+    {
+      "key": "chapter.unlock_progress",
+      "en": "Unlock progress",
+      "zh_Hant": "解鎖進度"
+    },
+    {
+      "key": "chapter.current_progress",
+      "en": "Current progress",
+      "zh_Hant": "目前進度"
+    },
+    {
+      "key": "chapter.locked",
+      "en": "Locked",
+      "zh_Hant": "未解鎖"
+    },
+    {
+      "key": "chapter.no_levels_status",
+      "en": "New levels are coming soon",
+      "zh_Hant": "新關卡即將推出"
+    },
+    {
+      "key": "chapter.coming_soon",
+      "en": "Coming Soon",
+      "zh_Hant": "即將推出"
+    },
+    {
+      "key": "hud.level",
+      "en": "LEVEL %d",
+      "zh_Hant": "第 %d 關"
+    },
+    {
+      "key": "hud.combo",
+      "en": "COMBO ×%d",
+      "zh_Hant": "連擊 ×%d"
+    },
+    {
+      "key": "hud.ability_tooltip.hammer",
+      "en": "Hammer -- clears a matching triple",
+      "zh_Hant": "槌子——消除三個相同商品"
+    },
+    {
+      "key": "hud.ability_tooltip.shuffle",
+      "en": "Shuffle -- reshuffles unlocked items",
+      "zh_Hant": "重排——重新排列未鎖定的商品"
+    },
+    {
+      "key": "hud.ability_tooltip.lantern",
+      "en": "Lantern -- highlights a matchable triple",
+      "zh_Hant": "提燈——標示可消除的三個相同商品"
+    },
+    {
+      "key": "hud.ability_tooltip.freezer",
+      "en": "Freezer -- pauses the countdown timer",
+      "zh_Hant": "冰凍器——暫停倒數計時"
+    },
+    {
+      "key": "hud.seconds_short",
+      "en": "%ds",
+      "zh_Hant": "%d秒"
+    },
+    {
+      "key": "tip.tap_dispenser",
+      "en": "Tap a dispenser to throw items onto the shelves!",
+      "zh_Hant": "點一下出貨機，就能把商品送到貨架上！"
+    },
+    {
+      "key": "pause.title",
+      "en": "PAUSE",
+      "zh_Hant": "暫停"
+    },
+    {
+      "key": "pause.leave",
+      "en": "Leave",
+      "zh_Hant": "離開"
+    },
+    {
+      "key": "leave.title",
+      "en": "LEAVING THE LEVEL",
+      "zh_Hant": "離開關卡"
+    },
+    {
+      "key": "leave.you_will_lose",
+      "en": "You will lose:",
+      "zh_Hant": "你將失去："
+    },
+    {
+      "key": "leave.confirm",
+      "en": "Leave",
+      "zh_Hant": "離開"
+    },
+    {
+      "key": "timeup.title",
+      "en": "TIME'S UP",
+      "zh_Hant": "時間到！"
+    },
+    {
+      "key": "timeup.offer",
+      "en": "Add one minute and keep sorting!",
+      "zh_Hant": "增加一分鐘，繼續整理！"
+    },
+    {
+      "key": "timeup.used",
+      "en": "Used",
+      "zh_Hant": "已使用"
+    },
+    {
+      "key": "ability_purchase.title",
+      "en": "USE ABILITY",
+      "zh_Hant": "使用道具"
+    },
+    {
+      "key": "shelf_unlock.title",
+      "en": "UNLOCK SHELF",
+      "zh_Hant": "解鎖貨架"
+    },
+    {
+      "key": "shelf_unlock.offer",
+      "en": "Watch one ad to unlock this shelf now.",
+      "zh_Hant": "觀看一則廣告，立即解鎖此貨架。"
+    },
+    {
+      "key": "shelf_unlock.offer_or_clear",
+      "en": "Watch one ad to unlock this shelf now, or clear %s more.",
+      "zh_Hant": "觀看一則廣告立即解鎖此貨架，或再消除 %s 組商品即可解鎖。"
+    },
+    {
+      "key": "shelf_unlock.button",
+      "en": "Watch Ad · Unlock Shelf",
+      "zh_Hant": "觀看廣告 · 解鎖貨架"
+    },
+    {
+      "key": "shelf_unlock.ad_unavailable",
+      "en": "Ad unavailable. This shelf stays locked.",
+      "zh_Hant": "廣告目前無法播放，此貨架仍未解鎖。"
+    },
+    {
+      "key": "complete.title",
+      "en": "GREAT JOB!",
+      "zh_Hant": "做得好！"
+    },
+    {
+      "key": "failed.title",
+      "en": "LEVEL %d",
+      "zh_Hant": "第 %d 關"
+    },
+    {
+      "key": "failed.headline",
+      "en": "LEVEL FAILED",
+      "zh_Hant": "闖關失敗"
+    },
+    {
+      "key": "failed.retry",
+      "en": "Retry",
+      "zh_Hant": "重新挑戰"
+    },
+    {
+      "key": "combo.praise.2",
+      "en": "Cool",
+      "zh_Hant": "酷喔"
+    },
+    {
+      "key": "combo.praise.3",
+      "en": "Great",
+      "zh_Hant": "很棒"
+    },
+    {
+      "key": "combo.praise.4",
+      "en": "Awesome",
+      "zh_Hant": "超讚"
+    },
+    {
+      "key": "combo.praise.5",
+      "en": "Amazing",
+      "zh_Hant": "太厲害了"
+    },
+    {
+      "key": "combo.praise.6",
+      "en": "Fantastic",
+      "zh_Hant": "太精彩了"
+    },
+    {
+      "key": "combo.praise.7",
+      "en": "Incredible",
+      "zh_Hant": "不可思議"
+    },
+    {
+      "key": "combo.praise.8",
+      "en": "Spectacular",
+      "zh_Hant": "震撼全場"
+    },
+    {
+      "key": "combo.praise.9",
+      "en": "Unstoppable",
+      "zh_Hant": "勢不可擋"
+    },
+    {
+      "key": "combo.praise.10",
+      "en": "Legendary",
+      "zh_Hant": "傳奇表現"
+    },
+    {
+      "key": "combo.praise.11",
+      "en": "Epic",
+      "zh_Hant": "史詩表現"
+    },
+    {
+      "key": "combo.praise.12",
+      "en": "Brilliant",
+      "zh_Hant": "精彩絕倫"
+    },
+    {
+      "key": "combo.praise.13",
+      "en": "Masterful",
+      "zh_Hant": "大師級"
+    },
+    {
+      "key": "combo.praise.14",
+      "en": "Supreme",
+      "zh_Hant": "無與倫比"
+    },
+    {
+      "key": "combo.praise.15",
+      "en": "Phenomenal",
+      "zh_Hant": "超凡表現"
+    },
+    {
+      "key": "combo.praise.16",
+      "en": "Mythic",
+      "zh_Hant": "神級"
+    },
+    {
+      "key": "combo.praise.17",
+      "en": "Majestic",
+      "zh_Hant": "氣勢非凡"
+    },
+    {
+      "key": "combo.praise.18",
+      "en": "Radiant",
+      "zh_Hant": "光芒四射"
+    },
+    {
+      "key": "combo.praise.19",
+      "en": "Divine",
+      "zh_Hant": "神乎其技"
+    },
+    {
+      "key": "combo.praise.20",
+      "en": "Transcendent",
+      "zh_Hant": "超越極限"
+    },
+    {
+      "key": "ability.hammer.name",
+      "en": "Hammer",
+      "zh_Hant": "槌子"
+    },
+    {
+      "key": "ability.shuffle.name",
+      "en": "Shuffle",
+      "zh_Hant": "重排"
+    },
+    {
+      "key": "ability.lantern.name",
+      "en": "Lantern",
+      "zh_Hant": "提燈"
+    },
+    {
+      "key": "ability.freezer.name",
+      "en": "Freezer",
+      "zh_Hant": "冰凍器"
+    },
+    {
+      "key": "ability.hammer.description",
+      "en": "Instantly clears one matching set of items off the shelves.",
+      "zh_Hant": "立即消除貨架上的一組相同商品。"
+    },
+    {
+      "key": "ability.shuffle.description",
+      "en": "Shuffles shelf items into new spots to help you find a match.",
+      "zh_Hant": "重新排列貨架上的商品，幫助你找出可消除的組合。"
+    },
+    {
+      "key": "ability.lantern.description",
+      "en": "Highlights a matching triple you can clear for 15 seconds.",
+      "zh_Hant": "標示一組可消除的三個相同商品，持續 15 秒。"
+    },
+    {
+      "key": "ability.freezer.description",
+      "en": "Freezes the level timer for 30 seconds.",
+      "zh_Hant": "凍結關卡計時器 30 秒。"
+    },
+    {
+      "key": "ad.watch",
+      "en": "Watch Ad",
+      "zh_Hant": "觀看廣告"
+    },
+    {
+      "key": "ad.loading",
+      "en": "Loading...",
+      "zh_Hant": "載入中…"
+    },
+    {
+      "key": "ad.verifying",
+      "en": "Verifying...",
+      "zh_Hant": "驗證中…"
+    },
+    {
+      "key": "ad.verify_reward",
+      "en": "Verify Reward",
+      "zh_Hant": "驗證獎勵"
+    },
+    {
+      "key": "ad.reward_pending",
+      "en": "Reward verification is still pending.",
+      "zh_Hant": "獎勵驗證仍在處理中。"
+    },
+    {
+      "key": "ad.unavailable_retry",
+      "en": "Ad unavailable. Please try again.",
+      "zh_Hant": "廣告目前無法播放，請再試一次。"
+    },
+    {
+      "key": "ad.watch_unavailable",
+      "en": "Watch Ad\nUnavailable",
+      "zh_Hant": "觀看廣告\n暫時無法播放"
+    },
+    {
+      "key": "ad.watch_coming_soon",
+      "en": "Watch Ad\nComing Soon",
+      "zh_Hant": "觀看廣告\n即將推出"
+    },
+    {
+      "key": "ad.badge",
+      "en": "AD",
+      "zh_Hant": "AD"
+    },
+    {
+      "key": "lives.title.out",
+      "en": "OUT OF LIVES",
+      "zh_Hant": "生命已用完"
+    },
+    {
+      "key": "lives.title.get_more",
+      "en": "GET MORE LIVES",
+      "zh_Hant": "補充生命"
+    },
+    {
+      "key": "lives.title.full",
+      "en": "LIVES FULL",
+      "zh_Hant": "生命已滿"
+    },
+    {
+      "key": "lives.next_in",
+      "en": "NEXT LIFE IN",
+      "zh_Hant": "生命恢復倒數"
+    },
+    {
+      "key": "lives.full_body",
+      "en": "Your lives are full! Play a level to spend them.",
+      "zh_Hant": "你的生命已滿！開始闖關來使用生命吧。"
+    },
+    {
+      "key": "chest.title",
+      "en": "CHEST REWARDS",
+      "zh_Hant": "寶箱獎勵"
+    },
+    {
+      "key": "chest.progress_hint",
+      "en": "Collect stars to unlock a chest and claim your reward",
+      "zh_Hant": "收集星星，解鎖寶箱並領取獎勵"
+    },
+    {
+      "key": "chest.ready",
+      "en": "A REWARD CHEST AWAITS!",
+      "zh_Hant": "獎勵寶箱等你開啟！"
+    },
+    {
+      "key": "chest.tap_to_open",
+      "en": "Tap to open",
+      "zh_Hant": "點一下開啟"
+    },
+    {
+      "key": "purchase.tap_to_collect",
+      "en": "Tap to collect",
+      "zh_Hant": "點一下領取"
+    },
+    {
+      "key": "purchase.complete",
+      "en": "PURCHASE COMPLETE",
+      "zh_Hant": "購買完成"
+    },
+    {
+      "key": "shop.title",
+      "en": "SHOP",
+      "zh_Hant": "商店"
+    },
+    {
+      "key": "shop.section.bundles",
+      "en": "SPECIAL BUNDLES",
+      "zh_Hant": "特別禮包"
+    },
+    {
+      "key": "shop.section.coins",
+      "en": "COINS",
+      "zh_Hant": "金幣"
+    },
+    {
+      "key": "shop.offer.starter_bundle",
+      "en": "Starter Bundle",
+      "zh_Hant": "新手禮包"
+    },
+    {
+      "key": "shop.offer.basic_bundle",
+      "en": "Basic Bundle",
+      "zh_Hant": "基礎禮包"
+    },
+    {
+      "key": "shop.tag.best_value",
+      "en": "BEST VALUE",
+      "zh_Hant": "最划算"
+    },
+    {
+      "key": "shop.discount_off",
+      "en": "OFF",
+      "zh_Hant": "OFF"
+    },
+    {
+      "key": "shop.ability_hint",
+      "en": "Tap an ability to see what it does",
+      "zh_Hant": "點一下道具，查看它的效果"
+    },
+    {
+      "key": "shop.purchasing",
+      "en": "Purchasing…",
+      "zh_Hant": "購買中…"
+    },
+    {
+      "key": "shop.no_offers",
+      "en": "No shop offers are available for this region.",
+      "zh_Hant": "此地區目前沒有可購買的商品。"
+    },
+    {
+      "key": "shop.load_failed",
+      "en": "Could not load the shop.",
+      "zh_Hant": "無法載入商店。"
+    },
+    {
+      "key": "shop.error.title.purchase",
+      "en": "Purchase unavailable",
+      "zh_Hant": "無法購買"
+    },
+    {
+      "key": "shop.error.title.reward",
+      "en": "Reward error",
+      "zh_Hant": "獎勵錯誤"
+    },
+    {
+      "key": "shop.error.purchase_failed",
+      "en": "The purchase could not be completed.",
+      "zh_Hant": "無法完成購買。"
+    },
+    {
+      "key": "shop.error.grant_failed",
+      "en": "The purchased rewards could not be granted.",
+      "zh_Hant": "無法發放已購買的獎勵。"
+    },
+    {
+      "key": "shop.error.offer_unavailable",
+      "en": "This shop offer is unavailable.",
+      "zh_Hant": "此商店優惠目前無法購買。"
+    },
+    {
+      "key": "shop.error.already_bought",
+      "en": "This one-time shop offer has already been purchased.",
+      "zh_Hant": "此優惠限購一次，且你已購買過。"
+    },
+    {
+      "key": "starter.title",
+      "en": "STARTER BUNDLE",
+      "zh_Hant": "新手禮包"
+    },
+    {
+      "key": "starter.one_time",
+      "en": "ONE-TIME OFFER",
+      "zh_Hant": "限購一次"
+    },
+    {
+      "key": "starter.boosters_included",
+      "en": "BOOSTERS INCLUDED",
+      "zh_Hant": "內含道具"
+    },
+    {
+      "key": "starter.coins",
+      "en": "%s COINS",
+      "zh_Hant": "%s 枚金幣"
+    },
+    {
+      "key": "starter.buy_for",
+      "en": "Buy for %s",
+      "zh_Hant": "用 %s 購買"
+    },
+    {
+      "key": "starter.checking",
+      "en": "Checking offer…",
+      "zh_Hant": "正在確認優惠…"
+    },
+    {
+      "key": "starter.checking_short",
+      "en": "Checking…",
+      "zh_Hant": "確認中…"
+    },
+    {
+      "key": "starter.no_longer_available",
+      "en": "This offer is no longer available.",
+      "zh_Hant": "此優惠已無法購買。"
+    },
+    {
+      "key": "starter.unavailable",
+      "en": "Unavailable",
+      "zh_Hant": "無法購買"
+    },
+    {
+      "key": "booster_chip.claimed",
+      "en": "+%d %s",
+      "zh_Hant": "+%d %s"
+    },
+    {
+      "key": "profile.title",
+      "en": "EDIT PROFILE",
+      "zh_Hant": "編輯個人檔案"
+    },
+    {
+      "key": "profile.name_header",
+      "en": "PLAYER NAME",
+      "zh_Hant": "玩家名稱"
+    },
+    {
+      "key": "profile.name_placeholder",
+      "en": "Player name",
+      "zh_Hant": "玩家名稱"
+    },
+    {
+      "key": "profile.edit_name_tooltip",
+      "en": "Edit player name",
+      "zh_Hant": "編輯玩家名稱"
+    },
+    {
+      "key": "profile.avatar_tab",
+      "en": "AVATAR",
+      "zh_Hant": "頭像"
+    },
+    {
+      "key": "profile.frame_tab",
+      "en": "FRAME",
+      "zh_Hant": "頭像框"
+    },
+    {
+      "key": "profile.unlock.level",
+      "en": "Complete level %d to unlock",
+      "zh_Hant": "完成第 %d 關即可解鎖"
+    },
+    {
+      "key": "profile.unlock.combo",
+      "en": "Reach a combo of ×%d in any run to unlock",
+      "zh_Hant": "在任一場遊戲中達成 ×%d 連擊即可解鎖"
+    },
+    {
+      "key": "profile.unlock.weekly_first",
+      "en": "Finish 1st on the Weekly leaderboard to unlock",
+      "zh_Hant": "在每週排行榜獲得第 1 名即可解鎖"
+    },
+    {
+      "key": "profile.unlock.weekly_top",
+      "en": "Finish top %d on the Weekly leaderboard to unlock",
+      "zh_Hant": "在每週排行榜進入前 %d 名即可解鎖"
+    },
+    {
+      "key": "leaderboard.title",
+      "en": "LEADERBOARD",
+      "zh_Hant": "排行榜"
+    },
+    {
+      "key": "leaderboard.tab.weekly",
+      "en": "Weekly",
+      "zh_Hant": "每週"
+    },
+    {
+      "key": "leaderboard.tab.country",
+      "en": "Country",
+      "zh_Hant": "國內"
+    },
+    {
+      "key": "leaderboard.tab.world",
+      "en": "World",
+      "zh_Hant": "全球"
+    },
+    {
+      "key": "leaderboard.weekly_reset",
+      "en": "Weekly reset in %s",
+      "zh_Hant": "每週排名將於 %s 後重置"
+    },
+    {
+      "key": "leaderboard.duration.dh",
+      "en": "%dd %dh",
+      "zh_Hant": "%d天 %d小時"
+    },
+    {
+      "key": "leaderboard.duration.hm",
+      "en": "%dh %dm",
+      "zh_Hant": "%d小時 %d分"
+    },
+    {
+      "key": "leaderboard.duration.m",
+      "en": "%dm",
+      "zh_Hant": "%d分"
+    },
+    {
+      "key": "leaderboard.country_caption",
+      "en": "Country · All-time stars",
+      "zh_Hant": "國內 · 累計星星"
+    },
+    {
+      "key": "leaderboard.world_caption",
+      "en": "Worldwide · All-time stars",
+      "zh_Hant": "全球 · 累計星星"
+    },
+    {
+      "key": "leaderboard.load_failed",
+      "en": "Could not load leaderboard.",
+      "zh_Hant": "無法載入排行榜。"
+    },
+    {
+      "key": "leaderboard.default_name",
+      "en": "Player",
+      "zh_Hant": "玩家"
+    },
+    {
+      "key": "leaderboard.row_tooltip",
+      "en": "Rank %d, %s, %d stars",
+      "zh_Hant": "第 %d 名，%s，%d 顆星星"
+    },
+    {
+      "key": "leaderboard.reward_tooltip",
+      "en": "%s coin weekly reward",
+      "zh_Hant": "每週獎勵：%s 枚金幣"
+    },
+    {
+      "key": "leaderboard.reward.title",
+      "en": "WEEKLY REWARD!",
+      "zh_Hant": "每週獎勵！"
+    },
+    {
+      "key": "leaderboard.reward.body",
+      "en": "You finished #%d last week and earned %d coins!",
+      "zh_Hant": "你上週獲得第 %d 名，贏得 %d 枚金幣！"
+    },
+    {
+      "key": "leaderboard.reward.ok",
+      "en": "Nice!",
+      "zh_Hant": "太棒了！"
+    },
+    {
+      "key": "settings.title",
+      "en": "SETTINGS",
+      "zh_Hant": "設定"
+    },
+    {
+      "key": "settings.music",
+      "en": "Music",
+      "zh_Hant": "音樂"
+    },
+    {
+      "key": "settings.sfx",
+      "en": "SFX",
+      "zh_Hant": "音效"
+    },
+    {
+      "key": "settings.vibrate",
+      "en": "Vibrate",
+      "zh_Hant": "震動"
+    },
+    {
+      "key": "settings.support",
+      "en": "Support",
+      "zh_Hant": "客服"
+    },
+    {
+      "key": "settings.language",
+      "en": "Language",
+      "zh_Hant": "語言"
+    },
+    {
+      "key": "settings.privacy_policy",
+      "en": "Privacy Policy",
+      "zh_Hant": "隱私權政策"
+    },
+    {
+      "key": "settings.privacy_choices",
+      "en": "Privacy Choices",
+      "zh_Hant": "隱私權選項"
+    },
+    {
+      "key": "settings.diagnostics",
+      "en": "Version %s • Build %d\nPlatform: %s • User: %s",
+      "zh_Hant": "版本 %s • 組建 %d\n平台：%s • 使用者：%s"
+    },
+    {
+      "key": "language.title",
+      "en": "LANGUAGE",
+      "zh_Hant": "語言"
+    },
+    {
+      "key": "support.title",
+      "en": "SUPPORT",
+      "zh_Hant": "客服"
+    },
+    {
+      "key": "support.faq_header",
+      "en": "Frequently Asked Questions",
+      "zh_Hant": "常見問題"
+    },
+    {
+      "key": "support.faq.play.q",
+      "en": "How do I play?",
+      "zh_Hant": "要怎麼玩？"
+    },
+    {
+      "key": "support.faq.play.a",
+      "en": "Move matching goods onto the same shelf. When three identical items are visible together, they clear. Complete the board before time runs out.",
+      "zh_Hant": "將相同商品移到同一個貨架。當三個相同商品同時出現在貨架上，就會消除。在時間用完前，清空所有商品即可過關。"
+    },
+    {
+      "key": "support.faq.contact.q",
+      "en": "How do I contact support?",
+      "zh_Hant": "如何聯絡客服？"
+    },
+    {
+      "key": "support.faq.contact.a",
+      "en": "Email us at %s. Include a short description, your device platform, and when the problem happened.",
+      "zh_Hant": "請寄電子郵件至 %s，簡短說明問題、裝置平台及問題發生的時間。"
+    },
+    {
+      "key": "support.faq.contact.action",
+      "en": "Email Support",
+      "zh_Hant": "寄信給客服"
+    },
+    {
+      "key": "support.faq.crash.q",
+      "en": "What if the game freezes or crashes?",
+      "zh_Hant": "遊戲卡住或閃退時該怎麼辦？"
+    },
+    {
+      "key": "support.faq.crash.a",
+      "en": "Close and reopen the game first. If it happens again, restart the device and make sure the game is updated. Contact support with the device model, platform version, and what you were doing before the problem.",
+      "zh_Hant": "請先關閉並重新開啟遊戲。如果再次發生，請重新啟動裝置，並確認遊戲已更新。聯絡客服時，請提供裝置型號、平台版本，以及問題發生前你正在進行的操作。"
+    },
+    {
+      "key": "support.faq.sync.q",
+      "en": "How do I sync progress between devices?",
+      "zh_Hant": "如何在不同裝置間同步進度？"
+    },
+    {
+      "key": "support.faq.sync.a",
+      "en": "Use the same signed-in platform account on both devices and allow synchronization to finish before playing. If the progress differs, avoid playing on both devices and contact support.",
+      "zh_Hant": "請在兩台裝置上登入同一個平台帳號，並等同步完成後再開始遊戲。如果進度不同，請先不要在任一裝置上繼續遊玩，並聯絡客服。"
+    },
+    {
+      "key": "support.faq.bad_ad.q",
+      "en": "How do I report a bad ad?",
+      "zh_Hant": "如何檢舉不當廣告？"
+    },
+    {
+      "key": "support.faq.bad_ad.a",
+      "en": "1. Close the ad if you can do so safely.\n2. Take a screenshot of the ad and any advertiser or app name shown.\n3. Note the approximate time and where the ad appeared in the game.\n4. Describe why the ad seemed offensive, misleading, or fraudulent.\n5. Email these details to %s. Do not include passwords or payment information.",
+      "zh_Hant": "1. 如果能安全關閉廣告，請先關閉。\n2. 擷取廣告畫面，以及畫面中顯示的廣告主或應用程式名稱。\n3. 記下大約時間，以及廣告在遊戲中出現的位置。\n4. 說明你認為廣告含有冒犯、誤導或詐騙內容的原因。\n5. 將上述資訊寄至 %s。請勿附上密碼或付款資訊。"
+    },
+    {
+      "key": "support.faq.bad_ad.action",
+      "en": "Email Ad Report",
+      "zh_Hant": "寄信檢舉廣告"
+    },
+    {
+      "key": "support.account_header",
+      "en": "Account",
+      "zh_Hant": "帳號"
+    },
+    {
+      "key": "support.delete_account",
+      "en": "Delete Account",
+      "zh_Hant": "刪除帳號"
+    },
+    {
+      "key": "support.delete_game_data",
+      "en": "Delete Game Data",
+      "zh_Hant": "刪除遊戲資料"
+    },
+    {
+      "key": "support.no_secrets",
+      "en": "Please never send passwords or payment information.",
+      "zh_Hant": "請勿提供密碼或付款資訊。"
+    },
+    {
+      "key": "deletion.title.delete_account",
+      "en": "DELETE ACCOUNT",
+      "zh_Hant": "刪除帳號"
+    },
+    {
+      "key": "deletion.title.delete_game_data",
+      "en": "DELETE GAME DATA",
+      "zh_Hant": "刪除遊戲資料"
+    },
+    {
+      "key": "deletion.title.not_confirmed",
+      "en": "NOT CONFIRMED",
+      "zh_Hant": "尚未確認"
+    },
+    {
+      "key": "deletion.title.status_unconfirmed",
+      "en": "STATUS UNCONFIRMED",
+      "zh_Hant": "狀態尚未確認"
+    },
+    {
+      "key": "deletion.title.finishing_up",
+      "en": "FINISHING UP",
+      "zh_Hant": "正在完成清除"
+    },
+    {
+      "key": "deletion.title.new_game",
+      "en": "NEW GAME",
+      "zh_Hant": "新遊戲"
+    },
+    {
+      "key": "deletion.title.status_unknown",
+      "en": "STATUS UNKNOWN",
+      "zh_Hant": "狀態不明"
+    },
+    {
+      "key": "deletion.title.not_deleted",
+      "en": "NOT DELETED",
+      "zh_Hant": "未刪除"
+    },
+    {
+      "key": "deletion.title.data_deleted",
+      "en": "DATA DELETED",
+      "zh_Hant": "資料已刪除"
+    },
+    {
+      "key": "deletion.title.accepted",
+      "en": "DELETION ACCEPTED",
+      "zh_Hant": "刪除申請已受理"
+    },
+    {
+      "key": "deletion.confirm.headline",
+      "en": "This permanently deletes your account.",
+      "zh_Hant": "這將永久刪除你的帳號。"
+    },
+    {
+      "key": "deletion.confirm.body",
+      "en": "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nIf you sign in again later, you'll start a new account.\n\nSome purchase and security records are kept without your name or profile. The rest is removed within 30 days.",
+      "zh_Hant": "你的進度、金幣、道具及個人檔案將全部刪除。此操作無法復原。\n\n如果日後再次登入，將會建立新帳號。\n\n部分購買及安全紀錄會保留，但不含你的姓名或個人檔案。其餘資料將於 30 天內刪除。"
+    },
+    {
+      "key": "deletion.confirm.button",
+      "en": "Delete Account",
+      "zh_Hant": "刪除帳號"
+    },
+    {
+      "key": "deletion.local_confirm.headline",
+      "en": "This deletes your game data on this device.",
+      "zh_Hant": "這將刪除此裝置上的遊戲資料。"
+    },
+    {
+      "key": "deletion.local_confirm.body",
+      "en": "Your progress, coins, items, and profile will be gone. You can't undo this.\n\nThis game never created an online account for you, so nothing needs to be deleted from our servers.",
+      "zh_Hant": "你的進度、金幣、道具及個人檔案將全部刪除。此操作無法復原。\n\n本遊戲從未為你建立線上帳號，因此無須從我們的伺服器刪除任何資料。"
+    },
+    {
+      "key": "deletion.local_confirm.button",
+      "en": "Delete Data",
+      "zh_Hant": "刪除資料"
+    },
+    {
+      "key": "deletion.pending_setup.headline",
+      "en": "Your account is still being set up.",
+      "zh_Hant": "你的帳號仍在建立中。"
+    },
+    {
+      "key": "deletion.pending_setup.body",
+      "en": "Connect to the internet and try again in a moment. Nothing was deleted.",
+      "zh_Hant": "請連上網路，稍後再試。未刪除任何資料。"
+    },
+    {
+      "key": "deletion.sign_in.headline",
+      "en": "Sign in to the account you want to delete.",
+      "zh_Hant": "請登入你要刪除的帳號。"
+    },
+    {
+      "key": "deletion.sign_in.body",
+      "en": "If you can't sign in, contact support for help.",
+      "zh_Hant": "如果無法登入，請聯絡客服尋求協助。"
+    },
+    {
+      "key": "deletion.read_failed.headline",
+      "en": "Your game data couldn't be read.",
+      "zh_Hant": "無法讀取你的遊戲資料。"
+    },
+    {
+      "key": "deletion.read_failed.body",
+      "en": "Restart the game, then try again. Nothing was deleted.",
+      "zh_Hant": "請重新啟動遊戲後再試。未刪除任何資料。"
+    },
+    {
+      "key": "deletion.unavailable.headline",
+      "en": "Account deletion isn't available in this version of the game.",
+      "zh_Hant": "此遊戲版本不支援刪除帳號。"
+    },
+    {
+      "key": "deletion.unavailable.body",
+      "en": "Update the game, or contact support for help deleting your account. Nothing was deleted.",
+      "zh_Hant": "請更新遊戲，或聯絡客服協助刪除帳號。未刪除任何資料。"
+    },
+    {
+      "key": "deletion.in_progress.account",
+      "en": "Deleting your account...",
+      "zh_Hant": "正在刪除你的帳號…"
+    },
+    {
+      "key": "deletion.in_progress.local",
+      "en": "Deleting your game data...",
+      "zh_Hant": "正在刪除你的遊戲資料…"
+    },
+    {
+      "key": "deletion.in_progress.body",
+      "en": "Keep the game open. This only takes a moment.",
+      "zh_Hant": "請保持遊戲開啟，這只需要片刻。"
+    },
+    {
+      "key": "deletion.not_confirmed.headline",
+      "en": "We haven't heard back about your deletion yet.",
+      "zh_Hant": "我們尚未收到你的刪除申請結果。"
+    },
+    {
+      "key": "deletion.not_confirmed.body",
+      "en": "Your request was sent, but the answer didn't arrive. Connect to the internet and try again. The game stays locked until we know the result.",
+      "zh_Hant": "你的申請已送出，但尚未收到回覆。請連上網路後再試。確認結果前，遊戲會保持鎖定。"
+    },
+    {
+      "key": "deletion.unconfirmed.headline",
+      "en": "Deletion status unconfirmed",
+      "zh_Hant": "刪除狀態尚未確認"
+    },
+    {
+      "key": "deletion.unconfirmed.body",
+      "en": "We couldn't confirm whether your account was deleted. To keep your data safe, the game stays locked. Contact support and include the reference below.",
+      "zh_Hant": "我們無法確認你的帳號是否已刪除。為保護你的資料，遊戲會保持鎖定。請聯絡客服，並提供下方的參考編號。"
+    },
+    {
+      "key": "deletion.check_again",
+      "en": "Check Again",
+      "zh_Hant": "再次確認"
+    },
+    {
+      "key": "deletion.cleanup.headline.local",
+      "en": "Your local game data couldn't be fully deleted yet.",
+      "zh_Hant": "你的本機遊戲資料尚未完全刪除。"
+    },
+    {
+      "key": "deletion.cleanup.headline.account",
+      "en": "Account deletion accepted; finishing cleanup.",
+      "zh_Hant": "帳號刪除申請已受理，正在完成清除。"
+    },
+    {
+      "key": "deletion.cleanup.body",
+      "en": "Some game data couldn't be removed from this device yet. Try again to finish.",
+      "zh_Hant": "此裝置上的部分遊戲資料尚未移除。請再試一次以完成清除。"
+    },
+    {
+      "key": "deletion.new_game.headline",
+      "en": "Starting a new game...",
+      "zh_Hant": "正在開始新遊戲…"
+    },
+    {
+      "key": "deletion.new_game.body",
+      "en": "This only takes a moment.",
+      "zh_Hant": "這只需要片刻。"
+    },
+    {
+      "key": "deletion.status_unknown.headline",
+      "en": "We couldn't read the deletion status on this device.",
+      "zh_Hant": "我們無法讀取此裝置上的刪除狀態。"
+    },
+    {
+      "key": "deletion.status_unknown.body",
+      "en": "To keep your data safe, the game stays locked. Contact support for help.",
+      "zh_Hant": "為保護你的資料，遊戲會保持鎖定。請聯絡客服尋求協助。"
+    },
+    {
+      "key": "deletion.fail.offline",
+      "en": "Connect to the internet to delete your account.",
+      "zh_Hant": "請連上網路以刪除帳號。"
+    },
+    {
+      "key": "deletion.fail.rate_limited",
+      "en": "Too many attempts. Wait a moment, then try again.",
+      "zh_Hant": "嘗試次數過多，請稍後再試。"
+    },
+    {
+      "key": "deletion.fail.busy",
+      "en": "Account deletion is busy right now. Try again in a moment.",
+      "zh_Hant": "帳號刪除服務目前忙碌中，請稍後再試。"
+    },
+    {
+      "key": "deletion.fail.syncing",
+      "en": "The game is still syncing. Try again in a moment.",
+      "zh_Hant": "遊戲仍在同步中，請稍後再試。"
+    },
+    {
+      "key": "deletion.fail.auth",
+      "en": "We couldn't verify your account. Restart the game, then try again.",
+      "zh_Hant": "我們無法驗證你的帳號。請重新啟動遊戲後再試。"
+    },
+    {
+      "key": "deletion.fail.update",
+      "en": "Update the game to delete your account.",
+      "zh_Hant": "請更新遊戲以刪除帳號。"
+    },
+    {
+      "key": "deletion.fail.changed",
+      "en": "Your account changed while we were deleting it. Try again.",
+      "zh_Hant": "刪除過程中，你的帳號發生變更。請再試一次。"
+    },
+    {
+      "key": "deletion.fail.storage",
+      "en": "Your device couldn't save the deletion request. Try again.",
+      "zh_Hant": "你的裝置無法儲存刪除申請。請再試一次。"
+    },
+    {
+      "key": "deletion.fail.generic",
+      "en": "We couldn't delete your account. Try again later or contact support.",
+      "zh_Hant": "我們無法刪除你的帳號。請稍後再試，或聯絡客服。"
+    },
+    {
+      "key": "deletion.fail.local",
+      "en": "Your game data couldn't be deleted. Try again.",
+      "zh_Hant": "無法刪除你的遊戲資料。請再試一次。"
+    },
+    {
+      "key": "deletion.fail.body",
+      "en": "Nothing was deleted, and you can keep playing.",
+      "zh_Hant": "未刪除任何資料，你可以繼續遊戲。"
+    },
+    {
+      "key": "deletion.done_local.headline",
+      "en": "Your local game data was deleted.",
+      "zh_Hant": "你的本機遊戲資料已刪除。"
+    },
+    {
+      "key": "deletion.done_local.body",
+      "en": "You can start over with a new game.",
+      "zh_Hant": "你可以開始新遊戲，從頭再來。"
+    },
+    {
+      "key": "deletion.new_game_failed",
+      "en": "The new game couldn't start. Try again.",
+      "zh_Hant": "無法開始新遊戲。請再試一次。"
+    },
+    {
+      "key": "deletion.accepted.headline",
+      "en": "Your account is no longer accessible.",
+      "zh_Hant": "你已無法再存取此帳號。"
+    },
+    {
+      "key": "deletion.accepted.body",
+      "en": "Your deletion request was accepted.",
+      "zh_Hant": "你的刪除申請已受理。"
+    },
+    {
+      "key": "deletion.accepted.body_deadline",
+      "en": "Your deletion request was accepted. Data removal is due by %s.",
+      "zh_Hant": "你的刪除申請已受理。資料最遲將於 %s 刪除。"
+    },
+    {
+      "key": "deletion.reference",
+      "en": "Reference: %s",
+      "zh_Hant": "參考編號：%s"
+    },
+    {
+      "key": "deletion.start_new_game",
+      "en": "Start New Game",
+      "zh_Hant": "開始新遊戲"
+    },
+    {
+      "key": "app.name",
+      "en": "SortingPuzzle",
+      "zh_Hant": "SortingPuzzle"
+    },
+    {
+      "key": "support.email.subject",
+      "en": "Sorting Puzzle support request",
+      "zh_Hant": "Sorting Puzzle 客服支援請求"
+    },
+    {
+      "key": "support.email.body",
+      "en": "Please describe the issue here.\n\nDevice/platform:\nApproximate time:\n",
+      "zh_Hant": "請在此描述問題。\n\n裝置／平台：\n大約發生時間：\n"
+    },
+    {
+      "key": "support.ad_email.subject",
+      "en": "Sorting Puzzle ad report",
+      "zh_Hant": "Sorting Puzzle 廣告檢舉"
+    },
+    {
+      "key": "support.ad_email.body",
+      "en": "Please attach a screenshot and complete the details below.\n\nApproximate time:\nAd placement in the game:\nAdvertiser or app name:\nWhy the ad should be reviewed:\n",
+      "zh_Hant": "請附上螢幕截圖，並填寫以下資訊。\n\n大約發生時間：\n廣告在遊戲中出現的位置：\n廣告主或應用程式名稱：\n需要審查此廣告的原因：\n"
+    },
+    {
+      "key": "deletion.email.subject",
+      "en": "Sorting Puzzle account deletion",
+      "zh_Hant": "Sorting Puzzle 帳號刪除"
+    },
+    {
+      "key": "deletion.email.body",
+      "en": "Please help me with my account deletion.",
+      "zh_Hant": "請協助我刪除帳號。"
+    }
+  ],
+  "plurals": {
+    "chapter.locked_status": {
+      "other": "再完成 %d 個「%s」關卡即可解鎖"
+    },
+    "shelf_unlock.offer_or_clear": {
+      "other": "觀看一則廣告立即解鎖此貨架，或再消除 %s 組商品即可解鎖。"
+    },
+    "starter.coins": {
+      "other": "%s 枚金幣"
+    },
+    "leaderboard.row_tooltip": {
+      "other": "第 %d 名，%s，%d 顆星星"
+    },
+    "leaderboard.reward_tooltip": {
+      "other": "每週獎勵：%s 枚金幣"
+    },
+    "leaderboard.reward.body": {
+      "other": "你上週獲得第 %d 名，贏得 %d 枚金幣！"
+    }
+  },
+  "counted_boosters": {
+    "Hammer": [
+      "槌子"
+    ],
+    "Shuffle": [
+      "重排"
+    ],
+    "Lantern": [
+      "提燈"
+    ],
+    "Freezer": [
+      "冰凍器"
+    ]
+  },
+  "months": [
+    "1月",
+    "2月",
+    "3月",
+    "4月",
+    "5月",
+    "6月",
+    "7月",
+    "8月",
+    "9月",
+    "10月",
+    "11月",
+    "12月"
+  ],
+  "additional": [
+    {
+      "key": "support.email.status",
+      "en": "Status: %s",
+      "zh_Hant": "狀態：%s"
+    },
+    {
+      "key": "support.email.deletion_reference",
+      "en": "Deletion reference",
+      "zh_Hant": "刪除參考編號"
+    },
+    {
+      "key": "support.email.server_reference",
+      "en": "Server reference",
+      "zh_Hant": "伺服器參考編號"
+    },
+    {
+      "key": "support.email.player_id",
+      "en": "Player ID",
+      "zh_Hant": "玩家 ID"
+    },
+    {
+      "key": "leaderboard.empty",
+      "en": "No scores yet",
+      "zh_Hant": "尚無成績"
+    }
+  ]
+}
