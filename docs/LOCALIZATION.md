@@ -9,6 +9,13 @@ the six invariant counted messages, fixed booster names, supplementary email lab
 terms. This is translation copy for review; runtime catalog integration and rendered Indonesian
 layout verification are pending. The selectable `id` locale continues to use English fallback.
 
+`docs/localization/INDONESIAN_TRANSLATIONS.docx` is the editable Word version for copy review.
+It includes all 251 keys with English originals and Indonesian text, plus the terminology,
+counted-message guidance, supplementary deletion-email labels and month names. The Word layout
+uses repeating table headers and preserves the source's visible line-break notation.
+All 251 table entries were verified against the Markdown copy, and the 16-page Word export
+was rendered and visually reviewed.
+
 ## Runtime ownership
 
 - `scripts/localization/locale_catalog.gd` owns the release-language allowlist, native language
