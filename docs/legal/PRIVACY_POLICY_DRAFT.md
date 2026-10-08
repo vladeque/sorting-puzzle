@@ -7,12 +7,12 @@ Effective date: **[EFFECTIVE_DATE]**
 
 ## 1. Who we are
 
-Sorting Puzzle is operated by **[LEGAL_PUBLISHER_NAME]**, a **[BUSINESS_FORM]** established in Ukraine,
-at **[PUBLIC_BUSINESS_ADDRESS]**. We are responsible for the personal data we process to operate
-the game, including as its data controller where that term applies.
+Sorting Puzzle is operated by **ФОП Брусєнцев Владислав Михайлович**, an individual entrepreneur
+established in Ukraine, at **[PUBLIC_BUSINESS_ADDRESS]**. We are responsible for the personal data
+we process to operate the game, including as its data controller where that term applies.
 
-Contact us about privacy or your personal data at **[PRIVACY_CONTACT_EMAIL]**, or write to the
-address above. Our website is **[PUBLISHER_WEBSITE_URL]**.
+Contact us about privacy or your personal data at **sortingpuzzle.support@gmail.com**, or write to
+the address above. Our website is **[PUBLISHER_WEBSITE_URL]**.
 
 For people in the European Economic Area, our representative is:
 **[EEA_REPRESENTATIVE_NAME_ADDRESS_AND_CONTACT]**.
@@ -109,8 +109,8 @@ We disclose information only for the purposes explained in this policy, includin
 - **Google Cloud**, which hosts and operates infrastructure for our online service;
 - **Google and Apple platform services**, for connected platform accounts, purchase verification,
   refunds, and optional Google AdMob ads;
-- **[SUPPORT_EMAIL_AND_OTHER_SERVICE_PROVIDERS]**, which handle support correspondence or other
-  specifically identified service functions;
+- **Google (Gmail)**, which handles email correspondence sent to our support/privacy address;
+- **[OTHER_SERVICE_PROVIDERS_AND_FUNCTIONS]**, if applicable;
 - authorized advisers or authorities when necessary to comply with law, protect rights, or resolve
   a legal dispute;
 - a successor operator if the game or business is transferred, subject to applicable privacy duties.
@@ -131,8 +131,8 @@ We are based in Ukraine. Our service providers may process information in other 
 including **[CONFIRMED_HOSTING_AND_PROVIDER_COUNTRIES]**. Privacy laws may differ between countries.
 
 Where cross-border-transfer rules apply, we use **[APPLICABLE_TRANSFER_MECHANISMS_AND_SAFEGUARDS]**.
-You can ask **[PRIVACY_CONTACT_EMAIL]** for information or a copy of applicable safeguards, with
-unrelated confidential information removed where appropriate.
+You can ask **sortingpuzzle.support@gmail.com** for information or a copy of applicable safeguards,
+with unrelated confidential information removed where appropriate.
 
 ## 7. How long we keep information
 
@@ -178,7 +178,8 @@ deletion arrangements.
 
 For an online account, including a registered guest account, open **Settings → Support → Delete
 Account** and follow the confirmation steps. You can also request deletion outside the game at
-**[ACCOUNT_DELETION_REQUEST_URL]**, or contact **[PRIVACY_CONTACT_EMAIL]** if you cannot access it.
+**[ACCOUNT_DELETION_REQUEST_URL]**, or contact **sortingpuzzle.support@gmail.com** if you cannot
+access it.
 
 Once your deletion request is accepted, access to the account is revoked and it is removed from
 online leaderboard results. We complete removal or de-identification of the account's login,
@@ -201,8 +202,8 @@ correct it, delete it, restrict its use, or provide portable data. You may also 
 based on legitimate interests. Where we rely on consent, you may withdraw it without affecting
 processing already lawfully carried out.
 
-Send requests to **[PRIVACY_CONTACT_EMAIL]**. We may need proportionate information to verify that
-the account is yours. We respond within the applicable legal time limit and explain any lawful
+Send requests to **sortingpuzzle.support@gmail.com**. We may need proportionate information to
+verify that the account is yours. We respond within the applicable legal time limit and explain any lawful
 restriction, refusal, or extension. Where applicable, you can use an authorized agent or appeal a
 request decision through the same contact. We do not penalize you for exercising privacy rights.
 
@@ -221,7 +222,7 @@ law, any parental-consent process, and relevant advertising restrictions. A stor
 does not determine whether child-privacy obligations apply.]**
 
 If you are a parent or guardian and believe we have processed your child's information
-inappropriately, contact **[PRIVACY_CONTACT_EMAIL]** so we can investigate and take the required
+inappropriately, contact **sortingpuzzle.support@gmail.com** so we can investigate and take the required
 steps.
 
 ## 11. Security
@@ -238,5 +239,5 @@ date and provide additional notice of material changes where required. We obtain
 before new processing where the law requires it; continuing to play is not a substitute for that
 consent.
 
-For questions or requests: **[PRIVACY_CONTACT_EMAIL]** — **[LEGAL_PUBLISHER_NAME]**,
-**[PUBLIC_BUSINESS_ADDRESS]**, Ukraine.
+For questions or requests: **sortingpuzzle.support@gmail.com** —
+**ФОП Брусєнцев Владислав Михайлович**, **[PUBLIC_BUSINESS_ADDRESS]**, Ukraine.
