@@ -7,9 +7,14 @@ Effective date: **[EFFECTIVE_DATE]**
 
 ## 1. Who we are
 
-Sorting Puzzle is operated by **ФОП Брусєнцев Владислав Михайлович**, an individual entrepreneur
-established in Ukraine, at **[PUBLIC_BUSINESS_ADDRESS]**. We are responsible for the personal data
-we process to operate the game, including as its data controller where that term applies.
+Sorting Puzzle is operated by **Vladyslav Mykhailovych Brusientsev**, an individual entrepreneur
+established in Ukraine. Our business address is:
+
+**Apartment 29, 13 Viiskovoho Tylu Street, Pokrovskyi District, Kryvyi Rih,
+Dnipropetrovska Oblast, 50029, Ukraine.**
+
+We are responsible for the personal data we process to operate the game, including as its data
+controller where that term applies.
 
 Contact us about privacy or your personal data at **sortingpuzzle.support@gmail.com**, or write to
 the address above. Our website is **[PUBLISHER_WEBSITE_URL]**.
@@ -240,4 +245,6 @@ before new processing where the law requires it; continuing to play is not a sub
 consent.
 
 For questions or requests: **sortingpuzzle.support@gmail.com** —
-**ФОП Брусєнцев Владислав Михайлович**, **[PUBLIC_BUSINESS_ADDRESS]**, Ukraine.
+**Vladyslav Mykhailovych Brusientsev**, individual entrepreneur,
+**Apartment 29, 13 Viiskovoho Tylu Street, Pokrovskyi District, Kryvyi Rih,
+Dnipropetrovska Oblast, 50029, Ukraine.**

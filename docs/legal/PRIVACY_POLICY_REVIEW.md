@@ -3,7 +3,8 @@
 Prepared: **2026-10-08**. Status: **English draft; not approved for publication**.
 
 The owner confirmed a Ukrainian publisher, broad international distribution, and English only.
-Publisher identity and privacy email have now been supplied; outstanding details remain placeholders.
+Publisher identity, English name spelling, address, and privacy email have now been supplied;
+outstanding details remain placeholders.
 The proposed public text is [PRIVACY_POLICY_DRAFT.md](PRIVACY_POLICY_DRAFT.md).
 It describes a connected production release
 with platform recovery, purchases, leaderboards, and optional non-personalized rewarded ads.
@@ -12,19 +13,18 @@ It does not certify those features as deployed or clear every country for launch
 ## Publisher details supplied on 2026-10-08
 
 - Registered publisher name supplied by the owner: **ФОП "БРУСЄНЦЕВ ВЛАДИСЛАВ МИХАЙЛОВИЧ"**.
-  The draft uses the Ukrainian name with normalized capitalization and describes the business form
-  in English as an individual entrepreneur. This is owner-supplied information, not an independent
-  verification of registration. Proposed English rendering: **Vladyslav Mykhailovych Brusientsev**;
-  confirm the spelling used in identity/store verification before substituting it.
+  The owner confirmed **Vladyslav Mykhailovych Brusientsev** for the English policy. The draft now
+  uses that spelling and describes the business form as an individual entrepreneur. This is
+  owner-supplied information, not an independent verification of registration.
 - Privacy/support contact: **sortingpuzzle.support@gmail.com**. The draft uses this for privacy
   requests. Inbox operation, access, and provider terms remain to be verified; this task sends no
   test email. The draft now names Google (Gmail) as an email recipient; complete its role, processing
   terms, locations, and retention assessment in the correspondence inventory.
-- Address supplied by the owner: **УКРАЇНА, 50029, ДНIПРОПЕТРОВСЬКА ОБЛАСТЬ, М.КРИВИЙ РІГ,
-  ПОКРОВСЬКИЙ Р-Н, ВУЛ. УФИМСЬКА, БУД. 13, КВ.29**. The public address placeholder remains pending
-  confirmation of the current registered/correspondence street name. A
-  [2022 local report](https://1kr.ua/ua/news-75522.html) lists **Уфимська → Військового тилу**;
-  the supplied address has not been silently changed based on that report.
+- Address: the owner confirmed **Військового тилу** as the street name and requested an English
+  rendering. The draft now uses **Apartment 29, 13 Viiskovoho Tylu Street, Pokrovskyi District,
+  Kryvyi Rih, Dnipropetrovska Oblast, 50029, Ukraine**. Building, apartment, district, city, oblast,
+  and postal code follow the supplied address. The street name is transliterated rather than
+  translated into a different English street name.
 - `CONFIRMED_HOSTING_AND_PROVIDER_COUNTRIES` remains unresolved. An email address does not fill
   this field. The backend deployment plan selects Germany (`europe-west3`); Ukraine is the
   publisher location. Actual hosting, administrative access, and Google/Apple/email-provider
@@ -41,7 +41,7 @@ itself establish all data-processing/transfer arrangements for a consumer Gmail 
 
 | Decision | Required outcome |
 | --- | --- |
-| Publisher and contacts | Ukrainian name and individual-entrepreneur form are filled; confirm any English spelling against identity/store records. Confirm the address/street name, website, and effective date. Verify the supplied privacy mailbox works and is monitored. The runtime still uses the `.example` support address; changing it is separate from this documentation task. |
+| Publisher and contacts | Owner-confirmed English name, individual-entrepreneur form, English address, and privacy email are filled. Supply the website and effective date, and verify the privacy mailbox works and is monitored. Keep store identity details consistent. The runtime still uses the `.example` support address; changing it is separate from this documentation task. |
 | Launch feature set | Audit the actual Android/iOS builds and production configuration. Remove sections for excluded features or revise them to describe actual behavior. Development currently has no backend URL, mock shop/leaderboards, and ads disabled. |
 | EU/EEA and UK coverage | Resolve Article 27 representatives before targeting these regions, or document a defensible exemption/scope assessment. Do not remove the placeholders simply because no representative is appointed. Routine cloud-account processing gives no clear basis to assume the occasional-processing exemption. This last point is an inference about the planned service, not a regulator ruling on this game. |
 | International transfers | Confirm hosting locations, Ukrainian administrator access, vendor/subprocessor countries and roles, executed agreements, and any required assessments and safeguards. Identify the actual mechanism in section 6. A German database alone does not settle international access or onward transfers. |
