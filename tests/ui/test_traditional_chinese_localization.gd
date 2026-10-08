@@ -5,6 +5,11 @@ const COUNTS := [0, 1, 2, 3, 10, 11, 21, 101, 1000, 1000000]
 var _failures: Array[String] = []
 var _reviewed: Dictionary
 var _locale_manager: Node
+const DISPLAY_ROLES: Array[String] = ["GameTitleLabel", "GameSectionLabel", "GameHudLabel", "GameNumberLabel", "Button"]
+const CJK_FONT_FILES: Array[String] = [
+	"MPLUSRounded1c-ExtraBold.ttf", "NotoSansJP-Variable.ttf", "Jua-Regular.ttf",
+	"NotoSansKR-Variable.ttf", "Huninn-Regular.ttf", "NotoSansTC-Variable.ttf",
+]
 var _font_characters: Dictionary = {}
 
 
@@ -66,7 +71,8 @@ func _run() -> void:
 		checked[letter] = true
 	for role in ["GameTitleLabel", "GameSectionLabel", "GameHudLabel", "GameNumberLabel", "GameBodyLabel", "GameSmallLabel", "Button", "GameBodyButton", "LineEdit", "TextEdit"]:
 		var font := theme.get_font("font", role)
-		_check(_cjk_font_order(font)[0] == "NotoSansTC-Variable.ttf", "Traditional Chinese glyph forms take priority for %s." % role)
+		var expected := "Huninn-Regular.ttf" if DISPLAY_ROLES.has(role) else "NotoSansTC-Variable.ttf"
+		_check(_cjk_font_order(font)[0] == expected, "Traditional Chinese glyph forms take priority for %s." % role)
 		for letter: String in checked:
 			if letter.unicode_at(0) > 127:
 				_check(_bundled_has_char(font, letter), "Bundled %s covers %s without system fallback." % [role, letter])
@@ -74,6 +80,10 @@ func _run() -> void:
 		for letter: String in checked:
 			if letter.unicode_at(0) > 127:
 				_check(_bundled_has_char(theme.get_font(role, "GameBodyRichText"), letter), "RichText %s covers %s." % [role, letter])
+	var display_face := load("res://assets/fonts/Huninn-Regular.ttf") as FontFile
+	for letter: String in checked:
+		if letter.unicode_at(0) >= 0x3000:
+			_check(display_face.has_char(letter.unicode_at(0)), "Huninn draws %s in display roles." % letter)
 	_check(tr("failed.headline") == "闖關失敗", "The reviewed failure headline is preserved.")
 	_check(tr("starter.one_time") == "限購一次", "The reviewed one-time offer is preserved.")
 	_check(tr("Retry") == "重新挑戰", "The failure-screen scene alias uses the reviewed replay action.")
@@ -232,7 +242,8 @@ func _run() -> void:
 	_check(not root.get_node("PlayerProgress").call("_snapshot_for_storage").has("locale"),
 		"Selecting Traditional Chinese does not alter synchronized gameplay state.")
 	_locale_manager.call("set_locale", "ja")
-	_check(_cjk_font_order(theme.get_font("font", "GameTitleLabel"))[0] == "NotoSansJP-Variable.ttf", "Switching to Japanese restores Japanese glyph forms.")
+	_check(_cjk_font_order(theme.get_font("font", "GameTitleLabel"))[0] == "MPLUSRounded1c-ExtraBold.ttf", "Switching to Japanese restores Japanese glyph forms.")
+	_check(_cjk_font_order(theme.get_font("font", "GameBodyLabel"))[0] == "NotoSansJP-Variable.ttf", "Switching to Japanese restores Japanese reading glyph forms.")
 	_locale_manager.call("set_locale", "en")
 	for scene in [shelf, starter, row, weekly, rank_reward, chip, chapter, failure_screen, support, deletion, badge, pause, leave, main_menu]:
 		scene.queue_free()
@@ -285,6 +296,6 @@ func _cjk_font_order(font: Font) -> Array[String]:
 	for fallback in font.fallbacks:
 		if fallback is FontVariation:
 			var filename := (fallback as FontVariation).base_font.resource_path.get_file()
-			if filename.begins_with("NotoSans") and filename != "NotoSansArabic-Variable.ttf":
+			if CJK_FONT_FILES.has(filename):
 				paths.append(filename)
 	return paths

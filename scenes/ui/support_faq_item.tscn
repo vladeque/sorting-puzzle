@@ -98,6 +98,7 @@ offset_bottom = 24.0
 grow_horizontal = 0
 grow_vertical = 2
 mouse_filter = 2
+theme_type_variation = &"GameGlyphLabel"
 theme_override_colors/font_color = Color(0.6, 0.2, 0.09, 1)
 theme_override_font_sizes/font_size = 32
 text = "+"

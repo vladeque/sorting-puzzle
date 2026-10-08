@@ -145,7 +145,9 @@ See [STICKY_ITEMS.md](STICKY_ITEMS.md) for ownership, rules, capture commands, a
 All UI scenes inherit the project typography theme from
 `assets/themes/game_typography.tres`. Scene labels select semantic variations
 such as `GameTitleLabel`, `GameNumberLabel`, and `GameBodyLabel`; see
-`docs/TYPOGRAPHY.md`. Scene-owned color, size, outline, and shadow overrides
+`docs/TYPOGRAPHY.md`. Controls whose text is an icon character (close `X`, back/pager arrows,
+settings `II`, `✓` marks, `+` badges and the FAQ chevron) use the `GameGlyph*` roles so they
+keep DynaPuff in every locale. Scene-owned color, size, outline, and shadow overrides
 remain responsible for contrast against each component's art.
 
 ## Shared UI Style Tokens

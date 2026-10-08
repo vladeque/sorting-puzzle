@@ -5,6 +5,7 @@ const COUNTS := [0, 1, 2, 3, 10, 11, 21, 101, 1000, 1000000]
 var _failures: Array[String] = []
 var _reviewed: Dictionary
 var _locale_manager: Node
+const DISPLAY_ROLES: Array[String] = ["GameTitleLabel", "GameSectionLabel", "GameHudLabel", "GameNumberLabel", "Button"]
 var _font_characters: Dictionary = {}
 
 
@@ -71,6 +72,13 @@ func _run() -> void:
 		for letter: String in checked:
 			if letter.unicode_at(0) > 127:
 				_check(_bundled_has_char(theme.get_font(role, "GameBodyRichText"), letter), "RichText %s covers %s." % [role, letter])
+	var display_face := load("res://assets/fonts/MPLUSRounded1c-ExtraBold.ttf") as FontFile
+	for role in ["GameTitleLabel", "GameSectionLabel", "GameHudLabel", "GameNumberLabel", "GameBodyLabel", "GameSmallLabel", "Button", "GameBodyButton", "LineEdit", "TextEdit"]:
+		var expected := "MPLUSRounded1c-ExtraBold.ttf" if DISPLAY_ROLES.has(role) else "NotoSansJP-Variable.ttf"
+		_check(_first_face_for(theme.get_font("font", role), "レ") == expected, "%s draws Japanese with %s." % [role, expected])
+	for letter: String in checked:
+		if letter.unicode_at(0) >= 0x3000:
+			_check(display_face.has_char(letter.unicode_at(0)), "M PLUS Rounded 1c draws %s in display roles." % letter)
 	_check(tr("failed.headline") == "クリア失敗", "The reviewed failure headline is preserved.")
 	_check(tr("starter.one_time") == "1回限定", "The reviewed one-time offer is preserved.")
 	_check(tr("Retry") == "もう一度プレイ", "The failure-screen scene alias uses the reviewed replay action.")
@@ -258,6 +266,19 @@ func _scene(scene_path: String) -> Node:
 func _check(condition: bool, description: String) -> void:
 	if not condition:
 		_failures.append(description)
+
+
+## Returns the file of the first bundled face, in the order Godot searches a fallback chain, that
+## draws the character.
+func _first_face_for(font: Font, character: String) -> String:
+	var own: Font = (font as FontVariation).base_font if font is FontVariation else font
+	if own is FontFile and own.has_char(character.unicode_at(0)):
+		return own.resource_path.get_file()
+	for fallback in font.fallbacks:
+		var found := _first_face_for(fallback, character)
+		if not found.is_empty():
+			return found
+	return ""
 
 
 func _bundled_has_char(font: Font, character: String) -> bool:

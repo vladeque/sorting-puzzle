@@ -152,6 +152,7 @@ offset_right = 44.0
 offset_bottom = -4.0
 grow_horizontal = 0
 focus_mode = 0
+theme_type_variation = &"GameGlyphButton"
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)

@@ -1,6 +1,7 @@
 extends SceneTree
 
 const EXPECTED_STRINGS := "res://tests/localization/russian_inventory.json"
+const WEIGHT_AXIS := 2003265652 # OpenType "wght".
 const COIN_TEXTURE := preload("res://assets/ui/clover_coin_transparent_96x96.png")
 var _failures: Array[String] = []
 var _locale_manager: Node
@@ -48,6 +49,10 @@ func _run() -> void:
 	var font := theme.get_font("font", "GameTitleLabel")
 	for letter in "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя":
 		_check(font.has_char(letter.unicode_at(0)), "The display font covers %s." % letter)
+	_check_cyrillic_display(theme, true)
+	for letter in "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя0123456789×":
+		_check((font as FontVariation).base_font.has_char(letter.unicode_at(0)),
+			"The Russian display face draws %s itself." % letter)
 
 	var shelf := _scene("res://scenes/ui/shelf_unlock_menu.tscn")
 	var starter := _scene("res://scenes/ui/starter_bundle_offer_modal.tscn")
@@ -96,6 +101,7 @@ func _run() -> void:
 	await process_frame
 	_locale_manager.call("set_locale", "en")
 	await process_frame
+	_check_cyrillic_display(theme, false)
 	_check(starter.get_node("%BuyPriceLabel").get("text") == "Buy for %s" % shop_price,
 		"An existing offer refreshes its formatted price label in English.")
 	_check(str(row.get("tooltip_text")).ends_with("stars"), "An existing row refreshes to English.")
@@ -122,6 +128,33 @@ func _run() -> void:
 		for failure in _failures:
 			push_error(failure)
 	quit(0 if _failures.is_empty() else 1)
+
+
+## Russian and Ukrainian draw every DynaPuff display role, digits included, in heavier bundled
+## Nunito so mixed strings such as "УРОВЕНЬ 12" use one face; other locales restore DynaPuff.
+func _check_cyrillic_display(theme: Theme, active: bool) -> void:
+	var weights := {
+		"GameTitleLabel": 700.0,
+		"GameSectionLabel": 700.0,
+		"GameNumberLabel": 700.0,
+		"Button": 700.0,
+		"GameHudLabel": 600.0,
+	}
+	var fonts := {"default": theme.default_font}
+	for role: String in weights:
+		fonts[role] = theme.get_font("font", role)
+	weights["default"] = 500.0
+	for role: String in fonts:
+		var font := fonts[role] as FontVariation
+		var path := "res://assets/fonts/Nunito-Variable.ttf" if active else "res://assets/fonts/DynaPuff-Variable.ttf"
+		var weight := float(weights[role]) + (200.0 if active else 0.0)
+		_check(font.base_font.resource_path == path, "The %s display face is %s." % [role, path.get_file()])
+		_check(is_equal_approx(float(font.variation_opentype.get(WEIGHT_AXIS, 0.0)), weight),
+			"The %s display weight is %d." % [role, weight])
+	for role in ["GameGlyphButton", "GameGlyphLabel", "GameGlyphBoldLabel"]:
+		var glyph_font := theme.get_font("font", role) as FontVariation
+		_check(glyph_font.base_font.resource_path == "res://assets/fonts/DynaPuff-Variable.ttf",
+			"%s icon characters keep DynaPuff in every locale." % role)
 
 
 func _scene(scene_path: String) -> Node:

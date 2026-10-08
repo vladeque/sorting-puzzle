@@ -123,9 +123,10 @@ Prices, player names, identifiers, references, language names, branding, `AD` an
 The additional empty-leaderboard caption is `尚無成績`; supplementary email labels use the
 attachment's wording within the existing email-field formatter.
 
-Bundled Noto Sans TC variations at 500/600/700 weights provide Chinese glyphs in every theme role.
+Bundled Huninn draws Chinese in the display roles (titles, buttons, HUD, counters), backed by
+Noto Sans TC variations at 500/600/700 weights, which also serve every reading role.
 `scripts/localization/locale_typography.gd`, called by `LocaleManager` before applying the locale,
-prioritizes the Taiwan face ahead of the Japanese fallback only for `zh_Hant`. Other locales
+prioritizes the Taiwan faces ahead of the Japanese fallbacks only for `zh_Hant`. Other locales
 restore the original fallback order, including Japanese glyph forms. Existing scene owners
 retain their live refresh, fitting, wrapping and scrolling. Integration verification is recorded
 in `docs/localization/TRADITIONAL_CHINESE_LOCALIZATION_QA.md`.
@@ -147,8 +148,9 @@ Counts use commas (`1,234,567`); `GameText.format_date()` presents Japanese dead
 `2026年11月2日`. Provider prices, player names, IDs, reference values, native language names,
 `SortingPuzzle`, `AD` and `OFF` remain unchanged. Selection stays in local preferences.
 
-Bundled Noto Sans JP fallbacks at 500/600/700 weights provide Japanese kana and kanji across
-all theme roles. The only supplementary screen caption absent from the attachment is the
+Bundled M PLUS Rounded 1c ExtraBold draws Japanese in the display roles, backed by Noto Sans JP
+fallbacks at 500/600/700 weights, which also provide kana and kanji in every reading role.
+The only supplementary screen caption absent from the attachment is the
 existing empty leaderboard, translated as `まだスコアがありません`.
 The archive retains its pre-integration notes; runtime verification is recorded in
 `docs/localization/JAPANESE_LOCALIZATION_QA.md`.
@@ -170,9 +172,10 @@ deletion messages retain the supplied text exactly. Counts use commas (`1,234,56
 `GameText.format_date()` uses year/month/day Korean deadlines (`2026년 11월 2일`).
 The existing brand, native language names, prices, player names, IDs and compact `AD` / `OFF`
 markers retain their values. Only the local preference stores the language selection.
-Bundled Noto Sans KR fallbacks at 500/600/700 weights provide Hangul across all theme roles
-without depending on system fonts. The archive retains its pre-integration notes; runtime
-verification is recorded in `docs/localization/KOREAN_LOCALIZATION_QA.md`.
+Bundled Jua draws Hangul in the display roles, backed by Noto Sans KR fallbacks at 500/600/700
+weights, which also provide Hangul in every reading role, without depending on system fonts.
+The archive retains its pre-integration notes; runtime verification is recorded in
+`docs/localization/KOREAN_LOCALIZATION_QA.md`.
 
 Ukrainian includes all 251 entries from the owner's reviewed October 5, 2026 document archived
 at `docs/localization/UKRAINIAN_TRANSLATIONS.md`. `uk.po` preserves the edited captions and
@@ -357,8 +360,10 @@ checks every non-ASCII character used in the reviewed catalog through bundled fo
 inventories, plus decomposed Hangul, without counting system-font fallback as coverage.
 
 The bundled DynaPuff font does not contain Cyrillic. Its theme variations use bundled Nunito
-fallback variations at matching 500/600/700 weights, so Russian and Ukrainian do not depend on mobile system
-fonts. `docs/TYPOGRAPHY.md` records this ownership.
+fallback variations at heavier 700/800/900 weights, so Russian and Ukrainian do not depend on mobile system
+fonts. While either language is active, `scripts/localization/locale_typography.gd` makes that
+Nunito variation the primary face of every DynaPuff role, so digits, `×` and Latin text in a
+display string match its Cyrillic letters. `docs/TYPOGRAPHY.md` records this ownership.
 
 Awning headers, ribbons and shared font fitting measure the translated text. Booster chips fit
 their localized name within the authored chip width, down to the exported

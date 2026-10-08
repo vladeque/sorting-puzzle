@@ -31,9 +31,11 @@ and `docs/localization/INDONESIAN_LOCALIZATION_QA.md`.
 `assets/translations/zh_Hant.po` provides all 251 owner-refined Taiwan Chinese strings through
 the existing scene owners, English aliases, six invariant plural forms and fixed counted boosters.
 `scripts/localization/game_text.gd` owns Chinese year/month/day deadlines and comma grouping.
-`scripts/localization/locale_typography.gd` prioritizes bundled Noto Sans TC variations before
-the Japanese fallback in the shared theme when `zh_Hant` is active, and restores the original
-order for other locales. `LocaleManager` applies this on startup and before live locale changes.
+`scripts/localization/locale_typography.gd` prioritizes the bundled Chinese faces (Huninn in
+display roles, Noto Sans TC in reading roles) before the Japanese fallbacks in the shared theme
+when `zh_Hant` is active. For Russian and Ukrainian it makes each DynaPuff role's heavier Nunito
+fallback the role's primary face, so whole display strings use one face. Other locales restore
+the theme's authored fonts. `LocaleManager` applies this on startup and before live locale changes.
 `tests/ui/test_traditional_chinese_localization.gd` checks reviewed copy, font priority/coverage,
 counts, dates, live refresh, contextual actions and unchanged player data.
 Copy and verification are recorded in `docs/localization/TRADITIONAL_CHINESE_TRANSLATIONS.md`

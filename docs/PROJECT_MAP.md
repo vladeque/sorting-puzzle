@@ -1427,6 +1427,8 @@ Change pause menu layout:
 
 Change fonts or text hierarchy:
 - Update `assets/themes/game_typography.tres` for shared font families, weights, and semantic type variations.
+- Locale-specific font priority (Taiwan glyph forms, whole-string Cyrillic display faces) lives in
+  `scripts/localization/locale_typography.gd`, which `LocaleManager` runs on every locale change.
 - Apply an existing theme type variation in the owning scene instead of attaching font files directly.
 - Keep uppercase title rules and the `×` multiplier convention synchronized with dynamic strings in the owning scripts.
 - Gameplay modal-title regular/long and terminal-result hero sizes live in
