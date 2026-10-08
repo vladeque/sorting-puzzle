@@ -14,6 +14,15 @@ This investigation identifies the common release package and important regional 
 does not clear every country for distribution or supply publishable legal text. Runtime behavior
 and canonical backend requirements were not changed.
 
+## Follow-up — 2026-10-08
+
+An [English privacy policy draft](legal/PRIVACY_POLICY_DRAFT.md) and
+[review notes](legal/PRIVACY_POLICY_REVIEW.md) are now available, with publisher details left as
+placeholders. Neither is approved for publication. Since this research baseline, in-app account
+deletion and backend data export have been implemented; production validation, worker scheduling,
+public deletion access, and privacy-request handling still have release work. Use the review
+notes for current evidence; implementation-status observations below describe 2026-10-01.
+
 ## Required documents versus settings actions
 
 | Item | Status for this game | Suggested treatment |
