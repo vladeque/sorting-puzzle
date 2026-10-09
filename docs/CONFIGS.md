@@ -1258,6 +1258,9 @@ Contract:
   after changing either source.
 - `configs/chapters.json` is included in the pinned source-file set so chapter membership changes
   invalidate stale provenance before export.
+- `configs/combo_scoring.json` and `scripts/combo_scoring_rules.gd` are pinned too, so a combo
+  window or stars-per-triple change also invalidates stale provenance until the backend candidate
+  is regenerated.
 - Runtime validates the packaged manifest's closed schema, self-digest, publication identity, and
   level mappings. It deliberately does not hash raw authored `.gd`/`.tscn` files because Godot
   export templates compile/remap them.

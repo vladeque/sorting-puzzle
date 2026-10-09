@@ -4,13 +4,15 @@
   "publication": {
     "configuration_version": "config_231beb828a95ce785678187e0056db128fd7e95ae85cf79dd13d46bf37bd9fbb",
     "digest_sha256": "231beb828a95ce785678187e0056db128fd7e95ae85cf79dd13d46bf37bd9fbb",
-    "source_candidate_sha256": "5db022b595c4977a404138cb962ff4c8932ffe140efb8757c94c2ef937aa29a9"
+    "source_candidate_sha256": "46ba9bd41d9e98d85267dcc9b6da97850cf1bf9a472b8f53b46f8439cbeba9c0"
   },
-  "supported_campaign_levels": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+  "supported_campaign_levels": [
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20
+  ],
   "excluded_campaign_levels": [],
   "source": {
     "repository": "sorting-puzzle",
-    "commit": "5e2970ec9a17eea404f435c517c7293c8af3704e",
+    "commit": "29d5f3e2c961eb95c530f764238023d82d07a2e3",
     "files": [
       {
         "path": "configs/item_sprites.json",
@@ -35,6 +37,10 @@
       {
         "path": "configs/reward_chest_goals.json",
         "sha256": "9d24d18a868934fe295c8b26716277af7681750d77cf99b3c2103f50539951b6"
+      },
+      {
+        "path": "configs/combo_scoring.json",
+        "sha256": "a0006b9a048b37e6ec72dd307889eba4e64363c1f24a20d8af9adb9648f3f760"
       },
       {
         "path": "configs/level_templates/level_001.json",
@@ -206,7 +212,11 @@
       },
       {
         "path": "scripts/level.gd",
-        "sha256": "dced4b67527540164e9b848d4844ceccd60fd752f363213665fc15f2f47e4508"
+        "sha256": "e50bda9fa2f6b273a88753e4ca4501ff76ae508c176e0eadb0bc37e5458ff28d"
+      },
+      {
+        "path": "scripts/combo_scoring_rules.gd",
+        "sha256": "9f6cb57f920bbf4a2980eb8328af913264c05e6ab3aca59bb8726a2d3a7e4575"
       },
       {
         "path": "scripts/shelf_layout_row.gd",
@@ -344,5 +354,5 @@
       "rules_version": "rules_449b8359ba07ee204f72ab03de1e0278493f2c708aea0882f5f46ae63f27a3ab"
     }
   ],
-  "digest_sha256": "8e6b1f834dafa0bc73389478e931ffbd3f949725b633c282026fb09ec25ed8a3"
+  "digest_sha256": "1194bf5dcbed5b11f3a67ea240a1f44890f252f22c18e74bb92858eb208f4b4d"
 }
