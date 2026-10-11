@@ -25,6 +25,10 @@ var _suspended := false
 
 
 func configure(store, session_store, coordinator, content_provenance_valid: bool = true) -> void:
+	# Reopening the same save must not orphan a registration request already in flight: its
+	# state was persisted before sending, so the new handle can process the response.
+	if _busy and _is_same_save(_request_store, store):
+		_request_store = store
 	_store = store
 	_session_store = session_store
 	_coordinator = coordinator
@@ -55,6 +59,18 @@ func replace_store(store) -> void:
 ## request already in flight still completes; account deletion waits for is_busy() to clear.
 func set_suspended(suspended: bool) -> void:
 	_suspended = suspended
+
+
+## True when both stores are handles on the same save namespace, as after PlayerProgress reopens
+## the active save (the main menu and the Shop do this every time they open).
+func _is_same_save(left, right) -> bool:
+	return (
+		left != null
+		and right != null
+		and left.has_method("get_namespace")
+		and right.has_method("get_namespace")
+		and left.get_namespace() == right.get_namespace()
+	)
 
 
 func is_busy() -> bool:
@@ -222,6 +238,9 @@ func _on_request_completed(
 ) -> void:
 	_busy = false
 	if _request_store != _store:
+		# The response belongs to a save that is no longer active. Re-evaluate the active save
+		# instead of leaving its registration waiting for a response that never arrives.
+		request_registration.call_deferred()
 		return
 	if result != HTTPRequest.RESULT_SUCCESS:
 		_schedule_retry()

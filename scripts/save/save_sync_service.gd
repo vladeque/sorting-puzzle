@@ -37,6 +37,11 @@ func configure(
 	checkpoint_mapper: Callable,
 	content_provenance_valid: bool = true
 ) -> void:
+	# Reopening the same save must not orphan a request already in flight: the pending request
+	# and refresh state were persisted before sending, so the new handle can process the response.
+	# Dropping a refresh response would lose the rotated refresh token.
+	if _busy and _is_same_save(_request_store, store):
+		_request_store = store
 	_store = store
 	_session_store = session_store
 	_checkpoint_mapper = checkpoint_mapper
@@ -52,6 +57,18 @@ func configure(
 		_retry_timer.timeout.connect(request_background_sync)
 		add_child(_retry_timer)
 	_schedule_persisted_retry()
+
+
+## True when both stores are handles on the same save namespace, as after PlayerProgress reopens
+## the active save (the main menu and the Shop do this every time they open).
+func _is_same_save(left, right) -> bool:
+	return (
+		left != null
+		and right != null
+		and left.has_method("get_namespace")
+		and right.has_method("get_namespace")
+		and left.get_namespace() == right.get_namespace()
+	)
 
 
 func replace_store(store: LocalSaveStore) -> void:
@@ -209,6 +226,9 @@ func _on_request_completed(
 ) -> void:
 	_busy = false
 	if _request_store != _store:
+		# The response belongs to a save that is no longer active. Re-evaluate the active save
+		# instead of leaving its pending sync waiting for a response that never arrives.
+		request_background_sync.call_deferred()
 		return
 	if result != HTTPRequest.RESULT_SUCCESS:
 		if _request_mode.begins_with("refresh_"):

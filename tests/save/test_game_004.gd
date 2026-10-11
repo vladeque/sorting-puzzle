@@ -61,6 +61,9 @@ func _init() -> void:
 	_test_binding_mismatched_refresh_response_is_terminal()
 	_test_single_refresh_attempt_guard()
 	_test_guest_restart_resumes_same_player_without_second_guest()
+	_test_reopened_save_keeps_in_flight_registration_response()
+	_test_reopened_save_keeps_in_flight_refresh_response()
+	_test_registration_response_for_another_save_is_not_applied()
 
 	if _failures.is_empty():
 		print("GAME-004 tests passed.")
@@ -466,6 +469,136 @@ func _test_guest_restart_resumes_same_player_without_second_guest() -> void:
 		{"kind": "installation_guest", "installation_id": _session.get_installation_id()}
 	)
 	_reset_namespace_directory({"kind": "player", "player_id": player_id})
+
+
+## The main menu and the Shop call PlayerProgress.load_progress(), which reopens the active save as
+## a new store object. A registration request already in flight must survive that: on a fresh
+## install the menu opens while the first guest challenge is pending, and dropping its response
+## left the guest unregistered until the next launch.
+func _test_reopened_save_keeps_in_flight_registration_response() -> void:
+	var save_namespace := _guest_namespace()
+	var store = SaveStore.new(_session)
+	store.open_namespace(save_namespace, _snapshot(), _preferences())
+	var sync := store.get_sync_metadata()
+	sync["guest_registration"] = _pending_challenge_registration()
+	store.persist_sync_metadata(sync)
+
+	var service = GuestBootstrapService.new()
+	get_root().add_child(service)
+	service.configure(store, FakeGuestSession.new(), RecordingCoordinator.new())
+	service.set("_request_store", store)
+	service.set("_busy", true)
+
+	var reopened = SaveStore.new(_session)
+	reopened.open_namespace(save_namespace, _snapshot(), _preferences())
+	service.configure(reopened, FakeGuestSession.new(), RecordingCoordinator.new())
+
+	service.call(
+		"_on_request_completed",
+		HTTPRequest.RESULT_SUCCESS,
+		400,
+		PackedStringArray(),
+		_terminal_registration_error_body()
+	)
+
+	var updated := reopened.get_sync_metadata().get("guest_registration", {}) as Dictionary
+	_check(
+		str(updated.get("phase", "")) == "challenge"
+		and str((updated.get("terminal_error", {}) as Dictionary).get("code", "")) == "request.invalid",
+		"a registration response that arrives after the save is reopened is processed, not dropped"
+	)
+	_check(not service.is_busy(), "the reopened registration service is idle after the response")
+	service.free()
+
+
+func _test_reopened_save_keeps_in_flight_refresh_response() -> void:
+	var player_id := Codec.create_uuid()
+	var save_namespace := {"kind": "player", "player_id": player_id}
+	var store = SaveStore.new(_session)
+	store.open_namespace(save_namespace, _snapshot(), _preferences())
+	var original_session := _refresh_test_session()
+	_session.store_session(player_id, original_session)
+
+	var sync_service = SyncService.new()
+	get_root().add_child(sync_service)
+	sync_service.configure(store, _session, func(checkpoint, current, remaining): return current)
+	sync_service.set("_request_store", store)
+	sync_service.set("_busy", true)
+	sync_service.set("_request_mode", "refresh_sync")
+	sync_service.set("_active_session", original_session.duplicate(true))
+	sync_service.set("_refresh_request_id", "00000000-0000-4000-8000-000000000811")
+
+	var reopened = SaveStore.new(_session)
+	reopened.open_namespace(save_namespace, _snapshot(), _preferences())
+	sync_service.configure(reopened, _session, func(checkpoint, current, remaining): return current)
+
+	var body := JSON.stringify({"meta": {"protocol_version": "1.1"}}).to_utf8_buffer()
+	sync_service.call("_on_request_completed", HTTPRequest.RESULT_SUCCESS, 200, PackedStringArray(), body)
+
+	var terminal := reopened.get_sync_metadata().get("terminal_error", {}) as Dictionary
+	_check(
+		str(terminal.get("code", "")) == "auth.refresh_response_malformed",
+		"a refresh response that arrives after the save is reopened is processed, not dropped"
+	)
+	sync_service.free()
+
+
+func _test_registration_response_for_another_save_is_not_applied() -> void:
+	var store = SaveStore.new(_session)
+	store.open_namespace(_guest_namespace(), _snapshot(), _preferences())
+	var sync := store.get_sync_metadata()
+	sync["guest_registration"] = _pending_challenge_registration()
+	store.persist_sync_metadata(sync)
+
+	var service = GuestBootstrapService.new()
+	get_root().add_child(service)
+	service.configure(store, FakeGuestSession.new(), RecordingCoordinator.new())
+	service.set("_request_store", store)
+	service.set("_busy", true)
+
+	var other = SaveStore.new(_session)
+	other.open_namespace(_guest_namespace(), _snapshot(), _preferences())
+	service.configure(other, FakeGuestSession.new(), RecordingCoordinator.new())
+
+	service.call(
+		"_on_request_completed",
+		HTTPRequest.RESULT_SUCCESS,
+		400,
+		PackedStringArray(),
+		_terminal_registration_error_body()
+	)
+
+	_check(
+		(
+			(store.get_sync_metadata().get("guest_registration", {}) as Dictionary).get(
+				"terminal_error",
+				{}
+			) as Dictionary
+		).is_empty()
+		and (other.get_sync_metadata().get("guest_registration", {}) as Dictionary).is_empty(),
+		"a registration response for a different save is never applied to the active save"
+	)
+	_check(not service.is_busy(), "a dropped response still leaves the registration service idle")
+	service.free()
+
+
+func _terminal_registration_error_body() -> PackedByteArray:
+	return JSON.stringify({
+		"meta": {"protocol_version": "1.1", "correlation_id": Codec.create_uuid()},
+		"error": {"code": "request.invalid", "category": "validation", "retryable": false},
+	}).to_utf8_buffer()
+
+
+func _pending_challenge_registration() -> Dictionary:
+	return {
+		"phase": "challenge",
+		"request_id": Codec.create_uuid(),
+		"idempotency_key": "",
+		"payload": "{}",
+		"retry_attempt": 0,
+		"next_retry_unix": 0,
+		"terminal_error": {},
+	}
 
 
 func _refresh_test_session() -> Dictionary:

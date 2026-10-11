@@ -16,6 +16,13 @@ is an asynchronous recovery/merge destination, not an alternative runtime save p
   installation proof, idempotent bootstrap, and coordinator handoff.
 - `scripts/save/save_sync_service.gd`: v2 batching, identical-request idempotency, connectivity
   failure handling, refresh hooks, persisted full-jitter retry, cursors, and reconciliation.
+- Both network services survive `PlayerProgress.load_progress()`, which the main menu and the Shop
+  call whenever they open and which reopens the active save as a new store object. A request in
+  flight for the same save namespace is carried over to the new store, because its state was
+  persisted before sending; a response that still arrives for a different save is not applied, and
+  the service re-evaluates the active save instead of waiting. Before this, a fresh install whose
+  first guest challenge was answered after the main menu opened stayed unregistered until the next
+  launch.
 - `scripts/save/account_save_coordinator.gd`: installation guest bootstrap, one-time guest rebind,
   player namespace switching, sign-out, and clean-install restore selection.
 - `scripts/save/account_deletion_service.gd` and `scripts/save/account_deletion_record_store.gd`:
