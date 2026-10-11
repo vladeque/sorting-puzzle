@@ -18,14 +18,62 @@
       }
     },
     {
-      "platform_product_id": "sorting_puzzle.local.coin_pack_small",
-      "title": "500 Coins",
+      "platform_product_id": "sorting_puzzle.local.new_player_bundle",
+      "title": "Basic Bundle",
+      "mock_prices": {
+        "US": {"formatted_price": "$7.99", "currency_code": "USD"}
+      }
+    },
+    {
+      "platform_product_id": "sorting_puzzle.local.coins_100",
+      "title": "100 Coins",
+      "mock_prices": {
+        "US": {"formatted_price": "$0.99", "currency_code": "USD"},
+        "UA": {"formatted_price": "₴39.99", "currency_code": "UAH"},
+        "DE": {"formatted_price": "0,99 €", "currency_code": "EUR"},
+        "JP": {"formatted_price": "¥160", "currency_code": "JPY"}
+      }
+    },
+    {
+      "platform_product_id": "sorting_puzzle.local.coins_300",
+      "title": "300 Coins",
       "mock_prices": {
         "US": {"formatted_price": "$2.49", "currency_code": "USD"},
         "UA": {"formatted_price": "₴99.99", "currency_code": "UAH"},
         "DE": {"formatted_price": "2,49 €", "currency_code": "EUR"},
         "JP": {"formatted_price": "¥400", "currency_code": "JPY"}
       }
+    },
+    {
+      "platform_product_id": "sorting_puzzle.local.coins_750",
+      "title": "750 Coins",
+      "mock_prices": {
+        "US": {"formatted_price": "$4.99", "currency_code": "USD"},
+        "UA": {"formatted_price": "₴199.99", "currency_code": "UAH"},
+        "DE": {"formatted_price": "4,99 €", "currency_code": "EUR"},
+        "JP": {"formatted_price": "¥800", "currency_code": "JPY"}
+      }
+    },
+    {
+      "platform_product_id": "sorting_puzzle.local.coins_1600",
+      "title": "1,600 Coins",
+      "mock_prices": {
+        "US": {"formatted_price": "$9.99", "currency_code": "USD"},
+        "UA": {"formatted_price": "₴399.99", "currency_code": "UAH"},
+        "DE": {"formatted_price": "9,99 €", "currency_code": "EUR"},
+        "JP": {"formatted_price": "¥1,600", "currency_code": "JPY"}
+      }
+    },
+    {
+      "platform_product_id": "sorting_puzzle.local.coins_3500",
+      "title": "3,500 Coins",
+      "mock_prices": {
+        "US": {"formatted_price": "$19.99", "currency_code": "USD"},
+        "UA": {"formatted_price": "₴799.99", "currency_code": "UAH"},
+        "DE": {"formatted_price": "19,99 €", "currency_code": "EUR"},
+        "JP": {"formatted_price": "¥3,200", "currency_code": "JPY"}
+      },
+      "tag": "BEST VALUE"
     }
   ]
 }

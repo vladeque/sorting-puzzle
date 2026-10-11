@@ -1314,6 +1314,7 @@ Production integration must replace the mock provider with platform product quer
 Purpose:
 - Local-only presentation join table used when `application/config/shop_catalog_source` is `backend`. The backend catalog (`GET /v1/catalog`) is authoritative for offer eligibility, rewards, and product IDs but never returns a display title or a price (see `../sorting-puzzle-backend/docs/SHOP_CATALOGS.md`); this file supplies both for local development.
 - Owned by `scripts/store/backend_catalog_source.gd`, which joins each eligible backend offer to one entry here by `platform_product_id`.
+- Generated, not hand-edited: the sibling backend's `pnpm generate:development-client-manifest` writes it from this repository's `configs/shop_catalog.json`, in the same run that derives the backend development catalog from that file, so it has one entry per local Shop offer (`sorting_puzzle.<name>` becomes `sorting_puzzle.local.<name>`). Change `configs/shop_catalog.json` and rerun that command instead of editing this file; its `--check` mode fails when the two drift.
 
 Shape:
 
@@ -1336,7 +1337,7 @@ Shape:
 ```
 
 Rules:
-- `platform_product_id` must match a `platform_product_id` value the backend's active development catalog actually returns (see `../sorting-puzzle-backend/contracts/configuration/v1/local-development-shop-catalog.json`, the seed `pnpm bootstrap:local` publishes).
+- `platform_product_id` must match a `platform_product_id` value the backend's active development catalog actually returns (see `../sorting-puzzle-backend/contracts/configuration/v1/local-development-shop-catalog.json`, which `pnpm bootstrap:local` and the deployed development migration job publish).
 - `mock_prices` follows the exact same shape as `configs/shop_catalog.json`'s `mock_prices` and is formatted by the same `MockStoreProvider`.
 - `discount_percent`, `compare_at_prices`, and `tag` are optional and follow the same shape and
   presentation-only semantics as their `configs/shop_catalog.json` counterparts.

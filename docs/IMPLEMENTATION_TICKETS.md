@@ -598,10 +598,11 @@ while keeping price lookup and purchasing explicitly local/mock.
   always calls the mock provider's `purchase()` regardless of catalog source, so a backend-sourced
   offer is bought exactly the same mock-transaction-id way a local-catalog offer already was, and
   no purchase-intent or verification endpoint is ever called.
-- `configs/backend/shop_catalog_prices.json` presents the two offers the sibling backend's
-  `pnpm bootstrap:local` seed actually publishes (`../sorting-puzzle-backend/contracts/configuration/v1/local-development-shop-catalog.json`):
-  `sorting_puzzle.local.starter_bundle` and `sorting_puzzle.local.coin_pack_small`. It must be kept
-  in sync with that seed file if the backend's local development catalog content changes.
+- `configs/backend/shop_catalog_prices.json` presents the offers the sibling backend's development
+  catalog publishes (`../sorting-puzzle-backend/contracts/configuration/v1/local-development-shop-catalog.json`).
+  Both files are now generated from `configs/shop_catalog.json` by the backend's
+  `pnpm generate:development-client-manifest`, so the table has one `sorting_puzzle.local.*` entry
+  per local Shop offer and stays in sync automatically.
 - `tests/backend/test_game_008.gd` drives `BackendCatalogSource` with the same synthetic-transport
   test-double pattern `tests/backend/test_game_007.gd` established (a `BackendTransport` subclass
   overriding only `_send_get`/`_send_post`/`_wait_before_retry`), covering: eligible-offer join and

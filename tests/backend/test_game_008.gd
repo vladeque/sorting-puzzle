@@ -123,7 +123,7 @@ func _check_eligible_offers_are_joined_and_priced() -> void:
 	(transport as FakeTransport).get_queue = [
 		_catalog_success([
 			_backend_offer("starter_bundle", "starter", "sorting_puzzle.local.starter_bundle", true),
-			_backend_offer("coin_pack_small", "coin_pack", "sorting_puzzle.local.coin_pack_small", true),
+			_backend_offer("coins_100", "coin_pack", "sorting_puzzle.local.coins_100", true),
 		]),
 	]
 	var result: Dictionary = await source.get("source").load_catalog(_price_provider())
@@ -146,7 +146,7 @@ func _check_eligible_offers_are_joined_and_priced() -> void:
 	)
 	var starter_store := starter.get("store", {}) as Dictionary
 	_check(str(starter_store.get("formatted_price", "")) == "$4.99", "starter offer price is joined from the mock price table")
-	var coins := _find_offer(offers, "coin_pack_small")
+	var coins := _find_offer(offers, "coins_100")
 	_check(str(coins.get("type", "")) == "coins", "coin pack offer type maps to coins")
 
 
@@ -175,14 +175,14 @@ func _check_ineligible_offers_are_excluded() -> void:
 	(transport as FakeTransport).get_queue = [
 		_catalog_success([
 			_backend_offer("starter_bundle", "starter", "sorting_puzzle.local.starter_bundle", true),
-			_backend_offer("coin_pack_small", "coin_pack", "sorting_puzzle.local.coin_pack_small", false),
+			_backend_offer("coins_100", "coin_pack", "sorting_puzzle.local.coins_100", false),
 		]),
 	]
 	var result: Dictionary = await source.get("source").load_catalog(_price_provider())
 	_check(bool(result.get("ok", false)), "ineligible-mixed catalog fetch succeeds")
 	var offers := result.get("offers", []) as Array
 	_check(offers.size() == 1, "only the eligible offer is returned")
-	_check(_find_offer(offers, "coin_pack_small").is_empty(), "the ineligible offer never crosses the join")
+	_check(_find_offer(offers, "coins_100").is_empty(), "the ineligible offer never crosses the join")
 
 
 func _check_unknown_offer_type_is_excluded() -> void:
