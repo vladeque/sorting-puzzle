@@ -23,6 +23,10 @@ $testId = [guid]::NewGuid().ToString('N')
 $testProjectName = "SortingPuzzleTest_$testId"
 $scratchParent = [System.IO.Path]::GetTempPath()
 $scratchRoot = Join-Path $scratchParent "sorting-puzzle-godot-$testId"
+# The project sits one level down so tests that read the sibling backend through
+# res://../sorting-puzzle-backend resolve it inside the scratch directory.
+$scratchProject = Join-Path $scratchRoot 'sorting-puzzle'
+$siblingBackend = Join-Path (Split-Path -Parent $projectRoot) 'sorting-puzzle-backend'
 $userDataParent = Join-Path $env:APPDATA 'Godot\app_userdata'
 $userDataPath = Join-Path $userDataParent $testProjectName
 $exitCode = 1
@@ -66,15 +70,23 @@ try {
     }
 
     New-Item -ItemType Directory -Path $scratchRoot | Out-Null
+    New-Item -ItemType Directory -Path $scratchProject | Out-Null
     Get-ChildItem -LiteralPath $projectRoot -File -Force | ForEach-Object {
-        Copy-Item -LiteralPath $_.FullName -Destination $scratchRoot
+        Copy-Item -LiteralPath $_.FullName -Destination $scratchProject
     }
     $importCache = Join-Path $projectRoot '.godot'
     if (Test-Path -LiteralPath $importCache -PathType Container) {
-        Copy-Item -LiteralPath $importCache -Destination $scratchRoot -Recurse
+        Copy-Item -LiteralPath $importCache -Destination $scratchProject -Recurse
+    }
+    if (Test-Path -LiteralPath $siblingBackend -PathType Container) {
+        # Read-only use by contract tests. Cleanup deletes this junction before the
+        # recursive removal, so the backend repository itself is never touched.
+        $backendJunction = Join-Path $scratchRoot 'sorting-puzzle-backend'
+        New-Item -ItemType Junction -Path $backendJunction -Target $siblingBackend | Out-Null
+        $junctionPaths += $backendJunction
     }
 
-    $projectFile = Join-Path $scratchRoot 'project.godot'
+    $projectFile = Join-Path $scratchProject 'project.godot'
     $projectText = [System.IO.File]::ReadAllText($projectFile)
     $originalName = 'config/name="SortingPuzzle"'
     if (-not $projectText.Contains($originalName)) {
@@ -93,7 +105,7 @@ try {
         if (-not (Test-Path -LiteralPath $sourceDirectory -PathType Container)) {
             continue
         }
-        $junctionPath = Join-Path $scratchRoot $directoryName
+        $junctionPath = Join-Path $scratchProject $directoryName
         New-Item -ItemType Junction -Path $junctionPath -Target $sourceDirectory | Out-Null
         $junctionPaths += $junctionPath
     }
@@ -105,7 +117,7 @@ try {
     if (-not $Windowed) {
         $arguments += '--headless'
     }
-    $arguments += @('--path', $scratchRoot) + $GodotArguments
+    $arguments += @('--path', $scratchProject) + $GodotArguments
     if ($PSCmdlet.ParameterSetName -eq 'Script') {
         $arguments += @('--script', $godotTarget)
     } else {
@@ -117,7 +129,7 @@ try {
     }
 
     $modeLabel = if ($Windowed) { 'windowed' } else { 'headless' }
-    Write-Output "Running isolated Godot test ($modeLabel) in $scratchRoot"
+    Write-Output "Running isolated Godot test ($modeLabel) in $scratchProject"
     $processArguments = @{
         FilePath = $GodotPath
         ArgumentList = $arguments
@@ -145,7 +157,7 @@ try {
 }
 finally {
     if ($KeepArtifacts) {
-        Write-Output "Kept isolated project: $scratchRoot"
+        Write-Output "Kept isolated project: $scratchProject"
         if (Test-Path -LiteralPath $userDataPath) {
             Write-Output "Kept isolated user data: $userDataPath"
         }
