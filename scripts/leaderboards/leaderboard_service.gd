@@ -8,6 +8,10 @@ const PROVIDER_MOCK := "mock"
 const PROVIDER_BACKEND := "backend"
 
 var _provider: RefCounted
+## Release-safety guard (Google Play testing plan step 2.4b): a release build never shows the
+## mock provider's invented rivals, so it never records a weekly rank or reward against them.
+## The screen then shows its normal empty state. Debug builds keep the mock rows.
+var _hide_mock_rows := not OS.is_debug_build()
 
 
 func _init(provider: RefCounted = null) -> void:
@@ -23,6 +27,15 @@ func fetch_leaderboard(
 	current_player: Dictionary,
 	limit: int = 50
 ) -> Dictionary:
+	if _hide_mock_rows and _provider.get_provider_name() == PROVIDER_MOCK:
+		return {
+			"ok": true,
+			"entries": [],
+			"player_entry": {},
+			"period_end_unix": 0,
+			"has_more": false,
+			"error": "",
+		}
 	return await _provider.fetch_leaderboard(scope, current_player, limit)
 
 

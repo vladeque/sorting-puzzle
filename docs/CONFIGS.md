@@ -1285,7 +1285,7 @@ Purpose:
 - Selects the data source used by `LeaderboardService` without coupling the UI to backend details.
 
 Field:
-- `application/config/leaderboard_provider`: `mock` (default) or `backend` (GAME-009). Unsupported values warn and fall back to mock data. `backend` sources Weekly/Country/World pages from the authenticated backend development leaderboard through `scripts/leaderboards/backend_leaderboard_provider.gd`; entries, rank, and current-player placement are authoritative from the response and are never re-derived locally.
+- `application/config/leaderboard_provider`: `mock` (default) or `backend` (GAME-009). Unsupported values warn and fall back to mock data. `backend` sources Weekly/Country/World pages from the authenticated backend development leaderboard through `scripts/leaderboards/backend_leaderboard_provider.gd`; entries, rank, and current-player placement are authoritative from the response and are never re-derived locally. Release-safety guard: a non-debug build never shows the `mock` provider's invented rows; it returns an empty page, so the screen shows "No scores yet" and no weekly rank or reward is recorded against fake players. Debug builds keep the mock rows.
 
 See:
 - `docs/LEADERBOARDS.md`
@@ -1303,7 +1303,7 @@ Rules:
 ## Store Provider Settings
 
 Fields:
-- `application/config/store_provider`: currently supports `mock` and defaults to it. Unsupported values warn and fall back to the mock provider. Always used for regional price formatting and purchase execution, regardless of `shop_catalog_source`.
+- `application/config/store_provider`: currently supports `mock` and defaults to it. Unsupported values warn and fall back to the mock provider. Always used for regional price formatting and purchase execution, regardless of `shop_catalog_source`. Release-safety guard: the mock grants rewards without charging, so a non-debug build lists no real-money offers (the Shop shows its "no offers" state and the main menu hides the Starter Bundle badge) and refuses every purchase until a real billing provider exists. Debug builds keep the mock Shop.
 - `application/config/mock_store_country`: mock storefront country used to select development price strings. Defaults to `US`; the catalog also defines `UA`, `DE`, and `JP` examples.
 - `application/config/shop_catalog_source` (GAME-008): selects where the Shop's *offer list* comes from, independently of `store_provider`. `local` (default) reads `configs/shop_catalog.json` exactly as before. `backend` sources eligibility, rewards, and product IDs from the authenticated backend development catalog through `scripts/store/backend_catalog_source.gd`; unsupported values warn and fall back to `local`.
 

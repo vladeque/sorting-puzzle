@@ -15,6 +15,10 @@ const STARTER_BUNDLE_ID := "starter_bundle"
 var _provider: RefCounted
 var _catalog_source: RefCounted
 var _offers_by_id := {}
+## Release-safety guard (Google Play testing plan step 2.4a): every provider today is the
+## development mock, which grants rewards without charging, so a release build offers and
+## sells nothing until real billing replaces it. Debug builds keep the mock Shop.
+var _real_money_enabled := OS.is_debug_build()
 
 
 func _init() -> void:
@@ -27,6 +31,9 @@ func _init() -> void:
 ## price formatting and purchase execution still go through `_provider` (mock), unchanged. The
 ## default `local` source keeps reading the bundled `configs/shop_catalog.json` exactly as before.
 func load_catalog() -> Dictionary:
+	if not _real_money_enabled:
+		_offers_by_id.clear()
+		return {"ok": true, "offers": [], "country_code": "", "source": "release_guard"}
 	var result: Dictionary = (
 		await _catalog_source.load_catalog(_provider)
 		if _catalog_source != null
@@ -89,6 +96,8 @@ func _load_local_catalog() -> Dictionary:
 
 
 func purchase_offer(offer_id: StringName) -> Dictionary:
+	if not _real_money_enabled:
+		return {"ok": false, "error": "This shop offer is unavailable."}
 	var offer = _offers_by_id.get(String(offer_id))
 	if not (offer is Dictionary):
 		return {"ok": false, "error": "This shop offer is unavailable."}
