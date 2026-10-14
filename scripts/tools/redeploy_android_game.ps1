@@ -21,7 +21,7 @@
   Already-running host API port. Emulator tcp:8080 is mapped to this port. Defaults to 8080.
 
 .PARAMETER PackageName
-  Android package from export_presets.cfg. Defaults to com.sortingpuzzle.game.
+  Android package from export_presets.cfg. Defaults to com.vbrus.sortingpuzzle.
 
 .PARAMETER LaunchTimeoutSeconds
   Maximum wait for the relaunched Android process. Defaults to 20 seconds.
@@ -30,7 +30,7 @@ param(
     [string]$AvdName = "sorting-puzzle-api36",
     [string]$GodotPath = "D:\Godot\godot.exe",
     [int]$ApiPort = 8080,
-    [string]$PackageName = "com.sortingpuzzle.game",
+    [string]$PackageName = "com.vbrus.sortingpuzzle",
     [int]$LaunchTimeoutSeconds = 20
 )
 

@@ -19,8 +19,8 @@ and links to restricted change records.
 
 **Actions:**
 
-- Confirm the permanent Android package name; current export value is
-  `com.sortingpuzzle.game`.
+- Permanent Android package name: decided as `com.vbrus.sortingpuzzle` (2026-10-14) and set in the export
+  preset.
 - Choose the permanent Apple bundle ID and whether it intentionally matches the Android reverse-DNS
   identifier.
 - Record the public app display name, development Google Cloud/control-plane project IDs, region,

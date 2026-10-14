@@ -37,7 +37,7 @@
 #>
 param(
     [string]$ApkPath = "build\android\sorting_puzzle_local_backend_debug.apk",
-    [string]$PackageName = "com.sortingpuzzle.game",
+    [string]$PackageName = "com.vbrus.sortingpuzzle",
     [string]$AdbPath = "",
     [string]$DeviceSerial = "",
     [int]$HostPort = 8080,

@@ -39,7 +39,7 @@ Canonical references: [Backend requirements](../../sorting-puzzle-backend/BACKEN
 | Chapters | Chapter 1 contains levels 1-20; Chapter 2 has no levels and requires 25 previous-chapter completions; chapter selection defaults off | Keep empty/unreachable chapter content out of the first tester flow. |
 | Saves | Atomic local generations, signed journal, guest bootstrap, secure-session handling, protocol 2.1 background sync | Core save architecture exists. Remote Android behavior still requires proof. |
 | Networking defaults | Empty backend URL and save sync disabled in project.godot | Normal release builds will not connect until environment configuration is added. |
-| Android export | One local debug APK preset; package com.sortingpuzzle.game; version 0.1.0/code 1; target API 35 | No reproducible internal release AAB preset was found. Confirm package identity before first upload. |
+| Android export | One local debug APK preset; package com.vbrus.sortingpuzzle (decided 2026-10-14); version 0.1.0/code 1; target API 35 | No reproducible internal release AAB preset was found. Confirm package identity before first upload. |
 | Android build tools | Installed ignored Android template uses compile SDK 35 and AGP 8.6.1; secure-store plugin separately compiles against SDK 36 | An API-36 emulator or plugin compile setting does not make the game artifact API-36 compliant. |
 | Secure storage | Android debug/release AAR bridge and export hook exist | The export hook warns and continues if its AAR is missing. The connected release must fail validation in that case. |
 | Internet permission | Secure-store debug AAR adds INTERNET and cleartext; release AAR adds neither; preset has no explicit Internet permission | Add INTERNET to the remote release manifest while retaining HTTPS-only networking. Verify the merged artifact. |
@@ -163,7 +163,7 @@ This is a test-build capability profile, not a change to the product's final pla
 
 **Owner:** Project/publisher owner. **Dependency:** None.
 
-Confirm the permanent Android package, public title, publisher identity, first test language, intended age groups, tester count, feedback contact, region, and initial supported devices. The current package com.sortingpuzzle.game is a proposal until confirmed; the first uploaded artifact fixes package identity.
+Confirm the permanent Android package, public title, publisher identity, first test language, intended age groups, tester count, feedback contact, region, and initial supported devices. The package is decided as com.vbrus.sortingpuzzle (2026-10-14); the first uploaded artifact fixes package identity.
 
 Assign the existing billed GCP project to a role. The accepted topology needs distinct control-plane, development, and production project identities. Create missing projects and attach billing; do not silently collapse the architecture. Production services can remain undeployed.
 

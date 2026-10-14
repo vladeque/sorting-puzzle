@@ -73,7 +73,7 @@ The starting batch is GPI-001. After its decisions, Play verification, policy pr
 
 **Work**
 
-- Confirm the permanent package (currently proposed as `com.sortingpuzzle.game`), public title, publisher, first language, age audience, tester/device scope, feedback contact, region, and first version/build numbering policy.
+- Permanent package decided as `com.vbrus.sortingpuzzle` (2026-10-14). Confirm the public title, publisher, first language, age audience, tester/device scope, feedback contact, region, and first version/build numbering policy.
 - Assign the existing billed GCP project to control-plane, development, or production. Record three distinct project identities under the accepted topology; production runtime deployment can wait.
 - Assign named owners for Play, signing, infrastructure, secrets, database changes, QA, privacy requests, and operations. Record repository numeric IDs, a current regional cost estimate, instance ceilings, and alert recipients.
 
