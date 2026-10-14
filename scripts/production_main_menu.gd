@@ -111,7 +111,7 @@ var _starter_purchase_in_progress := false
 
 func _ready() -> void:
 	UIMotionScript.fade_in(self)
-	PlayerProgress.load_progress()
+	PlayerProgress.ensure_progress_loaded()
 	PlayerProgress.refresh_lives()
 	var pending_reward_animation := PlayerProgress.consume_pending_reward_chest_animation()
 	var pending_leaderboard_reward := PlayerProgress.consume_pending_leaderboard_reward()

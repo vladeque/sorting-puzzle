@@ -16,7 +16,7 @@ var _campaign_level_numbers := PackedInt32Array()
 
 
 func _ready() -> void:
-	PlayerProgress.load_progress()
+	PlayerProgress.ensure_progress_loaded()
 	PlayerProgress.refresh_lives()
 	_campaign_level_numbers = _collect_campaign_level_numbers()
 	_play_button.pressed.connect(_launch_campaign_level)

@@ -69,7 +69,7 @@ var _reward_coin_holdback := 0
 
 
 func _ready() -> void:
-	PlayerProgress.load_progress()
+	PlayerProgress.ensure_progress_loaded()
 	_status_panel.connect("retry_pressed", Callable(self, "_load_shop"))
 	_overlay_close_button.pressed.connect(_request_overlay_close)
 	_reward_sequence.coin_arrived.connect(_on_reward_coin_arrived)

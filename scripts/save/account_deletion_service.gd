@@ -94,8 +94,8 @@ func configure(host: Object, record_store = null) -> void:
 
 ## Reads the persisted record once per process. PlayerProgress calls this before it opens any save
 ## storage, then asks requires_released_storage() and has_unsettled_request() how to start. Every
-## Main Menu open calls PlayerProgress.load_progress() again, so later calls only report the live
-## state; re-reading could replace an operation that is mid-send.
+## Main Menu and Shop open asks again through PlayerProgress.ensure_progress_loaded(), so later
+## calls only report the live state; re-reading could replace an operation that is mid-send.
 func load_record() -> Dictionary:
 	if _record_loaded:
 		return get_state()

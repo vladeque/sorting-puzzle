@@ -116,6 +116,27 @@ func _ready() -> void:
 	load_progress()
 
 
+## Entry point for screens that need progress, such as the Main Menu and the Shop. The save
+## opens once per process: here when nothing is open yet, at startup, or after an account
+## deletion's new game. Reopening it on every screen open handed the save and registration
+## services a new store while their requests were in flight. Later calls only resume a
+## pending account deletion or nudge guest registration and background sync, which is all
+## screens relied on. load_progress() keeps its full reload for restart-style callers.
+func ensure_progress_loaded() -> void:
+	if (
+		_local_store == null
+		or _account_deletion_service == null
+		or _account_deletion_service.requires_released_storage()
+	):
+		load_progress()
+		return
+	if _account_deletion_service.has_unsettled_request():
+		_account_deletion_service.resume.call_deferred()
+		return
+	_guest_bootstrap_service.request_registration()
+	_sync_service.request_background_sync()
+
+
 func load_progress() -> void:
 	_load_content_provenance()
 	_load_life_purchase_configuration()
