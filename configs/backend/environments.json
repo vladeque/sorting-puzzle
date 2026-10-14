@@ -1,0 +1,23 @@
+{
+  "schema": "sorting-puzzle-backend-environments/1",
+  "environments": {
+    "development": {
+      "api_origin": "https://sorting-puzzle-api-767190448941.europe-west3.run.app",
+      "android_package": "com.vbrus.sortingpuzzle",
+      "save_sync_v2_enabled": true,
+      "shop_catalog_source": "backend",
+      "leaderboard_provider": "backend",
+      "store_provider": "mock",
+      "content_provenance_path": "res://configs/backend/content_provenance.json"
+    },
+    "production": {
+      "api_origin": "https://sorting-puzzle-api-82809416429.europe-west3.run.app",
+      "android_package": "com.vbrus.sortingpuzzle",
+      "save_sync_v2_enabled": true,
+      "shop_catalog_source": "backend",
+      "leaderboard_provider": "backend",
+      "store_provider": "mock",
+      "content_provenance_path": "res://configs/backend/content_provenance.production.json"
+    }
+  }
+}

@@ -849,6 +849,25 @@ Examples:
 & .\scripts\tools\run_isolated_godot_test.ps1 -Script tests/save/test_player_progress_facade.gd -GodotArguments '--verbose'
 ```
 
+## `scripts/backend/backend_environment.gd`
+
+- `BackendEnvironment` autoload (DEV-CODE-004), registered first. Reads the export's
+  `backend_<name>` feature tag, validates that entry of `configs/backend/environments.json`, and
+  sets the backend project settings together. `resolve()` and `validate_entry()` are pure, so
+  tests and the release check use them without the autoload.
+
+## `scripts/tools/check_release_export.gd` and `scripts/tools/release_export_check.gd`
+
+- `check_release_export.gd` reads the "Android (Release)" preset, the environments file, the
+  production content manifest (with source verification), the support email, the store guard,
+  and the secure-store plugin, prints one ok/FAIL line per rule, and exits 0 only when all pass.
+- `release_export_check.gd` holds the rules as one pure `validate()` function, so
+  `tests/backend/test_backend_environment.gd` can break each rule in turn.
+
+```powershell
+& .\scripts\tools\run_isolated_godot_test.ps1 -Script scripts/tools/check_release_export.gd
+```
+
 ## `scripts/tools/verify_shop.gd`
 
 - Runs through `scenes/shop_verification.tscn` with the isolated test wrapper above and refuses to

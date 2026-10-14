@@ -16,6 +16,7 @@ extends Node
 const OVERRIDE_PATH := "res://local/backend_debug.cfg"
 const BASE_URL_SETTING := "application/config/backend_base_url"
 const SYNC_ENABLED_SETTING := "application/config/save_sync_v2_enabled"
+const BACKEND_ENVIRONMENT_SETTING := "application/config/backend_environment"
 const SECURE_BRIDGE_SINGLETON := "SortingPuzzleSecureStoreBridge"
 const LOG_TAG := "[LocalBackendDebug]"
 const HEALTH_PROBE_TIMEOUT_SECONDS := 5.0
@@ -24,6 +25,11 @@ const IDENTITY_DIAGNOSTICS_POLL_INTERVAL_SECONDS := 3.0
 
 func _ready() -> void:
 	if not OS.is_debug_build():
+		return
+	if not str(ProjectSettings.get_setting(BACKEND_ENVIRONMENT_SETTING, "")).is_empty():
+		# DEV-CODE-004: an exported backend environment and a local override never combine.
+		if FileAccess.file_exists(OVERRIDE_PATH):
+			push_warning("%s A backend environment is active; %s is ignored." % [LOG_TAG, OVERRIDE_PATH])
 		return
 	if not FileAccess.file_exists(OVERRIDE_PATH):
 		return

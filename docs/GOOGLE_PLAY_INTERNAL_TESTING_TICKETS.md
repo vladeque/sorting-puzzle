@@ -286,6 +286,15 @@ The starting batch is GPI-001. After its decisions, Play verification, policy pr
 
 **Existing work:** DEV-CODE-004 Android slice; GAME-003 is a debug export, not completion evidence for this ticket. **Plan:** Step 8.
 
+**Progress:** the "Android (Release)" preset, `configs/backend/environments.json`, and
+`scripts/tools/check_release_export.gd` exist (see `docs/CONFIGS.md`). The preset targets
+production, not development. The check rejects non-HTTPS, local, and development origins, mixed
+environment tags, a wrong package, mismatched versions, an unexcluded `local/`, a missing
+release bridge or Internet permission, a placeholder support email, unguarded mock purchases,
+and a missing or non-production manifest. Still open: the production manifest and support
+email, a merged-manifest cleartext check and a packaged build manifest, which need a real
+export, and the signed test export itself.
+
 ## GPI-012
 
 **Package managed migration and content-publication execution**

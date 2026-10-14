@@ -1188,13 +1188,112 @@ Fields:
 - `application/config/secure_storage_bridge_singleton`: native secure bridge override; empty uses
   `SortingPuzzleSecureStoreBridge`.
 - `application/config/build_number`: positive mobile build number sent in request metadata.
+- `application/config/backend_environment`: not committed. `BackendEnvironment` sets it to
+  `development` or `production` at startup when the export selects an environment (see
+  `configs/backend/environments.json`); empty everywhere else.
+- `application/config/content_provenance_path`: not committed. The selected environment's
+  manifest; without one, `PlayerProgress` loads `configs/backend/content_provenance.json`.
 
-Content provenance is not a project setting and has no synthetic fallback. Campaign journal
-operations load their exact configuration/level/rules identities from
-`configs/backend/content_provenance.json`.
+An exported environment overwrites `backend_base_url`, `save_sync_v2_enabled`,
+`shop_catalog_source`, `leaderboard_provider`, and `store_provider` together from
+`configs/backend/environments.json`.
+
+Content provenance has no synthetic fallback. Campaign journal operations load their exact
+configuration/level/rules identities from the manifest at `content_provenance_path`. A build
+with an environment refuses a manifest generated for another environment, which disables guest
+registration and synchronization while local play continues.
 
 See:
 - `docs/CLOUD_SAVE.md`
+
+## `configs/backend/environments.json` (DEV-CODE-004)
+
+Purpose:
+- The closed set of backend environments an export can select. Each entry fixes the public API
+  origin, cloud save, Shop catalog source, leaderboard provider, store provider, the Android package
+  it belongs to, and the content provenance manifest it ships. It holds no secrets.
+
+Owner:
+- `scripts/backend/backend_environment.gd`, registered as the `BackendEnvironment` autoload, first
+  in the list, so the selection lands before `LocalBackendDebugBootstrap`, `PlayerProgress`, and
+  the Shop and leaderboard services read any backend setting.
+
+Shape:
+
+```json
+{
+  "schema": "sorting-puzzle-backend-environments/1",
+  "environments": {
+    "production": {
+      "api_origin": "https://sorting-puzzle-api-82809416429.europe-west3.run.app",
+      "android_package": "com.vbrus.sortingpuzzle",
+      "save_sync_v2_enabled": true,
+      "shop_catalog_source": "backend",
+      "leaderboard_provider": "backend",
+      "store_provider": "mock",
+      "content_provenance_path": "res://configs/backend/content_provenance.production.json"
+    }
+  }
+}
+```
+
+`development` has the same fields, with the development Cloud Run origin and
+`configs/backend/content_provenance.json`.
+
+Selection:
+- An export preset selects an environment with exactly one `backend_<name>` custom feature tag. The
+  "Android (Release)" preset carries `backend_production`.
+- With no tag (the editor, headless tests, and the "Android (Local Backend Debug)" preset) nothing
+  is applied and the committed `project.godot` defaults stay: no backend URL, sync off, local
+  catalog, mock leaderboards.
+- Two tags, an unknown name, a missing file, or an invalid entry apply nothing and log an error, so
+  local, development, and production values never combine.
+- An entry is valid only with an `https://` origin that has no path and is not a local host
+  (`localhost`, `127.0.0.1`, `10.0.2.2`, or an IPv6 literal), a reverse-DNS package, known catalog,
+  leaderboard, and store values, and a provenance manifest under `res://configs/backend/`.
+- The only store provider is `mock`. In a release build StoreService's release guard lists no
+  real-money offers and refuses every purchase, so `mock` never charges or grants anything there.
+
+The production origin is the Cloud Run URL `https://<service>-<project-number>.<region>.run.app`,
+which exists once the production service is deployed. Changing it, or any other value here, needs a
+new build.
+
+See:
+- `docs/DEV_BACKEND_CODE_TICKETS.md` (DEV-CODE-004)
+- "Android release export" below
+
+## Android release export (`export_presets.cfg`)
+
+Purpose:
+- The "Android (Release)" preset builds the signed Play AAB for the production environment.
+
+Settings:
+- `custom_features="backend_production"` selects the production entry above.
+- Gradle build, AAB format (`gradle_build/export_format=1`), arm64-v8a and armeabi-v7a, minimum SDK
+  24, target SDK 36, package `com.vbrus.sortingpuzzle`, signed.
+- `exclude_filter` leaves out `local/*`, `tests/*`, `tmp/*`, `build/*`, and `docs/*`, so
+  `local/backend_debug.cfg` is never packaged.
+- `permissions/internet=true` is required: only the secure-store plugin's debug AAR adds INTERNET,
+  so a release build without this option cannot reach the backend.
+- `version/code` and `version/name` must equal `application/config/build_number` and
+  `application/config/version`.
+- The preset never stores the keystore. Godot reads the upload key from the
+  `GODOT_ANDROID_KEYSTORE_RELEASE_PATH`, `GODOT_ANDROID_KEYSTORE_RELEASE_USER`, and
+  `GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD` environment variables at export time.
+
+Check before every release export:
+
+```powershell
+& .\scripts\tools\run_isolated_godot_test.ps1 -Script scripts/tools/check_release_export.gd
+```
+
+It exits 0 only when every rule in `scripts/tools/release_export_check.gd` passes: Android platform,
+exactly the production tag, a valid production entry whose origin is not the development one, the
+matching package, local and test files excluded, the release secure-store plugin enabled with its
+release AAR built, Internet permission, no debug command-line arguments, an AAB from a Gradle build,
+signed, versions matching the project, a real support email, the store release guard present, and a
+production content provenance manifest that loads with source verification and is for
+`production`.
 
 ## `local/backend_debug.cfg` (GAME-003, gitignored)
 
@@ -1225,6 +1324,8 @@ Rules:
 - `sync_enabled` must be a literal `true`/`false`; a non-boolean value is rejected.
 - The file is only read when `OS.is_debug_build()` is true and only if it exists; a missing file or
   a release export both leave `project.godot`'s committed defaults untouched.
+- It is ignored, with a warning, when an export selects a backend environment, so a local URL
+  never mixes with development or production values.
 - With `adb reverse tcp:8080 tcp:8080` running, `http://127.0.0.1:8080` reaches the developer
   machine's backend from the Android emulator; `http://10.0.2.2:8080` is the documented fallback.
 - `scripts/tools/run_android_local_development.ps1` regenerates this ignored file for the selected
@@ -1245,6 +1346,13 @@ Owner:
 - Canonical backend copy:
   `../sorting-puzzle-backend/contracts/configuration/v1/development-client-provenance.json`.
 - Runtime validation: `scripts/save/content_provenance_manifest.gd`.
+
+Production copy:
+- `configs/backend/content_provenance.production.json` is the same contract for the production
+  publication, shipped by the "Android (Release)" preset. It is written by the backend's
+  `pnpm generate:production-publication` from the operator's production inputs (real Play
+  product IDs), and does not exist until those inputs are filled in. Until then the release
+  export check fails its provenance rule.
 
 Contract:
 - `digest_sha256` covers every other manifest field as canonical JSON.

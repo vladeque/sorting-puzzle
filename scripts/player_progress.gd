@@ -12,6 +12,8 @@ const GuestSessionBootstrapServiceScript := preload("res://scripts/save/guest_se
 const SaveSyncServiceScript := preload("res://scripts/save/save_sync_service.gd")
 const BackendTransportScript := preload("res://scripts/backend/backend_transport.gd")
 const ProfileFrameCatalogScript := preload("res://scripts/profile_frame_catalog.gd")
+const BACKEND_ENVIRONMENT_SETTING := "application/config/backend_environment"
+const CONTENT_PROVENANCE_PATH_SETTING := "application/config/content_provenance_path"
 const ContentProvenanceManifestScript := preload(
 	"res://scripts/save/content_provenance_manifest.gd"
 )
@@ -1774,7 +1776,14 @@ func _campaign_attempt_payload(level_number: int, outcome: String) -> Dictionary
 func _load_content_provenance() -> void:
 	_content_operation_diagnostic.clear()
 	_content_provenance = ContentProvenanceManifestScript.new()
-	var result: Dictionary = _content_provenance.load_manifest()
+	var result: Dictionary = _content_provenance.load_manifest(str(ProjectSettings.get_setting(
+		CONTENT_PROVENANCE_PATH_SETTING,
+		ContentProvenanceManifestScript.DEFAULT_PATH
+	)))
+	if bool(result.get("ok", false)):
+		result = _content_provenance.require_environment(
+			str(ProjectSettings.get_setting(BACKEND_ENVIRONMENT_SETTING, ""))
+		)
 	if not bool(result.get("ok", false)):
 		push_warning(
 			"Backend synchronization disabled [%s]: %s" % [

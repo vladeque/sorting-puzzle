@@ -43,6 +43,18 @@ func _load_manifest(path: String, verify_source_files: bool) -> Dictionary:
 	return load_document(parsed as Dictionary, verify_source_files)
 
 
+## DEV-CODE-004: an exported backend environment ships its own manifest. A build selected for
+## production refuses a development manifest, so it never synchronizes against content
+## published for another environment. An empty `expected` (no exported environment) accepts any.
+func require_environment(expected: String) -> Dictionary:
+	if expected.is_empty() or not _valid or _environment == expected:
+		return {"ok": _valid}
+	return _fail(
+		"content_manifest.environment_mismatch",
+		"Bundled content provenance is for %s, not %s." % [_environment, expected]
+	)
+
+
 func load_document(document: Dictionary, verify_source_files: bool = false) -> Dictionary:
 	_reset()
 	var structural_error := _validate_structure(document)

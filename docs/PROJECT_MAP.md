@@ -432,6 +432,30 @@ Change here when:
   `docs/LOCAL_BACKEND_INTEGRATION.md`; identity/session and save-sync end-to-end verification are
   `GAME-004`-`GAME-006` (Phase L2), not this system.
 
+### Backend Environment And Release Export (DEV-CODE-004)
+
+Files:
+- `configs/backend/environments.json`
+- `scripts/backend/backend_environment.gd` (`BackendEnvironment` autoload, first in the list)
+- `export_presets.cfg` ("Android (Release)" preset)
+- `scripts/tools/release_export_check.gd`
+- `scripts/tools/check_release_export.gd`
+- `tests/backend/test_backend_environment.gd`
+
+Responsibility:
+- Applies one closed backend environment (origin, cloud save, Shop catalog source, leaderboard
+  and store providers, content manifest) when an export preset carries a `backend_<name>`
+  feature tag. Without a tag the committed defaults stay; two tags or an invalid entry apply
+  nothing.
+- Makes `LocalBackendDebugBootstrap` ignore `local/backend_debug.cfg` while an environment is
+  active, and makes `PlayerProgress` refuse a content manifest made for another environment.
+- Defines the signed production AAB preset and the pre-export check that refuses unsafe release
+  settings.
+
+Change here when:
+- Adding an environment, changing an origin or provider for an exported build, changing the
+  release preset, or adding a release export rule. See `docs/CONFIGS.md`.
+
 ### Local Backend Identity/Session Verification (GAME-004)
 
 Files:
